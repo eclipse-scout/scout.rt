@@ -27,13 +27,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
+import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
+import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.RunWithRunContext;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
-import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * <code>SOAPHandler</code> used to authenticate webservice requests based on the configured <i>Authentication
@@ -46,19 +47,19 @@ import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
 public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AuthenticationHandler.class);
-  protected static final Subject SUBJECT_AUTHENTICATOR = CONFIG.getPropertyValue(JaxWsAuthenticatorSubjectProperty.class);
+  protected static final Subject AUTHENTICATOR_SUBJECT = CONFIG.getPropertyValue(JaxWsAuthenticatorSubjectProperty.class);
 
   protected final IAuthenticationMethod m_authenticationMethod;
   protected final IAuthenticator m_authenticator;
-  protected final RunContextProvider m_authenticatorRunContextProvider;
-  protected final RunContextProvider m_requestRunContextProvider;
+  protected final ServerRunContextProvider m_authenticatorRunContextProvider;
+  protected final ServerRunContextProvider m_requestRunContextProvider;
 
   public AuthenticationHandler(final Authentication authenticationAnnotation) {
     m_authenticationMethod = BEANS.get(ClazzUtil.resolve(authenticationAnnotation.method(), IAuthenticationMethod.class, "@Authentication.method"));
     m_authenticator = BEANS.get(ClazzUtil.resolve(authenticationAnnotation.authenticator(), IAuthenticator.class, "@Authentication.authenticator"));
-    m_requestRunContextProvider = BEANS.get(ClazzUtil.resolve(authenticationAnnotation.runContextProvider(), RunContextProvider.class, "@Authentication.runContextProvider"));
+    m_requestRunContextProvider = BEANS.get(ClazzUtil.resolve(authenticationAnnotation.runContextProvider(), ServerRunContextProvider.class, "@Authentication.runContextProvider"));
 
-    final RunWithRunContext authenticateWithRunContext = m_authenticator.getClass().getAnnotation(RunWithRunContext.class);
+    final RunWithServerRunContext authenticateWithRunContext = m_authenticator.getClass().getAnnotation(RunWithServerRunContext.class);
     m_authenticatorRunContextProvider = (authenticateWithRunContext != null ? BEANS.get(authenticateWithRunContext.provider()) : null);
   }
 
@@ -72,14 +73,14 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       // Check whether the request is already authenticated, e.g. by the container.
       final Subject currentSubject = Subject.getSubject(AccessController.getContext());
       if (currentSubject != null && !currentSubject.getPrincipals().isEmpty()) {
-        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(currentSubject));
+        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(currentSubject).transactionScope(TransactionScope.REQUIRES_NEW));
         return true;
       }
 
       // Authenticate the request.
       final Subject subject = authenticateRequest(messageContext);
       if (subject != null) {
-        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(subject));
+        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(subject).transactionScope(TransactionScope.REQUIRES_NEW));
         return true;
       }
       else {
@@ -116,7 +117,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       return m_authenticationMethod.authenticate(context, m_authenticator);
     }
     else {
-      return m_authenticatorRunContextProvider.provide(SUBJECT_AUTHENTICATOR).call(new Callable<Subject>() {
+      return m_authenticatorRunContextProvider.provide(AUTHENTICATOR_SUBJECT).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Subject>() {
 
         @Override
         public Subject call() throws Exception {

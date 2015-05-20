@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.jaxws.provider.context;
+package org.eclipse.scout.rt.server.jaxws;
+
+import java.security.AccessController;
 
 import javax.security.auth.Subject;
 
@@ -16,27 +18,31 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
- * Factory for {@link RunContext} objects.
+ * Factory for {@link ServerRunContext} objects.
+ * <p>
+ * The default implementation creates a copy of the current calling {@link ServerRunContext} with transaction scope
+ * {@link TransactionScope#REQUIRES_NEW}.
  *
  * @since 5.1
  */
 @ApplicationScoped
-public class RunContextProvider {
+public class ServerRunContextProvider {
 
   /**
-   * Provides a {@link ServerRunContext} for the given {@link Subject}. This implementation uses a session cache to not
-   * always create a new {@link IServerSession}.
+   * Provides a {@link RunContext} for the given {@link Subject}.
    */
-  public RunContext provide(final Subject subject) throws ProcessingException {
-    final ServerRunContext serverRunContext = ServerRunContexts.empty();
-    serverRunContext.subject(subject);
-    serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
-    return serverRunContext;
+  public ServerRunContext provide(final Subject subject) throws ProcessingException {
+    final ServerRunContext runContext = ServerRunContexts.copyCurrent().subject(subject);
+
+    if (runContext.session() == null || !subject.equals(Subject.getSubject(AccessController.getContext()))) {
+      runContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(runContext.copy()));
+    }
+    return runContext;
   }
 }

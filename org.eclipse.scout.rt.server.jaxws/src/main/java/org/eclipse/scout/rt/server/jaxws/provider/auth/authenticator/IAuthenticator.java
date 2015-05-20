@@ -14,15 +14,15 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.RunWithRunContext;
 
 /**
  * Authenticator to authenticate webservice requests against a database, config.properties, LDAP, or others.
  * <p>
- * To authenticate credentials on behalf of a {@link RunContext}, annotate this class with {@link RunWithRunContext}.
- * That way, {@link #authenticate(String, String)} is invoked with the {@link RunContext} provided and with the
- * {@link Subject} as configured in {@link JaxWsAuthenticatorSubjectProperty}.
+ * To authenticate credentials on behalf of a {@link RunContext}, annotate this class with
+ * {@link RunWithServerRunContext}. That way, {@link #authenticate(String, String)} is invoked with the
+ * {@link RunContext} provided and with the {@link Subject} as configured in {@link JaxWsAuthenticatorSubjectProperty}.
  *
  * @since 5.1
  */

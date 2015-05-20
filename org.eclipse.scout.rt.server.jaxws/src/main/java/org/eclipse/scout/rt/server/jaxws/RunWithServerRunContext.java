@@ -8,28 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.jaxws.provider.annotation;
+package org.eclipse.scout.rt.server.jaxws;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 /**
- * Indicates to execute methods of a type on behalf of a {@link RunContext}.
+ * Indicates to execute methods of a type on behalf of a {@link ServerRunContext}.
  *
  * @since 5.1
  */
 @Target(java.lang.annotation.ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface RunWithRunContext {
+public @interface RunWithServerRunContext {
 
   /**
-   * The provider to be used to obtain a {@link RunContext}. By default, {@link RunContextProvider} is used.
+   * The provider to be used to obtain a {@link ServerRunContext}. By default, {@link ServerRunContextProvider} is used.
    */
-  Class<? extends RunContextProvider> provider() default RunContextProvider.class;
+  Class<? extends ServerRunContextProvider> provider() default ServerRunContextProvider.class;
 }

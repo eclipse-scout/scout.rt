@@ -11,14 +11,23 @@
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
+import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceClient;
@@ -35,10 +44,13 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
+import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsConnectTimeoutProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheCorePoolSizeProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheEnabledProperty;
@@ -48,6 +60,7 @@ import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.IPortProvider;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * This class represents and encapsulates a webservice endpoint port to communicate with, and is based on a preemptive
@@ -118,6 +131,11 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
   protected final PortCache<PORT> m_portCache;
 
+  private static final Set<Method> PROXIED_HANDLER_METHODS;
+  static {
+    PROXIED_HANDLER_METHODS = new HashSet<>(Arrays.asList(Handler.class.getDeclaredMethods())); // only methods declared directly on the handler are proxied.
+  }
+
   public AbstractJaxWsClient() {
     m_serviceClazz = resolveServiceClass();
     m_portTypeClazz = resolvePortClass();
@@ -169,10 +187,14 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * Overwrite to install JAX-WS handlers by adding them to the given {@link List}. The handlers are invoked in the
    * order as placed in the handler-chain list. By default, no handlers are installed.
    * <p>
-   * This method is invoked the time the service and port is created, and by any thread, meaning that it is not
-   * guaranteed to be the calling thread, when invoking a webservice endpoint.
+   * This method is invoked the time the service and port is preemptively created and put into cache. Consequently, you
+   * cannot do any assumption about the calling thread.
    * <p>
-   * If the endpoint requires to authenticate requests, typically an authentication handler is added to the list, e.g.
+   * At invocation time, if the handler requires to run on another {@link RunContext} than the one from the calling
+   * context, annotate it with {@link RunWithServerRunContext} annotation, e.g. to run the handler in a separate
+   * transaction to do some logging.
+   * <p>
+   * If the endpoint requires to authenticate requests, an authentication handler is typically added to the list, e.g.
    * {@link BasicAuthenticationHandler} for 'Basic authentication', or {@link WsseUsernameTokenAuthenticationHandler}
    * for 'Message Level WS-Security authentication', or some other handler to provide credentials.
    */
@@ -184,8 +206,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * Overwrite to install JAX-WS webservice features to enable implementor specific functionality. Features are
    * installed by adding them to the given {@link List}. By default, no features are installed.
    * <p>
-   * This method is invoked the time the service and port is created, and by any thread, meaning that it is not
-   * guaranteed to be the calling thread, when invoking a webservice endpoint.
+   * This method is invoked the time the service and port is preemptively created and put into cache. Consequently, you
+   * cannot do any assumption about the calling thread.
    */
   @ConfigOperation
   protected void execInstallWebServiceFeatures(final List<WebServiceFeature> webServiceFeatures) {
@@ -368,40 +390,82 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * Overwrite to provide another {@link IPortProvider} to create new port objects.
    */
   protected IPortProvider<PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portClazz) {
-    return new IPortProvider<PORT>() {
+    return new P_PortProvider();
+  }
 
-      @Override
-      public PORT provide() {
-        Assertions.assertNotNull(getWsdlLocation(), "No 'wsdlLocation' configured on webservice stub '%s'.", getClass().getSimpleName());
+  protected class P_PortProvider implements IPortProvider<PORT> {
 
-        try {
-          // Create the service.
-          final Constructor<? extends Service> constructor = serviceClazz.getConstructor(URL.class, QName.class);
-          @SuppressWarnings("unchecked")
-          final SERVICE service = (SERVICE) constructor.newInstance(getWsdlLocation(), new QName(getTargetNamespace(), getServiceName()));
+    @Override
+    public PORT provide() {
+      try {
+        // Create the service
+        final Constructor<? extends Service> constructor = m_serviceClazz.getConstructor(URL.class, QName.class);
+        @SuppressWarnings("unchecked")
+        final SERVICE service = (SERVICE) constructor.newInstance(getWsdlLocation(), new QName(getTargetNamespace(), getServiceName()));
 
-          // Install the handler chain.
-          service.setHandlerResolver(new HandlerResolver() {
+        // Install the handler chain
+        service.setHandlerResolver(new HandlerResolver() {
 
-            @Override
-            public List<Handler> getHandlerChain(final PortInfo portInfo) {
-              final List<Handler> handlers = new ArrayList<>();
-              execInstallHandlers(handlers);
-              return handlers;
+          @Override
+          public List<Handler> getHandlerChain(final PortInfo portInfo) {
+            final List<Handler> handlers = new ArrayList<>();
+            execInstallHandlers(handlers);
+
+            for (int i = 0; i < handlers.size(); i++) {
+              handlers.set(i, decorateHandler(handlers.get(i)));
             }
-          });
 
-          // Install proprietary webservice features.
-          final List<WebServiceFeature> webServiceFeatures = new ArrayList<>();
-          execInstallWebServiceFeatures(webServiceFeatures);
+            return handlers;
+          }
+        });
 
-          // Create the port.
-          return service.getPort(m_portTypeClazz, CollectionUtility.toArray(webServiceFeatures, WebServiceFeature.class));
-        }
-        catch (final ReflectiveOperationException e) {
-          throw new WebServiceException("Failed to instantiate webservice stub.", e);
-        }
+        // Install implementor specific webservice features
+        final List<WebServiceFeature> webServiceFeatures = new ArrayList<>();
+        execInstallWebServiceFeatures(webServiceFeatures);
+
+        // Create the port
+        return service.getPort(m_portTypeClazz, CollectionUtility.toArray(webServiceFeatures, WebServiceFeature.class));
       }
-    };
+      catch (final ReflectiveOperationException e) {
+        throw new WebServiceException("Failed to instantiate webservice stub.", e);
+      }
+    }
+
+    /**
+     * Method invoked to decorate a handler to be installed. The default implementation proxies the handler if
+     * configured to run on behalf of a {@link RunContext}.
+     */
+    protected Handler decorateHandler(final Handler handler) {
+      final RunWithServerRunContext runWithRunContext = handler.getClass().getAnnotation(RunWithServerRunContext.class);
+      if (runWithRunContext == null) {
+        return handler;
+      }
+
+      // Proxy the handler to run on behalf of a RunContext when being invoked.
+      final ServerRunContextProvider provider = BEANS.get(runWithRunContext.provider());
+      return (Handler) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
+
+        @Override
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+          try {
+            if (PROXIED_HANDLER_METHODS.contains(method)) {
+              return provider.provide(Subject.getSubject(AccessController.getContext())).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
+
+                @Override
+                public Object call() throws Exception {
+                  return method.invoke(handler, args);
+                }
+              });
+            }
+            else {
+              return method.invoke(handler, args);
+            }
+          }
+          catch (final ProcessingException e) {
+            return e.getCause();
+          }
+        }
+      });
+    }
   }
 }

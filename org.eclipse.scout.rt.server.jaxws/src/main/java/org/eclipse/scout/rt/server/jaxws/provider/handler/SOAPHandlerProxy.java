@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler;
 
 /**
- * {@link HandlerProxy} to represent a {@link SOAPHandler}.
+ * {@link HandlerProxy} to proxy a {@link SOAPHandler}.
  *
  * @see HandlerProxy
  * @since 5.1

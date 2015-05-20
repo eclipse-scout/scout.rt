@@ -26,24 +26,27 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
+import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
+import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.InitParam;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.RunWithRunContext;
-import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
- * This handler acts as delegate for another handler and is installed in the handler chain for a webservice endpoint.
- * This handler provides support for 'init-params' and allows the delegate to run in a specific {@link RunContext}. The
- * delegate itself is described in {@link org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler} annotation, and
- * is obtained by {@link IPlatform}.<br/>
- * This handler proxy is useful because JAX-WS handlers are instantiated by the implementor with no hook for
- * interception.
+ * This class proxies a JAX-WS handler to be installed on provider side, and adds the following functionality:
+ * <ul>
+ * <li>Adds support for 'init-params' to initialize the handler (not supported by JAX-WS specification).</li>
+ * <li>Runs the handler's methods on behalf of a {@link RunContext} if annotated with {@link RunWithServerRunContext}
+ * annotation.</li>
+ * <li>Obtains the concrete handler instance from {@link IBeanManager}.</li>
+ * <li>Provides a default constructor because being instantiated by the JAX-WS implementor.</li>
+ * </ul>
  *
  * @since 5.1
  */
@@ -51,11 +54,11 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HandlerProxy.class);
 
-  private static final Subject SUBJECT_ANONYMOUS = CONFIG.getPropertyValue(JaxWsHandlerSubjectProperty.class);
+  private static final Subject HANDLER_SUBJECT = CONFIG.getPropertyValue(JaxWsHandlerSubjectProperty.class);
 
   private final Handler<CONTEXT> m_handler;
 
-  private final RunContextProvider m_runContextProvider;
+  private final ServerRunContextProvider m_runContextProvider;
 
   @SuppressWarnings("unchecked")
   public HandlerProxy(final org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler handlerAnnotation) {
@@ -109,7 +112,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
         return callable.call();
       }
       else {
-        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, SUBJECT_ANONYMOUS)).call(new Callable<T>() {
+        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, HANDLER_SUBJECT)).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<T>() {
           @Override
           public T call() throws Exception {
             return callable.call();
@@ -131,12 +134,12 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
   }
 
   /**
-   * Returns the {@link RunContextProvider} if the given handler is annotated with <code>@RunWithRunContext</code>, or
-   * <code>null</code> if not present.
+   * Returns the {@link ServerRunContextProvider} if the given handler is annotated with <code>@RunWithRunContext</code>
+   * , or <code>null</code> if not present.
    */
   @Internal
-  protected RunContextProvider getRunContextProvider(final Class<? extends Handler> handlerClass) {
-    final RunWithRunContext runWithRunContext = handlerClass.getAnnotation(RunWithRunContext.class);
+  protected ServerRunContextProvider getRunContextProvider(final Class<? extends Handler> handlerClass) {
+    final RunWithServerRunContext runWithRunContext = handlerClass.getAnnotation(RunWithServerRunContext.class);
     if (runWithRunContext != null) {
       return BEANS.get(runWithRunContext.provider());
     }

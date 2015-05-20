@@ -18,12 +18,12 @@ import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
-import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
 
 /**
  * Indicates what authentication mechanism to install on a webservice endpoint, and in which {@link RunContext} to run
@@ -63,8 +63,8 @@ public @interface Authentication {
   Clazz authenticator() default @Clazz(value = ConfigFileAuthenticator.class);
 
   /**
-   * Indicates which {@link RunContextProvider} to use to provide a {@link RunContext} for authenticated requests. By
-   * default, {@link RunContextProvider} is used which is based on a LRU cache to provide a {@link IServerSession}.
+   * Indicates which {@link ServerRunContextProvider} to use to run authenticated requests. By
+   * default, {@link ServerRunContextProvider} is used which is based on a LRU cache to provide a {@link IServerSession}
    */
-  Clazz runContextProvider() default @Clazz(value = RunContextProvider.class);
+  Clazz runContextProvider() default @Clazz(value = ServerRunContextProvider.class);
 }

@@ -15,8 +15,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
+import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
+
 /**
  * Describes a JAX-WS handler to intercept webservice requests.
+ * <p>
+ * Please note:<br/>
+ * To run the handler on behalf of a {@link ServerRunContext}, annotate the handler class with
+ * {@link RunWithServerRunContext}. Thereto, the {@link ServerRunContext} is initialized with the authenticated
+ * {@link Subject} of the ongoing webservice request, or if not applicable, with the {@link Subject} as configured in
+ * {@link JaxWsHandlerSubjectProperty}.
  *
  * @since 5.1
  */

@@ -27,15 +27,15 @@ public abstract class AbstractSubjectConfigProperty extends AbstractConfigProper
     return convertToSubject(value);
   }
 
-  @Override
-  public Subject getDefaultValue() {
-    return convertToSubject("jaxws-authenticator");
-  }
-
   protected Subject convertToSubject(final String user) {
-    final Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal(user));
-    subject.setReadOnly();
-    return subject;
+    if (user != null) {
+      final Subject subject = new Subject();
+      subject.getPrincipals().add(new SimplePrincipal(user));
+      subject.setReadOnly();
+      return subject;
+    }
+    else {
+      return null;
+    }
   }
 }

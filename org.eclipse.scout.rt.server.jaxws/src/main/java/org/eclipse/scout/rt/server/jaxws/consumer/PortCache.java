@@ -104,6 +104,7 @@ public class PortCache<PORT> {
     final PortCacheEntry<PORT> portCacheEntry = m_queue.poll();
 
     // Preemptively create a new port and put it into the cache.
+    // Note: Do not invoke with current RunContext because the port will be used by any other invoker.
     Jobs.schedule(new IRunnable() {
 
       @Override
