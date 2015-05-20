@@ -34,14 +34,17 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
   if(!$focusableElements){
     $focusableElements = $container.find(':focusable');
   }
-  var firstDefaultButton;
+  var firstDefaultButton, $firstButton;
   for (var i = 0; i < $focusableElements.length; i++) {
-    var menuParents = $($focusableElements[i]).parents('div.menubar');
-    var tabParents = $($focusableElements[i]).parents('div.tab-area');
+    var $focusableElement = $($focusableElements[i]);
+    var menuParents = $focusableElement.parents('div.menubar');
+    var tabParents = $focusableElement.parents('div.tab-area');
     if (!firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
       firstDefaultButton = $focusableElements[i];
     }
-    if (menuParents.length === 0 && tabParents.length === 0) {
+    if(!$firstButton && ($focusableElement.hasClass('button') ||$focusableElement.hasClass('menu-item'))){
+      $firstButton = $focusableElement;
+    } else if (menuParents.length === 0 && tabParents.length === 0) {
       focused = true;
       return $focusableElements.get(i);
     }
@@ -50,6 +53,8 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
   if (!focused) {
     if (firstDefaultButton) {
       firstDefaultButton.focus();
+    } else if ($firstButton){
+      $firstButton.focus();
     } else if ($focusableElements && $focusableElements.length > 0) {
       return $focusableElements.first();
     } else {
