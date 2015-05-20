@@ -100,14 +100,6 @@ public interface IUiSession {
   boolean isInspectorHint();
 
   /**
-   * Returns whether or not the client (browser) should poll for jobs running in the background.
-   * When enabled, the feature is provided either by web-sockets or by long-polling. Web-sockets is
-   * the preferred way, but its not supported by every web-container or browser yet. The default
-   * implementation returns true.
-   */
-  boolean isBackgroundJobPollingEnabled();
-
-  /**
    * Blocks the current thread/request until a model job started by a background job has terminated.
    */
   void waitForBackgroundJobs();

@@ -26,6 +26,9 @@ scout.BackgroundJobPollingStatus = {
  *     Default: DESKTOP
  *   [objectFactories]
  *     Factories to build model adapters. Default: scout.defaultObjectFactories.
+ *   [backgroundJobPollingEnabled]
+ *     Unless websockets is used, this property turns on (default) or off background
+ *     polling using an async ajax call together with setTimeout()
  */
 scout.Session = function($entryPoint, uiSessionId, partId, options) {
   if (typeof partId === 'object') { // partId is optional --> if it is an object, use it as 'options' argument
@@ -71,7 +74,7 @@ scout.Session = function($entryPoint, uiSessionId, partId, options) {
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
-  this._backgroundJobPollingEnabled = false;
+  this._backgroundJobPollingEnabled = (options.backgroundJobPollingEnabled!== false);
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
 
   // TODO BSH Detach | Check if there is another way
@@ -385,6 +388,13 @@ scout.Session.prototype.defaultAjaxOptions = function(request, async) {
     data: JSON.stringify(request),
     context: request
   };
+};
+
+/**
+ * Enable / disable background job polling.
+ */
+scout.Session.prototype.enableBackgroundJobPolling = function(enabled) {
+  this._backgroundJobPollingEnabled = enabled;
 };
 
 /**
@@ -785,7 +795,6 @@ scout.Session.prototype._onInitialized = function(event) {
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
   this._setApplicationLoading(false);
-  this._backgroundJobPollingEnabled = event.backgroundJobPollingEnabled;
 
   var d = scout.device;
   $.log.info('Session initialized. Detected user-agent: system=' + d.system + ' device=' + d.device + ' browser=' + d.browser);

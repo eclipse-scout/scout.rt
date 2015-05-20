@@ -14,7 +14,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -354,23 +353,28 @@ public final class JsonObjectUtility {
       throw new IllegalArgumentException("type " + type + " object " + jval, e);
     }
     try {
+      HashSet<String> missingNames = new HashSet<>();
       String[] nameArray = JSONObject.getNames(jbean);
-      HashSet<String> missingNames = new HashSet<>(Arrays.asList(nameArray));
-      for (String key : nameArray) {
-        try {
-          Field f = type.getField(key);
-          if (Modifier.isStatic(f.getModifiers())) {
-            continue;
+      if (nameArray != null) {
+        for (String key : nameArray) {
+          missingNames.add(key);
+        }
+        for (String key : nameArray) {
+          try {
+            Field f = type.getField(key);
+            if (Modifier.isStatic(f.getModifiers())) {
+              continue;
+            }
+            Object val = jsonObjectPropertyToJava(jbean, key, f.getType(), throwForMissingProperty);
+            f.set(o, val);
+            missingNames.remove(key);
           }
-          Object val = jsonObjectPropertyToJava(jbean, key, f.getType(), throwForMissingProperty);
-          f.set(o, val);
-          missingNames.remove(key);
-        }
-        catch (NoSuchElementException nse) {
-          //nop
-        }
-        catch (NoSuchFieldException nse) {
-          //nop
+          catch (NoSuchElementException nse) {
+            //nop
+          }
+          catch (NoSuchFieldException nse) {
+            //nop
+          }
         }
       }
       if (missingNames.size() > 0) {

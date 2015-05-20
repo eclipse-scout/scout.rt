@@ -342,7 +342,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       }
     });
     putLocaleData(jsonEvent, sessionLocale);
-    JsonObjectUtility.putProperty(jsonEvent, "backgroundJobPollingEnabled", isBackgroundJobPollingEnabled());
     m_currentJsonResponse.addActionEvent(m_uiSessionId, "initialized", jsonEvent);
   }
 
@@ -575,11 +574,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    */
   protected JSONObject responseToJsonInternal() {
     return currentJsonResponse().toJson();
-  }
-
-  @Override
-  public boolean isBackgroundJobPollingEnabled() {
-    return true;
   }
 
   @Override
