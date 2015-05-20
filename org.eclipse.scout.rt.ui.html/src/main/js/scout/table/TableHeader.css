@@ -1,12 +1,16 @@
 @table-header-padding-y: @table-row-padding-y;
 @table-header-padding-left: @table-row-padding-left;
 
+.table-header-container {
+  position: relative;
+  overflow: hidden;
+}
+
 .table-header {
   position: relative;
   background-color: @panel-background-color;
   border-bottom: 1px solid @border-color;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .sort-icon(@icon) {

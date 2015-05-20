@@ -428,6 +428,10 @@
     return this.css('top', position + 'px');
   };
 
+  $.fn.cssBottom = function(position) {
+    return this.css('bottom', position + 'px');
+  };
+
   $.fn.cssRight = function(position) {
     return this.css('right', position + 'px');
   };
@@ -465,6 +469,22 @@
 
   $.fn.cssMarginTop = function(value) {
     return this.cssPxValue('margin-top', value);
+  };
+
+  $.fn.cssMarginX = function(value) {
+    if (value === undefined) {
+      return this.cssMarginLeft() + this.cssMarginRight();
+    }
+    this.cssMarginLeft(value);
+    this.cssMarginRight(value);
+  };
+
+  $.fn.cssMarginY = function(value) {
+    if (value === undefined) {
+      return this.cssMarginTop() + this.cssMarginBottom();
+    }
+    this.cssMarginTop(value);
+    this.cssMarginBottom(value);
   };
 
   $.fn.cssBorderBottomWidth = function(value) {

@@ -348,13 +348,6 @@ scout.FocusContext.prototype._validateFocus = function() {
     $.log.trace(this._$focusedElement ? 'focused element :' + this._$focusedElement.attr('class') : 'focused element with undefined class');
     this.bindHideListener();
   }
-//update scrollbar
-  if(this._$focusedElement){
-    var $scrollable = scout.scrollbars.nextScrollableUpwards(this._$focusedElement, $focusContext);
-    if($scrollable){
-      scout.scrollbars.update($scrollable);
-    }
-  }
   scout.focusManager.validatingFocus = false;
 };
 

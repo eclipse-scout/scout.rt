@@ -7,13 +7,16 @@ scout.TableHeader = function(table, session) {
     columns = table.columns;
 
   this.dragging = false;
-  this.$container = table.$data.beforeDiv('table-header');
   this.table = table;
   this.columns = table.columns;
+  // Additional container div is only necessary for the desktop table's horizontal scrolling because that header has a margin left and right
+  this.$container = table.$data.beforeDiv('table-header-container');
+  this.$tableHeader = this.$container.appendDiv('table-header')
+    .width(this.table._rowWidth);
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
-    $header = this.$container.appendDiv('header-item')
+    $header = this.$tableHeader.appendDiv('header-item')
       .data('column', column)
       .css('min-width', column.width + 'px')
       .css('max-width', column.width + 'px')
@@ -29,7 +32,7 @@ scout.TableHeader = function(table, session) {
     }
 
     if (!column.fixedWidth) {
-      $separator = this.$container.appendDiv('header-resize');
+      $separator = this.$tableHeader.appendDiv('header-resize');
       $separator.on('mousedown', '', resizeHeader);
     }
   }
@@ -48,7 +51,7 @@ scout.TableHeader = function(table, session) {
       that._tableHeaderMenu.remove();
       that._tableHeaderMenu = null;
     } else {
-      var x = $header.position().left + that.$container.position().left + parseFloat(that.$container.css('margin-left')),
+      var x = $header.position().left + that.$tableHeader.position().left + parseFloat(that.$container.css('margin-left')),
         y = $header.position().top + that.$container.position().top;
       that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, session);
     }
@@ -112,7 +115,7 @@ scout.TableHeader = function(table, session) {
       // change css of dragged header
       $header.css('z-index', 50)
         .addClass('header-move');
-      that.$container.addClass('header-move');
+      that.$tableHeader.addClass('header-move');
 
       // move dragged header
       $header.css('left', diff);
@@ -190,7 +193,7 @@ scout.TableHeader = function(table, session) {
       $header.css('z-index', '')
         .css('background', '')
         .removeClass('header-move');
-      that.$container.removeClass('header-move');
+      that.$tableHeader.removeClass('header-move');
     }
   }
 };
@@ -204,6 +207,7 @@ scout.TableHeader.prototype.onColumnResized = function(column, width) {
   $header
     .css('min-width', width)
     .css('max-width', width);
+  this.$tableHeader.width(this.table._rowWidth);
 };
 
 scout.TableHeader.prototype.onSortingChanged = function() {
@@ -236,7 +240,7 @@ scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dra
   // move menu
   if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
     var left = $header.position().left;
-    var marginLeft = this.$container.cssMarginLeft();
+    var marginLeft = this.$tableHeader.cssMarginLeft();
     this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + marginLeft);
   }
 
@@ -267,8 +271,8 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
     $header = column.$header;
     $headerResize = $header.next('.header-resize');
 
-    this.$container.append($header);
-    this.$container.append($headerResize);
+    this.$tableHeader.append($header);
+    this.$tableHeader.append($headerResize);
   }
 
   // move menu
@@ -286,7 +290,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {
-  return this.$container.find('.header-item');
+  return this.$tableHeader.find('.header-item');
 };
 
 /**

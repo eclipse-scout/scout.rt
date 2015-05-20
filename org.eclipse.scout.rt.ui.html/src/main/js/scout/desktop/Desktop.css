@@ -213,12 +213,12 @@
     outline: none;
   }
 
-  & > .table-header > .header-item {
+  & > .table-header-container > .table-header > .header-item {
     padding-top: @desktop-table-header-padding-y;
     padding-bottom: @desktop-table-header-padding-y;
   }
 
-  & > .table-header,
+  & > .table-header-container,
   & > .table-data {
     margin-left: @bench-margin-x;
     margin-right: @bench-margin-x;

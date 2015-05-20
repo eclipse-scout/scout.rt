@@ -71,17 +71,17 @@ scout.Table.prototype._createKeyStrokeAdapter = function() {
   return new scout.TableKeyStrokeAdapter(this);
 };
 
-scout.Table.prototype._syncMenus = function(menus){
+scout.Table.prototype._syncMenus = function(menus) {
   var i;
-  for (i= 0; i < this.menus.length; i++) {
+  for (i = 0; i < this.menus.length; i++) {
     this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
   }
- this.menus = menus;
- for (i = 0; i < this.menus.length; i++) {
-   if(this.menus[i].enabled){
-     this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
-   }
- }
+  this.menus = menus;
+  for (i = 0; i < this.menus.length; i++) {
+    if (this.menus[i].enabled) {
+      this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+    }
+  }
 };
 
 scout.Table.prototype._insertCheckBoxColumn = function() {
@@ -105,18 +105,21 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
   this.$data = this.$container.appendDiv('table-data');
   this.$data.on('mousedown', '.table-row', onMouseDown)
-  .on('mouseup', '.table-row', onMouseUp)
-  .on('dblclick', '.table-row', onDoubleClick)
-  .on('contextmenu','.table-row', onContextMenu);
-  scout.scrollbars.install(this.$data);
+    .on('mouseup', '.table-row', onMouseUp)
+    .on('dblclick', '.table-row', onDoubleClick)
+    .on('contextmenu', '.table-row', onContextMenu)
+    .on('scroll', this._onDataScroll.bind(this));
+  scout.scrollbars.install(this.$data, {
+    axis: 'both'
+  });
   this.session.detachHelper.pushScrollable(this.$data);
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, menuSorter);
   this.drawData();
 
-//----- inline methods: --------
+  //----- inline methods: --------
 
-  var $mouseDownRow, mouseDownColumn, that=this;
+  var $mouseDownRow, mouseDownColumn, that = this;
 
   function onMouseDown(event) {
     $mouseDownRow = $(event.currentTarget);
@@ -248,7 +251,7 @@ scout.Table.prototype.toggleSelection = function() {
   this.selectionHandler.toggleSelection();
 };
 
-scout.Table.prototype.updateScrollbar = function() {
+scout.Table.prototype.updateScrollbars = function() {
   scout.scrollbars.update(this.$data);
 };
 
@@ -545,10 +548,10 @@ scout.Table.prototype._installRows = function($rows) {
     var editorField,
       $row = $(this),
       row = $row.data('row');
-//    $row.on('mousedown', '', onMouseDown)
-//      .on('mouseup', '', onMouseUp)
-//      .on('dblclick', '', onDoubleClick)
-//      .on('contextmenu', onContextMenu);
+    //    $row.on('mousedown', '', onMouseDown)
+    //      .on('mouseup', '', onMouseUp)
+    //      .on('dblclick', '', onDoubleClick)
+    //      .on('contextmenu', onContextMenu);
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -570,7 +573,6 @@ scout.Table.prototype._installRows = function($rows) {
 
   // update grouping if data was grouped
   this._group();
-
 
 };
 
@@ -899,7 +901,7 @@ scout.Table.prototype._group = function() {
     groupColumn = this._groupColumn();
 
   // remove all sum rows
-  this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
+  this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbars.bind(that));
 
   if (!this.grouped && !groupColumn) {
     return;
@@ -1062,6 +1064,16 @@ scout.Table.prototype.colorData = function(column, mode) {
       colorFunc($cell, value);
     }
   }
+};
+
+scout.Table.prototype._onDataScroll = function(event) {
+  if (!this.header) {
+    return;
+  }
+
+  // move header when scrolling horizontally
+  var scrollLeft = this.$data.scrollLeft();
+  this.header.$tableHeader.cssLeft(-1 * scrollLeft);
 };
 
 scout.Table.prototype._onRowsSelected = function(rowIds) {
@@ -1468,13 +1480,13 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
       duration: 250,
       complete: function() {
         $row.removeClass('invisible');
-        that.updateScrollbar();
+        that.updateScrollbars();
       }
     });
   } else {
     $row.show();
     $row.removeClass('invisible');
-    that.updateScrollbar();
+    that.updateScrollbars();
   }
 };
 
@@ -1489,13 +1501,13 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
       duration: 250,
       complete: function() {
         $row.addClass('invisible');
-        that.updateScrollbar();
+        that.updateScrollbars();
       }
     });
   } else {
     $row.hide();
     $row.addClass('invisible');
-    that.updateScrollbar();
+    that.updateScrollbars();
   }
 };
 
@@ -1519,7 +1531,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   if (this.header) {
     this.header.onColumnResized(column, width);
   }
-
+  this.updateScrollbars();
   this._sendColumnResized(column);
 };
 

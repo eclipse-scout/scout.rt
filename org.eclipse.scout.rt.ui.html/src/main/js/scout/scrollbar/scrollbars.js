@@ -9,65 +9,88 @@ scout.scrollbars = {
    *
    */
   install: function($container, options) {
-    var scrollbar, nativeScrollbars,
+    var scrollbars, scrollbar, nativeScrollbars,
       htmlContainer = scout.HtmlComponent.optGet($container);
 
     options = options || {};
+    options.axis = options.axis || 'y';
+
     if (options.nativeScrollbars !== undefined) {
       nativeScrollbars = options.nativeScrollbars;
     } else {
       nativeScrollbars = scout.device.hasPrettyScrollbars();
     }
     if (nativeScrollbars) {
-      $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
-      $container
-        .css('overflow-x', 'hidden')
-        .css('overflow-y', 'auto')
-        .css('-webkit-overflow-scrolling', 'touch');
+      installNativeScrollbars();
     } else {
-      $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
-      scrollbar = new scout.Scrollbar($container, options);
-      scrollbar.updateThumb();
-      $container.data('scrollbar', scrollbar);
+      installJsScrollbars();
     }
     if (htmlContainer) {
       htmlContainer.scrollable = true;
     }
     $container.data('scrollable', true);
     return $container;
+
+    function installNativeScrollbars() {
+      $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
+      if (options.axis === 'x') {
+        $container
+          .css('overflow-x', 'auto')
+          .css('overflow-y', 'hidden');
+      } else if (options.axis === 'y') {
+        $container
+          .css('overflow-x', 'hidden')
+          .css('overflow-y', 'auto');
+      } else {
+        $container.css('overflow', 'auto');
+      }
+      $container.css('-webkit-overflow-scrolling', 'touch');
+    }
+
+    function installJsScrollbars() {
+      $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
+      scrollbars = [];
+      if (options.axis === 'both') {
+        options.axis = 'y';
+        scrollbar = new scout.Scrollbar($container, options);
+        scrollbars.push(scrollbar);
+
+        options.axis = 'x';
+        options.mouseWheelNeedsShift = true;
+        scrollbar = new scout.Scrollbar($container, options);
+        scrollbars.push(scrollbar);
+      } else {
+        scrollbar = new scout.Scrollbar($container, options);
+        scrollbars.push(scrollbar);
+      }
+      $container.data('scrollbars', scrollbars);
+    }
   },
 
   update: function($scrollable) {
-    var scrollbar = $scrollable.data('scrollbar');
-    if (scrollbar) {
-      scrollbar.updateThumb();
+    var scrollbars = $scrollable.data('scrollbars');
+    if (!scrollbars) {
+      return;
     }
+    scrollbars.forEach(function(scrollbar) {
+      scrollbar.updateThumb();
+    });
   },
 
   /**
-   * Scrolls the scrollable to the given object (must be a child of scrollable)
-   * @param $scrollable
-   * @param $selection
+   * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
+   *
    */
-  scrollTo: function($scrollable, $selection) {
-    var scrollbar = $scrollable.data('scrollbar'),
-      scrollableH = $scrollable.height(),
-      optionH = scout.graphics.getSize($selection, true).height,
-      optionY,
-      scrollTopFunc;
+  scrollTo: function($scrollable, $element) {
+    var scrollableH = $scrollable.height(),
+      elementBounds = scout.graphics.bounds($element, true, true),
+      elementTop = elementBounds.y,
+      elementH = elementBounds.height;
 
-    if (scrollbar) {
-      scrollTopFunc = scrollbar.scrollTop.bind(scrollbar);
-      optionY = $selection.offset().top - $selection.parent().offset().top;
-    } else {
-      scrollTopFunc = $scrollable.scrollTop.bind($scrollable);
-      optionY = $selection.position().top;
-    }
-
-    if (optionY < 0) {
-      scrollTopFunc(scrollTopFunc() + optionY);
-    } else if (optionY + optionH > scrollableH) {
-      scrollTopFunc(scrollTopFunc() + optionY + optionH - scrollableH);
+    if (elementTop < 0) {
+      $scrollable.scrollTop($scrollable.scrollTop() + elementTop);
+    } else if (elementTop + elementH > scrollableH) {
+      $scrollable.scrollTop($scrollable.scrollTop() + elementTop + elementH - scrollableH);
     }
   },
 

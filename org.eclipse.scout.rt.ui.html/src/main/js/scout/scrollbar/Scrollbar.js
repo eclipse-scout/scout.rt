@@ -4,14 +4,16 @@ scout.Scrollbar = function($parent, options) {
   var begin = 0,
     that = this;
 
-  this.defaultOptions = {
+  var defaults = {
     axis: 'y',
     invertColors: false,
     borderless: false,
-    updateScrollbarPos: true
+    updateScrollbarPos: true,
+    mouseWheelNeedsShift: false
   };
 
-  this.options = $.extend({}, this.defaultOptions, options);
+  $.extend(this, defaults, options);
+
   this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
@@ -20,38 +22,48 @@ scout.Scrollbar = function($parent, options) {
   this._updateThumbPending = false;
 
   // create scrollbar
-  this._$scrollbar = $parent.appendDiv('scrollbar');
-  this._$thumb = this._$scrollbar.appendDiv('scrollbar-thumb');
-  if (this.options.invertColors) {
+  this._$scrollbar = $parent.appendDiv('scrollbar')
+    .addClass(this.axis + '-axis');
+  this._$thumb = this._$scrollbar.appendDiv('scrollbar-thumb')
+    .addClass(this.axis + '-axis');
+  if (this.invertColors) {
     this._$thumb.addClass('inverted');
   }
-  if (this.options.borderless) {
+  if (this.borderless) {
     this._$scrollbar.addClass('borderless');
   }
 
-  this._dim = this.options.axis === 'x' ? 'Width' : 'Height';
-  this._dir = this.options.axis === 'x' ? 'left' : 'top';
-  this._scrollDir = this.options.axis === 'x' ? 'scrollLeft' : 'scrollTop';
+  this._dim = this.axis === 'x' ? 'Width' : 'Height';
+  this._dir = this.axis === 'x' ? 'left' : 'top';
+  this._dirReverse = this.axis === 'x' ? 'right' : 'bottom';
+  this._scrollDir = this.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
   // event handling
-  $parent.on('DOMMouseScroll mousewheel', '', scrollWheel);
+  $parent.on('DOMMouseScroll mousewheel', '', scrollWheel)
+    .on('scroll', this._updateThumbImpl.bind(this));
   this._$scrollbar.on('mousedown', scrollEnd);
   this._$thumb.on('mousedown', '', scrollStart);
+
+  this.updateThumb();
 
   function scrollWheel(event) {
     var w, d;
     if (event.ctrlKey) {
       return true; // allow ctrl+mousewheel to zoom the page
     }
+    if (that.mouseWheelNeedsShift !== event.shiftKey) {
+      // only scroll if shift modifier matches
+      return true;
+    }
     event = event.originalEvent || window.event.originalEvent;
     w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 60;
     d = that._scrollSize / that._offsetSize;
-    that._setThumb(w / d);
+    that.scroll(w / d);
     return false;
   }
 
   function scrollStart(event) {
-    begin = (that.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    begin = (that.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._$thumb.addClass('scrollbar-thumb-move');
     $(document)
       .on('mousemove', scrollEnd)
@@ -61,8 +73,8 @@ scout.Scrollbar = function($parent, options) {
 
   function scrollEnd(event) {
     begin = begin === 0 ? that._beginDefault : begin;
-    var end = (that.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
-    that._setThumb(end - begin);
+    var end = (that.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    that.scroll(end - begin);
   }
 
   function scrollExit() {
@@ -98,13 +110,16 @@ scout.Scrollbar.prototype.updateThumb = function(force) {
  * do not use this internal method
  */
 scout.Scrollbar.prototype._updateThumbImpl = function() {
-  var margin = this._$scrollbar.cssMarginTop() + this._$scrollbar.cssMarginBottom(),
-    scrollPos = this._$parent[this._scrollDir]();
+  var margin = this._$scrollbar['cssMargin' + this.axis.toUpperCase()](),
+    scrollPos = this._$parent[this._scrollDir](),
+    scrollLeft = this._$parent.scrollLeft(),
+    scrollTop = this._$parent.scrollTop();
 
   // Reset thumb size and scrollbar position to make sure it does not extend the scrollSize
   this._$thumb.css(this._dim.toLowerCase(), 0);
-  if (this.options.updateScrollbarPos) {
-    this._$scrollbar.css(this._dir, 0);
+  if (this.updateScrollbarPos) {
+    this._$scrollbar.cssRight(0);
+    this._$scrollbar.cssBottom(0);
   }
 
   this._offsetSize = this._$parent[0]['offset' + this._dim];
@@ -128,31 +143,25 @@ scout.Scrollbar.prototype._updateThumbImpl = function() {
   } else {
     this._$scrollbar.css('visibility', 'visible');
   }
-  if (this.options.updateScrollbarPos && scrollPos > 0) {
-    this._$scrollbar.css(this._dir, scrollPos);
+
+  // Position the scrollbar(s)
+  if (this.updateScrollbarPos) {
+    // Always update both to make sure every scrollbar (x and y) is positioned correctly
+    this._$scrollbar.cssRight(-1 * scrollLeft);
+    this._$scrollbar.cssBottom(-1 * scrollTop);
   }
 };
 
-scout.Scrollbar.prototype.scrollTop = function(scrollTop) {
-  if (scrollTop === undefined) {
-    return this._$parent.scrollTop();
-  }
-  var posNew = scrollTop / (this._scrollSize - this._offsetSize) * this._thumbRange;
-  this._$parent.scrollTop(scrollTop);
-  this._$thumb.css(this._dir, posNew);
-  if (this.options.updateScrollbarPos) {
-    this._$scrollbar.css(this._dir, scrollTop);
-  }
-};
-
-scout.Scrollbar.prototype._setThumb = function(posDiff) {
+scout.Scrollbar.prototype.scroll = function(posDiff) {
   var posOld = this._$thumb.offset()[this._dir] - this._$scrollbar.offset()[this._dir],
     posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff)),
     scrollPos = (this._scrollSize - this._offsetSize) / this._thumbRange * posNew;
 
   this._$parent[this._scrollDir](scrollPos);
+
+  // Thumb and scrollbar would be updated by the scroll handler. To make it more fluent it is done here as well
   this._$thumb.css(this._dir, posNew);
-  if (this.options.updateScrollbarPos) {
-    this._$scrollbar.css(this._dir, scrollPos);
+  if (this.updateScrollbarPos) {
+    this._$scrollbar.css(this._dirReverse, -1 * scrollPos);
   }
 };

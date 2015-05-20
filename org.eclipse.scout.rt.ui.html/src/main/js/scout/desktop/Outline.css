@@ -11,6 +11,9 @@
 }
 
 .outline > .tree-data {
+  & > .scrollbar.y-axis {
+    margin-right: 6px;
+  }
 
   & > .tree-node,
   & > .animationWrapper > .tree-node {
