@@ -22,7 +22,7 @@ scout.Table = function() {
   this.animationRowLimit = 25;
   this.menuBar;
   this.menuBarPosition = 'bottom';
-  this._drawDataInProgress = false;
+  this._renderRowsInProgress = false;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -115,7 +115,7 @@ scout.Table.prototype._render = function($parent) {
   this.session.detachHelper.pushScrollable(this.$data);
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, menuSorter);
-  this.drawData();
+  this._renderRows();
 
   //----- inline methods: --------
 
@@ -463,11 +463,6 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
   column.sortActive = true;
 };
 
-scout.Table.prototype.drawData = function() {
-  this.$rows().remove();
-  this._drawData(0);
-};
-
 scout.Table.prototype._buildRowDiv = function(row) {
   var rowWidth = this._rowWidth;
   var rowClass = 'table-row';
@@ -493,17 +488,21 @@ scout.Table.prototype._updateRowWidth = function() {
   }
 };
 
-scout.Table.prototype._drawData = function(startRow) {
+/**
+ * @param new rows to append at the end of this.$data. If undefined this.rows is used.
+ */
+scout.Table.prototype._renderRows = function(rows, startRowIndex) {
   // this function has to be fast
-  var $rows, $selectedRows,
+  var $rows, $selectedRows, numRowsLoaded,
     rowString = '',
-    that = this,
-    numRowsLoaded = startRow;
-
-  if (this.rows.length > 0) {
+    that = this;
+  startRowIndex = startRowIndex !== undefined ? startRowIndex : 0;
+  rows = rows || this.rows;
+  numRowsLoaded = startRowIndex;
+  if (rows.length > 0) {
     // Build $rows (as string instead of jQuery objects for efficiency reasons)
-    for (var r = startRow; r < Math.min(this.rows.length, startRow + 100); r++) {
-      var row = this.rows[r];
+    for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + 100); r++) {
+      var row = rows[r];
       rowString += this._buildRowDiv(row, r);
     }
     numRowsLoaded = r;
@@ -513,7 +512,7 @@ scout.Table.prototype._drawData = function(startRow) {
     //FIXME CGU merge with loop in installRows
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
-      var row = that.rows[startRow + index];
+      var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
     });
 
@@ -530,13 +529,17 @@ scout.Table.prototype._drawData = function(startRow) {
   }
 
   // repaint and append next block
-  this._drawDataInProgress = false;
-  if (this.rows.length > numRowsLoaded) {
-    this._drawDataInProgress = true;
+  this._renderRowsInProgress = false;
+  if (rows.length > numRowsLoaded) {
+    this._renderRowsInProgress = true;
     setTimeout(function() {
-      that._drawData(startRow + 100);
+      that._renderRows(rows, startRowIndex + 100);
     }, 0);
   }
+};
+
+scout.Table.prototype._removeRows = function() {
+  this.$rows().remove();
 };
 
 /**
@@ -1155,6 +1158,31 @@ scout.Table.prototype.checkRow = function(row, checked) {
   }
 };
 
+scout.Table.prototype._insertRows = function(rows) {
+  // Update model
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    this._initRow(row);
+    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
+    this.rows.push(row);
+  }
+
+  // Update HTML
+  if (this.rendered) {
+    // Remember inserted rows for future events like rowOrderChanged
+    if (!this._insertedRows) {
+      this._insertedRows = rows;
+      setTimeout(function() {
+        this._insertedRows = null;
+      }.bind(this), 0);
+    } else {
+      scout.arrays.pushAll(this._insertedRows, rows);
+    }
+
+    this._renderRows(rows);
+  }
+};
+
 scout.Table.prototype._deleteRows = function(rows) {
   var invalidate, i;
 
@@ -1204,7 +1232,7 @@ scout.Table.prototype._deleteAllRows = function() {
       this.cellEditorPopup.cancelEdit();
     }
 
-    this.drawData();
+    this._removeRows();
     this.invalidateTree();
   }
 };
@@ -1697,7 +1725,8 @@ scout.Table.prototype._renderCheckable = function() {
 scout.Table.prototype._redraw = function() {
   this._removeTableHeader();
   this._renderTableHeader();
-  this.drawData();
+  this._removeRows();
+  this._renderRows();
 };
 
 scout.Table.prototype._renderTableHeader = function() {
@@ -1772,28 +1801,7 @@ scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
-  // Update model
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    this._initRow(row);
-    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
-    this.rows.push(row);
-  }
-
-  // Update HTML
-  if (this.rendered) {
-    // Remember inserted rows for future events like rowOrderChanged
-    if (!this._insertedRows) {
-      this._insertedRows = rows;
-      setTimeout(function() {
-        this._insertedRows = null;
-      }.bind(this), 0);
-    } else {
-      scout.arrays.pushAll(this._insertedRows, rows);
-    }
-
-    this.drawData();
-  }
+  this._insertRows(rows);
 };
 
 scout.Table.prototype._onRowsDeleted = function(rowIds) {
@@ -1911,9 +1919,9 @@ scout.Table.prototype._onScrollToSelection = function() {
 };
 
 scout.Table.prototype.onModelAction = function(event) {
-  // _drawData() might not have drawn all rows yet, therefore postpone the
+  // _renderRows() might not have drawn all rows yet, therefore postpone the
   // execution of this method to prevent conflicts on the row objects.
-  if (this._drawDataInProgress) {
+  if (this._renderRowsInProgress) {
     var that = this;
     setTimeout(function() {
       that.onModelAction(event);

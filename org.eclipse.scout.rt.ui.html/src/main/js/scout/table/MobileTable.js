@@ -20,9 +20,9 @@ scout.MobileTable.prototype.init = function(model, session) {
 /**
  * @override
  */
-scout.MobileTable.prototype._drawData = function(startRow) {
+scout.MobileTable.prototype._RenderRows = function(rows, startRowIndex) {
   this._headerColumns = this._computeHeaderColumns();
-  scout.MobileTable.parent.prototype._drawData.call(this, startRow);
+  scout.MobileTable.parent.prototype._renderRows.call(this, rows, startRowIndex);
 };
 
 /**
