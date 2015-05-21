@@ -76,7 +76,7 @@ scout.CellEditorPopup.prototype.alignTo = function(event) {
 
   cellBounds = scout.graphics.bounds($cell, false, true);
   rowBounds = scout.graphics.bounds($row, false, true);
-  this.setLocation(new scout.Point($tableData.scrollLeft() + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
+  this.setLocation(new scout.Point(cellBounds.x, $tableData.scrollTop() + rowBounds.y));
 };
 
 scout.CellEditorPopup.prototype.completeEdit = function() {

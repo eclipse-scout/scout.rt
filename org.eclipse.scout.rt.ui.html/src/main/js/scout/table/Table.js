@@ -610,14 +610,16 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
  */
 scout.Table.prototype._columnAtX = function(x) {
   var columnOffsetRight = 0,
-    offsetLeft = this.$data.offset().left;
+    columnOffsetLeft = this.$data.offset().left,
+    scrollLeft = this.$data.scrollLeft();
 
+  columnOffsetLeft -= scrollLeft;
   return scout.arrays.find(this.columns, function(column) {
-    columnOffsetRight = offsetLeft + column.width;
-    if (x >= offsetLeft && x < columnOffsetRight) {
+    columnOffsetRight = columnOffsetLeft + column.width;
+    if (columnOffsetLeft >= 0 && x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
     }
-    offsetLeft = columnOffsetRight;
+    columnOffsetLeft = columnOffsetRight;
   });
 };
 
