@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthUsersProperty;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthCredentialsProperty;
 
 /**
  * Authenticator to validate webservice requests against configured users in <code>config.properties</code> file.
@@ -35,7 +35,7 @@ public class ConfigFileAuthenticator implements IAuthenticator {
   private final Map<String, String> m_users;
 
   public ConfigFileAuthenticator() {
-    m_users = readUsers();
+    m_users = readCredentials();
   }
 
   @Override
@@ -47,18 +47,18 @@ public class ConfigFileAuthenticator implements IAuthenticator {
    * Method invoked to read the credentials from <code>config.properties</code>.
    */
   @Internal
-  protected Map<String, String> readUsers() {
-    IConfigProperty<String> usersProperty = CONFIG.getProperty(JaxWsAuthUsersProperty.class);
-    final String credentialsRaw = usersProperty.getValue();
+  protected Map<String, String> readCredentials() {
+    final IConfigProperty<String> credentialsProperty = CONFIG.getProperty(JaxWsAuthCredentialsProperty.class);
+    final String credentialsRaw = credentialsProperty.getValue();
     if (credentialsRaw == null) {
       return Collections.emptyMap();
     }
 
+    final String configSample = String.format("%s=jack\\=XXXX;john\\=XXXX;anna\\=XXXX", credentialsProperty.getKey());
     final Map<String, String> credentialMap = new HashMap<>();
 
     for (final String credentialRaw : credentialsRaw.split(";")) {
       final String[] credential = credentialRaw.split("=", 2);
-      final String configSample = String.format("%s=jack\\=XXXX;john\\=XXXX;anna\\=XXXX", usersProperty.getKey());
       if (credential.length == 2) {
         final String username = credential[0];
         if (!StringUtility.hasText(username)) {

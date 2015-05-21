@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebMethod;
 import javax.servlet.http.HttpServletResponse;
@@ -138,22 +139,22 @@ public class InvocationContext<PORT> {
   }
 
   /**
-   * Sets the connect timeout for this {@link InvocationContext} to a specified timeout, in milliseconds. If the timeout
+   * Sets the connect timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
    * expires before the connection can be established, the request is aborted. Use <code>null</code> to specify
    * an infinite timeout.
    */
   public InvocationContext<PORT> connectTimeout(final Integer connectTimeout) {
-    m_implementorSpecifics.setSocketConnectTimeout(m_requestContext, NumberUtility.nvl(connectTimeout, 0));
+    m_implementorSpecifics.setSocketConnectTimeout(m_requestContext, (int) TimeUnit.SECONDS.toMillis(NumberUtility.nvl(connectTimeout, 0)));
     return this;
   }
 
   /**
-   * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in milliseconds. If the timeout
+   * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
    * expires before there is data available for read, the request is aborted. Use <code>null</code> to specify an
    * infinite timeout.
    */
   public InvocationContext<PORT> readTimeout(final Integer readTimeout) {
-    m_implementorSpecifics.setSocketReadTimeout(m_requestContext, NumberUtility.nvl(readTimeout, 0));
+    m_implementorSpecifics.setSocketReadTimeout(m_requestContext, (int) TimeUnit.SECONDS.toMillis(NumberUtility.nvl(readTimeout, 0)));
     return this;
   }
 

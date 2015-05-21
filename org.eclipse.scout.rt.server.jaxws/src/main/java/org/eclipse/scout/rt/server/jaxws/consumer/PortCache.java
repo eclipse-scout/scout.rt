@@ -43,7 +43,7 @@ public class PortCache<PORT> {
 
   protected final int m_corePoolSize;
 
-  protected final long m_ttl;
+  protected final long m_timeToLive;
 
   protected boolean m_enabled;
 
@@ -52,13 +52,13 @@ public class PortCache<PORT> {
    *          <code>true</code> to enable caching, <code>false</code> otherwise.
    * @param corePoolSize
    *          number of Ports to have preemptively in the cache.
-   * @param ttl
-   *          time-to-live for a Port in the cache if the 'corePoolSize' is exceeded.
+   * @param timeToLive
+   *          time-to-live [ms] for a Port in the cache if the 'corePoolSize' is exceeded.
    * @param portProvider
    *          factory to create new Ports.
    */
-  public PortCache(final boolean enabled, final int corePoolSize, final long ttl, final IPortProvider<PORT> portProvider) {
-    this(enabled, corePoolSize, ttl, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
+  public PortCache(final boolean enabled, final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider) {
+    this(enabled, corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
 
     if (m_enabled) {
       // Start periodic cleanup job.
@@ -83,10 +83,10 @@ public class PortCache<PORT> {
     }
   }
 
-  PortCache(final boolean enabled, final int corePoolSize, final long ttl, final IPortProvider<PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
+  PortCache(final boolean enabled, final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
     m_enabled = enabled;
     m_corePoolSize = corePoolSize;
-    m_ttl = ttl;
+    m_timeToLive = timeToLive;
     m_portProvider = portProvider;
     m_queue = queue;
   }
@@ -109,7 +109,7 @@ public class PortCache<PORT> {
 
       @Override
       public void run() throws Exception {
-        m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_ttl));
+        m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
       }
     });
 
@@ -143,7 +143,7 @@ public class PortCache<PORT> {
    */
   protected void ensureCorePool() {
     while (m_queue.size() < m_corePoolSize) {
-      m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_ttl));
+      m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
     }
   }
 

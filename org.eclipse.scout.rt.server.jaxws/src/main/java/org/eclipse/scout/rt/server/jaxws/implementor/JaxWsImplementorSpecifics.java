@@ -84,14 +84,14 @@ public class JaxWsImplementorSpecifics {
   }
 
   /**
-   * Sets the given socket connect timeout.
+   * Sets the given socket connect timeout [ms].
    */
   public void setSocketConnectTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
     LOG.warn("'socketConnectTimeout' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), CONFIG.getProperty(JaxWsImplementorProperty.class).getKey());
   }
 
   /**
-   * Sets the given socket read timeout.
+   * Sets the given socket read timeout [ms].
    */
   public void setSocketReadTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
     LOG.warn("'socketReadTimeout' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), CONFIG.getProperty(JaxWsImplementorProperty.class).getKey());

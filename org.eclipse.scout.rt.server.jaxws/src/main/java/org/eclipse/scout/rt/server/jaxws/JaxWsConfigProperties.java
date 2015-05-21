@@ -40,7 +40,7 @@ public final class JaxWsConfigProperties {
 
     @Override
     public String getKey() {
-      return "jaxws.user.authenticator";
+      return "jaxws.provider.user.authenticator";
     }
 
     @Override
@@ -57,7 +57,7 @@ public final class JaxWsConfigProperties {
 
     @Override
     public String getKey() {
-      return "jaxws.user.handler";
+      return "jaxws.provider.user.handler";
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class JaxWsConfigProperties {
 
     @Override
     public Boolean getDefaultValue() {
-      return null;
+      return false;
     }
   }
 
@@ -101,11 +101,11 @@ public final class JaxWsConfigProperties {
   /**
    * Users granted to access webservices; used by {@link ConfigFileAuthenticator}.
    */
-  public static class JaxWsAuthUsersProperty extends AbstractStringConfigProperty {
+  public static class JaxWsAuthCredentialsProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getKey() {
-      return "jaxws.authentication.users";
+      return "jaxws.provider.authentication.credentials";
     }
 
     @Override
@@ -121,7 +121,7 @@ public final class JaxWsConfigProperties {
 
     @Override
     public String getKey() {
-      return "jaxws.authentication.basic.realm";
+      return "jaxws.provider.authentication.basic.realm";
     }
 
     @Override
@@ -173,8 +173,8 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Maximum time [ms] to retain ports in the cache if the 'corePoolSize' is exceeded. That typically occurs at high
-   * load, or if 'corePoolSize' is undersized.
+   * Maximum time in seconds to retain ports in the cache if the 'corePoolSize' is exceeded. That typically occurs at
+   * high load, or if 'corePoolSize' is undersized.
    *
    * @see JaxWsPortCacheEnabledProperty
    */
@@ -187,13 +187,13 @@ public final class JaxWsConfigProperties {
 
     @Override
     public Long getDefaultValue() {
-      return TimeUnit.MINUTES.toMillis(15);
+      return TimeUnit.MINUTES.toSeconds(15);
     }
   }
 
   /**
-   * Connect timeout [ms] to abort a webservice request, if establishment of the HTTP connection takes longer than this
-   * timeout. A timeout of <code>null</code> means an infinite timeout.
+   * Connect timeout in seconds to abort a webservice request, if establishment of the HTTP connection takes longer than
+   * this timeout. A timeout of <code>null</code> means an infinite timeout.
    */
   public static class JaxWsConnectTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
 
@@ -209,8 +209,8 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Read timeout [ms] to abort a webservice request, if it takes longer than this timeout for data to be available for
-   * read. A timeout of <code>null</code> means an infinite timeout.
+   * Read timeout in seconds to abort a webservice request, if it takes longer than this timeout for data to be
+   * available for read. A timeout of <code>null</code> means an infinite timeout.
    */
   public static class JaxWsReadTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
 

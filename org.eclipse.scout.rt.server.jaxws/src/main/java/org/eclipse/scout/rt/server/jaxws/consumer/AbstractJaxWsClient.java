@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
@@ -35,6 +36,7 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.HandlerResolver;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.PortInfo;
 
 import org.eclipse.scout.commons.Assertions;
@@ -49,13 +51,13 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
-import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsConnectTimeoutProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheCorePoolSizeProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheEnabledProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheTTLProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsReadTimeoutProperty;
+import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
+import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.IPortProvider;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
@@ -143,7 +145,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
     final boolean cacheEnabled = CONFIG.getPropertyValue(getConfiguredPortCacheEnabledProperty()).booleanValue();
     final int corePoolSize = CONFIG.getPropertyValue(getConfiguredPortCacheCorePoolSizeProperty()).intValue();
-    final long timeToLive = CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty()).longValue();
+    final long timeToLive = TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty()).longValue());
     m_portCache = new PortCache<>(cacheEnabled, corePoolSize, timeToLive, getConfiguredPortProvider(m_serviceClazz, m_portTypeClazz));
 
     initConfig();
@@ -199,7 +201,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * for 'Message Level WS-Security authentication', or some other handler to provide credentials.
    */
   @ConfigOperation
-  protected void execInstallHandlers(final List<Handler> handlerChain) {
+  protected void execInstallHandlers(final List<Handler<? extends MessageContext>> handlerChain) {
   }
 
   /**
@@ -321,9 +323,9 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to configure the maximum time [ms] to retain ports in the cache if the 'corePoolSize' is exceeded. That
-   * typically occurs at high load, or if 'corePoolSize' is undersized. By default, the same 'time-to-live' is used by
-   * all webservice clients configured by {@link JaxWsPortCacheTTLProperty}.
+   * Overwrite to configure the maximum time in seconds to retain ports in the cache if the 'corePoolSize' is exceeded.
+   * That typically occurs at high load, or if 'corePoolSize' is undersized. By default, the same 'time-to-live' is used
+   * by all webservice clients configured by {@link JaxWsPortCacheTTLProperty}.
    *
    * @see JaxWsPortCacheTTLProperty
    */
@@ -333,9 +335,9 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to configure the connect timeout [ms] for requests initiated by this webservice client. If the timeout
-   * expires before the connection can be established, the request is aborted. A timeout of null means an infinite
-   * timeout.
+   * Overwrite to configure the connect timeout in seconds for requests initiated by this webservice client. If the
+   * timeout expires before the connection can be established, the request is aborted. A timeout of null means an
+   * infinite timeout.
    *
    * @see JaxWsConnectTimeoutProperty
    */
@@ -345,7 +347,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to configure the read timeout [ms] for requests initiated by this webservice client. If the timeout
+   * Overwrite to configure the read timeout in seconds for requests initiated by this webservice client. If the timeout
    * expires before data is available for read, the request is aborted. A timeout of null means an infinite timeout.
    *
    * @see JaxWsReadTimeoutProperty
@@ -408,13 +410,15 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
           @Override
           public List<Handler> getHandlerChain(final PortInfo portInfo) {
-            final List<Handler> handlers = new ArrayList<>();
-            execInstallHandlers(handlers);
+            final List<Handler<? extends MessageContext>> handlerChain = new ArrayList<>();
+            execInstallHandlers(handlerChain);
 
-            for (int i = 0; i < handlers.size(); i++) {
-              handlers.set(i, decorateHandler(handlers.get(i)));
+            for (int i = 0; i < handlerChain.size(); i++) {
+              handlerChain.set(i, decorateHandler(handlerChain.get(i)));
             }
 
+            @SuppressWarnings("unchecked")
+            final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
             return handlers;
           }
         });
@@ -435,7 +439,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
      * Method invoked to decorate a handler to be installed. The default implementation proxies the handler if
      * configured to run on behalf of a {@link RunContext}.
      */
-    protected Handler decorateHandler(final Handler handler) {
+    protected Handler<? extends MessageContext> decorateHandler(final Handler<? extends MessageContext> handler) {
       final RunWithServerRunContext runWithRunContext = handler.getClass().getAnnotation(RunWithServerRunContext.class);
       if (runWithRunContext == null) {
         return handler;
@@ -443,7 +447,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
       // Proxy the handler to run on behalf of a RunContext when being invoked.
       final ServerRunContextProvider provider = BEANS.get(runWithRunContext.provider());
-      return (Handler) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
+
+      return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
 
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
