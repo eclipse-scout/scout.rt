@@ -4,8 +4,12 @@ scout.BeanColumn = function() {
 scout.inherits(scout.BeanColumn, scout.Column);
 
 scout.BeanColumn.prototype.buildCell = function(row) {
-  var $cell = $(scout.BeanColumn.parent.prototype.buildCell.call(this, row));
-  var value = this.table.cellValue(this, row);
+  var $cell, value;
+  $cell = $(scout.BeanColumn.parent.prototype.buildCell.call(this, row));
+  // Clear any content (e.g. nbsp due to empty text)
+  $cell.empty();
+
+  value = this.table.cellValue(this, row);
   this._renderValue($cell, value);
   return $cell[0].outerHTML;
 };
