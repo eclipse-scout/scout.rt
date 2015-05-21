@@ -41,7 +41,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
 
   overflown = leftEnd > rightEnd;
   $container.css('overflow', oldOverflow);
-  $.log.info('leftEnd=' + leftEnd + ' rightEnd=' + rightEnd + ' overflown=' + overflown);
 
   if (overflown) {
     var menuItemsCopy = [];
@@ -119,12 +118,11 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
 
   var prefSize,
     oldWidth = $container.css('width'),
-    containerInsets = scout.graphics.getInsets($container, {includeMargin: true});
+    containerMargins = scout.graphics.getMargins($container);
 
   $container.css('width', '100%');
-  prefSize = scout.graphics.getVisibleSize($container);
-  prefSize.width -= containerInsets.left;
-  prefSize.width -= containerInsets.right;
+  prefSize = scout.graphics.getVisibleSize($container)
+    .subtract(containerMargins);
   $container.css('width', oldWidth);
   return prefSize;
 };

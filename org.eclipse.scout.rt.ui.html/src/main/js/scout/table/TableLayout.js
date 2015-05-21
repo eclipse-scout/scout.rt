@@ -4,7 +4,6 @@ scout.TableLayout = function(table) {
 };
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
-// FIXME AWE: (menu) layout-bug bei menus in table-footer mit organize menu
 scout.TableLayout.prototype.layout = function($container) {
   var menuBar = this.table.menuBar,
     footer = this.table.footer,
