@@ -15,7 +15,7 @@ scout.TableLayout.prototype.layout = function($container) {
     var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
       menuBarSize = htmlMenuBar.getPreferredSize();
     htmlMenuBar.setSize(menuBarSize);
-    height += htmlMenuBar.height;
+    height += menuBarSize.height;
   }
   if (footer) {
     height += scout.graphics.getSize(footer.$container).height;
