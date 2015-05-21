@@ -14,9 +14,13 @@ scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
 
 scout.CellEditorPopup.prototype._render = function($parent) {
   scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
-  var field = this.cell.field;
+  var field = this.cell.field,
+    firstCell = this.table.columns.indexOf(this.column) === 0;
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
+  if (firstCell) {
+    this.$container.addClass('first');
+  }
   this.$body.addClass('cell-editor-popup-body');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
@@ -41,6 +45,9 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   }
   if (field.$field) {
     field.$field.addClass('cell-editor-field');
+    if (firstCell) {
+      field.$field.addClass('first');
+    }
   }
   // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
   this.$anchor.css('visibility', 'hidden');

@@ -1,11 +1,26 @@
 .cell-editor-popup {
   /* make sure it is behind the scrollbar */
   z-index: 0;
+
+  .first& {
+    /* Hide the left border of the field */
+    margin-left: -1px;
+  }
 }
 
 .cell-editor-field {
   /* -1px correction is necessary because the table-cell does not have a border but the fields have */
   padding: @table-row-padding-y @table-cell-padding-right - 1px @table-row-padding-y @table-cell-padding-left - 1px;
+  border-radius: 0;
+
+  &:focus {
+    .inner-glow(@focus-glow-color);
+  }
+
+  .first& {
+    /* correction for margin-left -1px */
+    padding-left: @table-cell-padding-left;
+  }
 }
 
 .check-box-field.cell-editor-form-field {

@@ -12,6 +12,10 @@
   box-shadow: 0 0 @radius @color;
 }
 
+.inner-glow(@color, @radius: 4px) {
+  box-shadow: inset 0 0 @radius @color;
+}
+
 .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {
   box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
 }
