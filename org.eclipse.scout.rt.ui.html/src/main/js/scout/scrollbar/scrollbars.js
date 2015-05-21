@@ -82,7 +82,8 @@ scout.scrollbars = {
    *
    */
   scrollTo: function($scrollable, $element) {
-    var scrollableH = $scrollable.height(),
+    var scrollTo,
+      scrollableH = $scrollable.height(),
       elementBounds = scout.graphics.bounds($element, true, true),
       elementTop = elementBounds.y,
       elementH = elementBounds.height;
@@ -90,7 +91,9 @@ scout.scrollbars = {
     if (elementTop < 0) {
       $scrollable.scrollTop($scrollable.scrollTop() + elementTop);
     } else if (elementTop + elementH > scrollableH) {
-      $scrollable.scrollTop($scrollable.scrollTop() + elementTop + elementH - scrollableH);
+      // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
+      scrollTo = Math.ceil($scrollable.scrollTop() + elementTop + elementH - scrollableH);
+      $scrollable.scrollTop(scrollTo);
     }
   },
 

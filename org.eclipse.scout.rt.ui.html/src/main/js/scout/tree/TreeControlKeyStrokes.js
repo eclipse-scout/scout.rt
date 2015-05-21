@@ -10,7 +10,7 @@ scout.inherits(scout.TreeControlKeyStrokes, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.TreeControlKeyStrokes.prototype.handle = function(event) {
-  var $targetNode, targetNode,
+  var $targetNode, targetNode, newNodeSelection,
     keycode = event.which,
     $currentNode = this._field.$selectedNodes().eq(0),
     currentNode = $currentNode.data('node');
@@ -32,7 +32,7 @@ scout.TreeControlKeyStrokes.prototype.handle = function(event) {
       targetNode = $targetNode.data('node');
     }
     if (targetNode) {
-      this._field.setNodesSelected(targetNode);
+      newNodeSelection = targetNode;
     }
   } else if (keycode === scout.keys.DOWN) {
     if ($currentNode.length === 0) {
@@ -43,20 +43,26 @@ scout.TreeControlKeyStrokes.prototype.handle = function(event) {
       targetNode = $targetNode.data('node');
     }
     if (targetNode) {
-      this._field.setNodesSelected(targetNode);
+      newNodeSelection = targetNode;
     }
   } else if (currentNode && keycode === scout.keys.SUBTRACT) {
     if (currentNode.expanded) {
       this._field.setNodeExpanded(currentNode, false);
     } else if (currentNode.parentNode) {
-      this._field.setNodesSelected(currentNode.parentNode);
+      newNodeSelection = currentNode.parentNode;
     }
   } else if (currentNode && keycode === scout.keys.ADD) {
     if (!currentNode.expanded && !currentNode.leaf) {
       this._field.setNodeExpanded(currentNode, true);
     } else if (currentNode.childNodes.length > 0) {
-      this._field.setNodesSelected(currentNode.childNodes[0]);
+      newNodeSelection = currentNode.childNodes[0];
     }
+  }
+
+  if (newNodeSelection) {
+    this._field.setNodesSelected(newNodeSelection);
+    // scroll selection into view (if not visible)
+    this._field.scrollTo(newNodeSelection);
   }
 };
 /**
@@ -68,29 +74,27 @@ scout.TreeControlKeyStrokes.prototype._drawKeyBox = function($container, drawedK
   var $upNode, $downNode;
   var offset = 4;
 
-//  if (currentNode) {
-    if ($currentNode.length === 0) {
-      $upNode = this._field.$nodes().last();
-    } else {
-      $upNode = $currentNode.prev('.tree-node');
-    }
-    if ($upNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.UP)) {
-      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↑', $upNode, this.ctrl, this.alt, this.shift, true);
-    }
-    if ($currentNode.length === 0) {
-      $downNode = this._field.$nodes().first();
-    } else {
-      $downNode = $currentNode.next('.tree-node');
-    }
-    if ($downNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
-      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↓', $downNode, this.ctrl, this.alt, this.shift, true);
-    }
-    if (currentNode && currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.LEFT)) {
-      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '-', $currentNode, this.ctrl, this.alt, this.shift, true);
-    } else if (currentNode &&  !currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
-      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '+', $currentNode, this.ctrl, this.alt, this.shift, true);
-    }
-//  }
+  if ($currentNode.length === 0) {
+    $upNode = this._field.$nodes().last();
+  } else {
+    $upNode = $currentNode.prev('.tree-node');
+  }
+  if ($upNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.UP)) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↑', $upNode, this.ctrl, this.alt, this.shift, true);
+  }
+  if ($currentNode.length === 0) {
+    $downNode = this._field.$nodes().first();
+  } else {
+    $downNode = $currentNode.next('.tree-node');
+  }
+  if ($downNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↓', $downNode, this.ctrl, this.alt, this.shift, true);
+  }
+  if (currentNode && currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.LEFT)) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '-', $currentNode, this.ctrl, this.alt, this.shift, true);
+  } else if (currentNode && !currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '+', $currentNode, this.ctrl, this.alt, this.shift, true);
+  }
 };
 
 /**

@@ -25,14 +25,14 @@ scout.Tree.prototype.init = function(model, session) {
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
 };
 
-scout.Tree.prototype._syncMenus = function(menus){
+scout.Tree.prototype._syncMenus = function(menus) {
   var i;
-   for (i= 0; i < this.menus.length; i++) {
-     this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
-   }
+  for (i = 0; i < this.menus.length; i++) {
+    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
+  }
   this.menus = menus;
   for (i = 0; i < this.menus.length; i++) {
-    if(this.menus[i].enabled){
+    if (this.menus[i].enabled) {
       this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
     }
   }
@@ -96,11 +96,10 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   this.$data = this.$container.appendDiv('tree-data')
-  .on('click', '.tree-node', this._onNodeClick.bind(this))
-  .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
-  .on('click', '.tree-node-control', this._onNodeControlClick.bind(this))
-  .on('dblclick', '.tree-node-control', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
-
+    .on('click', '.tree-node', this._onNodeClick.bind(this))
+    .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
+    .on('click', '.tree-node-control', this._onNodeControlClick.bind(this))
+    .on('dblclick', '.tree-node-control', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
@@ -350,6 +349,16 @@ scout.Tree.prototype._renderExpansion = function(node) {
   }
 };
 
+scout.Tree.prototype.scrollTo = function(node) {
+  scout.scrollbars.scrollTo(this.$data, node.$node);
+};
+
+scout.Tree.prototype.revealSelection = function() {
+  if (this.selectedNodeIds.length > 0) {
+    this.scrollTo(this.nodesMap[this.selectedNodeIds[0]]);
+  }
+};
+
 scout.Tree.prototype.clearSelection = function() {
   this.setNodesSelected([]);
 };
@@ -425,6 +434,10 @@ scout.Tree.prototype._renderSelection = function() {
   }
 
   this._updateItemPath();
+  if (this.scrollToSelection) {
+    // Execute delayed because tree may be not layouted yet
+    setTimeout(this.revealSelection.bind(this));
+  }
 };
 
 scout.Tree.prototype._removeSelection = function() {
@@ -852,7 +865,7 @@ scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
 
 scout.Tree.prototype.checkChildren = function(node, checked) {
   var updatedNodes = [];
-  if (this.autoCheckChildren && node ) {
+  if (this.autoCheckChildren && node) {
     for (var i = 0; i < node.childNodes.length; i++) {
       updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], checked, true));
     }
@@ -1057,7 +1070,7 @@ scout.Tree.prototype._onRequestFocus = function() {
 };
 
 scout.Tree.prototype._onScrollToSelection = function() {
-  // TODO BSH Implement
+  this.revealSelection();
 };
 
 scout.Tree.prototype.onModelAction = function(event) {

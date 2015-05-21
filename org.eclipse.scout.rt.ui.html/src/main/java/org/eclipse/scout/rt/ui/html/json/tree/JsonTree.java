@@ -107,6 +107,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         return getModel().isAutoCheckChildNodes();
       }
     });
+    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_SCROLL_TO_SELECTION, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isScrollToSelection();
+      }
+    });
   }
 
   @Override

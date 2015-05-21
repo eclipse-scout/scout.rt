@@ -93,11 +93,8 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
       rows.push($($newRowSelection[i]).data('row'));
     }
     this._field.selectRows(rows);
-  }
-
-  // scroll selection into scrollable (if not visible)
-  if ($newRowSelection.length > 0) {
-    this._field.scrollTo($newRowSelection);
+    // scroll selection into view (if not visible)
+    this._field.scrollTo(rows[0]);
   }
 
   // preventDefault() is required here, because Chrome would native scroll a scrollable DIV,

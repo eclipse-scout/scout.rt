@@ -495,10 +495,10 @@ scout.Table.prototype._updateRowWidth = function() {
 
 scout.Table.prototype._drawData = function(startRow) {
   // this function has to be fast
-  var rowString = '',
+  var $rows, $selectedRows,
+    rowString = '',
     that = this,
-    numRowsLoaded = startRow,
-    $rows;
+    numRowsLoaded = startRow;
 
   if (this.rows.length > 0) {
     // Build $rows (as string instead of jQuery objects for efficiency reasons)
@@ -519,9 +519,14 @@ scout.Table.prototype._drawData = function(startRow) {
 
     // append block of rows
     $rows.appendTo(this.$data);
-
-    // Add row listeners, inform subscribers and update scrollbar
     this._installRows($rows);
+    this._triggerRowsDrawn($rows);
+    $selectedRows = this.selectionHandler.dataDrawn();
+    this._triggerRowsSelected($selectedRows);
+    if (this.scrollToSelection) {
+      // Execute delayed because table may be not layouted yet
+      setTimeout(this.revealSelection.bind(this));
+    }
   }
 
   // repaint and append next block
@@ -535,23 +540,16 @@ scout.Table.prototype._drawData = function(startRow) {
 };
 
 /**
- * Adds row listeners, triggers "rows drawn" event and updates the scrollbar.
- * This method should be used after the $rows are added to the DOM. The '$rows'
+ * This method should be used after the $rows are added to the DOM (new rows, updated rows). The '$rows'
  * are expected to be linked with the corresponding 'rows' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRows = function($rows) {
-  var $selectedRows,
-    that = this;
+  var that = this;
 
-  // Attach listeners
   $rows.each(function() {
     var editorField,
       $row = $(this),
       row = $row.data('row');
-    //    $row.on('mousedown', '', onMouseDown)
-    //      .on('mouseup', '', onMouseUp)
-    //      .on('dblclick', '', onDoubleClick)
-    //      .on('contextmenu', onContextMenu);
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -565,15 +563,10 @@ scout.Table.prototype._installRows = function($rows) {
       that._startCellEdit(that.cellEditorPopup.column, row, editorField.id);
     }
   });
-
-  this._triggerRowsDrawn($rows);
-  $selectedRows = this.selectionHandler.dataDrawn();
-  this._triggerRowsSelected($selectedRows);
   this.invalidateTree();
 
   // update grouping if data was grouped
   this._group();
-
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
@@ -1083,6 +1076,9 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
   if (this.rendered) {
     $selectedRows = this.selectionHandler.renderSelection();
     this._triggerRowsSelected($selectedRows);
+    if (this.scrollToSelection) {
+      this.revealSelection();
+    }
   }
 };
 
@@ -1123,7 +1119,6 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
     }
   }
 
-  // Re-attach listeners and inform subscribers
   if ($updatedRows.length > 0) {
     this._installRows($updatedRows);
   }
@@ -1220,8 +1215,14 @@ scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
   return popup;
 };
 
-scout.Table.prototype.scrollTo = function($selection) {
-  scout.scrollbars.scrollTo(this.$data, $selection);
+scout.Table.prototype.scrollTo = function(row) {
+  scout.scrollbars.scrollTo(this.$data, row.$row);
+};
+
+scout.Table.prototype.revealSelection = function() {
+  if (this.selectedRows.length > 0) {
+    this.scrollTo(this.selectedRows[0]);
+  }
 };
 
 scout.Table.prototype.rowById = function(id) {
@@ -1248,6 +1249,9 @@ scout.Table.prototype.selectRows = function(rows) {
 
   $selectedRows = this.selectionHandler.renderSelection();
   this._triggerRowsSelected($selectedRows);
+  if (this.scrollToSelection) {
+    this.revealSelection();
+  }
   this._renderMenus();
 };
 
@@ -1903,7 +1907,7 @@ scout.Table.prototype._onRequestFocus = function() {
 };
 
 scout.Table.prototype._onScrollToSelection = function() {
-  // TODO BSH Implement
+  this.revealSelection();
 };
 
 scout.Table.prototype.onModelAction = function(event) {
