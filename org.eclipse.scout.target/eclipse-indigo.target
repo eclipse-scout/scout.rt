@@ -20,7 +20,7 @@
     </location>
 
      <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20150513182540/repository"/>
+      <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20150519210750/repository"/>
       <unit id="javax.jms" version="1.1.0.v201205091237"/>
       <unit id="javax.jms.source" version="1.1.0.v201205091237"/>
       <unit id="javax.servlet" version="3.0.0.v201112011016"/>
@@ -38,8 +38,8 @@
       <unit id="org.apache.batik.util.gui.source" version="1.7.0.v200903091627"/>
       <unit id="org.apache.batik.bridge" version="1.7.0.v201011041433"/>
       <unit id="org.apache.batik.bridge.source" version="1.7.0.v201011041433"/>
-      <unit id="org.apache.batik.dom" version="1.7.0.v201011041433"/>
-      <unit id="org.apache.batik.dom.source" version="1.7.0.v201011041433"/>
+      <unit id="org.apache.batik.dom" version="1.7.1.v201505191845"/>
+      <unit id="org.apache.batik.dom.source" version="1.7.1.v201505191845"/>
       <unit id="org.apache.batik.dom.svg" version="1.7.0.v201011041433"/>
       <unit id="org.apache.batik.dom.svg.source" version="1.7.0.v201011041433"/>
       <unit id="org.apache.batik.ext.awt" version="1.7.0.v201011041433"/>
