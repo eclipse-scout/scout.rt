@@ -18,20 +18,23 @@ scout.MenuBarLeftKeyStroke = function(menuBar, keyStroke) {
   this.bubbleUp = false;
 };
 scout.inherits(scout.MenuBarLeftKeyStroke, scout.KeyStroke);
+
+// FIXME NBU/AWE: remove copy/paste here
+// FIXME NBU/AWE: move menu-stuff to menu.js / button.js
+
 /**
  * @Override scout.KeyStroke
  */
 scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
-  var menuItems = this.menuBar.menuItems;
+  var menuItems = this.menuBar.visibleMenuItems;
   var $menuItemFocused = this.menuBar.$container.find(':focus');
   var lastValidItem, elementToFocus;
 
   for (var i = 0; i < menuItems.length; i++) {
     var actualItem = menuItems[i];
-    if(actualItem instanceof scout.Button){
-      actualItem.$field.attr('tabindex', '-1');
-    }
-    else{
+    if (actualItem instanceof scout.Button) {
+        actualItem.$field.attr('tabindex', '-1');
+    } else {
       actualItem.$container.removeAttr('tabindex');
     }
     if ($menuItemFocused[0] === actualItem.$container[0] || (actualItem.$field && $menuItemFocused[0] === actualItem.$field[0])) {
@@ -70,11 +73,12 @@ scout.MenuBarRightKeyStroke = function(menuBar, keyStroke) {
   this.bubbleUp = false;
 };
 scout.inherits(scout.MenuBarRightKeyStroke, scout.KeyStroke);
+
 /**
  * @Override scout.KeyStroke
  */
 scout.MenuBarRightKeyStroke.prototype.handle = function(event) {
-  var menuItems = this.menuBar.menuItems;
+  var menuItems = this.menuBar.visibleMenuItems;
   var $menuItemFocused = this.menuBar.$container.find(':focus');
   var focusNext = false,
     elementToFocus;

@@ -4,6 +4,14 @@ scout.MenuBar = function($parent, position, session, menuSorter) {
   this.session = session;
   this.menuSorter = menuSorter;
   this.menuItems = [];
+
+  /**
+   * This array is === menuItems when menu-bar is not over-sized.
+   * When the menu-bar is over-sized, we this property is set be the MenuBarLayout
+   * which adds an additional ellipsis-menu, and removes menu items that doesn't
+   * fit into the available menu-bar space.
+   */
+  this.visibleMenuItems = [];
   this.keyStrokeAdapter;
 
   // Create a menu-bar container and add it to the parent, but don't show it yet. It will

@@ -5,8 +5,6 @@ scout.MenuBarLayout = function(menuBar) {
 };
 scout.inherits(scout.MenuBarLayout, scout.AbstractLayout);
 
-// FIXME AWE: add tabindex=0 for ellipsis menu-item
-
 /**
  * @override AbstractLayout.js
  */
@@ -46,8 +44,9 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   $.log.info('leftEnd=' + leftEnd + ' rightEnd=' + rightEnd + ' overflown=' + overflown);
 
   if (overflown) {
+    var menuItemsCopy = [];
 
-    // add ellipsis icon
+    // create ellipsis menu
     this._renderEllipsis($container);
     ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
     rightEnd -= ellipsisSize.width;
@@ -63,7 +62,10 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     // menu-items.
     var overflowNextItems = false;
     this._menuBar.menuItems.forEach(function(menuItem) {
-      if (!isRightAligned(menuItem)) {
+      if (isRightAligned(menuItem)) {
+        // Always add right-aligned menus
+        menuItemsCopy.push(menuItem);
+      } else {
         var itemBounds = scout.graphics.bounds(menuItem.$container, true, true),
           rightOuterX = itemBounds.x + itemBounds.width;
         if (overflowNextItems || rightOuterX > rightEnd) {
@@ -71,9 +73,19 @@ scout.MenuBarLayout.prototype.layout = function($container) {
           // FIXME AWE: hier eine property setzen, für popup/overflow/style
           this._ellipsis.childActions.push(menuItem);
           overflowNextItems = true;
+        } else {
+          // Only add left-aligned menu items when they're visible
+          menuItemsCopy.push(menuItem);
         }
       }
     }, this);
+
+    // add the ellipsis menu as last item - order matters because we do
+    // not sort the menu items again.
+    menuItemsCopy.push(this._ellipsis);
+    this._menuBar.visibleMenuItems = menuItemsCopy;
+  } else {
+    this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   }
 
   function isRightAligned(menuItem) {
@@ -88,6 +100,7 @@ scout.MenuBarLayout.prototype._renderEllipsis = function($container) {
     iconId: 'font:\uF143'
   });
   ellipsis.render($container);
+  ellipsis.$container.removeAttr('tabindex'); // FIXME NBU/AWE: (menu) move all tab-index stuff to Button.js and Menu.js
   this._ellipsis = ellipsis;
 };
 
