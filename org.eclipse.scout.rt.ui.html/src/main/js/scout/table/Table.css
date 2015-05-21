@@ -146,9 +146,24 @@
   }
 }
 
+.table-cell-icon {
+  .font-icon& {
+    color: @icon-color;
+  }
+
+  .image-icon& {
+    /* vertical-align-bottom is necessary to remove the bottom margin of the image */
+    vertical-align: bottom;
+  }
+
+  .with-text& {
+    margin-right: 8px;
+  }
+}
+
 /* key box */
 
-.table-row>.key-box {
+.table-row > .key-box {
   top: calc(~"50%" - 17px/2);
 }
 

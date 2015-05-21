@@ -764,19 +764,16 @@ scout.Table.prototype.sendReload = function() {
   this.session.send(this.id, 'reload');
 };
 
-/**
- * @columnIndex column.index is expected and not the index of the column in this.columns
- */
-scout.Table.prototype.cell = function(columnIndex, row) {
-  return row.cells[columnIndex];
+scout.Table.prototype.cell = function(column, row) {
+  return row.cells[column.index];
 };
 
 scout.Table.prototype.cellByCellIndex = function(cellIndex, row) {
-  return this.cell(this.columns[cellIndex].index, row);
+  return this.cell(this.columns[cellIndex], row);
 };
 
 scout.Table.prototype.cellValue = function(column, row) {
-  var cell = this.cell(column.index, row);
+  var cell = this.cell(column, row);
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -791,7 +788,7 @@ scout.Table.prototype.cellValue = function(column, row) {
 };
 
 scout.Table.prototype.cellText = function(column, row) {
-  var cell = this.cell(column.index, row);
+  var cell = this.cell(column, row);
 
   if (!cell) {
     return '';
@@ -880,7 +877,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
       // does not support tabbing and does not have a cell -> would throw an exception
       return false;
     }
-    cell = this.cell(column.index, row);
+    cell = this.cell(column, row);
     return this.enabled && row.enabled && cell.editable;
   }.bind(this);
 

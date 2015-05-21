@@ -9,7 +9,7 @@ scout.CheckBoxColumn.prototype.buildCell = function(row) {
   if (this.isCheckableColumn()) {
     checked = row.checked;
   } else {
-    cell = this.table.cell(this.index, row);
+    cell = this.table.cell(this, row);
     checked = cell.value;
     enabled = enabled && cell.editable;
   }
