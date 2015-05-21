@@ -29,7 +29,7 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.jaxws.apt.PortTypeProxyAnnotationProcessor;
+import org.eclipse.scout.jaxws.apt.JaxWsAnnotationProcessor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor.HandlerDescriptor;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.Logger;
@@ -125,7 +125,7 @@ public class HandlerArtifactProcessor {
 
     // Add 'Generated' annotation
     final JAnnotationUse generatedAnnotation = authHandler.annotate(Generated.class);
-    generatedAnnotation.param("value", PortTypeProxyAnnotationProcessor.class.getName());
+    generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
     generatedAnnotation.param("comments", String.format("Authentication Handler for [method=%s, authenticator=%s]", AptUtil.toSimpleName(descriptor.getAuthMethod()), AptUtil.toSimpleName(descriptor.getAuthenticator())));
 
@@ -152,7 +152,7 @@ public class HandlerArtifactProcessor {
 
     // Add 'Generated' annotation
     final JAnnotationUse generatedAnnotation = handlerProxy.annotate(Generated.class);
-    generatedAnnotation.param("value", PortTypeProxyAnnotationProcessor.class.getName());
+    generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
     generatedAnnotation.param("comments", "Handler proxy for " + handler.getQualifiedName());
 

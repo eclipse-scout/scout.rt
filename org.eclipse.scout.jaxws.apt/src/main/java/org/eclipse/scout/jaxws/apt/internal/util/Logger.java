@@ -17,7 +17,7 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic.Kind;
 
-import org.eclipse.scout.jaxws.apt.PortTypeProxyAnnotationProcessor;
+import org.eclipse.scout.jaxws.apt.JaxWsAnnotationProcessor;
 
 /**
  * Logger used to log messages to the APT console.
@@ -35,7 +35,7 @@ public class Logger {
   }
 
   public void logInfo(final String msg, final Object... args) {
-    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), PortTypeProxyAnnotationProcessor.class.getSimpleName());
+    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), JaxWsAnnotationProcessor.class.getSimpleName());
     m_message.printMessage(Kind.NOTE, logMsg);
     if (m_consoleLog) {
       System.out.println("[INFO] " + logMsg);
@@ -43,7 +43,7 @@ public class Logger {
   }
 
   public void logWarn(final String msg, final Object... args) {
-    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), PortTypeProxyAnnotationProcessor.class.getSimpleName());
+    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), JaxWsAnnotationProcessor.class.getSimpleName());
     m_message.printMessage(Kind.WARNING, logMsg);
     if (m_consoleLog) {
       System.out.println("[WARN] " + logMsg);
@@ -51,7 +51,7 @@ public class Logger {
   }
 
   public void logError(final String msg, final Object... args) {
-    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), PortTypeProxyAnnotationProcessor.class.getSimpleName());
+    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), JaxWsAnnotationProcessor.class.getSimpleName());
 
     m_message.printMessage(Kind.ERROR, logMsg); // fails the build
     if (m_consoleLog) {
@@ -60,7 +60,7 @@ public class Logger {
   }
 
   public void logError(final Throwable t, final String msg, final Object... args) {
-    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), PortTypeProxyAnnotationProcessor.class.getSimpleName());
+    final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), JaxWsAnnotationProcessor.class.getSimpleName());
 
     final StringWriter stacktrace = new StringWriter();
     t.printStackTrace(new PrintWriter(stacktrace));

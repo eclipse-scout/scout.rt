@@ -89,7 +89,7 @@ import com.sun.codemodel.JVar;
  */
 @SupportedAnnotationTypes({"javax.jws.WebService", "org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeDecorator"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
+public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
   public static final String PORT_TYPE_PROXY_SUFFIX = "Proxy";
 
@@ -397,7 +397,7 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
   protected void addAnnotations(final JCodeModel model, final JDefinedClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final RoundEnvironment roundEnv) {
     // Add 'Generated' annotation
     final JAnnotationUse generatedAnnotation = portTypeProxy.annotate(Generated.class);
-    generatedAnnotation.param("value", PortTypeProxyAnnotationProcessor.class.getName());
+    generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
     generatedAnnotation.param("comments", "Proxy to run webservice requests on behalf of a RunContext");
 
