@@ -665,7 +665,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Subclasses can override this method. The default opens the configured default menu or if no default menu is
    * configured, fires a {@link TableEvent#TYPE_ROW_ACTION} event.
    *
-   * @param Row
+   * @param row
    *          that was activated (never null).
    * @throws ProcessingException
    */
@@ -693,8 +693,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Subclasses can override this method. The default does nothing.
    *
    * @param rows
-   *          a unmodifiable list of selected rows.
-   *          that were selected.
+   *          an unmodifiable list of the selected rows.
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -761,17 +760,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Called when the user checks or unchecks a row in this table.
+   * Called when rows get checked or unchecked.
    * <p>
    * Subclasses can override this method.
    *
-   * @param Row
-   *          that was checked or unchecked (never null).
+   * @param rows
+   *          list of rows which have been checked or unchecked (never null).
    * @throws ProcessingException
    */
   @ConfigOperation
   @Order(130)
-  protected void execRowsChecked(Collection<? extends ITableRow> row) throws ProcessingException {
+  protected void execRowsChecked(Collection<? extends ITableRow> rows) throws ProcessingException {
   }
 
   /**

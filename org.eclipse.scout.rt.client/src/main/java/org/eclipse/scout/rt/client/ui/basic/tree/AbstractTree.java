@@ -451,6 +451,15 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     fireTreeEventInternal(e);
   }
 
+  /**
+   * Called when nodes get checked or unchecked.
+   * <p>
+   * Subclasses can override this method.
+   *
+   * @param nodes
+   *          list of nodes which have been checked or unchecked (never null).
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(90)
   protected void execNodesChecked(List<ITreeNode> nodes) throws ProcessingException {
