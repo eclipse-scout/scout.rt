@@ -44,7 +44,7 @@ public class Logger {
 
   public void logWarn(final String msg, final Object... args) {
     final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), PortTypeProxyAnnotationProcessor.class.getSimpleName());
-    m_message.printMessage(Kind.WARNING, String.format(msg, args));
+    m_message.printMessage(Kind.WARNING, logMsg);
     if (m_consoleLog) {
       System.out.println("[WARN] " + logMsg);
     }
@@ -53,7 +53,7 @@ public class Logger {
   public void logError(final String msg, final Object... args) {
     final String logMsg = String.format("Annotation processing: %s [processor=%s]", String.format(msg, args), PortTypeProxyAnnotationProcessor.class.getSimpleName());
 
-    m_message.printMessage(Kind.ERROR, String.format(msg, args)); // for fail the build
+    m_message.printMessage(Kind.ERROR, logMsg); // fails the build
     if (m_consoleLog) {
       System.err.println(String.format("[ERROR] %s", logMsg));
     }
@@ -64,7 +64,7 @@ public class Logger {
 
     final StringWriter stacktrace = new StringWriter();
     t.printStackTrace(new PrintWriter(stacktrace));
-    m_message.printMessage(Kind.ERROR, String.format(msg, args) + stacktrace); // for fail the build
+    m_message.printMessage(Kind.ERROR, logMsg + stacktrace); // for fail the build
     if (m_consoleLog) {
       System.err.println(String.format("[ERROR] %s\n%s:%s", logMsg, t.getMessage(), stacktrace));
     }

@@ -15,6 +15,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -40,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.http.HTTPException;
-import javax.xml.ws.soap.MTOM;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
@@ -69,7 +69,6 @@ import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -126,26 +125,93 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
    */
   protected void generatePortTypeProxyForEachEndpoint(final RoundEnvironment roundEnv) {
     for (final Element candidate : roundEnv.getElementsAnnotatedWith(WebService.class)) {
+      // Iterate through all classes annotated with @WebService
       if (candidate instanceof TypeElement && ElementKind.INTERFACE.equals(candidate.getKind()) && candidate.getAnnotation(JaxWsPortTypeDecorator.class) == null /* skip decorators */) {
-        final TypeElement portTypeInterface = (TypeElement) candidate;
-        try {
-          m_logger.logInfo("Generating PortTypeProxy for '%s'", portTypeInterface.getQualifiedName());
-          generatePortTypeProxy(portTypeInterface, roundEnv);
+        final TypeElement _portTypeInterface = (TypeElement) candidate;
+        final String portTypeName = _portTypeInterface.getAnnotation(WebService.class).name();
+
+        m_logger.logInfo("Webservice found: '%s'", _portTypeInterface.getQualifiedName());
+
+        // Find the Decorator(s) which matches the webservice. There are multiple decorates if the webservices declares multiple services/ports which should be provided.
+        final List<PortTypeProxyDescriptor> descriptors = new ArrayList<>();
+        for (final Element _decoratorClazz : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeDecorator.class)) {
+          final JaxWsPortTypeDecorator _decoratorAnnotation = _decoratorClazz.getAnnotation(JaxWsPortTypeDecorator.class);
+          if (portTypeName.equals(_decoratorAnnotation.belongsToPortType())) {
+            descriptors.add(new PortTypeProxyDescriptor(_decoratorClazz, _portTypeInterface, processingEnv));
+          }
         }
-        catch (final Exception e) {
-          m_logger.logError(e, e.getMessage());
+
+        if (descriptors.isEmpty()) {
+          m_logger.logInfo("Skipped generation of PortTypeProxy for '%s', because no %s for 'portType=%s' found. That is ok, if the stub is used as webservice consumer only. If being used as provider, create such a decorator class to instrument proxy generation.", _portTypeInterface.getQualifiedName(), JaxWsPortTypeDecorator.class.getSimpleName(), portTypeName);
+        }
+        else {
+          ensureUniqueProxyNames(descriptors);
+
+          for (final PortTypeProxyDescriptor descriptor : descriptors) {
+            try {
+              m_logger.logInfo("Generating PortTypeProxy for '%s' [proxy=%s, portType=%s, service=%s, port=%s]", _portTypeInterface.getQualifiedName(), descriptor.getProxyQualifiedName(), portTypeName, descriptor.getServiceName(), descriptor.getPortName());
+              generatePortTypeProxy(descriptor, roundEnv);
+            }
+            catch (final Exception e) {
+              m_logger.logError(e, e.getMessage());
+            }
+          }
         }
       }
     }
   }
 
   /**
+   * Ensures the proxies to have unique names.
+   */
+  protected void ensureUniqueProxyNames(final List<PortTypeProxyDescriptor> descriptors) {
+    if (descriptors.size() == 1) {
+      return;
+    }
+
+    final Set<String> names = new HashSet<>();
+    for (final PortTypeProxyDescriptor descriptor : descriptors) {
+      names.add(descriptor.getProxyQualifiedName());
+    }
+
+    // Check for a name conflict.
+    if (names.size() == descriptors.size()) {
+      return; // no conflict.
+    }
+
+    m_logger.logWarn("Port type proxy names not unique");
+
+    // Make proxy names unique.
+    for (int i = 0; i < descriptors.size(); i++) {
+      descriptors.get(i).setProxyNameSuffix(String.valueOf(i));
+    }
+  }
+
+  /**
    * Generates the PortTypeProxy and associated artifacts for the given port type.
    */
-  protected void generatePortTypeProxy(final TypeElement _interface, final RoundEnvironment roundEnv) throws Exception {
+  protected void generatePortTypeProxy(final PortTypeProxyDescriptor descriptor, final RoundEnvironment roundEnv) throws Exception {
     final JCodeModel model = new JCodeModel();
 
-    final JDefinedClass portTypeProxy = createPortTypeProxyClass(model, _interface, roundEnv);
+    // Create PortTypeProxy class.
+    final TypeElement _portTypeInterface = descriptor.getPortTypeInterface();
+    final JClass portTypeInterface = model.ref(_portTypeInterface.getQualifiedName().toString());
+    final JDefinedClass portTypeProxy = model._class(descriptor.getProxyQualifiedName())._implements(portTypeInterface);
+
+    // Add annotations to the PortTypeProxy.
+    addAnnotations(model, portTypeProxy, descriptor, roundEnv);
+
+    // Create handler chain.
+    final HandlerChain _handlerChainAnnotation = _portTypeInterface.getAnnotation(HandlerChain.class);
+    if (_handlerChainAnnotation != null) {
+      m_logger.logInfo("Handler file not generated because provided as binding file [file=%s]", _handlerChainAnnotation.file());
+    }
+    else if (!descriptor.getHandlerChain().isEmpty() || descriptor.getAuthentication().enabled()) {
+      portTypeProxy.annotate(HandlerChain.class).param("file", new HandlerArtifactProcessor().generateHandlerArtifacts(portTypeProxy, descriptor, processingEnv, m_logger));
+    }
+
+    // Add JavaDoc to the PortTypeProxy.
+    AptUtil.addJavaDoc(portTypeProxy, createJavaDocForPortTypeProxy(descriptor));
 
     // Create the logger field.
     final JFieldVar logger = portTypeProxy.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, IScoutLogger.class, LOGGER_FIELD_NAME, model.ref(ScoutLogManager.class).staticInvoke("getLogger").arg(portTypeProxy.dotclass()));
@@ -154,7 +220,7 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
     webServiceContext.annotate(Resource.class);
 
     // Overwrite all methods declared on the PortType interface.
-    for (final Element _element : _interface.getEnclosedElements()) {
+    for (final Element _element : _portTypeInterface.getEnclosedElements()) {
       if (!(ElementKind.METHOD.equals(_element.getKind()))) {
         continue;
       }
@@ -162,8 +228,6 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
 
       final String methodName = _method.getSimpleName().toString();
       final JType returnType = JTypeParser.parseType(model, _method.getReturnType());
-
-      m_logger.logInfo("Generating PortTypeProxy implementation for method '%s#%s'", _interface.getQualifiedName().toString(), methodName);
 
       // Create the method.
       final JMethod method = portTypeProxy.method(JMod.PUBLIC, returnType, methodName);
@@ -183,7 +247,7 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
       }
 
       // Create the proxy implementation.
-      addMethodProxyImplementation(model, webServiceContext, method, throwTypes, TypeKind.VOID.equals(_method.getReturnType().getKind()), _interface.getQualifiedName().toString());
+      addMethodProxyImplementation(model, webServiceContext, method, throwTypes, TypeKind.VOID.equals(_method.getReturnType().getKind()), _portTypeInterface.getQualifiedName().toString());
     }
 
     // Create the method to handle undeclared errors.
@@ -193,44 +257,6 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
     AptUtil.buildAndPersist(model, processingEnv.getFiler());
 
     m_logger.logInfo("PortTypeProxy '%s' successfully generated.'", portTypeProxy.fullName());
-  }
-
-  /**
-   * Creates the skeleton class for the port type proxy.
-   */
-  @Internal
-  protected JDefinedClass createPortTypeProxyClass(final JCodeModel model, final TypeElement _portTypeInterface, final RoundEnvironment roundEnv) throws JClassAlreadyExistsException {
-    final JClass portTypeInterface = model.ref(_portTypeInterface.getQualifiedName().toString());
-
-    final String portTypeName = _portTypeInterface.getAnnotation(WebService.class).name();
-    final PortTypeProxyDescriptor descriptor = findPortTypeProxyDescriptor(roundEnv, portTypeName);
-    if (descriptor == null) {
-      m_logger.logInfo("No endpoint decorator class annotated with '%s' found. Using derived values for @%s annotation. [portType=%s]", JaxWsPortTypeDecorator.class.getSimpleName(), WebService.class.getSimpleName(), portTypeName);
-    }
-
-    // Create PortTypeProxy class.
-    final JDefinedClass portTypeProxy;
-
-    final String pck;
-    final String name;
-    if (descriptor != null) {
-      pck = processingEnv.getElementUtils().getPackageOf(descriptor.getDeclaringType()).getQualifiedName().toString();
-      name = (descriptor.isProxyNameDerived() ? _portTypeInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX : descriptor.getProxyName());
-    }
-    else {
-      pck = processingEnv.getElementUtils().getPackageOf(_portTypeInterface).getQualifiedName().toString();
-      name = _portTypeInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX;
-    }
-
-    portTypeProxy = model._class(StringUtility.join(".", pck, name));
-    portTypeProxy._implements(portTypeInterface);
-
-    // Add annotations to the PortTypeProxy.
-    addAnnotations(model, portTypeProxy, _portTypeInterface, descriptor, roundEnv);
-
-    // Add JavaDoc to the PortTypeProxy.
-    AptUtil.addJavaDoc(portTypeProxy, createJavaDocForPortTypeProxy(_portTypeInterface, descriptor));
-    return portTypeProxy;
   }
 
   /**
@@ -368,70 +394,54 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
   /**
    * Adds annotations to the PortTypeProxy.
    */
-  protected void addAnnotations(final JCodeModel model, final JDefinedClass portTypeProxy, final TypeElement _portTypeInterface, final PortTypeProxyDescriptor descriptor, final RoundEnvironment roundEnv) {
+  protected void addAnnotations(final JCodeModel model, final JDefinedClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final RoundEnvironment roundEnv) {
     // Add 'Generated' annotation
     final JAnnotationUse generatedAnnotation = portTypeProxy.annotate(Generated.class);
     generatedAnnotation.param("value", PortTypeProxyAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
     generatedAnnotation.param("comments", "Proxy to run webservice requests on behalf of a RunContext");
 
-    if (descriptor != null) {
-      // Add 'WebService' annotation
-      if (!descriptor.containsAnnotation(WebService.class)) {
-        final WebService _webServiceAnnotation = _portTypeInterface.getAnnotation(WebService.class);
-        final JAnnotationUse webServiceAnnotation = portTypeProxy.annotate(WebService.class);
-        webServiceAnnotation.param("name", _webServiceAnnotation.name());
-        webServiceAnnotation.param("targetNamespace", _webServiceAnnotation.targetNamespace());
-        webServiceAnnotation.param("endpointInterface", _portTypeInterface.getQualifiedName().toString());
+    // Add 'WebService' annotation
+    if (!descriptor.containsAnnotation(WebService.class)) {
+      final WebService _webServiceAnnotation = descriptor.getPortTypeInterface().getAnnotation(WebService.class);
+      final JAnnotationUse webServiceAnnotation = portTypeProxy.annotate(WebService.class);
+      webServiceAnnotation.param("name", _webServiceAnnotation.name());
+      webServiceAnnotation.param("targetNamespace", _webServiceAnnotation.targetNamespace());
+      webServiceAnnotation.param("endpointInterface", descriptor.getPortTypeInterface().getQualifiedName().toString());
 
-        if (descriptor != null) {
-          if (StringUtility.hasText(descriptor.getServiceName())) {
-            webServiceAnnotation.param("serviceName", descriptor.getServiceName());
-          }
-          if (StringUtility.hasText(descriptor.getPortName())) {
-            webServiceAnnotation.param("portName", descriptor.getPortName());
-          }
-          if (descriptor.isWsdlLocationDerived()) {
-            final WebServiceClient _webServiceClientAnnotation = findWebServiceClientAnnotation(roundEnv, descriptor.getServiceName());
-            if (_webServiceClientAnnotation != null) {
-              webServiceAnnotation.param("wsdlLocation", _webServiceClientAnnotation.wsdlLocation());
-            }
-            else {
-              m_logger.logWarn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"%s\")' found.", descriptor.getServiceName());
-            }
-          }
-          else if (StringUtility.hasText(descriptor.getWsdlLocation())) {
-            webServiceAnnotation.param("wsdlLocation", descriptor.getWsdlLocation());
-          }
-        }
-      }
-
-      // Add custom annotations
-      AnnotationUtil.addAnnotations(model, portTypeProxy, descriptor.getSiblingAnnotations());
-
-      // Add handler chain annotation.
-      final HandlerChain _handlerChainAnnotation = _portTypeInterface.getAnnotation(HandlerChain.class);
-      if (_handlerChainAnnotation == null) {
-        portTypeProxy.annotate(HandlerChain.class).param("file", new HandlerArtifactProcessor().generateHandlerArtifacts(portTypeProxy, descriptor, processingEnv, m_logger));
+      if (StringUtility.hasText(descriptor.getServiceName())) {
+        webServiceAnnotation.param("serviceName", descriptor.getServiceName());
       }
       else {
-        m_logger.logInfo("Handler file not generated because provided as binding file [file=%s]", _handlerChainAnnotation.file());
+        m_logger.logWarn("No 'serviceName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDeclaringType().getSimpleName().toString());
       }
-    }
-  }
 
-  /**
-   * Returns the descriptor representing {@link JaxWsPortTypeDecorator}, or <code>null</code> if not found.
-   */
-  @Internal
-  protected PortTypeProxyDescriptor findPortTypeProxyDescriptor(final RoundEnvironment roundEnv, final String portTypeName) {
-    for (final Element _portTypeProxyElement : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeDecorator.class)) {
-      final JaxWsPortTypeDecorator _portTypeProxyAnnotation = _portTypeProxyElement.getAnnotation(JaxWsPortTypeDecorator.class);
-      if (portTypeName.equals(_portTypeProxyAnnotation.belongsToPortType())) {
-        return new PortTypeProxyDescriptor(_portTypeProxyElement, processingEnv);
+      if (StringUtility.hasText(descriptor.getPortName())) {
+        webServiceAnnotation.param("portName", descriptor.getPortName());
+      }
+      else {
+        m_logger.logWarn("No 'portName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDeclaringType().getSimpleName().toString());
+      }
+
+      if (descriptor.isWsdlLocationDerived()) {
+        final WebServiceClient _webServiceClientAnnotation = findWebServiceClientAnnotation(roundEnv, descriptor.getServiceName());
+        if (_webServiceClientAnnotation != null) {
+          webServiceAnnotation.param("wsdlLocation", _webServiceClientAnnotation.wsdlLocation());
+        }
+        else if (!StringUtility.hasText(descriptor.getServiceName())) {
+          m_logger.logWarn("Cannot derive 'wsdlLocation' because no 'serviceName' specified in %s.", descriptor.getDeclaringType().getSimpleName().toString());
+        }
+        else {
+          m_logger.logWarn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"%s\")' found. [decorator=%s]", descriptor.getServiceName(), descriptor.getDeclaringType().getSimpleName().toString());
+        }
+      }
+      else if (StringUtility.hasText(descriptor.getWsdlLocation())) {
+        webServiceAnnotation.param("wsdlLocation", descriptor.getWsdlLocation());
       }
     }
-    return null;
+
+    // Add custom annotations
+    AnnotationUtil.addAnnotations(model, portTypeProxy, descriptor.getSiblingAnnotations());
   }
 
   /**
@@ -448,58 +458,44 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
     return null;
   }
 
-  private String createJavaDocForPortTypeProxy(final TypeElement _portTypeInterface, final PortTypeProxyDescriptor descriptor) {
+  private String createJavaDocForPortTypeProxy(final PortTypeProxyDescriptor descriptor) {
     final StringWriter writer = new StringWriter();
     final PrintWriter out = new PrintWriter(writer);
 
-    out.printf("This class is auto-generated by APT triggered by Maven build based on {@link %s} annotation on {@link %s}", WebService.class.getSimpleName(), _portTypeInterface.getSimpleName());
-    if (descriptor != null) {
-      out.printf(", and is customized by {@link %s}.", descriptor.getDeclaringType().getSimpleName()).println();
+    out.printf("This class is auto-generated by APT triggered by Maven build based on {@link %s}.", descriptor.getDeclaringType().getSimpleName()).println();
+    out.println("<p>");
+    out.printf("This proxy intercepts webservice requests and runs them on behalf of a {@link ServerRunContext}, before being propagated to the implementing PortType Bean. Typically, the RunContext is configured by a preceding handler, like {@link %s}.", AuthenticationHandler.class.getSimpleName()).println();
+    out.println("<p>");
+
+    out.println("<table>");
+
+    out.printf("<tr><td>Webservice:</td><td>{@link %s}</td>", descriptor.getPortTypeInterface().getSimpleName().toString()).println();
+    out.printf("<tr><td>Decorator:</td><td>{@link %s}</td>", descriptor.getDeclaringType().getSimpleName().toString()).println();
+
+    // Authentication
+    if (descriptor.getAuthentication().enabled()) {
+      out.printf("<tr><td>Authentication Method:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthMethod())).println();
+      out.printf("<tr><td>Authenticator:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthenticator())).println();
     }
     else {
-      out.println(".");
+      out.println("<tr><td>Authentication:</td><td>none</td>");
     }
-    out.println("<p>");
-    out.printf("This proxy intercepts webservice requests and runs them on behalf of a {@link RunContext}, before being dispatched to the implementing PortType bean. Typically, the RunContext is configured by a preceding handler, like {@link %s}.", AuthenticationHandler.class.getSimpleName()).println();
-    out.println("<p>");
-    if (descriptor != null) {
-      out.println("<table>");
 
-      // Authentication
-      if (descriptor.getAuthentication().enabled()) {
-        out.printf("<tr><td>Authentication Method:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthMethod())).println();
-        out.printf("<tr><td>Authenticator:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthenticator())).println();
-      }
-      else {
-        out.println("<tr><td>Authentication:</td><td>none</td>");
-      }
-
-      // Handlers
-      if (descriptor.getHandlerChain().isEmpty()) {
-        out.println("<tr><td>Handler chain:</td><td>none</td>");
-      }
-      else {
-        final List<String> handlers = new ArrayList<>();
-        for (final HandlerDescriptor handler : descriptor.getHandlerChain()) {
-          handlers.add(String.format("{@link %s}", handler.getSimpleName()));
-        }
-        out.printf("<tr><td>Handler chain:</td><td>%s</td>", StringUtility.join(", ", handlers)).println();
-      }
-
-      out.println("</table>");
+    // Handlers
+    if (descriptor.getHandlerChain().isEmpty()) {
+      out.println("<tr><td>Handler chain:</td><td>none</td>");
     }
+    else {
+      final List<String> handlers = new ArrayList<>();
+      for (final HandlerDescriptor handler : descriptor.getHandlerChain()) {
+        handlers.add(String.format("{@link %s}", handler.getSimpleName()));
+      }
+      out.printf("<tr><td>Handler chain:</td><td>%s</td>", StringUtility.join(", ", handlers)).println();
+    }
+    out.println("</table>");
     out.println("<ul>");
-    out.println("<li>To disable proxy generation, set Maven property 'jaxws.porttypeproxy.enabled' to <code>false</code>, or disable APT.</li>");
     out.println("<li>To rebuild stub and proxy, run 'mvn clean compile', or update the Maven Project in Eclipse IDE (Ctrl+F5 with 'clean projects' checked).</li>");
-    out.println("<li>If not cleaning 'target' folder, stub and proxy is only re-generated if either WSDL, schema or binding files change, or '/target/jaxws/wsartifact-hash' is deleted manually.</li>");
-    out.printf("<li>Provide an interface annotated with {@link %s} to customize proxy and artifact generation, e.g. to configure authentication, install handlers, or to contribute additional annotations like {@link %s}.</li>", JaxWsPortTypeDecorator.class.getSimpleName(), MTOM.class.getSimpleName()).println();
-    out.printf("<li>Any annotation declared on interface annotated with {@link %s} is contributed to the PortTypeProxy.</li>", JaxWsPortTypeDecorator.class.getSimpleName()).println();
-    out.printf("<li>By contributing a {@link %s} annotation on proxy decorator, webservice configuration can be overwritten.</li>", WebService.class.getSimpleName()).println();
-    out.printf("<li>If providing a binding file with a handler-chain definition, handler definition and authentication on proxy decorator is ignored.</li>", WebService.class.getSimpleName()).println();
-    if (descriptor != null && _portTypeInterface.getAnnotation(HandlerChain.class) == null) {
-      out.println("<li>JAX-WS handlers are registered in 'handler-chain.xml'.</li>");
-    }
-
+    out.println("<li>When running an incremental build, stub and proxy are only re-generated if either WSDL, schema or binding files change, or '/target/jaxws/wsartifact-hash' is deleted manually.</li>");
     out.println("</ul>");
 
     final StringWriter newLine = new StringWriter();

@@ -26,6 +26,7 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.soap.MTOM;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
@@ -41,21 +42,26 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  */
 public class PortTypeProxyDescriptor {
 
+  public static final String PORT_TYPE_PROXY_SUFFIX = "Proxy";
+
+  private final TypeElement m_portTypeInterface;
   private final TypeElement m_declaringType;
   private final JaxWsPortTypeDecorator m_annotation;
   private final AnnotationMirror m_annotationMirror;
   private final List<AnnotationMirror> m_siblingAnnotations;
+  private String m_proxyNameSuffix;
 
   private final ProcessingEnvironment m_env;
 
-  public PortTypeProxyDescriptor(final Element portTypeProxyElement, final ProcessingEnvironment env) {
-    m_declaringType = (TypeElement) env.getTypeUtils().asElement(portTypeProxyElement.asType());
-    m_annotation = Assertions.assertNotNull(portTypeProxyElement.getAnnotation(JaxWsPortTypeDecorator.class), "Unexpected: Annotation '%s' not found [class=%s],", JaxWsPortTypeDecorator.class.getName(), portTypeProxyElement);
+  public PortTypeProxyDescriptor(final Element portTypeProxyClazz, final TypeElement portTypeInterface, final ProcessingEnvironment env) {
+    m_portTypeInterface = portTypeInterface;
+    m_declaringType = (TypeElement) env.getTypeUtils().asElement(portTypeProxyClazz.asType());
+    m_annotation = Assertions.assertNotNull(portTypeProxyClazz.getAnnotation(JaxWsPortTypeDecorator.class), "Unexpected: Annotation '%s' not found [class=%s],", JaxWsPortTypeDecorator.class.getName(), portTypeProxyClazz);
     m_siblingAnnotations = new ArrayList<>();
     m_env = env;
 
     AnnotationMirror decoratorAnnotationMirror = null;
-    for (final AnnotationMirror _annotationMirror : portTypeProxyElement.getAnnotationMirrors()) {
+    for (final AnnotationMirror _annotationMirror : portTypeProxyClazz.getAnnotationMirrors()) {
       if (JaxWsPortTypeDecorator.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
         decoratorAnnotationMirror = _annotationMirror;
       }
@@ -65,6 +71,34 @@ public class PortTypeProxyDescriptor {
     }
 
     m_annotationMirror = Assertions.assertNotNull(decoratorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '%s' not found,", JaxWsPortTypeDecorator.class.getName());
+  }
+
+  public TypeElement getPortTypeInterface() {
+    return m_portTypeInterface;
+  }
+
+  /**
+   * @return the fully qualified name of the port type proxy.
+   */
+  public String getProxyQualifiedName() {
+    final boolean derived = JaxWsPortTypeDecorator.DERIVED.equals(m_annotation.portTypeProxyName());
+
+    final String suffix = StringUtility.nvl(m_proxyNameSuffix, "");
+    final String pck = m_env.getElementUtils().getPackageOf(m_declaringType).getQualifiedName().toString();
+    if (derived) {
+      return StringUtility.join(".", pck, m_portTypeInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX + suffix);
+    }
+    else {
+      return StringUtility.join(".", pck, m_annotation.portTypeProxyName() + suffix);
+    }
+  }
+
+  /**
+   * Sets a suffix to be appended to the PortTypeProxyName, or <code>null</code> for no suffix. The suffix is used for
+   * unique names.
+   */
+  public void setProxyNameSuffix(final String suffix) {
+    m_proxyNameSuffix = suffix;
   }
 
   /**
@@ -111,20 +145,6 @@ public class PortTypeProxyDescriptor {
     }
 
     return handlerChain;
-  }
-
-  /**
-   * @return name of the proxy class.
-   */
-  public String getProxyName() {
-    return m_annotation.portTypeProxyName();
-  }
-
-  /**
-   * @return <code>true</code> if the proxy name is to be derived from port type interface.
-   */
-  public boolean isProxyNameDerived() {
-    return JaxWsPortTypeDecorator.DERIVED.equals(getProxyName());
   }
 
   /**

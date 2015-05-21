@@ -20,6 +20,7 @@ import javax.xml.ws.WebServiceClient;
 
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
@@ -27,10 +28,18 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticatio
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
 /**
- * Use this annotation to instrument <code>PortTypeProxy</code> generation by configuring authentication, JAX-WS
- * handlers, change properties of {@link WebService} annotation, or to inject additional annotations to the port type.
- * Thereby, any annotation declared aside this annotation is injected to the proxy. If declaring a {@link WebService}
- * annotation, that annotation is used instead of a derived one.
+ * Annotate an interface with this annotation, if you like to generate a PortTypProxy for a webservice provider. A
+ * PortTypeProxy implements all methods of a webservice and makes webservice requests to run on behalf of a
+ * {@link ServerRunContext}, before being propagated to the Bean implementing the port type interface. Also,
+ * installation of authentication and JAX-WS handlers is facilitated.
+ * <p>
+ * Any annotation added to the interface is added to the proxy as well. That also applies for {@link WebService}
+ * annotation to overwrite values derived from WSDL. If you provide an explicit handler-chain binding file, handlers and
+ * authentication declared on this annotation are ignored.
+ * <p>
+ * The binding to the concrete webservice is done by {@link #belongsToPortType()} attribute. If a WSDL declares multiple
+ * services, create a separate decorator interface for each service to be provided, and distinguish the proxy's name by
+ * {@link #portTypeProxyName()} attribute.
  *
  * @since 5.1
  */
@@ -42,7 +51,7 @@ public @interface JaxWsPortTypeDecorator {
   public static final String DERIVED = "derived";
 
   /**
-   * The port type name as specified in the WSDL file to bind the declaring class to a PortTypeProxy.
+   * The 'port type name' as specified in the WSDL file to generate a PortTypeProxy for.
    *
    * <pre>
    * &lt;wsdl:portType name="PORT_TYPE_NAME"&gt;
@@ -54,12 +63,13 @@ public @interface JaxWsPortTypeDecorator {
 
   /**
    * The class name of the PortTypeProxy to be generated. If not set, the name is derived from the PortType interface
-   * suffixed with 'Proxy_'.
+   * suffixed with 'Proxy'.
    */
   String portTypeProxyName() default JaxWsPortTypeDecorator.DERIVED;
 
   /**
-   * The service name as specified in the WSDL file, and must be set if running in J2EE container.
+   * The service name as specified in the WSDL file, and must be set if publishing a webservice in J2EE container.
+   * Both, {@link #serviceName()} and {@link #portName()}, uniquely identify a webservice endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="SERVICE_NAME">
@@ -70,7 +80,8 @@ public @interface JaxWsPortTypeDecorator {
   String serviceName() default "";
 
   /**
-   * The name of the port as specified in the WSDL file, and must be set if running in J2EE container.
+   * The name of the port as specified in the WSDL file, and must be set if publishing a webservice in J2EE container.
+   * Both, {@link #serviceName()} and {@link #portName()}, uniquely identify a webservice endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="...">
