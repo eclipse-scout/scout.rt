@@ -30,10 +30,10 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFil
    * Computes whether the event should be returned to the GUI. There are three cases:
    * <ul>
    * <li>No filtering happens: The original event is returned. <br>
-   * This is the case if {@link #m_ignorableModelEvents} does not contain an event with the same type as the original
+   * This is the case if the conditions don't contain an event with the same type as the original
    * event.</li>
-   * <li>Partial filtering happens: A new event with a subset of tree nodes is returned.<br>
-   * This is the case if the {@link #m_ignorableModelEvents} contains a relevant event but has different nodes than the
+   * <li>Partial filtering happens (if condition.checkNodes is true): A new event with a subset of tree nodes is returned.<br>
+   * This is the case if the conditions contain a relevant event but has different nodes than the
    * original event.
    * <li>Complete filtering happens: Null is returned.<br>
    * This is the case if the event should be filtered for every node in the original event
