@@ -46,7 +46,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
 @Target(java.lang.annotation.ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface JaxWsPortTypeDecorator {
+public @interface JaxWsPortTypeProxy {
 
   public static final String DERIVED = "derived";
 
@@ -65,7 +65,7 @@ public @interface JaxWsPortTypeDecorator {
    * The class name of the PortTypeProxy to be generated. If not set, the name is derived from the PortType interface
    * suffixed with 'Proxy'.
    */
-  String portTypeProxyName() default JaxWsPortTypeDecorator.DERIVED;
+  String portTypeProxyName() default JaxWsPortTypeProxy.DERIVED;
 
   /**
    * The service name as specified in the WSDL file, and must be set if publishing a webservice in J2EE container.
@@ -95,7 +95,7 @@ public @interface JaxWsPortTypeDecorator {
    * The location of the WSDL document. If not set, the location is derived from {@link WebServiceClient} annotation
    * which is typically initialized with the location provided to 'wsimport'.
    */
-  String wsdlLocation() default JaxWsPortTypeDecorator.DERIVED;
+  String wsdlLocation() default JaxWsPortTypeProxy.DERIVED;
 
   /**
    * The authentication mechanism to be installed on the webservice endpoint, and to specify in which {@link RunContext}

@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  * If <code>enabled</code>, an {@link AuthenticationHandler} is generated at compile time (APT) and registered in the
  * handler chain as very first handler.
  *
- * @see JaxWsPortTypeDecorator
+ * @see JaxWsPortTypeProxy
  * @since 5.1
  */
 @Documented

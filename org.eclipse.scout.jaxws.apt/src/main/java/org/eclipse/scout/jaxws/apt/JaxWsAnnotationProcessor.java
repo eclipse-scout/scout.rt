@@ -61,7 +61,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeDecorator;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsRunContexts;
 
@@ -82,12 +82,12 @@ import com.sun.codemodel.JVar;
 
 /**
  * Annotation processor to generate a proxy for each webservice endpoint, so that webservice requests are run on behalf
- * of a {@link RunContext}. Based on the existence of an associated {@link JaxWsPortTypeDecorator}, other artifacts like
+ * of a {@link RunContext}. Based on the existence of an associated {@link JaxWsPortTypeProxy}, other artifacts like
  * authentication handler, proxies for handlers and handler-chain XML file are generated.
  *
  * @since 5.1
  */
-@SupportedAnnotationTypes({"javax.jws.WebService", "org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeDecorator"})
+@SupportedAnnotationTypes({"javax.jws.WebService", "org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
@@ -126,23 +126,23 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected void generatePortTypeProxyForEachEndpoint(final RoundEnvironment roundEnv) {
     for (final Element candidate : roundEnv.getElementsAnnotatedWith(WebService.class)) {
       // Iterate through all classes annotated with @WebService
-      if (candidate instanceof TypeElement && ElementKind.INTERFACE.equals(candidate.getKind()) && candidate.getAnnotation(JaxWsPortTypeDecorator.class) == null /* skip decorators */) {
+      if (candidate instanceof TypeElement && ElementKind.INTERFACE.equals(candidate.getKind()) && candidate.getAnnotation(JaxWsPortTypeProxy.class) == null /* skip proxy descriptors */) {
         final TypeElement _portTypeInterface = (TypeElement) candidate;
         final String portTypeName = _portTypeInterface.getAnnotation(WebService.class).name();
 
         m_logger.logInfo("Webservice found: '%s'", _portTypeInterface.getQualifiedName());
 
-        // Find the Decorator(s) which matches the webservice. There are multiple decorates if the webservices declares multiple services/ports which should be provided.
+        // Find the Descriptor(s) which matches the webservice. There are multiple decorates if the webservices declares multiple services/ports which should be provided.
         final List<PortTypeProxyDescriptor> descriptors = new ArrayList<>();
-        for (final Element _decoratorClazz : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeDecorator.class)) {
-          final JaxWsPortTypeDecorator _decoratorAnnotation = _decoratorClazz.getAnnotation(JaxWsPortTypeDecorator.class);
-          if (portTypeName.equals(_decoratorAnnotation.belongsToPortType())) {
-            descriptors.add(new PortTypeProxyDescriptor(_decoratorClazz, _portTypeInterface, processingEnv));
+        for (final Element _portTypeProxyDescriptorClazz : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeProxy.class)) {
+          final JaxWsPortTypeProxy _portTypeProxyAnnotation = _portTypeProxyDescriptorClazz.getAnnotation(JaxWsPortTypeProxy.class);
+          if (portTypeName.equals(_portTypeProxyAnnotation.belongsToPortType())) {
+            descriptors.add(new PortTypeProxyDescriptor(_portTypeProxyDescriptorClazz, _portTypeInterface, processingEnv));
           }
         }
 
         if (descriptors.isEmpty()) {
-          m_logger.logInfo("Skipped generation of PortTypeProxy for '%s', because no %s for 'portType=%s' found. That is ok, if the stub is used as webservice consumer only. If being used as provider, create such a decorator class to instrument proxy generation.", _portTypeInterface.getQualifiedName(), JaxWsPortTypeDecorator.class.getSimpleName(), portTypeName);
+          m_logger.logInfo("Skipped generation of PortTypeProxy for '%s', because no descriptor class annotated with %s for portType %s found. If that service is to be provided as webservice, create such a proxy descriptor class to instrument proxy generation.", _portTypeInterface.getQualifiedName(), JaxWsPortTypeProxy.class.getSimpleName(), portTypeName);
         }
         else {
           ensureUniqueProxyNames(descriptors);
@@ -432,7 +432,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
           m_logger.logWarn("Cannot derive 'wsdlLocation' because no 'serviceName' specified in %s.", descriptor.getDeclaringType().getSimpleName().toString());
         }
         else {
-          m_logger.logWarn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"%s\")' found. [decorator=%s]", descriptor.getServiceName(), descriptor.getDeclaringType().getSimpleName().toString());
+          m_logger.logWarn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"%s\")' found. [proxy descriptor=%s]", descriptor.getServiceName(), descriptor.getDeclaringType().getSimpleName().toString());
         }
       }
       else if (StringUtility.hasText(descriptor.getWsdlLocation())) {
@@ -470,7 +470,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     out.println("<table>");
 
     out.printf("<tr><td>Webservice:</td><td>{@link %s}</td>", descriptor.getPortTypeInterface().getSimpleName().toString()).println();
-    out.printf("<tr><td>Decorator:</td><td>{@link %s}</td>", descriptor.getDeclaringType().getSimpleName().toString()).println();
+    out.printf("<tr><td>Proxy descriptor:</td><td>{@link %s}</td>", descriptor.getDeclaringType().getSimpleName().toString()).println();
 
     // Authentication
     if (descriptor.getAuthentication().enabled()) {

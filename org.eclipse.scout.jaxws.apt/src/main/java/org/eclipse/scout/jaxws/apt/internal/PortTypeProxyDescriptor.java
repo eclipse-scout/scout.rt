@@ -31,12 +31,12 @@ import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler.HandlerType;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeDecorator;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
 /**
- * This class represents values declared in {@link JaxWsPortTypeDecorator}.
+ * This class represents values declared in {@link JaxWsPortTypeProxy}.
  *
  * @since 5.1
  */
@@ -46,7 +46,7 @@ public class PortTypeProxyDescriptor {
 
   private final TypeElement m_portTypeInterface;
   private final TypeElement m_declaringType;
-  private final JaxWsPortTypeDecorator m_annotation;
+  private final JaxWsPortTypeProxy m_annotation;
   private final AnnotationMirror m_annotationMirror;
   private final List<AnnotationMirror> m_siblingAnnotations;
   private String m_proxyNameSuffix;
@@ -56,21 +56,21 @@ public class PortTypeProxyDescriptor {
   public PortTypeProxyDescriptor(final Element portTypeProxyClazz, final TypeElement portTypeInterface, final ProcessingEnvironment env) {
     m_portTypeInterface = portTypeInterface;
     m_declaringType = (TypeElement) env.getTypeUtils().asElement(portTypeProxyClazz.asType());
-    m_annotation = Assertions.assertNotNull(portTypeProxyClazz.getAnnotation(JaxWsPortTypeDecorator.class), "Unexpected: Annotation '%s' not found [class=%s],", JaxWsPortTypeDecorator.class.getName(), portTypeProxyClazz);
+    m_annotation = Assertions.assertNotNull(portTypeProxyClazz.getAnnotation(JaxWsPortTypeProxy.class), "Unexpected: Annotation '%s' not found [class=%s],", JaxWsPortTypeProxy.class.getName(), portTypeProxyClazz);
     m_siblingAnnotations = new ArrayList<>();
     m_env = env;
 
-    AnnotationMirror decoratorAnnotationMirror = null;
+    AnnotationMirror descriptorAnnotationMirror = null;
     for (final AnnotationMirror _annotationMirror : portTypeProxyClazz.getAnnotationMirrors()) {
-      if (JaxWsPortTypeDecorator.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
-        decoratorAnnotationMirror = _annotationMirror;
+      if (JaxWsPortTypeProxy.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
+        descriptorAnnotationMirror = _annotationMirror;
       }
       else {
         m_siblingAnnotations.add(_annotationMirror);
       }
     }
 
-    m_annotationMirror = Assertions.assertNotNull(decoratorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '%s' not found,", JaxWsPortTypeDecorator.class.getName());
+    m_annotationMirror = Assertions.assertNotNull(descriptorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '%s' not found,", JaxWsPortTypeProxy.class.getName());
   }
 
   public TypeElement getPortTypeInterface() {
@@ -81,7 +81,7 @@ public class PortTypeProxyDescriptor {
    * @return the fully qualified name of the port type proxy.
    */
   public String getProxyQualifiedName() {
-    final boolean derived = JaxWsPortTypeDecorator.DERIVED.equals(m_annotation.portTypeProxyName());
+    final boolean derived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypeProxyName());
 
     final String suffix = StringUtility.nvl(m_proxyNameSuffix, "");
     final String pck = m_env.getElementUtils().getPackageOf(m_declaringType).getQualifiedName().toString();
@@ -102,7 +102,7 @@ public class PortTypeProxyDescriptor {
   }
 
   /**
-   * Returns the class or interface which contains {@link JaxWsPortTypeDecorator} annotation.
+   * Returns the class or interface which contains {@link JaxWsPortTypeProxy} annotation.
    */
   public TypeElement getDeclaringType() {
     return m_declaringType;
@@ -173,7 +173,7 @@ public class PortTypeProxyDescriptor {
    *         class.
    */
   public boolean isWsdlLocationDerived() {
-    return JaxWsPortTypeDecorator.DERIVED.equals(getWsdlLocation());
+    return JaxWsPortTypeProxy.DERIVED.equals(getWsdlLocation());
   }
 
   /**
@@ -184,7 +184,7 @@ public class PortTypeProxyDescriptor {
   }
 
   /**
-   * @return <code>true</code>, if the decorator contains the given annotation.
+   * @return <code>true</code>, if the descriptor contains the given annotation.
    */
   public boolean containsAnnotation(final Class<? extends Annotation> annotationClass) {
     for (final AnnotationMirror siblingAnnotation : m_siblingAnnotations) {
