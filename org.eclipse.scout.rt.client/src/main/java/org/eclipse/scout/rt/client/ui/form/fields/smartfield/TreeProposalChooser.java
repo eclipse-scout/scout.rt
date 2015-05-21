@@ -513,6 +513,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
       m_contentAssistField.acceptProposal();
     }
+
+    @Override
+    protected boolean getConfiguredScrollToSelection() {
+      return true;
+    }
   }
 
   private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_KEY> {
