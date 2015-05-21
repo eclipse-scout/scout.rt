@@ -59,6 +59,19 @@
     padding-right: 2px;
   }
 
+  /* This definition is required because the negative margin causes wrong results
+   * when we check if the menu-bar is over-sized. When a float:right element has
+   * a negative margin, the scrollWidth of its parent is _always_ > its clientWidth
+   * just because of the negative margin. Furthermore we have no way to read the
+   * margin dynamically with JQuery, since ::before elements are not part of the DOM
+   * and thus there's no way to access the with JavaScript. When the negative margin
+   * is removed above, this definition may also be removed.
+   */
+  &.right-aligned.last[data-icon]::before {
+    margin-right: 0;
+    padding-right: 0;
+  }
+
   &[data-icon]:hover::before {
     color: @hover-color;
   }

@@ -8,8 +8,8 @@ describe("MenuItemsOrder", function() {
     menuItemsOrder = new scout.MenuItemsOrder(session, 'Table');
   });
 
-  it("createSeparator", function() {
-    var separator = menuItemsOrder.createSeparator();
+  it("_createSeparator", function() {
+    var separator = menuItemsOrder._createSeparator();
     expect(separator.separator).toBe(true);
     expect(separator.session).toBeTruthy();
     expect(separator.visible).toBe(true);

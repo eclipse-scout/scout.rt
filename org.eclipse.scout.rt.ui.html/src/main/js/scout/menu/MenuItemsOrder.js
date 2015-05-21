@@ -10,6 +10,10 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     rightItems = [];
 
   items.forEach(function(item) {
+    // skip separators added by this class
+    if (item.createdBy === this) {
+      return;
+    }
     if (scout.menus.isButton(item)) {
       buttons.push(item);
     } else if (scout.menus.checkType(item, this._menuTypes('EmptySpace'))) {
@@ -23,7 +27,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
 
   // add fixed separator between emptySpace and selection
   if (emptySpaceItems.length > 0 && selectionItems.length > 0) {
-    emptySpaceItems.push(this.createSeparator());
+    emptySpaceItems.push(this._createSeparator());
   }
 
   return {
@@ -42,10 +46,12 @@ scout.MenuItemsOrder.prototype._menuTypes = function() {
 
 /**
  * The separator here does not exist in the model delivered by the server-side client.
+ * The createdBy property is added to the model to find items added by the UI later.
  */
-scout.MenuItemsOrder.prototype.createSeparator = function() {
+scout.MenuItemsOrder.prototype._createSeparator = function() {
   return this.session.createUiObject({
     objectType: 'Menu',
+    createdBy: this,
     separator: true
   });
 };
