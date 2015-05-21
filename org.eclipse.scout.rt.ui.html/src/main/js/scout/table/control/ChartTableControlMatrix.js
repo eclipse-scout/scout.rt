@@ -39,7 +39,11 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
     };
   } else if (dataGroup === 1) {
     dataAxis.norm = function(f) {
-      return parseFloat(f);
+      if (isNaN(f) || f === null || f === '') {
+        return null;
+      } else {
+        return parseFloat(f);
+      }
     };
     dataAxis.group = function(array) {
       return array.reduce(function(a, b) {
@@ -48,12 +52,25 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
     };
   } else if (dataGroup === 2) {
     dataAxis.norm = function(f) {
-      return parseFloat(f);
+      if (isNaN(f) || f === null || f === '') {
+        return null;
+      } else {
+        return parseFloat(f);
+      }
     };
     dataAxis.group = function(array) {
-      return array.reduce(function(a, b) {
-        return a + b;
-      }) / array.length;
+      var sum = array.reduce(function(a, b) {
+          return a + b;
+        }),
+        count = array.reduce(function(a, b) {
+          return (b === null ? a : a + 1);
+        }, 0);
+
+      if (count === 0) {
+        return null;
+      } else {
+        return sum / count;
+      }
     };
   }
 
@@ -221,7 +238,6 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     for (v = 0; v < this._allData.length; v++) {
       data = this._table.cellValue(this._allData[v].column, this._rows[r]);
       normData = this._allData[v].norm(data);
-      normData = this._allData[v].norm(data);
       if (normData !== undefined) {
         values.push(normData);
       }
@@ -256,6 +272,10 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
         cube[k][v] = newValue;
         data.total += newValue;
 
+        if (newValue === null) {
+          continue;
+        }
+
         if (newValue < data.min || data.min === null) {
           data.min = newValue;
         }
@@ -277,6 +297,11 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
 
     key.min = Math.min.apply(null, key);
     key.max = Math.max.apply(null, key);
+
+    // null value should be handeld as first value (in charts)
+    if (key.indexOf(null) > -1) {
+      key.max = key.max + 1;
+    }
 
     key.reorder();
   }

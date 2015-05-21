@@ -111,24 +111,27 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
       countries.push($(this).attr('id'));
     });
 
-    var filterFunc = function($row) {
-      for (var c = 0; c < that.countryColumns.length; c++) {
-        var column = that.countryColumns[c];
-        var row = $row.data('row');
-        var cellText = that.table.cellText(column, row);
-        if (countries.indexOf(cellText) > -1) {
-          return true;
+    if (countries.length) {
+      var filterFunc = function($row) {
+        for (var c = 0; c < that.countryColumns.length; c++) {
+          var column = that.countryColumns[c];
+          var row = $row.data('row');
+          var cellText = that.table.cellText(column, row);
+          if (countries.indexOf(cellText) > -1) {
+            return true;
+          }
         }
-      }
-      return false;
-    };
+        return false;
+      };
 
-    // callback to table
-    // set filter function
-    var filter = that.table.getFilter(scout.MapTableControl.FILTER_KEY) || {};
-    filter.label = that.tooltipText;
-    filter.accept = filterFunc;
-    that.table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
+      var filter = that.table.getFilter(scout.MapTableControl.FILTER_KEY) || {};
+      filter.label = that.tooltipText;
+      filter.accept = filterFunc;
+      that.table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
+    } else {
+      that.table.unregisterFilter(scout.MapTableControl.FILTER_KEY);
+    }
+
     that.table.filter();
   }
 };

@@ -116,8 +116,9 @@
   &.sort-desc.selected:hover::before,
   &.sort-desc-add.selected:hover::before,
   &.group-all.selected:hover::before,
+  &.group-selection.selected:hover::before,
   &.group-sort.selected:hover::before {
-    top: 0px;
+    top: -1px;
     font-size: 17px;
     line-height: 20px;
     .font-icon;
@@ -129,17 +130,23 @@
   &.sort-desc.selected:hover::after,
   &.sort-desc-add.selected:hover::after,
   &.group-all.selected:hover::after,
+  &.group-selection.selected:hover::after,
   &.group-sort.selected:hover::after {
     content: '';
   }
 
   &.group-all::before,
+  &.group-selection::before,
   &.group-sort::before {
     position: relative;
     top: 0px;
     font-size: 20px;
     line-height: 20px;
     content: @icon-sum;
+  }
+
+  &.group-selection::after {
+    content: @icon-menu;
   }
 
   &.group-sort::after {

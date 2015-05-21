@@ -679,6 +679,10 @@ scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelectin
   }
   this._triggerRowsSelected($selectedRows);
   this._renderMenus();
+
+  if (this.groupedSelection) {
+    this._group(true);
+  }
 };
 
 // Only necessary if the table is a root html comp (outline table)
@@ -890,13 +894,17 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   }
 };
 
-scout.Table.prototype._group = function() {
-  var column, alignment, rows, sum, row, value, nextRow,
+scout.Table.prototype._group = function(update) {
+  var column, alignment, rows, sum, row, value, nextRow, useRow,
     that = this,
     groupColumn = this._groupColumn();
 
   // remove all sum rows
-  this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbars.bind(that));
+  if (update) {
+    this.$sumRows().remove();
+  } else {
+    this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbars.bind(that));
+  }
 
   if (!this.grouped && !groupColumn) {
     return;
@@ -908,6 +916,7 @@ scout.Table.prototype._group = function() {
 
   for (var r = 0; r < rows.length; r++) {
     row = rows[r];
+    useRow = !this.groupedSelection || row.$row.isSelected();
 
     // calculate sum per column
     for (var c = 0; c < this.columns.length; c++) {
@@ -915,14 +924,14 @@ scout.Table.prototype._group = function() {
       value = this.cellValue(column, row);
 
       if (column.type === 'number') {
-        sum[c] = (sum[c] || 0) + value;
+        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value) ;
       }
     }
 
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
     if ((r === rows.length - 1) || (!this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
-      this._appendSumRow(sum, groupColumn, row, this.grouped);
+      this._appendSumRow(sum, groupColumn, row, this.grouped, update);
       sum = [];
     }
   }
@@ -937,9 +946,13 @@ scout.Table.prototype._groupColumn = function() {
 /**
  * Appends a new sum row after row.$row
  */
-scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all) {
+scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, update) {
   var c, column, alignment, $cell,
     $sumRow = $.makeDiv('table-row-sum');
+
+  if (this.groupedSelection) {
+    $sumRow.addClass('sum-selection');
+  }
 
   for (c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
@@ -964,29 +977,34 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all) {
       .css('max-width', column.width);
   }
 
-  $sumRow.insertAfter(row.$row)
-    .width(this._rowWidth)
-    .hide()
-    .slideDown();
+  $sumRow.insertAfter(row.$row);
+
+  if (!update) {
+    $sumRow
+      .width(this._rowWidth)
+      .hide()
+      .slideDown();
+  }
 };
 
 scout.Table.prototype.removeGrouping = function() {
-  this.group('', true);
-};
-
-scout.Table.prototype.group = function(column, remove) {
   this.grouped = false;
   for (var i = 0; i < this.columns.length; i++) {
     this.columns[i].grouped = false;
   }
 
-  if (remove) {
-    this._group();
-    return;
+  this._group();
+};
+
+scout.Table.prototype.group = function(column, selection) {
+  this.grouped = false;
+  for (var i = 0; i < this.columns.length; i++) {
+    this.columns[i].grouped = false;
   }
 
   if (!column) {
     this.grouped = true;
+    this.groupedSelection = selection;
     this._group();
   } else {
     column.grouped = true;

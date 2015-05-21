@@ -313,6 +313,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     // dimension functions
     var width = Math.min(800 / (xAxis.max - xAxis.min), 60),
       x = function(i) {
+        i = i === null ? xAxis.max : i;
         return 100 + (i - xAxis.min) * width;
       },
       y = function(i) {
@@ -362,6 +363,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         return 100 + i / dataAxis.max * 800;
       },
       y = function(i) {
+        i = i === null ? xAxis.max : i;
         return 50 + (i - xAxis.min) * height;
       };
 
@@ -403,6 +405,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawLine(xAxis, dataAxis, cube) {
     // dimension functions
     var x = function(i) {
+      i = i === null ? xAxis.max : i;
       return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * 800;
     },
       y = function(i) {
@@ -546,9 +549,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawScatter(xAxis, yAxis, dataAxis, cube) {
     // dimension functions
     var x = function(i) {
+      i = i === null ? xAxis.max : i;
       return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * 700;
     },
       y = function(i) {
+        i = i === null ? yAxis.max : i;
         return 280 - (i - yAxis.min) / (yAxis.max - yAxis.min) * 240;
       };
 
@@ -595,8 +600,15 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
           testValue = cube.getValue([key1, key2]);
 
         if (testValue) {
-          var value = testValue[0],
-            r = Math.max(Math.sqrt((value - dataAxis.min) / (dataAxis.max - dataAxis.min)) * 40, 5);
+          var value = testValue[0], r;
+
+          if (value === null) {
+            continue;
+          } else if (dataAxis.max === dataAxis.min) {
+            r = 40;
+          } else {
+            r = Math.max(Math.sqrt((value - dataAxis.min) / (dataAxis.max - dataAxis.min)) * 40, 10);
+          }
 
           $chartMain.appendSVG('circle', '', 'main-chart')
             .attr('cx', x(key1))
@@ -665,37 +677,46 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     //  prepare filter
     var filters = [],
-      oneDim = $('.selected', $chartSelect).attr('id') !== 'ChartScatter';
+      oneDim = !$('.selected', $chartSelect).hasClassSVG('chart-scatter'),
+      filterFunc;
 
     //  find all filter
     that.$contentContainer.find('.main-chart.selected').each(function() {
       var dX = parseFloat($(this).attr('data-xAxis'));
+      dX = isNaN(dX) ? null : dX;
 
       if (oneDim) {
         filters.push(dX);
       } else {
         var dY = parseFloat($(this).attr('data-yAxis'));
+        dY = isNaN(dY) ? null : dY;
         filters.push(JSON.stringify([dX, dY]));
       }
     });
 
     //  filter function
-    var filterFunc = function($row) {
-      var row = $row.data('row');
-      var nX = xAxis.norm(that.table.cellValue(xAxis.column, row));
+    if (filters.length) {
+      filterFunc = function($row) {
+        var row = $row.data('row');
+        var nX = xAxis.norm(that.table.cellValue(xAxis.column, row));
 
-      if (oneDim) {
-        return (filters.indexOf(nX) > -1);
-      } else {
-        var nY = yAxis.norm(that.table.cellValue(yAxis.column, row));
-        return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
-      }
-    };
+        if (oneDim) {
+          return (filters.indexOf(nX) > -1);
+        } else {
+          var nY = yAxis.norm(that.table.cellValue(yAxis.column, row));
+          return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
+        }
+      };
 
-    var filter = that.table.getFilter(scout.ChartTableControl.FILTER_KEY) || {};
-    filter.label = that.tooltipText;
-    filter.accept = filterFunc;
-    that.table.registerFilter(scout.ChartTableControl.FILTER_KEY, filter);
+      var filter = that.table.getFilter(scout.ChartTableControl.FILTER_KEY) || {};
+      filter.label = that.tooltipText;
+      filter.accept = filterFunc;
+      that.table.registerFilter(scout.ChartTableControl.FILTER_KEY, filter);
+
+    } else {
+      that.table.unregisterFilter(scout.ChartTableControl.FILTER_KEY);
+    }
+
     that.table.filter();
   }
 };

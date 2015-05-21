@@ -90,6 +90,12 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       .click(this.remove.bind(this))
       .click(groupAll);
 
+    var $groupSelection = $commandGroup.appendDiv('header-command group-selection')
+    .data('label', session.text('overSelection'))
+    .click(this.remove.bind(this))
+    .click(groupSelection);
+
+
     if (column.type !== 'number') {
       var $groupSort = $commandGroup.appendDiv('header-command group-sort')
         .data('label', session.text('grouped'))
@@ -124,6 +130,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   // create buttons in command for new columns
+  // TODO cru: improve organize table
+  /*
   var $commandColumn = $menuHeader.appendDiv('header-group');
   $commandColumn.appendDiv('header-text')
     .data('label', session.text('Column'));
@@ -134,6 +142,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $commandColumn.appendDiv('header-command column-remove')
     .data('label', session.text('remove'))
     .click(columnRemove);
+   */
 
   // filter
   var $headerFilter = $menuHeader.appendDiv('header-group-filter');
@@ -299,18 +308,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function groupAll() {
-    doGroup($(this));
+    doGroup($(this), null, false);
+  }
+
+  function groupSelection() {
+    doGroup($(this), null, true);
   }
 
   function groupSort() {
-    doGroup($(this), column);
+    doGroup($(this), column, false);
   }
 
-  function doGroup($command, column) {
+  function doGroup($command, column, selection) {
     if ($command.isSelected()) {
       table.removeGrouping();
     } else {
-      table.group(column);
+      table.group(column, selection);
     }
 
     sortSelect();
@@ -323,9 +336,14 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       $groupSort.removeClass('selected');
     }
 
-    if (table.grouped) {
+    if (table.grouped && !table.groupedSelection) {
       $groupAll.addClass('selected');
     }
+
+    if (table.grouped && table.groupedSelection) {
+      $groupSelection.addClass('selected');
+    }
+
     if (column.grouped) {
       $groupSort.addClass('selected');
     }

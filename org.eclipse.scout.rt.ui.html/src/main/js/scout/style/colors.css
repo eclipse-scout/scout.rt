@@ -94,8 +94,8 @@
 @button-background-color: @palette-gray-2;
 @chart-axis-line-color: @palette-gray-4;
 @chart-axis-text-color: @palette-gray-6;
-@chart-data-color: @palette-cyan-3;
-@chart-data-active-color: @palette-cyan-4;
+@chart-data-color: @palette-blue-3;
+@chart-data-active-color: @palette-blue-4;
 @chart-empty-color: @palette-gray-4;
 @chart-type-color: @palette-gray-4;
 @chart-selected-color: @active-inverted-background-color;

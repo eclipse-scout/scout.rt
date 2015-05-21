@@ -165,7 +165,7 @@ svg.select-chart.selected {
 
   &.data-sum.selected::before {
     content: @icon-sum;
-    top: 4px;
+    top: 5px;
     right: 8px;
   }
 
@@ -239,7 +239,7 @@ text.main-axis-y {
   text-anchor: end;
   dominant-baseline: central;
   font-size: 10px;
-  }
+}
 
 text.main-axis-x, textPath.main-axis-x {
   fill: @chart-axis-text-color;
