@@ -45,6 +45,10 @@
   border-right: 0px solid transparent;
   border-bottom: 1px solid @border-color;
 
+  &.sum-selection {
+     color: @item-selection-border-color;
+   }
+
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
     border-color: @item-selection-nonfocus-border-color;

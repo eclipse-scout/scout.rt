@@ -233,10 +233,6 @@
       border-left-width: 2px;
       border-right-width: 2px;
 
-      &.sum-selection {
-        color: @item-selection-border-color
-      }
-
       &.selected {
         background-color: @item-selection-background-color;
         border-color: @item-selection-border-color;

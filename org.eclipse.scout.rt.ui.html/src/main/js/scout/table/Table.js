@@ -1008,6 +1008,7 @@ scout.Table.prototype.group = function(column, selection) {
     this._group();
   } else {
     column.grouped = true;
+    this.groupedSelection = false;
 
     // sort also takes care about the grouping
     this.sort(column, 'asc', false);
