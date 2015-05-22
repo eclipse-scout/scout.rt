@@ -3,10 +3,9 @@
 <provider id="org.eclipse.egit.core.GitProvider">
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.commons"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.commons.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216.jre17.fragment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216.jre18.fragment"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws216.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server.jaxws"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.server.jaxws.test"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.jaxws.apt"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client.mobile"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.client.mobile.test"/>
@@ -40,9 +39,6 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.svg.ui.swing"/>
 </provider>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705155466_3" label="scout.rt" name="scout.rt">
-<item elementID="=org.eclipse.scout.jaxws216.jre18.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.jaxws216" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.jaxws216.jre17.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -50,7 +46,6 @@
 <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.jaxws216.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.platform.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
