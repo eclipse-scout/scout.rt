@@ -205,11 +205,15 @@ scout.FormField.prototype._onStatusClick = function() {
 
 scout.FormField.prototype._showStatusMessage = function(options) {
   var opts,
-    text = this.tooltipText;
+    text = this.tooltipText,
+    cssClass = '';
+
   if (this.errorStatusUi) {
     text = this.errorStatusUi.message;
+    cssClass = 'tooltip-error';
   } else if (this.errorStatus) {
     text = this.errorStatus.message;
+    cssClass = 'tooltip-error';
   }
 
   if (this.tooltip && this.tooltip.rendered) {
@@ -219,6 +223,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     // create new tooltip
     opts = {
       text: text,
+      cssClass: cssClass,
       $anchor: this.$status
     };
     $.extend(opts, options);

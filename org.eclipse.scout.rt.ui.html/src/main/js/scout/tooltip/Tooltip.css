@@ -38,3 +38,17 @@
   top: -(@tooltip-arrow-size / 2);
   margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
 }
+
+.tooltip-error {
+  background-color: @error-background-color;
+  border-color: @error-color;
+
+  & .tooltip-arrow {
+    background-color: @error-background-color;
+    border-color: @error-color;
+  }
+
+  & .tooltip-content {
+    background-color: @error-background-color;
+  }
+}

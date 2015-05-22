@@ -977,11 +977,10 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
       .css('max-width', column.width);
   }
 
-  $sumRow.insertAfter(row.$row);
+  $sumRow.insertAfter(row.$row).width(this._rowWidth);
 
   if (!update) {
     $sumRow
-      .width(this._rowWidth)
       .hide()
       .slideDown();
   }
