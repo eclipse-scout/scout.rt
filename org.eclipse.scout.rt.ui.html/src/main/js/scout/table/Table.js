@@ -71,29 +71,18 @@ scout.Table.prototype._createKeyStrokeAdapter = function() {
   return new scout.TableKeyStrokeAdapter(this);
 };
 
-scout.Table.prototype._syncMenus = function(menus) {
-  var i;
-  for (i = 0; i < this.menus.length; i++) {
-    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
-  }
-  this.menus = menus;
-  for (i = 0; i < this.menus.length; i++) {
-    if (this.menus[i].enabled) {
-      this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
-    }
-  }
-};
-
 scout.Table.prototype._insertCheckBoxColumn = function() {
   var column = new scout.CheckBoxColumn(),
-    columnWidth = scout.Table.COLUMN_MIN_WIDTH;
-  column.init();
-  column.table = this;
-  column.fixedWidth = true;
-  column.guiOnlyCheckBoxColumn = true;
-  column.width = columnWidth;
+    model = {
+    fixedWidth: true,
+    fixedPosition: true,
+    guiOnly: true,
+    disallowHeaderMenu: true,
+    width: scout.Table.COLUMN_MIN_WIDTH,
+    table: this
+  };
+  column.init(model, this.session);
   scout.arrays.insert(this.columns, column, 0);
-
   this.checkableColumn = column;
 };
 
@@ -154,7 +143,7 @@ scout.Table.prototype._render = function($parent) {
     }
     if ($appLink) {
       that.sendAppLinkAction(column.id, $appLink.data('ref'));
-    } else if (column.guiOnlyCheckBoxColumn) {
+    } else if (column.guiOnly) {
       that.sendRowClicked($row, mouseButton);
     } else {
       that.sendRowClicked($row, mouseButton, column.id);
@@ -803,9 +792,8 @@ scout.Table.prototype.cellText = function(column, row) {
   return cell.text || '';
 };
 
-scout.Table.prototype.cellStyle = function(column, row) {
+scout.Table.prototype.cellStyle = function(column, cell) {
   var style, hAlign,
-    cell = row.cells[column.index],
     width = column.width;
 
   if (width === 0) {
@@ -813,7 +801,7 @@ scout.Table.prototype.cellStyle = function(column, row) {
   }
 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-  if (!column.guiOnlyCheckBoxColumn) {
+  if (cell) {
     // guiOnly column doesn't have cells
     style += scout.helpers.legacyCellStyle(cell);
     hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
@@ -877,7 +865,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   var cell, column, predicate;
 
   predicate = function(column) {
-    if (column.guiOnlyCheckBoxColumn) {
+    if (column.guiOnly) {
       // does not support tabbing and does not have a cell -> would throw an exception
       return false;
     }
@@ -1604,20 +1592,25 @@ scout.Table.prototype._sendColumnResized = function(column) {
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
-  var index = newPos,
-    column0 = this.columns[0];
+  var index;
 
-  // If column 0 is the gui only checkbox column, don't allow moving a column before this one.
-  if (column0.guiOnlyCheckBoxColumn) {
-    if (newPos === 0) {
-      newPos = 1;
+  this.columns.forEach(function(iteratingColumn, i) {
+    // Don't allow moving a column before the last column with a fixed position (checkbox col, row icon col ...)
+    if (iteratingColumn.fixedPosition && newPos <= i) {
+      newPos = i + 1;
     }
-    // Adjust index because column is only known on the gui
-    index = newPos - 1;
-  }
+  });
 
   scout.arrays.remove(this.columns, column);
   scout.arrays.insert(this.columns, column, newPos);
+
+  index = newPos;
+  this.columns.forEach(function(iteratingColumn, i) {
+    // Adjust index if column is only known on the gui
+    if (iteratingColumn.guiOnly) {
+      index--;
+    }
+  });
 
   var data = {
     columnId: column.id,
@@ -1630,14 +1623,8 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   }
 
   // move cells
-  this.$rows(true).each(function() {
-    var $cells = $(this).children();
-    if (newPos < oldPos) {
-      $cells.eq(newPos).before($cells.eq(oldPos));
-    } else {
-      $cells.eq(newPos).after($cells.eq(oldPos));
-    }
-  });
+  this._removeRows();
+  this._renderRows();
 };
 
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
@@ -1722,10 +1709,10 @@ scout.Table.prototype._renderHeaderVisible = function() {
 scout.Table.prototype._syncCheckable = function(checkable) {
   this.checkable = checkable;
 
-  var column = this.columns[0];
-  if (this.checkable && !column.guiOnlyCheckBoxColumn) {
+  var column = this.checkableColumn;
+  if (this.checkable && !column) {
     this._insertCheckBoxColumn();
-  } else if (!this.checkable && column.guiOnlyCheckBoxColumn) {
+  } else if (!this.checkable && column) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
   }
@@ -1733,6 +1720,19 @@ scout.Table.prototype._syncCheckable = function(checkable) {
 
 scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
   this.selectedRows = this._rowsByIds(selectedRowIds);
+};
+
+scout.Table.prototype._syncMenus = function(menus) {
+  var i;
+  for (i = 0; i < this.menus.length; i++) {
+    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
+  }
+  this.menus = menus;
+  for (i = 0; i < this.menus.length; i++) {
+    if (this.menus[i].enabled) {
+      this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+    }
+  }
 };
 
 scout.Table.prototype._renderCheckable = function() {

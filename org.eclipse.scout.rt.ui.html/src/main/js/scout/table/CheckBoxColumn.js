@@ -13,7 +13,7 @@ scout.CheckBoxColumn.prototype.buildCell = function(row) {
     checked = cell.value;
     enabled = enabled && cell.editable;
   }
-  style = this.table.cellStyle(this, row);
+  style = this.table.cellStyle(this, cell);
   cssClass = this._cssClass(row, cell);
   if (!enabled) {
     cssClass +=' disabled';

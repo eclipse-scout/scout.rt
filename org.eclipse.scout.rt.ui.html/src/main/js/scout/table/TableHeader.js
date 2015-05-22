@@ -39,8 +39,7 @@ scout.TableHeader = function(table, session) {
 
   function onHeaderClick(event) {
     var $header = $(this);
-    if ($header.data('column').guiOnlyCheckBoxColumn) {
-      // Header menu actions are not possible for the gui only checkbox column -> don't open it
+    if ($header.data('column').disallowHeaderMenu) {
       return;
     }
     if (that.dragging) {
@@ -306,7 +305,7 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
     $header.removeClass(oldColumnState.headerCssClass);
   }
   $header.addClass(column.headerCssClass);
-  if (column.guiOnlyCheckBoxColumn) {
+  if (column.disallowHeaderMenu) {
     $header.addClass('disabled');
   }
   this._applyColumnText($header, column);

@@ -16,10 +16,9 @@ scout.Column.prototype.init = function(model, session) {
 };
 
 scout.Column.prototype.buildCell = function(row) {
-  var style, text, tooltipText, tooltip, cssClass, cell, icon,
+  var style, text, tooltipText, tooltip, cssClass, cell, icon, iconId,
     content = '';
   cell = this.table.cell(this, row);
-  style = this.table.cellStyle(this, row);
   text = this.table.cellText(this, row);
 
   if (!cell.htmlEnabled) {
@@ -28,7 +27,16 @@ scout.Column.prototype.buildCell = function(row) {
   if (this.table.multilineText) {
     text = scout.strings.nl2br(text, false);
   }
-  icon = this._icon(row, cell, !! text) || '';
+  iconId = cell.iconId;
+  // Cell icon has priority over row icon
+  // If there is no cell icon, the row icon is displayed if the column is the first one
+  if (!iconId && row.iconId && this.table.columns.indexOf(this) === 0) {
+    iconId = row.iconId;
+    // row icon must always be left aligned (copy cell to not modify the original state)
+    cell = $.extend({}, cell);
+    cell.horizontalAlignment = -1;
+  }
+  icon = this._icon(row, iconId, !! text) || '';
   if (!text && !icon) {
     // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
     content = '&nbsp;';
@@ -38,6 +46,7 @@ scout.Column.prototype.buildCell = function(row) {
   cssClass = this._cssClass(row, cell);
   tooltipText = this.table.cellTooltipText(this, row);
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
+  style = this.table.cellStyle(this, cell);
   if (cell.errorStatus) {
     row.hasError = true;
   }
@@ -45,22 +54,22 @@ scout.Column.prototype.buildCell = function(row) {
   return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + content + '</div>';
 };
 
-scout.Column.prototype._icon = function(row, cell, hasText) {
+scout.Column.prototype._icon = function(row, iconId, hasText) {
   var cssClass, iconChar;
-  if (!cell.iconId) {
+  if (!iconId) {
     return;
   }
   cssClass = 'table-cell-icon';
   if (hasText) {
     cssClass += ' with-text';
   }
-  if (scout.strings.startsWith(cell.iconId, "font:")) {
-    iconChar = cell.iconId.substr(5);
+  if (scout.strings.startsWith(iconId, "font:")) {
+    iconChar = iconId.substr(5);
     cssClass += ' font-icon';
     return '<span class="' + cssClass + '">' + iconChar + '</span>';
   } else {
     cssClass += ' image-icon';
-    return '<img class="' + cssClass + '" src="' + cell.iconId + '">';
+    return '<img class="' + cssClass + '" src="' + iconId + '">';
   }
 };
 
