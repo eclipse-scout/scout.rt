@@ -121,15 +121,16 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   protected final Class<SERVICE> m_serviceClazz;
   protected final Class<PORT> m_portTypeClazz;
 
-  protected URL m_wsdlLocation;
-  protected String m_targetNamespace;
-  protected String m_serviceName;
+  // The following members are volatile because read from different threads.
+  protected volatile URL m_wsdlLocation;
+  protected volatile String m_targetNamespace;
+  protected volatile String m_serviceName;
 
-  protected String m_endpointUrl;
-  protected Integer m_readTimeout;
-  protected Integer m_connectTimeout;
-  protected String m_username;
-  protected String m_password;
+  protected volatile String m_endpointUrl;
+  protected volatile Integer m_readTimeout;
+  protected volatile Integer m_connectTimeout;
+  protected volatile String m_username;
+  protected volatile String m_password;
 
   protected final PortCache<PORT> m_portCache;
 
@@ -146,9 +147,8 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     final boolean cacheEnabled = CONFIG.getPropertyValue(getConfiguredPortCacheEnabledProperty()).booleanValue();
     final int corePoolSize = CONFIG.getPropertyValue(getConfiguredPortCacheCorePoolSizeProperty()).intValue();
     final long timeToLive = TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty()).longValue());
-    m_portCache = new PortCache<>(cacheEnabled, corePoolSize, timeToLive, getConfiguredPortProvider(m_serviceClazz, m_portTypeClazz));
-
     initConfig();
+    m_portCache = new PortCache<>(cacheEnabled, corePoolSize, timeToLive, getConfiguredPortProvider(m_serviceClazz, m_portTypeClazz));
   }
 
   protected void initConfig() {
