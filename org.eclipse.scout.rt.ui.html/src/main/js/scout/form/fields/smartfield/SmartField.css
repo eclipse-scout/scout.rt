@@ -69,18 +69,24 @@
 .proposal-chooser {
   & > .active-filter, & > .status {
     background-color: @panel-background-color;
-    border-top: solid 1px @border-color;
+    border-top: solid 1px @item-selection-border-color;
     height: @logical-grid-height;
-    padding: 7px 8px 0 8px;
+    padding: 7px 8px 0 10px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
-  & .table-row.selected {
+  & .table-row {
+    padding-left: @text-field-padding - 7px;
+  }
+
+  & .table-row.selected,
+  & .tree-node.selected {
     background-color: @item-selection-background-color;
     border-color: @item-selection-border-color;
   }
+
 }
 
 .elipsis {
