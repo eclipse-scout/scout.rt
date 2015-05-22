@@ -3,8 +3,9 @@
  * ScrollTop and ScrollLeft are such examples.
  * This detach helper provides methods to store and restore such data.
  */
-scout.DetachHelper = function() {
+scout.DetachHelper = function(session) {
   this._$scrollables = [];
+  this.session=session;
 };
 
 scout.DetachHelper.prototype.beforeDetach = function($container) {
@@ -20,8 +21,8 @@ scout.DetachHelper.prototype.afterAttach = function($container) {
 };
 
 scout.DetachHelper.prototype._storeFocus = function($container) {
-  if ($container.find(':focus')) {
-    var $focusedElement = $container.find(':focus');
+  var $focusedElement =  scout.focusManager._sessionFocusContexts[this.session.uiSessionId].focusContexts[0]._$focusedElement;
+  if ($focusedElement) {
     $container.data('lastFocus', $focusedElement);
     $.log.debug('Stored focus ' + $focusedElement.attr('class'));
   }

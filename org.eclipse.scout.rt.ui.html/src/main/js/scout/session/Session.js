@@ -73,7 +73,7 @@ scout.Session = function($entryPoint, options) {
   this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
-  this.detachHelper = new scout.DetachHelper();
+  this.detachHelper = new scout.DetachHelper(this);
   this._backgroundJobPollingEnabled = (options.backgroundJobPollingEnabled!== false);
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
 

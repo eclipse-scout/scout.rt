@@ -1,14 +1,16 @@
 describe("DetachHelper", function() {
-  var $sandbox;
+  var $sandbox, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     $sandbox = $('#sandbox');
+    session = sandboxSession();
+    session.init();
   });
 
   it("restores sticky tooltips", function() {
     var $tooltip,
-      detachHelper = new scout.DetachHelper(),
+      detachHelper = new scout.DetachHelper(session),
       $div = $('<div>').appendTo($sandbox),
       $anchor = $('<div>').appendTo($div)
         .cssLeft(50)
@@ -38,7 +40,7 @@ describe("DetachHelper", function() {
 
   it("considers the context of $anchor -> only removes tooltips in that context", function() {
     var $tooltip,
-      detachHelper = new scout.DetachHelper(),
+      detachHelper = new scout.DetachHelper(session),
       $div = $('<div>').appendTo($sandbox),
       $topLevelAnchor = $('<div>').appendTo($sandbox),
       $anchor = $('<div>').appendTo($div)

@@ -123,14 +123,6 @@ describe("scout.Focusmanager", function() {
                 }
                 expect(isInDialog).toBeTruthy();
             });
-            it("setting focus on rootGroupBox of Dialog is impossible, focus stays in last focused field", function() {
-              $.log.trace('eight test');
-              var $focusedField = focusContextsForSession[focusContextsForSession.length - 1]._$focusedElement;
-              dialogform.rootGroupBox.$body.focus();
-                var $newFocusedField = focusContextsForSession[focusContextsForSession.length - 1]._$focusedElement;
-                expect(dialogform.rootGroupBox.$body[0]).not.toBe($newFocusedField[0]);
-                expect($newFocusedField[0]).toBe($focusedField[0]);
-            });
           });
         });
 

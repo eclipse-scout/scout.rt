@@ -52,7 +52,6 @@ scout.FormToolPopup.prototype.attach = function() {
   this._installKeyStrokeAdapter();
   setTimeout(function() {
     this.$container.installFocusContext('auto', this.session.uiSessionId);
-    this.$container.focus();
   }.bind(this));
   this.alignTo();
 };

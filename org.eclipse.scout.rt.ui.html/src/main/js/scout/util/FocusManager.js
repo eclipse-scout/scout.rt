@@ -1,7 +1,6 @@
 scout.FocusManager = function() {
   this._sessionFocusContexts = {};
   var that = this;
-  this.validatingFocus = false;
 };
 
 scout.FocusManager.prototype.installManagerForSession = function(session, options) {
@@ -29,9 +28,9 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 
 };
 
-scout.FocusManager.prototype.getFirstFocusableElement = function($container,$focusableElements) {
+scout.FocusManager.prototype.getFirstFocusableElement = function($container, $focusableElements) {
   var focused = false;
-  if(!$focusableElements){
+  if (!$focusableElements) {
     $focusableElements = $container.find(':focusable');
   }
   var firstDefaultButton, $firstButton;
@@ -42,7 +41,7 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
     if (!firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
       firstDefaultButton = $focusableElements[i];
     }
-    if(!$firstButton && ($focusableElement.hasClass('button') ||$focusableElement.hasClass('menu-item'))){
+    if (!$firstButton && ($focusableElement.hasClass('button') || $focusableElement.hasClass('menu-item'))) {
       $firstButton = $focusableElement;
     } else if (menuParents.length === 0 && tabParents.length === 0) {
       focused = true;
@@ -53,7 +52,7 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
   if (!focused) {
     if (firstDefaultButton) {
       firstDefaultButton.focus();
-    } else if ($firstButton){
+    } else if ($firstButton) {
       $firstButton.focus();
     } else if ($focusableElements && $focusableElements.length > 0) {
       return $focusableElements.first();
@@ -64,8 +63,8 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
   }
 };
 
-scout.FocusManager.prototype.focusFirstElement = function($container,$focusableElements) {
-  var focusableElement = this.getFirstFocusableElement($container,$focusableElements);
+scout.FocusManager.prototype.focusFirstElement = function($container, $focusableElements) {
+  var focusableElement = this.getFirstFocusableElement($container, $focusableElements);
   if (focusableElement) {
     focusableElement.focus();
   }
@@ -170,7 +169,7 @@ scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) 
   this._uiSessionId = uiSessionId;
   this._isRoot = isRoot;
   this.isUninstalled = false;
-  this.focusinListener = this._validateFocusInEvent.bind(this);
+  this.focusinListener = this._onHandleFocusIn.bind(this);
   this._$container.on('focusin', this.focusinListener);
   this.removeContainerListener = this.uninstall.bind(this);
   this._$container.on('remove', this.removeContainerListener);
@@ -178,6 +177,7 @@ scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) 
   this.hideListener;
   this.focusOutListener;
   this.keyDownListener;
+  this.mouseDownListener = this._handleOnMouseDown.bind(this);
 };
 
 scout.FocusContext.prototype.uninstall = function(event) {
@@ -186,6 +186,8 @@ scout.FocusContext.prototype.uninstall = function(event) {
   }
   this._$container.off('keydown', this.keyDownListener);
   this._$container.off('focusin', this.focusinListener);
+  this._$container.off('mousedown', this.mouseDownListener);
+
   if (this._$focusedElement) {
     this._$focusedElement.off('hide', this.hideListener);
     this._$focusedElement.off('remove', this.removeListener);
@@ -197,7 +199,8 @@ scout.FocusContext.prototype.uninstall = function(event) {
 };
 
 scout.FocusContext.prototype.dispose = function() {
-  this._$container.unbind('keydown', this.keyDownListener);
+  this._$container.off('keydown', this.keyDownListener);
+  this._$container.off('mousedown', this.mouseDownListener);
 };
 
 scout.FocusContext.prototype.handleTab = function(event) {
@@ -229,6 +232,7 @@ scout.FocusContext.prototype.handleTab = function(event) {
 scout.FocusContext.prototype.activate = function(disposeOld) {
   this.keyDownListener = this.handleTab.bind(this);
   this._$container.on('keydown', this.keyDownListener);
+  this._$container.on('mousedown', this.mouseDownListener);
   $.log.trace('activate event focus context: ' + this.name);
   if (disposeOld) {
     scout.focusManager.disposeActiveFocusContext(this._uiSessionId);
@@ -241,10 +245,50 @@ scout.FocusContext.prototype.activate = function(disposeOld) {
   this._validateFocus();
 };
 
-scout.FocusContext.prototype._validateFocusInEvent = function(event) {
-  $.log.trace('_validateFocusInEvent' + ' context: ' + this.name + ' eventTarget: ' + event.target);
-  this._validateFocus();
-  $.suppressEvent(event);
+scout.FocusContext.prototype._onHandleFocusIn = function(event) {
+  $.log.trace('_onHandleFocusIn' + ' context: ' + this.name + ' eventTarget: ' + event.target);
+
+  event.stopPropagation();
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  if(this._$container[0] === event.target){
+    return;
+  }
+  this._$focusedElement = $(event.target);
+  this.bindHideListener();
+};
+
+scout.FocusContext.prototype._handleOnMouseDown = function(event) {
+  var focusAccepted = this._checkElementContainsText(event.target) || this._validatePotentialFocus(event.target);
+  if (!focusAccepted) {
+    event.preventDefault();
+  }
+};
+
+scout.FocusContext.prototype._validatePotentialFocus = function(element) {
+  var $element = $(element);
+  if($element.hasClass('glasspane')){
+    //glasspane can not gain focus if there is a click on it.
+    return false;
+  } else if ($element.is(':focusable')) {
+    return true;
+  } else if ($element && $element.length > 0 && $element.parent()[0] !== this._$container[0]) {
+    return this._checkParentFocusable($(element));
+  }
+  return false;
+};
+
+scout.FocusContext.prototype._checkParentFocusable = function($child) {
+  var $parent = $child.parent();
+  if (!$parent || $parent.length === 0) {
+    return false;
+  } else if ($parent.is(":focusable")) {
+    return true;
+  } else if ($parent.parent()[0] !== this._$container[0]) {
+    return this._checkParentFocusable($child.parent());
+  } else {
+    return false;
+  }
 };
 
 scout.FocusContext.prototype.onRemoveField = function() {
@@ -266,7 +310,19 @@ scout.FocusContext.prototype.bindHideListener = function() {
   $focusedElement.off('focusout', this.focusoutListener);
   this.focusoutListener = this.onFieldFocusOff.bind(this, $focusedElement);
   $focusedElement.on('focusout', this.focusoutListener);
-  $.log.trace('hidelistner bound on ' + $focusedElement.attr('class') + ' context: ' + this.name);
+  $.log.trace('hidelistner bound on ' + $focusedElement.attr('class') + ' id ' + $focusedElement.attr('id')+' context: ' + this.name);
+};
+
+scout.FocusContext.prototype._checkElementContainsText = function(element) {
+  var $element = $(element);
+  if ($element.clone()
+    .children()
+    .remove()
+    .end()
+    .text().trim().length && $element.css('user-select')) {
+    return true;
+  }
+  return false;
 };
 
 scout.FocusContext.prototype.onFieldFocusOff = function($focusedElement) {
@@ -277,10 +333,6 @@ scout.FocusContext.prototype.onFieldFocusOff = function($focusedElement) {
 };
 
 scout.FocusContext.prototype._validateFocus = function() {
-  if (scout.focusManager.validatingFocus) {
-    return;
-  }
-  scout.focusManager.validatingFocus = true;
   $.log.trace('_validate focus called');
   //If somehow, this scout div gets the focus, ensure it is set to the correct focus context.
   // For example, if glasspanes are active, the focus should _only_ be applied to the top-most glasspane.
@@ -298,7 +350,6 @@ scout.FocusContext.prototype._validateFocus = function() {
   //TODO bsh if glasspane is consolidated in desktop use desktop to find glasspane
   var $glasspanes = this._$container.find('.glasspane');
   if ($glasspanes.length > 0) {
-    scout.focusManager.validatingFocus = false;
     return;
   }
 
@@ -306,20 +357,15 @@ scout.FocusContext.prototype._validateFocus = function() {
   $.log.trace(!$(activeElement).is(':focusable') + ':' + $(activeElement).attr('class'));
   var $focusableElements = this._$container.find(':focusable');
   if (activeElement === this._$container[0]) {
-    $.log.trace('_fuu ' + ' context: ' + this.name);
+    $.log.trace('container is active ' + ' context: ' + this.name);
     //if we are on scout div and there are elements on this div which can gain the focus then it's not allowed to focus scout div. focus last element
-    if (this._$focusedElement && this._$focusedElement.length > 0 && this._$focusedElement.is(':focusable') ) {
+    if (this._$focusedElement && this._$focusedElement.length > 0 && this._$focusedElement.is(':focusable')) {
       this._$focusedElement[0].focus();
       $.log.trace(this._$focusedElement ? '_validate focus  focused ' + this._$focusedElement.attr('class') + ' context: ' + this.name : '_validate focus  focused context: ' + this.name);
     } else {
       $.log.trace('_validate first focused ' + ' context: ' + this.name);
-      scout.focusManager.focusFirstElement($focusContext,$focusableElements);
+      scout.focusManager.focusFirstElement($focusContext, $focusableElements);
     }
-  }
-  // If any non-focusable element inside the $focusContext got the focus...
-  else if (activeElement === $focusContext[0]) {
-    // ... do nothing and swallow the event
-    $.log.trace('... do nothing and swallow the event' + ' context: ' + this.name);
   }
   // If the active element is inside or equal to the focus context or if activeElement is no longer focusable.
   else if (!$focusContext[0].contains(activeElement) || !$(activeElement).is(':focusable')) {
@@ -334,24 +380,14 @@ scout.FocusContext.prototype._validateFocus = function() {
       this._$focusedElement[0].focus();
     } else {
       $.log.trace(' ...set focus on first element ' + ' context: ' + this.name);
-      scout.focusManager.focusFirstElement($focusContext,$focusableElements);
+      scout.focusManager.focusFirstElement($focusContext, $focusableElements);
     }
   }
   //if active element is no longer focusable
   else {
     $.log.trace('do nothing');
   }
-  if ($focusableElements.filter(function() {
-    return this === document.activeElement;
-  }).length === 1) {
-    this._$focusedElement = $(document.activeElement);
-    $.log.trace(this._$focusedElement ? 'focused element :' + this._$focusedElement.attr('class') : 'focused element with undefined class');
-    this.bindHideListener();
-  }
-  scout.focusManager.validatingFocus = false;
 };
 
 //Singleton
 scout.focusManager = new scout.FocusManager();
-
-
