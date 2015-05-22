@@ -269,7 +269,7 @@ scout.Desktop.prototype._renderView = function(view) {
   this._selectTab(tab);
   view.render(this.$bench);
 
-  scout.focusManager.validateFocus(this.session.uiSessionId);
+  scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
 
   // FIXME CGU: maybe include in render?
   view.htmlComp.layout();
@@ -361,13 +361,13 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     if (content instanceof scout.Table) {
       content.menuBar.$container.addClass('main-menubar');
     }
-    //request focus on first element in new outlineTab.
-    scout.focusManager.validateFocus(this.session.uiSessionId);
 
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();
     content.htmlComp.validateRoot = true;
   }
+  //request focus on first element in new outlineTab.
+  scout.focusManager.validateFocus(this.session.uiSessionId, 'update');
 };
 
 scout.Desktop.prototype.changeOutline = function(outline) {

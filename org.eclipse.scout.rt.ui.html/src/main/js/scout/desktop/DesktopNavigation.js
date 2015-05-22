@@ -187,6 +187,8 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
     // Focus and select content AFTER the search outline was rendered (and therefore the query field filled)
     this.$queryField.focus();
     this.$queryField[0].select();
+  } else{
+    scout.focusManager.validateFocus(this.session.uiSessionId);
   }
 };
 
