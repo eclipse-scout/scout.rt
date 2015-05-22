@@ -187,13 +187,15 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     owner = parent;
   }
 
+  // override previously set owner/parent for adapter-data so
+  // we can access them in ModelAdapter#init()
+  adapterData.owner = owner;
+  adapterData.parent = parent;
   adapter =  this.objectFactory.create(adapterData);
-  $.log.trace('created new adapter ' + adapter + ': owner = ' + owner + ', parent = ' + parent + ', adapterData.owner = ' + adapterData.owner);
-  adapter.owner = owner;
-  adapter.parent = parent;
+  $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
+
   owner.addOwnedAdapter(adapter);
   parent.addChild(adapter);
-
   return adapter;
 };
 

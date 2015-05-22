@@ -6,7 +6,6 @@ scout.GroupBox = function() {
   this.fields = [];
   this.menus = [];
   this.staticMenus = [];
-  this.menuBarPosition = 'top';
   this._addAdapterProperties(['fields', 'menus']);
   this.$body;
   this._$groupBoxTitle;
@@ -17,6 +16,14 @@ scout.GroupBox = function() {
   this.processButtons = [];
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
+
+scout.GroupBox.prototype.init = function(model, session) {
+  scout.GroupBox.parent.prototype.init.call(this, model, session);
+  this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
+  if (this.mainBox && !(this.getForm().parent instanceof scout.WrappedFormField)) {
+    this.menuBar.large();
+  }
+};
 
 /**
  * @override
@@ -38,7 +45,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this._$groupBoxTitle = this.$container
     .appendDiv('group-box-title')
     .append(this.$label);
-
+  this.menuBar.render(this.$container, 'top');
   this.$body = this.$container.appendDiv('group-box-body');
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
@@ -50,13 +57,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this.controls.forEach(function(control) {
     control.render(this.$body);
   }, this);
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, new scout.GroupBoxMenuItemsOrder());
-  if (this.menuBar.position === 'top') {
-    this._$groupBoxTitle.after(this.menuBar.$container);
-  }
-  if (this.mainBox && !(this.getForm().parent instanceof scout.WrappedFormField)) {
-    this.menuBar.$container.addClass('main-menubar');
-  }
+  this.menuBar.render(this.$container, 'bottom');
 };
 
 scout.GroupBox.prototype._renderProperties = function() {

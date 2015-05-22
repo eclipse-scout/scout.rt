@@ -150,7 +150,7 @@ scout.MapTableControl.prototype._renderMap = function(map) {
 };
 
 scout.MapTableControl.prototype.isContentAvailable = function() {
-  return this.map;
+  return !!this.map;
 };
 
 scout.MapTableControl.prototype._resolveColumnIds = function() {

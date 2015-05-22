@@ -23,6 +23,7 @@ scout.Table = function() {
   this.menuBar;
   this.menuBarPosition = 'bottom';
   this._renderRowsInProgress = false;
+  this._drawDataInProgress = false;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -39,9 +40,14 @@ scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
 
   this._initColumns();
-  for (var i = 0; i < this.rows.length; i++) {
-    this._initRow(this.rows[i]);
-  }
+  this.rows.forEach(function(row) {
+    this._initRow(row);
+  }, this);
+
+  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
+  this.menuBar = new scout.MenuBar(this.session, menuSorter);
+  this.menuBar.bottom();
+
   this._syncSelectedRows(this.selectedRows);
 };
 
@@ -102,8 +108,7 @@ scout.Table.prototype._render = function($parent) {
     axis: 'both'
   });
   this.session.detachHelper.pushScrollable(this.$data);
-  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, menuSorter);
+  this.menuBar.render(this.$container);
   this._renderRows();
 
   //----- inline methods: --------
@@ -182,7 +187,7 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   this.session.detachHelper.removeScrollable(this.$data);
-  this.menuBar.remove();
+//  this.menuBar.remove();
   this.header = null;
   this.footer = null;
   scout.Table.parent.prototype._remove.call(this);

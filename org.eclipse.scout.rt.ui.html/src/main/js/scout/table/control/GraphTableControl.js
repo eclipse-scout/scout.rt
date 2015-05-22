@@ -252,7 +252,7 @@ scout.GraphTableControl.prototype._renderGraph = function(graph) {
 };
 
 scout.GraphTableControl.prototype.isContentAvailable = function() {
-  return this.graph;
+  return !!this.graph;
 };
 
 scout.GraphTableControl.prototype.onResize = function() {

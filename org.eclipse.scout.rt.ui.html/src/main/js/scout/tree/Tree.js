@@ -16,13 +16,15 @@ scout.Tree = function() {
   this._treeItemPaddingLevel = 15;
   this.menus = [];
   this.menuBar;
-  this.menuBarPosition = 'bottom';
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
 scout.Tree.prototype.init = function(model, session) {
   scout.Tree.parent.prototype.init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
+  this.menuBar = new scout.MenuBar(this.session, menuSorter);
+  this.menuBar.bottom();
 };
 
 scout.Tree.prototype._syncMenus = function(menus) {
@@ -103,8 +105,7 @@ scout.Tree.prototype._render = function($parent) {
 
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
-  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, menuSorter);
+  this.menuBar.render(this.$container);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();

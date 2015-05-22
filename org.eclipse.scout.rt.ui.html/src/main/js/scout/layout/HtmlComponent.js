@@ -195,6 +195,11 @@ scout.HtmlComponent.prototype.debug = function() {
   return scout.graphics.debugOutput(this.$comp);
 };
 
+scout.HtmlComponent.prototype.isVisible = function() {
+  return this.$comp.isVisible();
+};
+
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**

@@ -2,6 +2,7 @@
 
 .menubar {
   position: relative;
+  width: 100%;
   height: @menubar-height;
   border-bottom: 1px solid @border-color;
   white-space: nowrap;

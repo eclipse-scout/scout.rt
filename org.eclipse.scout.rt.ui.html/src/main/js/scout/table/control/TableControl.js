@@ -8,12 +8,16 @@ scout.TableControl = function() {
 };
 scout.inherits(scout.TableControl, scout.Action);
 
+scout.TableControl.prototype.init = function(model, session) {
+  scout.TableControl.parent.prototype.init.call(this, model, session);
+  this._syncForm(this.form);
+};
+
 scout.TableControl.prototype._render = function($parent) {
   var classes = 'control ';
   if (this.cssClass) {
     classes += this.cssClass;
   }
-
   this.$container = $parent.appendDiv(classes)
     .data('control', this);
 };
@@ -24,12 +28,10 @@ scout.TableControl.prototype.remove = function() {
 };
 
 scout.TableControl.prototype._renderContent = function($parent) {
-  var rootGroupBox = this.form.rootGroupBox;
-
-  rootGroupBox.menuBarPosition = 'bottom';
   this.form.render($parent);
 
   // Tab box gets a special style if it is the first field in the root group box
+  var rootGroupBox = this.form.rootGroupBox;
   if (rootGroupBox.fields[0] instanceof scout.TabBox) {
     rootGroupBox.fields[0].$container.addClass('in-table-control');
   }
@@ -97,6 +99,13 @@ scout.TableControl.prototype._removeForm = function() {
   this.removeContent();
 };
 
+scout.TableControl.prototype._syncForm = function(form) {
+  if (form) {
+    form.rootGroupBox.menuBar.bottom();
+  }
+  this.form = form;
+};
+
 scout.TableControl.prototype._renderForm = function(form) {
   this.renderContent();
 };
@@ -105,7 +114,7 @@ scout.TableControl.prototype._renderForm = function(form) {
  * Returns true if the table control may be displayed (opened).
  */
 scout.TableControl.prototype.isContentAvailable = function() {
-  return this.form;
+  return !!this.form;
 };
 
 scout.TableControl.prototype._onMouseDown = function() {

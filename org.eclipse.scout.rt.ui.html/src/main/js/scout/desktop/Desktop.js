@@ -355,12 +355,13 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   }
   if (!content.rendered) {
     if (content instanceof scout.Table) {
-      content.menuBarPosition = 'top';
+      content.menuBar.top();
+      content.menuBar.large();
     }
     content.render(this.$bench);
-    if (content instanceof scout.Table) {
-      content.menuBar.$container.addClass('main-menubar');
-    }
+
+    //request focus on first element in new outlineTab.
+    scout.focusManager.validateFocus(this.session.uiSessionId);
 
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();

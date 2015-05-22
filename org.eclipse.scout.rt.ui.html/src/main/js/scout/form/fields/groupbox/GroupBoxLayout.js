@@ -13,6 +13,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     gbBodySize;
 
   if (htmlMenuBar) {
+    // required to trigger layout() of menu-bar
     menuBarSize = htmlMenuBar.getPreferredSize();
     htmlMenuBar.setSize(menuBarSize);
   } else {
@@ -36,6 +37,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
+    htmlMenuBar,
     prefSize;
 
   if (htmlGbBody.$comp.isVisible()) {
@@ -47,7 +49,11 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
   }
   prefSize = prefSize.add(htmlContainer.getInsets());
   prefSize.height += this._titleHeight($container);
-  prefSize.height += this._menuBarHeight($container);
+
+  htmlMenuBar = this._htmlMenuBar();
+  if (htmlMenuBar) {
+    prefSize.height += htmlMenuBar.getSize(true).height;
+  }
 
   return prefSize;
 };
@@ -56,16 +62,17 @@ scout.GroupBoxLayout.prototype._titleHeight = function($container) {
   return scout.graphics.getVisibleSize($container.children('.group-box-title'), true).height;
 };
 
-scout.GroupBoxLayout.prototype._menuBarHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.menubar'), true).height;
-};
-
+/**
+ * Return menu-bar when it exists and it is visible.
+ */
 scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
   if (this._groupBox.menuBar) {
-    return scout.HtmlComponent.get(this._groupBox.menuBar.$container);
-  } else {
-    return null;
+    var htmlMenuBar = scout.HtmlComponent.get(this._groupBox.menuBar.$container);
+    if (htmlMenuBar.isVisible()) {
+      return htmlMenuBar;
+    }
   }
+  return null;
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {

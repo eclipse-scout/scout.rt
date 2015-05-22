@@ -2,6 +2,7 @@ scout.FormToolPopup = function(formToolButton, session) {
   scout.FormToolPopup.parent.call(this, session);
   this.$formToolButton = formToolButton.$container;
   this.formToolButton = formToolButton;
+  formToolButton.form.rootGroupBox.menuBar.bottom();
   if (formToolButton.keyStroke) {
     var closeKeyStroke = new scout.PopupCloseKeyStroke(this);
     closeKeyStroke.keyStroke = formToolButton.keyStroke;
@@ -16,10 +17,10 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.$container.addClass('form-tool');
 
   this._renderHead($parent);
-  this.formToolButton.form.rootGroupBox.menuBarPosition = 'bottom';
-  this.formToolButton.form.render(this.$body);
-  this.formToolButton.form.htmlComp.pixelBasedSizing = true;
-  this.formToolButton.form.htmlComp.pack();
+  var form = this.formToolButton.form;
+  form.render(this.$body);
+  form.htmlComp.pixelBasedSizing = true;
+  form.htmlComp.pack();
 
   this.alignTo();
 };

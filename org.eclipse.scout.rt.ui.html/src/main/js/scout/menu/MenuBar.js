@@ -1,6 +1,6 @@
-scout.MenuBar = function($parent, position, session, menuSorter) {
-  this.$parent = $parent;
-  this.position = position;
+scout.MenuBar = function(session, menuSorter) {
+  this.position = 'top'; // or 'bottom'
+  this.size = 'small'; // or 'large'
   this.session = session;
   this.menuSorter = menuSorter;
   this.menuItems = [];
@@ -13,19 +13,41 @@ scout.MenuBar = function($parent, position, session, menuSorter) {
    */
   this.visibleMenuItems = [];
   this.keyStrokeAdapter;
+};
 
-  // Create a menu-bar container and add it to the parent, but don't show it yet. It will
-  // be shown automatically when items are added to the menu-bar, see updateVisibility().
-  this.$container = $.makeDiv('menubar').hide();
+scout.MenuBar.prototype.render = function($parent, whenPosition) {
+  // only render when 2nd argument is undefined or matches this.position
+  if (whenPosition !== undefined && this.position !== whenPosition) {
+    return;
+  }
+
+  // Visibility may change when updateItems() function is called, see updateVisibility().
+  this.$container = $.makeDiv('menubar')
+    .attr('id', 'MenuBar-' + scout.createUniqueId())
+    .toggleClass('main-menubar', this.size === 'large')
+    .setVisible(this.menuItems.length > 0);
+
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);
   htmlComp.setLayout(new scout.MenuBarLayout(this));
 
   if (this.position === 'top') {
-    this.$parent.prepend(this.$container);
+    $parent.prepend(this.$container);
   } else {
     this.$container.addClass('bottom');
-    this.$parent.append(this.$container);
+    $parent.append(this.$container);
   }
+};
+
+scout.MenuBar.prototype.bottom = function() {
+  this.position = 'bottom';
+};
+
+scout.MenuBar.prototype.top = function() {
+  this.position = 'top';
+};
+
+scout.MenuBar.prototype.large = function() {
+  this.size = 'large';
 };
 
 scout.MenuBar.prototype.remove = function() {
@@ -113,22 +135,14 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
-  var wasVisible = this.$container.isVisible();
+  var htmlComp = scout.HtmlComponent.get(this.$container),
+    oldVisible = htmlComp.isVisible(),
+    visible = !this.hiddenByUi && this.menuItems.length > 0;
 
-  // Calculate new visibility of the menu-bar
-  var visible = !this.hiddenByUi && this.menuItems.length > 0;
-
-  if (visible !== wasVisible) {
-    // Update visibility
+  // Update visibility, layout and key-strokes
+  if (visible !== oldVisible) {
     this.$container.setVisible(visible);
-
-    // Update layout
-    var htmlComp = scout.HtmlComponent.optGet(this.$parent);
-    if (htmlComp) {
-      htmlComp.invalidateTree();
-    }
-
-    // Update keystrokes
+    htmlComp.invalidateTree();
     if (visible) {
       this._registerKeyStrokeAdapter();
     } else {

@@ -42,7 +42,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     if (!menu.visible || menu.separator) {
       return;
     }
-    menuClone = menu.clone();
+    menuClone = this._cloneMenuItem(menu);
     menuClone.render(this.$body); // FIXME AWE: (menus) items nicht mehr in der vertikalen mitte
     menuClone.$container
       .on('click', '', this.closePopup.bind(this));
@@ -55,6 +55,21 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     };
 
   }.bind(this));
+};
+
+/**
+ * Creates a shallow copy of the given menu instance, all references to DOM elements are removed
+ * and the rendered property is set to false. Thus the method can be used to render an already rendered
+ * menu again, as required when a pop-up menu is opened in a table or in a tree (where the same item
+ * is already rendered in the menu-bar).
+ *
+ * @param menuItem can be a Button or a Menu instance.
+ */
+scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
+  var clone = $.extend({}, menuItem);
+  clone.rendered = false;
+  clone.$container = null;
+  return clone;
 };
 
 scout.ContextMenuPopup.prototype._createKeyStrokeAdapter = function() {

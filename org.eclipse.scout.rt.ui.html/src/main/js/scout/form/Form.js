@@ -7,10 +7,16 @@ scout.Form = function() {
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
+scout.Form.prototype.init = function(model, session) {
+  scout.Form.parent.prototype.init.call(this, model, session);
+  if (this.isDialog()) {
+    this.rootGroupBox.menuBar.bottom();
+  }
+};
+
 scout.Form.prototype._render = function($parent) {
   if (this.isDialog()) {
-    this.rootGroupBox.menuBarPosition = 'bottom';
-    // FIXME BSH Try to consolidate management of glasspanes in desktop (but: Session.showFatalMessage())
+    // FIXME BSH Try to consolidate management of glass-panes in desktop (but: Session.showFatalMessage())
     this._$glassPane = scout.fields.new$Glasspane(this.session.uiSessionId).appendTo($parent);
     $parent = this._$glassPane;
   }

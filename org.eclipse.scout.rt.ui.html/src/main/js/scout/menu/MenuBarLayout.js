@@ -114,16 +114,19 @@ scout.MenuBarLayout.prototype._removeEllipsis = function() {
  * @override AbstractLayout.js
  */
 scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
-  $.log.info('(MenuBarLayout#preferredLayoutSize)');
-
   var prefSize,
     oldWidth = $container.css('width'),
+    oldHeight = $container.css('height'),
     containerMargins = scout.graphics.getMargins($container);
 
-  $container.css('width', '100%');
-  prefSize = scout.graphics.getVisibleSize($container)
+  // reset height and width, so default CSS styles will apply before we measure pref. size
+  $container.css('height', '');
+  $container.css('width', '');
+  prefSize = scout.graphics.getSize($container)
     .subtract(containerMargins);
   $container.css('width', oldWidth);
+  $container.css('height', oldHeight);
+
   return prefSize;
 };
 
