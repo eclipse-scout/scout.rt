@@ -46,9 +46,9 @@ public @interface Authentication {
 
   /**
    * Indicates whether to enable authentication and to generate an {@link AuthenticationHandler} at compile-time by APT.
-   * By default, authentication is <code>enabled</code>.
+   * By default, authentication is <code>disabled</code>.
    */
-  boolean enabled() default true;
+  boolean enabled() default false;
 
   /**
    * Indicates the authentication method to be used to challenge the client to provide credentials. By default,
