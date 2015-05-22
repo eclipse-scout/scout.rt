@@ -40,6 +40,16 @@ scout.StringFieldKeyStrokeAdapter = function(field) {
 };
 scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
+scout.StringFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
+//add swallowed keys to drawed keys;
+var i = 0;
+for (i = 0; i < this.preventBubbleUpKeys.length; i++) {
+  scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, false, false, false, this.preventBubbleUpKeys[i]);
+}
+
+scout.StringFieldKeyStrokeAdapter.parent.prototype.drawKeyBox.call(this, drawedKeys);
+};
+
 scout.StringFieldEnterKeyStroke = function() {
   scout.StringFieldEnterKeyStroke.parent.call(this);
   this.keyStroke = 'ENTER';
@@ -60,12 +70,9 @@ scout.StringFieldEnterKeyStroke.prototype.accept = function(event) {
   return false;
 };
 
+
+
 scout.StringFieldEnterKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
-  //add swallowed keys to drawed keys;
-  var i = 0;
-  for (i = 0; i < this.preventBubbleUpKeys.length; i++) {
-    scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, false, false, false, this.preventBubbleUpKeys[i]);
-  }
   if (drawedKeys[this.keyStrokeName()]) {
     return;
   }
