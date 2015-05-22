@@ -14,7 +14,7 @@
   border-radius: 0;
 
   &:focus {
-    .inner-glow(@focus-glow-color);
+   box-shadow: none;
   }
 
   .first& {
