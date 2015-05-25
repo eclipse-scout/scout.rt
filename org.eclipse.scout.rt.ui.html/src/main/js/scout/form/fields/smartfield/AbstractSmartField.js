@@ -10,6 +10,7 @@ scout.AbstractSmartField = function() {
   this._oldSearchText;
   this._browseOnce;
   this._addAdapterProperties(['proposalChooser']);
+  this._mouseDownListener=this._onMouseDown.bind(this);
   /**
    * This flag is required in 'proposal' mode because in that case,
    * we do not open the $popup immediately. With the flag we can
@@ -44,9 +45,14 @@ scout.AbstractSmartField.prototype._render = function($parent) {
     .focus(this._onFocus.bind(this))
     .keyup(this._onKeyUp.bind(this))
     .keydown(this._onKeyDown.bind(this)));
+
   this.addMandatoryIndicator();
   this.addIcon();
   this.addStatus();
+};
+
+scout.AbstractSmartField.prototype._onMouseDown=function(event, originalEvent){
+  this._closeProposal(true);
 };
 
 scout.AbstractSmartField.prototype._renderProperties = function() {
@@ -245,6 +251,7 @@ scout.AbstractSmartField.prototype._acceptProposal = function() {
 };
 
 scout.AbstractSmartField.prototype._closeProposal = function(notifyServer) {
+  $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).off('mouseDownProcessedByFocusContext', this._mouseDownListener);
   if (this._$popup) {
     notifyServer = scout.objects.whenUndefined(notifyServer, true);
     if (notifyServer) {
@@ -271,6 +278,7 @@ scout.AbstractSmartField.prototype._openProposal = function(searchText, selectCu
   // When the typed proposal doesn't match a proposal from the list, the popup
   // is closed. The smart-field would stay open in that case. The SF also opens the
   // popup _before_ we send a request to the server (-> more responsive UI)
+  $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).on('mouseDownProcessedByFocusContext', this._mouseDownListener);
   if (!this.proposal) {
     this._renderPopup();
   }

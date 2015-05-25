@@ -162,6 +162,10 @@ scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
   }
 };
 
+scout.FocusManager.prototype.getActiveFocusContext = function(uiSessionId){
+  return this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length-1];
+};
+
 scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) {
   this._$container = $container;
   this.name = 'name' + $container.attr('class');
@@ -268,8 +272,10 @@ scout.FocusContext.prototype._handleOnMouseDown = function(event) {
   var focusAccepted = this._validatePotentialFocus(event.target) || this._checkElementContainsText(event.target);
   if (!focusAccepted) {
     event.preventDefault();
+    $(this).trigger('mouseDownProcessedByFocusContext', [event]);
   }
 };
+
 
 scout.FocusContext.prototype._validatePotentialFocus = function(element) {
   var $element = $(element);
