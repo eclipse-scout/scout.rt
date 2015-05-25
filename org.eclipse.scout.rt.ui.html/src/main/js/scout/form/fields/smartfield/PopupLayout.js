@@ -54,7 +54,7 @@ scout.PopupLayout.prototype.preferredLayoutSize = function($container) {
   }
 
   // hack, remove double selection border
-  return prefSize.add({top: 0, right: 0, bottom: -2, left: 0});
+  return prefSize.add({top: 0, right: 0, bottom: -1, left: 0});
 };
 
 scout.PopupLayout.prototype._htmlProposalChooser = function($container) {
