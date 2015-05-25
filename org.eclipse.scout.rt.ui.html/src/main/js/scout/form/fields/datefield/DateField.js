@@ -7,6 +7,7 @@ scout.DateField.prototype._render = function($parent) {
   this.addContainer($parent, 'date-field');
   this.addLabel();
   this.addMandatoryIndicator();
+  this._mouseDownListener =  this._onMouseDownFocusContext.bind(this);
   this.addField(scout.fields.new$TextField()
     .focus(this._onFieldFocus.bind(this))
     .blur(this._onFieldBlur.bind(this))
@@ -25,6 +26,13 @@ scout.DateField.prototype._onFieldFocus = function() {
 };
 
 scout.DateField.prototype._onFieldBlur = function() {
+  this.closeOnClickOutsideOrFocusLost();
+};
+
+scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function (){
+  if(!this._picker.isOpen()){
+    return;
+  }
   this._acceptPrediction();
 
   // Only update model if date is valid (according to ui)
@@ -35,6 +43,13 @@ scout.DateField.prototype._onFieldBlur = function() {
   this._$predict.remove();
   this._$predict = null;
   this._picker.close();
+  $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).off('mouseDownProcessedByFocusContext', this._mouseDownListener);
+
+};
+
+scout.DateField.prototype._onMouseDownFocusContext = function() {
+  this.closeOnClickOutsideOrFocusLost();
+
 };
 
 scout.DateField.prototype._onClick = function() {
@@ -50,6 +65,7 @@ scout.DateField.prototype._onIconClick = function(event) {
  * Opens picker and selects date
  */
 scout.DateField.prototype.openPicker = function() {
+  $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).on('mouseDownProcessedByFocusContext', this._mouseDownListener);
   this._updateSelection(this.$field.val());
 };
 
@@ -104,6 +120,7 @@ scout.DateField.prototype._onKeyDown = function(event) {
     this.displayTextChanged();
     if (this._picker.isOpen()) {
       this._picker.close();
+      $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).off('mouseDownProcessedByFocusContext', this._mouseDownListener);
       event.stopPropagation();
     }
     return;
@@ -111,6 +128,7 @@ scout.DateField.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.ESC) {
     if (this._picker.isOpen()) {
       this._picker.close();
+      $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).off('mouseDownProcessedByFocusContext', this._mouseDownListener);
       event.stopPropagation();
     }
     return;
@@ -211,6 +229,9 @@ scout.DateField.prototype.validateDisplayText = function(text) {
 };
 
 scout.DateField.prototype._acceptPrediction = function() {
+  if(!this._$predict){
+    return;
+  }
   var prediction = this._$predict.val();
   if (!prediction) {
     return;
