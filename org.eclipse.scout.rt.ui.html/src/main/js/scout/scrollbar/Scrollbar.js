@@ -56,7 +56,8 @@ scout.Scrollbar = function($parent, options) {
       return true;
     }
     event = event.originalEvent || window.event.originalEvent;
-    w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 60;
+    w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
+    $.l(w, event.wheelDelta, event.detail)
     d = that._scrollSize / that._offsetSize;
     that.scroll(w / d);
     return false;
