@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;

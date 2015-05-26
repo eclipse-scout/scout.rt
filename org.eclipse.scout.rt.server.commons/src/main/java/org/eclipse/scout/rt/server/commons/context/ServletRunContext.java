@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
-import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 
 /**
  * The <code>ServletRunContext</code> facilitates propagation of the {@link Servlet} state. This context is not intended

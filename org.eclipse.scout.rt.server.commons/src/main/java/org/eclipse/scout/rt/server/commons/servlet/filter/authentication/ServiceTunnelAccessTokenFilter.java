@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.server.commons.servletfilter.security;
+package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
 import java.io.IOException;
 import java.security.AccessController;

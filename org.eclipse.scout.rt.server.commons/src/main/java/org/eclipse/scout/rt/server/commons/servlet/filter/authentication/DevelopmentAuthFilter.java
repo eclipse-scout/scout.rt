@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.commons.servletfilter.helper;
+package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
 import java.io.IOException;
 import java.security.AccessController;
@@ -30,7 +30,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 
 /**
  * Convenience authentication filter for development mode.

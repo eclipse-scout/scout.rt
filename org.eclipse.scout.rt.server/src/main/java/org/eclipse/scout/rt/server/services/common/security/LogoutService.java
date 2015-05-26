@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 
 @Server

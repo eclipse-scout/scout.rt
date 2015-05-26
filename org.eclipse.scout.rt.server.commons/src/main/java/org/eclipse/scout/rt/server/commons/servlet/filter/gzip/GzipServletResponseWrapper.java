@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.commons.servletfilter;
+package org.eclipse.scout.rt.server.commons.servlet.filter.gzip;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

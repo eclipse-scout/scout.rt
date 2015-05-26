@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.inspector.info.SessionInfo;
-import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 

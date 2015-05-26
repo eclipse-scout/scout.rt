@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.commons.servletfilter.helper;
+package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
 import java.io.IOException;
 import java.security.AccessController;
@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 
 /**
  * Transformation filter used to create a subject based on {@link HttpServletRequest#getRemoteUser()} or
