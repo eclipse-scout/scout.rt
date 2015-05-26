@@ -63,6 +63,7 @@ __include("scout/menu/Menu.js");
 __include("scout/menu/MenuBar.js");
 __include("scout/menu/MenuBarKeyStrokeAdapter.js");
 __include("scout/menu/MenuBarLayout.js");
+__include("scout/menu/MenuButtonAdapter.js");
 __include("scout/menu/MenuKeyStrokeAdapter.js");
 __include("scout/menu/MenuItemsOrder.js");
 __include("scout/menu/Popup.js");

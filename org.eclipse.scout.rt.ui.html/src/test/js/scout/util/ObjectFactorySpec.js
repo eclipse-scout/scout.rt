@@ -28,6 +28,8 @@ describe("ObjectFactory", function() {
       };
     } else if ('Calendar' === objectType) {
       model.selectedDate = '2015-04-06 00:00:00.000';
+    } else if ('Form' === objectType) {
+      model.displayHint = 'view';
     }
     return model;
   }

@@ -16,7 +16,11 @@ describe("FormToolButton", function() {
     htmlComp: {
       pack: function() {}
     },
-    rootGroupBox: {}
+    rootGroupBox: {
+      menuBar: {
+        bottom: function() {}
+      }
+    }
   };
 
   function createAction(model) {

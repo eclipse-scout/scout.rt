@@ -12,12 +12,13 @@ describe("MenuBar", function() {
 
     it("prefers menu type for the left location if menu types for multiple locations are specified", function() {
       var menus, menu1,
-        menuBar = new scout.MenuBar(session.$entryPoint, 'top', session, new scout.GroupBoxMenuItemsOrder());
+        menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
 
       menu1 = helper.createMenu(helper.createModel(1));
       menu1.menuTypes = ['Table.EmptySpace', 'Table.SingleSelection'];
       menus = [menu1];
 
+      menuBar.render(session.$entryPoint);
       menuBar.updateItems(menus);
 
       expect(menuBar.menuItems.length).toBe(1);
