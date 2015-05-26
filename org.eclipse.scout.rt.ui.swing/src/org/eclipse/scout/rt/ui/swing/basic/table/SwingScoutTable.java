@@ -1661,7 +1661,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

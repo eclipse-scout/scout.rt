@@ -87,6 +87,7 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "SystemButton.yesIcon", null);
     putIfUndefined(defaults, "TabbedPane.tabAreaInsets", new InsetsUIResource(2, 2, 2, 6));
     putIfUndefined(defaults, "TabItem.foreground", new ColorUIResource(0, 0, 0));
+    putIfUndefined(defaults, "TabItem.disabledText", new ColorUIResource(142, 143, 145));
     putIfUndefined(defaults, "TabItem.selected.foreground", new ColorUIResource(0, 0, 0));
     putIfUndefined(defaults, "Table.focusCellForeground", new ColorUIResource(0x000000));
     putIfUndefined(defaults, "Table.rowHeight", 24);
