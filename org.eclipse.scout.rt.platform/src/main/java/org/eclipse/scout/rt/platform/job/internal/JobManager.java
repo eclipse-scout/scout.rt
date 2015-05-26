@@ -30,11 +30,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobAllowCoreThreadTimeoutProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobCorePoolSizeProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobDispatcherThreadCountProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobKeepAliveTimeProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobMaximumPoolSizeProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerAllowCoreThreadTimeoutProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerCorePoolSizeProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerDispatcherThreadCountProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerKeepAliveTimeProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerMaximumPoolSizeProperty;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -80,8 +80,7 @@ public class JobManager implements IJobManager {
     m_futures = new FutureSet();
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = Assertions.assertNotNull(createJobListeners(m_executor));
-    final int dispatcherThreadCount = CONFIG.getPropertyValue(JobDispatcherThreadCountProperty.class);
-    m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", dispatcherThreadCount);
+    m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", CONFIG.getPropertyValue(JobManagerDispatcherThreadCountProperty.class));
 
     addListener(Jobs.newEventFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
   }
@@ -220,11 +219,11 @@ public class JobManager implements IJobManager {
    */
   @Internal
   protected ExecutorService createExecutor() {
-    final int corePoolSize = CONFIG.getPropertyValue(JobCorePoolSizeProperty.class);
-    final int maximumPoolSize = CONFIG.getPropertyValue(JobMaximumPoolSizeProperty.class);
-    final long keepAliveTime = CONFIG.getPropertyValue(JobKeepAliveTimeProperty.class);
-    final boolean allowCoreThreadTimeOut = CONFIG.getPropertyValue(JobAllowCoreThreadTimeoutProperty.class);
-    final int dispatcherThreadCount = CONFIG.getPropertyValue(JobDispatcherThreadCountProperty.class);
+    final int corePoolSize = CONFIG.getPropertyValue(JobManagerCorePoolSizeProperty.class);
+    final int maximumPoolSize = CONFIG.getPropertyValue(JobManagerMaximumPoolSizeProperty.class);
+    final long keepAliveTime = CONFIG.getPropertyValue(JobManagerKeepAliveTimeProperty.class);
+    final boolean allowCoreThreadTimeOut = CONFIG.getPropertyValue(JobManagerAllowCoreThreadTimeoutProperty.class);
+    final int dispatcherThreadCount = CONFIG.getPropertyValue(JobManagerDispatcherThreadCountProperty.class);
 
     // Create the rejection handler.
     final RejectedExecutionHandler rejectHandler = new RejectedExecutionHandler() {

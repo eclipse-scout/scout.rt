@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-
 /**
  *
  */
@@ -25,39 +24,39 @@ public final class PlatformConfigProperties {
   public static class PlatformDevModeProperty extends AbstractBooleanConfigProperty {
 
     @Override
-    public Boolean getDefaultValue() {
-      return Boolean.FALSE;
+    public String getKey() {
+      return "scout.dev.mode";
     }
 
     @Override
-    public String getKey() {
-      return "scout.dev.mode";
+    public Boolean getDefaultValue() {
+      return Boolean.FALSE;
     }
   }
 
   public static class ApplicationVersionProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
-      return "0.0.0";
+    public String getKey() {
+      return "scout.application.version";
     }
 
     @Override
-    public String getKey() {
-      return "scout.application.version";
+    public String getDefaultValue() {
+      return "0.0.0";
     }
   }
 
   public static class ApplicationNameProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
-      return "unknown";
+    public String getKey() {
+      return "scout.application.name";
     }
 
     @Override
-    public String getKey() {
-      return "scout.application.name";
+    public String getDefaultValue() {
+      return "unknown";
     }
   }
 
@@ -66,82 +65,79 @@ public final class PlatformConfigProperties {
    */
   public static class JandexRebuildProperty extends AbstractBooleanConfigProperty {
 
-    public static final String JANDEX_REBUILD_PROPERTY_NAME = "jandex.rebuild";
+    @Override
+    public String getKey() {
+      return "jandex.rebuild";
+    }
 
     @Override
     public Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
-
-    @Override
-    public String getKey() {
-      return JANDEX_REBUILD_PROPERTY_NAME;
-    }
   }
 
   /**
-   * The number of threads to keep in the pool, even if they are idle
+   * The number of threads to keep in the pool, even if they are idle.
    */
-  public static class JobCorePoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class JobManagerCorePoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.corePoolSize";
+    }
 
     @Override
     public Integer getDefaultValue() {
       return Integer.valueOf(10);
-    }
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.job.corePoolSize";
     }
   }
 
   /**
    * The maximal number of threads to be created once the core-pool-size is exceeded.
    */
-  public static class JobMaximumPoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class JobManagerMaximumPoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.maximumPoolSize";
+    }
 
     @Override
     public Integer getDefaultValue() {
       return Integer.MAX_VALUE;
     }
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.job.maximumPoolSize";
-    }
   }
 
   /**
    * The time limit (in seconds) for which threads, which are created upon exceeding the 'core-pool-size' limit, may
-   * remain idle
-   * before being terminated.
+   * remain idle before being terminated.
    */
-  public static class JobKeepAliveTimeProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class JobManagerKeepAliveTimeProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.keepAliveTime";
+    }
 
     @Override
     public Integer getDefaultValue() {
       return Integer.valueOf(60);
-    }
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.job.keepAliveTime";
     }
   }
 
   /**
    * Specifies whether threads of the core-pool should be terminated after being idle for longer than 'keepAliveTime'.
    */
-  public static class JobAllowCoreThreadTimeoutProperty extends AbstractBooleanConfigProperty {
+  public static class JobManagerAllowCoreThreadTimeoutProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.allowCoreThreadTimeOut";
+    }
 
     @Override
     public Boolean getDefaultValue() {
       return Boolean.FALSE;
-    }
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.job.allowCoreThreadTimeOut";
     }
   }
 
@@ -149,16 +145,16 @@ public final class PlatformConfigProperties {
    * The number of dispatcher threads to be used to dispatch delayed jobs, meaning jobs scheduled with a delay or
    * periodic jobs.
    */
-  public static class JobDispatcherThreadCountProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class JobManagerDispatcherThreadCountProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.dispatcherThreadCount";
+    }
 
     @Override
     public Integer getDefaultValue() {
       return Integer.valueOf(1);
-    }
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.job.dispatcherThreadCount";
     }
   }
 }
