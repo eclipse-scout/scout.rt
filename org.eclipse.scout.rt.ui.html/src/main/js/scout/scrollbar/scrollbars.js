@@ -141,13 +141,5 @@ scout.scrollbars = {
       var $elem = $scrollParents[i];
       $elem.off('scroll', handler);
     }
-  },
-
-  nextScrollableUpwards: function($startElement, $context) {
-   return $startElement.parentsUntil($context).filter( function( index, element ) {
-     return $(element).data('scrollable')===true;
-   });
-
   }
-
 };
