@@ -34,7 +34,7 @@ public class SwingScoutTabItem extends SwingScoutComposite<IGroupBox> implements
   private ISwingScoutGroupBox m_groupBoxComposite;
   private static final Color FOREGROUND = UIManager.getColor("TabItem.foreground");
   private static final Color SELECTED = UIManager.getColor("TabItem.selected.foreground");
-  private static final Color DISABLED = UIManager.getColor("textInactiveText");
+  private static final Color DISABLED = UIManager.getColor("TabItem.disabledText");
 
   @Override
   protected void initializeSwing() {
