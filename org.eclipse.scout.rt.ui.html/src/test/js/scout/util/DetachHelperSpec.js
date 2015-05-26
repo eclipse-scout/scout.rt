@@ -4,8 +4,13 @@ describe("DetachHelper", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     $sandbox = $('#sandbox');
+    jasmine.Ajax.install();
     session = sandboxSession();
     session.init();
+  });
+
+  afterEach(function(){
+    jasmine.Ajax.uninstall();
   });
 
   it("restores sticky tooltips", function() {
