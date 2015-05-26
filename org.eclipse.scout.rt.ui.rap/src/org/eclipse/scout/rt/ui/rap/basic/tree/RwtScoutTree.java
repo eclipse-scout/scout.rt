@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -69,6 +68,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * @since 3.8.0
@@ -109,7 +109,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     viewer.addDoubleClickListener(new P_RwtDoubleClickListener());
 
     P_RwtTreeListener treeListener = new P_RwtTreeListener();
-    viewer.getTree().addListener(SWT.Selection, treeListener);
+    //selection events do not contain correct position of the node
+    viewer.getTree().addListener(SWT.MouseDown, treeListener);
     viewer.getTree().addListener(SWT.MouseUp, treeListener);
     viewer.getTree().addListener(SWT.MenuDetect, treeListener);
 
@@ -785,11 +786,10 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     @Override
     public void handleEvent(Event event) {
       switch (event.type) {
-        case SWT.Selection: {
-          ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
-          if (cell != null && cell.getBounds().contains(event.x, event.y) && cell.getElement() instanceof ITreeNode) {
-            ITreeNode nodeToClick = (ITreeNode) cell.getElement();
-            handleUiNodeClick(nodeToClick, event.button);
+        case SWT.MouseUp: {
+          ITreeNode node = findTreeNode(event);
+          if (node != null) {
+            handleUiNodeClick(node, event.button);
           }
           break;
         }
@@ -803,6 +803,17 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           break;
         }
       }
+    }
+
+    private ITreeNode findTreeNode(Event event) {
+      if (event.data instanceof TreeItem) {
+        TreeItem item = (TreeItem) event.data;
+        if (item.getData() instanceof ITreeNode) {
+          return (ITreeNode) item.getData();
+        }
+      }
+      //not found
+      return null;
     }
   }
 
