@@ -10,43 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.URL;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 
-import javax.security.auth.Subject;
-import javax.xml.namespace.QName;
+import javax.annotation.PostConstruct;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
 import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.PortInfo;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
@@ -58,12 +42,10 @@ import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheEna
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsPortCacheTTLProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsReadTimeoutProperty;
 import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
-import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
-import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.IPortProvider;
+import org.eclipse.scout.rt.server.jaxws.consumer.PortProvider.IPortInitializer;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * This class represents and encapsulates a webservice endpoint port to communicate with, and is based on a preemptive
@@ -123,36 +105,26 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   protected final Class<SERVICE> m_serviceClazz;
   protected final Class<PORT> m_portTypeClazz;
 
-  // The following members are volatile because read from different threads.
-  protected volatile URL m_wsdlLocation;
-  protected volatile String m_targetNamespace;
-  protected volatile String m_serviceName;
+  protected URL m_wsdlLocation;
+  protected String m_targetNamespace;
+  protected String m_serviceName;
 
-  protected volatile String m_endpointUrl;
-  protected volatile Integer m_readTimeout;
-  protected volatile Integer m_connectTimeout;
-  protected volatile String m_username;
-  protected volatile String m_password;
+  protected String m_endpointUrl;
+  protected Integer m_readTimeout;
+  protected Integer m_connectTimeout;
+  protected String m_username;
+  protected String m_password;
 
-  protected final PortCache<PORT> m_portCache;
-
-  private static final Set<Method> PROXIED_HANDLER_METHODS;
-  static {
-    PROXIED_HANDLER_METHODS = new HashSet<>(Arrays.asList(Handler.class.getDeclaredMethods())); // only methods declared directly on the handler are proxied.
-  }
+  protected PortProvider<SERVICE, PORT> m_portProvider;
+  protected PortCache<PORT> m_portCache;
 
   public AbstractJaxWsClient() {
     m_serviceClazz = resolveServiceClass();
     m_portTypeClazz = resolvePortClass();
     m_webServiceClientAnnotation = Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '%s' annotation on webservice [service=%s]", AbstractJaxWsClient.class.getSimpleName(), m_serviceClazz.getName());
-
-    final boolean cacheEnabled = CONFIG.getPropertyValue(getConfiguredPortCacheEnabledProperty()).booleanValue();
-    final int corePoolSize = CONFIG.getPropertyValue(getConfiguredPortCacheCorePoolSizeProperty()).intValue();
-    final long timeToLive = TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty()).longValue());
-    initConfig();
-    m_portCache = new PortCache<>(cacheEnabled, corePoolSize, timeToLive, getConfiguredPortProvider(m_serviceClazz, m_portTypeClazz));
   }
 
+  @PostConstruct
   protected void initConfig() {
     m_endpointUrl = CONFIG.getPropertyValue(getConfiguredEndpointUrlProperty());
     m_username = AbstractJaxWsClient.getOptionalConfigPropertyValue(getConfiguredUsernameProperty());
@@ -163,19 +135,36 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     m_wsdlLocation = resolveWsdlUrl(Assertions.assertNotNullOrEmpty(m_webServiceClientAnnotation.wsdlLocation(), "Missing 'wsdlLocation' on %s annotation. Use argument 'wsdlLocation' when generating webservice stub. [service=%s]", WebServiceClient.class.getSimpleName(), m_serviceClazz.getName()));
     m_targetNamespace = m_webServiceClientAnnotation.targetNamespace();
     m_serviceName = m_webServiceClientAnnotation.name();
+
+    m_portProvider = getConfiguredPortProvider(m_serviceClazz, m_portTypeClazz, m_wsdlLocation, m_targetNamespace, m_serviceName, new IPortInitializer() {
+
+      @Override
+      public void initWebServiceFeatures(final List<WebServiceFeature> webServiceFeatures) {
+        execInstallWebServiceFeatures(webServiceFeatures);
+      }
+
+      @Override
+      public void initHandlers(final List<Handler<? extends MessageContext>> handlerChain) {
+        execInstallHandlers(handlerChain);
+      }
+    });
+
+    if (CONFIG.getPropertyValue(getConfiguredPortCacheEnabledProperty())) {
+      m_portCache = new PortCache<>(CONFIG.getPropertyValue(getConfiguredPortCacheCorePoolSizeProperty()), TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(getConfiguredPortCacheTTLProperty())), m_portProvider);
+      m_portCache.init();
+    }
   }
 
   /**
    * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a cached Port.<br/>
    * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
-   * context.
-   * That is useful if having a port with some operations require some different properties set, e.g. another
+   * context. That is useful if having a port with some operations require some different properties set, e.g. another
    * read-timeout to transfer big data. Also, if associated with a transaction, respective commit or rollback listeners
    * are called upon leaving the transaction boundary, e.g. to implement a 2-phase-commit-protocol (2PC) for the
    * webservice operations invoked.
    */
   public InvocationContext<PORT> newInvocationContext() throws ProcessingException {
-    final PORT port = m_portCache.get();
+    final PORT port = (m_portCache != null ? m_portCache.get() : m_portProvider.provide());
 
     final InvocationContext<PORT> portHandle = new InvocationContext<>(port, getClass().getSimpleName());
     portHandle.endpointUrl(m_endpointUrl);
@@ -391,88 +380,9 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to provide another {@link IPortProvider} to create new port objects.
+   * Overwrite to provide another {@link PortProvider} to create new port objects.
    */
-  protected IPortProvider<PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portClazz) {
-    return new P_PortProvider();
-  }
-
-  protected class P_PortProvider implements IPortProvider<PORT> {
-
-    @Override
-    public PORT provide() {
-      try {
-        // Create the service
-        final Constructor<? extends Service> constructor = m_serviceClazz.getConstructor(URL.class, QName.class);
-        @SuppressWarnings("unchecked")
-        final SERVICE service = (SERVICE) constructor.newInstance(getWsdlLocation(), new QName(getTargetNamespace(), getServiceName()));
-
-        // Install the handler chain
-        service.setHandlerResolver(new HandlerResolver() {
-
-          @Override
-          public List<Handler> getHandlerChain(final PortInfo portInfo) {
-            final List<Handler<? extends MessageContext>> handlerChain = new ArrayList<>();
-            execInstallHandlers(handlerChain);
-
-            for (int i = 0; i < handlerChain.size(); i++) {
-              handlerChain.set(i, decorateHandler(handlerChain.get(i)));
-            }
-
-            @SuppressWarnings("unchecked")
-            final List<Handler> handlers = TypeCastUtility.castValue(handlerChain, List.class);
-            return handlers;
-          }
-        });
-
-        // Install implementor specific webservice features
-        final List<WebServiceFeature> webServiceFeatures = new ArrayList<>();
-        execInstallWebServiceFeatures(webServiceFeatures);
-
-        // Create the port
-        return service.getPort(m_portTypeClazz, CollectionUtility.toArray(webServiceFeatures, WebServiceFeature.class));
-      }
-      catch (final ReflectiveOperationException e) {
-        throw new WebServiceException("Failed to instantiate webservice stub.", e);
-      }
-    }
-
-    /**
-     * Method invoked to decorate a handler to be installed. The default implementation proxies the handler if
-     * configured to run on behalf of a {@link RunContext}.
-     */
-    protected Handler<? extends MessageContext> decorateHandler(final Handler<? extends MessageContext> handler) {
-      final RunWithServerRunContext runWithRunContext = handler.getClass().getAnnotation(RunWithServerRunContext.class);
-      if (runWithRunContext == null) {
-        return handler;
-      }
-
-      // Proxy the handler to run on behalf of a RunContext when being invoked.
-      final ServerRunContextProvider provider = BEANS.get(runWithRunContext.provider());
-
-      return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
-
-        @Override
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-          try {
-            if (PROXIED_HANDLER_METHODS.contains(method)) {
-              return provider.provide(Subject.getSubject(AccessController.getContext())).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
-
-                @Override
-                public Object call() throws Exception {
-                  return method.invoke(handler, args);
-                }
-              });
-            }
-            else {
-              return method.invoke(handler, args);
-            }
-          }
-          catch (final ProcessingException e) {
-            return e.getCause();
-          }
-        }
-      });
-    }
+  protected PortProvider<SERVICE, PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation, final String targetNamespace, final String serviceName, final IPortInitializer portInitializer) {
+    return new PortProvider<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
   }
 }

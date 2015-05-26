@@ -17,8 +17,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.ws.Service;
+
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.IPortProvider;
 import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.PortCacheEntry;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -28,11 +29,11 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class PortCacheTest {
 
-  private IPortProvider<Object> m_portProvider;
+  private PortProvider<Service, Object> m_portProvider;
 
   @Before
   public void before() {
-    m_portProvider = new IPortProvider<Object>() {
+    m_portProvider = new PortProvider<Service, Object>(null, null, null, null, null, null) {
 
       @Override
       public Object provide() {
@@ -44,7 +45,7 @@ public class PortCacheTest {
   @Test
   public void testCorePoolSize() {
     Deque<PortCacheEntry<Object>> queue = new ArrayDeque<>();
-    PortCache<Object> cache = new PortCache<>(true, 5, TimeUnit.HOURS.toMillis(1), m_portProvider, queue);
+    PortCache<Object> cache = new PortCache<>(5, TimeUnit.HOURS.toMillis(1), m_portProvider, queue);
 
     assertEquals(0, queue.size());
     cache.ensureCorePool();
@@ -72,7 +73,7 @@ public class PortCacheTest {
   @Test
   public void testNoCorePoolSize() {
     Deque<PortCacheEntry<Object>> queue = new ArrayDeque<>();
-    PortCache<Object> cache = new PortCache<>(true, 0, TimeUnit.HOURS.toMillis(1), m_portProvider, queue);
+    PortCache<Object> cache = new PortCache<>(0, TimeUnit.HOURS.toMillis(1), m_portProvider, queue);
 
     assertEquals(0, queue.size());
     cache.ensureCorePool();

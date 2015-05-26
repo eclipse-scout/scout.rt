@@ -16,6 +16,8 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.ws.Service;
+
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -39,17 +41,13 @@ public class PortCache<PORT> {
 
   protected final Deque<PortCacheEntry<PORT>> m_queue;
 
-  protected final IPortProvider<PORT> m_portProvider;
+  protected final PortProvider<? extends Service, PORT> m_portProvider;
 
   protected final int m_corePoolSize;
 
   protected final long m_timeToLive;
 
-  protected boolean m_enabled;
-
   /**
-   * @param enabled
-   *          <code>true</code> to enable caching, <code>false</code> otherwise.
    * @param corePoolSize
    *          number of Ports to have preemptively in the cache.
    * @param timeToLive
@@ -57,34 +55,11 @@ public class PortCache<PORT> {
    * @param portProvider
    *          factory to create new Ports.
    */
-  public PortCache(final boolean enabled, final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider) {
-    this(enabled, corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
-
-    if (m_enabled) {
-      // Start periodic cleanup job.
-      Jobs.scheduleAtFixedRate(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          discardExpiredPorts();
-        }
-      }, 1, 1, TimeUnit.MINUTES, Jobs.newInput(RunContexts.empty()).name("JAX-WS port cache cleanup"));
-
-      // Ensures to have at minimum 'corePortSize' Ports in the pool.
-      if (corePoolSize > 0) {
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            ensureCorePool();
-          }
-        }, Jobs.newInput(null));
-      }
-    }
+  public PortCache(final int corePoolSize, final long timeToLive, final PortProvider<? extends Service, PORT> portProvider) {
+    this(corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
   }
 
-  PortCache(final boolean enabled, final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
-    m_enabled = enabled;
+  PortCache(final int corePoolSize, final long timeToLive, final PortProvider<? extends Service, PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
     m_corePoolSize = corePoolSize;
     m_timeToLive = timeToLive;
     m_portProvider = portProvider;
@@ -92,14 +67,35 @@ public class PortCache<PORT> {
   }
 
   /**
+   * Initializes the cache and asynchronously instantiates 'corePoolSize' ports.
+   */
+  public void init() {
+    // Start periodic cleanup job.
+    Jobs.scheduleAtFixedRate(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        discardExpiredPorts();
+      }
+    }, 1, 1, TimeUnit.MINUTES, Jobs.newInput(RunContexts.empty()).name("JAX-WS port cache cleanup"));
+
+    // Ensures to have at minimum 'corePoolSize' Ports in the cache.
+    if (m_corePoolSize > 0) {
+      Jobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          ensureCorePool();
+        }
+      }, Jobs.newInput(RunContexts.empty()).name("JAX-WS port cache initializer"));
+    }
+  }
+
+  /**
    * @return a new Port instance from cache. Please note, that a port should not be used concurrently across multiple
    *         threads because not being thread-safe.
    */
   public PORT get() {
-    if (!m_enabled) {
-      return m_portProvider.provide();
-    }
-
     // Get oldest Port from queue.
     final PortCacheEntry<PORT> portCacheEntry = m_queue.poll();
 
@@ -179,16 +175,5 @@ public class PortCache<PORT> {
       builder.attr("expiration", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(new Date(m_expiration)));
       return builder.toString();
     }
-  }
-
-  /**
-   * Factory for new port objects.
-   */
-  public interface IPortProvider<PORT> {
-
-    /**
-     * @return a new Port, is not <code>null</code>.
-     */
-    PORT provide();
   }
 }
