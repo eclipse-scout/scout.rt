@@ -1,3 +1,5 @@
+/* This class is used for menu items styling */
+
 @menu-margin-x: @bench-margin-x;
 @menu-item-margin-right: 14px;
 @menu-item-height: 39px;
@@ -211,4 +213,68 @@
   height: 1px;
   left: 1px;
   background-color:@background-color;
+}
+
+
+
+/* FIXME AWE: reduce copy/paste --> Button.css */
+.menu-button {
+
+  text-align: center;
+  position: relative;
+  height: 30px;
+  color: @text-color;
+  background-color: @button-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  cursor: pointer;
+  height: @menubar-height;
+  line-height: @menubar-height;
+  min-width: 110px;
+  margin-right: @menu-item-margin-right;
+
+  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
+  /* cut off. We should find a better solution for this. */
+  white-space: nowrap;
+
+  &:hover :not(:disabled) {
+    color: @hover-color;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus::before {
+    .button-focus;
+  }
+
+  &.default-menu:not(.disabled) {
+    .font-text-normal(@bold);
+    background-color: @default-button-background-color;
+    color: @default-button-color;
+    border-width: 0;
+
+    &:hover {
+      background-color: @default-button-hover-background-color;
+    }
+  }
+
+  &:disabled {
+    background-color: @palette-white;
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.selected {
+    border-style: inset;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
+  &.has-submenu::after {
+   .button-sub-menu-icon;
+  }
+
 }

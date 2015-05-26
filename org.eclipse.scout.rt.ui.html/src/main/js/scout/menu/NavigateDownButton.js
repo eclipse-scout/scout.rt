@@ -2,7 +2,7 @@ scout.NavigateDownButton = function(outline, node) {
   scout.NavigateDownButton.parent.call(this, outline, node);
   this._text1 = 'Continue';
   this._text2 = 'Show';
-  this.systemType = scout.Button.SYSTEM_TYPE.OK;
+  this.defaultMenu = true;
   this.objectType = 'NavigateDownButton';
   this.keyStroke = 'Enter';
 };

@@ -210,9 +210,11 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
 };
 
 scout.GroupBox.prototype._renderMenus = function(menus) {
-  var menuItems = this.staticMenus.
-  concat(menus).
-  concat(this.processButtons);
+  // create a menu-wrapper for each process button
+  var menuItems = this.staticMenus.concat(menus);
+  this.processButtons.forEach(function(button) {
+    menuItems.push(new scout.MenuButtonAdapter(button));
+  });
   this.menuBar.updateItems(menuItems);
 };
 

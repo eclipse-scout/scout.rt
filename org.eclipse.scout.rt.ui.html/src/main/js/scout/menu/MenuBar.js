@@ -91,13 +91,12 @@ scout.MenuBar.prototype.updateItems = function(menuItems, force) {
     this._lastVisibleItem.$container.addClass('last');
   }
 
-  // Add tabindex 0 to first valid MenuItem so that it can be focused. All other items
-  // are not tabbable. They can be selected with the arrow keys.
+  // Make first valid MenuItem tabbable so that it can be focused. All other items
+  // are not tabbable. But they can be selected with the arrow keys.
   if (this.tabbable) {
     this.menuItems.some(function(item) {
-      if (item.enabled && item.visible && (item instanceof scout.Button || isNotSeparator(item))) {
-        var $target = (item instanceof scout.Button ? item.$field : item.$container);
-        $target.attr('tabindex', 0);
+      if (item.isTabTarget()) {
+        item.setTabbable();
         return true;
       } else {
         return false;
@@ -167,20 +166,10 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   menuItems.forEach(function(item) {
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
-    item.menuBar = this; // link to menuBar
-    item.$container.removeClass('form-field'); // FIXME AWE: do this removeClass in Menu.js when menuBar is set
-
+    item.menuBar = this; // link to menuBar // FIXME AWE: check if really needed
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
     // assigned again later in updateItems().
-    if (item instanceof scout.Button && item.$field.is('button')) {
-      // <button>s are tabbable by default, therefore explicitly disable it by setting the tabindex to -1
-      item.$field.attr('tabindex', -1);
-    } else if (item instanceof scout.Button){
-      item.$field.removeAttr('tabindex');
-    } else {
-      // For all other items we can just remove the attribute to make them non-tabbable
-      item.$container.removeAttr('tabindex');
-    }
+    item.setTabbable(false);
 
     if (right) {
       // Mark as right-aligned

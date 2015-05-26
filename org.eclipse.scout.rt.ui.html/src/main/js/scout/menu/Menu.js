@@ -4,6 +4,22 @@ scout.Menu = function() {
   this._addAdapterProperties('childActions');
   this.popup = undefined; // FIXME AWE: use this for different style?
   this.keyStrokeAdapter;
+  /**
+   * This property is true when the menu instance was moved into a overflow-menu
+   * when there's not enough space on the screen (see MenuBarLayout.js). When set
+   * to true, button style menus must be displayed as regular menus.
+   */
+  this.overflown = false;
+
+  /**
+   * Supported menu styles are:
+   * - default: regular menu-look, also used in overflow menus
+   * - taskbar: as used in the task bar
+   * - button: menu looks like a button
+   */
+  this.menuStyle = 'default';
+
+  this.defaultMenu = false;
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -34,6 +50,13 @@ scout.Menu.prototype._renderItem = function($parent) {
   }
   if (this.visible && this.enabled) {
     this._registerKeyStrokeAdapter();
+  }
+
+  if ('button' === this.menuStyle) {
+    this.$container.addClass('menu-button');
+  }
+  if (this.defaultMenu) {
+    this.$container.addClass('default-menu');
   }
 
   // --- Helper functions ---
@@ -78,6 +101,18 @@ scout.Menu.prototype._renderText = function(text) {
 scout.Menu.prototype._renderIconId = function(iconId) {
   scout.Menu.parent.prototype._renderIconId.call(this, iconId);
   this._updateIconAndTextStyle();
+};
+
+scout.Menu.prototype.isTabTarget = function() {
+  return this.enabled && this.visible && (this.menuStyle === 'button' || !this.separator);
+};
+
+scout.Menu.prototype.setTabbable = function(tabbable) {
+  if (tabbable) {
+    this.$container.attr('tabindex', 0);
+  } else {
+    this.$container.removeAttr('tabindex');
+  }
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {

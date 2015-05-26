@@ -57,11 +57,11 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
 
 scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
-  if (!this._hasButton(menus, scout.NavigateUpButton)) {
+  if (!this._hasMenu(menus, scout.NavigateUpButton)) {
     var upButton = new scout.NavigateUpButton(this, node);
     menus.push(upButton);
   }
-  if (!this._hasButton(menus, scout.NavigateDownButton)) {
+  if (!this._hasMenu(menus, scout.NavigateDownButton)) {
     var downButton = new scout.NavigateDownButton(this, node);
     menus.push(downButton);
   }
@@ -69,7 +69,7 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
     formOrTable.rootGroupBox.staticMenus = menus;
   } else {
     var table = formOrTable,
-      button = this._getButton(menus, scout.NavigateDownButton);
+      button = this._getMenu(menus, scout.NavigateDownButton);
     table.staticMenus = menus;
     this._tableSelectionListener = table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
       button.updateEnabled();
@@ -77,18 +77,17 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
   }
 };
 
-scout.Outline.prototype._getButton = function(menus, buttonClass) {
+scout.Outline.prototype._getMenu = function(menus, menuClass) {
   for (var i = 0; i < menus.length; i++) {
-    if (menus[i] instanceof buttonClass) {
+    if (menus[i] instanceof menuClass) {
       return menus[i];
     }
   }
   return null;
 };
 
-
-scout.Outline.prototype._hasButton = function(menus, buttonClass) {
-  return this._getButton(menus, buttonClass) !== null;
+scout.Outline.prototype._hasMenu = function(menus, menuClass) {
+  return this._getMenu(menus, menuClass) !== null;
 };
 
 scout.Outline.prototype._onNodeDeleted = function(node) {

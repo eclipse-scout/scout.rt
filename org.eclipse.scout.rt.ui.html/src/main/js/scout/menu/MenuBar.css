@@ -15,6 +15,8 @@
     vertical-align: middle;
   }
 
+  /*
+  
   & .button button {
     min-width: 110px;
     margin-right: @menu-item-margin-right;
@@ -22,6 +24,8 @@
   & .button.last.right-aligned button {
     margin-right: 0;
   }
+  
+  */
 
   &.bottom {
     border-top: 1px solid @border-color;

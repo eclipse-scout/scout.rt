@@ -71,7 +71,7 @@ scout.menus = {
   },
 
   isButton: function(obj) {
-    return obj instanceof scout.Button;
+    return obj instanceof scout.Menu && obj.menuStyle === 'button'; // FIXME AWE: check this too, move to Menu.js#isButton
   }
 
 };

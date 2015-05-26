@@ -51,8 +51,8 @@ scout.Action.prototype._renderEnabled = function(enabled) {
   this.$container.setEnabled(enabled);
 };
 
-scout.Action.prototype._renderVisible = function(enabled) {
-  this.$container.setVisible(enabled);
+scout.Action.prototype._renderVisible = function(visible) {
+  this.$container.setVisible(visible);
 };
 
 scout.Action.prototype._renderSelected = function(selected) {
