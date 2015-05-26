@@ -102,8 +102,7 @@ scout.Table.prototype._render = function($parent) {
   this.$data.on('mousedown', '.table-row', onMouseDown)
     .on('mouseup', '.table-row', onMouseUp)
     .on('dblclick', '.table-row', onDoubleClick)
-    .on('contextmenu', '.table-row', onContextMenu)
-    .on('scroll', this._onDataScroll.bind(this));
+    .on('contextmenu', '.table-row', onContextMenu);
   scout.scrollbars.install(this.$data, {
     axis: 'both'
   });
@@ -179,9 +178,9 @@ scout.Table.prototype._render = function($parent) {
 
 scout.Table.prototype._renderProperties = function() {
   scout.Table.parent.prototype._renderProperties.call(this);
-  this._renderMenus();
   this._renderTableHeader();
   this._renderTableFooter();
+  this._renderMenus();
   this._renderEnabled();
 };
 
@@ -636,22 +635,22 @@ scout.Table.prototype._find$AppLink = function(event) {
 
 scout.Table.prototype._filterMenus = function(allowedTypes) {
   allowedTypes = allowedTypes || [];
-  if (!this.headerVisible) {
-    //if no header is visible header menues should not be displayed
-    delete allowedTypes[allowedTypes.indexOf('Table.Header')];
-  }
-  if (this.selectedRows.length === 1) {
+  if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length === 1) {
     allowedTypes.push('Table.SingleSelection');
-  } else if (this.selectedRows.length > 1) {
+  } else if (allowedTypes.indexOf('Table.MultiSelection') > -1 && this.selectedRows.length > 1) {
     allowedTypes.push('Table.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes);
 };
 
 scout.Table.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(['Table.EmptySpace', 'Table.Header']);
+  var menuItems = this._filterMenus(['Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection']);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
+  if (this.header) {
+    menuItems = this._filterMenus(['Table.Header']);
+    this.header.renderMenus(menuItems);
+  }
 };
 
 scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelecting) {
@@ -1070,16 +1069,6 @@ scout.Table.prototype.colorData = function(column, mode) {
       colorFunc($cell, value);
     }
   }
-};
-
-scout.Table.prototype._onDataScroll = function(event) {
-  if (!this.header) {
-    return;
-  }
-
-  // move header when scrolling horizontally
-  var scrollLeft = this.$data.scrollLeft();
-  this.header.$tableHeader.cssLeft(-1 * scrollLeft);
 };
 
 scout.Table.prototype._onRowsSelected = function(rowIds) {
@@ -1571,7 +1560,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
     .css('width', this._rowWidth);
 
   if (this.header) {
-    this.header.onColumnResized(column, width);
+    this.header.onColumnResized(column);
   }
   this.updateScrollbars();
   this._sendColumnResized(column);

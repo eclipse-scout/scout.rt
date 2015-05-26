@@ -3,6 +3,7 @@ scout.MenuBar = function(session, menuSorter) {
   this.size = 'small'; // or 'large'
   this.session = session;
   this.menuSorter = menuSorter;
+  this.tabbable = true;
   this.menuItems = [];
 
   /**
@@ -86,18 +87,23 @@ scout.MenuBar.prototype.updateItems = function(menuItems, force) {
   // of elements. Otherwise a strange layout bug occurs.
   this._renderMenuItems(orderedMenuItems.right, true);
   this._renderMenuItems(orderedMenuItems.left, false);
+  if (this._lastVisibleItem) {
+    this._lastVisibleItem.$container.addClass('last');
+  }
 
   // Add tabindex 0 to first valid MenuItem so that it can be focused. All other items
   // are not tabbable. They can be selected with the arrow keys.
-  this.menuItems.some(function(item) {
-    if (item.enabled && item.visible && (item instanceof scout.Button || isNotSeparator(item))) {
-      var $target = (item instanceof scout.Button ? item.$field : item.$container);
-      $target.attr('tabindex', 0);
-      return true;
-    } else {
-      return false;
-    }
-  });
+  if (this.tabbable) {
+    this.menuItems.some(function(item) {
+      if (item.enabled && item.visible && (item instanceof scout.Button || isNotSeparator(item))) {
+        var $target = (item instanceof scout.Button ? item.$field : item.$container);
+        $target.attr('tabindex', 0);
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
 
   this.updateVisibility();
 
@@ -158,7 +164,6 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     menuItems.reverse();
   }
   var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
-  var foundLastItem = false;
   menuItems.forEach(function(item) {
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
@@ -182,10 +187,9 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
       item.rightAligned = true;
       item.$container.addClass('right-aligned');
       // Mark the first visible item as last item (inverse order due to 'float: right')
-      if (!foundLastItem && item.visible) {
-        item.$container.addClass('last');
-        foundLastItem = true;
-      }
+    }
+    if (item.visible) {
+      this._lastVisibleItem = item;
     }
   }.bind(this));
 };

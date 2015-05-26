@@ -1,16 +1,36 @@
 @table-header-padding-y: @table-row-padding-y;
 @table-header-padding-left: @table-row-padding-left;
 
-.table-header-container {
-  position: relative;
-  background-color: @panel-background-color;
-  border-bottom: 1px solid @border-color;
-  overflow: hidden;
-}
-
 .table-header {
   position: relative;
   white-space: nowrap;
+  overflow: hidden;
+  background-color: @panel-background-color;
+  border-bottom: 1px solid @border-color;
+}
+
+.table-header > .menubar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding-right: 8px;
+  padding-left: 10px;
+  background-color: @panel-background-color;
+  width: auto;
+  border: none;
+  border: none;
+  z-index: 1;
+
+  & > .menu-item {
+    height: auto;
+    line-height: normal;
+    padding-top: 4px;
+  }
+
+  & > .menu-item[data-icon]:before {
+    height: auto;
+    line-height: normal;
+  }
 }
 
 .sort-icon(@icon) {

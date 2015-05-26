@@ -9,14 +9,14 @@ scout.TableHeader = function(table, session) {
   this.dragging = false;
   this.table = table;
   this.columns = table.columns;
-  // Additional container div is only necessary for the desktop table's horizontal scrolling because that header has a margin left and right
-  this.$container = table.$data.beforeDiv('table-header-container');
-  this.$tableHeader = this.$container.appendDiv('table-header')
-    .width(this.table._rowWidth);
+  this.$container = table.$data.beforeDiv('table-header');
+
+  this._dataScrollHandler = this._reconcileScrollPos.bind(this);
+  table.$data.on('scroll', this._dataScrollHandler);
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
-    $header = this.$tableHeader.appendDiv('header-item')
+    $header = this.$container.appendDiv('header-item')
       .data('column', column)
       .css('min-width', column.width + 'px')
       .css('max-width', column.width + 'px')
@@ -32,10 +32,18 @@ scout.TableHeader = function(table, session) {
     }
 
     if (!column.fixedWidth) {
-      $separator = this.$tableHeader.appendDiv('header-resize');
+      $separator = this.$container.appendDiv('header-resize');
       $separator.on('mousedown', '', resizeHeader);
     }
   }
+
+  this.$filler = this.$container.appendDiv('header-item filler').css('visible', 'hidden');
+  this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
+  this.menuBar.tabbable = false;
+  this.menuBar.bottom();
+  this.menuBar.render(this.$container);
+  this.$menuBar = this.menuBar.$container;
+  this._reconcileScrollPos();
 
   function onHeaderClick(event) {
     var $header = $(this);
@@ -50,7 +58,7 @@ scout.TableHeader = function(table, session) {
       that._tableHeaderMenu.remove();
       that._tableHeaderMenu = null;
     } else {
-      var x = $header.position().left + that.$tableHeader.position().left + parseFloat(that.$container.css('margin-left')),
+      var x = $header.position().left + that.$container.position().left + parseFloat(that.$container.css('margin-left')),
         y = $header.position().top + that.$container.position().top;
       that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, session);
     }
@@ -114,7 +122,7 @@ scout.TableHeader = function(table, session) {
       // change css of dragged header
       $header.css('z-index', 50)
         .addClass('header-move');
-      that.$tableHeader.addClass('header-move');
+      that.$container.addClass('header-move');
 
       // move dragged header
       $header.css('left', diff);
@@ -175,7 +183,7 @@ scout.TableHeader = function(table, session) {
       });
 
       // move column
-      if (oldPos !== newPos) {
+      if (newPos > -1 && oldPos !== newPos) {
         table.moveColumn($header.data('column'), oldPos, newPos, true);
         that.dragging = false;
       } else {
@@ -192,21 +200,54 @@ scout.TableHeader = function(table, session) {
       $header.css('z-index', '')
         .css('background', '')
         .removeClass('header-move');
-      that.$tableHeader.removeClass('header-move');
+      that.$container.removeClass('header-move');
     }
   }
 };
 
 scout.TableHeader.prototype.remove = function() {
   this.$container.remove();
+  this.table.$data.off('scroll', this._dataScrollHandler);
 };
 
-scout.TableHeader.prototype.onColumnResized = function(column, width) {
-  var $header = column.$header;
+scout.TableHeader.prototype.onColumnResized = function(column) {
+  var lastColumn = this.table.columns[this.table.columns.length - 1];
+  this.resizeHeaderItem(column);
+  if (lastColumn !== column) {
+    this.resizeHeaderItem(lastColumn);
+  }
+};
+
+scout.TableHeader.prototype.resizeHeaderItem = function(column) {
+  var remainingHeaderSpace, adjustment,
+    $header = column.$header,
+    width = column.width,
+    menuBarWidth = this.$menuBar.outerWidth(),
+    isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length -1;
+
+  if (isLastColumn) {
+    remainingHeaderSpace = Math.max(this.$container.width() - this.table._rowWidth, 0);
+    if (remainingHeaderSpace < menuBarWidth) {
+      // add 1 px to make the resizer visible
+      adjustment = menuBarWidth - remainingHeaderSpace + 1;
+      width -= adjustment;
+      width = Math.max(width, scout.Table.COLUMN_MIN_WIDTH);
+      this.$filler.cssWidth(adjustment);
+    }
+  }
   $header
     .css('min-width', width)
     .css('max-width', width);
-  this.$tableHeader.width(this.table._rowWidth);
+};
+
+scout.TableHeader.prototype._reconcileScrollPos = function() {
+  // When scrolling horizontally scroll header as well
+  var scrollLeft = this.table.$data.scrollLeft(),
+    lastColumn = this.table.columns[this.table.columns.length - 1];
+
+  this.resizeHeaderItem(lastColumn);
+  this.$container.scrollLeft(scrollLeft);
+  this.$menuBar.cssRight(-1 * scrollLeft);
 };
 
 scout.TableHeader.prototype.onSortingChanged = function() {
@@ -220,7 +261,8 @@ scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dra
   var $header = column.$header,
     $headers = this.findHeaderItems(),
     $moveHeader = $headers.eq(oldPos),
-    $moveResize = $moveHeader.next();
+    $moveResize = $moveHeader.next(),
+    lastColumnPos = this.table.columns.length - 1;
 
   // store old position of header
   $headers.each(function() {
@@ -236,10 +278,17 @@ scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dra
     $headers.eq(newPos).after($moveResize);
   }
 
+  // Update header size due to header menu items if moved from or to last position
+  if (oldPos === lastColumnPos || newPos === lastColumnPos) {
+    this.table.columns.forEach(function(column) {
+      this.resizeHeaderItem(column);
+    }.bind(this));
+  }
+
   // move menu
   if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
     var left = $header.position().left;
-    var marginLeft = this.$tableHeader.cssMarginLeft();
+    var marginLeft = this.$container.cssMarginLeft();
     this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + marginLeft);
   }
 
@@ -270,8 +319,8 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
     $header = column.$header;
     $headerResize = $header.next('.header-resize');
 
-    this.$tableHeader.append($header);
-    this.$tableHeader.append($headerResize);
+    this.$container.append($header);
+    this.$container.append($headerResize);
   }
 
   // move menu
@@ -289,7 +338,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {
-  return this.$tableHeader.find('.header-item');
+  return this.$container.find('.header-item:not(.filler)');
 };
 
 /**
@@ -331,4 +380,8 @@ scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
     sortDirection = column.sortAscending ? 'asc' : 'desc';
     $header.addClass('sort-' + sortDirection);
   }
+};
+
+scout.TableHeader.prototype.renderMenus = function(menuItems) {
+  this.menuBar.updateItems(menuItems);
 };

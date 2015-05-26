@@ -9,6 +9,7 @@ scout.TableLayout.prototype.layout = function($container) {
     footer = this.table.footer,
     header = this.table.header,
     $data = this.table.$data,
+    lastColumn = this.table.columns[this.table.columns.length - 1],
     height = 0;
 
   if (menuBar.$container.isVisible()) {
@@ -30,6 +31,11 @@ scout.TableLayout.prototype.layout = function($container) {
   if (this.table.autoResizeColumns) {
     this._layoutColumns();
   }
+  // Size of last column may have to be adjusted due to the header menu items
+  if (this.table.header) {
+    this.table.header.resizeHeaderItem(lastColumn);
+  }
+
   // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
   this.table.tooltips.forEach(function(tooltip) {
     tooltip.position();

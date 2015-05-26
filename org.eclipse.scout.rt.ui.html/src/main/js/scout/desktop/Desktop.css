@@ -213,12 +213,18 @@
     outline: none;
   }
 
-  & > .table-header-container > .table-header > .header-item {
-    padding-top: @desktop-table-header-padding-y;
-    padding-bottom: @desktop-table-header-padding-y;
+  & > .table-header {
+    & > .header-item {
+      padding-top: @desktop-table-header-padding-y;
+      padding-bottom: @desktop-table-header-padding-y;
+    }
+
+    & > .menubar > .menu-item {
+      padding-top: 9px;
+    }
   }
 
-  & > .table-header-container,
+  & > .table-header,
   & > .table-data {
     margin-left: @bench-margin-x;
     margin-right: @bench-margin-x;

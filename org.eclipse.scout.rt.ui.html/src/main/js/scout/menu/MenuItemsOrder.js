@@ -16,12 +16,12 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     }
     if (scout.menus.isButton(item)) {
       buttons.push(item);
+    } else if (item.horizontalAlignment === 1) {
+      rightItems.push(item);
     } else if (scout.menus.checkType(item, this._menuTypes('EmptySpace'))) {
       emptySpaceItems.push(item);
     } else if (scout.menus.checkType(item, this._menuTypes('SingleSelection', 'MultiSelection'))) {
       selectionItems.push(item);
-    } else if (scout.menus.checkType(item, this._menuTypes('Header'))) {
-      rightItems.push(item);
     }
   }, this);
 
