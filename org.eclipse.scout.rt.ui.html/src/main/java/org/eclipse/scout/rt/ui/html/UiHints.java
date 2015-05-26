@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.server.commons.servletfilter.GzipServletFilter;
+import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
 
 /**
  * Helper to manage url param hints for the {@link UiServlet}.
