@@ -47,6 +47,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -115,6 +116,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * @since 5.1
  */
 @ApplicationScoped
+@CreateImmediately
 public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
   protected final WebServiceClient m_webServiceClientAnnotation;
