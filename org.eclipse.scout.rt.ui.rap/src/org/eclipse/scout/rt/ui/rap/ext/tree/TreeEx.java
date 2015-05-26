@@ -33,7 +33,7 @@ public class TreeEx extends Tree {
 
   public TreeEx(Composite parent, int style) {
     super(parent, style | SWT.FULL_SELECTION);
-    addListener(SWT.MouseDown, new Listener() {
+    addListener(SWT.MouseUp, new Listener() {
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -41,6 +41,28 @@ public class TreeEx extends Tree {
         m_contextItem = getItem(new Point(event.x, event.y));
       }
     });
+  }
+
+  @Override
+  public void notifyListeners(int eventType, Event event) {
+    //add context item to event before the table may change (e.g. scrolling due to node expansion)
+    if (isClick(event)) {
+      TreeItem contextItem = getItem(new Point(event.x, event.y));
+      Rectangle bounds = contextItem.getBounds();
+
+      //make sure no item is added for expansion events
+      if (event.x >= bounds.x) {
+        if (event.data == null) {
+          event.data = contextItem;
+        }
+      }
+
+    }
+    super.notifyListeners(eventType, event);
+  }
+
+  private boolean isClick(Event event) {
+    return event.type == SWT.MouseDown || event.type == SWT.MouseUp;
   }
 
   @Override
