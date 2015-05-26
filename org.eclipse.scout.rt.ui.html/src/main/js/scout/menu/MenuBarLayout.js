@@ -39,7 +39,8 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     }
   });
 
-  overflown = leftEnd > rightEnd;
+  // 1 instead of 0 is used to tolerate rounding issues, browsers return a rounded width instead of the precise one
+  overflown = leftEnd - rightEnd >= 1;
   $container.css('overflow', oldOverflow);
 
   if (overflown) {
