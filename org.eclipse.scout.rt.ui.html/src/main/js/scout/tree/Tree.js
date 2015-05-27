@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Tree = function() {
-  scout.Tree.parent.call(this);
+  scout.Tree.parent.call(this, false);
   this.$data;
   this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes
@@ -25,6 +25,7 @@ scout.Tree.prototype.init = function(model, session) {
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.Tree.prototype._syncMenus = function(menus) {
