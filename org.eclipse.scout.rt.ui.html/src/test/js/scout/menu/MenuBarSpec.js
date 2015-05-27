@@ -8,13 +8,13 @@ describe("MenuBar", function() {
     helper = new MenuSpecHelper(session);
   });
 
-  describe("updateItems", function() {
+  describe('updateItems', function() {
 
-    it("prefers menu type for the left location if menu types for multiple locations are specified", function() {
+    it('prefers menu type for the left location if menu types for multiple locations are specified', function() {
       var menus, menu1,
         menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
 
-      menu1 = helper.createMenu(helper.createModel(1));
+      menu1 = helper.createMenu(helper.createModel('foo'));
       menu1.menuTypes = ['Table.EmptySpace', 'Table.SingleSelection'];
       menus = [menu1];
 

@@ -11,8 +11,6 @@ scout.MenuButtonAdapter = function() {
 };
 scout.inherits(scout.MenuButtonAdapter, scout.Menu);
 
-// FIXME AWE: (menu) prüfen, ob wir das hier über objectFactories erzeugen können.
-
 /**
  * @override Menu.js
  */
@@ -27,6 +25,14 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
   };
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
 
+  // FIXME AWE: (menu) MenuButtonAdapter verbessern:
+  // - aktuell verdrängt der MenuButtonAdapter den Button (gleiche ID, siehe init())
+  //   das funktioniert ganz gut, aber korrekter wäre es, wenn wir zwei
+  //   IDs und Instanzen hätten und die Synchronisation via Listener
+  //   funktionieren würde. Aktuell funktioniert nämlich das Setzen vom
+  //   Label nicht, da die Property beim Button "label" und beim Menu "text"
+  //   heisst. Den MenuButtonAdapter würden wir dann eher mit session.createUiObject
+  //   erzeugen. Es braucht einen Sync für adapter.destroy()
   this._button = button;
   this.enabled = button.enabled;
   this.visible = button.visible;

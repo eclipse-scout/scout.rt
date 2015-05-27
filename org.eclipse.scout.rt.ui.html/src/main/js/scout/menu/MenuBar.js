@@ -70,16 +70,31 @@ scout.MenuBar.prototype._remove = function() {
   }
 };
 
-// FIXME AWE: (menu) check if the force parameter is really required
-scout.MenuBar.prototype.updateItems = function(menuItems, force) {
+scout.MenuBar.prototype.rebuildItems = function() {
+  this._updateItems(this.menuItems);
+};
+
+scout.MenuBar.prototype.updateItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
 
   // stop if menus are the same as before
   // remove separators before comparison, because menuSorter may add new separators (arrays.equals compares by reference (===))
-  if (!force && scout.arrays.equals(this.menuItems.filter(isNotSeparator), menuItems.filter(isNotSeparator))) {
-    return;
+  if (scout.arrays.equals(this.menuItems.filter(isNotSeparator), menuItems.filter(isNotSeparator))) {
+    // NOP
+  } else {
+    this._updateItems(menuItems);
   }
 
+  function isNotSeparator(item) {
+    if (item instanceof scout.Menu) {
+      return !item.separator;
+    } else {
+      return true;
+    }
+  }
+};
+
+scout.MenuBar.prototype._updateItems = function(menuItems) {
   // remove existing menu items
   this.menuItems.forEach(function(item) {
     item.remove();
@@ -115,16 +130,6 @@ scout.MenuBar.prototype.updateItems = function(menuItems, force) {
   }
 
   this.updateVisibility();
-
-  // --- Helper functions ---
-
-  function isNotSeparator(item) {
-    if (item instanceof scout.Menu) {
-      return !item.separator;
-    } else {
-      return true;
-    }
-  }
 };
 
 /**

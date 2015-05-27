@@ -1,5 +1,5 @@
 scout.MessageBox = function(model, session) {
-  scout.MessageBox.parent.call(this);
+  scout.MessageBox.parent.call(this, false);
   if (!(model instanceof scout.ModelAdapter)) {
     // If message box is used gui only, otherwise the model gets written by the model adapter.
     $.extend(this, model);
@@ -19,6 +19,8 @@ scout.MessageBox = function(model, session) {
   this._$glassPane;
   this._session = session;
   this._addEventSupport();
+
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
