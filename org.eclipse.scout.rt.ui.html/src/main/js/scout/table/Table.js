@@ -165,7 +165,7 @@ scout.Table.prototype._render = function($parent) {
     var menuItems, popup;
     event.preventDefault();
     if (that.$selectedRows().length > 0) {
-      menuItems = that._filterMenus('', true);
+      menuItems = that._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
       if (menuItems.length > 0) {
         popup = new scout.ContextMenuPopup(that.session, menuItems);
         popup.$anchor = that.$data;
@@ -636,10 +636,11 @@ scout.Table.prototype._find$AppLink = function(event) {
 
 scout.Table.prototype._filterMenus = function(allowedTypes) {
   allowedTypes = allowedTypes || [];
-  if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length === 1) {
-    allowedTypes.push('Table.SingleSelection');
-  } else if (allowedTypes.indexOf('Table.MultiSelection') > -1 && this.selectedRows.length > 1) {
-    allowedTypes.push('Table.MultiSelection');
+  if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length !== 1) {
+    scout.arrays.remove(allowedTypes, 'Table.SingleSelection');
+  }
+  if (allowedTypes.indexOf('Table.MultiSelection') > -1 && this.selectedRows.length <= 1) {
+    scout.arrays.remove(allowedTypes, 'Table.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes);
 };
@@ -1269,18 +1270,21 @@ scout.Table.prototype._rowsToIds = function(rows) {
 
 scout.Table.prototype.selectRows = function(rows) {
   var $selectedRows;
+  rows = scout.arrays.ensure(rows);
   if (!scout.arrays.equalsIgnoreOrder(rows, this.selectedRows)) {
     this.selectedRows = rows;
     // FIXME CGU send delayed in case of key navigation
     this.sendRowsSelected(this._rowsToIds(rows));
   }
 
-  $selectedRows = this.selectionHandler.renderSelection();
-  this._triggerRowsSelected($selectedRows);
-  if (this.scrollToSelection) {
-    this.revealSelection();
+  if (this.rendered) {
+    $selectedRows = this.selectionHandler.renderSelection();
+    this._triggerRowsSelected($selectedRows);
+    if (this.scrollToSelection) {
+      this.revealSelection();
+    }
+    this._renderMenus();
   }
-  this._renderMenus();
 };
 
 scout.Table.prototype.$selectedRows = function() {

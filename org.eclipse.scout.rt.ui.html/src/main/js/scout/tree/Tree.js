@@ -126,16 +126,17 @@ scout.Tree.prototype._renderProperties = function() {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(['Tree.EmptySpace']);
+  var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection']);
   this.menuBar.updateItems(menuItems);
 };
 
 scout.Tree.prototype._filterMenus = function(allowedTypes) {
   allowedTypes = allowedTypes || [];
-  if (this.selectedNodeIds.length === 1) {
-    allowedTypes.push('Tree.SingleSelection');
-  } else if (this.selectedNodeIds.length > 1) {
-    allowedTypes.push('Tree.MultiSelection');
+  if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodeIds.length !== 1) {
+    scout.arrays.remove(allowedTypes, 'Tree.SingleSelection');
+  }
+  if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodeIds.length <= 1) {
+    scout.arrays.remove(allowedTypes, 'Tree.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes);
 };

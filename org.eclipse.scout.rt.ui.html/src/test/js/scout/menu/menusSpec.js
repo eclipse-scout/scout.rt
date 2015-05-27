@@ -16,7 +16,7 @@ describe("menus", function() {
       expect(menus).toBeUndefined();
     });
 
-    it("returns menus (even when menu is not visible)", function() {
+    it("returns no menus if no types are given", function() {
       var menus, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu2 = helper.createMenu(helper.createModel(2));
@@ -24,7 +24,7 @@ describe("menus", function() {
       menu3.visible = false;
 
       menus = scout.menus.filter([menu1, menu2, menu3]);
-      expect(menus).toEqual([menu1, menu2, menu3]);
+      expect(menus).toEqual([]);
     });
 
     it("only returns menus with given type (even when menu is not visible)", function() {

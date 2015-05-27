@@ -791,6 +791,7 @@ describe("Table", function() {
     it("opens context menu", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
+      table.selectedRows = [table.rows[0]];
       table.render(session.$entryPoint);
 
       var menuModel = helper.createMenuModel('menu'),
@@ -808,6 +809,7 @@ describe("Table", function() {
     it("context menu only shows visible menus", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
+      table.selectedRows = [table.rows[0]];
       table.render(session.$entryPoint);
 
       var menuModel1 = helper.createMenuModel('menu'),
@@ -826,6 +828,52 @@ describe("Table", function() {
       expect($menu.find('.menu-item').length).toBe(1);
     });
 
+  });
+
+  describe("_filterMenus", function() {
+    var singleSelMenu, multiSelMenu, bothSelMenu, table;
+
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 2);
+      singleSelMenu = helper.menuHelper.createMenu({menuTypes: ['Table.SingleSelection']});
+      multiSelMenu = helper.menuHelper.createMenu({menuTypes: ['Table.MultiSelection']});
+      table = helper.createTable(model);
+      table.menus = [singleSelMenu, multiSelMenu];
+    });
+
+    it("returns no menus if no row is selected", function() {
+      table.selectRows([]);
+      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      expect(menus).toEqual([]);
+    });
+
+    it("returns only single selection menus if one row is selected", function() {
+      table.selectRows(table.rows[0]);
+      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      expect(menus).toEqual([singleSelMenu]);
+    });
+
+    it("returns only multi selection menus if multiple rows are selected", function() {
+      table.selectRows([table.rows[0], table.rows[1]]);
+      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      expect(menus).toEqual([multiSelMenu]);
+    });
+
+    it("returns menus with both types set if one or more rows are selected", function() {
+      bothSelMenu = helper.menuHelper.createMenu({menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']});
+      table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
+      table.selectRows(table.rows[0]);
+      var menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      expect(menus).toEqual([singleSelMenu, bothSelMenu]);
+
+      table.selectRows([table.rows[0], table.rows[1]]);
+      menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      expect(menus).toEqual([multiSelMenu, bothSelMenu]);
+
+      table.selectRows([]);
+      menus = table._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+      expect(menus).toEqual([]);
+    });
   });
 
   describe("row mouse down / move / up", function() {

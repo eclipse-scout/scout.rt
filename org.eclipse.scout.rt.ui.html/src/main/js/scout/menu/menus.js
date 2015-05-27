@@ -58,7 +58,7 @@ scout.menus = {
    */
   _checkType: function(menu, types) {
     if (!types || types.length === 0) {
-      return true;
+      return false;
     }
     if (!menu.menuTypes) {
       return false;
