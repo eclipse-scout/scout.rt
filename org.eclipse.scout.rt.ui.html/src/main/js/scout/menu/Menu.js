@@ -128,7 +128,9 @@ scout.Menu.prototype.isTabTarget = function() {
 
 scout.Menu.prototype.setTabbable = function(tabbable) {
   this.tabbable = tabbable;
-  this._renderTabbable();
+  if (this.rendered) {
+    this._renderTabbable();
+  }
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {

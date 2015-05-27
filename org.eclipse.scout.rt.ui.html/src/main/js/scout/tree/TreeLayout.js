@@ -10,7 +10,10 @@ scout.TreeLayout.prototype.layout = function($container) {
     height = 0;
 
   if (menuBar.$container.isVisible()) {
-    height += scout.graphics.getSize(menuBar.$container).height;
+    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+      menuBarSize = htmlMenuBar.getPreferredSize();
+    htmlMenuBar.setSize(menuBarSize);
+    height += menuBarSize.height;
   }
   height += $data.cssMarginTop() + $data.cssMarginBottom();
 

@@ -10,8 +10,9 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     rightItems = [];
 
   items.forEach(function(item) {
-    // skip separators added by this class
+    // destroy/skip separators added by this class
     if (item.createdBy === this) {
+      item.destroy();
       return;
     }
     if (scout.menus.isButton(item)) {
