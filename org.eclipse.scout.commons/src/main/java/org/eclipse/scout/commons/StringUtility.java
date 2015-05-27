@@ -550,10 +550,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-          start +
-          text.substring(a.end, b) +
-          end +
-          text.substring(b + tagName.length() + 3);
+              start +
+              text.substring(a.end, b) +
+              end +
+              text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -822,32 +822,20 @@ public final class StringUtility {
     }
   }
 
+  /**
+   * @deprecated use {@link HexUtility#decode(String)}
+   */
+  @Deprecated
   public static byte[] hexToBytes(String s) {
-    if (s == null) {
-      return new byte[0];
-    }
-    int slen = s.length();
-    byte[] a = new byte[slen / 2];
-    for (int i = 0; i < slen; i = i + 2) {
-      a[i / 2] = (byte) Integer.parseInt(s.substring(i, i + 2), 16);
-    }
-    return a;
+    return HexUtility.decode(s);
   }
 
+  /**
+   * @deprecated use {@link HexUtility#encode(byte[])}
+   */
+  @Deprecated
   public static String bytesToHex(byte[] a) {
-    if (a == null || a.length == 0) {
-      return null;
-    }
-    StringBuilder buf = new StringBuilder(a.length * 2);
-    int hi, lo;
-    for (int i = 0; i < a.length; i++) {
-      lo = (a[i]) & 0xff;
-      hi = (lo >> 4);
-      lo = lo & 0x0f;
-      buf.append(Integer.toHexString(hi));
-      buf.append(Integer.toHexString(lo));
-    }
-    return buf.toString();
+    return HexUtility.encode(a);
   }
 
   /**
@@ -1179,7 +1167,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-            " "
+        " "
         );
   }
 

@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.HexUtility;
+import org.eclipse.scout.commons.HexUtility.HexOutputStream;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -32,7 +35,7 @@ public class DefaultAuthToken {
   protected static final char TOKEN_DELIM = ';';
   protected static final Pattern TOKEN_SPLIT_REGEX = Pattern.compile(Character.toString(TOKEN_DELIM));
 
-  protected static final byte[] SALT = Base64Utility.decode("tIJdVyLxYDCoXZOAFlZ8Xw==");
+  protected static final byte[] SALT = HexUtility.decode("b4825d5722f16030a85d938016567c5f");
   protected static final byte[] PRIVATE_KEY = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
   protected static final byte[] PUBLIC_KEY = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
   protected static final long TOKEN_TTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
@@ -51,17 +54,30 @@ public class DefaultAuthToken {
       return null;
     }
 
-    String userId = parts[0];
-    long validUntil = Long.parseLong(parts[1]);
-    String[] customTokens = null;
-    if (parts.length > 3) {
-      customTokens = Arrays.copyOfRange(parts, 2, parts.length - 1);
+    try {
+      String userId = new String(HexUtility.decode(parts[0]), "UTF-8");
+      long validUntil = Long.parseLong(parts[1], 16);
+      String[] customTokens = null;
+      if (parts.length > 3) {
+        customTokens = Arrays.copyOfRange(parts, 2, parts.length - 1);
+        for (int i = 0; i < customTokens.length; i++) {
+          customTokens[i] = new String(HexUtility.decode(customTokens[i]), "UTF-8");
+        }
+      }
+      byte[] signature;
+      try {
+        signature = HexUtility.decode(parts[parts.length - 1]);
+      }
+      catch (Exception ex) {
+        signature = new byte[0];
+      }
+      DefaultAuthToken instance = new DefaultAuthToken(userId, validUntil, customTokens);
+      instance.setSignature(signature);
+      return instance;
     }
-    byte[] signature = Base64Utility.decode(parts[parts.length - 1]);
-
-    DefaultAuthToken instance = new DefaultAuthToken(userId, validUntil, customTokens);
-    instance.setSignature(signature);
-    return instance;
+    catch (Exception ex) {
+      throw new PlatformException("unexpected behaviour", ex);
+    }
   }
 
   private final String m_userId;
@@ -72,7 +88,7 @@ public class DefaultAuthToken {
   public DefaultAuthToken(String userId, String... customTokens) throws ProcessingException {
     this(userId, System.currentTimeMillis() + TOKEN_TTL, customTokens);
     try {
-      setSignature(SecurityUtility.createSignature(PRIVATE_KEY, createUnsignedText().getBytes("UTF-8")));
+      setSignature(SecurityUtility.createSignature(PRIVATE_KEY, createUnsignedData()));
     }
     catch (Exception e) {
       throw new PlatformException("Invalid signature setup", e);
@@ -112,15 +128,22 @@ public class DefaultAuthToken {
     return m_customTokens[customIndex];
   }
 
-  protected String createUnsignedText() throws PlatformException {
-    StringBuilder sb = new StringBuilder();
-    sb.append(m_userId).append(TOKEN_DELIM).append(m_validUntil);
-    if (m_customTokens != null) {
-      for (String token : m_customTokens) {
-        sb.append(TOKEN_DELIM).append(token);
+  protected byte[] createUnsignedData() {
+    try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); HexOutputStream hex = new HexOutputStream(bytes)) {
+      hex.write(m_userId.getBytes("UTF-8"));
+      bytes.write(TOKEN_DELIM);
+      bytes.write(Long.toHexString(m_validUntil).getBytes());
+      if (m_customTokens != null) {
+        for (String token : m_customTokens) {
+          bytes.write(TOKEN_DELIM);
+          hex.write(token.getBytes("UTF-8"));
+        }
       }
+      return bytes.toByteArray();
     }
-    return sb.toString();
+    catch (IOException ex) {
+      throw new PlatformException("unexpected behaviour", ex);
+    }
   }
 
   public boolean isValid() {
@@ -131,7 +154,7 @@ public class DefaultAuthToken {
       return false;
     }
     try {
-      return SecurityUtility.verifySignature(PUBLIC_KEY, createUnsignedText().getBytes("UTF-8"), getSignature());
+      return SecurityUtility.verifySignature(PUBLIC_KEY, createUnsignedData(), getSignature());
     }
     catch (Exception e) {
       return false;
@@ -140,10 +163,10 @@ public class DefaultAuthToken {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(createUnsignedText());
-    sb.append(TOKEN_DELIM);
-    sb.append(Base64Utility.encode(m_signature));
-    return sb.toString();
+    StringBuilder buf = new StringBuilder();
+    buf.append(new String(createUnsignedData()));
+    buf.append(TOKEN_DELIM);
+    buf.append(HexUtility.encode(m_signature));
+    return buf.toString();
   }
 }

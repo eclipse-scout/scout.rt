@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
+import org.eclipse.scout.commons.HexUtility;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -73,7 +75,7 @@ public class DefaultAuthTokenTest {
     Assert.assertTrue(t.getValidUntil() - System.currentTimeMillis() > 0);
     Assert.assertNotNull(t.getSignature());
     Assert.assertTrue(t.isValid());
-    Assert.assertEquals("foo;" + t.getValidUntil(), t.createUnsignedText());
+    Assert.assertEquals(toUtf8Hex("foo") + ";" + Long.toHexString(t.getValidUntil()), new String(t.createUnsignedData()));
 
     String encoded = t.toString();
 
@@ -82,7 +84,7 @@ public class DefaultAuthTokenTest {
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
     Assert.assertTrue(t2.isValid());
 
-    String encodedAndTampered = t.createUnsignedText() + ";abc";
+    String encodedAndTampered = new String(t.createUnsignedData()) + ";" + toUtf8Hex("abc");
     DefaultAuthToken t3 = DefaultAuthToken.parse(encodedAndTampered);
     Assert.assertEquals(t.getUserId(), t3.getUserId());
     Assert.assertEquals(t.getValidUntil(), t3.getValidUntil());
@@ -97,7 +99,7 @@ public class DefaultAuthTokenTest {
     Assert.assertEquals("foo", t.getUserId());
     Assert.assertEquals(1, t.getCustomTokenCount());
     Assert.assertTrue(t.isValid());
-    Assert.assertEquals("foo;" + t.getValidUntil() + ";bar", t.createUnsignedText());
+    Assert.assertEquals(toUtf8Hex("foo") + ";" + Long.toHexString(t.getValidUntil()) + ";" + toUtf8Hex("bar"), new String(t.createUnsignedData()));
 
     String encoded = t.toString();
 
@@ -106,6 +108,15 @@ public class DefaultAuthTokenTest {
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
     Assert.assertEquals(t.getCustomToken(0), t2.getCustomToken(0));
     Assert.assertTrue(t2.isValid());
+  }
+
+  private static String toUtf8Hex(String s) {
+    try {
+      return HexUtility.encode(s.getBytes("UTF-8"));
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

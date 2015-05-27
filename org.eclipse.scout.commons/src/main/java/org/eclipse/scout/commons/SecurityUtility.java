@@ -443,8 +443,8 @@ public final class SecurityUtility {
       sig.update(data);
       return sig.verify(signatureToVerify);
     }
-    catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
-      throw new ProcessingException("unable to verify signature", e);
+    catch (Throwable t) {
+      throw new ProcessingException("unable to verify signature", t);
     }
   }
 
