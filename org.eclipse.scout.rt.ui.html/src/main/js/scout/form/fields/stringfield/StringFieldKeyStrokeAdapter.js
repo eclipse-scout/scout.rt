@@ -41,11 +41,10 @@ scout.StringFieldKeyStrokeAdapter = function(field) {
 scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
 scout.StringFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
-//add swallowed keys to drawed keys;
-var i = 0;
-for (i = 0; i < this.preventBubbleUpKeys.length; i++) {
-  scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, false, false, false, this.preventBubbleUpKeys[i]);
-}
+  // add swallowed keys to drawed keys;
+  for (var i = 0; i < this.preventBubbleUpKeys.length; i++) {
+    scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, false, false, false, this.preventBubbleUpKeys[i]);
+  }
 
 scout.StringFieldKeyStrokeAdapter.parent.prototype.drawKeyBox.call(this, drawedKeys);
 };

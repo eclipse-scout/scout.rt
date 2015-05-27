@@ -14,7 +14,7 @@
  * </ol>
  */
 scout.ModelAdapter = function(callInitializer) {
-  scout.ModelAdapter.parent.call(this, callInitializer);
+  scout.ModelAdapter.parent.call(this, false);
   this.session;
   this._adapterProperties = [];
   this.ui;
@@ -46,6 +46,8 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     }
     target[propertyName] = value;
   }.bind(this));
+
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(target);
