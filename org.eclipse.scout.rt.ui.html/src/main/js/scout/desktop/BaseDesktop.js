@@ -27,7 +27,7 @@ scout.BaseDesktop.prototype._goOffline = function() {
     return;
   }
 
-  this.$offline = this.$parent.prependDiv('offline-message');
+  this.$offline = this.$container.prependDiv('offline-message');
   this.$offline.text(message);
   $reconnect = this.$offline.appendDiv('reconnect');
   $reconnect
