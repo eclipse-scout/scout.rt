@@ -7,7 +7,13 @@ scout.Widget = function(callInitializer) {
   this.$container;
 
   if (scout.objects.whenUndefined(callInitializer, true)) {
-    this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+    // FIXME AWE/NBU This execution order. Maybe add initWidget() method?
+    try {
+      this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+    }
+    catch (err) {
+      // IGNORE ERROR - TEMPORARY WORKAROUND!
+    }
   }
 };
 
