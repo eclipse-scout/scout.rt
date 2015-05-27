@@ -10,7 +10,7 @@ scout.inherits(scout.MenuBarLayout, scout.AbstractLayout);
  */
 scout.MenuBarLayout.prototype.layout = function($container) {
   // check if all menu items have enough room to be displayed without ellipsis
-  this._removeEllipsis();
+  this._destroyEllipsis();
   this._menuBar.updateItems(this._menuBar.menuItems, true);
 
   var ellipsisSize, leftEnd = 0, rightEnd, overflown,
@@ -47,7 +47,7 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     var menuItemsCopy = [];
 
     // create ellipsis menu
-    this._renderEllipsis($container);
+    this._createAndRenderEllipsis($container);
     ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
     rightEnd -= ellipsisSize.width;
 
@@ -81,9 +81,7 @@ scout.MenuBarLayout.prototype.layout = function($container) {
       }
     }, this);
 
-    // add the ellipsis menu as last item - order matters because we do
-    // not sort the menu items again.
-    menuItemsCopy.push(this._ellipsis);
+    this._addEllipsisToMenuItems(menuItemsCopy);
     this._menuBar.visibleMenuItems = menuItemsCopy;
   } else {
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
@@ -94,7 +92,29 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   }
 };
 
-scout.MenuBarLayout.prototype._renderEllipsis = function($container) {
+/**
+ * Add the ellipsis menu to the menu-items list. Order matters because we do not sort
+ * menu-items again.
+ */
+scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItemsCopy) {
+  var i, menuItem, insertItemAt = 0;
+  for (i = 0; i < menuItemsCopy.length; i++) {
+    menuItem = menuItemsCopy[i];
+    if (isRightAligned(menuItem)) {
+      break;
+    } else {
+      insertItemAt = i + 1;
+    }
+  }
+
+  scout.arrays.insert(menuItemsCopy, this._ellipsis, insertItemAt);
+
+  function isRightAligned(menuItem) {
+    return menuItem.$container.hasClass('right-aligned');
+  }
+};
+
+scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
   var ellipsis = this._menuBar.session.createUiObject({
     objectType: 'Menu',
     horizontalAlignment: 1,
@@ -105,9 +125,9 @@ scout.MenuBarLayout.prototype._renderEllipsis = function($container) {
   this._ellipsis = ellipsis;
 };
 
-scout.MenuBarLayout.prototype._removeEllipsis = function() {
+scout.MenuBarLayout.prototype._destroyEllipsis = function() {
   if (this._ellipsis) {
-    this._ellipsis.remove(); // FIXME AWE: (menu) check if we must remove or destroy
+    this._ellipsis.destroy();
     this._ellipsis = null;
   }
 };

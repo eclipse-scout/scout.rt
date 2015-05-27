@@ -213,16 +213,16 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
  * @override
  */
 scout.GroupBox.prototype._renderLabelVisible = function(visible) {
-  // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
-  // --> kein hack für main-box, wenn die auf dem model ein label hat, hat es im UI auch eins
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
 };
 
 scout.GroupBox.prototype._renderMenus = function(menus) {
-  // create a menu-wrapper for each process button
-  var menuItems = this.staticMenus.concat(menus);
+  // create a menu-adapter for each process button
+  var menuButtonAdapter, menuItems = this.staticMenus.concat(menus);
   this.processButtons.forEach(function(button) {
-    menuItems.push(new scout.MenuButtonAdapter(button));
+    menuButtonAdapter = new scout.MenuButtonAdapter();
+    menuButtonAdapter.init(button);
+    menuItems.push(menuButtonAdapter);
   });
   this.menuBar.updateItems(menuItems);
 };

@@ -7,23 +7,23 @@
   border-bottom: 1px solid @border-color;
   white-space: nowrap;
 
-  & > div {
-    position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
+  &.bottom {
+    border-top: 1px solid @border-color;
+    border-bottom: 0;
+  }
+
+  & > .menu-item, .menu-separator {
+    /* reset a possible different value (e.g. set by .form-field)
+       which might cause 'display: inline-block' to be ignored for
+       the computed style */
+    position: relative;
     display: inline-block;
     height: @menubar-height;
     line-height: @menubar-height;
     vertical-align: middle;
   }
 
-  &.bottom {
-    border-top: 1px solid @border-color;
-    border-bottom: 0;
-  }
-
   & > .menu-item {
-    height: @menubar-height;
-    line-height: @menubar-height;
-
     &:focus:not(.disabled):not(.menu-button) {
       text-decoration: underline;
       color: @focus-color;

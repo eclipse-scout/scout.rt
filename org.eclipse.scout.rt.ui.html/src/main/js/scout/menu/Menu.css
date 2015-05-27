@@ -45,7 +45,6 @@
   line-height: @menu-item-height;
   white-space: nowrap;
   cursor: pointer;
-  padding-top: 1px;
   display: inline-block;
 
   &[data-icon]::before {
