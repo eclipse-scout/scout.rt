@@ -66,6 +66,7 @@ scout.MenuBar.prototype._remove = function() {
   });
   if (this.$container) {
     this.$container.remove();
+    this.$container = undefined;
   }
 };
 
