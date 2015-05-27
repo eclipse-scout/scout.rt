@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -49,35 +51,63 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_table = table;
     m_enabled = true;
     m_status = STATUS_NON_CHANGED;
-    m_cells = new ArrayList<Cell>(table.getColumnCount());
-    for (int i = 0; i < table.getColumnCount(); i++) {
-      m_cells.add(new Cell(this));
-    }
+    addEmptyCells(table.getColumnCount());
   }
 
+  @SuppressWarnings("unchecked")
   public InternalTableRow(ITable table, ITableRow row) throws ProcessingException {
     this();
     m_rowIndex = row.getRowIndex();
     m_enabled = row.isEnabled();
-    m_status = row.getStatus();
-    m_cells = new ArrayList<Cell>(table.getColumnCount());
-    for (int i = 0; i < table.getColumnCount(); i++) {
-      m_cells.add(new Cell(this, row.getCell(i)));
+    int columnCount = table.getColumnCount();
+    m_cells = new ArrayList<Cell>(columnCount);
+    for (int i = 0; i < columnCount; i++) {
+      m_cells.add(new Cell(this));
     }
-    // validate values
-    List<IColumn<?>> cols = table.getColumns();
-    int i = 0;
-    for (IColumn<?> col : cols) {
-      Cell cell = m_cells.get(i);
-      Object value = cell.getValue();
-      value = col.parseValue(this, value);
-      cell.setValue(value);
-      i++;
+    // import and validate cell values
+    for (int i = 0; i < table.getColumnCount(); i++) {
+      ICell newCell = row.getCell(i);
+      IColumn col = table.getColumnSet().getColumn(i);
+      tryParseAndSetValue(col, m_cells.get(i), newCell);
     }
     // reset status
     m_status = row.getStatus();
+
+    //add observer
+    for (int i = 0; i < columnCount; i++) {
+      Cell cell = m_cells.get(i);
+      cell.setObserver(this);
+    }
+
     // set table at end to avoid events before the row is even attached
     m_table = table;
+  }
+
+  private void addEmptyCells(int columnCount) {
+    m_cells = new ArrayList<Cell>(columnCount);
+    for (int i = 0; i < columnCount; i++) {
+      m_cells.add(new Cell(this));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> void tryParseAndSetValue(IColumn<T> col, Cell internalCell, ICell newCell) {
+    T value = (T) newCell.getValue();
+    try {
+      internalCell.setText(newCell.getText());
+      Object parsedValue = col.parseValue(this, value);
+      T validValue = col.validateValue(this, (T) parsedValue);
+      internalCell.setValue(validValue);
+      internalCell.removeErrorStatus(ValidationFailedStatus.class);
+    }
+    catch (ProcessingException e) {
+      internalCell.setText(format(value));
+      internalCell.addErrorStatus(new ValidationFailedStatus<Object>(e, value));
+    }
+  }
+
+  private <T> String format(T value) {
+    return StringUtility.nvl(value, "");
   }
 
   @Override

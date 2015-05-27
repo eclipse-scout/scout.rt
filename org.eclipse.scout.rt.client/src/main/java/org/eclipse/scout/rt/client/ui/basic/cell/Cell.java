@@ -19,9 +19,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.IStyleable;
+import org.eclipse.scout.rt.client.ui.form.fields.DefaultFieldStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -50,7 +51,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   private String m_text;
   private ICellSpecialization m_cellSpecialization = DEFAULT_CELL_STYLE;
 
-  private IStatus m_errorStatus = null;
+  private MultiStatus m_errorStatus = null;
 
   public Cell() {
   }
@@ -305,19 +306,66 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return m_errorStatus;
   }
 
+  @Deprecated
   public void setErrorStatus(String message) {
-    setErrorStatus(new Status(message));
+    addErrorStatus(new DefaultFieldStatus(message));
   }
 
   /**
    * Set the error status of the cell or <code>null</code> in case of no error.
    **/
+  @Deprecated
   public void setErrorStatus(IStatus status) {
-    m_errorStatus = status;
+    setErrorStatusInternal(ensureMultiStatus(status));
   }
 
   public void clearErrorStatus() {
-    setErrorStatus((IStatus) null);
+    setErrorStatusInternal(null);
+  }
+
+  public void addErrorStatus(String message) {
+    addErrorStatus(new DefaultFieldStatus(message));
+  }
+
+  /**
+   * Adds an error status
+   */
+  public void addErrorStatus(IStatus newStatus) {
+    final MultiStatus status = ensureMultiStatus(getErrorStatusInternal());
+    status.add(newStatus);
+    setErrorStatusInternal(status);
+  }
+
+  /**
+   * Remove IStatus of a specific type
+   */
+  public void removeErrorStatus(Class<? extends IStatus> statusClazz) {
+    final MultiStatus ms = getErrorStatusInternal();
+    if (ms != null) {
+      ms.removeAll(statusClazz);
+      if (ms.getChildren().isEmpty()) {
+        clearErrorStatus();
+      }
+    }
+  }
+
+  private MultiStatus ensureMultiStatus(IStatus s) {
+    if (s instanceof MultiStatus) {
+      return (MultiStatus) s;
+    }
+    final MultiStatus ms = new MultiStatus();
+    if (s != null) {
+      ms.add(s);
+    }
+    return ms;
+  }
+
+  private MultiStatus getErrorStatusInternal() {
+    return m_errorStatus;
+  }
+
+  private void setErrorStatusInternal(MultiStatus status) {
+    m_errorStatus = status;
   }
 
   public boolean isContentValid() {

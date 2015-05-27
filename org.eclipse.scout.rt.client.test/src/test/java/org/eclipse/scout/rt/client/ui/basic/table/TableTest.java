@@ -36,13 +36,37 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class TableTest {
 
+  @Test
+  public void testAddRows_StatusNonChanged() throws ProcessingException {
+    P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
+    assertValidTestTable(table, ITableRow.STATUS_NON_CHANGED);
+  }
+
+  @Test
+  public void testAddRows_StatusInserted() throws ProcessingException {
+    P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
+    assertValidTestTable(table, ITableRow.STATUS_INSERTED);
+  }
+
+  @Test
+  public void testAddRows_StatusUpdated() throws ProcessingException {
+    P_Table table = createTestTable(ITableRow.STATUS_UPDATED);
+    assertValidTestTable(table, ITableRow.STATUS_UPDATED);
+  }
+
+  @Test
+  public void testAddRows_StatusDeleted() throws ProcessingException {
+    P_Table table = createTestTable(ITableRow.STATUS_DELETED);
+    assertValidTestTable(table, ITableRow.STATUS_DELETED);
+  }
+
   /**
    * Test that new inserted rows are automatically discarded.
    */
   @Test
   public void testDeleteAllNew() throws ProcessingException {
     //Bug 361985
-    P_Table table = createTable(ITableRow.STATUS_INSERTED);
+    P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
 
     final CapturingTableAdapter ta = new CapturingTableAdapter();
     table.addTableListener(ta);
@@ -60,7 +84,7 @@ public class TableTest {
   @Test
   public void testDeleteAllAndDiscardFirst() throws ProcessingException {
     //Bug 361985
-    P_Table table = createTable(ITableRow.STATUS_NON_CHANGED);
+    P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
     final CapturingTableAdapter ta = new CapturingTableAdapter();
     table.addTableListener(ta);
 
@@ -88,7 +112,7 @@ public class TableTest {
   @Test
   public void testDeleteAndDiscard() throws Exception {
     //Bug 361985
-    P_Table table = createTable(ITableRow.STATUS_NON_CHANGED);
+    P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
     final CapturingTableAdapter ta = new CapturingTableAdapter();
     table.addTableListener(ta);
 
@@ -115,7 +139,7 @@ public class TableTest {
   @Test
   public void testDeleteAllAndDiscardAll() throws Exception {
     //Bug 361985
-    P_Table table = createTable(ITableRow.STATUS_NON_CHANGED);
+    P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
 
     table.deleteAllRows();
     assertRowCount(0, 2, table);
@@ -139,14 +163,14 @@ public class TableTest {
   public void testDeleteAllAutoDiscard() throws Exception {
     //Bug 361985
     //test with STATUS_INSERTED and AutoDiscardOnDelete:
-    P_Table table = createTable(ITableRow.STATUS_INSERTED);
+    P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
     table.setAutoDiscardOnDelete(true);
 
     table.deleteAllRows();
     assertRowCount(0, 0, table);
 
     //test with STATUS_NON_CHANGED:
-    P_Table table2 = createTable(ITableRow.STATUS_NON_CHANGED);
+    P_Table table2 = createTestTable(ITableRow.STATUS_NON_CHANGED);
     table2.setAutoDiscardOnDelete(true);
 
     table2.deleteAllRows();
@@ -154,20 +178,27 @@ public class TableTest {
   }
 
   /**
-   * Test that deleted tableRows can be discarded:
+   * Test that deleted tableRows can be discarded (with table rows with status STATUS_INSERTED):<br>
    * discard all rows => no deleted row.
    */
   @Test
-  public void testDiscardAll() throws Exception {
+  public void testDiscardAll_StatusInserted() throws Exception {
     //Bug 361985
     //test with STATUS_INSERTED and AutoDiscardOnDelete:
-    P_Table table = createTable(ITableRow.STATUS_INSERTED);
+    P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
 
     table.discardAllRows();
     assertRowCount(0, 0, table);
 
-    //test with STATUS_NON_CHANGED:
-    P_Table table2 = createTable(ITableRow.STATUS_NON_CHANGED);
+  }
+
+  /**
+   * Tests discarding rows with status STATUS_NON_CHANGED.<br>
+   * discard all rows => no deleted row.
+   */
+  @Test
+  public void testDiscardAll_StatusNonChanged() throws Exception {
+    P_Table table2 = createTestTable(ITableRow.STATUS_NON_CHANGED);
 
     table2.discardAllRows();
     assertRowCount(0, 0, table2);
@@ -339,18 +370,19 @@ public class TableTest {
     assertTrue(table.isEnabled());
   }
 
-  /**
-   * Creates a table with 2 rows. with given status.
-   */
-  private P_Table createTable(int status) throws ProcessingException {
-    P_Table table = new P_Table();
-    table.initTable();
-
-    table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}}, status);
+  private void assertValidTestTable(P_Table table, int status) {
     assertRowCount(2, 0, table);
     assertStatusAndTable(table, status, table.getRow(0));
     assertStatusAndTable(table, status, table.getRow(1));
+  }
 
+  /**
+   * Creates a table with 2 rows. with given status.
+   */
+  private P_Table createTestTable(int status) throws ProcessingException {
+    P_Table table = new P_Table();
+    table.initTable();
+    table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}}, status);
     return table;
   }
 

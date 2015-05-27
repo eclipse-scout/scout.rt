@@ -306,7 +306,7 @@ public class CellTest {
   @Test
   public void testSetErrorStatus() {
     Cell c = new Cell();
-    c.setErrorStatus(new Status("error", IStatus.ERROR));
+    c.addErrorStatus(new Status("error", IStatus.ERROR));
     assertEquals(IStatus.ERROR, c.getErrorStatus().getSeverity());
   }
 
@@ -317,7 +317,7 @@ public class CellTest {
   @Test
   public void testClearErrorStatus() {
     Cell c = new Cell();
-    c.setErrorStatus(new Status("error", IStatus.ERROR));
+    c.addErrorStatus(new Status("error", IStatus.ERROR));
     c.clearErrorStatus();
     assertNull(c.getErrorStatus());
   }
@@ -331,10 +331,10 @@ public class CellTest {
     final String testIconId = "";
     Cell c = new Cell();
     c.setIconId(testIconId);
-    c.setErrorStatus(new Status("error", IStatus.ERROR));
-    c.setErrorStatus(new Status("error2", IStatus.ERROR));
+    c.addErrorStatus(new Status("error", IStatus.ERROR));
+    c.addErrorStatus(new Status("error2", IStatus.ERROR));
     c.clearErrorStatus();
-    c.setErrorStatus(new Status("error3", IStatus.ERROR));
+    c.addErrorStatus(new Status("error3", IStatus.ERROR));
     c.clearErrorStatus();
     assertNull(c.getErrorStatus());
     assertEquals(testIconId, c.getIconId());

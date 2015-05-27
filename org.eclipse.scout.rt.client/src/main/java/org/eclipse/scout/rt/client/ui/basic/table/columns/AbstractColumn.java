@@ -31,11 +31,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
@@ -62,6 +62,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -674,7 +675,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (editingField instanceof IValueField) {
       IValueField v = (IValueField) editingField;
       if (v.isSaveNeeded() || editingField.getErrorStatus() != null || row.getCell(this).getErrorStatus() != null) {
-        VALUE parsedValue = parseValue(row, v.getValue());
+        VALUE parsedValue = interceptParseValue(row, v.getValue());
         setValueInternal(row, parsedValue, editingField);
         if (getTable() instanceof AbstractTable && ((AbstractTable) getTable()).wasEverValid(row)) {
           persistRowChange(row);
@@ -1016,19 +1017,27 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   private void setValueInternal(ITableRow row, VALUE value, IFormField editingField) throws ProcessingException {
-    VALUE newValue = validateValue(row, value);
+    try {
+      VALUE newValue = validateValue(row, value);
+      /*
+       * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
+       * If the passed value is valid, it will be removed from the validated value cache and stored when getValue()
+       * is called next time. Otherwise, the old validated value will be left in the cache.
+       */
+      validateColumnValue(row, editingField, true, newValue);
 
-    /*
-     * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
-     * If the passed value is valid, it will be removed from the validated value cache and stored when getValue()
-     * is called next time. Otherwise, the old validated value will be left in the cache.
-     */
-    validateColumnValue(row, editingField, true, newValue);
-
-    // set newValue into the cell only if there's no error.
-    ICell cell = row.getCell(this);
-    if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
-      row.setCellValue(getColumnIndex(), newValue);
+      // set newValue into the cell only if there's no error.
+      ICell cell = row.getCell(this);
+      if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
+        row.setCellValue(getColumnIndex(), newValue);
+      }
+    }
+    catch (ProcessingException v) {
+      Cell cell = row.getCellForUpdate(this);
+      //add
+      cell.addErrorStatus(new ValidationFailedStatus<VALUE>(v, value));
+      //update cell displayText
+      cell.setText(value.toString());
     }
   }
 
@@ -1331,7 +1340,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public VALUE/* validValue */validateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
-    return interceptValidateValue(row, rawValue);
+    VALUE validatedValue = interceptValidateValue(row, rawValue);
+    validateMandatoryProperty(row, validatedValue);
+    return validatedValue;
   }
 
   /**
@@ -1412,9 +1423,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void decorateCell(ITableRow row) {
     Cell cell = row.getCellForUpdate(getColumnIndex());
-    if (cell.getErrorStatus() == null) {
-      decorateCellInternal(cell, row);
-    }
+    decorateCellInternal(cell, row);
     try {
       interceptDecorateCell(cell, row);
     }
@@ -1726,7 +1735,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * @param value
    *          The value that is set in the Scout model and not in the UI component
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked"})
   public void validateColumnValue(ITableRow row, IFormField editor, boolean singleColValidation, VALUE value) {
     if (row == null) {
       LOG.error("validateColumnValue called with row=null");
@@ -1738,7 +1747,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (m_isValidating) {
       LOG.warn("validateColumnValue called during running validation. Value " + String.valueOf(value) + " will not be set.");
       Cell cell = row.getCellForUpdate(this);
-      cell.setErrorStatus(ScoutTexts.get("RunningColumnValidation"));
+      cell.addErrorStatus(new ValidationFailedStatus(ScoutTexts.get("RunningColumnValidation")));
       return;
     }
 
@@ -1760,7 +1769,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
           Cell cell = row.getCellForUpdate(this);
           IMultiStatus status = getEditorErrorIncludingMandatory((IValueField<VALUE>) editor);
           if (!status.isOK()) {
-            cell.setErrorStatus(status);
+            cell.addErrorStatus(status);
             cell.setText(((IValueField<VALUE>) editor).getDisplayText());
           }
           else {
@@ -1770,8 +1779,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
              * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(List<ITableRow> rows)}
              * to propagate the new error status and value.
              */
-            //FIXME CGU/JGU what is this for?
-//            cell.clearErrorStatus();
+            cell.removeErrorStatus(ValidationFailedStatus.class);
             cell.setValue(value);
             decorateCellInternal(cell, row);
             ITable table = getTable();
@@ -1779,12 +1787,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
               ((AbstractTable) table).wasEverValid(row);
             }
           }
-
-          //displayable column with invalid values should become visible
-          if (!cell.isContentValid() && isDisplayable() && !isVisible()) {
-            setVisible(true);
-          }
-
+          ensureErrorVisibility(row);
         }
       }
       catch (Exception e) {
@@ -1797,7 +1800,22 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
       removeValidatedValue(row);
     }
+  }
 
+  /**
+   * Ensure that displayable columns are visible, if there is an error
+   */
+  public void ensureErrorVisibility(ITableRow row) {
+    Cell cell = row.getCellForUpdate(this);
+    if (!cell.isContentValid() && isDisplayable() && !isVisible()) {
+      setVisible(true);
+    }
+  }
+
+  private void validateMandatoryProperty(ITableRow row, VALUE validatedValue) throws VetoException {
+    if (isMandatory() && validatedValue == null) {
+      throw new VetoException(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"));
+    }
   }
 
   /**
@@ -1807,7 +1825,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     IMultiStatus editorError = editor.getErrorStatus();
     MultiStatus status = editorError == null ? new MultiStatus() : new MultiStatus(editorError);
     if (!editor.isMandatoryFulfilled()) {
-      status.add(new Status(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
+      status.add(new ValidationFailedStatus<VALUE>(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
     }
     return status;
   }

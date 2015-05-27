@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -61,15 +60,18 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   @Test
   public void testValidateColumn() throws ProcessingException {
     TestTable table = new TestTable();
-    table.addRowsByArray(new String[]{"a", "invalid"});
+    table.addRowsByArray(new String[]{"invalid", "a"});
     ICell c0 = table.getCell(0, 0);
     ICell c1 = table.getCell(1, 0);
 
-    assertNoErrorStatus(c0);
-    assertErrorStatus(c1);
+    assertNoErrorStatus(c1);
+    assertErrorStatus(c0);
     //invalid value is set on the table anyways
-    assertEquals("invalid", c1.getValue());
-    assertEquals("invalid", c1.getText());
+    assertEquals("invalid", c0.getValue());
+    assertEquals("invalid", c0.getText());
+
+    assertEquals("a", c1.getValue());
+    assertEquals("a", c1.getText());
   }
 
   @Test
@@ -91,24 +93,24 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     TestTable testTable = new TestTable();
     testTable.getValidateTestColumn().setVisible(false);
     testTable.addRowsByArray(new String[]{"invalid"});
+    ICell c0 = testTable.getCell(0, 0);
+    assertErrorStatus(c0);
     assertTrue(testTable.getValidateTestColumn().isVisible());
   }
 
   /**
    * Tests validation with a {@link VetoException}<br>
    * Invalid column values should have an error status
-   * TODO jgu
    */
   @Test
-  @Ignore
   public void testValidateVetoColumn() throws ProcessingException {
     TestVetoTable table = new TestVetoTable();
-    table.addRowsByArray(new String[]{"a", "invalid"});
+    table.addRowsByArray(new String[]{"invalid", "a"});
     ICell c0 = table.getCell(0, 0);
     ICell c1 = table.getCell(1, 0);
 
-    assertNoErrorStatus(c0);
-    assertErrorStatus(c1);
+    assertErrorStatus(c0);
+    assertNoErrorStatus(c1);
   }
 
   private void assertErrorStatus(ICell c) {
@@ -137,7 +139,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
         Cell cell = row.getCellForUpdate(this);
         if ("invalid".equals(rawValue)) {
-          cell.setErrorStatus(INVALID_MESSAGE);
+          cell.addErrorStatus(INVALID_MESSAGE);
         }
         else {
           cell.clearErrorStatus();

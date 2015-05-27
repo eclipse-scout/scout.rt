@@ -38,6 +38,15 @@ import org.junit.runner.RunWith;
 public class AbstractPageWithNodesTest {
 
   @Test
+  public void testPageNodeText() throws Exception {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
+    desktop.setOutline(PageWithTableOutline.class);
+    ITreeNode parentPageNode = desktop.getOutline().getSelectedNode();
+    Assert.assertEquals("Parent page", parentPageNode.getCell().getText());
+  }
+
+  @Test
   public void testRenameChildPages() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
@@ -81,8 +90,7 @@ public class AbstractPageWithNodesTest {
   public static class PageWithTableOutline extends AbstractOutline {
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
-      ParentItemNodePage parentPage = new ParentItemNodePage();
-      pageList.add(parentPage);
+      pageList.add(new ParentItemNodePage());
     }
   }
 
@@ -95,8 +103,7 @@ public class AbstractPageWithNodesTest {
 
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
-      ItemNodePage childPage = new ItemNodePage();
-      pageList.add(childPage);
+      pageList.add(new ItemNodePage());
     }
   }
 

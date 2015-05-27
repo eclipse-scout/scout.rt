@@ -2177,7 +2177,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
        */
       for (IColumn<?> col : getColumns()) {
         if (col instanceof AbstractColumn<?>) {
-          ((AbstractColumn<?>) col).validateColumnValue(row);
+          ((AbstractColumn<?>) col).clearValidatedValue(row);
+          ((AbstractColumn<?>) col).ensureErrorVisibility(row);
         }
       }
       enqueueDecorationTasks(row);
@@ -2830,7 +2831,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private ITableRow addInternalRow(InternalTableRow newIRow) throws ProcessingException {
     for (IColumn<?> col : getColumns()) {
       if (col instanceof AbstractColumn<?>) {
-        ((AbstractColumn<?>) col).validateColumnValue(newIRow);
         ((AbstractColumn<?>) col).initCell(newIRow);
       }
     }
