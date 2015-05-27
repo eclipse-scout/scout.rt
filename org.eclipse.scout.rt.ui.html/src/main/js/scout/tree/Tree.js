@@ -115,6 +115,7 @@ scout.Tree.prototype._render = function($parent) {
 
 scout.Tree.prototype._remove = function() {
   this.session.detachHelper.removeScrollable(this.$data);
+  this.menuBar.remove();
   scout.Tree.parent.prototype._remove.call(this);
 };
 

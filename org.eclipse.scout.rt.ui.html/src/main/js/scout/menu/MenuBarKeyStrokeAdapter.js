@@ -9,110 +9,88 @@ scout.MenuBarKeyStrokeAdapter = function(menuBar) {
 };
 scout.inherits(scout.MenuBarKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
-scout.MenuBarLeftKeyStroke = function(menuBar, keyStroke) {
-  scout.MenuBarLeftKeyStroke.parent.call(this);
-  this.drawHint = true;
-  this.keyStroke = 'LEFT';
-  this.menuBar = menuBar;
-  this.initKeyStrokeParts();
-  this.bubbleUp = false;
-};
-scout.inherits(scout.MenuBarLeftKeyStroke, scout.KeyStroke);
+/* --- MenuBarKeyStroke --- */
 
-// FIXME NBU/AWE: remove copy/paste here
-// FIXME NBU/AWE: move menu-stuff to menu.js / button.js
+scout.MenuBarKeyStroke = function(menuBar, keyStroke) {
+  scout.MenuBarKeyStroke.parent.call(this);
+  this.menuBar = menuBar;
+  this.keyStroke = keyStroke;
+  this.drawHint = true;
+  this.bubbleUp = false;
+  this.initKeyStrokeParts();
+};
+scout.inherits(scout.MenuBarKeyStroke, scout.KeyStroke);
+
+scout.MenuBarKeyStroke.prototype._handleElementToFocus = function(elementToFocus, $menuItemFocused) {
+  if (elementToFocus) {
+    elementToFocus.setTabbable(true);
+    elementToFocus.$container.focus();
+  } else {
+    $menuItemFocused.attr('tabindex', 0);
+  }
+};
+
+scout.MenuBarKeyStroke.prototype._drawKeyBox = function($container) {
+  // NOP
+};
+
+/* --- MenuBarLeftKeyStroke --- */
+
+scout.MenuBarLeftKeyStroke = function(menuBar) {
+  scout.MenuBarLeftKeyStroke.parent.call(this, menuBar, 'LEFT');
+};
+scout.inherits(scout.MenuBarLeftKeyStroke, scout.MenuBarKeyStroke);
 
 /**
  * @Override scout.KeyStroke
  */
 scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
-  var menuItems = this.menuBar.visibleMenuItems;
-  var $menuItemFocused = this.menuBar.$container.find(':focus');
-  var lastValidItem, elementToFocus;
+  var menuItems = this.menuBar.visibleMenuItems,
+    $menuItemFocused = this.menuBar.$container.find(':focus'),
+    i, menuItem, lastValidItem, elementToFocus;
 
-  for (var i = 0; i < menuItems.length; i++) {
-    var actualItem = menuItems[i];
-    if (actualItem instanceof scout.Button) {
-        actualItem.$field.attr('tabindex', '-1');
-    } else {
-      actualItem.$container.removeAttr('tabindex');
-    }
-    if ($menuItemFocused[0] === actualItem.$container[0] || (actualItem.$field && $menuItemFocused[0] === actualItem.$field[0])) {
+  for (i = 0; i < menuItems.length; i++) {
+    menuItem = menuItems[i];
+    menuItem.setTabbable(false);
+    if ($menuItemFocused[0] === menuItem.$container[0]) {
       if (lastValidItem) {
         elementToFocus = lastValidItem;
       }
       break;
     }
-    if ((actualItem instanceof scout.Button || (actualItem instanceof scout.Menu && !actualItem.separator)) && actualItem.visible && actualItem.enabled) {
-      lastValidItem = actualItem;
+    if (menuItem.isTabTarget()) {
+      lastValidItem = menuItem;
     }
   }
-  if (elementToFocus) {
-    if (elementToFocus instanceof scout.Button) {
-      elementToFocus.$field.attr('tabindex', 0);
-      elementToFocus.$field.focus();
-    } else {
-      elementToFocus.$container.attr('tabindex', 0);
-      elementToFocus.$container.focus();
-    }
-  } else {
-    $menuItemFocused.attr('tabindex', 0);
-  }
+  this._handleElementToFocus(elementToFocus, $menuItemFocused);
 };
 
-scout.MenuBarLeftKeyStroke.prototype._drawKeyBox = function($container) {
+/* --- MenuBarRightKeyStroke --- */
 
+scout.MenuBarRightKeyStroke = function(menuBar) {
+  scout.MenuBarRightKeyStroke.parent.call(this, menuBar, 'RIGHT');
 };
-
-scout.MenuBarRightKeyStroke = function(menuBar, keyStroke) {
-  scout.MenuBarRightKeyStroke.parent.call(this);
-  this.drawHint = true;
-  this.keyStroke = 'RIGHT';
-  this.menuBar = menuBar;
-  this.initKeyStrokeParts();
-  this.bubbleUp = false;
-};
-scout.inherits(scout.MenuBarRightKeyStroke, scout.KeyStroke);
+scout.inherits(scout.MenuBarRightKeyStroke, scout.MenuBarKeyStroke);
 
 /**
  * @Override scout.KeyStroke
  */
 scout.MenuBarRightKeyStroke.prototype.handle = function(event) {
-  var menuItems = this.menuBar.visibleMenuItems;
-  var $menuItemFocused = this.menuBar.$container.find(':focus');
-  var focusNext = false,
-    elementToFocus;
+  var menuItems = this.menuBar.visibleMenuItems,
+    $menuItemFocused = this.menuBar.$container.find(':focus'),
+    i, menuItem, elementToFocus, focusNext = false;
 
-  for (var i = 0; i < menuItems.length; i++) {
-    var actualItem = menuItems[i];
-    if(actualItem instanceof scout.Button){
-      actualItem.$field.attr('tabindex', '-1');
-    }
-    else{
-      actualItem.$container.removeAttr('tabindex');
-    }
-    if (focusNext && (actualItem instanceof scout.Button || (actualItem instanceof scout.Menu && !actualItem.separator)) && actualItem.visible && actualItem.enabled) {
+  for (i = 0; i < menuItems.length; i++) {
+    menuItem = menuItems[i];
+    menuItem.setTabbable(false);
+    if (focusNext && menuItem.isTabTarget()) {
       focusNext = false;
-      elementToFocus = actualItem;
+      elementToFocus = menuItem;
       break;
     }
-    if ($menuItemFocused[0] === actualItem.$container[0] || (actualItem.$field && $menuItemFocused[0] === actualItem.$field[0])) {
+    if ($menuItemFocused[0] === menuItem.$container[0]) {
       focusNext = true;
     }
   }
-  if (elementToFocus) {
-    if (elementToFocus instanceof scout.Button) {
-      elementToFocus.$field.attr('tabindex', 0);
-      elementToFocus.$field.focus();
-    } else {
-      elementToFocus.$container.attr('tabindex', 0);
-      elementToFocus.$container.focus();
-    }
-  } else {
-    $menuItemFocused.attr('tabindex', 0);
-  }
-};
-
-scout.MenuBarRightKeyStroke.prototype._drawKeyBox = function($container) {
-
+  this._handleElementToFocus(elementToFocus, $menuItemFocused);
 };

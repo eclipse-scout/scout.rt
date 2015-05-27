@@ -1,9 +1,14 @@
-scout.Widget = function() {
+scout.Widget = function(callInitializer) {
   this.parent;
+  this.keyStrokeAdapter;
   this.children = [];
   this.rendered = false;
   this.destroyed = false;
   this.$container;
+
+  if (scout.objects.whenUndefined(callInitializer, true)) {
+    this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  }
 };
 
 scout.Widget.prototype.render = function($parent) {

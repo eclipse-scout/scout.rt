@@ -1,3 +1,4 @@
+// FIXME NBU/AWE: inherit from Widget.js? refactor un-/installKeyStroke
 scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
@@ -216,7 +217,7 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
  */
 scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
   for (var propertyName in event.properties) {
-    if (propertyName === "text") {
+    if (propertyName === 'text') {
       this.$outlineTitle.text(event.properties[propertyName]);
     }
   }
@@ -228,7 +229,7 @@ scout.DesktopNavigation.prototype._createKeyStrokeAdapter = function() {
 
 scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {
   if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.desktop.$parent, this.keyStrokeAdapter);
+    scout.keyStrokeManager.installAdapter(this.desktop.$container, this.keyStrokeAdapter);
   }
 };
 

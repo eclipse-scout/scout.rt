@@ -45,7 +45,9 @@ scout.GroupBox.prototype._render = function($parent) {
   this._$groupBoxTitle = this.$container
     .appendDiv('group-box-title')
     .append(this.$label);
-  this.menuBar.render(this.$container, 'top');
+  if (this.menuBar.position === 'top') {
+    this.menuBar.render(this.$container);
+  }
   this.$body = this.$container.appendDiv('group-box-body');
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
@@ -57,7 +59,14 @@ scout.GroupBox.prototype._render = function($parent) {
   this.controls.forEach(function(control) {
     control.render(this.$body);
   }, this);
-  this.menuBar.render(this.$container, 'bottom');
+  // FIXME AWE: andere lösung finden für das hier
+  // only render when 2nd argument is undefined or matches this.position
+//  if (whenPosition !== undefined && this.position !== whenPosition) {
+//    return;
+//  }
+  if (this.menuBar.position === 'bottom') {
+    this.menuBar.render(this.$container);
+  }
 };
 
 scout.GroupBox.prototype._renderProperties = function() {

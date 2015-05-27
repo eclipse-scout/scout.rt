@@ -215,11 +215,10 @@
   background-color:@background-color;
 }
 
-
-
 /* FIXME AWE: reduce copy/paste --> Button.css */
 .menu-button {
 
+  padding-top: 0;
   text-align: center;
   position: relative;
   height: 30px;
@@ -259,6 +258,10 @@
     &:hover {
       background-color: @default-button-hover-background-color;
     }
+
+    &:focus {
+      color: @default-button-color;
+    }
   }
 
   &:disabled {
@@ -268,7 +271,7 @@
   }
 
   &.selected {
-    border-style: inset;
+  border-style: inset;
     border-right-color: @border-color;
     border-bottom-color: @border-color;
   }

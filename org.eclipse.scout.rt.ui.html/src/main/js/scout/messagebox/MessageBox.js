@@ -77,7 +77,6 @@ scout.MessageBox.prototype._render = function($parent) {
 
   // Now that all texts are set, we can calculate the position
   this._position();
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.MessageBox.prototype._remove = function() {

@@ -13,8 +13,8 @@
  *   by using this.[propertyName]. The _render method is required to update the UI based on the new property-value.</li>
  * </ol>
  */
-scout.ModelAdapter = function() {
-  scout.ModelAdapter.parent.call(this);
+scout.ModelAdapter = function(callInitializer) {
+  scout.ModelAdapter.parent.call(this, callInitializer);
   this.session;
   this._adapterProperties = [];
   this.ui;
@@ -47,7 +47,6 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     target[propertyName] = value;
   }.bind(this));
 
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   // Fill in the missing default values
   scout.defaultValues.applyTo(target);
 };

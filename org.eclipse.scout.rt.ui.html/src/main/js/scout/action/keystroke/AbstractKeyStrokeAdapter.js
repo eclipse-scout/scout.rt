@@ -6,10 +6,10 @@ scout.AbstractKeyStrokeAdapter = function(field) {
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
   this._uiSessionId;
-  if(this._field && this._field.session){
+  if (this._field && this._field.session) {
     this._uiSessionId = this._field.session.uiSessionId;
   }
-  this.anchorKeyStrokeAdapter=false;
+  this.anchorKeyStrokeAdapter = false;
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
@@ -27,7 +27,6 @@ scout.AbstractKeyStrokeAdapter.prototype.removeKeyBox = function() {
   for (var i = 0; i < this.keyStrokes.length; i++) {
     this.keyStrokes[i].removeKeyBox(this._field.$container);
   }
-
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
@@ -62,7 +61,7 @@ scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStrok
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.uiSessionId = function(uiSessionId){
-  if(uiSessionId){
+  if (uiSessionId) {
     this._uiSessionId = uiSessionId;
   }
   return this._uiSessionId;

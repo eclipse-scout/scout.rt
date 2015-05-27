@@ -85,7 +85,7 @@ scout.Button.prototype._remove = function() {
 
 scout.Button.prototype.doAction = function($target) {
   var activeValueField = $(document.activeElement).data('valuefield');
-  if(activeValueField){
+  if (activeValueField) {
     activeValueField.displayTextChanged();
   }
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {

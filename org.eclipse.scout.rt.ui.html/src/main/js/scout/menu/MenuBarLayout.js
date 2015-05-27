@@ -70,11 +70,12 @@ scout.MenuBarLayout.prototype.layout = function($container) {
           rightOuterX = itemBounds.x + itemBounds.width;
         if (overflowNextItems || rightOuterX > rightEnd) {
           menuItem.remove();
-          // FIXME AWE: hier eine property setzen, für popup/overflow/style
+          menuItem.overflow = true;
           this._ellipsis.childActions.push(menuItem);
           overflowNextItems = true;
         } else {
           // Only add left-aligned menu items when they're visible
+          menuItem.overflow = false;
           menuItemsCopy.push(menuItem);
         }
       }
@@ -97,16 +98,16 @@ scout.MenuBarLayout.prototype._renderEllipsis = function($container) {
   var ellipsis = this._menuBar.session.createUiObject({
     objectType: 'Menu',
     horizontalAlignment: 1,
-    iconId: 'font:\uF143'
+    iconId: 'font:\uF143',
+    tabbable: false
   });
   ellipsis.render($container);
-  ellipsis.$container.removeAttr('tabindex'); // FIXME NBU/AWE: (menu) move all tab-index stuff to Button.js and Menu.js
   this._ellipsis = ellipsis;
 };
 
 scout.MenuBarLayout.prototype._removeEllipsis = function() {
   if (this._ellipsis) {
-    this._ellipsis.remove(); // FIXME AWE: do not destroy childActions! check!
+    this._ellipsis.remove(); // FIXME AWE: (menu) check if we must remove or destroy
     this._ellipsis = null;
   }
 };

@@ -33,7 +33,7 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
 scout.Desktop.prototype._render = function($parent) {
   var i, action;
 
-  this.$parent = $parent;
+  this.$container = $parent;
   this._renderUniqueId($parent);
   this._renderModelClass($parent);
 
@@ -61,7 +61,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.$tabbar = this.$bar.appendDiv('taskbar-tabs');
   this.$toolbar = this.$bar.appendDiv('taskbar-tools');
-  this.$bench = this.$parent.appendDiv('desktop-bench');
+  this.$bench = this.$container.appendDiv('desktop-bench');
   new scout.HtmlComponent(this.$bench, this.session);
 
   this._outlineTab = new scout.Desktop.TabAndContent();
@@ -92,17 +92,15 @@ scout.Desktop.prototype._render = function($parent) {
   $(window).on('resize', this.onResize.bind(this));
 
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
-  $parent.bind("contextmenu", function(event) {
-    if (event.target.nodeName !== "INPUT" && event.target.nodeName !== "TEXTAREA" && !event.target.isContentEditable) {
+  $parent.bind('contextmenu', function(event) {
+    if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
       event.preventDefault();
     }
   });
-
-  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
 scout.Desktop.prototype.onResize = function(event) {
-  //FIXME AWE/CGU this is called by jquery ui when the dialog gets resized, why?
+  // FIXME AWE/CGU this is called by jquery ui when the dialog gets resized, why?
   if (this._selectedTab && this._selectedTab.content) {
     this._selectedTab.content.onResize();
   }
@@ -198,9 +196,9 @@ scout.Desktop.prototype._selectTab = function(tab) {
   if (tab.content instanceof scout.Table) {
     // Install adapter on parent (no table focus required)
     if (!(tab.content.keyStrokeAdapter instanceof scout.DesktopTableKeyStrokeAdapter)) {
-      tab.content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(tab.content), this.$parent);
+      tab.content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(tab.content), this.$container);
     } else {
-      scout.keyStrokeManager.installAdapter(this.$parent, tab.content.keyStrokeAdapter);
+      scout.keyStrokeManager.installAdapter(this.$container, tab.content.keyStrokeAdapter);
     }
   }
   if (tab.$storage && tab.$storage.length > 0) {
@@ -233,7 +231,7 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 /* handling of forms */
 
 scout.Desktop.prototype._renderDialog = function(dialog) {
-  dialog.render(this.$parent);
+  dialog.render(this.$container);
   dialog.htmlComp.pixelBasedSizing = true;
 
   var prefSize = dialog.htmlComp.getPreferredSize(),
@@ -347,9 +345,9 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   if (content instanceof scout.Table) {
     if (!scout.keyStrokeManager.isAdapterInstalled(content.keyStrokeAdapter)) {
       if (!(content.keyStrokeAdapter instanceof scout.DesktopTableKeyStrokeAdapter)) {
-        content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(content), this.$parent);
+        content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(content), this.$container);
       } else {
-        scout.keyStrokeManager.installAdapter(this.$parent, content.keyStrokeAdapter);
+        scout.keyStrokeManager.installAdapter(this.$container, content.keyStrokeAdapter);
       }
     }
   }
@@ -396,7 +394,7 @@ scout.Desktop.prototype.removeForm = function(id) {
 /* message boxes */
 
 scout.Desktop.prototype._renderMessageBox = function(messageBox) {
-  messageBox.render(this.$parent);
+  messageBox.render(this.$container);
 };
 
 scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {

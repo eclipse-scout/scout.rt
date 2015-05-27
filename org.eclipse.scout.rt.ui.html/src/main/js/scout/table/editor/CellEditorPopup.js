@@ -4,7 +4,6 @@ scout.CellEditorPopup = function(column, row, cell, session) {
   this.column = column;
   this.row = row;
   this.cell = cell;
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
 

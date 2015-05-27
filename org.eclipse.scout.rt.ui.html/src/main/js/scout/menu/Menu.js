@@ -2,14 +2,16 @@ scout.Menu = function() {
   scout.Menu.parent.call(this);
   this.childActions = [];
   this._addAdapterProperties('childActions');
-  this.popup = undefined; // FIXME AWE: use this for different style?
+  this.popup;
   this.keyStrokeAdapter;
+  this.defaultMenu = false;
+
   /**
    * This property is true when the menu instance was moved into a overflow-menu
    * when there's not enough space on the screen (see MenuBarLayout.js). When set
    * to true, button style menus must be displayed as regular menus.
    */
-  this.overflown = false;
+  this.overflow = false;
 
   /**
    * Supported menu styles are:
@@ -19,7 +21,10 @@ scout.Menu = function() {
    */
   this.menuStyle = 'default';
 
-  this.defaultMenu = false;
+  /**
+   * This property decides whether or not the tabindex attribute is set in the DOM.
+   */
+  this.tabbable = true;
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -31,18 +36,28 @@ scout.Menu.prototype._render = function($parent) {
   }
 };
 
+scout.Menu.prototype._renderProperties = function() {
+  scout.Menu.parent.prototype._renderProperties.call(this);
+  this._renderTabbable();
+};
+
+scout.Menu.prototype._renderTabbable = function() {
+  if (this.tabbable) {
+    this.$container.attr('tabindex', 0);
+  } else {
+    this.$container.removeAttr('tabindex');
+  }
+};
+
 scout.Menu.prototype._renderSeparator = function($parent) {
   this.$container = $parent.appendDiv('menu-separator');
 };
 
 scout.Menu.prototype._renderItem = function($parent) {
   if ('taskbar' === this.menuStyle) {
-    this.$container = $parent
-      .appendDiv('taskbar-tool-item');
+    this.$container = $parent.appendDiv('taskbar-tool-item');
   } else {
-    this.$container = $parent
-      .appendDiv('menu-item')
-      .attr('tabindex', 0);
+    this.$container = $parent.appendDiv('menu-item');
   }
   this.$container.on('click', '', onClicked.bind(this));
   if (this.childActions.length > 0 && this.text) {
@@ -52,11 +67,15 @@ scout.Menu.prototype._renderItem = function($parent) {
     this._registerKeyStrokeAdapter();
   }
 
-  if ('button' === this.menuStyle) {
-    this.$container.addClass('menu-button');
-  }
-  if (this.defaultMenu) {
-    this.$container.addClass('default-menu');
+  // when menus with button style are displayed in a overflow-menu,
+  // render as regular menu, ignore button styles.
+  if (!this.overflow) {
+    if ('button' === this.menuStyle) {
+      this.$container.addClass('menu-button');
+    }
+    if (this.defaultMenu) {
+      this.$container.addClass('default-menu');
+    }
   }
 
   // --- Helper functions ---
@@ -108,11 +127,8 @@ scout.Menu.prototype.isTabTarget = function() {
 };
 
 scout.Menu.prototype.setTabbable = function(tabbable) {
-  if (tabbable) {
-    this.$container.attr('tabindex', 0);
-  } else {
-    this.$container.removeAttr('tabindex');
-  }
+  this.tabbable = tabbable;
+  this._renderTabbable();
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {

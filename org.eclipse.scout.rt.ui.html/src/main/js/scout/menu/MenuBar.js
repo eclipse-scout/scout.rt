@@ -1,8 +1,10 @@
 scout.MenuBar = function(session, menuSorter) {
-  this.position = 'top'; // or 'bottom'
-  this.size = 'small'; // or 'large'
+  scout.MenuBar.parent.call(this, false);
+
   this.session = session;
   this.menuSorter = menuSorter;
+  this.position = 'top'; // or 'bottom'
+  this.size = 'small'; // or 'large'
   this.tabbable = true;
   this.menuItems = [];
 
@@ -13,15 +15,22 @@ scout.MenuBar = function(session, menuSorter) {
    * fit into the available menu-bar space.
    */
   this.visibleMenuItems = [];
-  this.keyStrokeAdapter;
+
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+};
+scout.inherits(scout.MenuBar, scout.Widget);
+
+/**
+ * @implements Widgets.js
+ */
+scout.MenuBar.prototype._createKeyStrokeAdapter = function() {
+  return new scout.MenuBarKeyStrokeAdapter(this);
 };
 
-scout.MenuBar.prototype.render = function($parent, whenPosition) {
-  // only render when 2nd argument is undefined or matches this.position
-  if (whenPosition !== undefined && this.position !== whenPosition) {
-    return;
-  }
-
+/**
+ * @override Widget.js
+ */
+scout.MenuBar.prototype._render = function($parent) {
   // Visibility may change when updateItems() function is called, see updateVisibility().
   this.$container = $.makeDiv('menubar')
     .attr('id', 'MenuBar-' + scout.createUniqueId())
@@ -51,7 +60,7 @@ scout.MenuBar.prototype.large = function() {
   this.size = 'large';
 };
 
-scout.MenuBar.prototype.remove = function() {
+scout.MenuBar.prototype._remove = function() {
   this.menuItems.forEach(function(item) {
     item.remove();
   });
@@ -96,7 +105,7 @@ scout.MenuBar.prototype.updateItems = function(menuItems, force) {
   if (this.tabbable) {
     this.menuItems.some(function(item) {
       if (item.isTabTarget()) {
-        item.setTabbable();
+        item.setTabbable(true);
         return true;
       } else {
         return false;
@@ -149,9 +158,9 @@ scout.MenuBar.prototype.updateVisibility = function() {
     this.$container.setVisible(visible);
     htmlComp.invalidateTree();
     if (visible) {
-      this._registerKeyStrokeAdapter();
+      this._installKeyStrokeAdapter();
     } else {
-      this._unregisterKeyStrokeAdapter();
+      this._uninstallKeyStrokeAdapter();
     }
   }
 };
@@ -183,15 +192,3 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   }.bind(this));
 };
 
-scout.MenuBar.prototype._registerKeyStrokeAdapter = function() {
-  if (!this.keyStrokeAdapter) {
-    this.keyStrokeAdapter = new scout.MenuBarKeyStrokeAdapter(this);
-  }
-  scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-};
-
-scout.MenuBar.prototype._unregisterKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-};

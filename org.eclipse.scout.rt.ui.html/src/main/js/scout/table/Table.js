@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Table = function() {
-  scout.Table.parent.call(this);
+  scout.Table.parent.call(this, false);
   this.$container;
   this.$data;
   this.header;
@@ -49,6 +49,7 @@ scout.Table.prototype.init = function(model, session) {
   this.menuBar.bottom();
 
   this._syncSelectedRows(this.selectedRows);
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -186,7 +187,7 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   this.session.detachHelper.removeScrollable(this.$data);
-//  this.menuBar.remove();
+  this.menuBar.remove();
   this.header = null;
   this.footer = null;
   scout.Table.parent.prototype._remove.call(this);

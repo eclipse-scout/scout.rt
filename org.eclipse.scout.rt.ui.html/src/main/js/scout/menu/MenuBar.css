@@ -15,25 +15,16 @@
     vertical-align: middle;
   }
 
-  /*
-  
-  & .button button {
-    min-width: 110px;
-    margin-right: @menu-item-margin-right;
-  }
-  & .button.last.right-aligned button {
-    margin-right: 0;
-  }
-  
-  */
-
   &.bottom {
     border-top: 1px solid @border-color;
     border-bottom: 0;
   }
 
   & > .menu-item {
-    &:focus:not(.disabled) {
+    height: @menubar-height;
+    line-height: @menubar-height;
+
+    &:focus:not(.disabled):not(.menu-button) {
       text-decoration: underline;
       color: @focus-color;
 
@@ -41,12 +32,6 @@
         color: @focus-color;
       }
     }
-  }
-
-  & > .menu-item,
-  & > .link-button > .menu-item {
-    height: @menubar-height;
-    line-height: @menubar-height;
   }
 
   & > .menu-separator {
