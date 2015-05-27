@@ -11,7 +11,7 @@ scout.TableHeader = function(table, session) {
   this.columns = table.columns;
   this.$container = table.$data.beforeDiv('table-header');
 
-  this._dataScrollHandler = this._reconcileScrollPos.bind(this);
+  this._dataScrollHandler = this._onDataScroll.bind(this);
   table.$data.on('scroll', this._dataScrollHandler);
 
   for (var i = 0; i < columns.length; i++) {
@@ -42,7 +42,7 @@ scout.TableHeader = function(table, session) {
   this.menuBar.tabbable = false;
   this.menuBar.bottom();
   this.menuBar.render(this.$container);
-  this.$menuBar = this.menuBar.$container;
+  this._$menuBar = this.menuBar.$container;
   this._reconcileScrollPos();
 
   function onHeaderClick(event) {
@@ -222,7 +222,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
     width = column.width,
-    menuBarWidth = this.$menuBar.outerWidth(),
+    menuBarWidth = this._$menuBar.outerWidth(),
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length -1;
 
   if (isLastColumn) {
@@ -240,6 +240,12 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     .css('max-width', width);
 };
 
+scout.TableHeader.prototype._onDataScroll = function() {
+  scout.scrollbars.fix(this._$menuBar);
+  this._reconcileScrollPos();
+  this._fixTimeout = scout.scrollbars.unfix(this._$menuBar, this._fixTimeout);
+};
+
 scout.TableHeader.prototype._reconcileScrollPos = function() {
   // When scrolling horizontally scroll header as well
   var scrollLeft = this.table.$data.scrollLeft(),
@@ -247,7 +253,7 @@ scout.TableHeader.prototype._reconcileScrollPos = function() {
 
   this.resizeHeaderItem(lastColumn);
   this.$container.scrollLeft(scrollLeft);
-  this.$menuBar.cssRight(-1 * scrollLeft);
+  this._$menuBar.cssRight(-1 * scrollLeft);
 };
 
 scout.TableHeader.prototype.onSortingChanged = function() {

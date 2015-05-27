@@ -1,9 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-scout.Scrollbar = function($parent, options) {
-  var begin = 0,
-    that = this;
-
+scout.Scrollbar = function(options) {
+  scout.Scrollbar.parent.call(this);
   var defaults = {
     axis: 'y',
     invertColors: false,
@@ -14,14 +12,19 @@ scout.Scrollbar = function($parent, options) {
 
   $.extend(this, defaults, options);
 
-  this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
   this._scrollSize;
   this._offsetSize;
   this._updateThumbPending = false;
+  this._addEventSupport();
+};
+scout.inherits(scout.Scrollbar, scout.Widget);
 
-  // create scrollbar
+scout.Scrollbar.prototype._render = function($parent) {
+  var begin = 0;
+
+  this._$parent = $parent;
   this._$scrollbar = $parent.appendDiv('scrollbar')
     .addClass(this.axis + '-axis');
   this._$thumb = this._$scrollbar.appendDiv('scrollbar-thumb')
@@ -39,49 +42,65 @@ scout.Scrollbar = function($parent, options) {
   this._scrollDir = this.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
   // event handling
-  $parent.on('DOMMouseScroll mousewheel', '', scrollWheel)
-    .on('scroll', this._updateThumbImpl.bind(this));
-  this._$scrollbar.on('mousedown', scrollEnd);
-  this._$thumb.on('mousedown', '', scrollStart);
+  $parent.on('DOMMouseScroll mousewheel', '', scrollWheel.bind(this))
+    .on('scroll', this.updateThumb.bind(this));
+  $parent.data('scrollbars').forEach(function(scrollbar) {
+    scrollbar.on('scrollstart', this._fixScrollbar.bind(this));
+    scrollbar.on('scrollend', this._unfixScrollbar.bind(this));
+  }, this);
+  this._$scrollbar.on('mousedown', onScrollbarMousedown.bind(this));
+  this._$thumb.on('mousedown', '', onThumbMousedown.bind(this));
 
   this.updateThumb();
 
   function scrollWheel(event) {
     var w, d;
     if (event.ctrlKey) {
-      return true; // allow ctrl+mousewheel to zoom the page
+      return true; // allow ctrl + mousewheel to zoom the page
     }
-    if (that.mouseWheelNeedsShift !== event.shiftKey) {
+    if (this.mouseWheelNeedsShift !== event.shiftKey) {
       // only scroll if shift modifier matches
       return true;
     }
     event = event.originalEvent || window.event.originalEvent;
     w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
     $.l(w, event.wheelDelta, event.detail);
-    d = that._scrollSize / that._offsetSize;
-    that.scroll(w / d);
+    d = this._scrollSize / this._offsetSize;
+
+    this.trigger('scrollstart');
+    this.scroll(w / d);
+    this.trigger('scrollend');
     return false;
   }
 
-  function scrollStart(event) {
-    begin = (that.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
-    that._$thumb.addClass('scrollbar-thumb-move');
+  function onScrollbarMousedown(event) {
+    this.trigger('scrollstart');
+    scrollTo.call(this, event);
+    this.trigger('scrollend');
+  }
+
+  function onThumbMousedown(event) {
+    this.trigger('scrollstart');
+    begin = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
+    this._$thumb.addClass('scrollbar-thumb-move');
+    this._mousemoveHandler = scrollTo.bind(this);
     $(document)
-      .on('mousemove', scrollEnd)
-      .one('mouseup', scrollExit);
+      .on('mousemove', this._mousemoveHandler)
+      .one('mouseup', onThumbMouseup.bind(this));
     return false;
   }
 
-  function scrollEnd(event) {
-    begin = begin === 0 ? that._beginDefault : begin;
-    var end = (that.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
-    that.scroll(end - begin);
+  function onThumbMouseup() {
+    this._$thumb.removeClass('scrollbar-thumb-move');
+    $(document).off('mousemove', this._mousemoveHandler);
+    this.trigger('scrollend');
+    return false;
   }
 
-  function scrollExit() {
-    that._$thumb.removeClass('scrollbar-thumb-move');
-    $(document).off('mousemove');
-    return false;
+  function scrollTo(event) {
+    begin = begin === 0 ? this._beginDefault : begin;
+    var end = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
+    this.scroll(end - begin);
   }
 };
 
@@ -154,7 +173,9 @@ scout.Scrollbar.prototype._updateThumbImpl = function() {
 };
 
 scout.Scrollbar.prototype.scroll = function(posDiff) {
-  var posOld = this._$thumb.offset()[this._dir] - this._$scrollbar.offset()[this._dir],
+  var scrollbarOffset = this._$scrollbar.offset(),
+    thumbOffset = this._$thumb.offset(),
+    posOld = thumbOffset[this._dir] - scrollbarOffset[this._dir],
     posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff)),
     scrollPos = (this._scrollSize - this._offsetSize) / this._thumbRange * posNew;
 
@@ -165,4 +186,27 @@ scout.Scrollbar.prototype.scroll = function(posDiff) {
   if (this.updateScrollbarPos) {
     this._$scrollbar.css(this._dirReverse, -1 * scrollPos);
   }
+};
+
+/**
+ * Sets the position to fixed and updates left and top position.
+ * This is necessary to prevent flickering in IE.
+ */
+scout.Scrollbar.prototype._fixScrollbar = function() {
+  scout.scrollbars.fix(this._$scrollbar);
+};
+
+/**
+ * Reverts the changes made by fixScrollbar.
+ */
+scout.Scrollbar.prototype._unfixScrollbar = function() {
+  this._unfixTimeoutId = scout.scrollbars.unfix(this._$scrollbar, this._unfixTimeoutId);
+};
+
+scout.Scrollbar.prototype.notifyBeforeScroll = function() {
+  this.trigger('scrollstart');
+};
+
+scout.Scrollbar.prototype.notifyAfterScroll = function() {
+  this.trigger('scrollend');
 };

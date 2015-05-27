@@ -52,18 +52,21 @@ scout.scrollbars = {
       scrollbars = [];
       if (options.axis === 'both') {
         options.axis = 'y';
-        scrollbar = new scout.Scrollbar($container, options);
+        scrollbar = new scout.Scrollbar(options);
         scrollbars.push(scrollbar);
 
         options.axis = 'x';
         options.mouseWheelNeedsShift = true;
-        scrollbar = new scout.Scrollbar($container, options);
+        scrollbar = new scout.Scrollbar(options);
         scrollbars.push(scrollbar);
       } else {
-        scrollbar = new scout.Scrollbar($container, options);
+        scrollbar = new scout.Scrollbar(options);
         scrollbars.push(scrollbar);
       }
       $container.data('scrollbars', scrollbars);
+      scrollbars.forEach(function(scrollbar) {
+        scrollbar.render($container);
+      });
     }
   },
 
@@ -86,19 +89,41 @@ scout.scrollbars = {
       scrollableH = $scrollable.height(),
       elementBounds = scout.graphics.bounds($element, true, true),
       elementTop = elementBounds.y,
-      elementH = elementBounds.height;
+      elementH = elementBounds.height,
+      scrollbars;
 
     if (elementTop < 0) {
-      $scrollable.scrollTop($scrollable.scrollTop() + elementTop);
+      scout.scrollbars.scrollTop($scrollable, $scrollable.scrollTop() + elementTop);
     } else if (elementTop + elementH > scrollableH) {
       // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
       scrollTo = Math.ceil($scrollable.scrollTop() + elementTop + elementH - scrollableH);
-      $scrollable.scrollTop(scrollTo);
+      scout.scrollbars.scrollTop($scrollable, scrollTo);
     }
   },
 
+  scrollTop: function($scrollable, scrollTop) {
+    var scrollbar = scout.scrollbars.scrollbar($scrollable, 'y');
+    scrollbar.notifyBeforeScroll();
+    $scrollable.scrollTop(scrollTop);
+    scrollbar.notifyAfterScroll();
+  },
+
+  scrollLeft: function($scrollable, scrollLeft) {
+    var scrollbar = scout.scrollbars.scrollbar($scrollable, 'x');
+    scrollbar.notifyBeforeScroll();
+    $scrollable.scrollLeft(scrollLeft);
+    scrollbar.notifyAfterScroll();
+  },
+
+  scrollbar: function($scrollable, axis) {
+    var scrollbars = $scrollable.data('scrollbars') || [];
+    return scout.arrays.find(scrollbars, function(scrollbar) {
+      return scrollbar.axis === axis;
+    });
+  },
+
   scrollToBottom: function($scrollable) {
-    $scrollable.scrollTop($scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
+    scout.scrollbars.scrollTop($scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
   },
 
   /**
@@ -141,5 +166,34 @@ scout.scrollbars = {
       var $elem = $scrollParents[i];
       $elem.off('scroll', handler);
     }
+  },
+
+  /**
+   * Sets the position to fixed and updates left and top position.
+   * This is necessary to prevent flickering in IE.
+   */
+  fix: function($elem) {
+    var bounds = scout.graphics.offsetBounds($elem);
+    $elem
+      .css('position', 'fixed')
+      .cssLeft(bounds.x - $elem.cssMarginLeft())
+      .cssTop(bounds.y - $elem.cssMarginTop())
+      .cssWidth(bounds.width)
+      .cssHeight(bounds.height);
+  },
+
+  /**
+   * Reverts the changes made by fix().
+   */
+  unfix: function($elem, timeoutId) {
+    clearTimeout(timeoutId);
+    return setTimeout(function() {
+      $elem.css({
+        position: 'absolute',
+        left: '',
+        top: '',
+        width: '',
+        height: ''});
+    }.bind(this), 50);
   }
 };
