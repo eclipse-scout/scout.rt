@@ -8,8 +8,6 @@ scout.Splitter = function(options) {
 scout.inherits(scout.Splitter, scout.Widget);
 
 scout.Splitter.prototype._render = function($parent) {
-  this.$parent = $parent;
-
   this.$container = $parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
     .on('mousedown', this._onMouseDown.bind(this));

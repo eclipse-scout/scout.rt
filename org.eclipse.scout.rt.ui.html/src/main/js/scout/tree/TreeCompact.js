@@ -12,7 +12,6 @@ scout.TreeCompact = function() {
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);
 
 scout.TreeCompact.prototype._render = function($parent) {
-  this.$parent = $parent;
   this.$container = $parent.appendDiv('compact-tree');
 
   this.$filter = $('<input>').

@@ -87,7 +87,6 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 };
 
 scout.Tree.prototype._render = function($parent) {
-  this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
   if (this._additionalContainerClasses) {
     this.$container.addClass(this._additionalContainerClasses);

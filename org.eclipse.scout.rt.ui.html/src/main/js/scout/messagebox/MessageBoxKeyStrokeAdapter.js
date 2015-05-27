@@ -5,8 +5,10 @@ scout.MessageBoxKeyStrokeAdapter = function(field) {
   this.keyStrokes.push(new scout.BoxNavKeyStrokes(this._$container));
   this.anchorKeyStrokeAdapter = true;
 };
-
 scout.inherits(scout.MessageBoxKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
+
+scout.MessageBoxKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
+};
 
 scout.BoxNavKeyStrokes = function($container) {
   scout.BoxNavKeyStrokes.parent.call(this);
@@ -14,10 +16,6 @@ scout.BoxNavKeyStrokes = function($container) {
   this._$container = $container;
 };
 scout.inherits(scout.BoxNavKeyStrokes, scout.KeyStroke);
-
-scout.MessageBoxKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
-
-};
 
 scout.BoxNavKeyStrokes.prototype.handle = function(event) {
   var $focusableElements = this._$container.find(':focusable');
