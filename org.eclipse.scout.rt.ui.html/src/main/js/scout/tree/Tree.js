@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Tree = function() {
-  scout.Tree.parent.call(this, false);
+  scout.Tree.parent.call(this);
   this.$data;
   this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes

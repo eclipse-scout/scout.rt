@@ -5,6 +5,7 @@ scout.Popup = function(session) {
   this.$deco;
   this._mouseDownHandler;
   this.session = session;
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 scout.inherits(scout.Popup, scout.Widget);
 

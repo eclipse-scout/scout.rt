@@ -1,5 +1,5 @@
 scout.MessageBox = function(model, session) {
-  scout.MessageBox.parent.call(this, false);
+  scout.MessageBox.parent.call(this);
   if (!(model instanceof scout.ModelAdapter)) {
     // If message box is used gui only, otherwise the model gets written by the model adapter.
     $.extend(this, model);
@@ -19,8 +19,6 @@ scout.MessageBox = function(model, session) {
   this._$glassPane;
   this._session = session;
   this._addEventSupport();
-
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
@@ -79,6 +77,7 @@ scout.MessageBox.prototype._render = function($parent) {
 
   // Now that all texts are set, we can calculate the position
   this._position();
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.MessageBox.prototype._remove = function() {

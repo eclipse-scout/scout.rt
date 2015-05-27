@@ -1,5 +1,5 @@
 scout.MenuBar = function(session, menuSorter) {
-  scout.MenuBar.parent.call(this, false);
+  scout.MenuBar.parent.call(this);
 
   this.session = session;
   this.menuSorter = menuSorter;

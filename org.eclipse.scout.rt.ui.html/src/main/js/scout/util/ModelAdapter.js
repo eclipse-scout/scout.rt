@@ -13,8 +13,8 @@
  *   by using this.[propertyName]. The _render method is required to update the UI based on the new property-value.</li>
  * </ol>
  */
-scout.ModelAdapter = function(callInitializer) {
-  scout.ModelAdapter.parent.call(this, false);
+scout.ModelAdapter = function() {
+  scout.ModelAdapter.parent.call(this);
   this.session;
   this._adapterProperties = [];
   this.ui;
