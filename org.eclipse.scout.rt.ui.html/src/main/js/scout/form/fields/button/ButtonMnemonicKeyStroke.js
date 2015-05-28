@@ -3,8 +3,6 @@ scout.ButtonMnemonicKeyStroke = function(keyStroke, field) {
 };
 scout.inherits(scout.ButtonMnemonicKeyStroke, scout.MnemonicKeyStroke);
 
-// FIXME AWE/NBU: (menu) muss neu auch mit Menus im Button-Look funktionieren.
-
 /**
  * @Override scout.MnemonicKeyStroke
  */
