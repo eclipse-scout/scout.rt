@@ -49,7 +49,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   String PROP_NODE_HEIGHT_HINT = "propNodeHeightHint";
   String PROP_ROOT_NODE_VISIBLE = "rootNodeVisible";
   String PROP_ROOT_HANDLES_VISIBLE = "rootHandlesVisible";
-  String PROP_KEY_STROKES = "keyStroks";
+  String PROP_KEY_STROKES = "keyStrokes";
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
   /**
    * Object
