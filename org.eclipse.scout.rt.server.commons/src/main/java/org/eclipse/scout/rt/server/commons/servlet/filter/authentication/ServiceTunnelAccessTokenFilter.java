@@ -47,8 +47,8 @@ public class ServiceTunnelAccessTokenFilter implements Filter {
     }
 
     String tokenString = req.getHeader(AbstractHttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
-    DefaultAuthToken token = DefaultAuthToken.parse(tokenString);
-    if (token == null) {
+    DefaultAuthToken token = new DefaultAuthToken();
+    if (!token.parse(tokenString)) {
       chain.doFilter(in, out);
       return;
     }

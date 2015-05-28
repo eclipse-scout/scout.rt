@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -71,7 +72,7 @@ public class DefaultAuthTokenTest {
 
     DefaultAuthToken t = new DefaultAuthToken("foo");
     Assert.assertEquals("foo", t.getUserId());
-    Assert.assertEquals(0, t.getCustomTokenCount());
+    Assert.assertEquals(0, t.getCustomArgCount());
     Assert.assertTrue(t.getValidUntil() - System.currentTimeMillis() > 0);
     Assert.assertNotNull(t.getSignature());
     Assert.assertTrue(t.isValid());
@@ -79,13 +80,15 @@ public class DefaultAuthTokenTest {
 
     String encoded = t.toString();
 
-    DefaultAuthToken t2 = DefaultAuthToken.parse(encoded);
+    DefaultAuthToken t2 = new DefaultAuthToken();
+    Assert.assertTrue(t2.parse(encoded));
     Assert.assertEquals(t.getUserId(), t2.getUserId());
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
     Assert.assertTrue(t2.isValid());
 
     String encodedAndTampered = new String(t.createUnsignedData()) + ";" + toUtf8Hex("abc");
-    DefaultAuthToken t3 = DefaultAuthToken.parse(encodedAndTampered);
+    DefaultAuthToken t3 = new DefaultAuthToken();
+    Assert.assertTrue(t3.parse(encodedAndTampered));
     Assert.assertEquals(t.getUserId(), t3.getUserId());
     Assert.assertEquals(t.getValidUntil(), t3.getValidUntil());
     Assert.assertFalse(t3.isValid());
@@ -97,17 +100,27 @@ public class DefaultAuthTokenTest {
 
     DefaultAuthToken t = new DefaultAuthToken("foo", "bar");
     Assert.assertEquals("foo", t.getUserId());
-    Assert.assertEquals(1, t.getCustomTokenCount());
+    Assert.assertEquals(1, t.getCustomArgCount());
     Assert.assertTrue(t.isValid());
     Assert.assertEquals(toUtf8Hex("foo") + ";" + Long.toHexString(t.getValidUntil()) + ";" + toUtf8Hex("bar"), new String(t.createUnsignedData()));
 
     String encoded = t.toString();
 
-    DefaultAuthToken t2 = DefaultAuthToken.parse(encoded);
+    DefaultAuthToken t2 = new DefaultAuthToken();
+    Assert.assertTrue(t2.parse(encoded));
     Assert.assertEquals(t.getUserId(), t2.getUserId());
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
-    Assert.assertEquals(t.getCustomToken(0), t2.getCustomToken(0));
+    Assert.assertEquals(t.getCustomArg(0), t2.getCustomArg(0));
     Assert.assertTrue(t2.isValid());
+  }
+
+  @Test
+  @Times(100)
+  public void testReporducibility() throws ProcessingException {
+    DefaultAuthToken t = new DefaultAuthToken("foo");
+    byte[] s1 = SecurityUtility.encrypt(t.createUnsignedData(), new String(DefaultAuthToken.PRIVATE_KEY), DefaultAuthToken.SALT, 128);
+    byte[] s2 = SecurityUtility.encrypt(t.createUnsignedData(), new String(DefaultAuthToken.PRIVATE_KEY), DefaultAuthToken.SALT, 128);
+    Assert.assertArrayEquals(s1, s2);
   }
 
   private static String toUtf8Hex(String s) {
