@@ -75,6 +75,18 @@ scout.MenuButtonAdapter.prototype._renderText = function(text) {
    scout.Menu.parent.prototype._renderText.call(this, text);
 };
 
+scout.MenuButtonAdapter.prototype._syncLabel = function(label) {
+  this.text = label;
+};
+
+scout.MenuButtonAdapter.prototype._renderLabel = function() {
+  this._renderText(this.text);
+};
+
+scout.MenuButtonAdapter.prototype._renderGridData = function() {
+  // NOP - since in a menu-bar we don't work with grid-data
+};
+
 scout.MenuButtonAdapter.prototype._registerButtonKeyStroke = function() {
   //register buttons key stroke on root Groupbox
   this._unregisterButtonKeyStroke();
@@ -115,3 +127,5 @@ scout.MenuButtonAdapter.prototype.handle = function(event) {
     }
   }
 };
+
+

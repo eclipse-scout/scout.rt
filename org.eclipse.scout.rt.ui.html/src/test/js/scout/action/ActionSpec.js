@@ -13,7 +13,7 @@ describe('Action', function() {
   describe('defaults', function() {
 
     it('should be as expected', function() {
-      expect(action.tabbable).toBe(true);
+      expect(action.tabbable).toBe(false);
       expect(action.actionStyle).toBe('default');
     });
 
@@ -26,10 +26,10 @@ describe('Action', function() {
       // but _renderProperties() is called anyway
       action.$container = $sandbox;
       action.render($sandbox);
-      expect(action.$container.attr('tabindex')).toBe('0');
-
-      action.setTabbable(false);
       expect(action.$container.attr('tabindex')).toBe(undefined);
+
+      action.setTabbable(true);
+      expect(action.$container.attr('tabindex')).toBe('0');
     });
 
   });

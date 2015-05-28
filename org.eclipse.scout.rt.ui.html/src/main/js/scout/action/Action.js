@@ -15,7 +15,7 @@ scout.Action = function() {
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */
-  this.tabbable = true;
+  this.tabbable = false;
 
   /**
    * Supported action styles are:
