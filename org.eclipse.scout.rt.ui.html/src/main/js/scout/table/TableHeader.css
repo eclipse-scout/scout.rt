@@ -20,6 +20,7 @@
   border: none;
   border: none;
   z-index: 1;
+  height: 100%;
 
   & > .menu-item {
     height: auto;

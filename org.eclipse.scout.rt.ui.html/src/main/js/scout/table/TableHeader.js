@@ -49,7 +49,11 @@ scout.TableHeader.prototype._render = function() {
   }
 
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
-  this.$filler = this.$container.appendDiv('header-item filler').css('visible', 'hidden');
+  this.$filler = this.$container.appendDiv('header-item filler').css('visibility', 'hidden');
+  if (this.columns.length === 0) {
+    // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
+    this.$filler.css('visibility', 'visible').html('&nbsp;');
+  }
 
   this.menuBar.render(this.$container);
   this._$menuBar = this.menuBar.$container;
@@ -229,6 +233,10 @@ scout.TableHeader.prototype.onColumnResized = function(column) {
 };
 
 scout.TableHeader.prototype.resizeHeaderItem = function(column) {
+  if (!column) {
+    //May be undefined if there are no columns
+    return;
+  }
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
     width = column.width,
