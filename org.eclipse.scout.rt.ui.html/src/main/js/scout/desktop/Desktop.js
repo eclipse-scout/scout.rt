@@ -97,6 +97,7 @@ scout.Desktop.prototype._render = function($parent) {
       event.preventDefault();
     }
   });
+  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
 scout.Desktop.prototype.onResize = function(event) {
