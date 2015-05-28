@@ -139,3 +139,11 @@ scout.Widget.prototype._uninstallKeyStrokeAdapter = function() {
     scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
 };
+
+scout.Widget.prototype.toString = function() {
+  var str = 'Widget[rendered=' +  this.rendered + ']';
+  if (this.$container) {
+    str += '\n' + scout.graphics.debugOutput(this.$container);
+  }
+  return str;
+};

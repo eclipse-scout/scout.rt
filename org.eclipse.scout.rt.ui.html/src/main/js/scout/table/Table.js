@@ -47,6 +47,7 @@ scout.Table.prototype.init = function(model, session) {
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
+  this.addChild(this.menuBar);
 
   this._syncSelectedRows(this.selectedRows);
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
@@ -187,7 +188,6 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   this.session.detachHelper.removeScrollable(this.$data);
-  this.menuBar.remove();
   this.header = null;
   this.footer = null;
   scout.Table.parent.prototype._remove.call(this);
@@ -646,13 +646,16 @@ scout.Table.prototype._filterMenus = function(allowedTypes) {
 };
 
 scout.Table.prototype._renderMenus = function() {
+  this._updateMenuBar();
+  if (this.header) {
+    this.header.updateMenuBar();
+  }
+};
+
+scout.Table.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(['Table.EmptySpace', 'Table.SingleSelection', 'Table.MultiSelection']);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
-  if (this.header) {
-    menuItems = this._filterMenus(['Table.Header']);
-    this.header.renderMenus(menuItems);
-  }
 };
 
 scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelecting) {
@@ -673,7 +676,7 @@ scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelectin
     this._sendRowsPending = false;
   }
   this._triggerRowsSelected($selectedRows);
-  this._renderMenus();
+  this._updateMenuBar();
 
   if (this.groupedSelection) {
     this._group(true);
@@ -1283,7 +1286,7 @@ scout.Table.prototype.selectRows = function(rows) {
     if (this.scrollToSelection) {
       this.revealSelection();
     }
-    this._renderMenus();
+    this._updateMenuBar();
   }
 };
 
@@ -1748,6 +1751,7 @@ scout.Table.prototype._redraw = function() {
 scout.Table.prototype._renderTableHeader = function() {
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
+    this.header.render();
   } else if (!this.headerVisible && this.header) {
     this._removeTableHeader();
   }

@@ -25,6 +25,7 @@ scout.Tree.prototype.init = function(model, session) {
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
+  this.addChild(this.menuBar);
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
@@ -115,7 +116,6 @@ scout.Tree.prototype._render = function($parent) {
 
 scout.Tree.prototype._remove = function() {
   this.session.detachHelper.removeScrollable(this.$data);
-  this.menuBar.remove();
   scout.Tree.parent.prototype._remove.call(this);
 };
 

@@ -2,13 +2,24 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableHeader = function(table, session) {
-  var column, $header, alignment, $defaultCheckedColumHeader, $separator,
-    that = this,
-    columns = table.columns;
-
+  scout.TableHeader.parent.call(this);
+  this.session = session;
   this.dragging = false;
   this.table = table;
   this.columns = table.columns;
+  this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
+  this.menuBar.tabbable = false;
+  this.menuBar.bottom();
+  this.addChild(this.menuBar);
+};
+scout.inherits(scout.TableHeader, scout.Widget);
+
+scout.TableHeader.prototype._render = function() {
+  var column, $header, alignment, $defaultCheckedColumHeader, $separator,
+    that = this,
+    columns = this.columns,
+    table = this.table;
+
   this.$container = table.$data.beforeDiv('table-header');
 
   this._dataScrollHandler = this._onDataScroll.bind(this);
@@ -37,12 +48,12 @@ scout.TableHeader = function(table, session) {
     }
   }
 
+  // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
   this.$filler = this.$container.appendDiv('header-item filler').css('visible', 'hidden');
-  this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
-  this.menuBar.tabbable = false;
-  this.menuBar.bottom();
+
   this.menuBar.render(this.$container);
   this._$menuBar = this.menuBar.$container;
+  this.updateMenuBar();
   this._reconcileScrollPos();
 
   function onHeaderClick(event) {
@@ -60,7 +71,7 @@ scout.TableHeader = function(table, session) {
     } else {
       var x = $header.position().left + that.$container.position().left + parseFloat(that.$container.css('margin-left')),
         y = $header.position().top + that.$container.position().top;
-      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, session);
+      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, that.session);
     }
 
     return false;
@@ -142,7 +153,6 @@ scout.TableHeader = function(table, session) {
         }
       });
 
-
       if (that._tableHeaderMenu && that._tableHeaderMenu.isOpen()) {
         that._tableHeaderMenu.remove();
         that._tableHeaderMenu = null;
@@ -205,8 +215,8 @@ scout.TableHeader = function(table, session) {
   }
 };
 
-scout.TableHeader.prototype.remove = function() {
-  this.$container.remove();
+scout.TableHeader.prototype._remove = function() {
+  scout.TableHeader.parent.prototype._remove.call(this);
   this.table.$data.off('scroll', this._dataScrollHandler);
 };
 
@@ -223,7 +233,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     $header = column.$header,
     width = column.width,
     menuBarWidth = this._$menuBar.outerWidth(),
-    isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length -1;
+    isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
 
   if (isLastColumn) {
     remainingHeaderSpace = Math.max(this.$container.width() - this.table._rowWidth, 0);
@@ -356,7 +366,7 @@ scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
 
 scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
   var $header = column.$header;
-  if (oldColumnState){
+  if (oldColumnState) {
     $header.removeClass(oldColumnState.headerCssClass);
   }
   $header.addClass(column.headerCssClass);
@@ -388,6 +398,7 @@ scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
   }
 };
 
-scout.TableHeader.prototype.renderMenus = function(menuItems) {
+scout.TableHeader.prototype.updateMenuBar = function() {
+  var menuItems = this.table._filterMenus(['Table.Header']);
   this.menuBar.updateItems(menuItems);
 };

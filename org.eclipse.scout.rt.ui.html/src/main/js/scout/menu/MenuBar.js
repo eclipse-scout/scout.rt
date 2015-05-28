@@ -61,13 +61,10 @@ scout.MenuBar.prototype.large = function() {
 };
 
 scout.MenuBar.prototype._remove = function() {
+  scout.MenuBar.parent.prototype._remove.call(this);
   this.menuItems.forEach(function(item) {
     item.remove();
   });
-  if (this.$container) {
-    this.$container.remove();
-    this.$container = undefined;
-  }
 };
 
 scout.MenuBar.prototype.rebuildItems = function() {

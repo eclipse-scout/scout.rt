@@ -191,10 +191,13 @@ scout.graphics = {
     if ($comp.attr('class')) {
       attrs += ' class=' + $comp.attr('class');
     }
+    if ($comp.attr('data-modelclass')) {
+      attrs += ' data-modelclass=' + $comp.attr('data-modelclass');
+    }
     if (attrs.length === 0) {
       attrs = $comp.html().substring(0, 30) + '...';
     }
-    return 'HtmlComponent[' + attrs.trim() + ']';
+    return 'Element[' + attrs.trim() + ']';
   }
 };
 
