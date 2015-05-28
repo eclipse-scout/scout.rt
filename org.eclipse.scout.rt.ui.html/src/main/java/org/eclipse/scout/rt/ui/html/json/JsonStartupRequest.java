@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 
@@ -27,7 +28,7 @@ import org.json.JSONObject;
  * <li>{@link JsonStartupRequest#PROP_USER_AGENT} - first one defined: argument to scout.init(), default
  * scout.UserAgent.DEVICE_TYPE_DESKTOP</li>
  * <li>{@link JsonStartupRequest#PROP_CUSTOM_PARAMS} - contains custom parameters to scout.init() as well as all
- * location url parameters</li>
+ * location url parameters and the url itself with key 'url'</li>
  * </ul>
  */
 public class JsonStartupRequest extends JsonRequest {
@@ -57,7 +58,7 @@ public class JsonStartupRequest extends JsonRequest {
   }
 
   /**
-   * These properties are passed to the {@link IClientSession#initCustomParams(Map<String, String>)}
+   * These properties are available at {@link PropertyMap#CURRENT} when the {@link IClientSession} starts
    */
   public JSONObject getCustomParams() {
     //optional

@@ -103,12 +103,16 @@ scout.Session = function($entryPoint, options) {
 };
 
 /**
- * Extracts custom parameters from URL
+ * Extracts custom parameters from URL: query string parameters and the url itself with key 'url'
  */
 scout.Session.prototype._initCustomParams = function() {
-  var customParamMap = new scout.URL().parameterMap;
+  this._customParams = this._customParams || {};
+
+  var scoutUrl = new scout.URL();
+  this._customParams.url = scoutUrl._baseUrlRaw;
+
+  var customParamMap = scoutUrl.parameterMap;
   for (var prop in customParamMap) {
-    this._customParams = this._customParams || {};
     this._customParams[prop] = customParamMap[prop];
   }
 };
