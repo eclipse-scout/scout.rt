@@ -12,19 +12,6 @@ scout.Menu = function() {
    * to true, button style menus must be displayed as regular menus.
    */
   this.overflow = false;
-
-  /**
-   * Supported menu styles are:
-   * - default: regular menu-look, also used in overflow menus
-   * - taskbar: as used in the task bar
-   * - button: menu looks like a button
-   */
-  this.menuStyle = 'default';
-
-  /**
-   * This property decides whether or not the tabindex attribute is set in the DOM.
-   */
-  this.tabbable = true;
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -36,25 +23,12 @@ scout.Menu.prototype._render = function($parent) {
   }
 };
 
-scout.Menu.prototype._renderProperties = function() {
-  scout.Menu.parent.prototype._renderProperties.call(this);
-  this._renderTabbable();
-};
-
-scout.Menu.prototype._renderTabbable = function() {
-  if (this.tabbable) {
-    this.$container.attr('tabindex', 0);
-  } else {
-    this.$container.removeAttr('tabindex');
-  }
-};
-
 scout.Menu.prototype._renderSeparator = function($parent) {
   this.$container = $parent.appendDiv('menu-separator');
 };
 
 scout.Menu.prototype._renderItem = function($parent) {
-  if ('taskbar' === this.menuStyle) {
+  if ('taskbar' === this.actionStyle) {
     this.$container = $parent.appendDiv('taskbar-tool-item');
   } else {
     this.$container = $parent.appendDiv('menu-item');
@@ -70,7 +44,7 @@ scout.Menu.prototype._renderItem = function($parent) {
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
   if (!this.overflow) {
-    if ('button' === this.menuStyle) {
+    if ('button' === this.actionStyle) {
       this.$container.addClass('menu-button');
     }
     if (this.defaultMenu) {
@@ -123,22 +97,14 @@ scout.Menu.prototype._renderIconId = function(iconId) {
 };
 
 scout.Menu.prototype.isTabTarget = function() {
-  return this.enabled && this.visible && (this.menuStyle === 'button' || !this.separator);
-};
-
-scout.Menu.prototype.setTabbable = function(tabbable) {
-  this.tabbable = tabbable;
-  if (this.rendered) {
-    this._renderTabbable();
-  }
+  return this.enabled && this.visible && (this.actionStyle === 'button' || !this.separator);
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  if ('taskbar' === this.menuStyle) {
-    return;
+  if ('taskbar' !== this.actionStyle) {
+    var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
+    this.$container.toggleClass('menu-textandicon', !!textAndIcon);
   }
-  var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-  this.$container.toggleClass('menu-textandicon', !! textAndIcon);
 };
 
 scout.Menu.prototype.doAction = function($target) {

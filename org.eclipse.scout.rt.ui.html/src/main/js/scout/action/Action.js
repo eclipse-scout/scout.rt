@@ -2,7 +2,7 @@ scout.Action = function() {
   this._hoverBound = false;
   scout.Action.parent.call(this);
 
-  //keyStroke
+  // keyStroke
   this.keyStroke;
   this.keyStrokeKeyPart;
   this.ctrl = false;
@@ -10,8 +10,21 @@ scout.Action = function() {
   this.shift = false;
   this.bubbleUp = false;
   this.drawHint = true;
-
   this.preventDefaultOnEvent = true;
+
+  /**
+   * This property decides whether or not the tabindex attribute is set in the DOM.
+   */
+  this.tabbable = true;
+
+  /**
+   * Supported action styles are:
+   * - default: regular menu-look, also used in overflow menus
+   * - taskbar: as used in the task bar
+   * - button: menu looks like a button
+   */
+  this.actionStyle = 'default';
+
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -25,6 +38,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
   this._renderSelected(this.selected);
   this._renderVisible(this.visible);
+  this._renderTabbable();
 };
 
 scout.Action.prototype.init = function(model, session) {
@@ -78,8 +92,16 @@ scout.Action.prototype._renderTooltipText = function(tooltipText) {
   }
 };
 
+scout.Action.prototype._renderTabbable = function() {
+  if (this.tabbable) {
+    this.$container.attr('tabindex', 0);
+  } else {
+    this.$container.removeAttr('tabindex');
+  }
+};
+
 scout.Action.prototype._onHoverIn = function() {
-  //Don't show tooltip if action is selected or not enabled
+  // Don't show tooltip if action is selected or not enabled
   if (this.enabled && !this.selected) {
     this._showTooltip();
   }
@@ -133,7 +155,7 @@ scout.Action.prototype.sendSelected = function(selected) {
   });
 };
 
-//KeyStrokes
+// KeyStrokes
 
 scout.Action.prototype.ignore = function(event) {
   return false;
@@ -174,6 +196,13 @@ scout.Action.prototype.accept = function(event) {
     return true;
   }
   return false;
+};
+
+scout.Action.prototype.setTabbable = function(tabbable) {
+  this.tabbable = tabbable;
+  if (this.rendered) {
+    this._renderTabbable();
+  }
 };
 
 scout.Action.prototype.handle = function(event) {

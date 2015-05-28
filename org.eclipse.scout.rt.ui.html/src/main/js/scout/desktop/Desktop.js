@@ -60,6 +60,7 @@ scout.Desktop.prototype._render = function($parent) {
     }.bind(this));
 
   this.$tabbar = this.$bar.appendDiv('taskbar-tabs');
+  // FIXME AWE: (menu) hier menu-bar verwenden?
   this.$toolbar = this.$bar.appendDiv('taskbar-tools');
   this.$bench = this.$container.appendDiv('desktop-bench');
   new scout.HtmlComponent(this.$bench, this.session);
@@ -74,7 +75,8 @@ scout.Desktop.prototype._render = function($parent) {
   // depending on where the menu is located (taskbar VS menubar).
   for (i = 0; i < this.actions.length; i++) {
     action = this.actions[i];
-    action.menuStyle = 'taskbar';
+    action.setTabbable(false);
+    action.actionStyle = 'taskbar';
     action.render(this.$toolbar);
   }
   if (action) {

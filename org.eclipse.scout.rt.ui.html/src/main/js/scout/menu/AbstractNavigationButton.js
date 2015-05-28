@@ -14,7 +14,7 @@ scout.AbstractNavigationButton = function(outline, node) {
   this.visible = true;
   this.enabled = true;
   this.mandatory = false;
-  this.menuStyle = 'button';
+  this.actionStyle = 'button';
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Menu);
 // FIXME AWE: re-name to *Menu

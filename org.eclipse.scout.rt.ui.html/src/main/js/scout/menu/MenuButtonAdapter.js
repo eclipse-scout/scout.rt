@@ -7,7 +7,7 @@ scout.MenuButtonAdapter = function() {
   scout.MenuButtonAdapter.parent.call(this);
 
   this.defaultMenu = false;
-  this.menuStyle = 'default';
+  this.actionStyle = 'default';
 };
 scout.inherits(scout.MenuButtonAdapter, scout.Menu);
 
@@ -46,7 +46,7 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
     this.defaultMenu = true;
   }
   if (button.displayStyle !== scout.Button.DISPLAY_STYLE.LINK) {
-    this.menuStyle = 'button';
+    this.actionStyle = 'button';
   }
 };
 

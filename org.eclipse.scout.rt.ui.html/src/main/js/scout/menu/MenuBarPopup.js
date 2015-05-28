@@ -27,7 +27,7 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this.headText = this.menu.$container.text();
   this.headIcon = this.menu.$container.attr('data-icon');
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
-  if ('taskbar' === this.menu.menuStyle) {
+  if ('taskbar' === this.menu.actionStyle) {
     this._copyCssClassToHead('taskbar-tool-item');
     this.$head.addClass('selected');
   } else {
