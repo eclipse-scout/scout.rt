@@ -531,6 +531,10 @@ scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
       oldNode.leaf = updatedNode.leaf;
       propertiesChanged = true;
     }
+    if (oldNode.enabled !== updatedNode.enabled) {
+      oldNode.enabled = updatedNode.enabled;
+      propertiesChanged = true;
+    }
 
     if (this.rendered && propertiesChanged) {
       this._decorateNode(oldNode);
@@ -805,8 +809,9 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.removeClass();
   $node.addClass(formerClasses);
   $node.addClass(node.cssClass);
-  $node.toggleClass('leaf', !! node.leaf);
-  $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
+  $node.toggleClass('leaf', !!node.leaf);
+  $node.toggleClass('expanded', (!!node.expanded && node.childNodes.length > 0));
+  $node.setEnabled(!!node.enabled);
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();

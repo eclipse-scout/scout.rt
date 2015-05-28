@@ -41,6 +41,10 @@
     border-left-color: transparent;
     border-right-color: transparent;
   }
+
+  &.disabled {
+    color: @disabled-color;
+  }
 }
 
 .tree-node-checkbox {
@@ -136,13 +140,6 @@
 
     .tree-node-control:hover& {
       color: @hover-color;
-    }
-
-    .disabled & {
-      color: @palette-gray-5;
-    }
-    .disabled .tree-node-control:hover& {
-      color: @palette-gray-7;
     }
   }
 

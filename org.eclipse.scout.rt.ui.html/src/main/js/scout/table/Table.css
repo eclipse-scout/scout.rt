@@ -98,6 +98,10 @@
     font-weight: bold;
   }
 
+  .disabled & {
+    color: @disabled-color;
+  }
+
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable:before {
     position: absolute;
     content: '';
@@ -151,8 +155,13 @@
 }
 
 .table-cell-icon {
+
   .font-icon& {
     color: @icon-color;
+
+    .disabled & {
+      color: @disabled-color;
+    }
   }
 
   .image-icon& {

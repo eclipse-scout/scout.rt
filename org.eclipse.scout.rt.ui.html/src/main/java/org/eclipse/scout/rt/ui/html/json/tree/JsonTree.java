@@ -349,11 +349,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       if (node.isStatusDeleted() || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
         continue;
       }
-      // Only send _some_ of the properties. Everything else will be handled with separate events.
-      // --> See also: Tree.js/_onNodesUpdated()
       JSONObject jsonNode = JsonObjectUtility.newOrderedJSONObject();
       putProperty(jsonNode, "id", getOrCreateNodeId(node));
+      // Only send _some_ of the properties. Everything else (e.g. "checked", "expanded") will be handled with separate events.
+      // --> See also: Tree.js/_onNodesUpdated()
       putProperty(jsonNode, "leaf", node.isLeaf());
+      putProperty(jsonNode, "enabled", node.isEnabled());
       jsonNodes.put(jsonNode);
     }
     if (jsonNodes.length() == 0) {
