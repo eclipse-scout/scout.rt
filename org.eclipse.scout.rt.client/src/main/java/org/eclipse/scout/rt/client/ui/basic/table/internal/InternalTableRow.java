@@ -64,7 +64,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     int columnCount = table.getColumnCount();
     m_cells = new ArrayList<Cell>(columnCount);
     for (int i = 0; i < columnCount; i++) {
-      m_cells.add(new Cell(this));
+      m_cells.add(new Cell(row.getCell(i)));
     }
     // import and validate cell values
     for (int i = 0; i < table.getColumnCount(); i++) {
@@ -468,7 +468,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   public String getIconId() {
     return m_iconId;
   }
-  
+
   @Override
   public String getCssClass() {
     return m_cssClass;
