@@ -31,6 +31,8 @@ public class TreeEx extends Tree {
   private boolean m_readOnly = false;
   private TreeItem m_contextItem;
 
+  private Event m_lastMouseDown = null;
+
   public TreeEx(Composite parent, int style) {
     super(parent, style | SWT.FULL_SELECTION);
     addListener(SWT.MouseUp, new Listener() {
@@ -46,23 +48,24 @@ public class TreeEx extends Tree {
   @Override
   public void notifyListeners(int eventType, Event event) {
     //add context item to event before the table may change (e.g. scrolling due to node expansion)
-    if (isClick(event)) {
-      TreeItem contextItem = getItem(new Point(event.x, event.y));
-      Rectangle bounds = contextItem.getBounds();
-
-      //make sure no item is added for expansion events
-      if (event.x >= bounds.x) {
-        if (event.data == null) {
-          event.data = contextItem;
-        }
+    if (event.type == SWT.MouseDown) {
+      if (!isDuplicateMouseDown(event)) {
+        setContextItem(event);
       }
-
+      m_lastMouseDown = event;
     }
     super.notifyListeners(eventType, event);
   }
 
-  private boolean isClick(Event event) {
-    return event.type == SWT.MouseDown || event.type == SWT.MouseUp;
+  private void setContextItem(Event event) {
+    if (event != null) {
+      TreeItem contextItem = getItem(new Point(event.x, event.y));
+      event.data = contextItem;
+    }
+  }
+
+  private boolean isDuplicateMouseDown(Event event) {
+    return m_lastMouseDown != null && event.time == m_lastMouseDown.time;
   }
 
   @Override
