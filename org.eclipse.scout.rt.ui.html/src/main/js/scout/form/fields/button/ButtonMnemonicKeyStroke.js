@@ -9,7 +9,12 @@ scout.inherits(scout.ButtonMnemonicKeyStroke, scout.MnemonicKeyStroke);
  * @Override scout.MnemonicKeyStroke
  */
 scout.ButtonMnemonicKeyStroke.prototype.handle = function(event) {
-  this._field.$field.trigger('click');
+  if (this._field.enabled && this._field.visible) {
+    this._field.doAction($(event.target));
+    if (this.preventDefaultOnEvent) {
+      event.preventDefault();
+    }
+  }
 };
 /**
  * @Override scout.MnemonicKeyStroke
