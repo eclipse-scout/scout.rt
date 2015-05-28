@@ -17,6 +17,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * A class annotated with this annotation represents a Bean which is application scoped, meaning that that Bean only
+ * exists once per application, or classloader.
+ * All classes marked with this annotation (or an annotation that has this annotation) are automatically registered in
+ * the {@link IBeanManager}.
+ */
 @Bean
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
