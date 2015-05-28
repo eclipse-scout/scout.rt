@@ -91,31 +91,42 @@ public class InvocationContext<PORT> {
 
   /**
    * Installs the given listener for this {@link InvocationContext} to be notified once the transaction is rolled back.
+   *
+   * @return <code>this</code> in order to support for method chaining.
    */
-  public void whenRollback(final IRollbackListener listener) {
+  public InvocationContext<PORT> whenRollback(final IRollbackListener listener) {
     Assertions.assertNull(m_rollbackListener, "RollbackListener already installed");
     m_rollbackListener = listener;
+    return this;
   }
 
   /**
    * Installs the given listener for this {@link InvocationContext} to be notified once the transaction is committed.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
-  public void whenCommit(final ICommitListener listener) {
+  public InvocationContext<PORT> whenCommit(final ICommitListener listener) {
     Assertions.assertNull(m_commitListener, "CommitListener already installed");
     m_commitListener = listener;
+    return this;
   }
 
   /**
    * Installs the given {@link InvocationHandler} for this {@link InvocationContext} to be invoked for every webservice
    * request.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
-  public void whenInvoke(final InvocationHandler invocationHandler) {
+  public InvocationContext<PORT> whenInvoke(final InvocationHandler invocationHandler) {
     Assertions.assertNull(m_invocationHandler, "InvocationHandler already installed");
     m_invocationHandler = invocationHandler;
+    return this;
   }
 
   /**
    * Sets the URL of the webservice endpoint for this {@link InvocationContext}.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> endpointUrl(final String endpointUrl) {
     m_requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointUrl);
@@ -124,6 +135,8 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets the username used by authentication handler for this {@link InvocationContext}.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> username(final String username) {
     m_requestContext.put(InvocationContext.PROP_USERNAME, username);
@@ -132,6 +145,8 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets the password used by authentication handler for this {@link InvocationContext}.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> password(final String password) {
     m_requestContext.put(InvocationContext.PROP_PASSWORD, password);
@@ -142,6 +157,8 @@ public class InvocationContext<PORT> {
    * Sets the connect timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
    * expires before the connection can be established, the request is aborted. Use <code>null</code> to specify
    * an infinite timeout.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> connectTimeout(final Integer connectTimeout) {
     m_implementorSpecifics.setSocketConnectTimeout(m_requestContext, (int) TimeUnit.SECONDS.toMillis(NumberUtility.nvl(connectTimeout, 0)));
@@ -152,6 +169,8 @@ public class InvocationContext<PORT> {
    * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
    * expires before there is data available for read, the request is aborted. Use <code>null</code> to specify an
    * infinite timeout.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> readTimeout(final Integer readTimeout) {
     m_implementorSpecifics.setSocketReadTimeout(m_requestContext, (int) TimeUnit.SECONDS.toMillis(NumberUtility.nvl(readTimeout, 0)));
@@ -160,6 +179,8 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets a context property for this {@link InvocationContext} to be used in JAX-WS handlers.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> contextProperty(final String key, final Object value) {
     m_requestContext.put(key, value);
@@ -168,6 +189,8 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets a HTTP request header for this {@link InvocationContext} to be sent to the endpoint.
+   * 
+   * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> httpRequestHeader(final String key, final String value) {
     m_implementorSpecifics.setHttpRequestHeader(m_requestContext, key, value);
@@ -177,7 +200,7 @@ public class InvocationContext<PORT> {
   /**
    * Returns a HTTP response header of the previous webservice request, or <code>null</code> if not available.
    */
-  public List<String> getHttpResponseHeader(final String key) {
+  public List<String> httpResponseHeader(final String key) {
     final Map<String, Object> responseContext = ((BindingProvider) m_portProxy).getResponseContext();
     return (responseContext != null ? m_implementorSpecifics.getHttpResponseHeader(responseContext, key) : null);
   }
@@ -186,7 +209,7 @@ public class InvocationContext<PORT> {
    * Returns the HTTP status code of the previous webservice request, or <code>-1</code> if not available yet. See the
    * constants on {@link HttpServletResponse} for valid response codes.
    */
-  public int getHttpStatusCode() {
+  public int httpStatusCode() {
     final Map<String, Object> responseContext = ((BindingProvider) m_portProxy).getResponseContext();
     return (responseContext != null ? m_implementorSpecifics.getHttpStatusCode(responseContext).intValue() : -1);
   }
