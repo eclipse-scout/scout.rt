@@ -24,6 +24,8 @@ public class JsonRequest {
 
   public static final String PROP_STARTUP = "startup";
   public static final String PROP_UNLOAD = "unload";
+  public static final String PROP_POLL_FOR_BACKGROUND_JOBS = "pollForBackgroundJobs";
+  public static final String PROP_CANCEL = "cancel";
   public static final String PROP_UI_SESSION_ID = "uiSessionId";
   public static final String PROP_EVENTS = "events";
 
@@ -72,7 +74,11 @@ public class JsonRequest {
   }
 
   public boolean isPollForBackgroundJobsRequest() {
-    return m_request.has("pollForBackgroundJobs");
+    return m_request.has(PROP_POLL_FOR_BACKGROUND_JOBS);
+  }
+
+  public boolean isCancelRequest() {
+    return m_request.has(PROP_CANCEL);
   }
 
   @Override

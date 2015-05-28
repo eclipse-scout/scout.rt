@@ -25,7 +25,9 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -97,6 +99,12 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
             LOG.debug("polling end after " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
           }
         }
+        else if (jsonReq.isCancelRequest()) {
+          // Cancel all running model jobs for the requested session (interrupt if necessary)
+          BEANS.get(IJobManager.class).cancel(ModelJobs.newFutureFilter().session(uiSession.getClientSession()).notBlocked(), true);
+          writeResponse(httpResp, createEmptyResponse());
+          return true;
+        }
 
         // GUI requests for the same session must be processed consecutively
         if (LOG.isDebugEnabled()) {
@@ -121,7 +129,6 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         if (LOG.isDebugEnabled()) {
           LOG.debug("completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
-
       }
       finally {
         if (oldScoutSessionId != null) {

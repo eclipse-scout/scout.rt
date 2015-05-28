@@ -14,7 +14,6 @@ scout.MessageBox = function(model, session) {
   this.$defaultButton;
   this.$noButton;
   this.$cancelButton;
-  this.previouslyFocusedElement;
   this.focusListener;
   this._$glassPane;
   this._session = session;
@@ -59,7 +58,6 @@ scout.MessageBox.prototype._render = function($parent) {
   }
   this._updateButtonWidths();
 
-  this.previouslyFocusedElement = document.activeElement;
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown');

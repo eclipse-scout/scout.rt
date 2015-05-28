@@ -1,0 +1,102 @@
+@color-busyindicator-active: @palette-blue-4;
+@color-busyindicator-border: @palette-gray-4;
+@busyindicator-icon-size: 20px;
+
+.busyindicator {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  max-width: 300px;
+  .drop-shadow;
+  border-top: 5px solid @color-busyindicator-active;
+  border-top-left-radius: @border-radius;
+  border-top-right-radius: @border-radius;
+
+  &.shown {
+    .animation-name(fade-in);
+    .animation-duration(0.5s);
+  }
+}
+
+.busyindicator-content {
+  border-left: 1px solid @color-busyindicator-border;
+  border-right: 1px solid @color-busyindicator-border;
+  background-color: @control-background-color;
+  padding: 26px;
+
+  &.no-buttons {
+    border-bottom: 1px solid @color-busyindicator-border;
+  }
+}
+
+.busyindicator-label {
+  display: inline-block;
+  font-weight: bold;
+  margin-left: @busyindicator-icon-size + 10px;
+  text-indent: -(@busyindicator-icon-size + 10px);
+
+  &::before {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    width: @busyindicator-icon-size;
+    height: @busyindicator-icon-size;
+    margin-top: -3px;
+    margin-right: 15px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    border-top-color: @color-busyindicator-active;
+    border-left-color: @color-busyindicator-active;
+    border-right-color: @color-busyindicator-active;
+    .animation(rotation 1.1s linear infinite);
+  }
+
+  &.cancelled::before {
+    border-top-color: transparent;
+    border-left-color: @color-busyindicator-active;
+    border-right-color: @color-busyindicator-active;
+    .animation(rotation-reverse 2.0s linear infinite);
+  }
+}
+
+.busyindicator-buttons {
+
+  & button {
+    position: relative;
+    padding: 12px;
+    background-color: @palette-gray-2;
+    border: 1px solid @color-busyindicator-border;
+    cursor: pointer;
+    .overflow-ellipsis-nowrap;
+  }
+
+  & > button:first-child {
+    border-bottom-left-radius: @border-radius;
+  }
+
+  & > button:last-child {
+    border-bottom-right-radius: @border-radius;
+  }
+
+  & > button:first-child ~ button {
+    border-left-width: 0px;
+  }
+
+  & > button:focus {
+    outline: none;
+  }
+
+  & > button:focus::before {
+    .focus-border;
+    .overlay(2px, 2px, -4px, -4px);
+    z-index: 1;
+  }
+
+  & > button:first-child:focus::before {
+    border-bottom-left-radius: @border-radius;
+  }
+
+  & > button:last-child:focus::before {
+    border-bottom-right-radius: @border-radius;
+  }
+}

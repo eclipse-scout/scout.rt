@@ -682,7 +682,6 @@ scout.Session.prototype._renderBusyGlasspane = function() {
     this._$busyGlasspane = scout.fields.new$Glasspane(this.uiSessionId)
       .addClass('busy')
       .appendTo(this.$entryPoint);
-    $('.taskbar-logo').addClass('animated');
 
     // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
     // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
@@ -694,7 +693,21 @@ scout.Session.prototype._renderBusyGlasspane = function() {
 
     if (this.desktop) {
       this._darkBusyGlasspaneTimeoutId = setTimeout(function() {
+        var busyIndicator = new scout.BusyIndicator(this);
+        busyIndicator.on('buttonClick', function(event) {
+          // Set "cancelling" state
+          busyIndicator.$label.addClass('cancelled');
+          busyIndicator.$buttons.remove();
+          busyIndicator.$content.addClass('no-buttons');
+          // Request cancel on server
+          var request = {
+            uiSessionId: this.uiSessionId,
+            cancel: true
+          };
+          this._sendRequest(request);
+        }.bind(this));
         this._$busyGlasspane.addClass('dark');
+        busyIndicator.render(this._$busyGlasspane);
       }.bind(this), 2500);
     }
   }.bind(this), 500);
@@ -713,7 +726,6 @@ scout.Session.prototype._removeBusyGlasspane = function() {
     setTimeout(function() {
       // (End workaround)
       this._$busyGlasspane.stop().fadeOut(150, $.removeThis);
-      $('.taskbar-logo').removeClass('animated');
     }.bind(this), 0);
   }
 };

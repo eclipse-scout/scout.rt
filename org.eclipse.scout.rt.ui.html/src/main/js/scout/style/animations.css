@@ -134,6 +134,20 @@
 @-webkit-keyframes rotation { .keyframes-rotation; }
 @keyframes rotation { .keyframes-rotation; }
 
+/*** Rotation-Reverse ***/
+
+.keyframes-rotation-reverse () {
+  0% {
+    .transform(rotate(-0deg));
+  }
+  100% {
+    .transform(rotate(-359deg));
+  }
+}
+
+@-webkit-keyframes rotation-reverse { .keyframes-rotation-reverse; }
+@keyframes rotation-reverse { .keyframes-rotation-reverse; }
+
 /*** Pulse Opacity ***/
 
 .keyframes-pulse-opacity () {

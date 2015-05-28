@@ -28,6 +28,7 @@ __include("scout/util/status.js");
 __include("scout/util/strings.js");
 __include("scout/util/URL.js");
 // Session related
+__include("scout/session/BusyIndicator.js");
 __include("scout/session/Event.js");
 __include("scout/session/Locale.js");
 __include("scout/session/Reconnector.js");

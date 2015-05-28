@@ -12,6 +12,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ResetTableColumns",
         "ColumnSorting",
         "Column",
+        "Cancel",
         // From org.eclipse.scout.rt.ui.html
         "LoadOptions_",
         "NoOptions",
@@ -72,7 +73,8 @@ public class UiTextContributor implements IUiTextContributor {
         "Ignore",
         "UiProcessingErrorTitle",
         "UiProcessingErrorText",
-        "UiProcessingErrorAction"
+        "UiProcessingErrorAction",
+        "PleaseWait_"
         ));
   }
 }
