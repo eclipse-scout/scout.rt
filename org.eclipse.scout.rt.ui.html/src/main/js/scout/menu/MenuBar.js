@@ -95,17 +95,23 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
 };
 
 scout.MenuBar.prototype._updateItems = function(menuItems) {
-  // remove existing menu items
+  // remove DOM for existing menu items and destroy items that have
+  // been created by the menuSorter (e.g. separators).
   this.menuItems.forEach(function(item) {
-    item.remove();
-  });
+    if (item.createdBy === this.menuSorter) {
+      item.destroy();
+    } else {
+      item.remove();
+    }
+  }, this);
 
   // The menuSorter may add separators to the list of items, that's why we
   // store the return value of menuSorter in this.menuItems and not the
   // menuItems passed to the updateItems method. We must do this because
   // otherwise we could not remove the added separator later.
-  var orderedMenuItems = this.menuSorter.order(menuItems);
+  var orderedMenuItems = this.menuSorter.order(menuItems, this);
   this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
+  this.visibleMenuItems = this.menuItems;
 
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
   // float:right. In Firefox elements with float:right must come first in the HTML order

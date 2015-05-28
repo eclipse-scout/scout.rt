@@ -10,11 +10,6 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     rightItems = [];
 
   items.forEach(function(item) {
-    // destroy/skip separators added by this class
-    if (item.createdBy === this) {
-      item.destroy();
-      return;
-    }
     if (scout.menus.isButton(item)) {
       buttons.push(item);
     } else if (item.horizontalAlignment === 1) {
@@ -47,7 +42,7 @@ scout.MenuItemsOrder.prototype._menuTypes = function() {
 
 /**
  * The separator here does not exist in the model delivered by the server-side client.
- * The createdBy property is added to the model to find items added by the UI later.
+ * The createdBy property is added to the model to find and destroy items added by the UI later.
  */
 scout.MenuItemsOrder.prototype._createSeparator = function() {
   return this.session.createUiObject({
