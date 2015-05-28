@@ -280,14 +280,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     List<ITableRow> selectedRows = getTable().getSelectedRows();
     if (CollectionUtility.size(selectedRows) == 1) {
       ITreeNode node = getTreeNodeFor(CollectionUtility.firstElement(selectedRows));
-      if (node instanceof IPageWithTable<?>) {
-        IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
-        List<IMenu> menus = ActionUtility.getActions(tablePage.getTable().getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
-        for (IMenu m : menus) {
-          pageMenus.add(new OutlineMenuWrapper(m, TableMenuType.SingleSelection));
-        }
-      }
-      else if (node instanceof IPageWithNodes) {
+      if (node instanceof IPageWithNodes) {
         IPageWithNodes pageWithNodes = (IPageWithNodes) node;
         List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.SingleSelection), false));
         for (IMenu m : menus) {
