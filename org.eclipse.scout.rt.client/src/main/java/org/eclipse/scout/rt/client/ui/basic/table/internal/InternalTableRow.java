@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -92,13 +93,14 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @SuppressWarnings("unchecked")
   private <T> void tryParseAndSetValue(IColumn<T> col, Cell internalCell, ICell newCell) {
+    internalCell.removeErrorStatus(ParsingFailedStatus.class);
+    internalCell.removeErrorStatus(ValidationFailedStatus.class);
     T value = (T) newCell.getValue();
     try {
       internalCell.setText(newCell.getText());
       Object parsedValue = col.parseValue(this, value);
       T validValue = col.validateValue(this, (T) parsedValue);
       internalCell.setValue(validValue);
-      internalCell.removeErrorStatus(ValidationFailedStatus.class);
     }
     catch (ProcessingException e) {
       internalCell.setText(format(value));

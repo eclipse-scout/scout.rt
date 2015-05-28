@@ -119,7 +119,7 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public String toString() {
-    return "Status [" + "severity=" + getSeverityName() + ", message=" + m_message + "]";
+    return getClass().getSimpleName() + " [" + "severity=" + getSeverityName() + ", message=" + m_message + "]";
   }
 
   /**

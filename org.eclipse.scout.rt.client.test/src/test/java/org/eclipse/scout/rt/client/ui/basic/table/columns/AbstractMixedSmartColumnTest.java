@@ -11,11 +11,19 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.services.lookup.DefaultLookupCallProvisioningService;
+import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
@@ -23,19 +31,27 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
  * Tests for {@link AbstractMixedSmartColumn}
  */
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractMixedSmartColumnTest {
 
   private static List<IBean<?>> s_regs;
@@ -46,11 +62,14 @@ public class AbstractMixedSmartColumnTest {
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_regs = TestingUtility.registerBeans(
         new BeanMetaData(ICodeService.class).
-            initialInstance(codeService).
-            applicationScoped(true),
+        initialInstance(codeService).
+        applicationScoped(true),
         new BeanMetaData(ICodeLookupCallFactoryService.class).
-            initialInstance(codeLookupCallFactoryService).
-            applicationScoped(true)
+        initialInstance(codeLookupCallFactoryService).
+        applicationScoped(true),
+        new BeanMetaData(ILookupCallProvisioningService.class).
+        initialInstance(new DefaultLookupCallProvisioningService()).
+        applicationScoped(true)
         );
   }
 
@@ -65,11 +84,61 @@ public class AbstractMixedSmartColumnTest {
     };
     column.setCodeTypeClass(TestCodeType.class);
     column.setMandatory(true);
-    ITableRow row = Mockito.mock(ITableRow.class);
+    ITableRow row = mock(ITableRow.class);
     @SuppressWarnings("unchecked")
     IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
     assertEquals("code type class property to be progagated to field", column.getCodeTypeClass(), field.getCodeTypeClass());
+  }
+
+  /**
+   * Tests successful editing of a table cell
+   */
+  @Test
+  public void testEditingValidValue() throws ProcessingException {
+    P_Table table = new P_Table();
+    table.addRowsByArray(new Object[]{1L});
+    ITableRow testRow = table.getRow(0);
+    @SuppressWarnings("unchecked")
+    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) table.getEditableSmartColumn().prepareEdit(testRow);
+    field.parseAndSetValue(TestCodeType.TestCode.TEXT);
+    table.getEditableSmartColumn().completeEdit(testRow, field);
+    assertNull(field.getErrorStatus());
+    assertTrue(testRow.getCellForUpdate(table.getEditableSmartColumn()).isContentValid());
+  }
+
+  /**
+   * An unparsable error should lead to an error on the column
+   */
+  @Test
+  public void testSetUnparsableValue() throws ProcessingException {
+    P_Table table = new P_Table();
+    table.addRowsByArray(new Object[]{1L});
+    ITableRow testRow = table.getRow(0);
+    @SuppressWarnings("unchecked")
+    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) table.getEditableSmartColumn().prepareEdit(testRow);
+    field.parseAndSetValue("-1L");
+    table.getEditableSmartColumn().completeEdit(testRow, field);
+    assertNotNull(field.getErrorStatus());
+    assertFalse(testRow.getCellForUpdate(table.getEditableSmartColumn()).isContentValid());
+  }
+
+  /**
+   * An unparsable error should be reset, if a valid value is entered
+   */
+  @Test
+  public void testResetParsingError() throws ProcessingException {
+    P_Table table = new P_Table();
+    table.addRowsByArray(new Object[]{1L});
+    ITableRow testRow = table.getRow(0);
+    @SuppressWarnings("unchecked")
+    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) table.getEditableSmartColumn().prepareEdit(testRow);
+    field.parseAndSetValue("-1L");
+    table.getEditableSmartColumn().completeEdit(testRow, field);
+    field.parseAndSetValue(TestCodeType.TestCode.TEXT);
+    table.getEditableSmartColumn().completeEdit(testRow, field);
+    assertNull(field.getErrorStatus());
+    assertTrue(testRow.getCellForUpdate(table.getEditableSmartColumn()).isContentValid());
   }
 
   /**
@@ -119,6 +188,26 @@ public class AbstractMixedSmartColumnTest {
     protected Long execConvertValueToKey(String value) {
       lastValue = value;
       return 0L;
+    }
+  }
+
+  public static class P_Table extends AbstractTable {
+
+    public EditableSmartColumn getEditableSmartColumn() {
+      return getColumnSet().getColumnByClass(EditableSmartColumn.class);
+    }
+
+    public static class EditableSmartColumn extends AbstractMixedSmartColumn<String, Long> {
+
+      @Override
+      protected boolean getConfiguredEditable() {
+        return true;
+      }
+
+      @Override
+      protected Class<? extends ICodeType<?, Long>> getConfiguredCodeType() {
+        return TestCodeType.class;
+      }
     }
 
   }

@@ -110,6 +110,10 @@ public class MultiStatus extends Status implements IMultiStatus {
     m_children.add(Assertions.assertNotNull(status));
   }
 
+  public void addAll(List<IStatus> status) {
+    m_children.addAll(Assertions.assertNotNull(status));
+  }
+
   public void remove(IStatus status) {
     m_children.remove(Assertions.assertNotNull(status));
   }

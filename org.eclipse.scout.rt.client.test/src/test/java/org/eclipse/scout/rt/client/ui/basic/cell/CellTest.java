@@ -21,7 +21,9 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -47,6 +49,10 @@ public class CellTest {
     assertNull(c.getCssClass());
   }
 
+  /**
+   * When a new Cell is crated as a copy <br>
+   * , all values should be copied and that there are no calls to an observer
+   */
   @Test
   public void testConstructor_copy() throws Exception {
     Object value = new Object();
@@ -339,4 +345,19 @@ public class CellTest {
     assertNull(c.getErrorStatus());
     assertEquals(testIconId, c.getIconId());
   }
+
+  /**
+   * {@link Cell#setErrorStatus(org.eclipse.scout.commons.status.IStatus)}
+   */
+  @Test
+  public void testAddRemoveMultistatus() {
+    Cell c = new Cell();
+    ParsingFailedStatus errorStatus = new ParsingFailedStatus("failed", "rawString");
+    MultiStatus ms = new MultiStatus();
+    ms.add(errorStatus);
+    c.addErrorStatuses(ms.getChildren());
+    c.removeErrorStatus(ParsingFailedStatus.class);
+    assertNull(c.getErrorStatus());
+  }
+
 }

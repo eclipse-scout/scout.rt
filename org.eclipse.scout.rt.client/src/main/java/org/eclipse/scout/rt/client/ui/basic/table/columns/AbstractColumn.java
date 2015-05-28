@@ -62,6 +62,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -673,15 +674,31 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Order(62)
   protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
     if (editingField instanceof IValueField) {
-      IValueField v = (IValueField) editingField;
-      if (v.isSaveNeeded() || editingField.getErrorStatus() != null || row.getCell(this).getErrorStatus() != null) {
-        VALUE parsedValue = interceptParseValue(row, v.getValue());
-        setValueInternal(row, parsedValue, editingField);
+      @SuppressWarnings("unchecked")
+      IValueField<VALUE> valueField = (IValueField<VALUE>) editingField;
+      Cell cell = row.getCellForUpdate(this);
+
+      if (!contentEquals(cell, valueField)) {
+        //map data from field to column
+        cell.setText(valueField.getDisplayText());
+        //only remove errors set by scout
+        cell.removeErrorStatus(ValidationFailedStatus.class);
+        cell.removeErrorStatus(ParsingFailedStatus.class);
+        if (editingField.getErrorStatus() != null) {
+          cell.addErrorStatuses(valueField.getErrorStatus().getChildren());
+        }
+        cell.setValue(valueField.getValue());
         if (getTable() instanceof AbstractTable && ((AbstractTable) getTable()).wasEverValid(row)) {
           persistRowChange(row);
         }
       }
     }
+  }
+
+  private boolean contentEquals(Cell cell, IValueField<VALUE> field) {
+    return CompareUtility.equals(cell.getText(), field.getDisplayText()) &&
+        CompareUtility.equals(cell.getValue(), field.getValue()) &&
+        CompareUtility.equals(cell.getErrorStatus(), field.getErrorStatus());
   }
 
   /**
@@ -1018,6 +1035,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   private void setValueInternal(ITableRow row, VALUE value, IFormField editingField) throws ProcessingException {
     try {
+      Cell cell = row.getCellForUpdate(this);
+      cell.removeErrorStatus(ValidationFailedStatus.class);
       VALUE newValue = validateValue(row, value);
       /*
        * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
@@ -1027,7 +1046,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       validateColumnValue(row, editingField, true, newValue);
 
       // set newValue into the cell only if there's no error.
-      ICell cell = row.getCell(this);
       if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
         row.setCellValue(getColumnIndex(), newValue);
       }
@@ -1767,6 +1785,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         }
         if (editor != null) {
           Cell cell = row.getCellForUpdate(this);
+          cell.removeErrorStatus(ParsingFailedStatus.class);
+          cell.removeErrorStatus(ValidationFailedStatus.class);
           IMultiStatus status = getEditorErrorIncludingMandatory((IValueField<VALUE>) editor);
           if (!status.isOK()) {
             cell.addErrorStatus(status);
@@ -1779,7 +1799,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
              * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(List<ITableRow> rows)}
              * to propagate the new error status and value.
              */
-            cell.removeErrorStatus(ValidationFailedStatus.class);
             cell.setValue(value);
             decorateCellInternal(cell, row);
             ITable table = getTable();

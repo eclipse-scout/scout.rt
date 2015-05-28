@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -18,6 +19,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
@@ -302,7 +304,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   @Override
-  public IStatus getErrorStatus() {
+  public IMultiStatus getErrorStatus() {
     return m_errorStatus;
   }
 
@@ -337,6 +339,15 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   /**
+   * Adds an error status
+   */
+  public void addErrorStatuses(List<IStatus> newStatus) {
+    final MultiStatus status = ensureMultiStatus(getErrorStatusInternal());
+    status.addAll(newStatus);
+    setErrorStatusInternal(status);
+  }
+
+  /**
    * Remove IStatus of a specific type
    */
   public void removeErrorStatus(Class<? extends IStatus> statusClazz) {
@@ -364,7 +375,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return m_errorStatus;
   }
 
-  private void setErrorStatusInternal(MultiStatus status) {
+  public void setErrorStatusInternal(MultiStatus status) {
     m_errorStatus = status;
   }
 
