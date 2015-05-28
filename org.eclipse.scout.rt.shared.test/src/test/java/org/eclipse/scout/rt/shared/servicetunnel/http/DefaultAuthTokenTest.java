@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -112,15 +111,6 @@ public class DefaultAuthTokenTest {
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
     Assert.assertEquals(t.getCustomArg(0), t2.getCustomArg(0));
     Assert.assertTrue(t2.isValid());
-  }
-
-  @Test
-  @Times(100)
-  public void testReporducibility() throws ProcessingException {
-    DefaultAuthToken t = new DefaultAuthToken("foo");
-    byte[] s1 = SecurityUtility.encrypt(t.createUnsignedData(), new String(DefaultAuthToken.PRIVATE_KEY), DefaultAuthToken.SALT, 128);
-    byte[] s2 = SecurityUtility.encrypt(t.createUnsignedData(), new String(DefaultAuthToken.PRIVATE_KEY), DefaultAuthToken.SALT, 128);
-    Assert.assertArrayEquals(s1, s2);
   }
 
   private static String toUtf8Hex(String s) {
