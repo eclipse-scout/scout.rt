@@ -143,6 +143,8 @@ public interface ITableRow {
    */
   void setCssClass(String cssClass);
 
+  String getCssClass();
+
   /**
    * Convenience method for setting font on all cells of this row
    */

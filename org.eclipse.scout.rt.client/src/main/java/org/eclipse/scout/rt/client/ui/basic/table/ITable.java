@@ -58,6 +58,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * String
    */
   String PROP_DEFAULT_ICON = "defaultIcon";
+
+  /**
+   * Boolean
+   */
+  String PROP_ROW_ICON_VISIBLE = "rowIconVisible";
   /**
    * Boolean
    */
@@ -513,6 +518,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   String getDefaultIconId();
 
   void setDefaultIconId(String iconId);
+
+  boolean isRowIconVisible();
+
+  void setRowIconVisible(boolean rowIconVisible);
 
   /**
    * Notify the ui factory to give focus to the table

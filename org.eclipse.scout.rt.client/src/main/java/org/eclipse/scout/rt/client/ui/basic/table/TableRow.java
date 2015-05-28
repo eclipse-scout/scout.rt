@@ -27,6 +27,8 @@ public class TableRow implements ITableRow {
   private int m_status = STATUS_NON_CHANGED;
   private boolean m_enabled;
   private boolean m_checked;
+  private String m_iconId;
+  private String m_cssClass;
   private final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
 
@@ -302,9 +304,15 @@ public class TableRow implements ITableRow {
 
   @Override
   public void setCssClass(String cssClass) {
+    m_cssClass = cssClass;
     for (int i = 0; i < m_cells.size(); i++) {
       m_cells.get(i).setCssClass(cssClass);
     }
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
   }
 
   @Override
@@ -322,28 +330,13 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public void setIconId(String id) {
-    if (m_columnSet == null) {
-      throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
-    }
-    IColumn col = m_columnSet.getFirstVisibleColumn();
-    if (col != null) {
-      m_cells.get(col.getColumnIndex()).setIconId(id);
-    }
+  public void setIconId(String iconId) {
+    m_iconId = iconId;
   }
 
   @Override
   public String getIconId() {
-    if (m_columnSet == null) {
-      throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
-    }
-    IColumn col = m_columnSet.getFirstVisibleColumn();
-    if (col != null) {
-      return m_cells.get(col.getColumnIndex()).getIconId();
-    }
-    else {
-      return null;
-    }
+    return m_iconId;
   }
 
   @Override

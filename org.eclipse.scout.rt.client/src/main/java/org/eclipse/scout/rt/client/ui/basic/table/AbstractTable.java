@@ -267,6 +267,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Configures the default icon for this table. The default icon is used for each row in the table.
    * <p>
+   * This has only an effect, if {@link #getConfiguredRowIconVisible()} is set to true.
+   * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return the ID (name) of the icon
@@ -276,6 +278,27 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Order(20)
   protected String getConfiguredDefaultIconId() {
     return null;
+  }
+
+  /**
+   * Configures whether the row icon is visible.
+   * <p>
+   * If set to true the gui creates a column which contains the row icons. The column has a fixed width, is not moveable
+   * and always the first column (resp. the second if the table is checkable). The column is not available in the model.
+   * <p>
+   * If you need other settings or if you need the icon at another column position, you cannot use the row icons.
+   * Instead you have to create a column and use {@link Cell#setIconId(String)} to set the icons on it's cells.
+   * <p>
+   * Subclasses can override this method. Default is false.
+   *
+   * @return {@code true} if the row icon is visible, {@code false} otherwise.
+   * @see ITableRow#getIconId()
+   * @see #getConfiguredDefaultIconId()
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(25)
+  protected boolean getConfiguredRowIconVisible() {
+    return false;
   }
 
   /**
@@ -849,6 +872,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
     setDefaultIconId(getConfiguredDefaultIconId());
+    setRowIconVisible(getConfiguredRowIconVisible());
     setHeaderVisible(getConfiguredHeaderVisible());
     setAutoResizeColumns(getConfiguredAutoResizeColumns());
     setCheckable(getConfiguredCheckable());
@@ -2498,6 +2522,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setDefaultIconId(String iconId) {
     propertySupport.setPropertyString(PROP_DEFAULT_ICON, iconId);
+  }
+
+  @Override
+  public boolean isRowIconVisible() {
+    return propertySupport.getPropertyBool(PROP_ROW_ICON_VISIBLE);
+  }
+
+  @Override
+  public void setRowIconVisible(boolean rowIconVisible) {
+    propertySupport.setPropertyBool(PROP_ROW_ICON_VISIBLE, rowIconVisible);
   }
 
   @Override

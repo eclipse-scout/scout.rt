@@ -34,6 +34,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   private int m_rowIndex;
   private boolean m_enabled;
   private String m_iconId;
+  private String m_cssClass;
   private int m_status = STATUS_NON_CHANGED;
   private List<Cell> m_cells;
   private int m_rowChanging = 0;
@@ -411,6 +412,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   public void setCssClass(String cssClass) {
     try {
       setRowChanging(true);
+      m_cssClass = cssClass;
       //
       for (Cell cell : m_cells) {
         cell.setCssClass(cssClass);
@@ -465,6 +467,11 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   @Override
   public String getIconId() {
     return m_iconId;
+  }
+  
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
   }
 
   @Override
