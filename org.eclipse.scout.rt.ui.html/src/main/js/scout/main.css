@@ -166,20 +166,22 @@ button::-moz-focus-inner {
 }
 
 .application-loading {
-  display: block;
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  margin-left: -50px;
-  margin-top: -50px;
+  @application-loading-size: 50px;
 
-  background-image: url('logo.png');
-  background-repeat: no-repeat;
-  background-position: center center;
-
-  .animation(rotate-x 5s infinite linear);
+  &::before {
+    content: '';
+    border-radius: @application-loading-size;
+    border: 3px solid @palette-gray-4;
+    border-right-color: @palette-blue-4;
+    width: @application-loading-size;
+    height: @application-loading-size;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -(@application-loading-size / 2);
+    margin-top: -((@application-loading-size / 2) + 10px);
+    .animation(rotation 1.0s infinite linear);
+  }
 }
 
 /* Links calling back to the server, for example Table#execAppLinkAction */
