@@ -79,6 +79,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
 
   private P_ScoutTreeListener m_scoutTreeListener;
 
+  ITreeNode m_contextNode;
+
   private TreeViewer m_treeViewer;
 
   private boolean m_enabledFromScout = true;
@@ -786,10 +788,13 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     @Override
     public void handleEvent(Event event) {
       switch (event.type) {
+        case SWT.MouseDown: {
+          m_contextNode = findTreeNode(event);
+          break;
+        }
         case SWT.MouseUp: {
-          ITreeNode node = findTreeNode(event);
-          if (node != null) {
-            handleUiNodeClick(node, event.button);
+          if (m_contextNode != null) {
+            handleUiNodeClick(m_contextNode, event.button);
           }
           break;
         }
@@ -808,8 +813,10 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     private ITreeNode findTreeNode(Event event) {
       if (event.data instanceof TreeItem) {
         TreeItem item = (TreeItem) event.data;
-        if (item.getData() instanceof ITreeNode) {
-          return (ITreeNode) item.getData();
+        if (event.x >= item.getBounds().x) {
+          if (item.getData() instanceof ITreeNode) {
+            return (ITreeNode) item.getData();
+          }
         }
       }
       //not found
