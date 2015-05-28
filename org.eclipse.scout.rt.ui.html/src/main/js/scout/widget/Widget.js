@@ -25,6 +25,7 @@ scout.Widget.prototype._renderInternal = function($parent) {
   this._render($parent);
   this._renderProperties();
   this._renderModelClass();
+  this._renderClassId();
 };
 
 /**
@@ -48,7 +49,14 @@ scout.Widget.prototype._renderProperties = function() {
 scout.Widget.prototype._renderModelClass = function($target) {
   $target = $target || this.$container;
   if ($target && this.modelClass) {
-    $target.attr('data-modelClass', this.modelClass);
+    $target.attr('data-modelclass', this.modelClass);
+  }
+};
+
+scout.Widget.prototype._renderClassId = function($target) {
+  $target = $target || this.$container;
+  if ($target && this.classId) {
+    $target.attr('data-classid', this.classId);
   }
 };
 

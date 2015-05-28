@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -132,6 +133,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     putProperty(json, "objectType", getObjectTypeVariant());
     if (getUiSession().isInspectorHint()) {
       putProperty(json, "modelClass", getModel().getClass().getName());
+      if (getModel() instanceof ITypeWithClassId) {
+        putProperty(json, "classId", ((ITypeWithClassId) getModel()).classId());
+      }
     }
 
     // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
