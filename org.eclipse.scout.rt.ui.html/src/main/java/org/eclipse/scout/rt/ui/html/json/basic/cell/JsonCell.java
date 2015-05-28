@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -56,9 +57,9 @@ public class JsonCell implements IJsonObject {
     JsonObjectUtility.putProperty(json, "text", m_cellText);
     JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
-    JsonObjectUtility.putProperty(json, "errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
-    if (m_cell.getErrorStatus() != null) {
-      System.out.println("asdf");
+    if (m_cell.getErrorStatus() != null && m_cell.getErrorStatus().getSeverity() == IStatus.ERROR) {
+      //FIXME CGU ask JGU why is errorStatus set with severity = OK if there is no error?
+      JsonObjectUtility.putProperty(json, "errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
     }
     JsonObjectUtility.putProperty(json, "cssClass", m_cell.getCssClass());
     JsonObjectUtility.putProperty(json, "horizontalAlignment", m_cell.getHorizontalAlignment());
