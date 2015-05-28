@@ -1000,7 +1000,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), false);
-    return simpleClassId + ID_CONCAT_SYMBOL + getTable().classId();
+    if (getTable() != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + getTable().classId();
+    }
+    return simpleClassId;
   }
 
   @Override
