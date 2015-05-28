@@ -69,6 +69,9 @@ scout.Table.prototype._initColumns = function() {
   }
 
   // Add gui only checkbox column at the beginning
+  if (this.rowIconVisible) {
+    this._insertRowIconColumn();
+  }
   if (this.checkable) {
     this._insertCheckBoxColumn();
   }
@@ -82,16 +85,36 @@ scout.Table.prototype._createKeyStrokeAdapter = function() {
 scout.Table.prototype._insertCheckBoxColumn = function() {
   var column = new scout.CheckBoxColumn(),
     model = {
-    fixedWidth: true,
-    fixedPosition: true,
-    guiOnly: true,
-    disallowHeaderMenu: true,
-    width: scout.Table.COLUMN_MIN_WIDTH,
-    table: this
-  };
+      fixedWidth: true,
+      fixedPosition: true,
+      guiOnly: true,
+      disallowHeaderMenu: true,
+      width: scout.Table.COLUMN_MIN_WIDTH,
+      table: this
+    };
   column.init(model, this.session);
+
   scout.arrays.insert(this.columns, column, 0);
   this.checkableColumn = column;
+};
+
+scout.Table.prototype._insertRowIconColumn = function() {
+  var position = 0,
+    column = new scout.Column(),
+    model = {
+      fixedWidth: true,
+      fixedPosition: true,
+      guiOnly: true,
+      disallowHeaderMenu: true,
+      width: scout.Table.COLUMN_MIN_WIDTH,
+      table: this
+    };
+  column.init(model, this.session);
+  if (this.columns[0] === this.checkableColumn) {
+    position = 1;
+  }
+  scout.arrays.insert(this.columns, column, position);
+  this.rowIconColumn = column;
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -769,6 +792,24 @@ scout.Table.prototype.sendReload = function() {
 };
 
 scout.Table.prototype.cell = function(column, row) {
+  var cell;
+  // Row Icon column and cell icon column don't not have cells -> generate one
+  if (column === this.rowIconColumn || column === this.checkableColumn) {
+    if (column === this.rowIconColumn) {
+      cell = {
+        iconId: row.iconId,
+        cssClass: 'row-icon-cell ' + row.cssClass
+      };
+    } else if (column === this.checkableColumn) {
+      cell = {
+        value: row.checked,
+        editable: true,
+        cssClass: row.cssClass
+      };
+    }
+    scout.defaultValues.applyTo(cell, 'Cell');
+    return cell;
+  }
   return row.cells[column.index];
 };
 
@@ -812,12 +853,8 @@ scout.Table.prototype.cellStyle = function(column, cell) {
   }
 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-  if (cell) {
-    // guiOnly column doesn't have cells
-    style += scout.helpers.legacyCellStyle(cell);
-    hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
-    // TODO BSH Table | iconId, editable, errorStatus
-  }
+  style += scout.helpers.legacyCellStyle(cell);
+  hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
   return style + (hAlign === 'left' || !hAlign ? '' : 'text-align: ' + hAlign + '; ');
 };
 
@@ -877,7 +914,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 
   predicate = function(column) {
     if (column.guiOnly) {
-      // does not support tabbing and does not have a cell -> would throw an exception
+      // does not support tabbing
       return false;
     }
     cell = this.cell(column, row);
@@ -923,7 +960,7 @@ scout.Table.prototype._group = function(update) {
       value = this.cellValue(column, row);
 
       if (column.type === 'number') {
-        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value) ;
+        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
       }
     }
 
@@ -1729,6 +1766,18 @@ scout.Table.prototype._syncCheckable = function(checkable) {
   }
 };
 
+scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
+  this.rowIconVisible = rowIconVisible;
+
+  var column = this.rowIconColumn;
+  if (this.rowIconVisible && !column) {
+    this._insertRowIconColumn();
+  } else if (!this.rowIconVisible && column) {
+    scout.arrays.remove(this.columns, column);
+    this.rowIconColumn = null;
+  }
+};
+
 scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
   this.selectedRows = this._rowsByIds(selectedRowIds);
 };
@@ -1747,6 +1796,10 @@ scout.Table.prototype._syncMenus = function(menus) {
 };
 
 scout.Table.prototype._renderCheckable = function() {
+  this._redraw();
+};
+
+scout.Table.prototype._renderRowIconVisible = function() {
   this._redraw();
 };
 

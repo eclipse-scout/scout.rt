@@ -161,6 +161,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isCheckable();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ROW_ICON_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isRowIconVisible();
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
@@ -563,6 +569,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(jsonRow, "checked", row.isChecked());
     putProperty(jsonRow, "enabled", row.isEnabled());
     putProperty(jsonRow, "iconId", BinaryResourceUrlUtility.createIconUrl(row.getIconId()));
+    putProperty(jsonRow, "cssClass", row.getCssClass());
     JsonObjectUtility.filterDefaultValues(jsonRow, "TableRow");
     return jsonRow;
   }

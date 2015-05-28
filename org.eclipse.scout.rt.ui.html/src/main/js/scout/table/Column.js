@@ -28,14 +28,6 @@ scout.Column.prototype.buildCell = function(row) {
     text = scout.strings.nl2br(text, false);
   }
   iconId = cell.iconId;
-  // Cell icon has priority over row icon
-  // If there is no cell icon, the row icon is displayed if the column is the first one
-  if (!iconId && row.iconId && this.table.columns.indexOf(this) === 0) {
-    iconId = row.iconId;
-    // row icon must always be left aligned (copy cell to not modify the original state)
-    cell = $.extend({}, cell);
-    cell.horizontalAlignment = -1;
-  }
   icon = this._icon(row, iconId, !! text) || '';
   if (!text && !icon) {
     // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
@@ -80,10 +72,6 @@ scout.Column.prototype._cssClass = function(row, cell) {
   }
   if (!this.table.multilineText || !this.textWrap) {
     cssClass += ' white-space-nowrap';
-  }
-  if (!cell) {
-    // gui only columns don't have cells
-    return cssClass;
   }
   if (cell.editable) {
     cssClass += ' editable';

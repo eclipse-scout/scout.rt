@@ -1,3 +1,7 @@
+/**
+ * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
+ * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
+ */
 scout.CheckBoxColumn = function() {
   scout.CheckBoxColumn.parent.call(this);
 };
@@ -6,13 +10,9 @@ scout.inherits(scout.CheckBoxColumn, scout.Column);
 scout.CheckBoxColumn.prototype.buildCell = function(row) {
   var cell, style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
   var enabled = row.enabled;
-  if (this.isCheckableColumn()) {
-    checked = row.checked;
-  } else {
-    cell = this.table.cell(this, row);
-    checked = cell.value;
-    enabled = enabled && cell.editable;
-  }
+  cell = this.table.cell(this, row);
+  checked = cell.value;
+  enabled = enabled && cell.editable;
   style = this.table.cellStyle(this, cell);
   cssClass = this._cssClass(row, cell);
   if (!enabled) {
@@ -49,19 +49,10 @@ scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
     $target = $(event.target);
 
-  if (this.isCheckableColumn()) {
+  if (this.table.checkableColumn === this) {
     this.table.checkRow(row, !row.checked);
   } else {
     // editable column behaviour -> server will handle the click, see AbstractTable#interceptRowClickSingleObserver
     // don't call super, no need to send a prepareEdit
   }
-};
-
-/**
- *
- * @returns true if it is the table's checkable column, false if it is just a boolean column.
- * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
- */
-scout.CheckBoxColumn.prototype.isCheckableColumn = function() {
-  return this.table.checkableColumn === this;
 };
