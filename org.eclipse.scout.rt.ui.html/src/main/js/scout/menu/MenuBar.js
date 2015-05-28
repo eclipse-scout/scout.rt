@@ -109,6 +109,7 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   var orderedMenuItems = this.menuSorter.order(menuItems, this);
   this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
   this.visibleMenuItems = this.menuItems;
+  this._lastVisibleItem = null;
 
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
   // float:right. In Firefox elements with float:right must come first in the HTML order
