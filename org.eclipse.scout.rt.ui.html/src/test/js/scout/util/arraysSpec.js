@@ -42,6 +42,36 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("removeAll", function() {
+
+    it("removes all given elements", function() {
+      var arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
+
+      expect(scout.arrays.removeAll(arr, ['y'])).toBe(false);
+      expect(arr).toEqual(['a', 'b', 'c', 'a', 'd']);
+      expect(scout.arrays.removeAll(arr, ['b'])).toBe(true);
+      expect(arr).toEqual(['a', 'c', 'a', 'd']);
+      expect(scout.arrays.removeAll(arr, ['a'])).toBe(true);
+      expect(arr).toEqual(['c', 'd']);
+
+      arr = ['a', 'b', 'c', 'a', 'd'];
+      expect(scout.arrays.removeAll(arr, ['a', 'd'])).toBe(true);
+      expect(arr).toEqual(['b', 'c']);
+
+      arr = ['a', 'b', 'c', 'a', 'd'];
+      expect(scout.arrays.removeAll(arr, ['a', 'b', 'c', 'd'])).toBe(true);
+      expect(arr).toEqual([]);
+    });
+
+    it("considers emtpy args", function() {
+      expect(scout.arrays.removeAll()).toBe(false);
+      expect(scout.arrays.removeAll([])).toBe(false);
+      expect(scout.arrays.removeAll([], [])).toBe(false);
+      expect(scout.arrays.removeAll([], ['x'])).toBe(false);
+    });
+
+  });
+
   describe("replace", function() {
 
     it("replaces elements", function() {

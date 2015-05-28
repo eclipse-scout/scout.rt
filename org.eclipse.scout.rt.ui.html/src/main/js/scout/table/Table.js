@@ -532,8 +532,10 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex) {
   }
 };
 
-scout.Table.prototype._removeRows = function() {
-  this.$rows().remove();
+scout.Table.prototype._removeRows = function($rows) {
+  $rows = $rows || this.$rows();
+  $rows.remove();
+  this._triggerRowsDrawn($rows);
 };
 
 /**
@@ -1079,14 +1081,7 @@ scout.Table.prototype.colorData = function(column, mode) {
 scout.Table.prototype._onRowsSelected = function(rowIds) {
   var $selectedRows;
   this._syncSelectedRows(rowIds);
-
-  if (this.rendered) {
-    $selectedRows = this.selectionHandler.renderSelection();
-    this._triggerRowsSelected($selectedRows);
-    if (this.scrollToSelection) {
-      this.revealSelection();
-    }
-  }
+  this.selectRows(this.selectedRows, false);
 };
 
 scout.Table.prototype._onRowsChecked = function(rows) {
@@ -1190,6 +1185,7 @@ scout.Table.prototype._insertRows = function(rows) {
 scout.Table.prototype._deleteRows = function(rows) {
   var invalidate, i;
 
+  this.deselectRows(rows, false);
   rows.forEach(function(row) {
     //Update model
     scout.arrays.remove(this.rows, row);
@@ -1204,7 +1200,7 @@ scout.Table.prototype._deleteRows = function(rows) {
       // Remove tooltips for the deleted row
       this._removeTooltipsForRow(row);
 
-      row.$row.remove();
+      this._removeRows(row.$row);
       delete row.$row;
       invalidate = true;
     }
@@ -1228,6 +1224,7 @@ scout.Table.prototype._deleteAllRows = function() {
   // Update model
   this.rows = [];
   this.rowsMap = {};
+  this.selectRows([], false);
 
   // Update HTML
   if (this.rendered) {
@@ -1271,13 +1268,16 @@ scout.Table.prototype._rowsToIds = function(rows) {
   });
 };
 
-scout.Table.prototype.selectRows = function(rows) {
+scout.Table.prototype.selectRows = function(rows, notifyServer) {
   var $selectedRows;
   rows = scout.arrays.ensure(rows);
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
   if (!scout.arrays.equalsIgnoreOrder(rows, this.selectedRows)) {
     this.selectedRows = rows;
     // FIXME CGU send delayed in case of key navigation
-    this.sendRowsSelected(this._rowsToIds(rows));
+    if (notifyServer) {
+      this.sendRowsSelected(this._rowsToIds(rows));
+    }
   }
 
   if (this.rendered) {
@@ -1287,6 +1287,15 @@ scout.Table.prototype.selectRows = function(rows) {
       this.revealSelection();
     }
     this._updateMenuBar();
+  }
+};
+
+scout.Table.prototype.deselectRows = function(rows, notifyServer) {
+  rows = scout.arrays.ensure(rows);
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
+  var selectedRows = this.selectedRows.slice(); // copy
+  if (scout.arrays.removeAll(selectedRows, rows)) {
+    this.selectRows(selectedRows, notifyServer);
   }
 };
 

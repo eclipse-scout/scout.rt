@@ -42,6 +42,25 @@ scout.arrays = {
     return false;
   },
 
+  /**
+   * Removes every given element from the array
+   *
+   * @return true if the array contained at least one of the specified elements
+   */
+  removeAll: function(arr, elements) {
+    var modified = false;
+    if (!elements || elements.length === 0) {
+      return false;
+    }
+    for (var i = arr.length - 1; i >= 0; i--) {
+      if (elements.indexOf(arr[i]) > -1) {
+        arr.splice(i, 1);
+        modified = true;
+      }
+    }
+    return modified;
+  },
+
   replace: function(arr, element, replacement) {
     var index = arr.indexOf(element);
     if (index !== -1) {
