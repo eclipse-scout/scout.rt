@@ -257,7 +257,7 @@ describe("Session", function() {
       var expectedSeqNo = scout._uniqueIdSeqNo + 1,
         menu = createSession().createUiObject({objectType: 'Menu'});
       expect(menu._registered).toBe(false);
-      expect(menu.id).toBe(expectedSeqNo.toString());
+      expect(menu.id).toBe('ui' + expectedSeqNo.toString());
       expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
     });
 
