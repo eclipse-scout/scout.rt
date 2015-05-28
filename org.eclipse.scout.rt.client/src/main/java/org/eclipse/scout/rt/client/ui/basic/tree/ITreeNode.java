@@ -304,8 +304,8 @@ public interface ITreeNode {
   List<ITreeNode> getFilteredChildNodes();
 
   /**
-   * @return the level from top to bottom if root is invisible then it is not
-   *         counted as a level
+   * @return the node's nesting level in the tree (counting upwards from the root node). The root node has level 0, no
+   *         matter whether it is visible or invisible.
    */
   int getTreeLevel();
 
