@@ -59,6 +59,11 @@ scout.MessageBox.prototype._render = function($parent) {
   this._updateButtonWidths();
 
   setTimeout(function() {
+    if (!this.rendered) {
+      // Already removed in the meantime
+      return;
+    }
+
     // Class 'shown' is used for css animation
     this.$container.addClass('shown');
     this._$glassPane.installFocusContext('auto', this._session.uiSessionId);
