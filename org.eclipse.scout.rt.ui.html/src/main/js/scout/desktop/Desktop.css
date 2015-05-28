@@ -55,7 +55,7 @@
   border-bottom: 1px solid @border-color;
 }
 
-.popup-head.taskbar-tool-item.has-submenu:after {
+.popup-head.taskbar-tool-item.has-submenu::after {
   font-size: 17px;
   top:0px;
 }

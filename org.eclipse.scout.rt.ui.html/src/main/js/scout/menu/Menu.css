@@ -99,7 +99,7 @@
   }
 
   /* Draw border for icon only items */
-  &:not(.menu-textandicon):focus:before {
+  &:not(.menu-textandicon):focus::before {
     .focus-border;
   }
 

@@ -206,7 +206,7 @@
     }
 
 
-     & .year-title:after{
+     & .year-title::after{
       position: absolute;
       height: 1px;
       width: 100%;
@@ -229,7 +229,7 @@
       color: red;
     }
 
-      & .year-month:before{
+      & .year-month::before{
       position: absolute;
       left: 0px;
       top: 0px;
@@ -293,7 +293,7 @@
       font-size: 17px;
       color: @palette-gray-6;
 
-      &:after {
+      &::after {
         position: absolute;
         height: 1px;
         width: 100%;
@@ -491,7 +491,7 @@
     overflow: visible !important;
     padding-top: 10px;
 
-    &:before {
+    &::before {
       position: absolute;
       display: block;
       content: "";
@@ -507,7 +507,7 @@
   & .component-open-bottom {
     overflow: visible !important;
 
-    &:after {
+    &::after {
       position: absolute;
       display: block;
       content: "";

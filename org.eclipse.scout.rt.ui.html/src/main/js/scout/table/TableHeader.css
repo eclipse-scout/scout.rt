@@ -27,7 +27,7 @@
     padding-top: 4px;
   }
 
-  & > .menu-item[data-icon]:before {
+  & > .menu-item[data-icon]::before {
     height: auto;
     line-height: normal;
   }

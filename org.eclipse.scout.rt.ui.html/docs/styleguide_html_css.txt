@@ -56,6 +56,13 @@ https://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
       .class:hover:after { ... }
     Zwar funktioniert der einfache Doppelpunkt auch fuer Pseudoelemente, aber das ist nur ein Legacy-Fallback der Browser.
     IE kann :: ab Version 8, sollte darum so verwendet werden.
+    Folgendes sind Pseudoelemente, alles andere nicht:
+    - ::after
+    - ::before
+    - ::first-letter
+    - ::first-line
+    - ::selection
+    (Quelle: https://developer.mozilla.org/de/docs/Web/CSS/Pseudo-elements)
 
 - Auf "!important" verzichten
     Normalerweise sollte eine Regel immer durch die CSS-Spezifität angewandt werden koennen, d.h. sie wird automatisch

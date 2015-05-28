@@ -156,7 +156,7 @@
     }
 
 
-     & .year-title:after{
+     & .year-title::after{
       position: absolute;
       height: 1px;
       width: 100%;
@@ -179,7 +179,7 @@
       color: red;
     }
 
-      & .year-month:before{
+      & .year-month::before{
       position: absolute;
       left: 0px;
       top: 0px;
@@ -255,7 +255,7 @@
     background-color: @palette-gray-2;
     line-height: @calendar-header-height / 2;
 
-    & .scale-item:after{
+    & .scale-item::after{
       position: absolute;
       height: 1000px;
       width: 1px;
@@ -279,7 +279,7 @@
       background-color: @item-selection-background-color;
     }
 
-    & .scale-item:after{
+    & .scale-item::after{
       position: absolute;
       height: 1000px;
       width: 1px;
