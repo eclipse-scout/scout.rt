@@ -220,7 +220,7 @@ scout.FocusContext.prototype.handleTab = function(event) {
     // Forward (TAB)
     if (!event.shiftKey) {
       // If the last focusable element is focused, or the focus is on the container, set the focus to the first focusable element
-      if (activeElement === $lastFocusableElement[0] || activeElement === this._$container[0]) {
+      if ($firstFocusableElement[0] && (activeElement === $lastFocusableElement[0] || activeElement === this._$container[0])) {
         $.suppressEvent(event);
         $firstFocusableElement[0].focus();
       }
@@ -228,7 +228,7 @@ scout.FocusContext.prototype.handleTab = function(event) {
     // Backward (Shift+TAB)
     else {
       // If the first focusable element is focused, or the focus is on the container, set the focus to the last focusable element
-      if (activeElement === this._$container[0] || activeElement === $firstFocusableElement[0]) {
+      if ($lastFocusableElement[0] && (activeElement === this._$container[0] || activeElement === $firstFocusableElement[0])) {
         $.suppressEvent(event);
         $lastFocusableElement[0].focus();
       }
