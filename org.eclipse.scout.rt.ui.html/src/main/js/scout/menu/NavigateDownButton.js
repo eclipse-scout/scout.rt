@@ -5,6 +5,7 @@ scout.NavigateDownButton = function(outline, node) {
   this.defaultMenu = true;
   this.objectType = 'NavigateDownButton';
   this.keyStroke = 'Enter';
+  this.initKeyStrokeParts();
 };
 scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
 

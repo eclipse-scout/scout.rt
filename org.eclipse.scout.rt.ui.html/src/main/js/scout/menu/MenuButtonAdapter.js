@@ -21,7 +21,8 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
 
   var model = {
       id: button.id,
-      objectType: 'Menu'
+      objectType: 'Menu',
+      keyStroke: button.keyStroke
   };
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
 
@@ -61,7 +62,56 @@ scout.MenuButtonAdapter.prototype._onMenuClicked = function(event) {
 /**
  * @override Menu.js
  */
-scout.Menu.prototype._renderText = function(text) {
+scout.MenuButtonAdapter.prototype._render = function($parent) {
+  scout.MenuButtonAdapter.parent.prototype._render.call(this, $parent);
+  this._registerButtonKeyStroke();
+};
+
+/**
+ * @override Menu.js
+ */
+scout.MenuButtonAdapter.prototype._renderText = function(text) {
    text = text ? scout.strings.removeAmpersand(text) : '';
    scout.Menu.parent.prototype._renderText.call(this, text);
+};
+
+scout.MenuButtonAdapter.prototype._registerButtonKeyStroke = function() {
+  //register buttons key stroke on root Groupbox
+  this._unregisterButtonKeyStroke();
+  if (this.keyStroke) {
+    this._button.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(this);
+  }
+};
+
+scout.MenuButtonAdapter.prototype._unregisterButtonKeyStroke = function() {
+  //unregister buttons key stroke on root Groupbox
+    this._button.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(this);
+};
+/**
+ * @override Action.js
+ */
+scout.MenuButtonAdapter.prototype._remove = function() {
+  scout.MenuButtonAdapter.parent.prototype._remove.call(this);
+  this._unregisterButtonKeyStroke();
+};
+
+
+/**
+ * @override Action.js
+ */
+scout.MenuButtonAdapter.prototype._syncKeyStroke = function(keyStroke) {
+  scout.MenuButtonAdapter.parent.prototype._syncKeyStroke.call(this, keyStroke);
+  this._registerButtonKeyStroke();
+};
+
+/**
+ * @Override scout.KeyStroke
+ */
+scout.MenuButtonAdapter.prototype.handle = function(event) {
+  if (this._button.enabled && this._button.visible) {
+    this._button.doAction($(event.target));
+    if (this.preventDefaultOnEvent) {
+      event.preventDefault();
+    }
+  }
 };

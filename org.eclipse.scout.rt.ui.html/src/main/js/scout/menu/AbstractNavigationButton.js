@@ -18,7 +18,6 @@ scout.AbstractNavigationButton = function(outline, node) {
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Menu);
 // FIXME AWE: re-name to *Menu
-
 /**
  * @override
  */
@@ -32,6 +31,15 @@ scout.AbstractNavigationButton.prototype._render = function($parent) {
   }
   this.enabled = this._buttonEnabled();
   scout.AbstractNavigationButton.parent.prototype._render.call(this, $parent);
+  this._registerButtonKeyStroke();
+};
+
+/**
+ * @override Action.js
+ */
+scout.AbstractNavigationButton.prototype._remove = function() {
+  scout.AbstractNavigationButton.parent.prototype._remove.call(this);
+  this._unregisterButtonKeyStroke();
 };
 
 scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
@@ -59,13 +67,10 @@ scout.AbstractNavigationButton.prototype.updateEnabled = function() {
  * @override
  */
 scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
-  if (this.defaultKeyStroke) {
-    this._unregisterButtonKeyStroke();
-  }
+  this._unregisterButtonKeyStroke();
   if (this.keyStroke) {
     // register buttons key stroke on root group-box
-    this.defaultKeyStroke = new scout.ButtonKeyStroke(this, this.keyStroke);
-    this.outline.keyStrokeAdapter.registerKeyStroke(this.defaultKeyStroke);
+    this.outline.keyStrokeAdapter.registerKeyStroke(this);
   }
 };
 
@@ -74,7 +79,5 @@ scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
  */
 scout.AbstractNavigationButton.prototype._unregisterButtonKeyStroke = function() {
   // unregister buttons key stroke on root group-box
-  if (this.defaultKeyStroke) {
-    this.outline.keyStrokeAdapter.unregisterKeyStroke(this.defaultKeyStroke);
-  }
+  this.outline.keyStrokeAdapter.unregisterKeyStroke(this);
 };

@@ -9,8 +9,8 @@ scout.DesktopKeyStrokeAdapter = function(desktop) {
   this._desktop = desktop;
   this._viewTabAutoKeyStroke = new scout.ViewTabAutoKeyStroke(desktop.autoTabKeyStrokesEnabled, this._tabs, desktop.autoTabKeyStrokeModifier);
 
-  this.installDesktopModelKeystrokes();
   this.keyStrokes.push(this._viewTabAutoKeyStroke);
+  this.installDesktopModelKeystrokes();
 };
 
 scout.inherits(scout.DesktopKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
@@ -44,7 +44,6 @@ scout.DesktopKeyStrokeAdapter.prototype.removeKeyBox = function() {
 };
 
 scout.DesktopKeyStrokeAdapter.prototype.installDesktopModelKeystrokes = function() {
-  scout.DesktopKeyStrokeAdapter.parent.prototype.installModelKeystrokes.call(this);
   if (this.keyStrokes.length > 0 && this._desktop.viewButtons) {
     this.keyStrokes = this.keyStrokes.concat(this._desktop.viewButtons);
   } else if (this._desktop.viewButtons) {
