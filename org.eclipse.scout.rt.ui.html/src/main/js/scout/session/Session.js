@@ -696,7 +696,8 @@ scout.Session.prototype._renderBusyGlasspane = function() {
     // (End workaround)
 
     if (this.desktop) {
-      this._darkBusyGlasspaneTimeoutId = setTimeout(function() {
+      this._$busyGlasspane.installFocusContext('auto', this.uiSessionId);
+      this._busyIndicatorTimeoutId = setTimeout(function() {
         var busyIndicator = new scout.BusyIndicator(this);
         busyIndicator.on('buttonClick', function(event) {
           // Set "cancelling" state
@@ -710,7 +711,6 @@ scout.Session.prototype._renderBusyGlasspane = function() {
           };
           this._sendRequest(request);
         }.bind(this));
-        this._$busyGlasspane.addClass('dark');
         busyIndicator.render(this._$busyGlasspane);
       }.bind(this), 2500);
     }
@@ -720,7 +720,7 @@ scout.Session.prototype._renderBusyGlasspane = function() {
 scout.Session.prototype._removeBusyGlasspane = function() {
   // Clear any pending timers
   clearTimeout(this._busyGlasspaneTimeoutId);
-  clearTimeout(this._darkBusyGlasspaneTimeoutId);
+  clearTimeout(this._busyIndicatorTimeoutId);
 
   // If the timer action was executed and the glasspane is showing, we have to remove it
   if (this._$busyGlasspane) {

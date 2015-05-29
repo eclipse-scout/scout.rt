@@ -27,7 +27,6 @@ scout.BusyIndicator.prototype._render = function($parent) {
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown');
-    this.$container.installFocusContext('auto', this._session.uiSessionId);
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.css('min-width', this.$container.width());
   }.bind(this));

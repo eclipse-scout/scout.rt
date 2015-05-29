@@ -8,8 +8,7 @@
   max-width: 300px;
   .drop-shadow;
   border-top: 5px solid @active-color;
-  border-top-left-radius: @border-radius;
-  border-top-right-radius: @border-radius;
+  border-radius: @border-radius;
 
   &.severity-error {
     border-top-color: @error-border-color;
@@ -38,6 +37,7 @@
 }
 
 .messagebox-buttons {
+
   & button {
     position: relative;
     padding: 12px;

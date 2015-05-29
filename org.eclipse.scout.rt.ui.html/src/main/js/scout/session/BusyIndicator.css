@@ -7,10 +7,9 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  .drop-shadow;
+  .drop-shadow(0, 0, 10px, 0);
   border-top: 5px solid @color-busyindicator-active;
-  border-top-left-radius: @border-radius;
-  border-top-right-radius: @border-radius;
+  border-radius: @border-radius;
 
   &.shown {
     .animation-name(fade-in);
@@ -26,6 +25,8 @@
 
   &.no-buttons {
     border-bottom: 1px solid @color-busyindicator-border;
+    border-bottom-left-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
   }
 }
 
