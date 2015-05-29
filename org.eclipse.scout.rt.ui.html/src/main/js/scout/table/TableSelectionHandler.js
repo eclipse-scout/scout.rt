@@ -49,8 +49,9 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
     toIndex = this._$allRows.index($row);
     handleSelection.call(this);
   }
-
-  this.table.notifyRowsSelected(this._$selectedRows, true);
+  else {
+    this.table.notifyRowsSelected(this._$selectedRows, true);
+  }
 
   if (this.mouseMoveSelectionEnabled) {
     // Handle movement with held mouse button. Each event gets only fired once (to prevent event firing when moving
