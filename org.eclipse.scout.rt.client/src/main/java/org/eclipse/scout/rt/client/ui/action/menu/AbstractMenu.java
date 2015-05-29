@@ -66,9 +66,14 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Order(55)
   @ConfigProperty(ConfigProperty.MENU_TYPE)
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection,
+    return CollectionUtility.<IMenuType> hashSet(
+        TableMenuType.SingleSelection,
         TreeMenuType.SingleSelection,
-        ValueFieldMenuType.NotNull, ActivityMapMenuType.Activity, CalendarMenuType.CalendarComponent, PlannerMenuType.Activity);
+        ValueFieldMenuType.NotNull,
+        ActivityMapMenuType.Activity,
+        CalendarMenuType.CalendarComponent,
+        PlannerMenuType.Activity
+        );
   }
 
   @Override
