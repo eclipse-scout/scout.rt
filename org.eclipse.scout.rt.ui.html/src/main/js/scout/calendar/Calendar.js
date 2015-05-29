@@ -433,10 +433,7 @@ scout.Calendar.prototype._sendSelectionChanged = function() {
 };
 
 scout.Calendar.prototype._jsonViewRange = function() {
-  return {
-    from: scout.dates.toJsonDate(this.viewRange.from),
-    to: scout.dates.toJsonDate(this.viewRange.to)
-  };
+  return scout.dates.toJsonDateRange(this.viewRange);
 };
 
 scout.Calendar.prototype._updateScreen = function() {

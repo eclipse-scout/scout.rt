@@ -78,6 +78,7 @@
       "availableDisplayModes": [],
       "resources": [],
       "viewRange": {},
+      "selectionRange": {},
       "selectedResources": []
     },
     "Resource": {

@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
+import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -106,17 +107,28 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return getModel().getViewRange();
       }
 
+      @SuppressWarnings("unchecked")
       @Override
       public Object prepareValueForToJson(Object value) {
         if (value == null) {
           return null;
         }
-        @SuppressWarnings("unchecked")
-        Range<Date> modelValue = (Range<Date>) value;
-        JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-        json.put("from", new JsonDate(modelValue.getFrom()).asJsonString());
-        json.put("to", new JsonDate(modelValue.getTo()).asJsonString());
-        return json;
+        return new JsonDateRange((Range<Date>) value).toJson();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTION_RANGE, model) {
+      @Override
+      protected Range<Date> modelValue() {
+        return getModel().getSelectionRange();
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (value == null) {
+          return null;
+        }
+        return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
     //FIXME CGU remove
@@ -152,28 +164,6 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 //        return getModel().getIntradayInterval();
 //      }
 //    });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_BEGIN_TIME, model) {
-      @Override
-      protected Date modelValue() {
-        return getModel().getSelectedBeginTime();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return new JsonDate((Date) value).asJsonString();
-      }
-    });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_END_TIME, model) {
-      @Override
-      protected Date modelValue() {
-        return getModel().getSelectedEndTime();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return new JsonDate((Date) value).asJsonString();
-      }
-    });
     putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_RESOURCES, model) {
       @Override
       protected List<?> modelValue() {
@@ -183,9 +173,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
       @Override
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        List<Resource<?>> resources = (List<Resource<?>>) value;
-        resources = new ArrayList<Resource<?>>();
-        return resourceIdsToJson(resources, new P_GetOrCreateResourceIdProvider());
+        return resourceIdsToJson((List<Resource<?>>) value, new P_GetOrCreateResourceIdProvider());
       }
     });
     putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_ACTIVITY_CELL, model) {
@@ -389,11 +377,23 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 
   @SuppressWarnings("unchecked")
   protected void handleUiSetSelection(JsonEvent event) {
-    Date beginTime = new JsonDate(event.getData().optString("beginTime")).asJavaDate();
-    Date endTime = new JsonDate(event.getData().optString("endTime")).asJavaDate();
+    Range<Date> selectionRange = extractSelectionRange(event.getData());
     List<Resource<?>> resources = extractResources(event.getData());
+    //FIXME CGU filter selectionRange as well
     addPropertyEventFilterCondition(IPlanner.PROP_SELECTED_RESOURCES, resources);
-    getModel().getUIFacade().setSelectionFromUI(resources, beginTime, endTime);
+    getModel().getUIFacade().setSelectionFromUI(resources, selectionRange);
+    LOG.debug("selectionRange=" + selectionRange);
+  }
+
+  private Range<Date> extractSelectionRange(JSONObject data) {
+    JSONObject selectionRange = data.optJSONObject("selectionRange");
+    Date fromDate = toJavaDate(selectionRange, "from");
+    Date toDate = toJavaDate(selectionRange, "to");
+    return new Range<Date>(fromDate, toDate);
+  }
+
+  private Date toJavaDate(JSONObject data, String propertyName) {
+    return new JsonDate(data.optString(propertyName)).asJavaDate();
   }
 
   // FIXME CGU Fix generics

@@ -62,6 +62,7 @@ scout.Planner.prototype.init = function(model, session) {
   }
   this._syncViewRange(this.viewRange);
   this._syncSelectedResources(this.selectedResources);
+  this._syncSelectionRange(this.selectionRange);
 };
 
 scout.Planner.prototype._initResource = function(resource) {
@@ -105,6 +106,8 @@ scout.Planner.prototype._renderProperties = function() {
 
   //TODO CGU/CRU vermutlich nicht nötig, da in updateScreen gemacht
   //this._renderSelectedResources();
+  // render with setTimeout because the planner needs to be layouted first
+  setTimeout(this._renderSelectionRange.bind(this));
   this._renderDisplayMode();
 };
 
@@ -503,15 +506,15 @@ scout.Planner.prototype._onCellMousedown = function(event) {
     }
   } else {
     // init selector
-    this.$startRow = this._findRow(event.pageY);
-    this.$lastRow = this.$startRow;
+    this.startRow = this._findRow(event.pageY);
+    this.lastRow = this.startRow;
 
     // find range on scale
     this.startRange = this._findScale(event.pageX);
     this.lastRange = this.startRange;
 
     // draw
-    this._drawSelector(event);
+    this._select(true);
 
     // event
     $(document)
@@ -542,67 +545,39 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
 };
 
 scout.Planner.prototype._onCellMousemove = function(event) {
-  this.$lastRow = this._findRow(event.pageY);
+  this.lastRow = this._findRow(event.pageY);
   this.lastRange = this._findScale(event.pageX);
 
-  this._drawSelector(event);
+  this._select(true);
 };
 
 scout.Planner.prototype._onResizeMousemove = function(event) {
   this.lastRange = this._findScale(event.pageX);
 
-  this._drawSelector(event);
+  this._select(true);
 };
 
 scout.Planner.prototype._onCellMouseup = function(event) {
+  this._select();
   $('body').removeClass('col-resize');
-  $(document)
-    .off('mousemove');
+  $(document).off('mousemove');
 };
 
-scout.Planner.prototype._drawSelector = function(event) {
-  if (this.$startRow === null || this.$lastRow === null || this.startRange === null || this.lastRange === null) {
+scout.Planner.prototype._select = function(whileSelecting) {
+  if (this.startRow === null || this.lastRow === null || this.startRange === null || this.lastRange === null) {
     return;
   }
+  var $startRow = this.startRow.$resource,
+    $lastRow = this.lastRow.$resource;
 
-  // remove old selector
-  if (this.$selector) {
-    this.$selector.remove();
-  }
-
-  // in case of singel selectioon
+  // in case of single selection
   if (this.selecMode == this.SELECTOR_ONE) {
-    this.$lastRow = this.$startRow;
-  }
-
-  // top and height
-  var $parent = (this.$startRow[0].offsetTop <= this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow;
-  this.$selector = $parent.children('.resource-cells').appendDiv('selector');
-  this.$selector.css('height', this.$startRow.outerHeight() + Math.abs(this.$lastRow[0].offsetTop - this.$startRow[0].offsetTop));
-  this.$selector.appendDiv('selector-resize-left').mousedown(this._onResizeMousedown.bind(this));
-  this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMousedown.bind(this));
-
-  // left and with
-  var from = Math.min(this.lastRange.from, this.startRange.from),
-    to = Math.max(this.lastRange.to, this.startRange.to);
-
-  this.$selector
-    .css('left', 'calc(' + this.transformLeft(from) + '% - 6px)')
-    .css('width', 'calc(' + this.transformWidth(to - from) + '% + 12px)');
-
-  // colorize scale
-  $('.selected', this.$scale).removeClass('selected');
-  var $scaleItems = $('.timeline-small', this.$scale).children();
-  for (var i = 0; i < $scaleItems.length; i++) {
-    var $item = $scaleItems.eq(i);
-    if ($item.data('date-from') >= from && $item.data('date-to') <= to) {
-      $item.addClass('selected');
-    }
+    this.lastRow = this.startRow;
   }
 
   // select rows
-  var $upperRow = (this.$startRow[0].offsetTop <= this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow,
-    $lowerRow = (this.$startRow[0].offsetTop > this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow,
+  var $upperRow = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow,
+    $lowerRow = ($startRow[0].offsetTop > $lastRow[0].offsetTop) ? $startRow : $lastRow,
     resources = $('.resource', this.$grid).toArray(),
     top = $upperRow[0].offsetTop,
     low = $lowerRow[0].offsetTop;
@@ -616,7 +591,17 @@ scout.Planner.prototype._drawSelector = function(event) {
 
   this.selectResources(resources.map(function(i) {
     return $(i).data('resource');
-  }));
+  }), false);
+
+  // left and width
+  var from = Math.min(this.lastRange.from, this.startRange.from),
+    to = Math.max(this.lastRange.to, this.startRange.to);
+  var selectionRange = {
+    from: new Date(from),
+    to: new Date(to)
+  };
+
+  this.selectRange(selectionRange, !whileSelecting);
 };
 
 scout.Planner.prototype._findRow = function(y) {
@@ -624,7 +609,7 @@ scout.Planner.prototype._findRow = function(y) {
     $row = $(document.elementFromPoint(x, y)).parent();
 
   if ($row.hasClass('resource')) {
-    return $row;
+    return $row.data('resource');
   } else {
     return null;
   }
@@ -860,14 +845,17 @@ scout.Planner.prototype._renderDisplayMode = function() {
   $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
 };
 
-scout.Planner.prototype._renderSelectedBeginTime = function() {};
-
-scout.Planner.prototype._renderSelectedEndTime = function() {};
-
 scout.Planner.prototype._syncViewRange = function(viewRange) {
   this.viewRange = {
     from: scout.dates.create(viewRange.from),
     to: scout.dates.create(viewRange.to)
+  };
+};
+
+scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
+  this.selectionRange = {
+    from: scout.dates.create(selectionRange.from),
+    to: scout.dates.create(selectionRange.to)
   };
 };
 
@@ -885,6 +873,45 @@ scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedR
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(true);
   });
+};
+
+scout.Planner.prototype._renderSelectionRange = function() {
+  var $startRow, $lastRow,
+    from = this.selectionRange.from,
+    to = this.selectionRange.to,
+    startRow = this.selectedResources[0],
+    lastRow = this.selectedResources[this.selectedResources.length - 1];
+
+  // remove old selector
+  if (this.$selector) {
+    this.$selector.remove();
+  }
+
+  if (!startRow || !lastRow) {
+    return;
+  }
+  $startRow = startRow.$resource;
+  $lastRow = lastRow.$resource;
+
+  // top and height
+  var $parent = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow;
+  this.$selector = $parent.children('.resource-cells').appendDiv('selector');
+  this.$selector.css('height', $startRow.outerHeight() + Math.abs($lastRow[0].offsetTop - $startRow[0].offsetTop));
+  this.$selector.appendDiv('selector-resize-left').mousedown(this._onResizeMousedown.bind(this));
+  this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMousedown.bind(this));
+  this.$selector
+    .css('left', 'calc(' + this.transformLeft(from) + '% - 6px)')
+    .css('width', 'calc(' + this.transformWidth(to - from) + '% + 12px)');
+
+  // colorize scale
+  $('.selected', this.$scale).removeClass('selected');
+  var $scaleItems = $('.timeline-small', this.$scale).children();
+  for (var i = 0; i < $scaleItems.length; i++) {
+    var $item = $scaleItems.eq(i);
+    if ($item.data('date-from') >= from && $item.data('date-to') <= to) {
+      $item.addClass('selected');
+    }
+  }
 };
 
 scout.Planner.prototype._renderSelectedActivityCell = function() {};
@@ -907,15 +934,27 @@ scout.Planner.prototype.setDisplayMode = function(displayMode) {
   //  this._updateScreen();
 };
 
-scout.Planner.prototype.selectResources = function(resources) {
-  var oldSelection = this.selectedResources,
-    ressourceIds = resources.map(function(r) {
-      return r.id;
-    });
+scout.Planner.prototype.selectRange = function(range, notifyServer) {
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
+  this.selectionRange = range;
+  if (notifyServer) {
+    this._sendSetSelection();
+  }
+  if (this.rendered) {
+    this._renderSelectionRange();
+  }
+};
 
+scout.Planner.prototype.selectResources = function(resources, notifyServer) {
+  var oldSelection = this.selectedResources;
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
   this.selectedResources = resources;
-  this._sendSetSelection(ressourceIds);
-  this._renderSelectedResources('', oldSelection);
+  if (notifyServer) {
+    this._sendSetSelection();
+  }
+  if (this.rendered) {
+    this._renderSelectedResources('', oldSelection);
+  }
 };
 
 scout.Planner.prototype._insertResources = function(resources) {
@@ -965,11 +1004,14 @@ scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {
   });
 };
 
-scout.Planner.prototype._sendSetSelection = function(resourceIds, beginTime, endTime) {
+scout.Planner.prototype._sendSetSelection = function() {
+  var selectionRange = scout.dates.toJsonDateRange(this.selectionRange),
+    resourceIds = this.selectedResources.map(function(r) {
+      return r.id;
+    });
   this.session.send(this.id, 'setSelection', {
     resourceIds: resourceIds,
-    beginTime: beginTime,
-    endTime: endTime
+    selectionRange: selectionRange
   });
 };
 

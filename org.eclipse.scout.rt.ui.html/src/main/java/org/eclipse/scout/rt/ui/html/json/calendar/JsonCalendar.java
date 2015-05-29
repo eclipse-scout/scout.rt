@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
+import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -139,17 +140,13 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         return getModel().getViewRange();
       }
 
+      @SuppressWarnings("unchecked")
       @Override
       public Object prepareValueForToJson(Object value) {
         if (value == null) {
           return null;
         }
-        @SuppressWarnings("unchecked")
-        Range<Date> modelValue = (Range<Date>) value;
-        JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-        JsonObjectUtility.putProperty(json, "from", new JsonDate(modelValue.getFrom()).asJsonString());
-        JsonObjectUtility.putProperty(json, "to", new JsonDate(modelValue.getTo()).asJsonString());
-        return json;
+        return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
     putJsonProperty(new JsonProperty<T>(ICalendar.PROP_SELECTED_DATE, model) {

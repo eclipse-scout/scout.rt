@@ -264,6 +264,13 @@ scout.dates = {
     return result;
   },
 
+  toJsonDateRange: function(range) {
+    return {
+      from: scout.dates.toJsonDate(range.from),
+      to: scout.dates.toJsonDate(range.to)
+    };
+  },
+
   /**
    * Creates a new JavaScript Date object by parsing the given string. The format is as follows:
    *
