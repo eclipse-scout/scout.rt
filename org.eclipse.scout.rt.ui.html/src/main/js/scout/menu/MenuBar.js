@@ -98,6 +98,7 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
     if (item.createdBy === this.menuSorter) {
       item.destroy();
     } else {
+      item.overflow = false;
       item.remove();
     }
   }, this);
@@ -183,20 +184,18 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   }
   var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
   menuItems.forEach(function(item) {
-    item.tooltipPosition = tooltipPosition;
-    item.render(this.$container);
-    item.menuBar = this; // link to menuBar // FIXME AWE: check if really needed
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
     // assigned again later in updateItems().
     item.setTabbable(false);
-
+    item.tooltipPosition = tooltipPosition;
+    item.render(this.$container);
     if (right) {
       // Mark as right-aligned
       item.rightAligned = true;
       item.$container.addClass('right-aligned');
-      // Mark the first visible item as last item (inverse order due to 'float: right')
     }
     if (item.visible) {
+      // Mark the first visible item as last item (inverse order due to 'float: right')
       this._lastVisibleItem = item;
     }
   }.bind(this));

@@ -138,6 +138,7 @@ scout.Button.prototype._renderEnabled = function() {
  */
 scout.Button.prototype._renderVisible = function(visible) {
   scout.Button.parent.prototype._renderVisible.call(this, visible);
+  // FIXME AWE: move to menuBar#layout or MenuButtonAdapter
   if (visible) {
     if (this.menuBar && !this.$container.hasClass('last')) {
       this.menuBar.updateLastItemMarker();

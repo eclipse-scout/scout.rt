@@ -75,7 +75,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
           overflowNextItems = true;
         } else {
           // Only add left-aligned menu items when they're visible
-          menuItem.overflow = false;
           menuItemsCopy.push(menuItem);
         }
       }

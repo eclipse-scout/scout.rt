@@ -111,7 +111,7 @@
    .sub-menu-icon;
   }
 
-  &.selected {
+  &.selected:not(.menu-button) {
     background-color: @item-selection-background-color;
     border-color: @item-selection-border-color;
   }

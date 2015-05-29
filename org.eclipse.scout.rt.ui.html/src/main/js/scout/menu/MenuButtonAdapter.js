@@ -39,6 +39,7 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
       modelClass: button.modelClass
   };
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
+  button._renderSelected = this._renderSelected.bind(this);
   this._button = button;
 
   if (button.systemType === scout.Button.SYSTEM_TYPE.OK ||
@@ -132,8 +133,3 @@ scout.MenuButtonAdapter.prototype.handle = function(event) {
     }
   }
 };
-
-/* FIXME AWE Unterschied:
- * - Action sends doAction when clicked
- * - Button sends clicked  when clicked
- */
