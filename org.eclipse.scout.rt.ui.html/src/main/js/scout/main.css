@@ -179,7 +179,7 @@ button::-moz-focus-inner {
     top: 50%;
     left: 50%;
     margin-left: -(@application-loading-size / 2);
-    margin-top: -((@application-loading-size / 2) + 10px);
+    margin-top: -((@application-loading-size / 2) + 20px);
     .animation(rotation 1.0s infinite linear);
   }
 }
