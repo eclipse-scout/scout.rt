@@ -77,9 +77,7 @@ scout.Action.prototype._renderVisible = function(visible) {
 };
 
 scout.Action.prototype._renderSelected = function(selected) {
-  if (this.$container) {
-    this.$container.select(selected);
-  }
+  this.$container.select(selected);
 };
 
 scout.Action.prototype._renderKeyStroke = function(keyStroke) {

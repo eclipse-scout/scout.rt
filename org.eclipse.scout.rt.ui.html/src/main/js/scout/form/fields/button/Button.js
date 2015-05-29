@@ -101,16 +101,22 @@ scout.Button.prototype.doAction = function() {
   }
 
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
-    this.selected = !this.selected;
-    this._renderSelected();
-    this.session.send(this.id, 'selected', {
-      selected: this.selected
-    });
+    this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {
     this.popup = new scout.MenuBarPopup(this, this.session);
     this.popup.render();
   } else {
     this.session.send(this.id, 'clicked');
+  }
+};
+
+scout.Button.prototype.setSelected = function(selected, notifyServer) {
+  this.selected = selected;
+  if (this.rendered) {
+    this._renderSelected(this.selected);
+  }
+  if (scout.objects.whenUndefined(notifyServer, true)) {
+    this.session.send(this.id, 'selected', {selected: selected});
   }
 };
 
@@ -138,7 +144,7 @@ scout.Button.prototype._renderEnabled = function() {
  */
 scout.Button.prototype._renderVisible = function(visible) {
   scout.Button.parent.prototype._renderVisible.call(this, visible);
-  // FIXME AWE: move to menuBar#layout or MenuButtonAdapter
+  // FIXME AWE: (menu) move to menuBar#layout or MenuButtonAdapter
   if (visible) {
     if (this.menuBar && !this.$container.hasClass('last')) {
       this.menuBar.updateLastItemMarker();
