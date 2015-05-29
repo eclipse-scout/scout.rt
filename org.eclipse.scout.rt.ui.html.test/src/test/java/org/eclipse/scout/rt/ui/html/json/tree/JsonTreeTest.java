@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -490,6 +492,28 @@ public class JsonTreeTest {
     assertEquals("allNodesDeleted", events.get(0).getType());
     assertEquals("nodesInserted", events.get(1).getType());
     assertEquals("nodesSelected", events.get(2).getType());
+  }
+
+  /**
+   * Tests that events are ignored when nodes are not yet inserted.
+   */
+  @Test
+  public void testWrongEventOrder() throws ProcessingException, JSONException {
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+
+    TreeNode newNode = new TreeNode();
+    jsonTree.handleModelTreeEvent(new TreeEvent(tree, TreeEvent.TYPE_NODE_EXPANDED, newNode));
+    jsonTree.handleModelTreeEvent(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, nodes.get(0), Collections.singletonList(newNode)));
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEquals("nodesInserted", events.get(0).getType());
   }
 
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {

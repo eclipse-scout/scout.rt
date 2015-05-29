@@ -141,6 +141,15 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   protected void handleModelPageChanged(OutlineEvent event) {
     IPage page = (IPage) event.getNode();
+
+    if (page.isStatusDeleted() || !page.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      return;
+    }
+    String nodeId = getNodeId(page);
+    if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
+      return;
+    }
+
     attachNode(page, false);
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
