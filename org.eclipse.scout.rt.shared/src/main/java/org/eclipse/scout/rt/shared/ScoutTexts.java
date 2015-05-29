@@ -110,11 +110,6 @@ public class ScoutTexts {
     return "{undefined text " + key + "}";
   }
 
-  /**
-   * @param key
-   * @param fallback
-   * @return
-   */
   public String getTextWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
     return getTextInternal(locale, key, fallback, messageArguments);
   }
