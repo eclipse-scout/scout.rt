@@ -129,7 +129,7 @@ scout.GroupBox.prototype._prepareFields = function() {
           //Add mnemonic keyStrokevar
           var tabmnemonic = field.tabItems[k].label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
           res = tabmnemonic.charAt(tabmnemonic.length - 1);
-          this.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(new scout.TabItemMnemonicKeyStroke(res, field.tabItems[k]));
+          this.registerRootKeyStroke(new scout.TabItemMnemonicKeyStroke(res, field.tabItems[k]));
 
         }
       }

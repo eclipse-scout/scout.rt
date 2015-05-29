@@ -71,7 +71,8 @@ scout.menus = {
   },
 
   isButton: function(obj) {
-    return obj instanceof scout.Menu && obj.actionStyle === 'button'; // FIXME AWE: check this too, move to Menu.js#isButton
+    // FIXME AWE: check this too, move to Menu.js#isButton
+    return obj instanceof scout.Menu && obj.actionStyle === scout.Action.ActionStyle.BUTTON;
   }
 
 };

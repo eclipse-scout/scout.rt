@@ -240,6 +240,14 @@ scout.FormField.prototype.getForm = function() {
   return parent;
 };
 
+scout.FormField.prototype.registerRootKeyStroke = function(keyStroke) {
+  this.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
+};
+
+scout.FormField.prototype.unregisterRootKeyStroke = function(keyStroke) {
+  this.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(keyStroke);
+};
+
 scout.FormField.prototype._hideStatusMessage = function() {
   if (this.tooltip) {
     this.tooltip.remove();

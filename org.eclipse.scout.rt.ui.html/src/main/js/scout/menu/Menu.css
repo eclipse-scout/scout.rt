@@ -263,7 +263,7 @@
     }
   }
 
-  &:disabled {
+  &.disabled {
     background-color: @palette-white;
     color: @disabled-color;
     cursor: default;

@@ -23,10 +23,17 @@ scout.Action = function() {
    * - taskbar: as used in the task bar
    * - button: menu looks like a button
    */
-  this.actionStyle = 'default';
+  this.actionStyle = scout.Action.ActionStyle.DEFAULT;
 
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
+
+scout.Action.ActionStyle = {
+  DEFAULT: 0,
+  BUTTON: 1,
+  TOGGLE: 2,
+  TASK_BAR: 3
+};
 
 scout.Action.prototype._renderProperties = function() {
   scout.Action.parent.prototype._renderProperties.call(this);

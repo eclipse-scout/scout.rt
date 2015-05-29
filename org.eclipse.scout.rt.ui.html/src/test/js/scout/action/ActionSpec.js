@@ -14,7 +14,7 @@ describe('Action', function() {
 
     it('should be as expected', function() {
       expect(action.tabbable).toBe(false);
-      expect(action.actionStyle).toBe('default');
+      expect(action.actionStyle).toBe(scout.Action.ActionStyle.DEFAULT);
     });
 
   });

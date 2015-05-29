@@ -50,18 +50,18 @@ scout.Button.prototype._render = function($parent) {
   this.addField($button);
 
   $button.on('click', this._onClick.bind(this))
-  //prevent focus validation on other field on mouse down. -> Safari workaround
+  // prevent focus validation on other field on mouse down. -> Safari workaround
   .on('mousedown', function(event) {
     event.preventDefault();
   });
   if (this.systemType === scout.Button.SYSTEM_TYPE.OK ||
-    this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
+      this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
     $button.addClass('default-button');
   }
   if (this.menus && this.menus.length > 0) {
-    for (var j = 0; j < this.menus.length; j++) {
-      this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
-    }
+    this.menus.forEach(function(menu) {
+      this.keyStrokeAdapter.registerKeyStroke(menu);
+    }, this);
     if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
       $button.addClass('has-submenu');
     }
@@ -70,12 +70,14 @@ scout.Button.prototype._render = function($parent) {
   this._registerButtonKeyStroke();
 };
 
-scout.Button.prototype._createKeyStrokeAdapter = function() {
-  return new scout.ButtonKeyStrokeAdapter(this);
+scout.Button.prototype._onClick = function() {
+  if (this.enabled) {
+    this.doAction();
+  }
 };
 
-scout.Button.prototype._onClick = function(event) {
-  this.doAction($(event.target));
+scout.Button.prototype._createKeyStrokeAdapter = function() {
+  return new scout.ButtonKeyStrokeAdapter(this);
 };
 
 scout.Button.prototype._remove = function() {
@@ -83,11 +85,21 @@ scout.Button.prototype._remove = function() {
   this._unregisterButtonKeyStroke();
 };
 
-scout.Button.prototype.doAction = function($target) {
+scout.Button.prototype.doAction = function() {
+  // this is required for key-stroke actions, they're triggered on key-down,
+  // this the active field is still focused and its blur-event is not
+  // triggered, which means the displayTextChanged() is never executed so
+  // the executed action works with a wrong value for the active field.
+  // Note: we could probably improve this with a listener concept. Each
+  // value field would register itself as a listener on the form. When a key-
+  // stroke action is executed, all listeners will receive an artificial
+  // blur event, which does not change the focus but executes all code that
+  // is normally triggered when a regular blur event occurs.
   var activeValueField = $(document.activeElement).data('valuefield');
   if (activeValueField) {
     activeValueField.displayTextChanged();
   }
+
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
     this.selected = !this.selected;
     this._renderSelected();
@@ -172,20 +184,20 @@ scout.Button.prototype._renderIconId = function() {
 };
 
 scout.Button.prototype._registerButtonKeyStroke = function() {
-  //register buttons key stroke on root Groupbox
+  // register buttons key stroke on root Groupbox
   if (this.defaultKeyStroke) {
     this._unregisterButtonKeyStroke();
   }
   if (this.keyStroke) {
     this.defaultKeyStroke = new scout.ButtonKeyStroke(this, this.keyStroke);
-    this.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(this.defaultKeyStroke);
+    this.registerRootKeyStroke(this.defaultKeyStroke);
   }
 };
 
 scout.Button.prototype._unregisterButtonKeyStroke = function() {
-  //unregister buttons key stroke on root Groupbox
+  // unregister buttons key stroke on root Groupbox
   if (this.defaultKeyStroke) {
-    this.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(this.defaultKeyStroke);
+    this.unregisterRootKeyStroke(this.defaultKeyStroke);
   }
 };
 

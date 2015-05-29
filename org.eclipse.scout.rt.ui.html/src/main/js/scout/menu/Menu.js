@@ -28,12 +28,12 @@ scout.Menu.prototype._renderSeparator = function($parent) {
 };
 
 scout.Menu.prototype._renderItem = function($parent) {
-  if ('taskbar' === this.actionStyle) {
+  if (scout.Action.ActionStyle.TASK_BAR === this.actionStyle) {
     this.$container = $parent.appendDiv('taskbar-tool-item');
   } else {
     this.$container = $parent.appendDiv('menu-item');
   }
-  this.$container.on('click', '', onClicked.bind(this));
+  this.$container.on('click', '', this._onClick.bind(this));
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }
@@ -44,27 +44,19 @@ scout.Menu.prototype._renderItem = function($parent) {
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
   if (!this.overflow) {
-    if ('button' === this.actionStyle) {
+    if (scout.Action.ActionStyle.BUTTON === this.actionStyle ||
+        scout.Action.ActionStyle.TOGGLE === this.actionStyle) {
       this.$container.addClass('menu-button');
     }
     if (this.defaultMenu) {
       this.$container.addClass('default-menu');
     }
   }
-
-  // --- Helper functions ---
-
-  function onClicked(event) {
-    if (!this.$container.isEnabled()) {
-      return;
-    }
-    this._onMenuClicked(event);
-  }
 };
 
-scout.Menu.prototype._onMenuClicked = function(event) {
-  if (this.$container.isEnabled()) {
-    this.doAction($(event.target));
+scout.Menu.prototype._onClick = function() {
+  if (this.enabled) {
+    this.doAction();
   }
 };
 
@@ -97,17 +89,17 @@ scout.Menu.prototype._renderIconId = function(iconId) {
 };
 
 scout.Menu.prototype.isTabTarget = function() {
-  return this.enabled && this.visible && (this.actionStyle === 'button' || !this.separator);
+  return this.enabled && this.visible && (this.actionStyle === scout.Action.ActionStyle.BUTTON || !this.separator);
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  if ('taskbar' !== this.actionStyle) {
+  if (scout.Action.ActionStyle.TASK_BAR !== this.actionStyle) {
     var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
     this.$container.toggleClass('menu-textandicon', !!textAndIcon);
   }
 };
 
-scout.Menu.prototype.doAction = function($target) {
+scout.Menu.prototype.doAction = function() {
   if (this.childActions.length > 0) {
     this.popup = new scout.MenuBarPopup(this, this.session);
     this.popup.render();
@@ -117,8 +109,8 @@ scout.Menu.prototype.doAction = function($target) {
 };
 
 scout.Menu.prototype.handle = function(event) {
-  if(this.enabled&&this.visible){
-    this.doAction(this.$container);
+  if (this.enabled && this.visible) {
+    this.doAction();
     if (this.preventDefaultOnEvent) {
       event.preventDefault();
     }

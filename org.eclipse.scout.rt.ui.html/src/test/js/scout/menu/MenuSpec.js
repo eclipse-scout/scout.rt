@@ -27,7 +27,7 @@ describe("Menu", function() {
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
       menu1.remove();
 
-      menu1.actionStyle = 'button';
+      menu1.actionStyle = scout.Action.ActionStyle.BUTTON;
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-button')).toBe(true);
       menu1.remove();
@@ -58,10 +58,10 @@ describe("Menu", function() {
     it('should return true when menu can be a target of TAB action', function() {
       menu1.enabled = true;
       menu1.visible = true;
-      menu1.actionStyle = 'button';
+      menu1.actionStyle = scout.Action.ActionStyle.BUTTON;
       expect(menu1.isTabTarget()).toBe(true);
 
-      menu1.actionStyle = 'menu-item';
+      menu1.actionStyle = scout.Action.ActionStyle.DEFAULT;
       expect(menu1.isTabTarget()).toBe(true);
 
       menu1.separator = true;

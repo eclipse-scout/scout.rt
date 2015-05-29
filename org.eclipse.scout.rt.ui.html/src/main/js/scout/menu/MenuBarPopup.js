@@ -8,17 +8,23 @@ scout.MenuBarPopup = function(menu, session) {
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
-// @override
+/**
+ *  @override
+ */
 scout.MenuBarPopup.prototype._getMenuItems = function() {
   return this.menu.childActions || this.menu.menus;
 };
 
-// @override
+/**
+ *  @override
+ */
 scout.MenuBarPopup.prototype._beforeRenderMenuItems = function() {
   this._renderHead();
 };
 
-// @override
+/**
+ *  @override
+ */
 scout.MenuBarPopup.prototype._afterRenderMenuItems = function() {
   this.alignTo();
 };
@@ -27,7 +33,7 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this.headText = this.menu.$container.text();
   this.headIcon = this.menu.$container.attr('data-icon');
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
-  if ('taskbar' === this.menu.actionStyle) {
+  if (scout.Action.ActionStyle.TASK_BAR === this.menu.actionStyle) {
     this._copyCssClassToHead('taskbar-tool-item');
     this.$head.addClass('selected');
   } else {

@@ -75,7 +75,7 @@ scout.Desktop.prototype._render = function($parent) {
   // depending on where the menu is located (taskbar VS menubar).
   for (i = 0; i < this.actions.length; i++) {
     action = this.actions[i];
-    action.actionStyle = 'taskbar';
+    action.actionStyle = scout.Action.ActionStyle.TASK_BAR;
     action.render(this.$toolbar);
   }
   if (action) {

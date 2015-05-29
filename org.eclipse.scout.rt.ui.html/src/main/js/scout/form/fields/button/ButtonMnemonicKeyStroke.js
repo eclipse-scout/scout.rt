@@ -8,7 +8,7 @@ scout.inherits(scout.ButtonMnemonicKeyStroke, scout.MnemonicKeyStroke);
  */
 scout.ButtonMnemonicKeyStroke.prototype.handle = function(event) {
   if (this._field.enabled && this._field.visible) {
-    this._field.doAction($(event.target));
+    this._field.doAction();
     if (this.preventDefaultOnEvent) {
       event.preventDefault();
     }

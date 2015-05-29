@@ -7,55 +7,62 @@ scout.MenuButtonAdapter = function() {
   scout.MenuButtonAdapter.parent.call(this);
 
   this.defaultMenu = false;
-  this.actionStyle = 'default';
+  this.actionStyle = scout.Action.ActionStyle.DEFAULT;
 };
 scout.inherits(scout.MenuButtonAdapter, scout.Menu);
+
+// FIXME AWE: (menu) MenuButtonAdapter verbessern:
+// - aktuell verdrängt der MenuButtonAdapter den Button (gleiche ID, siehe init())
+//   das funktioniert ganz gut, aber korrekter wäre es, wenn wir zwei
+//   IDs und Instanzen hätten und die Synchronisation via Listener
+//   funktionieren würde. Aktuell funktioniert nämlich das Setzen vom
+//   Label nicht, da die Property beim Button "label" und beim Menu "text"
+//   heisst. Den MenuButtonAdapter würden wir dann eher mit session.createUiObject
+//   erzeugen. Es braucht einen Sync für adapter.destroy()
 
 /**
  * @override Menu.js
  */
 scout.MenuButtonAdapter.prototype.init = function(button) {
   if (!button) {
-    throw new Error('Property "button" is not set');
+    throw new Error('missing parameter "button"');
   }
-
   var model = {
-      id: button.id,
       objectType: 'Menu',
-      keyStroke: button.keyStroke
+      id: button.id,
+      enabled: button.enabled,
+      visible: button.visible,
+      selected: button.selected,
+      text: button.label,
+      keyStroke: button.keyStroke,
+      keyStrokes: button.keyStrokes,
+      modelClass: button.modelClass
   };
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
-
-  // FIXME AWE: (menu) MenuButtonAdapter verbessern:
-  // - aktuell verdrängt der MenuButtonAdapter den Button (gleiche ID, siehe init())
-  //   das funktioniert ganz gut, aber korrekter wäre es, wenn wir zwei
-  //   IDs und Instanzen hätten und die Synchronisation via Listener
-  //   funktionieren würde. Aktuell funktioniert nämlich das Setzen vom
-  //   Label nicht, da die Property beim Button "label" und beim Menu "text"
-  //   heisst. Den MenuButtonAdapter würden wir dann eher mit session.createUiObject
-  //   erzeugen. Es braucht einen Sync für adapter.destroy()
   this._button = button;
-  this.enabled = button.enabled;
-  this.visible = button.visible;
-  this.selected = button.selected;
-  this.text = button.label;
-  this.keyStrokes = button.keyStrokes;
 
   if (button.systemType === scout.Button.SYSTEM_TYPE.OK ||
       button.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
     this.defaultMenu = true;
   }
-  if (button.displayStyle !== scout.Button.DISPLAY_STYLE.LINK) {
-    this.actionStyle = 'button';
+
+  if (button.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
+    this.actionStyle = scout.Action.ActionStyle.TOGGLE;
+  }
+  else if (button.displayStyle === scout.Button.DISPLAY_STYLE.DEFAULT) {
+    this.actionStyle = scout.Action.ActionStyle.BUTTON;
+  }
+  else {
+    this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   }
 };
 
 /**
  * @override Menu.js
  */
-scout.MenuButtonAdapter.prototype._onMenuClicked = function(event) {
-  if (this.$container.isEnabled()) {
-    this._button.doAction($(event.target));
+scout.MenuButtonAdapter.prototype._onClick = function() {
+  if (this.enabled) {
+    this._button.doAction();
   }
 };
 
@@ -88,17 +95,16 @@ scout.MenuButtonAdapter.prototype._renderGridData = function() {
 };
 
 scout.MenuButtonAdapter.prototype._registerButtonKeyStroke = function() {
-  //register buttons key stroke on root Groupbox
   this._unregisterButtonKeyStroke();
   if (this.keyStroke) {
-    this._button.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(this);
+    this._button.registerRootKeyStroke(this);
   }
 };
 
 scout.MenuButtonAdapter.prototype._unregisterButtonKeyStroke = function() {
-  //unregister buttons key stroke on root Groupbox
-    this._button.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(this);
+  this._button.unregisterRootKeyStroke(this);
 };
+
 /**
  * @override Action.js
  */
@@ -106,7 +112,6 @@ scout.MenuButtonAdapter.prototype._remove = function() {
   scout.MenuButtonAdapter.parent.prototype._remove.call(this);
   this._unregisterButtonKeyStroke();
 };
-
 
 /**
  * @override Action.js
@@ -117,15 +122,18 @@ scout.MenuButtonAdapter.prototype._syncKeyStroke = function(keyStroke) {
 };
 
 /**
- * @Override scout.KeyStroke
+ * @override scout.KeyStroke
  */
 scout.MenuButtonAdapter.prototype.handle = function(event) {
-  if (this._button.enabled && this._button.visible) {
-    this._button.doAction($(event.target));
+  if (this.enabled && this.visible) {
+    this._button.doAction();
     if (this.preventDefaultOnEvent) {
       event.preventDefault();
     }
   }
 };
 
-
+/* FIXME AWE Unterschied:
+ * - Action sends doAction when clicked
+ * - Button sends clicked  when clicked
+ */

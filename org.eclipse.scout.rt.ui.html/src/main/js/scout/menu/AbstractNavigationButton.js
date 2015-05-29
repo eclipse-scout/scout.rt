@@ -14,10 +14,12 @@ scout.AbstractNavigationButton = function(outline, node) {
   this.visible = true;
   this.enabled = true;
   this.mandatory = false;
-  this.actionStyle = 'button';
+  this.actionStyle = scout.Action.ActionStyle.BUTTON;
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Menu);
+
 // FIXME AWE: re-name to *Menu
+
 /**
  * @override
  */
