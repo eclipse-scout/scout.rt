@@ -64,7 +64,6 @@ scout.Scrollbar.prototype._render = function($parent) {
     }
     event = event.originalEvent || window.event.originalEvent;
     w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
-    $.l(w, event.wheelDelta, event.detail);
     d = this._scrollSize / this._offsetSize;
 
     this.trigger('scrollstart');
