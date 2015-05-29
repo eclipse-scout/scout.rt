@@ -50,14 +50,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.$bar = $parent.appendDiv('desktop-taskbar');
   this.$bar.appendDiv('taskbar-logo')
     .delay(1000)
-    .animateAVCSD('width', 40, null, null, 1000)
-    .on('click', function() {
-      if (this.session.url === 'json') {
-        this.session.url = 'http://localhost:123';
-      } else {
-        this.session.url = 'json';
-      }
-    }.bind(this));
+    .animateAVCSD('width', 40, null, null, 1000);
 
   this.$tabbar = this.$bar.appendDiv('taskbar-tabs');
   // FIXME AWE: (menu) hier menu-bar verwenden?
