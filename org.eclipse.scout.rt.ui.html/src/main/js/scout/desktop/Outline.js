@@ -55,6 +55,22 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
   }
 };
 
+/**
+ * @override
+ */
+scout.Outline.prototype._decorateNode = function(node) {
+  scout.Outline.parent.prototype._decorateNode.call(this, node);
+  if (node.$node) {
+    if (node.modelClass) {
+      node.$node.attr('data-modelclass', node.modelClass);
+    }
+    if (node.classId) {
+      node.$node.attr('data-classid', node.classId);
+    }
+  }
+};
+
+
 scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
   if (!this._hasMenu(menus, scout.NavigateUpButton)) {

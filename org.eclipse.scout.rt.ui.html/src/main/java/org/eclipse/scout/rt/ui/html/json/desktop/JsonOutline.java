@@ -82,6 +82,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     IPage page = (IPage) node;
     JSONObject json = super.treeNodeToJson(node);
     putDetailFormAndTable(json, page);
+    if (getUiSession().isInspectorHint()) {
+      putProperty(json, "modelClass", page.getClass().getName());
+      putProperty(json, "classId", page.classId());
+    }
     return json;
   }
 
