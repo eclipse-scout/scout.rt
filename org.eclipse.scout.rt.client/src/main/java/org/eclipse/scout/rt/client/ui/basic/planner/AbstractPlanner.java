@@ -1010,36 +1010,27 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setViewRange(Date minDate, Date maxDate) {
-    setViewRangeInternal(new Range<Date>(minDate, maxDate));
+    setViewRange(new Range<Date>(minDate, maxDate));
   }
 
   @Override
   public void setViewRange(Range<Date> viewRange) {
-    setViewRangeInternal(new Range<Date>(viewRange));
-  }
-
-  private void setViewRangeInternal(Range<Date> viewRange) {
-    LOG.info("Set view range to " + viewRange);
+    LOG.debug("Setting selection range to " + viewRange);
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
   }
 
   @Override
-  public Date getSelectedBeginTime() {
-    return (Date) propertySupport.getProperty(PROP_SELECTED_BEGIN_TIME);
+  public void setSelectionRange(Date beginDate, Date endDate) {
+    setSelectionRange(new Range<Date>(beginDate, endDate));
   }
 
   @Override
-  public Date getSelectedEndTime() {
-    return (Date) propertySupport.getProperty(PROP_SELECTED_END_TIME);
-  }
-
-  @Override
-  public void setSelectedTime(Date beginTime, Date endTime) {
+  public void setSelectionRange(Range<Date> selectionRange) {
     try {
       setPlannerChanging(true);
       //
-      propertySupport.setProperty(PROP_SELECTED_BEGIN_TIME, beginTime);
-      propertySupport.setProperty(PROP_SELECTED_END_TIME, endTime);
+      LOG.debug("Seting selection range to " + selectionRange);
+      propertySupport.setProperty(PROP_SELECTION_RANGE, selectionRange);
 
       // update selected activity cell based on selected time range.
       // this is a work around for enforcing an owner value change event on context menus. Actually the empty selection event
@@ -1050,13 +1041,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         List<Activity<?, ?>> activityCells = resource.getActivities();
         for (Activity<?, ?> cell : activityCells) {
 
-          if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
-              (CompareUtility.equals(cell.getEndTime(), endTime)
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
+          if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
+              (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
                   && cell.getEndTime() != null
-                  && endTime != null
-                  && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
+                  && selectionRange.getTo() != null
+                  && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {
 //                setSelectedActivityCell(cell);
             return;
           }
@@ -1067,6 +1058,24 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     finally {
       setPlannerChanging(false);
     }
+  }
+
+  @Override
+  public Range<Date> getSelectionRange() {
+    @SuppressWarnings("unchecked")
+    Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_SELECTION_RANGE);
+    // return a copy
+    return new Range<Date>(propValue);
+  }
+
+  @Override
+  public Date getSelectedBeginTime() {
+    return getSelectionRange().getFrom();
+  }
+
+  @Override
+  public Date getSelectedEndTime() {
+    return getSelectionRange().getTo();
   }
 
   @Override
@@ -1124,11 +1133,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private class P_PlannerUIFacade implements IPlannerUIFacade<RI, AI> {
 
     @Override
-    public void setSelectionFromUI(List<? extends Resource<RI>> resources, Date beginTime, Date endTime) {
+    public void setSelectionFromUI(List<? extends Resource<RI>> resources, Range<Date> selectionRange) {
       try {
         setPlannerChanging(true);
         setSelectedResources(resources);
-        setSelectedTime(beginTime, endTime);
+        setSelectionRange(selectionRange);
       }
       finally {
         setPlannerChanging(false);

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 
 public interface IPlannerUIFacade<RI, AI> {
@@ -21,7 +22,7 @@ public interface IPlannerUIFacade<RI, AI> {
 
   void setSelectedActivityCellFromUI(Activity<RI, AI> cell);
 
-  void setSelectionFromUI(List<? extends Resource<RI>> resources, Date beginTime, Date endTime);
+  void setSelectionFromUI(List<? extends Resource<RI>> resources, Range<Date> selectionRange);
 
   /**
    * Action on a empty cell or activity cell

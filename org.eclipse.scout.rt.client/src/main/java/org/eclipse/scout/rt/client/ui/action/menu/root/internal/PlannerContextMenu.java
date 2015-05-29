@@ -59,13 +59,9 @@ public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPla
     else if (IPlanner.PROP_SELECTED_RESOURCES.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
-    else if (IPlanner.PROP_SELECTED_BEGIN_TIME.equals(evt.getPropertyName())) {
+    else if (IPlanner.PROP_SELECTION_RANGE.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
-    else if (IPlanner.PROP_SELECTED_END_TIME.equals(evt.getPropertyName())) {
-      handleOwnerValueChanged();
-    }
-
   }
 
 }

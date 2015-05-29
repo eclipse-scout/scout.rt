@@ -36,6 +36,8 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    */
   String PROP_VIEW_RANGE = "viewRange";
 
+  String PROP_SELECTION_RANGE = "selectionRange";
+
   /**
    * {@link Integer}
    */
@@ -66,14 +68,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * {@link Set}
    */
   String PROP_AVAILABLE_DISPLAY_MODES = "availableDisplayModes";
-  /**
-   * {@link Date}
-   */
-  String PROP_SELECTED_BEGIN_TIME = "selectedBeginTime";
-  /**
-   * {@link Date}
-   */
-  String PROP_SELECTED_END_TIME = "selectedEndTime";
   /**
    * {@link Long}[]
    */
@@ -126,9 +120,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    */
   void setPlannerChanging(boolean b);
 
-  /**
-   * @return a Date tupel [begin, end]
-   */
   Range<Date> getViewRange();
 
   void setViewRange(Date viewDateStart, Date viewDateEnd);
@@ -198,11 +189,15 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   void setMinimumActivityDurationInMinutes(long min);
 
+  Range<Date> getSelectionRange();
+
+  void setSelectionRange(Date beginDate, Date endDate);
+
+  void setSelectionRange(Range<Date> selectionRange);
+
   Date getSelectedBeginTime();
 
   Date getSelectedEndTime();
-
-  void setSelectedTime(Date beginTime, Date endTime);
 
   void decorateActivityCell(Activity<RI, AI> p);
 
