@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -60,6 +61,11 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * {@link #DISPLAY_MODE_WORKWEEK}
    */
   String PROP_DISPLAY_MODE = "displayMode";
+
+  /**
+   * {@link Set}
+   */
+  String PROP_AVAILABLE_DISPLAY_MODES = "availableDisplayModes";
   /**
    * {@link Date}
    */
@@ -172,6 +178,10 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * {@link #DISPLAY_MODE_WORKWEEK}
    */
   void setDisplayMode(int mode);
+
+  Set<Integer> getAvailableDisplayModes();
+
+  void setAvailableDisplayModes(Set<Integer> displayModes);
 
   /**
    * milliseconds

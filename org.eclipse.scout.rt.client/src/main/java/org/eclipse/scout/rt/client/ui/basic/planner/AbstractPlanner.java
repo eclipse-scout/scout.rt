@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -117,6 +118,18 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   /*
    * Configuration
    */
+
+  @Order(10)
+  protected Set<Integer> getConfiguredAvailableDisplayModes() {
+    return CollectionUtility.hashSet(
+        DISPLAY_MODE_INTRADAY,
+        DISPLAY_MODE_DAY,
+        DISPLAY_MODE_WEEK,
+        DISPLAY_MODE_MONTH,
+        DISPLAY_MODE_WORKWEEK,
+        DISPLAY_MODE_CALENDAR_WEEK,
+        DISPLAY_MODE_YEAR);
+  }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
@@ -280,6 +293,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     m_activityMapUIFacade = createUIFacade();
 //    m_cellObserver = new P_ActivityCellObserver();
     //
+    setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
     setWorkDayCount(getConfiguredWorkDayCount());
     setWorkDaysOnly(getConfiguredWorkDaysOnly());
     setFirstHourOfDay(getConfiguredFirstHourOfDay());
@@ -973,6 +987,17 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setDisplayMode(int mode) {
     propertySupport.setPropertyInt(PROP_DISPLAY_MODE, mode);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<Integer> getAvailableDisplayModes() {
+    return (Set<Integer>) propertySupport.getProperty(PROP_AVAILABLE_DISPLAY_MODES);
+  }
+
+  @Override
+  public void setAvailableDisplayModes(Set<Integer> modes) {
+    propertySupport.setProperty(PROP_AVAILABLE_DISPLAY_MODES, modes);
   }
 
   @Override
