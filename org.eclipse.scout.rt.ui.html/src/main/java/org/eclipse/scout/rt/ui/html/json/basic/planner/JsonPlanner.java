@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -87,6 +88,12 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_AVAILABLE_DISPLAY_MODES, model) {
+      @Override
+      protected Set<Integer> modelValue() {
+        return getModel().getAvailableDisplayModes();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IPlanner.PROP_DISPLAY_MODE, model) {
       @Override
       protected Integer modelValue() {

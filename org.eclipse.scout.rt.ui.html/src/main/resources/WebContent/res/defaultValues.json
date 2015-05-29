@@ -75,6 +75,7 @@
       "splitterPosition": 168
     },
     "Planner": {
+      "availableDisplayModes": [],
       "resources": [],
       "viewRange": {},
       "selectedResources": []
