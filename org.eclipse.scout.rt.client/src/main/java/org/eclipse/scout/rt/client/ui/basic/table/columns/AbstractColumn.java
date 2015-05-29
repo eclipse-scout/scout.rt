@@ -1058,7 +1058,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       //add
       cell.addErrorStatus(new ValidationFailedStatus<VALUE>(v, value));
       //update cell displayText
-      cell.setText(value.toString());
+      cell.setText(value == null ? null : value.toString());
     }
   }
 
