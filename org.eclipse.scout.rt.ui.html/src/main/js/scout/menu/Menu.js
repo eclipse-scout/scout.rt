@@ -117,9 +117,11 @@ scout.Menu.prototype.doAction = function($target) {
 };
 
 scout.Menu.prototype.handle = function(event) {
-  this.doAction(this.$container);
-  if (this.preventDefaultOnEvent) {
-    event.preventDefault();
+  if(this.enabled&&this.visible){
+    this.doAction(this.$container);
+    if (this.preventDefaultOnEvent) {
+      event.preventDefault();
+    }
   }
 };
 

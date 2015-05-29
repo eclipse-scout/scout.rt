@@ -76,8 +76,7 @@ scout.Action.prototype._renderSelected = function(selected) {
 scout.Action.prototype._renderKeyStroke = function(keyStroke) {
   if (keyStroke === undefined) {
     this.$container.removeAttr('data-shortcut');
-  }
-  else {
+  } else {
     this.$container.attr('data-shortcut', keyStroke);
   }
 };
@@ -143,7 +142,7 @@ scout.Action.prototype._goOnline = function() {
 
 scout.Action.prototype.sendDoAction = function() {
   var activeValueField = $(document.activeElement).data('valuefield');
-  if(activeValueField){
+  if (activeValueField) {
     activeValueField.displayTextChanged();
   }
   this.session.send(this.id, 'doAction');
@@ -206,9 +205,11 @@ scout.Action.prototype.setTabbable = function(tabbable) {
 };
 
 scout.Action.prototype.handle = function(event) {
-  this.sendDoAction();
-  if (this.preventDefaultOnEvent) {
-    event.preventDefault();
+  if (this.enabled && this.visible) {
+    this.sendDoAction();
+    if (this.preventDefaultOnEvent) {
+      event.preventDefault();
+    }
   }
 };
 

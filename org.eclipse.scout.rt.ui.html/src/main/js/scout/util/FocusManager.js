@@ -272,7 +272,6 @@ scout.FocusContext.prototype._handleOnMouseDown = function(event) {
   var focusAccepted = this._validatePotentialFocus(event.target) || this._checkElementContainsText(event.target);
   if (!focusAccepted) {
     event.preventDefault();
-    $(this).trigger('mouseDownProcessedByFocusContext', [event]);
   }
 };
 

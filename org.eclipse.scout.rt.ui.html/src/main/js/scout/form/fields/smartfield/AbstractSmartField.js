@@ -51,8 +51,12 @@ scout.AbstractSmartField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.AbstractSmartField.prototype._onMouseDown=function(event, originalEvent){
-  this._closeProposal(true);
+scout.AbstractSmartField.prototype._onMouseDown=function(event){
+  var $target = $(event.target);
+  // close the popup only if the click happened outside of the popup
+  if (this._$popup.has($target).length === 0 && this.$container.has($target).length === 0) {
+    this._closeProposal(true);
+  }
 };
 
 scout.AbstractSmartField.prototype._renderProperties = function() {
@@ -251,7 +255,7 @@ scout.AbstractSmartField.prototype._acceptProposal = function() {
 };
 
 scout.AbstractSmartField.prototype._closeProposal = function(notifyServer) {
-  $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).off('mouseDownProcessedByFocusContext', this._mouseDownListener);
+  $(document).off('mousedown', this._mouseDownListener);
   if (this._$popup) {
     notifyServer = scout.objects.whenUndefined(notifyServer, true);
     if (notifyServer) {
@@ -278,7 +282,7 @@ scout.AbstractSmartField.prototype._openProposal = function(searchText, selectCu
   // When the typed proposal doesn't match a proposal from the list, the popup
   // is closed. The smart-field would stay open in that case. The SF also opens the
   // popup _before_ we send a request to the server (-> more responsive UI)
-  $(scout.focusManager.getActiveFocusContext(this.session.uiSessionId)).on('mouseDownProcessedByFocusContext', this._mouseDownListener);
+  $(document).on('mousedown', this._mouseDownListener);
   if (!this.proposal) {
     this._renderPopup();
   }
