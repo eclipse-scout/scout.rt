@@ -6,7 +6,6 @@
 
 .radio-button {
   & label {
-    cursor: pointer;
     display: inline-block;
     position: relative;
     margin-right: 15px;

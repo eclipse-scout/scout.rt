@@ -6,7 +6,6 @@
 
 .check-box-field > .field {
   & > label {
-    cursor: pointer;
     display: block;
     position: relative;
     padding-left: 25px;
