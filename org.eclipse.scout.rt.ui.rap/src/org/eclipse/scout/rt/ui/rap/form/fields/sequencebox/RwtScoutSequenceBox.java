@@ -12,13 +12,11 @@ package org.eclipse.scout.rt.ui.rap.form.fields.sequencebox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.rap.LogicalGridData;
@@ -28,13 +26,13 @@ import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
-import org.eclipse.scout.rt.ui.rap.form.fields.checkbox.IRwtScoutCheckbox;
 import org.eclipse.swt.widgets.Composite;
 
 public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> implements IRwtScoutSequenceBox {
 
-  private PropertyChangeListener m_scoutMandatoryChangeListener;
-  private PropertyChangeListener m_scoutErrorStatusChangeListener;
+  private PropertyChangeListener m_changeListener;
+
+  private Map<IFormField, IRwtScoutFormField> m_fieldMap = new HashMap<IFormField, IRwtScoutFormField>();
 
   @Override
   protected void initializeUi(Composite parent) {
@@ -42,56 +40,32 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     Composite fieldContainer = getUiEnvironment().getFormToolkit().createComposite(container);
-    int visibleCount = 0;
     for (IFormField scoutField : getScoutObject().getFields()) {
       IRwtScoutFormField childFormField = getUiEnvironment().createFormField(fieldContainer, scoutField);
+      m_fieldMap.put(scoutField, childFormField);
 
-      ILabelComposite childLabel = null;
-      if (childFormField instanceof IRwtScoutCheckbox) {
-        childLabel = ((IRwtScoutCheckbox) childFormField).getPlaceholderLabel();
+      ILabelComposite childLabel = childFormField.getUiLabel();
+      if (childLabel != null) {
+        childLabel.setGrabHorizontalEnabled(false); // disable grabbing so that mandatory and error status are rendered as expected, and the label is not swallowed.
+        if (childLabel.getLayoutData() instanceof LogicalGridData) {
+          ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0; // Make the label as small as possible
+        }
       }
-      else {
-        childLabel = childFormField.getUiLabel();
-      }
-      if (childLabel != null && childLabel.getLayoutData() instanceof LogicalGridData) {
-        //Make the label as small as possible
-        ((LogicalGridData) childLabel.getLayoutData()).widthHint = 0;
 
-        //Remove the label completely if the formField doesn't actually have a label on the left side
-        if (removeLabelCompletely(childFormField)) {
-          childLabel.setVisible(false);
-        }
-        // <bsh 2010-10-01>
-        // Force an empty, but visible label for all but the first visible fields
-        // within an SequenceBox. This empty status label is necessary to show the
-        // "mandatory" indicator.
-        if (childFormField.getScoutObject() instanceof IFormField) {
-          IFormField childScoutField = ((IFormField) childFormField.getScoutObject());
-          if (childScoutField.isVisible()) {
-            visibleCount++;
-          }
-          if (visibleCount > 1) {
-            if (!childLabel.getVisible()) {
-              // make the label visible, but clear any text
-              childLabel.setVisible(true);
-              childLabel.setText("");
-            }
-          }
-        }
-        // <bsh>
-      }
       // create layout constraints
+      final boolean checkbox = scoutField instanceof IBooleanField;
       RwtScoutFormFieldGridData data = new RwtScoutFormFieldGridData(scoutField) {
         @Override
         public void validate() {
           super.validate();
-          useUiWidth = !getScoutObject().isEqualColumnWidths();
+          useUiWidth = !getScoutObject().isEqualColumnWidths() || checkbox;
           useUiHeight = true;
+          weightx = (checkbox ? 0 : weightx); // to enforce the checkbox to be rendered completely (with its label)
         }
       };
       childFormField.getUiContainer().setLayoutData(data);
-
     }
+
     //
     setUiContainer(container);
     setUiLabel(label);
@@ -100,7 +74,8 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
     // layout
     fieldContainer.setLayout(new LogicalGridLayout(getGridColumnGapInPixel(), 0));
     container.setLayout(new LogicalGridLayout(1, 0));
-    setChildMandatoryFromScout();
+
+    applyInheritedDecoration();
   }
 
   protected int getGridColumnGapInPixel() {
@@ -134,42 +109,35 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
     return super.getScoutObject();
   }
 
-  protected void setChildMandatoryFromScout() {
+  /**
+   * Applies the mandatory and error status of the first visible field to the sequence box.
+   */
+  public void applyInheritedDecoration() {
+    // Make the status label part visible for all fields.
+    for (IFormField field : getScoutObject().getFields()) {
+      ILabelComposite label = m_fieldMap.get(field).getUiLabel();
+      if (label != null) {
+        m_fieldMap.get(field).getUiLabel().setStatusVisible(field.isMandatory() || field.getErrorStatus() != null);
+      }
+    }
+
+    // Apply 'mandatory' or 'error' status of the first visible field to the sequence box.
     boolean inheritedMandatory = false;
-    List<IValueField<?>> visibleFields = findVisibleValueFields(getScoutObject());
-    for (IValueField<?> field : visibleFields) {
-      if (field.isMandatory()) {
-        inheritedMandatory = true;
+    IProcessingStatus inheritedErrorStatus = null;
+
+    for (IFormField candidate : getScoutObject().getFields()) {
+      if (candidate.isVisible() && m_fieldMap.get(candidate).getUiLabel() != null) {
+        // This is the first visible field of the sequence box. Hide the status label.
+        m_fieldMap.get(candidate).getUiLabel().setStatusVisible(false);
+
+        inheritedMandatory = candidate.isMandatory();
+        inheritedErrorStatus = candidate.getErrorStatus();
         break;
       }
     }
+
     setMandatoryFromScout(inheritedMandatory);
-  }
-
-  protected void setChildErrorStatusFromScout() {
-    IProcessingStatus inheritedErrorStatus = null;
-    List<IValueField<?>> visibleFields = findVisibleValueFields(getScoutObject());
-    if (visibleFields.size() > 0) {
-      // bsh 2010-10-01: don't inherit error status from other fields than the first visible field
-      inheritedErrorStatus = visibleFields.get(0).getErrorStatus();
-    }
     setErrorStatusFromScout(inheritedErrorStatus);
-  }
-
-  protected List<IValueField<?>> findVisibleValueFields(ICompositeField parent) {
-    List<IValueField<?>> valueFields = new LinkedList<IValueField<?>>();
-    for (IFormField field : parent.getFields()) {
-      if (!field.isVisible()) {
-        continue;
-      }
-      if (field instanceof IValueField) {
-        valueFields.add((IValueField<?>) field);
-      }
-      else if (field instanceof ICompositeField) {
-        valueFields.addAll(findVisibleValueFields((ICompositeField) field));
-      }
-    }
-    return valueFields;
   }
 
   @Override
@@ -186,58 +154,39 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
   protected void attachScout() {
     super.attachScout();
     // add mandatory change listener on children to decorate my label same as any mandatory child
-    m_scoutMandatoryChangeListener = new PropertyChangeListener() {
+    m_changeListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
         Runnable j = new Runnable() {
           @Override
           public void run() {
-            if (getUiContainer() != null && !getUiContainer().isDisposed()) {
-              setChildMandatoryFromScout();
-            }
+            applyInheritedDecoration();
           }
         };
         getUiEnvironment().invokeUiLater(j);
       }
     };
     for (IFormField f : getScoutObject().getFields()) {
-      f.addPropertyChangeListener(IFormField.PROP_MANDATORY, m_scoutMandatoryChangeListener);
-    }
-
-    // add error status change listener on children to decorate my label same as any child with an error status
-    m_scoutErrorStatusChangeListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        Runnable j = new Runnable() {
-          @Override
-          public void run() {
-            setChildErrorStatusFromScout();
-          }
-        };
-        getUiEnvironment().invokeUiLater(j);
-      }
-    };
-    for (IFormField f : getScoutObject().getFields()) {
-      f.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_scoutErrorStatusChangeListener);
+      f.addPropertyChangeListener(IFormField.PROP_VISIBLE, m_changeListener);
+      f.addPropertyChangeListener(IFormField.PROP_LABEL_VISIBLE, m_changeListener);
+      f.addPropertyChangeListener(IFormField.PROP_LABEL, m_changeListener);
+      f.addPropertyChangeListener(IFormField.PROP_MANDATORY, m_changeListener);
+      f.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_changeListener);
     }
   }
 
   @Override
   protected void detachScout() {
-    if (m_scoutMandatoryChangeListener != null) {
+    if (m_changeListener != null) {
       for (IFormField f : getScoutObject().getFields()) {
-        f.removePropertyChangeListener(IFormField.PROP_MANDATORY, m_scoutMandatoryChangeListener);
+        f.addPropertyChangeListener(IFormField.PROP_VISIBLE, m_changeListener);
+        f.addPropertyChangeListener(IFormField.PROP_LABEL_VISIBLE, m_changeListener);
+        f.addPropertyChangeListener(IFormField.PROP_LABEL, m_changeListener);
+        f.addPropertyChangeListener(IFormField.PROP_MANDATORY, m_changeListener);
+        f.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_changeListener);
       }
-      m_scoutMandatoryChangeListener = null;
+      m_changeListener = null;
     }
-
-    if (m_scoutErrorStatusChangeListener != null) {
-      for (IFormField f : getScoutObject().getFields()) {
-        f.removePropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_scoutErrorStatusChangeListener);
-      }
-      m_scoutErrorStatusChangeListener = null;
-    }
-
     super.detachScout();
   }
 
