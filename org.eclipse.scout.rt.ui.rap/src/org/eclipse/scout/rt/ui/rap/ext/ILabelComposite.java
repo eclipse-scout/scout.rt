@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.ext;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
@@ -40,6 +41,18 @@ public interface ILabelComposite {
   boolean getVisible();
 
   void setVisible(boolean b);
+
+  /**
+   * Changes the visibility of the status label part. Typically, the visibility is set to <code>false</code> for the
+   * first field used in a {@link ISequenceBox}, because rendered as part of the box label.
+   */
+  void setStatusVisible(boolean b);
+
+  /**
+   * Changes the grabbing behavior of this compound label. By default, grabbing is <code>enabled</code>. Typically,
+   * grabbing is disabled for fields used within a {@link ISequenceBox}.
+   */
+  public void setGrabHorizontalEnabled(boolean enabled);
 
   Object getData(String key);
 
