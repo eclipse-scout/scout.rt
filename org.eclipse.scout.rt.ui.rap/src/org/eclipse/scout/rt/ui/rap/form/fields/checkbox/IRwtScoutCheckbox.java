@@ -11,19 +11,16 @@
 package org.eclipse.scout.rt.ui.rap.form.fields.checkbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
-import org.eclipse.scout.rt.ui.rap.ext.ILabelComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.swt.widgets.Button;
 
 /**
  * <h3>IRwtScoutCheckbox</h3> ...
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public interface IRwtScoutCheckbox extends IRwtScoutFormField<IBooleanField> {
 
   @Override
   Button getUiField();
-
-  ILabelComposite getPlaceholderLabel();
 }

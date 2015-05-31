@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.ext;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
@@ -26,7 +28,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -36,6 +37,12 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   private static final String STAR_MARKER = "*";
   private static final String WHITE_SPACE = " ";
 
+  private static final boolean GRAB_HORIZONTAL_LABEL = true; // The label must grab horizontal space in order to allow horizontal alignment of the label.
+  private static final boolean GRAB_HORIZONTAL_STATUS = false;
+
+  // Represents the effective visibility status set for this composite.
+  // This flag is required to still visualize error and mandatory status, even if this composite is not visible.
+  private boolean m_visible = true;
   private IProcessingStatus m_status;
   private boolean m_mandatory;
   private Control m_label;
@@ -67,12 +74,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   }
 
   protected void createLayout() {
-    GridLayout containerLayout = new GridLayout(2, false);
-    containerLayout.horizontalSpacing = 0;
-    containerLayout.marginHeight = 0;
-    containerLayout.marginWidth = 0;
-    containerLayout.verticalSpacing = 0;
-    setLayout(containerLayout);
+    GridLayoutFactory.swtDefaults().numColumns(2).spacing(0, 0).margins(0, 0).applyTo(this);
   }
 
   protected void createContent(Composite parent, int style) {
@@ -82,13 +84,8 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     m_statusLabel = new Label(parent, SWT.NONE);
     getUiEnvironment().getFormToolkit().getFormToolkit().adapt(m_statusLabel, false, false);
 
-    //Make sure the label composite fills the cell so that horizontal alignment of the text works well
-    GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-    m_label.setLayoutData(data);
-
-    data = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
-    data.verticalIndent = 3;
-    m_statusLabel.setLayoutData(data);
+    GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(GRAB_HORIZONTAL_LABEL, true).applyTo(m_label); // do not make the label to grab horizontal space so that scaling in sequence box works properly.
+    GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER).grab(GRAB_HORIZONTAL_STATUS, false).indent(SWT.NONE, 3).applyTo(m_statusLabel);
   }
 
   protected IRwtEnvironment getUiEnvironment() {
@@ -295,6 +292,48 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
       }
     }
     layout(true, true);
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    m_visible = visible;
+    super.setVisible(visible);
+  }
+
+  @Override
+  public void setStatusVisible(boolean visible) {
+    // Status
+    boolean statusVisible = visible;
+    Label statusLabel = getStatusLabel();
+    if (statusLabel != null) {
+      GridDataFactory.createFrom((GridData) statusLabel.getLayoutData()).exclude(!statusVisible);
+      statusLabel.setVisible(statusVisible);
+    }
+
+    // Label
+    boolean labelVisible = m_visible && StringUtility.hasText(m_nonMandatoryText);
+    Control label = getLabel();
+    if (label != null) {
+      GridDataFactory.createFrom((GridData) label.getLayoutData()).exclude(!labelVisible);
+      label.setVisible(labelVisible);
+    }
+
+    layout(true, true);
+
+    // Make this compound label visible if status is to be displayed.
+    if (statusVisible) {
+      super.setVisible(true); // super-call to not change the effective 'm_visible' value.
+    }
+    else {
+      super.setVisible(labelVisible); // super-call to not change the effective 'm_visible' value.
+    }
+  }
+
+  @Override
+  public void setGrabHorizontalEnabled(boolean enabled) {
+    // Grabbing should be disabled if being used within a sequence box, so label, mandatory and error flag are displayed as expected.
+    ((GridData) m_label.getLayoutData()).grabExcessHorizontalSpace = (enabled ? GRAB_HORIZONTAL_LABEL : false);
+    ((GridData) m_statusLabel.getLayoutData()).grabExcessHorizontalSpace = (enabled ? GRAB_HORIZONTAL_STATUS : false);
   }
 
 // delegate methods
