@@ -271,9 +271,7 @@ scout.FormField.prototype._goOnline = function() {
  * Appends a LABEL element to this.$container and sets the this.$label property.
  */
 scout.FormField.prototype.addLabel = function() {
-  this.$label = $('<label>')
-    .attr('for', this.refFieldId)
-    .appendTo(this.$container);
+  this.$label = $('<label>').appendTo(this.$container);
 };
 
 /**

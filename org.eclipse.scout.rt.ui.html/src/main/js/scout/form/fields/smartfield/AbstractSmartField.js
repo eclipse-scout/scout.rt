@@ -270,6 +270,9 @@ scout.AbstractSmartField.prototype._searchText = function() {
   return this.$field.val();
 };
 
+// FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
+// --> Keine Daten vorhanden
+
 // FIXME AWE: (smart-field) an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
 // und entscheiden, ob das popup gegen unten oder gegen oben geöffnet werden soll.
 /**
@@ -284,7 +287,8 @@ scout.AbstractSmartField.prototype._openProposal = function(searchText, selectCu
   // popup _before_ we send a request to the server (-> more responsive UI)
   $(document).on('mousedown', this._mouseDownListener);
   if (!this.proposal) {
-    this._renderPopup();
+    // FIXME AWE: das hier ausbauen und Lupe-Icon durch Loading-Icon austauschen während laden
+    // this._renderPopup();
   }
   if (!this._requestedProposal) {
     this._requestedProposal = true;
