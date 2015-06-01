@@ -156,7 +156,7 @@ scout.Table.prototype._render = function($parent) {
     $mouseUpRow = $(event.currentTarget);
     that.selectionHandler.onMouseUp(event, $mouseUpRow);
 
-    if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
+    if ($mouseDownRow.attr('data-rowid') !== $mouseUpRow.attr('data-rowid')) {
       return;
     }
 

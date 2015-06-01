@@ -129,9 +129,9 @@ scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex
     $actionRow.select(true);
   } else {
     $actionRow.select(false);
-    this._clearSelectionBorder(this._$selectedRows);
   }
 
+  this._clearSelectionBorder($actionRow);
   this._$selectedRows = this.table.$selectedRows();
   this._clearSelectionBorder(this._$selectedRows);
   this._renderSelectionBorder(this._$selectedRows);
@@ -143,6 +143,12 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
     return;
   }
   this._mouseDown = false;
+
+  // Update selectedRows and allRows, this might have changed in the meantime (e.g. when row
+  // was replaced by update event due to cell editing)
+  this._$selectedRows = this.table.$selectedRows();
+  this._$allRows = this.table.$filteredRows();
+
   this.table.notifyRowsSelected(this._$selectedRows);
 
   // TODO BSH Table Selection | This is way too inefficient for many rows!
