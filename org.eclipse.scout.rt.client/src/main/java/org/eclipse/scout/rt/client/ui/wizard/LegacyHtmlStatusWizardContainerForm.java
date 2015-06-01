@@ -11,40 +11,49 @@
 package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.AbstractWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.ContentBox;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.ContentBox.WrappedWizardForm;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardCancelButton;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardFinishButton;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardNextStepButton;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardPreviousStepButton;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardProgressField;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardResetButton;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.ContentBox;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.ContentBox.WrappedWizardForm;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.StatusBox;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.SplitBox.StatusBox.StatusField;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardCancelButton;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardFinishButton;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardNextStepButton;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardPreviousStepButton;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardResetButton;
+import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardSuspendButton;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
- * <h3>DefaultWizardContainerForm</h3> A container form containing a wizard form
+ * <h3>LegacyHtmlStatusWizardContainerForm</h3> A container form containing a wizard form
  * area (current step) a status area. see {@link AbstractWizard#execCreateContainerForm()}
  *
  * @since 24.11.2009
+ * @deprecated This form uses a HTML provider to indicate the wizard progress. It should be replaced by
+ *             {@link DefaultWizardContainerForm} which uses a {@link AbstractWizardProgressField} instead. This class
+ *             will be deleted in the O-Release.
  */
-public class DefaultWizardContainerForm extends AbstractWizardContainerForm implements IWizardContainerForm {
+@Deprecated
+public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainerForm implements IWizardContainerForm {
 
-  public DefaultWizardContainerForm(IWizard wizard) throws ProcessingException {
+  public LegacyHtmlStatusWizardContainerForm(IWizard wizard) throws ProcessingException {
     this(wizard, true);
   }
 
-  public DefaultWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
+  public LegacyHtmlStatusWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
     super(wizard, false);
     if (callInitializer) {
       callInitializer();
@@ -55,16 +64,24 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
     return getFieldByClass(MainBox.class);
   }
 
-  public WizardProgressField getWizardProgressField() {
-    return getFieldByClass(WizardProgressField.class);
+  public SplitBox getSplitBox() {
+    return getFieldByClass(SplitBox.class);
   }
 
   public ContentBox getContentBox() {
     return getFieldByClass(ContentBox.class);
   }
 
+  public StatusBox getStatusBox() {
+    return getFieldByClass(StatusBox.class);
+  }
+
   public WrappedWizardForm getWrappedWizardForm() {
     return getFieldByClass(WrappedWizardForm.class);
+  }
+
+  public StatusField getStatusField() {
+    return getFieldByClass(StatusField.class);
   }
 
   @Override
@@ -135,24 +152,78 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       return 2;
     }
 
-    @Order(10.0)
-    public class WizardProgressField extends AbstractWizardProgressField {
-    }
-
     @Order(20.0)
-    public class ContentBox extends AbstractGroupBox {
+    public class SplitBox extends AbstractSplitBox {
 
       @Override
-      protected boolean getConfiguredBorderVisible() {
+      protected double getConfiguredSplitterPosition() {
+        return 0.75;
+      }
+
+      @Override
+      protected boolean getConfiguredLabelVisible() {
         return false;
       }
 
       @Order(10.0)
-      public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
+      public class ContentBox extends AbstractGroupBox {
+
+        @Override
+        protected boolean getConfiguredBorderVisible() {
+          return false;
+        }
+
+        @Order(10.0)
+        public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
+
+          @Override
+          protected int getConfiguredGridW() {
+            return 2;
+          }
+        }
+      }
+
+      @Order(20.0)
+      public class StatusBox extends AbstractGroupBox {
 
         @Override
         protected int getConfiguredGridW() {
-          return 2;
+          return 1;
+        }
+
+        @Override
+        protected boolean getConfiguredBorderVisible() {
+          return false;
+        }
+
+        @Override
+        protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+          super.injectFieldsInternal(fields);
+          // TODO BSH Inject info boxes and groups here
+        }
+
+        @Order(20.0)
+        public class StatusField extends AbstractWizardStatusField {
+
+          @Override
+          protected int getConfiguredGridW() {
+            return 2;
+          }
+
+          @Override
+          protected int getConfiguredGridH() {
+            return 2;
+          }
+
+          @Override
+          protected void execAppLinkAction(String ref) throws ProcessingException {
+            if (LegacyHtmlStatusWizardContainerForm.this.getWizard() != null) {
+              LegacyHtmlStatusWizardContainerForm.this.getWizard().doAppLinkAction(ref);
+            }
+            else {
+              super.execAppLinkAction(ref);
+            }
+          }
         }
       }
     }
