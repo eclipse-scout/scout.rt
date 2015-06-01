@@ -130,8 +130,10 @@ scout.FormField.prototype._renderLabel = function() {
     if (!label) {
       // Make sure an empty label is as height as the other labels, especially important for top labels
       this.$label.html('&nbsp;');
+      this.$label.addClass('empty');
     } else {
       this.$label.text(label);
+      this.$label.removeClass('empty');
     }
 
     // Invalidate layout if label width depends on its content

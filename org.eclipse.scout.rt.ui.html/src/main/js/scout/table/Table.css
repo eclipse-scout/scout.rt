@@ -102,6 +102,11 @@
     color: @disabled-color;
   }
 
+  &.empty {
+    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
+    text-overflow: clip;
+  }
+
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable::before {
     position: absolute;
     content: '';

@@ -8,6 +8,7 @@ scout.BeanColumn.prototype.buildCell = function(row) {
   $cell = $(scout.BeanColumn.parent.prototype.buildCell.call(this, row));
   // Clear any content (e.g. nbsp due to empty text)
   $cell.empty();
+  $cell.removeClass('empty');
 
   value = this.table.cellValue(this, row);
   this._renderValue($cell, value);

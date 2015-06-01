@@ -60,6 +60,11 @@
     cursor: default;
   }
 
+  &.empty {
+    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
+    text-overflow: clip;
+  }
+
   &.sort-asc,
   &.sort-desc {
     /* make room form sort-icon */

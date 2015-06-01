@@ -1005,7 +1005,7 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
       $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
         .css('text-align', alignment);
     } else {
-      $cell = $.makeDiv('table-cell', '&nbsp');
+      $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
     }
 
     $cell.appendTo($sumRow)

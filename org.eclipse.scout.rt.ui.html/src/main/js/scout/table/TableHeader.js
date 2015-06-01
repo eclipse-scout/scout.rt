@@ -52,7 +52,7 @@ scout.TableHeader.prototype._render = function() {
   this.$filler = this.$container.appendDiv('header-item filler').css('visibility', 'hidden');
   if (this.columns.length === 0) {
     // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
-    this.$filler.css('visibility', 'visible').html('&nbsp;');
+    this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
   }
 
   this.menuBar.render(this.$container);
@@ -390,8 +390,10 @@ scout.TableHeader.prototype._applyColumnText = function($header, column) {
   if (!text) {
     // Make sure empty header is as height as the others to make it properly clickable
     $header.html('&nbsp;');
+    $header.addClass('empty');
   } else {
     $header.text(text);
+    $header.removeClass('empty');
   }
 };
 

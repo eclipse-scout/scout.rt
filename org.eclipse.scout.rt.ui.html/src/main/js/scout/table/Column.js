@@ -16,31 +16,32 @@ scout.Column.prototype.init = function(model, session) {
 };
 
 scout.Column.prototype.buildCell = function(row) {
-  var style, text, tooltipText, tooltip, cssClass, cell, icon, iconId,
-    content = '';
-  cell = this.table.cell(this, row);
-  text = this.table.cellText(this, row);
-
+  var cell = this.table.cell(this, row);
+  var text = this.table.cellText(this, row);
   if (!cell.htmlEnabled) {
     text = scout.strings.encode(text);
   }
   if (this.table.multilineText) {
     text = scout.strings.nl2br(text, false);
   }
-  iconId = cell.iconId;
-  icon = this._icon(row, iconId, !! text) || '';
+  var iconId = cell.iconId;
+  var icon = this._icon(row, iconId, !! text) || '';
+  var cssClass = this._cssClass(row, cell);
+  var tooltipText = this.table.cellTooltipText(this, row);
+  var tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
+  var style = this.table.cellStyle(this, cell);
+
+  if (cell.errorStatus) {
+    row.hasError = true;
+  }
+
+  var content;
   if (!text && !icon) {
     // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
     content = '&nbsp;';
+    cssClass = scout.strings.join(' ', cssClass, 'empty');
   } else {
     content = icon + text;
-  }
-  cssClass = this._cssClass(row, cell);
-  tooltipText = this.table.cellTooltipText(this, row);
-  tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
-  style = this.table.cellStyle(this, cell);
-  if (cell.errorStatus) {
-    row.hasError = true;
   }
 
   return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + content + '</div>';

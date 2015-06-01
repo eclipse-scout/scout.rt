@@ -68,5 +68,5 @@ scout.CheckBoxField.prototype._renderLabel = function(label) {
     this._$checkBoxLabel.text(label);
   }
   // Make sure an empty label is as height as the other labels, especially important for top labels
-  this.$label.html('&nbsp;');
+  this.$label.html('&nbsp;').addClass('empty');
 };
