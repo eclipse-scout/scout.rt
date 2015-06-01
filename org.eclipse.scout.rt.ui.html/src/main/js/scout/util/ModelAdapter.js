@@ -34,7 +34,7 @@ scout.ModelAdapter.prototype.init = function(model, session) {
   // remove the registerModelAdapter from the ModelAdpater.js and move it to Session.js
   // getOrCreateModelAdapter() - This will cause many Jasmine tests to fail, since they
   // rely on the current behavior. See also createUiObject() where the flag is set.
-  if (scout.objects.whenUndefined(model._registered, true)) {
+  if (scout.helpers.nvl(model._registered, true)) {
     this.session.registerModelAdapter(this);
   }
   this.ui = this._createUi();
@@ -404,12 +404,12 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
     s += qualifier;
   }
   else {
-    s += scout.strings.nvl(this.objectType, 'NO_TYPE');
+    s += scout.helpers.nvl(this.objectType, 'NO_TYPE');
     if (qualifier) {
       s += '@' + qualifier;
     }
   }
-  s +=  '[' + this.session.partId + '-' + scout.strings.nvl(this.id, 'NO_ID') + ']';
+  s +=  '[' + this.session.partId + '-' + scout.helpers.nvl(this.id, 'NO_ID') + ']';
   return s.replace(/\s/g, '');
 };
 

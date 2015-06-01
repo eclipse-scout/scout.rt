@@ -52,10 +52,5 @@ scout.objects = {
    */
   isPlainObject: function(obj) {
     return (typeof obj === 'object' && !Array.isArray(obj));
-  },
-
-  whenUndefined: function(obj, defaultValue) {
-    return obj === undefined ? defaultValue : obj;
   }
-
 };

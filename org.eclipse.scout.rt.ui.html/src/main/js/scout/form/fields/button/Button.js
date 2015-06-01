@@ -115,8 +115,10 @@ scout.Button.prototype.setSelected = function(selected, notifyServer) {
   if (this.rendered) {
     this._renderSelected(this.selected);
   }
-  if (scout.objects.whenUndefined(notifyServer, true)) {
-    this.session.send(this.id, 'selected', {selected: selected});
+  if (scout.helpers.nvl(notifyServer, true)) {
+    this.session.send(this.id, 'selected', {
+      selected: selected
+    });
   }
 };
 

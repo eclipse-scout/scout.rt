@@ -257,8 +257,7 @@ scout.AbstractSmartField.prototype._acceptProposal = function() {
 scout.AbstractSmartField.prototype._closeProposal = function(notifyServer) {
   $(document).off('mousedown', this._mouseDownListener);
   if (this._$popup) {
-    notifyServer = scout.objects.whenUndefined(notifyServer, true);
-    if (notifyServer) {
+    if (scout.helpers.nvl(notifyServer, true)) {
       this.session.send(this.id, 'cancelProposal');
     }
     this._$popup.remove();

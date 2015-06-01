@@ -383,7 +383,7 @@ scout.Session.prototype._sendRequest = function(request) {
 
 scout.Session.prototype.defaultAjaxOptions = function(request, async) {
   request = request || {};
-  async = scout.objects.whenUndefined(async, true);
+  async = scout.helpers.nvl(async, true);
   return {
     async: async,
     type: 'POST',

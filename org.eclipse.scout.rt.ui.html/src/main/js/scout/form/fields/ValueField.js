@@ -61,8 +61,8 @@ scout.ValueField.prototype._onFieldBlur = function() {
 //   ruft typischerweise auch sendDisplayText(displayText) auf
 
 scout.ValueField.prototype.displayTextChanged = function() {
-  var displayText = scout.strings.nvl(this._readDisplayText(), ''),
-    oldDisplayText = scout.strings.nvl(this.displayText, '');
+  var displayText = scout.helpers.nvl(this._readDisplayText(), ''),
+    oldDisplayText = scout.helpers.nvl(this.displayText, '');
   if (displayText === oldDisplayText) {
     return;
   }
@@ -71,7 +71,7 @@ scout.ValueField.prototype.displayTextChanged = function() {
 };
 
 scout.ValueField.prototype._onFieldKeyUp = function() {
-  var displayText = scout.strings.nvl(this._readDisplayText(), '');
+  var displayText = scout.helpers.nvl(this._readDisplayText(), '');
   this._sendDisplayTextChanged(displayText, true);
 };
 

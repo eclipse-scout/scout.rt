@@ -383,8 +383,7 @@ scout.Tree.prototype._updateSelectedNodeIds = function(selectedNodeIds, notifySe
 
     this.selectedNodeIds = selectedNodeIds;
 
-    notifyServer = scout.objects.whenUndefined(notifyServer, true);
-    if (notifyServer) {
+    if (scout.helpers.nvl(notifyServer, true)) {
       this.session.send(this.id, 'nodesSelected', {
         nodeIds: selectedNodeIds
       });

@@ -61,16 +61,6 @@ scout.strings = {
     return z.slice(-padding);
   },
 
-  /**
-   * If the given string 's' is undefined or null, the given defaultValue is returned. Otherwise, s is returned.
-   */
-  nvl: function(s, defaultValue) {
-    if (s === undefined || s === null) {
-      return defaultValue;
-    }
-    return s;
-  },
-
   startsWith: function(fullString, startString) {
     if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
       return false;

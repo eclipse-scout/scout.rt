@@ -78,25 +78,6 @@ describe("scout.strings", function() {
 
   });
 
-  describe("nvl", function() {
-
-    it("can return alternative string", function() {
-      expect(scout.strings.nvl()).toBe(undefined);
-      expect(scout.strings.nvl('X')).toBe('X');
-      expect(scout.strings.nvl(undefined)).toBe(undefined);
-      expect(scout.strings.nvl(undefined, undefined)).toBe(undefined);
-      expect(scout.strings.nvl(undefined, null)).toBe(null);
-      expect(scout.strings.nvl(undefined, '')).toBe('');
-      expect(scout.strings.nvl(undefined, 'X')).toBe('X');
-      expect(scout.strings.nvl(null, 'X')).toBe('X');
-      expect(scout.strings.nvl(null, '')).toBe('');
-      expect(scout.strings.nvl(null, undefined)).toBe(undefined);
-      expect(scout.strings.nvl(null, null)).toBe(null);
-      expect(scout.strings.nvl(null)).toBe(undefined);
-    });
-
-  });
-
   describe("startsWith", function() {
 
     it("can check if a string starts with another", function() {

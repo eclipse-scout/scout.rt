@@ -175,6 +175,17 @@ scout.helpers = {
   // TODO IMO Is this still needed???
   dynamicResourceUrl: function(adapter, url) {
     return url;
+  },
+
+
+  /**
+   * If 'value' is undefined or null, 'defaultValue' is returned. Otherwise, 'value' is returned.
+   */
+  nvl: function(value, defaultValue) {
+    if (value === undefined || value === null) {
+      return defaultValue;
+    }
+    return value;
   }
 
 };
