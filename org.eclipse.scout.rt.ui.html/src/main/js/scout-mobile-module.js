@@ -123,6 +123,7 @@ __include("scout/desktop/Desktop.js");
 __include("scout/desktop/DesktopKeyStrokeAdapter.js");
 __include("scout/desktop/DesktopNavigationKeyStroke.js");
 __include("scout/desktop/DesktopNavigationKeyStrokeAdapter.js");
+__include("scout/desktop/DesktopTaskBarLayout.js");
 __include("scout/desktop/SearchFieldKeyStrokeAdapter.js");
 __include("scout/desktop/DesktopNavigationPopup.js");
 __include("scout/desktop/DesktopTableKeyStrokeAdapter.js");

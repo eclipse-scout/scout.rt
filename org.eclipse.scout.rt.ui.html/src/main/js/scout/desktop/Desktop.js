@@ -2,7 +2,7 @@ scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
   this.navigation;
-  this.$bar;
+  this.$taskBar;
   this.$tabbar;
   this.$toolbar;
   this.$bench;
@@ -40,29 +40,35 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation = new scout.DesktopNavigation(this);
   this.navigation.render($parent);
 
+  this.$taskBar = $parent.appendDiv('desktop-taskbar');
+  var htmlTabbar = new scout.HtmlComponent(this.$taskBar, this.session);
+  htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
+
+  this.$taskBar.appendDiv('taskbar-logo')
+    .delay(1000)
+    .animateAVCSD('width', 40, null, null, 1000);
+
+  this.$tabbar = this.$taskBar.appendDiv('taskbar-tabs');
+
+  // FIXME AWE: (menu) hier menu-bar verwenden?
+  this.$toolbar = this.$taskBar.appendDiv('taskbar-tools');
+  this.$bench = this.$container.appendDiv('desktop-bench');
+  new scout.HtmlComponent(this.$bench, this.session);
+
   this.splitter = new scout.Splitter({
-    $anchor: this.navigation.$navigation
+    $anchor: this.navigation.$navigation,
+    $root: this.$container,
+    maxRatio: 0.33
   });
   this.splitter.render($parent);
   this.splitter.on('resize', this.onSplitterResize.bind(this));
   this.splitter.on('resizeend', this.onSplitterResizeEnd.bind(this));
 
-  this.$bar = $parent.appendDiv('desktop-taskbar');
-  this.$bar.appendDiv('taskbar-logo')
-    .delay(1000)
-    .animateAVCSD('width', 40, null, null, 1000);
-
-  this.$tabbar = this.$bar.appendDiv('taskbar-tabs');
-  // FIXME AWE: (menu) hier menu-bar verwenden?
-  this.$toolbar = this.$bar.appendDiv('taskbar-tools');
-  this.$bench = this.$container.appendDiv('desktop-bench');
-  new scout.HtmlComponent(this.$bench, this.session);
-
   this._outlineTab = new scout.Desktop.TabAndContent();
 
-  for (i = 0; i < this.addOns.length; i++) {
-    this.addOns[i].render($parent);
-  }
+  this.addOns.forEach(function(addOn) {
+    addOn.render($parent);
+  });
 
   // we set the menuStyle property to render a menu with a different style
   // depending on where the menu is located (taskbar VS menubar).
@@ -102,6 +108,13 @@ scout.Desktop.prototype.onResize = function(event) {
   if (this.outline) {
     this.outline.onResize();
   }
+  this._layoutTaskBar();
+};
+
+scout.Desktop.prototype._layoutTaskBar = function() {
+  var htmlTaskBar = scout.HtmlComponent.get(this.$taskBar);
+  htmlTaskBar.invalidate();
+  htmlTaskBar.layout();
 };
 
 scout.Desktop.prototype.onSplitterResize = function(event) {
@@ -110,10 +123,10 @@ scout.Desktop.prototype.onSplitterResize = function(event) {
 };
 
 scout.Desktop.prototype.onSplitterResizeEnd = function(event) {
-  var w = event.pageX;
+  var w = event.data;
   if (w < this.navigation.breadcrumbSwitchWidth) {
     this.navigation.$navigation.animateAVCSD('width', this.navigation.breadcrumbSwitchWidth);
-    this.$bar.animateAVCSD('left', this.navigation.breadcrumbSwitchWidth);
+    this.$taskBar.animateAVCSD('left', this.navigation.breadcrumbSwitchWidth);
     this.$bench.animate({
       left: this.navigation.breadcrumbSwitchWidth
     }, {
@@ -150,6 +163,7 @@ scout.Desktop.prototype._addTab = function(tab, prepend) {
   }.bind(this));
 
   this._allTabs.push(tab);
+  this._layoutTaskBar();
 };
 
 scout.Desktop.prototype._isTabVisible = function(tab) {
@@ -179,6 +193,8 @@ scout.Desktop.prototype._removeTab = function(tab) {
     }
     tab.$container.remove();
   }
+
+  this._layoutTaskBar();
 };
 
 scout.Desktop.prototype._selectTab = function(tab) {
@@ -438,6 +454,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
   scout.focusManager.validateFocus(this.session.uiSessionId);
+};
+
+scout.Desktop.prototype.tabCount = function() {
+  return this._allTabs.length;
 };
 
 /* --- INNER TYPES ---------------------------------------------------------------- */

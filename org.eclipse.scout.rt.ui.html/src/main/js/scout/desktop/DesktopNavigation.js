@@ -195,10 +195,10 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
 
 // vertical splitter
 scout.DesktopNavigation.prototype.onResize = function(event) {
-  var w = event.pageX;
+  var w = event.data; // data = newSize
 
   this.$navigation.width(w);
-  this.desktop.$bar.css('left', w);
+  this.desktop.$taskBar.css('left', w);
   this.desktop.$bench.css('left', w);
 
   if (w <= this.breadcrumbSwitchWidth) {
