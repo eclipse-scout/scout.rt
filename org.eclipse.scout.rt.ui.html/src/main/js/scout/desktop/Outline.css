@@ -55,6 +55,11 @@
         /* always use same color as the tree-node label */
         color: inherit;
       }
+
+      &:hover:before {
+        color: @highlight-color;
+      }
+
     }
   }
 
