@@ -1136,7 +1136,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     boolean duplicate = existsDuplicateClassId();
     if (duplicate) {
       LOG.warn("Found a duplicate classid for {}, adding field index. Override classId for dynamically injected fields.", classId);
-      int fieldIndex = getParentField().getFieldIndex(this);
+      int fieldIndex = (getParentField() == null ? 0 : getParentField().getFieldIndex(this));
       classId.append(ID_CONCAT_SYMBOL).append(fieldIndex);
     }
 
