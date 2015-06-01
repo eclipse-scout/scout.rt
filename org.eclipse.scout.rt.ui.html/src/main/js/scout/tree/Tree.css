@@ -8,6 +8,12 @@
       background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;
     }
+
+    /*first child is the scrollbar*/
+    .tree-node:nth-of-type(2).selected {
+      border-top-color: @item-selection-nonfocus-background-color;
+    }
+
   }
 
   & .menubar {
@@ -44,6 +50,11 @@
 
   &.disabled {
     color: @disabled-color;
+  }
+
+  /*first child is the scrollbar*/
+  &:nth-of-type(2).selected {
+    border-top-color: @item-selection-nonfocus-background-color;
   }
 }
 
