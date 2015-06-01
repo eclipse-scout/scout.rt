@@ -5,6 +5,7 @@ scout.DesktopTabBarLayout = function(desktop) {
   this.TAB_WIDTH_SMALL = 130;
   this._desktop = desktop;
   this._$overflowTab;
+  this._overflowTabsIndizes = [];
 };
 scout.inherits(scout.DesktopTabBarLayout, scout.AbstractLayout);
 
@@ -40,16 +41,19 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
     toolsWidth, tabsWidth;
 
-  // reset tool-bar-items
+  // reset tabs and tool-items
   if (this._$overflowTab) {
     this._$overflowTab.remove();
   }
 
+  $tabs.find('.taskbar-tab-item').setVisible(true);
+
   $tools.find('.taskbar-tool-item').each(function() {
-    $(this).removeClass('min-padding');
-    var dataText = $(this).data('item-text');
+    var $item = $(this);
+    $item.removeClass('min-padding');
+    var dataText = $item.data('item-text');
     if (dataText) {
-      $(this).text(dataText);
+      $item.text(dataText);
     }
   });
 
@@ -59,8 +63,9 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
   $.log.info('numTabs=' + numTabs + ' contWidth=' + contWidth + ' toolsWidth=' + toolsWidth + ' logoWidth=' + logoWidth + ' --> tabsWidth=' + tabsWidth);
   $tools.cssLeft(contWidth - toolsWidth - logoWidth);
 
- var tabWidth;
- if (smallPrefTabsWidth <= tabsWidth) {
+  this._overflowTabsIndizes = [];
+  var tabWidth;
+  if (smallPrefTabsWidth <= tabsWidth) {
     tabWidth = Math.min(this.TAB_WIDTH_LARGE, Math.floor(tabsWidth / numTabs));
     $.log.info('MEEP(1) tabWidth=' + tabWidth);
     // 2nd - all Tabs fit when they have small size
@@ -119,6 +124,29 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     $.log.info('MEEP(4) icon-only tabsWidth=' + tabsWidth + ' toolsWidth=' + toolsWidth + ' numVisibleTabs=' + numVisibleTabs + ' numOverflowTabs=' + numOverflowTabs);
 
     // FIXME AWE: display correct range of tabs (around visible tab)
+    // FIXME AWE: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
+    // Never put first tab into overflow (this will change when desktop is refactored)
+    var i = 0, selectedIndex, tab;
+    $tabs.find('.taskbar-tab-item').each(function() {
+      if ($(this).hasClass('selected')) {
+        selectedIndex = i;
+      }
+      i++;
+    });
+
+    // determine visible range
+    var rightEnd, leftEnd = selectedIndex - Math.floor(numVisibleTabs / 2);
+    if (leftEnd < 0) {
+      leftEnd = 0;
+      rightEnd = numVisibleTabs - 1;
+    } else {
+      rightEnd = leftEnd + numVisibleTabs - 1;
+      if (rightEnd > numTabs - 1) {
+        rightEnd = numTabs - 1;
+        leftEnd = rightEnd - numVisibleTabs + 1;
+      }
+    }
+    $.log.info('show items from leftEnd=' + leftEnd + ' to rightEnd=' + rightEnd + ' selectedIndex=' + selectedIndex);
 
     this._$overflowTab = $tabs
       .appendDiv('overflow-tab-item')
@@ -127,15 +155,38 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
       this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
     }
 
+    var that = this;
     tabWidth = this.TAB_WIDTH_SMALL;
+    i = 0;
     $tabs.find('.taskbar-tab-item').each(function() {
-      $(this).outerWidth(tabWidth);
+      if (i >= leftEnd && i <= rightEnd) {
+        $(this).outerWidth(tabWidth);
+      } else {
+        $(this).setVisible(false);
+        that._overflowTabsIndizes.push(i);
+      }
+      i++;
     });
-
   }
 };
 
 scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
-  // FIXME AWE: open overflow menu
-  $.log.info('XXX click overflow');
+  var menu, tab, text, popup, overflowMenus = [], session = this._desktop.session, allTabs = this._desktop._allTabs;
+  this._overflowTabsIndizes.forEach(function(i) {
+    tab = allTabs[i];
+    text = tab.title;
+    if (tab.subTitle) {
+      text += ' (' + tab.subTitle + ')';
+    }
+    menu = session.createUiObject({
+      objectType: 'Menu',
+      text: text
+    });
+    overflowMenus.push(menu);
+  });
+
+  $.log.info('XXX click overflow ' + this._overflowTabsIndizes);
+  popup = new scout.ContextMenuPopup(session, overflowMenus);
+  popup.render();
+  popup.setLocation(new scout.Point(event.pageX, event.pageY));
 };
