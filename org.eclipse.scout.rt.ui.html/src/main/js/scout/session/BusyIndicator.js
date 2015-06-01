@@ -28,14 +28,15 @@ scout.BusyIndicator.prototype._render = function($parent) {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown');
     // Prevent resizing when message-box is dragged off the viewport
+    this.$container.addClass('calc-helper');
     this.$container.css('min-width', this.$container.width());
+    this.$container.removeClass('calc-helper');
+    // Now that all texts, paddings, widths etc. are set, we can calculate the position
+    this._position();
   }.bind(this));
 
   // Render properties
   this.$label.text(this._session.text('PleaseWait_'));
-
-  // Now that all texts are set, we can calculate the position
-  this._position();
 };
 
 scout.BusyIndicator.prototype._position = function() {

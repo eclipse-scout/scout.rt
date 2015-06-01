@@ -66,9 +66,14 @@ scout.MessageBox.prototype._render = function($parent) {
 
     // Class 'shown' is used for css animation
     this.$container.addClass('shown');
-    this._$glassPane.installFocusContext('auto', this._session.uiSessionId);
     // Prevent resizing when message-box is dragged off the viewport
+    this.$container.addClass('calc-helper');
     this.$container.css('min-width', this.$container.width());
+    this.$container.removeClass('calc-helper');
+    // Now that all texts, paddings, widths etc. are set, we can calculate the position
+    this._position();
+
+    this._$glassPane.installFocusContext('auto', this._session.uiSessionId);
   }.bind(this));
 
   // Render properties
@@ -78,8 +83,6 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderIntroText(this.introText);
   this._renderActionText(this.actionText);
 
-  // Now that all texts are set, we can calculate the position
-  this._position();
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 

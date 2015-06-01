@@ -14,6 +14,12 @@
     border-top-color: @error-border-color;
   }
 
+  /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
+  &.calc-helper {
+    top: 0;
+    left: 0;
+  }
+
   &.shown {
     .animation-name(fade-slidein-top);
     .animation-duration(0.5s);
