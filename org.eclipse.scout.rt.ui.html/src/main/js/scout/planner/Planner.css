@@ -237,7 +237,7 @@
     padding: 0px 5px;
     font-size: 17px;
     color: @palette-gray-6;
-    line-height: @calendar-header-height;
+    line-height: @planner-header-height;
     width: @planner-resource-title-width;
   }
 
@@ -253,7 +253,7 @@
     float: right;
     width: calc(~"100%" - @planner-resource-title-width);
     background-color: @palette-gray-2;
-    line-height: @calendar-header-height / 2;
+    line-height: @planner-header-height / 2;
 
     & .scale-item::after{
       position: absolute;
@@ -273,7 +273,7 @@
     float: right;
     width: calc(~"100%" - @planner-resource-title-width);
     //background-color: @palette-gray-1;
-    line-height: @calendar-header-height / 2;
+    line-height: @planner-header-height / 2;
 
     & .selected {
       background-color: @item-selection-background-color;

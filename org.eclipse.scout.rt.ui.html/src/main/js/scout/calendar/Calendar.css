@@ -243,12 +243,7 @@
       }
     }
 
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-
-     & .year-title::after{
-=======
-    &:after{
->>>>>>> 0644ba7 html ui: design calendar
+     &::after{
       position: absolute;
       height: 1px;
       width: 100%;
@@ -278,11 +273,7 @@
       width: 180px;
     }
 
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-      & .year-month::before{
-=======
     & .year-month:before{
->>>>>>> 0644ba7 html ui: design calendar
       position: absolute;
       left: 0px;
       top: 0px;
