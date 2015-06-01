@@ -186,7 +186,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       jsonNodes.put(treeNodeToJson(childNode));
     }
     putProperty(json, PROP_NODES, jsonNodes);
-    putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes(), true));
+    putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
     putContextMenu(json);
     return json;
   }
@@ -385,7 +385,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
     else {
       putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
-      JSONArray jsonNodeIds = nodeIdsToJson(nodes, false);
+      JSONArray jsonNodeIds = nodeIdsToJson(nodes, false, false);
       if (jsonNodeIds.length() > 0) {
         putProperty(jsonEvent, PROP_NODE_IDS, jsonNodeIds);
         addActionEvent(EVENT_NODES_DELETED, jsonEvent);
@@ -403,7 +403,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
-    JSONArray jsonNodeIds = nodeIdsToJson(modelNodes, false);
+    JSONArray jsonNodeIds = nodeIdsToJson(modelNodes, true, false);
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_IDS, jsonNodeIds);
     addActionEvent(EVENT_NODES_SELECTED, jsonEvent);
@@ -479,10 +479,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
-  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean autoCreateNodeId) {
+  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean ignoreDeletedNodes, boolean autoCreateNodeId) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      if (node.isStatusDeleted() || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if ((ignoreDeletedNodes && node.isStatusDeleted()) || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
         continue;
       }
       String nodeId;
