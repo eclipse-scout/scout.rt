@@ -42,7 +42,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
     }
 
     $part = $day
-      .appendDiv('calendar-component')
+      .appendDiv('calendar-component', this.item.subject )
       .addClass(this.item.cssClass)
       .data('component', this)
       .data('partDay', partDay)
@@ -50,9 +50,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
       .mouseenter(this._onHoverIn.bind(this))
       .mouseleave(this._onHoverOut.bind(this))
       .on('contextmenu', this._onContextMenu.bind(this));
-    if (scout.strings.hasText(this.item.subject)) {
-      $part.html('<b>' + this.item.subject + '</b>');
-    }
+
     this._$parts.push($part);
 
     if (!this.parent._isMonth()) {
@@ -193,7 +191,7 @@ scout.CalendarComponent.prototype._description = function() {
 
   // subject
   if (scout.strings.hasText(this.item.subject)) {
-    descParts.push({text: this.item.subject, bold: true});
+    descParts.push({text: this.item.subject, style: 'bold'});
   }
 
   // time-range
@@ -206,7 +204,7 @@ scout.CalendarComponent.prototype._description = function() {
   }
 
   if (scout.strings.hasText(range)) {
-    descParts.push({text: range});
+    descParts.push({text: range, style: 'small'});
   }
 
   // body
@@ -216,7 +214,7 @@ scout.CalendarComponent.prototype._description = function() {
 
   // build text
   descParts.forEach(function(part) {
-    text += (part.bold ? '<b>' + part.text + '</b>' : part.text) + '<br/>';
+    text += (part.style ? '<span class = "' + part.style + '">' + part.text + '</span>' : part.text) + '<br/>';
   });
 
   return text;

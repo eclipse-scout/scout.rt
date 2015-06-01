@@ -1,4 +1,6 @@
 @calendar-header-height: 45px;
+@calendar-header-buttons: 30px;
+@calendar-title-height: 25px;
 
 .calendar-icon(@icon, @size) {
   .font-icon;
@@ -20,24 +22,52 @@
 
 .calendar-header {
   height: @calendar-header-height;
+  line-height: @calendar-header-height;
+
   min-width: 420px;
   text-align: center;
 
+  .calendar-progress {
+    display: inline;
+  };
+
+
   & .calendar-range {
     float: left;
+    padding-left: 8px;
 
     & .calendar-previous,
+    & .calendar-today,
     & .calendar-next {
       cursor: pointer;
-      display: inline-block;
+      float: left;
+      height: @calendar-header-buttons;
+      color: @text-color;
+      background-color: @button-background-color;
+      border: 1px solid @border-color;
+      border-radius: @border-radius;
+      cursor: pointer;
+      white-space: nowrap;
+      margin-right: 5px;
+
+      line-height: @calendar-header-buttons;
+
+      &:hover {
+        color: @hover-color;
+      }
     }
 
+    & .calendar-today {
+      width: 65px;
+    }
+
+
     & .calendar-select {
-      display: inline-block;
-      font-size: 17px;
-      position: relative;
-      top: -5px;
-      left: 2px;
+      height: @calendar-header-buttons;
+      line-height: @calendar-header-buttons;
+      float: left;
+      font-size: 16px;
+      margin-left: 15px;
     }
 
     & .calendar-previous:hover::before,
@@ -46,55 +76,65 @@
     }
 
     & .calendar-previous::before {
-      .calendar-icon(@icon-angle-left, 29px);
+      .calendar-icon(@icon-angle-left, 20px);
     }
 
     & .calendar-next::before {
-      .calendar-icon(@icon-angle-right, 29px);
+      .calendar-icon(@icon-angle-right, 20px);
     }
   }
 
   & .calendar-commands {
     float: right;
 
-    & * {
-      display: inline-block;
+    & .calendar-mode,
+    & .calendar-toggle-year,
+    & .calendar-toggle-list {
+      height: @calendar-header-buttons;
+      line-height: @calendar-header-buttons;
+      float: left;
       cursor: pointer;
     }
 
-    & .calendar-today::before {
-      .calendar-icon(@icon-target, 20px);
+    & .calendar-mode {
+      width: 65px;
+
+      border-top: 1px solid @border-color;
+      border-bottom: 1px solid @border-color;
+      border-left: 1px solid @border-color;
+
+      &.first {
+        border-left: 1px solid @border-color;
+        border-top-left-radius: @border-radius;
+        border-bottom-left-radius: @border-radius;
+      }
+
+      &.last {
+        border-right: 1px solid @border-color;
+        border-top-right-radius: @border-radius;
+        border-bottom-right-radius: @border-radius;
+        margin-right: 5px;
+
+      }
+
+      &.selected{
+        background-color: @item-selection-background-color;
+      }
     }
 
-    & .calendar-mode-day::before {
-      .calendar-icon("1", 20px);
-     }
+    & .calendar-toggle-year,
+    & .calendar-toggle-list {
+      margin-left: 5px;
+    }
 
-    & .calendar-mode-work::before {
-      .calendar-icon("5", 20px);
-     }
-
-    & .calendar-mode-week::before {
-      .calendar-icon("7", 20px);
-     }
-
-    & .calendar-mode-month::before {
-      .calendar-icon("31", 20px);
-     }
 
     & .calendar-toggle-year::before {
-      .calendar-icon(@icon-clock, 20px);
+      .calendar-icon(@icon-calendar, 20px);
      }
 
     & .calendar-toggle-list::before {
-      .calendar-icon(@icon-menu, 20px);
+      .calendar-icon(@icon-th-list, 20px);
      }
-
-    & .calendar-separator {
-      box-sizing: content-box;
-      width: 20px;
-      height: 25px;
-    }
 
     & *:hover::before, & *:hover,
     & .selected::before, & .selected {
@@ -104,10 +144,8 @@
 }
 
 .calendar-component {
-
   position: relative;
   float: left;
-  font-size: 10px;
   line-height: 20px;
   height: 20px;
   padding-left: 4px;
@@ -116,6 +154,15 @@
   width: calc(~"100%" - 38px);
   border-left: 4px solid;
   text-align: left;
+
+  & span.bold {
+    font-weight: bold;
+  }
+
+  & span.small {
+    font-size: 11px;
+    color: @palette-gray-5;
+  }
 
   /* Default colors used when component has no specific class */
   background-color: @palette-blue-1;
@@ -167,37 +214,28 @@
 .calendar-year-container {
   display: inline-block;
   width: 0%;
-  padding: 0;
   height: calc(~"100%" - @calendar-header-height);
   background-color: @palette-white;
   overflow: hidden;
 
-  & .calendar-year {
-    width: 270px;
-    padding: 0px 10px;
-    height: 100%;
-
-    & .year-title {
-      position: relative;
-      width: calc(~"100%" - 20px);
-      height: @calendar-header-height;
-    }
+  & .calendar-year-title {
+    position: relative;
+    margin-left: 10px;
+    width: calc(~"100%" - 40px);
+    height: @calendar-title-height;
+    white-space: nowrap;
 
     & .year-title-item {
       display: inline-block;
       padding-right: 15px;
-      line-height: @calendar-header-height;
-      font-size: 17px;
-      color: @palette-gray-4;
+      line-height: @calendar-title-height;
+      color: @palette-gray-5;
       cursor: pointer;
+      font-weight: bold;
 
       &.selected {
-        color: @palette-gray-6;
+        color: @text-color;
         cursor: default;
-      }
-
-      &.ui-selected {
-        background-color: red;
       }
 
       &:hover {
@@ -205,8 +243,12 @@
       }
     }
 
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
 
      & .year-title::after{
+=======
+    &:after{
+>>>>>>> 0644ba7 html ui: design calendar
       position: absolute;
       height: 1px;
       width: 100%;
@@ -216,57 +258,79 @@
       background-color: @palette-gray-4;
     }
 
+  }
+
+  & .calendar-year-list {
+    position: relative;
+    width: 180px;
+    margin-left: 10px;
+
+    height: calc(~"100%" -  @calendar-title-height);
+    overflow: hidden;
+
     & .year-month{
       margin-top: 18px;
+      margin-bottom: 8px;
       position: relative;
       padding-top: 20px;
       padding-right: 15px;
       float: left;
-      height: 85px;
-      width: 125px;
-
-      font-size: 17px;
-      color: red;
+      width: 180px;
     }
 
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
       & .year-month::before{
+=======
+    & .year-month:before{
+>>>>>>> 0644ba7 html ui: design calendar
       position: absolute;
       left: 0px;
       top: 0px;
-      height: 100px;
       width: 100%;
       content: attr(data-title);
-      font-size: 17px;
-      color: @palette-green-4;
+      font-weight: bold;
+      color: @text-color;
     }
+
+    & .year-month:after{
+      position: absolute;
+      bottom: 0px;
+      right: 19px;
+      height: calc(~"100%" -  20px);
+      width: 26%;
+      content: ' ';
+      background-color: @palette-gray-6;
+      opacity: 0.13;
+      pointer-events: none
+    }
+
 
     & .year-day{
       position: relative;
       float: left;
-      width: 15px;
+      width: 23px;
       text-align: right;
-      color: @palette-gray-6;
-      font-size: 10px;
-      height: 12px;
-      padding: 1px;
-      line-height: 12px;
+      color: @text-color;
+      height: 18px;
+      padding-right: 5px;
+      line-height: 19px;
       cursor: pointer;
-    }
 
-    & .year-range{
-      background-color: @palette-green-0;
-    }
+      &.year-range{
+        background-color: @palette-green-0;
+      }
 
-    & .year-range-day{
-      background-color: @palette-green-3;
-    }
+      &.year-range-day{
+        background-color: @palette-green-3;
+      }
 
-    & .year-hover{
-      background-color: @palette-orange-0 !important;
-    }
+      &.year-hover{
+        background-color: @palette-orange-0 !important;
+      }
 
-    & .year-hover-day{
-      background-color: @palette-orange-2 !important;
+      &.year-hover-day{
+        background-color: @palette-orange-2 !important;
+      }
     }
   }
 
@@ -288,10 +352,10 @@
     & .list-title {
       position: relative;
       width: calc(~"100%" - 10px);
-      height: @calendar-header-height;
-      line-height: @calendar-header-height;
-      font-size: 17px;
-      color: @palette-gray-6;
+      height: @calendar-title-height;
+      line-height: @calendar-title-height;
+      font-weight: bold;
+      color: @text-color;
 
       &::after {
         position: absolute;
@@ -326,12 +390,12 @@
   }
 
   & .calendar-week-header {
-    height: @calendar-header-height;
+    height: @calendar-title-height;
   }
 
   & .calendar-week {
     position: relative;
-    height: calc(~"(100%" - @calendar-header-height ~") / 6");
+    height: calc(~"(100%" - @calendar-title-height ~") / 6");
   }
 
   & .calendar-week-name{
@@ -345,7 +409,6 @@
     display: inline-block;
     overflow: hidden;
     height: 100%;
-    text-align: center;
     z-index: 2;
 
     &.selected {
@@ -362,8 +425,8 @@
   }
 
   & .calendar-week-name {
-    font-size: 10px;
-    color: @palette-gray-4;
+    font-size: 11px;
+    color: @palette-gray-5;
     vertical-align: middle;
   }
 
@@ -390,17 +453,16 @@
 
 
   & .calendar-day-name {
-    line-height: @calendar-header-height;
-    color: @palette-gray-6;
+    line-height: @calendar-title-height;
+    padding-left: 7px;
   }
 
   & .calendar-day::before {
     position: absolute;
-    font-size: 17px;
     content: attr(data-day-name);
     color: @palette-gray-6;
     left: 7px;
-    top: 5px;
+    top: 7px;
     z-index: 2;
   }
 
@@ -409,15 +471,20 @@
   }
 
   & .weekend::before {
-    color: @palette-blue-4;
+    color: @palette-blue-5;
   }
 
   & .weekend-out::before {
-    color: @palette-blue-2 ;
+    color: @palette-blue-3 ;
   }
 
   & .now::before {
-    color: @palette-orange-3;
+    left: 4px;
+    top: 3px;
+    border: solid 4px @palette-gray-6;
+    border-radius: 50%;
+    background-color:  @palette-gray-6;
+    color: @palette-white;
   }
 
   & .calendar-week-axis {
@@ -436,10 +503,10 @@
 
   & .calendar-week-axis::before {
     position: absolute;
-    font-size: 10px;
+    font-size: 11px;
     top: -5px;
     left: -30px;
-    color: @palette-gray-4;
+    color: @palette-gray-5;
     content: attr(data-axis-name);
    }
 
@@ -459,10 +526,10 @@
 
   & .calendar-week-task::before {
     position: absolute;
-    font-size: 10px;
+    font-size: 11px;
     top: 5px;
     left: 9px;
-    color: @palette-gray-4;
+    color: @palette-gray-5;
     content: attr(data-axis-name);
   }
 
@@ -520,9 +587,4 @@
     }
   }
 }
-
-.calendar-progress {
-  margin-top: 5px;
-  display: inline;
-};
 

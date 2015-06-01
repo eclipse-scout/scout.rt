@@ -12,6 +12,7 @@ scout.CalendarLayout.prototype.layout = function($container) {
   $container.css('height', 'calc(100% - '+ height + 'px)');
 
   this.calendar.layoutSize();
+ // scout.scrollbars.update(this.calendar.$year);
 };
 
 scout.CalendarLayout.prototype.preferredLayoutSize = function($comp) {
