@@ -66,7 +66,7 @@
 }
 
 .taskbar-tabs, .taskbar-tools {
-  display:inline-block;
+  position: absolute;
   word-wrap: none;
   vertical-align:top;
 }
@@ -150,6 +150,11 @@
   border-right: 1px solid transparent;
   padding-top:16px;
 
+  &.min-padding {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
   &::before {
     .font-icon;
     color: @icon-color;
@@ -184,6 +189,28 @@
 
   &.disabled {
     background-color: @disabled-color;
+  }
+}
+
+.overflow-tab-item {
+  border-right: 1px solid @border-color;
+  display: inline-block;
+  height: 50px;
+  width: 30px;
+  padding-top: 17px;
+  text-align: center;
+  cursor: pointer;
+
+  &:before {
+    .font-icon;
+    color: @icon-color;
+    content: @icon-chevron-right;
+  }
+
+  & .num-tabs {
+    color: @disabled-color;
+    font-size: 10px;
+    margin-top: -4px;
   }
 }
 
