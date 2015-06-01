@@ -31,8 +31,12 @@ scout.WizardProgressField.prototype._renderWizardSteps = function(wizardSteps) {
         .attr('data-index', wizardStep.index)
         .appendTo(this._$stepList);
       var $wizardStepLabel = $.makeDiv('wizard-step-label')
-        .text(wizardStep.title)
         .appendTo($wizardStep);
+      if (wizardStep.title) {
+        $wizardStepLabel.text(wizardStep.title);
+      } else {
+        $wizardStepLabel.html('&nbsp;');
+      }
       // TODO BSH Wizard | Add icon
 
       if (wizardStep.enabled) {
