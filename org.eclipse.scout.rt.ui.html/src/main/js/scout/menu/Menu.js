@@ -69,9 +69,9 @@ scout.Menu.prototype._renderEnabled = function(enabled) {
   }
 };
 
-scout.Menu.prototype._renderVisible = function(enabled) {
-  scout.Menu.parent.prototype._renderVisible.call(this, enabled);
-  if (enabled) {
+scout.Menu.prototype._renderVisible = function(visible) {
+  scout.Menu.parent.prototype._renderVisible.call(this, visible);
+  if (visible) {
     this._registerKeyStrokeAdapter();
   } else {
     this._unregisterKeyStrokeAdapter();
