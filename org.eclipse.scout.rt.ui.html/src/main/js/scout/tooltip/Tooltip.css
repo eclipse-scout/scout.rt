@@ -17,6 +17,16 @@
   background-color: @tooltip-background-color;
   padding: 8px 12px;
   position: relative;
+
+  & span.bold {
+    font-weight: bold;
+  }
+
+  & span.small {
+    font-size: 11px;
+    color: @palette-gray-5;
+  }
+
 }
 
 .tooltip-arrow {
