@@ -20,12 +20,14 @@ import org.eclipse.scout.commons.HexUtility.HexOutputStream;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLifeProperty;
 
+@Bean
 public class DefaultAuthToken {
   protected static final byte[] SALT = HexUtility.decode("b4825d5722f16030a85d938016567c5f");
   protected static final byte[] PRIVATE_KEY = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
@@ -41,6 +43,10 @@ public class DefaultAuthToken {
   private String[] m_customArgs;
   private byte[] m_signature;
 
+  /**
+   * @deprecated Do not create manually, use {@code BEANS.get(BindData.class)} instead.
+   */
+  @Deprecated
   public DefaultAuthToken() {
   }
 
@@ -85,7 +91,13 @@ public class DefaultAuthToken {
     }
   }
 
-  public DefaultAuthToken(String userId, String... customArgs) {
+  /**
+   * Init this auth-token with explicit values
+   * 
+   * @param userId
+   * @param customArgs
+   */
+  public void init(String userId, String... customArgs) {
     m_userId = userId;
     m_validUntil = System.currentTimeMillis() + TOKEN_TTL;
     if (customArgs != null && customArgs.length == 0) {

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 
@@ -47,7 +48,7 @@ public class ServiceTunnelAccessTokenFilter implements Filter {
     }
 
     String tokenString = req.getHeader(AbstractHttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
-    DefaultAuthToken token = new DefaultAuthToken();
+    DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
     if (!token.parse(tokenString)) {
       chain.doFilter(in, out);
       return;

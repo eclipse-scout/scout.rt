@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -171,7 +172,9 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
       return null;
     }
     String userId = CollectionUtility.firstElement(getSession().getSubject().getPrincipals()).getName();
-    return new DefaultAuthToken(userId).toString();
+    DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
+    token.init(userId);
+    return token.toString();
   }
 
   /**
