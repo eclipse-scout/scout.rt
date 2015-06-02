@@ -29,13 +29,11 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLifePro
 
 @Bean
 public class DefaultAuthToken {
-  protected static final byte[] SALT = HexUtility.decode("b4825d5722f16030a85d938016567c5f");
-  protected static final byte[] PRIVATE_KEY = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
-  protected static final byte[] PUBLIC_KEY = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
-  protected static final long TOKEN_TTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
 
   public static boolean isActive() {
-    return PRIVATE_KEY != null || PUBLIC_KEY != null;
+    byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
+    byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
+    return privateKey != null || publicKey != null;
   }
 
   private String m_userId;
@@ -93,13 +91,14 @@ public class DefaultAuthToken {
 
   /**
    * Init this auth-token with explicit values
-   * 
+   *
    * @param userId
    * @param customArgs
    */
   public void init(String userId, String... customArgs) {
+    long tokenTTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
     m_userId = userId;
-    m_validUntil = System.currentTimeMillis() + TOKEN_TTL;
+    m_validUntil = System.currentTimeMillis() + tokenTTL;
     if (customArgs != null && customArgs.length == 0) {
       customArgs = null;
     }
@@ -160,11 +159,13 @@ public class DefaultAuthToken {
   }
 
   protected byte[] sign() throws ProcessingException {
-    return SecurityUtility.createSignature(PRIVATE_KEY, createUnsignedData());
+    byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
+    return SecurityUtility.createSignature(privateKey, createUnsignedData());
   }
 
   protected boolean verify() throws ProcessingException {
-    return SecurityUtility.verifySignature(PUBLIC_KEY, createUnsignedData(), getSignature());
+    byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
+    return SecurityUtility.verifySignature(publicKey, createUnsignedData(), getSignature());
   }
 
   public boolean isValid() {

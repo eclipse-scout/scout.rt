@@ -23,14 +23,22 @@ import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-/**
- *
- */
 public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigPropertyWithStatus<DATA_TYPE> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractConfigProperty.class);
 
+  private boolean m_valueInitialized;
+  private DATA_TYPE m_value;
+
   @Override
   public DATA_TYPE getValue() {
+    if (!m_valueInitialized) {
+      m_value = createValue();
+      m_valueInitialized = true;
+    }
+    return m_value;
+  }
+
+  protected DATA_TYPE createValue() {
     String prop = getRawValue();
     if (!StringUtility.hasText(prop)) {
       return getDefaultValue();
