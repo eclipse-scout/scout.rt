@@ -30,17 +30,21 @@ describe("DateField", function() {
     var dateField = createField(model);
     dateField.render(session.$entryPoint);
 
-    dateField.$field.focus();
-    expect(dateField.$field).toBeFocused();
-
-    dateField.$field.click();
+    dateField.$dateField.focus();
+    jasmine.clock().tick(101);
+    expect(dateField.$dateField).toBeFocused();
+    dateField.$dateField.click();
     expect(findPicker().length).toBe(1);
 
     return dateField;
   }
 
   function createModel() {
-    return helper.createFieldModel();
+    var model = helper.createFieldModel('scout.DateField');
+    model.hasDate=true;
+    model.timeFormatPattern = 'HH:mm';
+    model.dateFormatPattern = 'dd.MM.yyyy';
+    return model;
   }
 
   function findPicker() {
@@ -48,8 +52,8 @@ describe("DateField", function() {
   }
 
   function writeText(dateField, displayText) {
-    dateField.$field.val(displayText);
-    dateField.validateDisplayText(dateField.$field.val());
+    dateField.$dateField.val(displayText);
+    dateField.validateDisplayText(dateField.$dateField.val());
   }
 
   describe("Clicking the field", function() {
@@ -60,7 +64,7 @@ describe("DateField", function() {
       dateField.render(session.$entryPoint);
       expect(findPicker().length).toBe(0);
 
-      dateField.$field.click();
+      dateField.$dateField.click();
 
       expect(findPicker().length).toBe(1);
     });
@@ -74,7 +78,7 @@ describe("DateField", function() {
       var dateField = createFieldAndFocusAndOpenPicker(model);
       expect(findPicker().length).toBe(1);
 
-      dateField.$field.blur();
+      dateField.$dateField.blur();
 
       expect(findPicker().length).toBe(0);
     });
@@ -85,21 +89,32 @@ describe("DateField", function() {
 
       writeText(dateField, '02');
       dateField._$predict.val('02.11.2015');
-      dateField._onFieldBlur();
+      dateField._onFieldBlurDate();
 
-      expect(dateField.$field.val()).toBe('02.11.2015');
+      expect(dateField.$dateField.val()).toBe('02.11.2015');
     });
 
     it("updates the model with the selected value", function() {
       var model = createModel();
-      model.displayText = '01.10.2014';
+      model.timestamp = 1412114400000;
       var dateField = createFieldAndFocusAndOpenPicker(model);
-      expect(dateField.displayText).toBe('01.10.2014');
+      var dateBefore = new Date(dateField.timestamp);
+      expect(dateBefore.getFullYear()).toBe(2014);
+      expect(dateBefore.getMonth()).toBe(9);
+      expect(dateBefore.getDate()).toBe(1);
 
-      writeText(dateField, '02.11.2015');
-      expect(dateField.displayText).toBe('01.10.2014');
-      dateField._onFieldBlur();
-      expect(dateField.displayText).toBe('02.11.2015');
+      writeText(dateField, '11.02.2015');
+      dateBefore = new Date(dateField.timestamp);
+      expect(dateBefore.getFullYear()).toBe(2014);
+      expect(dateBefore.getMonth()).toBe(9);
+      expect(dateBefore.getDate()).toBe(1);
+
+      dateField._onFieldBlurDate();
+      var date= new Date(dateField.timestamp);
+      expect(date.getFullYear()).toBe(2015);
+      expect(date.getMonth()).toBe(1);
+      expect(date.getDate()).toBe(11);
+
     });
 
   });
@@ -111,7 +126,7 @@ describe("DateField", function() {
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
       writeText(dateField, '33');
-      expect(dateField.$field).toHaveClass('has-error');
+      expect(dateField.$dateField).toHaveClass('has-error');
     });
 
     it("prevents model update if value is invalid", function() {
@@ -135,7 +150,7 @@ describe("DateField", function() {
         var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(findPicker().length).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.ESC);
+        dateField.$dateField.triggerKeyDown(scout.keys.ESC);
 
         expect(findPicker().length).toBe(0);
       });
@@ -146,14 +161,26 @@ describe("DateField", function() {
 
       it("updates the model with the selected value and closes picker", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        writeText(dateField, '02.11.2015');
-        expect(dateField.displayText).toBe('01.10.2014');
-        dateField.$field.triggerKeyDown(scout.keys.ENTER);
-        expect(dateField.displayText).toBe('02.11.2015');
+
+        writeText(dateField, '11.02.2015');
+        dateBefore=new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
+
+
+        dateField.$dateField.triggerKeyDown(scout.keys.ENTER);
+        var date= new Date(dateField.timestamp);
+        expect(date.getFullYear()).toBe(2015);
+        expect(date.getMonth()).toBe(1);
+        expect(date.getDate()).toBe(11);
         expect(findPicker().length).toBe(0);
       });
 
@@ -163,38 +190,57 @@ describe("DateField", function() {
 
       it("increases day by one", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.DOWN);
+        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
 
-        expect(dateField.displayText).toBe('01.10.2014');
-        expect(dateField.$field.val()).toBe('02.10.2014');
+        dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
+        expect(dateField.$dateField.val()).toBe('02.10.2014');
       });
 
       it("increases month by one if shift is used as modifier", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.DOWN, 'shift');
+        dateField.$dateField.triggerKeyDown(scout.keys.DOWN, 'shift');
+        dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        expect(dateField.displayText).toBe('01.10.2014');
-        expect(dateField.$field.val()).toBe('01.11.2014');
+        expect(dateField.$dateField.val()).toBe('01.11.2014');
       });
 
       it("increases year by one if ctrl is used as modifier", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.DOWN, 'ctrl');
+        dateField.$dateField.triggerKeyDown(scout.keys.DOWN, 'ctrl');
 
-        expect(dateField.displayText).toBe('01.10.2014');
-        expect(dateField.$field.val()).toBe('01.10.2015');
+        dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
+
+        expect(dateField.$dateField.val()).toBe('01.10.2015');
       });
 
     });
@@ -203,38 +249,56 @@ describe("DateField", function() {
 
       it("decreases day by one", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.UP);
+        dateField.$dateField.triggerKeyDown(scout.keys.UP);
 
-        expect(dateField.displayText).toBe('01.10.2014');
-        expect(dateField.$field.val()).toBe('30.09.2014');
+        dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
+        expect(dateField.$dateField.val()).toBe('30.09.2014');
       });
 
       it("decreases month by one if shift is used as modifier", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.UP, 'shift');
+        dateField.$dateField.triggerKeyDown(scout.keys.UP, 'shift');
 
-        expect(dateField.displayText).toBe('01.10.2014');
-        expect(dateField.$field.val()).toBe('01.09.2014');
+        dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
+        expect(dateField.$dateField.val()).toBe('01.09.2014');
       });
 
       it("decreases year by one if ctrl is used as modifier", function() {
         var model = createModel();
-        model.displayText = '01.10.2014';
+        model.timestamp = 1412114400000;
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(dateField.displayText).toBe('01.10.2014');
+        var dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
 
-        dateField.$field.triggerKeyDown(scout.keys.UP, 'ctrl');
+        dateField.$dateField.triggerKeyDown(scout.keys.UP, 'ctrl');
 
-        expect(dateField.displayText).toBe('01.10.2014');
-        expect(dateField.$field.val()).toBe('01.10.2013');
+        dateBefore = new Date(dateField.timestamp);
+        expect(dateBefore.getFullYear()).toBe(2014);
+        expect(dateBefore.getMonth()).toBe(9);
+        expect(dateBefore.getDate()).toBe(1);
+        expect(dateField.$dateField.val()).toBe('01.10.2013');
       });
 
     });

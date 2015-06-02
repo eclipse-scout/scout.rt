@@ -25,33 +25,59 @@ scout.DateFormat = function(locale, pattern) {
   this.symbols.firstDayOfWeek = 1; // monday //FIXME deliver from server
   this.symbols.weekdaysOrdered = scout.dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
   this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
+  this.symbols.monthsToNumber;
+  this.symbols.monthsShortToNumber;
+  this._createMonthsToNumberMapping;
   this.formatFunc = [];
+  this.patternDefinitions = [];
+  this.parseFunc = [];
   this.pattern = pattern;
+  this.timePart;
+  this.datePart;
 
   // Local helper (constructor) functions
-  var DateFormatPatternDefinition = function(term, func) {
+  var DateFormatPatternDefinition = function(term, func, parseFunc, isTimePattern) {
     if (Array.isArray(term)) {
       this.terms = term;
-    }
-    else {
+    } else {
       this.terms = [term];
     }
     this.func = func;
+    this.parseFunc = parseFunc;
+    this.isTimePattern=isTimePattern;
+    this.patternIndex = -1;
+    this.patternTextAfter = ''; //is set by DateFormat
+    this.firstPatternDefinition; //is set by DateFormat
+    this.selectedPattern;
+  };
+
+  DateFormatPatternDefinition.prototype.compile = function(pattern) {
+    for (var i = 0; i < this.terms.length; i++) {
+      var index = pattern.indexOf(this.terms[i]);
+      if (index !== -1) {
+        this.index = index;
+        this.selectedPattern = this.terms[i];
+        break;
+      }
+    }
   };
   DateFormatPatternDefinition.prototype.createFormatFunc = function() {
     var that = this;
     return function(string, date) {
-      // Find the first term that matches (we can assume that one does, because
-      // accept() should have been called earlier), then replace the term by
-      // the value provided by the definition's function.
-      for (var i = 0; i < that.terms.length; i++) {
-        if (string.indexOf(that.terms[i]) !== -1) {
-          return string.replace(that.terms[i], that.func(date));
-        }
-      }
-      return string;
+      return string.replace(that.selectedPattern, that.func(date));
     };
   };
+
+  DateFormatPatternDefinition.prototype.createParseFunc = function() {
+    var that = this;
+    return function(dateString, date) {
+      if (that.firstPatternDefinition) {
+        dateString = dateString.substring(that.index, dateString.length);
+      }
+      return that.parseFunc(dateString, date, that.patternTextAfter);
+    };
+  };
+
   DateFormatPatternDefinition.prototype.accept = function(pattern) {
     if (!pattern) {
       return false;
@@ -77,119 +103,263 @@ scout.DateFormat = function(locale, pattern) {
     [
       new DateFormatPatternDefinition('yyyy', function(date) {
         return String(date.getFullYear());
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        //every time 4 chars
+        date.setFullYear(dateString.substr(0, 4));
+        return dateString.substring(4 + this.patternTextAfter.length, dateString.length);
+      }, false),
       new DateFormatPatternDefinition(['yy', 'y'], function(date) {
         return String(date.getFullYear()).slice(2);
-      })
+      }, function(dateString, date, patternTextAfter) {
+        var shortYear = Number(dateString.substr(0, 2));
+        var actualYear = Number(String(new Date().getFullYear()).slice(2));
+        var rangeMin = actualYear-50<0 ? actualYear+50 : actualYear-50;
+        var yearprefix = shortYear>rangeMin ? Number(String(new Date().getFullYear()).substr(0,2) )-1:String(new Date().getFullYear()).substr(0,2);
+
+        date.setFullYear(yearprefix+dateString.substr(0, 2));
+        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
+      }, false)
     ],
     // Month
     [
       new DateFormatPatternDefinition('MMMM', function(date) {
         return that.symbols.months[date.getMonth()];
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setMonth(that.symbols.monthsToNumber[dateString.toUpperCase()]);
+      }, false),
       new DateFormatPatternDefinition('MMM', function(date) {
         return that.symbols.monthsShort[date.getMonth()];
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setMonth(that.symbols.monthsShortToNumber[dateString.toUpperCase()]);
+      }, false),
       new DateFormatPatternDefinition('MM', function(date) {
         return scout.strings.padZeroLeft(date.getMonth() + 1, 2);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setMonth(Number(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart) - 1);
+        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
+      }, false),
       new DateFormatPatternDefinition('M', function(date) {
         return date.getMonth() + 1;
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setMonth(dateString - 1);
+      }, false)
     ],
     // Week in year
     [
       new DateFormatPatternDefinition('ww', function(date) {
         return scout.strings.padZeroLeft(scout.dates.weekInYear(date), 2);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        //not supported
+        return date;
+      }, false),
       new DateFormatPatternDefinition('w', function(date) {
         return scout.dates.weekInYear(date);
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //notSuported
+        return date;
+      }, false)
     ],
     // Day in month
     [
       new DateFormatPatternDefinition('dd', function(date) {
         return scout.strings.padZeroLeft(date.getDate(), 2);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setDate(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
+        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
+      }, false),
       new DateFormatPatternDefinition('d', function(date) {
         return date.getDate();
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setMonth(dateString);
+      }, false)
     ],
     // Weekday
     [
       new DateFormatPatternDefinition('EEEE', function(date) {
         return that.symbols.weekdays[date.getDay()];
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        //not supported
+        return date;
+      }, false),
       new DateFormatPatternDefinition(['EEE', 'EE', 'E'], function(date) {
         return that.symbols.weekdaysShort[date.getDay()];
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //not supported
+        return date;
+      }, false)
     ],
     // Hour (24h)
     [
       new DateFormatPatternDefinition('HH', function(date) {
         return scout.strings.padZeroLeft(date.getHours(), 2);
-      }),
-      new DateFormatPatternDefinition('H', function(date) {
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setHours(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
+        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
+      }, true),
+      new DateFormatPatternDefinition(['H','h'], function(date) {
         return date.getHours();
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setHours(dateString);
+      }, true)
     ],
     // Hour (12h)
     [
       new DateFormatPatternDefinition('KK', function(date) {
         return scout.strings.padZeroLeft((date.getHours() + 11) % 12 + 1, 2);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setHours(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
+        return dateString.substring(1 + this.patternTextAfter.length, dateString.length);
+      }, true),
       new DateFormatPatternDefinition('K', function(date) {
         return (date.getHours() + 11) % 12 + 1;
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setHours(dateString);
+      }, true)
     ],
 
     // AM/PM marker
     [
       new DateFormatPatternDefinition('a', function(date) {
-        return (date.getHours() < 12) ? that.symbols.am : that.symbols.pm;
-      })
+        return (date.getHours() < 12) ? 'am' : 'pm';
+      }, function(dateString, date, patternTextAfter) {
+        //not supported
+        return date;
+      }, true)
     ],
     // Minute
     [
       new DateFormatPatternDefinition('mm', function(date) {
         return scout.strings.padZeroLeft(date.getMinutes(), 2);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setMinutes(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
+        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
+      }, true),
       new DateFormatPatternDefinition('m', function(date) {
         return date.getMinutes();
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setMinutes(dateString);
+      }, true)
     ],
     // Second
     [
       new DateFormatPatternDefinition('ss', function(date) {
         return scout.strings.padZeroLeft(date.getSeconds(), 2);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setSeconds(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
+        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
+      }, true),
       new DateFormatPatternDefinition('s', function(date) {
         return date.getSeconds();
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setSeconds(dateString);
+      }, true)
     ],
     // Millisecond
     [
       new DateFormatPatternDefinition('SSS', function(date) {
         return ('000' + date.getMilliseconds()).slice(-3);
-      }),
+      }, function(dateString, date, patternTextAfter) {
+        var datePart = dateString.substr(0, 2);
+        date.setMilliseconds(datePart.indexOf(0) === 0 ? datePart.indexOf(0) === 1 ? datePart.substr(2, 1) : datePart.substr(1, 1) : datePart);
+        return dateString.substring(3 + this.patternTextAfter.length, dateString.length);
+      }, true),
       new DateFormatPatternDefinition('S', function(date) {
         return date.getMilliseconds();
-      })
+      }, function(dateString, date, patternTextAfter) {
+        //TODO nbu
+        return date.setMilliseconds(dateString);
+      }, true)
     ]
   ];
 
-  // Now for each pattern group in the library, pick the best matching definition
+  this.compile(patternLibrary);
+
+};
+
+scout.DateFormat.prototype.compile = function(patternLibrary) {
+  //Now for each pattern group in the library, pick the best matching definition
   // and retrieve the formatter function from it.
+  var lastTimePattern,
+    lastDatePattern,
+    firstTimePattern,
+    firstDatePattern;
   for (var i = 0; i < patternLibrary.length; i++) {
     var patternGroup = patternLibrary[i];
     for (var j = 0; j < patternGroup.length; j++) {
       var patternDefinition = patternGroup[j];
-      if (patternDefinition.accept(pattern)) {
+      if (patternDefinition.accept(this.pattern)) {
+        patternDefinition.compile(this.pattern);
         this.formatFunc.push(patternDefinition.createFormatFunc());
+        this.patternDefinitions[patternDefinition.index] = patternDefinition;
+        if (patternDefinition.isTimePattern) {
+          lastTimePattern = lastTimePattern? lastTimePattern.index > patternDefinition.index ? lastTimePattern : patternDefinition :patternDefinition;
+          firstTimePattern = firstTimePattern? firstTimePattern.index > patternDefinition.index ? patternDefinition : firstTimePattern:patternDefinition;
+        } else {
+          lastDatePattern = lastDatePattern ? lastDatePattern.index > patternDefinition.index ? lastDatePattern : patternDefinition:patternDefinition;
+          firstDatePattern = firstDatePattern? firstDatePattern.index > patternDefinition.index ? patternDefinition : firstDatePattern:patternDefinition;
+        }
         break;
       }
     }
   }
+  //create date and time part;
+  if(firstTimePattern&&lastTimePattern){
+    this.timePart = this.pattern.substring(firstTimePattern.index, lastTimePattern.index + lastTimePattern.selectedPattern.length).trim();
+  }
+  if(firstDatePattern && lastDatePattern){
+    this.datePart= this.pattern.substring(firstDatePattern.index, lastDatePattern.index + lastDatePattern.selectedPattern.length).trim();
+  }
+
+  //update Patterndefinitions and create parseFunc in correct order.
+  var firstDefinition = true;
+  var pattern = this.pattern;
+  var lastPatternDef;
+  for (i = 0; i < this.patternDefinitions.length; i++) {
+    var patternDef = this.patternDefinitions[i];
+    if (patternDef) {
+      this.parseFunc.push(patternDef.createParseFunc());
+      if (firstDefinition) {
+        patternDef.firstPatternDefinition = firstDefinition;
+        firstDefinition = false;
+        lastPatternDef = this.patternDefinitions[i];
+        continue;
+      }
+      if (this.patternDefinitions.length === i + 1) {
+        //last element
+        var patternAfter = pattern.substring(pattern.indexOf(patternDef.selectedPattern) + patternDef.selectedPattern.length, pattern.length);
+        patternDef.patternTextAfter = patternAfter ? patternAfter : '';
+      }
+      var patternLastAfter = pattern.substring(pattern.indexOf(lastPatternDef.selectedPattern) + lastPatternDef.selectedPattern.length, pattern.indexOf(patternDef.selectedPattern));
+      lastPatternDef.patternTextAfter = patternLastAfter ? patternLastAfter : '';
+      lastPatternDef = this.patternDefinitions[i];
+    }
+  }
+};
+
+scout.DateFormat.prototype._createMonthsToNumberMapping = function(date) {
+  var monthMap = {}, monthShortMap = {};
+
+  for (var i = 0; i < 12; i++) {
+    monthMap.set(this.symbols.months[i].toUpperCase(), i);
+    monthShortMap.se(this.symbols.monthsShort[i].toUpperCase(), i);
+  }
+
+  this.symbols.monthsToNumber = monthMap;
+  this.symbols.monthsShortToNumber = monthShortMap;
 };
 
 scout.DateFormat.prototype.format = function(date) {
@@ -203,6 +373,7 @@ scout.DateFormat.prototype.format = function(date) {
 };
 
 scout.DateFormat.prototype.analyze = function(text, asNumber) {
+  //TODO nbu check this code is this used if parse can parse different patterns
   var result = {};
   if (text) {
     var sep = this.pattern.replace('dd', '').replace('MM', '').replace('yyyy', '')[0];
@@ -222,27 +393,29 @@ scout.DateFormat.prototype.analyze = function(text, asNumber) {
   return result;
 };
 
+scout.DateFormat.prototype.fusionDateTime = function(date, time) {
+  var newDate = new Date();
+  newDate.setHours(0,0,0);
+  newDate.setFullYear(date.getYear(), date.getMonth(), date.getDay());
+  newDate.setHours(scout.strings.nvl(time.getHours(),0), scout.strings.nvl(time.getMinutes(),0), scout.strings.nvl(time.getSeconds(),0), scout.strings.nvl(time.getMilliseconds,0));
+  return newDate;
+};
+
 scout.DateFormat.prototype.parse = function(text) {
+
   if (!text) {
     return undefined;
   }
 
-  var dateInfo = this.analyze(text, true);
-  if (isNaN(dateInfo.year) || isNaN(dateInfo.month) || isNaN(dateInfo.day)) {
-    return undefined;
-  }
-
-  var year = dateInfo.year;
-  // TODO BSH Date | Try to move this logic to analyze()
-  if (year < 100) {
-    year += 2000;
-  }
-
+  //  var dateInfo = this.analyze(text, true);
+  //  if (isNaN(dateInfo.year) || isNaN(dateInfo.month) || isNaN(dateInfo.day)) {
+  //    return undefined;
+  //  }
+  //
   var date = new Date();
-  date.setFullYear(year);
-  date.setMonth(dateInfo.month - 1);
-  date.setDate(dateInfo.day);
-  date.setHours(0, 0, 0, 0);
-
+  var ret = text;
+  for (var i = 0; i < this.parseFunc.length; i++) {
+    ret = this.parseFunc[i](ret, date);
+  }
   return date;
 };

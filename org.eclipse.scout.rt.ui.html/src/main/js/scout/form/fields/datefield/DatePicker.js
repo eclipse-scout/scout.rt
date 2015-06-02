@@ -15,9 +15,9 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
-  var origin = scout.graphics.offsetBounds(this._dateField.$field);
+  var origin = scout.graphics.offsetBounds(this._dateField.$dateField);
   if (!this.$popup) {
-    var $parent = $('body'); // TODO BSH Try this: this._dateField.$field.closest('.desktop .glasspane') || $('body');
+    var $parent = $('body'); // TODO BSH Try this: this._dateField.$dateField.closest('.desktop .glasspane') || $('body');
     this.$popup = $.makeDiv('date-box')
       .cssLeft(origin.x)
       .cssTop(origin.y + origin.height)
@@ -25,7 +25,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
       .appendTo($parent);
 
     this._scrollHandler = this.close.bind(this);
-    scout.scrollbars.onScroll(this._dateField.$field, this._scrollHandler);
+    scout.scrollbars.onScroll(this._dateField.$dateField, this._scrollHandler);
 
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));

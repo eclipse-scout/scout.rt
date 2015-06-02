@@ -1,3 +1,4 @@
+/* global LocaleSpecHelper*/
 describe("ObjectFactory", function() {
 
   beforeEach(function() {
@@ -57,6 +58,7 @@ describe("ObjectFactory", function() {
     setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1'),
       factories = scout.defaultObjectFactories;
+    session.locale = new LocaleSpecHelper().createLocale('de');
     verifyCreationAndRegistration(session, factories);
   });
 
@@ -64,6 +66,7 @@ describe("ObjectFactory", function() {
     setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1'),
       factories = scout.mobileObjectFactories;
+    session.locale = new LocaleSpecHelper().createLocale('de');
     verifyCreationAndRegistration(session, factories);
   });
 

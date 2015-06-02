@@ -64,16 +64,17 @@
 }
 
 /* Expects a sibling html element with class 'icon' **/
-.text-field-with-icon (@icon) {
+
+.text-field-with-icon (@icon; @className: ~'') {
   padding-right: @text-field-padding + 15px;
 
-  & ~ .icon {
+  & ~ .icon@{className} {
     position: absolute;
     margin-right: @text-field-padding;
     cursor: text;
   }
 
-  & ~ .icon::before {
+  & ~ .icon@{className}::before {
     .font-icon;
     font-size: 13px;
     content: @icon;
@@ -84,11 +85,11 @@
     color: @text-field-icon-color;
   }
 
-  &:focus ~ .icon::before {
+  &:focus ~ .icon@{className}::before {
     color: @text-field-icon-focus-color;
   }
 
-  &.has-error ~ .icon::before {
+  &.has-error ~ .icon@{className}::before {
     color: @text-field-icon-error-color;
   }
 
@@ -96,7 +97,7 @@
     padding-right: @text-field-padding;
   }
 
-  &.disabled ~ .icon {
+  &.disabled ~ .icon@{className} {
     display: none;
   }
 }

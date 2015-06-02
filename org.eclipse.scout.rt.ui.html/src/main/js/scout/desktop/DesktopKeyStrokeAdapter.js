@@ -10,6 +10,7 @@ scout.DesktopKeyStrokeAdapter = function(desktop) {
   this._viewTabAutoKeyStroke = new scout.ViewTabAutoKeyStroke(desktop.autoTabKeyStrokesEnabled, this._tabs, desktop.autoTabKeyStrokeModifier);
 
   this.keyStrokes.push(this._viewTabAutoKeyStroke);
+  this.keyStrokes.push(new scout.DesktopBackspaceKeyStroke());
   this.installDesktopModelKeystrokes();
 };
 
@@ -60,3 +61,14 @@ scout.DesktopKeyStrokeAdapter.prototype.installDesktopModelKeystrokes = function
     this.keyStrokes = this._desktop.actions;
   }
 };
+
+scout.DesktopBackspaceKeyStroke = function() {
+  scout.DesktopBackspaceKeyStroke.parent.call(this);
+  this.keyStroke = 'Backspace';
+  this.drawHint = false;
+  this.initKeyStrokeParts();
+  this.preventDefaultOnEvent = true;
+};
+scout.inherits(scout.DesktopBackspaceKeyStroke, scout.KeyStroke);
+
+scout.DesktopBackspaceKeyStroke.prototype.handle = function(event) {};
