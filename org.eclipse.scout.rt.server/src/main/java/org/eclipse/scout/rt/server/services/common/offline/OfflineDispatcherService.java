@@ -37,7 +37,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   @Override
   public IServiceTunnelResponse dispatch(final IServiceTunnelRequest serviceRequest) {
     try {
-      //enable cancel
+      // Enable global cancellation of the service request.
       IRunMonitor runMonitor = BEANS.get(IRunMonitor.class);
 
       ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
@@ -48,18 +48,15 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       serverRunContext.session(provideServerSession(serverRunContext.copy()));
 
       IServerSession session = serverRunContext.session();
+      long requestId = serviceRequest.getRequestSequence();
 
-      BEANS.get(RunMonitorCancelRegistry.class).register(session, serviceRequest.getRequestSequence(), runMonitor);
-
-      final IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-
-      BEANS.get(RunMonitorCancelRegistry.class).unregister(session, serviceRequest.getRequestSequence());
-
-      if (serviceResponse != null) {
-        return serviceResponse;
+      BEANS.get(RunMonitorCancelRegistry.class).register(session, requestId, runMonitor);
+      try {
+        IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+        return (serviceResponse != null ? serviceResponse : new ServiceTunnelResponse(null, null, new InterruptedException("Result from handler was null")));
       }
-      else {
-        return new ServiceTunnelResponse(null, null, new InterruptedException("Result from handler was null"));
+      finally {
+        BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestId);
       }
     }
     catch (final Exception e) {

@@ -110,6 +110,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
           IServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
+          // Enable global cancellation of the service request.
           IRunMonitor runMonitor = BEANS.get(IRunMonitor.class);
 
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
@@ -118,15 +119,17 @@ public class ServiceTunnelServlet extends HttpServlet {
           serverRunContext.runMonitor(runMonitor);
           serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-          //enable cancel
           IServerSession session = serverRunContext.session();
-          BEANS.get(RunMonitorCancelRegistry.class).register(session, serviceRequest.getRequestSequence(), runMonitor);
+          long requestSequence = serviceRequest.getRequestSequence();
 
-          IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-
-          BEANS.get(RunMonitorCancelRegistry.class).unregister(session, serviceRequest.getRequestSequence());
-
-          serializeServiceResponse(serviceResponse);
+          BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
+          try {
+            IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+            serializeServiceResponse(serviceResponse);
+          }
+          finally {
+            BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
+          }
         }
       });
     }
