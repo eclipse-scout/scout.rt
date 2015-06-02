@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
@@ -69,7 +70,8 @@ public class DefaultAuthTokenTest {
   public void testSimple() throws ProcessingException {
     Assert.assertTrue(DefaultAuthToken.isActive());
 
-    DefaultAuthToken t = new DefaultAuthToken("foo");
+    DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
+    t.init("foo");
     Assert.assertEquals("foo", t.getUserId());
     Assert.assertEquals(0, t.getCustomArgCount());
     Assert.assertTrue(t.getValidUntil() - System.currentTimeMillis() > 0);
@@ -79,14 +81,14 @@ public class DefaultAuthTokenTest {
 
     String encoded = t.toString();
 
-    DefaultAuthToken t2 = new DefaultAuthToken();
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class);
     Assert.assertTrue(t2.parse(encoded));
     Assert.assertEquals(t.getUserId(), t2.getUserId());
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
     Assert.assertTrue(t2.isValid());
 
     String encodedAndTampered = new String(t.createUnsignedData()) + ";" + toUtf8Hex("abc");
-    DefaultAuthToken t3 = new DefaultAuthToken();
+    DefaultAuthToken t3 = BEANS.get(DefaultAuthToken.class);
     Assert.assertTrue(t3.parse(encodedAndTampered));
     Assert.assertEquals(t.getUserId(), t3.getUserId());
     Assert.assertEquals(t.getValidUntil(), t3.getValidUntil());
@@ -97,7 +99,8 @@ public class DefaultAuthTokenTest {
   public void testWithCustomToken() throws ProcessingException {
     Assert.assertTrue(DefaultAuthToken.isActive());
 
-    DefaultAuthToken t = new DefaultAuthToken("foo", "bar");
+    DefaultAuthToken t = BEANS.get(DefaultAuthToken.class);
+    t.init("foo", "bar");
     Assert.assertEquals("foo", t.getUserId());
     Assert.assertEquals(1, t.getCustomArgCount());
     Assert.assertTrue(t.isValid());
@@ -105,7 +108,7 @@ public class DefaultAuthTokenTest {
 
     String encoded = t.toString();
 
-    DefaultAuthToken t2 = new DefaultAuthToken();
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class);
     Assert.assertTrue(t2.parse(encoded));
     Assert.assertEquals(t.getUserId(), t2.getUserId());
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
