@@ -700,8 +700,8 @@ scout.Calendar.prototype.drawYear = function() {
 
 scout.Calendar.prototype._scrollYear = function() {
   // TODO cru;
-  this.$yearList.scrollTop(10000)
-}
+  this.$yearList.scrollTop(10000);
+};
 
 scout.Calendar.prototype._colorYear = function() {
   // color is only needed if visible
