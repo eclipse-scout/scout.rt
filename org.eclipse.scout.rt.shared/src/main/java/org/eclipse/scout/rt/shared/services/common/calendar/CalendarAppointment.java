@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 
 public class CalendarAppointment extends AbstractCalendarItem implements ICalendarAppointment, Serializable {
@@ -216,6 +217,21 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     attributes.put("location", m_location);
     attributes.put("busyStatus", m_busyStatus);
     attributes.put("recipientEmail", m_recipientEmail);
+  }
+
+  @Override
+  public String getDescription() {
+    StringBuilder sb = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(m_location)) {
+      sb.append(m_location);
+    }
+    if (!StringUtility.isNullOrEmpty(getBody())) {
+      if (sb.length() > 0) {
+        sb.append("\n");
+      }
+      sb.append(getBody());
+    }
+    return sb.toString();
   }
 
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,6 @@ import java.util.Date;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
-import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarTask;
@@ -27,18 +26,16 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
   private ICalendar m_calendar;
   private ICalendarItemProvider m_producer;
   private ICalendarItem m_item;
-  private ICell m_cell;
   // cache
   private Date m_fromDate;
   private Date m_toDate;
   private Date[] m_coveredDays;
   private boolean m_fullDay;
 
-  protected CalendarComponent(ICalendar calendar, ICalendarItemProvider producer, ICalendarItem item, ICell cell) {
+  protected CalendarComponent(ICalendar calendar, ICalendarItemProvider producer, ICalendarItem item) {
     m_calendar = calendar;
     m_producer = producer;
     m_item = item;
-    m_cell = cell;
     // cache FROM date
     Date d = null;
     if (m_item instanceof ICalendarAppointment) {
@@ -94,10 +91,6 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     }
   }
 
-  public ICell getCell() {
-    return m_cell;
-  }
-
   public ICalendarItem getItem() {
     return m_item;
   }
@@ -130,38 +123,15 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
   }
 
   /**
-   * Convenience for getting the specific (composite) displayed label of an item
-   * for a specific day This includes the start date, the end date and the label
-   * of the item
-   */
-  public String getLabel(Date day) {
-    /* day=DateUtility.truncDate(day); */
-    switch (m_calendar.getDisplayMode()) {
-      case ICalendar.DISPLAY_MODE_MONTH: {
-        return m_cell.getText();
-      }
-      case ICalendar.DISPLAY_MODE_WEEK:
-      case ICalendar.DISPLAY_MODE_WORKWEEK: {
-        return m_cell.getText();
-      }
-      case ICalendar.DISPLAY_MODE_DAY: {
-        return m_cell.getText();
-      }
-      default: {
-        return m_cell.getText();
-      }
-    }
-  }
-
-  /**
    * Convenience for getting the specific (composite) displayed tooltip of an
    * item for a specific day This includes the start date, the end date and the
    * label of the item
    */
+  @Deprecated
   public String getTooltip(Date day) {
     day = DateUtility.truncDate(day);
     String s = createDayTooltip(day);
-    String s2 = m_cell.getTooltipText();
+    String s2 = m_item.getDescription();
     if (s2 != null && s2.length() > 0) {
       s = s + "\n" + s2;
     }
@@ -176,6 +146,10 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     return m_coveredDays;
   }
 
+  /**
+   * FIXME AWE: (post-swing) remove when Swing client is no more.
+   */
+  @Deprecated
   private String createDayTooltip(Date dayTruncated) {
     Date a = getFromDate();
     Date b = getToDate();
@@ -183,27 +157,27 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     DateFormat dayFmt = m_calendar.getDateTimeFormatFactory().getDayMonth(DateFormat.MEDIUM);
     if (m_coveredDays.length == 1) {
       if (isFullDay()) {
-        return m_cell.getText();
+        return m_item.getSubject();
       }
       else if (DateUtility.equals(a, b)) {
         if (DateUtility.equals(a, dayTruncated)) {
           // the date is at 00:00 so probably time is irrelevant
-          return m_cell.getText();
+          return m_item.getSubject();
         }
         else {
-          return timeFmt.format(a) + " " + m_cell.getText();
+          return timeFmt.format(a) + " " + m_item.getSubject();
         }
       }
       else {
-        return timeFmt.format(a) + "-" + timeFmt.format(b) + " " + m_cell.getText();
+        return timeFmt.format(a) + "-" + timeFmt.format(b) + " " + m_item.getSubject();
       }
     }
     else {// not just one day
       if (isFullDay()) {
-        return dayFmt.format(a) + " - " + dayFmt.format(b) + "  " + m_cell.getText();
+        return dayFmt.format(a) + " - " + dayFmt.format(b) + "  " + m_item.getSubject();
       }
       else {
-        return dayFmt.format(a) + " " + timeFmt.format(a) + " - " + dayFmt.format(b) + " " + timeFmt.format(b) + "  " + m_cell.getText();
+        return dayFmt.format(a) + " " + timeFmt.format(a) + " - " + dayFmt.format(b) + " " + timeFmt.format(b) + "  " + m_item.getSubject();
       }
     }
   }

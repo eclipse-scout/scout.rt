@@ -197,4 +197,19 @@ public class CalendarItemTest {
     assertEquals("ExternalKey", "1", app.getExternalKey());
     assertNull("copy() should not copy external key", app.copy().getExternalKey());
   }
+
+  @Test
+  public void testGetDescription() {
+    ICalendarTask task = new CalendarTask();
+    task.setBody("foo");
+    assertEquals("foo", task.getDescription());
+
+    ICalendarAppointment app = new CalendarAppointment();
+    app.setLocation("foo");
+    app.setBody("bar");
+    assertEquals("foo\nbar", app.getDescription());
+
+    app.setLocation(null);
+    assertEquals("bar", app.getDescription());
+  }
 }

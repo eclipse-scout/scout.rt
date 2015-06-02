@@ -134,7 +134,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
       buf.append("#" + m_type);
     }
     if (m_component != null) {
-      buf.append(", component=" + m_component.getCell().getText());
+      buf.append(", component=" + m_component.getItem().getSubject());
     }
     buf.append("]");
     return buf.toString();

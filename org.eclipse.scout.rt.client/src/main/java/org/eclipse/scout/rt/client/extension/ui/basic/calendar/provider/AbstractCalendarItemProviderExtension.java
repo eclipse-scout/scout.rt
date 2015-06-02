@@ -15,19 +15,14 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemMovedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsInBackgroundChain;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
-/**
- *
- */
 public abstract class AbstractCalendarItemProviderExtension<OWNER extends AbstractCalendarItemProvider> extends AbstractExtension<OWNER> implements ICalendarItemProviderExtension<OWNER> {
 
   public AbstractCalendarItemProviderExtension(OWNER owner) {
@@ -52,11 +47,6 @@ public abstract class AbstractCalendarItemProviderExtension<OWNER extends Abstra
   @Override
   public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) throws ProcessingException {
     chain.execItemMoved(item, newDate);
-  }
-
-  @Override
-  public void execDecorateCell(CalendarItemProviderDecorateCellChain chain, Cell cell, ICalendarItem item) throws ProcessingException {
-    chain.execDecorateCell(cell, item);
   }
 
 }

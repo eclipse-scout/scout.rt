@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.CalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -649,9 +648,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       for (ICalendarItemProvider p : changedProviders) {
         LinkedList<CalendarComponent> components = new LinkedList<CalendarComponent>();
         for (ICalendarItem item : p.getItems(d.getFrom(), d.getTo())) {
-          Cell cell = new Cell();
-          p.decorateCell(cell, item);
-          components.add(new CalendarComponent(this, p, item, cell));
+          components.add(new CalendarComponent(this, p, item));
         }
         m_componentsByProvider.put(p.getClass(), components);
       }

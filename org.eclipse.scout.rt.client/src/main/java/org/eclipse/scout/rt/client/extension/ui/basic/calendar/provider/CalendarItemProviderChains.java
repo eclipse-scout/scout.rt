@@ -7,7 +7,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
@@ -107,24 +106,4 @@ public final class CalendarItemProviderChains {
     }
   }
 
-  public static class CalendarItemProviderDecorateCellChain extends AbstractCalendarItemProviderChain {
-
-    public CalendarItemProviderDecorateCellChain(List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions) {
-      super(extensions);
-    }
-
-    public void execDecorateCell(final Cell cell, final ICalendarItem item) throws ProcessingException {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) throws ProcessingException {
-          next.execDecorateCell(CalendarItemProviderDecorateCellChain.this, cell, item);
-        }
-      };
-      callChain(methodInvocation, cell, item);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
-    }
-  }
 }

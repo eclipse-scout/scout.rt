@@ -185,6 +185,11 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   }
 
   @Override
+  public String getDescription() {
+    return m_body;
+  }
+
+  @Override
   public String toString() {
     StringBuilder b = new StringBuilder();
     b.append(getClass().getSimpleName());

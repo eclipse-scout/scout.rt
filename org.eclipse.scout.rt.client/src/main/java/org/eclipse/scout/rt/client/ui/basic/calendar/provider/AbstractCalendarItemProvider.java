@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
-import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemMovedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsChain;
@@ -53,9 +52,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarAppointment;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
-import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarTask;
 
 public abstract class AbstractCalendarItemProvider extends AbstractPropertyObserver implements ICalendarItemProvider, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarItemProvider.class);
@@ -252,56 +249,6 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       job.cancel(true);
       m_reloadJob = null;
     }
-  }
-
-  @Override
-  public final void decorateCell(Cell cell, ICalendarItem item) {
-    decorateCellInternal(cell, item);
-    try {
-      interceptDecorateCell(cell, item);
-    }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
-  }
-
-  @SuppressWarnings("deprecation")
-  protected void decorateCellInternal(Cell cell, ICalendarItem item) {
-    if (item instanceof ICalendarAppointment) {
-      ICalendarAppointment app = (ICalendarAppointment) item;
-      cell.setText(app.getSubject());
-      StringBuffer buf = new StringBuffer();
-      if (app.getLocation() != null) {
-        if (buf.length() > 0) {
-          buf.append("\n");
-        }
-        buf.append(app.getLocation());
-      }
-      if (app.getBody() != null) {
-        if (buf.length() > 0) {
-          buf.append("\n");
-        }
-        buf.append(app.getBody());
-      }
-      if (buf.length() > 0) {
-        cell.setTooltipText(buf.toString());
-      }
-    }
-    if (item instanceof ICalendarTask) {
-      ICalendarTask task = (ICalendarTask) item;
-      cell.setText(task.getSubject());
-      StringBuffer buf = new StringBuffer();
-      if (task.getBody() != null) {
-        if (buf.length() > 0) {
-          buf.append("\n");
-        }
-        buf.append(task.getBody());
-      }
-      if (buf.length() > 0) {
-        cell.setTooltipText(buf.toString());
-      }
-    }
-    cell.setBackgroundColor((item.getColor()));
   }
 
   @Override
@@ -523,11 +470,6 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       getOwner().execItemMoved(item, newDate);
     }
 
-    @Override
-    public void execDecorateCell(CalendarItemProviderDecorateCellChain chain, Cell cell, ICalendarItem item) throws ProcessingException {
-      getOwner().execDecorateCell(cell, item);
-    }
-
   }
 
   protected final void interceptLoadItems(Date minDate, Date maxDate, Set<ICalendarItem> result) throws ProcessingException {
@@ -554,9 +496,4 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     chain.execItemMoved(item, newDate);
   }
 
-  protected final void interceptDecorateCell(Cell cell, ICalendarItem item) throws ProcessingException {
-    List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
-    CalendarItemProviderDecorateCellChain chain = new CalendarItemProviderDecorateCellChain(extensions);
-    chain.execDecorateCell(cell, item);
-  }
 }

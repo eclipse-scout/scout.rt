@@ -94,8 +94,7 @@ public class CalendarComponentTest {
   }
 
   private CalendarComponent createComponent(ICalendarItem item) {
-    CalendarComponent comp = new CalendarComponent(null, null, item, null);
-    return comp;
+    return new CalendarComponent(null, null, item);
   }
 
   private ICalendarItem createItem(Date date, String subject) {

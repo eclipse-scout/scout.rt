@@ -205,6 +205,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public String getTooltip(Object item, Date d) {
       CalendarComponent comp = (CalendarComponent) item;
       return comp.getTooltip(d);
@@ -213,7 +214,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     @Override
     public String getLabel(Object item, Date d) {
       CalendarComponent comp = (CalendarComponent) item;
-      return comp.getLabel(d);
+      return comp.getItem().getSubject();
     }
 
     @Override
@@ -229,9 +230,10 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Color getColor(Object item) {
       CalendarComponent comp = (CalendarComponent) item;
-      return ColorUtility.createColor(comp.getCell().getBackgroundColor());
+      return ColorUtility.createColor(comp.getItem().getColor());
     }
 
     @Override
