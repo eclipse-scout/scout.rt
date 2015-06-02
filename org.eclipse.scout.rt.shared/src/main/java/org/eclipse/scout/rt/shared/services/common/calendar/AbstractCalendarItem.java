@@ -37,6 +37,11 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private String m_cssClass;
   private RecurrencePattern m_recurrencyPattern;
 
+  /**
+   * External key is intentionally not copied in the copy() method.
+   */
+  private Serializable m_externalKey;
+
   public AbstractCalendarItem() {
     this(Long.valueOf(0L));
   }
@@ -167,6 +172,16 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
       attributes.put("body", m_body.replace('\n', ' ').replace('\r', ' ').substring(0, Math.min(200, m_body.length())));
     }
     attributes.put("recurrencyPattern", m_recurrencyPattern);
+  }
+
+  @Override
+  public Serializable getExternalKey() {
+    return m_externalKey;
+  }
+
+  @Override
+  public void setExternalKey(Serializable externalKey) {
+    m_externalKey = externalKey;
   }
 
   @Override

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
-import java.io.Serializable;
 import java.util.Date;
 
 public interface ICalendarAppointment extends ICalendarItem {
@@ -62,9 +61,5 @@ public interface ICalendarAppointment extends ICalendarItem {
   void removeRecipientEmail(String recipientEmail);
 
   void removeAllRecipientEmail();
-
-  Serializable getExternalKey();
-
-  void setExternalKey(Serializable externalKey);
 
 }

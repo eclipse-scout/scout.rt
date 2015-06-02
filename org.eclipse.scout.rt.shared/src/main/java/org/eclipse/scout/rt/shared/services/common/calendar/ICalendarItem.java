@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
+import java.io.Serializable;
 import java.util.Date;
 
 public interface ICalendarItem {
@@ -73,10 +74,8 @@ public interface ICalendarItem {
 
   Object getItemId();
 
-  @Override
-  boolean equals(Object obj);
+  Serializable getExternalKey();
 
-  @Override
-  int hashCode();
+  void setExternalKey(Serializable externalKey);
 
 }

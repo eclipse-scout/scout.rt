@@ -28,7 +28,6 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   private String m_location;
   private int m_busyStatus;
   private HashSet<String> m_recipientEmail = new HashSet<String>();
-  private Serializable m_externalKey;
 
   public CalendarAppointment() {
     super();
@@ -217,16 +216,6 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     attributes.put("location", m_location);
     attributes.put("busyStatus", m_busyStatus);
     attributes.put("recipientEmail", m_recipientEmail);
-  }
-
-  @Override
-  public Serializable getExternalKey() {
-    return m_externalKey;
-  }
-
-  @Override
-  public void setExternalKey(Serializable externalKey) {
-    m_externalKey = externalKey;
   }
 
 }

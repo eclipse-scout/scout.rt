@@ -189,4 +189,12 @@ public class CalendarItemTest {
     app.setPerson(new String("1"));
     assertEquals("Person", "1", app.getPerson());
   }
+
+  @Test
+  public void testExternalKey() {
+    CalendarAppointment app = new CalendarAppointment();
+    app.setExternalKey("1");
+    assertEquals("ExternalKey", "1", app.getExternalKey());
+    assertNull("copy() should not copy external key", app.copy().getExternalKey());
+  }
 }
