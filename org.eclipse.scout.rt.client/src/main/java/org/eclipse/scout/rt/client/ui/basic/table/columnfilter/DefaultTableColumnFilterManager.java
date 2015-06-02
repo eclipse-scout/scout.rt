@@ -160,8 +160,13 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
   }
 
   @Override
+  public boolean removeFilter(IColumn col) {
+    return m_filterMap.remove(col) != null;
+  }
+
+  @Override
   public Collection<ITableColumnFilter> getFilters() {
-    return m_filterMap.values();
+    return Collections.unmodifiableCollection(m_filterMap.values());
   }
 
   @Override
@@ -266,4 +271,5 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
       }
     }
   }
+
 }

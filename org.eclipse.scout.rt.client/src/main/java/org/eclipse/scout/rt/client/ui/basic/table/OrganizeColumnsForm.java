@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.RemoveCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.SelectAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -920,8 +919,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               if (m_table.getColumnFilterManager() != null) {
                 IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
                 if (col != null) {
-                  ITableColumnFilter<?> filter = m_table.getColumnFilterManager().getFilter(col);
-                  m_table.getColumnFilterManager().getFilters().remove(filter);
+                  m_table.getColumnFilterManager().removeFilter(col);
                   m_table.applyRowFilters();
                 }
               }

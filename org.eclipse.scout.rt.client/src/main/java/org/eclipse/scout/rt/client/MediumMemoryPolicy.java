@@ -84,7 +84,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   @Override
   protected void storeColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
     ITableColumnFilterManager filterManager = t.getColumnFilterManager();
-    if (filterManager == null || filterManager.getFilters() == null || filterManager.getFilters().isEmpty()) {
+    if (filterManager == null || filterManager.getFilters().isEmpty()) {
       m_tableColumnFilterManagerState.remove(pageTableIdentifier);
       return;
     }

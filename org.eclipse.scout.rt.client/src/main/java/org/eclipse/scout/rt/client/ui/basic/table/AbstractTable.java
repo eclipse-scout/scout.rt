@@ -3330,7 +3330,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       // re-apply existing filters to new columns
       ITableColumnFilterManager filterManager = getColumnFilterManager();
-      if (filterManager != null && filterManager.getFilters() != null) {
+      if (filterManager != null) {
         for (IColumn<?> col : getColumns()) {
           for (ITableColumnFilter filter : filterManager.getFilters()) {
             if (filter.getColumn().getColumnId().equals(col.getColumnId())) {

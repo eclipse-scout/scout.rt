@@ -34,7 +34,14 @@ public interface ITableColumnFilterManager {
   void setSerializedFilter(byte[] filterData, IColumn col);
 
   /**
-   * @return a collection of all filters of all rows
+   * Removes the filter of a column if present.
+   *
+   * @return <tt>true</tt> if the given column had a filter that was removed as a result of this call
+   */
+  boolean removeFilter(IColumn col);
+
+  /**
+   * @return a unmodifiable collection of all filters of all rows. Never null.
    */
   Collection<ITableColumnFilter> getFilters();
 
@@ -50,7 +57,7 @@ public interface ITableColumnFilterManager {
 
   /**
    * Shows a form to create or modify a column filter
-   * 
+   *
    * @param col
    *          the filtered column
    * @param showAsPopupDialog
@@ -65,7 +72,7 @@ public interface ITableColumnFilterManager {
    * Adds a column filter listener.
    * <p/>
    * <b>Note:</b> The method does not check whether a listener is already in the listener list.
-   * 
+   *
    * @param listener
    * @since 3.8.0
    */
@@ -73,7 +80,7 @@ public interface ITableColumnFilterManager {
 
   /**
    * Removes the given table column listener.
-   * 
+   *
    * @param listener
    * @since 3.8.0
    */
