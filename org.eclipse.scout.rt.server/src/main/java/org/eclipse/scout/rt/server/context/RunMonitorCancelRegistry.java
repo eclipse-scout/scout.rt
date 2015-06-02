@@ -14,91 +14,87 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
-import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.shared.ISession;
 
 /**
- * Cache the {@link IRunMonitor} per session in order to allow cancelling
+ * Registry that contains the {@link IRunMonitor}s of operations which are currently executed, and which are subject for
+ * global cancellation. Typically, such operations are HTTP service requests initiated by a client, and are cancelled by
+ * a respective cancellation request.
+ * <p>
+ * The RunMonitors are not really hold in this registry, but bound to the given {@link ISession}.
  */
 @ApplicationScoped
 public class RunMonitorCancelRegistry {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunMonitorCancelRegistry.class);
-  protected static final String SESSION_STATE_KEY = "activeTransactions";
 
-  public RunMonitorCancelRegistry() {
-  }
+  protected static final String RUN_MONITORS_KEY = "activeRunMonitors";
 
-  public void register(IServerSession session, long id, IRunMonitor monitor) {
-    if (id == 0L) {
-      return;
-    }
-    SessionState state = getSessionState(session, true);
-    if (state == null) {
-      LOG.error("failed to register transaction due to missing session");
-      return;
-    }
-    synchronized (state.m_mapLock) {
-      state.m_map.put(id, new WeakReference<IRunMonitor>(monitor));
-    }
-  }
-
-  public void unregister(IServerSession session, long id) {
-    if (id == 0L) {
-      return;
-    }
-    SessionState state = getSessionState(session, false);
-    if (state == null) {
-      return;
-    }
-    synchronized (state.m_mapLock) {
-      state.m_map.remove(id);
-    }
+  /**
+   * Registers the given {@link IRunMonitor} by binding it to the given {@link ISession} with the given <code>id</code>.
+   * Has no effect if the given <code>id</code> is <code>0</code>.
+   */
+  public void register(final ISession session, final long id, final IRunMonitor monitor) {
+    Assertions.assertNotNull(session, "session must not be null");
+    put(session, id, monitor);
   }
 
   /**
-   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
+   * Unregisters the {@link IRunMonitor} bound to the given {@link ISession} and <code>id</code>. Has no effect if no
+   * monitor is found.
    */
-  public boolean cancel(IServerSession session, long id) {
-    if (id == 0L) {
-      return false;
-    }
-    SessionState state = getSessionState(session, false);
-    if (state == null) {
-      return false;
-    }
-    IRunMonitor monitor;
-    synchronized (state.m_mapLock) {
-      WeakReference<IRunMonitor> ref = state.m_map.get(id);
-      if (ref == null) {
-        return false;
-      }
-      monitor = ref.get();
-      if (monitor == null) {
-        return false;
-      }
-    }
-    return monitor.cancel(true);
+  public void unregister(final ISession session, final long id) {
+    Assertions.assertNotNull(session, "session must not be null");
+    remove(session, id);
   }
 
-  protected SessionState getSessionState(IServerSession session, boolean autoCreate) {
-    if (session == null) {
+  /**
+   * Cancels and removes the {@link IRunMonitor} which was bound to the given {@link ISession} and <code>id</code>. Has
+   * no effect if no monitor is found.
+   *
+   * @return <code>true</code> if cancel was successful.
+   */
+  public boolean cancel(final ISession session, final long id) {
+    Assertions.assertNotNull(session, "session must not be null");
+    final IRunMonitor runMonitor = remove(session, id);
+    return (runMonitor != null ? runMonitor.cancel(true) : false);
+  }
+
+  // === Internal methods ===
+
+  protected void put(final ISession session, final long id, final IRunMonitor monitor) {
+    if (id != 0L) {
+      synchronized (session) {
+        get(session, true).put(id, new WeakReference<IRunMonitor>(monitor));
+      }
+    }
+  }
+
+  protected IRunMonitor remove(final ISession session, final long id) {
+    if (id == 0L) {
       return null;
     }
+    WeakReference<IRunMonitor> monitorWeakRef = null;
     synchronized (session) {
-      SessionState state = (SessionState) session.getData(SESSION_STATE_KEY);
-      if (state == null && autoCreate) {
-        state = new SessionState();
-        session.setData(SESSION_STATE_KEY, state);
+      final Map<Long, WeakReference<IRunMonitor>> monitors = get(session, false);
+      if (monitors != null) {
+        monitorWeakRef = monitors.remove(id);
+        if (monitors.isEmpty()) {
+          session.setData(RUN_MONITORS_KEY, null); // free memory
+        }
       }
-      return state;
     }
+    return (monitorWeakRef != null ? monitorWeakRef.get() : null);
   }
 
-  protected static class SessionState {
-    final Object m_mapLock = new Object();
-    final Map<Long, WeakReference<IRunMonitor>> m_map = new HashMap<>();
+  @SuppressWarnings("unchecked")
+  protected Map<Long, WeakReference<IRunMonitor>> get(final ISession session, final boolean autoCreate) {
+    Map<Long, WeakReference<IRunMonitor>> monitors = (Map<Long, WeakReference<IRunMonitor>>) session.getData(RUN_MONITORS_KEY);
+    if (monitors == null && autoCreate) {
+      monitors = new HashMap<>();
+      session.setData(RUN_MONITORS_KEY, monitors);
+    }
+    return monitors;
   }
 }

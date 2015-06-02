@@ -7,7 +7,6 @@ import java.util.HashSet;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 public abstract class AbstractSqlTransactionMember extends AbstractTransactionMember {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlTransactionMember.class);
@@ -38,8 +37,8 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
   }
 
   /**
-   * Registers a statement in order to be canceled by {@link ITransaction#cancel()}
-   * 
+   * Registers a statement in order to be canceled by {@link ITransaction#cancel(boolean))}
+   *
    * @param statement
    *          the statement to be registered
    * @throws SQLException
@@ -55,7 +54,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
 
   /**
    * Removes a statement
-   * 
+   *
    * @param statement
    *          the statement to be removed
    */

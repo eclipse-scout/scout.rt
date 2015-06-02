@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMe
  * {@link AbstractSqlTransactionMember#registerActiveStatement(java.sql.Statement)} /
  * {@link AbstractSqlTransactionMember#unregisterActiveStatement(java.sql.Statement)}.
  * <p>
- * Thus canceling a {@link ITransaction#cancel()} also cancels all its members {@link ITransactionMember#cancel()} and
- * that cancels the (potentially) running statement.
+ * Thus canceling a {@link ITransaction#cancel(boolean))} also cancels all its members
+ * {@link ITransactionMember#cancel()} and that cancels the (potentially) running statement.
  * <p>
  * A canceled transaction can only do a rollback and does not accept new members.
  * <p>
@@ -93,18 +93,4 @@ public interface ITransaction extends ICancellable {
    * release any members allocated by the transaction members
    */
   void release();
-
-  /**
-   * an external process tries to cancel the transaction
-   *
-   * @return true if cancel was successful and transaction was in fact canceled, false otherwise
-   */
-  boolean cancel();
-
-  @Override
-  boolean cancel(boolean mayInterruptIfRunning);
-
-  @Override
-  boolean isCancelled();
-
 }

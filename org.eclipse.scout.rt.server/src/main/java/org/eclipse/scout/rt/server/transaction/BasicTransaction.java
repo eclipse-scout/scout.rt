@@ -202,11 +202,6 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
-  public synchronized boolean cancel() {
-    return cancel(true);
-  }
-
-  @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
     synchronized (m_memberMapLock) {
       if (m_commitPhase) {
