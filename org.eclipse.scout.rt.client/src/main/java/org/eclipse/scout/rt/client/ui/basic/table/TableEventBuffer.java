@@ -334,7 +334,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   }
 
   /**
-   * Removes identical events (same type and content) when they occur consecutively. The oldest event is preserved.
+   * Removes identical events (same type and content) when they occur consecutively (not necessarily directly, but
+   * within the same type group). The oldest event is preserved.
    */
   protected void removeIdenticalEvents(List<TableEvent> events) {
     // Please note: In contrast to all other methods in this class, this method loops through the
