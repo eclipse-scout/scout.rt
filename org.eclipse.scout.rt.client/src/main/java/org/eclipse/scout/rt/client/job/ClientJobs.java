@@ -346,7 +346,7 @@ public final class ClientJobs {
    * </pre>
    */
   public static ClientJobFutureFilters.Filter newFutureFilter() {
-    return new ClientJobFutureFilters.Filter().andFilter(ClientJobFutureFilters.ClientJobFilter.INSTANCE);
+    return new ClientJobFutureFilters.Filter().andMatch(ClientJobFutureFilters.ClientJobFilter.INSTANCE);
   }
 
   /**
@@ -361,7 +361,7 @@ public final class ClientJobs {
    * </pre>
    */
   public static ClientJobEventFilters.Filter newEventFilter() {
-    return new ClientJobEventFilters.Filter().andFilter(ClientJobEventFilters.CLIENT_JOB_EVENT_FILTER);
+    return new ClientJobEventFilters.Filter().andMatch(ClientJobEventFilters.CLIENT_JOB_EVENT_FILTER);
   }
 
   /**

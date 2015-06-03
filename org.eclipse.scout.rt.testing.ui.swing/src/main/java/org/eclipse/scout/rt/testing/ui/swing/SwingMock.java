@@ -138,7 +138,7 @@ public class SwingMock extends AbstractGuiMock {
 
       //wait until model queue is empty
       IClientSession clientSession = getClientSession();
-      Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().session(clientSession).notPeriodic(), 1, TimeUnit.HOURS);
+      Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotPeriodic(), 1, TimeUnit.HOURS);
     }
   }
 

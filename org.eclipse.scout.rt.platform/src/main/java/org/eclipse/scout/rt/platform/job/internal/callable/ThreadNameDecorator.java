@@ -59,7 +59,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, IChainable
     final AtomicLong lastEventTime = new AtomicLong(System.nanoTime());
 
     // Install job listener to decorate the thread's name once being blocked.
-    final IJobListener listener = Jobs.getJobManager().addListener(Jobs.newEventFilter().currentFuture().eventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.RESUMED), new IJobListener() {
+    final IJobListener listener = Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatchCurrentFuture().andMatchEventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.RESUMED), new IJobListener() {
 
       @Override
       public void changed(final JobEvent event) {

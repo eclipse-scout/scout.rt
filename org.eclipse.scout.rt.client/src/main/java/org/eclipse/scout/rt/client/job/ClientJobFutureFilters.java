@@ -42,74 +42,54 @@ public final class ClientJobFutureFilters {
 
     @Override
     protected void postConstruct() {
-      andFilter(new OrFilter<>(ClientJobFilter.INSTANCE, ModelJobFilter.INSTANCE));
+      andMatch(new OrFilter<>(ClientJobFilter.INSTANCE, ModelJobFilter.INSTANCE));
     }
 
     @Override
-    public Filter andFilter(final IFilter<IFuture<?>> filter) {
-      return (Filter) super.andFilter(filter);
+    public Filter andMatch(final IFilter<IFuture<?>> filter) {
+      return (Filter) super.andMatch(filter);
     }
 
     @Override
-    public Filter names(final String... names) {
-      return (Filter) super.names(names);
+    public Filter andMatchNames(final String... names) {
+      return (Filter) super.andMatchNames(names);
     }
 
     @Override
-    public Filter nameRegex(final Pattern regex) {
-      return (Filter) super.nameRegex(regex);
+    public Filter andMatchNameRegex(final Pattern regex) {
+      return (Filter) super.andMatchNameRegex(regex);
     }
 
     @Override
-    public Filter futures(final IFuture<?>... futures) {
-      return (Filter) super.futures(futures);
+    public Filter andMatchFutures(final IFuture<?>... futures) {
+      return (Filter) super.andMatchFutures(futures);
     }
 
     @Override
-    public Filter futures(final Collection<IFuture<?>> futures) {
-      return (Filter) super.futures(futures);
+    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
+      return (Filter) super.andMatchFutures(futures);
     }
 
     @Override
-    public Filter currentFuture() {
-      return (Filter) super.currentFuture();
+    public Filter andMatchCurrentFuture() {
+      return (Filter) super.andMatchCurrentFuture();
     }
 
     @Override
-    public Filter notCurrentFuture() {
-      return (Filter) super.notCurrentFuture();
+    public Filter andMatchNotCurrentFuture() {
+      return (Filter) super.andMatchNotCurrentFuture();
     }
 
     @Override
-    public Filter blocked() {
-      return (Filter) super.blocked();
-    }
-
-    @Override
-    public Filter notBlocked() {
-      return (Filter) super.notBlocked();
-    }
-
-    @Override
-    public Filter periodic() {
-      return (Filter) super.periodic();
-    }
-
-    @Override
-    public Filter notPeriodic() {
-      return (Filter) super.notPeriodic();
-    }
-
-    @Override
-    public Filter mutex(final Object mutexObject) {
-      return (Filter) super.mutex(mutexObject);
+    public Filter andMatchMutex(final Object mutexObject) {
+      return (Filter) super.andMatchMutex(mutexObject);
     }
 
     /**
      * To accept only jobs which are run on behalf of the given client session.
      */
-    public Filter session(final IClientSession session) {
-      andFilter(new SessionFilter(session));
+    public Filter andMatchSession(final IClientSession session) {
+      andMatch(new SessionFilter(session));
       return this;
     }
 
@@ -118,8 +98,8 @@ public final class ClientJobFutureFilters {
      *
      * @see ISession#CURRENT
      */
-    public Filter currentSession() {
-      andFilter(new SessionFilter(ISession.CURRENT.get()));
+    public Filter andMatchCurrentSession() {
+      andMatch(new SessionFilter(ISession.CURRENT.get()));
       return this;
     }
 
@@ -128,9 +108,29 @@ public final class ClientJobFutureFilters {
      *
      * @see ISession#CURRENT
      */
-    public Filter notCurrentSession() {
-      andFilter(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
+    public Filter andMatchNotCurrentSession() {
+      andMatch(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
       return this;
+    }
+
+    @Override
+    public Filter andAreBlocked() {
+      return (Filter) super.andAreBlocked();
+    }
+
+    @Override
+    public Filter andAreNotBlocked() {
+      return (Filter) super.andAreNotBlocked();
+    }
+
+    @Override
+    public Filter andArePeriodic() {
+      return (Filter) super.andArePeriodic();
+    }
+
+    @Override
+    public Filter andAreNotPeriodic() {
+      return (Filter) super.andAreNotPeriodic();
     }
   }
 

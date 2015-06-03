@@ -227,7 +227,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitBlockedFilter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilter().blocked(), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(Jobs.newFutureFilter().andAreBlocked(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -250,7 +250,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitNotBlockedFilter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new NotFilter<>(Jobs.newFutureFilter().blocked()), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new NotFilter<>(Jobs.newFutureFilter().andAreBlocked()), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -273,7 +273,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession1Filter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilter().nameRegex(Pattern.compile("mutex1_.*")), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(Jobs.newFutureFilter().andMatchNameRegex(Pattern.compile("mutex1_.*")), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -296,7 +296,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession2Filter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilter().nameRegex(Pattern.compile("mutex2_.*")), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(Jobs.newFutureFilter().andMatchNameRegex(Pattern.compile("mutex2_.*")), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -319,7 +319,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSessionFilterAndBlocked() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilter().nameRegex(Pattern.compile("mutex1_.*")).blocked()), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilter().andMatchNameRegex(Pattern.compile("mutex1_.*")).andAreBlocked()), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {

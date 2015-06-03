@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
@@ -55,6 +54,7 @@ import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobFutureFilters.Filter;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -412,13 +412,14 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
     final long shutdownWaitTime = getMaxShutdownWaitTime();
     if (shutdownWaitTime > 0) {
-      // Wait for the client and model jobs to finish before shutdown the session.
+      // Wait for running jobs to complete prior shutdown the session.
       ClientJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
-            boolean timeout = !Jobs.getJobManager().awaitDone(otherRunningJobsFilter(), shutdownWaitTime, TimeUnit.MILLISECONDS);
-            if (timeout) {
+            final Filter futureFilter = Jobs.newFutureFilter().andMatchFutures(findRunningJobs());
+            boolean timeoutElapsed = !Jobs.getJobManager().awaitDone(futureFilter, shutdownWaitTime, TimeUnit.MILLISECONDS);
+            if (timeoutElapsed) {
               logRunningJobs();
             }
           }
@@ -454,10 +455,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
    * and are not blocked. If yes, a warning with the list of found jobs is printed to the logger.
    */
   protected void logRunningJobs() {
-    CollectorVisitor<IFuture<?>> runningJobsCollector = new CollectorVisitor<>();
-    Jobs.getJobManager().visit(otherRunningJobsFilter(), runningJobsCollector);
-    List<IFuture<?>> runningJobs = runningJobsCollector.getElements();
-
+    final List<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
       LOG.warn(""
           + "Some running client jobs found while client session is going to shutdown. "
@@ -468,10 +466,12 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   /**
-   * Returns a new {@link Filter} that matches all non-blocked jobs for the current session (except the current job).
+   * Returns all the jobs which currently are running and prevent the session from shutdown.
    */
-  protected Filter otherRunningJobsFilter() {
-    return ClientJobs.newFutureFilter().notCurrentFuture().currentSession().notBlocked();
+  protected List<IFuture<?>> findRunningJobs() {
+    CollectorVisitor<IFuture<?>> collector = new CollectorVisitor<>();
+    Jobs.getJobManager().visit(ClientJobs.newFutureFilter().andMatchNotCurrentFuture().andMatchCurrentSession().andAreNotBlocked(), collector);
+    return collector.getElements();
   }
 
   @Override

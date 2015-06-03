@@ -111,7 +111,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
 
       IJobListener listener = new P_JobChangeListenerEx();
       m_listeners.put(future, listener);
-      Jobs.getJobManager().addListener(Jobs.newEventFilter().futures(future), listener);
+      Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatchFutures(future), listener);
 
       handler.onJobBegin(future);
     }

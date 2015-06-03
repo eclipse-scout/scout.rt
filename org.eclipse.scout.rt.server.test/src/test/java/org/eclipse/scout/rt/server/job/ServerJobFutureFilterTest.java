@@ -70,63 +70,63 @@ public class ServerJobFutureFilterTest {
   public void testBlocked() {
     when(m_serverJobFuture.isBlocked()).thenReturn(true);
     assertTrue(ServerJobs.newFutureFilter().accept(m_serverJobFuture));
-    assertTrue(ServerJobs.newFutureFilter().blocked().accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().notBlocked().accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andAreBlocked().accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andAreNotBlocked().accept(m_serverJobFuture));
   }
 
   @Test
   public void testPeriodic() {
     when(m_serverJobFuture.isPeriodic()).thenReturn(true);
     assertTrue(ServerJobs.newFutureFilter().accept(m_serverJobFuture));
-    assertTrue(ServerJobs.newFutureFilter().periodic().accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().notPeriodic().accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andArePeriodic().accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andAreNotPeriodic().accept(m_serverJobFuture));
   }
 
   @Test
   public void testSession() {
-    assertTrue(ServerJobs.newFutureFilter().session(m_serverSession1).accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().session(m_serverSession2).accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchSession(m_serverSession1).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchSession(m_serverSession2).accept(m_serverJobFuture));
   }
 
   @Test
   public void testCurrentSession() {
     ISession.CURRENT.set(m_serverSession1);
-    assertTrue(ServerJobs.newFutureFilter().currentSession().accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchCurrentSession().accept(m_serverJobFuture));
     ISession.CURRENT.set(m_serverSession2);
-    assertFalse(ServerJobs.newFutureFilter().currentSession().accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchCurrentSession().accept(m_serverJobFuture));
     ISession.CURRENT.remove();
   }
 
   @Test
   public void testNotCurrentSession() {
     ISession.CURRENT.set(m_serverSession1);
-    assertFalse(ServerJobs.newFutureFilter().notCurrentSession().accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchNotCurrentSession().accept(m_serverJobFuture));
     ISession.CURRENT.set(m_serverSession2);
-    assertTrue(ServerJobs.newFutureFilter().notCurrentSession().accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchNotCurrentSession().accept(m_serverJobFuture));
     ISession.CURRENT.remove();
   }
 
   @Test
   public void testFuture() {
-    assertTrue(ServerJobs.newFutureFilter().futures(m_serverJobFuture).accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().futures(mock(IFuture.class)).accept(m_jobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchFutures(m_serverJobFuture).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchFutures(mock(IFuture.class)).accept(m_jobFuture));
   }
 
   @Test
   public void testCurrentFuture() {
     IFuture.CURRENT.set(m_serverJobFuture);
-    assertTrue(ServerJobs.newFutureFilter().currentFuture().accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchCurrentFuture().accept(m_serverJobFuture));
     IFuture.CURRENT.set(m_jobFuture);
-    assertFalse(ServerJobs.newFutureFilter().currentFuture().accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchCurrentFuture().accept(m_serverJobFuture));
     IFuture.CURRENT.remove();
   }
 
   @Test
   public void testNotCurrentFuture() {
     IFuture.CURRENT.set(m_serverJobFuture);
-    assertFalse(ServerJobs.newFutureFilter().notCurrentFuture().accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchNotCurrentFuture().accept(m_serverJobFuture));
     IFuture.CURRENT.set(m_jobFuture);
-    assertTrue(ServerJobs.newFutureFilter().notCurrentFuture().accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchNotCurrentFuture().accept(m_serverJobFuture));
     IFuture.CURRENT.remove();
   }
 
@@ -137,21 +137,21 @@ public class ServerJobFutureFilterTest {
 
     m_serverJobFuture.getJobInput().mutex(mutexObject1);
     assertTrue(ServerJobs.newFutureFilter().accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().mutex(null).accept(m_serverJobFuture));
-    assertTrue(ServerJobs.newFutureFilter().mutex(mutexObject1).accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().mutex(mutexObject2).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchMutex(null).accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchMutex(mutexObject1).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchMutex(mutexObject2).accept(m_serverJobFuture));
 
     m_serverJobFuture.getJobInput().mutex(null);
     assertTrue(ServerJobs.newFutureFilter().accept(m_serverJobFuture));
-    assertTrue(ServerJobs.newFutureFilter().mutex(null).accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().mutex(mutexObject1).accept(m_serverJobFuture));
-    assertFalse(ServerJobs.newFutureFilter().mutex(mutexObject2).accept(m_serverJobFuture));
+    assertTrue(ServerJobs.newFutureFilter().andMatchMutex(null).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchMutex(mutexObject1).accept(m_serverJobFuture));
+    assertFalse(ServerJobs.newFutureFilter().andMatchMutex(mutexObject2).accept(m_serverJobFuture));
   }
 
   @Test
   public void testCustomFilter() {
     // False Filter
-    assertFalse(ServerJobs.newFutureFilter().andFilter(new IFilter<IFuture<?>>() {
+    assertFalse(ServerJobs.newFutureFilter().andMatch(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {
@@ -160,7 +160,7 @@ public class ServerJobFutureFilterTest {
     }).accept(m_serverJobFuture));
 
     // True Filter
-    assertTrue(ServerJobs.newFutureFilter().andFilter(new IFilter<IFuture<?>>() {
+    assertTrue(ServerJobs.newFutureFilter().andMatch(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {
@@ -169,13 +169,13 @@ public class ServerJobFutureFilterTest {
     }).accept(m_serverJobFuture));
 
     // True/False Filter
-    assertFalse(ServerJobs.newFutureFilter().andFilter(new IFilter<IFuture<?>>() {
+    assertFalse(ServerJobs.newFutureFilter().andMatch(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {
         return true;
       }
-    }).andFilter(new IFilter<IFuture<?>>() {
+    }).andMatch(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {

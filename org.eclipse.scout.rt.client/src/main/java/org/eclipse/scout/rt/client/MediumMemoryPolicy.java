@@ -188,7 +188,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       String gcJobId = getClass().getName();
 
       // Cancel already running GC job
-      Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().currentSession().nameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")), true);
+      Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().andMatchCurrentSession().andMatchNameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")), true);
       // Schedule new GC job
       ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name(gcJobId + ":release memory"));
 

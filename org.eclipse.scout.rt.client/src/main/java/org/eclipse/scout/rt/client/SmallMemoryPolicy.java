@@ -46,7 +46,7 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     String gcJobId = getClass().getName();
 
     // Cancel already running GC job
-    Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().nameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")).currentSession(), true);
+    Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().andMatchNameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")).andMatchCurrentSession(), true);
     // Schedule new GC job
     ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name(gcJobId + ":release memory"));
 

@@ -60,7 +60,7 @@ public final class JobFutureFilters {
     /**
      * Registers the given filter to further constrain the Futures to be accepted.
      */
-    public Filter andFilter(final IFilter<IFuture<?>> filter) {
+    public Filter andMatch(final IFilter<IFuture<?>> filter) {
       m_filters.add(filter);
       return this;
     }
@@ -68,32 +68,32 @@ public final class JobFutureFilters {
     /**
      * To accept only jobs of the given job names.
      */
-    public Filter names(final String... names) {
-      andFilter(new JobNameFilter(names));
+    public Filter andMatchNames(final String... names) {
+      andMatch(new JobNameFilter(names));
       return this;
     }
 
     /**
      * To accept only jobs of the given job name regex.
      */
-    public Filter nameRegex(final Pattern regex) {
-      andFilter(new JobNameRegexFilter(regex));
+    public Filter andMatchNameRegex(final Pattern regex) {
+      andMatch(new JobNameRegexFilter(regex));
       return this;
     }
 
     /**
      * To accept only jobs which belong to the given Futures.
      */
-    public Filter futures(final IFuture<?>... futures) {
-      andFilter(new FutureFilter(futures));
+    public Filter andMatchFutures(final IFuture<?>... futures) {
+      andMatch(new FutureFilter(futures));
       return this;
     }
 
     /**
      * To accept only jobs which belong to the given Futures.
      */
-    public Filter futures(final Collection<IFuture<?>> futures) {
-      andFilter(new FutureFilter(futures));
+    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
+      andMatch(new FutureFilter(futures));
       return this;
     }
 
@@ -102,8 +102,8 @@ public final class JobFutureFilters {
      *
      * @see IFuture#CURRENT
      */
-    public Filter currentFuture() {
-      andFilter(new FutureFilter(IFuture.CURRENT.get()));
+    public Filter andMatchCurrentFuture() {
+      andMatch(new FutureFilter(IFuture.CURRENT.get()));
       return this;
     }
 
@@ -112,8 +112,16 @@ public final class JobFutureFilters {
      *
      * @see IFuture#CURRENT
      */
-    public Filter notCurrentFuture() {
-      andFilter(new NotFilter<>(new FutureFilter(IFuture.CURRENT.get())));
+    public Filter andMatchNotCurrentFuture() {
+      andMatch(new NotFilter<>(new FutureFilter(IFuture.CURRENT.get())));
+      return this;
+    }
+
+    /**
+     * To accept only jobs which belong to the given mutex object.
+     */
+    public Filter andMatchMutex(final Object mutexObject) {
+      andMatch(new MutexFilter(mutexObject));
       return this;
     }
 
@@ -122,8 +130,8 @@ public final class JobFutureFilters {
      *
      * @see IBlockingCondition
      */
-    public Filter blocked() {
-      andFilter(BlockedFilter.TRUE_INSTANCE);
+    public Filter andAreBlocked() {
+      andMatch(BlockedFilter.TRUE_INSTANCE);
       return this;
     }
 
@@ -132,8 +140,8 @@ public final class JobFutureFilters {
      *
      * @see IBlockingCondition
      */
-    public Filter notBlocked() {
-      andFilter(BlockedFilter.FALSE_INSTANCE);
+    public Filter andAreNotBlocked() {
+      andMatch(BlockedFilter.FALSE_INSTANCE);
       return this;
     }
 
@@ -143,8 +151,8 @@ public final class JobFutureFilters {
      * @see IJobManager#scheduleWithFixedDelay()
      * @see IJobManager#scheduleAtFixedRate()
      */
-    public Filter periodic() {
-      andFilter(PeriodicFilter.TRUE_INSTANCE);
+    public Filter andArePeriodic() {
+      andMatch(PeriodicFilter.TRUE_INSTANCE);
       return this;
     }
 
@@ -153,16 +161,8 @@ public final class JobFutureFilters {
      *
      * @see IJobManager#schedule()
      */
-    public Filter notPeriodic() {
-      andFilter(PeriodicFilter.FALSE_INSTANCE);
-      return this;
-    }
-
-    /**
-     * To accept only jobs which belong to the given mutex object.
-     */
-    public Filter mutex(final Object mutexObject) {
-      andFilter(new MutexFilter(mutexObject));
+    public Filter andAreNotPeriodic() {
+      andMatch(PeriodicFilter.FALSE_INSTANCE);
       return this;
     }
   }

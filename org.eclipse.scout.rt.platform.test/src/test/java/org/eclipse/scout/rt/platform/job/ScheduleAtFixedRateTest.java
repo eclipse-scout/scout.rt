@@ -71,7 +71,7 @@ public class ScheduleAtFixedRateTest {
     }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -112,7 +112,7 @@ public class ScheduleAtFixedRateTest {
     }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -155,7 +155,7 @@ public class ScheduleAtFixedRateTest {
     }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -198,7 +198,7 @@ public class ScheduleAtFixedRateTest {
     }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);

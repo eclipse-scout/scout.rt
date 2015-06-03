@@ -335,7 +335,7 @@ public final class ModelJobs {
    * </pre>
    */
   public static ClientJobFutureFilters.Filter newFutureFilter() {
-    return new ClientJobFutureFilters.Filter().andFilter(ClientJobFutureFilters.ModelJobFilter.INSTANCE);
+    return new ClientJobFutureFilters.Filter().andMatch(ClientJobFutureFilters.ModelJobFilter.INSTANCE);
   }
 
   /**
@@ -350,7 +350,7 @@ public final class ModelJobs {
    * </pre>
    */
   public static ClientJobEventFilters.Filter newEventFilter() {
-    return new ClientJobEventFilters.Filter().andFilter(ClientJobEventFilters.MODEL_JOB_EVENT_FILTER);
+    return new ClientJobEventFilters.Filter().andMatch(ClientJobEventFilters.MODEL_JOB_EVENT_FILTER);
   }
 
   /**

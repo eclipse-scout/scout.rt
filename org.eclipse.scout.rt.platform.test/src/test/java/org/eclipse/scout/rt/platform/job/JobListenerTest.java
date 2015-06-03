@@ -62,7 +62,7 @@ public class JobListenerTest {
     m_jobManager.addListener(Jobs.newEventFilter(), listener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    m_jobManager.addListener(Jobs.newEventFilter().eventTypes(JobEventType.SHUTDOWN), shutdownListener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchEventTypes(JobEventType.SHUTDOWN), shutdownListener);
 
     IFuture<Void> future = null;
     future = m_jobManager.schedule(new Callable<Void>() {
@@ -71,7 +71,7 @@ public class JobListenerTest {
         return null;
       }
     }, Jobs.newInput(RunContexts.empty()));
-    m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
     m_jobManager.removeListener(shutdownListener);
@@ -97,7 +97,7 @@ public class JobListenerTest {
     m_jobManager.addListener(Jobs.newEventFilter(), listener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    m_jobManager.addListener(Jobs.newEventFilter().eventTypes(JobEventType.SHUTDOWN), shutdownListener);
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchEventTypes(JobEventType.SHUTDOWN), shutdownListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -108,7 +108,7 @@ public class JobListenerTest {
       }
     }, 200, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()));
     future.cancel(true);
-    m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
     m_jobManager.removeListener(shutdownListener);

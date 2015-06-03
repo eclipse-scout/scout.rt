@@ -64,7 +64,7 @@ public final class JobEventFilters {
     /**
      * Registers the given filter to further constrain the events to be accepted.
      */
-    public Filter andFilter(final IFilter<JobEvent> filter) {
+    public Filter andMatch(final IFilter<JobEvent> filter) {
       m_filters.add(filter);
       return this;
     }
@@ -72,40 +72,40 @@ public final class JobEventFilters {
     /**
      * To accept only events of the given event types.
      */
-    public Filter eventTypes(final JobEventType... eventTypes) {
-      andFilter(new EventTypeFilter(eventTypes));
+    public Filter andMatchEventTypes(final JobEventType... eventTypes) {
+      andMatch(new EventTypeFilter(eventTypes));
       return this;
     }
 
     /**
      * To accept only events which belong to jobs of the given job name's.
      */
-    public Filter names(final String... names) {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.JobNameFilter(names)));
+    public Filter andMatchNames(final String... names) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.JobNameFilter(names)));
       return this;
     }
 
     /**
      * To accept only events which belong to jobs of the given job name's regex.
      */
-    public Filter nameRegex(final Pattern regex) {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.JobNameRegexFilter(regex)));
+    public Filter andMatchNameRegex(final Pattern regex) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.JobNameRegexFilter(regex)));
       return this;
     }
 
     /**
      * To accept only events which belong to the given Futures.
      */
-    public Filter futures(final IFuture<?>... futures) {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
+    public Filter andMatchFutures(final IFuture<?>... futures) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
       return this;
     }
 
     /**
      * To accept only events which belong to the given Futures.
      */
-    public Filter futures(final Collection<IFuture<?>> futures) {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
+    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
       return this;
     }
 
@@ -114,8 +114,8 @@ public final class JobEventFilters {
      *
      * @see IFuture#CURRENT
      */
-    public Filter currentFuture() {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get())));
+    public Filter andMatchCurrentFuture() {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get())));
       return this;
     }
 
@@ -124,8 +124,16 @@ public final class JobEventFilters {
      *
      * @see IFuture#CURRENT
      */
-    public Filter notCurrentFuture() {
-      andFilter(new FutureEventFilterDelegate(new NotFilter<>(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get()))));
+    public Filter andMatchNotCurrentFuture() {
+      andMatch(new FutureEventFilterDelegate(new NotFilter<>(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get()))));
+      return this;
+    }
+
+    /**
+     * To accept only events for jobs which belong to the given mutex object.
+     */
+    public Filter andMatchMutex(final Object mutexObject) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.MutexFilter(mutexObject)));
       return this;
     }
 
@@ -135,8 +143,8 @@ public final class JobEventFilters {
      * @see IJobManager#scheduleWithFixedDelay()
      * @see IJobManager#scheduleAtFixedRate()
      */
-    public Filter periodic() {
-      andFilter(PERIODIC_JOB_EVENT_FILTER);
+    public Filter andArePeriodic() {
+      andMatch(PERIODIC_JOB_EVENT_FILTER);
       return this;
     }
 
@@ -145,16 +153,8 @@ public final class JobEventFilters {
      *
      * @see IJobManager#schedule()
      */
-    public Filter notPeriodic() {
-      andFilter(NON_PERIODIC_JOB_EVENT_FILTER);
-      return this;
-    }
-
-    /**
-     * To accept only events for jobs which belong to the given mutex object.
-     */
-    public Filter mutex(final Object mutexObject) {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.MutexFilter(mutexObject)));
+    public Filter andAreNotPeriodic() {
+      andMatch(NON_PERIODIC_JOB_EVENT_FILTER);
       return this;
     }
   }

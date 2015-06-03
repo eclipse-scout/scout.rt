@@ -55,69 +55,59 @@ public final class ClientJobEventFilters {
 
     @Override
     protected void postConstruct() {
-      andFilter(new OrFilter<>(CLIENT_JOB_EVENT_FILTER, MODEL_JOB_EVENT_FILTER));
+      andMatch(new OrFilter<>(CLIENT_JOB_EVENT_FILTER, MODEL_JOB_EVENT_FILTER));
     }
 
     @Override
-    public Filter andFilter(final IFilter<JobEvent> filter) {
-      return (Filter) super.andFilter(filter);
+    public Filter andMatch(final IFilter<JobEvent> filter) {
+      return (Filter) super.andMatch(filter);
     }
 
     @Override
-    public Filter eventTypes(final JobEventType... eventTypes) {
-      return (Filter) super.eventTypes(eventTypes);
+    public Filter andMatchEventTypes(final JobEventType... eventTypes) {
+      return (Filter) super.andMatchEventTypes(eventTypes);
     }
 
     @Override
-    public Filter names(final String... names) {
-      return (Filter) super.names(names);
+    public Filter andMatchNames(final String... names) {
+      return (Filter) super.andMatchNames(names);
     }
 
     @Override
-    public Filter nameRegex(final Pattern regex) {
-      return (Filter) super.nameRegex(regex);
+    public Filter andMatchNameRegex(final Pattern regex) {
+      return (Filter) super.andMatchNameRegex(regex);
     }
 
     @Override
-    public Filter futures(final IFuture<?>... futures) {
-      return (Filter) super.futures(futures);
+    public Filter andMatchFutures(final IFuture<?>... futures) {
+      return (Filter) super.andMatchFutures(futures);
     }
 
     @Override
-    public Filter futures(final Collection<IFuture<?>> futures) {
-      return (Filter) super.futures(futures);
+    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
+      return (Filter) super.andMatchFutures(futures);
     }
 
     @Override
-    public Filter currentFuture() {
-      return (Filter) super.currentFuture();
+    public Filter andMatchCurrentFuture() {
+      return (Filter) super.andMatchCurrentFuture();
     }
 
     @Override
-    public Filter notCurrentFuture() {
-      return (Filter) super.notCurrentFuture();
+    public Filter andMatchNotCurrentFuture() {
+      return (Filter) super.andMatchNotCurrentFuture();
     }
 
     @Override
-    public Filter periodic() {
-      return (Filter) super.periodic();
-    }
-
-    @Override
-    public Filter notPeriodic() {
-      return (Filter) super.notPeriodic();
-    }
-
-    @Override
-    public Filter mutex(final Object mutexObject) {
-      return (Filter) super.mutex(mutexObject);
+    public Filter andMatchMutex(final Object mutexObject) {
+      return (Filter) super.andMatchMutex(mutexObject);
     }
 
     /**
      * To accept only events for jobs which are run on behalf of the given client session.
      */
-    public Filter session(final IClientSession session) {
-      andFilter(new FutureEventFilterDelegate(new ClientJobFutureFilters.SessionFilter(session)));
+    public Filter andMatchSession(final IClientSession session) {
+      andMatch(new FutureEventFilterDelegate(new ClientJobFutureFilters.SessionFilter(session)));
       return this;
     }
 
@@ -126,8 +116,8 @@ public final class ClientJobEventFilters {
      *
      * @see ISession#CURRENT
      */
-    public Filter currentSession() {
-      andFilter(new FutureEventFilterDelegate(new ClientJobFutureFilters.SessionFilter(ISession.CURRENT.get())));
+    public Filter andMatchCurrentSession() {
+      andMatch(new FutureEventFilterDelegate(new ClientJobFutureFilters.SessionFilter(ISession.CURRENT.get())));
       return this;
     }
 
@@ -136,25 +126,35 @@ public final class ClientJobEventFilters {
      *
      * @see ISession#CURRENT
      */
-    public Filter notCurrentSession() {
-      andFilter(new FutureEventFilterDelegate(new NotFilter<>(new ClientJobFutureFilters.SessionFilter(ISession.CURRENT.get()))));
+    public Filter andMatchNotCurrentSession() {
+      andMatch(new FutureEventFilterDelegate(new NotFilter<>(new ClientJobFutureFilters.SessionFilter(ISession.CURRENT.get()))));
       return this;
     }
 
     /**
      * To accept only events for model jobs, and not client jobs.
      */
-    public Filter modelJobsOnly() {
-      andFilter(MODEL_JOB_EVENT_FILTER);
+    public Filter andAreModelJobs() {
+      andMatch(MODEL_JOB_EVENT_FILTER);
       return this;
     }
 
     /**
      * To accept only events for client jobs, and not model jobs.
      */
-    public Filter clientJobsOnly() {
-      andFilter(CLIENT_JOB_EVENT_FILTER);
+    public Filter andAreClientJobs() {
+      andMatch(CLIENT_JOB_EVENT_FILTER);
       return this;
+    }
+
+    @Override
+    public Filter andArePeriodic() {
+      return (Filter) super.andArePeriodic();
+    }
+
+    @Override
+    public Filter andAreNotPeriodic() {
+      return (Filter) super.andAreNotPeriodic();
     }
   }
 }
