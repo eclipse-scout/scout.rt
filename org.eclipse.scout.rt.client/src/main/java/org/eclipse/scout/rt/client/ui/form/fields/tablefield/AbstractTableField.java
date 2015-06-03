@@ -549,7 +549,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           if (col.isCellEditable(row)) {
             try {
               ICell cell = row.getCell(col);
-              if (cell.getErrorStatus() != null) {
+              if (!cell.isContentValid()) {
                 if (col.isDisplayable() && !col.isVisible()) {
                   //column should become visible
                   invisbleColumnsWithErrors.add(col);
@@ -557,7 +557,12 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
                 if (tableDesc == null) {
                   tableDesc = new ValidateTableFieldDescriptor(this, row, col);
                 }
-                columnNames.add(col.getHeaderCell().getText());
+                String columnName = col.getHeaderCell().getText();
+                if (columnName == null) {
+                  LOG.warn("Validation Error on Column without header text, using className for error message.");
+                  columnName = col.getClass().getSimpleName();
+                }
+                columnNames.add(columnName);
               }
             }
             catch (Exception t) {

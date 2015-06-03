@@ -11,15 +11,21 @@
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.ITableHolder;
+import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -34,6 +40,7 @@ import org.junit.runner.RunWith;
 @SuppressWarnings("unused")
 @RunWith(PlatformTestRunner.class)
 public class TableFieldTest {
+  private static final Object[] TEST_ROW = new Object[]{1, "Test", false};
 
   /**
    * Test method for {@link AbstractTableField#importFormFieldData(AbstractFormFieldData, boolean)} With and without
@@ -50,6 +57,50 @@ public class TableFieldTest {
     P_TableField tableField2 = createTableField(true);
     assertEquals("prerequisite: tableField2.isPrimaryKey()", true, tableField2.getTable().getKeyColumn().isPrimaryKey());
     assertEquals("prerequisite: tableField2.isDisplayable()", false, tableField2.getTable().getKeyColumn().isDisplayable());
+  }
+
+  /**
+   * Tests that there is no error when adding a {@link Status#OK_STATUS} to a cell.
+   */
+  @Test
+  public void testOkErrorStatus_NoError() throws ProcessingException {
+    P_TableField tableField = createTableField(false);
+    tableField.getTable().addRowByArray(TEST_ROW);
+    Cell cell = (Cell) tableField.getTable().getCell(0, 1);
+    cell.setEditable(true);
+    cell.addErrorStatus(Status.OK_STATUS);
+    IValidateContentDescriptor desc = tableField.validateContent();
+    assertNull(desc);
+  }
+
+  /**
+   * Tests that there is an error on the field, when a table field with errors is validated.
+   */
+  @Test
+  public void testOkErrorStatus_ErrorText() throws ProcessingException {
+    P_TableField tableField = createTableField(false);
+    tableField.getTable().addRowByArray(TEST_ROW);
+    Cell cell = (Cell) tableField.getTable().getCell(0, 1);
+    cell.setEditable(true);
+    cell.addErrorStatus("ErrorX");
+    IValidateContentDescriptor desc = tableField.validateContent();
+    assertNotNull(desc);
+    assertTrue(desc.getDisplayText().contains(tableField.getTable().getStringColumn().getClass().getSimpleName()));
+  }
+
+  /**
+   * Tests that an invisible displayable column is shown, if there is an error.
+   */
+  @Test
+  public void testErrorColumn_Visible() throws ProcessingException {
+    P_TableField tableField = createTableField(false);
+    tableField.getTable().addRowByArray(TEST_ROW);
+    Cell cell = (Cell) tableField.getTable().getCell(0, 1);
+    cell.setEditable(true);
+    tableField.getTable().getStringColumn().setVisible(false);
+    cell.addErrorStatus("ErrorX");
+    IValidateContentDescriptor desc = tableField.validateContent();
+    assertTrue(tableField.getTable().getStringColumn().isVisible());
   }
 
   private P_TableField createTableField(boolean hasPrimaryKey) {
