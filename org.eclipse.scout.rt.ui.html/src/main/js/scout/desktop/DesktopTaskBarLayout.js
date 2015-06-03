@@ -67,7 +67,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
   var tabWidth;
   if (smallPrefTabsWidth <= tabsWidth) {
     tabWidth = Math.min(this.TAB_WIDTH_LARGE, Math.floor(tabsWidth / numTabs));
-    $.log.info('MEEP(1) tabWidth=' + tabWidth);
     // 2nd - all Tabs fit when they have small size
     $tabs.find('.taskbar-tab-item').each(function() {
       $(this).outerWidth(tabWidth);
@@ -84,7 +83,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     toolsWidth = scout.graphics.getSize($tools, true).width;
     tabsWidth = contWidth - toolsWidth - logoWidth;
     $tools.cssLeft(contWidth - toolsWidth - logoWidth);
-    $.log.info('MEEP(2) min-padding tabsWidth=' + tabsWidth + ' toolsWidth=' + toolsWidth);
 
     if (smallPrefTabsWidth <= tabsWidth) {
       tabWidth = this.TAB_WIDTH_SMALL;
@@ -105,7 +103,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     toolsWidth = scout.graphics.getSize($tools, true).width;
     tabsWidth = contWidth - toolsWidth - logoWidth;
     $tools.cssLeft(contWidth - toolsWidth - logoWidth);
-    $.log.info('MEEP(3) icon-only tabsWidth=' + tabsWidth + ' toolsWidth=' + toolsWidth);
 
     if (smallPrefTabsWidth <= tabsWidth) {
       tabWidth = this.TAB_WIDTH_SMALL;
@@ -121,7 +118,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // check how many tabs fit into remaining tabsWidth
     var numVisibleTabs = Math.floor(tabsWidth / this.TAB_WIDTH_SMALL),
       numOverflowTabs = numTabs - numVisibleTabs;
-    $.log.info('MEEP(4) icon-only tabsWidth=' + tabsWidth + ' toolsWidth=' + toolsWidth + ' numVisibleTabs=' + numVisibleTabs + ' numOverflowTabs=' + numOverflowTabs);
 
     // FIXME AWE: display correct range of tabs (around visible tab)
     // FIXME AWE: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
@@ -146,7 +142,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
         leftEnd = rightEnd - numVisibleTabs + 1;
       }
     }
-    $.log.info('show items from leftEnd=' + leftEnd + ' to rightEnd=' + rightEnd + ' selectedIndex=' + selectedIndex);
 
     this._$overflowTab = $tabs
       .appendDiv('overflow-tab-item')
@@ -185,8 +180,7 @@ scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
     overflowMenus.push(menu);
   });
 
-  $.log.info('XXX click overflow ' + this._overflowTabsIndizes);
-  popup = new scout.ContextMenuPopup(session, overflowMenus);
+  popup = new scout.ContextMenuPopup(session, overflowMenus, {cloneMenuItems: false});
   popup.render();
   popup.setLocation(new scout.Point(event.pageX, event.pageY));
 };

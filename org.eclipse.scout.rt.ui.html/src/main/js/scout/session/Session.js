@@ -56,6 +56,7 @@ scout.Session = function($entryPoint, options) {
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   this.modelAdapterRegistry = {};
+  this._proxyRegistry = {}; // key = adapter-ID, value = array of proxies for that adapter
   this.locale;
   this._asyncEvents = [];
   this._asyncRequestQueued;
@@ -766,8 +767,14 @@ scout.Session.prototype._processEvents = function(events) {
     }
     if (event.type === 'property') { // Special handling for 'property' type
       adapter.onModelPropertyChange(event);
+      this.getProxies(adapter).forEach(function(proxy) {
+        proxy.onModelPropertyChange(event);
+      });
     } else {
       adapter.onModelAction(event);
+      this.getProxies(adapter).forEach(function(proxy) {
+        proxy.onModelAction(event);
+      });
     }
   }
 };
@@ -890,4 +897,48 @@ scout.Session.prototype.optText = function(textKey, defaultValue) {
 
 scout.Session.prototype.textExists = function(textKey) {
   return this._texts.exists(textKey);
+};
+
+scout.Session.prototype.addProxy = function(adapter, proxy) {
+  proxy.proxyFor = adapter.id;
+  var entry = this._proxyRegistry[adapter.id];
+  if (entry && Array.isArray(entry)) {
+    entry.push(proxy);
+  } else {
+    entry = [proxy];
+    this._proxyRegistry[adapter.id] = entry;
+  }
+};
+
+scout.Session.prototype.getProxies = function(adapter) {
+  var entry = this._proxyRegistry[adapter.id];
+  if (entry && Array.isArray(entry)) {
+    return entry;
+  } else {
+    return [];
+  }
+};
+
+scout.Session.prototype.removeProxies = function(adapter) {
+  var entry = this._proxyRegistry[adapter.id];
+  if (entry === undefined) {
+    throw new Error('No proxies registered for the given adapter');
+  }
+  delete this._proxyRegistry[adapter.id];
+};
+
+scout.Session.prototype.removeProxy = function(proxy) {
+  if (proxy.proxyOf === undefined) {
+    throw new Error('Tried to remove a proxy but the property proxyOf is not set');
+  }
+  var entry = this._proxyRegistry[proxy.proxyOf];
+  if (entry && Array.isArray(entry)) {
+    var i = entry.indexOf(proxy);
+    if (i === -1) {
+      throw new Error('Adapter found, but proxy does not exist in proxy registry');
+    }
+    entry.splice(i, 1);
+  } else {
+    throw new Error('Proxy does not exist in proxy registry');
+  }
 };
