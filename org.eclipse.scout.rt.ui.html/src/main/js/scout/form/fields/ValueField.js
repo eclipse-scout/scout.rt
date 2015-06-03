@@ -21,35 +21,44 @@ scout.ValueField.prototype.init = function(model, session) {
 };
 
 scout.ValueField.prototype._syncMenus = function(menus) {
-  this.menus.forEach(function(menu) {
-     this.keyStrokeAdapter.unregisterKeyStroke(menu);
-  }, this);
+  if (this._hasMenus()) {
+    this.menus.forEach(function(menu) {
+       this.keyStrokeAdapter.unregisterKeyStroke(menu);
+    }, this);
+  }
   this.menus = menus;
-  this.menus.forEach(function(menu) {
-    if (menu.enabled) {
-      this.keyStrokeAdapter.registerKeyStroke(menu);
-    }
-  }, this);
+  if (this._hasMenus()) {
+    this.menus.forEach(function(menu) {
+      if (menu.enabled) {
+        this.keyStrokeAdapter.registerKeyStroke(menu);
+      }
+    }, this);
+  }
 };
 
 /**
  * @override FormField.js
  */
 scout.ValueField.prototype._onStatusClick = function(event) {
-  if (this.menus.length > 0) {
+  if (this._hasMenus()) {
     // showing menus is more important than showing tooltips
     var popup = new scout.ContextMenuPopup(this.session, this.menus),
-      bounds = scout.graphics.getBounds(this.$status);
+      bounds = scout.graphics.getBounds(this.$status),
+      pos = this.$status.position();
     popup.render(this.$container);
-    popup.setLocation(new scout.Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2));
+    popup.setLocation(new scout.Point(pos.left + bounds.width / 2, pos.top + bounds.height / 2));
   } else {
     // super call shows tooltip
     scout.ValueField.parent.prototype._onStatusClick.call(this);
   }
 };
 
+scout.ValueField.prototype._hasMenus = function() {
+  return this.menus && this.menus.length > 0;
+};
+
 scout.ValueField.prototype._renderMenus = function(menus) {
-  this.$container.toggleClass('has-menus', this.menus.length > 0);
+  this.$container.toggleClass('has-menus', this._hasMenus());
 };
 
 scout.ValueField.prototype._renderDisplayText = function(displayText) {
