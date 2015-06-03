@@ -604,6 +604,13 @@ scout.Calendar.prototype.layoutLabel = function() {
       if (scout.dates.isSameDay(date, this.selectedDate)) {
         cssClass += ' selected';
       }
+
+      // some dates are not centred nice by browsers
+      if (date.getDate() > 9 && date.getDate() < 20) {
+        cssClass += ' center-nice';
+      }
+
+
       text = this._format(date, 'dd');
       $dates.eq(w * 7 + d)
         .removeClass('weekend-out weekend out selected now')
