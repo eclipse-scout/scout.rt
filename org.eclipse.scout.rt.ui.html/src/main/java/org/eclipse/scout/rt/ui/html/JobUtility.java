@@ -39,7 +39,7 @@ public final class JobUtility {
 
     boolean timeout;
     try {
-      Filter filter = ModelJobs.newFutureFilter().session(clientSession).notBlocked();
+      Filter filter = ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotBlocked();
       timeout = !Jobs.getJobManager().awaitDone(filter, AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (JobException e) {
@@ -81,7 +81,7 @@ public final class JobUtility {
     final IFuture<RESULT> future = ModelJobs.schedule(callable, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)).name(jobName));
     boolean timeout;
     try {
-      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFutures(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (JobException e) {
       throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, callable.getClass().getName(), future);
