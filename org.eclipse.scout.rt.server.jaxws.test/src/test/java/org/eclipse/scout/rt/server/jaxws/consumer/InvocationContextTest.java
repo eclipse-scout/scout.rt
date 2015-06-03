@@ -36,7 +36,6 @@ import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -235,7 +234,7 @@ public class InvocationContextTest {
       }
     }).when(m_port).webMethod();
 
-    final IRunMonitor runMonitor = new RunMonitor();
+    final RunMonitor runMonitor = new RunMonitor();
 
     // Cancel the 'webMethod' once blocking.
     Jobs.schedule(new IRunnable() {

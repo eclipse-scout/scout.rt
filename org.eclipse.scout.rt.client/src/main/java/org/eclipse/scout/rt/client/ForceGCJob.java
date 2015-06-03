@@ -11,14 +11,14 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 
 public class ForceGCJob implements IRunnable {
   @Override
   public void run() throws Exception {
     int counter = 0;
     Thread.sleep(10000);
-    while (counter < 7 && !Thread.interrupted() && !IRunMonitor.CURRENT.get().isCancelled() && (Runtime.getRuntime().freeMemory() > 30000000 || counter < 2)) {
+    while (counter < 7 && !Thread.interrupted() && !RunMonitor.CURRENT.get().isCancelled() && (Runtime.getRuntime().freeMemory() > 30000000 || counter < 2)) {
       System.gc();
       counter++;
       Thread.sleep(10000);

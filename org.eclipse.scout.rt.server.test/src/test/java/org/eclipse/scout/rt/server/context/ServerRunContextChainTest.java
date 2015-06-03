@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
@@ -133,9 +133,9 @@ public class ServerRunContextChainTest {
   }
 
   private IChainable<?> assertCallableChain(IChainable<?> c1) throws Exception {
-    // 1. InitThreadLocalCallable for IRunMonitor.CURRENT
+    // 1. InitThreadLocalCallable for RunMonitor.CURRENT
     assertTrue(InitThreadLocalCallable.class.equals(c1.getClass()));
-    assertSame(IRunMonitor.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
+    assertSame(RunMonitor.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
     // 2. SubjectCallable
     SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);

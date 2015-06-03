@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -85,7 +84,7 @@ public class JobCancelTest {
 
       @Override
       public Void call() throws Exception {
-        if (IRunMonitor.CURRENT.get().isCancelled()) {
+        if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-before");
         }
 
@@ -96,7 +95,7 @@ public class JobCancelTest {
           protocol.add("interrupted");
         }
 
-        if (IRunMonitor.CURRENT.get().isCancelled()) {
+        if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-after");
         }
 
@@ -135,7 +134,7 @@ public class JobCancelTest {
 
       @Override
       public Void call() throws Exception {
-        if (IRunMonitor.CURRENT.get().isCancelled()) {
+        if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-before");
         }
 
@@ -146,7 +145,7 @@ public class JobCancelTest {
           protocol.add("interrupted");
         }
 
-        if (IRunMonitor.CURRENT.get().isCancelled()) {
+        if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-after");
         }
 
@@ -350,7 +349,7 @@ public class JobCancelTest {
             if (IFuture.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled (future)");
             }
-            if (IRunMonitor.CURRENT.get().isCancelled()) {
+            if (RunMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled (monitor)");
             }
             job2DoneLatch.countDown();
@@ -369,7 +368,7 @@ public class JobCancelTest {
         if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled (future)");
         }
-        if (IRunMonitor.CURRENT.get().isCancelled()) {
+        if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled (monitor)");
         }
         verifyLatch.countDown();
@@ -418,7 +417,7 @@ public class JobCancelTest {
             if (IFuture.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled (future)");
             }
-            if (IRunMonitor.CURRENT.get().isCancelled()) {
+            if (RunMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled (monitor)");
             }
             verifyLatch.countDown();
@@ -439,7 +438,7 @@ public class JobCancelTest {
             if (IFuture.CURRENT.get().isCancelled()) {
               protocol.add("job-3-cancelled (future)");
             }
-            if (IRunMonitor.CURRENT.get().isCancelled()) {
+            if (RunMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-3-cancelled (monitor)");
             }
             verifyLatch.countDown();
@@ -456,7 +455,7 @@ public class JobCancelTest {
         if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled (future)");
         }
-        if (IRunMonitor.CURRENT.get().isCancelled()) {
+        if (RunMonitor.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled (monitor)");
         }
         job1DoneLatch.countDown();

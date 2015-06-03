@@ -16,11 +16,11 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
- * Registry that contains the {@link IRunMonitor}s of operations which are currently executed, and which are subject for
+ * Registry that contains the {@link RunMonitor}s of operations which are currently executed, and which are subject for
  * global cancellation. Typically, such operations are HTTP service requests initiated by a client, and are cancelled by
  * a respective cancellation request.
  * <p>
@@ -32,16 +32,16 @@ public class RunMonitorCancelRegistry {
   protected static final String RUN_MONITORS_KEY = "activeRunMonitors";
 
   /**
-   * Registers the given {@link IRunMonitor} by binding it to the given {@link ISession} with the given <code>id</code>.
+   * Registers the given {@link RunMonitor} by binding it to the given {@link ISession} with the given <code>id</code>.
    * Has no effect if the given <code>id</code> is <code>0</code>.
    */
-  public void register(final ISession session, final long id, final IRunMonitor monitor) {
+  public void register(final ISession session, final long id, final RunMonitor monitor) {
     Assertions.assertNotNull(session, "session must not be null");
     put(session, id, monitor);
   }
 
   /**
-   * Unregisters the {@link IRunMonitor} bound to the given {@link ISession} and <code>id</code>. Has no effect if no
+   * Unregisters the {@link RunMonitor} bound to the given {@link ISession} and <code>id</code>. Has no effect if no
    * monitor is found.
    */
   public void unregister(final ISession session, final long id) {
@@ -50,34 +50,34 @@ public class RunMonitorCancelRegistry {
   }
 
   /**
-   * Cancels and removes the {@link IRunMonitor} which was bound to the given {@link ISession} and <code>id</code>. Has
+   * Cancels and removes the {@link RunMonitor} which was bound to the given {@link ISession} and <code>id</code>. Has
    * no effect if no monitor is found.
    *
    * @return <code>true</code> if cancel was successful.
    */
   public boolean cancel(final ISession session, final long id) {
     Assertions.assertNotNull(session, "session must not be null");
-    final IRunMonitor runMonitor = remove(session, id);
+    final RunMonitor runMonitor = remove(session, id);
     return (runMonitor != null ? runMonitor.cancel(true) : false);
   }
 
   // === Internal methods ===
 
-  protected void put(final ISession session, final long id, final IRunMonitor monitor) {
+  protected void put(final ISession session, final long id, final RunMonitor monitor) {
     if (id != 0L) {
       synchronized (session) {
-        get(session, true).put(id, new WeakReference<IRunMonitor>(monitor));
+        get(session, true).put(id, new WeakReference<RunMonitor>(monitor));
       }
     }
   }
 
-  protected IRunMonitor remove(final ISession session, final long id) {
+  protected RunMonitor remove(final ISession session, final long id) {
     if (id == 0L) {
       return null;
     }
-    WeakReference<IRunMonitor> monitorWeakRef = null;
+    WeakReference<RunMonitor> monitorWeakRef = null;
     synchronized (session) {
-      final Map<Long, WeakReference<IRunMonitor>> monitors = get(session, false);
+      final Map<Long, WeakReference<RunMonitor>> monitors = get(session, false);
       if (monitors != null) {
         monitorWeakRef = monitors.remove(id);
         if (monitors.isEmpty()) {
@@ -89,8 +89,8 @@ public class RunMonitorCancelRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  protected Map<Long, WeakReference<IRunMonitor>> get(final ISession session, final boolean autoCreate) {
-    Map<Long, WeakReference<IRunMonitor>> monitors = (Map<Long, WeakReference<IRunMonitor>>) session.getData(RUN_MONITORS_KEY);
+  protected Map<Long, WeakReference<RunMonitor>> get(final ISession session, final boolean autoCreate) {
+    Map<Long, WeakReference<RunMonitor>> monitors = (Map<Long, WeakReference<RunMonitor>>) session.getData(RUN_MONITORS_KEY);
     if (monitors == null && autoCreate) {
       monitors = new HashMap<>();
       session.setData(RUN_MONITORS_KEY, monitors);

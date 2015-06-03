@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.ServerConfigProperties.HttpServerDebugProperty;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
@@ -111,7 +111,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           IServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
           // Enable global cancellation of the service request.
-          IRunMonitor runMonitor = BEANS.get(IRunMonitor.class);
+          RunMonitor runMonitor = BEANS.get(RunMonitor.class);
 
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.locale(serviceRequest.getLocale());

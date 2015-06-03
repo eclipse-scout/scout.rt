@@ -41,7 +41,7 @@ public class RunContextTest {
   @After
   public void after() {
     NlsLocale.CURRENT.remove();
-    IRunMonitor.CURRENT.remove();
+    RunMonitor.CURRENT.remove();
   }
 
   @Test
@@ -129,7 +129,7 @@ public class RunContextTest {
    */
   @Test
   public void testCopyCurrent_RunMonitor1() throws ProcessingException {
-    IRunMonitor.CURRENT.remove();
+    RunMonitor.CURRENT.remove();
 
     RunContext runContext = RunContexts.copyCurrent();
     assertNotNull(runContext.runMonitor());
@@ -156,7 +156,7 @@ public class RunContextTest {
    */
   @Test
   public void testCopyCurrent_RunMonitor2() throws ProcessingException {
-    IRunMonitor.CURRENT.remove();
+    RunMonitor.CURRENT.remove();
 
     final RunMonitor explicitRunMonitor = new RunMonitor();
     RunContext runContext = RunContexts.copyCurrent();
@@ -189,10 +189,10 @@ public class RunContextTest {
   @Test
   public void testCopyCurrent_RunMonitor3() throws ProcessingException {
     final RunMonitor currentRunMonitor = new RunMonitor();
-    IRunMonitor.CURRENT.set(currentRunMonitor);
+    RunMonitor.CURRENT.set(currentRunMonitor);
 
     RunContext runContext = RunContexts.copyCurrent();
-    final IRunMonitor newRunMonitor = runContext.runMonitor();
+    final RunMonitor newRunMonitor = runContext.runMonitor();
 
     assertNotSame("RunMonitor should not be same instance a current RunMonitor", currentRunMonitor, newRunMonitor);
     assertTrue("RunMonitor should be registered within current RunMonitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
@@ -222,11 +222,11 @@ public class RunContextTest {
   @Test
   public void testCopyCurrent_RunMonitor4() throws ProcessingException {
     final RunMonitor currentRunMonitor = new RunMonitor();
-    final IRunMonitor explicitRunMonitor = new RunMonitor();
+    final RunMonitor explicitRunMonitor = new RunMonitor();
 
-    IRunMonitor.CURRENT.set(currentRunMonitor);
+    RunMonitor.CURRENT.set(currentRunMonitor);
     RunContext runContext = RunContexts.copyCurrent();
-    final IRunMonitor defaultRunMonitor = runContext.runMonitor();
+    final RunMonitor defaultRunMonitor = runContext.runMonitor();
 
     runContext.runMonitor(explicitRunMonitor); // explicit RunMonitor
     assertSame(explicitRunMonitor, runContext.runMonitor());

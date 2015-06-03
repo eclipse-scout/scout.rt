@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.context.ICancellable;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
@@ -63,7 +62,7 @@ public class RunMonitorJobTest {
   public void testNoCurrentAndExplicitMonitor() throws Exception {
     final RunMonitorEx explicitMonitor = new RunMonitorEx();
 
-    IRunMonitor.CURRENT.remove();
+    RunMonitor.CURRENT.remove();
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override

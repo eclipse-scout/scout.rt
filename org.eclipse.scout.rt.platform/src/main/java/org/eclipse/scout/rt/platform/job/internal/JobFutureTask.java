@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.ICancellable;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
@@ -67,7 +66,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private final boolean m_periodic;
 
   private final boolean m_runWithRunContext;
-  private final IRunMonitor m_runMonitor;
+  private final RunMonitor m_runMonitor;
 
   private final DonePromise<RESULT> m_donePremise;
 
@@ -98,7 +97,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
     m_runWithRunContext = m_input.runContext() != null;
-    m_runMonitor = (m_runWithRunContext ? m_input.runContext().runMonitor() : BEANS.get(IRunMonitor.class));
+    m_runMonitor = (m_runWithRunContext ? m_input.runContext().runMonitor() : BEANS.get(RunMonitor.class));
 
     m_jobManager.registerFuture(this);
     m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
@@ -167,7 +166,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, this));
 
     // Callable to set the current RunMonitor. That is only required, if no RunContext is provided, because done by RunContext otherwise.
-    final Callable<RESULT> c2 = (m_runWithRunContext ? target : new InitThreadLocalCallable<>(target, IRunMonitor.CURRENT, m_runMonitor));
+    final Callable<RESULT> c2 = (m_runWithRunContext ? target : new InitThreadLocalCallable<>(target, RunMonitor.CURRENT, m_runMonitor));
     // Callable to set the current Future.
     final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, IFuture.CURRENT, this);
 

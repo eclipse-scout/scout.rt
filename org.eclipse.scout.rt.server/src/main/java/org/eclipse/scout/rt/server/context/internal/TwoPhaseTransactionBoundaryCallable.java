@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -87,13 +87,13 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
   protected RESULT runRequiresNewTxBoundary() throws Exception {
     final ITransaction newTransaction = BEANS.get(ITransaction.class);
 
-    IRunMonitor.CURRENT.get().registerCancellable(newTransaction);
+    RunMonitor.CURRENT.get().registerCancellable(newTransaction);
     try {
       return initTxThreadLocalAndContinueChain(newTransaction);
     }
     finally {
       endTransactionSafe(newTransaction);
-      IRunMonitor.CURRENT.get().unregisterCancellable(newTransaction);
+      RunMonitor.CURRENT.get().unregisterCancellable(newTransaction);
     }
   }
 

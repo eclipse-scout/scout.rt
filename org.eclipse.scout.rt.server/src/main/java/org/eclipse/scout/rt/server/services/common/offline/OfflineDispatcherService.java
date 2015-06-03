@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -38,7 +38,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   public IServiceTunnelResponse dispatch(final IServiceTunnelRequest serviceRequest) {
     try {
       // Enable global cancellation of the service request.
-      IRunMonitor runMonitor = BEANS.get(IRunMonitor.class);
+      RunMonitor runMonitor = BEANS.get(RunMonitor.class);
 
       ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
       serverRunContext.offline(true);

@@ -24,7 +24,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
- * <li>{@link IRunMonitor#CURRENT}</li>
+ * <li>{@link RunMonitor#CURRENT}</li>
  * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
@@ -66,7 +66,7 @@ public class JaxWsRunContext extends ServletRunContext {
   }
 
   @Override
-  public JaxWsRunContext runMonitor(final IRunMonitor runMonitor) {
+  public JaxWsRunContext runMonitor(final RunMonitor runMonitor) {
     super.runMonitor(runMonitor);
     return this;
   }

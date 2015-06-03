@@ -24,7 +24,6 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.shared.ISession;
 import org.junit.Before;
@@ -165,7 +164,7 @@ public class RunMonitorCancelRegistryTest {
   }
 
   @SuppressWarnings("unchecked")
-  private Map<Long, WeakReference<IRunMonitor>> getRunMonitors(ISession session) {
-    return (Map<Long, WeakReference<IRunMonitor>>) session.getData(RunMonitorCancelRegistry.RUN_MONITORS_KEY);
+  private Map<Long, WeakReference<RunMonitor>> getRunMonitors(ISession session) {
+    return (Map<Long, WeakReference<RunMonitor>>) session.getData(RunMonitorCancelRegistry.RUN_MONITORS_KEY);
   }
 }

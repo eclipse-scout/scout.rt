@@ -15,7 +15,6 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -55,9 +54,9 @@ public final class ServerRunContexts {
   /**
    * Creates an empty {@link ServerRunContext}.
    *
-   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is
    *             NOT registered as child monitor, meaning that it will not be cancelled once the current
-   *             {@link IRunMonitor} is cancelled.
+   *             {@link RunMonitor} is cancelled.
    * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
    * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
    *          the session.

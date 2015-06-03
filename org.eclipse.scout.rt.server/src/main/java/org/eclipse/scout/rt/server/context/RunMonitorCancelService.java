@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.context;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
@@ -22,7 +21,6 @@ public class RunMonitorCancelService extends AbstractService implements IRunMoni
 
   @Override
   public boolean cancel(long requestSequence) {
-    IServerSession session = ServerSessionProvider.currentSession();
-    return BEANS.get(RunMonitorCancelRegistry.class).cancel(session, requestSequence);
+    return BEANS.get(RunMonitorCancelRegistry.class).cancel(ServerSessionProvider.currentSession(), requestSequence);
   }
 }

@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 
@@ -49,9 +48,9 @@ public final class ServletRunContexts {
   /**
    * Creates an empty {@link ServletRunContext}.
    *
-   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is
    *             NOT registered as child monitor, meaning that it will not be cancelled once the current
-   *             {@link IRunMonitor} is cancelled.
+   *             {@link RunMonitor} is cancelled.
    * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
    *          the session.
    * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like

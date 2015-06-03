@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -405,7 +405,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
 
     @Override
     public void run() throws Exception {
-      if (IRunMonitor.CURRENT.get().isCancelled()) {
+      if (RunMonitor.CURRENT.get().isCancelled()) {
         return;
       }
 
@@ -426,7 +426,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           @Override
           public void run() throws Exception {
             synchronized (AbstractCalendarItemProvider.this) {
-              if (!IRunMonitor.CURRENT.get().isCancelled()) {
+              if (!RunMonitor.CURRENT.get().isCancelled()) {
                 setItemsInternal(m_loadingMinDate, m_loadingMaxDate, m_result);
               }
             }

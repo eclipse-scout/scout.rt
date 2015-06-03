@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.servicetunnel.http.internal.ClientNotificatio
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
@@ -143,7 +143,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSe
   }
 
   protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) {
-    if (IRunMonitor.CURRENT.get().isCancelled()) {
+    if (RunMonitor.CURRENT.get().isCancelled()) {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
     return super.tunnel(req);

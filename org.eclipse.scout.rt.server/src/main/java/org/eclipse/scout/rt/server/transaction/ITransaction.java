@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.transaction;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.ICancellable;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMe
  * Whenever a remote service call is handled by the {@link ServiceTunnelServlet} it is dispatched to a
  * {@link DefaultTransactionDelegate} that runs in a {@link RunContext} with a {@link ITransaction}.
  * <p>
- * Cancelling is done using {@link IRunMonitor#cancel(boolean)} on {@link IRunMonitor#CURRENT}
+ * Cancelling is done using {@link RunMonitor#cancel(boolean)} on {@link RunMonitor#CURRENT}
  * <p>
  * Whenever for example a sql statement is run, it registers/unregisters on the
  * {@link AbstractSqlTransactionMember#registerActiveStatement(java.sql.Statement)} /

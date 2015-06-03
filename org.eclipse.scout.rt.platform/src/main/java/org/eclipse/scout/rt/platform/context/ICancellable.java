@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.platform.context;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
- * This is any kind of object interested in active cancellation of a {@link IRunMonitor#cancel(boolean)}.
+ * This is any kind of object interested in active cancellation of a {@link RunMonitor#cancel(boolean)}.
  * <p>
- * Note that a {@link IFuture} represents itself a {@link IRunMonitor}
+ * Note that a {@link IFuture} represents itself a {@link RunMonitor}
  *
  * @since 5.1
  */

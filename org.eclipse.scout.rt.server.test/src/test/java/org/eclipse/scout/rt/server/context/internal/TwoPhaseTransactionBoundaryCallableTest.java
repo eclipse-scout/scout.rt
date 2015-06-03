@@ -27,9 +27,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -93,12 +91,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
       }
     }).when(m_transaction).hasFailures();
 
-    IRunMonitor.CURRENT.set(new RunMonitor());
+    RunMonitor.CURRENT.set(new RunMonitor());
   }
 
   @After
   public void after() {
-    IRunMonitor.CURRENT.remove();
+    RunMonitor.CURRENT.remove();
     TestingUtility.unregisterBeans(m_beans);
     m_beans.clear();
     m_txErrors.clear();

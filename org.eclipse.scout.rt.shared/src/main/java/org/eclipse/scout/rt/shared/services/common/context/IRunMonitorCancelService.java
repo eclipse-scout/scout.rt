@@ -10,28 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.context;
 
+import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
+/**
+ * Provides cancellation support for operations initiated by the client.
+ */
 @TunnelToServer
 public interface IRunMonitorCancelService extends IService {
 
   /**
-   * Cancels a {@link RunContext}with its associated transaction which was originally initiated by a client-server
-   * request.<br/>
-   * Also, any nested 'runNow'-style jobs, which where run on behalf of that job and did not complete yet, are
-   * cancelled, as well as any associated transactions. In order to be cancelled, the session of the cancel-request must
-   * be the same as the job's session.
+   * Cancels all running operations which are associated with the given <code>requestSequence</code>.
+   * Technically, that is any {@link ICancellable} which was bound to the {@link RunMonitor} of the originating service
+   * request and includes {@link RunContext} executions, jobs and transactions.
    *
    * @param requestSequence
-   *          id of the job; corresponds to the <code>requestSequence</code> of the {@link ServiceTunnelRequest} which
-   *          initiated the job.
-   * @return <code>true</code> if cancel was successful and transaction was in fact cancelled, <code>false</code>
-   *         otherwise.
+   *          <code>requestSequence</code> to identify the {@link RunMonitor} to cancel.
+   * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
    */
   @InputValidation(IValidationStrategy.NO_CHECK.class)
   boolean cancel(long requestSequence);

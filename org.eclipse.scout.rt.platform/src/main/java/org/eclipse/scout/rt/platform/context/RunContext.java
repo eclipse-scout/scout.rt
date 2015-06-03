@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
- * <li>{@link IRunMonitor#CURRENT}</li>
+ * <li>{@link RunMonitor#CURRENT}</li>
  * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
@@ -54,7 +54,7 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
 @Bean
 public class RunContext {
 
-  protected IRunMonitor m_runMonitor = BEANS.get(IRunMonitor.class);
+  protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap = new PropertyMap();
@@ -135,21 +135,21 @@ public class RunContext {
   /**
    * @return {@link RunMonitor} to be used, is never <code>null</code>.
    */
-  public IRunMonitor runMonitor() {
+  public RunMonitor runMonitor() {
     return m_runMonitor;
   }
 
   /**
-   * Set a specific {@link IRunMonitor} to be used, which must not be <code>null</code>. However, even if there is a
-   * current {@link IRunMonitor}, it is NOT registered as child monitor, meaning that it will not be cancelled once the
-   * current {@link IRunMonitor} is cancelled. If such a linking is needed, you have to do that yourself:
+   * Set a specific {@link RunMonitor} to be used, which must not be <code>null</code>. However, even if there is a
+   * current {@link RunMonitor}, it is NOT registered as child monitor, meaning that it will not be cancelled once the
+   * current {@link RunMonitor} is cancelled. If such a linking is needed, you have to do that yourself:
    *
    * <pre>
    * <code>
-   *     IRunMonitor monitor = BEANS.get(IRunMonitor.class);
+   *     RunMonitor monitor = BEANS.get(RunMonitor.class);
    * 
    *     // Register your monitor to be cancelled as well
-   *     IRunMonitor.CURRENT.get().registerCancellable(monitor);
+   *     RunMonitor.CURRENT.get().registerCancellable(monitor);
    * 
    *     RunContexts.copyCurrent().runMonitor(monitor).run(new IRunnable() {
    * 
@@ -161,7 +161,7 @@ public class RunContext {
    * </code>
    * </pre>
    */
-  public RunContext runMonitor(final IRunMonitor runMonitor) {
+  public RunContext runMonitor(final RunMonitor runMonitor) {
     m_runMonitor = Assertions.assertNotNull(runMonitor, "RunMonitor must not be null");
     return this;
   }
@@ -216,8 +216,8 @@ public class RunContext {
   /**
    * Method invoked to fill this {@link RunContext} with values from the current calling {@link RunContext}.
    *
-   * @RunMonitor a new {@link IRunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link IRunMonitor}. That makes the <i>returned</i>
+   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i>
    *             {@link RunContext} to be cancelled as well once the current calling {@link RunContext} is cancelled,
    *             but DOES NOT cancel the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is
    *             cancelled.
@@ -230,18 +230,18 @@ public class RunContext {
     m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
-    m_runMonitor = BEANS.get(IRunMonitor.class);
-    if (IRunMonitor.CURRENT.get() != null) {
-      IRunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
+    m_runMonitor = BEANS.get(RunMonitor.class);
+    if (RunMonitor.CURRENT.get() != null) {
+      RunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
     }
   }
 
   /**
    * Method invoked to fill this {@link RunContext} with empty values.
    *
-   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is
    *             NOT registered as child monitor, meaning that it will not be cancelled once the current
-   *             {@link IRunMonitor} is cancelled.
+   *             {@link RunMonitor} is cancelled.
    * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
    *          the session.
    * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
@@ -250,7 +250,7 @@ public class RunContext {
   protected void fillEmptyValues() {
     m_subject = new PreferredValue<>(null, true); // null as preferred Subject
     m_locale = new PreferredValue<>(null, true); // null as preferred Locale
-    m_runMonitor = BEANS.get(IRunMonitor.class);
+    m_runMonitor = BEANS.get(RunMonitor.class);
     m_propertyMap = new PropertyMap();
   }
 
