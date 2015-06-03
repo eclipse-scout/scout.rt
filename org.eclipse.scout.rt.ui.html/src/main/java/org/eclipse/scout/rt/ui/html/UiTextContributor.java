@@ -79,7 +79,8 @@ public class UiTextContributor implements IUiTextContributor {
         "UiProcessingErrorTitle",
         "UiProcessingErrorText",
         "UiProcessingErrorAction",
-        "PleaseWait_"
+        "PleaseWait_",
+        "ShowAllNodes"
         ));
   }
 }

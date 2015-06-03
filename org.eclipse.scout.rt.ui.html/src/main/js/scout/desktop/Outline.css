@@ -41,6 +41,10 @@
       border: 0;
     }
 
+    &.show-all:hover {
+      color: @highlight-color;
+    }
+
     & > .tree-node-control {
       /* adjust control position */
       margin-left: -@outline-node-control-size - 5px;
@@ -59,7 +63,6 @@
       &:hover:before {
         color: @highlight-color;
       }
-
     }
   }
 
@@ -83,6 +86,15 @@
       .font-text-plus;
       display: block;
       background-color: @outline-group-background-color;
+    }
+
+    &.hidden {
+      display: none;
+    }
+
+    &.show-all::before {
+      content: '+';
+      padding-right: 5px;
     }
 
     &.selected {
