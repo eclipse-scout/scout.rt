@@ -229,23 +229,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   /**
-   * Calls {@link #disposeColumn(IColumn)} for all columns in the model.
-   *
-   * @throws IllegalStateException
-   *           when not all column mappings are gone afterwards (potential memory leak)
-   */
-  protected void disposeColumns() {
-    for (IColumn<?> column : getModel().getColumns()) {
-      disposeColumn(column);
-    }
-    // "Leak detection"
-    if (!m_jsonColumns.isEmpty()) {
-      throw new IllegalStateException("Not all columns have been disposed! Columns: " + m_jsonColumns.keySet());
-    }
-  }
-
-  /**
-   * Removes all JsonColumn mappings without querying the model. Can be useful when the
+   * Removes all column mappings without querying the model. Can be useful when the
    * model is already updated (e.g. while handling the "column structure changed" event).
    */
   protected void disposeAllColumns() {
@@ -256,20 +240,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     m_jsonColumns.remove(column);
   }
 
+  protected void disposeColumns(Collection<IColumn<?>> columns) {
+    for (IColumn<?> column : columns) {
+      disposeColumn(column);
+    }
+  }
+
   /**
-   * Calls {@link #disposeRow(ITableRow)} for all rows in the model.
-   *
-   * @throws IllegalStateException
-   *           when not all row mappings are gone afterwards (potential memory leak)
+   * Removes all row mappings without querying the model.
    */
-  protected void disposeRows() {
-    for (ITableRow row : getModel().getRows()) {
-      disposeRow(row);
-    }
-    // "Leak detection"
-    if (!m_tableRowIds.isEmpty() || !m_tableRows.isEmpty()) {
-      throw new IllegalStateException("Not all rows have been disposed! TableRowIds: " + m_tableRowIds + " TableRows: " + m_tableRows);
-    }
+  protected void disposeAllRows() {
+    m_tableRowIds.clear();
+    m_tableRows.clear();
   }
 
   protected void disposeRow(ITableRow row) {
@@ -278,12 +260,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     m_tableRows.remove(rowId);
   }
 
+  protected void disposeRows(Collection<ITableRow> rows) {
+    for (ITableRow row : rows) {
+      disposeRow(row);
+    }
+  }
+
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
-    processBufferedEvents();
-    disposeColumns();
-    disposeRows();
+    disposeAllColumns();
+    disposeAllRows();
   }
 
   @Override
