@@ -47,10 +47,10 @@ body {
 .disabled {
   color: @text-disabled-color;
 
-  & ::-moz-selection {
+  &::-moz-selection {
     .text-selection-disabled();
   }
-  & ::selection {
+  &::selection {
     .text-selection-disabled();
   }
 
@@ -90,7 +90,7 @@ input, textarea {
   border: 1px solid @border-color;
   border-radius: @border-radius;
 
-  .disabled & {
+  &.disabled {
     background-color: @control-disabled-background-color;
     color: @control-disabled-color;
   }
