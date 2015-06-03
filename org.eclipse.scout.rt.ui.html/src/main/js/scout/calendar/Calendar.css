@@ -27,7 +27,7 @@
   min-width: 420px;
   text-align: center;
 
-  & .busyindicator-label:before {
+  & .busyindicator-label::before {
     margin-top: -14px;
   }
 
@@ -272,7 +272,7 @@
       width: 180px;
     }
 
-    & .year-month:before{
+    & .year-month::before{
       position: absolute;
       left: 0px;
       top: 0px;
@@ -282,7 +282,7 @@
       color: @text-color;
     }
 
-    & .year-month:after{
+    & .year-month::after{
       position: absolute;
       bottom: 0px;
       right: 19px;
@@ -469,7 +469,7 @@
     color: @palette-blue-3 ;
   }
 
-  & .now:before {
+  & .now::before {
     color: @highlight-color;
     font-weight: bold;
   }
@@ -484,7 +484,7 @@
     color: @palette-white;
   }
 
-  & .selected:before {
+  & .selected::before {
     text-align: center;
     left: 4px;
     top: 3px;
@@ -498,7 +498,7 @@
   }
 
   /* helps to center days between 10 and 19 nicer */
-  & .selected.center-nice:before {
+  & .selected.center-nice::before {
       padding-right: 2px;
   }
 

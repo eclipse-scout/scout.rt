@@ -60,7 +60,7 @@
         color: inherit;
       }
 
-      &:hover:before {
+      &:hover::before {
         color: @highlight-color;
       }
     }

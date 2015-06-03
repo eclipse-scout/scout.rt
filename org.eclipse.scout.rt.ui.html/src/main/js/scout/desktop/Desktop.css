@@ -201,7 +201,7 @@
   text-align: center;
   cursor: pointer;
 
-  &:before {
+  &::before {
     .font-icon;
     color: @icon-color;
     content: @icon-chevron-right;
