@@ -1047,18 +1047,54 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 };
 
 scout.Tree.prototype._showAllNodes = function($showAllNode) {
-  var parentNode = $showAllNode.data('parentNode');
+  var parentNode = $showAllNode.data('parentNode'),
+    first = true,
+    updateFunc = function() {
+      this.updateScrollbar();
+      this.revealSelection();
+    }.bind(this);
 
-  // Remoe "show all" dummy node
+  // Remove "show all" dummy node
   delete parentNode.$showAllNode;
   $showAllNode.remove();
 
   // Show all nodes for this parent
   for (var i = 0; i < parentNode.childNodes.length; i++) {
     var childNode = parentNode.childNodes[i];
-    childNode.$node.removeClass('hidden');
+
+    // skip if already visible
+    if (childNode.$node.css('display') !== 'none') {
+      continue;
+    }
+
+    // only animate small trees
+    if (parentNode.childNodes.length < 100) {
+      var h = childNode.$node.outerHeight(),
+        p = childNode.$node.css('padding-top'),
+        func = first ? updateFunc : null;
+
+      // only first animated element should handle scrollbar and visibility of selection
+      first = false;
+
+      // make height 0
+      childNode.$node
+        .outerHeight(0)
+        .css('padding-top', '0')
+        .css('padding-bottom', '0')
+        .removeClass('hidden');
+
+      // animate to original height
+      childNode.$node
+        .animateAVCSD('padding-top', p, null, null, 200)
+        .animateAVCSD('padding-bottom', p, null, null, 200)
+        .animateAVCSD('height', h, null, func, 200);
+
+    } else {
+      childNode.$node.removeClass('hidden');
+    }
   }
 
+  // without animation
   this.updateScrollbar();
   this.revealSelection();
 };
