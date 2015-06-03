@@ -329,7 +329,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer();
-    buf.append("TreeEvent[");
+    buf.append(getClass().getSimpleName() + "[");
     buf.append(getTypeName());
     // nodes
     if (CollectionUtility.hasElements(m_nodes) && getTree() != null) {
