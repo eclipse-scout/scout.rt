@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
@@ -43,10 +44,13 @@ public class OutlineTest {
     o.firePageChanged(mock(IPage.class));
     o.firePageChanged(mock(IPage.class));
     o.setTreeChanging(false);
-    final List<? extends TreeEvent> batch = listener.getBatch();
-    assertEquals(1, batch.size());
-    final TreeEvent e = batch.get(0);
-    assertEquals(OutlineEvent.TYPE_PAGE_CHANGED, e.getType());
+    List<? extends TreeEvent> batch = listener.getBatch();
+    assertEquals(2, batch.size());
+    TreeEvent e1 = batch.get(0);
+    assertEquals(OutlineEvent.TYPE_PAGE_CHANGED, e1.getType());
+    TreeEvent e2 = batch.get(1);
+    assertEquals(OutlineEvent.TYPE_PAGE_CHANGED, e2.getType());
+    assertNotEquals(e1.getNode(), e2.getNode());
   }
 
   private static class SavingTreeListener extends TreeAdapter {
@@ -60,7 +64,5 @@ public class OutlineTest {
     public List<? extends TreeEvent> getBatch() {
       return m_batch;
     }
-
   }
-
 }
