@@ -308,6 +308,9 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return m_errorStatus;
   }
 
+  /**
+   * @deprecated use {@link #addErrorStatus(String)}
+   */
   @Deprecated
   public void setErrorStatus(String message) {
     addErrorStatus(new DefaultFieldStatus(message));
@@ -315,6 +318,8 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
 
   /**
    * Set the error status of the cell or <code>null</code> in case of no error.
+   *
+   * @deprecated use {@link #addErrorStatus(IStatus)}
    **/
   @Deprecated
   public void setErrorStatus(IStatus status) {
@@ -379,6 +384,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     m_errorStatus = status;
   }
 
+  @Override
   public boolean isContentValid() {
     IStatus errorStatus = getErrorStatus();
     return errorStatus == null || (errorStatus.getSeverity() < IStatus.ERROR);
