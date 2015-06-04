@@ -44,6 +44,19 @@ body {
   .placeholder();
 }
 
+/* Hide IE decorations for text input fields: */
+/* - Clear button ("X"): https://msdn.microsoft.com/en-us/library/windows/apps/hh465740.aspx */
+/* - Password reveal button: https://msdn.microsoft.com/en-us/library/windows/apps/hh465773.aspx */
+/* Note: Set width/height to 0 instead of "display: none", because of http://stackoverflow.com/a/17986002 */
+::-ms-clear {
+  width : 0;
+  height: 0;
+}
+::-ms-reveal {
+  width : 0;
+  height: 0;
+}
+
 .disabled {
   color: @text-disabled-color;
 
