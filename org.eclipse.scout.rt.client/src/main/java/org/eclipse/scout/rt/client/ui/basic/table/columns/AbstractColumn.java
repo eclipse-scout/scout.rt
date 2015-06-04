@@ -615,9 +615,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
     IFormField f = prepareEditInternal(row);
     if (f != null) {
-      if (f instanceof AbstractValueField<?>) {
-        ((AbstractValueField<?>) f).setAutoDisplayText(!m_isValidating);
-      }
       f.setLabelVisible(false);
       GridData gd = f.getGridDataHints();
       // apply horizontal alignment of column to respective editor field
@@ -1007,11 +1004,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       Cell cell = row.getCellForUpdate(this);
       cell.removeErrorStatus(ValidationFailedStatus.class);
       VALUE newValue = validateValue(row, value);
-      /*
-       * In case there is a validated value in the cache, the value passed as a parameter has to be validated.
-       * If the passed value is valid, it will be removed from the validated value cache and stored when getValue()
-       * is called next time. Otherwise, the old validated value will be left in the cache.
-       */
+
       validateColumnValue(row, editingField, true, newValue);
 
       // set newValue into the cell only if there's no error.
