@@ -184,6 +184,12 @@ scout.graphics = {
   },
 
   debugOutput: function($comp) {
+    if (!$comp) {
+      return 'undefined';
+    }
+    if ($comp.length === 0) {
+      return '$()';
+    }
     var attrs = '';
     if ($comp.attr('id')) {
       attrs += 'id=' + $comp.attr('id');
@@ -195,7 +201,11 @@ scout.graphics = {
       attrs += ' data-modelclass=' + $comp.attr('data-modelclass');
     }
     if (attrs.length === 0) {
-      attrs = $comp.html().substring(0, 30) + '...';
+      var html = scout.helpers.nvl($comp.html(), '');
+      if (html.length > 30) {
+        html = html.substring(0, 30) + '...';
+      }
+      attrs = html;
     }
     return 'Element[' + attrs.trim() + ']';
   }
