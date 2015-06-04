@@ -184,12 +184,13 @@ scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
 };
 
 scout.DateField.prototype._onMouseDownFocusContext = function(event) {
-  var $target = $(event.target);
+  var $target = $(event.target),
+    insidePopup = (this._picker && this._picker.$popup && this._picker.$popup.has($target).length > 0),
+    insideContainer = (this.$container && this.$container.has($target).length > 0);
   // close the popup only if the click happened outside of the popup
-  if (this._picker.$popup && this._picker.$popup.has($target).length === 0 && this.$container.has($target).length === 0) {
+  if (!insidePopup && !insideContainer) {
     this.closeOnClickOutsideOrFocusLost();
   }
-
 };
 
 scout.DateField.prototype._onClick = function() {

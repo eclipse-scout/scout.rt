@@ -51,10 +51,12 @@ scout.AbstractSmartField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.AbstractSmartField.prototype._onMouseDown=function(event){
-  var $target = $(event.target);
+scout.AbstractSmartField.prototype._onMouseDown = function(event) {
+  var $target = $(event.target),
+    insidePopup = (this._$popup && this._$popup.has($target).length > 0),
+    insideContainer = (this.$container && this.$container.has($target).length > 0);
   // close the popup only if the click happened outside of the popup
-  if (this._$popup.has($target).length === 0 && this.$container.has($target).length === 0) {
+  if (!insidePopup && !insideContainer) {
     this._closeProposal(true);
   }
 };
