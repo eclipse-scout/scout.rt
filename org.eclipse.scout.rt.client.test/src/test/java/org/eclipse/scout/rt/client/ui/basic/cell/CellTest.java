@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
@@ -122,7 +123,7 @@ public class CellTest {
     Object value = new Object();
 
     ICellObserver observer = mock(ICellObserver.class);
-    Mockito.when(observer.validateValue(c, value)).thenReturn(value);
+    when(observer.validateValue(c, value)).thenReturn(value);
 
     c.setObserver(observer);
 
@@ -138,7 +139,7 @@ public class CellTest {
     Object value = new Object();
 
     ICellObserver observer = Mockito.mock(ICellObserver.class);
-    Mockito.when(observer.validateValue(c, value)).thenReturn(value);
+    when(observer.validateValue(c, value)).thenReturn(value);
 
     c.setObserver(observer);
 
@@ -149,8 +150,8 @@ public class CellTest {
     assertFalse(changed);
     assertSame(value, c.getValue());
 
-    Mockito.verify(observer).cellChanged(c, ICell.VALUE_BIT);
-    Mockito.verify(observer, Mockito.times(2)).validateValue(c, value);
+    verify(observer).cellChanged(c, ICell.VALUE_BIT);
+    verify(observer, Mockito.times(2)).validateValue(c, value);
   }
 
   @Test
@@ -159,28 +160,27 @@ public class CellTest {
     Cell c = new Cell(observer);
     Object value = new Object();
 
-    Mockito.when(observer.validateValue(c, value)).thenReturn(value);
+    when(observer.validateValue(c, value)).thenReturn(value);
 
     boolean changed = c.setValue(value);
     assertTrue(changed);
     assertSame(value, c.getValue());
 
-    Mockito.verify(observer).cellChanged(c, ICell.VALUE_BIT);
-    Mockito.verify(observer).validateValue(c, value);
+    verify(observer).cellChanged(c, ICell.VALUE_BIT);
+    verify(observer).validateValue(c, value);
   }
 
-  @Test(expected = ProcessingException.class)
   public void testSetValue_validateInalidValue() throws Exception {
     ICellObserver observer = Mockito.mock(ICellObserver.class);
     Cell c = new Cell(observer);
     Object value = new Object();
 
-    Mockito.when(observer.validateValue(c, value)).thenThrow(new ProcessingException());
+    when(observer.validateValue(c, value)).thenThrow(new ProcessingException());
 
     boolean changed = c.setValue(value);
     assertTrue(changed);
     assertSame(value, c.getValue());
-    Mockito.verifyZeroInteractions(observer);
+    assertFalse(c.isContentValid());
   }
 
   @Test
@@ -190,7 +190,7 @@ public class CellTest {
     String text = "text";
     c.setText(text);
     assertEquals(text, c.getText());
-    Mockito.verify(observer).cellChanged(c, ICell.TEXT_BIT);
+    verify(observer).cellChanged(c, ICell.TEXT_BIT);
   }
 
   @Test
@@ -200,7 +200,7 @@ public class CellTest {
     String iconId = "iconId";
     c.setIconId(iconId);
     assertEquals(iconId, c.getIconId());
-    Mockito.verify(observer).cellChanged(c, ICell.ICON_ID_BIT);
+    verify(observer).cellChanged(c, ICell.ICON_ID_BIT);
   }
 
   @Test
@@ -287,7 +287,7 @@ public class CellTest {
     ICellObserver observer = Mockito.mock(ICellObserver.class);
     c.setObserver(observer);
     assertSame(observer, c.getObserver());
-    Mockito.verifyZeroInteractions(observer);
+    verifyZeroInteractions(observer);
   }
 
   private ICellObserver installMockObserver(Cell c) {
