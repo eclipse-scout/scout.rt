@@ -29,7 +29,7 @@ public class TableRow implements ITableRow {
   private boolean m_checked;
   private String m_iconId;
   private String m_cssClass;
-  private final List<Cell> m_cells;
+  protected final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
 
   /**

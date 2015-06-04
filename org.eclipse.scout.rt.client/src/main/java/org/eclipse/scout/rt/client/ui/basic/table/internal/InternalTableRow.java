@@ -22,50 +22,39 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public class InternalTableRow implements ITableRow, ICellObserver {
+/**
+ * Internal representation of a Table row. Contains some more information than {@link TableRow} like validation.
+ */
+public class InternalTableRow extends TableRow implements ITableRow, ICellObserver {
 
   private ITable m_table;
   private int m_rowIndex;
-  private boolean m_enabled;
-  private String m_iconId;
-  private String m_cssClass;
-  private int m_status = STATUS_NON_CHANGED;
-  private List<Cell> m_cells;
   private int m_rowChanging = 0;
   private boolean m_rowPropertiesChanged;
-  private boolean m_filterAccepted;
+  private boolean m_filterAccepted = true;
 
   private InternalTableRow() {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerTableRow(this);
-    }
-    m_filterAccepted = true;
+    super(null);
   }
 
   public InternalTableRow(ITable table) {
-    this();
+    super(table.getColumnSet());
     m_table = table;
-    m_enabled = true;
-    m_status = STATUS_NON_CHANGED;
-    addEmptyCells(table.getColumnCount());
   }
 
   @SuppressWarnings("unchecked")
   public InternalTableRow(ITable table, ITableRow row) throws ProcessingException {
-    this();
+    super(table.getColumnSet());
+    setEnabled(row.isEnabled());
     m_rowIndex = row.getRowIndex();
-    m_enabled = row.isEnabled();
+
     int columnCount = table.getColumnCount();
-    m_cells = new ArrayList<Cell>(columnCount);
-    for (int i = 0; i < columnCount; i++) {
-      m_cells.add(new Cell(row.getCell(i)));
-    }
     // import and validate cell values
     for (int i = 0; i < table.getColumnCount(); i++) {
       ICell newCell = row.getCell(i);
@@ -73,7 +62,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
       tryParseAndSetValue(col, m_cells.get(i), newCell);
     }
     // reset status
-    m_status = row.getStatus();
+    setStatus(row.getStatus());
 
     //add observer
     for (int i = 0; i < columnCount; i++) {
@@ -83,13 +72,6 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
     // set table at end to avoid events before the row is even attached
     m_table = table;
-  }
-
-  private void addEmptyCells(int columnCount) {
-    m_cells = new ArrayList<Cell>(columnCount);
-    for (int i = 0; i < columnCount; i++) {
-      m_cells.add(new Cell(this));
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -123,17 +105,12 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   }
 
   @Override
-  public int getStatus() {
-    return m_status;
-  }
-
-  @Override
   public void setStatus(int status) {
     try {
       setRowChanging(true);
       //
-      if (m_status != status) {
-        m_status = status;
+      if (getStatus() != status) {
+        super.setStatus(status);
         m_rowPropertiesChanged = true;
       }
     }
@@ -143,56 +120,11 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   }
 
   @Override
-  public boolean isStatusInserted() {
-    return m_status == STATUS_INSERTED;
-  }
-
-  @Override
-  public void setStatusInserted() {
-    setStatus(STATUS_INSERTED);
-  }
-
-  @Override
-  public boolean isStatusUpdated() {
-    return m_status == STATUS_UPDATED;
-  }
-
-  @Override
-  public void setStatusUpdated() {
-    setStatus(STATUS_UPDATED);
-  }
-
-  @Override
-  public boolean isStatusDeleted() {
-    return m_status == STATUS_DELETED;
-  }
-
-  @Override
-  public void setStatusDeleted() {
-    setStatus(STATUS_DELETED);
-  }
-
-  @Override
-  public boolean isStatusNonchanged() {
-    return m_status == STATUS_NON_CHANGED;
-  }
-
-  @Override
-  public void setStatusNonchanged() {
-    setStatus(STATUS_NON_CHANGED);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return m_enabled;
-  }
-
-  @Override
   public void setEnabled(boolean b) {
     try {
       setRowChanging(true);
       //
-      m_enabled = b;
+      super.setEnabled(b);
       m_rowPropertiesChanged = true;
     }
     finally {
@@ -412,11 +344,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   public void setCssClass(String cssClass) {
     try {
       setRowChanging(true);
-      m_cssClass = cssClass;
-      //
-      for (Cell cell : m_cells) {
-        cell.setCssClass(cssClass);
-      }
+      super.setCssClass(cssClass);
     }
     finally {
       setRowChanging(false);
@@ -456,22 +384,12 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     try {
       setRowChanging(true);
       //
-      m_iconId = id;
+      super.setIconId(id);
       m_rowPropertiesChanged = true;
     }
     finally {
       setRowChanging(false);
     }
-  }
-
-  @Override
-  public String getIconId() {
-    return m_iconId;
-  }
-
-  @Override
-  public String getCssClass() {
-    return m_cssClass;
   }
 
   @Override
