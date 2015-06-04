@@ -576,6 +576,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
     severity: options.severity || 4,
     introText: options.text || options.introText,
     actionText: options.actionText,
+    hiddenText: options.hiddenText,
     yesButtonText: options.yesButtonText,
     noButtonText: options.noButtonText,
     cancelButtonText: options.cancelButtonText

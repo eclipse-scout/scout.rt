@@ -82,6 +82,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderSeverity(this.severity);
   this._renderIntroText(this.introText);
   this._renderActionText(this.actionText);
+  this._renderHiddenText(this.hiddenText);
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
@@ -139,6 +140,15 @@ scout.MessageBox.prototype._renderIntroText = function(text) {
 scout.MessageBox.prototype._renderActionText = function(text) {
   this.$actionText.html(scout.strings.nl2br(text));
   this.$actionText.setVisible(text);
+};
+
+scout.MessageBox.prototype._renderHiddenText = function(text) {
+  if (this.$hiddenText) {
+    this.$hiddenText.remove();
+  }
+  if (text) {
+    this.$hiddenText = $('<!-- \n' + text.replace(/<!--|-->/g, '') + '\n -->').appendTo(this.$content);
+  }
 };
 
 scout.MessageBox.prototype._updateButtonWidths = function() {
