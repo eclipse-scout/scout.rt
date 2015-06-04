@@ -1,5 +1,3 @@
-@text-field-padding: 10px;
-
 .vendor(@property, @value) {
   -webkit-@{property}: @value;
   -moz-@{property}: @value;

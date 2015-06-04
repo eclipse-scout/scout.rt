@@ -216,8 +216,7 @@
 
 /* FIXME AWE: reduce copy/paste --> Button.css */
 .menu-button {
-
-  padding-top: 0;
+  padding: 0 @button-padding;
   text-align: center;
   position: relative;
   height: 30px;

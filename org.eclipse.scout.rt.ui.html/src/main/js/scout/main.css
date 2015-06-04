@@ -126,6 +126,10 @@ input {
   padding: 0 @text-field-padding;
 }
 
+button {
+  padding: 0 @button-padding;
+}
+
 textarea {
   /* these two properties are required for FF, otherwise the editable textarea is 2px too large, */
   /* and the DOM inspector does not include these 2 pixels. */
