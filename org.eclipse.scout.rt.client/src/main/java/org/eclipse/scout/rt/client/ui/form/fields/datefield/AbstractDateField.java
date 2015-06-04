@@ -228,11 +228,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Override
   public void setFormat(String s) {
     m_format = s;
-    if (isInitialized()) {
-      if (isAutoDisplayText()) {
-        setDisplayText(interceptFormatValue(getValue()));
-      }
-    }
+    refreshDisplayText();
   }
 
   @Override

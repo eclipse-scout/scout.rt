@@ -129,11 +129,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       DecimalFormat format = getFormat();
       format.setRoundingMode(roundingMode);
       setFormat(format);
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
+      refreshDisplayText();
     }
     finally {
       setFieldChanging(false);
@@ -156,11 +152,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       newFormat.setParseBigDecimal(true);
 
       propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, newFormat);
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
+      refreshDisplayText();
     }
     finally {
       setFieldChanging(false);
@@ -188,11 +180,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       DecimalFormat format = getFormat();
       format.setGroupingUsed(b);
       setFormat(format);
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
     }
     finally {
       setFieldChanging(false);
@@ -210,11 +197,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       DecimalFormat format = getFormat();
       format.setMaximumIntegerDigits(maxIntegerDigits);
       setFormat(format);
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
     }
     finally {
       setFieldChanging(false);

@@ -267,7 +267,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   public void refreshDisplayText() {
-    if (isAutoDisplayText()) {
+    if (isInitialized() && isAutoDisplayText()) {
       String t = interceptFormatValue(getValue());
       setDisplayText(t);
     }

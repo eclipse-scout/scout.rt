@@ -144,11 +144,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   public void setFolderMode(boolean b) {
     m_folderMode = b;
-    if (isInitialized()) {
-      if (isAutoDisplayText()) {
-        setDisplayText(interceptFormatValue(getValue()));
-      }
-    }
+    refreshDisplayText();
   }
 
   @Override
@@ -162,11 +158,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     if (UserAgentUtility.isWebClient()) {
       m_showDirectory = false;
     }
-    if (isInitialized()) {
-      if (isAutoDisplayText()) {
-        setDisplayText(interceptFormatValue(getValue()));
-      }
-    }
+    refreshDisplayText();
   }
 
   @Override
@@ -177,11 +169,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   public void setShowFileName(boolean b) {
     m_showFileName = b;
-    if (isInitialized()) {
-      if (isAutoDisplayText()) {
-        setDisplayText(interceptFormatValue(getValue()));
-      }
-    }
+    refreshDisplayText();
   }
 
   @Override
@@ -192,11 +180,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   @Override
   public void setShowFileExtension(boolean b) {
     m_showFileExtension = b;
-    if (isInitialized()) {
-      if (isAutoDisplayText()) {
-        setDisplayText(interceptFormatValue(getValue()));
-      }
-    }
+    refreshDisplayText();
   }
 
   @Override

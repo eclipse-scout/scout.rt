@@ -83,8 +83,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   /**
    * Default for {@link IDecimalField#setPercent(boolean)}
    * <p>
-   * When set to true, a percentage format (depending on {@link NlsLocale#get()}) is used for parsing an
-   * formatting.<br>
+   * When set to true, a percentage format (depending on {@link NlsLocale#get()}) is used for parsing an formatting.<br>
    * <b>Note:</b> This setting is independent from {@link #getConfiguredMultiplier()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -134,12 +133,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       DecimalFormat format = getFormat();
       format.setMinimumFractionDigits(i);
       setFormat(format);
-      //
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
     }
     finally {
       setFieldChanging(false);
@@ -159,11 +152,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       DecimalFormat format = getFormat();
       format.setMaximumFractionDigits(i);
       setFormat(format);
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
     }
     finally {
       setFieldChanging(false);
@@ -191,12 +179,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
         }
       }
       setFormat(format);
-
-      if (isInitialized()) {
-        if (isAutoDisplayText()) {
-          setDisplayText(interceptFormatValue(getValue()));
-        }
-      }
     }
     finally {
       setFieldChanging(false);

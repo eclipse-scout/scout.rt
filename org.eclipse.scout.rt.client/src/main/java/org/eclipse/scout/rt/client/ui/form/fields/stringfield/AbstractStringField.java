@@ -386,12 +386,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   @Override
   public void setFormat(String s) {
     propertySupport.setPropertyString(PROP_FORMAT, s);
-    if (isInitialized()) {
-      if (isAutoDisplayText()) {
-        String t = interceptFormatValue(getValue());
-        setDisplayText(t);
-      }
-    }
+    refreshDisplayText();
   }
 
   @Override
@@ -521,7 +516,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-      implements IStringFieldExtension<OWNER_FIELD> {
+  implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);
