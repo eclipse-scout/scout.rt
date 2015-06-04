@@ -266,14 +266,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  public void refreshDisplayText() {
-    if (isInitialized() && isAutoDisplayText()) {
-      String t = interceptFormatValue(getValue());
-      setDisplayText(t);
-    }
-  }
-
-  @Override
   public void addMasterListener(MasterListener listener) {
     m_listeningSlaves.add(MasterListener.class, listener);
   }
@@ -345,7 +337,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       }
       catch (ProcessingException v) {
         addErrorStatus(new ValidationFailedStatus<VALUE>(v, rawValue));
-        updateDisplayText(rawValue, false);
+        updateDisplayText(rawValue);
         return;
       }
       catch (Exception e) {
@@ -353,14 +345,14 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         ProcessingException pe = new ProcessingException(message, e);
         LOG.warn("Unexpected Error: ", pe);
         addErrorStatus(new ValidationFailedStatus<VALUE>(pe, rawValue));
-        updateDisplayText(rawValue, false);
+        updateDisplayText(rawValue);
         return;
       }
       //
       VALUE oldValue = getValue();
       boolean changed = propertySupport.setPropertyNoFire(PROP_VALUE, validatedValue);
       // change text if auto-set-text enabled
-      updateDisplayText(rawValue, CompareUtility.notEquals(rawValue, validatedValue));
+      updateDisplayText(rawValue);
 
       if (changed) {
         propertySupport.firePropertyChange(PROP_VALUE, oldValue, validatedValue);
@@ -385,11 +377,14 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
   }
 
-  /**
-   * @param rawValue
-   * @param validValueDiffersFromRawValue
-   */
-  private void updateDisplayText(VALUE rawValue, boolean validValueDiffersFromRawValue) {
+  @Override
+  public void refreshDisplayText() {
+    if (isInitialized()) {
+      updateDisplayText(getValue());
+    }
+  }
+
+  private void updateDisplayText(VALUE rawValue) {
     if (isAutoDisplayText()) {
       setDisplayText(interceptFormatValue(rawValue));
     }
@@ -658,7 +653,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-      implements IValueFieldExtension<VALUE, OWNER> {
+  implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);
