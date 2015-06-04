@@ -23,6 +23,8 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -111,6 +113,22 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
 
     assertErrorStatus(c0);
     assertNoErrorStatus(c1);
+  }
+
+  /**
+   * Tests that the error status is correct on the table when a field cell is edited and throwing a
+   * {@link VetoException}
+   */
+  @Test
+  public void testValidateVetoColumn_CompleteEdit() throws Exception {
+    TestVetoTable table = new TestVetoTable();
+    table.addRowsByArray(new String[]{"valid", "a"});
+    IStringField sf = new AbstractStringField() {
+    };
+    sf.setValue("invalid");
+    table.getValidateTestColumn().completeEdit(table.getRow(0), sf);
+    ICell c0 = table.getCell(0, 0);
+    assertErrorStatus(c0);
   }
 
   private void assertErrorStatus(ICell c) {

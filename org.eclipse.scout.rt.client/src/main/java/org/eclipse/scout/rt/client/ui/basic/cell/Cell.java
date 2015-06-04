@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.form.fields.DefaultFieldStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -107,7 +108,12 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
    */
   public boolean setValue(Object value) throws ProcessingException {
     if (getObserver() != null) {
-      value = getObserver().validateValue(this, value);
+      try {
+        value = getObserver().validateValue(this, value);
+      }
+      catch (ProcessingException e) {
+        addErrorStatus(new ValidationFailedStatus<Object>(e, value));
+      }
     }
     if (CompareUtility.equals(m_value, value)) {
       return false;
