@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
@@ -102,11 +100,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_initialAlwaysIncludeSortAtEnd;
 
   private IValueField<VALUE> m_defaultEditor;
-  /**
-   * Used for mutable tables to keep last valid value per row and column.
-   */
-  // TODO: Move cache to AbstractTable with bug 414646
-  private final Map<InternalTableRow, VALUE> m_validatedValues = new HashMap<InternalTableRow, VALUE>();
   private final ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> m_objectExtensions;
 
   public AbstractColumn() {
@@ -130,26 +123,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   protected boolean isInitialized() {
     return m_initialized;
-  }
-
-  public final void clearValidatedValues() {
-    m_validatedValues.clear();
-  }
-
-  public final VALUE clearValidatedValue(ITableRow row) {
-    return m_validatedValues.remove(row);
-  }
-
-  private void storeValidatedValue(ITableRow row, VALUE validatedValue) {
-    if (row instanceof InternalTableRow) {
-      m_validatedValues.put((InternalTableRow) row, validatedValue);
-    }
-  }
-
-  private void removeValidatedValue(ITableRow row) {
-    if (row instanceof InternalTableRow) {
-      m_validatedValues.remove((InternalTableRow) row);
-    }
   }
 
   protected Map<String, Object> getPropertiesMap() {
@@ -688,9 +661,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
           cell.addErrorStatuses(valueField.getErrorStatus().getChildren());
         }
         cell.setValue(valueField.getValue());
-        if (getTable() instanceof AbstractTable && ((AbstractTable) getTable()).wasEverValid(row)) {
-          persistRowChange(row);
-        }
+        persistRowChange(row);
       }
     }
   }
@@ -1008,12 +979,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public VALUE getValue(ITableRow r) {
-    VALUE validatedValue = m_validatedValues.get(r);
-    if (validatedValue == null) {
-      validatedValue = getValueInternal(r);
-      storeValidatedValue(r, validatedValue);
-    }
-    return validatedValue;
+    return getValueInternal(r);
   }
 
   @SuppressWarnings("unchecked")
@@ -1804,10 +1770,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
              */
             cell.setValue(value);
             decorateCellInternal(cell, row);
-            ITable table = getTable();
-            if (table instanceof AbstractTable && singleColValidation) {
-              ((AbstractTable) table).wasEverValid(row);
-            }
           }
           ensureErrorVisibility(row);
         }
@@ -1818,10 +1780,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       }
     }
 
-    ICell cell = row.getCell(this);
-    if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
-      removeValidatedValue(row);
-    }
   }
 
   /**

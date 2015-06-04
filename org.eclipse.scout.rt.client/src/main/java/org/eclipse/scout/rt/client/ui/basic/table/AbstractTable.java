@@ -169,7 +169,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final EventListenerList m_listenerList = new EventListenerList();
   //cell editing
   private P_CellEditorContext m_editContext;
-  private final Set<ITableRow> m_rowValidty;
   //checkable table
   private IBooleanColumn m_checkableColumn;
   //auto filter
@@ -191,7 +190,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerTable(this);
     }
-    m_rowValidty = new HashSet<ITableRow>();
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
@@ -1710,8 +1708,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   public void importFromTableRowBeanData(List<? extends AbstractTableRowData> rowDatas, Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
     discardAllDeletedRows();
-    clearValidatedValuesOnAllColumns();
-    clearAllRowsValidity();
     int deleteCount = 0;
     List<ITableRow> newRows = new ArrayList<ITableRow>(rowDatas.size());
     ITableRowDataMapper mapper = createTableRowDataMapper(rowType);
@@ -1772,8 +1768,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @SuppressWarnings("unchecked")
   public void updateTable(AbstractTableFieldData source) throws ProcessingException {
     if (source.isValueSet()) {
-      clearValidatedValuesOnAllColumns();
-      clearAllRowsValidity();
       discardAllDeletedRows();
       int deleteCount = 0;
       List<ITableRow> newRows = new ArrayList<ITableRow>();
@@ -2205,7 +2199,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
        */
       for (IColumn<?> col : getColumns()) {
         if (col instanceof AbstractColumn<?>) {
-          ((AbstractColumn<?>) col).clearValidatedValue(row);
           ((AbstractColumn<?>) col).ensureErrorVisibility(row);
         }
       }
@@ -2872,7 +2865,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         ((AbstractColumn<?>) col).initCell(newIRow);
       }
     }
-    wasEverValid(newIRow);
     synchronized (m_cachedRowsLock) {
       m_cachedRows = null;
       int newIndex = m_rows.size();
@@ -3024,8 +3016,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             m_rows.clear();
             m_cachedRows = null;
           }
-          clearValidatedValuesOnAllColumns();
-          clearAllRowsValidity();
           for (int i = deletedRows.size() - 1; i >= 0; i--) {
             ITableRow candidateRow = deletedRows.get(i);
             if (candidateRow != null) {
@@ -3046,8 +3036,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
                 }
               }
               if (removed) {
-                clearValidatedValueOnColumns(candidateRow);
-                clearRowValidity(candidateRow);
                 deleteRowImpl(candidateRow);
               }
             }
@@ -3092,22 +3080,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     else {
       internalRow.setStatus(ITableRow.STATUS_DELETED);
       m_deletedRows.put(new CompositeObject(getRowKeys(internalRow)), internalRow);
-    }
-  }
-
-  private void clearValidatedValuesOnAllColumns() {
-    for (IColumn column : getColumnSet().getColumns()) {
-      if (column instanceof AbstractColumn<?>) {
-        ((AbstractColumn) column).clearValidatedValues();
-      }
-    }
-  }
-
-  private void clearValidatedValueOnColumns(ITableRow row) {
-    for (IColumn column : getColumnSet().getColumns()) {
-      if (column instanceof AbstractColumn<?>) {
-        ((AbstractColumn) column).clearValidatedValue(row);
-      }
     }
   }
 
@@ -3764,26 +3736,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
-  }
-
-  public boolean wasEverValid(ITableRow row) {
-    if (!m_rowValidty.contains(row)) {
-      for (IColumn<?> col : getColumns()) {
-        if (row.getCell(col).getErrorStatus() != null) {
-          return false;
-        }
-      }
-      m_rowValidty.add(row);
-    }
-    return true;
-  }
-
-  private void clearRowValidity(ITableRow row) {
-    m_rowValidty.remove(row);
-  }
-
-  private void clearAllRowsValidity() {
-    m_rowValidty.clear();
   }
 
   protected void decorateCellInternal(Cell view, ITableRow row, IColumn<?> col) {
