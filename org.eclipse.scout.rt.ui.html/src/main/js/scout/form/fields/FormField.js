@@ -205,6 +205,11 @@ scout.FormField.prototype._onStatusClick = function() {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
+  // FIXME CGU Correctly handle tooltip when field is a cell editor of an editable table
+  if (!this.$status) {
+    return;
+  }
+
   var opts,
     text = this.tooltipText,
     cssClass = '';
