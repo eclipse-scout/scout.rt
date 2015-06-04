@@ -116,6 +116,19 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   /**
+   * Tests mandatory validation after setting property.
+   */
+  @Test
+  public void testValidate_MandatoryChange() throws ProcessingException {
+    TestVetoTable table = new TestVetoTable();
+    table.addRowsByArray(new String[]{"", ""});
+    table.addRowsByArray(new String[]{"", ""});
+    table.getValidateTestColumn().setMandatory(true);
+    ICell c0 = table.getCell(0, 0);
+    assertNotNull(c0.getErrorStatus());
+  }
+
+  /**
    * Tests that the error status is correct on the table when a field cell is edited and throwing a
    * {@link VetoException}
    */
