@@ -106,7 +106,7 @@ scout.Popup.prototype._detachCloseHandler = function() {
 scout.Popup.prototype._onMouseDown = function(event) {
   var $target = $(event.target);
   // close the popup only if the click happened outside of the popup
-  if (this.$container.has($target).length === 0) {
+  if (this.$container && this.$container.has($target).length === 0) {
     this._onMouseDownOutside(event);
   }
 };

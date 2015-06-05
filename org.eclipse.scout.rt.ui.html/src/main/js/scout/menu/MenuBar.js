@@ -80,6 +80,8 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
     // NOP
   } else {
     this._updateItems(menuItems);
+    // Re-layout menubar (because items might have changed)
+    scout.HtmlComponent.get(this.$container).revalidate();
   }
 
   function isNotSeparator(item) {
@@ -110,15 +112,17 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   var orderedMenuItems = this.menuSorter.order(menuItems, this);
   this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
   this.visibleMenuItems = this.menuItems;
-  this._lastVisibleItem = null;
+  this._lastVisibleItemLeft = null;
+  this._lastVisibleItemRight = null;
 
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
   // float:right. In Firefox elements with float:right must come first in the HTML order
   // of elements. Otherwise a strange layout bug occurs.
   this._renderMenuItems(orderedMenuItems.right, true);
   this._renderMenuItems(orderedMenuItems.left, false);
-  if (this._lastVisibleItem) {
-    this._lastVisibleItem.$container.addClass('last');
+  var lastVisibleItem = this._lastVisibleItemRight || this._lastVisibleItemLeft;
+  if (lastVisibleItem) {
+    lastVisibleItem.$container.addClass('last');
   }
 
   // Make first valid MenuItem tabbable so that it can be focused. All other items
@@ -193,10 +197,14 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
       // Mark as right-aligned
       item.rightAligned = true;
       item.$container.addClass('right-aligned');
+      if (item.visible && !this._lastVisibleItemRight) {
+        this._lastVisibleItemRight = item;
+      }
     }
-    if (item.visible) {
-      // Mark the first visible item as last item (inverse order due to 'float: right')
-      this._lastVisibleItem = item;
+    else {
+      if (item.visible) {
+        this._lastVisibleItemLeft = item;
+      }
     }
   }.bind(this));
 };

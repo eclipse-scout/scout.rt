@@ -114,7 +114,7 @@ scout.Calendar.prototype._render = function($parent) {
   this.$listTitle = this.$list.appendDiv('list-title');
 
   // header contains all controls
-  this.$progress = this.$header.appendDiv('calendar-progress').text('Lade Kalender-Einträge...'); // FIXME AWE: (calendar) i18n
+  this.$progress = this.$header.appendDiv('busyindicator-label');
   this.$range = this.$header.appendDiv('calendar-range');
   this.$range.appendDiv('calendar-previous').click(this._onClickPrevious.bind(this));
   this.$range.appendDiv('calendar-today', this.session.text('CalendarToday')).click(this._onClickToday.bind(this));
@@ -159,7 +159,7 @@ scout.Calendar.prototype._render = function($parent) {
 
   // click event on all day and children elements
   $('.calendar-day', this.$grid).mousedown(this._onMousedownDay.bind(this));
-  this._updateScreen();
+  this._updateScreen(false);
 };
 
 scout.Calendar.prototype._renderProperties = function() {
@@ -195,11 +195,7 @@ scout.Calendar.prototype._renderSelectedComponent = function() {
 };
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
-  $.log.debug('(Calendar#_renderLoadInProgress)');
   this.$progress.setVisible(this.loadInProgress);
-  if (this.loadInProgress) {
-    scout.status.animateStatusMessage(this.$progress, 'Lade Kalender-Einträge...');
-  }
 };
 
 scout.Calendar.prototype._renderViewRange = function() {
@@ -244,7 +240,7 @@ scout.Calendar.prototype._dateParts = function(date, modulo) {
 
 scout.Calendar.prototype._navigateDate = function(direction) {
   this.selectedDate = this._calcSelectedDate(direction);
-  this._updateModel();
+  this._updateModel(false);
 };
 
 scout.Calendar.prototype._calcSelectedDate = function(direction) {
@@ -262,11 +258,11 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
   }
 };
 
-scout.Calendar.prototype._updateModel = function() {
+scout.Calendar.prototype._updateModel = function(animate) {
   this._exactRange = this._calcExactRange();
   this.viewRange = this._calcViewRange();
   this._sendModelChanged();
-  this._updateScreen();
+  this._updateScreen(animate);
 };
 
 /**
@@ -329,7 +325,7 @@ scout.Calendar.prototype._calcViewRange = function() {
 
 scout.Calendar.prototype._onClickToday = function(event) {
   this.selectedDate = new Date();
-  this._updateModel();
+  this._updateModel(false);
 };
 
 scout.Calendar.prototype._onClickDisplayMode = function(event) {
@@ -346,18 +342,18 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
         this.selectedDate = new Date(p.year, p.month, p.date - p.day + 4);
       }
     }
-    this._updateModel();
+    this._updateModel(true);
     this._renderComponents();
   }
 };
 
 scout.Calendar.prototype._onClickYear = function(event) {
   this._showYearPanel = !this._showYearPanel;
-  this._updateScreen();
+  this._updateScreen(true);
 };
 scout.Calendar.prototype._onClickList = function(event) {
   this._showListPanel = !this._showListPanel;
-  this._updateScreen();
+  this._updateScreen(true);
 };
 
 scout.Calendar.prototype._onMousedownDay = function(event) {
@@ -410,6 +406,12 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
     this._colorYear();
     this._updateListPanel();
   }
+
+  // if year shown and changed, redraw year
+  if (this.selectedDate.getFullYear() !== this.$yearTitle.data('year') && this._showYearPanel) {
+    $('.year-month', this.$yearList).remove();
+    this.drawYear();
+  }
 };
 
 /* --  set display mode and range ------------------------------------- */
@@ -441,7 +443,7 @@ scout.Calendar.prototype._jsonViewRange = function() {
   return scout.dates.toJsonDateRange(this.viewRange);
 };
 
-scout.Calendar.prototype._updateScreen = function() {
+scout.Calendar.prototype._updateScreen = function(animate) {
   $.log.info('(Calendar#_updateScreen)');
 
   // select mode
@@ -453,7 +455,7 @@ scout.Calendar.prototype._updateScreen = function() {
 
   // layout grid
   this.layoutLabel();
-  this.layoutSize();
+  this.layoutSize(animate);
   this.layoutAxis();
 
   // if year shown and changed, redraw year
@@ -466,7 +468,7 @@ scout.Calendar.prototype._updateScreen = function() {
   this._updateListPanel();
 };
 
-scout.Calendar.prototype.layoutSize = function() {
+scout.Calendar.prototype.layoutSize = function(animate) {
   // reset animation sizes
   $('div', this.$container).removeData(['new-width', 'new-height']);
 
@@ -550,11 +552,20 @@ scout.Calendar.prototype.layoutSize = function() {
     var $e = $(this),
       w = $e.data('new-width'),
       h = $e.data('new-height');
+    $.l($e.width(), w);
     if (w !== undefined && w !== $e.width()) {
-      $e.animateAVCSD('width', w);
+      if (animate) {
+        $e.animateAVCSD('width', w);
+      } else {
+        $e.css('width', w);
+      }
     }
     if (h !== undefined && h !== $e.height()) {
-      $e.animateAVCSD('height', h);
+      if (animate) {
+        $e.animateAVCSD('height', h);
+      } else {
+        $e.css('height', h);
+      }
     }
   });
 };
@@ -604,6 +615,13 @@ scout.Calendar.prototype.layoutLabel = function() {
       if (scout.dates.isSameDay(date, this.selectedDate)) {
         cssClass += ' selected';
       }
+
+      // some dates are not centred nice by browsers
+      if (date.getDate() > 9 && date.getDate() < 20) {
+        cssClass += ' center-nice';
+      }
+
+
       text = this._format(date, 'dd');
       $dates.eq(w * 7 + d)
         .removeClass('weekend-out weekend out selected now')
@@ -643,7 +661,7 @@ scout.Calendar.prototype.layoutAxis = function() {
 
 scout.Calendar.prototype.drawYear = function() {
   var first, month, $month, d, day, $day,
-    year = this.viewRange.from.getFullYear();
+    year = this.selectedDate.getFullYear();
 
   // append 3 years
   this.$yearTitle
@@ -692,16 +710,10 @@ scout.Calendar.prototype.drawYear = function() {
     .click(this._onYearDayClick.bind(this))
     .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 
-  // selected has to be visible day
-
   // update scrollbar
   scout.scrollbars.update(this.$yearList);
 };
 
-scout.Calendar.prototype._scrollYear = function() {
-  // TODO cru;
-  this.$yearList.scrollTop(10000)
-}
 
 scout.Calendar.prototype._colorYear = function() {
   // color is only needed if visible
@@ -728,6 +740,21 @@ scout.Calendar.prototype._colorYear = function() {
       $day.addClass('year-range-day');
     }
   });
+
+  // selected has to be visible day
+  this._scrollYear();
+
+};
+
+scout.Calendar.prototype._scrollYear = function() {
+  var $day = $('.year-range-day', this.$yearList),
+    $month = $day.parent(),
+    $year = $day.parent().parent(),
+    top = $month[0].offsetTop,
+    halfMonth = $month.outerHeight() / 2,
+    halfYear = $year.outerHeight() / 2;
+
+  this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
 };
 
 /* -- year, events ---------------------------------------- */
@@ -738,12 +765,12 @@ scout.Calendar.prototype._onYearClick = function(event) {
     month = this.selectedDate.getMonth(),
     date = this.selectedDate.getDate();
   this.selectedDate = new Date(year + diff, month, date);
-  this._updateModel();
+  this._updateModel(false);
 };
 
 scout.Calendar.prototype._onYearDayClick = function(event) {
   this.selectedDate = $(event.target).data('date');
-  this._updateModel();
+  this._updateModel(false);
 };
 
 scout.Calendar.prototype._onYearHoverIn = function(event) {

@@ -27,10 +27,9 @@
   min-width: 420px;
   text-align: center;
 
-  .calendar-progress {
-    display: inline;
-  };
-
+  & .busyindicator-label::before {
+    margin-top: -14px;
+  }
 
   & .calendar-range {
     float: left;
@@ -239,7 +238,7 @@
       }
 
       &:hover {
-        color: @palette-gray-6;
+        color: @text-color;
       }
     }
 
@@ -273,7 +272,7 @@
       width: 180px;
     }
 
-    & .year-month:before{
+    & .year-month::before{
       position: absolute;
       left: 0px;
       top: 0px;
@@ -283,7 +282,7 @@
       color: @text-color;
     }
 
-    & .year-month:after{
+    & .year-month::after{
       position: absolute;
       bottom: 0px;
       right: 19px;
@@ -291,7 +290,7 @@
       width: 26%;
       content: ' ';
       background-color: @palette-gray-6;
-      opacity: 0.13;
+      opacity: 0.10;
       pointer-events: none
     }
 
@@ -308,19 +307,22 @@
       cursor: pointer;
 
       &.year-range{
-        background-color: @palette-green-0;
+        background-color: @item-selection-background-color;
+      }
+
+
+      &.year-hover{
+        background-color: @item-selection-background-color;
       }
 
       &.year-range-day{
-        background-color: @palette-green-3;
-      }
-
-      &.year-hover{
-        background-color: @palette-orange-0 !important;
+        background-color: @item-selection-border-color;
+        color: @palette-white;
       }
 
       &.year-hover-day{
-        background-color: @palette-orange-2 !important;
+        background-color: @item-selection-border-color;
+        color: @palette-white;
       }
     }
   }
@@ -378,6 +380,7 @@
   & .calendar-week {
     display: block;
     width: 100%;
+    white-space: nowrap;
   }
 
   & .calendar-week-header {
@@ -402,10 +405,6 @@
     height: 100%;
     z-index: 2;
 
-    &.selected {
-      box-shadow:  1px 1px 10px -1px @item-selection-border-color;
-    }
-
     &.ui-selected {
       background-color: @palette-cyan-0;
     }
@@ -418,7 +417,8 @@
   & .calendar-week-name {
     font-size: 11px;
     color: @palette-gray-5;
-    vertical-align: middle;
+    padding-top: 9px;
+    text-align: center;
   }
 
   & .calendar-day::after,
@@ -470,12 +470,36 @@
   }
 
   & .now::before {
+    color: @highlight-color;
+    font-weight: bold;
+  }
+
+  & .selected.now::before{
     left: 4px;
     top: 3px;
-    border: solid 4px @palette-gray-6;
+    font-weight: normal;
+    border: solid 4px @highlight-color;
     border-radius: 50%;
-    background-color:  @palette-gray-6;
+    background-color:  @highlight-color;
     color: @palette-white;
+  }
+
+  & .selected::before {
+    text-align: center;
+    left: 4px;
+    top: 3px;
+    width: 23px;
+    height: 23px;
+    border: solid 4px @item-selection-border-color;
+    border-radius: 50%;
+    background-color:  @item-selection-border-color;
+    color: @palette-white;
+
+  }
+
+  /* helps to center days between 10 and 19 nicer */
+  & .selected.center-nice::before {
+      padding-right: 2px;
   }
 
   & .calendar-week-axis {

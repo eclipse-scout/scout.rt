@@ -2,6 +2,9 @@
 @desktop-taskbar-height: 50px;
 @bench-margin-x: 20px;
 
+@text-field-padding: 10px;
+@button-padding: 7px;
+
 @border-radius: 3px;
 /* also defined in scout.HtmlEnvironment (graphics.js) */
 @logical-grid-height: 30px;

@@ -101,7 +101,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         }
         else if (jsonReq.isCancelRequest()) {
           // Cancel all running model jobs for the requested session (interrupt if necessary)
-          BEANS.get(IJobManager.class).cancel(ModelJobs.newFutureFilter().session(uiSession.getClientSession()).notBlocked(), true);
+          BEANS.get(IJobManager.class).cancel(ModelJobs.newFutureFilter().andMatchSession(uiSession.getClientSession()).andAreNotBlocked(), true);
           writeResponse(httpResp, createEmptyResponse());
           return true;
         }

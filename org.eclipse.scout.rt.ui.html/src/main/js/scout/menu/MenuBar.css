@@ -24,6 +24,7 @@
   }
 
   & > .menu-item {
+
     &:focus:not(.disabled):not(.menu-button) {
       text-decoration: underline;
       color: @focus-color;

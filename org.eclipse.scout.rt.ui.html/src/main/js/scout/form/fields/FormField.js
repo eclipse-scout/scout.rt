@@ -84,10 +84,10 @@ scout.FormField.prototype._renderMandatory = function(mandatory) {
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   errorStatus = this.errorStatusUi || this.errorStatus;
-  this.$container.toggleClass('has-error', !! errorStatus);
+  this.$container.toggleClass('has-error', !!errorStatus);
 
   if (this.$field) {
-    this.$field.toggleClass('has-error', !! errorStatus);
+    this.$field.toggleClass('has-error', !!errorStatus);
   }
 
   if (errorStatus) {
@@ -100,10 +100,9 @@ scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
 };
 
 scout.FormField.prototype._renderTooltipText = function(tooltipText) {
-  this.$container.toggleClass('has-tooltip', !! tooltipText);
-
+  this.$container.toggleClass('has-tooltip', !!tooltipText);
   if (this.$field) {
-    this.$field.toggleClass('has-tooltip', !! tooltipText);
+    this.$field.toggleClass('has-tooltip', !!tooltipText);
   }
 };
 
@@ -206,6 +205,11 @@ scout.FormField.prototype._onStatusClick = function() {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
+  // FIXME CGU Correctly handle tooltip when field is a cell editor of an editable table
+  if (!this.$status) {
+    return;
+  }
+
   var opts,
     text = this.tooltipText,
     cssClass = '';

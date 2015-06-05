@@ -125,13 +125,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
-    processBufferedEvents();
-    disposeNodes(getTopLevelNodes(true), true);
-
-    // "Leak detection"
-    if (!m_treeNodeIds.isEmpty() || !m_treeNodes.isEmpty()) {
-      throw new IllegalStateException("Not all nodes have been disposed! TreeNodeIds: " + m_treeNodeIds + " TreeNodes: " + m_treeNodes);
-    }
+    disposeAllNodes();
   }
 
   @Override
@@ -161,6 +155,14 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     for (ITreeNode node : nodes) {
       attachNode(node, attachChildren);
     }
+  }
+
+  /**
+   * Removes all node mappings without querying the model.
+   */
+  protected void disposeAllNodes() {
+    m_treeNodeIds.clear();
+    m_treeNodes.clear();
   }
 
   protected void disposeNode(ITreeNode node, boolean disposeChildren) {

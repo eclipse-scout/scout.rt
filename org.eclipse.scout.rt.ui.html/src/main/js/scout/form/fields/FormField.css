@@ -39,6 +39,7 @@
     visibility: hidden;
   }
 
+  /* FIXME AWE/CGU: better solve this which-icon-is-visible? logic in javascript */
   & > .status {
     position: absolute;
     right: 0;
@@ -59,6 +60,20 @@
 
     &::before  {
       content: @icon-info;
+      color: @icon-light-color;
+    }
+
+    &:hover::before {
+      color: @icon-color;
+    }
+  }
+
+  &.has-menus > .status {
+    visibility: visible;
+
+    &::before {
+      padding-left: 6px;
+      content: @icon-ellipsis-v;
       color: @icon-light-color;
     }
 

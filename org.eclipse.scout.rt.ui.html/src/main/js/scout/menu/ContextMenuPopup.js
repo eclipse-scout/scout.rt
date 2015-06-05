@@ -1,6 +1,9 @@
-scout.ContextMenuPopup = function(session, menuItems) {
+scout.ContextMenuPopup = function(session, menuItems, options) {
   scout.ContextMenuPopup.parent.call(this, session);
   this.menuItems = menuItems;
+  this.options = $.extend({
+    cloneMenuItems: true
+  }, options);
 };
 scout.inherits(scout.ContextMenuPopup, scout.Popup);
 
@@ -33,7 +36,8 @@ scout.ContextMenuPopup.prototype._getMenuItems = function() {
 };
 
 scout.ContextMenuPopup.prototype._renderMenuItems = function() {
-  var menus = this._getMenuItems();
+  var session = this.session,
+    menus = this._getMenuItems();
   if (!menus || menus.length === 0) {
     return;
   }
@@ -42,18 +46,21 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     if (!menu.visible || menu.separator) {
       return;
     }
-    menuClone = this._cloneMenuItem(menu);
-    menuClone.render(this.$body);
-    menuClone.$container
+    if (this.options.cloneMenuItems) {
+      menuClone = this._cloneMenuItem(menu);
+      session.addProxy(menu, menuClone);
+      menu = menuClone;
+    }
+    menu.render(this.$body);
+    menu.$container
       .on('click', '', this.closePopup.bind(this));
 
-    var oldSendDoAction = menuClone.sendDoAction;
+    var oldSendDoAction = menu.sendDoAction;
     var that = this;
-    menuClone.sendDoAction = function(){
+    menu.sendDoAction = function() {
       oldSendDoAction.call(this);
       that.closePopup();
     };
-
   }.bind(this));
 };
 
@@ -74,4 +81,18 @@ scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
 
 scout.ContextMenuPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupMenuItemKeyStrokeAdapter(this);
+};
+
+/**
+ * @override Popup.js
+ */
+scout.ContextMenuPopup.prototype.closePopup = function() {
+  scout.ContextMenuPopup.parent.prototype.closePopup.call(this);
+  if (this.options.cloneMenuItems) {
+    this._getMenuItems().forEach(function(menu) {
+      if (menu.visible && !menu.separator) {
+        this.session.removeProxies(menu);
+      }
+    }, this);
+  }
 };

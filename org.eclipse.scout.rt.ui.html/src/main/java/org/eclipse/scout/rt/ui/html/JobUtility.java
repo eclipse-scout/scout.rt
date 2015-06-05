@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobException;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 
@@ -39,7 +40,7 @@ public final class JobUtility {
 
     boolean timeout;
     try {
-      Filter filter = ModelJobs.newFutureFilter().session(clientSession).notBlocked();
+      Filter filter = ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotBlocked();
       timeout = !Jobs.getJobManager().awaitDone(filter, AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (JobException e) {
@@ -51,6 +52,12 @@ public final class JobUtility {
     }
   }
 
+  private static final String POLLING_REQUEST_HINT = "pollingRequest";
+
+  public static boolean isPollingRequestJob(JobInput jobInput) {
+    return jobInput.propertyMap().get(POLLING_REQUEST_HINT) != null;
+  }
+
   /**
    * Runs the given job as the model thread, and blocks until the job completed or enters a blocking condition.
    * If the calling thread is already the model thread, the job is executed directly (without scheduling a new job).
@@ -59,6 +66,7 @@ public final class JobUtility {
    *          name to use for the model job (expect if the current thread is already the model job)
    * @param clientSession
    *          client session to run the job on behalf
+   * @param pollingRequest
    * @param callable
    *          {@link Callable} to be executed
    * @throws JsonException
@@ -66,7 +74,7 @@ public final class JobUtility {
    *           processing exception.
    * @return the job's result.
    */
-  public static <RESULT> RESULT runModelJobAndAwait(final String jobName, final IClientSession clientSession, final Callable<RESULT> callable) {
+  public static <RESULT> RESULT runModelJobAndAwait(final String jobName, final IClientSession clientSession, final boolean pollingRequest, final Callable<RESULT> callable) {
     // If we are already in the model thread, execute the job directly (without scheduling a new job)
     if (ModelJobs.isModelThread(clientSession)) {
       try {
@@ -78,10 +86,14 @@ public final class JobUtility {
     }
 
     // Otherwise, schedule a model job and wait for it to finish
-    final IFuture<RESULT> future = ModelJobs.schedule(callable, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)).name(jobName));
+    JobInput jobInput = ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)).name(jobName);
+    if (pollingRequest) {
+      jobInput.propertyMap().put(POLLING_REQUEST_HINT, pollingRequest);
+    }
+    final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput);
     boolean timeout;
     try {
-      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFutures(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (JobException e) {
       throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, callable.getClass().getName(), future);

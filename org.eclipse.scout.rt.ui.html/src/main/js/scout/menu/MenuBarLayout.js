@@ -25,8 +25,12 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   // 1st find the left-most position of all right-aligned items
   // see: special comment for negative margins in Menu.css
   this._menuBar.menuItems.forEach(function(menuItem) {
-    var tmpX, itemBounds = scout.graphics.bounds(menuItem.$container, true, true);
-    if (isRightAligned(menuItem)) {
+    if (!menuItem.visible) {
+      return;
+    }
+    var itemBounds = scout.graphics.bounds(menuItem.$container, true, true),
+      tmpX;
+    if (menuItem.rightAligned) {
       tmpX = itemBounds.x;
       if (tmpX < rightEnd) {
         rightEnd = tmpX;
@@ -62,7 +66,7 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     // menu-items.
     var overflowNextItems = false;
     this._menuBar.menuItems.forEach(function(menuItem) {
-      if (isRightAligned(menuItem)) {
+      if (menuItem.rightAligned) {
         // Always add right-aligned menus
         menuItemsCopy.push(menuItem);
       } else {
@@ -85,10 +89,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   } else {
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   }
-
-  function isRightAligned(menuItem) {
-    return menuItem.$container.hasClass('right-aligned');
-  }
 };
 
 /**
@@ -99,18 +99,13 @@ scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItemsCopy) 
   var i, menuItem, insertItemAt = 0;
   for (i = 0; i < menuItemsCopy.length; i++) {
     menuItem = menuItemsCopy[i];
-    if (isRightAligned(menuItem)) {
+    if (menuItem.rightAligned) {
       break;
     } else {
       insertItemAt = i + 1;
     }
   }
-
   scout.arrays.insert(menuItemsCopy, this._ellipsis, insertItemAt);
-
-  function isRightAligned(menuItem) {
-    return menuItem.$container.hasClass('right-aligned');
-  }
 };
 
 scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {

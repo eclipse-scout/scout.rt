@@ -286,3 +286,7 @@ ILabelField, IHtmlField and IStringField are now IHtmlCapable
 AWE 01.05.2015
 Removed get/setColor() from ICalenderItem, replaced with get/setCssClass().
 
+AWE 02.06.2015
+Moved get/setExternalKey() from ICalendarAppointment to base class ICalenderItem.
+Removed decorateCell/-Internal method from AbstractCalendarItemProvider
+Removed Cell instance from CalendarComponent

@@ -48,6 +48,10 @@
     border-right-color: transparent;
   }
 
+  &.hidden {
+    display: none;
+  }
+
   &.disabled {
     color: @disabled-color;
   }
@@ -149,7 +153,12 @@
       content: '';
     }
 
-    .tree-node-control:hover& {
+    .tree-node.show-all > & {
+      .font-text-normal;
+      content: '+';
+    }
+
+    .tree-node-control:hover::before {
       color: @hover-color;
     }
   }
