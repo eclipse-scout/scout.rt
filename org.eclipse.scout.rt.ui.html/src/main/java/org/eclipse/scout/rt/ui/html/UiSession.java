@@ -118,11 +118,15 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     Jobs.getJobManager().addListener(new IFilter<JobEvent>() {
       @Override
       public boolean accept(JobEvent event) {
-        // a) It has to be a model job
+        // It has to be a model job
         if (!ModelJobFilter.INSTANCE.accept(event.getFuture())) {
           return false;
         }
-        // b) It has to be in a state that is considered "finished"
+        // job must not be a polling client job (loop...)
+        if (JobUtility.isPollingRequestJob(event.getFuture().getJobInput())) {
+          return false;
+        }
+        // it has to be in a state that is considered "finished"
         switch (event.getType()) {
           case BLOCKED:
           case DONE:
@@ -133,14 +137,17 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           default:
             return false;
         }
-        // c) No client request must currently being processed (because in that case, the result of the
+        // no client request must currently being processed (because in that case, the result of the
         // model job will be returned as payload of the current JSON response).
         if (isProcessingClientRequest()) {
           return false;
         }
-        // d) The model job's session has to match our session
+        // the model job's session has to match our session
         ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().runContext();
-        return (runContext.session() == getClientSession());
+        if (runContext.session() != getClientSession()) {
+          return false;
+        }
+        return true;
       }
     }, m_modelJobFinishedListener);
   }
@@ -296,7 +303,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
     // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
-    return JobUtility.runModelJobAndAwait("startUp jsonClientSession", clientSession, new Callable<JsonClientSession<?>>() {
+    return JobUtility.runModelJobAndAwait("startUp jsonClientSession", clientSession, false, new Callable<JsonClientSession<?>>() {
       @Override
       public JsonClientSession<?> call() throws Exception {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
@@ -316,7 +323,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected void fireDesktopOpened() {
-    JobUtility.runModelJobAndAwait("start up desktop", m_jsonClientSession.getModel(), Callables.callable(new IRunnable() {
+    JobUtility.runModelJobAndAwait("start up desktop", m_jsonClientSession.getModel(), false, Callables.callable(new IRunnable() {
       @Override
       public void run() throws Exception {
         IClientSession clientSession = ClientSessionProvider.currentSession();
@@ -335,7 +342,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   protected void sendInitializationEvent() {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
-    Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_jsonClientSession.getModel(), new Callable<Locale>() {
+    Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_jsonClientSession.getModel(), false, new Callable<Locale>() {
       @Override
       public Locale call() throws Exception {
         return m_jsonClientSession.getModel().getLocale();
@@ -521,7 +528,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentJsonRequest = jsonRequest;
 
       // Process events in model job
-      JobUtility.runModelJobAndAwait("event-processing", getClientSession(), Callables.callable(new IRunnable() {
+      JobUtility.runModelJobAndAwait("event-processing", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest(), Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
           processRequestInternal();
@@ -534,7 +541,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
       // Convert the collected response to JSON. It is important that this is done in a
       // model job, because during toJson(), the model might be accessed.
-      JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), new Callable<JSONObject>() {
+      JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest(), new Callable<JSONObject>() {
         @Override
         public JSONObject call() throws Exception {
           JSONObject json = responseToJsonInternal();
@@ -664,7 +671,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session");
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        JobUtility.runModelJobAndAwait("fireDesktopClosingFromUI", m_clientSession, Callables.callable(new IRunnable() {
+        JobUtility.runModelJobAndAwait("fireDesktopClosingFromUI", m_clientSession, false, Callables.callable(new IRunnable() {
           @Override
           public void run() throws Exception {
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
