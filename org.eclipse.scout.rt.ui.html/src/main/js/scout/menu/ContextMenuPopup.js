@@ -48,7 +48,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     }
     if (this.options.cloneMenuItems) {
       menuClone = this._cloneMenuItem(menu);
-      session.addProxy(menu, menuClone);
+      session.registerAdapterClone(menu, menuClone);
       menu = menuClone;
     }
     menu.render(this.$body);
@@ -90,7 +90,7 @@ scout.ContextMenuPopup.prototype.closePopup = function() {
   if (this.options.cloneMenuItems) {
     this._getMenuItems().forEach(function(menu) {
       if (menu.visible && !menu.separator) {
-        session.removeProxies(menu);
+        session.unregisterAllAdapterClones(menu);
       }
     }, this);
   }

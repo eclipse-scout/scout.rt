@@ -56,7 +56,7 @@ scout.Session = function($entryPoint, options) {
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   this.modelAdapterRegistry = {};
-  this._proxyRegistry = {}; // key = adapter-ID, value = array of proxies for that adapter
+  this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
   this._asyncEvents = [];
   this._asyncRequestQueued;
@@ -750,7 +750,7 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
 };
 
 scout.Session.prototype._processEvents = function(events) {
-  var i, event, adapter;
+  var i, j, event, adapter, adapterClones, eventTargets;
   for (i = 0; i < events.length; i++) {
     event = events[i];
 
@@ -765,16 +765,14 @@ scout.Session.prototype._processEvents = function(events) {
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }
-    if (event.type === 'property') { // Special handling for 'property' type
-      adapter.onModelPropertyChange(event);
-      this.getProxies(adapter).forEach(function(proxy) {
-        proxy.onModelPropertyChange(event);
-      });
-    } else {
-      adapter.onModelAction(event);
-      this.getProxies(adapter).forEach(function(proxy) {
-        proxy.onModelAction(event);
-      });
+    eventTargets = [ adapter ];
+    scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
+    for (j = 0; j < eventTargets.length; j++) {
+      if (event.type === 'property') { // Special handling for 'property' type
+        eventTargets[j].onModelPropertyChange(event);
+      } else {
+        eventTargets[j].onModelAction(event);
+      }
     }
   }
 };
@@ -899,46 +897,40 @@ scout.Session.prototype.textExists = function(textKey) {
   return this._texts.exists(textKey);
 };
 
-scout.Session.prototype.addProxy = function(adapter, proxy) {
-  proxy.proxyFor = adapter.id;
-  var entry = this._proxyRegistry[adapter.id];
-  if (entry && Array.isArray(entry)) {
-    entry.push(proxy);
+scout.Session.prototype.registerAdapterClone = function(adapter, clone) {
+  clone.cloneOf = adapter.id;
+  var entry = this._clonedModelAdapterRegistry[adapter.id];
+  if (entry) {
+    entry.push(clone);
   } else {
-    entry = [proxy];
-    this._proxyRegistry[adapter.id] = entry;
+    this._clonedModelAdapterRegistry[adapter.id] = [clone];
   }
 };
 
-scout.Session.prototype.getProxies = function(adapter) {
-  var entry = this._proxyRegistry[adapter.id];
-  if (entry && Array.isArray(entry)) {
-    return entry;
-  } else {
-    return [];
-  }
+scout.Session.prototype.getAdapterClones = function(adapter) {
+  var entry = this._clonedModelAdapterRegistry[adapter.id];
+  return scout.arrays.ensure(entry);
 };
 
-scout.Session.prototype.removeProxies = function(adapter) {
-  var entry = this._proxyRegistry[adapter.id];
+scout.Session.prototype.unregisterAllAdapterClones = function(adapter) {
+  var entry = this._clonedModelAdapterRegistry[adapter.id];
   if (entry === undefined) {
-    throw new Error('No proxies registered for the given adapter');
+    throw new Error('No clones registered for the given adapter');
   }
-  delete this._proxyRegistry[adapter.id];
+  delete this._clonedModelAdapterRegistry[adapter.id];
 };
 
-scout.Session.prototype.removeProxy = function(proxy) {
-  if (proxy.proxyOf === undefined) {
-    throw new Error('Tried to remove a proxy but the property proxyOf is not set');
+scout.Session.prototype.unregisterAdapterClone = function(clone) {
+  if (clone.cloneOf === undefined) {
+    throw new Error('Tried to unregister a clone but the property cloneOf is not set');
   }
-  var entry = this._proxyRegistry[proxy.proxyOf];
-  if (entry && Array.isArray(entry)) {
-    var i = entry.indexOf(proxy);
-    if (i === -1) {
-      throw new Error('Adapter found, but proxy does not exist in proxy registry');
-    }
-    entry.splice(i, 1);
-  } else {
-    throw new Error('Proxy does not exist in proxy registry');
+  var entry = this._clonedModelAdapterRegistry[clone.cloneOf];
+  if (!entry) {
+    throw new Error('No clones registered for adapter');
   }
+  var i = entry.indexOf(clone);
+  if (i === -1) {
+    throw new Error('Adapter found, but clone is not registered');
+  }
+  entry.splice(i, 1);
 };
