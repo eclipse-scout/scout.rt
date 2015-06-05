@@ -9,7 +9,7 @@ scout.inherits(scout.DateField, scout.ValueField);
 
 scout.DateField.prototype.init = function(model, session) {
   scout.DateField.parent.prototype.init.call(this, model, session);
-  this.internalTimeParseDateFormat = new scout.DateFormat(session.locale, 'HHmmssSSS');
+  this._internalTimeParseDateFormat = new scout.DateFormat(session.locale, 'HHmmssSSS');
 };
 
 scout.DateField.prototype._render = function($parent) {
@@ -24,7 +24,7 @@ scout.DateField.prototype._render = function($parent) {
 scout.DateField.prototype._renderProperties = function() {
   this._renderHasTime();
   this._renderHasDate();
-  this._renderTimestamp(this.timestamp);
+  this._renderTimestamp(this.timestamp, true, true);
   scout.DateField.parent.prototype._renderProperties.call(this);
 };
 
@@ -46,9 +46,9 @@ scout.DateField.prototype._renderHasTime = function() {
   } else if (this.$timeField) {
     this.$timeField.remove();
     this.$timeFieldIcon.remove();
-    this.$timeField=null;
+    this.$timeField = null;
   }
-  this.htmlComp.valid=false;
+  this.htmlComp.valid = false;
   this.layout();
 };
 
@@ -63,30 +63,28 @@ scout.DateField.prototype._onIconClick = function(event) {
 
 scout.DateField.prototype.timestampChanged = function() {
   var date;
-  if(this.hasTime && this.hasDate){
-    date = this._dateFormat.fusionDateTime(this.isolatedDateFormat.parse(this.$dateField.val()),
-        this.isolatedTimeFormat.parse(this.$timeField.val()));
-  }
-  else if(this.hasTime){
-    date=this.isolatedTimeFormat.parse(this.$timeField.val());
-  }
-  else if(this.hasDate){
-    date=this.isolatedDateFormat.parse(this.$dateField.val());
+  if (this.hasTime && this.hasDate) {
+    date = scout.dates.combineDateTime(
+      this.isolatedDateFormat.parse(this.$dateField.val()),
+      this.isolatedTimeFormat.parse(this.$timeField.val())
+    );
+  } else if (this.hasTime) {
+    date = this.isolatedTimeFormat.parse(this.$timeField.val());
+  } else if (this.hasDate) {
+    date = this.isolatedDateFormat.parse(this.$dateField.val());
   }
 
-
-  var timestamp = date?date.getTime():null,
-    oldTimestamp = this.timestamp;
-  if (oldTimestamp === timestamp) {
-    return;
+  var timestamp = (date ? date.getTime() : null);
+  if (timestamp !== this.timestamp) {
+    this.timestamp = timestamp;
+    this._sendTimestampChanged(timestamp);
   }
-  this.timestamp = timestamp;
-  this._sendTimestampChanged(timestamp);
 };
 
 scout.DateField.prototype._sendTimestampChanged = function(timestamp) {
   this.session.send(this.id, 'timestampChanged', {
-    timestamp: timestamp});
+    timestamp: timestamp
+  });
 };
 
 scout.DateField.prototype._renderHasDate = function() {
@@ -100,15 +98,17 @@ scout.DateField.prototype._renderHasDate = function() {
     this.$field.prepend(this.$dateField);
     this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
     this._picker = new scout.DatePicker(this.isolatedDateFormat, this);
-    this.$dateField.val(this.isolatedDateFormat.format(new Date(this.timestamp)));
+    if (this.timestamp) {
+      this.$dateField.val(this.isolatedDateFormat.format(new Date(this.timestamp)));
+    }
     this.addIcon(this.$field);
   } else if (this.$dateField) {
     this.$dateField.remove();
     this.$icon.remove();
-    this.$dateField=null;
+    this.$dateField = null;
   }
   this.addStatus(this.$field);
-  this.htmlComp.valid=false;
+  this.htmlComp.valid = false;
   this.layout();
 };
 /**
@@ -128,7 +128,7 @@ scout.DateField.prototype._renderEnabled = function() {
 scout.DateField.prototype._onFieldFocus = function() {
   if (!this._$predict || this._$predict.length === 0) {
 //    setTimeout(function(){
-      this._$predict = this._createPredictionField();
+    this._$predict = this._createPredictionField();
 //    }.bind(this));
   }
 };
@@ -141,7 +141,7 @@ scout.DateField.prototype._onFieldBlurTime = function() {
   if (!this.hasTime && !this.$timeField) {
     return;
   }
-  if(!this.$timeField.val()){
+  if (!this.$timeField.val()) {
     return;
   }
   var date = this._parseTime(this.$timeField.val());
@@ -149,17 +149,17 @@ scout.DateField.prototype._onFieldBlurTime = function() {
     return;
   }
 
-  this.errorStatus=null;
+  this.errorStatus = null;
   this.timeError = false;
-  if(isNaN( date.getTime() )){
-    this.timeError=true;
-      this.errorStatus= {
-        message: this.session.text('InvalidDateFormat')
-      };
+  if (isNaN(date.getTime())) {
+    this.timeError = true;
+    this.errorStatus = {
+      message: this.session.text('InvalidDateFormat')
+    };
   }
   this._renderErrorStatus(this.errorStatus);
 
-  if(!this.timeError){
+  if (!this.timeError) {
     this.$timeField.val(this.isolatedTimeFormat.format(date));
   }
   this.timestampChanged();
@@ -214,41 +214,44 @@ scout.DateField.prototype.openPicker = function() {
  * Called by datepicker when a date has been selected
  */
 scout.DateField.prototype.onDateSelected = function(date) {
-  var text = this.isolatedDateFormat.format(date);
-  this._renderTimestamp(date);
+// FIXME NBU What about this?
+//var text = this.isolatedDateFormat.format(date);
+  this._renderTimestamp(date.getTime(), true, false);
 };
 
 /**
  * @Override
  */
 scout.DateField.prototype._renderDisplayText = function(text) {
- //nop -> handled in _renderTimestamp
-  this.displayText=text;
+  //nop -> handled in _renderTimestamp
+// FIXME NBU What about this?
+//  this.displayText = text;
 };
 
-scout.DateField.prototype._renderTimestamp = function(timestamp){
-  if((timestamp && timestamp==="")|| timestamp===undefined){
-    if (this.hasDate && date) {
+scout.DateField.prototype._renderTimestamp = function(timestamp, updateDate, updateTime) {
+  if (!timestamp) {
+    if (this.hasDate && updateDate) {
       this.$dateField.val('');
       // Make sure there is no invisible and wrong prediction
       if (this._$predict) {
         this._$predict.val('');
       }
     }
-    if (this.hasTime && date) {
+    if (this.hasTime && updateTime) {
       this.$timeField.val('');
     }
     return;
   }
+
   var date = new Date(timestamp);
-  if (this.hasDate && date) {
+  if (this.hasDate && updateDate) {
     this.$dateField.val(this.isolatedDateFormat.format(date));
     // Make sure there is no invisible and wrong prediction
     if (this._$predict) {
       this._$predict.val('');
     }
   }
-  if (this.hasTime && date) {
+  if (this.hasTime && updateTime) {
     this.$timeField.val(this.isolatedTimeFormat.format(date));
   }
 };
@@ -260,11 +263,11 @@ scout.DateField.prototype._renderErrorStatus = function(errorStatus) {
   errorStatus = this.errorStatusUi || this.errorStatus;
   this.$container.toggleClass('has-error', !! errorStatus);
 
-  if (this.$dateField ) {
+  if (this.$dateField) {
     this.$dateField.toggleClass('has-error', !! this.dateError);
 
   }
-  if (this.$timeField ) {
+  if (this.$timeField) {
     this.$timeField.toggleClass('has-error', !! this.timeError);
 
   }
@@ -284,8 +287,6 @@ scout.DateField.prototype._renderErrorStatus = function(errorStatus) {
     this._picker.$popup.toggleClass('has-error', !! errorStatus);
   }
 };
-
-
 
 scout.DateField.prototype._onKeyDownDate = function(event) {
   var years = 0,
@@ -356,18 +357,24 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
       return;
     }
     displayText = this.$dateField.val();
-    var predictedDateText = '';
+    var datePrediction = {};
     var valid = this.validateDisplayText(displayText);
     if (displayText && valid) {
-      predictedDateText = this._predict(displayText);
+      datePrediction = this._predict(displayText);
     }
-    this._$predict.val(predictedDateText.display);
-    this._updateSelection(predictedDateText.full);
+    this._$predict.val(datePrediction.text);
+    this._updateSelection(datePrediction.date);
   }.bind(this), 1);
 };
 
-scout.DateField.prototype._updateSelection = function(displayText) {
-  var date = this._dateFormat.parse(displayText);
+scout.DateField.prototype._updateSelection = function(selection) {
+  var date;
+  if (selection instanceof Date) {
+    date = selection;
+  }
+  else {
+    date = this._dateFormat.parse(selection);
+  }
   this._picker.selectDate(date);
 };
 
@@ -397,7 +404,7 @@ scout.DateField.prototype._validateDisplayText = function(text) {
   } else if (day) {
     valid = day >= 0 && day < 32;
   }
-  this.dateError =!valid;
+  this.dateError = !valid;
   if (!valid) {
     return {
       message: this.session.text('InvalidDateFormat')
@@ -418,13 +425,13 @@ scout.DateField.prototype._acceptPrediction = function() {
   if (!this._$predict) {
     return;
   }
-  var prediction = this._$predict.val();
-  if (!prediction) {
+  var predictionText = this._$predict.val();
+  if (!predictionText) {
     return;
   }
-  prediction = this._predict(prediction, true);
-  this.$dateField.val(prediction.full);
-  this._updateSelection(prediction.full);
+  var datePrediction = this._predict(predictionText, true);
+  this.$dateField.val(datePrediction.text);
+  this._updateSelection(datePrediction.date);
 };
 
 scout.DateField.prototype._predict = function(validatedText, format) {
@@ -469,10 +476,11 @@ scout.DateField.prototype._predict = function(validatedText, format) {
     fullYear = year;
   }
 
-  prediction.full = this.isolatedDateFormat.pattern.replace('dd', fullDay).replace('MM', fullMonth).replace('yyyy', fullYear);
-  prediction.display = this.isolatedDateFormat.pattern.replace('dd', day).replace('MM', month).replace('yyyy', year);
-
-  return prediction;
+  var predictedDate = new Date(fullYear, fullMonth - 1, fullDay, 0, 0, 0, 0);
+  return {
+    date: predictedDate,
+    text: this.isolatedDateFormat.format(predictedDate)
+  };
 };
 
 scout.DateField.prototype._createPredictionField = function() {
@@ -510,7 +518,7 @@ scout.DateField.prototype._parseTime = function(inputValue) {
     //add 12 hours before parsing
     timeString = Number(timeString) + 120000000;
   }
-  return this.internalTimeParseDateFormat.parse(timeString);
+  return this._internalTimeParseDateFormat.parse(timeString);
 };
 
 scout.DateField.prototype._createKeyStrokeAdapter = function() {

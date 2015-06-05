@@ -325,6 +325,26 @@ scout.dates = {
     if (diff < -1) { return -1; }
     if (diff >  1) { return 1;  }
     return diff;
+  },
+
+  /**
+   * TODO NBU Add jasmine test
+   * TODO NBU Add documentation
+   */
+  combineDateTime: function(date, time) {
+    var newDate = new Date();
+    if (date) {
+      newDate.setFullYear(date.getYear(), date.getMonth(), date.getDay());
+    }
+    if (time) {
+      newDate.setHours(
+        scout.helpers.nvl(time.getHours(), 0),
+        scout.helpers.nvl(time.getMinutes(), 0),
+        scout.helpers.nvl(time.getSeconds(), 0),
+        scout.helpers.nvl(time.getMilliseconds, 0)
+      );
+    }
+    return newDate;
   }
 
 };

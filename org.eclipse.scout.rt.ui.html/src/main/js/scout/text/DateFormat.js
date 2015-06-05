@@ -44,7 +44,7 @@ scout.DateFormat = function(locale, pattern) {
     }
     this.func = func;
     this.parseFunc = parseFunc;
-    this.isTimePattern=isTimePattern;
+    this.isTimePattern = isTimePattern;
     this.patternIndex = -1;
     this.patternTextAfter = ''; //is set by DateFormat
     this.firstPatternDefinition; //is set by DateFormat
@@ -113,10 +113,10 @@ scout.DateFormat = function(locale, pattern) {
       }, function(dateString, date, patternTextAfter) {
         var shortYear = Number(dateString.substr(0, 2));
         var actualYear = Number(String(new Date().getFullYear()).slice(2));
-        var rangeMin = actualYear-50<0 ? actualYear+50 : actualYear-50;
-        var yearprefix = shortYear>rangeMin ? Number(String(new Date().getFullYear()).substr(0,2) )-1:String(new Date().getFullYear()).substr(0,2);
+        var rangeMin = actualYear - 50 < 0 ? actualYear + 50 : actualYear - 50;
+        var yearprefix = shortYear > rangeMin ? Number(String(new Date().getFullYear()).substr(0, 2)) - 1 : String(new Date().getFullYear()).substr(0, 2);
 
-        date.setFullYear(yearprefix+dateString.substr(0, 2));
+        date.setFullYear(yearprefix + dateString.substr(0, 2));
         return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
       }, false)
     ],
@@ -203,7 +203,7 @@ scout.DateFormat = function(locale, pattern) {
         date.setHours(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
         return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
       }, true),
-      new DateFormatPatternDefinition(['H','h'], function(date) {
+      new DateFormatPatternDefinition(['H', 'h'], function(date) {
         return date.getHours();
       }, function(dateString, date, patternTextAfter) {
         //TODO nbu
@@ -306,22 +306,22 @@ scout.DateFormat.prototype.compile = function(patternLibrary) {
         this.formatFunc.push(patternDefinition.createFormatFunc());
         this.patternDefinitions[patternDefinition.index] = patternDefinition;
         if (patternDefinition.isTimePattern) {
-          lastTimePattern = lastTimePattern? lastTimePattern.index > patternDefinition.index ? lastTimePattern : patternDefinition :patternDefinition;
-          firstTimePattern = firstTimePattern? firstTimePattern.index > patternDefinition.index ? patternDefinition : firstTimePattern:patternDefinition;
+          lastTimePattern = lastTimePattern ? lastTimePattern.index > patternDefinition.index ? lastTimePattern : patternDefinition : patternDefinition;
+          firstTimePattern = firstTimePattern ? firstTimePattern.index > patternDefinition.index ? patternDefinition : firstTimePattern : patternDefinition;
         } else {
-          lastDatePattern = lastDatePattern ? lastDatePattern.index > patternDefinition.index ? lastDatePattern : patternDefinition:patternDefinition;
-          firstDatePattern = firstDatePattern? firstDatePattern.index > patternDefinition.index ? patternDefinition : firstDatePattern:patternDefinition;
+          lastDatePattern = lastDatePattern ? lastDatePattern.index > patternDefinition.index ? lastDatePattern : patternDefinition : patternDefinition;
+          firstDatePattern = firstDatePattern ? firstDatePattern.index > patternDefinition.index ? patternDefinition : firstDatePattern : patternDefinition;
         }
         break;
       }
     }
   }
   //create date and time part;
-  if(firstTimePattern&&lastTimePattern){
+  if (firstTimePattern && lastTimePattern) {
     this.timePart = this.pattern.substring(firstTimePattern.index, lastTimePattern.index + lastTimePattern.selectedPattern.length).trim();
   }
-  if(firstDatePattern && lastDatePattern){
-    this.datePart= this.pattern.substring(firstDatePattern.index, lastDatePattern.index + lastDatePattern.selectedPattern.length).trim();
+  if (firstDatePattern && lastDatePattern) {
+    this.datePart = this.pattern.substring(firstDatePattern.index, lastDatePattern.index + lastDatePattern.selectedPattern.length).trim();
   }
 
   //update Patterndefinitions and create parseFunc in correct order.
@@ -393,20 +393,12 @@ scout.DateFormat.prototype.analyze = function(text, asNumber) {
   return result;
 };
 
-scout.DateFormat.prototype.fusionDateTime = function(date, time) {
-  var newDate = new Date();
-  newDate.setHours(0,0,0);
-  newDate.setFullYear(date.getYear(), date.getMonth(), date.getDay());
-  newDate.setHours(scout.strings.nvl(time.getHours(),0), scout.strings.nvl(time.getMinutes(),0), scout.strings.nvl(time.getSeconds(),0), scout.strings.nvl(time.getMilliseconds,0));
-  return newDate;
-};
-
 scout.DateFormat.prototype.parse = function(text) {
-
   if (!text) {
     return undefined;
   }
 
+  // FIXME NBU Fix this!
   //  var dateInfo = this.analyze(text, true);
   //  if (isNaN(dateInfo.year) || isNaN(dateInfo.month) || isNaN(dateInfo.day)) {
   //    return undefined;
