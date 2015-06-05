@@ -14,6 +14,7 @@ scout.WrappedFormField.prototype._render = function($parent) {
 };
 
 scout.WrappedFormField.prototype._renderProperties = function() {
+  scout.WrappedFormField.parent.prototype._renderProperties.call(this);
   this._renderInnerForm();
 };
 
