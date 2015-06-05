@@ -62,8 +62,8 @@ scout.TableFooter.prototype._render = function($parent) {
   });
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
     var numRows = 0;
-    if (event.$rows) {
-      numRows = event.$rows.length;
+    if (event.rows) {
+      numRows = event.rows.length;
     }
     that._updateInfoSelection(numRows, event.allSelected);
     that._updateInfoSelectionVisibility();

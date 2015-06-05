@@ -13,6 +13,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
   var $newRowSelection, $prev, $next, i, rows;
   var keycode = event.which;
   var $rowsAll = this._field.$rows();
+  //TODO nbu refactor
   var $rowsSelected = this._field.$selectedRows();
 
   if (keycode === scout.keys.SPACE) {
@@ -113,8 +114,9 @@ scout.TableControlKeyStrokes.prototype._drawKeyBox = function($container, drawed
     if (!scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.HOME)) {
       scout.keyStrokeBox.drawSingleKeyBoxItem(offset, 'Home', $firstRow, false, false, false);
     }
-
+    //TODO nbu refactor
     var $rowsSelected = this._field.$selectedRows();
+
     var $pageUpRow;
     var $prev;
     if ($rowsSelected.length > 0) {

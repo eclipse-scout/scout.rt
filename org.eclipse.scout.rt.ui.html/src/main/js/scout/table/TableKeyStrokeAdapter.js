@@ -28,7 +28,7 @@ scout.inherits(scout.TableStartCellEditKeyStroke, scout.KeyStroke);
  */
 scout.TableStartCellEditKeyStroke.prototype.handle = function(event) {
   var pos, $selectedRow;
-
+  //TODO nbu refactor
   $selectedRow = this._table.$selectedRows().first();
   if ($selectedRow.length === 0) {
     return;
@@ -50,7 +50,7 @@ scout.TableStartCellEditKeyStroke.prototype._drawKeyBox = function($container, d
   if (!this.drawHint || !this.keyStroke) {
     return;
   }
-
+//TODO nbu refactor
   $selectedRow = this._table.$selectedRows().first();
   if ($selectedRow.length === 0) {
     return;

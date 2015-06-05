@@ -29,6 +29,7 @@ scout.MobileTable.prototype._RenderRows = function(rows, startRowIndex) {
  * @override
  */
 scout.MobileTable.prototype._buildRowDiv = function(row) {
+  //TODO nbu selection border
   var rowClass,
     cellContent = '',
     columns = this.columns,

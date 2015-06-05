@@ -8,9 +8,14 @@ scout.TableSelectionHandler = function(table) {
   this.table = table;
   this.mouseMoveSelectionEnabled = true;
   this._mouseDown;
-  this._$selectedRows;
-  this._$allRows;
+  this.lastActionRow;
+  this._allRows;
+  this.mouseOverHandler;
+  this.select = true;
+  this.counterDebug = 0;
 
+  this.fromIndex;
+  this.toIndex;
   // Index of the row that got a 'mouseover' event previously (needed to determine if the user is going up or down)
   this._prevSelectedRowIndex;
   // The index of the selected row with the greatest distance to fromIndex (needed to efficiently clear the selection)
@@ -18,123 +23,112 @@ scout.TableSelectionHandler = function(table) {
 };
 
 // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
-//FIXME CGU refactor, this handler should not directly render the selection, instead it should call table.selectRows which updates model and calls renderSelection.
-scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
-  var fromIndex, toIndex,
-    select = true;
+scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
 
+  var $row = $(event.currentTarget),
+    row = $row.data('row'),
+    oldSelectedState = $row.isSelected();
   this._mouseDown = true;
-  this._$allRows = this.table.$filteredRows();
-  this._$selectedRows = this.table.$selectedRows();
 
-  // Click without ctrl always starts new selection, with ctrl toggle
+  //TODO nbu check option to save filtered rows in model
+  this._allRows = this.table.filteredRows();
   if (this.table.multiSelect && event.shiftKey) {
-    fromIndex = this._$allRows.index(this._$selectedRows.first());
+    this.fromIndex = this._allRows.indexOf(this.lastActionRow);
   } else if (this.table.multiSelect && event.ctrlKey) {
-    select = !$row.isSelected();
+    this.select = !oldSelectedState;
   } else {
+    this.select = true;
     // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
     // Right click on already selected rows must not clear the selection
-    if (!$row.isSelected() || (this._$selectedRows.length > 1 && event.which !== 3)) {
-      this._$selectedRows.select(false);
-      this._clearSelectionBorder(this._$selectedRows);
+    if (!oldSelectedState || (this.table.selectedRows.length > 1 && event.which !== 3)) {
+      this.table.clearSelection(true);
     }
   }
-  if (fromIndex === undefined || fromIndex < 0) {
-    fromIndex = this._$allRows.index($row);
+  if (this.fromIndex === undefined || this.fromIndex < 0) {
+    this.fromIndex = this._allRows.indexOf(row);
   }
 
-  // just a click... right click do not select if clicked in selection
-  if (event.which !== 3 || !$row.is(this._$selectedRows)) {
-    toIndex = this._$allRows.index($row);
-    handleSelection.call(this);
-  }
-  else {
-    this.table.notifyRowsSelected(this._$selectedRows, true);
+  if (event.which !== 3 || !oldSelectedState) {
+    this.toIndex = this._allRows.indexOf(row);
+    this.handleSelection(event);
   }
 
   if (this.mouseMoveSelectionEnabled) {
-    // Handle movement with held mouse button. Each event gets only fired once (to prevent event firing when moving
-    // inside the same row), but when the mouse leaves the row, the listener is re-attached (see below).
-    this._$allRows.not($row).one('mousemove.selectionHandler', onMouseMove.bind(this));
-    this._$allRows.on('mouseleave.selectionHandler', function(event) {
-      var $row = $(event.delegateTarget);
-      $row.one('mousemove.selectionHandler', onMouseMove.bind(this));
-    }.bind(this));
-
+    this.table.$data.off('mouseover', this.mouseOverHandler);
+    this.mouseOverHandler = this.onMouseOver.bind(this);
+    this.table.$data.on('mouseover', '.table-row', this.mouseOverHandler);
     // This additionally window listener is necessary to track the clicks outside of a table row.
     // If the mouse is released on a table row, onMouseUp gets called by the table's mouseUp listener.
     $(window).one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   }
 
-  // --- Helper functions ---
+  this.lastActionRow = row;
+};
 
-  function onMouseMove(event) {
-    var $row = $(event.delegateTarget);
-    toIndex = this._$allRows.index($row);
-    handleSelection.call(this);
-  }
+scout.TableSelectionHandler.prototype.onMouseOver = function(event) {
+  var $row = $(event.currentTarget),
+    row = $row.data('row');
+  this.toIndex = this._allRows.indexOf(row);
+  this.handleSelection(event);
+  this.lastActionRow = row;
 
-  function handleSelection() {
-    var $rowsToUnselect;
-    if (this.table.multiSelect) {
-      // Multi-selection -> expand/shrink selection
-      var thisIndex = toIndex;
-      var goingUp = (thisIndex < this._prevSelectedRowIndex);
-      var goingDown = (thisIndex > this._prevSelectedRowIndex);
-      var beforeFromSelection = (this._prevSelectedRowIndex < fromIndex);
-      var afterFromSelection = (this._prevSelectedRowIndex > fromIndex);
+};
 
-      // In 'ctrlKey' mode, the unselection is done via 'select=false'
-      if (!event.ctrlKey) {
-        // If we are going _towards_ the startIndex, unselect all rows between the current row and the
-        // selected row with the greatest distance (this._maxSelectedRowIndex).
-        if (goingUp && afterFromSelection) {
-          $rowsToUnselect = this._$allRows.slice(thisIndex + 1, this._maxSelectedRowIndex + 1);
-        }
-        if (goingDown && beforeFromSelection) {
-          $rowsToUnselect = this._$allRows.slice(this._maxSelectedRowIndex, thisIndex);
-        }
+scout.TableSelectionHandler.prototype.handleSelection = function(event) {
+  var rowsToUnselect;
+  if (this.table.multiSelect) {
+    // Multi-selection -> expand/shrink selection
+    var thisIndex = this.toIndex;
+    var goingUp = (thisIndex < this._prevSelectedRowIndex);
+    var goingDown = (thisIndex > this._prevSelectedRowIndex);
+    var beforeFromSelection = (this._prevSelectedRowIndex < this.fromIndex);
+    var afterFromSelection = (this._prevSelectedRowIndex > this.fromIndex);
+
+    // In 'ctrlKey' mode, the unselection is done via 'select=false'
+    if (!event.ctrlKey) {
+      // If we are going _towards_ the startIndex, unselect all rows between the current row and the
+      // selected row with the greatest distance (this._maxSelectedRowIndex).
+      if (goingUp && afterFromSelection) {
+        rowsToUnselect = this._allRows.slice(thisIndex + 1, this._maxSelectedRowIndex + 1);
+      } else if (goingDown && beforeFromSelection) {
+        rowsToUnselect = this._allRows.slice(this._maxSelectedRowIndex, thisIndex);
       }
-      // Adjust the indexes
-      this._maxSelectedRowIndex = (goingUp ? Math.min(this._maxSelectedRowIndex, thisIndex) : (goingDown ? Math.max(this._maxSelectedRowIndex, thisIndex) : thisIndex));
-      this._prevSelectedRowIndex = thisIndex;
-    } else {
-      // Single selection -> unselect previously selected row
-      $rowsToUnselect = this._$allRows.eq(fromIndex);
-
-      // Adjust the indexes
-      fromIndex = toIndex;
+      if (rowsToUnselect) {
+        rowsToUnselect.forEach(function(row) {
+          this.table.removeRowFromSelection(row, true);
+        }, this);
+      }
     }
+    // Adjust the indexes
+    this._maxSelectedRowIndex = (goingUp ? Math.min(this._maxSelectedRowIndex, thisIndex) : (goingDown ? Math.max(this._maxSelectedRowIndex, thisIndex) : thisIndex));
+    this._prevSelectedRowIndex = thisIndex;
+  } else {
+    // Single selection -> unselect previously selected row
+    this.table.clearSelection(true);
 
-    // Unselect rows outside the selection
-    if ($rowsToUnselect) {
-      $rowsToUnselect.select(false);
-      this._clearSelectionBorder($rowsToUnselect);
-    }
-
-    // Set the new selection
-    this._selectRange(fromIndex, toIndex, select);
-    this.table.notifyRowsSelected(this._$selectedRows, true);
+    // Adjust the indexes
+    this.fromIndex = this.toIndex;
   }
+
+  // Set the new selection
+  $.log.error("from:" + this.fromIndex + " to:" + this.toIndex);
+  this._selectRange(this.fromIndex, this.toIndex, this.select);
 };
 
 scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex, select) {
   var startIndex = Math.min(fromIndex, toIndex),
     endIndex = Math.max(fromIndex, toIndex) + 1,
-    $actionRow = this._$allRows.slice(startIndex, endIndex);
-
+    actionRows = this._allRows.slice(startIndex, endIndex);
   // set/remove selection
   if (select) {
-    $actionRow.select(true);
+    actionRows.forEach(function(row) {
+      this.table.addRowToSelection(row, true);
+    }, this);
   } else {
-    $actionRow.select(false);
+    actionRows.forEach(function(row) {
+      this.table.removeRowFromSelection(row, true);
+    }, this);
   }
-
-  this._clearSelectionBorder($actionRow);
-  this._$selectedRows = this.table.$selectedRows();
-  this._clearSelectionBorder(this._$selectedRows);
-  this._renderSelectionBorder(this._$selectedRows);
 };
 
 scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
@@ -142,105 +136,14 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
     // May happen when selecting elements with chrome dev tools
     return;
   }
-  this._mouseDown = false;
 
+  this._mouseDown = false;
+  this.table.$data.off('mouseover', this.mouseOverHandler);
+  this._allRows = null;
+  this.fromIndex = -1;
+  this.toIndex = -1;
+  this.selected = true;
   // Update selectedRows and allRows, this might have changed in the meantime (e.g. when row
   // was replaced by update event due to cell editing)
-  this._$selectedRows = this.table.$selectedRows();
-  this._$allRows = this.table.$filteredRows();
-
-  this.table.notifyRowsSelected(this._$selectedRows);
-
-  // TODO BSH Table Selection | This is way too inefficient for many rows!
-  this._$allRows.off('.selectionHandler');
-  this._$allRows = null;
-  this._$selectedRows = null;
-};
-
-scout.TableSelectionHandler.prototype.renderSelection = function() {
-  this.clearSelection(true);
-  var selectedRows = this.table.selectedRows;
-  var selected$Rows = [];
-  for (var i = 0; i < selectedRows.length; i++) {
-    var selectedRow = selectedRows[i];
-    var $row = selectedRow.$row;
-    $row.select(true);
-    selected$Rows.push($row);
-  }
-
-  var $selectedRows = $(selected$Rows);
-  this._renderSelectionBorder($selectedRows);
-  return $selectedRows;
-};
-
-scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
-  var $selectedRows = this.table.$selectedRows();
-  $selectedRows.select(false);
-  this._clearSelectionBorder($selectedRows);
-
-  if (!dontFire) {
-    this.table.notifyRowsSelected();
-  }
-};
-
-/**
- * Just renders selection border because the css class "selected" was already set by Table._buildRowDiv
- */
-scout.TableSelectionHandler.prototype.dataDrawn = function() {
-  var $selectedRows = this.table.$selectedRows();
-
-  this._clearSelectionBorder($selectedRows);
-  this._renderSelectionBorder($selectedRows);
-  return $selectedRows;
-};
-
-/**
- * Adds the css classes for the selection border based on the selected rows.
- */
-scout.TableSelectionHandler.prototype._renderSelectionBorder = function($selectedRows) {
-  var that = this;
-  $selectedRows.each(function() {
-    var $row = $(this);
-    var hasPrev = that.table.$prevFilteredRows($row, true).first().isSelected();
-    var hasNext = that.table.$nextFilteredRows($row, true).first().isSelected();
-
-    if (hasPrev && hasNext) {
-      $row.addClass('select-middle');
-    }
-    if (!hasPrev && hasNext) {
-      $row.addClass('select-top');
-    }
-    if (hasPrev && !hasNext) {
-      $row.addClass('select-bottom');
-    }
-    if (!hasPrev && !hasNext) {
-      $row.addClass('select-single');
-    }
-  });
-};
-
-scout.TableSelectionHandler.prototype._clearSelectionBorder = function($selectedRows) {
-  $selectedRows.removeClass('select-middle select-top select-bottom select-single');
-};
-
-scout.TableSelectionHandler.prototype.selectAll = function() {
-  if (!this.table.multiSelect) {
-    return; // not possible
-  }
-
-  this.clearSelection(true);
-
-  var $rows = this.table.$rows();
-  $rows.select(true);
-
-  this._renderSelectionBorder($rows);
-  this.table.notifyRowsSelected($rows);
-};
-
-scout.TableSelectionHandler.prototype.toggleSelection = function() {
-  if (this.table.selectedRows.length === this.table.rows.length) {
-    this.clearSelection();
-  } else {
-    this.selectAll();
-  }
+  this.table.notifyRowSelectionFinished();
 };

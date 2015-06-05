@@ -60,12 +60,15 @@ scout.arrays = {
     }
     return modified;
   },
-
+/**
+ * return index of replaced element
+ */
   replace: function(arr, element, replacement) {
     var index = arr.indexOf(element);
     if (index !== -1) {
       arr[index] = replacement;
     }
+    return index;
   },
 
   insert: function(arr, element, index) {
