@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonException;
  */
 public final class JobUtility {
   private static final long AWAIT_TIMEOUT = TimeUnit.HOURS.toMillis(1);
+  private static final String POLLING_REQUEST_HINT = "pollingRequest";
 
   private JobUtility() {
     // static access only
@@ -52,8 +53,6 @@ public final class JobUtility {
     }
   }
 
-  private static final String POLLING_REQUEST_HINT = "pollingRequest";
-
   public static boolean isPollingRequestJob(JobInput jobInput) {
     return jobInput.propertyMap().get(POLLING_REQUEST_HINT) != null;
   }
@@ -67,6 +66,10 @@ public final class JobUtility {
    * @param clientSession
    *          client session to run the job on behalf
    * @param pollingRequest
+   *          whether the model job is started for a "polling request". Set this argument to <code>false</code> when
+   *          handling a user context. A flag is put in the job input property map and may be retrieved again using the
+   *          method {@link #isPollingRequestJob(JobInput)}. This flag is useful when listening for certain job manager
+   *          events (see {@link UiSession#UiSession()}.
    * @param callable
    *          {@link Callable} to be executed
    * @throws JsonException
