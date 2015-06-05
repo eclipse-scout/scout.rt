@@ -287,7 +287,6 @@ scout.FormField.prototype.addField = function($field) {
     this.addFieldContainer($field);
   }
   this.$field = $field;
-  this.$field.attr('id', this.refFieldId);
 };
 
 /**
