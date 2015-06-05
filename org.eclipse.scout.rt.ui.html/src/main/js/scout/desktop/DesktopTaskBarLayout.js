@@ -177,6 +177,10 @@ scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
       objectType: 'Menu',
       text: text
     });
+    // FIXME AWE: continue
+    menu.sendDoAction = function() {
+      $.log.info('Meep');
+    };
     overflowMenus.push(menu);
   });
 

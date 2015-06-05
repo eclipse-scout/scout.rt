@@ -42,7 +42,7 @@ scout.ValueField.prototype._syncMenus = function(menus) {
 scout.ValueField.prototype._onStatusClick = function(event) {
   if (this._hasMenus()) {
     // showing menus is more important than showing tooltips
-    var popup = new scout.ContextMenuPopup(this.session, this.menus),
+    var popup = new scout.ContextMenuPopup(this.session, this.menus, {cloneMenuItems: false}),
       bounds = scout.graphics.getBounds(this.$status),
       pos = this.$status.position();
     popup.render(this.$container);

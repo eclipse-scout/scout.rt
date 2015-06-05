@@ -79,6 +79,7 @@ scout.Splitter.prototype._onMouseMove = function(event) {
     event.data = newSize;
     this.trigger('resize', event);
     this.position(newSize);
+    sessionStorage.setItem('splitter.size', newSize);
   }
   this._oldRatio = ratio;
 };

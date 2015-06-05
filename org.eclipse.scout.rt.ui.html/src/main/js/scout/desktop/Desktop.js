@@ -85,6 +85,14 @@ scout.Desktop.prototype._render = function($parent) {
   }
   this.navigation.onOutlineChanged(this.outline);
 
+  // FIXME AWE: (user-prefs) Use user-preferences instead of sessionStorage
+  var storedSplitterSize = sessionStorage.getItem('splitter.size');
+  if (storedSplitterSize) {
+    var splitterSize = parseInt(storedSplitterSize, 10);
+    this.navigation.onResize({data: splitterSize});
+    this.splitter.position(splitterSize);
+  }
+
   this.views.forEach(this._renderView.bind(this));
   this.dialogs.forEach(this._renderDialog.bind(this));
   this.messageBoxes.forEach(this._renderMessageBox.bind(this));
