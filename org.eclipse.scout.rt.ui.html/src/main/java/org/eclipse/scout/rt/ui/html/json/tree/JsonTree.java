@@ -119,6 +119,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+    attachAdapters(getModel().getKeyStrokes());
     attachNodes(getTopLevelNodes(true), true);
   }
 
@@ -190,6 +191,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
     putContextMenu(json);
+    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
     return json;
   }
 

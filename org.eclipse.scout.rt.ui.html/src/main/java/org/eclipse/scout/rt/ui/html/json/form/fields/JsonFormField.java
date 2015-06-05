@@ -121,7 +121,8 @@ public abstract class JsonFormField<T extends IFormField> extends AbstractJsonPr
 
   @Override
   public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), "keyStrokes", getModel().getKeyStrokes());
+    JSONObject json = super.toJson();
+    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
+    return json;
   }
-
 }

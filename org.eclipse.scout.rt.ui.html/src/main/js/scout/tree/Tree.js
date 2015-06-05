@@ -9,7 +9,7 @@ scout.Tree = function() {
   this.nodesMap = {}; // all nodes by id
   this._breadcrumb = false;
   this.events = new scout.EventSupport();
-  this._addAdapterProperties('menus');
+  this._addAdapterProperties(['menus', 'keyStrokes']);
   this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
   this._treeItemPaddingLeft = 23;
   this._treeItemCheckBoxPaddingLeft = 29;
