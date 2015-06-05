@@ -1465,6 +1465,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualsRows =scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
   if (!selectedEqualsRows) {
+    this.clearSelection(!notifyServer);
     this.selectedRows = rows;
     // FIXME CGU send delayed in case of key navigation
     if (notifyServer) {
@@ -1474,8 +1475,8 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
 
   if (this.rendered && !selectedEqualsRows) {
     this.selectedRows.forEach(function(row){
-      this.renderSelection(row, false);
-    });
+      this.renderSelection(row.$row, false);
+    },this );
     this._triggerRowsSelected();
     if (this.scrollToSelection) {
       this.revealSelection();
