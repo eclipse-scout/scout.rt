@@ -52,8 +52,6 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
       menu = menuClone;
     }
     menu.render(this.$body);
-    menu.$container
-      .on('click', '', this.closePopup.bind(this));
 
     var oldSendDoAction = menu.sendDoAction;
     var that = this;
@@ -88,10 +86,11 @@ scout.ContextMenuPopup.prototype._createKeyStrokeAdapter = function() {
  */
 scout.ContextMenuPopup.prototype.closePopup = function() {
   scout.ContextMenuPopup.parent.prototype.closePopup.call(this);
+  var session = this.session;
   if (this.options.cloneMenuItems) {
     this._getMenuItems().forEach(function(menu) {
       if (menu.visible && !menu.separator) {
-        this.session.removeProxies(menu);
+        session.removeProxies(menu);
       }
     }, this);
   }
