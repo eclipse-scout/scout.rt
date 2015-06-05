@@ -229,7 +229,7 @@ scout.Desktop.prototype._selectTab = function(tab) {
     var htmlParent = htmlComp.getParent();
     htmlComp.setSize(htmlParent.getSize());
   }
-
+  this._layoutTaskBar();
   scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
 };
 

@@ -166,25 +166,28 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 };
 
 scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
-  var menu, tab, text, popup, overflowMenus = [], session = this._desktop.session, allTabs = this._desktop._allTabs;
+  var menu, tab, text, popup, overflowMenus = [],
+    desktop = this._desktop;
   this._overflowTabsIndizes.forEach(function(i) {
-    tab = allTabs[i];
+    tab = desktop._allTabs[i];
     text = tab.title;
     if (tab.subTitle) {
       text += ' (' + tab.subTitle + ')';
     }
-    menu = session.createUiObject({
+    menu = desktop.session.createUiObject({
       objectType: 'Menu',
-      text: text
+      text: text,
+      tab: tab
     });
-    // FIXME AWE: continue
     menu.sendDoAction = function() {
-      $.log.info('Meep');
+      $.log.debug('(DesktopTaskBarLayout#_onClickOverflow) tab=' + this.tab);
+      desktop._selectTab(this.tab);
     };
     overflowMenus.push(menu);
   });
 
-  popup = new scout.ContextMenuPopup(session, overflowMenus, {cloneMenuItems: false});
+  popup = new scout.ContextMenuPopup(desktop.session, overflowMenus, {cloneMenuItems: false});
   popup.render();
   popup.setLocation(new scout.Point(event.pageX, event.pageY));
 };
+
