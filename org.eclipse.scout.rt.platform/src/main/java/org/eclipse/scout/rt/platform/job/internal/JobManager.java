@@ -44,7 +44,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -237,8 +236,8 @@ public class JobManager implements IJobManager {
           LOG.error("Job rejected because no more threads or queue slots available. [runnable={}]", runnable);
         }
 
-        if (runnable instanceof IFutureTask) {
-          ((IFutureTask<?>) runnable).reject();
+        if (runnable instanceof IRejectable) {
+          ((IRejectable) runnable).reject();
         }
       }
     };

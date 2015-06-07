@@ -8,31 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.future;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.FutureTask;
 
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 
 /**
- * FutureTask used to re-acquire the mutex after waiting for a blocking condition to fall.
+ * This task is not a real task like {@link JobFutureTask} which represents a 'runnable' to be run. Instead, this task
+ * is used to re-acquire the mutex for a {@link JobFutureTask} after entering a blocking condition, which in the
+ * meantime, is fallen.
  *
- * @see IBlockingCondition
  * @since 5.1
  */
 @Internal
-public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implements IFutureTask<Void> {
+public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implements IMutexTask<Void>, IRejectable {
 
-  private final MutexSemaphores m_mutexSemaphores;
   private final Object m_mutexObject;
   private volatile boolean m_awaitMutex;
 
-  public MutexAcquisitionFutureTask(final MutexSemaphores mutexSemaphores, final Object mutexObject) {
+  public MutexAcquisitionFutureTask(final Object mutexObject) {
     super(Callables.nullCallable());
-    m_mutexSemaphores = mutexSemaphores;
     m_mutexObject = mutexObject;
     m_awaitMutex = true;
   }
@@ -48,41 +45,31 @@ public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implem
   }
 
   @Override
-  public boolean isMutexOwner() {
-    return m_mutexSemaphores.isMutexOwner(this);
-  }
-
-  @Override
   public final void run() {
     mutexAcquired();
   }
 
   @Override
-  public final void reject() {
+  public void reject() {
     mutexAcquired();
   }
 
   /**
-   * @return <code>true</code> if there is a thread waiting for the mutex to become available.
+   * @return <code>true</code> if this task is still waiting for the mutex to become available.
    */
   public boolean isAwaitMutex() {
     return m_awaitMutex;
   }
 
   /**
-   * Invoke this method to no longer wait for the mutex to become available.
+   * Indicates that this task is no longer interested for the mutex to become available.
    */
   public void stopAwaitMutex() {
     m_awaitMutex = false;
   }
 
-  @Override
-  public void setBlocked(final boolean blocked) {
-    throw new UnsupportedOperationException();
-  }
-
   /**
-   * Method invoked once the mutex is acquired.
+   * Method invoked once the mutex is acquired for this task.
    */
   protected abstract void mutexAcquired();
 }

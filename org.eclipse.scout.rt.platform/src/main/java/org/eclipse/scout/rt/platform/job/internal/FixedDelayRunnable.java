@@ -14,10 +14,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-
 /**
- * Runnable to run the given {@link IFutureTask} periodically with the given 'fixed-delay' upon completion of its
+ * Runnable to run the given {@link JobFutureTask} periodically with the given 'fixed-delay' upon completion of its
  * execution.
  * <p/>
  * This class is necessary because {@link ScheduledThreadPoolExecutor} is not applicable for {@link JobManager} due to
@@ -31,11 +29,11 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 class FixedDelayRunnable implements Runnable {
 
   private final DelayedExecutor m_delayedExecutor;
-  private final IFutureTask<Void> m_futureTask;
+  private final JobFutureTask<Void> m_futureTask;
   private final long m_delay;
   private final TimeUnit m_unit;
 
-  public FixedDelayRunnable(final DelayedExecutor delayedExecutor, final IFutureTask<Void> futureTask, final long delay, final TimeUnit unit) {
+  public FixedDelayRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<Void> futureTask, final long delay, final TimeUnit unit) {
     m_delayedExecutor = delayedExecutor;
     m_futureTask = futureTask;
     m_delay = delay;

@@ -46,11 +46,12 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.job.internal.MutexAcquisitionFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
@@ -599,9 +600,9 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-        order(-1000).
-        initialInstance(jobManager).
-        applicationScoped(true)));
+            order(-1000).
+            initialInstance(jobManager).
+            applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
 
@@ -612,8 +613,8 @@ public class MutualExclusionTest {
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
         Runnable runnable = (Runnable) invocation.getArguments()[0];
-        if (runnable instanceof IFutureTask<?>) {
-          final IFutureTask<?> futureTask = (IFutureTask) invocation.getArguments()[0];
+        if (runnable instanceof JobFutureTask<?>) {
+          final JobFutureTask<?> futureTask = (JobFutureTask) invocation.getArguments()[0];
 
           switch (count.incrementAndGet()) {
             case 1: // job-1: RUN
@@ -740,8 +741,8 @@ public class MutualExclusionTest {
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
         Runnable runnable = (Runnable) invocation.getArguments()[0];
-        if (runnable instanceof IFutureTask<?>) {
-          final IFutureTask<?> futureTask = (IFutureTask) runnable;
+        if (runnable instanceof JobFutureTask<?>) {
+          final JobFutureTask<?> futureTask = (JobFutureTask) runnable;
 
           switch (count.incrementAndGet()) {
             case 1: // job-1: RUN
@@ -767,8 +768,8 @@ public class MutualExclusionTest {
               });
               break;
             case 2: // job-2: RUN after job1 enters blocking condition
-            case 4: // job-3: gets scheduled
-            case 5: // job-4: gets scheduled
+            case 3: // job-3: gets scheduled
+            case 4: // job-4: gets scheduled
               s_executor.execute(new Runnable() {
 
                 @Override
@@ -783,10 +784,10 @@ public class MutualExclusionTest {
                 }
               });
               break;
-            case 3: // job-1:  re-acquires the mutex after being released from the blocking condition
-              futureTask.reject();
-              break;
           }
+        }
+        else if (runnable instanceof MutexAcquisitionFutureTask) {
+          ((MutexAcquisitionFutureTask) runnable).reject(); // job-1:  re-acquires the mutex after being released from the blocking condition
         }
         else {
           s_executor.execute(runnable);
@@ -1246,15 +1247,14 @@ public class MutualExclusionTest {
 
           @Override
           public void run() throws Exception {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+            Thread.sleep(100);
             BC.setBlocking(false);
-            Thread.sleep(TimeUnit.SECONDS.toMillis(1));
           }
         });
         BC.waitFor();
         protocol.add("2: running");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).expirationTime(1, TimeUnit.MILLISECONDS));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).expirationTime(100, TimeUnit.MILLISECONDS));
 
     // Wait until entering blocking condition
     waitForPermitsAcquired(m_jobManager.getMutexSemaphores(), m_clientSession, 0);

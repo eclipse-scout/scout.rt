@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.context.ICancellable;
 
 /**
  * Represents a {@link Future} to interact with the associated job or to wait for the job to complete and to query it's
@@ -23,7 +24,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @see Future
  * @since 5.1
  */
-public interface IFuture<RESULT> {
+public interface IFuture<RESULT> extends ICancellable {
 
   /**
    * The {@link IFuture} which is currently associated with the current thread.
@@ -46,11 +47,13 @@ public interface IFuture<RESULT> {
    *          allowed to complete.
    * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally.
    */
+  @Override
   boolean cancel(boolean interruptIfRunning);
 
   /**
    * @return <code>true</code> if the associated job was cancelled before it completed normally.
    */
+  @Override
   boolean isCancelled();
 
   /**

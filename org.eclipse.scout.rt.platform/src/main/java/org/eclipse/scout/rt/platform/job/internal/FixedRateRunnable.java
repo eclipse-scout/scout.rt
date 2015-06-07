@@ -14,10 +14,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-
 /**
- * Runnable to run the given {@link IFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2 seconds
+ * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2 seconds
  * that the Runnable is executed every 2 seconds. If an execution takes longer than the period, the subsequent execution
  * starts immediately.
  * <p/>
@@ -32,10 +30,10 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 class FixedRateRunnable implements Runnable {
 
   private final DelayedExecutor m_delayedExecutor;
-  private final IFutureTask<Void> m_futureTask;
+  private final JobFutureTask<Void> m_futureTask;
   private final long m_periodNanos;
 
-  public FixedRateRunnable(final DelayedExecutor delayedExecutor, final IFutureTask<Void> futureTask, final long period, final TimeUnit unit) {
+  public FixedRateRunnable(final DelayedExecutor delayedExecutor, final JobFutureTask<Void> futureTask, final long period, final TimeUnit unit) {
     m_delayedExecutor = delayedExecutor;
     m_futureTask = futureTask;
     m_periodNanos = unit.toNanos(period);

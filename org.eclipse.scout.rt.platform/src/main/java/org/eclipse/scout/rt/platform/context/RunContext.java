@@ -217,8 +217,8 @@ public class RunContext {
    * Method invoked to fill this {@link RunContext} with values from the current calling {@link RunContext}.
    *
    * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i>
-   *             {@link RunContext} to be cancelled as well once the current calling {@link RunContext} is cancelled,
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
+   *             to be cancelled as well once the current calling {@link RunContext} is cancelled,
    *             but DOES NOT cancel the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is
    *             cancelled.
    * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the

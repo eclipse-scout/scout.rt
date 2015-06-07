@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobException;
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
@@ -40,7 +39,7 @@ public class BlockingCondition implements IBlockingCondition {
 
   private final Lock m_lock;
   private final Condition m_unblockedCondition;
-  private final Set<IFutureTask<?>> m_blockedJobFutures;
+  private final Set<JobFutureTask<?>> m_blockedJobFutures;
 
   private final JobManager m_jobManager;
 
@@ -51,7 +50,7 @@ public class BlockingCondition implements IBlockingCondition {
 
     m_lock = new ReentrantLock();
     m_unblockedCondition = m_lock.newCondition();
-    m_blockedJobFutures = Collections.synchronizedSet(new HashSet<IFutureTask<?>>()); // synchronized because modified/read by different threads.
+    m_blockedJobFutures = Collections.synchronizedSet(new HashSet<JobFutureTask<?>>()); // synchronized because modified/read by different threads.
   }
 
   @Override
@@ -80,7 +79,7 @@ public class BlockingCondition implements IBlockingCondition {
         // Unset blocking state so it is in correct state once this method returns.
         // That is crucial, if the invoker in turn waits for not-blocked jobs to complete, and expects just released jobs to be unblocked.
         // Otherwise, jobs that are unblocked by this invocation might be ignored, because still in blocked state.
-        for (final IFutureTask<?> blockedJobFuture : new HashSet<>(m_blockedJobFutures)) {
+        for (final JobFutureTask<?> blockedJobFuture : new HashSet<>(m_blockedJobFutures)) {
           unregisterAndMarkAsUnblocked(blockedJobFuture);
         }
 
@@ -198,12 +197,12 @@ public class BlockingCondition implements IBlockingCondition {
     }
   }
 
-  protected void unregisterAndMarkAsUnblocked(final IFutureTask<?> futureTask) {
+  protected void unregisterAndMarkAsUnblocked(final JobFutureTask<?> futureTask) {
     futureTask.setBlocked(false);
     m_blockedJobFutures.remove(futureTask);
   }
 
-  protected void registerAndMarkAsBlocked(final IFutureTask<?> futureTask) {
+  protected void registerAndMarkAsBlocked(final JobFutureTask<?> futureTask) {
     futureTask.setBlocked(true);
     m_blockedJobFutures.add(futureTask);
   }

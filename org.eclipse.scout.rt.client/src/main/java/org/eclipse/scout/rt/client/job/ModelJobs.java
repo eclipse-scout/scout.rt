@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
+import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 
 /**
  * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a {@link ClientRunContext}
@@ -277,7 +277,7 @@ public final class ModelJobs {
    */
   public static boolean isModelThread(IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    return ModelJobs.isModelJob(currentFuture) && ((IFutureTask) currentFuture).isMutexOwner() && (IClientSession) currentFuture.getJobInput().mutex() == clientSession;
+    return ModelJobs.isModelJob(currentFuture) && ((JobFutureTask) currentFuture).isMutexOwner() && (IClientSession) currentFuture.getJobInput().mutex() == clientSession;
   }
 
   /**

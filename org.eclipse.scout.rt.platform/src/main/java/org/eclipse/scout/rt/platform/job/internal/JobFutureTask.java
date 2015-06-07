@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
@@ -35,7 +34,6 @@ import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
@@ -56,7 +54,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT>, ICancellable {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
 
   protected final JobManager m_jobManager;
 
@@ -118,12 +116,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
   }
 
-  /**
-   * Method invoked if the executor rejected this task from being scheduled. This may occur when no more threads or
-   * queue slots are available because their bounds would be exceeded, or upon shutdown of the executor. This method is
-   * invoked from the thread that scheduled this task. When being invoked and this task is a mutex task, this task is
-   * the mutex owner.
-   */
   @Override
   public final void reject() {
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED, this));
@@ -178,7 +170,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return m_blocked;
   }
 
-  @Override
+  /**
+   * Marks this task as 'blocked' or 'unblocked'.
+   */
   public void setBlocked(final boolean blocked) {
     m_blocked = blocked;
   }
@@ -198,7 +192,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return getMutexObject() != null;
   }
 
-  @Override
+  /**
+   * @return <code>true</code> if this task is a mutex task and currently owns the mutex.
+   */
   public boolean isMutexOwner() {
     return m_jobManager.isMutexOwner(this);
   }
