@@ -363,6 +363,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   // override to freeze
+  /**
+   * @deprecated no replacement. Will be removed in the O-Release.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   protected final boolean getConfiguredAutoDisplayText() {
     return true;

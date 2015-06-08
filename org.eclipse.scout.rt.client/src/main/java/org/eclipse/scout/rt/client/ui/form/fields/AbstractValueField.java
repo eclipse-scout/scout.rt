@@ -86,8 +86,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
 
   /**
-   * Indicates whether setting the field's value results in an update of the display text.
+   * @deprecated no replacement. Will be removed in the O-Release.
+   *             Indicates whether setting the field's value results in an update of the display text.
    */
+  @Deprecated
   @Order(200)
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredAutoDisplayText() {
@@ -600,11 +602,19 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     propertySupport.setPropertyString(PROP_DISPLAY_TEXT, s);
   }
 
+  /**
+   * @deprecated no replacement. Will be removed in the O-Release.
+   */
+  @Deprecated
   @Override
   public boolean isAutoDisplayText() {
     return propertySupport.getPropertyBool(PROP_AUTO_DISPLAY_TEXT);
   }
 
+  /**
+   * @deprecated no replacement. Will be removed in the O-Release.
+   */
+  @Deprecated
   @Override
   public void setAutoDisplayText(boolean b) {
     propertySupport.setPropertyBool(PROP_AUTO_DISPLAY_TEXT, b);

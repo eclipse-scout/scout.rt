@@ -29,8 +29,12 @@ import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractValueField#setAutoDisplayText(boolean)}.
+ *
+ * @deprecated Will be removed with the O-Release.
  */
+@Deprecated
 @RunWith(PlatformTestRunner.class)
+@SuppressWarnings("deprecation")
 public class ValueFieldAutoDisplayTextTest extends AbstractValueField<Integer> {
 
   private static Locale s_original_locale;
