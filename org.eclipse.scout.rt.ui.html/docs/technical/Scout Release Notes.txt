@@ -294,3 +294,8 @@ Removed Cell instance from CalendarComponent
 ASA 08.06.2015 [Ticket #158271]
 - returned collection of ITableColumnFilterManager.getFilters() is now unmodifiable
 - new method ITableColumnFilterManager.removeFilter(IColumn col)
+
+JGU 08.06.2015
+Deprecated getConfiguredAutoDisplayText in AbstractValueField.
+The display text is always updated automatically.
+
