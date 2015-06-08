@@ -345,6 +345,14 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     } else if (modifierCount === 0) {
       days = diff;
     }
+    else{
+      //no navigation impact on date field.
+      if (this._picker.isOpen()) {
+        this._picker.close();
+        $(document).off('mousedown', this._mouseDownListener);
+      }
+      return true;
+    }
 
     this._picker.shiftSelectedDate(years, months, days);
     return false;
