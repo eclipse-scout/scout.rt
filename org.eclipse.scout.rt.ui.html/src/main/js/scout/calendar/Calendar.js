@@ -295,13 +295,9 @@ scout.Calendar.prototype._calcExactRange = function() {
  * as it contains also dates from the previous and next month.
  */
 scout.Calendar.prototype._calcViewRange = function() {
-  if (this._isMonth()) {
-    var viewFrom = _calcViewFromDate(this._exactRange.from),
-      viewTo = _calcViewToDate(viewFrom);
-    return new scout.Range(viewFrom, viewTo);
-  } else {
-    return this._exactRange;
-  }
+  var viewFrom = _calcViewFromDate(this._exactRange.from),
+    viewTo = _calcViewToDate(viewFrom);
+  return new scout.Range(viewFrom, viewTo);
 
   function _calcViewFromDate(fromDate) {
     var i, tmpDate = new Date(fromDate.valueOf());
@@ -552,7 +548,7 @@ scout.Calendar.prototype.layoutSize = function(animate) {
     var $e = $(this),
       w = $e.data('new-width'),
       h = $e.data('new-height');
-    $.l($e.width(), w);
+
     if (w !== undefined && w !== $e.width()) {
       if (animate) {
         $e.animateAVCSD('width', w);
