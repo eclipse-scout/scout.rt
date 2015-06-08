@@ -5,57 +5,48 @@
 }
 
 .check-box-field > .field {
-  & > label {
+  & > div {
     cursor: pointer;
     display: block;
     position: relative;
     padding-left: 25px;
     margin-right: 15px;
     font-size: 13px;
-
+    outline: none;
     white-space: nowrap;
     /* FIXME NBU overflow cannot be set, checkbox looks ugly because height is too small */
 /*     .overflow-ellipsis-nowrap;     */
   }
 
-  & > label::before {
+  & > div::before {
     .checkboxLabelBefore(0px, 0px, 0px, 10px, -2px);
   }
 
-  & > input[type=checkbox] {
-    /* no visiblity and display change to be focusable */
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    opacity: 0;
-  }
-
-  & > input[type=checkbox]:disabled + label:hover::before {
-    .checkboxLabelBeforeDisabledBorder;
-  }
-
-  & > input[type=checkbox]:focus + label::before {
+  & > div:focus::before {
     .checkboxLabelBeforeFocus;
   }
 
-  & > input[type=checkbox]:checked + label::before {
+  & > div.disabled:hover::before {
+    .checkboxLabelBeforeDisabledBorder;
+  }
+
+  & > div::before {
+    .checkboxLabelBeforeFocus;
+  }
+
+  & > div.checked::before {
     .checkboxLabelBeforeChecked;
   }
 
-  & > label::before {
+  & > div::before {
     .checkboxLabelBeforeBorder;
   }
 
-  & > input[type=checkbox]:disabled + label::before {
+  & > div.disabled::before {
     .checkboxLabelBeforeDisabled;
   }
 
-  & > input[type=checkbox]:disabled + label {
+  & > div.disabled {
     .checkboxLabelDisabled;
   }
 }

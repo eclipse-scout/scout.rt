@@ -1,7 +1,6 @@
 scout.CheckBoxField = function() {
   scout.CheckBoxField.parent.call(this);
   this._$checkBox;
-  this._$checkBoxLabel;
 };
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
@@ -14,27 +13,48 @@ scout.CheckBoxField.prototype._render = function($parent) {
   // the form-field. If we'd apply the width to the checkbox element itself, the
   // checkbox is always in the center.
 
-  this._$checkBox = $('<input>')
-    .attr('id', this.refFieldId)
-    .attr('type', 'checkbox');
-
   this.addFieldContainer($('<span>'));
+  this._$checkBox = $('<div>')
+  .appendTo(this.$fieldContainer);
+  //TODO nbu add keystrokes
+
+
+  if(this.enabled){
+    this._$checkBox.attr('tabindex', '0');
+  }
+
   this.addField(this._$checkBox);
   this._$checkBox.appendTo(this.$fieldContainer);
-
-  this._$checkBoxLabel = $('<label>')
-    .attr('for', this.refFieldId)
-    .appendTo(this.$fieldContainer);
-
-  this._$checkBox.on('click', this._onClick.bind(this));
+  this._$checkBox.on('mousedown', this._onMouseDown.bind(this));
   this.addStatus();
 };
 
-scout.CheckBoxField.prototype._onClick = function() {
-  var uiChecked = this._$checkBox[0].checked;
+scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
+  //nop;
+};
+
+scout.CheckBoxField.prototype._onMouseDown = function() {
+  if(!this.enabled){
+    return;
+  }
+  this._$checkBox.toggleClass('checked');
+  var uiChecked = this._$checkBox.hasClass('checked');
   this.session.send(this.id, 'clicked', {
     checked: uiChecked
   });
+};
+
+scout.CheckBoxField.prototype._renderEnabled=function(){
+  scout.CheckBoxField.parent.prototype._renderEnabled .call(this);
+  if (this._$checkBox) {
+    if(this.enabled){
+      this._$checkBox.attr('tabindex', '0');
+    }
+    else {
+      this._$checkBox.removeAttr('tabindex');
+    }
+    this._$checkBox.toggleClass('disabled', !this.enabled);
+  }
 };
 
 scout.CheckBoxField.prototype._renderProperties = function() {
@@ -43,11 +63,7 @@ scout.CheckBoxField.prototype._renderProperties = function() {
 };
 
 scout.CheckBoxField.prototype._renderValue = function(value) {
-  if (value) {
-    this._$checkBox[0].checked = 'checked';
-  } else {
-    this._$checkBox[0].checked = '';
-  }
+  this._$checkBox.toggleClass('checked', value);
 };
 
 /**
@@ -64,8 +80,8 @@ scout.CheckBoxField.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   }
-  if (this._$checkBoxLabel) {
-    this._$checkBoxLabel.text(label);
+  if (this._$checkBox) {
+    this._$checkBox.text(label);
   }
   // Make sure an empty label is as height as the other labels, especially important for top labels
   this.$label.html('&nbsp;').addClass('empty');
