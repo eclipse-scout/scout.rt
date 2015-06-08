@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.HexUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -90,7 +90,7 @@ public abstract class AbstractHttpSessionCacheService extends AbstractService im
   protected String serializedString(Object e) throws ProcessingException {
     try {
       byte[] bytes = m_objs.serialize(e);
-      return StringUtility.bytesToHex(bytes);
+      return HexUtility.encode(bytes);
     }
     catch (IOException ex) {
       throw new ProcessingException("Error during Serialization ", ex);
@@ -109,7 +109,7 @@ public abstract class AbstractHttpSessionCacheService extends AbstractService im
       return null;
     }
     try {
-      byte[] bytes = StringUtility.hexToBytes(s);
+      byte[] bytes = HexUtility.decode(s);
       if (bytes != null) {
         return m_objs.deserialize(bytes, Object.class);
       }
