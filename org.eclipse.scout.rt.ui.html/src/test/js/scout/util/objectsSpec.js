@@ -91,4 +91,18 @@ describe("scout.objects", function() {
 
   });
 
+  describe('isNumeric', function() {
+    it('returns true when argument is a number', function() {
+      expect(scout.objects.isNumber(0)).toBe(true);
+      expect(scout.objects.isNumber(1)).toBe(true);
+      expect(scout.objects.isNumber(1.0)).toBe(true);
+      expect(scout.objects.isNumber(-1)).toBe(true);
+      expect(scout.objects.isNumber('0x0a')).toBe(true); // valid hex-value
+      expect(scout.objects.isNumber(null)).toBe(true); // a number reference could be null
+
+      expect(scout.objects.isNumber(undefined)).toBe(false);
+      expect(scout.objects.isNumber('foo')).toBe(false);
+    });
+  });
+
 });

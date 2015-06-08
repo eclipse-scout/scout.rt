@@ -59,8 +59,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
   toolsWidth = this._toolsWidth($tools);
   tabsWidth = contWidth - toolsWidth - logoWidth;
-
-  $.log.info('numTabs=' + numTabs + ' contWidth=' + contWidth + ' toolsWidth=' + toolsWidth + ' logoWidth=' + logoWidth + ' --> tabsWidth=' + tabsWidth);
   $tools.cssLeft(contWidth - toolsWidth - logoWidth);
 
   this._overflowTabsIndizes = [];

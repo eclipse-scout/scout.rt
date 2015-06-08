@@ -4,6 +4,8 @@
 .tab-area {
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
+  white-space: nowrap;
+  overflow: hidden;
 
   & > button {
     position: relative;
@@ -53,5 +55,19 @@
     background-color: @palette-gray-4;
     content: '';
     display: block;
+  }
+
+  & > .overflow-tab-item {
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    padding: 0 20px;
+
+    &::before {
+      .font-icon;
+      font-size: 17px;
+      color: @icon-color;
+      content: @icon-ellipsis-v;
+    }
   }
 }

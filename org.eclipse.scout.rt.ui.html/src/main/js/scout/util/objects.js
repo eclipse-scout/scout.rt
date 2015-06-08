@@ -52,5 +52,9 @@ scout.objects = {
    */
   isPlainObject: function(obj) {
     return (typeof obj === 'object' && !Array.isArray(obj));
+  },
+
+  isNumber: function(obj) {
+    return !isNaN(obj) && isFinite(obj);
   }
 };

@@ -71,6 +71,28 @@
   vertical-align:top;
 }
 
+.taskbar-tabs > .overflow-tab-item {
+  border-right: 1px solid @border-color;
+  display: inline-block;
+  height: 50px;
+  width: 30px;
+  padding-top: 17px;
+  text-align: center;
+  cursor: pointer;
+
+  &::before {
+    .font-icon;
+    color: @icon-color;
+    content: @icon-chevron-right;
+  }
+
+  & .num-tabs {
+    color: @disabled-color;
+    font-size: 10px;
+    margin-top: -4px;
+  }
+}
+
 .taskbar-tools {
    float: right;
 }
@@ -189,28 +211,6 @@
 
   &.disabled {
     background-color: @disabled-color;
-  }
-}
-
-.overflow-tab-item {
-  border-right: 1px solid @border-color;
-  display: inline-block;
-  height: 50px;
-  width: 30px;
-  padding-top: 17px;
-  text-align: center;
-  cursor: pointer;
-
-  &::before {
-    .font-icon;
-    color: @icon-color;
-    content: @icon-chevron-right;
-  }
-
-  & .num-tabs {
-    color: @disabled-color;
-    font-size: 10px;
-    margin-top: -4px;
   }
 }
 

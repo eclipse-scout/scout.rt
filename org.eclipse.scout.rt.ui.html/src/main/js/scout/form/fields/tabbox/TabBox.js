@@ -21,118 +21,126 @@ scout.TabBox.prototype._render = function($parent) {
   this._$tabContentCache = []; // clear cache when tab-box is rendered anew
   this.addContainer($parent, 'tab-box', new scout.TabBoxLayout(this));
 
-  this._$tabArea = this.$container.appendDiv('tab-area');
+  this._$tabArea = this.$container
+    .appendDiv('tab-area')
+    .on('keydown', this._onKeyDown.bind(this));
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.NullLayout());
-  var tabItem, $tab;
-  for (var i = 0; i < this.tabItems.length; i++) {
-    tabItem = this.tabItems[i];
-    $tab = tabItem.renderTab(this._$tabArea, i).
-      on('mousedown', this._onMouseDown.bind(this)).
-      on('keydown', this._onKeyDown.bind(this));
-    // only the selected tab is focusable
-    if (i !== this.selectedTab) {
-      $tab.attr('tabindex', -1);
-    }
-  }
 
   this._$tabContent = this.$container.appendDiv('tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
+
+  this._renderTabs();
+  this._renderTabContent();
 };
 
-scout.TabBox.prototype._renderProperties = function() {
-  scout.TabBox.parent.prototype._renderProperties.call(this);
-  this._renderSelectedTab(this.selectedTab);
+scout.TabBox.prototype._renderTabs = function() {
+  this.tabItems.forEach(function(tabItem) {
+    tabItem.renderTab(this._$tabArea);
+  }, this);
+  // only the selected tab is focusable
+  this.tabItems[this.selectedTab].setTabTabbable(true);
 };
 
-scout.TabBox.prototype._onMouseDown = function(e) {
-  var tabIndex = $(e.target).data('tabIndex');
-  this._selectTab(tabIndex);
+scout.TabBox.prototype.rebuildTabs = function() {
+  $.log.info('rebuildTabs');
+  this.tabItems.forEach(function(tabItem) {
+    if (!tabItem._tabRendered) {
+      tabItem.renderTab(this._$tabArea);
+    }
+  }, this);
 };
 
-scout.TabBox.prototype._selectTab = function(tabIndex) {
-  this.selectedTab = tabIndex;
-  this.session.send(this.id, 'selected', {
-    tabIndex: tabIndex
-  });
-  this._renderSelectedTab(tabIndex);
+//scout.TabBox.prototype._renderProperties = function() {
+//  scout.TabBox.parent.prototype._renderProperties.call(this);
+//  this._renderSelectedTab(this.selectedTab);
+//};
+
+/**
+ * @param vararg either 'tabIndex' (numeric) or 'tabItem' (instanceof scout.TabItem)
+ */
+scout.TabBox.prototype._selectTab = function(vararg) {
+  var tabIndex;
+  if (scout.objects.isNumber(vararg)) { // FIXME AWE: remove? unused?
+    tabIndex = vararg;
+  }
+  else if (vararg instanceof scout.TabItem) {
+    tabIndex = this.tabItems.indexOf(vararg);
+  }
+  else {
+    throw new Error('Illegal argument for vararg');
+  }
+
+  if (tabIndex != this.selectedTab) {
+    var oldSelectedTab = this.selectedTab;
+    this.selectedTab = tabIndex;
+    this.session.send(this.id, 'selected', {
+      tabIndex: tabIndex
+    });
+
+    $.log.info('focus tabIndex=' + this.selectedTab);
+    this.tabItems[oldSelectedTab].setTabSelected(false);
+    this.tabItems[oldSelectedTab].setTabTabbable(false);
+
+    this.tabItems[this.selectedTab].setTabSelected(true);
+    this.tabItems[this.selectedTab].setTabTabbable(true);
+    setTimeout(function() { // FIXME AWE: wieso braucht es hiert NOCH ein setTimeoput??
+      this.tabItems[this.selectedTab].focusTab();
+    }.bind(this));
+
+    var $tabContent = this._$tabContent.children().first();
+    if ($tabContent.length > 0) {
+      this.session.detachHelper.beforeDetach($tabContent);
+      $tabContent.detach();
+      this._$tabContentCache[oldSelectedTab] = $tabContent;
+    }
+
+    this._renderTabContent();
+  }
 };
 
 // keyboard navigation in tab-box button area
-scout.TabBox.prototype._onKeyDown = function(e) {
+scout.TabBox.prototype._onKeyDown = function(event) {
   var tabIndex, navigationKey =
-    e.which === scout.keys.LEFT ||
-    e.which === scout.keys.RIGHT;
+    event.which === scout.keys.LEFT ||
+    event.which === scout.keys.RIGHT;
+
   if (!navigationKey) {
     return true;
   }
 
-  tabIndex = $(e.target).data('tabIndex');
-  if (e.which === scout.keys.LEFT) {
+  tabIndex = this.selectedTab;
+  if (event.which === scout.keys.LEFT) {
     tabIndex--;
   }
-
-  if (e.which === scout.keys.RIGHT) {
+  else if (event.which === scout.keys.RIGHT) {
     tabIndex++;
   }
 
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
     setTimeout(function() {
       if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
-        this._selectTab(tabIndex);
-        var $tabButton = this._$tabArea.children('button').eq(tabIndex);
-        $tabButton.focus();
+        var tabItem = this.tabItems[tabIndex];
+        if (tabItem._tabRendered) {
+          $.log.info('_selectTab tabItem=' + tabItem);
+          this._selectTab(tabItem);
+        }
       }
     }.bind(this));
   }
-  e.preventDefault();
+
+  event.preventDefault();
 };
 
-scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
-  $.log.debug('(TabBox#_renderSelectedTab) selectedTab='+selectedTab);
-  var $tabs = this._$tabArea.children('button');
-
-  var $oldTabButton;
-  for (var i = 0; i < $tabs.length; i++) {
-    var $tabButton = $($tabs[i]);
-    if ($tabButton.hasClass('selected')) {
-      $oldTabButton = $tabButton;
-      $oldTabButton.removeClass('selected');
-    }
-  }
-  var $selectedTabButton;
-  if (selectedTab >= 0 && selectedTab < $tabs.length) {
-    $selectedTabButton = $($tabs[selectedTab]);
-    $selectedTabButton.addClass('selected');
-  }
-
-  // deal with HTML attr 'tabindex' used for focus handling
-  // don't confuse jquery data 'tabIndex' and HTML attr 'tabindex' here.
-  // the former is used for internal widget logic, the later for focus handling
-  if ($oldTabButton && $selectedTabButton) {
-    $oldTabButton.attr('tabindex', -1);
-    $selectedTabButton.removeAttr('tabindex');
-  }
-
-  // replace tab-content
-  var $tabContent = this._$tabContent.children().first();
-  if ($tabContent.length > 0) {
-    this.session.detachHelper.beforeDetach($tabContent);
-    $tabContent.detach();
-    var oldTabIndex = $tabContent.data('tabIndex');
-    if (oldTabIndex !== undefined) {
-      this._$tabContentCache[oldTabIndex] = $tabContent;
-    }
-  }
-
+scout.TabBox.prototype._renderTabContent = function($tabContent) {
+  // add new tab-content (use from cache or render)
   var $cachedTabContent = this._$tabContentCache[this.selectedTab];
   if ($cachedTabContent) {
     $cachedTabContent.appendTo(this._$tabContent);
     this.session.detachHelper.afterAttach($cachedTabContent);
   } else {
     this.tabItems[this.selectedTab].render(this._$tabContent);
-    this._$tabContent.children().first().data('tabIndex', this.selectedTab);
 
     /* in Swing there's some complicated logic dealing with borders and labels
      * that determines whether the first group-box in a tab-box has a title or not.

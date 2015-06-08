@@ -3,8 +3,11 @@
 
 scout.TabItem = function() {
   scout.TabItem.parent.call(this);
-  this._$tabButton;
-  this._tabButtonRendered = false;
+  this.$tabContainer;
+  this._tabRendered = false;
+  this._tabSelected = false;
+  this._tabTabbable = false;
+//  this._tabIndex    = 0;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 
@@ -14,14 +17,65 @@ scout.inherits(scout.TabItem, scout.GroupBox);
  *
  * @return tab button as JQuery object
  */
-scout.TabItem.prototype.renderTab = function($parent, tabIndex) {
-  this._$tabButton = $('<button>').
-  text(scout.strings.removeAmpersand(this.label)).
-  appendTo($parent).
-  data('tabIndex', tabIndex);
-  this._tabButtonRendered = true;
+scout.TabItem.prototype.renderTab = function($parent) {
+  if (this._tabRendered) {
+    throw new Error('Tab already rendered');
+  }
+  this.$tabContainer = $('<button>')
+    .text(scout.strings.removeAmpersand(this.label))
+    .appendTo($parent)
+    .data('tabItem', this)
+    .on('mousedown', this._onTabMouseDown.bind(this));
+
+  this._renderTabTabbable();
+  this._renderTabSelected();
+  this._tabRendered = true;
   this._updateTabButton();
-  return this._$tabButton;
+};
+
+scout.TabItem.prototype._onTabMouseDown = function(event) {
+  this.parent._selectTab(this);
+};
+
+
+
+scout.TabItem.prototype.focusTab = function() {
+  $.log.info('focusTab =' + this + ' tabindex=' + this.$tabContainer.attr('tabindex'));
+  this.$tabContainer.focus();
+};
+
+scout.TabItem.prototype.setTabSelected = function(tabSelected) {
+  var oldTabSelected = this._tabSelected;
+  this._tabSelected = tabSelected;
+  if (oldTabSelected != tabSelected) {
+    this._renderTabSelected();
+  }
+};
+
+scout.TabItem.prototype._renderTabSelected = function() {
+  this.$tabContainer.select(this._tabSelected);
+};
+
+scout.TabItem.prototype.setTabTabbable = function(tabTabbable) {
+  var oldTabTabbable = this._tabTabbable;
+  this._tabTabbable = tabTabbable;
+  if (oldTabTabbable != tabTabbable) {
+    this._renderTabTabbable();
+  }
+};
+
+scout.TabItem.prototype._renderTabTabbable = function() {
+  if (this._tabTabbable) {
+    this.$tabContainer.removeAttr('tabindex');
+  } else {
+    this.$tabContainer.attr('tabindex', -1);
+  }
+};
+
+scout.TabItem.prototype.removeTab = function() {
+  $.log.info('removeTab =' + this);
+  this.$tabContainer.remove();
+  this._tabRendered = false;
 };
 
 scout.TabItem.prototype._syncMarked = function(marked) {
@@ -52,6 +106,6 @@ scout.TabItem.prototype._renderVisible = function(visible) {
 };
 
 scout.TabItem.prototype._updateTabButton = function() {
-  this._$tabButton.toggleClass('marked', this.marked);
-  this._$tabButton.setVisible(this.visible);
+  this.$tabContainer.toggleClass('marked', this.marked);
+  this.$tabContainer.setVisible(this.visible);
 };
