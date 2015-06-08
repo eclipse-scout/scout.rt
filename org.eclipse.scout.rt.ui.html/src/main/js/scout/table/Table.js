@@ -269,7 +269,7 @@ scout.Table.prototype.clearSelection = function(dontFire) {
 });
   this.selectedRows.length=0;
   if (!dontFire) {
-    this.sendRowsPending=true;
+    this._sendRowsPending=true;
     this.notifyRowSelectionFinished();
   }
 };
@@ -292,7 +292,7 @@ scout.Table.prototype.selectAll = function() {
   this.rows.forEach(function(row) {
     this.addRowToSelection(row, true);
   }, this);
-  this.sendRowsPending=true;
+  this._sendRowsPending=true;
   this.notifyRowSelectionFinished();
 };
 

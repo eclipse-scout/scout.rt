@@ -66,10 +66,6 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
 };
 
 scout.TableSelectionHandler.prototype.onMouseOver = function(event) {
-  if (!this.table.multiSelect) {
-    return;
-  }
-
   var $row = $(event.currentTarget),
     row = $row.data('row');
   this.toIndex = this._allRows.indexOf(row);

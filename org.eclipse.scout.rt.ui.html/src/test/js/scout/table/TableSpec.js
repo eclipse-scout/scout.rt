@@ -195,7 +195,7 @@ describe("Table", function() {
       table.render(session.$entryPoint);
 
       var rows = [table.rows[0], table.rows[4]];
-      table.selectRows(rows);
+      table.selectRows(rows, true);
 
       sendQueuedAjaxCalls();
 
@@ -893,8 +893,8 @@ describe("Table", function() {
       expect($rows).not.toHaveClass('selected');
 
       $row0.triggerMouseDown();
-      $row1.trigger('mousemove');
-      $row2.trigger('mousemove');
+      $row1.trigger('mouseover');
+      $row2.trigger('mouseover');
       $row2.triggerMouseUp();
 
       expect($row0).toHaveClass('selected');
@@ -917,8 +917,8 @@ describe("Table", function() {
       expect($rows).not.toHaveClass('selected');
 
       $row0.triggerMouseDown();
-      $row1.trigger('mousemove');
-      $row2.trigger('mousemove');
+      $row1.trigger('mouseover');
+      $row2.trigger('mouseover');
       $row2.triggerMouseUp();
 
       sendQueuedAjaxCalls();
@@ -956,8 +956,8 @@ describe("Table", function() {
       expect($rows).not.toHaveClass('selected');
 
       $row0.triggerMouseDown();
-      $row1.trigger('mousemove');
-      $row2.trigger('mousemove');
+      $row1.trigger('mouseover');
+      $row2.trigger('mouseover');
       $row2.triggerMouseUp();
 
       var expectedSelectedRowIndex = (selectionMovable ? 2 : 0);
