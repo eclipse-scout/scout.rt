@@ -16,8 +16,6 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addFieldContainer($('<span>'));
   this._$checkBox = $('<div>')
   .appendTo(this.$fieldContainer);
-  //TODO nbu add keystrokes
-
 
   if(this.enabled){
     this._$checkBox.attr('tabindex', '0');
@@ -29,11 +27,20 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addStatus();
 };
 
+scout.CheckBoxField.prototype._createKeyStrokeAdapter = function(){
+  return new scout.CheckBoxKeyStrokeAdapter(this);
+};
+
 scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
   //nop;
 };
 
 scout.CheckBoxField.prototype._onMouseDown = function() {
+  this._toggleChecked();
+};
+
+scout.CheckBoxField.prototype._toggleChecked = function(){
+
   if(!this.enabled){
     return;
   }

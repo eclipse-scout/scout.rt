@@ -157,6 +157,7 @@ __include("scout/form/fields/button/ButtonKeyStroke.js");
 __include("scout/form/fields/button/ButtonKeyStrokeAdapter.js");
 __include("scout/form/fields/calendarfield/CalendarField.js");
 __include("scout/form/fields/checkbox/CheckBoxField.js");
+__include("scout/form/fields/checkbox/CheckBoxKeyStrokeAdapter.js");
 __include("scout/form/fields/colorfield/ColorField.js");
 __include("scout/form/fields/datefield/DateField.js");
 __include("scout/form/fields/datefield/DateFieldKeyStrokeAdapter.js");
