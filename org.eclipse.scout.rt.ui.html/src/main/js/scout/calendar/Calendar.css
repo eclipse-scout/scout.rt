@@ -417,7 +417,7 @@
   & .calendar-week-name {
     font-size: 11px;
     color: @palette-gray-5;
-    padding-top: 9px;
+    padding-top: 8px;
     text-align: center;
   }
 
@@ -445,13 +445,21 @@
 
   & .calendar-day-name {
     line-height: @calendar-title-height;
-    padding-left: 7px;
+
+    &::before {
+      position: absolute;
+      content: attr(data-day-name);
+      left: 7px;
+      bottom: 0px;
+      color: @text-color;
+    }
+
   }
 
   & .calendar-day::before {
     position: absolute;
     content: attr(data-day-name);
-    color: @palette-gray-6;
+    color: @text-color;
     left: 7px;
     top: 7px;
     z-index: 2;

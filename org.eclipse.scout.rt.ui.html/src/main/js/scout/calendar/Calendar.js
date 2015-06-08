@@ -540,7 +540,8 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   }
 
   $('.calendar-day-name', this.$grid).each(function(index) {
-    $(this).text(weekdays[index]);
+    //$(this).text(weekdays[index]);
+    $(this).attr('data-day-name', weekdays[index]);
   });
 
   // animate old to new sizes
