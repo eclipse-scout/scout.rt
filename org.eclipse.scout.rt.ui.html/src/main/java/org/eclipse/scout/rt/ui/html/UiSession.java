@@ -98,6 +98,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private IJobListener m_modelJobFinishedListener;
   private final ArrayBlockingQueue<Object> m_backgroundJobNotificationQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_notificationToken = new Object();
+  private volatile long m_lastAccessedTime;
 
   public UiSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -194,6 +195,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     m_initialized = true;
 
+    touch();
     m_currentHttpRequest.set(httpRequest);
     m_currentJsonRequest = jsonStartupRequest;
     m_clientSessionId = jsonStartupRequest.getClientSessionId();
@@ -224,6 +226,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   @Override
   public ReentrantLock uiSessionLock() {
     return m_uiSessionLock;
+  }
+
+  @Override
+  public void touch() {
+    m_lastAccessedTime = System.currentTimeMillis();
+  }
+
+  @Override
+  public long getLastAccessedTime() {
+    return m_lastAccessedTime;
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
@@ -584,10 +596,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public void waitForBackgroundJobs() {
-    LOG.trace("Wait until background job terminates...");
+  public void waitForBackgroundJobs(int pollWaitSeconds) {
+    LOG.trace("Wait until background job terminates or session timeout...");
     try {
-      m_backgroundJobNotificationQueue.poll(1, TimeUnit.MINUTES);
+      m_backgroundJobNotificationQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
     }
     catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for notification token", e);

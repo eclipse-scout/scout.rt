@@ -15,11 +15,13 @@ import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
+import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
@@ -41,6 +43,20 @@ public interface IUiSession {
    * Returns a reentrant lock that can be used to synchronize on the {@link IUiSession}.
    */
   ReentrantLock uiSessionLock();
+
+  /**
+   * All requests except the polling requests are calling this method from the {@link JsonMessageRequestInterceptor}
+   * <p>
+   * Note that {@link HttpSession#getLastAccessedTime()} is also updated on polling requests
+   */
+  void touch();
+
+  /**
+   * @return the last access time in millis since 01.01.1970 of a request, except polling requests
+   *         <p>
+   *         see {@link #touch()}
+   */
+  long getLastAccessedTime();
 
   void dispose();
 
@@ -102,7 +118,7 @@ public interface IUiSession {
   /**
    * Blocks the current thread/request until a model job started by a background job has terminated.
    */
-  void waitForBackgroundJobs();
+  void waitForBackgroundJobs(int pollWaitSeconds);
 
   /**
    * Sends a "localeChanged" event to the UI. All locale-relevant data (number formats, texts map etc.) is sent along.

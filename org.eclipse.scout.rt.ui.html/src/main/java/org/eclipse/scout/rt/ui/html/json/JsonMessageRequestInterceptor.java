@@ -67,7 +67,6 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     try {
       //disable cache
       servlet.getHttpCacheControl().disableCacheHeaders(httpReq, httpResp);
-
       JSONObject jsonReqObj = decodeJSONRequest(httpReq);
       if (isPingRequest(jsonReqObj)) {
         writeResponse(httpResp, createPingResponse());
@@ -91,10 +90,13 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           // Blocks the current thread until:
           // - a model job terminates
           // - the max. wait time has exceeded
+          int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
+          int maxIdle = httpReq.getSession().getMaxInactiveInterval();
+          int pollWait = Math.max(Math.min(maxIdle - curIdle, 60), 0);
           if (LOG.isDebugEnabled()) {
-            LOG.debug("polling begin");
+            LOG.debug("polling begin for " + pollWait + " seconds");
           }
-          uiSession.waitForBackgroundJobs();
+          uiSession.waitForBackgroundJobs(pollWait);
           if (LOG.isDebugEnabled()) {
             LOG.debug("polling end after " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
           }
@@ -194,13 +196,19 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         return null;
       }
 
+      //check startup
+      if (uiSession == null && !jsonReq.isStartupRequest()) {
+        LOG.info("Request cannot be processed due to UI session timeout [id=" + jsonReq.getUiSessionId() + "]");
+        writeResponse(resp, createSessionTimeoutResponse());
+        return null;
+      }
+      else if (uiSession != null && jsonReq.isStartupRequest()) {
+        throw new IllegalStateException("Startup requested for existing UI session with ID " + jsonReq.getUiSessionId());
+      }
+
       if (uiSession == null) {
-        if (!jsonReq.isStartupRequest()) {
-          LOG.info("Request cannot be processed due to UI session timeout [id=" + jsonReq.getUiSessionId() + "]");
-          writeResponse(resp, createSessionTimeoutResponse());
-          return null;
-        }
-        LOG.info("Creating new UI session with ID " + jsonReq.getUiSessionId() + "...");
+        LOG.info("Creating new UI session with ID " + jsonReq.getUiSessionId() + ", timeout after " + req.getSession().getMaxInactiveInterval() + " sec...");
+
         uiSession = BEANS.get(IUiSession.class);
         uiSession.uiSessionLock().lock();
         try {
@@ -211,9 +219,21 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           uiSession.uiSessionLock().unlock();
         }
       }
-      else if (jsonReq.isStartupRequest()) {
-        throw new IllegalStateException("Startup requested for existing UI session with ID " + jsonReq.getUiSessionId());
+
+      //check timeout
+      int idleSeconds = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
+      if (idleSeconds > httpSession.getMaxInactiveInterval()) {
+        LOG.info("detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + httpSession.getMaxInactiveInterval() + ")");
+        httpSession.invalidate();
+        writeResponse(resp, createSessionTimeoutResponse());
+        return null;
       }
+
+      //update timeout
+      if (!jsonReq.isPollForBackgroundJobsRequest()) {
+        uiSession.touch();
+      }
+
       return uiSession;
     }
     finally {
