@@ -145,12 +145,12 @@
 .calendar-component {
   position: relative;
   float: left;
-  line-height: 20px;
-  height: 20px;
+  line-height: 24px;
+  height: 24px;
   padding-left: 4px;
   .overflow-ellipsis;
   min-height: 20px;
-  width: calc(~"100%" - 38px);
+  width: calc(~"100%" - 32px);
   border-left: 4px solid;
   text-align: left;
 
@@ -417,7 +417,7 @@
   & .calendar-week-name {
     font-size: 11px;
     color: @palette-gray-5;
-    padding-top: 8px;
+    padding-top: 9px;
     text-align: center;
   }
 
@@ -445,21 +445,13 @@
 
   & .calendar-day-name {
     line-height: @calendar-title-height;
-
-    &::before {
-      position: absolute;
-      content: attr(data-day-name);
-      left: 7px;
-      bottom: 0px;
-      color: @text-color;
-    }
-
+    padding-left: 7px;
   }
 
   & .calendar-day::before {
     position: absolute;
     content: attr(data-day-name);
-    color: @text-color;
+    color: @palette-gray-6;
     left: 7px;
     top: 7px;
     z-index: 2;
@@ -542,6 +534,7 @@
   & .calendar-week-task::after {
     position: absolute;
     height: 1px;
+    z-index: 2;
     width: 100%;
     content: " ";
     background-color: @palette-gray-4;
@@ -558,23 +551,20 @@
 
   & .calendar-component {
     margin-left: 32px;
-    margin-bottom: -3px;
-    margin-top: 6px;
+    margin-bottom: 1px;
+    margin-top: 1px;
 
-    &.many-items {
-      width: calc(~"50%" - 38px);
-      margin-right: -20px;
-    }
   }
 
   & .component-day,
   & .component-task {
     position: absolute;
     word-break: break-all;
-    left: 7px;
-    border-style: wave;
-    margin-left: 0px;
-    width: calc(~"100%" - 14px);
+    left: 0px;
+    margin: 0px;
+    width: 100%;
+    height: 24px;
+    line-height: 24px;
    }
 
   & .component-open-top {
@@ -588,7 +578,7 @@
       width: 16px;
       height: 16px;
       left: calc(~"50%" - 8px);
-      top: -10px;
+      top: -8px;
       transform: rotate(45deg);
       background-color: @palette-white;
     }
@@ -604,7 +594,7 @@
       width: 16px;
       height: 16px;
       left: calc(~"50%" - 8px);
-      bottom: -10px;
+      bottom: -8px;
       transform: rotate(45deg);
       background-color: inherit;
     }

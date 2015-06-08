@@ -173,14 +173,14 @@ scout.Calendar.prototype._renderProperties = function() {
 };
 
 scout.Calendar.prototype._renderComponents = function() {
-  var taskOffset = 5;
+  var taskOffset = 1;
 
   this.components.forEach(function(component) {
     component.remove();
     component.render(this.$container);
     if (component._isTask()) {
       component._arrangeTask(taskOffset);
-      taskOffset += 25;
+      taskOffset += 26;
     }
   });
   this._arrangeComponents();
@@ -540,7 +540,6 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   }
 
   $('.calendar-day-name', this.$grid).each(function(index) {
-    //$(this).text(weekdays[index]);
     $(this).attr('data-day-name', weekdays[index]);
   });
 
@@ -550,14 +549,14 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       w = $e.data('new-width'),
       h = $e.data('new-height');
 
-    if (w !== undefined && w !== $e.width()) {
+    if (w !== undefined && w !== $e.outerWidth()) {
       if (animate) {
         $e.animateAVCSD('width', w);
       } else {
         $e.css('width', w);
       }
     }
-    if (h !== undefined && h !== $e.height()) {
+    if (h !== undefined && h !== $e.outerHeight()) {
       if (animate) {
         $e.animateAVCSD('height', h);
       } else {
@@ -968,15 +967,9 @@ scout.Calendar.prototype._arrangeComponentSetPlacement = function($children) {
     stackW = $child.data('stackW');
 
     // make last element smaller
-    if (stackX < stackW - 1) {
-      $child
-        .css('width', 'calc(' + (100 / stackW) + '% - 7px)')
-        .css('left', 'calc(' + (stackX * 100 / stackW) + '% +  7px)');
-    } else {
-      $child
-        .css('width', 'calc(' + (100 / stackW) + '% - 14px)')
-        .css('left', 'calc(' + (stackX * 100 / stackW) + '% +  7px)');
-    }
+    $child
+      .css('width', 100 / stackW + '%')
+      .css('left', stackX * 100 / stackW + '%');
   }
 };
 
