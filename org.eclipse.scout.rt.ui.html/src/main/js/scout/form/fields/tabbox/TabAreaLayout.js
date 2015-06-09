@@ -2,7 +2,7 @@ scout.TabAreaLayout = function(tabBox) {
   scout.TabAreaLayout.parent.call(this);
   this._tabBox = tabBox;
   this._$ellipsis;
-  this._overflowTabItems = [];
+  this._overflowTabs = [];
 };
 scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
 
@@ -15,7 +15,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     clientWidth = tabArea.clientWidth,
     scrollWidth = tabArea.scrollWidth;
 
-  this._overflowTabItems = [];
+  this._overflowTabs = [];
   if (clientWidth < scrollWidth) {
 
     // determine visible range (at least selected tab must be visible)
@@ -35,7 +35,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     bounds = tabBounds[selectedTab];
 
     if (clientWidth > bounds.width) {
-      // 1. when oldTab is unknown, place selected tab at the left-most position
+      // in case of overflow, place selected tab at the left-most position...
       var
         viewWidth = bounds.width,
         delta = bounds.x, // delta used to start from x=0
@@ -43,8 +43,8 @@ scout.TabAreaLayout.prototype.layout = function($container) {
         rightMostTab = selectedTab,
         overflow = false;
 
-      // when leftEnd + rightEnd do not fit into clientWidth anymore, abort always
-      // expand to the right until the last tab is reached
+      // when viewWidth doesn't fit into clientWidth anymore, abort always
+      // expand to the right until the last tab is reached...
       if (selectedTab < numTabs - 1) {
         for (i = selectedTab + 1; i < numTabs; i++) {
           bounds = tabBounds[i];
@@ -66,23 +66,20 @@ scout.TabAreaLayout.prototype.layout = function($container) {
           }
         }
       }
-
-      // 2. find place for selected tab depending on the oldTab
-      // FIXME AWE: damit das richtig funktioniert, muss auch der _vorher_ selektierte tab bekannt sein
     }
 
-    // FIXME AWE: hier durch visibleTabs loopen
+    // remove all tabs which aren't visible
     for (i = 0; i < numTabs; i++) {
       tabItem = this._tabBox.tabItems[i];
       if (visibleTabs.indexOf(i) === -1) {
         $.log.debug('Overflow tabItem=' + tabItem);
-        this._overflowTabItems.push(tabItem);
+        this._overflowTabs.push(tabItem);
         tabItem.removeTab();
       }
     }
   }
 
-  if (this._overflowTabItems.length > 0) {
+  if (this._overflowTabs.length > 0) {
     this._createAndRenderEllipsis($container);
   }
 };
@@ -105,7 +102,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
   var menu, popup,
     overflowMenus = [],
     tabBox = this._tabBox;
-  this._overflowTabItems.forEach(function(tabItem) {
+  this._overflowTabs.forEach(function(tabItem) {
     menu = tabBox.session.createUiObject({
       objectType: 'Menu',
       text: scout.strings.removeAmpersand(tabItem.label),

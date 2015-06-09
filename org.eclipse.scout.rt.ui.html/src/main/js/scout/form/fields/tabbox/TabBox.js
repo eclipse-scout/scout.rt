@@ -80,9 +80,11 @@ scout.TabBox.prototype._selectTab = function(tabItem) {
     this.tabItems[oldSelectedTab].setTabActive(false);
     this.tabItems[this.selectedTab].setTabActive(true);
 
-    scout.HtmlComponent.get(this._$tabArea).revalidate();
+    // revalidate layout when tab-area has changed, because overflow tabs must be re-arranged
+    if (!this.tabItems[this.selectedTab]._tabRendered) {
+      scout.HtmlComponent.get(this._$tabArea).revalidate();
+    }
 
-    // FIXME AWE: (tab-box) focus scheitert, wenn tab nicht gerendert ist (weil in overflow)
     // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout?
     setTimeout(function() {
       this.tabItems[this.selectedTab].focusTab();
@@ -100,6 +102,7 @@ scout.TabBox.prototype._selectTab = function(tabItem) {
 };
 
 // keyboard navigation in tab-box button area
+// FIXME AWE: (tab-box) overflow menu must be accessible by keyboard navigation
 scout.TabBox.prototype._onKeyDown = function(event) {
   var tabIndex, navigationKey =
     event.which === scout.keys.LEFT ||
