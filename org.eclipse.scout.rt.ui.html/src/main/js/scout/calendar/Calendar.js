@@ -284,6 +284,8 @@ scout.Calendar.prototype._calcExactRange = function() {
   } else if (this._isWork()) {
     from = new Date(p.year, p.month, p.date - p.day);
     to = new Date(p.year, p.month, p.date - p.day + 4);
+  } else {
+    throw new Error('invalid value for displayMode');
   }
 
   return new scout.Range(from, to);

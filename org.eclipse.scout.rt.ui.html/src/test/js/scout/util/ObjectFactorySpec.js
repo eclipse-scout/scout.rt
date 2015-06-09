@@ -24,13 +24,22 @@ describe("ObjectFactory", function() {
       var outlineId = 'outline' + id;
       model.outline = outlineId;
       session._adapterDataCache[outlineId] = {
-          id: outlineId,
-          objectType: 'Outline'
+        id: outlineId,
+        objectType: 'Outline'
       };
     } else if ('Calendar' === objectType) {
+      model.displayMode = 3;
       model.selectedDate = '2015-04-06 00:00:00.000';
     } else if ('Form' === objectType) {
       model.displayHint = 'view';
+    } else if ('TabBox' === objectType) {
+      var tabItemId = 'tabItem' + id;
+      model.selectedTab = 0;
+      model.tabItems = [tabItemId];
+      session._adapterDataCache[tabItemId] = {
+        id: tabItemId,
+        objectType: 'TabItem'
+      };
     }
     return model;
   }
