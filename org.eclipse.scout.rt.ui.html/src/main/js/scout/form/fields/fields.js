@@ -10,7 +10,7 @@ scout.fields = {
     var $glassPane = $.makeDiv('glasspane');
     var keyStrokeAdapter = new scout.GlassPaneKeyStrokeAdapter($glassPane, uiSessionId);
     scout.keyStrokeManager.installAdapter($glassPane, keyStrokeAdapter);
-    $glassPane.on("remove", function () {
+    $glassPane.on('remove', function () {
       scout.keyStrokeManager.uninstallAdapter(keyStrokeAdapter);
     });
     return $glassPane;
