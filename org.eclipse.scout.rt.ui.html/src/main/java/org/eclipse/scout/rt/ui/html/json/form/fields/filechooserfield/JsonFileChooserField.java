@@ -13,10 +13,12 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-//FIXME ???: impl. JsonFileChooserField
 public class JsonFileChooserField<T extends IFileChooserField> extends JsonValueField<T> {
+
+  public static final String EVENT_CHOOSE_FILE = "chooseFile";
 
   public JsonFileChooserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -27,4 +29,22 @@ public class JsonFileChooserField<T extends IFileChooserField> extends JsonValue
     return "FileChooserField";
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_CHOOSE_FILE.equals(event.getType())) {
+      handleUiChooseFile();
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  @Override
+  protected void handleUiTextChangedImpl(String displayText) {
+    getModel().getUIFacade().parseAndSetValueFromUI(displayText);
+  }
+
+  private void handleUiChooseFile() {
+    getModel().getUIFacade().chooseFile();
+  }
 }

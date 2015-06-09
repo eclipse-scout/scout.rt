@@ -31,10 +31,12 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -63,6 +65,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -140,7 +143,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         }
         // no client request must currently being processed (because in that case, the result of the
         // model job will be returned as payload of the current JSON response).
-        if (isProcessingClientRequest()) {
+        if (isProcessingJsonRequest()) {
           return false;
         }
         // the model job's session has to match our session
@@ -194,33 +197,40 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       throw new IllegalStateException("Already initialized");
     }
     m_initialized = true;
-
     touch();
-    m_currentHttpRequest.set(httpRequest);
-    m_currentJsonRequest = jsonStartupRequest;
-    m_clientSessionId = jsonStartupRequest.getClientSessionId();
-    m_uiSessionId = jsonStartupRequest.getUiSessionId();
 
-    HttpSession httpSession = httpRequest.getSession();
+    try {
+      m_currentHttpRequest.set(httpRequest);
+      m_currentJsonRequest = jsonStartupRequest;
 
-    // Look up the requested client session (create and start a new one if necessary)
-    IClientSession clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
+      m_clientSessionId = jsonStartupRequest.getClientSessionId();
+      m_uiSessionId = jsonStartupRequest.getUiSessionId();
 
-    // At this point we have a valid, active clientSession. Therefore, we may now safely store it in the HTTP session
-    storeClientSessionInHttpSession(httpSession, clientSession);
+      HttpSession httpSession = httpRequest.getSession();
 
-    // Create a new JsonAdapter for the client session
-    m_jsonClientSession = createClientSessionAdapter(clientSession);
+      // Look up the requested client session (create and start a new one if necessary)
+      IClientSession clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
 
-    // Handle detach
-    handleDetach(jsonStartupRequest, httpSession);
+      // At this point we have a valid, active clientSession. Therefore, we may now safely store it in the HTTP session
+      storeClientSessionInHttpSession(httpSession, clientSession);
 
-    // Start desktop
-    fireDesktopOpened();
+      // Create a new JsonAdapter for the client session
+      m_jsonClientSession = createClientSessionAdapter(clientSession);
 
-    // Send "initialized" event
-    sendInitializationEvent();
-    LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
+      // Handle detach
+      handleDetach(jsonStartupRequest, httpSession);
+
+      // Start desktop
+      fireDesktopOpened();
+
+      // Send "initialized" event
+      sendInitializationEvent();
+      LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
+    }
+    finally {
+      m_currentHttpRequest.set(null);
+      m_currentJsonRequest = null;
+    }
   }
 
   @Override
@@ -389,7 +399,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void dispose() {
-    if (isProcessingClientRequest()) {
+    if (isProcessingJsonRequest()) {
       // If there is a request in progress just mark the session as being disposed.
       // The actual disposing happens before returning to the client, see processRequest.
       m_disposing = true;
@@ -530,7 +540,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public JSONObject processRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
+  public JSONObject processJsonRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
     }
@@ -543,7 +553,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       JobUtility.runModelJobAndAwait("event-processing", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest(), Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
-          processRequestInternal();
+          processJsonRequestInternal();
         }
       }));
 
@@ -568,6 +578,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     finally {
       m_currentHttpRequest.set(null);
+      m_currentJsonRequest = null;
       if (m_disposing) {
         dispose();
       }
@@ -579,20 +590,80 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   /**
    * <b>Do not call this internal method directly!</b> It should only be called be
-   * {@link #processRequest(HttpServletRequest, JsonRequest)} which ensures that the required
+   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required
    * state is set up correctly (and will be cleaned up later) and is run as a model job.
    */
-  protected void processRequestInternal() {
+  protected void processJsonRequestInternal() {
     jsonEventProcessor().processEvents(currentJsonRequest(), currentJsonResponse());
   }
 
   /**
    * <b>Do not call this internal method directly!</b> It should only be called be
-   * {@link #processRequest(HttpServletRequest, JsonRequest)} which ensures that the required
+   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required
    * state is set up correctly (and will be cleaned up later) and is run as a model job.
    */
   protected JSONObject responseToJsonInternal() {
     return currentJsonResponse().toJson();
+  }
+
+  @Override
+  public JSONObject processFileUpload(HttpServletRequest httpReq, final String targetAdapterId, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
+    try {
+      m_currentHttpRequest.set(httpReq);
+
+      // Process file upload in model job
+      JobUtility.runModelJobAndAwait("upload-processing", getClientSession(), false, Callables.callable(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          processFileUploadInternal(targetAdapterId, uploadResources, uploadProperties);
+        }
+      }));
+
+      // Wait for any other model jobs that might have been scheduled during event processing. If there are any
+      // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
+      JobUtility.awaitAllModelJobs(getClientSession());
+
+      // Convert the collected response to JSON. It is important that this is done in a
+      // model job, because during toJson(), the model might be accessed.
+      JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), false, new Callable<JSONObject>() {
+        @Override
+        public JSONObject call() throws Exception {
+          JSONObject json = responseToJsonInternal();
+          // Create new jsonResponse instance after JSON object has been created
+          // This must happen synchronized (as it always is, in a model-job) to avoid concurrency issues
+          // FIXME AWE: (json-layer) ausprobieren, ob die currentResponse auch im Fall von einer Exception zurück gesetzt werden muss.
+          m_currentJsonResponse = createJsonResponse();
+          return json;
+        }
+      });
+      return result;
+    }
+    finally {
+      m_currentHttpRequest.set(null);
+      if (m_disposing) {
+        dispose();
+      }
+    }
+  }
+
+  /**
+   * <b>Do not call this internal method directly!</b> It should only be called be
+   * {@link #processFileUpload(HttpServletRequest, Map, List)} which ensures that the required
+   * state is set up correctly (and will be cleaned up later) and is run as a model job.
+   */
+  protected void processFileUploadInternal(String targetAdapterId, List<BinaryResource> uploadFiles, Map<String, String> uploadProperties) {
+    // Resolve adapter
+    if (!StringUtility.hasText(targetAdapterId)) {
+      throw new IllegalArgumentException("Missing target adapter ID");
+    }
+    IJsonAdapter<?> jsonAdapter = getJsonAdapter(targetAdapterId);
+    if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
+      throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
+    }
+    IBinaryResourceConsumer resourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
+
+    // Consume
+    resourceConsumer.consumeBinaryResource(uploadFiles);
   }
 
   @Override
@@ -616,8 +687,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_backgroundJobNotificationQueue.offer(m_notificationToken);
   }
 
-  protected boolean isProcessingClientRequest() {
-    return currentHttpRequest() != null;
+  protected boolean isProcessingJsonRequest() {
+    return currentJsonRequest() != null;
   }
 
   @Override

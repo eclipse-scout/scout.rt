@@ -24,6 +24,7 @@ __include("scout/util/ModelAdapter.js");
 __include("scout/util/numbers.js");
 __include("scout/util/ObjectFactory.js");
 __include("scout/util/objects.js");
+__include("scout/util/polyfills.js");
 __include("scout/util/status.js");
 __include("scout/util/strings.js");
 __include("scout/util/URL.js");
@@ -85,6 +86,7 @@ __include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
 __include("scout/messagebox/MessageBoxModelAdapter.js");
 __include("scout/planner/Planner.js");
 __include("scout/planner/PlannerLayout.js");
+__include("scout/filechooser/FileChooser.js");
 // Table
 __include("scout/table/Column.js");
 __include("scout/table/BeanColumn.js"); // requires Column.js

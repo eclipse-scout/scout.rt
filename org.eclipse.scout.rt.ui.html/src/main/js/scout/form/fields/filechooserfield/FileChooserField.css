@@ -1,0 +1,10 @@
+.file-chooser-field {
+
+  & > input[type=text] {
+    .text-field-with-icon(@icon-file);
+  }
+
+  & > input[type=file] {
+    display: none;
+  }
+}

@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -63,8 +65,8 @@ public interface IUiSession {
   void logout();
 
   /**
-   * @return the current ui response that is collecting changes for the next
-   *         {@link #processRequest(HttpServletRequest, JsonRequest)} cycle
+   * @return the current U response that is collecting changes for the next
+   *         {@link #processJsonRequest(HttpServletRequest, JsonRequest)} cycle
    */
   JsonResponse currentJsonResponse();
 
@@ -73,7 +75,20 @@ public interface IUiSession {
   /**
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
-  JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
+  JSONObject processJsonRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
+
+  /**
+   * @param httpRequest
+   *          the HTTP request
+   * @param targetAdapterId
+   *          the ID of the adapter that receives the uploaded files
+   * @param uploadResources
+   *          list of uploaded files
+   * @param uploadProperties
+   *          a map of all other submitted string properties (usually not needed)
+   * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
+   */
+  JSONObject processFileUpload(HttpServletRequest httpReq, String targetAdapterId, List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
 
   String getUiSessionId();
 

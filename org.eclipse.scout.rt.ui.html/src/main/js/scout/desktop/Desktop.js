@@ -17,7 +17,7 @@ scout.Desktop = function() {
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
   this.selectedTool;
-  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -95,7 +95,9 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.views.forEach(this._renderView.bind(this));
   this.dialogs.forEach(this._renderDialog.bind(this));
+  // TODO BSH How to determine order of messageboxes and filechoosers?
   this.messageBoxes.forEach(this._renderMessageBox.bind(this));
+  this.fileChoosers.forEach(this._renderFileChooser.bind(this));
 
   $(window).on('resize', this.onResize.bind(this));
 
@@ -420,6 +422,16 @@ scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
   scout.arrays.remove(this.messageBoxes, messageBox);
 };
 
+/* file chooser */
+
+scout.Desktop.prototype._renderFileChooser = function(fileChooser) {
+  fileChooser.render(this.$container);
+};
+
+scout.Desktop.prototype.onFileChooserClosed = function(fileChooser) {
+  scout.arrays.remove(this.fileChoosers, fileChooser);
+};
+
 /* event handling */
 
 scout.Desktop.prototype._onModelFormAdded = function(event) {
@@ -456,6 +468,8 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this.navigation.onSearchPerformed(event);
   } else if (event.type === 'messageBoxAdded') {
     this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
+  } else if (event.type === 'fileChooserAdded') {
+    this._renderFileChooser(this.session.getOrCreateModelAdapter(event.fileChooser, this));
   } else if (event.type === 'openUri') {
     this._openUri(event);
   } else {

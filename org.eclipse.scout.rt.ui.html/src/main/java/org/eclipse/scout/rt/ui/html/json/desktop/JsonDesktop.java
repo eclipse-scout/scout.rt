@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
+import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -47,6 +48,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
+  public static final String PROP_FILE_CHOOSER = "fileChooser";
 
   private DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
@@ -67,6 +69,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     attachGlobalAdapters(getViews());
     attachGlobalAdapters(getDialogs());
     attachGlobalAdapters(getModel().getMessageBoxStack());
+    attachGlobalAdapters(getModel().getFileChooserStack());
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
@@ -143,6 +146,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     putAdapterIdsProperty(json, "views", getViews());
     putAdapterIdsProperty(json, "dialogs", getDialogs());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
+    putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChooserStack());
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
@@ -209,6 +213,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
         break;
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
+        break;
+      case DesktopEvent.TYPE_FILE_CHOOSER_ADDED:
+        handleModelFileChooserAdded(event.getFileChooser());
         break;
       default:
         // NOP
@@ -293,6 +300,13 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected void handleModelDesktopClosed() {
     getUiSession().logout();
+  }
+
+  protected void handleModelFileChooserAdded(IFileChooser fileChooser) {
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser);
+    putProperty(jsonEvent, PROP_FILE_CHOOSER, jsonAdapter.getId());
+    addActionEvent("fileChooserAdded", jsonEvent);
   }
 
   protected ISearchOutline getSearchOutline() {

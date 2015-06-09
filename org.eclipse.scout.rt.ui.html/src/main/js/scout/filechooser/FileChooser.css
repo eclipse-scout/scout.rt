@@ -1,0 +1,62 @@
+.file-chooser {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  max-width: 300px;
+  .drop-shadow;
+  border-top: 5px solid @active-color;
+  border-radius: @border-radius;
+
+  & > .file-chooser-content {
+    border: 0 solid @palette-gray-4;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    background-color: @control-background-color;
+    padding: 10px 20px;
+
+    & > .file-chooser-title {
+      margin-right: 30px; /* Leave space for 'x' closable */
+      word-wrap: break-word;
+      .font-text-large;
+      color: @active-color;
+    }
+
+    & > .file-chooser-files {
+      min-height: 100px; /* TODO BSH Remove */
+    }
+  }
+
+  & > input[type=file] {
+    display: none;
+  }
+
+  & > .closable {
+    position: absolute;
+    right: 5px;
+    margin: 8px;
+    .font-icon;
+    font-size: 17px;
+    cursor: pointer;
+    color: @icon-light-color;
+
+    &::before {
+      content: @icon-remove;
+    }
+
+    &:hover {
+      color: @hover-color;
+    }
+  }
+
+  /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
+  &.calc-helper {
+    top: 0;
+    left: 0;
+  }
+
+  &.shown {
+    .animation-name(fade-slidein-top);
+    .animation-duration(0.5s);
+  }
+}

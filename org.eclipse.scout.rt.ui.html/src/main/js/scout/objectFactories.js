@@ -312,4 +312,9 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.GraphField();
   }
+}, {
+  objectType: 'FileChooser',
+  create: function() {
+    return new scout.FileChooser();
+  }
 }];

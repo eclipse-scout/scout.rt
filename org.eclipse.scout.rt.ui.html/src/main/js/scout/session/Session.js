@@ -510,7 +510,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
   if (!jqXHR.status || jqXHR.status >= 12000) {
     this.goOffline();
-    if (!this._queuedRequest && !request.pollForBackgroundJob) {
+    if (!this._queuedRequest && request && !request.pollForBackgroundJob) {
       this._queuedRequest = request;
     }
     return;
@@ -599,6 +599,84 @@ scout.Session.prototype.showFatalMessage = function(options) {
 
   this._setApplicationLoading(false);
   ui.render(this.$entryPoint);
+};
+
+scout.Session.prototype.uploadFiles = function(target, files) {
+  var formData = new FormData();
+  formData.append('uiSessionId', this.uiSessionId);
+  formData.append('target', target.id);
+  files.forEach(function(file) {
+    formData.append('files', file, file.name);
+  }.bind(this));
+
+  var uploadAjaxOptions = {
+    async: true,
+    type: 'POST',
+    url: 'upload',
+    cache: false,
+    // Don't touch the data (do not convert it to string)
+    processData: false,
+    // Do not automatically add content type (otherwise, multipart boundary would be missing)
+    contentType: false,
+    data: formData
+  };
+  // Special handling for FormData polyfill
+  if (formData.polyfill) {
+    formData.applyToAjaxOptions(uploadAjaxOptions);
+  }
+
+  var busyHandling = !this.areRequestsPending();
+  if (busyHandling) {
+    this.setBusy(true);
+  }
+  this._requestsPendingCounter++;
+
+  $.ajax(uploadAjaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
+
+  // --- Helper methods ---
+
+  var jsError,
+    success = false;
+
+  function onAjaxDone(data) {
+    try {
+      if (data.error) {
+        this._processErrorJsonResponse(data.error);
+      } else {
+        this._processSuccessResponse(data);
+        success = true;
+      }
+    } catch (err) {
+      jsError = jsError || err;
+    }
+  }
+
+  function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    try {
+      this._processErrorResponse(undefined, jqXHR, textStatus, errorThrown);
+    } catch (err) {
+      jsError = jsError || err;
+    }
+  }
+
+  function onAjaxAlways(data, textStatus, errorThrown) {
+    this._requestsPendingCounter--;
+    if (busyHandling) {
+      this.setBusy(false);
+    }
+    this.layoutValidator.validate();
+    if (success) {
+      this._resumeBackgroundJobPolling();
+      this._fireRequestFinished(data);
+    }
+    // Throw previously catched error
+    if (jsError) {
+      throw jsError;
+    }
+  }
 };
 
 scout.Session.prototype.goOffline = function() {

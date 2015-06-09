@@ -13,6 +13,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ColumnSorting",
         "Column",
         "Cancel",
+        "Ok",
         // From org.eclipse.scout.rt.ui.html
         "LoadOptions_",
         "NoOptions",

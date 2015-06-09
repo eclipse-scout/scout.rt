@@ -39,18 +39,18 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
-import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
+import org.json.JSONObject;
 import org.slf4j.MDC;
 
 /**
  * This interceptor contributes to the {@link UiServlet} as the POST handler for /upload
  */
 @Order(30)
-public class UploadRequestInterceptor implements IServletRequestInterceptor {
+public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestInterceptor.class);
 
   private static final String PROP_UI_SESSION_ID = "uiSessionId";
-  private static final String PROP_ADAPTER_ID = "adapterId";
+  private static final String PROP_TARGET = "target";
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -92,12 +92,19 @@ public class UploadRequestInterceptor implements IServletRequestInterceptor {
         MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
         MDC.put(MDC_SCOUT_SESSION_ID, uiSession.getClientSessionId());
 
-        IBinaryResourceConsumer resourceConsumer = resolveBinaryResourceConsumer(uiSession, uploadProperties.get(PROP_ADAPTER_ID));
-
         // GUI requests for the same session must be processed consecutively
         uiSession.uiSessionLock().lock();
         try {
-          resourceConsumer.consumeBinaryResource(uploadResources);
+          if (uiSession.currentJsonResponse() == null) {
+            // Missing current JSON response, probably because the UiSession is disposed -> send empty answer
+            writeResponse(httpResp, createSessionTerminatedResponse());
+            return true;
+          }
+          JSONObject jsonResp = uiSession.processFileUpload(httpReq, uploadProperties.get(PROP_TARGET), uploadResources, uploadProperties);
+          if (jsonResp == null) {
+            jsonResp = createEmptyResponse();
+          }
+          writeResponse(httpResp, jsonResp);
         }
         finally {
           uiSession.uiSessionLock().unlock();
@@ -122,7 +129,8 @@ public class UploadRequestInterceptor implements IServletRequestInterceptor {
       }
     }
     catch (Exception e) {
-      throw new ServletException("Error while reading data from multipart request.", e);
+      LOG.error("Unexpected error while handling multipart upload request", e);
+      writeResponse(httpResp, createUnrecoverableFailureResponse());
     }
     return true;
   }
@@ -155,22 +163,8 @@ public class UploadRequestInterceptor implements IServletRequestInterceptor {
     HttpSession httpSession = httpReq.getSession();
     IUiSession uiSession = (IUiSession) httpSession.getAttribute(IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + uiSessionId);
     if (uiSession == null) {
-      LOG.error("Could not resolve uiSession with ID " + uiSessionId);
-      throw new IllegalStateException("Invalid UI session");
+      throw new IllegalStateException("Could not resolve UI session with ID " + uiSessionId);
     }
     return uiSession;
-  }
-
-  protected IBinaryResourceConsumer resolveBinaryResourceConsumer(IUiSession uiSession, String adapterId) {
-    if (!StringUtility.hasText(adapterId)) {
-      throw new IllegalArgumentException("Missing property '" + PROP_ADAPTER_ID + "'");
-    }
-    IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(adapterId);
-    if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
-      LOG.warn("No valid adapter found for ID " + adapterId);
-      throw new IllegalStateException("Invalid adapter");
-    }
-    IBinaryResourceConsumer resourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
-    return resourceConsumer;
   }
 }
