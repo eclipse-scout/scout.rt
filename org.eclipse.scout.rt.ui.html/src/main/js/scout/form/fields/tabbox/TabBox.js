@@ -17,6 +17,15 @@ scout.TabBox = function() {
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
+/**
+ * @override FormField.js
+ */
+scout.TabBox.prototype.init = function(model, session) {
+  scout.TabBox.parent.prototype.init.call(this, model, session);
+  this.tabItems[this.selectedTab].setTabTabbable(true);
+  this.tabItems[this.selectedTab].setTabSelected(true);
+};
+
 scout.TabBox.prototype._render = function($parent) {
   this._$tabContentCache = []; // clear cache when tab-box is rendered anew
   this.addContainer($parent, 'tab-box', new scout.TabBoxLayout(this));
@@ -30,7 +39,13 @@ scout.TabBox.prototype._render = function($parent) {
   this._$tabContent = this.$container.appendDiv('tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
+};
 
+/**
+ * @override FormField.js
+ */
+scout.TabBox.prototype._renderProperties = function() {
+  scout.TabBox.parent.prototype._renderProperties.call(this);
   this._renderTabs();
   this._renderTabContent();
 };
@@ -39,8 +54,6 @@ scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
   }, this);
-  // only the selected tab is focusable
-  this.tabItems[this.selectedTab].setTabTabbable(true);
 };
 
 scout.TabBox.prototype.rebuildTabs = function() {
@@ -51,11 +64,6 @@ scout.TabBox.prototype.rebuildTabs = function() {
     }
   }, this);
 };
-
-//scout.TabBox.prototype._renderProperties = function() {
-//  scout.TabBox.parent.prototype._renderProperties.call(this);
-//  this._renderSelectedTab(this.selectedTab);
-//};
 
 /**
  * @param vararg either 'tabIndex' (numeric) or 'tabItem' (instanceof scout.TabItem)

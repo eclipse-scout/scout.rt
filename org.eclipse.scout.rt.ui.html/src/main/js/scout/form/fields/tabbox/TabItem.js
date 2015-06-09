@@ -7,7 +7,6 @@ scout.TabItem = function() {
   this._tabRendered = false;
   this._tabSelected = false;
   this._tabTabbable = false;
-//  this._tabIndex    = 0;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 
@@ -30,14 +29,12 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderTabTabbable();
   this._renderTabSelected();
   this._tabRendered = true;
-  this._updateTabButton();
+  this._updateTab();
 };
 
 scout.TabItem.prototype._onTabMouseDown = function(event) {
   this.parent._selectTab(this);
 };
-
-
 
 scout.TabItem.prototype.focusTab = function() {
   $.log.info('focusTab =' + this + ' tabindex=' + this.$tabContainer.attr('tabindex'));
@@ -47,7 +44,7 @@ scout.TabItem.prototype.focusTab = function() {
 scout.TabItem.prototype.setTabSelected = function(tabSelected) {
   var oldTabSelected = this._tabSelected;
   this._tabSelected = tabSelected;
-  if (oldTabSelected != tabSelected) {
+  if (this._tabRendered && oldTabSelected != tabSelected) {
     this._renderTabSelected();
   }
 };
@@ -59,7 +56,7 @@ scout.TabItem.prototype._renderTabSelected = function() {
 scout.TabItem.prototype.setTabTabbable = function(tabTabbable) {
   var oldTabTabbable = this._tabTabbable;
   this._tabTabbable = tabTabbable;
-  if (oldTabTabbable != tabTabbable) {
+  if (this._tabRendered && oldTabTabbable != tabTabbable) {
     this._renderTabTabbable();
   }
 };
@@ -75,6 +72,7 @@ scout.TabItem.prototype._renderTabTabbable = function() {
 scout.TabItem.prototype.removeTab = function() {
   $.log.info('removeTab =' + this);
   this.$tabContainer.remove();
+  this.$tabContainer = null;
   this._tabRendered = false;
 };
 
@@ -82,30 +80,30 @@ scout.TabItem.prototype._syncMarked = function(marked) {
   this.marked = marked;
   // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
   // tabButton IS, render the properties that affect the tab button.
-  if (!this.rendered && this._tabButtonRendered) {
-    this._updateTabButton();
+  if (!this.rendered && this._tabRendered) {
+    this._updateTab();
   }
 };
 
 scout.TabItem.prototype._renderMarked = function(marked) {
-  this._updateTabButton();
+  this._updateTab();
 };
 
 scout.TabItem.prototype._syncVisible = function(visible) {
   this.visible = visible;
   // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
   // tabButton IS, render the properties that affect the tab button.
-  if (!this.rendered && this._tabButtonRendered) {
-    this._updateTabButton();
+  if (!this.rendered && this._tabRendered) {
+    this._updateTab();
   }
 };
 
 scout.TabItem.prototype._renderVisible = function(visible) {
   scout.TabItem.parent.prototype._renderVisible.call(this, visible);
-  this._updateTabButton();
+  this._updateTab();
 };
 
-scout.TabItem.prototype._updateTabButton = function() {
+scout.TabItem.prototype._updateTab = function() {
   this.$tabContainer.toggleClass('marked', this.marked);
   this.$tabContainer.setVisible(this.visible);
 };
