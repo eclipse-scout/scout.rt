@@ -243,6 +243,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public List<IFileChooser> getFileChooserStack() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void addFileChooser(IFileChooser fc) {
     throw createUnsupportedOperationException();
   }

@@ -20,13 +20,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +58,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.mail.MailUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -670,32 +666,33 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
       return SwingUtility.getNlsText("FormStateStoreAs");
     }
 
-    @Override
-    public void doAction() throws ProcessingException {
-      List<String> extensions = null;
-      try {
-        String fileName = m_file.getName();
-        String fileExt = m_file.getName().substring(fileName.lastIndexOf('.') + 1, fileName.length());
-        extensions = Collections.singletonList(fileExt);
-      }
-      catch (Exception e) {
-        LOG.warn("could not find extension of '" + m_file.getName() + "'");
-      }
-      File path = null;
-      File dir = null;
-      FileChooser fileChooser = new FileChooser(dir, extensions, false);
-      fileChooser.setFileName(m_file.getName());
-      List<File> a = fileChooser.startChooser();
-      if (!a.isEmpty()) {
-        path = a.get(0);
-        try {
-          IOUtility.writeContent(new FileOutputStream(path), IOUtility.getContent(new FileInputStream(m_file)));
-        }
-        catch (Exception e) {
-          LOG.warn(null, e);
-        }
-      }
-    }
+    // XXX BSH Obsolete because Swing is deleted
+//    @Override
+//    public void doAction() throws ProcessingException {
+//      List<String> extensions = null;
+//      try {
+//        String fileName = m_file.getName();
+//        String fileExt = m_file.getName().substring(fileName.lastIndexOf('.') + 1, fileName.length());
+//        extensions = Collections.singletonList(fileExt);
+//      }
+//      catch (Exception e) {
+//        LOG.warn("could not find extension of '" + m_file.getName() + "'");
+//      }
+//      File path = null;
+//      File dir = null;
+//      FileChooser fileChooser = new FileChooser(dir, extensions, false);
+//      fileChooser.setFileName(m_file.getName());
+//      List<File> a = fileChooser.startChooser();
+//      if (!a.isEmpty()) {
+//        path = a.get(0);
+//        try {
+//          IOUtility.writeContent(new FileOutputStream(path), IOUtility.getContent(new FileInputStream(m_file)));
+//        }
+//        catch (Exception e) {
+//          LOG.warn(null, e);
+//        }
+//      }
+//    }
   }
 
 }

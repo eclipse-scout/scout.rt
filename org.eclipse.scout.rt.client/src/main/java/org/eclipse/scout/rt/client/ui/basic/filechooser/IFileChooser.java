@@ -10,46 +10,37 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
-import java.io.File;
 import java.util.List;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
 
 public interface IFileChooser {
 
-  File getDirectory();
+  IFileChooserUIFacade getUIFacade();
 
-  String getFileName();
+  void addFileChooserListener(FileChooserListener listener);
+
+  void removeFileChooserListener(FileChooserListener listener);
 
   List<String> getFileExtensions();
-
-  /**
-   * Load or Save
-   * <ul>
-   * <li><code>true</code> loads the file from the file system into the application.</li>
-   * <li><code>false</code> saves the file from the application to the file system. Attention: This does not work in
-   * RAP/Web-UI</li>
-   * </ul>
-   */
-  boolean isTypeLoad();
-
-  /**
-   * Folder or File
-   */
-  boolean isFolderMode();
 
   boolean isMultiSelect();
 
   /**
    * start file choosing and block until a result is available
-   * 
+   *
    * @return {@link #getFiles()}
    */
-  List<File> startChooser();
+  List<BinaryResource> startChooser() throws ProcessingException;
 
   /**
-   * set result value and close chooser
+   * Sets the result and releases the blocking condition held by {@link #startChooser()}.
    */
-  void setFiles(List<File> files);
+  void setFiles(List<BinaryResource> result);
 
-  List<File> getFiles();
-
+  /**
+   * @return list of previously uploaded files using {@link #startChooser()} (empty list if chooser was not yet started)
+   */
+  List<BinaryResource> getFiles();
 }

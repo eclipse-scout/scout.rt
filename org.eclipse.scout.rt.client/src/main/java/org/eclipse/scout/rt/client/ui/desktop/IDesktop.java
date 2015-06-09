@@ -433,6 +433,8 @@ public interface IDesktop extends IPropertyObserver {
    */
   void setStatusText(String s);
 
+  List<IFileChooser> getFileChooserStack();
+
   /**
    * Retrieve files via a user interface
    */

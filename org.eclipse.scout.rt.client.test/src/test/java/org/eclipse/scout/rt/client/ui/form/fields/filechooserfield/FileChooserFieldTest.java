@@ -102,11 +102,6 @@ public class FileChooserFieldTest {
         protected String getConfiguredLabel() {
           return "&choose an image";
         }
-
-        @Override
-        protected boolean getConfiguredTypeLoad() {
-          return true;
-        }
       }
     }
   }

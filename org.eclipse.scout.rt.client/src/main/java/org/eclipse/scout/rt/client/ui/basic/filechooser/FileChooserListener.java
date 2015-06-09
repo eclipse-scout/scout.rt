@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
+package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
-public interface IFileChooserFieldUIFacade {
+import java.util.EventListener;
 
-  void parseAndSetValueFromUI(String value);
+public interface FileChooserListener extends EventListener {
 
-  void chooseFile();
+  void fileChooserChanged(FileChooserEvent e);
 }

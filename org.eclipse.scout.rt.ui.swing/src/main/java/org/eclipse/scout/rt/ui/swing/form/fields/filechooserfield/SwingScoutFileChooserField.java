@@ -15,7 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +31,7 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
@@ -266,13 +266,19 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
         @Override
         public void run() {
           IFileChooser fc = getScoutObject().getFileChooser();
-          final List<File> files = fc.startChooser();
+          final List<BinaryResource> files;
+          try {
+            files = fc.startChooser();
+          }
+          catch (ProcessingException e) {
+            throw new RuntimeException(e);
+          }
 
           Runnable swingJob = new Runnable() {
             @Override
             public void run() {
               if (CollectionUtility.hasElements(files)) {
-                getSwingTextField().setText(CollectionUtility.firstElement(files).getAbsolutePath());
+                getSwingTextField().setText(CollectionUtility.firstElement(files).getFilename());
                 handleSwingInputVerifier();
               }
             }

@@ -46,7 +46,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
   public void showFileChooser() {
     List<File> files = null;
     try {
-      if (m_useAWT && !m_scoutFileChooser.isFolderMode()) {
+      if (m_useAWT) {
         files = showFileChooserAWT();
       }
       else {
@@ -58,7 +58,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          m_scoutFileChooser.setFiles(finalFiles);
+          m_scoutFileChooser.setFiles(null);
         }
       };
 
@@ -68,10 +68,10 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
 
   protected List<File> showFileChooserSwing() {
     List<String> extensions = m_scoutFileChooser.getFileExtensions();
-    boolean openMode = m_scoutFileChooser.isTypeLoad();
-    File curDir = m_scoutFileChooser.getDirectory();
-    boolean folderMode = m_scoutFileChooser.isFolderMode();
-    String fileName = m_scoutFileChooser.getFileName();
+    boolean openMode = true; //m_scoutFileChooser.isTypeLoad();
+    File curDir = null; //m_scoutFileChooser.getDirectory();
+    boolean folderMode = false; //m_scoutFileChooser.isFolderMode();
+    String fileName = null; //m_scoutFileChooser.getFileName();
     //
     JFileChooser dlg;
     // workaround for java accidentally accessing A: when choosing files
@@ -159,10 +159,10 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
 
   protected List<File> showFileChooserAWT() {
     List<String> extensions = m_scoutFileChooser.getFileExtensions();
-    boolean openMode = m_scoutFileChooser.isTypeLoad();
-    File curDir = m_scoutFileChooser.getDirectory();
-    boolean folderMode = m_scoutFileChooser.isFolderMode();
-    String fileName = m_scoutFileChooser.getFileName();
+    boolean openMode = true; //m_scoutFileChooser.isTypeLoad();
+    File curDir = null; //m_scoutFileChooser.getDirectory();
+    boolean folderMode = false; // m_scoutFileChooser.isFolderMode();
+    String fileName = null; //m_scoutFileChooser.getFileName();
     //
     FileDialog dlg;
     // workaround for java accidentally accessing A: when choosing files

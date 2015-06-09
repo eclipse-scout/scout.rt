@@ -68,6 +68,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
+import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserEvent;
+import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -145,6 +147,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final List<IForm> m_viewStack;
   private final List<IForm> m_dialogStack;
   private final List<IMessageBox> m_messageBoxStack;
+  private final List<IFileChooser> m_fileChooserStack;
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
   private List<IToolButton> m_toolButtons;
@@ -175,6 +178,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_viewStack = new ArrayList<IForm>();
     m_dialogStack = new ArrayList<IForm>();
     m_messageBoxStack = new ArrayList<IMessageBox>();
+    m_fileChooserStack = new ArrayList<IFileChooser>();
     m_uiFacade = new P_UIFacade();
     m_outlineTableFormVisible = true;
     m_activatedFormListener = new P_ActivatedFormListener();
@@ -1353,8 +1357,28 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void addFileChooser(IFileChooser fc) {
+  public List<IFileChooser> getFileChooserStack() {
+    return CollectionUtility.arrayList(m_fileChooserStack);
+  }
+
+  @Override
+  public void addFileChooser(final IFileChooser fc) {
+    m_fileChooserStack.add(fc);
+    fc.addFileChooserListener(new FileChooserListener() {
+      @Override
+      public void fileChooserChanged(FileChooserEvent e) {
+        switch (e.getType()) {
+          case FileChooserEvent.TYPE_CLOSED: {
+            removeFileChooserInternal(fc);
+          }
+        }
+      }
+    });
     fireFileChooserAdded(fc);
+  }
+
+  private void removeFileChooserInternal(IFileChooser fc) {
+    m_fileChooserStack.remove(fc);
   }
 
   @Override

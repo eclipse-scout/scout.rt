@@ -22,44 +22,13 @@ public interface IFileChooserField extends IValueField<String> {
 
   String PROP_MAX_LENGTH = "maxLength";
 
-  void setFolderMode(boolean b);
-
-  boolean isFolderMode();
-
-  void setShowDirectory(boolean b);
-
-  boolean isShowDirectory();
-
-  void setShowFileName(boolean b);
-
-  boolean isShowFileName();
-
   void setShowFileExtension(boolean b);
 
   boolean isShowFileExtension();
-
-  /**
-   * Load or Save
-   * <ul>
-   * <li><code>true</code> loads the file from the file system into the application.</li>
-   * <li><code>false</code> saves the file from the application to the file system. Attention: This does not work in
-   * RAP/Web-UI</li>
-   * </ul>
-   */
-  void setTypeLoad(boolean b);
-
-  /**
-   * @see #setTypeLoad(boolean)
-   */
-  boolean isTypeLoad();
-
+  
   void setFileExtensions(List<String> extensions);
 
   List<String> getFileExtensions();
-
-  void setDirectory(File d);
-
-  File getDirectory();
 
   void setFileIconId(String s);
 

@@ -192,4 +192,19 @@ public final class BinaryResource implements Serializable {
         CompareUtility.equals(this.m_contentType, other.m_contentType) &&
         Arrays.equals(m_content, other.m_content);
   }
+
+  @Override
+  public String toString() {
+    String s = "content: " + (m_content == null ? "null" : m_content.length + " bytes");
+    if (m_filename != null) {
+      s += ", filename: " + m_filename;
+    }
+    if (m_lastModified != -1) {
+      s += ", lastModified: " + m_lastModified;
+    }
+    if (m_fingerprint != -1) {
+      s += ", fingerprint: " + m_fingerprint;
+    }
+    return getClass().getSimpleName() + " [" + s + "]";
+  }
 }

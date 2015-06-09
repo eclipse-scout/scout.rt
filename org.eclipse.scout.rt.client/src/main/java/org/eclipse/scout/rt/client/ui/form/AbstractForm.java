@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
@@ -56,6 +56,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
@@ -157,7 +158,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private String m_displayViewId;// no property, is fixed
   private int m_closeType = IButton.SYSTEM_TYPE_NONE;
   private String m_cancelVerificationText;
-  private File m_lastXmlFileForStorage;
   private IGroupBox m_mainBox;
   private IWrappedFormField m_wrappedFormField;
   private P_SystemButtonListener m_systemButtonListener;
@@ -2347,63 +2347,42 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doExportXml(boolean saveAs) {
-    while (true) {
-      File path = m_lastXmlFileForStorage;
-      if (saveAs || path == null) {
-        File dir = m_lastXmlFileForStorage;
-        if (dir != null) {
-          dir = dir.getParentFile();
-        }
-        List<File> a = new FileChooser(dir, Collections.singletonList("xml"), false).startChooser();
-        if (a.isEmpty()) {
-          break;
-        }
-        else {
-          path = a.get(0);
-        }
-      }
-
-      // export search parameters
-      try (Writer w = new OutputStreamWriter(new FileOutputStream(path), "UTF-8")) {
-        XmlUtility.wellformDocument(storeToXml(), w);
-        if (path != null) {
-          m_lastXmlFileForStorage = path;
-        }
-        break;
-      }
-      catch (Exception t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException(ScoutTexts.get("FormExportXml") + " " + getTitle(), t));
-        saveAs = true;
-      }
-    }// end while nok
+    // export search parameters
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, "UTF-8")) {
+      XmlUtility.wellformDocument(storeToXml(), w);
+      BinaryResource res = new BinaryResource("form.xml", bos.toByteArray());
+      getDesktop().downloadResource(res);
+    }
+    catch (Exception e) {
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException(ScoutTexts.get("FormExportXml") + " " + getTitle(), e));
+    }
   }
 
   @Override
   public void doImportXml() {
-    File dir = m_lastXmlFileForStorage;
-    if (dir != null) {
-      dir = dir.getParentFile();
+    try {
+      List<BinaryResource> a = new FileChooser(Collections.singletonList("xml"), false).startChooser();
+      if (a.size() == 1) {
+        BinaryResource newPath = a.get(0);
+        try (InputStream in = new ByteArrayInputStream(newPath.getContent())) {
+          Document doc = XmlUtility.getXmlDocument(in);
+          // load xml to search
+          loadFromXml(doc.getDocumentElement());
+        }
+        catch (Exception e) {
+          LOG.warn("loading: " + newPath + " Exception: " + e);
+          new MessageBox(
+              null,
+              TEXTS.get("LoadFormXmlFailedText"),
+              null,
+              TEXTS.get("OkButton"),
+              null,
+              null).startMessageBox();
+        }
+      }
     }
-    List<File> a = new FileChooser(dir, Collections.singletonList("xml"), true).startChooser();
-    if (a.size() == 1) {
-      File newPath = a.get(0);
-      try (InputStream in = new FileInputStream(newPath)) {
-        Document doc = XmlUtility.getXmlDocument(in);
-        // load xml to search
-        m_lastXmlFileForStorage = newPath;
-        loadFromXml(doc.getDocumentElement());
-      }
-      catch (Exception e) {
-        LOG.warn("loading: " + newPath + " Exception: " + e);
-        new MessageBox(
-            null,
-            TEXTS.get("LoadFormXmlFailedText"),
-            null,
-            TEXTS.get("OkButton"),
-            null,
-            null).startMessageBox();
-        m_lastXmlFileForStorage = null;
-      }
+    catch (Exception e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
