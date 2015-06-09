@@ -108,7 +108,7 @@ scout.TabBox.prototype._selectTab = function(tabItem) {
       scout.HtmlComponent.get(this._$tabArea).revalidate();
     }
 
-    // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout?
+    // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout? siehe _onKeyDown()
     setTimeout(function() {
       this.tabItems[this.selectedTab].focusTab();
     }.bind(this));

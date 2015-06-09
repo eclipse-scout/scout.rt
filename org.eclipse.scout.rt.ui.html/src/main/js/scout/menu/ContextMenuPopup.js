@@ -36,19 +36,17 @@ scout.ContextMenuPopup.prototype._getMenuItems = function() {
 };
 
 scout.ContextMenuPopup.prototype._renderMenuItems = function() {
-  var session = this.session,
-    menus = this._getMenuItems();
+  var menuClone, menus = this._getMenuItems();
   if (!menus || menus.length === 0) {
     return;
   }
-  var menuClone;
   menus.forEach(function(menu) {
     if (!menu.visible || menu.separator) {
       return;
     }
     if (this.options.cloneMenuItems) {
       menuClone = this._cloneMenuItem(menu);
-      session.registerAdapterClone(menu, menuClone);
+      this.session.registerAdapterClone(menu, menuClone);
       menu = menuClone;
     }
     menu.render(this.$body);
@@ -59,7 +57,29 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
       oldSendDoAction.call(this);
       that.closePopup();
     };
-  }.bind(this));
+  }, this);
+};
+
+/**
+ * When cloneMenuItems is true, it means the menu instance is also used elsewhere (for instance in a menu-bar).
+ * When cloneMenuItems is false, it means the menu instance is only used in this popup.
+ * In the first case we must _not_ call the remove() method, since the menu is still in use outside of the
+ * popup. In the second case we must call remove(), because the menu is only used in the popup and no one
+ * else would remove the widget otherwise.
+ *
+ * @override Widget.js
+ */
+scout.ContextMenuPopup.prototype._remove = function() {
+  scout.ContextMenuPopup.parent.prototype._remove.call(this);
+  this._getMenuItems().forEach(function(menu) {
+    if (this.options.cloneMenuItems) {
+      if (menu.visible && !menu.separator) {
+        this.session.unregisterAllAdapterClones(menu);
+      }
+    } else {
+      menu.remove();
+    }
+  }, this);
 };
 
 /**
@@ -81,17 +101,3 @@ scout.ContextMenuPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupMenuItemKeyStrokeAdapter(this);
 };
 
-/**
- * @override Popup.js
- */
-scout.ContextMenuPopup.prototype.closePopup = function() {
-  scout.ContextMenuPopup.parent.prototype.closePopup.call(this);
-  var session = this.session;
-  if (this.options.cloneMenuItems) {
-    this._getMenuItems().forEach(function(menu) {
-      if (menu.visible && !menu.separator) {
-        session.unregisterAllAdapterClones(menu);
-      }
-    }, this);
-  }
-};
