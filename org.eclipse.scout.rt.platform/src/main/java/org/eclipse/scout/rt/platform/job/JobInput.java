@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
@@ -69,9 +70,9 @@ public class JobInput {
   }
 
   /**
-   * Sets the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs
-   * with the same mutex object, so that no two such jobs are run in parallel at the same time. A <code>null</code>
-   * mutex means that no mutex is applied (by default).
+   * Sets the mutex object to run the job in sequence among other jobs with the same mutex object, so that no two such
+   * jobs are run in parallel at the same time. By default, no mutex object is set, meaning the job is not executed in
+   * mutually exclusive manner.
    */
   public JobInput mutex(final Object mutexObject) {
     m_mutexObject = mutexObject;
@@ -85,8 +86,7 @@ public class JobInput {
   /**
    * Sets the maximal expiration time, until the job must commence execution. If elapsed, the executable is cancelled
    * and never commence execution. This is useful when using a scheduling strategy which might queue scheduled
-   * executables
-   * prior execution. By default, there is no expiration time set.
+   * executables prior execution. By default, there is no expiration time set.
    *
    * @param time
    *          the maximal expiration time until an executable must commence execution.
@@ -103,7 +103,11 @@ public class JobInput {
   }
 
   /**
-   * Sets the <code>RunContext</code> to be applied for the time of execution.
+   * Sets the {@link RunContext} to be applied during job execution. Also, the context's {@link RunMonitor} is
+   * associated with the jobs's {@link IFuture}, meaning that cancellation requests to the {@link IFuture} or
+   * {@link RunContext} are equivalent.
+   * However, if no context is provided, the job manager ensures a {@link RunMonitor} to be installed, so that executing
+   * code can always query the cancellation status by <code>RunMonitor.CURRENT.get().isCancelled()</code>.
    */
   public JobInput runContext(final RunContext runContext) {
     m_runContext = runContext;
@@ -115,8 +119,9 @@ public class JobInput {
   }
 
   /**
-   * Instruments the job manager to log execution exceptions by use of the installed {@link ExceptionHandler}; is
-   * <code>true</code> by default.
+   * Instruments the job manager to log uncaught exceptions on behalf of the installed {@link ExceptionHandler}.
+   * That is enabled by default, but might be disabled, if the caller handles exceptions himself by waiting for the job
+   * to complete.
    */
   public JobInput logOnError(final boolean logOnError) {
     m_logOnError = logOnError;
