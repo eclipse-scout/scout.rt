@@ -49,11 +49,34 @@ scout.TabBox.prototype._renderProperties = function() {
   this._renderTabContent();
 };
 
+/**
+ * @override FormField.js
+ */
+scout.TabBox.prototype._remove = function() {
+  scout.TabBox.parent.prototype._remove.call(this);
+  this._removeTabs();
+  this._removeTabContent();
+  this._$tabContentCache = [];
+};
+
 scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
   }, this);
 };
+
+scout.TabBox.prototype._removeTabs = function() {
+  this.tabItems.forEach(function(tabItem) {
+    tabItem.removeTab();
+  }, this);
+};
+
+scout.TabBox.prototype._removeTabContent = function() {
+  this.tabItems.forEach(function(tabItem) {
+    tabItem.remove();
+  }, this);
+};
+
 
 scout.TabBox.prototype.rebuildTabs = function() {
   // FIXME AWE: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
