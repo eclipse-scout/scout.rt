@@ -2197,12 +2197,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       /*
        * do NOT use ITableRow#setRowChanging, this might cause a stack overflow
        */
-      for (IColumn<?> col : getColumns()) {
-        if (col instanceof AbstractColumn<?>) {
-          ((AbstractColumn<?>) col).ensureErrorVisibility(row);
-        }
-      }
+      ensureInvalidColumnsVisible(row);
       enqueueDecorationTasks(row);
+    }
+  }
+
+  @Override
+  public void ensureInvalidColumnsVisible() {
+    List<ITableRow> rows = getRows();
+    for (ITableRow row : rows) {
+      ensureInvalidColumnsVisible(row);
+    }
+  }
+
+  private void ensureInvalidColumnsVisible(ITableRow row) {
+    for (IColumn<?> col : getColumns()) {
+      col.ensureVisibileIfInvalid(row);
     }
   }
 

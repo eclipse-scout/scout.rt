@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.text.NumberFormat;
-import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -43,7 +42,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFiel
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveInsertedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveUpdatedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldUpdateTableStatusChain;
-import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -538,49 +536,38 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         return new ValidateFormFieldDescriptor(this);
       }
     }
-    //make editable columns visible if check fails
-    HashSet<IColumn<?>> invisbleColumnsWithErrors = new HashSet<IColumn<?>>();
-    //check editable cells
+    //check cells
     ValidateTableFieldDescriptor tableDesc = null;
     TreeSet<String> columnNames = new TreeSet<String>();
     if (table != null) {
       for (ITableRow row : table.getRows()) {
         for (IColumn col : table.getColumns()) {
-          if (col.isCellEditable(row)) {
-            try {
-              ICell cell = row.getCell(col);
-              if (!cell.isContentValid()) {
-                if (col.isDisplayable() && !col.isVisible()) {
-                  //column should become visible
-                  invisbleColumnsWithErrors.add(col);
-                }
-                if (tableDesc == null) {
-                  tableDesc = new ValidateTableFieldDescriptor(this, row, col);
-                }
-                String columnName = col.getHeaderCell().getText();
-                if (columnName == null) {
-                  LOG.warn("Validation Error on Column without header text, using className for error message.");
-                  columnName = col.getClass().getSimpleName();
-                }
-                columnNames.add(columnName);
-              }
+          if (!col.isContentValid(row)) {
+            if (tableDesc == null) {
+              tableDesc = new ValidateTableFieldDescriptor(this, row, col);
             }
-            catch (Exception t) {
-              LOG.error("validating " + getClass().getSimpleName() + " for row " + row.getRowIndex() + " for column " + col.getClass().getSimpleName(), t);
-            }
+            columnNames.add(getColumnName(col));
           }
         }
       }
+      table.ensureInvalidColumnsVisible();
     }
-    //make invalid invisible columns visible again
-    for (IColumn col : invisbleColumnsWithErrors) {
-      col.setVisible(true);
+    if (tableDesc != null) {
+      tableDesc.setDisplayText(ScoutTexts.get("TableName") + " " + getLabel() + ": " + CollectionUtility.format(columnNames));
     }
-    if (tableDesc == null) {
-      return null;
-    }
-    tableDesc.setDisplayText(ScoutTexts.get("TableName") + " " + getLabel() + ": " + CollectionUtility.format(columnNames));
     return tableDesc;
+  }
+
+  /**
+   * Column name for error message
+   */
+  private String getColumnName(IColumn col) {
+    String columnName = col.getHeaderCell().getText();
+    if (columnName == null) {
+      LOG.warn("Validation Error on Column without header text, using className for error message.");
+      columnName = col.getClass().getSimpleName();
+    }
+    return columnName;
   }
 
   @Override

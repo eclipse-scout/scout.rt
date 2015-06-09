@@ -89,6 +89,22 @@ public class TableFieldTest {
   }
 
   /**
+   * Tests that there is an error on the field, when a mandatory table is not filled.
+   */
+  @Test
+  public void testMandatory_ErrorText() throws ProcessingException {
+    P_TableField tableField = createTableField(false);
+    tableField.getTable().addRowByArray(new Object[]{1, null, false});
+    Cell cell = (Cell) tableField.getTable().getCell(0, 1);
+    cell.setEditable(true);
+    cell.setMandatory(true);
+    IValidateContentDescriptor desc = tableField.validateContent();
+    assertNotNull(desc);
+    assertNull(desc.getErrorStatus());
+    assertTrue(desc.getDisplayText().contains(tableField.getTable().getStringColumn().getClass().getSimpleName()));
+  }
+
+  /**
    * Tests that an invisible displayable column is shown, if there is an error.
    */
   @Test

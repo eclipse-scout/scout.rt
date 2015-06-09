@@ -404,4 +404,14 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   void setMandatory(boolean mandatory);
 
+  /**
+   * @return true if column content is valid, no error status is set on column and mandatory property is met.
+   */
+  boolean isContentValid(ITableRow row);
+
+  /**
+   * Ensure that a displayable columns is visible, if there is an error
+   */
+  void ensureVisibileIfInvalid(ITableRow row);
+
 }

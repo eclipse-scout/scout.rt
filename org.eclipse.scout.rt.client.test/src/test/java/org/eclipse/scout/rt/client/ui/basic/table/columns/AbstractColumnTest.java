@@ -57,6 +57,17 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     assertTrue("expected mandatory property to be progagated to field", field.isMandatory());
   }
 
+  @Test
+  public void testValidColumn() throws ProcessingException {
+    TestTable table = new TestTable();
+    table.addRowsByArray(new String[]{"valid"});
+    ICell c0 = table.getCell(0, 0);
+    assertTrue(table.getValidateTestColumn().isContentValid(table.getRow(0)));
+    assertNoErrorStatus(c0);
+    assertEquals("valid", c0.getValue());
+    assertEquals("valid", c0.getText());
+  }
+
   /**
    * Invalid column values should have an error status
    */
@@ -67,6 +78,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     ICell c0 = table.getCell(0, 0);
     ICell c1 = table.getCell(1, 0);
 
+    assertFalse(table.getValidateTestColumn().isContentValid(table.getRow(0)));
     assertNoErrorStatus(c1);
     assertErrorStatus(c0);
     //invalid value is set on the table anyways
@@ -83,6 +95,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     table.addRowsByArray(new String[]{"invalid"});
     table.getValidateTestColumn().setValue(0, "valid");
     ICell c0 = table.getCell(0, 0);
+    assertTrue(table.getValidateTestColumn().isContentValid(table.getRow(0)));
     assertNoErrorStatus(c0);
     assertEquals("valid", c0.getValue());
     assertEquals("valid", c0.getText());

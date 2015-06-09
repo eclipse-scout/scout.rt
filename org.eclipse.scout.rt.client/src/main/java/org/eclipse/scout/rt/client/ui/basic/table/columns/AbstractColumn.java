@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -45,6 +46,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
@@ -1768,7 +1770,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
             cell.setValue(value);
             decorateCellInternal(cell, row);
           }
-          ensureErrorVisibility(row);
+          ensureVisibileIfInvalid(row);
         }
       }
       catch (Exception e) {
@@ -1782,11 +1784,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   /**
    * Ensure that displayable columns are visible, if there is an error
    */
-  public void ensureErrorVisibility(ITableRow row) {
-    Cell cell = row.getCellForUpdate(this);
+  @Override
+  public void ensureVisibileIfInvalid(ITableRow row) {
+    ICell cell = row.getCell(this);
     if (!cell.isContentValid() && isDisplayable() && !isVisible()) {
       setVisible(true);
     }
+  }
+
+  /**
+   * @return true if column content is valid, no error status is set on column and mandatory property is met.
+   */
+  @Override
+  public boolean isContentValid(ITableRow row) {
+    return Assertions.assertNotNull(row).getCell(this).isContentValid();
   }
 
   /**

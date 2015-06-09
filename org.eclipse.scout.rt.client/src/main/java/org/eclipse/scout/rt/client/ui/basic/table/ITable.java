@@ -1039,4 +1039,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.1.0
    */
   void setReloadHandler(IReloadHandler reloadHandler);
+
+  void ensureInvalidColumnsVisible();
+
 }
