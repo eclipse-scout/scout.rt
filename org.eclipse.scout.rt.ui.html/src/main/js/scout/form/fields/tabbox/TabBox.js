@@ -33,7 +33,7 @@ scout.TabBox.prototype._render = function($parent) {
     .appendDiv('tab-area')
     .on('keydown', this._onKeyDown.bind(this));
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
-  htmlComp.setLayout(new scout.NullLayout());
+  htmlComp.setLayout(new scout.TabAreaLayout(this));
 
   this._$tabContent = this.$container.appendDiv('tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
@@ -80,12 +80,11 @@ scout.TabBox.prototype._selectTab = function(tabItem) {
     this.tabItems[oldSelectedTab].setTabActive(false);
     this.tabItems[this.selectedTab].setTabActive(true);
 
-    // FIXME AWE: (tab-box) hier die tab-area neu layouten / prüfen ob das layout der tab-area unabhängig vom
-    // layout der tab-box (=group-box) gemacht werden kann/soll
-    scout.HtmlComponent.get(this.$container).revalidate();
+    scout.HtmlComponent.get(this._$tabArea).revalidate();
 
     // FIXME AWE: (tab-box) focus scheitert, wenn tab nicht gerendert ist (weil in overflow)
-    setTimeout(function() { // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout?
+    // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout?
+    setTimeout(function() {
       this.tabItems[this.selectedTab].focusTab();
     }.bind(this));
 

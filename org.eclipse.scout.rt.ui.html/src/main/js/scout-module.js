@@ -198,6 +198,7 @@ __include("scout/form/fields/splitbox/SplitBox.js");
 __include("scout/form/fields/splitbox/SplitBoxLayout.js");
 __include("scout/form/fields/stringfield/StringField.js");
 __include("scout/form/fields/stringfield/StringFieldKeyStrokeAdapter.js");
+__include("scout/form/fields/tabbox/TabAreaLayout.js");
 __include("scout/form/fields/tabbox/TabBox.js");
 __include("scout/form/fields/tabbox/TabItemMnemonicKeyStroke.js");
 __include("scout/form/fields/tabbox/TabBoxLayout.js");
