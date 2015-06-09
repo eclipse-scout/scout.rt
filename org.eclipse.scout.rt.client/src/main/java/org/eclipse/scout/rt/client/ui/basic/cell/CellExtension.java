@@ -24,6 +24,7 @@ public class CellExtension implements ICellSpecialization {
   private boolean m_enabled;
   private boolean m_editable;
   private boolean m_htmlEnabled;
+  private boolean m_mandatory;
   private CellStyle m_cellStyle;
 
   public CellExtension(ICellSpecialization specialization) {
@@ -150,6 +151,16 @@ public class CellExtension implements ICellSpecialization {
   @Override
   public boolean isHtmlEnabled() {
     return m_htmlEnabled;
+  }
+
+  @Override
+  public boolean isMandatory() {
+    return m_mandatory;
+  }
+
+  @Override
+  public void setMandatory(boolean mandatory) {
+    m_mandatory = mandatory;
   }
 
 }

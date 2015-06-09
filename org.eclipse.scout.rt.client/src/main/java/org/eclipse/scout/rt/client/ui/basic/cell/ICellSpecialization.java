@@ -72,4 +72,8 @@ public interface ICellSpecialization extends IStyleable {
   void setHtmlEnabled(boolean enabled);
 
   boolean isHtmlEnabled();
+
+  boolean isMandatory();
+
+  void setMandatory(boolean b);
 }

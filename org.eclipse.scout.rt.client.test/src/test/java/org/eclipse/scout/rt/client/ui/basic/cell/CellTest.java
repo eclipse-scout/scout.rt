@@ -47,6 +47,7 @@ public class CellTest {
     assertNull(c.getFont());
     assertNull(c.getObserver());
     assertFalse(c.isHtmlEnabled());
+    assertFalse(c.isMandatory());
     assertNull(c.getCssClass());
   }
 
@@ -77,6 +78,7 @@ public class CellTest {
     c.setFont(font);
     c.setHtmlEnabled(true);
     c.setCssClass(cssClass);
+    c.setMandatory(true);
     c.setObserver(observer);
 
     Cell copy = new Cell(c);
@@ -86,12 +88,14 @@ public class CellTest {
     assertEquals(tooltipText, copy.getTooltipText());
     assertEquals(cssClass, copy.getCssClass());
     assertTrue(copy.isHtmlEnabled());
+    assertTrue(copy.isMandatory());
 
     assertEquals(100, c.getHorizontalAlignment());
     assertEquals(bgColor, c.getBackgroundColor());
     assertEquals(fgColor, c.getForegroundColor());
     assertEquals(cssClass, c.getCssClass());
     assertEquals(font.toPattern(), c.getFont().toPattern());
+    assertTrue(c.isMandatory());
     assertTrue(c.isHtmlEnabled());
 
     assertSame(observer, c.getObserver());
@@ -279,6 +283,15 @@ public class CellTest {
     c.setHtmlEnabled(true);
     assertTrue(c.isHtmlEnabled());
     verify(observer).cellChanged(c, ICell.HTML_ENABLED_BIT);
+  }
+
+  @Test
+  public void testSetMandatory() {
+    Cell c = new Cell();
+    ICellObserver observer = installMockObserver(c);
+    c.setMandatory(true);
+    assertTrue(c.isMandatory());
+    verify(observer).cellChanged(c, ICell.MANDATORY_BIT);
   }
 
   @Test

@@ -30,7 +30,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
@@ -562,7 +561,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @ConfigOperation
   @Order(30)
   protected VALUE/* validValue */execValidateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
-    return validateValueInternal(row, rawValue);
+    return rawValue;
   }
 
   /**
@@ -828,6 +827,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     cell.setHorizontalAlignment(getHorizontalAlignment());
     cell.setEditable(isEditable());
     cell.setHtmlEnabled(isHtmlEnabled());
+    cell.setMandatory(isMandatory());
   }
 
   protected void reinitCells() {
@@ -846,7 +846,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setMandatory(boolean mandatory) {
-    propertySupport.setPropertyBool(IFormField.PROP_MANDATORY, mandatory);
+    boolean changed = propertySupport.setPropertyBool(IFormField.PROP_MANDATORY, mandatory);
+    if (changed && isInitialized()) {
+      reinitCells();
+    }
     validateColumnValues();
   }
 
@@ -1320,8 +1323,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public VALUE/* validValue */validateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
-    VALUE validatedValue = interceptValidateValue(row, rawValue);
-    validateMandatoryProperty(row, validatedValue);
+    VALUE vinternal = validateValueInternal(row, rawValue);
+    VALUE validatedValue = interceptValidateValue(row, vinternal);
     return validatedValue;
   }
 
@@ -1749,7 +1752,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
           Cell cell = row.getCellForUpdate(this);
           cell.removeErrorStatus(ParsingFailedStatus.class);
           cell.removeErrorStatus(ValidationFailedStatus.class);
-          IMultiStatus status = getEditorErrorIncludingMandatory((IValueField<VALUE>) editor);
+          IMultiStatus editorError = ((IValueField<VALUE>) editor).getErrorStatus();
+          MultiStatus status = editorError == null ? new MultiStatus() : new MultiStatus(editorError);
           if (!status.isOK()) {
             cell.addErrorStatus(status);
             cell.setText(((IValueField<VALUE>) editor).getDisplayText());
@@ -1783,24 +1787,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (!cell.isContentValid() && isDisplayable() && !isVisible()) {
       setVisible(true);
     }
-  }
-
-  private void validateMandatoryProperty(ITableRow row, VALUE validatedValue) throws VetoException {
-    if (isMandatory() && validatedValue == null) {
-      throw new VetoException(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"));
-    }
-  }
-
-  /**
-   * @return error in editor field, including mandatory error, if no value is set.
-   */
-  private IMultiStatus getEditorErrorIncludingMandatory(IValueField<VALUE> editor) {
-    IMultiStatus editorError = editor.getErrorStatus();
-    MultiStatus status = editorError == null ? new MultiStatus() : new MultiStatus(editorError);
-    if (!editor.isMandatoryFulfilled()) {
-      status.add(new ValidationFailedStatus<VALUE>(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
-    }
-    return status;
   }
 
   /**

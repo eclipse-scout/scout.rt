@@ -92,6 +92,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
       setIconId(c.getIconId());
       setText(c.getText());
       setValue(c.getValue());
+      setMandatory(c.isMandatory());
       setErrorStatus(c.getErrorStatus());
       setHtmlEnabled(c.isHtmlEnabled());
       //do not reset observer
@@ -185,6 +186,25 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setTooltipText(s);
       setValueInternal(TOOLTIP_BIT, newStyle);
+    }
+  }
+
+  @Override
+  public boolean isMandatory() {
+    return m_cellSpecialization.isMandatory();
+  }
+
+  @Override
+  public void setMandatory(boolean mandatory) {
+    if (m_cellSpecialization instanceof CellStyle) {
+      ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
+      newStyle.setMandatory(mandatory);
+      setValueInternal(MANDATORY_BIT, newStyle);
+    }
+    else if (CompareUtility.notEquals(m_cellSpecialization.isMandatory(), mandatory)) {
+      ICellSpecialization newStyle = m_cellSpecialization.copy();
+      newStyle.setMandatory(mandatory);
+      setValueInternal(MANDATORY_BIT, newStyle);
     }
   }
 
@@ -390,10 +410,22 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     m_errorStatus = status;
   }
 
+  /**
+   * @return true, if it contains an error status with severity >= IStatus.ERROR
+   */
+  protected boolean hasError() {
+    IStatus errorStatus = getErrorStatus();
+    return errorStatus != null && (errorStatus.getSeverity() >= IStatus.ERROR);
+  }
+
   @Override
   public boolean isContentValid() {
-    IStatus errorStatus = getErrorStatus();
-    return errorStatus == null || (errorStatus.getSeverity() < IStatus.ERROR);
+    return !hasError() && isMandatoryFulfilled();
+  }
+
+  @Override
+  public boolean isMandatoryFulfilled() {
+    return !isMandatory() || getValue() != null;
   }
 
   @Override

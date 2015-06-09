@@ -24,6 +24,7 @@ public class CellStyle implements ICellSpecialization {
   private String m_foregroundColor;
   private FontSpec m_fontSpec;
   private int m_horizontalAlignment;
+  private boolean m_mandatory;
 
   public CellStyle() {
     m_horizontalAlignment = -1;
@@ -154,14 +155,26 @@ public class CellStyle implements ICellSpecialization {
   }
 
   @Override
+  public boolean isMandatory() {
+    return m_mandatory;
+  }
+
+  @Override
+  public void setMandatory(boolean mandatory) {
+    m_mandatory = mandatory;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((m_backgroundColor == null) ? 0 : m_backgroundColor.hashCode());
+    result = prime * result + ((m_cssClass == null) ? 0 : m_cssClass.hashCode());
     result = prime * result + ((m_fontSpec == null) ? 0 : m_fontSpec.hashCode());
     result = prime * result + ((m_foregroundColor == null) ? 0 : m_foregroundColor.hashCode());
     result = prime * result + m_horizontalAlignment;
     result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
+    result = prime * result + (m_mandatory ? 1231 : 1237);
     return result;
   }
 
@@ -177,20 +190,20 @@ public class CellStyle implements ICellSpecialization {
       return false;
     }
     CellStyle other = (CellStyle) obj;
-    if (m_cssClass == null) {
-      if (other.m_cssClass != null) {
-        return false;
-      }
-    }
-    else if (!m_cssClass.equals(other.m_cssClass)) {
-      return false;
-    }
     if (m_backgroundColor == null) {
       if (other.m_backgroundColor != null) {
         return false;
       }
     }
     else if (!m_backgroundColor.equals(other.m_backgroundColor)) {
+      return false;
+    }
+    if (m_cssClass == null) {
+      if (other.m_cssClass != null) {
+        return false;
+      }
+    }
+    else if (!m_cssClass.equals(other.m_cssClass)) {
       return false;
     }
     if (m_fontSpec == null) {
@@ -218,6 +231,9 @@ public class CellStyle implements ICellSpecialization {
       }
     }
     else if (!m_iconId.equals(other.m_iconId)) {
+      return false;
+    }
+    if (m_mandatory != other.m_mandatory) {
       return false;
     }
     return true;

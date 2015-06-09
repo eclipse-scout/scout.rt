@@ -208,6 +208,19 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return validValue;
   }
 
+  /**
+   * do not use or override this internal method<br>
+   * subclasses perform specific value validations here and set the
+   * default textual representation of the value
+   */
+  @Override
+  protected String/* validValue */validateValueInternal(ITableRow row, String rawValue) throws ProcessingException {
+    if (rawValue != null && rawValue.length() == 0) {
+      return null;
+    }
+    return rawValue;
+  }
+
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
     IValueField<String> f = getDefaultEditor();

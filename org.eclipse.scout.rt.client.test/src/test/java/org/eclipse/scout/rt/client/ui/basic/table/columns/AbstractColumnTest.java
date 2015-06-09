@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -125,7 +126,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     table.addRowsByArray(new String[]{"", ""});
     table.getValidateTestColumn().setMandatory(true);
     ICell c0 = table.getCell(0, 0);
-    assertNotNull(c0.getErrorStatus());
+    assertFalse(c0.isContentValid());
   }
 
   /**

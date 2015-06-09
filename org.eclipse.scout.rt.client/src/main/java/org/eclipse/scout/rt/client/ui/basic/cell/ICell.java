@@ -26,6 +26,7 @@ public interface ICell {
   int EDITABLE_BIT = 10;// default false, value Boolean
   int CSS_CLASS_BIT = 11;
   int HTML_ENABLED_BIT = 12; //default false, value Boolean
+  int MANDATORY_BIT = 13; //default false, value Boolean
 
   Object getValue();
 
@@ -44,6 +45,10 @@ public interface ICell {
   String getForegroundColor();
 
   FontSpec getFont();
+
+  boolean isMandatory();
+
+  void setMandatory(boolean b);
 
   boolean isEditable();
 
@@ -64,5 +69,7 @@ public interface ICell {
    *         property is met.
    */
   boolean isContentValid();
+
+  boolean isMandatoryFulfilled();
 
 }
