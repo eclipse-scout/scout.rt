@@ -11,7 +11,6 @@ scout.MessageBox = function(model, session) {
   this.$actionText;
   this.$buttons;
   this.$yesButton;
-  this.$defaultButton;
   this.$noButton;
   this.$cancelButton;
   this.focusListener;
@@ -40,21 +39,12 @@ scout.MessageBox.prototype._render = function($parent) {
 
   if (this.yesButtonText) {
     this.$yesButton = this._createButton('yes', this.yesButtonText);
-    if (!this.$defaultButton) {
-      this.$defaultButton = this.$yesButton;
-    }
   }
   if (this.noButtonText) {
     this.$noButton = this._createButton('no', this.noButtonText);
-    if (!this.$defaultButton) {
-      this.$defaultButton = this.$noButton;
-    }
   }
   if (this.cancelButtonText) {
     this.$cancelButton = this._createButton('cancel', this.cancelButtonText);
-    if (!this.$defaultButton) {
-      this.$defaultButton = this.$cancelButton;
-    }
   }
   this._updateButtonWidths();
 
