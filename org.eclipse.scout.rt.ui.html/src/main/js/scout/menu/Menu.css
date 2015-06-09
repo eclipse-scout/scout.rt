@@ -205,6 +205,12 @@
     .menu-icon(attr(data-icon));
     color: @active-color;
   }
+
+  &.in-main-menubar[data-icon]::before {
+    font-size: 22px;
+    display: inline-block;
+  }
+
 }
 
 .popup-deco {

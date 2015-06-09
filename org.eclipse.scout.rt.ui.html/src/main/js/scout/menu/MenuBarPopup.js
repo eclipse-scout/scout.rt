@@ -33,6 +33,11 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this.headText = this.menu.$container.text();
   this.headIcon = this.menu.$container.attr('data-icon');
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
+
+  if (this.menu.$container.parent().hasClass('main-menubar')) {
+    this.$head.addClass('in-main-menubar');
+  }
+
   if (scout.Action.ActionStyle.TASK_BAR === this.menu.actionStyle) {
     this._copyCssClassToHead('taskbar-tool-item');
     this.$head.addClass('selected');
@@ -69,7 +74,7 @@ scout.MenuBarPopup.prototype.alignTo = function() {
 
   // horiz. alignment
   var left = pos.left,
-    top = pos.top - 5,
+    top = pos.top - 6,
     headInsets = scout.graphics.getInsets(this.$head),
     bodyTop = headSize.height;
 
@@ -77,6 +82,7 @@ scout.MenuBarPopup.prototype.alignTo = function() {
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
   this.$body.cssTop(bodyTop);
   this.$deco.cssTop(bodyTop);
+
   if (this.menu.$container.hasClass('right-aligned')) {
     // when we use float:right, browser uses fractions of pixels, that's why we must
     // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
@@ -92,12 +98,14 @@ scout.MenuBarPopup.prototype.alignTo = function() {
     bodyTop = headSize.height - 1;
     this.$body.cssTop(bodyTop);
     this.$deco.cssTop(bodyTop);
+    this.$head.cssLeft(0);
+    this.$deco.cssLeft(1).width(headSize.width - 2);
   } else {
     left -= headInsets.left;
+    this.$head.cssLeft(0);
+    this.$deco.cssLeft(1).width(headSize.width - 2);
   }
 
-  this.$head.cssLeft(0);
-  this.$deco.cssLeft(1).width(headSize.width - 2);
   this.setLocation(new scout.Point(left, top));
 };
 
