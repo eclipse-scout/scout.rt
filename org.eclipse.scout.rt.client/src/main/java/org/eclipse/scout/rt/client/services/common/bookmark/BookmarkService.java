@@ -184,6 +184,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     String cachedIconId = bm.getIconId();
     String cachedTitle = bm.getTitle();
     String cachedKeyStroke = bm.getKeyStroke();
+    double cachedOrder = bm.getOrder();
 
     // Fill the old bookmark with the data from the new one:
     bm.setSerializedData(newBookmark.getSerializedData());
@@ -192,6 +193,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     bm.setIconId(cachedIconId);
     bm.setTitle(cachedTitle);
     bm.setKeyStroke(cachedKeyStroke);
+    bm.setOrder(cachedOrder);
     // The bookmark's "text" should not be preserved - it is not editable by
     // the user and the only way to tell what the bookmark does.
   }

@@ -243,6 +243,7 @@ public class BookmarkViewForm extends AbstractForm {
               if (form.isFormStored()) {
                 b.setTitle(b.getTitle());
                 b.setKeyStroke(b.getKeyStroke());
+                b.setOrder(b.getOrder());
                 BookmarkFolder folder = form.getFolder();
                 if (folder == null) {
                   folder = form.getBookmarkRootFolder();

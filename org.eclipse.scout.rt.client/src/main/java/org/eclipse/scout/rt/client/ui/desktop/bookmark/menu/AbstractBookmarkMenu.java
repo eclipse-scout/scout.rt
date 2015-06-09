@@ -109,6 +109,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
       if (form.isFormStored()) {
         b.setTitle(form.getBookmark().getTitle());
         b.setKeyStroke(form.getBookmark().getKeyStroke());
+        b.setOrder(form.getBookmark().getOrder());
         BookmarkFolder folder = form.getFolder();
         if (folder == null) {
           folder = form.getBookmarkRootFolder();

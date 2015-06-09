@@ -17,12 +17,13 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 
-public class Bookmark implements Serializable, Cloneable {
+public class Bookmark implements Serializable, Cloneable, IOrdered {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Bookmark.class);
   private static final long serialVersionUID = 1L;
 
@@ -45,6 +46,7 @@ public class Bookmark implements Serializable, Cloneable {
   private String m_outlineClassName;
   private List<AbstractPageState> m_path;
   private String m_iconId;
+  private double m_order;
   /*
    * cache of serialized object
    */
@@ -62,6 +64,7 @@ public class Bookmark implements Serializable, Cloneable {
     this.m_title = bm.m_title;
     this.m_text = bm.m_text;
     this.m_iconId = bm.m_iconId;
+    this.m_order = bm.m_order;
     this.m_keyStroke = bm.m_keyStroke;
     this.m_outlineClassName = bm.m_outlineClassName;
     if (bm.m_path != null) {
@@ -79,6 +82,17 @@ public class Bookmark implements Serializable, Cloneable {
 
   public void setIconId(String iconid) {
     m_iconId = iconid;
+    m_serializedData = null;
+  }
+
+  @Override
+  public double getOrder() {
+    return m_order;
+  }
+
+  @Override
+  public void setOrder(double order) {
+    m_order = order;
     m_serializedData = null;
   }
 

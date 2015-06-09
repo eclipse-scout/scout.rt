@@ -10,14 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.DescriptionField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.FolderField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.KeyStrokeField;
+import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.SortOrderField;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm.MainBox.GroupBox.TitleField;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -53,6 +57,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       m_bookmark.setTitle(getTitleField().getValue());
       m_bookmark.setKeyStroke(getKeyStrokeField().getValue());
       m_bookmark.setText(getDescriptionField().getValue());
+      m_bookmark.setOrder(getSortOrderField().getValue().doubleValue());
     }
     return m_bookmark;
   }
@@ -64,6 +69,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       getTitleField().setValue(bookmark.getTitle());
       getKeyStrokeField().setValue(bookmark.getKeyStroke());
       getDescriptionField().setValue(bookmark.getText());
+      getSortOrderField().setValue(new BigDecimal(bookmark.getOrder()));
     }
   }
 
@@ -100,6 +106,10 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
 
   public FolderField getFolderField() {
     return getFieldByClass(FolderField.class);
+  }
+
+  public SortOrderField getSortOrderField() {
+    return getFieldByClass(SortOrderField.class);
   }
 
   @Order(10f)
@@ -163,6 +173,24 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
         @Override
         protected void execPrepareLookup(ILookupCall<String> call) throws ProcessingException {
           ((KeyStrokeLookupCall) call).setCurrentKeyStroke(getValue());
+        }
+      }
+
+      @Order(35)
+      public class SortOrderField extends AbstractBigDecimalField {
+        @Override
+        protected String getConfiguredLabel() {
+          return ScoutTexts.get("ColumnSorting");
+        }
+
+        @Override
+        protected BigDecimal getConfiguredMinValue() {
+          return BigDecimal.ZERO;
+        }
+
+        @Override
+        protected int getConfiguredMinFractionDigits() {
+          return 0;
         }
       }
 

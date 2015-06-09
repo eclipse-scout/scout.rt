@@ -768,6 +768,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           bm.setKeyStroke(form.getBookmark().getKeyStroke());
           bm.setKind(form.getBookmark().getKind());
           bm.setIconId(form.getBookmark().getIconId());
+          bm.setOrder(form.getBookmark().getOrder());
           final BookmarkFolder newBmFolder = form.getFolder() != null ? form.getFolder() : form.getBookmarkRootFolder();
           if (!CompareUtility.equals(oldBmFolder, newBmFolder)) {
             //find new folder node
