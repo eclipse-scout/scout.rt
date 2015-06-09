@@ -414,4 +414,9 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   void ensureVisibileIfInvalid(ITableRow row);
 
+  /**
+   * Initialize cell properties with column properties
+   */
+  void initCell(ITableRow row);
+
 }

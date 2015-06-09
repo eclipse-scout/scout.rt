@@ -2810,6 +2810,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableChanging(true);
       //
       int oldRowCount = m_rows.size();
+      initCells(newRows);
       List<ITableRow> newIRows = createInternalRows(newRows, markAsInserted);
       // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
@@ -2857,6 +2858,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  /**
+   * initialize cells with column default values
+   */
+  private void initCells(List<? extends ITableRow> rows) {
+    for (int i = 0; i < getColumnCount(); i++) {
+      for (ITableRow row : rows) {
+        IColumn<?> col = getColumnSet().getColumn(i);
+        col.initCell(row);
+      }
+    }
+  }
+
   private List<ITableRow> createInternalRows(List<? extends ITableRow> newRows, boolean markAsInserted) throws ProcessingException {
     List<ITableRow> newIRows = new ArrayList<>(newRows.size());
     for (ITableRow newRow : newRows) {
@@ -2870,11 +2883,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private ITableRow addInternalRow(InternalTableRow newIRow) throws ProcessingException {
-    for (IColumn<?> col : getColumns()) {
-      if (col instanceof AbstractColumn<?>) {
-        ((AbstractColumn<?>) col).initCell(newIRow);
-      }
-    }
     synchronized (m_cachedRowsLock) {
       m_cachedRows = null;
       int newIndex = m_rows.size();

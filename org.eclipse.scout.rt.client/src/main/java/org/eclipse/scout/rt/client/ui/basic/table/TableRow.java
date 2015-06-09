@@ -25,7 +25,7 @@ public class TableRow implements ITableRow {
 
   private final ColumnSet m_columnSet;
   private int m_status = STATUS_NON_CHANGED;
-  private boolean m_enabled;
+  private boolean m_enabled = true;
   private boolean m_checked;
   private String m_iconId;
   private String m_cssClass;
@@ -38,16 +38,18 @@ public class TableRow implements ITableRow {
    */
   public TableRow(ColumnSet columnSet) {
     m_columnSet = columnSet;
-    m_enabled = true;
-    m_status = STATUS_NON_CHANGED;
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
-    for (int i = 0; i < colCount; i++) {
-      m_cells.add(new Cell());
-    }
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerTableRow(this);
-    }
+    addCells(colCount);
+    addDesktopProfiler();
+  }
+
+  public TableRow(ColumnSet columnSet, ITableRow row) throws ProcessingException {
+    m_columnSet = columnSet;
+    int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
+    m_cells = new ArrayList<Cell>(colCount);
+    copyCells(row);
+    addDesktopProfiler();
   }
 
   public TableRow(ColumnSet columnSet, List<? extends Object> values) throws ProcessingException {
@@ -57,6 +59,24 @@ public class TableRow implements ITableRow {
         Cell cell = getCellForUpdate(i);
         cell.setValue(values.get(i));
       }
+    }
+  }
+
+  private void addDesktopProfiler() {
+    if (DesktopProfiler.getInstance().isEnabled()) {
+      DesktopProfiler.getInstance().registerTableRow(this);
+    }
+  }
+
+  private void addCells(int colCount) {
+    for (int i = 0; i < colCount; i++) {
+      m_cells.add(new Cell());
+    }
+  }
+
+  private void copyCells(ITableRow row) {
+    for (int i = 0; i < row.getCellCount(); i++) {
+      m_cells.add(new Cell(row.getCell(i)));
     }
   }
 

@@ -85,6 +85,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     if (c != null) {
       setCssClass(c.getCssClass());
       setFont(c.getFont());
+      setEditable(c.isEditable());
       setForegroundColor(c.getForegroundColor());
       setBackgroundColor(c.getBackgroundColor());
       setHorizontalAlignment(c.getHorizontalAlignment());

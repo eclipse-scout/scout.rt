@@ -65,7 +65,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -811,7 +810,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     interceptDisposeColumn();
   }
 
-  public void initCell(ITableRow row) throws ProcessingException {
+  /**
+   * Initialize cell with column defaults.
+   */
+  @Override
+  public void initCell(ITableRow row) {
     Cell cell = row.getCellForUpdate(this);
     if (getForegroundColor() != null) {
       cell.setForegroundColor(getForegroundColor());
@@ -837,12 +840,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       return;
     }
     for (ITableRow row : getTable().getRows()) {
-      try {
-        initCell(row);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      initCell(row);
     }
   }
 

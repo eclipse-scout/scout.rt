@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -22,33 +20,6 @@ import org.junit.Test;
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=452283 <br>
  */
 public class TableValidationTest {
-
-  /**
-   * Compares performance for editable vs. non-editable table cells.
-   */
-  //TODO jgu
-  @Ignore
-  @Test
-  public void testLoadingPerformance() throws ProcessingException {
-    TestTable t = new TestTable();
-    Object[][] testRows = new Object[10000][1];
-    for (int i = 0; i < 10000; i++) {
-      testRows[i][0] = "a" + i;
-    }
-
-    TuningUtility.startTimer();
-    t.addRowsByMatrix(testRows);
-    TuningUtility.stopTimer("loading rows editable");
-    TuningUtility.finishAll();
-
-    TestTable t2 = new TestTable();
-    t2.getC1Column().setEditable(false);
-
-    TuningUtility.startTimer();
-    t2.addRowsByMatrix(testRows);
-    TuningUtility.stopTimer("loading rows not editable");
-    TuningUtility.finishAll();
-  }
 
   /*
    * Workaround for bugs 396848 & 408741
@@ -92,8 +63,4 @@ public class TableValidationTest {
     }
 
   }
-
-  //TODO JGU
-  //CSS CLASS soll das aufs feld gemapped werden?
-
 }

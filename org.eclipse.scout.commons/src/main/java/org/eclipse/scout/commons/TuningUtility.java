@@ -61,10 +61,10 @@ public final class TuningUtility {
   }
 
   // current timer
-  private static Stack<Long> timerStack;
+  private static final Stack<Long> timerStack;
   // analysis
-  private static Object analysisMapLock;
-  private static TreeMap<String, TreeSet<CompositeObject>> analysisMap;
+  private static final Object analysisMapLock;
+  private static final TreeMap<String, TreeSet<CompositeObject>> analysisMap;
 
   static {
     timerStack = new Stack<Long>();

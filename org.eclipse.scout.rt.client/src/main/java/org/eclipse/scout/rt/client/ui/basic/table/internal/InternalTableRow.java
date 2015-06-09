@@ -50,14 +50,14 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
 
   @SuppressWarnings("unchecked")
   public InternalTableRow(ITable table, ITableRow row) throws ProcessingException {
-    super(table.getColumnSet());
+    super(table.getColumnSet(), row);
     setEnabled(row.isEnabled());
     m_rowIndex = row.getRowIndex();
 
     int columnCount = table.getColumnCount();
     // import and validate cell values
     for (int i = 0; i < table.getColumnCount(); i++) {
-      ICell newCell = row.getCell(i);
+      Cell newCell = row.getCellForUpdate(i);
       IColumn col = table.getColumnSet().getColumn(i);
       tryParseAndSetValue(col, m_cells.get(i), newCell);
     }
@@ -81,9 +81,9 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     T value = (T) newCell.getValue();
     try {
       internalCell.setText(newCell.getText());
-      Object parsedValue = col.parseValue(this, value);
-      T validValue = col.validateValue(this, (T) parsedValue);
-      internalCell.setValue(validValue);
+      T parsedValue = col.parseValue(this, value);
+      col.setValue(this, parsedValue);
+      internalCell.setValue(parsedValue);
     }
     catch (ProcessingException e) {
       internalCell.setText(format(value));
