@@ -50,6 +50,8 @@
     }
 
      & > .tree-node-control {
+      color: @highlight-color;
+
       /* adjust control position */
       margin-left: -@outline-node-control-size - 5px;
       margin-top: -3px;
