@@ -22,8 +22,7 @@ scout.inherits(scout.TabBox, scout.CompositeField);
  */
 scout.TabBox.prototype.init = function(model, session) {
   scout.TabBox.parent.prototype.init.call(this, model, session);
-  this.tabItems[this.selectedTab].setTabTabbable(true);
-  this.tabItems[this.selectedTab].setTabSelected(true);
+  this.tabItems[this.selectedTab].setTabActive(true);
 };
 
 scout.TabBox.prototype._render = function($parent) {
@@ -57,43 +56,36 @@ scout.TabBox.prototype._renderTabs = function() {
 };
 
 scout.TabBox.prototype.rebuildTabs = function() {
-  $.log.info('rebuildTabs');
+  // FIXME AWE: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
+  // DOM element which currently has the focus - the focus is lost. An other solution would be, to render the
+  // tab at the correct position but probably that's not so easy because the render impl. does always append.
   this.tabItems.forEach(function(tabItem) {
-    if (!tabItem._tabRendered) {
-      tabItem.renderTab(this._$tabArea);
+    if (tabItem._tabRendered) {
+      tabItem.removeTab();
     }
   }, this);
+  this._renderTabs();
 };
 
-/**
- * @param vararg either 'tabIndex' (numeric) or 'tabItem' (instanceof scout.TabItem)
- */
-scout.TabBox.prototype._selectTab = function(vararg) {
-  var tabIndex;
-  if (scout.objects.isNumber(vararg)) { // FIXME AWE: remove? unused?
-    tabIndex = vararg;
-  }
-  else if (vararg instanceof scout.TabItem) {
-    tabIndex = this.tabItems.indexOf(vararg);
-  }
-  else {
-    throw new Error('Illegal argument for vararg');
-  }
-
+scout.TabBox.prototype._selectTab = function(tabItem) {
+  var tabIndex = this.tabItems.indexOf(tabItem);
   if (tabIndex != this.selectedTab) {
+    $.log.debug('(TabBox#_selectTab) tabItem=' + tabItem + ' tabIndex=' + tabIndex);
     var oldSelectedTab = this.selectedTab;
     this.selectedTab = tabIndex;
     this.session.send(this.id, 'selected', {
       tabIndex: tabIndex
     });
 
-    $.log.info('focus tabIndex=' + this.selectedTab);
-    this.tabItems[oldSelectedTab].setTabSelected(false);
-    this.tabItems[oldSelectedTab].setTabTabbable(false);
+    this.tabItems[oldSelectedTab].setTabActive(false);
+    this.tabItems[this.selectedTab].setTabActive(true);
 
-    this.tabItems[this.selectedTab].setTabSelected(true);
-    this.tabItems[this.selectedTab].setTabTabbable(true);
-    setTimeout(function() { // FIXME AWE: wieso braucht es hiert NOCH ein setTimeoput??
+    // FIXME AWE: (tab-box) hier die tab-area neu layouten / prüfen ob das layout der tab-area unabhängig vom
+    // layout der tab-box (=group-box) gemacht werden kann/soll
+    scout.HtmlComponent.get(this.$container).revalidate();
+
+    // FIXME AWE: (tab-box) focus scheitert, wenn tab nicht gerendert ist (weil in overflow)
+    setTimeout(function() { // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout?
       this.tabItems[this.selectedTab].focusTab();
     }.bind(this));
 
@@ -131,7 +123,6 @@ scout.TabBox.prototype._onKeyDown = function(event) {
       if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
         var tabItem = this.tabItems[tabIndex];
         if (tabItem._tabRendered) {
-          $.log.info('_selectTab tabItem=' + tabItem);
           this._selectTab(tabItem);
         }
       }
@@ -156,10 +147,9 @@ scout.TabBox.prototype._renderTabContent = function($tabContent) {
      * to invisible.
      */
     this.tabItems[this.selectedTab]._renderLabelVisible(false);
-
-    if (this.rendered) {
-      scout.HtmlComponent.get(this._$tabContent).revalidate();
-    }
+  }
+  if (this.rendered) {
+    scout.HtmlComponent.get(this._$tabContent).revalidate();
   }
 };
 

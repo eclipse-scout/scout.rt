@@ -414,9 +414,8 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
 };
 
 scout.ModelAdapter.prototype.toString = function() {
-  var str = 'Adapter[' + this.objectType + ', ' + this.id + ']';
-  str += '\n' + scout.ModelAdapter.parent.prototype.toString.call(this);
-  return str;
+  return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id +
+    ' super=' + scout.ModelAdapter.parent.prototype.toString.call(this) + ']';
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

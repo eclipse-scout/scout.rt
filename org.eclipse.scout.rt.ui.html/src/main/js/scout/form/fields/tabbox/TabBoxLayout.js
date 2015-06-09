@@ -41,15 +41,69 @@ scout.TabBoxLayout.prototype._layoutTabArea = function(htmlTabArea) {
 
   this._overflowTabItems = [];
   if (clientWidth < scrollWidth) {
-    this._tabBox.tabItems.forEach(function(tabItem) {
+
+    // determine visible range (at least selected tab must be visible)
+    var i, tabItem,
+      numTabs = this._tabBox.tabItems.length,
+      selectedTab = this._tabBox.selectedTab,
+      tabBounds = [],
+      visibleTabs = [];
+    for (i = 0; i < numTabs; i++) {
+      tabItem = this._tabBox.tabItems[i];
       bounds = scout.graphics.bounds(tabItem.$tabContainer, true, true);
-      rightOuterX = bounds.x + bounds.width;
-      if (rightOuterX > clientWidth) {
-        $.log.info('Overflow tabItem=' + tabItem);
+      tabBounds.push(bounds);
+    }
+
+    // if we have too few space to even display the selected tab, only render the selected tab
+    visibleTabs.push(selectedTab);
+    bounds = tabBounds[selectedTab];
+
+    if (clientWidth > bounds.width) {
+      // 1. when oldTab is unknown, place selected tab at the left-most position
+      var
+        viewWidth = bounds.width,
+        delta = bounds.x, // delta used to start from x=0
+        leftMostTab = selectedTab,
+        rightMostTab = selectedTab,
+        overflow = false;
+
+      // when leftEnd + rightEnd do not fit into clientWidth anymore, abort always
+      // expand to the right until the last tab is reached
+      if (selectedTab < numTabs - 1) {
+        for (i = selectedTab + 1; i < numTabs; i++) {
+          bounds = tabBounds[i];
+          viewWidth = bounds.x - delta + bounds.width;
+          if (viewWidth < clientWidth) {
+            visibleTabs.push(i);
+          } else {
+            overflow = true;
+          }
+        }
+      }
+
+      // than expand to the left until the first tab is reached
+      if (!overflow && selectedTab > 0) {
+        for (i = selectedTab - 1; i >= 0; i--) {
+          bounds = tabBounds[i];
+          if (viewWidth + delta - bounds.x < clientWidth) {
+            visibleTabs.push(i);
+          }
+        }
+      }
+
+      // 2. find place for selected tab depending on the oldTab
+      // FIXME AWE: damit das richtig funktioniert, muss auch der _vorher_ selektierte tab bekannt sein
+    }
+
+    // FIXME AWE: hier durch visibleTabs loopen
+    for (i = 0; i < numTabs; i++) {
+      tabItem = this._tabBox.tabItems[i];
+      if (visibleTabs.indexOf(i) === -1) {
+        $.log.debug('Overflow tabItem=' + tabItem);
         this._overflowTabItems.push(tabItem);
         tabItem.removeTab();
       }
-    }, this);
+    }
   }
 
   if (this._overflowTabItems.length > 0) {

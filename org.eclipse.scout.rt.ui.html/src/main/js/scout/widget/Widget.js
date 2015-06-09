@@ -149,9 +149,6 @@ scout.Widget.prototype._uninstallKeyStrokeAdapter = function() {
 };
 
 scout.Widget.prototype.toString = function() {
-  var str = 'Widget[rendered=' +  this.rendered + ']';
-  if (this.$container) {
-    str += '\n' + scout.graphics.debugOutput(this.$container);
-  }
-  return str;
+  return 'Widget[rendered=' +  this.rendered +
+      (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
 };

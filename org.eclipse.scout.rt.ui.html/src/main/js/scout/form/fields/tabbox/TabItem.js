@@ -5,8 +5,7 @@ scout.TabItem = function() {
   scout.TabItem.parent.call(this);
   this.$tabContainer;
   this._tabRendered = false;
-  this._tabSelected = false;
-  this._tabTabbable = false;
+  this._tabActive = false;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 
@@ -26,8 +25,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
     .data('tabItem', this)
     .on('mousedown', this._onTabMouseDown.bind(this));
 
-  this._renderTabTabbable();
-  this._renderTabSelected();
+  this._renderTabActive();
   this._tabRendered = true;
   this._updateTab();
 };
@@ -41,28 +39,17 @@ scout.TabItem.prototype.focusTab = function() {
   this.$tabContainer.focus();
 };
 
-scout.TabItem.prototype.setTabSelected = function(tabSelected) {
-  var oldTabSelected = this._tabSelected;
-  this._tabSelected = tabSelected;
-  if (this._tabRendered && oldTabSelected != tabSelected) {
-    this._renderTabSelected();
+scout.TabItem.prototype.setTabActive = function(active) {
+  var oldTabActive = this._tabActive;
+  this._tabActive = active;
+  if (this._tabRendered && oldTabActive != active) {
+    this._renderTabActive();
   }
 };
 
-scout.TabItem.prototype._renderTabSelected = function() {
-  this.$tabContainer.select(this._tabSelected);
-};
-
-scout.TabItem.prototype.setTabTabbable = function(tabTabbable) {
-  var oldTabTabbable = this._tabTabbable;
-  this._tabTabbable = tabTabbable;
-  if (this._tabRendered && oldTabTabbable != tabTabbable) {
-    this._renderTabTabbable();
-  }
-};
-
-scout.TabItem.prototype._renderTabTabbable = function() {
-  if (this._tabTabbable) {
+scout.TabItem.prototype._renderTabActive = function() {
+  this.$tabContainer.select(this._tabActive);
+  if (this._tabActive) {
     this.$tabContainer.removeAttr('tabindex');
   } else {
     this.$tabContainer.attr('tabindex', -1);
