@@ -46,7 +46,7 @@ public class TableLoadingPerfTest {
       durations[i] = TimeUnit.NANOSECONDS.toMillis(stop - start);
     }
     //should be ok on a slow machine
-    assertMean(durations, 300);
+    assertMean(durations, 1000);
   }
 
   private void assertMean(Long[] durations, int expectedMean) {
