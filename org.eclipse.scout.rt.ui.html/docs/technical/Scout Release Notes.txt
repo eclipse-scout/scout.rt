@@ -299,3 +299,6 @@ JGU 08.06.2015
 Deprecated getConfiguredAutoDisplayText in AbstractValueField.
 The display text is always updated automatically.
 
+AWE 10.06.2015
+AbstractGroupBox setBorderVisible(false) does not change visibility of label anymore
+Label of group-box must be made invisible by calling setLabelVisible(false)

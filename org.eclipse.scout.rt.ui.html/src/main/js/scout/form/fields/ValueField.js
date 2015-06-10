@@ -54,7 +54,7 @@ scout.ValueField.prototype._onStatusClick = function(event) {
 };
 
 scout.ValueField.prototype._hasMenus = function() {
-  return this.menus && this.menus.length > 0;
+  return !!(this.menus && this.menus.length > 0);
 };
 
 scout.ValueField.prototype._renderMenus = function(menus) {
