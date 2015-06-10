@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -83,8 +82,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     IPage page = (IPage) node;
     JSONObject json = super.treeNodeToJson(node);
     putDetailFormAndTable(json, page);
-    if (node.getParentNode() instanceof IPageWithTable && node.getParentNode().getChildNodeCount() > 1) {
-      putProperty(json, "lazyAddToTree", Boolean.TRUE);
+    if (page.getParentPage() != null) {
+      putProperty(json, "lazyAddToTree", page.getParentPage().isLazyAddChildPagesToOutline());
     }
     if (getUiSession().isInspectorHint()) {
       putProperty(json, "modelClass", page.getClass().getName());

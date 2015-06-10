@@ -302,3 +302,10 @@ The display text is always updated automatically.
 AWE 10.06.2015
 AbstractGroupBox setBorderVisible(false) does not change visibility of label anymore
 Label of group-box must be made invisible by calling setLabelVisible(false)
+
+BSH 10.06.2015
+The model can define whether child pages of a page should be added immediately to the outline tree or lazily. If nodes are added lazily, a dummy "show all" node is shown instead.
+Node pages never add child pages lazily. Table pages add child nodes lazily when they have more than a specific number of child pages (default 1).
+The behavior may be controlled using:
+- boolean getConfiguredLazyAddChildPagesToOutline() --> default false, for AbstractPageWithTable the default is true
+- int getConfiguredLazyAddChildPagesToOutlineThreshold() --> setting for AbstractPageWithTable, after how many child pages the lazy setting should be active (default 1)

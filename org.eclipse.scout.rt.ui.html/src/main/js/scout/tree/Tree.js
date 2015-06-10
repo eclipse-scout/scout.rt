@@ -736,14 +736,27 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
   //If every child node was deleted mark node as collapsed (independent of the model state)
   //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
+  var parentNode;
   if (!$parentNode && parentNodeId >= 0) {
-    var parentNode = this.nodesMap[parentNodeId];
+    parentNode = this.nodesMap[parentNodeId];
     $parentNode = (parentNode ? parentNode.$node : undefined);
   }
   if ($parentNode) {
-    var childNodesOfParent = $parentNode.data('node').childNodes;
+    if (!parentNode) {
+      parentNode = $parentNode.data('node');
+    }
+    var childNodesOfParent = parentNode.childNodes;
     if (!childNodesOfParent || childNodesOfParent.length === 0) {
       $parentNode.removeClass('expanded');
+      if (parentNode.$showAllNode) {
+        parentNode.$showAllNode.remove();
+        delete parentNode.$showAllNode;
+      }
+    }
+    else {
+      if (parentNode.$showAllNode) {
+        this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
+      }
     }
   }
 
@@ -786,11 +799,25 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     }
   }
 
-  // If some of the nodes are hidden, add a dummy "show all" node
-  if (hasHiddenNodes && parentNode.expanded && !parentNode.$showAllNode) {
-    var $showAllNode = this._$buildShowAllNode(parentNode);
-    $showAllNode.insertAfter($predecessor);
-    $predecessor = $showAllNode;
+  // Update dummy "show all" node
+  if (!hasHiddenNodes) {
+    // Delete existing $showAllNode
+    if (parentNode && parentNode.$showAllNode) {
+      parentNode.$showAllNode.remove();
+      delete parentNode.$showAllNode;
+    }
+  }
+  else {
+    // If parent is expanded and has not already a $showAllNode, create one
+    if (parentNode && parentNode.expanded && !parentNode.$showAllNode) {
+      var $showAllNode = this._$buildShowAllNode(parentNode);
+      $showAllNode.insertAfter($predecessor);
+      $predecessor = $showAllNode;
+    }
+    else {
+      // Node already exists, just update the text (node count might have changed)
+      this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
+    }
   }
 
   this.updateScrollbar();
@@ -825,9 +852,9 @@ scout.Tree.prototype._$buildShowAllNode = function(parentNode) {
 
   var $node = $.makeDiv('tree-node show-all')
     .attr('data-level', currentLevel)
-    .text(this.session.text('ShowAllNodes', parentNode.childNodes.length))
     .css('padding-left', this._computeTreeItemPaddingLeft(currentLevel));
 
+  this._decorateShowAllNode($node, parentNode);
   // TreeItemControl
   var $control = $node.prependDiv('tree-node-control');
 
@@ -872,6 +899,11 @@ scout.Tree.prototype._decorateNode = function(node) {
   // TODO BSH More attributes...
   // iconId
   // tooltipText
+};
+
+scout.Tree.prototype._decorateShowAllNode = function($showAllNode, parentNode) {
+  $showAllNode
+    .text(this.session.text('ShowAllNodes', parentNode.childNodes.length));
 };
 
 scout.Tree.prototype._renderNodeChecked = function(node) {
