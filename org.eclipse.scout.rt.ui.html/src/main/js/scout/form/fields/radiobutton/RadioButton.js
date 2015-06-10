@@ -6,18 +6,26 @@ scout.inherits(scout.RadioButton, scout.Button);
 scout.RadioButton.prototype._render = function($parent) {
   this.addContainer($parent, 'radio-button', new scout.RadioButtonLayout(this));
 
-  this.addField($('<input>')
-    .attr('id', this.refFieldId)
-    .attr('type', 'radio')
-    .attr('value', this.radioValue).on('click', this._onClick.bind(this)));
-  this.addLabel();
-  this.$label.attr('for', this.refFieldId);
+  this.addField($('<div>')
+    .attr('value', this.radioValue)
+    .on('mousedown', this._mouseDown.bind(this)));
+
   this.addStatus();
 };
 
-scout.RadioButton.prototype._onClick = function() {
+scout.RadioButton.prototype._mouseDown = function() {
+  this._toggleChecked();
+};
+
+//TODO nbu add to all places where used
+scout.RadioButton.prototype._toggleChecked = function(){
+  if(!this.enabled){
+    return;
+  }
+  this.$field.toggleClass('checked', true);
   this.session.send(this.id, 'selected');
 };
+
 /**
  * @override
  */
@@ -30,17 +38,38 @@ scout.RadioButton.prototype._renderProperties = function() {
  * @override
  */
 scout.RadioButton.prototype._renderLabel = function(label) {
-  if (this.$label) {
-    this.$label.html(label ? scout.strings.removeAmpersand(label) : '');
+  if (!label) {
+    label = '';
   }
+  if (this.$field) {
+    this.$field.text(label ? scout.strings.removeAmpersand(label) : '');
+  }
+
 };
 
 scout.RadioButton.prototype._renderRadioValue = function(radioValue) {
   this.$field.attr('value', radioValue);
 };
 
-scout.RadioButton.prototype._renderSelected = function(selected) {
-  if (selected) {
-    this.$field.attr('checked', 'checked');
+scout.RadioButton.prototype._renderTabbable = function(tabbable){
+  if(tabbable){
+    this.$field.attr('tabindex', '0');
+  }
+  else{
+    this.$field.removeAttr('tabindex');
   }
 };
+
+
+scout.RadioButton.prototype._handleTabIndex  = function(){
+  if(this.parent instanceof scout.RadioButtonGroup){
+    return;
+  }
+  this._renderTabbable(this.enabled);
+};
+
+scout.RadioButton.prototype._renderSelected = function(selected) {
+  this.$field.toggleClass('checked', selected);
+};
+
+

@@ -181,6 +181,7 @@ __include("scout/form/fields/placeholder/PlaceholderField.js");
 __include("scout/form/fields/plannerfield/PlannerField.js");
 __include("scout/form/fields/radiobutton/RadioButton.js");
 __include("scout/form/fields/radiobutton/RadioButtonGroup.js");
+__include("scout/form/fields/radiobutton/RadioButtonGroupKeyStrokeAdapter.js");
 __include("scout/form/fields/radiobutton/RadioButtonLayout.js");
 __include("scout/form/fields/richtextfield/RichTextField.js");
 __include("scout/form/fields/richtextfield/RichTextFieldKeyStrokeAdapter.js");

@@ -34,3 +34,32 @@ scout.RadioButtonGroup.prototype._render = function($parent) {
   this.addField(this._$body);
   this.addStatus();
 };
+
+scout.RadioButtonGroup.prototype._renderEnabled = function(){
+  scout.RadioButtonGroup.parent.prototype._renderEnabled.call(this);
+  this._provideTabIndex();
+};
+
+scout.RadioButtonGroup.prototype._provideTabIndex = function(){
+  var tabSet;
+  for (var i = 0; i < this.formFields.length; i++) {
+    if (this.formFields[i] instanceof scout.RadioButton) {
+      if(this.formFields[i].enabled && this.enabled && !tabSet){
+        this.formFields[i]._renderTabbable(true);
+        tabSet=this.formFields[i];
+      }
+      else if(tabSet && this.enabled && this.formFields[i].enabled && this.formFields[i].selected){
+        tabSet._renderTabbable(false);
+        this.formFields[i]._renderTabbable(true);
+        tabSet=this.formFields[i];
+      }
+      else{
+        this.formFields[i]._renderTabbable(false);
+      }
+    }
+  }
+};
+
+scout.RadioButtonGroup.prototype._createKeyStrokeAdapter = function(){
+  return new scout.RadioButtonGroupKeyStrokeAdapter(this);
+};
