@@ -84,8 +84,13 @@ public final class BinaryResource implements Serializable {
     }
   }
 
-  public BinaryResource(File file) throws ProcessingException {
-    this(file.getName(), FileUtility.getContentType(file), IOUtility.getContent(file), file.lastModified());
+  /**
+   * Convenience constructor which assumes <code>lastModified = -1</code>.
+   *
+   * @see #BinaryResource(String, String, byte[], long)
+   */
+  public BinaryResource(String filename, String contentType, byte[] content) {
+    this(filename, contentType, content, -1);
   }
 
   /**
@@ -97,6 +102,14 @@ public final class BinaryResource implements Serializable {
    */
   public BinaryResource(String filename, byte[] content) {
     this(filename, null, content, -1);
+  }
+
+  /**
+   * @deprecated do not use this constructor! In HtmlUI, it is wrong to work with {@link File} in most of the cases.
+   */
+  @Deprecated
+  public BinaryResource(File file) throws ProcessingException {
+    this(file.getName(), FileUtility.getContentType(file), IOUtility.getContent(file), file.lastModified());
   }
 
   /**
