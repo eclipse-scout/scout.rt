@@ -262,14 +262,14 @@ scout.Table.prototype._createFooter = function() {
 
 scout.Table.prototype.clearSelection = function(dontFire) {
   this.selectedRows.forEach(function(row) {
-    if(row.$row){
+    if (row.$row) {
       row.$row.select(false);
       row.$row.toggleClass('select-middle select-top select-bottom select-single', false);
     }
-});
-  this.selectedRows.length=0;
+  });
+  this.selectedRows.length = 0;
   if (!dontFire) {
-    this._sendRowsPending=true;
+    this._sendRowsPending = true;
     this.notifyRowSelectionFinished();
   }
 };
@@ -292,7 +292,7 @@ scout.Table.prototype.selectAll = function() {
   this.rows.forEach(function(row) {
     this.addRowToSelection(row, true);
   }, this);
-  this._sendRowsPending=true;
+  this._sendRowsPending = true;
   this.notifyRowSelectionFinished();
 };
 
@@ -511,16 +511,13 @@ scout.Table.prototype._buildRowDiv = function(row, rowSelected, previousRowSelec
   var rowClass = 'table-row';
   if (rowSelected) {
     rowClass += ' selected';
-    if(previousRowSelected&&followingRowSelected){
+    if (previousRowSelected && followingRowSelected) {
       rowClass += ' select-middle';
-    }
-    else if(!previousRowSelected&&followingRowSelected){
+    } else if (!previousRowSelected && followingRowSelected) {
       rowClass += ' select-top';
-    }
-    else if(!previousRowSelected&&!followingRowSelected){
+    } else if (!previousRowSelected && !followingRowSelected) {
       rowClass += ' select-single';
-    }
-    else if(previousRowSelected&&!followingRowSelected){
+    } else if (previousRowSelected && !followingRowSelected) {
       rowClass += ' select-bottom';
     }
   }
@@ -551,28 +548,27 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
   var $rows, numRowsLoaded,
     rowString = '',
     that = this;
-  lastRowOfBlockSelected = lastRowOfBlockSelected ? lastRowOfBlockSelected:false;
+  lastRowOfBlockSelected = lastRowOfBlockSelected ? lastRowOfBlockSelected : false;
   startRowIndex = startRowIndex !== undefined ? startRowIndex : 0;
   rows = rows || this.rows;
   numRowsLoaded = startRowIndex;
   if (rows.length > 0) {
     // Build $rows (as string instead of jQuery objects for efficiency reasons)
-    var previousRowSelected=false,
-    followingRowSelected = false;
+    var previousRowSelected = false,
+      followingRowSelected = false;
     for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + 100); r++) {
       var row = rows[r],
-      rowSelected = this.selectedRows.indexOf(row)>-1;
+        rowSelected = this.selectedRows.indexOf(row) > -1;
 
-      if(r===startRowIndex){
-        previousRowSelected=lastRowOfBlockSelected;
+      if (r === startRowIndex) {
+        previousRowSelected = lastRowOfBlockSelected;
       } else {
-        previousRowSelected = this.selectedRows.indexOf(rows[r-1])>-1;
+        previousRowSelected = this.selectedRows.indexOf(rows[r - 1]) > -1;
       }
-      if(r<Math.min(rows.length, startRowIndex + 100)-1){
-        followingRowSelected = this.selectedRows.indexOf(rows[r+1])>-1;
-      }
-      else{
-        followingRowSelected= false;
+      if (r < Math.min(rows.length, startRowIndex + 100) - 1) {
+        followingRowSelected = this.selectedRows.indexOf(rows[r + 1]) > -1;
+      } else {
+        followingRowSelected = false;
       }
       rowString += this._buildRowDiv(row, rowSelected, previousRowSelected, followingRowSelected);
     }
@@ -585,7 +581,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       var $row = $(rowObject);
       var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
-      lastRowOfBlockSelected= $row.isSelected();
+      lastRowOfBlockSelected = $row.isSelected();
     });
 
     // append block of rows
@@ -831,6 +827,7 @@ scout.Table.prototype.sendAppLinkAction = function(columnId, ref) {
 };
 
 scout.Table.prototype.sendReload = function() {
+  this.$data.empty();
   this.session.send(this.id, 'reload');
 };
 
@@ -1192,14 +1189,15 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
 
     // Replace old $row
     if (this.rendered && oldRow.$row) {
-      var rowSelected = this.selectedRows.indexOf(updatedRow)>-1;
+      var rowSelected = this.selectedRows.indexOf(updatedRow) > -1;
 
-      var previousRowSelected=false, followingRowSelected= false;
-      if(rowIndex>0){
-        previousRowSelected = this.selectedRows.indexOf(this.rows[rowIndex-1])>-1;
+      var previousRowSelected = false,
+        followingRowSelected = false;
+      if (rowIndex > 0) {
+        previousRowSelected = this.selectedRows.indexOf(this.rows[rowIndex - 1]) > -1;
       }
-      if(rowIndex+1<this.rows.length){
-        followingRowSelected = this.selectedRows.indexOf(this.rows[rowIndex+1])>-1;
+      if (rowIndex + 1 < this.rows.length) {
+        followingRowSelected = this.selectedRows.indexOf(this.rows[rowIndex + 1]) > -1;
       }
 
       var $updatedRow = $(this._buildRowDiv(updatedRow, rowSelected, previousRowSelected, followingRowSelected));
@@ -1357,65 +1355,60 @@ scout.Table.prototype._rowsToIds = function(rows) {
   });
 };
 
-
 /**
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
  */
 scout.Table.prototype.renderSelection = function($row, deselect) {
   var $previousElement = $row.prev('.table-row'),
-  $followingElement = $row.next('.table-row');
+    $followingElement = $row.next('.table-row');
   $row.removeClass('select-middle select-top select-bottom select-single selected');
-  if(!deselect){
+  if (!deselect) {
     $row.select(true);
-    if(!$previousElement.isSelected()){
-      if($followingElement.isSelected()){
+    if (!$previousElement.isSelected()) {
+      if ($followingElement.isSelected()) {
         $row.addClass('select-top');
-      }
-      else{
+      } else {
         $row.addClass('select-single');
       }
     } else {
-      if($followingElement.isSelected()){
+      if ($followingElement.isSelected()) {
         $row.addClass('select-middle');
-      }
-      else{
+      } else {
         $row.addClass('select-bottom');
       }
-      if($previousElement.hasClass('select-bottom')){
+      if ($previousElement.hasClass('select-bottom')) {
         $previousElement.toggleClass('select-middle', true);
         $previousElement.toggleClass('select-bottom', false);
-      }else{
+      } else {
         $previousElement.toggleClass('select-single', false);
         $previousElement.toggleClass('select-top', true);
       }
     }
-    if($followingElement.isSelected()){
-      if($followingElement.hasClass('select-single')){
+    if ($followingElement.isSelected()) {
+      if ($followingElement.hasClass('select-single')) {
         $followingElement.toggleClass('select-single', false);
         $followingElement.toggleClass('select-bottom', true);
-      }
-      else if($followingElement.hasClass('select-top')){
+      } else if ($followingElement.hasClass('select-top')) {
         $followingElement.toggleClass('select-top', false);
         $followingElement.toggleClass('select-middle', true);
       }
     }
-  }
-  else {
-    if ($previousElement.isSelected()){
-      if($previousElement.hasClass('select-middle')){
+  } else {
+    if ($previousElement.isSelected()) {
+      if ($previousElement.hasClass('select-middle')) {
         $previousElement.toggleClass('select-middle', false);
         $previousElement.toggleClass('select-bottom', true);
-      } else if($previousElement.hasClass('select-top')){
+      } else if ($previousElement.hasClass('select-top')) {
         $previousElement.toggleClass('select-top', false);
         $previousElement.toggleClass('select-single', true);
       }
     }
-    if($followingElement.isSelected()){
-      if($followingElement.hasClass('select-bottom')){
+    if ($followingElement.isSelected()) {
+      if ($followingElement.hasClass('select-bottom')) {
         $followingElement.toggleClass('select-single', true);
         $followingElement.toggleClass('select-bottom', false);
-      }else if($followingElement.hasClass('select-middle')){
+      } else if ($followingElement.hasClass('select-middle')) {
         $followingElement.toggleClass('select-top', true);
         $followingElement.toggleClass('select-middle', false);
       }
@@ -1423,14 +1416,14 @@ scout.Table.prototype.renderSelection = function($row, deselect) {
   }
 };
 
-scout.Table.prototype.addRowToSelection = function(row, ongoingSelection){
-  if(this.selectedRows.indexOf(row)>-1){
+scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
+  if (this.selectedRows.indexOf(row) > -1) {
     return;
   }
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
   this.selectedRows.push(row);
 
-  if(this.rendered){
+  if (row.$row && this.rendered) {
     row.$row.select(true);
     this.renderSelection(row.$row);
     if (this.scrollToSelection) {
@@ -1438,32 +1431,30 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection){
     }
   }
 
-
-  this._sendRowsPending=true;
+  this._sendRowsPending = true;
   if (!ongoingSelection) {
     this.notifyRowSelectionFinished();
   }
 };
 
-scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection){
+scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
-  if (scout.arrays.remove(this.selectedRows, row)){
-    if(this.rendered){
+  if (scout.arrays.remove(this.selectedRows, row)) {
+    if (this.rendered) {
       this.renderSelection(row.$row, true);
     }
     if (!ongoingSelection) {
       this._triggerRowsSelected();
       this.sendRowsSelected(this._rowsToIds(this.selectedRows));
-    }
-    else{
-      this._sendRowsPending=true;
+    } else {
+      this._sendRowsPending = true;
     }
   }
 };
 
 scout.Table.prototype.selectRows = function(rows, notifyServer) {
   rows = scout.arrays.ensure(rows);
-  var selectedEqualsRows =scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
+  var selectedEqualsRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
   if (!selectedEqualsRows) {
     this.clearSelection(!notifyServer);
     this.selectedRows = rows;
@@ -1474,9 +1465,9 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
   }
 
   if (this.rendered && !selectedEqualsRows) {
-    this.selectedRows.forEach(function(row){
+    this.selectedRows.forEach(function(row) {
       this.renderSelection(row.$row, false);
-    },this );
+    }, this);
     this._triggerRowsSelected();
     if (this.scrollToSelection) {
       this.revealSelection();
@@ -1505,7 +1496,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
   var filteredRows = [];
   for (var i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
-    if (row.$row.isVisible()) {
+    if (row.$row && row.$row.isVisible()) {
       filteredRows.push(row);
     }
   }
