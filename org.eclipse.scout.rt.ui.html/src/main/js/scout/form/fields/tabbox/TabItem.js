@@ -56,11 +56,17 @@ scout.TabItem.prototype._renderTabActive = function() {
   }
 };
 
+/**
+ * It's allowed to call removeTab() even when the tab is _not_ rendered.
+ * This may be the case, when a tab is placed in the overflow-menu of the tab-area.
+ * Thus it happens that some tabs are rendered and some are not.
+ */
 scout.TabItem.prototype.removeTab = function() {
-  $.log.info('removeTab =' + this);
-  this.$tabContainer.remove();
-  this.$tabContainer = null;
-  this._tabRendered = false;
+  if (this._tabRendered) {
+    this.$tabContainer.remove();
+    this.$tabContainer = null;
+    this._tabRendered = false;
+  }
 };
 
 scout.TabItem.prototype._syncMarked = function(marked) {
