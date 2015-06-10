@@ -21,6 +21,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
@@ -54,7 +56,7 @@ public class AbstractFormTest {
    */
   @Test
   public void testClassIdNoAnnotation() throws ProcessingException {
-    TestFormWithoutClassId form = new TestFormWithoutClassId();
+    TestForm form = new TestForm();
     assertFalse("ClassId should always be set.", StringUtility.isNullOrEmpty(form.classId()));
     testClassIdSetter(form, form.classId());
   }
@@ -79,6 +81,43 @@ public class AbstractFormTest {
     assertTrue("ClassId of innerform should contain formid.", classId.contains(FORM_TEST_CLASS_ID));
   }
 
+  /**
+   * Tests that validating a valid form should not result in any error.
+   */
+  @Test
+  public void testValidForm() throws ProcessingException {
+    TestForm form = new TestForm();
+    form.validateForm();
+  }
+
+  /**
+   * Tests that validating a valid form with an ok status should not result in any error.
+   */
+  @Test
+  public void testValidForm_OkStatus() throws ProcessingException {
+    TestForm form = new TestForm();
+    form.getMainBox().addErrorStatus(Status.OK_STATUS);
+    form.validateForm();
+  }
+
+  /**
+   * Tests that validating a valid form with an ok status should not result in any error.
+   */
+  public void testValidForm_ErrorStatus() throws ProcessingException {
+    String errorMessage = "";
+    try {
+      TestForm form = new TestForm();
+      form.getMainBox().addErrorStatus(new Status("ErrorMessage"));
+      form.validateForm();
+    }
+    catch (VetoException ve) {
+      errorMessage = ve.getMessage();
+    }
+
+    assertTrue(errorMessage.contains("MainBox: ErrorMessage"));
+
+  }
+
   // Test classes
 
   @ClassId(FORM_TEST_CLASS_ID)
@@ -93,14 +132,23 @@ public class AbstractFormTest {
     }
   }
 
-  class TestFormWithoutClassId extends AbstractForm {
+  class TestForm extends AbstractForm {
 
-    public TestFormWithoutClassId() throws ProcessingException {
+    public TestForm() throws ProcessingException {
       super();
+    }
+
+    public MainBox getMainBox() {
+      return getFieldByClass(MainBox.class);
     }
 
     @Order(10.0)
     public class MainBox extends AbstractGroupBox {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return "Main Box";
+      }
     }
   }
 
