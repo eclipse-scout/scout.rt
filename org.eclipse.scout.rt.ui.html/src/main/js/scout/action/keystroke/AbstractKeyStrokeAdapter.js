@@ -50,7 +50,10 @@ scout.AbstractKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.registerKeyStroke = function(keyStroke) {
-  this.keyStrokes.push(keyStroke);
+  var index = this.keyStrokes.indexOf(keyStroke);
+  if (index === -1) {
+    this.keyStrokes.push(keyStroke);
+  }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStroke) {

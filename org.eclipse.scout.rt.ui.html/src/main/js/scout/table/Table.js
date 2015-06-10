@@ -24,6 +24,7 @@ scout.Table = function() {
   this.menuBarPosition = 'bottom';
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this.handleAppLinkAction);
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -51,6 +52,7 @@ scout.Table.prototype.init = function(model, session) {
 
   this._syncSelectedRows(this.selectedRows);
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -115,6 +117,12 @@ scout.Table.prototype._insertRowIconColumn = function() {
   }
   scout.arrays.insert(this.columns, column, position);
   this.rowIconColumn = column;
+};
+
+scout.Table.prototype.handleAppLinkAction = function(event){
+  var $appLink = $(event.target);
+  var column = this._columnAtX($appLink.offset().left);
+  this.sendAppLinkAction(column.id, $appLink.data('ref'));
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -2028,6 +2036,7 @@ scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
     scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
   this.keyStrokeAdapter = adapter;
+  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
   scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
 };
 

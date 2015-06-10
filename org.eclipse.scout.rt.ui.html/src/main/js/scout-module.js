@@ -141,6 +141,7 @@ __include("scout/desktop/SearchOutline.js");
 __include("scout/form/Form.js");
 __include("scout/form/FormLayout.js");
 __include("scout/form/fields/fields.js");
+__include("scout/form/fields/AppLinkKeyStroke.js");
 __include("scout/form/fields/FormField.js");
 __include("scout/form/fields/FormFieldKeyStrokeAdapter.js");
 __include("scout/form/fields/FormFieldLayout.js");

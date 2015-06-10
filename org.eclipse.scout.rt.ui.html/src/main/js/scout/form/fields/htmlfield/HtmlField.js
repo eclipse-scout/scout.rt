@@ -8,6 +8,7 @@ scout.HtmlField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($.makeDiv());
   this.addStatus();
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 
 scout.HtmlField.prototype._renderProperties = function() {
@@ -29,6 +30,10 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this)).attr('tabindex', "0");
 };
 
+scout.HtmlField.prototype.init = function(model, session) {
+  scout.HtmlField.parent.prototype.init.call(this, model, session);
+  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
+};
 scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
   // XXX
 };

@@ -11,11 +11,17 @@ scout.BeanField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($('<div>'));
   this.addStatus();
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 
 scout.BeanField.prototype._renderProperties = function() {
   scout.BeanField.parent.prototype._renderProperties.call(this);
   this._renderValue(this.value);
+};
+
+scout.BeanField.prototype.init = function(model, session) {
+  scout.BeanField.parent.prototype.init.call(this, model, session);
+  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
 /**

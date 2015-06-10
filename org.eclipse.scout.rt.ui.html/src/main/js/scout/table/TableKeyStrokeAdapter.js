@@ -4,7 +4,7 @@ scout.TableKeyStrokeAdapter = function(field) {
   this.keyStrokes.push(new scout.TableFilterControlKeyStrokes(field));
   this.keyStrokes.push(new scout.TableControlKeyStrokes(field));
   this.keyStrokes.push(new scout.TableStartCellEditKeyStroke(field));
-};
+ };
 scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.TableKeyStrokeAdapter.prototype.installModelKeystrokes = function() {

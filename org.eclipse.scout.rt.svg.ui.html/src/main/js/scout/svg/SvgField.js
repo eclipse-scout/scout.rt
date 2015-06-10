@@ -9,11 +9,17 @@ scout.SvgField.prototype._render = function($parent) {
   this.addField($('<div>'));
   this.addMandatoryIndicator();
   this.addStatus();
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 
 scout.SvgField.prototype._renderProperties = function() {
   scout.SvgField.parent.prototype._renderProperties.call(this);
   this._renderSvgDocument();
+};
+
+scout.SvgField.prototype.init = function(model, session) {
+    scout.SvgField.parent.prototype.init.call(this, model, session);
+    this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
 scout.SvgField.prototype._renderSvgDocument = function() {
