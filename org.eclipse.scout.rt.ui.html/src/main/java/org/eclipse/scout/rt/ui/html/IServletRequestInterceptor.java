@@ -16,12 +16,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * This interceptor contributes to the {@link UiServlet}
  */
-public interface IServletRequestInterceptor extends IService {
+@ApplicationScoped
+public interface IServletRequestInterceptor {
+
+  public static final String MDC_SCOUT_SESSION_ID = "scout.session.id";
+  public static final String MDC_SCOUT_UI_SESSION_ID = "scout.ui.session.id";
 
   /**
    * @return true if the request was consumed by the interceptor, no further action is then necessary

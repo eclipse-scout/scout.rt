@@ -54,7 +54,7 @@ public class BinaryResourceUrlUtility {
 
   /**
    * @return a relative URL for a resource handled by an adapter, see
-   *         {@link StaticResourceRequestInterceptor#loadDynamicAdapterResource(javax.servlet.http.HttpServletRequest, String)}
+   *         {@link ResourceRequestInterceptor#loadDynamicAdapterResource(javax.servlet.http.HttpServletRequest, String)}
    *         <p>
    *         The calling adapter must implement {@link IBinaryResourceProvider}
    */

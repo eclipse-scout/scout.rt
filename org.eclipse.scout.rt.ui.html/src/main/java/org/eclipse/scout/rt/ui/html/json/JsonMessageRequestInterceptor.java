@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -37,16 +36,13 @@ import org.json.JSONObject;
 import org.slf4j.MDC;
 
 /**
- * This interceptor contributes to the {@link UiServlet} as the default POST handler
+ * This interceptor contributes to the {@link UiServlet} as the POST handler for /json.
  * <p>
- * Provides the {@link MDC#put(String, String)} properties {@value #SCOUT_SESSION_ID}
+ * Provides the {@link MDC#put(String, String)} properties {@value #MDC_SCOUT_SESSION_ID}
  */
 @Order(10)
-public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
+public class JsonMessageRequestInterceptor implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
-
-  public static final String SCOUT_SESSION_ID = "scout.session.id";
-  public static final String SCOUT_UI_SESSION_ID = "scout.ui.session.id";
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -58,10 +54,9 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     //serve only /json
     String pathInfo = httpReq.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
-      LOG.info("404_NOT_FOUND_POST: " + pathInfo);
-      httpResp.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return true;
+      return false;
     }
+
     IUiSession uiSession = null;
     JsonRequest jsonReq = null;
     try {
@@ -80,11 +75,11 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       }
 
       long start = System.nanoTime();
-      String oldScoutSessionId = MDC.get(SCOUT_SESSION_ID);
-      String oldScoutUiSessionId = MDC.get(SCOUT_UI_SESSION_ID);
+      String oldScoutSessionId = MDC.get(MDC_SCOUT_SESSION_ID);
+      String oldScoutUiSessionId = MDC.get(MDC_SCOUT_UI_SESSION_ID);
       try {
-        MDC.put(SCOUT_SESSION_ID, uiSession.getClientSessionId());
-        MDC.put(SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
+        MDC.put(MDC_SCOUT_SESSION_ID, uiSession.getClientSessionId());
+        MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
 
         if (jsonReq.isPollForBackgroundJobsRequest()) {
           // Blocks the current thread until:
@@ -134,16 +129,16 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       }
       finally {
         if (oldScoutSessionId != null) {
-          MDC.put(SCOUT_SESSION_ID, oldScoutSessionId);
+          MDC.put(MDC_SCOUT_SESSION_ID, oldScoutSessionId);
         }
         else {
-          MDC.remove(SCOUT_SESSION_ID);
+          MDC.remove(MDC_SCOUT_SESSION_ID);
         }
         if (oldScoutUiSessionId != null) {
-          MDC.put(SCOUT_UI_SESSION_ID, oldScoutUiSessionId);
+          MDC.put(MDC_SCOUT_UI_SESSION_ID, oldScoutUiSessionId);
         }
         else {
-          MDC.remove(SCOUT_UI_SESSION_ID);
+          MDC.remove(MDC_SCOUT_UI_SESSION_ID);
         }
       }
     }

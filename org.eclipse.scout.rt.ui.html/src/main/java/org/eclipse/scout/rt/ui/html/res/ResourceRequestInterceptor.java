@@ -33,7 +33,6 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiHints;
@@ -51,9 +50,9 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * <p>
  * js, css, html, png, gif, jpg, woff, json
  */
-@Order(10)
-public class StaticResourceRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceRequestInterceptor.class);
+@Order(20)
+public class ResourceRequestInterceptor implements IServletRequestInterceptor {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestInterceptor.class);
 
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
@@ -106,9 +105,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
 
     // check object existence
     if (cacheObj == null) {
-      LOG.info("404_NOT_FOUND_GET: " + pathInfo);
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return true;
+      return false;
     }
 
     String contentType = cacheObj.getResource().getContentType();
@@ -177,6 +174,9 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (pathInfo.matches("^/icon/.*")) {
       return loadIcon(servlet, req, pathInfo);
     }
+    if (pathInfo.matches("^/dynamic/.*")) {
+      return loadDynamicAdapterResource(servlet, req, pathInfo);
+    }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
       return loadScriptFile(servlet, req, pathInfo);
     }
@@ -185,9 +185,6 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     }
     if (pathInfo.endsWith(".json")) {
       return loadJsonFile(servlet, req, pathInfo);
-    }
-    if (pathInfo.matches("^/dynamic/.*")) {
-      return loadDynamicAdapterResource(servlet, req, pathInfo);
     }
     return loadBinaryFile(servlet, req, pathInfo);
   }

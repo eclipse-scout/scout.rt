@@ -30,16 +30,16 @@ import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.res.ResourceRequestInterceptor;
 
 /**
  * Instances of this class must be registered as servlet root path "/"
  * <p>
- * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link StaticResourceRequestInterceptor}
+ * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link ResourceRequestInterceptor}
  * <p>
- * Scripts js and css are served using HTTP GET, see {@link StaticResourceRequestInterceptor}
+ * Scripts js and css are served using HTTP GET, see {@link ResourceRequestInterceptor}
  * <p>
- * Images and fonts are served using HTTP GET, see {@link StaticResourceRequestInterceptor}
+ * Images and fonts are served using HTTP GET, see {@link ResourceRequestInterceptor}
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
  */
@@ -127,6 +127,9 @@ public class UiServlet extends HttpServlet {
             return;
           }
         }
+        // No interceptor was able to handle the request
+        LOG.info("404_NOT_FOUND_POST: " + req.getPathInfo());
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
       catch (Exception t) {
         LOG.error("Exception while processing", t);
