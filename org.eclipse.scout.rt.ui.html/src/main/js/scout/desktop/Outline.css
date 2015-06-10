@@ -41,7 +41,15 @@
       border: 0;
     }
 
-    & > .tree-node-control {
+    &.show-all:hover {
+      color: @palette-orange-3;
+
+      > .tree-node-control::before {
+        color: @highlight-color;
+      }
+    }
+
+     & > .tree-node-control {
       /* adjust control position */
       margin-left: -@outline-node-control-size - 5px;
       margin-top: -3px;
