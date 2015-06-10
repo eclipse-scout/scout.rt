@@ -18,5 +18,5 @@ public enum TableMenuType implements IMenuType {
   EmptySpace,
   SingleSelection,
   MultiSelection,
-  Header // FIXME AWE: (menu) prüfen ob wir das loswerden, wenn wir hier IToolMenu verwenden (mit AHO anschauen)
+  Header
 }

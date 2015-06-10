@@ -24,10 +24,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.DescendingButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.WithoutButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox.EditFilterButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.FilterBox.RemoveFilterButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.RemoveFilterButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetColumnFiltersButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetSortingButton;
@@ -68,6 +66,8 @@ import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 
 public class OrganizeColumnsForm extends AbstractForm {
+
+  private static final int COLUMN_HEIGHT = 7;
 
   ITable m_table;
 
@@ -120,16 +120,8 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(DeselectAllButton.class);
   }
 
-  public EditFilterButton getEditFilterButton() {
-    return getFieldByClass(EditFilterButton.class);
-  }
-
   public RemoveFilterButton getRemoveFilterButton() {
     return getFieldByClass(RemoveFilterButton.class);
-  }
-
-  public FilterBox getFilterBox() {
-    return getFieldByClass(FilterBox.class);
   }
 
   public GroupBox getGroupBox() {
@@ -196,16 +188,6 @@ public class OrganizeColumnsForm extends AbstractForm {
   public class MainBox extends AbstractGroupBox {
 
     @Override
-    protected int getConfiguredGridColumnCount() {
-      return 3;
-    }
-
-    @Override
-    protected int getConfiguredGridW() {
-      return 2;
-    }
-
-    @Override
     protected int getConfiguredWidthInPixel() {
       return 520;
     }
@@ -214,8 +196,8 @@ public class OrganizeColumnsForm extends AbstractForm {
     public class GroupBox extends AbstractGroupBox {
 
       @Override
-      protected int getConfiguredGridW() {
-        return 1;
+      protected int getConfiguredGridColumnCount() {
+        return 5;
       }
 
       @Order(10.0)
@@ -223,7 +205,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          return 5;
+          return COLUMN_HEIGHT;
         }
 
         @Override
@@ -537,6 +519,16 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Override
+        protected int getConfiguredGridH() {
+          return COLUMN_HEIGHT;
+        }
+
+        @Override
+        protected boolean getConfiguredGridUseUiHeight() {
+          return false;
+        }
+
+        @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("ResetTableColumnsView");
         }
@@ -782,6 +774,16 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Override
+        protected int getConfiguredGridH() {
+          return COLUMN_HEIGHT;
+        }
+
+        @Override
+        protected boolean getConfiguredGridUseUiHeight() {
+          return false;
+        }
+
+        @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("ColumnSorting");
         }
@@ -847,93 +849,6 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
       }
 
-      @Order(40.0)
-      public class FilterBox extends AbstractGroupBox {
-
-        @Override
-        protected int getConfiguredGridColumnCount() {
-          return 1;
-        }
-
-        @Override
-        protected int getConfiguredGridW() {
-          return 1;
-        }
-
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("ResetTableColumnFilter");
-        }
-
-        @Order(10.0)
-        public class EditFilterButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("EditFilterMenu");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            Integer selectedIndex = null;
-            if (m_table != null && getColumnsTableField().getTable().getSelectedRow() != null) {
-              selectedIndex = getColumnsTableField().getTable().getSelectedRow().getRowIndex();
-              if (m_table.getColumnFilterManager() != null) {
-                IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
-                if (col != null) {
-                  m_table.getColumnFilterManager().showFilterForm(col, false);
-                }
-              }
-            }
-            getColumnsTableField().reloadTableData();
-            if (selectedIndex != null) {
-              getColumnsTableField().getTable().selectRow(selectedIndex);
-            }
-          }
-
-        }
-
-        @Order(20.0)
-        public class RemoveFilterButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("Remove");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            Integer selectedIndex = null;
-            if (m_table != null && getColumnsTableField().getTable().getSelectedRow() != null) {
-              selectedIndex = getColumnsTableField().getTable().getSelectedRow().getRowIndex();
-              if (m_table.getColumnFilterManager() != null) {
-                IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
-                if (col != null) {
-                  m_table.getColumnFilterManager().removeFilter(col);
-                  m_table.applyRowFilters();
-                }
-              }
-            }
-            getColumnsTableField().reloadTableData();
-            if (selectedIndex != null) {
-              getColumnsTableField().getTable().selectRow(selectedIndex);
-            }
-          }
-
-        }
-
-      }
-
       @Order(50.0)
       public class ResetBox extends AbstractGroupBox {
 
@@ -945,6 +860,16 @@ public class OrganizeColumnsForm extends AbstractForm {
         @Override
         protected int getConfiguredGridW() {
           return 1;
+        }
+
+        @Override
+        protected int getConfiguredGridH() {
+          return COLUMN_HEIGHT;
+        }
+
+        @Override
+        protected boolean getConfiguredGridUseUiHeight() {
+          return false;
         }
 
         @Override
@@ -1031,6 +956,40 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
         }
+
+        @Order(20.0)
+        public class RemoveFilterButton extends AbstractLinkButton {
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("Remove");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            Integer selectedIndex = null;
+            if (m_table != null && getColumnsTableField().getTable().getSelectedRow() != null) {
+              selectedIndex = getColumnsTableField().getTable().getSelectedRow().getRowIndex();
+              if (m_table.getColumnFilterManager() != null) {
+                IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
+                if (col != null) {
+                  m_table.getColumnFilterManager().removeFilter(col);
+                  m_table.applyRowFilters();
+                }
+              }
+            }
+            getColumnsTableField().reloadTableData();
+            if (selectedIndex != null) {
+              getColumnsTableField().getTable().selectRow(selectedIndex);
+            }
+          }
+
+        }
       }
 
     }
@@ -1095,7 +1054,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     getDescendingButton().setEnabled(sortEnabled && selectedRowExists);
     getWithoutButton().setEnabled(sortEnabled && selectedRowExists);
 
-    getEditFilterButton().setEnabled(selectedRowExists);
     getRemoveFilterButton().setEnabled(selectedRowHasFilter);
   }
 
