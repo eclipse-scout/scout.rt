@@ -15,7 +15,7 @@ scout.ListBoxLayout.prototype.layout = function($container) {
 
   this.pixelBasedSizing = true;
 
-  if (this.filterBox && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
     minHeight = this.filterBox.children.length*scout.HtmlEnvironment.formRowHeight + ((this.filterBox.children.length-1)*scout.HtmlEnvironment.formRowGap);
     heightCalculated = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height*(height/this.preferredLayoutSize($container).height);
     height -= Math.max(minHeight, heightCalculated);
@@ -25,7 +25,7 @@ scout.ListBoxLayout.prototype.layout = function($container) {
   htmlTable.pixelBasedSizing = true;
   htmlTable.setSize(new scout.Dimension(size.width, height));
 
-  if (this.filterBox && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
     var htmlFilterBox = scout.HtmlComponent.get(this.filterBox.$container);
     htmlFilterBox.setSize(new scout.Dimension(size.width, Math.max(minHeight, heightCalculated)));
   }
