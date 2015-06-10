@@ -78,6 +78,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private boolean m_limitedResult;
   private boolean m_showEmptySpaceMenus;
   private boolean m_showTableRowMenus;
+  private int m_lazyAddChildPagesToOutlineThreshold;
 
   public AbstractPageWithTable() {
     this(true, null);
@@ -202,6 +203,25 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(130)
   protected boolean getConfiguredTableStatusVisible() {
+    return true;
+  }
+
+  /**
+   * By default, child pages of table pages are not shown immediately in the outline tree
+   * ("lazy add child pages to outline" setting). However, the setting is set to false when the child page count is less
+   * or equal to this threshold.
+   * <p>
+   * Subclasses can override this method. Default is {@code 1}.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(140)
+  protected int getConfiguredLazyAddChildPagesToOutlineThreshold() {
+    return 1;
+  }
+
+  @Override
+  protected boolean getConfiguredLazyAddChildPagesToOutline() {
+    // Override default value for all table pages
     return true;
   }
 
@@ -373,6 +393,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return childPage;
   }
 
+  @Override
+  protected boolean execCalculateLazyAddChildPagesToOutline() {
+    if (isLazyAddChildPagesToOutlineInternal()) {
+      return getChildNodeCount() > getLazyAddChildPagesToOutlineThreshold();
+    }
+    return false;
+  }
+
   private Class<? extends ITable> getConfiguredTable() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClass(dca, ITable.class);
@@ -385,6 +413,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     setSearchRequired(getConfiguredSearchRequired());
     setShowEmptySpaceMenus(getConfiguredShowEmptySpaceMenus());
     setShowTableRowMenus(getConfiguredShowTableRowMenus());
+    setLazyAddChildPagesToOutlineThreshold(getConfiguredLazyAddChildPagesToOutlineThreshold());
   }
 
   @Override
@@ -614,6 +643,16 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Override
   public void setShowTableRowMenus(boolean showTableRowMenus) {
     m_showTableRowMenus = showTableRowMenus;
+  }
+
+  @Override
+  public int getLazyAddChildPagesToOutlineThreshold() {
+    return m_lazyAddChildPagesToOutlineThreshold;
+  }
+
+  @Override
+  public void setLazyAddChildPagesToOutlineThreshold(int lazyAddChildPagesToOutlineThreshold) {
+    m_lazyAddChildPagesToOutlineThreshold = lazyAddChildPagesToOutlineThreshold;
   }
 
   @Override

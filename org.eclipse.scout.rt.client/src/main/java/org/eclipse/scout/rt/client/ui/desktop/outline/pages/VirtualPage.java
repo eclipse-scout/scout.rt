@@ -159,4 +159,12 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
     return null;
   }
 
+  @Override
+  public boolean isLazyAddChildPagesToOutline() {
+    return false;
+  }
+
+  @Override
+  public void setLazyAddChildPagesToOutline(boolean lazyAddChildPagesToOutline) {
+  }
 }

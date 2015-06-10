@@ -65,6 +65,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private IStatus m_pagePopulateStatus;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
+  private boolean m_lazyAddChildPagesToOutline; // local value (configured or manually set value)
 
   @Override
   public T getTable() {
@@ -242,6 +243,18 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
+   * Configures whether child pages should be added lazily to the outline tree (i.e. if not all child nodes should be
+   * shown immediately, but a "show all" dummy node should be inserted instead).
+   * <p>
+   * Subclasses can override this method. Default is {@code true} for table pages, {@code false} for all other pages.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredLazyAddChildPagesToOutline() {
+    return false;
+  }
+
+  /**
    * Called after this page has been added to the outline tree. This method may set a detail form or check
    * some parameters.
    * <p>
@@ -394,6 +407,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     m_table = initTable();
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
+    setLazyAddChildPagesToOutline(getConfiguredLazyAddChildPagesToOutline());
   }
 
   /*
@@ -750,6 +764,32 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public <A> A getAdapter(Class<A> clazz) {
     return null;
+  }
+
+  @Override
+  public boolean isLazyAddChildPagesToOutline() {
+    return execCalculateLazyAddChildPagesToOutline();
+  }
+
+  @Override
+  public void setLazyAddChildPagesToOutline(boolean lazyAddChildPagesToOutline) {
+    m_lazyAddChildPagesToOutline = lazyAddChildPagesToOutline;
+  }
+
+  /**
+   * @return value of the static "lazy add child pages to outline" value (without dynamic calculation).
+   */
+  protected boolean isLazyAddChildPagesToOutlineInternal() {
+    return m_lazyAddChildPagesToOutline;
+  }
+
+  /**
+   * @return dynamic "lazy add child pages to outline" value. By default,
+   *         {@link #isLazyAddChildPagesToOutlineInternal()} is returned, but subclasses may add their own additional
+   *         calculations here.
+   */
+  protected boolean execCalculateLazyAddChildPagesToOutline() {
+    return isLazyAddChildPagesToOutlineInternal();
   }
 
   protected final void interceptPageDataLoaded() throws ProcessingException {
