@@ -187,10 +187,10 @@ public final class BinaryResource implements Serializable {
       return false;
     }
     BinaryResource other = (BinaryResource) obj;
-    return this.m_lastModified == other.m_lastModified &&
-        CompareUtility.equals(this.m_filename, other.m_filename) &&
-        CompareUtility.equals(this.m_contentType, other.m_contentType) &&
-        Arrays.equals(m_content, other.m_content);
+    return this.m_lastModified == other.m_lastModified
+        && CompareUtility.equals(this.m_filename, other.m_filename)
+        && CompareUtility.equals(this.m_contentType, other.m_contentType)
+        && Arrays.equals(m_content, other.m_content);
   }
 
   @Override

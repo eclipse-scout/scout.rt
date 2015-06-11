@@ -297,7 +297,7 @@ public final class Assertions {
    *           if <code>value1</code> is not same as <code>value2</code>.
    */
   public static <T> T assertSame(final T value1, final Object value2, final String msg, final Object... msgArgs) {
-    if (value1 != value2) {
+    if (value1 != value2) { //NOSONAR
       fail(msg, msgArgs);
     }
     return value1;
@@ -334,7 +334,7 @@ public final class Assertions {
    *           if <code>value1</code> is same as <code>value2</code>.
    */
   public static <T> T assertNotSame(final T value1, final Object value2, final String msg, final Object... msgArgs) {
-    if (value1 == value2) {
+    if (value1 == value2) { //NOSONAR
       fail(msg, msgArgs);
     }
     return value1;

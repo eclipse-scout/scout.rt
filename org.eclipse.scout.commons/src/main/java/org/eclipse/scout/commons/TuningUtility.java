@@ -61,23 +61,23 @@ public final class TuningUtility {
   }
 
   // current timer
-  private static final Stack<Long> timerStack;
+  private static final Stack<Long> TIMER_STACK;
   // analysis
-  private static final Object analysisMapLock;
-  private static final TreeMap<String, TreeSet<CompositeObject>> analysisMap;
+  private static final Object ANALYSIS_MAP_LOCK;
+  private static final TreeMap<String, TreeSet<CompositeObject>> ANALYSIS_MAP;
 
   static {
-    timerStack = new Stack<Long>();
+    TIMER_STACK = new Stack<Long>();
     // analysis
-    analysisMapLock = new Object();
-    analysisMap = new TreeMap<String, TreeSet<CompositeObject>>();
+    ANALYSIS_MAP_LOCK = new Object();
+    ANALYSIS_MAP = new TreeMap<String, TreeSet<CompositeObject>>();
   }
 
   /**
    * Starts a timer by pushing the current time onto a stack.
    */
   public static void startTimer() {
-    timerStack.push(System.nanoTime());
+    TIMER_STACK.push(System.nanoTime());
   }
 
   /**
@@ -110,8 +110,8 @@ public final class TuningUtility {
    */
   public static long stopTimer(String name, boolean print, boolean addToBatch) {
     long dtNanos;
-    if (!timerStack.isEmpty()) {
-      dtNanos = System.nanoTime() - timerStack.pop();
+    if (!TIMER_STACK.isEmpty()) {
+      dtNanos = System.nanoTime() - TIMER_STACK.pop();
     }
     else {
       dtNanos = -1;
@@ -120,11 +120,11 @@ public final class TuningUtility {
       printSingle(name, dtNanos);
     }
     if (addToBatch) {
-      synchronized (analysisMapLock) {
-        TreeSet<CompositeObject> set = analysisMap.get(name);
+      synchronized (ANALYSIS_MAP_LOCK) {
+        TreeSet<CompositeObject> set = ANALYSIS_MAP.get(name);
         if (set == null) {
           set = new TreeSet<CompositeObject>();
-          analysisMap.put(name, set);
+          ANALYSIS_MAP.put(name, set);
         }
         set.add(new CompositeObject(dtNanos, set.size()));
       }
@@ -141,14 +141,14 @@ public final class TuningUtility {
    *          timers will not be stopped
    */
   public static void finishAll(boolean clearTimers) {
-    if (!timerStack.isEmpty()) {
-      System.out.println("#TUNING: there are " + timerStack.size() + " non-finished timers (start/stop mismatch)");
+    if (!TIMER_STACK.isEmpty()) {
+      System.out.println("#TUNING: there are " + TIMER_STACK.size() + " non-finished timers (start/stop mismatch)");
     }
-    while (clearTimers && !timerStack.isEmpty()) {
-      timerStack.pop();
+    while (clearTimers && !TIMER_STACK.isEmpty()) {
+      TIMER_STACK.pop();
     }
-    synchronized (analysisMapLock) {
-      for (Map.Entry<String, TreeSet<CompositeObject>> e : analysisMap.entrySet()) {
+    synchronized (ANALYSIS_MAP_LOCK) {
+      for (Map.Entry<String, TreeSet<CompositeObject>> e : ANALYSIS_MAP.entrySet()) {
         String name = e.getKey();
         TreeSet<CompositeObject> set = e.getValue();
         long[] seriesSorted = new long[set.size()];
@@ -159,7 +159,7 @@ public final class TuningUtility {
         }
         printMulti(name, seriesSorted);
       }
-      analysisMap.clear();
+      ANALYSIS_MAP.clear();
     }
   }
 
@@ -171,7 +171,7 @@ public final class TuningUtility {
   }
 
   private static void printSingle(String label, long dtNanos) {
-    int level = timerStack.size();
+    int level = TIMER_STACK.size();
     StringBuilder b = new StringBuilder();
     b.append("#TUNING: ");
     for (int i = 0; i < level; i++) {
