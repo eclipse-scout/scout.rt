@@ -125,13 +125,13 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   public void setHasDate(boolean b) {
     m_hasDate = b;
-    validateColumnValues();
+    refreshValues();
   }
 
   @Override
   public void setHasTime(boolean b) {
     m_hasTime = b;
-    validateColumnValues();
+    refreshValues();
   }
 
   @Override

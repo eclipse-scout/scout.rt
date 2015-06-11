@@ -66,6 +66,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -1011,8 +1012,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       validateColumnValue(row, editingField, true, newValue);
 
       // set newValue into the cell only if there's no error.
-      if (cell instanceof Cell && ((Cell) cell).getErrorStatus() == null) {
+      if (cell.isContentValid()) {
         row.setCellValue(getColumnIndex(), newValue);
+        decorateCellInternal(cell, row);
       }
     }
     catch (ProcessingException v) {
@@ -1021,6 +1023,26 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       cell.addErrorStatus(new ValidationFailedStatus<VALUE>(v, value));
       //update cell displayText
       cell.setText(value == null ? null : value.toString());
+    }
+  }
+
+  /**
+   * Refresh all column values to trigger validate and format
+   */
+  @Internal
+  protected void refreshValues() {
+    try {
+      if (isInitialized()) {
+        if (getTable() != null) {
+          List<ITableRow> rows = getTable().getRows();
+          for (ITableRow row : rows) {
+            setValue(row, getValue(row));
+          }
+        }
+      }
+    }
+    catch (ProcessingException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -1694,26 +1716,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   public void validateColumnValues() {
-    if (getTable() == null) {
-      return;
+    if (getTable() != null) {
+      for (ITableRow row : getTable().getRows()) {
+        @SuppressWarnings("unchecked")
+        VALUE value = (VALUE) row.getCell(this).getValue();
+        validateColumnValue(row, null, true, value);
+      }
     }
-    for (ITableRow row : getTable().getRows()) {
-      validateColumnValue(row, null, true, getValueOfCell(row));
-    }
-  }
-
-  public void validateColumnValue(ITableRow row) {
-    validateColumnValue(row, null, false, getValueOfCell(row));
-  }
-
-  /**
-   * @return The real value of the cell that belongs to the given {@link ITableRow}. Does not consider
-   *         {@link #m_validatedValues}.
-   * @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=424511
-   */
-  @SuppressWarnings("unchecked")
-  protected VALUE getValueOfCell(ITableRow row) {
-    return (VALUE) row.getCell(this).getValue();
   }
 
   /**
@@ -1788,7 +1797,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         return;
       }
     }
-
   }
 
   /**

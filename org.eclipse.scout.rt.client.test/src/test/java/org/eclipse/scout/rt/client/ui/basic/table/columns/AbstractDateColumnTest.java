@@ -61,7 +61,7 @@ public class AbstractDateColumnTest {
    * Tests that the cell text changes to the correct format, if the format is set on a column
    */
   @Test
-  public void testChangeFormat() throws Exception {
+  public void testChangeFormat() throws ProcessingException {
     Date testDate = new Date();
     String testFormat = "YYYY--MM--dd";
     SimpleDateFormat df = new SimpleDateFormat(testFormat, NlsLocale.get());
@@ -73,6 +73,54 @@ public class AbstractDateColumnTest {
     ICell cell = table.getCell(0, 0);
     assertTrue(cell.getValue() instanceof Date);
     assertEquals(df.format(testDate), cell.getText());
+  }
+
+  /**
+   * Tests that the cell text changes to the correct format, if hasTime is changed
+   */
+  @Test
+  public void testHasTimeChange() throws ProcessingException {
+    Date testDate = new Date();
+    TestTable table = new TestTable();
+    TestDateColumn col = table.getTestDateColumn();
+    col.setFormat(null);
+    table.addRowsByArray(new Object[]{testDate});
+    String dateOnlyText = table.getCell(0, 0).getText();
+    col.setHasTime(true);
+    String dateTimeText = table.getCell(0, 0).getText();
+    assertTrue(dateTimeText.length() > dateOnlyText.length());
+  }
+
+  /**
+   * Tests that the cell text changes to the correct format, if hasTime is changed for an editable table
+   */
+  @Test
+  public void testHasTime_EditableChange() throws ProcessingException {
+    Date testDate = new Date();
+    TestTable table = new TestTable();
+    TestDateColumn col = table.getTestDateColumn();
+    col.setFormat(null);
+    col.setEditable(true);
+    table.addRowsByArray(new Object[]{testDate});
+    String dateOnlyText = table.getCell(0, 0).getText();
+    col.setHasTime(true);
+    String dateTimeText = table.getCell(0, 0).getText();
+    assertTrue(dateTimeText.length() > dateOnlyText.length());
+  }
+
+  @Test
+  public void testHasDate() throws ProcessingException {
+    Date testDate = new Date();
+    TestTable table = new TestTable();
+    TestDateColumn col = table.getTestDateColumn();
+    col.setFormat(null);
+    col.setHasDate(false);
+    col.setHasTime(true);
+    table.addRowsByArray(new Object[]{testDate});
+    String timeOnlyText = table.getCell(0, 0).getText();
+    col.setHasDate(true);
+    String dateTimeText = table.getCell(0, 0).getText();
+    assertTrue(dateTimeText.length() > timeOnlyText.length());
   }
 
   public class TestTable extends AbstractTable {
@@ -89,6 +137,7 @@ public class AbstractDateColumnTest {
         return TEST_FORMAT1;
       }
     }
+
   }
 
 }
