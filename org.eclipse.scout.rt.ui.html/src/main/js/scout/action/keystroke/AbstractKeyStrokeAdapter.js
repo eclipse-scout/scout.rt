@@ -52,6 +52,9 @@ scout.AbstractKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
 scout.AbstractKeyStrokeAdapter.prototype.registerKeyStroke = function(keyStroke) {
   var index = this.keyStrokes.indexOf(keyStroke);
   if (index === -1) {
+    if (keyStroke === undefined) {
+      throw new Error('KeyStroke is undefined');
+    }
     this.keyStrokes.push(keyStroke);
   }
 };

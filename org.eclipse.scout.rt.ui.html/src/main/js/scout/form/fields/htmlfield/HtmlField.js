@@ -1,5 +1,6 @@
 scout.HtmlField = function() {
   scout.HtmlField.parent.call(this);
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 scout.inherits(scout.HtmlField, scout.ValueField);
 
@@ -8,7 +9,6 @@ scout.HtmlField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($.makeDiv());
   this.addStatus();
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 
 scout.HtmlField.prototype._renderProperties = function() {
