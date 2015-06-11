@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
@@ -850,7 +851,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (changed && isInitialized()) {
       reinitCells();
     }
-    validateColumnValues();
   }
 
   @Override
@@ -1401,6 +1401,18 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       return;
     }
     interceptCompleteEdit(row, editingField);
+  }
+
+  /**
+   * Decorate all cells
+   */
+  @Internal
+  protected void decorateCells() {
+    if (getTable() != null) {
+      for (ITableRow row : getTable().getRows()) {
+        decorateCell(row);
+      }
+    }
   }
 
   @Override
