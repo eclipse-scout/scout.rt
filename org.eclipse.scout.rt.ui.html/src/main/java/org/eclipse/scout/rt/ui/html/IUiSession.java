@@ -65,12 +65,14 @@ public interface IUiSession {
   void logout();
 
   /**
-   * @return the current U response that is collecting changes for the next
+   * @return the current UI response that is collecting changes for the next
    *         {@link #processJsonRequest(HttpServletRequest, JsonRequest)} cycle
    */
   JsonResponse currentJsonResponse();
 
   HttpServletRequest currentHttpRequest();
+
+  HttpSession currentHttpSession();
 
   /**
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.

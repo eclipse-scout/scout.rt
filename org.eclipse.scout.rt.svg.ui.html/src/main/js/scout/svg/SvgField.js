@@ -1,5 +1,6 @@
 scout.SvgField = function() {
   scout.SvgField.parent.call(this);
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 scout.inherits(scout.SvgField, scout.ValueField);
 
@@ -9,7 +10,6 @@ scout.SvgField.prototype._render = function($parent) {
   this.addField($('<div>'));
   this.addMandatoryIndicator();
   this.addStatus();
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 
 scout.SvgField.prototype._renderProperties = function() {

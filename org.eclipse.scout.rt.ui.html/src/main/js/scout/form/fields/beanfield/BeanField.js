@@ -3,6 +3,7 @@
  */
 scout.BeanField = function() {
   scout.BeanField.parent.call(this);
+  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 scout.inherits(scout.BeanField, scout.ValueField);
 
@@ -11,7 +12,6 @@ scout.BeanField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($('<div>'));
   this.addStatus();
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 
 scout.BeanField.prototype._renderProperties = function() {

@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.eclipse.scout.rt.client.AbstractClientSession;
@@ -44,9 +45,11 @@ public class UiSessionTest {
   @Test
   public void testLogout() throws Exception {
     IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
+    HttpSession httpSession = uiSession.currentHttpSession();
+
     uiSession.logout();
 
-    Mockito.verify(uiSession.currentHttpRequest().getSession()).invalidate();
+    Mockito.verify(httpSession).invalidate();
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(uiSession.currentJsonResponse(), "logout");
     assertTrue(responseEvents.size() == 1);
   }

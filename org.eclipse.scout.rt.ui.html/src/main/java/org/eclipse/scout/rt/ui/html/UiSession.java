@@ -95,6 +95,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * The variable is accessed by different threads, thus it is an atomic reference.
    */
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
+  private HttpSession m_currentHttpSession;
   private final JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
@@ -207,6 +208,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_uiSessionId = jsonStartupRequest.getUiSessionId();
 
       HttpSession httpSession = httpRequest.getSession();
+      m_currentHttpSession = httpSession;
 
       // Look up the requested client session (create and start a new one if necessary)
       IClientSession clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
@@ -412,6 +414,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     notifyPollingBackgroundJobRequests();
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
+    m_currentHttpSession = null;
   }
 
   protected JsonAdapterRegistry getJsonAdapterRegistry() {
@@ -533,6 +536,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   @Override
   public HttpServletRequest currentHttpRequest() {
     return m_currentHttpRequest.get();
+  }
+
+  @Override
+  public HttpSession currentHttpSession() {
+    return m_currentHttpSession;
   }
 
   public JsonEventProcessor jsonEventProcessor() {
@@ -709,18 +717,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void logout() {
-    HttpServletRequest req = currentHttpRequest();
-    if (req == null) {
-      // when timeout occurs, logout is called without a http context
-      return;
-    }
     LOG.info("Logging out from UI session with ID " + m_uiSessionId + " [clientSessionId=" + m_clientSessionId + "]");
-    HttpSession httpSession = req.getSession(false);
+    HttpSession httpSession = currentHttpSession();
     if (httpSession != null) {
       // This will cause P_ClientSessionCleanupHandler.valueUnbound() to be executed
       httpSession.invalidate();
     }
-    currentJsonResponse().addActionEvent(getUiSessionId(), "logout");
+    JsonResponse jsonResponse = currentJsonResponse();
+    if (jsonResponse != null) {
+      jsonResponse.addActionEvent(getUiSessionId(), "logout");
+    }
     LOG.info("Logged out successfully from UI session with ID " + m_uiSessionId);
   }
 
