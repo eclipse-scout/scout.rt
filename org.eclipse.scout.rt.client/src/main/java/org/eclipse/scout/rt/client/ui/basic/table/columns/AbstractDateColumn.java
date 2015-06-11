@@ -114,7 +114,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   public void setFormat(String s) {
     m_format = s;
-    validateColumnValues();
+    decorateCells();
   }
 
   @Override
@@ -219,12 +219,14 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
-    if (cell.getValue() != null) {
-      cell.setText(getDateFormat().format((Date) cell.getValue()));
+    cell.setText(formatValueInternal((Date) cell.getValue()));
+  }
+
+  private String formatValueInternal(Date value) {
+    if (value != null) {
+      return getDateFormat().format(value);
     }
-    else {
-      cell.setText("");
-    }
+    return "";
   }
 
   private DateFormat getDateFormat() {
