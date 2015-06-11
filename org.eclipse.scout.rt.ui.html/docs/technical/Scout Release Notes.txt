@@ -309,3 +309,7 @@ Node pages never add child pages lazily. Table pages add child nodes lazily when
 The behavior may be controlled using:
 - boolean getConfiguredLazyAddChildPagesToOutline() --> default false, for AbstractPageWithTable the default is true
 - int getConfiguredLazyAddChildPagesToOutlineThreshold() --> setting for AbstractPageWithTable, after how many child pages the lazy setting should be active (default 1)
+
+JGU 11.06.2015
+getConfiguredTreat0AsNull in Smartfield has been deleted. (ses also Bugzill 469902)
+
