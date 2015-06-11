@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.shared.validate.annotations.MaxValue;
 import org.eclipse.scout.rt.shared.validate.annotations.MinLength;
 import org.eclipse.scout.rt.shared.validate.annotations.MinValue;
 import org.eclipse.scout.rt.shared.validate.annotations.RegexMatch;
-import org.eclipse.scout.rt.shared.validate.annotations.Treat0AsNull;
 import org.eclipse.scout.rt.shared.validate.annotations.ValidateAnnotationMarker;
 import org.eclipse.scout.rt.shared.validate.checks.CodeValueCheck;
 import org.eclipse.scout.rt.shared.validate.checks.LookupValueCheck;
@@ -113,9 +112,6 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
    */
 
   protected ValidateCheckSet validateObjectByAnnotations(Collection<Annotation> annotationList, Object obj) throws Exception {
-    if (isTreat0AsNullFromAnnotations(annotationList)) {
-      obj = ValidationUtility.treat0AsNull(obj);
-    }
     //default node: retrieve checks by annotations
     ValidateCheckSet localSet = new ValidateCheckSet();
     ValidateCheckSet subtreeSet = new ValidateCheckSet();
@@ -132,18 +128,6 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
       m_defaultCheckSet.applyChecks(m_validationStrategy, obj, m_consumedChecks);
     }
     return subtreeSet;
-  }
-
-  protected boolean isTreat0AsNullFromAnnotations(Collection<Annotation> annotationList) {
-    if (annotationList.size() == 0) {
-      return false;
-    }
-    for (Annotation a : annotationList) {
-      if (a.annotationType() == Treat0AsNull.class) {
-        return ((Treat0AsNull) a).value();
-      }
-    }
-    return false;
   }
 
   /**
@@ -248,9 +232,6 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
     ctx.formData = formData;
     ctx.ruleMap = ruleMap;
     ctx.fieldName = fieldName;
-    if (isTreat0AsNullFromValidationRules(ctx)) {
-      obj = ValidationUtility.treat0AsNull(obj);
-    }
     //default node: retrieve checks by annotations
     ValidateCheckSet localCheckSet = new ValidateCheckSet();
     addChecksFromValidationRules(localCheckSet, ctx, obj);
@@ -262,10 +243,6 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
     if (m_defaultCheckSet != null) {
       m_defaultCheckSet.applyChecks(m_validationStrategy, obj, m_consumedChecks);
     }
-  }
-
-  protected boolean isTreat0AsNullFromValidationRules(FormDataCheckContext ctx) {
-    return Boolean.TRUE.equals(ctx.ruleMap.get(ValidationRule.ZERO_NULL_EQUALITY));
   }
 
   protected void addChecksFromValidationRules(ValidateCheckSet set, FormDataCheckContext ctx, Object value) {

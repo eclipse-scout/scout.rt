@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 /**
  * value or array (each element) must be part of a code type enum
  * <p>
- * In order to treat 0 as null, use the {@link Treat0AsNull} annotation.
+ * In order to treat 0 as null, use the annotation.
  * <p>
  * In order to annotate a field where you have no access (super class) you may consider using {@link FieldReference} on
  * a placeholder field.

@@ -147,17 +147,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
-   * the value 0 for numbers and "" for Strings will be set to null, if this
-   * flag is set to true
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(300)
-  @ValidationRule(ValidationRule.ZERO_NULL_EQUALITY)
-  protected boolean getConfiguredTreat0AsNull() {
-    return true;
-  }
-
-  /**
    * valid when configuredBrowseHierarchy=true
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -707,25 +696,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   protected final VALUE execValidateValue(VALUE rawValue) throws ProcessingException {
     return rawValue;
-  }
-
-  @Override
-  protected VALUE validateValueInternal(VALUE rawKey) throws ProcessingException {
-    if (rawKey instanceof Number) {
-      if (getConfiguredTreat0AsNull()) {
-        if (((Number) rawKey).longValue() == 0) {
-          rawKey = null;
-        }
-      }
-    }
-    else if (rawKey instanceof String) {
-      if (getConfiguredTreat0AsNull()) {
-        if (((String) rawKey).length() == 0) {
-          rawKey = null;
-        }
-      }
-    }
-    return super.validateValueInternal(rawKey);
   }
 
   @Override

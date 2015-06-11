@@ -49,7 +49,9 @@ public final class ValidationUtility {
 
   /**
    * @return null iff value is numeric and 0, otherwise teh original value
+   * @deprecated will be removed in the O-Release
    */
+  @Deprecated
   public static Object treat0AsNull(Object value) {
     if (value != null) {
       // equality is provided and a value is set

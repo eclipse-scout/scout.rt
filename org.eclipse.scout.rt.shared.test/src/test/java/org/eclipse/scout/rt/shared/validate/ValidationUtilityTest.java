@@ -10,21 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.validate;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Test;
 
 public class ValidationUtilityTest {
-
-  @Test
-  public void testTreat0AsNull() {
-    Integer intVal1 = new Integer(8);
-    Integer intval2 = new Integer(0);
-    assertEquals(intVal1, ValidationUtility.treat0AsNull(intVal1));
-    assertEquals(null, ValidationUtility.treat0AsNull(intval2));
-  }
 
   @Test
   public void testCheckMaxLength() {

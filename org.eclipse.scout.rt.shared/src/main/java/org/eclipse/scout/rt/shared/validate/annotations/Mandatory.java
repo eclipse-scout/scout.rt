@@ -18,10 +18,9 @@ import java.lang.annotation.Target;
 /**
  * value or array is mandatory / required
  * <p>
- * In order to treat 0 as null, use the {@link Treat0AsNull} annotation.
- * <p>
  * In order to annotate a field where you have no access (super class) you may consider using {@link FieldReference} on
  * a placeholder field.
+ * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})

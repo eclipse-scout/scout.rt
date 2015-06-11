@@ -58,11 +58,6 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
   }
 
   @Override
-  protected boolean getConfiguredTreat0AsNull() {
-    return false;
-  }
-
-  @Override
   protected void execAddSearchTerms(SearchFilter search) {
     //nop
   }

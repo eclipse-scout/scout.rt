@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxValue;
 import org.eclipse.scout.rt.shared.validate.annotations.MinValue;
 import org.eclipse.scout.rt.shared.validate.annotations.RegexMatch;
-import org.eclipse.scout.rt.shared.validate.annotations.Treat0AsNull;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +67,7 @@ public class ValidatorTest {
     validateSuccess(b);
     b.setId(-1L);
     validateFail(b);
-    b.setId(0L);
+    b.setId((Long) null);
     validateSuccess(b);
     b.setWeight(20.0);
     validateFail(b);
@@ -262,7 +261,6 @@ public class ValidatorTest {
   public static class CarBean {
     @Mandatory
     @MinValue(1)
-    @Treat0AsNull
     private Long m_id;
     @MaxLength(8)
     private String m_model;
@@ -298,7 +296,6 @@ public class ValidatorTest {
   public static class CarBeanEx extends CarBean {
     @FieldReference("m_id")
     @Mandatory(false)
-    @Treat0AsNull(false)
     private static final int M_ID = 0;
     @FieldReference("m_weight")
     @MaxValue(9)
