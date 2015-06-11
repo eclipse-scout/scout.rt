@@ -35,7 +35,6 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
 };
 
 scout.TabItem.prototype.focusTab = function() {
-  $.log.info('focusTab =' + this + ' tabindex=' + this.$tabContainer.attr('tabindex'));
   this.$tabContainer.focus();
 };
 

@@ -59,6 +59,18 @@ scout.TabBox.prototype._remove = function() {
   this._$tabContentCache = [];
 };
 
+/**
+ * Must call _selectTab(), the method sets the this.selectedTab property
+ * and renders the new tab/content.
+ */
+scout.TabBox.prototype._syncSelectedTab = function(selectedTab) {
+  this._selectTab(this.tabItems[selectedTab], false);
+};
+
+scout.TabBox.prototype._renderSelectedTab = function() {
+  // NOP - already handled by _syncSelectedTab
+};
+
 scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
@@ -90,15 +102,17 @@ scout.TabBox.prototype.rebuildTabs = function() {
   this._renderTabs();
 };
 
-scout.TabBox.prototype._selectTab = function(tabItem) {
+scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
   var tabIndex = this.tabItems.indexOf(tabItem);
   if (tabIndex != this.selectedTab) {
     $.log.debug('(TabBox#_selectTab) tabItem=' + tabItem + ' tabIndex=' + tabIndex);
     var oldSelectedTab = this.selectedTab;
     this.selectedTab = tabIndex;
-    this.session.send(this.id, 'selected', {
-      tabIndex: tabIndex
-    });
+    if (scout.helpers.nvl(notifyServer, true)) {
+      this.session.send(this.id, 'selected', {
+        tabIndex: tabIndex
+      });
+    }
 
     this.tabItems[oldSelectedTab].setTabActive(false);
     this.tabItems[this.selectedTab].setTabActive(true);
@@ -108,14 +122,11 @@ scout.TabBox.prototype._selectTab = function(tabItem) {
       scout.HtmlComponent.get(this._$tabArea).revalidate();
     }
 
-    // FIXME AWE: (tab-box) wieso braucht es hier NOCH ein setTimeout? siehe _onKeyDown()
-    setTimeout(function() {
-      this.tabItems[this.selectedTab].focusTab();
-    }.bind(this));
+    this.tabItems[this.selectedTab].focusTab();
 
     var $tabContent = this._$tabContent.children().first();
     if ($tabContent.length > 0) {
-      this.session.detachHelper.beforeDetach($tabContent);
+      this.session.detachHelper.beforeDetach($tabContent, {storeFocus: false});
       $tabContent.detach();
       this._$tabContentCache[oldSelectedTab] = $tabContent;
     }
@@ -135,6 +146,9 @@ scout.TabBox.prototype._onKeyDown = function(event) {
     return true;
   }
 
+  event.preventDefault();
+  event.stopPropagation();
+
   tabIndex = this.selectedTab;
   if (event.which === scout.keys.LEFT) {
     tabIndex--;
@@ -144,17 +158,11 @@ scout.TabBox.prototype._onKeyDown = function(event) {
   }
 
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
-    setTimeout(function() {
-      if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
-        var tabItem = this.tabItems[tabIndex];
-        if (tabItem._tabRendered) {
-          this._selectTab(tabItem);
-        }
-      }
-    }.bind(this));
+    var tabItem = this.tabItems[tabIndex];
+    if (tabItem._tabRendered) {
+        this._selectTab(tabItem);
+    }
   }
-
-  event.preventDefault();
 };
 
 scout.TabBox.prototype._renderTabContent = function($tabContent) {

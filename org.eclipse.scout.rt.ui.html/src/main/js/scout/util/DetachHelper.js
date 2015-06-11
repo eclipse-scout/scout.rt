@@ -5,13 +5,25 @@
  */
 scout.DetachHelper = function(session) {
   this._$scrollables = [];
-  this.session=session;
+  this.session = session;
+  this._defaultOptions = {
+    storeScrollPositions: true,
+    storeTooltips: true,
+    storeFocus: true
+  };
 };
 
-scout.DetachHelper.prototype.beforeDetach = function($container) {
-  this._storeScrollPositions($container);
-  this._storeTooltips($container);
-  this._storeFocus($container);
+scout.DetachHelper.prototype.beforeDetach = function($container, options) {
+  options = $.extend(this._defaultOptions, options || {});
+  if (options.storeScrollPositions) {
+    this._storeScrollPositions($container);
+  }
+  if (options.storeTooltips) {
+    this._storeTooltips($container);
+  }
+  if (options.storeFocus) {
+    this._storeFocus($container);
+  }
 };
 
 scout.DetachHelper.prototype.afterAttach = function($container) {
@@ -24,14 +36,15 @@ scout.DetachHelper.prototype._storeFocus = function($container) {
   var $focusedElement =  scout.focusManager._sessionFocusContexts[this.session.uiSessionId].focusContexts[0]._$focusedElement;
   if ($focusedElement) {
     $container.data('lastFocus', $focusedElement);
-    $.log.debug('Stored focus ' + $focusedElement.attr('class'));
+    $.log.debug('Stored focused element =' + scout.graphics.debugOutput($focusedElement));
   }
 };
 
 scout.DetachHelper.prototype._restoreFocus = function($container) {
-  if ($container.data('lastFocus')) {
-    $container.data('lastFocus').focus();
-    $.log.debug('Restored focus on ' + $container.data('lastFocus').attr('class'));
+  var $storedFocusElement = $container.data('lastFocus');
+  if ($storedFocusElement) {
+    $storedFocusElement.focus();
+    $.log.debug('Restored focus on element ' + scout.graphics.debugOutput($storedFocusElement));
   }
 };
 

@@ -12,7 +12,8 @@ scout.inherits(scout.TabItemMnemonicKeyStroke, scout.MnemonicKeyStroke);
  * @Override scout.KeyStroke
  */
 scout.TabItemMnemonicKeyStroke.prototype.handle = function(event) {
-  var index = this._field._$tabButton.data('tabIndex');
+  // FIXME AWE/NBU: das kann mit der neuen TabBox nicht mehr funktionieren (data tabIndex gibt es nicht mehr)
+  var index = this._field.$tabContainer.data('tabIndex');
   this._field.parent._selectTab(index);
   event.preventDefault();
 };
@@ -20,9 +21,9 @@ scout.TabItemMnemonicKeyStroke.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.TabItemMnemonicKeyStroke.prototype._drawKeyBox = function($container) {
-  if (this._field._$tabButton) {
+  if (this._field.$tabContainer) {
     var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._field._$tabButton, this.ctrl, this.alt, this.shift, true);
+    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._field.$tabContainer, this.ctrl, this.alt, this.shift, true);
   }
 };
 
@@ -30,5 +31,5 @@ scout.TabItemMnemonicKeyStroke.prototype._drawKeyBox = function($container) {
  * @Override scout.KeyStroke
  */
 scout.MnemonicKeyStroke.prototype.removeKeyBox = function($container) {
-  $('.key-box', this._field._$tabButton).remove();
+  $('.key-box', this._field.$tabContainer).remove();
 };
