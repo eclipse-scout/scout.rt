@@ -62,9 +62,9 @@ public class EntityNode extends AbstractComposerNode {
       label.append(ScoutTexts.get("ExtendedSearchAnd") + " ");
     }
     if (isNegative()) {
-      label.append(ScoutTexts.get("ExtendedSearchNot"));
+      label.append(ScoutTexts.get("ExtendedSearchNot") + " ");
     }
-    label.append(" " + m_entity.getText());
+    label.append(m_entity.getText());
     if (getChildNodeCount() > 0) {
       label.append(" " + ScoutTexts.get("ExtendedSearchEntitySuffix"));
     }
