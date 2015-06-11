@@ -138,7 +138,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
         validValue = TypeCastUtility.castValue(rawValue, getDataType());
       }
       catch (Exception e) {
-        throw new ProcessingException("invalid " + getDataType().getSimpleName() + " value in column '" + getClass().getName() + "': " + rawValue + " class=" + rawValue.getClass());
+        throw new ProcessingException("invalid " + getDataType().getSimpleName() + " value in column '" + getClass().getName() + "': " + rawValue + " class=" + rawValue.getClass(), e);
       }
     }
     return validValue;

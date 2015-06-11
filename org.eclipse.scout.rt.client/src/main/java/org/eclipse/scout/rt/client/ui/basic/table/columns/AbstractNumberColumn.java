@@ -266,12 +266,11 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
-    if (cell.getValue() != null) {
-      cell.setText(getFormat().format(cell.getValue()));
-    }
-    else {
-      cell.setText("");
-    }
+    cell.setText(formatValueInternal(cell.getValue()));
+  }
+
+  private String formatValueInternal(Object value) {
+    return (value != null) ? getFormat().format(value) : "";
   }
 
   protected static class LocalNumberColumnExtension<NUMBER extends Number, OWNER extends AbstractNumberColumn<NUMBER>> extends LocalColumnExtension<NUMBER, OWNER> implements INumberColumnExtension<NUMBER, OWNER> {

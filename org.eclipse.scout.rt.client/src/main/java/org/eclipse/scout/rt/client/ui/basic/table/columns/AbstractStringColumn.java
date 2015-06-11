@@ -248,19 +248,21 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
 
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
-    String format = getDisplayFormat();
     super.decorateCellInternal(cell, row);
-    if (format != null && cell.getValue() != null) {
+    cell.setText(formatValueInternal((String) cell.getValue()));
+  }
+
+  private String formatValueInternal(String value) {
+    String format = getDisplayFormat();
+    if (format != null && value != null) {
       if (FORMAT_LOWER.equals(format)) {
-        cell.setText(((String) cell.getValue()).toLowerCase());
+        return value.toLowerCase();
       }
       else if (FORMAT_UPPER.equals(format)) {
-        cell.setText(((String) cell.getValue()).toUpperCase());
+        value.toUpperCase();
       }
     }
-    else {
-      cell.setText((String) cell.getValue());
-    }
+    return value;
   }
 
   @Override
