@@ -609,6 +609,9 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
   this._renderRowsInProgress = false;
   if (rows.length > numRowsLoaded) {
     this._renderRowsInProgress = true;
+    // FIXME CGU: von A.WE - siehe E-Mail. Das hier macht Probleme, weil später invalidateTree() aufgerufen wird
+    // prüfen ob auf setTimeout verzichtet werden kann, oder _renderRows ohne Seiteneffekte funktionieren kann.
+    // siehe _installRows
     setTimeout(function() {
       that._renderRows(rows, startRowIndex + 100, lastRowOfBlockSelected);
     }, 0);

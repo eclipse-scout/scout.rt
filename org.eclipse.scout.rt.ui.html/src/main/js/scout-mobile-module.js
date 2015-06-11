@@ -16,6 +16,7 @@ __include("scout/util/DetachHelper.js");
 __include("scout/util/Device.js");
 __include("scout/util/EventSupport.js");
 __include("scout/util/helpers.js");
+__include("scout/util/icons.js");
 __include("scout/util/keys.js");
 __include("scout/util/KeyStrokeManager.js");
 __include("scout/util/FocusManager.js");

@@ -48,7 +48,7 @@ scout.Column.prototype.buildCell = function(row) {
 };
 
 scout.Column.prototype._icon = function(row, iconId, hasText) {
-  var cssClass, iconChar;
+  var cssClass, icon;
   if (!iconId) {
     return;
   }
@@ -56,13 +56,14 @@ scout.Column.prototype._icon = function(row, iconId, hasText) {
   if (hasText) {
     cssClass += ' with-text';
   }
-  if (scout.strings.startsWith(iconId, "font:")) {
-    iconChar = iconId.substr(5);
+  icon = scout.icons.parseIconId(iconId);
+  if (icon.isFontIcon()) {
     cssClass += ' font-icon';
-    return '<span class="' + cssClass + '">' + iconChar + '</span>';
-  } else {
+    return '<span class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
+  }
+  else {
     cssClass += ' image-icon';
-    return '<img class="' + cssClass + '" src="' + iconId + '">';
+    return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
 };
 

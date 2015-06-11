@@ -264,14 +264,14 @@
 
   $.fn.icon = function(iconId) {
     if (iconId) {
-      if (scout.strings.startsWith(iconId, 'font:')) {
-        iconId = iconId.substr(5);
+      var icon = scout.icons.parseIconId(iconId);
+      if (icon.isFontIcon()) {
+        this.attr('data-icon', icon.iconCharacter);
+        this.attr('data-iconFont', icon.font);
       } else {
         // FIXME BSH Handle URL icons. Check also: Button.js
         // scout.helpers.dynamicResourceUrl(this, this.iconId)
-        return;
       }
-      this.attr('data-icon', iconId);
     } else {
       this.removeAttr('data-icon');
     }
