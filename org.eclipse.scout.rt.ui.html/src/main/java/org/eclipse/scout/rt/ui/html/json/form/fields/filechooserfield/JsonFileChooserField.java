@@ -45,6 +45,6 @@ public class JsonFileChooserField<T extends IFileChooserField> extends JsonValue
   }
 
   private void handleUiChooseFile() {
-    getModel().getUIFacade().chooseFile();
+    getModel().getUIFacade().startFileChooserFromUI();
   }
 }
