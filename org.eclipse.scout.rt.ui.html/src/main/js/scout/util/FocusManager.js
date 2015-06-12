@@ -20,9 +20,9 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
   //Make container focusable and install focus context
   $container.attr('tabindex', portletPartId);
 
-  this.installFocusContext($container, session.uiSessionId, undefined, true);
   if (options.focusFirstPart && !firstPartFocusApplied) {
     firstPartFocusApplied = true;
+    this.installFocusContext($container, session.uiSessionId, undefined, true);
     $container[0].focus();
   }
 
