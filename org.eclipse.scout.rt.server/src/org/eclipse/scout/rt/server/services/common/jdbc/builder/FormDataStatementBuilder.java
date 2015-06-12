@@ -1945,7 +1945,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
         if (!plainBind) {
           addBinds(names, values);
         }
-        return m_sqlStyle.createInList(sql, plainBind, values[0]);
+        //no support for plain bind in here. otherwise, ArrayInput gets confused.
+        return m_sqlStyle.createInList(sql, true, values[0]);
       }
       case OPERATOR_CONTAINS: {
         if (!plainBind) {
@@ -1963,7 +1964,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
         if (!plainBind) {
           addBinds(names, values);
         }
-        return m_sqlStyle.createNotInList(sql, plainBind, values[0]);
+        //no support for plain bind in here. otherwise, ArrayInput gets confused.
+        return m_sqlStyle.createNotInList(sql, true, values[0]);
       }
       case OPERATOR_NOT_CONTAINS: {
         if (!plainBind) {
