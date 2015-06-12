@@ -199,6 +199,9 @@ public final class BinaryResource implements Serializable {
     if (m_filename != null) {
       s += ", filename: " + m_filename;
     }
+    if (m_contentType != null) {
+      s += ", contentType: " + m_contentType;
+    }
     if (m_lastModified != -1) {
       s += ", lastModified: " + m_lastModified;
     }

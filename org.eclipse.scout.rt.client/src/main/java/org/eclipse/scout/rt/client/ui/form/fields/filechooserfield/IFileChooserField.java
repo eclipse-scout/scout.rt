@@ -10,22 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
-import java.io.File;
 import java.util.List;
 
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-public interface IFileChooserField extends IValueField<String> {
+public interface IFileChooserField extends IValueField<BinaryResource> {
 
   String PROP_FILE_ICON_ID = "fileIconId";
-
-  String PROP_MAX_LENGTH = "maxLength";
 
   void setShowFileExtension(boolean b);
 
   boolean isShowFileExtension();
-  
+
   void setFileExtensions(List<String> extensions);
 
   List<String> getFileExtensions();
@@ -34,20 +32,12 @@ public interface IFileChooserField extends IValueField<String> {
 
   String getFileIconId();
 
-  void setMaxLength(int len);
-
-  int getMaxLength();
-
   IFileChooser getFileChooser();
 
   // Convenience file getter
-  File getValueAsFile();
-
   String getFileName();
 
-  long getFileSize();
-
-  boolean fileExists();
+  int getFileSize();
 
   IFileChooserFieldUIFacade getUIFacade();
 }

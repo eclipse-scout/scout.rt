@@ -14,5 +14,5 @@ public interface IFileChooserFieldUIFacade {
 
   void parseAndSetValueFromUI(String value);
 
-  void chooseFile();
+  void startFileChooserFromUI();
 }

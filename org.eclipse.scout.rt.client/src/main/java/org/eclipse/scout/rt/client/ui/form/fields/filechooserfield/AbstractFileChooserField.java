@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -27,10 +26,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
-public abstract class AbstractFileChooserField extends AbstractValueField<String> implements IFileChooserField {
+public abstract class AbstractFileChooserField extends AbstractValueField<BinaryResource> implements IFileChooserField {
 
   private IFileChooserFieldUIFacade m_uiFacade;
 
@@ -66,13 +64,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     return AbstractIcons.FileChooserFieldFile;
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(310)
-  @ValidationRule(ValidationRule.MAX_LENGTH)
-  protected int getConfiguredMaxLength() {
-    return 4000;
-  }
-
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
@@ -80,7 +71,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     setShowFileExtension(getConfiguredShowFileExtension());
     setFileExtensions(getConfiguredFileExtensions());
     setFileIconId(getConfiguredFileIconId());
-    setMaxLength(getConfiguredMaxLength());
   }
 
   @Override
@@ -120,149 +110,68 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   }
 
   @Override
-  public void setMaxLength(int len) {
-    if (len > 0) {
-      propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
-    }
-    if (isInitialized()) {
-      setValue(getValue());
-    }
-  }
-
-  @Override
-  public int getMaxLength() {
-    int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
-    if (len <= 0) {
-      len = 200;
-    }
-    return len;
-  }
-
-  @Override
   public IFileChooser getFileChooser() {
-    FileChooser fc = new FileChooser(getFileExtensions(), false);
-    return fc;
+    return new FileChooser(getFileExtensions(), false);
   }
 
   // Convenience file getter
-  // XXX BSH Refactor to BinaryResource!
-  @Override
-  public File getValueAsFile() {
-    String value = getValue();
-    if (value == null) {
-      return null;
-    }
-    else {
-      return new File(value);
-    }
-  }
 
   @Override
   public String getFileName() {
-    File f = getValueAsFile();
-    if (f != null) {
-      return f.getName();
+    BinaryResource value = getValue();
+    if (value != null) {
+      return value.getFilename();
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   @Override
-  public long getFileSize() {
-    File f = getValueAsFile();
-    if (f != null) {
-      return f.length();
+  public int getFileSize() {
+    BinaryResource value = getValue();
+    if (value != null) {
+      return value.getContentLength();
     }
-    else {
-      return 0;
-    }
-  }
-
-  @Override
-  public boolean fileExists() {
-    if (getValue() == null) {
-      return false;
-    }
-    return getValueAsFile().exists();
+    return 0;
   }
 
   // format value for display
   @Override
-  protected String formatValueInternal(String validValue) {
-    String s = validValue;
-    if (s != null && s.length() > 0) {
-      // XXX BSH Improve this
-      String n = s;
-      String e = "";
-      if (n.indexOf('.') >= 0) {
-        int i = n.lastIndexOf('.');
-        e = n.substring(i);
-        n = n.substring(0, i);
-      }
-      s = n;
-      if (isShowFileExtension()) {
-        s = s + e;
-      }
-    }
-    return s;
-  }
-
-  @Override
-  protected String parseValueInternal(String text) throws ProcessingException {
-    // XXX BSH Test this
-    String retVal = null;
-    if (!StringUtility.hasText(text)) {
+  protected String formatValueInternal(BinaryResource validValue) {
+    if (validValue == null) {
       return null;
     }
-    text = text.trim();
-    text = StringUtility.unquoteText(text);
-    String n = text;
-    String e = "";
-    if (n.indexOf('.') >= 0) {
-      int i = n.lastIndexOf('.');
-      e = n.substring(i);
-      n = n.substring(0, i);
+    String filename = validValue.getFilename();
+    if (StringUtility.hasText(filename)) {
+      if (!isShowFileExtension() && filename.indexOf('.') >= 0) {
+        return filename.substring(0, filename.lastIndexOf("."));
+      }
+      return filename;
     }
-    text = n;
-    if (e.length() == 0 && CollectionUtility.hasElements(m_fileExtensions)) {
-      e = "." + CollectionUtility.firstElement(m_fileExtensions);
-    }
-    text += e;
-    retVal = text;
-    return retVal;
+    return null;
   }
 
   @Override
-  protected String validateValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) {
-      text = null;
+  protected BinaryResource parseValueInternal(String text) throws ProcessingException {
+    // Don't allow to edit the value - except to completely delete it!
+    if (StringUtility.hasText(text)) {
+      return getValue();
     }
-    if (text != null) {
-      if (text.length() > getMaxLength()) {
-        text = text.substring(0, getMaxLength());
-      }
-    }
-    return text;
+    return null;
   }
 
   private class P_UIFacade implements IFileChooserFieldUIFacade {
 
     @Override
     public void parseAndSetValueFromUI(String value) {
-      if (value != null && value.length() == 0) {
-        value = null;
-      }
-      // parse always, validity might change even if text is same
       parseAndSetValue(value);
     }
 
     @Override
-    public void chooseFile() {
+    public void startFileChooserFromUI() {
       try {
         IFileChooser fileChooser = getFileChooser();
         List<BinaryResource> result = fileChooser.startChooser();
-        setValue(result.size() + " files"); // XXX
+        setValue(CollectionUtility.firstElement(result));
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
@@ -270,7 +179,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
   }
 
-  protected static class LocalFileChooserFieldExtension<OWNER extends AbstractFileChooserField> extends LocalValueFieldExtension<String, OWNER> implements IFileChooserFieldExtension<OWNER> {
+  protected static class LocalFileChooserFieldExtension<OWNER extends AbstractFileChooserField> extends LocalValueFieldExtension<BinaryResource, OWNER> implements IFileChooserFieldExtension<OWNER> {
 
     public LocalFileChooserFieldExtension(OWNER owner) {
       super(owner);
@@ -281,5 +190,4 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   protected IFileChooserFieldExtension<? extends AbstractFileChooserField> createLocalExtension() {
     return new LocalFileChooserFieldExtension<AbstractFileChooserField>(this);
   }
-
 }
