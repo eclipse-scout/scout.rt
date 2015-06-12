@@ -20,12 +20,12 @@ scout.TabItem.prototype.renderTab = function($parent) {
     throw new Error('Tab already rendered');
   }
   this.$tabContainer = $('<button>')
-    .text(scout.strings.removeAmpersand(this.label))
     .appendTo($parent)
     .data('tabItem', this)
     .on('mousedown', this._onTabMouseDown.bind(this));
 
   this._renderTabActive();
+  this._renderLabel(this.label);
   this._tabRendered = true;
   this._updateTab();
 };
@@ -95,7 +95,23 @@ scout.TabItem.prototype._renderVisible = function(visible) {
   this._updateTab();
 };
 
+scout.TabItem.prototype._syncLabel = function(label) {
+  this.label = label;
+  // TODO BSH/AWE/CGU Find a better solution for this!
+  // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
+  // tabButton IS, render the properties that affect the tab button.
+  if (!this.rendered && this._tabRendered) {
+    this._updateTab();
+  }
+};
+
+scout.TabItem.prototype._renderLabel = function(label) {
+  scout.TabItem.parent.prototype._renderLabel.call(this, label);
+  this._updateTab();
+};
+
 scout.TabItem.prototype._updateTab = function() {
   this.$tabContainer.toggleClass('marked', this.marked);
   this.$tabContainer.setVisible(this.visible);
+  this.$tabContainer.text(scout.helpers.nvl(scout.strings.removeAmpersand(this.label), '&nbsp'));
 };
