@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -41,6 +40,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.json.JSONObject;
 
 public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IBinaryResourceProvider {
@@ -242,10 +242,10 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   @Override
-  public BinaryResource getBinaryResource(String fileName) {
-    IDownloadHandler handler = m_downloads.remove(fileName);
+  public BinaryResourceHolder provideBinaryResource(String filename) {
+    IDownloadHandler handler = m_downloads.remove(filename);
     if (handler != null) {
-      return handler.getResource();
+      return new BinaryResourceHolder(handler.getResource(), true);
     }
     else {
       return null;

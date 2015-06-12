@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.URL;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 /**
@@ -14,5 +13,5 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  */
 public interface IBinaryResourceProvider {
 
-  BinaryResource getBinaryResource(String fileName);
+  BinaryResourceHolder provideBinaryResource(String filename);
 }

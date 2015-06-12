@@ -78,7 +78,7 @@ scout.FileChooser.prototype._position = function() {
 
 scout.FileChooser.prototype._doOk = function() {
   if (this._files.length === 0) {
-    this.doCancel();
+    this._doCancel();
     return;
   }
   this.session.uploadFiles(this, this._files);

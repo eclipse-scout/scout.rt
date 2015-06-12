@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.json.JSONObject;
 
 public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IBinaryResourceProvider, IJsonContextMenuOwner {
@@ -87,10 +88,10 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   // When an adapter has multiple images, it must deal itself with that case. For instance it could
   // add a sequence-number to the contentId to distinct between different images.
   @Override
-  public BinaryResource getBinaryResource(String filename) {
+  public BinaryResourceHolder provideBinaryResource(String filename) {
     BinaryResource res = extractBinaryResource(getModel().getImage());
     if (res != null && filename.equals(res.getFilename())) {
-      return res;
+      return new BinaryResourceHolder(res, false);
     }
     return null;
   }

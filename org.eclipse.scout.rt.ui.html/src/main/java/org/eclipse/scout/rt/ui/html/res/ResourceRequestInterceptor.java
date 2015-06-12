@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.ui.html.res;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,31 +55,6 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   private static final String UTF_8 = "UTF-8";
-  private static final Set<String> DOWNLOAD_CONTENT_TYPES = new HashSet<String>(Arrays.asList(new String[]{
-      "application/octet-stream",
-      "application/octet-stream",
-      "application/pdf",
-      "application/mspowerpoint",
-      "application/mspowerpoint",
-      "application/mspowerpoint",
-      "application/mspowerpoint",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
-      "application/vnd.openxmlformats-officedocument.presentationml.template",
-      "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.presentationml.slide",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
-      "application/zip",
-  }));
   private static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/dynamic/([^/]*)/([^/]*)/(.*)$");
 
   private ScriptProcessor m_scriptProcessor;
@@ -126,9 +98,8 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       }
     }
 
-    if (isDownload(cacheObj.getResource())) {
-      resp.setHeader("Content-Disposition", "attachment");
-    }
+    // Set additional headers requested by object itself
+    cacheObj.applyAdditionalHttpResponseHeaders(resp);
 
     if (!"HEAD".equals(req.getMethod())) {
       resp.getOutputStream().write(cacheObj.getResource().getContent());
@@ -230,7 +201,15 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     byte[] bytes = IOUtility.readFromUrl(url);
     bytes = replaceHtmlScriptTags(servlet, req, bytes);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, System.currentTimeMillis());
-    return new HttpCacheObject(pathInfo, true, -1, content);//no cache-control, only E-Tag checks to make sure that a session with timeout is correctly forwarded to the login using a GET request BEFORE the first json POST request
+    // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
+    // forwarded to the login using a GET request BEFORE the first json POST request
+    HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, true, -1, content);
+    // Suppress automatic "compatibility mode" in IE in intranet zone
+    BrowserInfo browserInfo = BrowserInfo.createFrom(req);
+    if (browserInfo.isMshtml()) {
+      httpCacheObject.putAdditionalHttpResponseHeader("X-UA-Compatible", "IE=edge");
+    }
+    return httpCacheObject;
   }
 
   /**
@@ -275,16 +254,21 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       return null;
     }
     IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    BinaryResource binaryResource = provider.getBinaryResource(filename);
-    if (binaryResource == null) {
+    BinaryResourceHolder binaryResource = provider.provideBinaryResource(filename);
+    if (binaryResource == null || binaryResource.get() == null) {
       return null;
     }
-    String contentType = binaryResource.getContentType();
+    String contentType = binaryResource.get().getContentType();
     if (contentType == null) {
       contentType = detectContentType(servlet, pathInfo);
     }
-    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.getContent(), binaryResource.getLastModified());
-    return new HttpCacheObject(pathInfo, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
+    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.get().getContent(), binaryResource.get().getLastModified());
+    HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
+    if (binaryResource.isDownload()) {
+      // Set hint for browser to show the "save as" dialog (no in-line display, not even for known types, e.g. XML)
+      httpCacheObject.putAdditionalHttpResponseHeader("Content-Disposition", "attachment");
+    }
+    return httpCacheObject;
   }
 
   /**
@@ -300,10 +284,6 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     URLConnection uc = url.openConnection();
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
     return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
-  }
-
-  protected boolean isDownload(BinaryResource res) {
-    return DOWNLOAD_CONTENT_TYPES.contains(res.getContentType());
   }
 
   protected String detectContentType(UiServlet servlet, String path) {

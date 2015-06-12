@@ -11,6 +11,10 @@
 package org.eclipse.scout.rt.ui.html.cache;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
 
@@ -24,6 +28,7 @@ public class HttpCacheObject implements Serializable {
   private final boolean m_cachingAllowed;
   private final int m_cacheMaxAge;
   private final BinaryResource m_resource;
+  private final Map<String, String> m_additionalHttpResponseHeaders = new HashMap<>();
 
   public HttpCacheObject(String cacheId, boolean cachingAllowed, int cacheMaxAge, BinaryResource resource) {
     m_cacheId = cacheId;
@@ -56,5 +61,17 @@ public class HttpCacheObject implements Serializable {
       return "W/\"" + m_resource.getContentLength() + "-" + m_resource.getFingerprint() + "\"";
     }
     return null;
+  }
+
+  public void putAdditionalHttpResponseHeader(String name, String value) {
+    m_additionalHttpResponseHeaders.put(name, value);
+  }
+
+  public void applyAdditionalHttpResponseHeaders(HttpServletResponse httpResp) {
+    if (httpResp != null) {
+      for (Map.Entry<String, String> entry : m_additionalHttpResponseHeaders.entrySet()) {
+        httpResp.setHeader(entry.getKey(), entry.getValue());
+      }
+    }
   }
 }
