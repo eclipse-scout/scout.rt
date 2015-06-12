@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -19,6 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.DisplayableFormFieldFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupBox> {
@@ -83,10 +85,17 @@ public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupB
 
   protected int getIndexForGroupBox(IGroupBox groupBox) {
     List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
-    for (int i = 0; i < groupBoxes.size(); i++) {
-      if (groupBox == groupBoxes.get(i)) {
+    DisplayableFormFieldFilter<IFormField> filter = new DisplayableFormFieldFilter<>();
+    int i = 0;
+    for (IGroupBox gb : groupBoxes) {
+      // Don't count invisible group boxes (they are not sent to the UI, see JsonCompositeField)
+      if (!filter.accept(gb)) {
+        continue;
+      }
+      if (gb == groupBox) {
         return i;
       }
+      i++;
     }
     throw new IllegalStateException("selected tab not found in group-boxes list");
   }
