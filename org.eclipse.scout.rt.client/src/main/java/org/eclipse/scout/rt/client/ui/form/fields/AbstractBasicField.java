@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains.BasicFieldExecChangedDisplayTextChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 
 /**
  * Implementation for {@link IBasicField}. Handle properties and event methods that deals with basic fields.
@@ -111,8 +112,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected final void interceptExecChangedDisplayText() {
-    @SuppressWarnings("unchecked")
-    List<? extends IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>>> extensions = (List<? extends IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>>>) getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     new BasicFieldChains.BasicFieldExecChangedDisplayTextChain<VALUE>(extensions).execChangedDisplayText();
   }
 
@@ -121,7 +121,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    * any further chain elements.
    */
   protected static class LocalBasicFieldExtension<VALUE_TYPE, OWNER_FIELD extends AbstractBasicField<VALUE_TYPE>> extends AbstractValueField.LocalValueFieldExtension<VALUE_TYPE, OWNER_FIELD>
-      implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
+  implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
 
     public LocalBasicFieldExtension(OWNER_FIELD owner) {
       super(owner);

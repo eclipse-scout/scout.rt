@@ -29,8 +29,10 @@ import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateLazyAddChildPagesToOutlineChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
@@ -583,7 +585,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     IForm form = createDetailForm();
     if (form != null) {
       setDetailForm(form);
-      execInitDetailForm();
+      interceptInitDetailForm();
     }
   }
 
@@ -768,7 +770,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public boolean isLazyAddChildPagesToOutline() {
-    return execCalculateLazyAddChildPagesToOutline();
+    return interceptCalculateLazyAddChildPagesToOutline();
   }
 
   @Override
@@ -828,6 +830,18 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     chain.execDisposePage();
   }
 
+  protected final void interceptInitDetailForm() throws ProcessingException {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageInitDetailFormChain chain = new PageInitDetailFormChain(extensions);
+    chain.execInitDetailForm();
+  }
+
+  protected boolean interceptCalculateLazyAddChildPagesToOutline() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageCalculateLazyAddChildPagesToOutlineChain chain = new PageCalculateLazyAddChildPagesToOutlineChain(extensions);
+    return chain.execCalculateLazyAddChildPagesToOutline();
+  }
+
   protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
 
     public LocalPageExtension(OWNER owner) {
@@ -862,6 +876,16 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     @Override
     public void execDisposePage(PageDisposePageChain chain) throws ProcessingException {
       getOwner().execDisposePage();
+    }
+
+    @Override
+    public void execInitDetailForm(PageInitDetailFormChain chain) throws ProcessingException {
+      getOwner().execInitDetailForm();
+    }
+
+    @Override
+    public boolean execCalculateLazyAddChildPagesToOutline(PageCalculateLazyAddChildPagesToOutlineChain chain) {
+      return getOwner().execCalculateLazyAddChildPagesToOutline();
     }
   }
 

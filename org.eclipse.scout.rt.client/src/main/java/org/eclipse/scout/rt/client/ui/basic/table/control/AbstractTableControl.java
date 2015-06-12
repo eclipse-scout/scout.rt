@@ -10,10 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.control.ITableControlExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -129,7 +134,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     if (form != null) {
       setForm(form);
       decorateForm();
-      execInitForm();
+      interceptInitForm();
     }
   }
 
@@ -142,5 +147,33 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
 
   public void decorateForm() {
     getForm().setAutoAddRemoveOnDesktop(false);
+  }
+
+  @Override
+  protected IActionExtension<? extends AbstractAction> createLocalExtension() {
+    return new LocalTableControlExtension<AbstractTableControl>(this);
+  }
+
+  protected final void interceptInitForm() throws ProcessingException {
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
+    TableControlInitFormChain chain = new TableControlInitFormChain(extensions);
+    chain.execInitForm();
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalTableControlExtension<OWNER extends AbstractTableControl> extends AbstractAction.LocalActionExtension<OWNER> implements ITableControlExtension<OWNER> {
+
+    public LocalTableControlExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execInitForm(TableControlInitFormChain chain) throws ProcessingException {
+      getOwner().execInitForm();
+    }
+
   }
 }

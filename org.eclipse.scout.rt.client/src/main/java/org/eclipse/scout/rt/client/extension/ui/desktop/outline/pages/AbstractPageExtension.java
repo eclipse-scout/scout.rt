@@ -2,8 +2,10 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateLazyAddChildPagesToOutlineChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
@@ -44,5 +46,15 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
   @Override
   public void execDisposePage(PageDisposePageChain chain) throws ProcessingException {
     chain.execDisposePage();
+  }
+
+  @Override
+  public void execInitDetailForm(PageInitDetailFormChain chain) throws ProcessingException {
+    chain.execInitDetailForm();
+  }
+
+  @Override
+  public boolean execCalculateLazyAddChildPagesToOutline(PageCalculateLazyAddChildPagesToOutlineChain chain) {
+    return chain.execCalculateLazyAddChildPagesToOutline();
   }
 }
