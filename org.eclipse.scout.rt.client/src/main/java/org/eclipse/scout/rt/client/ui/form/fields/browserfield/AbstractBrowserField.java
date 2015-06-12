@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -20,6 +22,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
@@ -29,12 +32,19 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
+// FIXME AWE: change value of BrowserField to URL. When we call setBinaryLocation() on the BrowserField
+// we must:
+// 1. create a download-URL for that resource
+// 2. set the location (=value) to that download-URL
+//
+// When we change the location (=value) of the BrowserField we must also set the binaryResource to null.
+// Talk to SME and PBN for more infos
+
 @ClassId("6402e68c-abd1-42b8-8da2-b4a12f910c98")
 public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile> implements IBrowserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBrowserField.class);
 
   private IBrowserFieldUIFacade m_uiFacade;
-  private boolean m_scrollBarEnabled;
 
   public AbstractBrowserField() {
     this(true);
@@ -55,6 +65,12 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredAutoAddDefaultMenus() {
     return false;
+  }
+
+  @Order(220)
+  @ConfigProperty(ConfigProperty.OBJECT)
+  protected Set<SandboxValues> getConfiguredSandbox() {
+    return fullSandbox();
   }
 
   /**
@@ -97,7 +113,8 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
-    m_scrollBarEnabled = getConfiguredScrollBarEnabled();
+    setScrollBarEnabled(getConfiguredScrollBarEnabled());
+    setSandbox(getConfiguredSandbox());
   }
 
   @Override
@@ -127,9 +144,13 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     return m_uiFacade;
   }
 
+  protected void setScrollBarEnabled(boolean scrollBarEnabled) {
+    propertySupport.setProperty(PROP_SCROLLBARS_ENABLED, scrollBarEnabled);
+  }
+
   @Override
   public boolean isScrollBarEnabled() {
-    return m_scrollBarEnabled;
+    return propertySupport.getPropertyBool(PROP_SCROLLBARS_ENABLED);
   }
 
   private class P_UIFacade implements IBrowserFieldUIFacade {
@@ -202,6 +223,35 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   @Override
   protected IBrowserFieldExtension<? extends AbstractBrowserField> createLocalExtension() {
     return new LocalBrowserFieldExtension<AbstractBrowserField>(this);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Set<SandboxValues> getSandbox() {
+    return (Set<SandboxValues>) propertySupport.getProperty(PROP_SANDBOX);
+  }
+
+  @Override
+  public void setSandbox(Set<SandboxValues> sandboxValues) {
+    propertySupport.setProperty(PROP_SANDBOX, sandboxValues);
+  }
+
+  protected Set<SandboxValues> fullSandbox() {
+    Set<SandboxValues> set = new HashSet<>();
+    for (SandboxValues sandboxValue : SandboxValues.values()) {
+      set.add(sandboxValue);
+    }
+    return set;
+  }
+
+  @Override
+  public BinaryResource getBinaryResource() {
+    return (BinaryResource) propertySupport.getProperty(PROP_BINARY_RESOURCE);
+  }
+
+  @Override
+  public void setBinaryResource(BinaryResource binaryResource) {
+    propertySupport.setProperty(PROP_BINARY_RESOURCE, binaryResource);
   }
 
 }

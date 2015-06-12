@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
+import java.util.Set;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -32,11 +35,37 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  */
 public interface IBrowserField extends IValueField<RemoteFile> {
 
+  public enum SandboxValues {
+    AllowForms("allow-forms"),
+    AllowPointerLock("allow-pointer-lock"),
+    AllowPopups("allow-popups"),
+    AllowSameOrigin("allow-same-origin"),
+    AllowScripts("allow-scripts"),
+    AllowTopNavigation("allow-top-navigation");
+
+    private String m_attribute;
+
+    private SandboxValues(String attribute) {
+      this.m_attribute = attribute;
+    }
+
+    public static boolean hasAllRestrictions(Set<SandboxValues> sandbox) {
+      return values().length == sandbox.size();
+    }
+
+    public String getAttribute() {
+      return m_attribute;
+    }
+  }
+
+  // FIXME AWE: fix name-inconsistency, constant-name VS property-name VS method-name SCROLLBARS, scrollBars, scrollBar
   String PROP_SCROLLBARS_ENABLED = "scrollBarsEnabled";
   /**
    * String
    */
   String PROP_LOCATION = "location";
+  String PROP_SANDBOX = "sandbox";
+  String PROP_BINARY_RESOURCE = "binaryResource";
 
   boolean isScrollBarEnabled();
 
@@ -53,5 +82,13 @@ public interface IBrowserField extends IValueField<RemoteFile> {
   void setLocation(String url);
 
   String getLocation();
+
+  void setSandbox(Set<SandboxValues> sandboxValues);
+
+  Set<SandboxValues> getSandbox();
+
+  void setBinaryResource(BinaryResource binaryResource);
+
+  BinaryResource getBinaryResource();
 
 }
