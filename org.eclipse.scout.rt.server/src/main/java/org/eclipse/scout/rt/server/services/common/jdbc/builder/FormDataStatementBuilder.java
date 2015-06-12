@@ -112,7 +112,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * Zero-traversing non aggregation attributes are simply wrapped using NLV(attribute).
  * <p>
  * That way non-existent matches are added to the result, which matches the expected behaviour.
- *
+ * 
  * @author Ivan Motsch
  */
 public class FormDataStatementBuilder implements DataModelConstants {
@@ -126,14 +126,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public static enum AttributeStrategy {
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
-     *
+     * 
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * 
      * this strategy only creates the contraint of the attribute part
-     *
+     * 
      * <pre>
      * {@link EntityContribution#getWhereParts()} = SALARY&gt;=1000
      * </pre>
@@ -141,14 +141,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
     BuildConstraintOfAttribute,
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
-     *
+     * 
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * 
      * this strategy only creates the contraint of the context (excluding the attribute)
-     *
+     * 
      * <pre>
      * {@link EntityContribution#getWhereParts()} = ACTIVE=1
      * </pre>
@@ -156,14 +156,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
     BuildConstraintOfContext,
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
-     *
+     * 
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * 
      * this strategy creates the contraint of the context and the attribute
-     *
+     * 
      * <pre>
      * {@link EntityContribution#getWhereParts()} = SALARY&gt;=1000 AND ACTIVE=1
      * </pre>
@@ -171,14 +171,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
     BuildConstraintOfAttributeWithContext,
     /**
      * Assuming the query "SALARY" and the attribute statement
-     *
+     * 
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     *
+     * 
      * this strategy creates the select query part of the attribute and adds constraints for the context
-     *
+     * 
      * <pre>
      * {@link EntityContribution#getSelectParts()} = SALARY
      * {@link EntityContribution#getWhereParts()} = ACTIVE=1
@@ -382,7 +382,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * <b>Data model attribute</b>:<br>
    * The sqlAttribute is something like LAST_NAME, STATUS or @PERSON@.LAST_NAME, @PERSON@.STATUS.
-   *
+   * 
    * @PERSON@ will be replaced by the parent entitie's generated alias.
    *          <p>
    *          The @PERSON@ prefix is added automatically if missing, but only if the entity where the attribute is
@@ -520,7 +520,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * Creates a select statement by merging the given entity contributions with the given base statement. This builder's
    * {@link #getWhereConstraints()} are added as well.
-   *
+   * 
    * @param stm
    *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
    *          or &lt;havingParts/&gt; place holders.
@@ -1154,7 +1154,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * and as 'where' on {@link EntityStrategy#BuildConstraints}
    * <p>
    * Default calls {@link EntityContributionUtility#createEntityPart(String, EntityContribution, boolean)}
-   *
+   * 
    * @param entityStrategy
    * @param entityPartWithTags
    *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts<br/>
@@ -1180,7 +1180,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * only used with strategy {@link EntityStrategy#BuildConstraints}
    * <p>
-   *
+   * 
    * @return the statement combined with the contributions
    */
   public String createEntityPart(String stm, boolean negative, EntityContribution childContributions) throws ProcessingException {
@@ -1222,7 +1222,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * Check if a group by part is valid, i.e. ist not a SELECT clause.
    * default uses {@link EntityContributionUtility#checkGroupByPart(String)}
-   *
+   * 
    * @throws ProcessingException
    *           with {@link IStatus#getCode()} = X
    * @since 3.8
@@ -1235,7 +1235,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * adding an attribute as an entity contribution
    * <p>
    * Evaluates the tags in the attribute statement and creates an {@link EntityContribution} based on it.
-   *
+   * 
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
@@ -1360,7 +1360,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       contrib.getFromParts().add(fromPart);
     }
     switch (attributeStrategy) {
-      //select ... where
+    //select ... where
       case BuildQueryOfAttributeAndConstraintOfContext: {
         //select
         if (attPart != null) {
@@ -1430,7 +1430,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * adding an attribute as an entity contribution
    * <p>
-   *
+   * 
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
@@ -1841,7 +1841,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
         if (!plainBind) {
           addBinds(names, values);
         }
-        return m_sqlStyle.createInList(sql, plainBind, values[0]);
+        //no support for plain bind in here. otherwise, ArrayInput gets confused.
+        return m_sqlStyle.createInList(sql, true, values[0]);
       }
       case OPERATOR_CONTAINS: {
         if (!plainBind) {
@@ -1859,7 +1860,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
         if (!plainBind) {
           addBinds(names, values);
         }
-        return m_sqlStyle.createNotInList(sql, plainBind, values[0]);
+        //no support for plain bind in here. otherwise, ArrayInput gets confused.
+        return m_sqlStyle.createNotInList(sql, true, values[0]);
       }
       case OPERATOR_NOT_CONTAINS: {
         if (!plainBind) {
