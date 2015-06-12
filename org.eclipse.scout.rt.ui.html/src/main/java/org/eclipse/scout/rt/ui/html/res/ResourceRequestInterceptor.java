@@ -213,8 +213,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
       BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(servlet, pathInfo), out.getContent(), out.getLastModified());
-      // TODO BSH Check with IMO: Why not pass MAX_AGE_ONE_YEAR instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
-      return new HttpCacheObject(pathInfo, true, -1, content);
+      return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_ONE_YEAR, content);
     }
     return null;
   }
@@ -231,8 +230,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     byte[] bytes = IOUtility.readFromUrl(url);
     bytes = replaceHtmlScriptTags(servlet, req, bytes);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, System.currentTimeMillis());
-    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
-    return new HttpCacheObject(pathInfo, true, -1, content);
+    return new HttpCacheObject(pathInfo, true, -1, content);//no cache-control, only E-Tag checks to make sure that a session with timeout is correctly forwarded to the login using a GET request BEFORE the first json POST request
   }
 
   /**
@@ -248,8 +246,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     String json = new String(IOUtility.readFromUrl(url), UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), json.getBytes(UTF_8), System.currentTimeMillis());
-    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
-    return new HttpCacheObject(pathInfo, true, -1, content);
+    return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 
   /**
@@ -287,9 +284,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       contentType = detectContentType(servlet, pathInfo);
     }
     BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.getContent(), binaryResource.getLastModified());
-
-    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
-    return new HttpCacheObject(pathInfo, content.getLastModified() > 0, -1, content);
+    return new HttpCacheObject(pathInfo, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 
   /**
@@ -304,8 +299,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     byte[] bytes = IOUtility.readFromUrl(url);
     URLConnection uc = url.openConnection();
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
-    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
-    return new HttpCacheObject(pathInfo, true, -1, content);
+    return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 
   protected boolean isDownload(BinaryResource res) {

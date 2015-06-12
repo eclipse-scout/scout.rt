@@ -31,12 +31,12 @@ public interface IHttpCacheControl extends Serializable {
 
   /**
    * default value (in seconds) used for js and css in
-   * {@link DefaultHttpCacheControl#getMaxAgeFor(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
+   * {@link DefaultHttpCacheControl#interceptCacheMaxAge(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
    */
   int MAX_AGE_ONE_YEAR = 365 * 24 * 3600;
   /**
    * default value (in seconds) used for html, jpg, gif etc. in
-   * {@link DefaultHttpCacheControl#getMaxAgeFor(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
+   * {@link DefaultHttpCacheControl#interceptCacheMaxAge(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
    */
   int MAX_AGE_4_HOURS = 4 * 3600;
 

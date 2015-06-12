@@ -69,7 +69,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     if (!obj.isCachingAllowed()) {
       return false;
     }
-    int maxAge = getMaxAgeFor(req, resp, obj);
+    int maxAge = obj.getCacheMaxAge();
     if (maxAge > 0) {
       // "private"
       //   Only browsers may cache this resource.
@@ -116,23 +116,6 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     }
 
     return false;
-  }
-
-  /**
-   * @return the preferred max age or 0/negative in oder to omit a max-age header
-   */
-  protected int getMaxAgeFor(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
-    if (obj.getCacheMaxAge() > 0) {
-      return obj.getCacheMaxAge();
-    }
-    String pathInfo = req.getPathInfo();
-    if (pathInfo == null) {
-      return MAX_AGE_4_HOURS;
-    }
-    if (pathInfo.endsWith(".js") || pathInfo.endsWith(".css")) {
-      return MAX_AGE_ONE_YEAR;
-    }
-    return MAX_AGE_4_HOURS;
   }
 
   @Override
