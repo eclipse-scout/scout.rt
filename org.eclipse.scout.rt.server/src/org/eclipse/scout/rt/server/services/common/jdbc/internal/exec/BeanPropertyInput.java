@@ -63,7 +63,7 @@ class BeanPropertyInput implements IBindInput {
           if (m_target.getParsedOp().equals("=")) {
             m_target.setParsedOp("IN");
           }
-          else { // != or <>
+          else if (m_target.getParsedOp().equals("!=") || m_target.getParsedOp().equals("<>")) {
             m_target.setParsedOp("NOT IN");
           }
         }
