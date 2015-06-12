@@ -57,8 +57,16 @@ scout.ValueField.prototype._hasMenus = function() {
   return !!(this.menus && this.menus.length > 0);
 };
 
-scout.ValueField.prototype._renderMenus = function(menus) {
-  this.$container.toggleClass('has-menus', this._hasMenus());
+scout.ValueField.prototype._renderMenus = function() {
+  this._updateMenus();
+};
+
+scout.ValueField.prototype._renderMenusVisible = function() {
+  this._updateMenus();
+};
+
+scout.ValueField.prototype._updateMenus = function() {
+  this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };
 
 scout.ValueField.prototype._renderDisplayText = function(displayText) {

@@ -15,7 +15,10 @@ import java.util.List;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 public interface IJsonContextMenuOwner {
+
   String PROP_MENUS = "menus";
+
+  String PROP_MENUS_VISIBLE = "menusVisible";
 
   void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters);
 }

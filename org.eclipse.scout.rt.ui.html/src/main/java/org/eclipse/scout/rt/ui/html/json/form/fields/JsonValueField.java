@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -41,6 +43,8 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
    */
   public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 
+  private PropertyChangeListener m_contextMenuListener;
+
   public JsonValueField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
@@ -68,11 +72,26 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    m_contextMenuListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
+        }
+      }
+    };
+    getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      JsonObjectUtility.putProperty(json, PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
     }
     return json;
   }
@@ -80,6 +99,10 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  protected void handleModelContextMenuVisibleChanged(boolean visible) {
+    addPropertyChangeEvent(PROP_MENUS_VISIBLE, visible);
   }
 
   @Override
