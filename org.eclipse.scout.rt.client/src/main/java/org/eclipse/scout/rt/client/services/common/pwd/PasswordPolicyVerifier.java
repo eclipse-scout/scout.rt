@@ -67,15 +67,18 @@ public class PasswordPolicyVerifier {
         // not expired
         long remainDays = (expiryDate.getTime() - now.getTime()) / 3600000L / 24L;
         if (remainDays < warnInAdvanceDays) {
-          int answer = MessageBox.showYesNoCancelMessage(
-              ScoutTexts.get("PasswordWillExpireTitle"),
-              remainDays == 0 ?
-                  ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Today")) :
-                  remainDays == 1 ?
-                      ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow")) :
-                      ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays)),
-              ScoutTexts.get("PasswordWillExpireInfo")
-              );
+          String header;
+          if (remainDays == 0) {
+            header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Today"));
+          }
+          else if (remainDays == 1) {
+            header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow"));
+          }
+          else {
+            header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays));
+          }
+
+          int answer = MessageBox.createYesNoCancel().header(header).body(ScoutTexts.get("PasswordWillExpireInfo")).start();
           if (answer == MessageBox.YES_OPTION) {
             changeNow = true;
           }
@@ -83,7 +86,7 @@ public class PasswordPolicyVerifier {
       }
       else {
         // has expired
-        MessageBox.showOkMessage(ScoutTexts.get("PasswordHasExpiredTitle"), ScoutTexts.get("PasswordHasExpiredHeader"), null);
+        MessageBox.createOk().header(ScoutTexts.get("PasswordHasExpiredTitle")).body(ScoutTexts.get("PasswordHasExpiredHeader")).start();
         changeNow = true;
       }
       //

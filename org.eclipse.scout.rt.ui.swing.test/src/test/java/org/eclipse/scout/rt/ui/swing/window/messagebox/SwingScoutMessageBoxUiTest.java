@@ -35,69 +35,66 @@ public class SwingScoutMessageBoxUiTest {
 
   @Test
   public void testLabels() {
-    String title = "Title";
-    String introText = "Intro Text";
-    String actionText = "Action Text";
+    String header = "Intro Text";
+    String body = "Action Text";
 
-    SwingScoutMessageBox box = new P_SwingScoutMessageBox(null, title, introText, actionText);
+    SwingScoutMessageBox box = new P_SwingScoutMessageBox(null, header, body);
     box.initializeSwing();
 
     JDialog dialog = box.getSwingDialog();
-    assertEquals(title, dialog.getTitle());
+    assertEquals(header, dialog.getTitle()); // title doesn't exist anymore since N release, header is used instead in Swing
 
     JLabel introLabel = findIntroLabel(dialog);
-    assertEquals(introText, introLabel.getText());
+    assertEquals(header, introLabel.getText());
 
     JLabel actionLabel = findActionLabel(dialog);
-    assertEquals(actionText, actionLabel.getText());
+    assertEquals(body, actionLabel.getText());
   }
 
   /**
-   * In case the introText or actionText is too long, surround the text with html tags to have text wrapping
+   * In case the header or body is too long, surround the text with html tags to have text wrapping
    */
   @Test
   public void testLongWrap() {
-    String title = "Title more text";
-    String introText = "Intro: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-    String actionText = "Content: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+    String header = "Intro: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+    String body = "Content: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 
-    SwingScoutMessageBox box = new P_SwingScoutMessageBox(null, title, introText, actionText);
+    SwingScoutMessageBox box = new P_SwingScoutMessageBox(null, header, body);
     box.initializeSwing();
 
     JDialog dialog = box.getSwingDialog();
-    assertEquals(title, dialog.getTitle());
+    assertEquals(header, dialog.getTitle()); // title doesn't exist anymore since N release, header is used instead in Swing
 
     JLabel introLabel = findIntroLabel(dialog);
-    assertEquals("<html>" + introText + "</html>", introLabel.getText());
+    assertEquals("<html>" + header + "</html>", introLabel.getText());
 
     JLabel actionLabel = findActionLabel(dialog);
-    assertEquals("<html>" + actionText + "</html>", actionLabel.getText());
+    assertEquals("<html>" + body + "</html>", actionLabel.getText());
   }
 
   /**
-   * If the introText or actionText is too long and has additional linebreaks, they must be converted to html br tags
+   * If the header or body is too long and has additional linebreaks, they must be converted to html br tags
    */
   @Test
   public void testLongWrapWithLinebreakes() {
-    String title = "Title even more text";
-    String introText = "Intro:\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-    String actionText = "Content:\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+    String header = "Intro:\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+    String body = "Content:\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 
-    SwingScoutMessageBox box = new P_SwingScoutMessageBox(null, title, introText, actionText);
+    SwingScoutMessageBox box = new P_SwingScoutMessageBox(null, header, body);
     box.initializeSwing();
 
     JDialog dialog = box.getSwingDialog();
-    assertEquals(title, dialog.getTitle());
+    assertEquals(header, dialog.getTitle()); // title doesn't exist anymore since N release, header is used instead in Swing
 
     JLabel introLabel = findIntroLabel(dialog);
-    assertEquals("<html>" + StringUtility.replaceNewLines(introText, "<br/>") + "</html>", introLabel.getText());
+    assertEquals("<html>" + StringUtility.replaceNewLines(header, "<br/>") + "</html>", introLabel.getText());
 
     JLabel actionLabel = findActionLabel(dialog);
-    assertEquals("<html>" + StringUtility.replaceNewLines(actionText, "<br/>") + "</html>", actionLabel.getText());
+    assertEquals("<html>" + StringUtility.replaceNewLines(body, "<br/>") + "</html>", actionLabel.getText());
   }
 
   /**
-   * Find the intro label in the SwingScoutMessageBox
+   * Find the header label in the SwingScoutMessageBox
    */
   private JLabel findIntroLabel(JDialog dialog) {
     JPanel contentPane = (JPanel) dialog.getContentPane();
@@ -109,7 +106,7 @@ public class SwingScoutMessageBoxUiTest {
   }
 
   /**
-   * Find the action label in the SwingScoutMessageBox
+   * Find the body label in the SwingScoutMessageBox
    */
   private JLabel findActionLabel(JDialog dialog) {
     JPanel contentPane = (JPanel) dialog.getContentPane();
@@ -122,25 +119,21 @@ public class SwingScoutMessageBoxUiTest {
 
   private class P_SwingScoutMessageBox extends SwingScoutMessageBox {
 
-    private String m_title;
-    private String m_introText;
-    private String m_actionText;
+    private String m_header;
+    private String m_body;
 
-    public P_SwingScoutMessageBox(Window swingParent, String title, String introText, String actionText) {
+    public P_SwingScoutMessageBox(Window swingParent, String header, String body) {
       super(swingParent);
-      m_title = title;
-      m_introText = introText;
-      m_actionText = actionText;
+      m_header = header;
+      m_body = body;
     }
 
     @Override
     public IMessageBox getScoutMessageBox() {
       IMessageBox scoutObject = mock(IMessageBox.class);
-      when(scoutObject.getTitle()).thenReturn(m_title);
-      when(scoutObject.getIntroText()).thenReturn(m_introText);
-      when(scoutObject.getActionText()).thenReturn(m_actionText);
+      when(scoutObject.header()).thenReturn(m_header);
+      when(scoutObject.body()).thenReturn(m_body);
       return scoutObject;
     }
-
   }
 }

@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobException;
@@ -34,52 +36,75 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@Bean
 public class MessageBox extends AbstractPropertyObserver implements IMessageBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
 
   /**
-   * Convenience function for simple info message box
+   * Do not use, use {@link #create()} instead.
    */
-  public static int showOkMessage(String title, String header, String info) {
-    MessageBox mbox = new MessageBox(
-        title,
-        header,
-        info,
-        ScoutTexts.get("OkButton"),
-        null,
-        null
-        );
-    return mbox.startMessageBox();
+  public MessageBox() {
+  }
+
+  public static IMessageBox create() {
+    return BEANS.get(IMessageBox.class);
+  }
+
+  /**
+   * Creates a message box with one button labeled OK.
+   * <p>
+   * Do not forget to call {@link #start()} at the end.
+   */
+  public static IMessageBox createOk() {
+    return create().
+        yesButtonText(ScoutTexts.get("OkButton"));
+  }
+
+  /**
+   * Creates e message box with yes and not buttons.
+   */
+  public static IMessageBox createYesNo() {
+    return create().
+        yesButtonText(ScoutTexts.get("YesButton")).
+        noButtonText(ScoutTexts.get("NoButton"));
+  }
+
+  /**
+   * Creates a message box with yes, no and cancel buttons.
+   */
+  public static IMessageBox createYesNoCancel() {
+    return createYesNo().
+        cancelButtonText(ScoutTexts.get("CancelButton"));
+  }
+
+  /**
+   * Convenience function for simple info message box.
+   *
+   * @deprecated use createOk().header(header).body(body).start() instead. Will be removed in the "N" release.
+   */
+  @Deprecated
+  public static int showOkMessage(String title, String header, String body) {
+    return createOk().header(header).body(body).start();
   }
 
   /**
    * Convenience function for simple yes/no message box
+   *
+   * @deprecated use createYesNo().header(header).body(body).start() instead. Will be removed in the "N" release.
    */
-  public static int showYesNoMessage(String title, String header, String info) {
-    MessageBox mbox = new MessageBox(
-        title,
-        header,
-        info,
-        ScoutTexts.get("YesButton"),
-        ScoutTexts.get("NoButton"),
-        null
-        );
-    return mbox.startMessageBox();
+  @Deprecated
+  public static int showYesNoMessage(String title, String header, String body) {
+    return createYesNo().header(header).body(body).start();
   }
 
   /**
    * Convenience function for simple yes/no/cancel message box
+   *
+   * @deprecated use createYesNoCancel().header(header).body(body).start() instead. Will be removed in the "N" release.
    */
-  public static int showYesNoCancelMessage(String title, String header, String info) {
-    MessageBox mbox = new MessageBox(
-        title,
-        header,
-        info,
-        ScoutTexts.get("YesButton"),
-        ScoutTexts.get("NoButton"),
-        ScoutTexts.get("CancelButton")
-        );
-    return mbox.startMessageBox();
+  @Deprecated
+  public static int showYesNoCancelMessage(String title, String header, String body) {
+    return createYesNoCancel().header(header).body(body).start();
   }
 
   /**
@@ -159,79 +184,49 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       }
     }
     //
-    String intro = null;
-    String action = null;
+    String header = null;
+    String body = null;
     if (itemType != null) {
-      intro = (n > 0 ? ScoutTexts.get("DeleteConfirmationTextX", itemType) : ScoutTexts.get("DeleteConfirmationTextNoItemListX", itemType));
-      action = (n > 0 ? t.toString() : null);
+      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationTextX", itemType) : ScoutTexts.get("DeleteConfirmationTextNoItemListX", itemType));
+      body = (n > 0 ? t.toString() : null);
     }
     else {
-      intro = (n > 0 ? ScoutTexts.get("DeleteConfirmationText") : ScoutTexts.get("DeleteConfirmationTextNoItemList"));
-      action = (n > 0 ? t.toString() : null);
+      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationText") : ScoutTexts.get("DeleteConfirmationTextNoItemList"));
+      body = (n > 0 ? t.toString() : null);
     }
-    MessageBox mbox = new MessageBox(
-        ScoutTexts.get("DeleteConfirmationTitle"),
-        intro,
-        action,
-        ScoutTexts.get("YesButton"),
-        ScoutTexts.get("NoButton"),
-        null
-        );
-    return mbox.startMessageBox() == IMessageBox.YES_OPTION;
+
+    int result = createYesNo().header(header).body(body).start();
+    return result == IMessageBox.YES_OPTION;
   }
 
   /**
    * Instance
    */
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final IMessageBoxUIFacade m_uiFacade;
-  private long m_autoCloseMillis;
-  private String m_title;
+  private final IMessageBoxUIFacade m_uiFacade = new P_UIFacade();
+
+  private long m_autoCloseMillis = -1;
+
   private String m_iconId;
-  private String m_introText;
-  private String m_actionText;
+
+  private String m_header;
+  private String m_body;
+
   private String m_yesButtonText;
   private String m_noButtonText;
   private String m_cancelButtonText;
+
   private String m_hiddenText;
   private String m_copyPasteText;
   // cached
   private String m_copyPasteTextInternal;
   // modality
-  private final IBlockingCondition m_blockingCondition;
+  private final IBlockingCondition m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
   private IFuture<Void> m_autoCloseJob;
   // result
   private int m_answer;
   private boolean m_answerSet;
   private int m_severity;
-
-  public MessageBox(String title, String introText, String okButtonText) {
-    this(title, introText, null, okButtonText, null, null);
-  }
-
-  public MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText) {
-    this(title, introText, actionText, yesButtonText, noButtonText, cancelButtonText, null, null);
-  }
-
-  public MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText, String hiddenText, String iconId) {
-    m_uiFacade = new P_UIFacade();
-    m_title = title;
-    m_introText = introText;
-    m_actionText = actionText;
-    m_hiddenText = hiddenText;
-    m_yesButtonText = yesButtonText;
-    m_noButtonText = noButtonText;
-    m_cancelButtonText = cancelButtonText;
-    m_iconId = iconId;
-    m_autoCloseMillis = -1;
-    m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
-    if (m_title == null) {
-      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-      if (desktop != null) {
-        m_title = desktop.getTitle();
-      }
-    }
-  }
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -254,111 +249,109 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   @Override
-  public String getTitle() {
-    return m_title;
+  public String header() {
+    return m_header;
   }
 
   @Override
-  public void setTitle(String s) {
-    m_title = s;
+  public MessageBox header(String header) {
+    m_header = header;
     m_copyPasteTextInternal = null;
+    return this;
   }
 
   @Override
-  public String getIntroText() {
-    return m_introText;
+  public String body() {
+    return m_body;
   }
 
   @Override
-  public void setIntroText(String s) {
-    m_introText = s;
+  public MessageBox body(String body) {
+    m_body = body;
     m_copyPasteTextInternal = null;
+    return this;
   }
 
   @Override
-  public String getActionText() {
-    return m_actionText;
-  }
-
-  @Override
-  public void setActionText(String s) {
-    m_actionText = s;
-    m_copyPasteTextInternal = null;
-  }
-
-  @Override
-  public String getHiddenText() {
+  public String hiddenText() {
     return m_hiddenText;
   }
 
   @Override
-  public void setHiddenText(String s) {
-    m_hiddenText = s;
+  public MessageBox hiddenText(String hiddenText) {
+    m_hiddenText = hiddenText;
     m_copyPasteTextInternal = null;
+    return this;
   }
 
   @Override
-  public String getYesButtonText() {
+  public String yesButtonText() {
     return m_yesButtonText;
   }
 
   @Override
-  public void setYesButtonText(String s) {
-    m_yesButtonText = s;
+  public MessageBox yesButtonText(String yesButtonText) {
+    m_yesButtonText = yesButtonText;
+    return this;
   }
 
   @Override
-  public String getNoButtonText() {
+  public String noButtonText() {
     return m_noButtonText;
   }
 
   @Override
-  public void setNoButtonText(String s) {
-    m_noButtonText = s;
+  public MessageBox noButtonText(String noButtonText) {
+    m_noButtonText = noButtonText;
+    return this;
   }
 
   @Override
-  public String getCancelButtonText() {
+  public String cancelButtonText() {
     return m_cancelButtonText;
   }
 
   @Override
-  public void setCancelButtonText(String s) {
-    m_cancelButtonText = s;
+  public MessageBox cancelButtonText(String cancelButtonText) {
+    m_cancelButtonText = cancelButtonText;
+    return this;
   }
 
   @Override
-  public String getIconId() {
+  public String iconId() {
     return m_iconId;
   }
 
   @Override
-  public void setIconId(String iconId) {
+  public MessageBox iconId(String iconId) {
     m_iconId = iconId;
+    return this;
   }
 
   @Override
-  public int getSeverity() {
+  public int severity() {
     return m_severity;
   }
 
   @Override
-  public void setSeverity(int severity) {
+  public MessageBox severity(int severity) {
     m_severity = severity;
+    return this;
   }
 
   @Override
-  public long getAutoCloseMillis() {
+  public long autoCloseMillis() {
     return m_autoCloseMillis;
   }
 
   @Override
-  public void setAutoCloseMillis(long millis) {
-    m_autoCloseMillis = millis;
+  public MessageBox autoCloseMillis(long autoCloseMillis) {
+    m_autoCloseMillis = autoCloseMillis;
+    return this;
   }
 
   @Override
-  public String getCopyPasteText() {
+  public String copyPasteText() {
     if (m_copyPasteText == null) {
       updateCopyPasteTextInternal();
       return m_copyPasteTextInternal;
@@ -369,8 +362,9 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   @Override
-  public void setCopyPasteText(String s) {
-    m_copyPasteText = s;
+  public MessageBox copyPasteText(String copyPasteText) {
+    m_copyPasteText = copyPasteText;
+    return this;
   }
 
   private void updateCopyPasteTextInternal() {
@@ -386,14 +380,11 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       buf.append("os.name_version: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n");
       buf.append("user.name: " + System.getProperty("user.name") + "\n");
       buf.append("\n");
-      if (m_title != null) {
-        buf.append(m_title + "\n\n");
+      if (m_header != null) {
+        buf.append(m_header + "\n\n");
       }
-      if (m_introText != null) {
-        buf.append(m_introText + "\n\n");
-      }
-      if (m_actionText != null) {
-        buf.append(m_actionText + "\n\n");
+      if (m_body != null) {
+        buf.append(m_body + "\n\n");
       }
       if (m_hiddenText != null) {
         buf.append(m_hiddenText + "\n\n");
@@ -439,12 +430,12 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   @Override
-  public int startMessageBox() {
-    return startMessageBox(CANCEL_OPTION);
+  public int start() {
+    return start(CANCEL_OPTION);
   }
 
   @Override
-  public int startMessageBox(int defaultResult) {
+  public int start(int defaultResult) {
     m_answerSet = false;
     m_answer = defaultResult;
     if (ClientSessionProvider.currentSession() != null) {
@@ -461,8 +452,8 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           // request a gui
           desktop.addMessageBox(this);
           // attach auto-cancel timer
-          if (getAutoCloseMillis() > 0) {
-            final long dt = getAutoCloseMillis();
+          if (autoCloseMillis() > 0) {
+            final long dt = autoCloseMillis();
             m_autoCloseJob = ClientJobs.schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
@@ -470,7 +461,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
                   closeMessageBox();
                 }
               }
-            }, dt, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Auto-close %s", getTitle()));
+            }, dt, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Auto-close %s", header()));
           }
           // start sub event dispatch thread
           waitFor();
@@ -529,4 +520,5 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       }
     }
   }
+
 }

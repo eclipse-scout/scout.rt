@@ -39,57 +39,53 @@ public interface IMessageBox extends IPropertyObserver {
    */
   IMessageBoxUIFacade getUIFacade();
 
-  String getTitle();
+  String iconId();
 
-  void setTitle(String s);
+  IMessageBox iconId(String iconId);
 
-  String getIconId();
+  int severity();
 
-  void setIconId(String iconId);
+  IMessageBox severity(int severity);
 
-  int getSeverity();
+  String header();
 
-  void setSeverity(int severity);
+  IMessageBox header(String header);
 
-  String getIntroText();
+  String body();
 
-  void setIntroText(String s);
+  IMessageBox body(String body);
 
-  String getActionText();
+  String hiddenText();
 
-  void setActionText(String s);
+  IMessageBox hiddenText(String hiddenText);
 
-  String getHiddenText();
+  String yesButtonText();
 
-  void setHiddenText(String s);
+  IMessageBox yesButtonText(String yesButtonText);
 
-  String getYesButtonText();
+  String noButtonText();
 
-  void setYesButtonText(String s);
+  IMessageBox noButtonText(String noButtonText);
 
-  String getNoButtonText();
+  String cancelButtonText();
 
-  void setNoButtonText(String s);
+  IMessageBox cancelButtonText(String cancelButtonText);
 
-  String getCancelButtonText();
-
-  void setCancelButtonText(String s);
-
-  long getAutoCloseMillis();
+  long autoCloseMillis();
 
   /**
    * To close the message box automatically after the specified period of time. By default, the result
-   * {@link #CANCEL_OPTION} is returned after being closed. This can be changed by using {@link #startMessageBox(int)}
-   * to construct the message box.
+   * {@link #CANCEL_OPTION} is returned after being closed. This can be changed by using {@link #start(int)} to
+   * construct the message box.
    *
-   * @param millis
+   * @param autoCloseMillis
    *          timeout [ms]
    */
-  void setAutoCloseMillis(long millis);
+  IMessageBox autoCloseMillis(long autoCloseMillis);
 
-  String getCopyPasteText();
+  String copyPasteText();
 
-  void setCopyPasteText(String s);
+  IMessageBox copyPasteText(String copyPasteText);
 
   /**
    * To query whether the message box is open or closed.
@@ -103,7 +99,7 @@ public interface IMessageBox extends IPropertyObserver {
    *
    * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
    */
-  int startMessageBox();
+  int start();
 
   /**
    * Opens a message box. This call blocks until the message box is closed.
@@ -112,5 +108,5 @@ public interface IMessageBox extends IPropertyObserver {
    *          default result to return if not closed by the user (e.g. by auto-close timer).
    * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
    */
-  int startMessageBox(int defaultResult);
+  int start(int defaultResult);
 }

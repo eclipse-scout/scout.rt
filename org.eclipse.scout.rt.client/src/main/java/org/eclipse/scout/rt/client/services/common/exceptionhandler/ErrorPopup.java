@@ -51,18 +51,13 @@ public class ErrorPopup {
   public void showMessageBox(Throwable error) {
     ensureErrorParsed(error);
 
-    MessageBox mbox = new MessageBox(
-        m_title,
-        m_text,
-        m_detail,
-        m_acceptText,
-        null,
-        null,
-        m_copyPasteText,
-        null
-        );
-    mbox.setSeverity(m_cause.getStatus().getSeverity());
-    mbox.startMessageBox();
+    MessageBox.create().
+        header(m_text).
+        body(m_detail).
+        yesButtonText(m_acceptText).
+        hiddenText(m_copyPasteText).
+        severity(m_cause.getStatus().getSeverity()).
+        start();
   }
 
   @Internal

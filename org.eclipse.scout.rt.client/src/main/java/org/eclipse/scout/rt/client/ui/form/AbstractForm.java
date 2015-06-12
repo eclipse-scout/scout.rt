@@ -1812,16 +1812,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       };
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
-        MessageBox messageBox = new MessageBox(
-            null,
-            getCancelVerificationText(),
-            null,
-            TEXTS.get("YesButton"),
-            TEXTS.get("NoButton"),
-            TEXTS.get("CancelButton")
-            );
-        messageBox.setSeverity(IStatus.INFO);
-        int result = messageBox.startMessageBox();
+        int result = MessageBox.createYesNoCancel().
+            header(getCancelVerificationText()).
+            severity(IStatus.INFO).
+            start();
+
         if (result == IMessageBox.YES_OPTION) {
           doOk();
           return;
@@ -2371,13 +2366,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
-          new MessageBox(
-              null,
-              TEXTS.get("LoadFormXmlFailedText"),
-              null,
-              TEXTS.get("OkButton"),
-              null,
-              null).startMessageBox();
+          MessageBox.createOk().
+              header(TEXTS.get("LoadFormXmlFailedText")).
+              start();
         }
       }
     }

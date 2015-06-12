@@ -233,12 +233,11 @@ public class MessageBoxTest {
     Mockito.verify(m_desktopSpy).addMessageBox(argument.capture());
 
     MessageBox messageBox = argument.getValue();
-    assertEquals("Title", TEXTS.get("DeleteConfirmationTitle"), messageBox.getTitle());
-    assertEquals("Intro text", expectedIntro, messageBox.getIntroText());
-    assertEquals("Action text", expectedAction, messageBox.getActionText());
-    assertEquals("Yes button text", TEXTS.get("YesButton"), messageBox.getYesButtonText());
-    assertEquals("No button text", TEXTS.get("NoButton"), messageBox.getNoButtonText());
-    assertEquals("Cancel button text", null, messageBox.getCancelButtonText());
+    assertEquals("Intro text", expectedIntro, messageBox.header());
+    assertEquals("Action text", expectedAction, messageBox.body());
+    assertEquals("Yes button text", TEXTS.get("YesButton"), messageBox.yesButtonText());
+    assertEquals("No button text", TEXTS.get("NoButton"), messageBox.noButtonText());
+    assertEquals("Cancel button text", null, messageBox.cancelButtonText());
   }
 
 }
