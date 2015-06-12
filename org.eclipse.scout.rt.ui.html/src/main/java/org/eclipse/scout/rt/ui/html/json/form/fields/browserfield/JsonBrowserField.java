@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
+import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxValues;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-//FIXME ???: impl. JsonBrowserField
 public class JsonBrowserField<T extends IBrowserField> extends JsonValueField<T> {
 
   public JsonBrowserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -27,4 +30,49 @@ public class JsonBrowserField<T extends IBrowserField> extends JsonValueField<T>
     return "BrowserField";
   }
 
+  @Override
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_LOCATION, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLocation();
+      }
+    });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SCROLLBARS_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isScrollBarEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SANDBOX, model) {
+      @Override
+      protected Set<SandboxValues> modelValue() {
+        return getModel().getSandbox();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        Set<SandboxValues> sandbox = (Set<SandboxValues>) value;
+        if (sandbox.isEmpty()) {
+          return "";
+        }
+        else if (SandboxValues.hasAllRestrictions(sandbox)) {
+          // not a valid attribute-value for the HTML sandbox attribute
+          // must be processed by the UI into 'attribute only, without a value'.
+          return "deny-all";
+        }
+        else {
+          StringBuilder sb = new StringBuilder();
+          for (SandboxValues sandboxValue : sandbox) {
+            sb.append(sandboxValue.getAttribute() + " ");
+          }
+          sb.deleteCharAt(sb.length() - 1); // delete last space
+          return sb.toString();
+        }
+      }
+    });
+
+  }
 }

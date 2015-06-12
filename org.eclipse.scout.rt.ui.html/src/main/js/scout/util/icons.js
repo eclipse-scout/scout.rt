@@ -11,7 +11,7 @@ scout.icons = {
       iconId = iconId.substr(5);
       if (iconId.length === 1) {
         // default icon-font scoutIcons
-        icon.font = 'scoutIcons';
+        icon.font = scout.Icon.DEFAULT_FONT;
         icon.iconCharacter = iconId;
       } else {
         var tmp = iconId.split(' ');
