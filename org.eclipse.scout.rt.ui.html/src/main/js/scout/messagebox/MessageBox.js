@@ -6,9 +6,8 @@ scout.MessageBox = function(model, session) {
   }
   this.$container;
   this.$content;
-  this.$title;
-  this.$introText;
-  this.$actionText;
+  this.$header;
+  this.$body;
   this.$buttons;
   this.$yesButton;
   this.$noButton;
@@ -32,9 +31,8 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$container.makeDraggable($handle);
 
   this.$content = this.$container.appendDiv('messagebox-content');
-  this.$title = this.$content.appendDiv('messagebox-label');
-  this.$introText = this.$content.appendDiv('messagebox-label messagebox-intro-text');
-  this.$actionText = this.$content.appendDiv('messagebox-label messagebox-action-text');
+  this.$header = this.$content.appendDiv('messagebox-label messagebox-header');
+  this.$body = this.$content.appendDiv('messagebox-label messagebox-body');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
   if (this.yesButtonText) {
@@ -67,11 +65,10 @@ scout.MessageBox.prototype._render = function($parent) {
   }.bind(this));
 
   // Render properties
-  this._renderTitle(this.title);
   this._renderIconId(this.iconId);
   this._renderSeverity(this.severity);
-  this._renderIntroText(this.introText);
-  this._renderActionText(this.actionText);
+  this._renderHeader(this.header);
+  this._renderBody(this.body);
   this._renderHiddenText(this.hiddenText);
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
@@ -106,11 +103,6 @@ scout.MessageBox.prototype._onButtonClicked = function(event) {
   });
 };
 
-scout.MessageBox.prototype._renderTitle = function(title) {
-  this.$title.html(scout.strings.nl2br(title));
-  this.$title.setVisible(title);
-};
-
 scout.MessageBox.prototype._renderIconId = function(iconId) {
   // FIXME implement
 };
@@ -122,14 +114,14 @@ scout.MessageBox.prototype._renderSeverity = function(severity) {
   }
 };
 
-scout.MessageBox.prototype._renderIntroText = function(text) {
-  this.$introText.html(scout.strings.nl2br(text));
-  this.$introText.setVisible(text);
+scout.MessageBox.prototype._renderHeader = function(text) {
+  this.$header.html(scout.strings.nl2br(text));
+  this.$header.setVisible(text);
 };
 
-scout.MessageBox.prototype._renderActionText = function(text) {
-  this.$actionText.html(scout.strings.nl2br(text));
-  this.$actionText.setVisible(text);
+scout.MessageBox.prototype._renderBody = function(text) {
+  this.$body.html(scout.strings.nl2br(text));
+  this.$body.setVisible(text);
 };
 
 scout.MessageBox.prototype._renderHiddenText = function(text) {

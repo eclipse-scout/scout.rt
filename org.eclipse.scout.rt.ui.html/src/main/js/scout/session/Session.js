@@ -547,7 +547,7 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
     boxOptions.title = this.optText('UiProcessingErrorTitle', boxOptions.title);
     boxOptions.text = this.optText('UiProcessingErrorText', boxOptions.text);
-    boxOptions.actionText = this.optText('UiProcessingErrorAction', boxOptions.actionText);
+    boxOptions.body = this.optText('UiProcessingErrorAction', boxOptions.body);
     boxOptions.noButtonText = this.text('Ignore');
   }
   this.showFatalMessage(boxOptions);
@@ -575,8 +575,8 @@ scout.Session.prototype.showFatalMessage = function(options) {
     title: options.title,
     iconId: options.iconId,
     severity: options.severity || 4,
-    introText: options.text || options.introText,
-    actionText: options.actionText,
+    header: options.text || options.header,
+    body: options.body,
     hiddenText: options.hiddenText,
     yesButtonText: options.yesButtonText,
     noButtonText: options.noButtonText,

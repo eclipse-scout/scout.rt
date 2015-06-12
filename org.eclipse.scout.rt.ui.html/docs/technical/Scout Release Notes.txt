@@ -313,3 +313,20 @@ The behavior may be controlled using:
 JGU 11.06.2015
 getConfiguredTreat0AsNull in Smartfield has been deleted. (ses also Bugzill 469902)
 
+SME 12.06.2015
+MessageBox
+- Removed title
+    -> no replacement, title is not supported anymore with N release
+- renamed intro text to header & info / actionText to body
+- using method chaining to construct message box
+    Example:
+    - getHiddenText() -> hiddenText()
+    - setHiddenText(hiddenText) -> hiddenText(hiddenText) and returning instance of IMessageBox
+- Renamed startMessageBox to start
+- Removed MessageBox(String title, String introText, String okButtonText)
+    -> MessageBox.createNoButtons().header(introText).yesButtonText(okButtonText)
+- Removed MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText)
+    -> MessageBox.createNoButtons().header(introText).body(actionText).yesButtonText(yesButtonText).noButtonText(noButtonText).cancelButtonText(cancelButtonText);
+- Removed MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText, String hiddenText, String iconId)
+    -> MessageBox.createNoButtons().header(introText).body(actionText).yesButtonText(yesButtonText).noButtonText(noButtonText).cancelButtonText(cancelButtonText).hiddenText(hiddenText).iconId(iconId);
+
