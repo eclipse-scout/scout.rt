@@ -7,9 +7,6 @@ import java.util.concurrent.TimeUnit;
  * job is configured for mutual exclusion, the job's mutex is released and passed to the next competing job.<br/>
  * This condition can be used across multiple threads to wait for the same condition; this condition is reusable upon
  * invalidation.
- * <p/>
- * The intrinsic lock used is provided by the {@link IBlockingCondition} instance itself and can be used for
- * synchronization outside the blocking condition.
  *
  * @since 5.1
  */
