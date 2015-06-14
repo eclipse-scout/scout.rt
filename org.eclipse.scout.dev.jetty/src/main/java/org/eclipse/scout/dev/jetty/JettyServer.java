@@ -99,8 +99,8 @@ public class JettyServer {
        * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current
        * context root, or relative to the /META-INF/resources directory of a JAR file inside the web application's
        * /WEB-INF/lib directory.</>
-       * 
-       * @see javax.servlet.ServletContext.getResource(String)
+       *
+       * @see javax.servlet.ServletContext#getResource(String)
        */
       @Override
       public URL getResource(String path) throws MalformedURLException {
@@ -120,8 +120,8 @@ public class JettyServer {
        * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current
        * context root, or relative to the /META-INF/resources directory of a JAR file inside the web application's
        * /WEB-INF/lib directory.</>
-       * 
-       * @see javax.servlet.ServletContext.getResourcePaths(String)
+       *
+       * @see javax.servlet.ServletContext#getResourcePaths(String)
        */
       @Override
       public Set<String> getResourcePaths(String path) {
