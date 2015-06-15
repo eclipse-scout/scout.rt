@@ -17,10 +17,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
@@ -106,6 +109,17 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
     format = getFormat();
     assertTrue("expected groupingUsed-property set to true after using convenience setter", format.isGroupingUsed());
     assertTrue("expected groupingUsed-property set to true after using convenience setter", isGroupingUsed());
+  }
+
+  @Test
+  public void testUpdateFormat() throws ProcessingException {
+    TestTable table = new TestTable();
+    table.addRow(table.createRow());
+    table.getTestNumberColumn().setValue(0, BigDecimal.TEN);
+    DecimalFormat format = table.getTestNumberColumn().getFormat();
+    format.setMinimumFractionDigits(3);
+    table.getTestNumberColumn().setFormat(format);
+    assertEquals("10.000", table.getCell(0, 0).getText());
   }
 
   @Test
@@ -229,6 +243,18 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
       m_notified = true;
       m_cachedProperty = evt.getNewValue();
     }
+  }
+
+  public class TestTable extends AbstractTable {
+
+    public TestNumberColumn getTestNumberColumn() {
+      return getColumnSet().getColumnByClass(TestNumberColumn.class);
+    }
+
+    @Order(10.0)
+    public class TestNumberColumn extends AbstractBigDecimalColumn {
+    }
+
   }
 
 }

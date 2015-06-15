@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -130,14 +131,11 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
    */
   @Override
   public void setFormat(DecimalFormat format) {
-    if (format == null) {
-      throw new IllegalArgumentException("Format may not be null.");
-    }
-
+    Assertions.assertNotNull(format);
     DecimalFormat newFormat = (DecimalFormat) format.clone();
     newFormat.setParseBigDecimal(true);
     propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, newFormat);
-    validateColumnValues();
+    decorateCells();
   }
 
   @Override

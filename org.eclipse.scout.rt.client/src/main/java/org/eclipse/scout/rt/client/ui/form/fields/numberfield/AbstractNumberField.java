@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -143,9 +144,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
   @Override
   public void setFormat(DecimalFormat format) {
-    if (format == null) {
-      throw new IllegalArgumentException("Format may not be null.");
-    }
+    Assertions.assertNotNull(format);
 
     try {
       DecimalFormat newFormat = (DecimalFormat) format.clone();
