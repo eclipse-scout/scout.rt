@@ -133,3 +133,11 @@ scout.MenuButtonAdapter.prototype.handle = function(event) {
     }
   }
 };
+
+
+/**
+ * @override Menu.js
+ */
+scout.MenuButtonAdapter.prototype.doAction = function(text) {
+   this._button.doAction();
+};
