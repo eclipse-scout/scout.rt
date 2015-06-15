@@ -135,24 +135,31 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
 };
 
 // navigate in options
-scout.AbstractSmartField.prototype._onKeyDown = function(event) {
-  if (event.which === scout.keys.TAB) {
+scout.AbstractSmartField.prototype._onKeyDown = function(e) {
+  if (e.which === scout.keys.ESCAPE) {
+    if (this._$popup) {
+      e.stopPropagation();
+    }
+    this._closeProposal();
+    return;
+  }
+
+  if (e.which === scout.keys.ENTER) {
+    if (this._$popup) {
+      e.stopPropagation();
+    }
     this._acceptProposal();
     return;
   }
 
-  // stop propagation if popup is open, so other key listeners aren't triggered (e.g. form close)
-  if (event.which === scout.keys.ENTER ||
-      event.which === scout.keys.ESCAPE) {
-    if (this._$popup) {
-      event.stopPropagation();
-    }
+  if (e.which === scout.keys.TAB) {
+    this._acceptProposal();
     return;
   }
 
-  if (this._isNavigationKey(event)) {
+  if (this._isNavigationKey(e)) {
     if (this.proposalChooser) {
-      this.proposalChooser.delegateEvent(event);
+      this.proposalChooser.delegateEvent(e);
     } else {
       this._openProposal(this.BROWSE_ALL, true);
     }
@@ -167,14 +174,12 @@ scout.AbstractSmartField.prototype._onFocus = function(e) {
 scout.AbstractSmartField.prototype._onKeyUp = function(e) {
   // Escape
   if (e.which === scout.keys.ESCAPE) {
-    this._closeProposal();
     e.stopPropagation();
     return;
   }
 
   // Enter
   if (e.which === scout.keys.ENTER) {
-    this._acceptProposal();
     e.stopPropagation();
     return;
   }
