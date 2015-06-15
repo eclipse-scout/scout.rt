@@ -75,7 +75,7 @@ public interface IMessageBox extends IPropertyObserver {
 
   /**
    * To close the message box automatically after the specified period of time. By default, the result
-   * {@link #CANCEL_OPTION} is returned after being closed. This can be changed by using {@link #start(int)} to
+   * {@link #CANCEL_OPTION} is returned after being closed. This can be changed by using {@link #show(int)} to
    * construct the message box.
    *
    * @param autoCloseMillis
@@ -99,7 +99,7 @@ public interface IMessageBox extends IPropertyObserver {
    *
    * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
    */
-  int start();
+  int show();
 
   /**
    * Opens a message box. This call blocks until the message box is closed.
@@ -108,5 +108,5 @@ public interface IMessageBox extends IPropertyObserver {
    *          default result to return if not closed by the user (e.g. by auto-close timer).
    * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
    */
-  int start(int defaultResult);
+  int show(int defaultResult);
 }

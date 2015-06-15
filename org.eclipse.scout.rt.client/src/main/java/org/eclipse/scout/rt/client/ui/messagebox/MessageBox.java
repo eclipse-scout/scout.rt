@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -41,70 +40,9 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
 
   /**
-   * Do not use, use {@link #create()} instead.
+   * Do not use, use {@link MessageBoxes#create()} instead.
    */
   public MessageBox() {
-  }
-
-  public static IMessageBox create() {
-    return BEANS.get(IMessageBox.class);
-  }
-
-  /**
-   * Creates a message box with one button labeled OK.
-   * <p>
-   * Do not forget to call {@link #start()} at the end.
-   */
-  public static IMessageBox createOk() {
-    return create().
-        yesButtonText(ScoutTexts.get("OkButton"));
-  }
-
-  /**
-   * Creates e message box with yes and not buttons.
-   */
-  public static IMessageBox createYesNo() {
-    return create().
-        yesButtonText(ScoutTexts.get("YesButton")).
-        noButtonText(ScoutTexts.get("NoButton"));
-  }
-
-  /**
-   * Creates a message box with yes, no and cancel buttons.
-   */
-  public static IMessageBox createYesNoCancel() {
-    return createYesNo().
-        cancelButtonText(ScoutTexts.get("CancelButton"));
-  }
-
-  /**
-   * Convenience function for simple info message box.
-   *
-   * @deprecated use createOk().header(header).body(body).start() instead. Will be removed in the "N" release.
-   */
-  @Deprecated
-  public static int showOkMessage(String title, String header, String body) {
-    return createOk().header(header).body(body).start();
-  }
-
-  /**
-   * Convenience function for simple yes/no message box
-   *
-   * @deprecated use createYesNo().header(header).body(body).start() instead. Will be removed in the "N" release.
-   */
-  @Deprecated
-  public static int showYesNoMessage(String title, String header, String body) {
-    return createYesNo().header(header).body(body).start();
-  }
-
-  /**
-   * Convenience function for simple yes/no/cancel message box
-   *
-   * @deprecated use createYesNoCancel().header(header).body(body).start() instead. Will be removed in the "N" release.
-   */
-  @Deprecated
-  public static int showYesNoCancelMessage(String title, String header, String body) {
-    return createYesNoCancel().header(header).body(body).start();
   }
 
   /**
@@ -195,7 +133,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       body = (n > 0 ? t.toString() : null);
     }
 
-    int result = createYesNo().header(header).body(body).start();
+    int result = MessageBoxes.createYesNo().header(header).body(body).show();
     return result == IMessageBox.YES_OPTION;
   }
 
@@ -429,13 +367,24 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     return m_blockingCondition.isBlocking();
   }
 
+  /**
+   * Displays the message box and waits for a response.
+   * <p>
+   * If {@link #autoCloseMillis()} is set, the message box will return with {@link IMessageBox#CANCEL_OPTION} after the
+   * specific time.
+   */
   @Override
-  public int start() {
-    return start(CANCEL_OPTION);
+  public int show() {
+    return show(CANCEL_OPTION);
   }
 
+  /**
+   * Displays the message box and waits for a response.
+   * <p>
+   * If {@link #autoCloseMillis()} is set, the message box will return with given response after the specific time.
+   */
   @Override
-  public int start(int defaultResult) {
+  public int show(int defaultResult) {
     m_answerSet = false;
     m_answer = defaultResult;
     if (ClientSessionProvider.currentSession() != null) {

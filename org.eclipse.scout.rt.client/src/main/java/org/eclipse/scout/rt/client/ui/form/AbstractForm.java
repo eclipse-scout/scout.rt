@@ -105,7 +105,7 @@ import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByFormDataIdVisitor
 import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByXmlIdsVisitor;
 import org.eclipse.scout.rt.client.ui.form.internal.FormDataPropertyFilter;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
@@ -1812,10 +1812,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       };
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
-        int result = MessageBox.createYesNoCancel().
+        int result = MessageBoxes.createYesNoCancel().
             header(getCancelVerificationText()).
             severity(IStatus.INFO).
-            start();
+            show();
 
         if (result == IMessageBox.YES_OPTION) {
           doOk();
@@ -2366,9 +2366,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
-          MessageBox.createOk().
+          MessageBoxes.createOk().
               header(TEXTS.get("LoadFormXmlFailedText")).
-              start();
+              show();
         }
       }
     }

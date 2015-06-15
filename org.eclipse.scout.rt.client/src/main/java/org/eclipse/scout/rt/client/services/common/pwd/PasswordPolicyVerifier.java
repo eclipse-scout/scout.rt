@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -78,7 +79,7 @@ public class PasswordPolicyVerifier {
             header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays));
           }
 
-          int answer = MessageBox.createYesNoCancel().header(header).body(ScoutTexts.get("PasswordWillExpireInfo")).start();
+          int answer = MessageBoxes.createYesNoCancel().header(header).body(ScoutTexts.get("PasswordWillExpireInfo")).show();
           if (answer == MessageBox.YES_OPTION) {
             changeNow = true;
           }
@@ -86,7 +87,7 @@ public class PasswordPolicyVerifier {
       }
       else {
         // has expired
-        MessageBox.createOk().header(ScoutTexts.get("PasswordHasExpiredTitle")).body(ScoutTexts.get("PasswordHasExpiredHeader")).start();
+        MessageBoxes.createOk().header(ScoutTexts.get("PasswordHasExpiredTitle")).body(ScoutTexts.get("PasswordHasExpiredHeader")).show();
         changeNow = true;
       }
       //

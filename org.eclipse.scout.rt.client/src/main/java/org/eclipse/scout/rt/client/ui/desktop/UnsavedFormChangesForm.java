@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -219,7 +219,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
         for (IForm f : invalidForms) {
           msg.append("- ").append(getFormDisplayName(f)).append("\n");
         }
-        MessageBox.createOk().header(TEXTS.get("NotAllCheckedFormsCanBeSaved")).body(msg.toString()).start();
+        MessageBoxes.createOk().header(TEXTS.get("NotAllCheckedFormsCanBeSaved")).body(msg.toString()).show();
         return false;
       }
       return true;

@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IPublishBookmarkComm
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -946,7 +947,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           }
         }
         if (success != null && !success) {
-          MessageBox.createOk().body(ScoutTexts.get("ApplyBookmarkToSearchFailedMessage")).start();
+          MessageBoxes.createOk().body(ScoutTexts.get("ApplyBookmarkToSearchFailedMessage")).show();
         }
       }
     }

@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
@@ -51,13 +51,13 @@ public class ErrorPopup {
   public void showMessageBox(Throwable error) {
     ensureErrorParsed(error);
 
-    MessageBox.create().
+    MessageBoxes.create().
         header(m_text).
         body(m_detail).
         yesButtonText(m_acceptText).
         hiddenText(m_copyPasteText).
         severity(m_cause.getStatus().getSeverity()).
-        start();
+        show();
   }
 
   @Internal

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonTest.TestForm.MainBox.PushButton1;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -87,7 +87,7 @@ public class ButtonTest {
 
           @Override
           protected void execAction() throws ProcessingException {
-            MessageBox.createOk().header("click").body("it").start();
+            MessageBoxes.createOk().header("click").body("it").show();
           }
         }
 
@@ -105,7 +105,7 @@ public class ButtonTest {
 
           @Override
           protected void execAction() throws ProcessingException {
-            MessageBox.createOk().header("click").body("it").start();
+            MessageBoxes.createOk().header("click").body("it").show();
           }
         }
       }
