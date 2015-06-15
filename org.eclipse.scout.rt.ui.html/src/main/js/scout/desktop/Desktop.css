@@ -243,7 +243,11 @@
     }
 
     & > .menubar > .menu-item {
-      padding-top: 9px;
+      padding-top: 10px;
+    }
+
+    & > .menubar {
+      padding-right: 7px;
     }
   }
 

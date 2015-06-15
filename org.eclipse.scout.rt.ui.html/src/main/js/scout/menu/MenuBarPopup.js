@@ -89,9 +89,9 @@ scout.MenuBarPopup.prototype.alignTo = function() {
     var widthDiff = bodyWidth - headSize.width,
       subPixelCorr = left - Math.floor(left);
     left -= widthDiff + headInsets.left;
-    this.$head.cssLeft(widthDiff);
-    this.$body.cssLeft(subPixelCorr);
-    this.$deco.cssLeft(widthDiff + 1).width(headSize.width - 2 + subPixelCorr);
+    this.$head.cssLeft(widthDiff + 1);
+    this.$body.cssLeft(subPixelCorr + 1);
+    this.$deco.cssLeft(widthDiff + 2).width(headSize.width - 2 + subPixelCorr);
     $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
   } else if (this.menu.$container.hasClass('taskbar-tool-item')) {
     top = pos.top;
