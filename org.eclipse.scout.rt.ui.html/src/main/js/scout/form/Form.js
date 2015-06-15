@@ -9,8 +9,10 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype.init = function(model, session) {
   scout.Form.parent.prototype.init.call(this, model, session);
-  if (this.isDialog()) {
+  // FIXME BSH Improve this logic - how about a mid-sized menubar? See also: GroupBox.js/init()
+  if (this.isDialog() || this.searchForm) {
     this.rootGroupBox.menuBar.bottom();
+    this.rootGroupBox.menuBar.large();
   }
 };
 

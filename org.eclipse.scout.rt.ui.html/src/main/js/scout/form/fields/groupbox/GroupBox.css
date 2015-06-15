@@ -19,6 +19,7 @@
 
 .group-box > .menubar {
   margin-left: @mandatory-indicator-width;
+  margin-right: 0;
 }
 
 .group-box-title {

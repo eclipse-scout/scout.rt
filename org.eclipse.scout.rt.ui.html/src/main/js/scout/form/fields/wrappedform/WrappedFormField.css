@@ -10,5 +10,6 @@
   /* Reset margin set in MenuBar.css */
   & > .root-group-box > .menubar {
     margin-left: @mandatory-indicator-width;
+    margin-right: 0;
   }
 }

@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -98,6 +99,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
+import org.eclipse.scout.rt.ui.html.json.form.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
@@ -287,6 +289,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IKeyStroke) {
       return new JsonKeyStroke<IKeyStroke>((IKeyStroke) model, session, id, parent);
+    }
+    if (model instanceof ISearchForm) {
+      return new JsonSearchForm<ISearchForm>((ISearchForm) model, session, id, parent);
     }
     if (model instanceof IForm) {
       return new JsonForm<IForm>((IForm) model, session, id, parent);
