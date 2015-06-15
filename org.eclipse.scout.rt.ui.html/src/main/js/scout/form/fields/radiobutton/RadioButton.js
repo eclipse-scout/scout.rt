@@ -17,13 +17,19 @@ scout.RadioButton.prototype._mouseDown = function() {
   this._toggleChecked();
 };
 
-//TODO nbu add to all places where used
 scout.RadioButton.prototype._toggleChecked = function(){
   if(!this.enabled){
     return;
   }
-  this.$field.toggleClass('checked', true);
-  this.session.send(this.id, 'selected');
+  if(this.parent instanceof scout.RadioButtonGroup){
+    this.parent.setNewSelection(this);
+  }
+  else{
+    this.selected = true;
+    this.$field.toggleClass('checked', true);
+    this.session.send(this.id, 'selected');
+    this.$field.focus();
+  }
 };
 
 /**
