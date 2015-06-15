@@ -15,25 +15,23 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 /**
  * This is any kind of object interested in active cancellation of a {@link RunMonitor#cancel(boolean)}.
  * <p>
- * Note that a {@link IFuture} represents itself a {@link RunMonitor}
+ * Note that a {@link IFuture} represents a {@link ICancellable} as well.
  *
  * @since 5.1
  */
 public interface ICancellable {
 
   /**
-   * Attempts to cancel the execution of the associated run phase (maybe inside a job).
+   * Attempts to cancel the execution of this {@link ICancellable}.
    *
    * @param interruptIfRunning
-   *          <code>true</code> if the thread executing this run phase (maybe inside a job) should be interrupted;
-   *          otherwise, in-progress jobs are allowed to complete.
-   * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally.
+   *          <code>true</code> if the thread executing this {@link ICancellable} should be interrupted.
+   * @return <code>false</code> if cancellation failed, typically because it has already cancelled or completed.
    */
   boolean cancel(boolean interruptIfRunning);
 
   /**
-   * @return <code>true</code> if the associated run phase (maybe inside a job) was cancelled before it completed
-   *         normally.
+   * @return <code>true</code> if this {@link ICancellable} was cancelled.
    */
   boolean isCancelled();
 }
