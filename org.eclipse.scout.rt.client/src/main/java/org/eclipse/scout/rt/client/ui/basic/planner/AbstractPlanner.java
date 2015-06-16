@@ -179,18 +179,9 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return 1800000L;
   }
 
-  /**
-   * Indicates whether this Planner should draw the
-   * red and green bordered rectangle sections
-   * around the area selected by the mouse.
-   *
-   * @return true if the colored sections should be displayed,
-   *         false if not. Default is true.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
-  protected boolean getConfiguredDrawSections() {
-    return true;
+  protected int getConfiguredSelectionMode() {
+    return SELECTION_MODE_MULTI_RANGE;
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -294,13 +285,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 //    m_cellObserver = new P_ActivityCellObserver();
     //
     setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
+    setSelectionMode(getConfiguredSelectionMode());
     setWorkDayCount(getConfiguredWorkDayCount());
     setWorkDaysOnly(getConfiguredWorkDaysOnly());
     setFirstHourOfDay(getConfiguredFirstHourOfDay());
     setIntradayInterval(getConfiguredIntradayInterval());
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
     setLastHourOfDay(getConfiguredLastHourOfDay());
-    setDrawSections(getConfiguredDrawSections());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
@@ -741,16 +732,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public void setDrawSections(boolean drawSections) {
-    propertySupport.setProperty(PROP_DRAW_SECTIONS, drawSections);
-  }
-
-  @Override
-  public boolean isDrawSections() {
-    return propertySupport.getPropertyBool(PROP_DRAW_SECTIONS);
-  }
-
-  @Override
   public void setMenus(List<? extends IMenu> menus) {
     getContextMenu().setChildActions(menus);
   }
@@ -998,6 +979,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setAvailableDisplayModes(Set<Integer> modes) {
     propertySupport.setProperty(PROP_AVAILABLE_DISPLAY_MODES, modes);
+  }
+
+  @Override
+  public int getSelectionMode() {
+    return propertySupport.getPropertyInt(PROP_SELECTION_MODE);
+  }
+
+  @Override
+  public void setSelectionMode(int mode) {
+    propertySupport.setPropertyInt(PROP_SELECTION_MODE, mode);
   }
 
   @Override

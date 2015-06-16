@@ -68,6 +68,13 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * {@link Set}
    */
   String PROP_AVAILABLE_DISPLAY_MODES = "availableDisplayModes";
+
+  /**
+   * {@link #SELECTION_MODE_NONE}, {@link #SELECTION_MODE_ACTIVITY}, {@link #SELECTION_MODE_SINGLE_RANGE},
+   * {@link #SELECTION_MODE_MULTI_RANGE}
+   */
+  String PROP_SELECTION_MODE = "selectionMode";
+
   /**
    * {@link Long}[]
    */
@@ -76,10 +83,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * {@link Activity}
    */
   String PROP_SELECTED_ACTIVITY_CELL = "selectedActivityCell";
-  /**
-   * {@link Boolean}
-   */
-  String PROP_DRAW_SECTIONS = "drawSections";
   /**
    * {@link Object} Container of this map, {@link IPlannerFieldOld} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    */
@@ -94,6 +97,11 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   int DISPLAY_MODE_WORKWEEK = 4;
   int DISPLAY_MODE_CALENDAR_WEEK = 5;
   int DISPLAY_MODE_YEAR = 6;
+
+  int SELECTION_MODE_NONE = 0;
+  int SELECTION_MODE_ACTIVITY = 1;
+  int SELECTION_MODE_SINGLE_RANGE = 2;
+  int SELECTION_MODE_MULTI_RANGE = 3;
 
   void initPlanner() throws ProcessingException;
 
@@ -173,6 +181,10 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   Set<Integer> getAvailableDisplayModes();
 
   void setAvailableDisplayModes(Set<Integer> displayModes);
+
+  int getSelectionMode();
+
+  void setSelectionMode(int mode);
 
   /**
    * milliseconds
@@ -255,27 +267,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   void deselectResources(List<? extends Resource> resources);
 
   void deselectAllResources();
-
-  /**
-   * Indicates whether the selected sections in the activity
-   * map should be visualized (by a rectangle with red and
-   * green borders).
-   *
-   * @return true if the activity map draws these sections,
-   *         false if not.
-   */
-  boolean isDrawSections();
-
-  /**
-   * Sets whether the selected sections in the activity
-   * map should be visualized (by a rectangle with red and
-   * green borders).
-   *
-   * @param drawSections
-   *          true if the activity map should draw these sections,
-   *          false if not.
-   */
-  void setDrawSections(boolean drawSections);
 
   /**
    * {@link Object}
