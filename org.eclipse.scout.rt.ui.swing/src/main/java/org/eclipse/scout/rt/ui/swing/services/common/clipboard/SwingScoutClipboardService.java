@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.dnd.FileListTransferObject;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.dnd.TransferObjectRequest;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -160,10 +161,17 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
       result.setMimeType(DataFlavor.imageFlavor.getMimeType());
       return result;
     }
-    else if (FileListTransferObject.class.equals(request.getTransferObjectType())) {
+    else if (ResourceListTransferObject.class.equals(request.getTransferObjectType())) {
       ArrayList<File> fileList = new ArrayList<File>();
       CollectionUtility.appendAllList(fileList, (List) contents.getTransferData(DataFlavor.javaFileListFlavor));
-      FileListTransferObject result = new FileListTransferObject(fileList);
+
+      // create binary resource list from file list
+      List<BinaryResource> resources = new ArrayList<BinaryResource>();
+      for (File file : fileList) {
+        resources.add(new BinaryResource(file.getName(), IOUtility.getContent(file)));
+      }
+
+      ResourceListTransferObject result = new ResourceListTransferObject(resources);
       result.setMimeType(DataFlavor.javaFileListFlavor.getMimeType());
       return result;
     }

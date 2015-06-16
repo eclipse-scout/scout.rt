@@ -704,7 +704,7 @@ public class SwingMock extends AbstractGuiMock {
     waitForIdle();
     Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
     TransferObject o = SwingUtility.createScoutTransferable(t);
-    if (o != null && o.isText()) {
+    if (o instanceof TextTransferObject) {
       return ((TextTransferObject) o).getPlainText();
     }
     return null;

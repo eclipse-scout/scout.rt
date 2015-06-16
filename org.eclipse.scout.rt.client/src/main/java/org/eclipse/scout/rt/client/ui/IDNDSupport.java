@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import org.eclipse.scout.commons.dnd.FileListTransferObject;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
  * @see TextTransferObject
  * @see JavaTransferObject
  * @see ImageTransferObject
- * @see FileListTransferObject
+ * @see ResourceListTransferObject
  */
 public interface IDNDSupport {
   /*

@@ -65,14 +65,17 @@ import javax.swing.plaf.basic.BasicHTML;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigUtility;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.dnd.FileListTransferObject;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -447,8 +450,19 @@ public final class SwingUtility {
     if (scoutT == null) {
       return null;
     }
-    if (scoutT instanceof FileListTransferObject) {
-      return new FileListTransferable(((FileListTransferObject) scoutT).getFiles());
+    if (scoutT instanceof ResourceListTransferObject) {
+      // create temporary files for Swing drag
+      List<BinaryResource> resources = ((ResourceListTransferObject) scoutT).getResources();
+      List<File> files = new ArrayList<File>();
+      for (BinaryResource resource : resources) {
+        try {
+          files.add(IOUtility.createTempFile(resource.getFilename(), resource.getContent()));
+        }
+        catch (ProcessingException e) {
+          LOG.warn("Failed to create temporary file for binary resource " + resource, e);
+        }
+      }
+      return new FileListTransferable(files);
     }
     else if (scoutT instanceof TextTransferObject) {
       TextTransferObject textTransferObject = (TextTransferObject) scoutT;
@@ -528,7 +542,7 @@ public final class SwingUtility {
     }
     DataFlavor[] flavors = swingT.getTransferDataFlavors();
     Exception ex = null;
-    FileListTransferObject fileTransferObject = null;
+    ResourceListTransferObject fileTransferObject = null;
     TextTransferObject textTransferObject = null;
     ImageTransferObject imageTransferObject = null;
     TextTransferObject serializedTransferObject = null;
@@ -538,8 +552,13 @@ public final class SwingUtility {
         try {
           ArrayList<File> fileList = new ArrayList<File>();
           fileList.addAll((List) swingT.getTransferData(flavors[i]));
+          List<BinaryResource> resources = new ArrayList<BinaryResource>();
+          for (File file : fileList) {
+            resources.add(new BinaryResource(file.getName(), IOUtility.getContent(file)));
+          }
+
           if (fileTransferObject == null) {
-            fileTransferObject = new FileListTransferObject(fileList);
+            fileTransferObject = new ResourceListTransferObject(resources);
           }
         }
         catch (Exception e) {

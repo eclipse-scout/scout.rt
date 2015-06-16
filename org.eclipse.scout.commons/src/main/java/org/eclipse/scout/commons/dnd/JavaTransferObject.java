@@ -29,11 +29,6 @@ public class JavaTransferObject extends TransferObject {
     m_localObject = bean;
   }
 
-  @Override
-  public boolean isLocalObject() {
-    return true;
-  }
-
   public Object getLocalObject() {
     return m_localObject;
   }

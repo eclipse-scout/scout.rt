@@ -21,11 +21,6 @@ public class TextTransferObject extends TransferObject {
     m_plainText = plainText;
   }
 
-  @Override
-  public boolean isText() {
-    return true;
-  }
-
   public String getPlainText() {
     return m_plainText;
   }
