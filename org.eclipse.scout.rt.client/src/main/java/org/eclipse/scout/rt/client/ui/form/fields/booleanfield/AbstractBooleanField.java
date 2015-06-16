@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -34,8 +35,6 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
-    // ticket 79554
-    /* setAutoDisplayText(false); */
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554
     propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue()));
@@ -68,16 +67,9 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     return validValue ? ScoutTexts.get("Yes") : ScoutTexts.get("No");
   }
 
-  // validate value for ranges
   @Override
   protected Boolean validateValueInternal(Boolean rawValue) throws ProcessingException {
-    Boolean validValue = null;
-    rawValue = super.validateValueInternal(rawValue);
-    validValue = rawValue;
-    if (validValue == null) {
-      validValue = false;
-    }
-    return validValue;
+    return BooleanUtility.nvl(super.validateValueInternal(rawValue));
   }
 
   // convert string to a boolean

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -63,6 +64,11 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
       throw new ProcessingException("invalid Boolean value in column '" + getClass().getSimpleName() + "': " + rawValue + " class=" + rawValue.getClass());
     }
     return validValue;
+  }
+
+  @Override
+  protected Boolean validateValueInternal(ITableRow row, Boolean rawValue) throws ProcessingException {
+    return BooleanUtility.nvl(super.validateValueInternal(row, rawValue));
   }
 
   @Override

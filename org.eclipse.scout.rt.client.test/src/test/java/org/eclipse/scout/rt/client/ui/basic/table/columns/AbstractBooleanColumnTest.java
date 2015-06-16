@@ -11,8 +11,12 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.junit.Test;
@@ -31,6 +35,27 @@ public class AbstractBooleanColumnTest {
     ITableRow row = Mockito.mock(ITableRow.class);
     IBooleanField field = (IBooleanField) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
+  }
+
+  @Test
+  public void testNoNullValues() throws ProcessingException {
+    TestTable table = new TestTable();
+    table.addRowByArray(new Object[]{null});
+    Boolean value = table.getTestBooleanColumn().getValue(0);
+    assertNotNull(value);
+    assertFalse(value);
+  }
+
+  public class TestTable extends AbstractTable {
+
+    public TestBooleanColumn getTestBooleanColumn() {
+      return getColumnSet().getColumnByClass(TestBooleanColumn.class);
+    }
+
+    @Order(10.0)
+    public class TestBooleanColumn extends AbstractBooleanColumn {
+    }
+
   }
 
 }
