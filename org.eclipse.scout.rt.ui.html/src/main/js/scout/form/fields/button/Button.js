@@ -168,7 +168,12 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function(label) {
-  this.$field.text(label ? scout.strings.removeAmpersand(label) : '');
+  if (label) {
+    this.$field.text(scout.strings.removeAmpersand(label));
+  }
+  else {
+    this.$field.html('&nbsp;');
+  }
 };
 
 /**

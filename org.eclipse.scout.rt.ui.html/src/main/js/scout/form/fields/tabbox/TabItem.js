@@ -113,5 +113,10 @@ scout.TabItem.prototype._renderLabel = function(label) {
 scout.TabItem.prototype._updateTab = function() {
   this.$tabContainer.toggleClass('marked', this.marked);
   this.$tabContainer.setVisible(this.visible);
-  this.$tabContainer.text(scout.helpers.nvl(scout.strings.removeAmpersand(this.label), '&nbsp'));
+  if (this.label) {
+    this.$tabContainer.text(scout.strings.removeAmpersand(this.label));
+  }
+  else {
+    this.$tabContainer.html('&nbsp;');
+  }
 };
