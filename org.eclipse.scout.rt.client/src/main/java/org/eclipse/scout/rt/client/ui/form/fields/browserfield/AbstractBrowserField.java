@@ -10,14 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.EventListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -28,23 +37,16 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.Browser
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-// FIXME AWE: change value of BrowserField to URL. When we call setBinaryLocation() on the BrowserField
-// we must:
-// 1. create a download-URL for that resource
-// 2. set the location (=value) to that download-URL
-//
-// When we change the location (=value) of the BrowserField we must also set the binaryResource to null.
-// Talk to SME and PBN for more infos
-
 @ClassId("6402e68c-abd1-42b8-8da2-b4a12f910c98")
-public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile> implements IBrowserField {
+@FormData(value = AbstractBrowserFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE)
+public abstract class AbstractBrowserField extends AbstractFormField implements IBrowserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBrowserField.class);
 
   private IBrowserFieldUIFacade m_uiFacade;
+  private final EventListenerList m_listenerList = new EventListenerList();
 
   public AbstractBrowserField() {
     this(true);
@@ -54,23 +56,27 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     super(callInitializer);
   }
 
+  @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
   protected boolean getConfiguredScrollBarEnabled() {
     return false;
   }
 
-  @Override
-  @Order(210)
+  @Order(220)
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredAutoAddDefaultMenus() {
-    return false;
+  protected boolean getConfiguredSandboxEnabled() {
+    return true;
   }
 
   @Order(220)
   @ConfigProperty(ConfigProperty.OBJECT)
-  protected Set<SandboxValues> getConfiguredSandbox() {
-    return fullSandbox();
+  protected Set<SandboxPermissions> getConfiguredSandboxRestrictions() {
+    return null;
   }
 
   /**
@@ -114,12 +120,164 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     m_uiFacade = new P_UIFacade();
     super.initConfig();
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
-    setSandbox(getConfiguredSandbox());
+    setSandboxEnabled(getConfiguredSandboxEnabled());
+    setSandboxPermissions(getSandboxPermissions());
   }
 
   @Override
   protected void applySearchInternal(SearchFilter search) {
     //nop
+  }
+
+  @Override
+  public IBrowserFieldUIFacade getUIFacade() {
+    return m_uiFacade;
+  }
+
+  @Override
+  public void addBrowserFieldListener(BrowserFieldListener listener) {
+    m_listenerList.add(BrowserFieldListener.class, listener);
+  }
+
+  @Override
+  public void removeBrowserFieldListener(BrowserFieldListener listener) {
+    m_listenerList.remove(BrowserFieldListener.class, listener);
+  }
+
+  protected void fireContentChanged() {
+    fireBrowserFieldEvent(new BrowserFieldEvent(this, BrowserFieldEvent.TYPE_CONTENT_CHANGED));
+  }
+
+  protected void fireBrowserFieldEvent(BrowserFieldEvent e) {
+    EventListener[] listeners = m_listenerList.getListeners(BrowserFieldListener.class);
+    if (listeners != null && listeners.length > 0) {
+      for (int i = 0; i < listeners.length; i++) {
+        ((BrowserFieldListener) listeners[i]).browserFieldChanged(e);
+      }
+    }
+  }
+
+  @Override
+  public void setLocation(String location) {
+    setLocationInternal(location);
+    setBinaryResourceInternal(null);
+    setAttachmentsInternal(null);
+    fireContentChanged();
+  }
+
+  @Internal
+  protected void setLocationInternal(String location) {
+    validateLocation(location);
+    propertySupport.setProperty(PROP_LOCATION, location);
+  }
+
+  /**
+   * If this method returns without throwing in exception, the location is considered a valid URI.
+   * By default, {@link URI} is used to check the location for syntax errors. If no scheme is defined,
+   * a {@link RuntimeException} is thrown, <i>unless</i> the location starts with <code>//</code>. An URL
+   * starting with <code>//</code> is considered a "protocol relative URL", i.e. it re-uses the current
+   * scheme, without explicitly specifying it. See also: http://www.paulirish.com/2010/the-protocol-relative-url
+   */
+  protected void validateLocation(String location) {
+    try {
+      if (location == null) {
+        return;
+      }
+      URI uri = new URI(location);
+      // Prevent
+      if (uri.getScheme() == null && !location.startsWith("//")) {
+        throw new IllegalArgumentException("Missing scheme in URI: " + location);
+      }
+    }
+    catch (URISyntaxException e) {
+      throw new IllegalArgumentException("Invalid URI: " + location, e);
+    }
+  }
+
+  @Override
+  public String getLocation() {
+    return propertySupport.getPropertyString(PROP_LOCATION);
+  }
+
+  @Override
+  public void setBinaryResource(BinaryResource binaryResource) {
+    setLocationInternal(null);
+    setBinaryResourceInternal(binaryResource);
+    fireContentChanged();
+  }
+
+  @Override
+  public void setBinaryResource(BinaryResource binaryResource, BinaryResource... attachments) {
+    setLocationInternal(null);
+    setBinaryResourceInternal(binaryResource);
+    if (attachments == null) {
+      setAttachmentsInternal(null);
+    }
+    else {
+      Set<BinaryResource> attachmentSet = new HashSet<>();
+      for (BinaryResource attachment : attachments) {
+        if (attachment != null) {
+          attachmentSet.add(attachment);
+        }
+      }
+      setAttachmentsInternal(attachmentSet);
+    }
+    fireContentChanged();
+  }
+
+  @Internal
+  protected void setBinaryResourceInternal(BinaryResource binaryResource) {
+    propertySupport.setProperty(PROP_BINARY_RESOURCE, binaryResource);
+  }
+
+  @Override
+  public BinaryResource getBinaryResource() {
+    return (BinaryResource) propertySupport.getProperty(PROP_BINARY_RESOURCE);
+  }
+
+  @Override
+  public void setAttachments(Set<BinaryResource> attachments) {
+    setAttachmentsInternal(attachments);
+  }
+
+  @Internal
+  protected void setAttachmentsInternal(Set<BinaryResource> attachments) {
+    propertySupport.setProperty(PROP_ATTACHMENTS, attachments);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<BinaryResource> getAttachments() {
+    return (Set<BinaryResource>) propertySupport.getProperty(PROP_ATTACHMENTS);
+  }
+
+  protected void setScrollBarEnabled(boolean scrollBarEnabled) {
+    propertySupport.setProperty(PROP_SCROLLBARS_ENABLED, scrollBarEnabled);
+  }
+
+  @Override
+  public boolean isScrollBarEnabled() {
+    return propertySupport.getPropertyBool(PROP_SCROLLBARS_ENABLED);
+  }
+
+  protected BinaryResource resolveBinaryResource(String filename) {
+    if (filename == null) {
+      return null;
+    }
+    BinaryResource binaryResource = getBinaryResource();
+    if (binaryResource != null && CompareUtility.equals(binaryResource.getFilename(), filename)) {
+      return binaryResource;
+    }
+    Set<BinaryResource> attachments = getAttachments();
+    if (attachments != null) {
+      for (BinaryResource attachment : attachments) {
+        if (CompareUtility.equals(attachment.getFilename(), filename)) {
+          return attachment;
+        }
+      }
+    }
+    LOG.warn("Could not resolve binary resource for filename: " + filename);
+    return null;
   }
 
   @Override
@@ -130,27 +288,24 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   }
 
   @Override
-  public void setLocation(String location) {
-    propertySupport.setProperty(PROP_LOCATION, location);
+  public void setSandboxEnabled(boolean sandboxEnabled) {
+    propertySupport.setProperty(PROP_SANDBOX_ENABLED, sandboxEnabled);
   }
 
   @Override
-  public String getLocation() {
-    return (String) propertySupport.getProperty(PROP_LOCATION);
+  public boolean isSandboxEnabled() {
+    return propertySupport.getPropertyBool(PROP_SANDBOX_ENABLED);
   }
 
   @Override
-  public IBrowserFieldUIFacade getUIFacade() {
-    return m_uiFacade;
+  public void setSandboxPermissions(Set<SandboxPermissions> sandboxPermissions) {
+    propertySupport.setProperty(PROP_SANDBOX_PERMISSIONS, sandboxPermissions);
   }
 
-  protected void setScrollBarEnabled(boolean scrollBarEnabled) {
-    propertySupport.setProperty(PROP_SCROLLBARS_ENABLED, scrollBarEnabled);
-  }
-
+  @SuppressWarnings("unchecked")
   @Override
-  public boolean isScrollBarEnabled() {
-    return propertySupport.getPropertyBool(PROP_SCROLLBARS_ENABLED);
+  public Set<SandboxPermissions> getSandboxPermissions() {
+    return (Set<SandboxPermissions>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
   }
 
   private class P_UIFacade implements IBrowserFieldUIFacade {
@@ -189,6 +344,11 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         LOG.error("location: " + location, t);
       }
     }
+
+    @Override
+    public BinaryResource requestBinaryResourceFromUI(String filename) {
+      return resolveBinaryResource(filename);
+    }
   }
 
   protected final void interceptLocationChanged(String location, String path, boolean local) throws ProcessingException {
@@ -203,7 +363,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     return chain.execAcceptLocationChange(location, path, local);
   }
 
-  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalValueFieldExtension<RemoteFile, OWNER> implements IBrowserFieldExtension<OWNER> {
+  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER> implements IBrowserFieldExtension<OWNER> {
 
     public LocalBrowserFieldExtension(OWNER owner) {
       super(owner);
@@ -224,34 +384,4 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   protected IBrowserFieldExtension<? extends AbstractBrowserField> createLocalExtension() {
     return new LocalBrowserFieldExtension<AbstractBrowserField>(this);
   }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public Set<SandboxValues> getSandbox() {
-    return (Set<SandboxValues>) propertySupport.getProperty(PROP_SANDBOX);
-  }
-
-  @Override
-  public void setSandbox(Set<SandboxValues> sandboxValues) {
-    propertySupport.setProperty(PROP_SANDBOX, sandboxValues);
-  }
-
-  protected Set<SandboxValues> fullSandbox() {
-    Set<SandboxValues> set = new HashSet<>();
-    for (SandboxValues sandboxValue : SandboxValues.values()) {
-      set.add(sandboxValue);
-    }
-    return set;
-  }
-
-  @Override
-  public BinaryResource getBinaryResource() {
-    return (BinaryResource) propertySupport.getProperty(PROP_BINARY_RESOURCE);
-  }
-
-  @Override
-  public void setBinaryResource(BinaryResource binaryResource) {
-    propertySupport.setProperty(PROP_BINARY_RESOURCE, binaryResource);
-  }
-
 }

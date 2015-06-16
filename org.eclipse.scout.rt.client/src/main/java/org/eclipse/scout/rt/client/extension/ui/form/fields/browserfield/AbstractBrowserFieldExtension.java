@@ -1,13 +1,12 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
-public abstract class AbstractBrowserFieldExtension<OWNER extends AbstractBrowserField> extends AbstractValueFieldExtension<RemoteFile, OWNER> implements IBrowserFieldExtension<OWNER> {
+public abstract class AbstractBrowserFieldExtension<OWNER extends AbstractBrowserField> extends AbstractFormFieldExtension<OWNER> implements IBrowserFieldExtension<OWNER> {
 
   public AbstractBrowserFieldExtension(OWNER owner) {
     super(owner);

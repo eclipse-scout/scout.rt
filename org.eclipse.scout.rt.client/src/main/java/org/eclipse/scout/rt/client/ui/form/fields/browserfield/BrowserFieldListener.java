@@ -10,16 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import org.eclipse.scout.commons.resource.BinaryResource;
+import java.util.EventListener;
 
-public interface IBrowserFieldUIFacade {
+public interface BrowserFieldListener extends EventListener {
 
-  /**
-   * return true to accept, false to veto the change
-   */
-  boolean fireBeforeLocationChangedFromUI(String location);
-
-  void fireAfterLocationChangedFromUI(String location);
-
-  BinaryResource requestBinaryResourceFromUI(String filename);
+  void browserFieldChanged(BrowserFieldEvent e);
 }

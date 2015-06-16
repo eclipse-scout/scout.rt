@@ -105,9 +105,9 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * @deprecated do not use this constructor! In HtmlUI, it is wrong to work with {@link File} in most of the cases.
+   * Reads the contents of the given file into a new {@link BinaryResource}. This constructor is intended to
+   * read from temporary files only. If the file is not accessible, the constructor will fail.
    */
-  @Deprecated
   public BinaryResource(File file) throws ProcessingException {
     this(file.getName(), FileUtility.getContentType(file), IOUtility.getContent(file), file.lastModified());
   }

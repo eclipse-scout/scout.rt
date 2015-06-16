@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.PopupFactoryEx;
-import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.browserfield.ISwingScoutBrowserField;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Browser-Field to display the native browser in a {@link Canvas} by using the SWT-AWT-Bridge.
  */
-public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrowserField> implements ISwingScoutBrowserField {
+public class SwingScoutBrowserField extends SwingScoutFieldComposite<IBrowserField> implements ISwingScoutBrowserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutBrowserField.class);
 
   private Shell m_swtShell;
@@ -157,8 +157,8 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
           if (scoutField.getLocation() != null) {
             url = scoutField.getLocation();
           }
-          else if (scoutField.getValue() != null) {
-            url = toRemoteFileUrl(scoutField.getValue());
+          else if (scoutField.getBinaryResource() != null) {
+            url = toRemoteFileUrl(new RemoteFile(scoutField.getBinaryResource()));
           }
 
           if (url != null && !url.isEmpty()) {
@@ -221,11 +221,6 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
 
   protected void setLocationFromScout() {
     setLocationInternal(getScoutObject().getLocation());
-  }
-
-  @Override
-  protected void setValueFromScout(Object value) {
-    setLocationInternal(toRemoteFileUrl(getScoutObject().getValue()));
   }
 
   /**
