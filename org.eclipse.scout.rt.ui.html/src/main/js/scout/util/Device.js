@@ -9,6 +9,9 @@ scout.Device = function(userAgent) {
   this.device;
   this.browser = scout.Device.SupportedBrowsers.UNKNWON;
 
+  // initialize with empty string so that it can be used without calling initUnselectableAttribute()
+  this.unselectableAttribute = '';
+
   this.parseUserAgent(this.userAgent);
 };
 
