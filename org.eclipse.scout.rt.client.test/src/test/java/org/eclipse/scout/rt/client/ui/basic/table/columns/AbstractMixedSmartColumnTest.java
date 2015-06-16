@@ -89,6 +89,7 @@ public class AbstractMixedSmartColumnTest {
     IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
     assertEquals("code type class property to be progagated to field", column.getCodeTypeClass(), field.getCodeTypeClass());
+    assertEquals("browse new text to be progagated to field", column.getConfiguredBrowseNewText(), field.getBrowseNewText());
   }
 
   /**

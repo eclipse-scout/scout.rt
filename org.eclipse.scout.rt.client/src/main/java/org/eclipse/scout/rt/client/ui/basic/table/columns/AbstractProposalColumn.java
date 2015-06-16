@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -27,11 +26,6 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
 
   public AbstractProposalColumn() {
     super();
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
   }
 
   @Override
@@ -56,17 +50,6 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   @Override
   protected IValueField<String> createDefaultEditor() {
     return new ProposalEditorField();
-  }
-
-  protected void mapEditorFieldProperties(IProposalField<LOOKUP_TYPE> f) {
-    super.mapEditorFieldProperties(f);
-    f.setCodeTypeClass(getCodeTypeClass());
-    f.setLookupCall(getLookupCall());
-    f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
-    f.setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
-    f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
-    f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
-    f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
   }
 
   @Override

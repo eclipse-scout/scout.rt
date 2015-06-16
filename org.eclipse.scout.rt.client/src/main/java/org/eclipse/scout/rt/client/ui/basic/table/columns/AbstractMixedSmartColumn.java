@@ -154,14 +154,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
 
   protected void mapEditorFieldProperties(IMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> f) {
     super.mapEditorFieldProperties(f);
-    f.setCodeTypeClass(getCodeTypeClass());
-    f.setLookupCall(getLookupCall());
-    f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
-    f.setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     f.setBrowseNewText(getConfiguredBrowseNewText());
-    f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
-    f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
-    f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
   }
 
   @Override

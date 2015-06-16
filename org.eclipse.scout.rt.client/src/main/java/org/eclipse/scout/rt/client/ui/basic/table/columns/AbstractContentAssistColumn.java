@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IContentAssi
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -225,6 +226,17 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       }
     }
     return validValue;
+  }
+
+  protected void mapEditorFieldProperties(IContentAssistField<VALUE, LOOKUP_TYPE> f) {
+    super.mapEditorFieldProperties(f);
+    f.setCodeTypeClass(getCodeTypeClass());
+    f.setLookupCall(getLookupCall());
+    f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
+    f.setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
+    f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
+    f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
+    f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
   }
 
   protected final LOOKUP_TYPE interceptConvertValueToKey(VALUE value) {
