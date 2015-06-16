@@ -915,11 +915,20 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     sfc.showFileChooser();
   }
 
+  private final HashMap<IMessageBox, SwtScoutMessageBoxDialog> m_openMessageBoxes = new HashMap<>();
+
   @Override
   public void showMessageBoxFromScout(IMessageBox messageBox) {
-    SwtScoutMessageBoxDialog box = new SwtScoutMessageBoxDialog(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), messageBox, this);
-    box.open();
+    SwtScoutMessageBoxDialog box = m_openMessageBoxes.get(messageBox);
+    if (box == null) {
+      box = new SwtScoutMessageBoxDialog(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), messageBox, this);
+      box.open();
+      m_openMessageBoxes.put(messageBox, box);
+    }
+  }
 
+  public void removeMessageBoxFromScout(IMessageBox messageBox) {
+    m_openMessageBoxes.remove(messageBox);
   }
 
   @Override
@@ -1314,6 +1323,10 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
             }
           };
           invokeSwtLater(t);
+          break;
+        }
+        case DesktopEvent.TYPE_MESSAGE_BOX_REMOVED: {
+
           break;
         }
         case DesktopEvent.TYPE_FILE_CHOOSER_ADDED: {

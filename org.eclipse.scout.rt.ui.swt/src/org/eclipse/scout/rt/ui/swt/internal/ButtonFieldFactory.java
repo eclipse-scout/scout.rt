@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.snapbox.ISnapBox;
@@ -44,7 +45,7 @@ public class ButtonFieldFactory implements IFormFieldFactory {
       }
       else {
         if (((IButton) model).getDisplayStyle() == IButton.DISPLAY_STYLE_RADIO) {
-          LOG.warn("It seems your RadioButton extends from AbstractButton with getConfiguredDisplayStyle set to DISPLAY_STYLE_RADIO. Please use the class AbstractRadioButton instead.");
+          LOG.warn(String.format("The button '%s''s superclass should be changed to %s.", model.getClass().getName(), AbstractRadioButton.class.getSimpleName()));
         }
         field = new SwtScoutButton<IButton>();
       }
@@ -53,5 +54,4 @@ public class ButtonFieldFactory implements IFormFieldFactory {
     }
     return null;
   }
-
 }

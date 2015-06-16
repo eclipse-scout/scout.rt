@@ -936,6 +936,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void removeMessageBoxInternal(IMessageBox mb) {
     m_messageBoxStack.remove(mb);
+    fireMessageBoxRemoved(mb);
   }
 
   @Override
@@ -1614,6 +1615,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireMessageBoxAdded(IMessageBox mb) {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_ADDED, mb);
+    fireDesktopEvent(e);
+  }
+
+  private void fireMessageBoxRemoved(IMessageBox mb) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_REMOVED, mb);
     fireDesktopEvent(e);
   }
 

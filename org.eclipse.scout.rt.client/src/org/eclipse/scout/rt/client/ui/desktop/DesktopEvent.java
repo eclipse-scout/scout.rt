@@ -46,6 +46,7 @@ public class DesktopEvent extends EventObject {
   public static final int TYPE_FORM_REMOVED = 610;
   public static final int TYPE_FORM_ENSURE_VISIBLE = 620;
   public static final int TYPE_MESSAGE_BOX_ADDED = 700;
+  public static final int TYPE_MESSAGE_BOX_REMOVED = 710;
   /**
    * print a form using properties printDevice, printParameters
    */
@@ -74,21 +75,21 @@ public class DesktopEvent extends EventObject {
 
   /**
    * Event type that indicates that the desktop should traverse the focus to the next possible location.
-   * 
+   *
    * @see IDesktop#traverseFocusNext()
    */
   public static final int TYPE_TRAVERSE_FOCUS_NEXT = 1020;
 
   /**
    * Event type that indicates that the desktop should traverse the focus to the previous location.
-   * 
+   *
    * @see IDesktop#traverseFocusPrevious()
    */
   public static final int TYPE_TRAVERSE_FOCUS_PREVIOUS = 1030;
 
   /**
    * Event type that indicates that the currently active (focused) {@link IForm} should be calculated.
-   * 
+   *
    * @see IDesktop#traverseFocusPrevious()
    */
   public static final int TYPE_FIND_ACTIVE_FORM = 1040;
