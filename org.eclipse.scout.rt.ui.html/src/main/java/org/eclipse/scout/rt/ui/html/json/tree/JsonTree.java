@@ -689,7 +689,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     CheckedInfo checkInfo = new CheckedInfo();
     for (int i = 0; i < jsonNodes.length(); i++) {
       JSONObject jsonObject = jsonNodes.optJSONObject(i);
-      ITreeNode row = m_treeNodes.get(jsonObject.optString("nodeId"));
+      ITreeNode row = m_treeNodes.get(jsonObject.getString("nodeId"));
       checkInfo.getAllNodes().add(row);
       if (jsonObject.optBoolean("checked")) {
         checkInfo.getCheckedNodes().add(row);

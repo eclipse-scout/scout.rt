@@ -35,15 +35,15 @@ public class AbstractJsonAdapterTest {
   @Test
   public void testToJson() {
     JSONObject json = newAdapter(new Object()).toJson();
-    assertEquals("x", json.optString("id"));
-    assertEquals("Foo", json.optString("objectType"));
+    assertEquals("x", json.getString("id"));
+    assertEquals("Foo", json.getString("objectType"));
   }
 
   @Test
   public void testToJson_WithVariant() {
     JSONObject json = newAdapter(new P_ModelVariant()).toJson();
-    assertEquals("x", json.optString("id"));
-    assertEquals("Foo.Bar", json.optString("objectType"));
+    assertEquals("x", json.getString("id"));
+    assertEquals("Foo.Bar", json.getString("objectType"));
   }
 
   @Test

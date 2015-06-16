@@ -56,7 +56,7 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
   }
 
   protected void handleUiSearch(JsonEvent event) {
-    String query = event.getData().optString("query");
+    String query = event.getData().getString("query");
     addPropertyEventFilterCondition(ISearchOutline.PROP_SEARCH_QUERY, query);
     getModel().getUIFacade().search(query);
   }

@@ -49,9 +49,9 @@ public class JsonEventTest {
     JSONObject data = new JSONObject().put("myProp", "myValue");
     JsonEvent event = new JsonEvent("foo", "bar", data);
     JSONObject json = event.toJson();
-    assertEquals("foo", json.optString("target"));
-    assertEquals("bar", json.optString("type"));
-    assertEquals("myValue", json.optString("myProp"));
+    assertEquals("foo", json.getString("target"));
+    assertEquals("bar", json.getString("type"));
+    assertEquals("myValue", json.getString("myProp"));
   }
 
   @Test
@@ -63,7 +63,7 @@ public class JsonEventTest {
     JsonEvent event = JsonEvent.fromJson(json);
     assertEquals("foo", event.getTarget());
     assertEquals("bar", event.getType());
-    assertEquals("myValue", event.getData().optString("myProp"));
+    assertEquals("myValue", event.getData().getString("myProp"));
   }
 
 }

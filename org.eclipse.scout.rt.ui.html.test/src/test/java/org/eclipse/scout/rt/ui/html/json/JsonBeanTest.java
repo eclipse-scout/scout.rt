@@ -46,7 +46,7 @@ public class JsonBeanTest {
 
     JSONObject json = (JSONObject) jsonObj.toJson();
     assertEquals(4, json.optLong("long"));
-    assertEquals("hello", json.optString("string"));
+    assertEquals("hello", json.getString("string"));
   }
 
   @Test
@@ -61,7 +61,7 @@ public class JsonBeanTest {
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();
-    assertEquals("2015-09-24 17:38:09.000", json.optString("date"));
+    assertEquals("2015-09-24 17:38:09.000", json.getString("date"));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class JsonBeanTest {
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();
-    assertEquals("property", json.optString("property"));
+    assertEquals("property", json.getString("property"));
     assertNull(json.optString("ignoredProperty", null));
     assertNull(json.optString("ignoredDefault", null));
   }

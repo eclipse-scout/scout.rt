@@ -86,7 +86,7 @@ public class JsonProposalChooser<T extends IProposalChooser> extends AbstractJso
   }
 
   private void handleActiveFilterChanged(JsonEvent event) {
-    String state = event.getData().optString("state");
+    String state = event.getData().optString("state", null);
     getModel().updateActiveFilter(TriState.valueOf(state));
   }
 

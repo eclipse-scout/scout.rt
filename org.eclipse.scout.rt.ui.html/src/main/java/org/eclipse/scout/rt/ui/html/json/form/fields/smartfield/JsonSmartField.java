@@ -107,12 +107,12 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   protected void handleUiProposalTyped(JsonEvent event) {
-    String text = event.getData().optString("searchText");
+    String text = event.getData().optString("searchText", null);
     getModel().getUIFacade().proposalTypedFromUI(text);
   }
 
   protected void handleUiAcceptProposal(JsonEvent event) {
-    String text = event.getData().optString("searchText");
+    String text = event.getData().optString("searchText", null);
     getModel().getUIFacade().acceptProposalFromUI(text);
   }
 
@@ -121,7 +121,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   protected void handleUiOpenProposal(JsonEvent event) {
-    String searchText = event.getData().optString("searchText");
+    String searchText = event.getData().optString("searchText", null);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
     LOG.debug("handle openProposal -> openProposalFromUI. searchText=" + searchText + " selectCurrentValue=" + selectCurrentValue);
     getModel().getUIFacade().openProposalChooserFromUI(searchText, selectCurrentValue);

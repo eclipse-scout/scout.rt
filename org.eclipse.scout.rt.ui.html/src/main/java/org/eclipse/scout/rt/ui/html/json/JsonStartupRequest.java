@@ -49,7 +49,7 @@ public class JsonStartupRequest extends JsonRequest {
 
   public String getParentUiSessionId() {
     //optional
-    return getRequestObject().optString(PROP_PARENT_UI_SESSION_ID);
+    return getRequestObject().optString(PROP_PARENT_UI_SESSION_ID, null);
   }
 
   public JSONObject getUserAgent() {

@@ -77,7 +77,7 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
   }
 
   protected void handleUiAppLinkAction(JsonEvent event) {
-    String ref = event.getData().optString("ref");
+    String ref = event.getData().getString("ref");
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

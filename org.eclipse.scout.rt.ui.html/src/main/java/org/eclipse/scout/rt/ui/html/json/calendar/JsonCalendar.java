@@ -252,7 +252,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   protected void handleUiComponentMoved(JsonEvent event) {
     JSONObject data = event.getData();
     Date newDate = toJavaDate(data, "newDate");
-    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component"));
+    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component", null));
     getModel().getUIFacade().fireComponentMovedFromUI(comp.getModel(), newDate);
   }
 
@@ -321,7 +321,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   private Date toJavaDate(JSONObject data, String propertyName) {
-    return new JsonDate(data.optString(propertyName)).asJavaDate();
+    return new JsonDate(data.optString(propertyName, null)).asJavaDate();
   }
 
   @Override

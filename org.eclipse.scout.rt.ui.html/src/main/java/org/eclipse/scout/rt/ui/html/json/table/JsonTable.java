@@ -488,7 +488,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleUiAppLinkAction(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    String ref = event.getData().optString("ref");
+    String ref = event.getData().getString("ref");
     if (column != null) {
       getModel().getUIFacade().setContextColumnFromUI(column);
     }
@@ -620,7 +620,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected IColumn extractColumn(JSONObject json) {
-    String columnId = json.optString(PROP_COLUMN_ID);
+    String columnId = json.optString(PROP_COLUMN_ID, null);
     if (columnId == null) {
       return null;
     }
@@ -968,7 +968,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     CheckedInfo checkInfo = new CheckedInfo();
     for (int i = 0; i < jsonRows.length(); i++) {
       JSONObject jsonObject = jsonRows.optJSONObject(i);
-      ITableRow row = m_tableRows.get(jsonObject.optString("rowId"));
+      ITableRow row = m_tableRows.get(jsonObject.getString("rowId"));
       checkInfo.getAllRows().add(row);
       if (jsonObject.optBoolean("checked")) {
         checkInfo.getCheckedRows().add(row);

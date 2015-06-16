@@ -38,8 +38,8 @@ public class DefaultValuesFilterTest {
   public void testDefaultValueFilter_simple() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_simple.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy"));
+    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
+    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
     DefaultValuesFilter filter = new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
 
     // Load test data and apply filter
@@ -122,8 +122,8 @@ public class DefaultValuesFilterTest {
   public void testDefaultValueFilter_illegalHierarchy() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_illegalHierarchy.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy"));
+    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
+    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
     new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
   }
 
@@ -131,8 +131,8 @@ public class DefaultValuesFilterTest {
   public void testDefaultValueFilter_loopHierarchy() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_loopHierarchy.json");
-    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults"));
-    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy"));
+    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
+    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
     new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
   }
 }

@@ -398,7 +398,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   }
 
   private Date toJavaDate(JSONObject data, String propertyName) {
-    return new JsonDate(data.optString(propertyName)).asJavaDate();
+    return new JsonDate(data.optString(propertyName, null)).asJavaDate();
   }
 
   // FIXME CGU Fix generics

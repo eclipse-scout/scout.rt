@@ -319,7 +319,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     if (customParams != null) {
       JSONArray names = customParams.names();
       for (int i = 0; i < names.length(); i++) {
-        customParamsMap.put(names.optString(i), customParams.optString(names.optString(i)));
+        String name = names.getString(i);
+        customParamsMap.put(name, customParams.getString(name));
       }
     }
     return customParamsMap;

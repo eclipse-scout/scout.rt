@@ -68,7 +68,7 @@ public class JsonSvgField extends JsonFormField<ISvgField> {
   }
 
   private void handleUiAppLinkAction(JsonEvent event) {
-    String ref = event.getData().optString("ref");
+    String ref = event.getData().getString("ref");
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }
