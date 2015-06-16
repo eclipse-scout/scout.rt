@@ -251,12 +251,8 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @Override
   protected String validateValueInternal(String rawValue) throws ProcessingException {
-    String validValue = null;
-    rawValue = super.validateValueInternal(rawValue);
-    validValue = rawValue;
-    if (validValue != null && validValue.length() == 0) {
-      validValue = null;
-    }
+    String validValue = super.validateValueInternal(rawValue);
+
     if (validValue != null) {
       if (validValue.length() > getMaxLength()) {
         validValue = validValue.substring(0, getMaxLength());
@@ -277,7 +273,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
       // replace newlines by spaces
       validValue = validValue.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
     }
-    return validValue;
+    return StringUtility.nullIfEmpty(validValue);
   }
 
   @Override

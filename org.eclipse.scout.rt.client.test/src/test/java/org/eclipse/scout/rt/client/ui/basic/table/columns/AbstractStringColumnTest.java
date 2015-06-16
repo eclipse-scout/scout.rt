@@ -11,9 +11,14 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumnTest.TestTable.TestStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -36,6 +41,42 @@ public class AbstractStringColumnTest {
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
     //TODO jgu
 //    assertEquals("css class property to be progagated to field", column.getCssClass(), field.getCssClass());
+  }
+
+  @Test
+  public void testCustomValidation() throws ProcessingException {
+    TestTable table = new TestTable();
+    TestStringColumn col = table.getTestStringColumn();
+    ITableRow row = table.addRowByArray(new Object[]{"valid"});
+    IStringField editor = (IStringField) col.prepareEdit(row);
+    editor.setValue("invalid");
+    col.completeEdit(row, editor);
+    assertFalse(table.getCell(0, 0).isContentValid());
+  }
+
+  public class TestTable extends AbstractTable {
+
+    public TestStringColumn getTestStringColumn() {
+      return getColumnSet().getColumnByClass(TestStringColumn.class);
+    }
+
+    @Order(70.0)
+    public class TestStringColumn extends AbstractStringColumn {
+
+      @Override
+      protected boolean getConfiguredEditable() {
+        return true;
+      }
+
+      @Override
+      protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
+        if ("invalid".equals(rawValue)) {
+          throw new VetoException("invalid");
+        }
+        return super.execValidateValue(row, rawValue);
+      }
+    }
+
   }
 
 }

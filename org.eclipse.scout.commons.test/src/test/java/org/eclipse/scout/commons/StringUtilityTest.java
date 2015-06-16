@@ -13,6 +13,7 @@ package org.eclipse.scout.commons;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -533,4 +534,12 @@ public class StringUtilityTest {
     assertEquals("test", StringUtility.rpad("test", "", 7));
     assertEquals("test", StringUtility.rpad("test", null, 7));
   }
+
+  @Test
+  public void testNullIfEmpty() {
+    assertNull(StringUtility.nullIfEmpty(""));
+    assertNull(StringUtility.nullIfEmpty(null));
+    assertNotNull(StringUtility.nullIfEmpty("test"));
+  }
+
 }

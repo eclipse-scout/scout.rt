@@ -550,10 +550,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-              start +
-              text.substring(a.end, b) +
-              end +
-              text.substring(b + tagName.length() + 3);
+          start +
+          text.substring(a.end, b) +
+          end +
+          text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -807,6 +807,13 @@ public final class StringUtility {
 
   public static String emptyIfNull(Object o) {
     return o == null ? "" : o.toString();
+  }
+
+  public static String nullIfEmpty(String s) {
+    if (s != null && s.length() == 0) {
+      return null;
+    }
+    return s;
   }
 
   public static String chr(int code) {
@@ -1167,7 +1174,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-        " "
+            " "
         );
   }
 

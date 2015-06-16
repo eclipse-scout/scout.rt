@@ -1009,13 +1009,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       cell.removeErrorStatus(ValidationFailedStatus.class);
       VALUE newValue = validateValue(row, value);
 
-      validateColumnValue(row, editingField, true, newValue);
-
       // set newValue into the cell only if there's no error.
       if (cell.isContentValid()) {
         row.setCellValue(getColumnIndex(), newValue);
         decorateCellInternal(cell, row);
       }
+
+      ensureVisibileIfInvalid(row);
     }
     catch (ProcessingException v) {
       Cell cell = row.getCellForUpdate(this);
@@ -1714,6 +1714,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   protected void persistRowChange(ITableRow row) throws ProcessingException {
   }
 
+  /**
+   * @deprecated use {@link #refreshValues()}
+   */
+  @Deprecated
   public void validateColumnValues() {
     if (getTable() != null) {
       for (ITableRow row : getTable().getRows()) {
@@ -1737,7 +1741,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *          Defines if single column validation should be used
    * @param value
    *          The value that is set in the Scout model and not in the UI component
+   * @deprecated use {@link #execValidateValue(ITableRow, Object)}
    */
+  @Deprecated
   @SuppressWarnings({"unchecked"})
   public void validateColumnValue(ITableRow row, IFormField editor, boolean singleColValidation, VALUE value) {
     if (row == null) {
