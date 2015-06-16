@@ -92,6 +92,8 @@ public interface IUiSession {
    */
   JSONObject processFileUpload(HttpServletRequest httpReq, String targetAdapterId, List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
 
+  void processCancelRequest();
+
   String getUiSessionId();
 
   String getClientSessionId();

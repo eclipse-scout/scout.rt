@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.ModelJobFilter;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -672,6 +673,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     // Consume
     resourceConsumer.consumeBinaryResource(uploadFiles);
+  }
+
+  @Override
+  public void processCancelRequest() {
+    // Cancel all running model jobs for the requested session (interrupt if necessary)
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilter().andMatchSession(getClientSession()).andAreNotBlocked(), true);
   }
 
   @Override
