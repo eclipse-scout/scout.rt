@@ -206,4 +206,14 @@ button::-moz-focus-inner {
   color: @applink-color;
   text-decoration: underline;
   cursor: pointer;
+  outline: none;
+
+  /* If app-links is focusable (i.e. has tabIndex attribute), only draw the underline decoration when link is focused */
+  &[tabIndex] {
+    text-decoration: none;
+
+    &:focus {
+      text-decoration: underline;
+    }
+  }
 }

@@ -19,4 +19,3 @@ scout.AppLinkKeyStroke.prototype.accept = function(event) {
 scout.AppLinkKeyStroke.prototype.handle = function(event) {
   this.appLinkTriggerFunction.call(this.field, event);
 };
-
