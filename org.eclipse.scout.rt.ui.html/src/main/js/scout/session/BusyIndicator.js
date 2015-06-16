@@ -7,7 +7,7 @@ scout.BusyIndicator = function(session, cancellable) {
 scout.inherits(scout.BusyIndicator, scout.Widget);
 
 scout.BusyIndicator.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('busyindicator shown');
+  this.$container = $parent.appendDiv('busyindicator');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
@@ -24,19 +24,17 @@ scout.BusyIndicator.prototype._render = function($parent) {
     this.$content.addClass('no-buttons');
   }
 
-  setTimeout(function() {
-    // Class 'shown' is used for css animation
-    this.$container.addClass('shown');
-    // Prevent resizing when message-box is dragged off the viewport
-    this.$container.addClass('calc-helper');
-    this.$container.css('min-width', this.$container.width());
-    this.$container.removeClass('calc-helper');
-    // Now that all texts, paddings, widths etc. are set, we can calculate the position
-    this._position();
-  }.bind(this));
-
   // Render properties
   this.$label.text(this._session.text('PleaseWait_'));
+
+  // Prevent resizing when message-box is dragged off the viewport
+  this.$container.addClass('calc-helper');
+  this.$container.css('min-width', this.$container.width());
+  this.$container.removeClass('calc-helper');
+  // Now that all texts, paddings, widths etc. are set, we can calculate the position
+  this._position();
+  // Class 'shown' is used for css animation
+  this.$container.addClass('shown');
 };
 
 scout.BusyIndicator.prototype._position = function() {

@@ -46,24 +46,6 @@ scout.MessageBox.prototype._render = function($parent) {
   }
   this._updateButtonWidths();
 
-  setTimeout(function() {
-    if (!this.rendered) {
-      // Already removed in the meantime
-      return;
-    }
-
-    // Class 'shown' is used for css animation
-    this.$container.addClass('shown');
-    // Prevent resizing when message-box is dragged off the viewport
-    this.$container.addClass('calc-helper');
-    this.$container.css('min-width', this.$container.width());
-    this.$container.removeClass('calc-helper');
-    // Now that all texts, paddings, widths etc. are set, we can calculate the position
-    this._position();
-
-    this._$glassPane.installFocusContext('auto', this._session.uiSessionId);
-  }.bind(this));
-
   // Render properties
   this._renderIconId(this.iconId);
   this._renderSeverity(this.severity);
@@ -72,6 +54,17 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderHiddenText(this.hiddenText);
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+
+  // Prevent resizing when message-box is dragged off the viewport
+  this.$container.addClass('calc-helper');
+  this.$container.css('min-width', this.$container.width());
+  this.$container.removeClass('calc-helper');
+  // Now that all texts, paddings, widths etc. are set, we can calculate the position
+  this._position();
+  // Class 'shown' is used for css animation
+  this.$container.addClass('shown');
+
+  this._$glassPane.installFocusContext('auto', this._session.uiSessionId);
 };
 
 scout.MessageBox.prototype._remove = function() {

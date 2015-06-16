@@ -44,27 +44,20 @@ scout.FileChooser.prototype._render = function($parent) {
     .on('click', this._onCancelButtonClicked.bind(this))
     .appendTo(this.$buttons);
 
-  setTimeout(function() {
-    if (!this.rendered) {
-      // Already removed in the meantime
-      return;
-    }
-
-    // Class 'shown' is used for css animation
-    this.$container.addClass('shown');
-    // Prevent resizing when message-box is dragged off the viewport
-    this.$container.addClass('calc-helper');
-    this.$container.css('min-width', this.$container.width());
-    this.$container.removeClass('calc-helper');
-    // Now that all texts, paddings, widths etc. are set, we can calculate the position
-    this._position();
-
-    this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
-  }.bind(this));
-
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.FormLayout(this));
   this.htmlComp.pixelBasedSizing = false;
+
+  // Class 'shown' is used for css animation
+  this.$container.addClass('shown');
+  // Prevent resizing when message-box is dragged off the viewport
+  this.$container.addClass('calc-helper');
+  this.$container.css('min-width', this.$container.width());
+  this.$container.removeClass('calc-helper');
+  // Now that all texts, paddings, widths etc. are set, we can calculate the position
+  this._position();
+
+  this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
 };
 
 scout.FileChooser.prototype._remove = function() {

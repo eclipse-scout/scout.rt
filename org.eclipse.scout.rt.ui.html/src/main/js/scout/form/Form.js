@@ -45,12 +45,6 @@ scout.Form.prototype._render = function($parent) {
       }.bind(this)
     });
     this._setDialogTitle();
-
-    setTimeout(function() {
-      this.$container.addClass('shown');
-      $.log.warn('startInstall');
-      this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
-    }.bind(this));
   }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -60,6 +54,12 @@ scout.Form.prototype._render = function($parent) {
 
   if (this._locked) {
     this.disable();
+  }
+
+  if (this.isDialog()) {
+    this.$container.addClass('shown');
+    $.log.warn('startInstall');
+    this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
   }
 };
 
