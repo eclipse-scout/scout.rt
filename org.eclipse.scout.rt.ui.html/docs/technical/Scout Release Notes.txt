@@ -363,3 +363,8 @@ As a last step, header(null) or body(null) can be removed, because they have no 
 Find:    MessageBoxes.create(.+)\(\)([^\n]*)?(\.header\(null\)|\.body\(null\))([^\n]*)?.show\(\)
 Replace: MessageBoxes.create\1()\2\4.show()
 
+
+SME 16.06.2015
+org.eclipse.scout.commons.dnd.TransferObject
+removed isText(), isFileList(), isImage(), isLocalObject(): replacement: instanceof check for the appropriate subclasses of TransferObject
+renamed FileListTransferObject to ResourceListTransferObject
