@@ -94,7 +94,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
       rows.push($($newRowSelection[i]).data('row'));
     }
     var r = rows[0];
-    this._field.selectRows(rows);
+    this._field.selectRows(rows, true);
     // scroll selection into view (if not visible)
     this._field.scrollTo(r);
   }
