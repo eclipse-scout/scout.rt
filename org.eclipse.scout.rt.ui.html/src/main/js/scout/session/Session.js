@@ -780,10 +780,17 @@ scout.Session.prototype._renderBusyGlasspane = function() {
       this._busyIndicatorTimeoutId = setTimeout(function() {
         var busyIndicator = new scout.BusyIndicator(this);
         busyIndicator.on('buttonClick', function(event) {
-          // Set "cancelling" state
-          busyIndicator.$label.addClass('cancelled');
-          busyIndicator.$buttons.remove();
-          busyIndicator.$content.addClass('no-buttons');
+          // Set "cancelling" state (after 100ms)
+          busyIndicator.off('buttonClick');
+          setTimeout(function() {
+            if (!busyIndicator.rendered) {
+              // closed in the meantime
+              return;
+            }
+            busyIndicator.$label.addClass('cancelled');
+            busyIndicator.$buttons.remove();
+            busyIndicator.$content.addClass('no-buttons');
+          }.bind(this), 100);
           // Request cancel on server
           var request = {
             uiSessionId: this.uiSessionId,
