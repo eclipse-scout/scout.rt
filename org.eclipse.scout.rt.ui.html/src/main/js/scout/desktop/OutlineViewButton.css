@@ -5,6 +5,7 @@
   cursor: pointer;
   color: @text-color;
   font-size: 16px;
+  .overflow-ellipsis-nowrap;
 
   &:first-child {
     border-top-color: transparent;
@@ -20,9 +21,9 @@
   }
 
   &.selected {
-      border-top: 1px solid @item-selection-border-color;
-      background-color: @item-selection-background-color;
-      border-color: @item-selection-border-color;
+    border-top: 1px solid @item-selection-border-color;
+    background-color: @item-selection-background-color;
+    border-color: @item-selection-border-color;
   }
 
   &.selected + .outline-menu-item {
@@ -36,6 +37,4 @@
   &:last-child {
     border-bottom: 1px solid @border-color;
   }
-
-
 }
