@@ -11,6 +11,16 @@ describe("Device", function() {
     return device;
   }
 
+  describe("scout.device", function() {
+
+    it("is initialized automatically", function() {
+      expect(scout.device).toBeDefined();
+      expect(scout.device.browser).toBeDefined();
+      expect(scout.device.unselectableAttribute).toBeDefined();
+    });
+
+  });
+
   describe("parseUserAgent", function() {
 
     it("recognizes ios devices", function() {

@@ -7,7 +7,7 @@ scout.Device = function(userAgent) {
   this.system;
   this.features = {};
   this.device;
-  this.browser = scout.Device.SupportedBrowsers.UNKNWON;
+  this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
 
   // initialize with empty string so that it can be used without calling initUnselectableAttribute()
   this.unselectableAttribute = '';
