@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,13 +54,13 @@ public abstract class AbstractJsonRequestInterceptor implements IServletRequestI
 
   protected JSONObject createPingResponse() {
     JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "pong", Boolean.TRUE);
+    json.put("pong", Boolean.TRUE);
     return json;
   }
 
   protected JSONObject createSessionTerminatedResponse() {
     JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "sessionTerminated", Boolean.TRUE);
+    json.put("sessionTerminated", Boolean.TRUE);
     return json;
   }
 
@@ -95,7 +96,7 @@ public abstract class AbstractJsonRequestInterceptor implements IServletRequestI
       return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
     }
     catch (ProcessingException | IOException | JSONException e) {
-      throw new JsonException(e.getMessage(), e);
+      throw new UiException(e.getMessage(), e);
     }
   }
 }

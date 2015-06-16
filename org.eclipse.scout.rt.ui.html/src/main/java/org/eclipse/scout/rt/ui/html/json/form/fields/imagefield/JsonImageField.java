@@ -107,7 +107,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     return json;
   }

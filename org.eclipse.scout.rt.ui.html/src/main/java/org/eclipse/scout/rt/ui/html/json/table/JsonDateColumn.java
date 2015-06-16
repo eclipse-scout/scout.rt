@@ -19,9 +19,8 @@ import java.util.Locale;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
@@ -42,10 +41,10 @@ public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
       Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");
       method.setAccessible(true);
       SimpleDateFormat dateFormat = (SimpleDateFormat) method.invoke(getColumn());
-      JsonObjectUtility.putProperty(json, "format", dateFormat.toPattern()); //Don't use toLocalizedPattern, it translates the chars ('d' to 't' for german).
+      json.put("format", dateFormat.toPattern()); //Don't use toLocalizedPattern, it translates the chars ('d' to 't' for german).
     }
     catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new JsonException("", e);
+      throw new UiException("", e);
     }
     finally {
       NlsLocale.set(oldLocale);

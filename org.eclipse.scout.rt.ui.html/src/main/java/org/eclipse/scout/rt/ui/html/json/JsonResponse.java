@@ -95,14 +95,14 @@ public class JsonResponse {
     JSONObject props = event.getData().optJSONObject("properties");
     if (props == null) {
       props = JsonObjectUtility.newOrderedJSONObject();
-      JsonObjectUtility.putProperty(event.getData(), "properties", props);
+      event.getData().put("properties", props);
     }
 
     // If text is null it won't be transferred -> set to empty string
     if (newValue == null) {
       newValue = "";
     }
-    JsonObjectUtility.putProperty(props, propertyName, newValue);
+    props.put(propertyName, newValue);
   }
 
   public void addActionEvent(String eventTarget, String eventType) {
@@ -212,7 +212,7 @@ public class JsonResponse {
         JSONObject adapterJson = entry.getValue().toJson();
         if (adapterJson != null) {
           JsonObjectUtility.filterDefaultValues(adapterJson);
-          JsonObjectUtility.putProperty(adapterData, entry.getKey(), adapterJson);
+          adapterData.put(entry.getKey(), adapterJson);
           if (LOG.isDebugEnabled()) {
             if (adapterIds == null) {
               adapterIds = new LinkedList<String>();
@@ -232,13 +232,13 @@ public class JsonResponse {
         }
       }
 
-      JsonObjectUtility.putProperty(json, PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
-      JsonObjectUtility.putProperty(json, PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
+      json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
+      json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
       if (m_error) {
         JSONObject jsonError = JsonObjectUtility.newOrderedJSONObject();
-        JsonObjectUtility.putProperty(jsonError, PROP_ERROR_CODE, m_errorCode);
-        JsonObjectUtility.putProperty(jsonError, PROP_ERROR_MESSAGE, m_errorMessage);
-        JsonObjectUtility.putProperty(json, PROP_ERROR, jsonError);
+        jsonError.put(PROP_ERROR_CODE, m_errorCode);
+        jsonError.put(PROP_ERROR_MESSAGE, m_errorMessage);
+        json.put(PROP_ERROR, jsonError);
       }
     }
     finally {

@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
@@ -130,7 +129,7 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
   }
 
   protected void handleUiSelected(JsonEvent event) {
-    boolean selected = JsonObjectUtility.getBoolean(event.getData(), IAction.PROP_SELECTED);
+    boolean selected = event.getData().getBoolean(IAction.PROP_SELECTED);
     addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
     getModel().getUIFacade().setSelectedFromUI(selected);
   }

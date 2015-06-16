@@ -27,20 +27,20 @@ public class JsonGridData implements IJsonObject {
       return null;
     }
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "fillHorizontal", m_gridData.fillHorizontal);
-    JsonObjectUtility.putProperty(json, "fillVertical", m_gridData.fillVertical);
-    JsonObjectUtility.putProperty(json, "h", m_gridData.h);
-    JsonObjectUtility.putProperty(json, "heightInPixel", m_gridData.heightInPixel);
-    JsonObjectUtility.putProperty(json, "horizontalAlignment", m_gridData.horizontalAlignment);
-    JsonObjectUtility.putProperty(json, "useUiHeight", m_gridData.useUiHeight);
-    JsonObjectUtility.putProperty(json, "useUiWidth", m_gridData.useUiWidth);
-    JsonObjectUtility.putProperty(json, "verticalAlignment", m_gridData.verticalAlignment);
-    JsonObjectUtility.putProperty(json, "w", m_gridData.w);
-    JsonObjectUtility.putProperty(json, "weightX", m_gridData.weightX);
-    JsonObjectUtility.putProperty(json, "weightY", m_gridData.weightY);
-    JsonObjectUtility.putProperty(json, "widthInPixel", m_gridData.widthInPixel);
-    JsonObjectUtility.putProperty(json, "x", m_gridData.x);
-    JsonObjectUtility.putProperty(json, "y", m_gridData.y);
+    json.put("fillHorizontal", m_gridData.fillHorizontal);
+    json.put("fillVertical", m_gridData.fillVertical);
+    json.put("h", m_gridData.h);
+    json.put("heightInPixel", m_gridData.heightInPixel);
+    json.put("horizontalAlignment", m_gridData.horizontalAlignment);
+    json.put("useUiHeight", m_gridData.useUiHeight);
+    json.put("useUiWidth", m_gridData.useUiWidth);
+    json.put("verticalAlignment", m_gridData.verticalAlignment);
+    json.put("w", m_gridData.w);
+    json.put("weightX", m_gridData.weightX);
+    json.put("weightY", m_gridData.weightY);
+    json.put("widthInPixel", m_gridData.widthInPixel);
+    json.put("x", m_gridData.x);
+    json.put("y", m_gridData.y);
     return json;
   }
 

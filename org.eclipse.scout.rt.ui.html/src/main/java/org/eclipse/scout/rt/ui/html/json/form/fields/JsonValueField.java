@@ -90,8 +90,8 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
-      JsonObjectUtility.putProperty(json, PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
     }
     return json;
   }
@@ -116,7 +116,7 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
   }
 
   protected void handleUiDisplayTextChanged(JsonEvent event) {
-    String displayText = JsonObjectUtility.getString(event.getData(), IValueField.PROP_DISPLAY_TEXT);
+    String displayText = event.getData().getString(IValueField.PROP_DISPLAY_TEXT);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
     boolean whileTyping = event.getData().optBoolean("whileTyping", false);
     if (whileTyping) {

@@ -80,12 +80,12 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
   protected JSONObject wizardStepToJson(IWizardStep<? extends IForm> wizardStep) {
     JSONObject jsonStep = JsonObjectUtility.newOrderedJSONObject();
     // TODO BSH Html??? Visible???
-    JsonObjectUtility.putProperty(jsonStep, "index", getStepIndex(wizardStep));
-    JsonObjectUtility.putProperty(jsonStep, "title", wizardStep.getTitle());
-    JsonObjectUtility.putProperty(jsonStep, "description", wizardStep.getDescriptionHtml());
-    JsonObjectUtility.putProperty(jsonStep, "enabled", wizardStep.isEnabled());
-    JsonObjectUtility.putProperty(jsonStep, "iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
-    JsonObjectUtility.putProperty(jsonStep, "tooltipText", wizardStep.getTooltipText());
+    jsonStep.put("index", getStepIndex(wizardStep));
+    jsonStep.put("title", wizardStep.getTitle());
+    jsonStep.put("description", wizardStep.getDescriptionHtml());
+    jsonStep.put("enabled", wizardStep.isEnabled());
+    jsonStep.put("iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
+    jsonStep.put("tooltipText", wizardStep.getTooltipText());
     return jsonStep;
   }
 

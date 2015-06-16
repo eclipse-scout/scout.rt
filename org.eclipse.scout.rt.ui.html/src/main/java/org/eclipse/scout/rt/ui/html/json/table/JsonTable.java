@@ -37,11 +37,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
@@ -309,7 +309,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(json, PROP_ROWS, jsonRows);
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     putProperty(json, PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
     return json;
@@ -424,7 +424,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         }
       }
       catch (ProcessingException e) {
-        throw new JsonException("", e);
+        throw new UiException("", e);
       }
     }
     finally {
@@ -455,14 +455,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     else {
       boolean multiSort = data.optBoolean("multiSort");
-      boolean sortAscending = JsonObjectUtility.getBoolean(data, "sortAscending");
+      boolean sortAscending = data.getBoolean("sortAscending");
       getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort, sortAscending);
     }
   }
 
   protected void handleUiColumnMoved(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    int viewIndex = JsonObjectUtility.getInt(event.getData(), "index");
+    int viewIndex = event.getData().getInt("index");
 
     // Create column list with expected order
     List<IColumn<?>> columns = getColumnsInViewOrder();
@@ -474,7 +474,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleUiColumnResized(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    int width = JsonObjectUtility.getInt(event.getData(), "width");
+    int width = event.getData().getInt("width");
 
     getModel().getUIFacade().setColumnWidthFromUI(column, width);
   }
@@ -488,7 +488,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleUiAppLinkAction(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    String ref = event.getData().optString("ref");
     if (column != null) {
       getModel().getUIFacade().setContextColumnFromUI(column);
     }
@@ -506,20 +506,20 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IJsonAdapter<?> jsonField = attachAdapter(field);
     LOG.debug("Created new field adapter for cell editing. Adapter: " + jsonField);
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    putProperty(json, "columnId", JsonObjectUtility.getString(event.getData(), PROP_COLUMN_ID));
-    putProperty(json, "rowId", JsonObjectUtility.getString(event.getData(), PROP_ROW_ID));
+    putProperty(json, "columnId", event.getData().getString(PROP_COLUMN_ID));
+    putProperty(json, "rowId", event.getData().getString(PROP_ROW_ID));
     putProperty(json, "fieldId", jsonField.getId());
     addActionEvent(EVENT_START_CELL_EDIT, json);
   }
 
   protected void handleUiCompleteCellEdit(JsonEvent event) {
-    String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
+    String fieldId = event.getData().getString("fieldId");
     getModel().getUIFacade().completeCellEditFromUI();
     endCellEdit(fieldId);
   }
 
   protected void handleUiCancelCellEdit(JsonEvent event) {
-    String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
+    String fieldId = event.getData().getString("fieldId");
     getModel().getUIFacade().cancelCellEditFromUI();
     endCellEdit(fieldId);
   }
@@ -612,21 +612,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected List<ITableRow> extractTableRows(JSONObject json) {
-    return jsonToTableRows(JsonObjectUtility.getJSONArray(json, PROP_ROW_IDS));
+    return jsonToTableRows(json.getJSONArray(PROP_ROW_IDS));
   }
 
   protected ITableRow extractTableRow(JSONObject json) {
-    return getTableRowForRowId(JsonObjectUtility.getString(json, PROP_ROW_ID));
+    return getTableRowForRowId(json.getString(PROP_ROW_ID));
   }
 
   protected IColumn extractColumn(JSONObject json) {
-    String columnId = JsonObjectUtility.optString(json, PROP_COLUMN_ID);
+    String columnId = json.optString(PROP_COLUMN_ID);
     if (columnId == null) {
       return null;
     }
     IColumn column = getModel().getColumnSet().getColumnById(columnId);
     if (column == null) {
-      throw new JsonException("No column found for id " + columnId);
+      throw new UiException("No column found for id " + columnId);
     }
     return column;
   }
@@ -642,7 +642,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
-      rows.add(m_tableRows.get(JsonObjectUtility.get(rowIds, i)));
+      rows.add(m_tableRows.get(rowIds.get(i)));
     }
     return rows;
   }
@@ -650,7 +650,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected ITableRow getTableRowForRowId(String rowId) {
     ITableRow row = m_tableRows.get(rowId);
     if (row == null) {
-      throw new JsonException("No row found for id " + rowId);
+      throw new UiException("No row found for id " + rowId);
     }
     return row;
   }
@@ -805,7 +805,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     for (ITableRow row : modelRows) {
       String rowId = m_tableRowIds.get(row);
-      JsonObjectUtility.append(jsonEvent, PROP_ROW_IDS, rowId);
+      jsonEvent.append(PROP_ROW_IDS, rowId);
       disposeRow(row);
     }
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);

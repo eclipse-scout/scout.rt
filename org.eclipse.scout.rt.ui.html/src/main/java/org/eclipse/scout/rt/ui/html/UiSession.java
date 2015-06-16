@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonLocale;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
@@ -185,7 +184,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     // Resolve texts with the given locale
     JSONObject map = JsonObjectUtility.newOrderedJSONObject();
     for (String textKey : textKeys) {
-      JsonObjectUtility.putProperty(map, textKey, TEXTS.get(locale, textKey));
+      map.put(textKey, TEXTS.get(locale, textKey));
     }
     return map;
   }
@@ -264,7 +263,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       clientSession = createAndStartClientSession(request.getLocale(), createUserAgent(jsonStartupRequest), extractSessionInitParams(jsonStartupRequest.getCustomParams()));
       // Ensure session is active
       if (!clientSession.isActive()) {
-        throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + m_clientSessionId + "]");
+        throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + m_clientSessionId + "]");
       }
     }
     return clientSession;
@@ -308,7 +307,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       return BEANS.get(ClientSessionProvider.class).provide(ctx);
     }
     catch (ProcessingException e) {
-      throw new JsonException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
+      throw new UiException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
     }
   }
 
@@ -366,7 +365,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected void sendInitializationEvent() {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
+    jsonEvent.put("clientSession", m_jsonClientSession.getId());
     Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_jsonClientSession.getModel(), false, new Callable<Locale>() {
       @Override
       public Locale call() throws Exception {
@@ -718,8 +717,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * given <code>jsonEvent</code>.
    */
   protected void putLocaleData(JSONObject jsonEvent, Locale locale) {
-    JsonObjectUtility.putProperty(jsonEvent, "locale", JsonLocale.toJson(locale));
-    JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap(locale));
+    jsonEvent.put("locale", JsonLocale.toJson(locale));
+    jsonEvent.put("textMap", getTextMap(locale));
   }
 
   @Override

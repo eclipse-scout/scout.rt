@@ -28,8 +28,8 @@ public class JsonStatus implements IJsonObject {
   @Override
   public JSONObject toJson() {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "message", m_status.getMessage());
-    JsonObjectUtility.putProperty(json, "severity", m_status.getSeverity());
+    json.put("message", m_status.getMessage());
+    json.put("severity", m_status.getSeverity());
     return json;
   }
 

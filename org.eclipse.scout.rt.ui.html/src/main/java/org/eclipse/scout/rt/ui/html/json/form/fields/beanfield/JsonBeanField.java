@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
@@ -59,7 +58,7 @@ public class JsonBeanField<T extends IBeanField<?>> extends JsonValueField<T> {
   }
 
   protected void handleUiAppLinkAction(JsonEvent event) {
-    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    String ref = event.getData().optString("ref");
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

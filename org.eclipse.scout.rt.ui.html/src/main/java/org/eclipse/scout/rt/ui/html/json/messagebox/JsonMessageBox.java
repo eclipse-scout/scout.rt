@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
@@ -142,7 +141,7 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
   }
 
   private void handleUiAction(JsonEvent event) {
-    String option = JsonObjectUtility.getString(event.getData(), "option");
+    String option = event.getData().getString("option");
     int resultOption = -1;
     if ("yes".equals(option)) {
       resultOption = IMessageBox.YES_OPTION;

@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBoxUIFacade;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -67,7 +66,7 @@ public class JsonTabBoxTest {
 
   private void handleUiTabSelected(int tabIndex) {
     JSONObject data = new JSONObject();
-    JsonObjectUtility.putProperty(data, "tabIndex", tabIndex);
+    data.put("tabIndex", tabIndex);
     m_tabBox.handleUiTabSelected(new JsonEvent("?", "?", data));
   }
 

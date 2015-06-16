@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,7 +37,7 @@ public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> 
   public JSONObject toJson() {
     URL url = ResourceBase.class.getResource("dummy_datamodel.json");
     if (url == null) {
-      throw new JsonException("Failed to load dummy_datamodel.json");
+      throw new UiException("Failed to load dummy_datamodel.json");
     }
     try {
       // FIXME read from model
@@ -48,7 +49,7 @@ public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> 
       return json;
     }
     catch (JSONException | ProcessingException | IOException e) {
-      throw new JsonException(e);
+      throw new UiException(e);
     }
   }
 

@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiException;
 
 /**
  * Processes JSON events from the UI in a Scout model job and waits for all model jobs of that session to complete.
@@ -53,7 +54,7 @@ public class JsonEventProcessor {
     }
     catch (Exception e) {
       LOG.error("Error while handling event '" + event.getType() + "' for adapter with ID " + event.getTarget(), e);
-      throw new JsonException(e);
+      throw new UiException(e);
     }
   }
 }

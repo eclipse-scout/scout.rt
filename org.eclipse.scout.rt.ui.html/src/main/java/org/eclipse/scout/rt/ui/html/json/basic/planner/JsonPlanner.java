@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -416,7 +415,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   }
 
   protected List<Resource<?>> extractResources(JSONObject json) {
-    return jsonToResources(JsonObjectUtility.getJSONArray(json, "resourceIds"));
+    return jsonToResources(json.getJSONArray("resourceIds"));
   }
 
   protected List<Resource<?>> jsonToResources(JSONArray resourceIds) {

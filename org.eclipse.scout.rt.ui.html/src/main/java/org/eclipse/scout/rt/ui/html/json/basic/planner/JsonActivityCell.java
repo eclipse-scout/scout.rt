@@ -28,17 +28,17 @@ public class JsonActivityCell implements IJsonObject {
       return null;
     }
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "id", m_idProvider.getId(m_activityCell));
-    JsonObjectUtility.putProperty(json, "beginTime", new JsonDate(m_activityCell.getBeginTime()).asJsonString());
-    JsonObjectUtility.putProperty(json, "endTime", new JsonDate(m_activityCell.getEndTime()).asJsonString());
-    JsonObjectUtility.putProperty(json, "text", m_activityCell.getText());
-    JsonObjectUtility.putProperty(json, "backgroundColor", m_activityCell.getBackgroundColor());
-    JsonObjectUtility.putProperty(json, "foregroundColor", m_activityCell.getForegroundColor());
-    JsonObjectUtility.putProperty(json, "level", m_activityCell.getLevel());
-    JsonObjectUtility.putProperty(json, "levelColor", m_activityCell.getLevelColor());
-    JsonObjectUtility.putProperty(json, "durationMinutes", m_activityCell.getDurationMinutes());
-    JsonObjectUtility.putProperty(json, "tooltipText", m_activityCell.getTooltipText());
-    JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_activityCell.getIconId()));
+    json.put("id", m_idProvider.getId(m_activityCell));
+    json.put("beginTime", new JsonDate(m_activityCell.getBeginTime()).asJsonString());
+    json.put("endTime", new JsonDate(m_activityCell.getEndTime()).asJsonString());
+    json.put("text", m_activityCell.getText());
+    json.put("backgroundColor", m_activityCell.getBackgroundColor());
+    json.put("foregroundColor", m_activityCell.getForegroundColor());
+    json.put("level", m_activityCell.getLevel());
+    json.put("levelColor", m_activityCell.getLevelColor());
+    json.put("durationMinutes", m_activityCell.getDurationMinutes());
+    json.put("tooltipText", m_activityCell.getTooltipText());
+    json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_activityCell.getIconId()));
     JsonObjectUtility.filterDefaultValues(json, "Activity");
     return json;
   }

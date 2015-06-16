@@ -7,10 +7,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.svg.client.SVGUtility;
 import org.eclipse.scout.rt.svg.client.svgfield.ISvgField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.w3c.dom.svg.SVGDocument;
@@ -53,7 +53,7 @@ public class JsonSvgField extends JsonFormField<ISvgField> {
       return new String(out.toByteArray(), SVG_ENCODING);
     }
     catch (UnsupportedEncodingException | ProcessingException e) {
-      throw new JsonException("Failed to write SVG document", e);
+      throw new UiException("Failed to write SVG document", e);
     }
   }
 

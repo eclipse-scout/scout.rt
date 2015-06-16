@@ -8,29 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json;
+package org.eclipse.scout.rt.ui.html;
 
 /**
- * Runtime exception used to handle JSON errors. Typically this exception is thrown by code that must try/catch the
- * checked <code>org.json.JSONException</code>.
+ * A runtime exception used by the Html UI.
  */
-public class JsonException extends RuntimeException {
-
+public class UiException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
-  public JsonException(String message) {
+  public UiException(String message) {
     super(message);
   }
 
-  public JsonException(Throwable cause) {
+  public UiException(Throwable cause) {
     super(cause);
   }
 
-  public JsonException(String message, Throwable cause) {
+  public UiException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public JsonException(String message, Throwable cause, Object... messageArguments) {
+  public UiException(String message, Throwable cause, Object... messageArguments) {
     super(String.format(message, messageArguments), cause);
   }
 }

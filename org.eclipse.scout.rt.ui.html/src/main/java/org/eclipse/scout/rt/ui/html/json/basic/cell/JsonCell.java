@@ -53,22 +53,22 @@ public class JsonCell implements IJsonObject {
       return null;
     }
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "value", m_cellValue);
-    JsonObjectUtility.putProperty(json, "text", m_cellText);
-    JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
-    JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
+    json.put("value", m_cellValue);
+    json.put("text", m_cellText);
+    json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
+    json.put("tooltipText", m_cell.getTooltipText());
     if (m_cell.getErrorStatus() != null && m_cell.getErrorStatus().getSeverity() == IStatus.ERROR) {
       //FIXME CGU ask JGU why is errorStatus set with severity = OK if there is no error?
-      JsonObjectUtility.putProperty(json, "errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
+      json.put("errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
     }
-    JsonObjectUtility.putProperty(json, "cssClass", m_cell.getCssClass());
-    JsonObjectUtility.putProperty(json, "horizontalAlignment", m_cell.getHorizontalAlignment());
-    JsonObjectUtility.putProperty(json, "foregroundColor", m_cell.getForegroundColor());
-    JsonObjectUtility.putProperty(json, "backgroundColor", m_cell.getBackgroundColor());
-    JsonObjectUtility.putProperty(json, "font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
+    json.put("cssClass", m_cell.getCssClass());
+    json.put("horizontalAlignment", m_cell.getHorizontalAlignment());
+    json.put("foregroundColor", m_cell.getForegroundColor());
+    json.put("backgroundColor", m_cell.getBackgroundColor());
+    json.put("font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
     //TODO CGU maybe only send if it differs from column, same for horizontal alignment. Could be difficult, depends on event order (update before column_structure_changed is bad. maybe solve in model?
-    JsonObjectUtility.putProperty(json, "editable", m_cell.isEditable());
-    JsonObjectUtility.putProperty(json, "htmlEnabled", m_cell.isHtmlEnabled());
+    json.put("editable", m_cell.isEditable());
+    json.put("htmlEnabled", m_cell.isHtmlEnabled());
     // TODO BSH Table | Add property "errorStatus"
     // TODO BSH Table | Add generic "cssStyle" property
     return json;

@@ -65,10 +65,10 @@ public class JsonEvent implements IJsonObject {
     if (json == null) {
       throw new IllegalArgumentException("Argument 'json' must not be null");
     }
-    String target = JsonObjectUtility.getString(json, TARGET);
-    String type = JsonObjectUtility.getString(json, TYPE);
+    String target = json.getString(TARGET);
+    String type = json.getString(TYPE);
     // data is a copy of the JSON object but without target and type properties
-    JSONObject data = JsonObjectUtility.newJSONObject(json.toString());
+    JSONObject data = new JSONObject(json.toString());
     data.remove(TARGET);
     data.remove(TYPE);
     return new JsonEvent(target, type, data);
@@ -77,8 +77,8 @@ public class JsonEvent implements IJsonObject {
   @Override
   public JSONObject toJson() {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, TARGET, m_target);
-    JsonObjectUtility.putProperty(json, TYPE, m_type);
+    json.put(TARGET, m_target);
+    json.put(TYPE, m_type);
     JsonObjectUtility.putProperties(json, m_data);
     return json;
   }

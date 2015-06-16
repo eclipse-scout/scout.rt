@@ -44,7 +44,7 @@ public class JsonStartupRequest extends JsonRequest {
 
   public String getClientSessionId() {
     //required
-    return JsonObjectUtility.getString(getRequestObject(), PROP_CLIENT_SESSION_ID);
+    return getRequestObject().getString(PROP_CLIENT_SESSION_ID);
   }
 
   public String getParentUiSessionId() {

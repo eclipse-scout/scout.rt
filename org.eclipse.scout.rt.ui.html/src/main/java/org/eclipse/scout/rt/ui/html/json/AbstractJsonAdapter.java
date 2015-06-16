@@ -249,7 +249,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdForModel(getUiSession(), model, this));
+    return json.put(key, JsonAdapterUtility.getAdapterIdForModel(getUiSession(), model, this));
   }
 
   protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models) {
@@ -257,11 +257,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models, IFilter<M> filter) {
-    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), models, this, filter));
+    return json.put(key, JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), models, this, filter));
   }
 
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
-    return JsonObjectUtility.putProperty(json, key, value);
+    return json.put(key, value);
   }
 
   protected final void addActionEvent(String eventName) {

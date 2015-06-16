@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonLocale implements IJsonObject {
@@ -44,20 +45,20 @@ public class JsonLocale implements IJsonObject {
 
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
-    JsonObjectUtility.putProperty(json, "groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
-    JsonObjectUtility.putProperty(json, "minusSign", String.valueOf(symbols.getMinusSign()));
+    json.put("decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
+    json.put("groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
+    json.put("minusSign", String.valueOf(symbols.getMinusSign()));
     return json;
   }
 
   protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "months", JsonObjectUtility.newJSONArray(symbols.getMonths()));
-    JsonObjectUtility.putProperty(json, "monthsShort", JsonObjectUtility.newJSONArray(symbols.getShortMonths()));
-    JsonObjectUtility.putProperty(json, "weekdays", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
-    JsonObjectUtility.putProperty(json, "weekdaysShort", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
-    JsonObjectUtility.putProperty(json, "am", symbols.getAmPmStrings()[Calendar.AM]);
-    JsonObjectUtility.putProperty(json, "pm", symbols.getAmPmStrings()[Calendar.PM]);
+    json.put("months", new JSONArray(symbols.getMonths()));
+    json.put("monthsShort", new JSONArray(symbols.getShortMonths()));
+    json.put("weekdays", new JSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
+    json.put("weekdaysShort", new JSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
+    json.put("am", symbols.getAmPmStrings()[Calendar.AM]);
+    json.put("pm", symbols.getAmPmStrings()[Calendar.PM]);
     return json;
   }
 
@@ -65,11 +66,11 @@ public class JsonLocale implements IJsonObject {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
     SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
-    JsonObjectUtility.putProperty(json, "languageTag", locale.toLanguageTag());
-    JsonObjectUtility.putProperty(json, "decimalFormatPatternDefault", defaultDecimalFormat.toPattern());
-    JsonObjectUtility.putProperty(json, "dateFormatPatternDefault", defaultDateFormat.toPattern());
-    JsonObjectUtility.putProperty(json, "decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
-    JsonObjectUtility.putProperty(json, "dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
+    json.put("languageTag", locale.toLanguageTag());
+    json.put("decimalFormatPatternDefault", defaultDecimalFormat.toPattern());
+    json.put("dateFormatPatternDefault", defaultDateFormat.toPattern());
+    json.put("decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
+    json.put("dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
     return json;
   }
 

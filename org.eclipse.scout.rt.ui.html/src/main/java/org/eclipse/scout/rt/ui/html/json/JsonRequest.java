@@ -49,7 +49,7 @@ public class JsonRequest {
   }
 
   public String getUiSessionId() {
-    return JsonObjectUtility.getString(m_request, PROP_UI_SESSION_ID);
+    return m_request.getString(PROP_UI_SESSION_ID);
   }
 
   public List<JsonEvent> getEvents() {
@@ -59,7 +59,7 @@ public class JsonRequest {
     }
     List<JsonEvent> actionList = new ArrayList<>(events.length());
     for (int i = 0; i < events.length(); i++) {
-      JSONObject json = JsonObjectUtility.getJSONObject(events, i);
+      JSONObject json = events.getJSONObject(i);
       actionList.add(JsonEvent.fromJson(json));
     }
     return actionList;

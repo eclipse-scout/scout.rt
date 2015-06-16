@@ -37,8 +37,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -528,7 +528,7 @@ public class JsonTableTest {
       jsonTable.getTableRowForRowId(row0Id); // throws exception
       fail("Expected an exception, but no exception was thrown");
     }
-    catch (JsonException e) {
+    catch (UiException e) {
       // ok
     }
   }

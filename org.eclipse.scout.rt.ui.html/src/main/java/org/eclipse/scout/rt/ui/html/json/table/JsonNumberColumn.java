@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> {
@@ -23,7 +22,7 @@ public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JsonObjectUtility.putProperty(json, "format", ((INumberColumn) getColumn()).getFormat().toPattern());
+    json.put("format", ((INumberColumn) getColumn()).getFormat().toPattern());
     return json;
   }
 

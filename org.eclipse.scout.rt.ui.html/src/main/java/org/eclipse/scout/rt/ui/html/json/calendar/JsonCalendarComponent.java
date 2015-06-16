@@ -7,7 +7,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonCalendarComponent<T extends CalendarComponent> extends AbstractJsonAdapter<T> {
@@ -24,19 +23,19 @@ public class JsonCalendarComponent<T extends CalendarComponent> extends Abstract
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JsonObjectUtility.putProperty(json, "item", new JsonCalendarItem(getModel().getItem()).toJson());
+    json.put("item", new JsonCalendarItem(getModel().getItem()).toJson());
     // FIXME AWE: (calendar) check if we can really remove the cell property. When we don't need it here
     // we should clean-up the Scout model and remove the cell from the model completely.
-    // JsonObjectUtility.putProperty(json, "cell", new JsonCell(getModel().getCell()).toJson());
-    JsonObjectUtility.putProperty(json, "fromDate", new JsonDate(getModel().getFromDate()).asJsonString());
-    JsonObjectUtility.putProperty(json, "toDate", new JsonDate(getModel().getToDate()).asJsonString());
+    // json.put("cell", new JsonCell(getModel().getCell()).toJson());
+    json.put("fromDate", new JsonDate(getModel().getFromDate()).asJsonString());
+    json.put("toDate", new JsonDate(getModel().getToDate()).asJsonString());
     if (getModel().getCoveredDays() != null) {
       for (Date coveredDay : getModel().getCoveredDays()) {
-        JsonObjectUtility.append(json, "coveredDays", new JsonDate(coveredDay).asJsonString());
+        json.append("coveredDays", new JsonDate(coveredDay).asJsonString());
       }
     }
-    JsonObjectUtility.putProperty(json, "fullDay", getModel().isFullDay());
-    JsonObjectUtility.putProperty(json, "draggable", getModel().getProvider().isMoveItemEnabled());
+    json.put("fullDay", getModel().isFullDay());
+    json.put("draggable", getModel().getProvider().isMoveItemEnabled());
     return json;
   }
 

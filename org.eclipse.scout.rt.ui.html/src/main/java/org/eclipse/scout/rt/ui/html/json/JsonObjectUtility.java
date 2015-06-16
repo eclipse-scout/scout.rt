@@ -24,182 +24,32 @@ import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * This class catches the checked {@link JSONException} used on classes of org.json.* and converts them into
- * our {@link JsonException} runtime exception.
- */
 public final class JsonObjectUtility {
 
   private JsonObjectUtility() {
     // static access only
   }
 
-  private static JsonException toRuntimeException(JSONException e) {
-    return new JsonException(e.getMessage(), e);
-  }
-
-  /**
-   * Adds a property to the given JSON object and deals with exceptions.
-   */
-  public static JSONObject putProperty(JSONObject json, String key, Object value) {
-    try {
-      json.put(key, value);
-      return json;
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
   /**
    * Puts every property from source to json.
+   *
+   * @param json
+   *          target object
+   * @param source
+   *          source object
    */
   public static void putProperties(JSONObject json, JSONObject source) {
+    if (json == null || source == null) {
+      return;
+    }
     String[] names = JSONObject.getNames(source);
     if (names == null) {
       return;
     }
-
-    try {
-      for (String name : names) {
-        json.putOnce(name, source.opt(name));
-      }
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static String getString(JSONObject json, String key) {
-    try {
-      return json.getString(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static String optString(JSONObject json, String key) {
-    return json.optString(key, null);
-  }
-
-  public static String getString(JSONArray json, int index) {
-    try {
-      return json.getString(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static int getInt(JSONObject json, String key) {
-    try {
-      return json.getInt(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static int getInt(JSONArray json, int index) {
-    try {
-      return json.getInt(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static long getLong(JSONObject json, String key) {
-    try {
-      return json.getLong(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static long getLong(JSONArray json, int index) {
-    try {
-      return json.getLong(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static boolean getBoolean(JSONObject json, String key) {
-    try {
-      return json.getBoolean(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static boolean getBoolean(JSONArray json, int index) {
-    try {
-      return json.getBoolean(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONObject getJSONObject(JSONObject json, String key) {
-    try {
-      return json.getJSONObject(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONObject getJSONObject(JSONArray json, int index) {
-    try {
-      return json.getJSONObject(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONArray getJSONArray(JSONObject json, String key) {
-    try {
-      return json.getJSONArray(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONArray getJSONArray(JSONArray json, int index) {
-    try {
-      return json.getJSONArray(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static Object get(JSONObject json, String key) {
-    try {
-      return json.get(key);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static Object get(JSONArray json, int index) {
-    try {
-      return json.get(index);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
+    for (String name : names) {
+      json.put(name, source.opt(name));
     }
   }
 
@@ -218,52 +68,10 @@ public final class JsonObjectUtility {
     return o;
   }
 
-  public static JSONObject newJSONObject(String source) {
-    try {
-      return new JSONObject(source);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONArray newJSONArray(String source) {
-    try {
-      return new JSONArray(source);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static Object newJSONArray(String[] array) {
-    try {
-      return new JSONArray(array);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONArray newJSONArray(Object array) {
-    try {
-      return new JSONArray(array);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
-  public static JSONObject append(JSONObject json, String key, Object value) {
-    try {
-      return json.append(key, value);
-    }
-    catch (JSONException e) {
-      throw toRuntimeException(e);
-    }
-  }
-
   public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
+    if (adapters == null) {
+      return null;
+    }
     JSONArray array = new JSONArray();
     for (IJsonAdapter<?> adapter : adapters) {
       array.put(adapter.getId());
@@ -412,29 +220,29 @@ public final class JsonObjectUtility {
     }
     //blob
     if (type == byte[].class) {
-      return Base64Utility.decode(getString(getJSONObject(jsonObject, propertyName), "b64"));
+      return Base64Utility.decode(jsonObject.getJSONObject(propertyName).getString("b64"));
     }
     //array
     if (jval instanceof JSONArray) {
       return (JSONArray) jval;
     }
     if (type == String.class) {
-      return getString(jsonObject, propertyName);
+      return jsonObject.getString(propertyName);
     }
     if (type == int.class || type == Integer.class) {
-      return getInt(jsonObject, propertyName);
+      return jsonObject.getInt(propertyName);
     }
     if (type == long.class || type == Long.class) {
-      return getLong(jsonObject, propertyName);
+      return jsonObject.getLong(propertyName);
     }
     if (type == boolean.class || type == Boolean.class) {
-      return getBoolean(jsonObject, propertyName);
+      return jsonObject.getBoolean(propertyName);
     }
     //bean
     if (type.getName().startsWith("java.")) {
       throw new IllegalArgumentException("Cannot convert " + type + " from json to java object");
     }
-    return getJSONObject(jsonObject, propertyName);
+    return jsonObject.getJSONObject(propertyName);
   }
 
   /**
@@ -449,29 +257,29 @@ public final class JsonObjectUtility {
     }
     //blob
     if (type == byte[].class) {
-      return Base64Utility.decode(getString(getJSONObject(jsonArray, index), "b64"));
+      return Base64Utility.decode(jsonArray.getJSONObject(index).getString("b64"));
     }
     //array
     if (jval instanceof JSONArray) {
       return (JSONArray) jval;
     }
     if (type == String.class) {
-      return getString(jsonArray, index);
+      return jsonArray.getString(index);
     }
     if (type == int.class || type == Integer.class) {
-      return getInt(jsonArray, index);
+      return jsonArray.getInt(index);
     }
     if (type == long.class || type == Long.class) {
-      return getLong(jsonArray, index);
+      return jsonArray.getLong(index);
     }
     if (type == boolean.class || type == Boolean.class) {
-      return getBoolean(jsonArray, index);
+      return jsonArray.getBoolean(index);
     }
     //bean
     if (type.getName().startsWith("java.")) {
       throw new IllegalArgumentException("Cannot convert " + type + " from json to java object");
     }
-    return getJSONObject(jsonArray, index);
+    return jsonArray.getJSONObject(index);
   }
 
   public static void filterDefaultValues(JSONObject json) {

@@ -46,7 +46,7 @@ public class JsonEventTest {
 
   @Test
   public void testToJson() throws Exception {
-    JSONObject data = JsonObjectUtility.putProperty(new JSONObject(), "myProp", "myValue");
+    JSONObject data = new JSONObject().put("myProp", "myValue");
     JsonEvent event = new JsonEvent("foo", "bar", data);
     JSONObject json = event.toJson();
     assertEquals("foo", json.optString("target"));
@@ -57,9 +57,9 @@ public class JsonEventTest {
   @Test
   public void testFromJson() throws Exception {
     JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "target", "foo");
-    JsonObjectUtility.putProperty(json, "type", "bar");
-    JsonObjectUtility.putProperty(json, "myProp", "myValue");
+    json.put("target", "foo");
+    json.put("type", "bar");
+    json.put("myProp", "myValue");
     JsonEvent event = JsonEvent.fromJson(json);
     assertEquals("foo", event.getTarget());
     assertEquals("bar", event.getType());

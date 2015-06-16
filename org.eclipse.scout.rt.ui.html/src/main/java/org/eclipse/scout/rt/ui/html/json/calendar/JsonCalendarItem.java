@@ -23,14 +23,14 @@ public class JsonCalendarItem implements IJsonObject {
       return null;
     }
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "exists", m_item.exists());
-    JsonObjectUtility.putProperty(json, "lastModified", m_item.getLastModified());
-    JsonObjectUtility.putProperty(json, "itemId", m_item.getItemId());
-    JsonObjectUtility.putProperty(json, "owner", m_item.getOwner());
-    JsonObjectUtility.putProperty(json, "subject", m_item.getSubject());
-    JsonObjectUtility.putProperty(json, "body", m_item.getBody());
-    JsonObjectUtility.putProperty(json, "cssClass", m_item.getCssClass());
-    JsonObjectUtility.putProperty(json, "recurrencePattern", new JsonRecurrencePattern(m_item.getRecurrencePattern()).toJson());
+    json.put("exists", m_item.exists());
+    json.put("lastModified", m_item.getLastModified());
+    json.put("itemId", m_item.getItemId());
+    json.put("owner", m_item.getOwner());
+    json.put("subject", m_item.getSubject());
+    json.put("body", m_item.getBody());
+    json.put("cssClass", m_item.getCssClass());
+    json.put("recurrencePattern", new JsonRecurrencePattern(m_item.getRecurrencePattern()).toJson());
     return json;
   }
 }

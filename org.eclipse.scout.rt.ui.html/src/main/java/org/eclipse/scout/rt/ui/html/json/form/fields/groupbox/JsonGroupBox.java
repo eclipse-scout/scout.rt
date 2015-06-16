@@ -100,7 +100,7 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     return json;
   }

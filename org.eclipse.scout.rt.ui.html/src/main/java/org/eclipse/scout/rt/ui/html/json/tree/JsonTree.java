@@ -18,10 +18,10 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
@@ -198,7 +198,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void putContextMenu(JSONObject json) {
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
   }
 
@@ -452,7 +452,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelChildNodeOrderChanged(TreeEvent event) {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(jsonEvent, "parentNodeId", getNodeId(event.getCommonParentNode()));
+    jsonEvent.put("parentNodeId", getNodeId(event.getCommonParentNode()));
     boolean hasNodeIds = false;
     for (ITreeNode childNode : event.getChildNodes()) {
       if (childNode.isStatusDeleted() || !childNode.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
@@ -462,7 +462,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       if (childNodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
         continue;
       }
-      JsonObjectUtility.append(jsonEvent, "childNodeIds", childNodeId);
+      jsonEvent.append("childNodeIds", childNodeId);
       hasNodeIds = true;
     }
     if (hasNodeIds) {
@@ -558,13 +558,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void putCellProperties(JSONObject json, ICell cell) {
     // We deliberately don't use JsonCell here, because most properties are not supported in a tree anyway
-    JsonObjectUtility.putProperty(json, "text", cell.getText());
-    JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(cell.getIconId()));
-    JsonObjectUtility.putProperty(json, "cssClass", (cell.getCssClass()));
-    JsonObjectUtility.putProperty(json, "tooltipText", cell.getTooltipText());
-    JsonObjectUtility.putProperty(json, "foregroundColor", cell.getForegroundColor());
-    JsonObjectUtility.putProperty(json, "backgroundColor", cell.getBackgroundColor());
-    JsonObjectUtility.putProperty(json, "font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
+    json.put("text", cell.getText());
+    json.put("iconId", BinaryResourceUrlUtility.createIconUrl(cell.getIconId()));
+    json.put("cssClass", (cell.getCssClass()));
+    json.put("tooltipText", cell.getTooltipText());
+    json.put("foregroundColor", cell.getForegroundColor());
+    json.put("backgroundColor", cell.getBackgroundColor());
+    json.put("font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
   }
 
   protected JSONObject treeNodeToJson(ITreeNode node) {
@@ -589,19 +589,19 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public ITreeNode getTreeNodeForNodeId(String nodeId) {
     ITreeNode node = m_treeNodes.get(nodeId);
     if (node == null) {
-      throw new JsonException("No node found for id " + nodeId);
+      throw new UiException("No node found for id " + nodeId);
     }
     return node;
   }
 
   public List<ITreeNode> extractTreeNodes(JSONObject json) {
-    return jsonToTreeNodes(JsonObjectUtility.getJSONArray(json, PROP_NODE_IDS));
+    return jsonToTreeNodes(json.getJSONArray(PROP_NODE_IDS));
   }
 
   public List<ITreeNode> jsonToTreeNodes(JSONArray nodeIds) {
     List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
     for (int i = 0; i < nodeIds.length(); i++) {
-      ITreeNode node = getNode(JsonObjectUtility.getString(nodeIds, i));
+      ITreeNode node = getNode(nodeIds.getString(i));
       if (node != null) {
         nodes.add(node);
       }
@@ -643,12 +643,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleUiNodeClicked(JsonEvent event) {
-    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
+    final ITreeNode node = getTreeNodeForNodeId(event.getData().getString(PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node, MouseButton.Left);
   }
 
   protected void handleUiNodeAction(JsonEvent event) {
-    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
+    final ITreeNode node = getTreeNodeForNodeId(event.getData().getString(PROP_NODE_ID));
     getModel().getUIFacade().fireNodeActionFromUI(node);
   }
 
@@ -659,8 +659,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleUiNodeExpanded(JsonEvent event) {
-    ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
-    boolean expanded = JsonObjectUtility.getBoolean(event.getData(), PROP_EXPANDED);
+    ITreeNode node = getTreeNodeForNodeId(event.getData().getString(PROP_NODE_ID));
+    boolean expanded = event.getData().getBoolean(PROP_EXPANDED);
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);

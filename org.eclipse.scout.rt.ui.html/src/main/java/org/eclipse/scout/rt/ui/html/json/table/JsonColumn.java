@@ -45,32 +45,32 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   @Override
   public JSONObject toJson() {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "id", getColumn().getColumnId());
-    JsonObjectUtility.putProperty(json, "objectType", getObjectTypeVariant());
-    JsonObjectUtility.putProperty(json, "index", getColumn().getColumnIndex() - m_indexOffset);
-    JsonObjectUtility.putProperty(json, "text", getColumn().getHeaderCell().getText());
-    JsonObjectUtility.putProperty(json, "type", computeColumnType(getColumn()));
-    JsonObjectUtility.putProperty(json, IColumn.PROP_WIDTH, getColumn().getWidth());
+    json.put("id", getColumn().getColumnId());
+    json.put("objectType", getObjectTypeVariant());
+    json.put("index", getColumn().getColumnIndex() - m_indexOffset);
+    json.put("text", getColumn().getHeaderCell().getText());
+    json.put("type", computeColumnType(getColumn()));
+    json.put(IColumn.PROP_WIDTH, getColumn().getWidth());
     if (getColumn().getInitialWidth() != getColumn().getWidth()) {
-      JsonObjectUtility.putProperty(json, "initialWidth", getColumn().getInitialWidth());
+      json.put("initialWidth", getColumn().getInitialWidth());
     }
-    JsonObjectUtility.putProperty(json, "summary", getColumn().isSummary());
-    JsonObjectUtility.putProperty(json, IColumn.PROP_HORIZONTAL_ALIGNMENT, getColumn().getHorizontalAlignment());
+    json.put("summary", getColumn().isSummary());
+    json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, getColumn().getHorizontalAlignment());
     if (getColumn().isSortActive() && getColumn().isSortExplicit()) {
-      JsonObjectUtility.putProperty(json, "sortActive", true);
-      JsonObjectUtility.putProperty(json, "sortAscending", getColumn().isSortAscending());
-      JsonObjectUtility.putProperty(json, "sortIndex", getColumn().getSortIndex());
+      json.put("sortActive", true);
+      json.put("sortAscending", getColumn().isSortAscending());
+      json.put("sortIndex", getColumn().getSortIndex());
     }
     if (getColumn() instanceof ICustomColumn) {
-      JsonObjectUtility.putProperty(json, "custom", true);
+      json.put("custom", true);
     }
     //TODO CGU remove this properties, they get sent by cell, or change behaviour in model, see also todo in Column.js
-    JsonObjectUtility.putProperty(json, IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
-    JsonObjectUtility.putProperty(json, IColumn.PROP_EDITABLE, getColumn().isEditable());
-    JsonObjectUtility.putProperty(json, "mandatory", getColumn().isMandatory());
-    JsonObjectUtility.putProperty(json, IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
-    JsonObjectUtility.putProperty(json, IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
-    JsonObjectUtility.putProperty(json, "headerCssClass", getColumn().getHeaderCell().getCssClass());
+    json.put(IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
+    json.put(IColumn.PROP_EDITABLE, getColumn().isEditable());
+    json.put("mandatory", getColumn().isMandatory());
+    json.put(IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
+    json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
+    json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
     return json;
   }
 

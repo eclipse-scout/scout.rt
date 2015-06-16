@@ -95,7 +95,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> implements I
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     return json;
   }

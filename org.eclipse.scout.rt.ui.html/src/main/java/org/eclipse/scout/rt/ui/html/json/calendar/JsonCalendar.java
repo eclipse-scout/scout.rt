@@ -240,7 +240,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 //   FIXME BSH Check if we need event filter here, as in the following example
 //   FIXME AWE: (calendar) check how the selected property is used in swing UI, decide if we can remove the property/event
 //    protected void handleUiSelectionChanged(JsonEvent event) {
-//      boolean selected = JsonObjectUtility.getBoolean(event.getData(), IAction.PROP_SELECTED);
+//      boolean selected = event.getData().getBoolean(IAction.PROP_SELECTED);
 //      addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
 //      getModel().getUIFacade().setSelectedFromUI(selected);
 //    }
@@ -335,7 +335,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     return json;
   }
@@ -354,7 +354,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         jsonArray.put(new JsonCalendarEvent(JsonCalendar.this, event).toJson());
       }
       JSONObject json = new JSONObject();
-      JsonObjectUtility.putProperty(json, "batch", jsonArray); // FIXME BSH: Calendar | Check if this works
+      json.put("batch", jsonArray); // FIXME BSH: Calendar | Check if this works
       addActionEvent(EVENT_CALENDAR_CHANGED_BATCH, json);
     }
   }

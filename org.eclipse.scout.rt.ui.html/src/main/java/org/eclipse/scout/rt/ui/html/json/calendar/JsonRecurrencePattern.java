@@ -24,21 +24,21 @@ public class JsonRecurrencePattern implements IJsonObject {
       return null;
     }
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JsonObjectUtility.putProperty(json, "lastModified", m_recurrencePattern.getLastModified());
-    JsonObjectUtility.putProperty(json, "regenerate", m_recurrencePattern.isRegenerate());
-    JsonObjectUtility.putProperty(json, "startTimeMinutes", m_recurrencePattern.getStartTimeMinutes());
-    JsonObjectUtility.putProperty(json, "endTimeMinutes", m_recurrencePattern.getEndTimeMinutes());
-    JsonObjectUtility.putProperty(json, "durationMinutes", m_recurrencePattern.getDurationMinutes());
-    JsonObjectUtility.putProperty(json, "firstDate", new JsonDate(m_recurrencePattern.getFirstDate()).asJsonString());
-    JsonObjectUtility.putProperty(json, "lastDate", new JsonDate(m_recurrencePattern.getLastDate()).asJsonString());
-    JsonObjectUtility.putProperty(json, "occurrences", m_recurrencePattern.getOccurrences());
-    JsonObjectUtility.putProperty(json, "noEndDate", m_recurrencePattern.getNoEndDate());
-    JsonObjectUtility.putProperty(json, "type", m_recurrencePattern.getType());
-    JsonObjectUtility.putProperty(json, "interval", m_recurrencePattern.getInterval());
-    JsonObjectUtility.putProperty(json, "instance", m_recurrencePattern.getInstance());
-    JsonObjectUtility.putProperty(json, "dayOfWeekBits", m_recurrencePattern.getDayOfWeek());
-    JsonObjectUtility.putProperty(json, "dayOfMonth", m_recurrencePattern.getDayOfMonth());
-    JsonObjectUtility.putProperty(json, "monthOfYear", m_recurrencePattern.getMonthOfYear());
+    json.put("lastModified", m_recurrencePattern.getLastModified());
+    json.put("regenerate", m_recurrencePattern.isRegenerate());
+    json.put("startTimeMinutes", m_recurrencePattern.getStartTimeMinutes());
+    json.put("endTimeMinutes", m_recurrencePattern.getEndTimeMinutes());
+    json.put("durationMinutes", m_recurrencePattern.getDurationMinutes());
+    json.put("firstDate", new JsonDate(m_recurrencePattern.getFirstDate()).asJsonString());
+    json.put("lastDate", new JsonDate(m_recurrencePattern.getLastDate()).asJsonString());
+    json.put("occurrences", m_recurrencePattern.getOccurrences());
+    json.put("noEndDate", m_recurrencePattern.getNoEndDate());
+    json.put("type", m_recurrencePattern.getType());
+    json.put("interval", m_recurrencePattern.getInterval());
+    json.put("instance", m_recurrencePattern.getInstance());
+    json.put("dayOfWeekBits", m_recurrencePattern.getDayOfWeek());
+    json.put("dayOfMonth", m_recurrencePattern.getDayOfMonth());
+    json.put("monthOfYear", m_recurrencePattern.getMonthOfYear());
     // TODO BSH Add RecurrenceException?
     return json;
   }

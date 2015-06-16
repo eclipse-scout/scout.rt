@@ -329,7 +329,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected void handleUiOutlineChanged(JsonEvent event) {
-    String outlineId = JsonObjectUtility.getString(event.getData(), "outlineId");
+    String outlineId = event.getData().getString("outlineId");
     IJsonAdapter<?> jsonOutline = getUiSession().getJsonAdapter(outlineId);
     getModel().setOutline((IOutline) jsonOutline.getModel());
   }

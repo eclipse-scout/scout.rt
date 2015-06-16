@@ -24,7 +24,7 @@ public class JsonByteArray implements IJsonObject {
   public Object toJson() {
     //TODO CGU/IMO is a json object necessary?
     JSONObject b64 = new JSONObject();
-    JsonObjectUtility.putProperty(b64, "b64", Base64Utility.encode((byte[]) m_bytes));
+    b64.put("b64", Base64Utility.encode((byte[]) m_bytes));
     return b64;
   }
 

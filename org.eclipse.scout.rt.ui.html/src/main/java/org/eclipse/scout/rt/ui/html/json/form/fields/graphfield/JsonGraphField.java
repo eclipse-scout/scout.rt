@@ -63,32 +63,32 @@ public class JsonGraphField<T extends IGraphField> extends JsonValueField<T> {
       graphNodeIds.put(node, graphNodeId);
 
       JSONObject jsonNode = JsonObjectUtility.newOrderedJSONObject();
-      JsonObjectUtility.putProperty(jsonNode, "id", graphNodeId);
-      JsonObjectUtility.putProperty(jsonNode, "label", node.getLabel());
-      JsonObjectUtility.putProperty(jsonNode, "shape", shapeAsString(node.getShape()));
-      JsonObjectUtility.putProperty(jsonNode, "url", node.getUrl());
+      jsonNode.put("id", graphNodeId);
+      jsonNode.put("label", node.getLabel());
+      jsonNode.put("shape", shapeAsString(node.getShape()));
+      jsonNode.put("url", node.getUrl());
       if (node.getColor() != null) {
-        JsonObjectUtility.putProperty(jsonNode, "foregroundColor", node.getColor().getForeground());
-        JsonObjectUtility.putProperty(jsonNode, "backgroundColor", node.getColor().getBackground());
+        jsonNode.put("foregroundColor", node.getColor().getForeground());
+        jsonNode.put("backgroundColor", node.getColor().getBackground());
       }
       if (node.getLocation() != null) {
-        JsonObjectUtility.putProperty(jsonNode, "locationX", node.getLocation().getX());
-        JsonObjectUtility.putProperty(jsonNode, "locationY", node.getLocation().getY());
+        jsonNode.put("locationX", node.getLocation().getX());
+        jsonNode.put("locationY", node.getLocation().getY());
       }
-      JsonObjectUtility.putProperty(jsonNode, "order", node.getOrder());
+      jsonNode.put("order", node.getOrder());
 
-      JsonObjectUtility.append(json, "nodes", jsonNode);
+      json.append("nodes", jsonNode);
     }
 
     // 2. Edges
     for (GraphEdge edge : graphModel.getEdges()) {
       JSONObject jsonEdge = JsonObjectUtility.newOrderedJSONObject();
-      JsonObjectUtility.putProperty(jsonEdge, "startNodeId", graphNodeIds.get(edge.getStart()));
-      JsonObjectUtility.putProperty(jsonEdge, "endNodeId", graphNodeIds.get(edge.getEnd()));
-      JsonObjectUtility.putProperty(jsonEdge, "label", edge.getLabel());
-      JsonObjectUtility.putProperty(jsonEdge, "style", lineStyleAsString(edge.getStyle()));
-      JsonObjectUtility.putProperty(jsonEdge, "directed", edge.isDirected());
-      JsonObjectUtility.append(json, "edges", jsonEdge);
+      jsonEdge.put("startNodeId", graphNodeIds.get(edge.getStart()));
+      jsonEdge.put("endNodeId", graphNodeIds.get(edge.getEnd()));
+      jsonEdge.put("label", edge.getLabel());
+      jsonEdge.put("style", lineStyleAsString(edge.getStyle()));
+      jsonEdge.put("directed", edge.isDirected());
+      json.append("edges", jsonEdge);
     }
 
     return json;
@@ -149,7 +149,7 @@ public class JsonGraphField<T extends IGraphField> extends JsonValueField<T> {
   }
 
   protected void handleUiAppLinkAction(JsonEvent event) {
-    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    String ref = event.getData().optString("ref");
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

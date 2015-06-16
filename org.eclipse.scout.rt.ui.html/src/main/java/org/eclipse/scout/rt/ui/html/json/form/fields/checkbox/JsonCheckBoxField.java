@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
@@ -48,7 +47,7 @@ public class JsonCheckBoxField<T extends IBooleanField> extends JsonValueField<T
   @Override
   public void handleUiEvent(JsonEvent event) {
     if (JsonEventType.CLICKED.matches(event)) {
-      handleUiClick(event, JsonObjectUtility.getBoolean(event.getData(), "checked"));
+      handleUiClick(event, event.getData().getBoolean("checked"));
     }
     else {
       throw new IllegalArgumentException("unsupported event type");

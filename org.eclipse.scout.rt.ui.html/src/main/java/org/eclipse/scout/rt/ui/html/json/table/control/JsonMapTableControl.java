@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,7 +60,7 @@ public class JsonMapTableControl<T extends IMapTableControl> extends JsonTableCo
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
-      putProperty(json, "map", JsonObjectUtility.newJSONObject(MAP));
+      putProperty(json, "map", new JSONObject(MAP));
       m_contentLoaded = true;
     }
     return json;
@@ -69,7 +68,7 @@ public class JsonMapTableControl<T extends IMapTableControl> extends JsonTableCo
 
   @Override
   protected void handleUiLoadContent() {
-    addPropertyChangeEvent("map", JsonObjectUtility.newJSONObject(MAP));
+    addPropertyChangeEvent("map", new JSONObject(MAP));
   }
 
 }

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.table.control;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonGraphTableControl<T extends IGraphTableControl> extends JsonTableControl<T> {
@@ -50,7 +49,7 @@ public class JsonGraphTableControl<T extends IGraphTableControl> extends JsonTab
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
-      putProperty(json, "graph", JsonObjectUtility.newJSONObject(GRAPH));
+      putProperty(json, "graph", new JSONObject(GRAPH));
       m_contentLoaded = true;
     }
     return json;
@@ -58,7 +57,7 @@ public class JsonGraphTableControl<T extends IGraphTableControl> extends JsonTab
 
   @Override
   protected void handleUiLoadContent() {
-    addPropertyChangeEvent("graph", JsonObjectUtility.newJSONObject(GRAPH));
+    addPropertyChangeEvent("graph", new JSONObject(GRAPH));
   }
 
 }
