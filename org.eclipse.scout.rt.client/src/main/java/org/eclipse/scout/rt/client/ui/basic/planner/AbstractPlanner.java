@@ -179,6 +179,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return 1800000L;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(130)
+  protected boolean getConfiguredHeaderVisible() {
+    return true;
+  }
+
   @Order(140)
   protected int getConfiguredSelectionMode() {
     return SELECTION_MODE_MULTI_RANGE;
@@ -285,6 +291,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 //    m_cellObserver = new P_ActivityCellObserver();
     //
     setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
+    setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
     setWorkDayCount(getConfiguredWorkDayCount());
     setWorkDaysOnly(getConfiguredWorkDaysOnly());
@@ -961,6 +968,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
+  public void setHeaderVisible(boolean visible) {
+    propertySupport.setPropertyBool(PROP_HEADER_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isHeaderVisible() {
+    return propertySupport.getPropertyBool(PROP_HEADER_VISIBLE);
+  }
+
+  @Override
   public int getDisplayMode() {
     return propertySupport.getPropertyInt(PROP_DISPLAY_MODE);
   }
@@ -1034,8 +1051,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {

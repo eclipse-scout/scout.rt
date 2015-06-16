@@ -58,6 +58,12 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * {@link Long}
    */
   String PROP_INTRADAY_INTERVAL = "intradayInterval";
+
+  /**
+   * {@link Boolean}
+   */
+  String PROP_HEADER_VISIBLE = "headerVisible";
+
   /**
    * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
    * {@link #DISPLAY_MODE_WORKWEEK}
@@ -181,6 +187,10 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   Set<Integer> getAvailableDisplayModes();
 
   void setAvailableDisplayModes(Set<Integer> displayModes);
+
+  boolean isHeaderVisible();
+
+  void setHeaderVisible(boolean visible);
 
   int getSelectionMode();
 
