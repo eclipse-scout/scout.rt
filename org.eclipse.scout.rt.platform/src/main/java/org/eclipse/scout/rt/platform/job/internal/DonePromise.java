@@ -52,10 +52,15 @@ class DonePromise<RESULT> {
     try {
       // Event creation
       try {
-        m_doneEvent = new DoneEvent<>(m_future.awaitDoneAndGet(), null, m_future.isCancelled());
+        m_doneEvent = new DoneEvent<>(m_future.awaitDoneAndGet(), null, false);
       }
       catch (final ProcessingException e) {
-        m_doneEvent = new DoneEvent<>(null, e, m_future.isCancelled());
+        if (e.isCancellation()) {
+          m_doneEvent = new DoneEvent<>(null, null, true);
+        }
+        else {
+          m_doneEvent = new DoneEvent<>(null, e, false);
+        }
       }
       catch (final Throwable t) {
         m_doneEvent = new DoneEvent<>(null, new ProcessingException("Unexpected exception while querying the Future's result", t), m_future.isCancelled());

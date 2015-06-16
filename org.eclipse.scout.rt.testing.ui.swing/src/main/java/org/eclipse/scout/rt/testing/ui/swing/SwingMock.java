@@ -50,6 +50,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -138,7 +139,12 @@ public class SwingMock extends AbstractGuiMock {
 
       //wait until model queue is empty
       IClientSession clientSession = getClientSession();
-      Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotPeriodic(), 1, TimeUnit.HOURS);
+      try {
+        Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotPeriodic(), 1, TimeUnit.HOURS);
+      }
+      catch (ProcessingException e) {
+        throw new IllegalStateException("Failed to wait for the model queue to get empty", e);
+      }
     }
   }
 

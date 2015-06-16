@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectorVisitor;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
@@ -116,7 +117,7 @@ public interface IJobManager {
   IFuture<Void> scheduleWithFixedDelay(IRunnable runnable, long initialDelay, long delay, TimeUnit unit, JobInput input);
 
   /**
-   * Checks whether all Futures accepted by the given Filter are in 'done-state'.
+   * Checks whether all Futures accepted by the given Filter are in 'done-state' (completed or cancelled).
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
@@ -130,8 +131,8 @@ public interface IJobManager {
   boolean isDone(IFilter<IFuture<?>> filter);
 
   /**
-   * Blocks the calling thread until all Futures accepted by the given Filter are in 'done-state', or the given timeout
-   * elapses.
+   * Blocks the calling thread until all Futures accepted by the given Filter are in 'done-state' (completed or
+   * cancelled), or the given timeout elapses.
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
@@ -145,10 +146,11 @@ public interface IJobManager {
    * @param unit
    *          unit of the given timeout.
    * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws JobException
-   *           is thrown if this thread was interrupted while waiting for the job to complete.
+   * @throws ProcessingException
+   *           if this thread was interrupted while waiting for the job to complete; see
+   *           {@link ProcessingException#isInterruption()}
    */
-  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
+  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws ProcessingException;
 
   /**
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.

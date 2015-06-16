@@ -49,7 +49,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitAllDone() throws InterruptedException {
+  public void testAwaitAllDone() throws ProcessingException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     m_jobManager.schedule(new Callable<Void>() {
@@ -68,7 +68,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitFutureDone1() throws InterruptedException {
+  public void testAwaitFutureDone1() throws ProcessingException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final IFuture<Void> future1 = m_jobManager.schedule(new Callable<Void>() {
@@ -88,7 +88,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitFutureDone2() throws InterruptedException {
+  public void testAwaitFutureDone2() throws ProcessingException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
@@ -126,7 +126,7 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitDoneOrBlocked() throws InterruptedException {
+  public void testAwaitDoneOrBlocked() throws ProcessingException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition bc = m_jobManager.createBlockingCondition("bc", true);

@@ -113,7 +113,7 @@ public class ServerJobsTest {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, ServerJobs.newInput(ServerRunContexts.copyCurrent())).awaitDoneAndGet();
+    }, 0, 0, TimeUnit.MILLISECONDS, ServerJobs.newInput(ServerRunContexts.copyCurrent())).awaitDone();
 
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
 
@@ -126,7 +126,7 @@ public class ServerJobsTest {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, ServerJobs.newInput(ServerRunContexts.copyCurrent())).awaitDoneAndGet();
+    }, 0, 0, TimeUnit.MILLISECONDS, ServerJobs.newInput(ServerRunContexts.copyCurrent())).awaitDone();
 
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
   }

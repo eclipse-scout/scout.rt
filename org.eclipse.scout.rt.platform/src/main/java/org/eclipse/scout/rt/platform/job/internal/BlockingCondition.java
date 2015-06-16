@@ -22,10 +22,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
@@ -33,6 +35,8 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * Implementation of {@link IBlockingCondition}.
  */
 public class BlockingCondition implements IBlockingCondition {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BlockingCondition.class);
 
   private volatile boolean m_blocking;
   private final String m_name;
@@ -93,30 +97,34 @@ public class BlockingCondition implements IBlockingCondition {
   }
 
   @Override
-  public void waitFor() {
+  public void waitFor() throws ProcessingException {
     waitFor(-1L, TimeUnit.MILLISECONDS);
   }
 
   @Override
-  public void waitFor(final long timeout, final TimeUnit unit) {
+  public boolean waitFor(final long timeout, final TimeUnit unit) throws ProcessingException {
     final JobFutureTask<?> currentTask = (JobFutureTask<?>) IFuture.CURRENT.get();
     if (currentTask != null) {
-      blockManagedThread(currentTask, timeout, unit);
+      return blockManagedThread(currentTask, timeout, unit);
     }
     else {
-      blockArbitraryThread(timeout, unit);
+      return blockArbitraryThread(timeout, unit);
     }
   }
 
   /**
    * Blocks the current thread if being managed by {@link IJobManager}. That is if the thread as a {@link JobFutureTask}
    * associated.
+   *
+   * @return <code>false</code> if the timeout elapsed, <code>false</code> otherwise.
+   * @throws ProcessingException
+   *           if the waiting thread was interrupted.
    */
-  protected void blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit) {
+  protected boolean blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit) throws ProcessingException {
     m_lock.lock();
     try {
       if (!m_blocking) {
-        return;
+        return true;
       }
 
       registerAndMarkAsBlocked(jobTask);
@@ -146,11 +154,12 @@ public class BlockingCondition implements IBlockingCondition {
     catch (final InterruptedException e) {
       Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
       unregisterAndMarkAsUnblocked(jobTask);
-      throw new JobException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      throw new ProcessingException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
     }
     catch (final TimeoutException e) {
       unregisterAndMarkAsUnblocked(jobTask);
-      throw new JobException(String.format("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      LOG.debug(String.format("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      return false;
     }
     finally {
       // Note: If released gracefully, the job's blocking-state is unset by the releaser.
@@ -165,16 +174,22 @@ public class BlockingCondition implements IBlockingCondition {
     }
 
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED, jobTask, this));
+
+    return true;
   }
 
   /**
    * Blocks the current thread if not being managed by {@link IJobManager}.
+   *
+   * @return <code>false</code> if the timeout elapsed, <code>false</code> otherwise.
+   * @throws ProcessingException
+   *           if the waiting thread was interrupted.
    */
-  protected void blockArbitraryThread(final long timeout, final TimeUnit unit) {
+  protected boolean blockArbitraryThread(final long timeout, final TimeUnit unit) throws ProcessingException {
     m_lock.lock();
     try {
       if (!m_blocking) {
-        return;
+        return true;
       }
 
       blockUntilSignaledOrTimeout(timeout, unit, new IBlockingGuard() {
@@ -184,13 +199,15 @@ public class BlockingCondition implements IBlockingCondition {
           return m_blocking; // This method is called once the condition is signaled or a spurious wake-up occurs.
         }
       });
+      return true;
     }
     catch (final InterruptedException e) {
       Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-      throw new JobException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      throw new ProcessingException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
     }
     catch (final TimeoutException e) {
-      throw new JobException(String.format("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      LOG.debug(String.format("Timeout elapsed while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+      return false;
     }
     finally {
       m_lock.unlock();

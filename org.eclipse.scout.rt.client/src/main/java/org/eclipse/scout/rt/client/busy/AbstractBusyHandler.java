@@ -242,13 +242,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   }
 
   private static boolean isJobActive(IFuture<?> future) {
-    if (future.isCancelled() || future.isDone()) {
-      return false;
-    }
-    if (future.isBlocked()) {
-      return false;
-    }
-    return true;
+    return !future.isDone() && !future.isBlocked();
   }
 
   private class P_TimerJob implements IRunnable {

@@ -200,17 +200,21 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
     final JobInput jobInput = Jobs.newInput(createCurrentRunContext().runMonitor(monitor)).name("Remote service request [%s]", requestSequence);
 
-    final IServiceTunnelResponse serviceResponse;
+    IServiceTunnelResponse serviceResponse;
     try {
       serviceResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet();
     }
-    catch (final Throwable t) {
-      return new ServiceTunnelResponse(null, null, t);
+    catch (final ProcessingException e) {
+      if (e.isInterruption() && !monitor.isCancelled()) {
+        monitor.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted.
+      }
+      serviceResponse = new ServiceTunnelResponse(null, null, e);
     }
 
     if (monitor.isCancelled()) {
-      return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
+      serviceResponse = new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
     }
+
     return serviceResponse;
   }
 

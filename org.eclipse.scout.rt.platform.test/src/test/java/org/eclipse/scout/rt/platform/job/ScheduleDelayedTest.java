@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -44,7 +45,7 @@ public class ScheduleDelayedTest {
   }
 
   @Test
-  public void testScheduleDelayed() throws InterruptedException {
+  public void testScheduleDelayed() throws ProcessingException {
     final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
 
     long delayNano = TimeUnit.SECONDS.toNanos(1);

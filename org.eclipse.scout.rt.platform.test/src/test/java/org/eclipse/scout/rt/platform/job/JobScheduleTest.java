@@ -389,14 +389,9 @@ public class JobScheduleTest {
       }
     }, 1, TimeUnit.SECONDS, Jobs.newInput(RunContexts.empty()).expirationTime(500, TimeUnit.MILLISECONDS));
 
-    try {
-      assertNull(future.awaitDoneAndGet());
-      assertTrue(future.isCancelled());
-      assertFalse(executed.get());
-    }
-    catch (JobException e) {
-      fail();
-    }
+    future.awaitDone();
+    assertTrue(future.isCancelled());
+    assertFalse(executed.get());
   }
 
   @Test
@@ -487,7 +482,7 @@ public class JobScheduleTest {
       assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));
       fail();
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       assertTrue(e.isTimeout());
     }
 

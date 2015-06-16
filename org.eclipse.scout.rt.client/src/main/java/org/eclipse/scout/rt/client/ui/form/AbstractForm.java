@@ -113,7 +113,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -967,17 +966,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
     // wait
-    try {
-      m_blockingCondition.waitFor();
-    }
-    catch (JobException e) {
-      if (e.isInterruption()) {
-        throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e.getCause());
-      }
-      else {
-        throw new ProcessingException("Failed to wait for the Form to close", e);
-      }
-    }
+    m_blockingCondition.waitFor();
   }
 
   private void exportExtensionProperties(Object o, IPropertyHolder target) throws ProcessingException {
@@ -2927,7 +2916,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               BEANS.get(ExceptionHandler.class).handle(pe);
             }
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Form timer")).awaitDoneAndGet();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Form timer")).awaitDone();
       }
     }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
   }
@@ -2968,7 +2957,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               }
             }
           }
-        }).awaitDoneAndGet();
+        }).awaitDone();
       }
     }, 0, 1, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("Close timer"));
   }

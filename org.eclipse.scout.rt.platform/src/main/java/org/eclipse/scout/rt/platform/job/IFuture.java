@@ -17,9 +17,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.context.ICancellable;
 
 /**
- * Represents a {@link Future} to interact with the associated job or to wait for the job to complete and to query it's
+ * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's
  * computation result. Exceptions thrown during the job's execution are propagated in the form of a
- * {@link ProcessingException}, technical exceptions like timeout or interruption in the form of a {@link JobException}.
+ * {@link ProcessingException}.
  *
  * @see Future
  * @since 5.1
@@ -73,23 +73,49 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean isPeriodic();
 
   /**
-   * Blocks the calling thread until the job gets cancelled or completed to return its execution result. This call
-   * returns immediately if the job is not running anymore or was cancelled. Use {@link #isCancelled()} to query the
-   * job's cancellation status.
+   * Waits if necessary for the job to complete, or to get cancelled. This method does not throw an exception if
+   * cancelled or the computation failed.
+   *
+   * @throws ProcessingException
+   *           if this thread was interrupted while waiting for the job to complete; see
+   *           {@link ProcessingException#isInterruption()}
+   */
+  void awaitDone() throws ProcessingException;
+
+  /**
+   * Waits if necessary for the job to complete, or to get cancelled, or until the timeout elapses. This method does not
+   * throw an exception if cancelled, or the timeout elapses, or the computation failed.
+   *
+   * @param timeout
+   *          the maximal time to wait for the job to complete.
+   * @param unit
+   *          unit of the timeout.
+   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
+   * @throws ProcessingException
+   *           if this thread was interrupted while waiting for the job to complete; see
+   *           {@link ProcessingException#isInterruption()}
+   */
+  boolean awaitDone(long timeout, TimeUnit unit) throws ProcessingException;
+
+  /**
+   * Waits if necessary for the computation to complete, and then retrieves its result, or throws a
+   * {@link ProcessingException} if the computation failed, or if cancelled, or if the calling thread was interrupted.
    *
    * @return the computed result.
    * @throws ProcessingException
-   *           is thrown if an exception is thrown during the job's execution.
-   * @throws JobException
-   *           is thrown if this thread was interrupted while waiting for the job to complete; see
-   *           {@link JobException#isInterruption()}
+   *           <ul>
+   *           <li>if an exception is thrown during the job's execution</li>
+   *           <li>if this thread was interrupted while waiting for the job to complete; see
+   *           {@link ProcessingException#isInterruption()}</li>
+   *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
+   *           </ul>
    */
   RESULT awaitDoneAndGet() throws ProcessingException;
 
   /**
-   * Blocks the calling thread until the job gets cancelled or completed to return its execution result. This call
-   * returns immediately if the job is not running anymore or was cancelled. Use {@link #isCancelled()} to query the
-   * job's cancellation status.
+   * Waits if necessary for the computation to complete, and then retrieves its result, or throws a
+   * {@link ProcessingException} if the computation failed, or if cancelled, or if the calling thread was interrupted,
+   * or the timeout elapses.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
@@ -97,14 +123,12 @@ public interface IFuture<RESULT> extends ICancellable {
    *          unit of the timeout.
    * @return the computed result.
    * @throws ProcessingException
-   *           is thrown if an exception is thrown during the job's execution.
-   * @throws JobException
-   *           is thrown in the following cases:
    *           <ul>
-   *           <li>this thread was interrupted while waiting for the job to complete;<br/>
-   *           see {@link JobException#isInterruption()};</li>
-   *           <li>the job did not return within the timeout specified;<br/>
-   *           see {@link JobException#isTimeout()};</li>
+   *           <li>if an exception is thrown during the job's execution</li>
+   *           <li>if this thread was interrupted while waiting for the job to complete; see
+   *           {@link ProcessingException#isInterruption()}</li>
+   *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
+   *           <li>if this job did not return within the timeout specified; see {@link ProcessingException#isTimeout()}</li>
    *           </ul>
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;

@@ -90,7 +90,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -1005,9 +1004,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDoneAndGet(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
       }
-      catch (ProcessingException | JobException e) {
+      catch (ProcessingException e) {
         // NOOP
       }
       // end notify
@@ -1035,9 +1034,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDoneAndGet(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
       }
-      catch (ProcessingException | JobException e) {
+      catch (ProcessingException e) {
         // NOOP
       }
       // end notify

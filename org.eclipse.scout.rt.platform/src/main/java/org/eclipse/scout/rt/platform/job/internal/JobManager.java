@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.Filters;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerM
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
@@ -138,12 +138,12 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
+  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws ProcessingException {
     try {
       return m_futures.awaitDone(filter, timeout, unit);
     }
     catch (final InterruptedException e) {
-      throw new JobException("Interrupted while waiting for jobs to complete", e);
+      throw new ProcessingException("Interrupted while waiting for jobs to complete", e);
     }
   }
 

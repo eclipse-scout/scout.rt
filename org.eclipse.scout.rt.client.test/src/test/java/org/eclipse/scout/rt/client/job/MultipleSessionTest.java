@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -61,7 +62,7 @@ public class MultipleSessionTest {
   }
 
   @Test
-  public void testMutalExclusion() throws InterruptedException {
+  public void testMutalExclusion() throws ProcessingException, InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(2);
@@ -115,7 +116,7 @@ public class MultipleSessionTest {
   }
 
   @Test
-  public void testCancel() throws InterruptedException {
+  public void testCancel() throws InterruptedException, ProcessingException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch1 = new BlockingCountDownLatch(2);

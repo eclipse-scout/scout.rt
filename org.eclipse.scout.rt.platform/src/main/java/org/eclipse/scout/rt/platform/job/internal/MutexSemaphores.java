@@ -22,9 +22,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.job.JobException;
 
 /**
  * Provides a thread-safe implementation of a non-blocking 1-permit-per-mutex semaphore backed with a fair queue. For
@@ -120,18 +120,18 @@ public class MutexSemaphores {
    *
    * @param task
    *          the task to acquire the mutex; must be a mutex task.
-   * @throws JobException
+   * @throws ProcessingException
    *           is thrown if the current thread is interrupted while waiting for the mutex to become available, or upon
    *           shutdown of the job manager.
    */
-  public void acquire(final IMutexTask<?> task) {
+  public void acquire(final IMutexTask<?> task) throws ProcessingException {
     Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
     final Object mutexObject = task.getMutexObject();
     final Object acquisitionLock = new Object();
 
     if (m_executor.isShutdown()) {
       task.cancel(true);
-      throw new JobException(String.format("Failed to acquire mutex because job manager is shutdown [task=%s]", task));
+      throw new ProcessingException(String.format("Failed to acquire mutex because job manager is shutdown [task=%s]", task));
     }
 
     // Create the task to re-acquire the mutex. This task is queued to compete for the mutex anew.
@@ -167,7 +167,7 @@ public class MutexSemaphores {
             mutexAcquisitionTask.stopAwaitMutex();
 
             Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-            throw new JobException(String.format("Interrupted while re-acquiring the mutex [%s]", task), e);
+            throw new ProcessingException(String.format("Interrupted while re-acquiring the mutex [%s]", task), e);
           }
         }
       }

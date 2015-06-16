@@ -34,7 +34,6 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -102,7 +101,7 @@ public class InvocationContext<PORT> {
 
   /**
    * Installs the given listener for this {@link InvocationContext} to be notified once the transaction is committed.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> whenCommit(final ICommitListener listener) {
@@ -114,7 +113,7 @@ public class InvocationContext<PORT> {
   /**
    * Installs the given {@link InvocationHandler} for this {@link InvocationContext} to be invoked for every webservice
    * request.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> whenInvoke(final InvocationHandler invocationHandler) {
@@ -125,7 +124,7 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets the URL of the webservice endpoint for this {@link InvocationContext}.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> endpointUrl(final String endpointUrl) {
@@ -135,7 +134,7 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets the username used by authentication handler for this {@link InvocationContext}.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> username(final String username) {
@@ -145,7 +144,7 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets the password used by authentication handler for this {@link InvocationContext}.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> password(final String password) {
@@ -157,7 +156,7 @@ public class InvocationContext<PORT> {
    * Sets the connect timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
    * expires before the connection can be established, the request is aborted. Use <code>null</code> to specify
    * an infinite timeout.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> connectTimeout(final Integer connectTimeout) {
@@ -169,7 +168,7 @@ public class InvocationContext<PORT> {
    * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in seconds. If the timeout
    * expires before there is data available for read, the request is aborted. Use <code>null</code> to specify an
    * infinite timeout.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> readTimeout(final Integer readTimeout) {
@@ -179,7 +178,7 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets a context property for this {@link InvocationContext} to be used in JAX-WS handlers.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> contextProperty(final String key, final Object value) {
@@ -189,7 +188,7 @@ public class InvocationContext<PORT> {
 
   /**
    * Sets a HTTP request header for this {@link InvocationContext} to be sent to the endpoint.
-   * 
+   *
    * @return <code>this</code> in order to support for method chaining.
    */
   public InvocationContext<PORT> httpRequestHeader(final String key, final String value) {
@@ -293,12 +292,10 @@ public class InvocationContext<PORT> {
       }, Jobs.newInput(currentRunContext).name("JAX-WS request [%s]", operation));
 
       try {
-        future.awaitDoneAndGet(); // wait until completed or interrupted.
+        future.awaitDone(); // wait until completed or interrupted.
       }
-      catch (final JobException e) {
-        if (e.isInterruption()) {
-          future.cancel(true); // ensure the job to be cancelled once this thread is interrupted.
-        }
+      catch (final ProcessingException e) {
+        future.cancel(true); // ensure the job to be cancelled once this thread is interrupted.
       }
 
       // If cancelled, try to close the HTTP connection (if supported by JAX-WS implementor) and throw a CancellationException.

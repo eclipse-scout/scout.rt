@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.ImageFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.ImageFieldListener;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
@@ -306,9 +305,9 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDoneAndGet(5678, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDone(5678, TimeUnit.MILLISECONDS);
       }
-      catch (ProcessingException | JobException e) {
+      catch (ProcessingException e) {
         // NOOP
       }
       // end notify

@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -628,10 +627,10 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     boolean hasFinished = false;
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.awaitDoneAndGet(2345, TimeUnit.MILLISECONDS);
+      job.awaitDone(2345, TimeUnit.MILLISECONDS);
       hasFinished = true;
     }
-    catch (ProcessingException | JobException e) {
+    catch (ProcessingException e) {
       // NOOP
     }
 

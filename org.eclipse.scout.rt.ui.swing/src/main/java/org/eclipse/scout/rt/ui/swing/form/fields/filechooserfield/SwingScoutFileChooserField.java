@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
@@ -231,9 +230,9 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     };
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.awaitDoneAndGet(2345, TimeUnit.MILLISECONDS);
+      job.awaitDone(2345, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException | JobException e) {
+    catch (ProcessingException e) {
       // NOOP
     }
     // end notify

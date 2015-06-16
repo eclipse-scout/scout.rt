@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -237,15 +236,49 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
+  public void awaitDone() throws ProcessingException {
+    try {
+      awaitDoneAndGet();
+    }
+    catch (final ProcessingException e) {
+      if (e.isInterruption()) {
+        throw e;
+      }
+      else {
+        // NOOP: Do not propagate exception (see JavaDoc contract)
+      }
+    }
+  }
+
+  @Override
+  public boolean awaitDone(final long timeout, final TimeUnit unit) throws ProcessingException {
+    try {
+      awaitDoneAndGet(timeout, unit);
+    }
+    catch (final ProcessingException e) {
+      if (e.isInterruption()) {
+        throw e;
+      }
+      else if (e.isTimeout()) {
+        return false;
+      }
+      else {
+        // NOOP: Do not propagate exception (see JavaDoc contract)
+      }
+    }
+    return true;
+  }
+
+  @Override
   public RESULT awaitDoneAndGet() throws ProcessingException {
     try {
       return get();
     }
     catch (final CancellationException e) {
-      return null; // Cancellation does not result in an exception.
+      throw new ProcessingException(String.format("The job was cancelled. [job=%s]", m_input.name()), e);
     }
     catch (final InterruptedException e) {
-      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
+      throw new ProcessingException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
     }
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);
@@ -258,13 +291,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return get(timeout, unit);
     }
     catch (final CancellationException e) {
-      return null; // Cancellation does not result in an exception.
+      throw new ProcessingException(String.format("The job was cancelled. [job=%s]", m_input.name()), e);
     }
     catch (final InterruptedException e) {
-      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
+      throw new ProcessingException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
     }
     catch (final TimeoutException e) {
-      throw new JobException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.name()), e);
+      throw new ProcessingException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.name()), e);
     }
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);

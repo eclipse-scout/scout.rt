@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
@@ -88,9 +87,9 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDoneAndGet(5678, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDone(5678, TimeUnit.MILLISECONDS);
       }
-      catch (ProcessingException | JobException e) {
+      catch (ProcessingException e) {
         // NOOP
       }
       // end notify

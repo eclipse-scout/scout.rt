@@ -13,6 +13,8 @@ package org.eclipse.scout.commons.exception;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 
@@ -118,11 +120,25 @@ public class ProcessingException extends Exception implements Serializable {
   }
 
   /**
-   * @return <code>true</code> to indicate that a blocking thread was interrupted while waiting for a condition to
-   *         become <code>true</code>.
+   * @return <code>true</code> to indicate that a thread waiting for a lock or condition was interrupted.
    */
   public boolean isInterruption() {
     return m_status != null && (m_status.getException() instanceof InterruptedException);
+  }
+
+  /**
+   * @return <code>true</code> to indicate that processing was cancelled.
+   */
+  public boolean isCancellation() {
+    return m_status != null && (m_status.getException() instanceof CancellationException);
+  }
+
+  /**
+   * @return <code>true</code> to indicate that a timeout elapsed while waiting for an operation to complete, e.g. a
+   *         job's execution.
+   */
+  public boolean isTimeout() {
+    return m_status != null && (m_status.getException() instanceof TimeoutException);
   }
 
   @Override

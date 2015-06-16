@@ -21,16 +21,17 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -436,12 +437,16 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     try {
       m_blockingCondition.waitFor();
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       if (e.isInterruption()) {
         LOG.info(ScoutTexts.get("UserInterrupted"), e.getCause());
       }
       else {
         LOG.error("Failed to wait for the MessageBox to close", e);
+      }
+
+      if (ModelJobs.isModelJob(IFuture.CURRENT.get())) {
+        throw new IllegalStateException("Failed to wait for the message box to close. Exit processing because not synchronized with the model-thread anymore.", e);
       }
     }
   }

@@ -148,13 +148,12 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   @ConfigOperation
   @Order(40)
   protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
-    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         interceptLoadItems(minDate, maxDate, result);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session)));
-    future.awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session))).awaitDone();
   }
 
   @ConfigOperation
@@ -311,10 +310,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           public void run() throws Exception {
             propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
           }
-        }).awaitDoneAndGet();
+        }).awaitDone();
       }
       catch (ProcessingException e) {
-        LOG.error("Failed to update property 'loadInProgress'", e);
+        // NOOP (interrupted)
       }
     }
   }
@@ -422,7 +421,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           }
         }
 
-        IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
+        ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             synchronized (AbstractCalendarItemProvider.this) {
@@ -431,8 +430,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
               }
             }
           }
-        });
-        future.awaitDoneAndGet();
+        }).awaitDone();
       }
       finally {
         setLoadInProgress(false);

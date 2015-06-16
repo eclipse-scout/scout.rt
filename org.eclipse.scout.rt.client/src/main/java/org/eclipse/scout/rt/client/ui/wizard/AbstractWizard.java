@@ -54,9 +54,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -1075,17 +1073,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
-    try {
-      m_blockingCondition.waitFor();
-    }
-    catch (JobException e) {
-      if (e.isInterruption()) {
-        throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e.getCause());
-      }
-      else {
-        throw new ProcessingException("Failed to wait for the Wizard to close", e);
-      }
-    }
+    m_blockingCondition.waitFor();
   }
 
   @Override

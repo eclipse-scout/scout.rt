@@ -4,10 +4,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
@@ -67,15 +67,10 @@ public class TimeoutClientRunContextStatement extends Statement {
       catch (WrappingError e) {
         throw e.getCause();
       }
-      catch (JobException e) {
+      catch (ProcessingException e) {
         if (e.isTimeout()) {
           // waiting on the job to complete timed out. Try to cancel the job and translate exception into junit counterpart.
-          try {
-            future.cancel(true);
-          }
-          catch (Exception e1) {
-            // nop
-          }
+          future.cancel(true);
           throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS);
         }
 

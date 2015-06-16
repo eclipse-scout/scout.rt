@@ -107,7 +107,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected boolean isMessageConsumerRunning() {
     IFuture<Void> future = m_messageConsumerFuture;
-    return future != null && !future.isCancelled();
+    return future != null && !future.isDone();
   }
 
   protected synchronized void startMessageConsumer() throws ProcessingException {

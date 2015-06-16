@@ -66,7 +66,7 @@ public class JobsTest {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDoneAndGet();
+    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDone();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
 
@@ -79,7 +79,7 @@ public class JobsTest {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDoneAndGet();
+    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDone();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
   }
@@ -119,7 +119,7 @@ public class JobsTest {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
+    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDone();
 
     assertNull(actualFuture.getJobInput().runContext());
 
@@ -132,7 +132,7 @@ public class JobsTest {
         actualFutureHolder.setValue(IFuture.CURRENT.get());
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
-    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
+    }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDone();
 
     assertNull(actualFuture.getJobInput().runContext());
   }

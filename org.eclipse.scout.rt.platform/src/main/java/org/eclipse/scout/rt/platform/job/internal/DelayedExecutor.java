@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 
@@ -96,9 +95,6 @@ class DelayedExecutor {
             if (!m_executor.isShutdown()) {
               LOG.error("Interrupted while waiting for 'delayed runnables' to be executed; ignored interruption because the executor is still running", e);
             }
-          }
-          catch (final JobException e) {
-            LOG.error("Failed to execute delayed runnable", e);
           }
           catch (final Throwable t) {
             LOG.error("Unexpected exception while waiting for expired runnables to be executed.", t);

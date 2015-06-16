@@ -20,9 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class FileChooser implements IFileChooser {
 
@@ -90,14 +88,6 @@ public class FileChooser implements IFileChooser {
   private void waitFor() throws ProcessingException {
     try {
       m_blockingCondition.waitFor();
-    }
-    catch (JobException e) {
-      if (e.isInterruption()) {
-        throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e.getCause());
-      }
-      else {
-        throw new ProcessingException("Failed to wait for the FileChooser to close", e);
-      }
     }
     finally {
       fireClosed();

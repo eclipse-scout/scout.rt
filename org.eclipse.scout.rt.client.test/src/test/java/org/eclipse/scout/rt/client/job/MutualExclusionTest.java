@@ -44,7 +44,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -96,8 +95,8 @@ public class MutualExclusionTest {
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobManager.class).
-            initialInstance(m_jobManager).
-            applicationScoped(true));
+        initialInstance(m_jobManager).
+        applicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
@@ -188,7 +187,7 @@ public class MutualExclusionTest {
             try {
               future.awaitDoneAndGet(1, TimeUnit.SECONDS);
             }
-            catch (JobException e) {
+            catch (ProcessingException e) {
               if (e.isTimeout()) {
                 protocol.add(5);
               }
@@ -251,7 +250,7 @@ public class MutualExclusionTest {
         try {
           future.awaitDoneAndGet(1, TimeUnit.SECONDS);
         }
-        catch (JobException e) {
+        catch (ProcessingException e) {
           protocol.add(2);
           if (e.isTimeout()) {
             protocol.add(3);
@@ -388,7 +387,7 @@ public class MutualExclusionTest {
    * is interrupted, job3 must not be scheduled because the mutex-owner is still job2.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException {
+  public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException, ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
@@ -404,7 +403,7 @@ public class MutualExclusionTest {
         try {
           BC.waitFor();
         }
-        catch (JobException e) {
+        catch (ProcessingException e) {
           if (e.isInterruption()) {
             protocol.add("interrupted-1");
           }
@@ -473,7 +472,7 @@ public class MutualExclusionTest {
           BC.waitFor();
           protocol.add("not-interrupted-1");
         }
-        catch (JobException e) {
+        catch (ProcessingException e) {
           protocol.add("jobException-1");
           if (e.isInterruption()) {
             protocol.add("interrupted-1");
@@ -532,10 +531,10 @@ public class MutualExclusionTest {
 
     assertTrue(future1.isCancelled());
     try {
-      assertNull(future1.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
+      future1.awaitDone();
       assertTrue(future1.isCancelled());
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       fail();
     }
 
@@ -544,7 +543,7 @@ public class MutualExclusionTest {
       future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
       fail();
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       assertTrue(e.isTimeout());
     }
 
@@ -553,7 +552,7 @@ public class MutualExclusionTest {
       future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
       fail();
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       assertTrue(e.isTimeout());
     }
 
@@ -567,14 +566,14 @@ public class MutualExclusionTest {
     try {
       assertNull(future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       fail();
     }
 
     try {
       assertNull(future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       fail();
     }
   }
@@ -584,7 +583,7 @@ public class MutualExclusionTest {
    * job2 gets scheduled, it is rejected by the executor. This test verifies, that job3 still gets scheduled.
    */
   @Test
-  public void testRejection() throws InterruptedException {
+  public void testRejection() throws ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final ExecutorService executorMock = mock(ExecutorService.class);
@@ -600,9 +599,9 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-            order(-1000).
-            initialInstance(jobManager).
-            applicationScoped(true)));
+        order(-1000).
+        initialInstance(jobManager).
+        applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
 
@@ -727,9 +726,9 @@ public class MutualExclusionTest {
 
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-            order(-1000).
-            initialInstance(jobManager).
-            applicationScoped(true)));
+        order(-1000).
+        initialInstance(jobManager).
+        applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);
@@ -807,7 +806,7 @@ public class MutualExclusionTest {
           BC.waitFor();
           protocol.add("running-job-1 (b)");
         }
-        catch (JobException e) {
+        catch (ProcessingException e) {
           protocol.add("jobException");
         }
 
@@ -1011,7 +1010,7 @@ public class MutualExclusionTest {
     assertEquals(expected, protocol);
   }
 
-  private void runTestBlockingCondition(final IBlockingCondition BC) throws InterruptedException {
+  private void runTestBlockingCondition(final IBlockingCondition BC) throws ProcessingException {
     BC.setBlocking(true);
 
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
@@ -1110,7 +1109,7 @@ public class MutualExclusionTest {
    * Tests that an invalidated Blocking condition does not block.
    */
   @Test
-  public void testBlockingConditionNotBlocking() throws InterruptedException {
+  public void testBlockingConditionNotBlocking() throws ProcessingException {
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", false);
     ModelJobs.schedule(new IRunnable() {
 
@@ -1233,7 +1232,7 @@ public class MutualExclusionTest {
    * Tests that a job continues execution after waiting for a blocking condition to fall.
    */
   @Test
-  public void testExpiredWhenReAcquiringMutex() throws ProcessingException, InterruptedException {
+  public void testExpiredWhenReAcquiringMutex() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
@@ -1268,7 +1267,7 @@ public class MutualExclusionTest {
       expected.add("2: running");
       assertEquals(expected, protocol);
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       fail();
     }
   }

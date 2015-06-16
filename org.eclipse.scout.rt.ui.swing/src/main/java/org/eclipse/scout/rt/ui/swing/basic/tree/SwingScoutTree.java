@@ -68,7 +68,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -545,10 +544,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     };
 
     try {
-      getSwingEnvironment().invokeScoutLater(t, 1234).awaitDoneAndGet(1234, TimeUnit.MILLISECONDS);
+      getSwingEnvironment().invokeScoutLater(t, 1234).awaitDone(1234, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException | JobException e) {
-      LOG.debug("exception occured while joining on model thread: ", e);
+    catch (ProcessingException e) {
+      // NOOP
     }
     if (scrollbarValues.get() != null) {
       /*
@@ -766,9 +765,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDoneAndGet(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
       }
-      catch (ProcessingException | JobException e) {
+      catch (ProcessingException e) {
         // NOOP
       }
       // end notify
