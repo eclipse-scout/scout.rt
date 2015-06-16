@@ -436,7 +436,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
           doClick();
         }
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

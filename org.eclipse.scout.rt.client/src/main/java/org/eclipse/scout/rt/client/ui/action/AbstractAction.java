@@ -498,7 +498,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       try {
         interceptSelectionChanged(b);
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
