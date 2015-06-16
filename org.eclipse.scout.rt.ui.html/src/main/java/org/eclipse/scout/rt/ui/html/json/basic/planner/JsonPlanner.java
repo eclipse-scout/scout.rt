@@ -115,6 +115,12 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_HEADER_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHeaderVisible();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTION_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {

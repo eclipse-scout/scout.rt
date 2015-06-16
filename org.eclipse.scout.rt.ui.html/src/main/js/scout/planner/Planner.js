@@ -107,6 +107,7 @@ scout.Planner.prototype._renderProperties = function() {
   // render with setTimeout because the planner needs to be layouted first
   setTimeout(this._renderSelectionRange.bind(this));
   this._renderDisplayMode();
+  this._renderHeaderVisible();
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -199,6 +200,7 @@ scout.Planner.prototype._updateScreen = function() {
     this.$grid.animateAVCSD('width', '100%');
     this.$scale.animateAVCSD('width', '100%');
   }
+  this.$year.parent().setVisible(this.showYearPanel);
 
   // color year
   this.colorYear();
@@ -799,6 +801,11 @@ scout.Planner.prototype._dateFormat = function(date, pattern) {
 scout.Planner.prototype._renderViewRange = function() {
   //FIXME CGU/CRU always redraw whole screen? what if several properties change?
   this._updateScreen();
+};
+
+scout.Planner.prototype._renderHeaderVisible = function() {
+  this.$header.setVisible(this.headerVisible);
+  this.invalidateTree();
 };
 
 scout.Planner.prototype._renderWorkDayCount = function() {};

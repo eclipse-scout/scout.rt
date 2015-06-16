@@ -122,7 +122,6 @@
   display: inline-block;
   width: 0%;
   padding: 0;
-  height: calc(~"100%" - @planner-header-height);
   background-color: @palette-white;
   overflow: hidden;
 
@@ -225,8 +224,6 @@
 .planner-scale {
   position: absolute;
   right: 0px;
-  top: @planner-header-height;
-
   height: @planner-header-height;
   border-bottom:  1px solid @palette-gray-4;
   width: 100%;
@@ -297,9 +294,6 @@
 .planner-grid {
   position: absolute;
   right: 0px;
-  top: 2 * @planner-header-height;
-
-  height: calc(~"100%" - 2 * @planner-header-height);
   width: 100%;
   overflow: hidden;
 
