@@ -1027,10 +1027,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Refresh all column values to trigger validate and format
+   * Refresh all column values to trigger re-validate and re-format
    */
-  @Internal
-  protected void refreshValues() {
+  public void refreshValues() {
     try {
       if (isInitialized()) {
         if (getTable() != null) {

@@ -144,7 +144,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   public void setTextWrap(boolean b) {
     propertySupport.setPropertyBool(IStringField.PROP_WRAP_TEXT, b);
-    validateColumnValues();
   }
 
   @Override
@@ -167,7 +166,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     if (len > 0) {
       propertySupport.setPropertyInt(IStringField.PROP_MAX_LENGTH, len);
     }
-    validateColumnValues();
+    refreshValues();
   }
 
   @Override
@@ -238,11 +237,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     super.mapEditorFieldProperties(f);
     f.setInputMasked(isInputMasked());
     f.setFormat(getDisplayFormat());
-    f.setWrapText(isTextWrap());
     f.setSelectAllOnFocus(isSelectAllOnEdit());
     f.setMaxLength(getMaxLength());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);
+    f.setWrapText(isTextWrap());
     f.setWrapText(true); // avoid to have an horizontal scroll bar
   }
 

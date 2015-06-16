@@ -202,7 +202,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
       propertySupport.setProperty(PROP_MIN_VALUE, maxValue);
     }
     propertySupport.setProperty(PROP_MAX_VALUE, maxValue);
-    validateColumnValues();
+    refreshValues();
   }
 
   @SuppressWarnings("unchecked")
@@ -228,7 +228,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
       propertySupport.setProperty(PROP_MAX_VALUE, minValue);
     }
     propertySupport.setProperty(PROP_MIN_VALUE, minValue);
-    validateColumnValues();
+    refreshValues();
   }
 
   @SuppressWarnings("unchecked")

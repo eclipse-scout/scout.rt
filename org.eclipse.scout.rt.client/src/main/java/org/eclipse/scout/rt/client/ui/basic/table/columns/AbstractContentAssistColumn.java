@@ -193,7 +193,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     if (m_codeTypeClass != null) {
       m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
     }
-    validateColumnValues();
+    refreshValues();
   }
 
   @Override
