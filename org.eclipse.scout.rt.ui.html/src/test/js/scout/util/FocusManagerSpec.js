@@ -11,6 +11,7 @@ describe("scout.Focusmanager", function() {
     jasmine.Ajax.install();
     session = sandboxSession();
     session.init();
+    jasmine.clock().install();
     focusContextsForSession = scout.focusManager._sessionFocusContexts[session.uiSessionId].focusContexts;
     uninstallUnloadHandlers(session);
   });
@@ -19,6 +20,7 @@ describe("scout.Focusmanager", function() {
     session = null;
     focusContextsForSession = null;
     jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
   });
 
   describe("install focuscontext and let focusmanager set the first element", function() {
@@ -39,7 +41,6 @@ describe("scout.Focusmanager", function() {
       afterEach(function() {
         form.remove();
         form = null;
-
       });
       it("focus first input field over focusManager", function() {
         $.log.trace('second test');
@@ -64,17 +65,14 @@ describe("scout.Focusmanager", function() {
           //old context should have second field as last selected
           expect(focusContextsForSession[0]._$focusedElement[0]).toBe(form.rootGroupBox.fields[1].$field[0]);
           focusHelper.checkListeners(form.rootGroupBox.fields[1].$field[0], true);
-
         });
         describe('Additional focus context(open dialog)', function() {
           var dialogform;
-          beforeEach(function(done) {
+          beforeEach(function() {
             //open dialog with glass pane
               dialogform = formHelper.createFormXFields(4, session, true);
               dialogform.render(session.$entryPoint);
-              setTimeout(function() {
-                done();
-              }.bind(this));
+              jasmine.clock().tick(100);
           });
 
           it("New focusContext is installed for dialog and first element on dialog is selected", function() {
