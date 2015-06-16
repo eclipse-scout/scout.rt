@@ -187,10 +187,10 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_DRAW_SECTIONS, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTION_MODE, model) {
       @Override
-      protected Boolean modelValue() {
-        return getModel().isDrawSections();
+      protected Integer modelValue() {
+        return getModel().getSelectionMode();
       }
     });
 

@@ -19,23 +19,6 @@ scout.Planner = function() {
   this.$year;
   this.$grid;
 
-  // display mode
-  this.DAY = 1;
-  this.WEEK = 2;
-  this.MONTH = 3;
-  this.WORK = 4;
-  this.CALENDAR_WEEK = 5;
-  this.YEAR = 6;
-
-  // selection mode
-  this.NONE = 1;
-  this.ACTIVITY = 2;
-  this.SELECTOR_ONE = 3;
-  this.SELECTOR_MORE = 4;
-
-  // test
-  this.selecMode = 4;
-
   // scale calculator
   this.transformLeft = function(t) {
     return t;
@@ -45,15 +28,30 @@ scout.Planner = function() {
   };
 
   // additional modes; should be stored in model
-  this.showYear = false;
+  this.showYearPanel = false;
 };
+scout.inherits(scout.Planner, scout.ModelAdapter);
 
 scout.Planner.Direction = {
   BACKWARD: -1,
   FORWARD: 1
 };
 
-scout.inherits(scout.Planner, scout.ModelAdapter);
+scout.Planner.DisplayMode = {
+  DAY:  1,
+  WEEK:  2,
+  MONTH:  3,
+  WORK:  4,
+  CALENDAR_WEEK:  5,
+  YEAR:  6
+};
+
+scout.Planner.SelectionMode = {
+  NONE: 0,
+  ACTIVITY: 1,
+  SINGLE_RANGE: 2,
+  MULTI_RANGE: 3
+};
 
 scout.Planner.prototype.init = function(model, session) {
   scout.Planner.parent.prototype.init.call(this, model, session);
@@ -122,19 +120,20 @@ scout.Planner.prototype._onClickNext = function(event) {
 };
 
 scout.Planner.prototype._navigateDate = function(direction) {
-  if (this.displayMode == this.DAY) {
+  var DISPLAY_MODE = scout.Planner.DisplayMode;
+  if (this.displayMode == DISPLAY_MODE.DAY) {
     this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
     this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
-  } else if (this.displayMode == this.WEEK || this.displayMode == this.WORK) {
+  } else if (this.displayMode == DISPLAY_MODE.WEEK || this.displayMode == DISPLAY_MODE.WORK) {
     this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
     this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
-  } else if (this.displayMode == this.MONTH) {
+  } else if (this.displayMode == DISPLAY_MODE.MONTH) {
     this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
     this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
-  } else if (this.displayMode == this.CALENDAR_WEEK) {
+  } else if (this.displayMode == DISPLAY_MODE.CALENDAR_WEEK) {
     this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
     this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
-  } else if (this.displayMode == this.YEAR) {
+  } else if (this.displayMode == DISPLAY_MODE.YEAR) {
     this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
     this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 3 * direction, 0);
   }
@@ -159,7 +158,7 @@ scout.Planner.prototype._onClickDisplayMode = function(event) {
 
 scout.Planner.prototype._onClickYear = function(event) {
   // set flag
-  this.showYear = !this.showYear;
+  this.showYearPanel = !this.showYearPanel;
 
   // update screen
   this._updateScreen();
@@ -183,7 +182,7 @@ scout.Planner.prototype._updateScreen = function() {
   this._renderSelectedResources();
 
   // if year shown and changed, redraw year
-  if (this.showYear) {
+  if (this.showYearPanel) {
     this.$year.empty();
     this.drawYear();
 
@@ -208,7 +207,8 @@ scout.Planner.prototype._updateScreen = function() {
 scout.Planner.prototype._layoutRange = function() {
   var text,
     toDate = new Date(this.viewRange.to.valueOf() - 1),
-    toText = ' bis ';
+    toText = ' bis ',
+    DISPLAY_MODE = scout.Planner.DisplayMode;
 
   // find range text
   if (scout.dates.isSameDay(this.viewRange.from, toDate)) {
@@ -216,13 +216,13 @@ scout.Planner.prototype._layoutRange = function() {
   } else if (this.viewRange.from.getMonth() == toDate.getMonth() && this.viewRange.from.getFullYear() == toDate.getFullYear()) {
     text = this._dateFormat(this.viewRange.from, 'd.') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
   } else if (this.viewRange.from.getFullYear() === toDate.getFullYear()) {
-    if (this.displayMode == this.YEAR) {
+    if (this.displayMode == DISPLAY_MODE.YEAR) {
       text = this._dateFormat(this.viewRange.from, 'MMMM') + toText + this._dateFormat(toDate, 'MMMM yyyy');
     } else {
       text = this._dateFormat(this.viewRange.from, 'd.  MMMM') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
     }
   } else {
-    if (this.displayMode == this.YEAR) {
+    if (this.displayMode == DISPLAY_MODE.YEAR) {
       text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(toDate, 'MMMM yyyy');
     } else {
       text = this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
@@ -233,12 +233,8 @@ scout.Planner.prototype._layoutRange = function() {
   $('.planner-select', this.$range).text(text);
 };
 scout.Planner.prototype._layoutScale = function() {
-  var $timelineLarge,
-    $timelineSmall,
-    loop,
-    $divLarge,
-    $divSmall,
-    width;
+  var $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width,
+    DISPLAY_MODE = scout.Planner.DisplayMode;
 
   // empty scale
   this.$scale.empty();
@@ -251,7 +247,7 @@ scout.Planner.prototype._layoutScale = function() {
   // fill timeline large depending on mode
   // TODO: depending on screen size: smaller or large representation
   // TODO: change to shift
-  if (this.displayMode === this.DAY) {
+  if (this.displayMode === DISPLAY_MODE.DAY) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end
@@ -269,7 +265,7 @@ scout.Planner.prototype._layoutScale = function() {
 
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
-  } else if ((this.displayMode === this.WORK) || (this.displayMode === this.WEEK)) {
+  } else if ((this.displayMode === DISPLAY_MODE.WORK) || (this.displayMode === DISPLAY_MODE.WEEK)) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end
@@ -294,7 +290,7 @@ scout.Planner.prototype._layoutScale = function() {
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
-  } else if (this.displayMode === this.MONTH) {
+  } else if (this.displayMode === DISPLAY_MODE.MONTH) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end
@@ -317,7 +313,7 @@ scout.Planner.prototype._layoutScale = function() {
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
-  } else if (this.displayMode === this.CALENDAR_WEEK) {
+  } else if (this.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end
@@ -342,7 +338,7 @@ scout.Planner.prototype._layoutScale = function() {
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
-  } else if (this.displayMode === this.YEAR) {
+  } else if (this.displayMode === DISPLAY_MODE.YEAR) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end
@@ -492,9 +488,14 @@ scout.Planner.prototype._build$Activity = function(activity) {
 
 scout.Planner.prototype._onCellMousedown = function(event) {
   var $activity,
-    $resource;
+    $resource,
+    SELECTION_MODE = scout.Planner.SelectionMode;
 
-  if (this.selecMode == this.NONE) {} else if (this.selecMode == this.ACTIVITY) {
+  if (this.selectionMode == SELECTION_MODE.NONE) {
+    return;
+  }
+
+  if (this.selectionMode == SELECTION_MODE.ACTIVITY) {
     $activity = $(document.elementFromPoint(event.pageX, event.pageY));
 
     if ($activity.hasClass('activity')) {
@@ -571,7 +572,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
     $lastRow = this.lastRow.$resource;
 
   // in case of single selection
-  if (this.selecMode == this.SELECTOR_ONE) {
+  if (this.selectionMode == scout.Planner.SelectionMode.SINGLE_RANGE) {
     this.lastRow = this.startRow;
   }
 
@@ -680,7 +681,7 @@ scout.Planner.prototype.drawYear = function() {
 
 scout.Planner.prototype.colorYear = function() {
   // color is only needed if visible
-  if (!this.showYear) {
+  if (!this.showYearPanel) {
     return;
   }
   /*
@@ -733,28 +734,26 @@ scout.Planner.prototype._onYearDayClick = function(event) {
 
 scout.Planner.prototype._onYearHoverIn = function(event) {
   // init vars
-  var $day = $(event.target),
+  var startHover, endHover, $day2, date2,
+    $day = $(event.target),
     date1 = $day.data('date'),
     year = date1.getFullYear(),
     month = date1.getMonth(),
     date = date1.getDate(),
     day = (date1.getDay() + 6) % 7,
-    that = this,
-    startHover,
-    endHover,
-    $day2, date2;
+    DISPLAY_MODE = scout.Planner.DisplayMode;
 
   // find hover based on mode
-  if (this.displayMode === this.DAY) {
+  if (this.displayMode === DISPLAY_MODE.DAY) {
     startHover = new Date(year, month, date);
     endHover = new Date(year, month, date);
-  } else if (this.displayMode === this.WEEK) {
+  } else if (this.displayMode === DISPLAY_MODE.WEEK) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 6);
-  } else if (this.displayMode === this.MONTH) {
+  } else if (this.displayMode === DISPLAY_MODE.MONTH) {
     startHover = new Date(year, month, 1);
     endHover = new Date(year, month + 1, 0);
-  } else if (this.displayMode === this.WORK) {
+  } else if (this.displayMode === DISPLAY_MODE.WORK) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 4);
 
@@ -778,7 +777,6 @@ scout.Planner.prototype._onYearHoverIn = function(event) {
     if (scout.dates.isSameDay(date1, date2)) {
       $day2.addClass('year-hover-day');
     }
-
   });
 };
 
@@ -814,27 +812,28 @@ scout.Planner.prototype._renderLastHourOfDay = function() {};
 scout.Planner.prototype._renderIntradayInterval = function() {};
 
 scout.Planner.prototype._renderAvailableDisplayModes = function() {
+  var DISPLAY_MODE = scout.Planner.DisplayMode;
   this.$commands.empty();
 
   this.$commands.appendDiv('planner-today').click(this._onClickToday.bind(this));
   this.$commands.appendDiv('planner-separator');
-  if (this.availableDisplayModes.indexOf(this.DAY) > -1) {
-    this.$commands.appendDiv('planner-mode-day planner-mode').attr('data-mode', this.DAY).click(this._onClickDisplayMode.bind(this));
+  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.DAY) > -1) {
+    this.$commands.appendDiv('planner-mode-day planner-mode').attr('data-mode', DISPLAY_MODE.DAY).click(this._onClickDisplayMode.bind(this));
   }
-  if (this.availableDisplayModes.indexOf(this.WORK) > -1) {
-    this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', this.WORK).click(this._onClickDisplayMode.bind(this));
+  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WORK) > -1) {
+    this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', DISPLAY_MODE.WORK).click(this._onClickDisplayMode.bind(this));
   }
-  if (this.availableDisplayModes.indexOf(this.WEEK) > -1) {
-    this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', this.WEEK).click(this._onClickDisplayMode.bind(this));
+  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WEEK) > -1) {
+    this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', DISPLAY_MODE.WEEK).click(this._onClickDisplayMode.bind(this));
   }
-  if (this.availableDisplayModes.indexOf(this.MONTH) > -1) {
-    this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', this.MONTH).click(this._onClickDisplayMode.bind(this));
+  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.MONTH) > -1) {
+    this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', DISPLAY_MODE.MONTH).click(this._onClickDisplayMode.bind(this));
   }
-  if (this.availableDisplayModes.indexOf(this.CALENDAR_WEEK) > -1) {
-    this.$commands.appendDiv('planner-mode-cw planner-mode').attr('data-mode', this.CALENDAR_WEEK).click(this._onClickDisplayMode.bind(this));
+  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.CALENDAR_WEEK) > -1) {
+    this.$commands.appendDiv('planner-mode-cw planner-mode').attr('data-mode', DISPLAY_MODE.CALENDAR_WEEK).click(this._onClickDisplayMode.bind(this));
   }
-  if (this.availableDisplayModes.indexOf(this.YEAR) > -1) {
-    this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', this.YEAR).click(this._onClickDisplayMode.bind(this));
+  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.YEAR) > -1) {
+    this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', DISPLAY_MODE.YEAR).click(this._onClickDisplayMode.bind(this));
   }
   this.$commands.appendDiv('planner-separator');
   this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
