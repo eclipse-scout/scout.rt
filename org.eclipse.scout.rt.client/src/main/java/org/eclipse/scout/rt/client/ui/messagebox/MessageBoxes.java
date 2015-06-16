@@ -20,6 +20,10 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  */
 public class MessageBoxes {
 
+  private MessageBoxes() {
+    // factory, private constructor
+  }
+
   /**
    * Creates a message box with no defined buttons.
    * <p>
