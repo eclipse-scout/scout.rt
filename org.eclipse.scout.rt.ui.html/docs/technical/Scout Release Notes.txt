@@ -336,35 +336,37 @@ This is the simple way, otherwise a more complex regex would be required.
 Use a pattern for temporary replacement that is not used anywhere else in the source code, e.g. §§__§§.
 Eclipse doesn't currently support replacement with lookahead expression, thus this will not work if executed with Eclipse search & replace.
 
-Find:    (?<=MessageBox\.show(Ok|YesNo|YesNoCancel)Message\(([^\n]){0,200})TEXTS\.get\(("[\w]+"),([^\n,\)]+)\)
-Replace: TEXTS.get(\1§§__§§\2)
-
+  Find:    (?<=MessageBox\.show(Ok|YesNo|YesNoCancel)Message\(([^\n]){0,200})TEXTS\.get\(("[\w]+"),([^\n,\)]+)\)
+  Replace: TEXTS.get(\1§§__§§\2)
 
 If title was null, "" or TEXTS.get("ApplicationTitle") no special considerations are required.
 Depending on how configured the Name of our application, you might used TEXTS.get("MyApplicationName") instead of TEXTS.get("ApplicationTitle).
 
-Find:    MessageBox.show(Ok|YesNo|YesNoCancel)Message\((?:null|""|TEXTS.get\("ApplicationTitle"\)), ([^,\n]+?), ([^,\n]+?)\)(;|[ ]*==|[ ]*!=)
-Replace: MessageBoxes.create\1().header(\2).body(\3).show()\4
-
+  Find:    MessageBox.show(Ok|YesNo|YesNoCancel)Message\((?:null|""|TEXTS.get\("ApplicationTitle"\)), ([^,\n]+?), ([^,\n]+?)\)(;|[ ]*==|[ ]*!=)
+  Replace: MessageBoxes.create\1().header(\2).body(\3).show()\4
 
 If a real title is set, a manual check is required.
 The old title might not be required anymore or the old title should be the new header
 and existing header should be moved to new body (possible concat with old body).
 
-Find:    MessageBox.show(Ok|YesNo|YesNoCancel)Message\(([^,\n]+?), ([^,\n]+?), ([^,\n]+?)\)(;|[ ]*==|[ ]*!=)
-Replace: MessageBoxes.create\1().header(\3).body(\4).show()\5 /* XXX [messagebox] verify auto-migration, title: \2 */
-
+  Find:    MessageBox.show(Ok|YesNo|YesNoCancel)Message\(([^,\n]+?), ([^,\n]+?), ([^,\n]+?)\)(;|[ ]*==|[ ]*!=)
+  Replace: MessageBoxes.create\1().header(\3).body(\4).show()\5 /* XXX [messagebox] verify auto-migration, title: \2 */
 
 Restore the temporary changed , by replacing §§__§§ by , again.
 After executing search & replace, take a look at the XXX [messagebox] tasks.
 
 As a last step, header(null) or body(null) can be removed, because they have no effect.
 
-Find:    MessageBoxes.create(.+)\(\)([^\n]*)?(\.header\(null\)|\.body\(null\))([^\n]*)?.show\(\)
-Replace: MessageBoxes.create\1()\2\4.show()
-
+  Find:    MessageBoxes.create(.+)\(\)([^\n]*)?(\.header\(null\)|\.body\(null\))([^\n]*)?.show\(\)
+  Replace: MessageBoxes.create\1()\2\4.show()
 
 SME 16.06.2015
 org.eclipse.scout.commons.dnd.TransferObject
 removed isText(), isFileList(), isImage(), isLocalObject(): replacement: instanceof check for the appropriate subclasses of TransferObject
 renamed FileListTransferObject to ResourceListTransferObject
+
+BSH 16.06.2015
+IBrowserField is no longer a value field. The RemoteFile value was changed to a property of type BinaryResource.
+Migration:
+- Instead of setValue()/getValue() use setBinaryResource()/getBinaryResource()
+- Instead of execChangedValue() use a BrowserFieldListener
