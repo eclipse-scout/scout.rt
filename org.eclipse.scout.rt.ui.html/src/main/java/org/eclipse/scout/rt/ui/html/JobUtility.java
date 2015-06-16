@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -44,12 +43,11 @@ public final class JobUtility {
       Filter filter = ModelJobs.newFutureFilter().andMatchSession(clientSession).andAreNotBlocked();
       timeout = !Jobs.getJobManager().awaitDone(filter, AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (JobException e) {
-      throw new JsonException("Interrupted while waiting for model jobs [clientSession=%s]", e, clientSession);
+    catch (ProcessingException e) {
+      throw new JsonException("Interrupted while waiting for model jobs to complete [clientSession=%s]", e, clientSession);
     }
-
     if (timeout) {
-      throw new JsonException("Timeout while waiting for model jobs [timeout=%ss, clientSession=%s]", new TimeoutException(), TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT), clientSession);
+      throw new JsonException("Timeout while waiting for model jobs to complete [timeout=%ss, clientSession=%s]", new TimeoutException(), TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT), clientSession);
     }
   }
 
@@ -98,7 +96,7 @@ public final class JobUtility {
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFutures(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (JobException e) {
+    catch (ProcessingException e) {
       throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, callable.getClass().getName(), future);
     }
 
