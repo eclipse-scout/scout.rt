@@ -17,10 +17,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,12 +46,12 @@ public class SharedCodeServiceTest {
   @Test
   public void testGetAllCodeTypeClasses() {
     ICodeService service = new P_SharedCodeService();
-    Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses1 = service.getAllCodeTypeClasses("");
+    Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses1 = service.getAllCodeTypeClasses("");
     assertEquals("codeTypeClasses1 size", 2, codeTypeClasses1.size());
     assertEquals("codeTypeClasses1 contains AbcCodeType", true, codeTypeClasses1.contains(AbcCodeType.class));
     assertEquals("codeTypeClasses1 contains ZyxCodeType", true, codeTypeClasses1.contains(ZyxCodeType.class));
 
-    Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses2 = service.getAllCodeTypeClasses("");
+    Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses2 = service.getAllCodeTypeClasses("");
     assertEquals("codeTypeClasses2 size", 1, codeTypeClasses2.size());
     assertEquals("codeTypeClasses2 contains AbcCodeType", true, codeTypeClasses2.contains(AbcCodeType.class));
     assertEquals("codeTypeClasses2 contains ZyxCodeType", false, codeTypeClasses2.contains(ZyxCodeType.class));
@@ -63,20 +65,18 @@ public class SharedCodeServiceTest {
   @Test
   public void testGetAllCodeTypesString() {
     ICodeService service = new P_SharedCodeService();
-    List<ICodeType<?, ?>> codeTypes1 = service.getAllCodeTypes("");
+    Collection<ICodeType<?, ?>> codeTypes1 = service.getAllCodeTypes("");
     assertEquals("size", 2, codeTypes1.size());
-    if (codeTypes1.get(0) instanceof AbcCodeType) {
-      assertEquals("codeType 1 (0)", AbcCodeType.class, codeTypes1.get(0).getClass());
-      assertEquals("codeType 1 (1)", ZyxCodeType.class, codeTypes1.get(1).getClass());
+    Set<Class<?>> codeTypeClasses = new HashSet<Class<?>>(2);
+    for (ICodeType<?, ?> ct : codeTypes1) {
+      codeTypeClasses.add(ct.getClass());
     }
-    else {
-      assertEquals("codeType 1 (0)", ZyxCodeType.class, codeTypes1.get(0).getClass());
-      assertEquals("codeType 1 (1)", AbcCodeType.class, codeTypes1.get(1).getClass());
-    }
+    assertTrue(codeTypeClasses.contains(AbcCodeType.class));
+    assertTrue(codeTypeClasses.contains(ZyxCodeType.class));
 
-    List<ICodeType<?, ?>> codeTypes2 = service.getAllCodeTypes("");
+    Collection<ICodeType<?, ?>> codeTypes2 = service.getAllCodeTypes("");
     assertEquals("size", 1, codeTypes2.size());
-    assertEquals("codeType 2 (0)", AbcCodeType.class, codeTypes2.get(0).getClass());
+    assertEquals("codeType 2 (0)", AbcCodeType.class, CollectionUtility.firstElement(codeTypes2).getClass());
   }
 
   /**

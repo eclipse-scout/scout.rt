@@ -137,10 +137,11 @@ public class BeanHierarchy<T> {
           }
           lastSeen = bean.getBeanClazz();
         }
+        // TODO[aho] remove filtering
         //filter beans not matching scope
-        if (evaluator != null) {
-          list = evaluator.filter(list, scope);
-        }
+//        if (evaluator != null) {
+//          list = evaluator.filter(list, scope);
+//        }
 
         //manage replaced beans
         HashMap<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value

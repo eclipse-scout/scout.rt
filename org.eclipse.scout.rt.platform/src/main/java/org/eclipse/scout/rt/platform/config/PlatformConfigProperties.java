@@ -157,4 +157,5 @@ public final class PlatformConfigProperties {
       return Integer.valueOf(1);
     }
   }
+
 }

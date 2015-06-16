@@ -16,18 +16,11 @@ import org.eclipse.scout.rt.platform.service.IService;
  * The {@link IClusterNotificationListener} provided by this interface is automatically added
  * through {@link IClusterSynchronizationService#addListener(IClusterNotificationListener)} when the cluster
  * synchronization service is enabled ({@link IClusterSynchronizationService#enable()}).
+ *
+ * @deprecated use {@link INotificationHandler<>}
  */
+@Deprecated
 public interface IClusterNotificationListenerService extends IService {
-
-  /**
-   * The defining service interface is used to avoid adding overridden service registrations as listeners.
-   * <p>
-   * Therefore only one service with the highest ranking with respect to the defining service interface is added as
-   * listener.
-   *
-   * @return service interface - not null
-   */
-  Class<? extends IService> getDefiningServiceInterface();
 
   /**
    * @return {@link IClusterNotificationListener} to be added to {@link IClusterNotificationListenerService}

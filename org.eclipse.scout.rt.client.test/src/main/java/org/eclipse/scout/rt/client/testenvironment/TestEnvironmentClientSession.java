@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.testenvironment;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -47,16 +47,25 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   }
 
   @Override
+  public String getUserId() {
+    String userId = super.getUserId();
+    if (StringUtility.isNullOrEmpty(userId)) {
+      userId = System.getProperty("user.name");
+    }
+    return userId;
+  }
+
+  @Override
   protected void execStoreSession() throws ProcessingException {
   }
 
-  /**
-   * export method as public setter
-   */
-  @Override
-  public void setServiceTunnel(IClientServiceTunnel tunnel) {
-    super.setServiceTunnel(tunnel);
-  }
+//  /**
+//   * export method as public setter
+//   */
+//  @Override
+//  public void setServiceTunnel(IClientServiceTunnel tunnel) {
+//    super.setServiceTunnel(tunnel);
+//  }
 
   @Override
   public IDesktop getDesktop() {

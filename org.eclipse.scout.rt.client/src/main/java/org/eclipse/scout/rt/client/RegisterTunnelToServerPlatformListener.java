@@ -7,9 +7,11 @@ import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.CreateTunnelToServerBeansProperty;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
@@ -21,13 +23,13 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanManagerPrepared) {
+      if (!CONFIG.getPropertyValue(CreateTunnelToServerBeansProperty.class)) {
+        return;
+      }
       //register all tunnels to server
       for (IClassInfo ci : ClassInventory.get().getKnownAnnotatedTypes(TunnelToServer.class)) {
-        if (!ci.isPublic()) {
-          continue;
-        }
-        if (!ci.isInterface()) {
-          LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on interfaces, not on " + ci.name());
+        if (!ci.isInterface() || !ci.isPublic()) {
+          LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on public interfaces, not on " + ci.name());
           continue;
         }
         Class<?> c;

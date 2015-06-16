@@ -23,16 +23,14 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
-import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
-import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.FineGrainedAccessCheckRequiredException;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlNotification;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
@@ -45,7 +43,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 @Client
 @Order(10)
 @CreateImmediately
-public class AccessControlServiceClientProxy extends AbstractService implements IAccessControlService {
+public class AccessControlServiceClientProxy extends AbstractService implements IAccessControlService, INotificationHandler<IAccessControlNotification> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);
   private static final String SESSION_DATA_KEY = "accessControlServiceState";
 
@@ -64,23 +62,16 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   @Override
-  public void initializeService() {
-    super.initializeService();
-    // add client notification listener
-    BEANS.get(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
-      @Override
-      public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
-        if (e.getClientNotification().getClass() == AccessControlChangedNotification.class) {
-          ServiceState state = getServiceState();
-          synchronized (state.m_cacheLock) {
-            state.m_permissions = ((AccessControlChangedNotification) e.getClientNotification()).getPermissions();
-          }
-        }
-        else if (e.getClientNotification().getClass() == ResetAccessControlChangedNotification.class) {
-          clearCache();
-        }
+  public void handleNotification(IAccessControlNotification notification) {
+    if (notification.getClass() == AccessControlChangedNotification.class) {
+      ServiceState state = getServiceState();
+      synchronized (state.m_cacheLock) {
+        state.m_permissions = ((AccessControlChangedNotification) notification).getPermissions();
       }
-    });
+    }
+    else if (notification.getClass() == ResetAccessControlChangedNotification.class) {
+      clearCache();
+    }
   }
 
   @Override
@@ -197,7 +188,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   private IAccessControlService getRemoteService() {
-    return ServiceTunnelUtility.createProxy(IAccessControlService.class, ClientSessionProvider.currentSession().getServiceTunnel());
+    return ServiceTunnelUtility.createProxy(IAccessControlService.class);
   }
 
   private static class ServiceState {

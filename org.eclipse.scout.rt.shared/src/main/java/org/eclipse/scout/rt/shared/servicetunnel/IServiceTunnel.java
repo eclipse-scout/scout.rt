@@ -13,11 +13,22 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Interface of a tunnel used to invoke a service through HTTP.
  */
+@Bean
 public interface IServiceTunnel {
+
+  /**
+   * The service tunnel is accessible over the {@link BEANS}. The service tunnel will always be available and indicates
+   * readiness for usage with the active {@link IServiceTunnel#isActive()} method.
+   * 
+   * @return true when the service tunnel is ready to get invoked false otherwise.
+   */
+  boolean isActive();
 
   /**
    * Invoke a remote service through a service tunnel<br>

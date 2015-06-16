@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.services.common.code;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,7 +21,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -29,15 +29,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
-import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
-import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
@@ -55,7 +51,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 @Client
 @Order(3)
 @CreateImmediately
-public class CodeServiceClientProxy extends AbstractService implements ICodeService {
+@ApplicationScoped
+public class CodeServiceClientProxy extends AbstractService implements ICodeService, INotificationHandler<CodeTypeChangedNotification> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeServiceClientProxy.class);
 
   private final Object m_stateLock = new Object();
@@ -91,33 +88,13 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   @Override
-  public void initializeService() {
-    super.initializeService();
-    // add client notification listener
-    BEANS.get(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
-      @Override
-      public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
-        if (e.getClientNotification().getClass() == CodeTypeChangedNotification.class) {
-          final CodeTypeChangedNotification notification = (CodeTypeChangedNotification) e.getClientNotification();
-          if (sync) {
-            try {
-              reloadCodeTypes(notification.getCodeTypes());
-            }
-            catch (Exception t) {
-              LOG.error("update due to client notification", t);
-            }
-          }
-          else {
-            ModelJobs.schedule(new IRunnable() {
-              @Override
-              public void run() throws Exception {
-                reloadCodeTypes(notification.getCodeTypes());
-              }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Reload code types"));
-          }
-        }
-      }
-    });
+  public void handleNotification(CodeTypeChangedNotification notification) {
+    try {
+      reloadCodeTypes(new ArrayList<Class<? extends ICodeType<?, ?>>>(notification.getCodeTypes()));
+    }
+    catch (Exception t) {
+      LOG.error("update due to client notification", t);
+    }
   }
 
   @Override
@@ -349,7 +326,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
       }
       // load code types from server-side
       Set<Class<? extends ICodeType<?, ?>>> verifiedCodeTypes = new HashSet<>();
-      Set<Class<? extends ICodeType<?, ?>>> remoteCodeTypes = getRemoteService().getAllCodeTypeClasses(classPrefix);
+      Collection<Class<? extends ICodeType<?, ?>>> remoteCodeTypes = getRemoteService().getAllCodeTypeClasses(classPrefix);
       ClassLoader classLoader = getClass().getClassLoader();
       for (Class<? extends ICodeType<?, ?>> d : remoteCodeTypes) {
         try {
@@ -397,7 +374,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   protected ICodeService getRemoteService() {
-    return ServiceTunnelUtility.createProxy(ICodeService.class, ClientSessionProvider.currentSession().getServiceTunnel());
+    return ServiceTunnelUtility.createProxy(ICodeService.class);
   }
 
   private static class ServiceState {

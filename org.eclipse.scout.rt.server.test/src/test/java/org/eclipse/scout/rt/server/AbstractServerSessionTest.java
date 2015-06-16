@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
@@ -58,7 +59,7 @@ public class AbstractServerSessionTest {
 
   @Test
   public void testDeserializeLoadedSession() throws IOException, ProcessingException, ClassNotFoundException {
-    m_testSession.start();
+    m_testSession.start(UUID.randomUUID().toString());
     byte[] serializedSession = m_objs.serialize(m_testSession);
     IServerSession deserializedSession = m_objs.deserialize(serializedSession, IServerSession.class);
     assertSessionsEquals(m_testSession, deserializedSession);

@@ -15,12 +15,18 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
 import java.util.concurrent.Callable;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.ICancellable;
@@ -29,48 +35,58 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
  */
-public abstract class AbstractHttpServiceTunnel<T extends ISession> extends AbstractServiceTunnel<T> {
+public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
   private IServiceTunnelContentHandler m_contentHandler;
   private final URL m_serverUrl;
+  private final boolean m_active;
 
-  public AbstractHttpServiceTunnel(T session) {
-    this(session, getConfiguredServerUrl());
+  public AbstractHttpServiceTunnel() {
+    this(getConfiguredServerUrl());
   }
 
-  public AbstractHttpServiceTunnel(T session, URL url) {
-    super(session);
+  public AbstractHttpServiceTunnel(URL url) {
     m_serverUrl = url;
+    m_active = url != null;
+    if (url == null) {
+      LOG.warn(String.format("No target url configured. Please specify a target URL in the config.properties using property '%s'.", BEANS.get(ServiceTunnelTargetUrlProperty.class).getKey()));
+    }
   }
 
   protected static URL getConfiguredServerUrl() {
     IConfigProperty<String> targetUrlProperty = BEANS.get(ServiceTunnelTargetUrlProperty.class);
     String url = targetUrlProperty.getValue();
-    try {
-      URL targetUrl = UriUtility.toUrl(url);
-      if (targetUrl == null) {
-        throw new IllegalArgumentException("No target url configured. Please specify a target URL in the config.properties using property '" + targetUrlProperty.getKey() + "'.");
+    if (StringUtility.hasText(url)) {
+      try {
+        URL targetUrl = UriUtility.toUrl(url);
+        return targetUrl;
       }
-      return targetUrl;
+      catch (ProcessingException e) {
+        throw new IllegalArgumentException("targetUrl: " + url, e);
+      }
     }
-    catch (ProcessingException e) {
-      throw new IllegalArgumentException("targetUrl: " + url, e);
-    }
+    return null;
+  }
+
+  @Override
+  public boolean isActive() {
+    return m_active;
   }
 
   public URL getServerUrl() {
@@ -88,7 +104,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    *           override this method to customize the creation of the {@link URLConnection} see
    *           {@link #addCustomHeaders(URLConnection, String)}
    */
-  protected URLConnection createURLConnection(IServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
     // fast check of dummy URL's
     if (getServerUrl().getProtocol().startsWith("file")) {
       throw new IOException("File connection is not supporting HTTP: " + getServerUrl());
@@ -133,7 +149,8 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
     if (!DefaultAuthToken.isActive()) {
       return null;
     }
-    String userId = CollectionUtility.firstElement(getSession().getSubject().getPrincipals()).getName();
+    String userId = CollectionUtility.firstElement(Assertions.assertNotNull(Subject.getSubject(AccessController.getContext())).getPrincipals()).getName();
+//    String userId = CollectionUtility.firstElement(getSession().getSubject().getPrincipals()).getName();
     DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
     token.init(userId);
     return token.toString();
@@ -169,7 +186,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
 
   @Override
   // Method overwritten to be accessible from within @{link RemoteServiceInvocationCallable}.
-  protected IServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
+  protected ServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
     return super.createServiceTunnelRequest(serviceInterfaceClass, operation, args);
   }
 
@@ -179,12 +196,12 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    * To enable cancellation, the callable returned must also implement {@link ICancellable}, so that the remote
    * operation can be cancelled once the current {@link RunMonitor} gets cancelled.
    */
-  protected RemoteServiceInvocationCallable createRemoteServiceInvocationCallable(IServiceTunnelRequest serviceRequest) {
+  protected RemoteServiceInvocationCallable createRemoteServiceInvocationCallable(ServiceTunnelRequest serviceRequest) {
     return new RemoteServiceInvocationCallable(this, serviceRequest);
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest serviceRequest) {
+  protected IServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
     final long requestSequence = serviceRequest.getRequestSequence();
 
     // Create the Callable to be given to the job manager for execution.
@@ -231,6 +248,6 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    *
    * @since 06.07.2009
    */
-  protected void preprocessHttpResponse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
+  protected void preprocessHttpResponse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
   }
 }

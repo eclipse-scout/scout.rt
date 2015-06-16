@@ -11,49 +11,39 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
-import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Notification is sent from server to client to notify that the code type has
  * changed and the client should clear its cache
  */
-public class CodeTypeChangedNotification extends AbstractClientNotification {
-  private static final long serialVersionUID = 1L;
-  private List<Class<? extends ICodeType<?, ?>>> m_codeTypes;
+public class CodeTypeChangedNotification implements Serializable {
 
-  public CodeTypeChangedNotification(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
-    for (Class<? extends ICodeType<?, ?>> codeTypeClazz : types) {
-      if (codeTypeClazz != null && codeTypeClazz.isAssignableFrom(Serializable.class)) {
-        throw new ProcessingException("Code type '" + codeTypeClazz.getName() + "' is not serializable!");
+  private static final long serialVersionUID = 1L;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeTypeChangedNotification.class);
+
+  private Set<Class<? extends ICodeType<?, ?>>> m_codeTypes;
+
+  public CodeTypeChangedNotification(Collection<Class<? extends ICodeType<?, ?>>> types) {
+    Iterator<Class<? extends ICodeType<?, ?>>> codeTypeClassIt = types.iterator();
+    while (codeTypeClassIt.hasNext()) {
+      Class<? extends ICodeType<?, ?>> next = codeTypeClassIt.next();
+      if (next != null && next.isAssignableFrom(Serializable.class)) {
+        LOG.error("Code type '" + next.getName() + "' is not serializable!");
+        codeTypeClassIt.remove();
       }
     }
-    m_codeTypes = CollectionUtility.arrayList(types);
+    m_codeTypes = CollectionUtility.hashSet(types);
   }
 
-  @Override
-  public boolean coalesce(IClientNotification existingNotification) {
-    CodeTypeChangedNotification n = (CodeTypeChangedNotification) existingNotification;
-    Set<Class<? extends ICodeType<?, ?>>> set = new HashSet<Class<? extends ICodeType<?, ?>>>();
-    set.addAll(this.m_codeTypes);
-    set.addAll(n.m_codeTypes);
-    m_codeTypes = new ArrayList<Class<? extends ICodeType<?, ?>>>(set);
-    if (!this.getOriginalServerNode().equals(existingNotification.getOriginalServerNode())) {
-      this.setOriginalServerNode("");
-    }
-    return true;
-  }
-
-  public List<Class<? extends ICodeType<?, ?>>> getCodeTypes() {
-    return CollectionUtility.arrayList(m_codeTypes);
+  public Set<Class<? extends ICodeType<?, ?>>> getCodeTypes() {
+    return CollectionUtility.hashSet(m_codeTypes);
   }
 
   @Override

@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationContainer;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
 import org.eclipse.scout.rt.server.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.shared.ISession;
@@ -165,14 +167,22 @@ public class ServerRunContextChainTest {
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
     assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 10. InitThreadLocalCallable for NotificationNodeId.CURRENT
     InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
+    assertSame(ClientNotificationNodeId.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c11 = getNextAndAssert(c10, TwoPhaseTransactionBoundaryCallable.class);
+    // 11. InitThreadLocalCallable for NotificationNodeId.CURRENT
+    InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
+    assertSame(ClientNotificationContainer.CURRENT, ((InitThreadLocalCallable) c11).getThreadLocal());
 
-    return c11;
+    // 12. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c12).getThreadLocal());
+
+    // 13. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c13 = getNextAndAssert(c12, TwoPhaseTransactionBoundaryCallable.class);
+
+    return c13;
   }
 
   @SuppressWarnings("unchecked")

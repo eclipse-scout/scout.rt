@@ -37,15 +37,11 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.context.SharedContextNotificationHanlder;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
-import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
-import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
-import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -62,6 +58,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
@@ -82,9 +79,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private volatile boolean m_isStopping;
   private int m_exitCode = 0;
   // model
+  private String m_id;
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
-  private IClientServiceTunnel m_serviceTunnel;
   private Subject m_offlineSubject;
   private Subject m_subject;
   private final SharedVariableMap m_sharedVariableMap;
@@ -140,6 +137,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Order(100)
   protected boolean getConfiguredSingleThreadSession() {
     return false;
+  }
+
+  @Override
+  public String getId() {
+    return m_id;
   }
 
   /**
@@ -244,33 +246,19 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
 
     // add client notification listener
-    IClientNotificationConsumerService clientNotificationConsumerService = BEANS.get(IClientNotificationConsumerService.class);
-    if (clientNotificationConsumerService != null) {
-      clientNotificationConsumerService.addClientNotificationConsumerListener(this, new IClientNotificationConsumerListener() {
-        @Override
-        public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
-          if (e.getClientNotification().getClass() == SharedContextChangedNotification.class) {
-            final SharedContextChangedNotification notification = (SharedContextChangedNotification) e.getClientNotification();
-            if (sync) {
-              try {
-                updateSharedVariableMap(notification.getSharedVariableMap());
-              }
-              catch (Exception ex) {
-                LOG.error("update of shared contex", ex);
-              }
-            }
-            else {
-              ModelJobs.schedule(new IRunnable() {
-                @Override
-                public void run() throws Exception {
-                  updateSharedVariableMap(notification.getSharedVariableMap());
-                }
-              }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Update shared context"));
-            }
-          }
+    BEANS.get(SharedContextNotificationHanlder.class).addListener(this, new INotificationListener<SharedContextChangedNotification>() {
+
+      @Override
+      public void handleNotification(SharedContextChangedNotification notification) {
+
+        try {
+          updateSharedVariableMap(notification.getSharedVariableMap());
         }
-      });
-    }
+        catch (Exception ex) {
+          LOG.error("update of shared contex", ex);
+        }
+      }
+    });
   }
 
   private void updateSharedVariableMap(SharedVariableMap newMap) {
@@ -278,10 +266,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void start() throws ProcessingException {
+  public void start(String sessionId) throws ProcessingException {
     if (isActive()) {
       throw new IllegalStateException("session is active");
     }
+    m_id = sessionId;
     interceptLoadSession();
     setActive(true);
 
@@ -436,15 +425,15 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   protected void inactivateSession() {
-    if (getServiceTunnel() != null) {
-      try {
-        BEANS.get(ILogoutService.class).logout();
-      }
-      catch (Exception e) {
-        LOG.info("Failed to logout from server.", e);
+    try {
+      ILogoutService logoutService = BEANS.opt(ILogoutService.class);
+      if (logoutService != null) {
+        logoutService.logout();
       }
     }
-    setActive(false);
+    finally {
+      setActive(false);
+    }
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
     LOG.info("Client session stopped [session={}, user={}]", this, getUserId());
@@ -484,14 +473,14 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     return m_exitCode;
   }
 
-  @Override
-  public IClientServiceTunnel getServiceTunnel() {
-    return m_serviceTunnel;
-  }
+//  @Override
+//  public IClientServiceTunnel getServiceTunnel() {
+//    return m_serviceTunnel;
+//  }
 
-  protected void setServiceTunnel(IClientServiceTunnel tunnel) {
-    m_serviceTunnel = tunnel;
-  }
+//  protected void setServiceTunnel(IClientServiceTunnel tunnel) {
+//    m_serviceTunnel = tunnel;
+//  }
 
   @Override
   public IMemoryPolicy getMemoryPolicy() {

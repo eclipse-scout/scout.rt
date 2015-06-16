@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
  *
@@ -63,7 +64,7 @@ public abstract class AbstractGlobalServerCacheService extends AbstractHttpSessi
   public abstract void touch(String key, Long expiration);
 
   protected String getKeyWithId(String key, HttpServletRequest req, HttpServletResponse res) {
-    String sessionId = BEANS.get(IClientIdentificationService.class).getClientId(req, res);
+    Object sessionId = BEANS.get(RunContext.class).propertyMap().get("sessionId");
     return sessionId + "_" + key;
   }
 

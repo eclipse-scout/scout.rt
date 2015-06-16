@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform;
 import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
 
 /**
- * @since 15.1
+ * @since 5.1
  */
 public class DefaultPlatform extends PlatformImplementor {
   public DefaultPlatform() {

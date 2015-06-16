@@ -16,7 +16,6 @@ import java.net.URL;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -25,7 +24,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  * Calls the /process servlet. Requires the config.properties variable <code>server.url</code>
  */
 public class ServiceTunnelServletCall extends Thread {
-  private IServiceTunnelRequest m_req;
+  private ServiceTunnelRequest m_req;
   private IServiceTunnelResponse m_res;
   private String m_serverUrl;
 

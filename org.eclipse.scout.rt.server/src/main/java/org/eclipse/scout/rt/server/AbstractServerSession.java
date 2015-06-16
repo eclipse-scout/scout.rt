@@ -32,10 +32,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
-import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
@@ -56,6 +56,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   transient private final EventListenerList m_eventListeners;
 
+  private String m_id;
   private boolean m_initialized;
   private boolean m_active;
   private final Map<String, Object> m_attributes;
@@ -63,7 +64,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final SharedVariableMap m_sharedVariableMap;
   private transient ScoutTexts m_scoutTexts;
   private Subject m_subject;
-  private String m_sessionId;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
@@ -175,9 +175,15 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
-        if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread()) {
-          // notify this session
-          BEANS.get(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
+        if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread() && ClientNotificationNodeId.CURRENT.get() != null) {
+          String sessionId = getId();
+          if (sessionId != null) {
+            SharedContextChangedNotification notification = new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap));
+            BEANS.get(ClientNotificationRegistry.class).putTransactionalForSession(sessionId, notification);
+          }
+          else {
+            LOG.warn("No sessionId set");
+          }
         }
       }
     });
@@ -202,7 +208,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public final void start() throws ProcessingException {
+  public final void start(String sessionId) throws ProcessingException {
+    m_id = sessionId;
     Assertions.assertFalse(isActive(), "Session already started");
     assignUserId();
     interceptLoadSession();
@@ -237,13 +244,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public void setIdInternal(String sessionId) {
-    m_sessionId = sessionId;
-  }
-
-  @Override
   public String getId() {
-    return m_sessionId;
+    return m_id;
   }
 
   /**

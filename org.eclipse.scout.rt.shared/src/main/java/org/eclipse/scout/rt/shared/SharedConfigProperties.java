@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -20,6 +22,7 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
 import org.eclipse.scout.rt.shared.TierState.Tier;
 
 /**
@@ -35,8 +38,6 @@ public final class SharedConfigProperties {
    */
   public static class AuthTokenPrivateKeyProperty extends AbstractBinaryConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "scout.auth.privatekey";
@@ -47,8 +48,6 @@ public final class SharedConfigProperties {
    * public key for {@link AuthTokenPrivateKeyProperty}
    */
   public static class AuthTokenPublicKeyProperty extends AbstractBinaryConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -102,7 +101,11 @@ public final class SharedConfigProperties {
 
     @Override
     protected String getDefaultValue() {
-      return BEANS.get(BackendUrlProperty.class).getValue() + "/process";
+      String backendUrl = BEANS.get(BackendUrlProperty.class).getValue();
+      if (StringUtility.hasText(backendUrl)) {
+        return backendUrl + "/process";
+      }
+      return null;
     }
 
     @Override
@@ -147,6 +150,50 @@ public final class SharedConfigProperties {
       }
 
       return Enum.valueOf(Tier.class, value);
+    }
+  }
+
+  /**
+   * Property to specify if remote proxy beans should be created for interfaces annotated with {@link TunnelToServer}.
+   * Default is <code>true</code>.
+   */
+  public static class CreateTunnelToServerBeansProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.beans.createTunnelToServerBeans";
+    }
+
+    @Override
+    protected Boolean createValue() {
+      // if no backend url is set proxy instances will not be created
+      if (StringUtility.isNullOrEmpty(BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue())) {
+        return Boolean.FALSE;
+      }
+      return super.createValue();
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.TRUE;
+    }
+  }
+
+  /**
+   * Technical {@link Subject} used to authenticate notification requests.
+   */
+  public static class NotificationSubjectProperty extends AbstractSubjectConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "notification.user.authenticator";
+    }
+
+    @Override
+    protected Subject getDefaultValue() {
+//TODO jgu
+//      return convertToSubject("notification-authenticator");
+      return convertToSubject("system");
     }
   }
 }

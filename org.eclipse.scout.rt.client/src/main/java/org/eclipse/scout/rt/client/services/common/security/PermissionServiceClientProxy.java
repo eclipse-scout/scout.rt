@@ -74,7 +74,7 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
   }
 
   private IPermissionService getRemoteService() {
-    return ServiceTunnelUtility.createProxy(IPermissionService.class, ClientSessionProvider.currentSession().getServiceTunnel());
+    return ServiceTunnelUtility.createProxy(IPermissionService.class);
   }
 
   private static final class ServiceState {

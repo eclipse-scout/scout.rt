@@ -16,19 +16,41 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 
 public final class AnnotationFactory {
+
+  private static final ApplicationScoped APPLICATION_SCOPED = new ApplicationScoped() {
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return ApplicationScoped.class;
+    }
+  };
+
+  private static final CreateImmediately CREATE_IMMEDIATELY = new CreateImmediately() {
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return CreateImmediately.class;
+    }
+  };
+
+  private static final Replace REPLACE = new Replace() {
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return Replace.class;
+    }
+  };
+
   private AnnotationFactory() {
   }
 
   public static ApplicationScoped createApplicationScoped() {
-    return AnnotationFactory.Dummy.class.getAnnotation(ApplicationScoped.class);
+    return APPLICATION_SCOPED;
   }
 
   public static CreateImmediately createCreateImmediately() {
-    return AnnotationFactory.Dummy.class.getAnnotation(CreateImmediately.class);
+    return CREATE_IMMEDIATELY;
   }
 
   public static Replace createReplace() {
-    return AnnotationFactory.Dummy.class.getAnnotation(Replace.class);
+    return REPLACE;
   }
 
   public static Order createOrder(final double order) {
@@ -69,9 +91,4 @@ public final class AnnotationFactory {
     };
   }
 
-  @ApplicationScoped
-  @CreateImmediately
-  @Replace
-  private static class Dummy {
-  }
 }

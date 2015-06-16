@@ -10,15 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
+import java.lang.annotation.Annotation;
+
 public final class AnnotationFactory {
+  private static final TunnelToServer TUNNEL_TO_SERVER = new TunnelToServer() {
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+      return TunnelToServer.class;
+    }
+  };
+
   private AnnotationFactory() {
   }
 
   public static TunnelToServer createTunnelToServer() {
-    return AnnotationFactory.Dummy.class.getAnnotation(TunnelToServer.class);
-  }
 
-  @TunnelToServer
-  private static class Dummy {
+    return TUNNEL_TO_SERVER;
   }
 }

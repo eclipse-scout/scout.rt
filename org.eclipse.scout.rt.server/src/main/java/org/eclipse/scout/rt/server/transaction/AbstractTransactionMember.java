@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.transaction;
 
 /**
  * Use this base class when implementing custom transaction members
- * 
+ *
  * @since 3.8
  */
 public abstract class AbstractTransactionMember implements ITransactionMember {
@@ -28,6 +28,29 @@ public abstract class AbstractTransactionMember implements ITransactionMember {
   }
 
   @Override
+  public boolean needsCommit() {
+    return false;
+  }
+
+  @Override
+  public boolean commitPhase1() {
+    return true;
+  }
+
+  @Override
+  public void commitPhase2() {
+  }
+
+  @Override
+  public void rollback() {
+  }
+
+  @Override
+  public void release() {
+  }
+
+  @Override
   public void cancel() {
   }
+
 }

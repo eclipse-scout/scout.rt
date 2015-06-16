@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -93,7 +94,7 @@ public final class CODES {
     return BEANS.get(ICodeService.class).reloadCodeTypes(types);
   }
 
-  public static List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
+  public static Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
     return BEANS.get(ICodeService.class).getAllCodeTypes(classPrefix);
   }
 }

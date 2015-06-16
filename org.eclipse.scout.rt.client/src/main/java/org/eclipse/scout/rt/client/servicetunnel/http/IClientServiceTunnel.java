@@ -10,26 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.servicetunnel.http;
 
-import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 
 /**
  * Interface for a client side service tunnel used to invoke a service.
  */
 public interface IClientServiceTunnel extends IServiceTunnel {
-
-  /**
-   * see {@link #setClientNotificationPollInterval(long)} default is -1L (turned
-   * off), when activated a value of 2000L is recommended.
-   */
-  long getClientNotificationPollInterval();
-
-  /**
-   * Set the intervall to automatically read {@link IClientNotification}s from
-   * the server. A negative value disables polling. Note: {@link IClientNotification}s are also recevied on every tunnel
-   * response from the server.
-   */
-  void setClientNotificationPollInterval(long intervallMillis);
 
   /**
    * see {@link #setAnalyzeNetworkLatency(boolean)} default is true

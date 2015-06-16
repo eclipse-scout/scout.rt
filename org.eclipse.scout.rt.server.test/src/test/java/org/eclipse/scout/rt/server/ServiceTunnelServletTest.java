@@ -87,17 +87,17 @@ public class ServiceTunnelServletTest {
 
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(StickySessionCacheService.class).
-            order(TEST_SERVICE_ORDER).
-            applicationScoped(true),
+        order(TEST_SERVICE_ORDER).
+        applicationScoped(true),
         new BeanMetaData(IAccessControlService.class).
-            initialInstance(new AbstractAccessControlService() {
-            }).
-            order(TEST_SERVICE_ORDER).
-            applicationScoped(true),
+        initialInstance(new AbstractAccessControlService() {
+        }).
+        order(TEST_SERVICE_ORDER).
+        applicationScoped(true),
         new BeanMetaData(ServerSessionProvider.class).
-            initialInstance(m_serverSessionProviderSpy).
-            order(TEST_SERVICE_ORDER).
-            applicationScoped(true)
+        initialInstance(m_serverSessionProviderSpy).
+        order(TEST_SERVICE_ORDER).
+        applicationScoped(true)
         );
 
     m_testServiceTunnelServlet = new ServiceTunnelServlet();
@@ -153,6 +153,7 @@ public class ServiceTunnelServletTest {
   @Test
   public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ProcessingException, ServletException, InterruptedException {
     final Map<String, ICacheEntry<?>> cache = new HashMap<String, ICacheEntry<?>>();
+
     final TestServerSession testServerSession = new TestServerSession();
     HttpServletRequest requestMock = mock(HttpServletRequest.class);
     HttpSession testHttpSession = mock(HttpSession.class);
@@ -166,8 +167,7 @@ public class ServiceTunnelServletTest {
     doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(eq(IServerSession.class.getName()), anyObject());
     when(testHttpSession.getAttribute(IServerSession.class.getName())).thenAnswer(getCachedValue(cache));
 
-    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(any(ServerRunContext.class));
-
+    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(any(ServerRunContext.class), any(String.class));
     List<HttpSessionLookupCallable> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       jobs.add(new HttpSessionLookupCallable(m_testServiceTunnelServlet, requestMock, m_responseMock));
@@ -182,7 +182,7 @@ public class ServiceTunnelServletTest {
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
 
-    verify(m_serverSessionProviderSpy, times(1)).provide(any(ServerRunContext.class));
+    verify(m_serverSessionProviderSpy, times(1)).provide(any(ServerRunContext.class), any(String.class));
   }
 
   private Answer<IServerSession> slowCreateTestsession(final TestServerSession testSession) {
@@ -214,7 +214,8 @@ public class ServiceTunnelServletTest {
       public Object answer(InvocationOnMock invocation) throws Throwable {
         Object[] args = invocation.getArguments();
         String key = (String) args[0];
-        return cache.get(key);
+        ICacheEntry<?> cacheEntry = cache.get(key);
+        return cacheEntry;
       }
     };
   }
@@ -234,7 +235,6 @@ public class ServiceTunnelServletTest {
   }
 
   private static class HttpSessionLookupCallable implements Callable<IServerSession> {
-
     private final ServiceTunnelServlet m_serviceTunnelServlet;
     private final HttpServletRequest m_request;
     private final HttpServletResponse m_response;

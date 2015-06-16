@@ -25,18 +25,17 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class OfflineDispatcherService extends AbstractService implements IOfflineDispatcherService {
 
   @Override
-  public IServiceTunnelResponse dispatch(final IServiceTunnelRequest serviceRequest) {
+  public IServiceTunnelResponse dispatch(final ServiceTunnelRequest serviceRequest) {
     try {
       // Enable global cancellation of the service request.
       RunMonitor runMonitor = BEANS.get(RunMonitor.class);
@@ -75,7 +74,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   /**
    * Method invoked to delegate the request to the 'process service'.
    */
-  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws Exception {
+  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) throws Exception {
     return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
 
       @Override
@@ -90,8 +89,6 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
 
         final ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(result, outParams, null);
 
-        // add accumulated client notifications as side-payload
-        serviceResponse.setClientNotifications(BEANS.get(IClientNotificationService.class).getNextNotifications(0));
         return serviceResponse;
       }
     }, BEANS.get(ExceptionTranslator.class));

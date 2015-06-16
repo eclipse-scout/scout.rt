@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.server.admin.inspector;
 
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 
 public class CallInspector {
   private SessionInspector m_parent;
   private CallInfo m_info;
 
-  protected CallInspector(SessionInspector parent, IServiceTunnelRequest call) {
+  protected CallInspector(SessionInspector parent, ServiceTunnelRequest call) {
     m_parent = parent;
     m_info = new CallInfo();
     m_info.setStartTime(System.currentTimeMillis());

@@ -21,11 +21,8 @@ public final class ServiceTunnelUtility {
   private ServiceTunnelUtility() {
   }
 
-  public static <T> T createProxy(Class<T> serviceInterfaceClass, IServiceTunnel tunnel) {
-    if (tunnel == null) {
-      throw new IllegalArgumentException("tunnel is null");
-    }
-    return createProxy(serviceInterfaceClass, new ServiceTunnelInvocationHandler(serviceInterfaceClass, tunnel));
+  public static <T> T createProxy(Class<T> serviceInterfaceClass) {
+    return createProxy(serviceInterfaceClass, new ServiceTunnelInvocationHandler(serviceInterfaceClass));
   }
 
   @SuppressWarnings("unchecked")

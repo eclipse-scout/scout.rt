@@ -17,7 +17,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -59,8 +58,11 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   /**
    * Invoke this method to initialize the session. The session is active just after this method returns.
+   * 
+   * @param sessionId
+   *          TODO
    */
-  void start() throws ProcessingException;
+  void start(String sessionId) throws ProcessingException;
 
   /**
    * send a stop signal to the session event queue<br>
@@ -90,7 +92,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
   /**
    * @return the desktop model assiciated with this client session
    *         <p>
-   *         Desktop is available only after {@link #start()} and <code>AbstractClientSession.execLoadSession()</code>
+   *         Desktop is available only after {@link #start(String)} and
    */
   IDesktop getDesktop();
 
@@ -99,7 +101,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   void setDesktop(IDesktop a) throws ProcessingException;
 
-  IClientServiceTunnel getServiceTunnel();
+//  IClientServiceTunnel getServiceTunnel();
 
   /**
    * see {@link IMemoryPolicy}

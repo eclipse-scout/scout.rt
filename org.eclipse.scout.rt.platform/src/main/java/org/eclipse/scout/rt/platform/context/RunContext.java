@@ -161,6 +161,7 @@ public class RunContext {
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
+
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, NlsLocale.CURRENT, locale());
     final Callable<RESULT> c3 = new CurrentSubjectLogCallable<>(c4);
     final Callable<RESULT> c2 = new SubjectCallable<>(c3, subject());
@@ -231,6 +232,7 @@ public class RunContext {
     builder.ref("runMonitor", runMonitor());
     builder.ref("subject", subject());
     builder.attr("locale", locale());
+
     return builder.toString();
   }
 

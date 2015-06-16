@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
-import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
+import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class ClusterNodeStatusInfoTest {
   @Before
   public void setup() {
     m_message = mock(ClusterNotificationMessage.class);
-    when(m_message.getProperties()).thenReturn(new ClusterNotificationMessageProperties(TEST_NODE, TEST_USER));
+    when(m_message.getProperties()).thenReturn(new ClusterNotificationProperties(TEST_NODE, TEST_USER));
   }
 
   @Test

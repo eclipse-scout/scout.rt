@@ -19,24 +19,16 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Service tunnel is Thread-Safe.
  */
-public abstract class AbstractServiceTunnel<T extends ISession> implements IServiceTunnel {
+public abstract class AbstractServiceTunnel implements IServiceTunnel {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServiceTunnel.class);
 
-  private final T m_session;
-
-  public AbstractServiceTunnel(T session) {
-    m_session = session;
-  }
-
-  protected T getSession() {
-    return m_session;
+  public AbstractServiceTunnel() {
   }
 
   @Override
@@ -50,7 +42,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
         LOG.debug("" + serviceInterfaceClass + "." + operation + "(" + Arrays.asList(callerArgs) + ")");
       }
       Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
-      IServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
+      ServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
       beforeTunnel(request);
       IServiceTunnelResponse response = tunnel(request);
       afterTunnel(t0, response);
@@ -89,7 +81,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
     }
   }
 
-  protected IServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
+  protected ServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
     UserAgent userAgent = UserAgent.CURRENT.get();
     if (userAgent == null) {
       LOG.warn("No UserAgent set on calling context; include default in service-request");
@@ -107,7 +99,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
    * Method invoked before the service request is tunneled to the server. Overwrite this method to add additional
    * information to the request.
    */
-  protected void beforeTunnel(IServiceTunnelRequest serviceRequest) {
+  protected void beforeTunnel(ServiceTunnelRequest serviceRequest) {
   }
 
   /**
@@ -119,7 +111,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
    *
    * @return response sent by the server; is never <code>null</code>.
    */
-  protected abstract IServiceTunnelResponse tunnel(final IServiceTunnelRequest serviceRequest);
+  protected abstract IServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest);
 
   /**
    * Method invoked after the service request was tunneled. Overwrite this method to add additional information to the

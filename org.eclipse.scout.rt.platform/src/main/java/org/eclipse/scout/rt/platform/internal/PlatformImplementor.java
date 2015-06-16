@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
- * @since 15.1
+ * @since 5.1
  */
 public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
@@ -94,12 +94,13 @@ public class PlatformImplementor implements IPlatform {
       initBeanScopeEvaluator();
       initBeanDecorationFactory();
 
-      changeState(State.BeanManagerValid, true);
-      startCreateImmediatelyBeans();
     }
     finally {
       m_platformLock.writeLock().unlock();
     }
+
+    changeState(State.BeanManagerValid, true);
+    startCreateImmediatelyBeans();
 
     // last event is outside lock to allow the listeners to use the bean context and the inventory
     changeState(State.PlatformStarted, true);

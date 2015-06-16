@@ -10,19 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.fixture;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 
 public class MockServerProcessingCancelService extends AbstractService implements IRunMonitorCancelService {
-  private MockServiceTunnel m_tunnel;
 
-  public MockServerProcessingCancelService(MockServiceTunnel tunnel) {
-    m_tunnel = tunnel;
+  public MockServerProcessingCancelService() {
   }
 
   @Override
   public boolean cancel(long requestSequence) {
-    Thread t = m_tunnel.getThreadByRequestSequence(requestSequence);
+    Thread t = BEANS.get(MockServiceTunnel.class).getThreadByRequestSequence(requestSequence);
     if (t != null) {
       t.interrupt();
       return true;

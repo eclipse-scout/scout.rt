@@ -30,6 +30,11 @@ public interface ISession {
   ThreadLocal<ISession> CURRENT = new ThreadLocal<>();
 
   /**
+   * @return the session id corresponding client and server sessions do have the same id.
+   */
+  String getId();
+
+  /**
    * Shared context variable containing the authenticated userId in lowercase
    */
   String getUserId();

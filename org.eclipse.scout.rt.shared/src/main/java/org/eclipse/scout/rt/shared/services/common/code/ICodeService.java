@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
@@ -68,11 +68,11 @@ public interface ICodeService extends IService {
   /**
    * @return all codetype classes from bundles with classPrefix
    */
-  Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix);
+  Collection<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix);
 
   @RemoteServiceAccessDenied
-  List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix);
+  Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix);
 
   @RemoteServiceAccessDenied
-  List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix, Long partitionId);
+  Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix, Long partitionId);
 }

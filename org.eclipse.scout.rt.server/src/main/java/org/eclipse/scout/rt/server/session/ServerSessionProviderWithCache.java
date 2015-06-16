@@ -39,7 +39,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
   }
 
   @Override
-  public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext) throws ProcessingException {
+  public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext, String sessionId) throws ProcessingException {
     final Subject subject = Assertions.assertNotNull(runContext.subject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
@@ -50,7 +50,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     }
     else {
       // create and initialize a new session; use optimistic locking because initializing the session is a long-running operation.
-      final SESSION newServerSession = super.provide(runContext);
+      final SESSION newServerSession = super.provide(runContext, sessionId);
 
       synchronized (m_cache) {
         serverSession = getFromCache(principals, newServerSession.getClass()); // optimistic locking: check, whether another thread already created and cached the session.

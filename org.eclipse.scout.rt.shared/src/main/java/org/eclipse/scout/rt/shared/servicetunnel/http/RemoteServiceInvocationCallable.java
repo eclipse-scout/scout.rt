@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
@@ -46,11 +46,11 @@ public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelR
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RemoteServiceInvocationCallable.class);
 
   private final AbstractHttpServiceTunnel m_tunnel;
-  private final IServiceTunnelRequest m_serviceRequest;
+  private final ServiceTunnelRequest m_serviceRequest;
 
   private final AtomicBoolean m_cancelled = new AtomicBoolean(false);
 
-  public RemoteServiceInvocationCallable(final AbstractHttpServiceTunnel tunnel, final IServiceTunnelRequest serviceRequest) {
+  public RemoteServiceInvocationCallable(final AbstractHttpServiceTunnel tunnel, final ServiceTunnelRequest serviceRequest) {
     m_tunnel = tunnel;
     m_serviceRequest = serviceRequest;
   }
@@ -106,7 +106,7 @@ public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelR
     }
 
     try {
-      final IServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
+      final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
       final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
 
       final RunMonitor runMonitor = BEANS.get(RunMonitor.class); // do not link the RunMonitor with the current RunMonitor to not cancel this request.

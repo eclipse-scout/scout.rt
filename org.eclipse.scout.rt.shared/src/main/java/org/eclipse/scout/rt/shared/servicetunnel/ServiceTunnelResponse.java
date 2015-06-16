@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private static final long serialVersionUID = 0L;
@@ -23,9 +21,10 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private final Object m_data;
   private final Object[] m_outVars;
   private final Throwable m_exception;
-  private Set<IClientNotification> m_clientNotifications;
   // added in 3.1.17
   private volatile Long m_processingDuration;
+
+  private Set<ClientNotificationMessage> m_notifications;
 
   public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
     m_data = data;
@@ -49,15 +48,6 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   }
 
   @Override
-  public Set<IClientNotification> getClientNotifications() {
-    return CollectionUtility.hashSet(m_clientNotifications);
-  }
-
-  public void setClientNotifications(Collection<? extends IClientNotification> clientNotifications) {
-    m_clientNotifications = CollectionUtility.hashSet(clientNotifications);
-  }
-
-  @Override
   public Long getProcessingDuration() {
     return m_processingDuration;
   }
@@ -71,6 +61,22 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
     StringBuilder buf = new StringBuilder();
     buf.append("Response[data=" + m_data + ", vars=" + ((m_outVars == null) ? "" : Arrays.asList(m_outVars)) + ", exception=" + m_exception + "]");
     return buf.toString();
+  }
+
+  /**
+   * Piggyback notifications. Transactional notifications are piggybacked to the client with the corresponding
+   * {@link ServiceTunnelResponse}.
+   *
+   * @param notifications
+   */
+  @Override
+  public void setNotifications(Set<ClientNotificationMessage> notifications) {
+    m_notifications = notifications;
+  }
+
+  @Override
+  public Set<ClientNotificationMessage> getNotifications() {
+    return m_notifications;
   }
 
   /*

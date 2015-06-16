@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.inspector.info.SessionInfo;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class SessionInspector {
@@ -78,7 +78,7 @@ public class SessionInspector {
     }
   }
 
-  public CallInspector requestCallInspector(IServiceTunnelRequest call) {
+  public CallInspector requestCallInspector(ServiceTunnelRequest call) {
     synchronized (m_callListLock) {
       if (getProcessInspector().isEnabled()) {
         if (getProcessInspector().acceptCall(call.getServiceInterfaceClassName(), call.getOperation())) {

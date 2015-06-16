@@ -22,20 +22,20 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
+@IgnoreBean
 public class MockServiceTunnel extends ClientHttpServiceTunnel {
 
   private final HashMap<Long, Thread> m_runningMap = new HashMap<Long, Thread>();
 
-  public MockServiceTunnel(IClientSession session) throws Exception {
-    super(session, UriUtility.toUrl("http://mock/process"));
+  public MockServiceTunnel() throws Exception {
+    super(UriUtility.toUrl("http://mock/process"));
     resetRequestSequenceGenerator();
   }
 
@@ -54,7 +54,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
    * @return the service response
    *         You may call callTargetService() to simply call a service for test purpose (without a transaction!)
    */
-  protected ServiceTunnelResponse mockServiceCall(IServiceTunnelRequest req) throws Exception {
+  protected ServiceTunnelResponse mockServiceCall(ServiceTunnelRequest req) throws Exception {
     try {
       Class<?> serviceInterface = Class.forName(req.getServiceInterfaceClassName());
       Method serviceOperation = ServiceUtility.getServiceOperation(serviceInterface, req.getOperation(), req.getParameterTypes());
@@ -78,11 +78,11 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   }
 
   @Override
-  protected URLConnection createURLConnection(final IServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected URLConnection createURLConnection(final ServiceTunnelRequest call, byte[] callData) throws IOException {
     URLConnection urlConn = new MockHttpURLConnection(getServerUrl()) {
       @Override
       protected void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
-        IServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
+        ServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
         try {
           m_runningMap.put(call.getRequestSequence(), Thread.currentThread());
           //

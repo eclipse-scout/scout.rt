@@ -10,20 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
@@ -35,17 +36,18 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncNodeIdProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
-import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 
 public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
@@ -54,6 +56,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
+  private final ConcurrentMap<Class<? extends Serializable>, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
 
   private volatile String m_nodeId;
   private final Subject m_subject;
@@ -120,16 +123,28 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return m_listenerList;
   }
 
+  /**
+   * @deprecated use {@link INotificationHandler}
+   */
+  @Deprecated
   @Override
   public void addListener(IClusterNotificationListener listener) {
     m_listenerList.add(IClusterNotificationListener.class, listener);
   }
 
+  /**
+   * @deprecated use {@link INotificationHandler}
+   */
+  @Deprecated
   @Override
   public void removeListener(IClusterNotificationListener listener) {
     m_listenerList.remove(IClusterNotificationListener.class, listener);
   }
 
+  /**
+   * @deprecated use {@link INotificationHandler}
+   */
+  @Deprecated
   protected IClusterNotificationListener[] getListeners() {
     return getListenerList().getListeners(IClusterNotificationListener.class);
   }
@@ -141,6 +156,11 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   protected ClusterNodeStatusInfo getStatusInfoInternal() {
     return m_statusInfo;
+  }
+
+  protected ClusterNodeStatusInfo getStatusInfoInternal(Class<? extends Serializable> messageType) {
+    m_messageStatusMap.putIfAbsent(messageType, new ClusterNodeStatusInfo());
+    return m_messageStatusMap.get(messageType);
   }
 
   @Override
@@ -165,28 +185,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return m_enabled;
   }
 
-  /**
-   * Contributing all {@link IClusterNotificationListenerService} to the listenerList. If a listener was already added,
-   * removes old listener if there is now a service with a higher ranking.
-   */
-  protected void contributeListeners() throws ProcessingException {
-    Set<IClusterNotificationListener> currentListeners = new HashSet<IClusterNotificationListener>(Arrays.asList(getListeners()));
-
-    for (IClusterNotificationListenerService contributingService : BEANS.all(IClusterNotificationListenerService.class)) {
-      IService definingService = BEANS.get(contributingService.getDefiningServiceInterface());
-      if (contributingService == definingService) {
-        if (!currentListeners.contains(contributingService)) {
-          addListener(contributingService.getClusterNotificationListener());
-        }
-      }
-      else {
-        if (currentListeners.contains(contributingService)) {
-          removeListener(contributingService.getClusterNotificationListener());
-        }
-      }
-    }
-  }
-
   @Override
   public boolean enable() {
     if (isEnabled()) {
@@ -205,7 +203,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       messageService.setListener(this);
       messageService.subscribe();
       setMessageService(messageService);
-      contributeListeners();
     }
     catch (Exception e) {
       LOG.error(e.getMessage(), e);
@@ -235,48 +232,69 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   }
 
   @Override
-  public void publishNotification(IClusterNotification notification) throws ProcessingException {
+  public void publishTransactional(Serializable notification) throws ProcessingException {
     if (isEnabled()) {
-      ClusterNotificationMessage message = new ClusterNotificationMessage(notification, getNotificationProperties());
-      getTransaction().addMessage(message);
-    }
-  }
-
-  protected IClusterNotificationMessageProperties getNotificationProperties() {
-    return new ClusterNotificationMessageProperties(getNodeId(), ServerSessionProvider.currentSession().getUserId());
-  }
-
-  protected void notifyListeners(IClusterNotificationMessage message) {
-    for (IClusterNotificationListener listener : getListeners()) {
-      try {
-        listener.onNotification(message);
-      }
-      catch (Exception e) {
-        LOG.error(String.format("Failed to notify listener about cluster-sync-message [message=%s, listener=%s]", message, listener.getClass().getName()), e);
-      }
+      getTransaction().addMessage(new ClusterNotificationMessage(notification, getNotificationProperties()));
     }
   }
 
   @Override
-  public void onMessage(final IClusterNotificationMessage message) throws ProcessingException {
-    //Do not progress notifications sent by node itself
-    String originNode = message.getProperties().getOriginNode();
-    if (getNodeId().equals(originNode)) {
-      return;
-    }
+  public void publish(Serializable notification) throws ProcessingException {
+    publishAll(CollectionUtility.arrayList(notification));
+  }
 
-    getStatusInfoInternal().updateReceiveStatus(message);
-
-    ServerRunContext serverRunContext = ServerRunContexts.empty();
-    serverRunContext.subject(m_subject);
-    serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()), true);
-    serverRunContext.run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        notifyListeners(message);
+  private void publishAll(Collection<Serializable> notifications) {
+    if (isEnabled()) {
+      List<IClusterNotificationMessage> internalMessages = new ArrayList<IClusterNotificationMessage>();
+      for (Serializable n : notifications) {
+        internalMessages.add(new ClusterNotificationMessage(n, getNotificationProperties()));
       }
-    });
+      publishInternal(internalMessages);
+    }
+  }
+
+  /**
+   * Publish and update status.
+   */
+  private void publishInternal(List<IClusterNotificationMessage> messages) {
+    m_messageService.publishNotifications(messages);
+    for (IClusterNotificationMessage im : messages) {
+      getStatusInfoInternal().updateSentStatus(im);
+      getStatusInfoInternal(im.getClass()).updateReceiveStatus(im);
+    }
+  }
+
+  @Override
+  public IClusterNotificationProperties getNotificationProperties() {
+    ISession curentSession = ISession.CURRENT.get();
+    String userid = curentSession != null ? curentSession.getUserId() : "";
+    return new ClusterNotificationProperties(getNodeId(), userid);
+  }
+
+  @Override
+  public void onMessage(final IClusterNotificationMessage message) throws ProcessingException {
+    if (isEnabled()) {
+      //Do not progress notifications sent by node itself
+      String originNode = message.getProperties().getOriginNode();
+      if (getNodeId().equals(originNode)) {
+        return;
+      }
+
+      getStatusInfoInternal().updateReceiveStatus(message);
+      getStatusInfoInternal(message.getClass()).updateReceiveStatus(message);
+
+      ServerRunContext serverRunContext = ServerRunContexts.empty();
+      serverRunContext.subject(m_subject);
+      serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()), true);
+      serverRunContext.run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
+          reg.notifyHandlers(message.getNotification());
+        }
+      });
+    }
   }
 
   @Override
@@ -285,11 +303,14 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     disable();
   }
 
-  protected ClusterSynchronizationTransaction getTransaction() throws ProcessingException {
+  /**
+   * @return transaction member for publishing messages within a transaction
+   */
+  protected ClusterSynchTransactionMember getTransaction() throws ProcessingException {
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
-    ClusterSynchronizationTransaction m = (ClusterSynchronizationTransaction) tx.getMember(TRANSACTION_MEMBER_ID);
+    ClusterSynchTransactionMember m = (ClusterSynchTransactionMember) tx.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
-      m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService(), m_statusInfo);
+      m = new ClusterSynchTransactionMember(TRANSACTION_MEMBER_ID);
       tx.registerMember(m);
     }
     return m;
@@ -299,31 +320,17 @@ public class ClusterSynchronizationService extends AbstractService implements IC
    * Transaction member that notifies other cluster nodes after the causing Scout transaction has been committed. This
    * ensures that other cluster nodes are not informed too early.
    */
-  protected static class ClusterSynchronizationTransaction extends AbstractTransactionMember {
-    private final List<IClusterNotificationMessage> m_messageQueue;
-    private final IPublishSubscribeMessageService m_messageService;
-    private final ClusterNodeStatusInfo m_statusInfo;
+  private class ClusterSynchTransactionMember extends AbstractTransactionMember {
+    private List<IClusterNotificationMessage> m_messageQueue;
 
-    public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService, ClusterNodeStatusInfo statusInfo) throws ProcessingException {
+    public ClusterSynchTransactionMember(String transactionId) throws ProcessingException {
       super(transactionId);
       m_messageQueue = new LinkedList<IClusterNotificationMessage>();
-      m_messageService = messageService;
-      m_statusInfo = statusInfo;
-    }
-
-    protected ClusterNodeStatusInfo getStatusInfoInternal() {
-      return m_statusInfo;
     }
 
     public synchronized void addMessage(IClusterNotificationMessage m) {
-      // check if new message can be merged with existing or if it is replacing a new one
-      for (Iterator<IClusterNotificationMessage> it = m_messageQueue.iterator(); it.hasNext();) {
-        IClusterNotificationMessage existingElem = it.next();
-        if (existingElem.coalesce(m)) {
-          it.remove();
-        }
-      }
       m_messageQueue.add(m);
+      m_messageQueue = BEANS.get(ClusterNotificationMessageCoalescer.class).coalesce(m_messageQueue);
     }
 
     @Override
@@ -333,10 +340,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     @Override
     public synchronized void commitPhase2() {
-      m_messageService.publishNotifications(new ArrayList<IClusterNotificationMessage>(m_messageQueue));
-      for (IClusterNotificationMessage m : m_messageQueue) {
-        getStatusInfoInternal().updateSentStatus(m);
-      }
+      publishInternal(m_messageQueue);
     }
 
     @Override
@@ -352,6 +356,11 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     public synchronized void rollback() {
       m_messageQueue.clear();
     }
+  }
+
+  @Override
+  public IClusterNodeStatusInfo getStatusInfo(Class<? extends Serializable> messageType) {
+    return getStatusInfoInternal(messageType).getStatus();
   }
 
 }

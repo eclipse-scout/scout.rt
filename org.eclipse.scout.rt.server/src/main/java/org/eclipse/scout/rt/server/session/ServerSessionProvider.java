@@ -32,6 +32,10 @@ import org.eclipse.scout.rt.shared.ISession;
 @ApplicationScoped
 public class ServerSessionProvider {
 
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) throws ProcessingException {
+    return provide(serverRunContext, UUID.randomUUID().toString());
+  }
+
   /**
    * Provides a new {@link IServerSession} for the {@link Subject} of the given {@link ServerRunContext}.
    *
@@ -41,21 +45,20 @@ public class ServerSessionProvider {
    * @throws ProcessingException
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
-  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) throws ProcessingException {
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext, final String sessionId) throws ProcessingException {
     return serverRunContext.copy().call(new Callable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {
         // 1. Create an empty session instance.
         final SESSION serverSession = ServerSessionProvider.cast(BEANS.get(IServerSession.class));
-        serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
         // 2. Load the session.
         ServerRunContexts.copyCurrent().session(serverSession, true).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            serverSession.start();
+            serverSession.start(sessionId);
           }
         });
 

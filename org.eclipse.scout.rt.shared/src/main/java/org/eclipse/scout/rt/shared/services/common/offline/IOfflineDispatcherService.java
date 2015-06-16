@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.shared.services.common.offline;
 
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
@@ -23,5 +23,5 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {
 
-  IServiceTunnelResponse dispatch(final IServiceTunnelRequest request);
+  IServiceTunnelResponse dispatch(final ServiceTunnelRequest request);
 }
