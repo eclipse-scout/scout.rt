@@ -1168,7 +1168,6 @@ scout.Table.prototype.colorData = function(column, mode) {
 
 scout.Table.prototype._onRowsSelected = function(rowIds) {
   this._syncSelectedRows(rowIds);
-  this.selectRows(this.selectedRows, false);
 };
 
 scout.Table.prototype._onRowsChecked = function(rows) {
@@ -1939,7 +1938,7 @@ scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
 };
 
 scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
-  this.selectedRows = this._rowsByIds(selectedRowIds);
+  this.selectRows(this._rowsByIds(selectedRowIds), false);
 };
 
 scout.Table.prototype._syncMenus = function(menus) {
