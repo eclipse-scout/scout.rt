@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -26,15 +25,13 @@ import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerServ
 import org.eclipse.scout.rt.client.servicetunnel.http.internal.ClientNotificationPollingJob;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.shared.OfflineState;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 
 /**
@@ -80,21 +77,21 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSe
   }
 
   @Override
-  protected void decorateServiceRequest(IServiceTunnelRequest call) {
+  protected void beforeTunnel(IServiceTunnelRequest serviceRequest) {
     IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
-    if (call instanceof ServiceTunnelRequest && cns != null) {
-      ((ServiceTunnelRequest) call).setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
+    if (serviceRequest instanceof ServiceTunnelRequest && cns != null) {
+      ((ServiceTunnelRequest) serviceRequest).setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
     }
   }
 
   @Override
-  protected void onInvokeService(long t0, IServiceTunnelResponse response) {
+  protected void afterTunnel(long t0, IServiceTunnelResponse serviceResponse) {
     if (isAnalyzeNetworkLatency()) {
       // performance analyzer
       IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
       if (perf != null) {
         long totalMillis = (System.nanoTime() - t0) / 1000000L;
-        Long execMillis = response.getProcessingDuration();
+        Long execMillis = serviceResponse.getProcessingDuration();
         if (execMillis != null) {
           perf.addNetworkLatencySample(totalMillis - execMillis);
           perf.addServerExecutionTimeSample(execMillis);
@@ -108,7 +105,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSe
     // client notification handler
     IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
     if (cns != null) {
-      cns.dispatchClientNotifications(response.getClientNotifications(), getSession());
+      cns.dispatchClientNotifications(serviceResponse.getClientNotifications(), getSession());
     }
   }
 
@@ -131,45 +128,40 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSe
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
-    boolean offline = OfflineState.isOfflineInCurrentThread();
-    //
-    if (offline) {
-      return tunnelOffline(call);
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest serviceRequest) {
+    if (OfflineState.isOfflineInCurrentThread()) {
+      return tunnelOffline(serviceRequest);
     }
     else {
-      return tunnelOnline(call);
+      return tunnelOnline(serviceRequest);
     }
   }
 
-  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) {
-    if (RunMonitor.CURRENT.get().isCancelled()) {
-      return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
-    }
-    return super.tunnel(req);
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest serviceRequest) {
+    return super.tunnel(serviceRequest);
   }
 
   /**
    * Default for offline handling
    */
-  protected IServiceTunnelResponse tunnelOffline(final IServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnelOffline(final IServiceTunnelRequest serviceRequest) {
     IClientSession clientSession = ClientSessionProvider.currentSession();
     if (clientSession != null && clientSession.getOfflineSubject() != null) {
       Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<IServiceTunnelResponse>() {
         @Override
         public IServiceTunnelResponse run() {
-          return BEANS.get(IOfflineDispatcherService.class).dispatch(call);
+          return BEANS.get(IOfflineDispatcherService.class).dispatch(serviceRequest);
         }
       });
       return (IServiceTunnelResponse) response;
     }
     else {
-      return BEANS.get(IOfflineDispatcherService.class).dispatch(call);
+      return BEANS.get(IOfflineDispatcherService.class).dispatch(serviceRequest);
     }
   }
 
   @Override
-  protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) {
-    return ClientJobs.schedule(runnable, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSession())));
+  protected RunContext createCurrentRunContext() {
+    return ClientRunContexts.copyCurrent();
   }
 }

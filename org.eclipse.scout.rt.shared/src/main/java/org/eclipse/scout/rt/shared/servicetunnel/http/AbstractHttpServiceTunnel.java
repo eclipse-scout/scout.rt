@@ -15,24 +15,24 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
-import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobException;
+import org.eclipse.scout.rt.platform.context.ICancellable;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
-import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -44,8 +44,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  * Abstract tunnel used to invoke a service through HTTP.
  */
 public abstract class AbstractHttpServiceTunnel<T extends ISession> extends AbstractServiceTunnel<T> {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
@@ -113,41 +111,6 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   /**
-   * Signals the server to cancel processing jobs for the current session.
-   *
-   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
-   */
-  protected boolean sendCancelRequest(long requestSequence) {
-    try {
-      IServiceTunnelRequest cancelCall = createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
-      IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(cancelCall, new Object());
-      IFuture<?> future = schedule(executor, cancelCall);
-      try {
-        future.awaitDoneAndGet(10, TimeUnit.SECONDS);
-        IServiceTunnelResponse cancelResult = executor.getResponse();
-        if (cancelResult == null) {
-          return false;
-        }
-        if (cancelResult.getException() != null) {
-          LOG.warn("cancel failed", cancelResult.getException());
-          return false;
-        }
-        Boolean result = (Boolean) cancelResult.getData();
-        return result != null && result.booleanValue();
-      }
-      catch (ProcessingException | JobException ie) {
-        return false;
-      }
-    }
-    catch (Throwable e) {
-      LOG.warn("failed to cancel server processing", e);
-      return false;
-    }
-  }
-
-  protected abstract IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req);
-
-  /**
    * @param method
    *          GET or POST override this method to add custom HTTP headers
    */
@@ -205,53 +168,57 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
     return super.invokeService(serviceInterfaceClass, operation, callerArgs);
   }
 
-  protected IHttpBackgroundExecutable createHttpBackgroundExecutor(IServiceTunnelRequest request, Object lock) {
-    return new HttpBackgroundExecutable(request, lock, this);
+  @Override
+  // Method overwritten to be accessible from within @{link RemoteServiceInvocationCallable}.
+  protected IServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
+    return super.createServiceTunnelRequest(serviceInterfaceClass, operation, args);
+  }
+
+  /**
+   * Creates the {@link Callable} to invoke the remote service operation described by 'serviceRequest'.
+   * <p>
+   * To enable cancellation, the callable returned must also implement {@link ICancellable}, so that the remote
+   * operation can be cancelled once the current {@link RunMonitor} gets cancelled.
+   */
+  protected RemoteServiceInvocationCallable createRemoteServiceInvocationCallable(IServiceTunnelRequest serviceRequest) {
+    return new RemoteServiceInvocationCallable(this, serviceRequest);
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest req) {
-    final Object backgroundLock = new Object();
-    IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(req, backgroundLock);
+  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest serviceRequest) {
+    final long requestSequence = serviceRequest.getRequestSequence();
 
-    // wait until done
-    IServiceTunnelResponse res = null;
-    boolean cancelled = false;
-    boolean sentCancelRequest = false;
-    synchronized (backgroundLock) {
-      IFuture<?> future = schedule(executor, req);
-      while (true) {
-        res = executor.getResponse();
-        if (res != null) {
-          break;
-        }
-        if ((!sentCancelRequest) && future.isCancelled()) {
-          sentCancelRequest = true;
-          boolean success = sendCancelRequest(req.getRequestSequence());
-          if (success) {
-            // in fact cancelled the job
-            cancelled = true;
-            break;
-          }
-          else {
-            // cancel was not possible, continue
-          }
-        }
-        if (future.isDone()) {
-          break;
-        }
-        try {
-          backgroundLock.wait(500);
-        }
-        catch (InterruptedException ie) {
-          break;
-        }
-      }
+    // Create the Callable to be given to the job manager for execution.
+    final RemoteServiceInvocationCallable remoteInvocationCallable = createRemoteServiceInvocationCallable(serviceRequest);
+
+    // Create a monitor and register it as child monitor of the current monitor so that the service request is cancelled once the current monitor gets cancelled.
+    // Furthermore, this monitor is given to the job manager, so that the job is cancelled as well.
+    final RunMonitor monitor = BEANS.get(RunMonitor.class);
+    monitor.registerCancellable(remoteInvocationCallable);
+    RunMonitor.CURRENT.get().registerCancellable(monitor);
+
+    // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
+    final JobInput jobInput = Jobs.newInput(createCurrentRunContext().runMonitor(monitor)).name("Remote service request [%s]", requestSequence);
+
+    final IServiceTunnelResponse serviceResponse;
+    try {
+      serviceResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet();
     }
-    if (res == null || cancelled) {
+    catch (final Throwable t) {
+      return new ServiceTunnelResponse(null, null, t);
+    }
+
+    if (monitor.isCancelled()) {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
-    return res;
+    return serviceResponse;
+  }
+
+  /**
+   * @return a copy of the current calling context to be used to invoke the remote service operation.
+   */
+  protected RunContext createCurrentRunContext() {
+    return RunContexts.copyCurrent();
   }
 
   /**
@@ -261,6 +228,6 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    *
    * @since 06.07.2009
    */
-  protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
+  protected void preprocessHttpResponse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
   }
 }

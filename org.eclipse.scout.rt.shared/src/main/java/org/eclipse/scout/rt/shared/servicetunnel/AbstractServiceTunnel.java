@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -49,15 +50,11 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
         LOG.debug("" + serviceInterfaceClass + "." + operation + "(" + Arrays.asList(callerArgs) + ")");
       }
       Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
-      IServiceTunnelRequest call = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
-      decorateServiceRequest(call);
-      //
-      IServiceTunnelResponse response = tunnel(call);
-      // check if response is interrupted (incomplete /null=interrupted)
-      if (response == null) {
-        response = new ServiceTunnelResponse(null, null, new InterruptedException());
-      }
-      onInvokeService(t0, response);
+      IServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
+      beforeTunnel(request);
+      IServiceTunnelResponse response = tunnel(request);
+      afterTunnel(t0, response);
+
       // error handler
       Throwable t = response.getException();
       if (t != null) {
@@ -107,20 +104,31 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   }
 
   /**
-   * Override this method to do additional things before the service is called
+   * Method invoked before the service request is tunneled to the server. Overwrite this method to add additional
+   * information to the request.
    */
-  protected void decorateServiceRequest(IServiceTunnelRequest call) {
+  protected void beforeTunnel(IServiceTunnelRequest serviceRequest) {
   }
 
   /**
-   * Override this method to do additional things after the the response has been received.
+   * Invokes the service operation remotely on server.
+   * <p>
+   * This method returns, once the current {@link RunMonitor} gets cancelled. When being cancelled, a cancellation
+   * request is sent to the server, and the {@link IServiceTunnelResponse} returned contains an
+   * {@link InterruptedException} to indicate cancellation.
+   *
+   * @return response sent by the server; is never <code>null</code>.
+   */
+  protected abstract IServiceTunnelResponse tunnel(final IServiceTunnelRequest serviceRequest);
+
+  /**
+   * Method invoked after the service request was tunneled. Overwrite this method to add additional information to the
+   * response.
    *
    * @param t0
    *          System time before the request has been started (may be used for performance analyzing).
-   * @param response
+   * @param serviceResponse
    */
-  protected void onInvokeService(long t0, IServiceTunnelResponse response) {
+  protected void afterTunnel(long t0, IServiceTunnelResponse serviceResponse) {
   }
-
-  protected abstract IServiceTunnelResponse tunnel(final IServiceTunnelRequest call);
 }

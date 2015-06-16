@@ -20,22 +20,16 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private static final long serialVersionUID = 0L;
 
-  private Object m_data;
-  private Object[] m_outVars;
-  private Throwable m_exception;
+  private final Object m_data;
+  private final Object[] m_outVars;
+  private final Throwable m_exception;
   private Set<IClientNotification> m_clientNotifications;
   // added in 3.1.17
-  private Long m_processingDuration;
-
-  // for scout serialization
-  public ServiceTunnelResponse() {
-  }
+  private volatile Long m_processingDuration;
 
   public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
     m_data = data;
-    if (outVars != null) {
-      m_outVars = outVars;
-    }
+    m_outVars = outVars;
     m_exception = t;
   }
 

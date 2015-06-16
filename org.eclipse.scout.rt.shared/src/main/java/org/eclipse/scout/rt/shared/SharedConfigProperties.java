@@ -150,20 +150,4 @@ public final class SharedConfigProperties {
       return Enum.valueOf(Tier.class, value);
     }
   }
-
-  /**
-   * specifies if debug output should be enabled for http requests. Default is <code>false</code>
-   */
-  public static class HttpClientDebugProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.FALSE;
-    }
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.rt.client.http.debug";
-    }
-  }
 }

@@ -25,6 +25,11 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 public interface IRunMonitorCancelService extends IService {
 
   /**
+   * Use this constant to construct cancellation request.
+   */
+  String CANCEL_METHOD = "cancel";
+
+  /**
    * Cancels all running operations which are associated with the given <code>requestSequence</code>.
    * Technically, that is any {@link ICancellable} which was bound to the {@link RunMonitor} of the originating service
    * request and includes {@link RunContext} executions, jobs and transactions.
