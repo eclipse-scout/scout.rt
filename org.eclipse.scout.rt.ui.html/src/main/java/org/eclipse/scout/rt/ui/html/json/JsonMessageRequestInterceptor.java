@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -95,7 +95,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         }
         else if (jsonReq.isCancelRequest()) {
           // Cancel all running model jobs for the requested session (interrupt if necessary)
-          BEANS.get(IJobManager.class).cancel(ModelJobs.newFutureFilter().andMatchSession(uiSession.getClientSession()).andAreNotBlocked(), true);
+          handleCancelRequest(uiSession);
           writeResponse(httpResp, createEmptyResponse());
           return true;
         }
@@ -152,6 +152,13 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
       }
     }
     return true;
+  }
+
+  /**
+   * Method invoked once a cancellation request was received from the UI.
+   */
+  protected void handleCancelRequest(IUiSession uiSession) throws IOException {
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilter().andMatchSession(uiSession.getClientSession()).andAreNotBlocked(), true);
   }
 
   /**
