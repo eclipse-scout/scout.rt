@@ -54,6 +54,15 @@ public class AbstractStringColumnTest {
     assertFalse(table.getCell(0, 0).isContentValid());
   }
 
+  @Test
+  public void testMaxLengthValidation() throws ProcessingException {
+    TestTable table = new TestTable();
+    TestStringColumn col = table.getTestStringColumn();
+    col.setMaxLength(1);
+    table.addRowByArray(new Object[]{"text"});
+    assertEquals("t", table.getCell(0, 0).getValue());
+  }
+
   public class TestTable extends AbstractTable {
 
     public TestStringColumn getTestStringColumn() {

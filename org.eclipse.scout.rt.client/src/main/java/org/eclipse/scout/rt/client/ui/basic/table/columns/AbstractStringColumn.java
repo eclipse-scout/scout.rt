@@ -214,10 +214,13 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
   @Override
   protected String/* validValue */validateValueInternal(ITableRow row, String rawValue) throws ProcessingException {
-    if (rawValue != null && rawValue.length() == 0) {
-      return null;
+    String value = super.validateValueInternal(row, rawValue);
+    if (value != null) {
+      if (value.length() > getMaxLength()) {
+        value = value.substring(0, getMaxLength());
+      }
     }
-    return rawValue;
+    return StringUtility.nullIfEmpty(value);
   }
 
   @Override
