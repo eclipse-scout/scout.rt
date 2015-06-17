@@ -18,7 +18,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 
 public class PlannerEvent extends java.util.EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;

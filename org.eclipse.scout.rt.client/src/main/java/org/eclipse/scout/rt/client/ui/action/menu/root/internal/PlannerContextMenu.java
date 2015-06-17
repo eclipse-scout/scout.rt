@@ -33,7 +33,7 @@ public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPla
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(getOwner().getSelectedActivityCell()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(getOwner().getSelectedResources(), getOwner().getSelectedActivity()));
     calculateLocalVisibility();
   }
 
@@ -44,8 +44,8 @@ public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPla
 
   protected void handleOwnerValueChanged() {
     if (getOwner() != null) {
-      final CompositeObject ownerValue = new CompositeObject(getOwner().getSelectedActivityCell(), getOwner().getSelectedResources(), getOwner().getSelectedBeginTime(), getOwner().getSelectedEndTime());
-      setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(getOwner().getSelectedActivityCell()));
+      final CompositeObject ownerValue = new CompositeObject(getOwner().getSelectedActivity(), getOwner().getSelectedResources(), getOwner().getSelectedBeginTime(), getOwner().getSelectedEndTime());
+      setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(getOwner().getSelectedResources(), getOwner().getSelectedActivity()));
       acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
       calculateLocalVisibility();
     }
@@ -53,7 +53,7 @@ public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPla
 
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    if (IPlanner.PROP_SELECTED_ACTIVITY_CELL.equals(evt.getPropertyName())) {
+    if (IPlanner.PROP_SELECTED_ACTIVITY.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
     else if (IPlanner.PROP_SELECTED_RESOURCES.equals(evt.getPropertyName())) {

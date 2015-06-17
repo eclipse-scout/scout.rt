@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
+package org.eclipse.scout.rt.client.ui.basic.planner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
-import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 
 public class Resource<RI> implements ICellObserver {
   private RI m_id;
@@ -66,5 +65,10 @@ public class Resource<RI> implements ICellObserver {
 
   @Override
   public void cellChanged(ICell cell, int changedBit) {
+  }
+
+  @Override
+  public String toString() {
+    return getId() + " " + m_cell.toString();
   }
 }

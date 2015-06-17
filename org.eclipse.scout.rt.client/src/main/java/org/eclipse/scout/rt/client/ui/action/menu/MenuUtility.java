@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
+import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
@@ -98,9 +99,9 @@ public final class MenuUtility {
     }
   }
 
-  public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(org.eclipse.scout.rt.client.ui.basic.planner.Activity<?, ?> selectedCell) {
-    if (selectedCell == null) {
-      return CollectionUtility.hashSet(PlannerMenuType.Selection);
+  public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(List<? extends Resource<?>> selectedResources, org.eclipse.scout.rt.client.ui.basic.planner.Activity<?, ?> selectedActivity) {
+    if (selectedActivity == null) {
+      return CollectionUtility.hashSet(PlannerMenuType.Range);
     }
     else {
       return CollectionUtility.hashSet(PlannerMenuType.Activity);

@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 
 /**
@@ -88,7 +87,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   /**
    * {@link Activity}
    */
-  String PROP_SELECTED_ACTIVITY_CELL = "selectedActivityCell";
+  String PROP_SELECTED_ACTIVITY = "selectedActivity";
   /**
    * {@link Object} Container of this map, {@link IPlannerFieldOld} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    */
@@ -255,7 +254,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 //
 //  void removeAllActivityCells();
 
-  Activity<RI, AI> getSelectedActivityCell();
+  Activity<RI, AI> getSelectedActivity();
 
   void setSelectedActivityCell(Activity<RI, AI> cell);
 

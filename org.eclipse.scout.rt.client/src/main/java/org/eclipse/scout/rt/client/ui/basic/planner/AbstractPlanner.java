@@ -46,7 +46,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.PlannerContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -357,7 +356,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
             BEANS.get(ExceptionHandler.class).handle(t);
           }
         }
-        else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY_CELL)) {
+        else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY)) {
           Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
           if (cell != null) {
             try {
@@ -659,19 +658,19 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @SuppressWarnings("unchecked")
   @Override
-  public Activity<RI, AI> getSelectedActivityCell() {
-    return (Activity<RI, AI>) propertySupport.getProperty(PROP_SELECTED_ACTIVITY_CELL);
+  public Activity<RI, AI> getSelectedActivity() {
+    return (Activity<RI, AI>) propertySupport.getProperty(PROP_SELECTED_ACTIVITY);
   }
 
   @Override
   public void setSelectedActivityCell(Activity<RI, AI> cell) {
 //    cell = resolveActivityCell(cell);
-    propertySupport.setProperty(PROP_SELECTED_ACTIVITY_CELL, cell);
+    propertySupport.setProperty(PROP_SELECTED_ACTIVITY, cell);
   }
 
   @Override
   public boolean isSelectedActivityCell(Activity<RI, AI> cell) {
-    return getSelectedActivityCell() == cell;
+    return getSelectedActivity() == cell;
   }
 
   @SuppressWarnings("unchecked")
@@ -720,7 +719,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       return;
     }
 
-    Activity<RI, AI> selectedCell = getSelectedActivityCell();
+    Activity<RI, AI> selectedCell = getSelectedActivity();
     if (selectedCell == null) {
       // nothing selected
       return;

@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 
 public interface IPlannerUIFacade<RI, AI> {
 
