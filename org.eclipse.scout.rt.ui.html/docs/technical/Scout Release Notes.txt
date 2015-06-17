@@ -370,3 +370,5 @@ IBrowserField is no longer a value field. The RemoteFile value was changed to a 
 Migration:
 - Instead of setValue()/getValue() use setBinaryResource()/getBinaryResource()
 - Instead of execChangedValue() use a BrowserFieldListener
+- If you relied on the browser field to be "save needed" when setting the value (RemoteFile), you have to call touch() manually,
+  because the browser field will never report "save needed" by itself (because it has no value).
