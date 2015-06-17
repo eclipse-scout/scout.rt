@@ -21,7 +21,6 @@ scout.Table = function() {
   this.tooltips = [];
   this.animationRowLimit = 25;
   this.menuBar;
-  this.menuBarPosition = 'bottom';
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
   this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this.handleAppLinkAction);

@@ -1,6 +1,8 @@
 scout.MenuItemsOrder = function(session, objectType) {
   this.session = session;
   this.objectType = objectType;
+  this.emptySpaceTypes = ['EmptySpace'];
+  this.selectionTypes = ['SingleSelection', 'MultiSelection'];
 };
 
 scout.MenuItemsOrder.prototype.order = function(items) {
@@ -18,9 +20,9 @@ scout.MenuItemsOrder.prototype.order = function(items) {
       buttons.push(item);
     } else if (item.horizontalAlignment === 1) {
       rightItems.push(item);
-    } else if (scout.menus.checkType(item, this._menuTypes('EmptySpace'))) {
+    } else if (scout.menus.checkType(item, this._menuTypes(this.emptySpaceTypes))) {
       emptySpaceItems.push(item);
-    } else if (scout.menus.checkType(item, this._menuTypes('SingleSelection', 'MultiSelection'))) {
+    } else if (scout.menus.checkType(item, this._menuTypes(this.selectionTypes))) {
       selectionItems.push(item);
     }
   }, this);
@@ -36,10 +38,11 @@ scout.MenuItemsOrder.prototype.order = function(items) {
   };
 };
 
-scout.MenuItemsOrder.prototype._menuTypes = function() {
+scout.MenuItemsOrder.prototype._menuTypes = function(types) {
   var i, menuTypes = [];
-  for (i = 0; i < arguments.length; i++) {
-    menuTypes.push(this.objectType + '.' + arguments[i]);
+  types = types || [];
+  for (i = 0; i < types.length; i++) {
+    menuTypes.push(this.objectType + '.' + types[i]);
   }
   return menuTypes;
 };

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
+import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;

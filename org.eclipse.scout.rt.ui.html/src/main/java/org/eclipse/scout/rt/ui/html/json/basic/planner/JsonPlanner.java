@@ -11,12 +11,14 @@ import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
+import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
@@ -24,11 +26,15 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<T> {
+public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonPlanner.class);
 
   // from model
@@ -83,6 +89,12 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     }
     getModel().removePlannerListener(m_plannerListener);
     m_plannerListener = null;
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override
@@ -181,10 +193,10 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return resourceIdsToJson((List<Resource<?>>) value, new P_GetOrCreateResourceIdProvider());
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_ACTIVITY_CELL, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
       @Override
       protected Activity<?, ?> modelValue() {
-        return getModel().getSelectedActivityCell();
+        return getModel().getSelectedActivity();
       }
 
       @Override
@@ -215,6 +227,10 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
       jsonResources.put(jsonResource);
     }
     json.put("resources", jsonResources);
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
+    }
     return json;
   }
 
@@ -356,6 +372,11 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   }
 
   @Override
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  @Override
   public void handleUiEvent(JsonEvent event) {
     if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
       handleUiSetDisplayMode(event);
@@ -487,6 +508,9 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 
     @Override
     public String getId(Activity<?, ?> cell) {
+      if (cell == null) {
+        return null;
+      }
       String id = getCellId(cell);
       if (id == null) {
         id = createCellId(cell);
@@ -515,6 +539,9 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 
     @Override
     public String getId(Resource<?> resource) {
+      if (resource == null) {
+        return null;
+      }
       String id = getResourceId(resource);
       if (id == null) {
         id = createResourceId(resource);

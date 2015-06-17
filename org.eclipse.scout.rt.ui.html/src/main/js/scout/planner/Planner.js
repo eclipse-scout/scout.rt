@@ -29,6 +29,7 @@ scout.Planner = function() {
 
   // additional modes; should be stored in model
   this.showYearPanel = false;
+  this._addAdapterProperties(['menus']);
 };
 scout.inherits(scout.Planner, scout.ModelAdapter);
 
@@ -61,6 +62,11 @@ scout.Planner.prototype.init = function(model, session) {
   this._syncViewRange(this.viewRange);
   this._syncSelectedResources(this.selectedResources);
   this._syncSelectionRange(this.selectionRange);
+
+  var menuOrder = new scout.PlannerMenuItemsOrder(this.session, this.objectType);
+  this.menuBar = new scout.MenuBar(this.session, menuOrder);
+  this.menuBar.bottom();
+  this.addChild(this.menuBar);
 };
 
 scout.Planner.prototype._initResource = function(resource) {
@@ -81,9 +87,12 @@ scout.Planner.prototype._render = function($parent) {
   // main elements
   this.$header = this.$container.appendDiv('planner-header');
   this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
-  this.$scale = this.$container.appendDiv('planner-scale');
   this.$grid = this.$container.appendDiv('planner-grid').mousedown(this._onCellMousedown.bind(this));
+  this.$scale = this.$container.appendDiv('planner-scale');
+  this.menuBar.render(this.$container);
+
   scout.scrollbars.install(this.$grid);
+  this.session.detachHelper.pushScrollable(this.$grid);
 
   // header contains all controls
   this.$range = this.$header.appendDiv('planner-range');
@@ -108,6 +117,7 @@ scout.Planner.prototype._renderProperties = function() {
   setTimeout(this._renderSelectionRange.bind(this));
   this._renderDisplayMode();
   this._renderHeaderVisible();
+  this._renderMenus();
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -163,6 +173,32 @@ scout.Planner.prototype._onClickYear = function(event) {
 
   // update screen
   this._updateScreen();
+};
+
+scout.Planner.prototype._onRangeSelectorContextMenu = function(event) {
+  this._showContextMenu(event, 'Planner.Range');
+};
+
+scout.Planner.prototype._onResourceContextMenu = function(event) {
+  //FIXME CGU only show contextmenu for selected resource
+  this._showContextMenu(event, 'Planner.Resource');
+};
+
+scout.Planner.prototype._onActivityContextMenu = function(event) {
+  this._showContextMenu(event, 'Planner.Activity');
+};
+
+scout.Planner.prototype._showContextMenu = function(event, allowedType) {
+  event.preventDefault();
+  event.stopPropagation();
+  var filteredMenus = this._filterMenus([allowedType]),
+    popup = new scout.ContextMenuPopup(this.session, filteredMenus),
+    $part = $(event.currentTarget),
+    x = event.pageX,
+    y = event.pageY;
+  popup.$anchor = $part;
+  popup.render();
+  popup.setLocation(new scout.Point(x, y));
 };
 
 /* --  set display mode and range ------------------------------------- */
@@ -426,7 +462,7 @@ scout.Planner.prototype._onScaleHoverOut = function(event) {
   }
 };
 
-/* --  render essources, activities --------------------------------- */
+/* --  render resources, activities --------------------------------- */
 
 scout.Planner.prototype._removeAllResources = function() {
   this.resources.forEach(function(resource) {
@@ -450,7 +486,9 @@ scout.Planner.prototype._renderResources = function(resources) {
 scout.Planner.prototype._build$Resource = function(resource) {
   var i, $activity,
     $resource = $.makeDiv('resource');
-  $resource.appendDiv('resource-title').text(resource.resourceCell.text);
+  $resource.appendDiv('resource-title')
+    .text(resource.resourceCell.text)
+    .on('contextmenu', this._onResourceContextMenu.bind(this));
   var $cells = $resource.appendDiv('resource-cells');
   for (i = 0; i < resource.activities.length; i++) {
     $activity = this._build$Activity(resource.activities[i]);
@@ -470,7 +508,8 @@ scout.Planner.prototype._build$Activity = function(activity) {
   $activity.text(activity.text)
     .data('activity', activity)
     .css('left', 'calc(' + this.transformLeft(begin) + '% + 2px)')
-    .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px');
+    .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px')
+    .on('contextmenu', this._onActivityContextMenu.bind(this));
 
   if (activity.cssClass) {
     $activity.addClass(activity.cssClass);
@@ -508,6 +547,10 @@ scout.Planner.prototype._onCellMousedown = function(event) {
       this.selectResources([$resource.data('resource')]);
     }
   } else {
+    if (event.which === 3 || event.which === 1 && event.ctrlKey) {
+      // don't select, context menu will be opened
+      return;
+    }
     // init selector
     this.startRow = this._findRow(event.pageY);
     this.lastRow = this.startRow;
@@ -796,8 +839,6 @@ scout.Planner.prototype._dateFormat = function(date, pattern) {
   return dateFormat.format(d);
 };
 
-/* -----------  Scout  -------------------------------*/
-
 scout.Planner.prototype._renderViewRange = function() {
   //FIXME CGU/CRU always redraw whole screen? what if several properties change?
   this._updateScreen();
@@ -806,6 +847,29 @@ scout.Planner.prototype._renderViewRange = function() {
 scout.Planner.prototype._renderHeaderVisible = function() {
   this.$header.setVisible(this.headerVisible);
   this.invalidateTree();
+};
+
+scout.Planner.prototype._renderMenus = function() {
+  this._updateMenuBar();
+};
+
+scout.Planner.prototype._updateMenuBar = function() {
+  var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range']);
+  this.menuBar.updateItems(menuItems);
+};
+
+scout.Planner.prototype._filterMenus = function(allowedTypes) {
+  allowedTypes = allowedTypes || [];
+  if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
+    scout.arrays.remove(allowedTypes, 'Planner.Resource');
+  }
+  if (allowedTypes.indexOf('Planner.Activity') > -1 && !this.selectedActivity) {
+    scout.arrays.remove(allowedTypes, 'Planner.Activity');
+  }
+  if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
+    scout.arrays.remove(allowedTypes, 'Planner.Range');
+  }
+  return scout.menus.filter(this.menus, allowedTypes);
 };
 
 scout.Planner.prototype._renderWorkDayCount = function() {};
@@ -879,6 +943,11 @@ scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedR
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(true);
   });
+
+  // Only call update menubar on property change, not necessary to call it when initializing
+  if (this.rendered) {
+    this._updateMenuBar();
+  }
 };
 
 scout.Planner.prototype._renderSelectionRange = function() {
@@ -907,7 +976,8 @@ scout.Planner.prototype._renderSelectionRange = function() {
   this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMousedown.bind(this));
   this.$selector
     .css('left', 'calc(' + this.transformLeft(from) + '% - 6px)')
-    .css('width', 'calc(' + this.transformWidth(to - from) + '% + 12px)');
+    .css('width', 'calc(' + this.transformWidth(to - from) + '% + 12px)')
+    .on('contextmenu', this._onRangeSelectorContextMenu.bind(this));
 
   // colorize scale
   $('.selected', this.$scale).removeClass('selected');
@@ -918,9 +988,19 @@ scout.Planner.prototype._renderSelectionRange = function() {
       $item.addClass('selected');
     }
   }
+
+  // Only call update menubar on property change, not necessary to call it when initializing
+  if (this.rendered) {
+    this._updateMenuBar();
+  }
 };
 
-scout.Planner.prototype._renderSelectedActivityCell = function() {};
+scout.Planner.prototype._renderSelectedActivity = function() {
+  // Only call update menubar on property change, not necessary to call it when initializing
+  if (this.rendered) {
+    this._updateMenuBar();
+  }
+};
 
 scout.Planner.prototype._renderDrawSections = function() {};
 

@@ -1,6 +1,7 @@
 @planner-header-height: 45px;
 @planner-resource-minheight: 30px;
 @planner-resource-title-width: 150px;
+@resource-padding-x: 5px;
 
 .planner-icon(@icon, @size) {
   .font-icon;
@@ -19,6 +20,17 @@
   height: 100%;
   position: absolute;
   overflow: hidden;
+
+  & > .menubar {
+    padding-left: @resource-padding-x;
+    padding-right: @resource-padding-x;
+    background-color: @control-background-color;
+  }
+
+  & > .menubar.bottom {
+    position: absolute;
+    bottom: 0;
+  }
 }
 
 .planner-header {
@@ -231,7 +243,7 @@
   & .planner-scale-title {
     height: 100%;
     float: left;
-    padding: 0px 5px;
+    padding: 0px @resource-padding-x;
     font-size: 17px;
     color: @palette-gray-6;
     line-height: @planner-header-height;
@@ -260,7 +272,6 @@
       top: 0px;
       content: " ";
       background-color: rgba(0, 0, 0, 0.10);
-      z-index: 2;
     }
 
   }
@@ -283,7 +294,6 @@
       left: 0px;
       top: 0px;
       content: " ";
-      z-index: 1;
       background-color: rgba(0, 0, 0, 0.07);
     }
 
@@ -344,8 +354,8 @@
     line-height: @planner-resource-minheight;
     height: 100%;
     width: @planner-resource-title-width;
-    padding: 0px 5px;
-    float:left;
+    padding: 0px @resource-padding-x;
+    float: left;
   }
 
   & .resource-cells {

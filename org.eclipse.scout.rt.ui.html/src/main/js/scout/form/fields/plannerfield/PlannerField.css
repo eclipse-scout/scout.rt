@@ -1,0 +1,5 @@
+.planner-field > .planner {
+  margin-left: @mandatory-indicator-width;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+}
