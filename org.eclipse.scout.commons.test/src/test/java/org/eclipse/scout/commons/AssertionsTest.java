@@ -17,6 +17,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.junit.Test;
 
 public class AssertionsTest {
@@ -27,7 +28,7 @@ public class AssertionsTest {
     assertSame(object, Assertions.assertNotNull(object));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testNotNull_Negative() {
     Assertions.assertNotNull(null);
   }
@@ -44,7 +45,7 @@ public class AssertionsTest {
       Assertions.assertNotNullOrEmpty(null);
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       // NOOP
     }
 
@@ -53,7 +54,7 @@ public class AssertionsTest {
       Assertions.assertNotNullOrEmpty("");
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       // NOOP
     }
   }
@@ -65,7 +66,7 @@ public class AssertionsTest {
       Assertions.assertNotNullOrEmpty(null, "failure");
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       // NOOP
     }
 
@@ -74,7 +75,7 @@ public class AssertionsTest {
       Assertions.assertNotNullOrEmpty("", "failure");
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       // NOOP
     }
   }
@@ -84,7 +85,7 @@ public class AssertionsTest {
     assertTrue(Assertions.assertTrue(true));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testTrue_Negative() {
     Assertions.assertTrue(false);
   }
@@ -94,7 +95,7 @@ public class AssertionsTest {
     assertFalse(Assertions.assertFalse(false));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testFalse_Negative() {
     Assertions.assertFalse(true);
   }
@@ -104,7 +105,7 @@ public class AssertionsTest {
     assertNull(Assertions.assertNull(null));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testNull_negative() {
     Assertions.assertNull(new Object());
   }
@@ -114,12 +115,12 @@ public class AssertionsTest {
     assertEquals(1, Assertions.assertLess(1, 2).intValue());
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testLess2() {
     Assertions.assertLess(1, 1);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testLess3() {
     Assertions.assertLess(1, 0);
   }
@@ -134,17 +135,17 @@ public class AssertionsTest {
     assertEquals(1, Assertions.assertLessOrEqual(1, 1).intValue());
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testLessOrEqual3() {
     Assertions.assertLessOrEqual(1, 0);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testGreater1() {
     Assertions.assertGreater(1, 2);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testGreater2() {
     Assertions.assertGreater(1, 1);
   }
@@ -154,7 +155,7 @@ public class AssertionsTest {
     assertEquals(1, Assertions.assertGreater(1, 0).intValue());
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testGreaterOrEqual1() {
     Assertions.assertGreaterOrEqual(1, 2);
   }
@@ -169,7 +170,7 @@ public class AssertionsTest {
     assertEquals(1, Assertions.assertGreaterOrEqual(1, 0).intValue());
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testEqual1() {
     Assertions.assertEqual(1, 2);
   }
@@ -179,7 +180,7 @@ public class AssertionsTest {
     assertEquals(1, Assertions.assertEqual(1, 1).intValue());
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testEqual3() {
     Assertions.assertEqual(1, 0);
   }
@@ -189,12 +190,12 @@ public class AssertionsTest {
     assertEquals("value", Assertions.assertEquals("value", "value"));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testEquals2() {
     Assertions.assertEquals("value", "something other");
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testNotEquals1() {
     Assertions.assertNotEquals("value", "value");
   }
@@ -210,12 +211,12 @@ public class AssertionsTest {
     assertSame(object, Assertions.assertSame(object, object));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testSame2() {
     Assertions.assertSame(new Object(), new Object());
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testNotSame1() {
     Object object = new Object();
     Assertions.assertNotSame(object, object);
@@ -234,7 +235,7 @@ public class AssertionsTest {
       Assertions.fail("failure");
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       assertEquals("Assertion error: failure", e.getMessage());
     }
 
@@ -243,7 +244,7 @@ public class AssertionsTest {
       Assertions.fail("failure [%s, %s]", "A", "B");
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       assertEquals("Assertion error: failure [A, B]", e.getMessage());
     }
 
@@ -252,7 +253,7 @@ public class AssertionsTest {
       Assertions.fail(null);
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       assertEquals("Assertion error: n/a", e.getMessage());
     }
 
@@ -261,7 +262,7 @@ public class AssertionsTest {
       Assertions.fail("failure %s", (Object) null);
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       assertEquals("Assertion error: failure null", e.getMessage());
     }
   }

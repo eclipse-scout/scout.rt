@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -49,7 +50,7 @@ public class ModelJobTest {
     ISession.CURRENT.remove();
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testNoSession() {
     ISession.CURRENT.remove();
     ModelJobs.schedule(new IRunnable() {

@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -505,7 +506,7 @@ public class JobScheduleTest {
       }, null);
       fail();
     }
-    catch (AssertionError e) {
+    catch (AssertionException e) {
       assertFalse(running.get());
       assertNull(future);
     }

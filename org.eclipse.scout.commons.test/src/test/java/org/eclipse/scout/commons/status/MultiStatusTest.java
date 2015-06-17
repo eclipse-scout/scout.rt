@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Order;
 import org.junit.Before;
 import org.junit.Test;
@@ -180,7 +181,7 @@ public class MultiStatusTest {
     assertFalse(multiStatus.containsStatus(TestStatus.class));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testThrowsOnNullStatus() {
     MultiStatus multiStatus = new MultiStatus();
     multiStatus.containsStatus(null);

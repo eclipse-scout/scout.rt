@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
@@ -121,12 +120,8 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
       return new InitThreadLocalCallable<>(m_next, ITransaction.CURRENT, tx).call();
     }
     catch (final Exception | Error e) {
-      tx.addFailure(BEANS.get(ExceptionTranslator.class).translate(e));
+      tx.addFailure(e);
       throw e;
-    }
-    catch (final Throwable t) {
-      tx.addFailure(BEANS.get(ExceptionTranslator.class).translate(t));
-      throw new Error(t);
     }
   }
 

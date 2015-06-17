@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -250,12 +251,12 @@ public class RunContextTest {
     assertFalse("Explicit RunMonitor should NOT be automatically registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(explicitRunMonitor));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testCopyCurrentWithNullRunMonitor() {
     RunContexts.copyCurrent().runMonitor(null);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = AssertionException.class)
   public void testEmptyWithNullRunMonitor() {
     RunContexts.empty().runMonitor(null);
   }

@@ -43,14 +43,11 @@ public class TimeoutClientRunContextStatement extends Statement {
           try {
             m_next.evaluate();
           }
-          catch (final Exception e) {
-            throw new WrappingError(e);
-          }
           catch (final Error e) {
             throw e;
           }
           catch (final Throwable t) {
-            throw new Error(t);
+            throw new ProcessingException("Wrapper", t);
           }
         }
       };
@@ -64,27 +61,15 @@ public class TimeoutClientRunContextStatement extends Statement {
           future.awaitDoneAndGet(m_timeoutMillis, TimeUnit.MILLISECONDS);
         }
       }
-      catch (WrappingError e) {
-        throw e.getCause();
-      }
       catch (ProcessingException e) {
-        if (e.isTimeout()) {
-          // waiting on the job to complete timed out. Try to cancel the job and translate exception into junit counterpart.
+        if (e.isTimeout() || e.isInterruption()) {
+          // Timeout or interruption: Try to cancel the job and translate exception into JUnit counterpart.
           future.cancel(true);
           throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS);
         }
 
-        // re-throw any other job exception
-        throw e;
+        throw e.getCause(); // re-throw wrapped exception
       }
-    }
-  }
-
-  private static class WrappingError extends Error {
-    private static final long serialVersionUID = 1L;
-
-    public WrappingError(Throwable paramThrowable) {
-      super(paramThrowable);
     }
   }
 }

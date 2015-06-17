@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 
@@ -26,7 +27,7 @@ import org.junit.runners.model.TestTimedOutException;
  * Statement for executing tests with a timeout (i.e. the annotated test method is expected to complete within the
  * specified amount of time). If the given timeout is <code>0</code> the next statement is executed using a copy of the
  * current {@link ServerRunContext}. A positive timeout value requires a new server job to be scheduled. In both cases,
- * the next statement is executed in its own transaction.
+ * the next statement is executed in the callers transaction, or in a new transaction if not available.
  *
  * @see Test#timeout()
  * @since 5.1
@@ -49,54 +50,43 @@ public class TimeoutServerRunContextStatement extends Statement {
         try {
           m_next.evaluate();
         }
-        catch (final Exception e) {
-          throw new WrappingError(e);
-        }
         catch (final Error e) {
           throw e;
         }
-        catch (final Throwable e) {
-          throw new Error(e);
+        catch (final Throwable t) {
+          throw new ProcessingException("Wrapper", t);
         }
       }
     };
 
+    // Create a copy of the calling RunContext and re-use its transaction if available.
+    // TODO [abr/dwi]: Should we use the current TX if available? (REQUIRED)
+    ServerRunContext runContext = ServerRunContexts.copyCurrent().transactionScope(TransactionScope.REQUIRES_NEW);
+
     if (m_timeoutMillis <= 0) {
       // no timeout specified. Hence run in a nested transaction that uses the calling thread
       try {
-        ServerRunContexts.copyCurrent().run(nestedRunnable);
+        runContext.run(nestedRunnable);
       }
-      catch (WrappingError e) {
-        throw e.getCause();
+      catch (ProcessingException e) {
+        throw e.getCause(); // re-throw wrapped exception
       }
     }
     else {
       // timeout specified. Run statement in a new server job and wait the amount specified.
-      IFuture<Void> future = ServerJobs.schedule(nestedRunnable);
+      IFuture<Void> future = ServerJobs.schedule(nestedRunnable, ServerJobs.newInput(runContext));
       try {
         future.awaitDoneAndGet(m_timeoutMillis, TimeUnit.MILLISECONDS);
       }
-      catch (WrappingError e) {
-        throw e.getCause();
-      }
       catch (ProcessingException e) {
-        if (e.isTimeout()) {
-          // waiting on the job to complete timed out. Try to cancel the job and translate exception into junit counterpart.
+        if (e.isTimeout() || e.isInterruption()) {
+          // Timeout or interruption: Try to cancel the job and translate exception into JUnit counterpart.
           future.cancel(true);
           throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS);
         }
 
-        // re-throw any other job exception
-        throw e;
+        throw e.getCause(); // re-throw wrapped exception
       }
-    }
-  }
-
-  private static class WrappingError extends Error {
-    private static final long serialVersionUID = 1L;
-
-    public WrappingError(Throwable paramThrowable) {
-      super(paramThrowable);
     }
   }
 }

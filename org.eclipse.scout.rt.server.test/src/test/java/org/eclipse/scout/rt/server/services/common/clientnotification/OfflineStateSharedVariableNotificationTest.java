@@ -55,8 +55,8 @@ public class OfflineStateSharedVariableNotificationTest {
     m_serverSession = new TestServerSession();
     m_registrationList = TestingUtility.registerBeans(
         new BeanMetaData(IClientNotificationService.class).
-            initialInstance(new MockClientNotificationService()).
-            applicationScoped(true)
+        initialInstance(new MockClientNotificationService()).
+        applicationScoped(true)
         );
   }
 
