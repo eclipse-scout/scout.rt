@@ -404,7 +404,7 @@ scout.DateFormat.prototype.parse = function(text) {
   //    return undefined;
   //  }
   //
-  var date = new Date();
+  var date = new Date(0);
   var ret = text;
   for (var i = 0; i < this.parseFunc.length; i++) {
     ret = this.parseFunc[i](ret, date);

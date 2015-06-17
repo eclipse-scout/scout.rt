@@ -35,7 +35,11 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     this._scrollableTop = this.$scrollable.position().top;
     this._scrollableLeft = this.$scrollable.position().left;
     // Fix the position of the scrollable in order to do proper scrollable shifting (see _appendAnimated)
-    this.$scrollable.css({'position': 'absolute', left: this._scrollableLeft, top: this._scrollableTop});
+    this.$scrollable.css({
+      'position': 'absolute',
+      left: this._scrollableLeft,
+      top: this._scrollableTop
+    });
   }
 
   this.selectedDate = selectedDate;
@@ -43,8 +47,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   if (!viewDate) {
     if (selectedDate) {
       viewDate = selectedDate;
-    }
-    else {
+    } else {
       viewDate = new Date();
     }
   }
@@ -77,11 +80,13 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     }
   }
   this.$currentBox = $box;
+  $(document).on('mousedown', this._dateField._mouseDownListener);
 };
 
 scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var $currentBox = this.$currentBox;
-  var newLeft = 0, that = this;
+  var newLeft = 0,
+    that = this;
   var monthBoxCount = this.$scrollable.find('.date-box-month').length + 1;
   var scrollableWidth = monthBoxCount * this._boxWidth;
 
@@ -108,18 +113,20 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   // Animate
   // At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
   this.$scrollable.
-    stop(true).
-    animate({ left: newLeft }, 300, function() {
-      // Remove every month box beside the new one
-      // Its important to use that.$currentBox because $box may already be removed
-      // if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
-      that.$currentBox.siblings('.date-box-month').remove();
+  stop(true).
+  animate({
+    left: newLeft
+  }, 300, function() {
+    // Remove every month box beside the new one
+    // Its important to use that.$currentBox because $box may already be removed
+    // if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
+    that.$currentBox.siblings('.date-box-month').remove();
 
-      // Reset scrollable settings
-      that.$scrollable
-        .cssLeft(that._scrollableLeft)
-        .width(that._boxWidth);
-    });
+    // Reset scrollable settings
+    that.$scrollable
+      .cssLeft(that._scrollableLeft)
+      .width(that._boxWidth);
+  });
 };
 
 scout.DatePicker.prototype._onNavigationMouseDown = function(event) {
@@ -135,7 +142,7 @@ scout.DatePicker.prototype._onDayClick = function(event) {
   var $target = $(event.currentTarget);
   var date = $target.data('date');
   this._dateField.onDateSelected(date);
-  this.close();
+  this.close(true);
 
   // Don't propagate
   return false;
@@ -156,11 +163,15 @@ scout.DatePicker.prototype._onMouseDown = function(event) {
   return false;
 };
 
-scout.DatePicker.prototype.close = function() {
+scout.DatePicker.prototype.close = function(focusDateField) {
   if (this.$popup) {
     this.$popup.remove();
     this.$popup = null;
+    if (focusDateField && this._dateField) {
+      this._dateField.$dateField.focus();
+    }
   }
+  $(document).off('mousedown', this._dateField._mouseDownListener);
   if (this._scrollHandler) {
     scout.scrollbars.offScroll(this._scrollHandler);
     this._scrollHandler = null;
@@ -175,7 +186,7 @@ scout.DatePicker.prototype._onCloseEvent = function() {
   if ($.contains(this.$popup[0], event.target)) {
     return;
   }
-  this.close();
+  this.close(true);
 };
 
 scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
@@ -196,7 +207,7 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   this.selectDate(date, true);
 };
 
-scout.DatePicker.prototype._createDateBox = function () {
+scout.DatePicker.prototype._createDateBox = function() {
   var cl, i, now = new Date();
   var day, dayInMonth, $day;
   var weekdays = this._dateFormat.symbols.weekdaysShortOrdered;
@@ -205,36 +216,35 @@ scout.DatePicker.prototype._createDateBox = function () {
   var $box = $.makeDiv('date-box-month').data('viewDate', this.viewDate);
 
   // Create weekday header
-  for (i in weekdays){
+  for (i in weekdays) {
     $box.appendDiv('date-box-weekday', weekdays[i]);
   }
 
   // Find start date (-1)
-  for (var offset = 0; offset < 42; offset++){
+  for (var offset = 0; offset < 42; offset++) {
     start.setDate(start.getDate() - 1);
     var diff = new Date(start.getYear(), this.viewDate.getMonth(), 0).getDate() - start.getDate();
-    if ((start.getDay() === 0) && (start.getMonth() !== this.viewDate.getMonth()) && (diff > 1)){
+    if ((start.getDay() === 0) && (start.getMonth() !== this.viewDate.getMonth()) && (diff > 1)) {
       break;
     }
   }
 
   // Create days
-  for (i = 0; i < 42; i++){
+  for (i = 0; i < 42; i++) {
     start.setDate(start.getDate() + 1);
     dayInMonth = start.getDate();
 
     if ((start.getDay() === 6) || (start.getDay() === 0)) {
       cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out-weekend' : ' date-box-weekend');
-    }
-    else {
+    } else {
       cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out' : '');
     }
 
-    if (scout.dates.isSameDay(start, now)){
+    if (scout.dates.isSameDay(start, now)) {
       cl += ' date-box-now';
     }
 
-    if (this.selectedDate && scout.dates.isSameDay(start, this.selectedDate)){
+    if (this.selectedDate && scout.dates.isSameDay(start, this.selectedDate)) {
       cl += ' date-box-selected';
     }
 
@@ -244,14 +254,14 @@ scout.DatePicker.prototype._createDateBox = function () {
 
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box.
-      appendDiv('date-box-day ' + cl, day).
-      data('date', new Date(start));
+    appendDiv('date-box-day ' + cl, day).
+    data('date', new Date(start));
   }
 
   return $box;
 };
 
-scout.DatePicker.prototype._createHeader = function () {
+scout.DatePicker.prototype._createHeader = function() {
   var headerHtml =
     '<div class="date-box-header">' +
     '  <div class="date-box-left-y" data-shift="-12"></div>' +
@@ -264,11 +274,11 @@ scout.DatePicker.prototype._createHeader = function () {
   return $(headerHtml);
 };
 
-scout.DatePicker.prototype._updateHeader = function (viewDate) {
+scout.DatePicker.prototype._updateHeader = function(viewDate) {
   this._$header.find('.date-box-header-month').text(this._createHeaderText(viewDate));
 };
 
-scout.DatePicker.prototype._createHeaderText = function (viewDate) {
+scout.DatePicker.prototype._createHeaderText = function(viewDate) {
   var months = this._dateFormat.symbols.months;
   return months[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
 };

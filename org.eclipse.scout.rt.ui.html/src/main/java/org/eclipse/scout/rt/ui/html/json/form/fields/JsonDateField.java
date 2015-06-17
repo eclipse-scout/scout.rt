@@ -100,7 +100,12 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   @Override
   public void handleUiEvent(JsonEvent event) {
     if ("timestampChanged".equals(event.getType())) {
-      handleTimestampChanged(event.getData().optLong("timestamp"));
+      if (event.getData().isNull("timestamp")) {
+        handleTimestampChanged(null);
+      }
+      else {
+        handleTimestampChanged(event.getData().optLong("timestamp"));
+      }
     }
     else {
       super.handleUiEvent(event);

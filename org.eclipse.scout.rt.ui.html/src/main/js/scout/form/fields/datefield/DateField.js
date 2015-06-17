@@ -56,24 +56,21 @@ scout.DateField.prototype._onIconClickTime = function(event) {
   this.$timeField.focus();
 };
 
-scout.DateField.prototype._onIconClick = function(event) {
-  this.openPicker();
-  this.$dateField.focus();
-};
-
 scout.DateField.prototype.timestampChanged = function() {
   var date;
   if (this.hasTime && this.hasDate) {
-    date = scout.dates.combineDateTime(
-      this.isolatedDateFormat.parse(this.$dateField.val()),
-      this.isolatedTimeFormat.parse(this.$timeField.val())
-    );
+    //both parts needed otherwise field is null
+    if(this.$dateField.val() && this.$timeField.val()){
+      date = scout.dates.combineDateTime(
+          this.isolatedDateFormat.parse(this.$dateField.val()),
+          this.isolatedTimeFormat.parse(this.$timeField.val())
+      );
+    }
   } else if (this.hasTime) {
     date = this.isolatedTimeFormat.parse(this.$timeField.val());
   } else if (this.hasDate) {
     date = this.isolatedDateFormat.parse(this.$dateField.val());
   }
-
   var timestamp = (date ? date.getTime() : null);
   if (timestamp !== this.timestamp) {
     this.timestamp = timestamp;
@@ -135,6 +132,7 @@ scout.DateField.prototype._onFieldFocus = function() {
 
 scout.DateField.prototype._onFieldBlurDate = function() {
   this.closeOnClickOutsideOrFocusLost();
+  this.timestampChanged();
 };
 
 scout.DateField.prototype._onFieldBlurTime = function() {
@@ -166,7 +164,11 @@ scout.DateField.prototype._onFieldBlurTime = function() {
 };
 
 scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
-  if (!this._picker.isOpen() || !this._$predict) {
+  if (!this._picker.isOpen() ) {
+    return;
+  }
+  if(!this._$predict && this._picker.isOpen()){
+    this._picker.close();
     return;
   }
   this._acceptPrediction();
@@ -179,7 +181,6 @@ scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
   this._$predict.remove();
   this._$predict = null;
   this._picker.close();
-  $(document).off('mousedown', this._mouseDownListener);
 
 };
 
@@ -200,13 +201,13 @@ scout.DateField.prototype._onClick = function() {
 scout.DateField.prototype._onIconClick = function(event) {
   scout.DateField.parent.prototype._onIconClick.call(this, event);
   this.openPicker();
+  this.$dateField.focus();
 };
 
 /**
  * Opens picker and selects date
  */
 scout.DateField.prototype.openPicker = function() {
-  $(document).on('mousedown', this._mouseDownListener);
   this._updateSelection(this.$dateField.val());
 };
 
@@ -295,7 +296,7 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     diff = 0,
     cursorPos = this.$dateField[0].selectionStart,
     displayText = this.$dateField.val(),
-    prediction = this._$predict.val();
+    prediction = this._$predict? this._$predict.val():undefined;
 
   if (event.which === scout.keys.TAB ||
     event.which === scout.keys.SHIFT) {
@@ -305,16 +306,14 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     // Update model and close picker
     this.timestampChanged();
     if (this._picker.isOpen()) {
-      this._picker.close();
-      $(document).off('mousedown', this._mouseDownListener);
+      this._picker.close(true);
       event.stopPropagation();
     }
     return;
   }
   if (event.which === scout.keys.ESC) {
     if (this._picker.isOpen()) {
-      this._picker.close();
-      $(document).off('mousedown', this._mouseDownListener);
+      this._picker.close(true);
       event.stopPropagation();
     }
     return;
@@ -349,7 +348,6 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
       //no navigation impact on date field.
       if (this._picker.isOpen()) {
         this._picker.close();
-        $(document).off('mousedown', this._mouseDownListener);
       }
       return true;
     }

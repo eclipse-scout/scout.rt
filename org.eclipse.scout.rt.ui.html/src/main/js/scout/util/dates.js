@@ -329,12 +329,12 @@ scout.dates = {
 
   /**
    * TODO NBU Add jasmine test
-   * TODO NBU Add documentation
+   * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.
    */
   combineDateTime: function(date, time) {
-    var newDate = new Date();
+    var newDate = new Date(0);
     if (date) {
-      newDate.setFullYear(date.getYear(), date.getMonth(), date.getDay());
+      newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDay());
     }
     if (time) {
       newDate.setHours(
