@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *
  * @since 6.0.0
  */
-public class MessageBoxes {
+public final class MessageBoxes {
 
   private MessageBoxes() {
     // factory, private constructor
