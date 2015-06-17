@@ -2437,31 +2437,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           else {
             uncheckAllEnabledRows();
           }
-          if (value) {
-            m_checkedRows.add(rowToCheck);
-          }
-          else {
-            m_checkedRows.remove(rowToCheck);
-          }
-          if (getCheckableColumn() != null) {
-            getCheckableColumn().setValue(rowToCheck, value);
-          }
+          checkRowImpl(rowToCheck, value);
           fireRowsChecked(CollectionUtility.arrayList(rowToCheck));
         }
       }
       else {
-        ArrayList<ITableRow> rowsChecked = new ArrayList<ITableRow>();
+        List<ITableRow> rowsChecked = new ArrayList<ITableRow>();
         for (ITableRow row : rows) {
           if (row.isChecked() != value && (!enabledRowsOnly || row.isEnabled())) {
-            if (value) {
-              m_checkedRows.add(row);
-            }
-            else {
-              m_checkedRows.remove(row);
-            }
-            if (getCheckableColumn() != null) {
-              getCheckableColumn().setValue(row, value);
-            }
+            checkRowImpl(row, value);
             rowsChecked.add(row);
           }
         }
@@ -2472,6 +2456,26 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     catch (ProcessingException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
+    }
+  }
+
+  private void checkRowImpl(ITableRow row, boolean value) throws ProcessingException {
+    if (!(row instanceof InternalTableRow)) {
+      return;
+    }
+    InternalTableRow internalRow = (InternalTableRow) row;
+    if (value) {
+      m_checkedRows.add(internalRow);
+    }
+    else {
+      m_checkedRows.remove(internalRow);
+    }
+    if (getCheckableColumn() != null) {
+      getCheckableColumn().setValue(internalRow, value);
+    }
+    else {
+      // Do not use setStatus() or setStatusUpdated(), because this would trigger unnecessary UPDATED events
+      internalRow.setStatusInternal(ITableRow.STATUS_UPDATED);
     }
   }
 

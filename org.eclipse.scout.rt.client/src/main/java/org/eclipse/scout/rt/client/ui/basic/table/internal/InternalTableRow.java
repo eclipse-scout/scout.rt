@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -117,6 +118,14 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     finally {
       setRowChanging(false);
     }
+  }
+
+  /**
+   * Sets the row status without firing any events.
+   */
+  @Internal
+  public void setStatusInternal(int status) {
+    super.setStatus(status);
   }
 
   @Override
