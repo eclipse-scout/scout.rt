@@ -84,6 +84,7 @@ __include("scout/calendar/CalendarListComponent.js");
 __include("scout/calendar/CalendarLayout.js");
 __include("scout/calendar/Range.js");
 __include("scout/messagebox/MessageBox.js");
+__include("scout/messagebox/MessageBoxControlKeyStrokes.js");
 __include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
 __include("scout/messagebox/MessageBoxModelAdapter.js");
 __include("scout/planner/Planner.js");

@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
 public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyObserver<T> {
+
   public static final String EVENT_ACTION = "action";
   public static final String EVENT_CLOSED = "closed";
 
@@ -68,6 +69,18 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
         return getModel().body();
       }
     });
+    putJsonProperty(new JsonProperty<IMessageBox>("hiddenText", model) {
+      @Override
+      protected String modelValue() {
+        return getModel().hiddenText();
+      }
+    });
+    putJsonProperty(new JsonProperty<IMessageBox>("copyPasteText", model) {
+      @Override
+      protected String modelValue() {
+        return getModel().copyPasteText();
+      }
+    });
     putJsonProperty(new JsonProperty<IMessageBox>("yesButtonText", model) {
       @Override
       protected String modelValue() {
@@ -86,13 +99,6 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
         return getModel().cancelButtonText();
       }
     });
-//  putJsonProperty(new JsonProperty<IMessageBox>("hiddenText", model) {
-//  @Override
-//  protected String modelValue() {
-//    return getModel().getHiddenText(); //FIXME implement
-//  }
-//});
-
   }
 
   @Override
@@ -140,7 +146,7 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
     }
   }
 
-  private void handleUiAction(JsonEvent event) {
+  protected void handleUiAction(JsonEvent event) {
     String option = event.getData().getString("option");
     int resultOption = -1;
     if ("yes".equals(option)) {

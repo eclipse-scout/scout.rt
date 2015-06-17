@@ -28,4 +28,22 @@ describe("scout.helpers", function() {
 
   });
 
+  describe("isOneOf", function() {
+
+    it("can check if value is one of multiple values", function() {
+      expect(scout.helpers.isOneOf()).toBe(false);
+      expect(scout.helpers.isOneOf('test')).toBe(false);
+      expect(scout.helpers.isOneOf('test', 'bla')).toBe(false);
+      expect(scout.helpers.isOneOf('test', {test: 'test'})).toBe(false);
+      expect(scout.helpers.isOneOf('test', 'bla', 123, {test: 'test'})).toBe(false);
+      expect(scout.helpers.isOneOf('test', 'bla', 123, {test: 'test'}, 'test', true)).toBe(true);
+      expect(scout.helpers.isOneOf('test', 'bla', 123, {test: 'test'}, ['test'], true)).toBe(false);
+      expect(scout.helpers.isOneOf('test', 'bla', 123, {test: 'test'}, 'Test', true)).toBe(false);
+      expect(scout.helpers.isOneOf('test', ['bla', 123, {test: 'test'}, 'test', true])).toBe(true);
+      expect(scout.helpers.isOneOf(123, '123', 123.00000000000001, -123)).toBe(false);
+      expect(scout.helpers.isOneOf(-123, '123', 123.00000000000001, -123)).toBe(true);
+    });
+
+  });
+
 });

@@ -186,6 +186,25 @@ scout.helpers = {
       return defaultValue;
     }
     return value;
+  },
+
+  isOneOf: function() {
+    if (arguments && arguments.length >= 2) {
+      var value = arguments[0];
+      var argsToCheck;
+      if (arguments.length === 2 && Array.isArray(arguments[1])) {
+        argsToCheck = arguments[1];
+      }
+      else {
+        argsToCheck = Array.prototype.slice.call(arguments, 1);
+      }
+      for (var i = 0; i < argsToCheck.length; i++) {
+        if (value === argsToCheck[i]) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
 };

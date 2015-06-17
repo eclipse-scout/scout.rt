@@ -12,6 +12,7 @@ scout.MessageBox = function(model, session) {
   this.$yesButton;
   this.$noButton;
   this.$cancelButton;
+  this._$closeButton;
   this.focusListener;
   this._$glassPane;
   this._session = session;
@@ -35,14 +36,18 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$body = this.$content.appendDiv('messagebox-label messagebox-body');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
+  this._$closeButton = null; // button to be executed when close() is called, e.g. when ESCAPE is pressed
   if (this.yesButtonText) {
     this.$yesButton = this._createButton('yes', this.yesButtonText);
+    this._$closeButton = this.$yesButton;
   }
   if (this.noButtonText) {
     this.$noButton = this._createButton('no', this.noButtonText);
+    this._$closeButton = this.$noButton;
   }
   if (this.cancelButtonText) {
     this.$cancelButton = this._createButton('cancel', this.cancelButtonText);
+    this._$closeButton = this.$cancelButton;
   }
   this._updateButtonWidths();
 
@@ -54,6 +59,8 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderHiddenText(this.hiddenText);
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+
+  // TODO Somehow let the user copy the 'copyPasteText' - but how?
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -126,6 +133,10 @@ scout.MessageBox.prototype._renderHiddenText = function(text) {
   }
 };
 
+scout.MessageBox.prototype._renderCopyPasteText = function(text) {
+  // nop
+};
+
 scout.MessageBox.prototype._updateButtonWidths = function() {
   // Find all visible buttons
   var $visibleButtons = [];
@@ -140,4 +151,11 @@ scout.MessageBox.prototype._updateButtonWidths = function() {
   $($visibleButtons).each(function() {
     this.css('width', width + '%');
   });
+};
+
+scout.MessageBox.prototype.close = function() {
+  if (this._$closeButton) {
+    this._$closeButton.focus();
+    this._$closeButton.click();
+  }
 };
