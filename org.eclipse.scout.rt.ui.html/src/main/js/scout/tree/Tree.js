@@ -105,7 +105,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('click', '.tree-node-control', this._onNodeControlClick.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 
-  scout.scrollbars.install(this.$data);
+  scout.scrollbars.install(this.$data, { axis: 'y' });
   this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar.render(this.$container);
   this._addNodes(this.nodes);

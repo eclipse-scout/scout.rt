@@ -53,7 +53,7 @@ scout.GroupBox.prototype._render = function($parent) {
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
   if (this.scrollable) {
-    scout.scrollbars.install(this.$body);
+    scout.scrollbars.install(this.$body, { axis: 'y' });
     this.session.detachHelper.pushScrollable(this.$body);
   }
   this._prepareFields();

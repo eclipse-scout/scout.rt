@@ -10,8 +10,7 @@ scout.ImageField.prototype._render = function($parent) {
 
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
 
-  // Create div to avoid resizing of the <img>
-  this.addFieldContainer($('<div>').css('overflow', 'hidden'));
+  this.addFieldContainer($('<div>'));
 
   if (this.scrollBarEnabled) {
     scout.scrollbars.install(this.$fieldContainer, {

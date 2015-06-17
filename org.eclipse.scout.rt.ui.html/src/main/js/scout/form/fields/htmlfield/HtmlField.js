@@ -5,8 +5,10 @@ scout.HtmlField = function() {
 scout.inherits(scout.HtmlField, scout.ValueField);
 
 scout.HtmlField.prototype._render = function($parent) {
-  this.addContainer($parent, 'html-field');
+
+  this.addContainer($parent, 'html-field', new scout.HtmlFieldLayout(this));
   this.addLabel();
+
   this.addField($.makeDiv());
   this.addStatus();
 };
@@ -30,23 +32,42 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   this.$field.find('.app-link')
     .on('click', this._onAppLinkAction.bind(this))
     .attr('tabindex', '0');
+
+  // this method replaces the content, also the scroll bars get lost
+  this._renderScrollBarsEnabled(this.scrollBarsEnabled);
+
+  this.invalidateTree();
 };
 
 scout.HtmlField.prototype.init = function(model, session) {
   scout.HtmlField.parent.prototype.init.call(this, model, session);
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
+
+scout.HtmlField.prototype._remove = function() {
+  if (this.scrollBarsEnabled) {
+    this.session.detachHelper.removeScrollable(this.$field);
+  }
+};
+
 scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
-  // XXX
+  if (this.scrollBarsEnabled) {
+    scout.scrollbars.install(this.$field);
+    this.session.detachHelper.pushScrollable(this.$field);
+  }
 };
 
 // Not called in _renderProperties() because this is not really a property (more like an event)
 scout.HtmlField.prototype._renderScrollToEnd = function() {
-  // XXX
+  if (this.scrollBarsEnabled) {
+    scout.scrollbars.scrollToBottom(this.$fieldContainer);
+  }
 };
 
-scout.HtmlField.prototype._renderScrollToPosition = function(scrollToPosition) {
-  // XXX
+scout.HtmlField.prototype._renderScrollToPosition = function(anchor) {
+  if (this.scrollBarsEnabled && anchor && this.$field.find(anchor)) {
+    scout.scrollbars.scrollTo(this.$fieldContainer, this.$field.find(anchor));
+  }
 };
 
 scout.HtmlField.prototype._onAppLinkAction = function(event) {

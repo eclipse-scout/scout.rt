@@ -13,7 +13,7 @@ scout.scrollbars = {
       htmlContainer = scout.HtmlComponent.optGet($container);
 
     options = options || {};
-    options.axis = options.axis || 'y';
+    options.axis = options.axis || 'both';
 
     if (options.nativeScrollbars !== undefined) {
       nativeScrollbars = options.nativeScrollbars;
@@ -63,6 +63,7 @@ scout.scrollbars = {
         scrollbar = new scout.Scrollbar(options);
         scrollbars.push(scrollbar);
       }
+      $container.css('overflow', 'hidden');
       $container.data('scrollbars', scrollbars);
       scrollbars.forEach(function(scrollbar) {
         scrollbar.render($container);
@@ -103,9 +104,15 @@ scout.scrollbars = {
 
   scrollTop: function($scrollable, scrollTop) {
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'y');
-    scrollbar.notifyBeforeScroll();
-    $scrollable.scrollTop(scrollTop);
-    scrollbar.notifyAfterScroll();
+    if (scrollbar) {
+      // js scrolling
+      scrollbar.notifyBeforeScroll();
+      $scrollable.scrollTop(scrollTop);
+      scrollbar.notifyAfterScroll();
+    } else {
+      // native scrolling
+      $scrollable.scrollTop(scrollTop);
+    }
   },
 
   scrollLeft: function($scrollable, scrollLeft) {
@@ -123,7 +130,7 @@ scout.scrollbars = {
   },
 
   scrollToBottom: function($scrollable) {
-    scout.scrollbars.scrollTop($scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
+    scout.scrollbars.scrollTop($scrollable, $scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
   },
 
   /**
