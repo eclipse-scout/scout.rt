@@ -501,8 +501,11 @@ scout.DateField.prototype._createPredictionField = function() {
 };
 
 scout.DateField.prototype._parseTime = function(inputValue) {
+  //TODO nbu time separator : , .
   var timeString = '';
   var isPM = false;
+  inputValue = this._formatTimeElement(inputValue);
+
   inputValue = inputValue.replace(':', '');
   inputValue = inputValue.replace('.', '');
   inputValue = inputValue.replace(/am/i, '');
@@ -526,6 +529,38 @@ scout.DateField.prototype._parseTime = function(inputValue) {
   }
   return this._internalTimeParseDateFormat.parse(timeString);
 };
+
+scout.DateField.prototype._formatTimeElement = function(inputValue){
+  var indexDp =  inputValue.indexOf(':');
+  var indexCom = inputValue.indexOf(',');
+  var indexP = inputValue.indexOf('.');
+  var newInputValue='';
+  while(indexDp+indexCom+indexP>-3){
+    var cutLocation, separator;
+    if(indexDp>-1 && (indexDp<indexCom || indexCom===-1)&& (indexDp<indexP || indexP===-1)){
+      separator = ':';
+      cutLocation=indexDp;
+    }
+    else if(indexCom>-1 && (indexCom<indexDp || indexDp===-1)&& (indexCom<indexP || indexP===-1)){
+      separator = ',';
+      cutLocation=indexCom;
+    }
+    else if(indexP>-1 && (indexP<indexDp || indexDp===-1)&& (indexP<indexCom || indexCom===-1)){
+      separator = '.';
+      cutLocation=indexP;
+    }
+
+    var inputPart = inputValue.substring(0, cutLocation);
+    newInputValue +=scout.strings.padZeroLeft(inputPart,2);
+    inputValue = inputValue.replace(inputPart+separator,'');
+    indexDp =  inputValue.indexOf(':');
+    indexCom = inputValue.indexOf(',');
+    indexP = inputValue.indexOf('.');
+  }
+  newInputValue += scout.strings.padZeroLeft(inputValue,2);
+  return newInputValue;
+};
+
 
 scout.DateField.prototype._createKeyStrokeAdapter = function() {
   return new scout.DateFieldKeyStrokeAdapter(this);
