@@ -606,12 +606,14 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * {@link #interceptCompleteEdit(ITableRow, IFormField)} is called on this column.
    * <p>
    * Subclasses can override this method. The default returns an appropriate field based on the column data type.
+   * <p>
+   * The mapping from the cell value to the field value is achieved using
+   * {@link #cellValueToEditField(Object, IFormField)}
    *
    * @param row
    *          on which editing occurs
    * @return a field for editing or null to install an empty cell editor.
    */
-  @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(61)
   protected IFormField execPrepareEdit(ITableRow row) throws ProcessingException {
@@ -622,9 +624,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       // apply horizontal alignment of column to respective editor field
       gd.horizontalAlignment = getHorizontalAlignment();
       f.setGridDataHints(gd);
-      if (f instanceof IValueField<?>) {
-        ((IValueField<VALUE>) f).setValue(getValue(row));
-      }
+      cellValueToEditField(getValue(row), f);
       f.markSaved();
     }
     return f;
@@ -635,6 +635,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * Subclasses can override this method. The default calls {@link #applyValueInternal(ITableRow, Object)} and delegates
    * to {@link #interceptParseValue(ITableRow, Object)} and {@link #interceptValidateValue(ITableRow, Object)}.
+   * <p>
+   * The mapping from the field value to the cell value is achieved using {@link #editFieldToCellValue(IFormField)}
    *
    * @param row
    *          on which editing occurred.
@@ -659,15 +661,36 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         if (editingField.getErrorStatus() != null) {
           cell.addErrorStatuses(valueField.getErrorStatus().getChildren());
         }
-        cell.setValue(valueField.getValue());
+        cell.setValue(editFieldToCellValue(valueField));
         persistRowChange(row);
       }
     }
   }
 
-  private boolean contentEquals(Cell cell, IValueField<VALUE> field) {
+  /**
+   * Used in {@link #execPrepareEdit(ITableRow)}
+   */
+  @SuppressWarnings("unchecked")
+  protected void cellValueToEditField(VALUE cellValue, IFormField editField) throws ProcessingException {
+    if (editField instanceof IValueField<?>) {
+      ((IValueField) editField).setValue(cellValue);
+    }
+  }
+
+  /**
+   * Used in {@link #execCompleteEdit(ITableRow, IFormField)}
+   */
+  @SuppressWarnings("unchecked")
+  protected VALUE editFieldToCellValue(IFormField editField) throws ProcessingException {
+    if (editField instanceof IValueField<?>) {
+      return (VALUE) ((IValueField) editField).getValue();
+    }
+    return null;
+  }
+
+  private boolean contentEquals(Cell cell, IValueField<VALUE> field) throws ProcessingException {
     return CompareUtility.equals(cell.getText(), field.getDisplayText()) &&
-        CompareUtility.equals(cell.getValue(), field.getValue()) &&
+        CompareUtility.equals(cell.getValue(), editFieldToCellValue(field)) &&
         CompareUtility.equals(cell.getErrorStatus(), field.getErrorStatus());
   }
 
