@@ -330,7 +330,7 @@ scout.FocusContext.prototype._checkElementContainsText = function(element) {
     .children()
     .remove()
     .end()
-    .text().trim().length && $element.css('user-select')) {
+    .text().trim().length && $element.css('user-select')!=='none') {
     return true;
   }
   return false;
