@@ -1,7 +1,6 @@
 scout.NavigateDownButton = function(outline, node) {
   scout.NavigateDownButton.parent.call(this, outline, node);
-  this._text1 = 'Continue';
-  this._text2 = 'Show';
+  this._text = 'Down';
   this.defaultMenu = true;
   this.objectType = 'NavigateDownButton';
   this.keyStroke = 'Enter';
@@ -9,30 +8,15 @@ scout.NavigateDownButton = function(outline, node) {
 };
 scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
 
-scout.NavigateDownButton.prototype._isDetail = function() {
-  // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
-  return !!(this.node.detailFormVisible && this.node.detailForm &&
-    this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
-};
-
-scout.NavigateDownButton.prototype._toggleDetail = function() {
-  return false;
-};
-
 scout.NavigateDownButton.prototype._buttonEnabled = function() {
-  if (this._isDetail()) {
-    return true;
-  }
-  if (this.node.leaf) {
-    return false;
-  }
+  var node = this.outline.nodesMap[this.outline.selectedNodeIds[0]];
+  // TODO: use this.outline.selectedRow
 
-  // when it's not a leaf and not a detail - the button is only enabled when a single row is selected
-  var table = this.node.detailTable;
-  if (table) {
-    return table.selectedRows.length === 1;
+
+  if (node) {
+    return !node.leaf;
   } else {
-    return true;
+    return false;
   }
 };
 

@@ -6,6 +6,8 @@ scout.Outline = function() {
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
   this._tableSelectionListener;
+  this.upButton;
+  this.downButton;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -23,6 +25,7 @@ scout.Outline.prototype._installKeyStrokeAdapter = function() {
  * @override
  */
 scout.Outline.prototype._render = function($parent) {
+  this._addOutlineNavigationButtons();
   scout.Outline.parent.prototype._render.call(this, $parent);
 
   if (this.selectedNodeIds.length === 0) {
@@ -47,11 +50,9 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
   // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
   if (node.detailTable) {
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
-    this._addOutlineNavigationButtons(node.detailTable, node);
   }
   if (node.detailForm) {
     node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
-    this._addOutlineNavigationButtons(node.detailForm, node);
   }
 };
 
@@ -70,27 +71,17 @@ scout.Outline.prototype._decorateNode = function(node) {
   }
 };
 
+scout.Outline.prototype._addOutlineNavigationButtons = function() {
+  this.upButton = new scout.NavigateUpButton(this);
+  this.staticMenus.push(this.upButton);
 
-scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
-  var menus = scout.arrays.ensure(formOrTable.staticMenus);
-  if (!this._hasMenu(menus, scout.NavigateUpButton)) {
-    var upButton = new scout.NavigateUpButton(this, node);
-    menus.push(upButton);
-  }
-  if (!this._hasMenu(menus, scout.NavigateDownButton)) {
-    var downButton = new scout.NavigateDownButton(this, node);
-    menus.push(downButton);
-  }
-  if (formOrTable instanceof scout.Form) {
-    formOrTable.rootGroupBox.staticMenus = menus;
-  } else {
-    var table = formOrTable,
-      button = this._getMenu(menus, scout.NavigateDownButton);
-    table.staticMenus = menus;
-    this._tableSelectionListener = table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
-      button.updateEnabled();
-    });
-  }
+  this.downButton = new scout.NavigateDownButton(this);
+  this.staticMenus.push(this.downButton);
+};
+
+scout.Outline.prototype._updateOutlineNavigationButtons = function() {
+  this.upButton.updateEnabled();
+  this.downButton.updateEnabled();
 };
 
 scout.Outline.prototype._getMenu = function(menus, menuClass) {
@@ -117,6 +108,9 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
 
 scout.Outline.prototype._renderSelection = function() {
   scout.Outline.parent.prototype._renderSelection.call(this);
+
+  // update up/down buttons
+  this._updateOutlineNavigationButtons();
 
   // Outline does not support multi selection -> [0]
   var node = this.nodesMap[this.selectedNodeIds[0]];
@@ -225,15 +219,9 @@ scout.Outline.prototype._onPageChanged = function(event) {
 
     node.detailFormVisible = event.detailFormVisible;
     node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    if (node.detailForm) {
-      this._addOutlineNavigationButtons(node.detailForm, node);
-    }
 
     node.detailTableVisible = event.detailTableVisible;
     node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
-    if (node.detailTable) {
-      this._addOutlineNavigationButtons(node.detailTable, node);
-    }
 
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.

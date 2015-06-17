@@ -24,14 +24,10 @@ scout.inherits(scout.AbstractNavigationButton, scout.Menu);
  * @override
  */
 scout.AbstractNavigationButton.prototype._render = function($parent) {
-  if (this._isDetail()) {
-    this._onClickFunc = this._setDetailVisible.bind(this);
-    this.text = this.session.text(this._text1);
-  } else {
-    this._onClickFunc = this._drill.bind(this);
-    this.text = this.session.text(this._text2);
-  }
+  //this.text = this.session.text(this.text);
+  this.text = this._text;
   this.enabled = this._buttonEnabled();
+
   scout.AbstractNavigationButton.parent.prototype._render.call(this, $parent);
   this._registerButtonKeyStroke();
 };
@@ -44,15 +40,8 @@ scout.AbstractNavigationButton.prototype._remove = function() {
   this._unregisterButtonKeyStroke();
 };
 
-scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
-  var detailVisible = this._toggleDetail();
-  $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
-  this.node.detailFormVisibleByUi = detailVisible;
-  this.outline._updateOutlineTab(this.node);
-};
-
 scout.AbstractNavigationButton.prototype.doAction = function() {
-  this._onClickFunc();
+  this._drill();
 };
 
 /**
@@ -61,7 +50,7 @@ scout.AbstractNavigationButton.prototype.doAction = function() {
 scout.AbstractNavigationButton.prototype.updateEnabled = function() {
   this.enabled = this._buttonEnabled();
   if (this.rendered) {
-    this._renderEnabled(this.enabled);
+    this._renderEnabled(this.enabled );
   }
 };
 
