@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @Bean
@@ -306,29 +305,9 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     return this;
   }
 
-  private void updateCopyPasteTextInternal() {
+  protected void updateCopyPasteTextInternal() {
     if (m_copyPasteTextInternal == null) {
-      StringBuffer buf = new StringBuffer();
-      if (OfficialVersion.customCopyrightText != null) {
-        buf.append(OfficialVersion.customCopyrightText + "\n");
-      }
-      else {
-        buf.append(OfficialVersion.COPYRIGHT + "\n");
-      }
-      buf.append("java.vm.version: " + System.getProperty("java.vm.version") + "\n");
-      buf.append("os.name_version: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\n");
-      buf.append("user.name: " + System.getProperty("user.name") + "\n");
-      buf.append("\n");
-      if (m_header != null) {
-        buf.append(m_header + "\n\n");
-      }
-      if (m_body != null) {
-        buf.append(m_body + "\n\n");
-      }
-      if (m_hiddenText != null) {
-        buf.append(m_hiddenText + "\n\n");
-      }
-      m_copyPasteTextInternal = buf.toString();
+      m_copyPasteTextInternal = StringUtility.join("\n\n", m_header, m_body, m_hiddenText);
     }
   }
 
