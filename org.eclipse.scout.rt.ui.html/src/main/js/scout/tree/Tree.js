@@ -496,7 +496,13 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 
   // Update parent with new child nodes
   if (parentNode) {
-    scout.arrays.pushAll(parentNode.childNodes, nodes);
+    if (parentNode.childNodes && parentNode.childNodes.length>0) {
+      nodes.forEach(function(entry) {
+        scout.arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex?entry.childNodeIndex:0);
+      }.bind(this));
+    } else {
+      scout.arrays.pushAll(parentNode.childNodes, nodes);
+    }
 
     if (this.rendered && parentNode.$node) {
       $parentNode = parentNode.$node;
@@ -511,7 +517,13 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
       }
     }
   } else {
-    scout.arrays.pushAll(this.nodes, nodes);
+    if (this.nodes && this.nodes.length > 0) {
+      nodes.forEach(function(entry) {
+        scout.arrays.insert(this.nodes, entry, entry.childNodeIndex?entry.childNodeIndex:0);
+      }.bind(this));
+    } else {
+      scout.arrays.pushAll(this.nodes, nodes);
+    }
 
     if (this.rendered) {
       this._addNodes(nodes);
@@ -752,8 +764,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
         parentNode.$showAllNode.remove();
         delete parentNode.$showAllNode;
       }
-    }
-    else {
+    } else {
       if (parentNode.$showAllNode) {
         this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
       }
@@ -774,6 +785,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 
   for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
+
     var $node = this._$buildNode(node, $parent);
 
     // If node wants to be lazy added to the tree, hide the DOM element, except the
@@ -783,12 +795,21 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       $node.addClass('hidden');
       hasHiddenNodes = true;
     }
-
     // append first node and successors
     if ($predecessor) {
+      if (parentNode && parentNode.childNodes.indexOf(node) > 0) {
+        $predecessor = parentNode.childNodes[parentNode.childNodes.indexOf(node) - 1].$node;
+      }
       $node.insertAfter($predecessor);
     } else {
-      $node.appendTo(this.$data);
+      //insert on top level
+      if (this.nodes && this.nodes.indexOf(node)>0) {
+        $predecessor = this.nodes[this.nodes.indexOf(node) - 1].$node;
+        $node.insertAfter($predecessor);
+      }
+      else{
+        $node.prependTo(this.$data);
+      }
     }
 
     // if model demands children, create them
@@ -806,15 +827,13 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       parentNode.$showAllNode.remove();
       delete parentNode.$showAllNode;
     }
-  }
-  else {
+  } else {
     // If parent is expanded and has not already a $showAllNode, create one
     if (parentNode && parentNode.expanded && !parentNode.$showAllNode) {
       var $showAllNode = this._$buildShowAllNode(parentNode);
       $showAllNode.insertAfter($predecessor);
       $predecessor = $showAllNode;
-    }
-    else {
+    } else {
       // Node already exists, just update the text (node count might have changed)
       this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
     }
@@ -880,9 +899,9 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.removeClass();
   $node.addClass(formerClasses);
   $node.addClass(node.cssClass);
-  $node.toggleClass('leaf', !!node.leaf);
-  $node.toggleClass('expanded', (!!node.expanded && node.childNodes.length > 0));
-  $node.setEnabled(!!node.enabled);
+  $node.toggleClass('leaf', !! node.leaf);
+  $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
+  $node.setEnabled( !! node.enabled);
 
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();

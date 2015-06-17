@@ -30,10 +30,11 @@ describe("Tree", function() {
     return model;
   }
 
-  function createModelNode(id, text) {
+  function createModelNode(id, text, position) {
     return {
       "id": id,
       "text": text,
+      "childNodeIndex": position?position:0,
       "enabled": true,
       "checked": false
     };
@@ -604,7 +605,7 @@ describe("Tree", function() {
       describe("inserting a child", function() {
 
         it("updates model", function() {
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',3);
           expect(tree.nodes.length).toBe(3);
           expect(Object.keys(tree.nodesMap).length).toBe(12);
 
@@ -621,7 +622,7 @@ describe("Tree", function() {
         it("updates html document if parent is expanded", function() {
           tree.render(session.$entryPoint);
 
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',3);
           expect(findAllNodes(tree).length).toBe(12);
 
           var message = {
@@ -639,7 +640,7 @@ describe("Tree", function() {
         node0.expanded = false;
         tree.render(session.$entryPoint);
 
-        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',3);
         expect(findAllNodes(tree).length).toBe(9);
 
         var message = {
