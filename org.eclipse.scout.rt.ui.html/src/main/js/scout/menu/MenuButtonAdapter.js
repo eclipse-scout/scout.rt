@@ -8,6 +8,19 @@ scout.MenuButtonAdapter = function() {
 
   this.defaultMenu = false;
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
+
+  // FIXME AWE: Da der Button von AbstractFormField erbt, MenuButtonAdapter.js aber nicht,
+  // kann es sein, dass Property Change Events fuer Properties ankommen, welche es auf
+  // MenuButtonAdapter nicht gibt (z.B. mandatory). Es gibt dann einen Fehler in
+  // ModelAdapter._renderPropertiesOnPropertyChange(). Darum kopieren wir hier als
+  // _Workaround_ (!) einfach alle _render* Methoden von FormField.js und stellen
+  // eine leere dummy Methode bereit, damit diese Fehler verhindert werden.
+  var  emptyDummyFunction = function() {};
+  for (var prop in scout.FormField.prototype) {
+    if (/^_render.+/.test(prop) && this[prop] === undefined) {
+      this[prop] = emptyDummyFunction.bind(this);
+    }
+  }
 };
 scout.inherits(scout.MenuButtonAdapter, scout.Menu);
 
