@@ -64,7 +64,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.splitter.on('resize', this.onSplitterResize.bind(this));
   this.splitter.on('resizeend', this.onSplitterResizeEnd.bind(this));
 
-  this._outlineTab = new scout.Desktop.TabAndContent();
+  this._outlineTab = new scout.Desktop.TabAndContent(this);
 
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
@@ -283,7 +283,7 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
 };
 
 scout.Desktop.prototype._renderView = function(view) {
-  var tab = new scout.Desktop.TabAndContent(view, view.title, view.subTitle);
+  var tab = new scout.Desktop.TabAndContent(this, view, view.title, view.subTitle);
   this._addTab(tab);
   this._selectTab(tab);
   view.render(this.$bench);
@@ -484,16 +484,35 @@ scout.Desktop.prototype.tabCount = function() {
 
 /* --- INNER TYPES ---------------------------------------------------------------- */
 
-scout.Desktop.TabAndContent = function(content, title, subTitle) {
-  this.content = content;
-  this.title = title;
-  this.subTitle = subTitle;
+scout.Desktop.TabAndContent = function(desktop, content, title, subTitle) {
+  this._desktop = desktop;
   this.$container;
   this.$storage;
+  this._update(content, title, subTitle);
 };
 
 scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitle) {
+  this._uninstallPropertyChangeListener();
   this.content = content;
   this.title = title;
   this.subTitle = subTitle;
+  this._installPropertyChangeListener();
+};
+
+scout.Desktop.TabAndContent.prototype._uninstallPropertyChangeListener = function() {
+  if (this.content instanceof scout.ModelAdapter) {
+    this.content.off('propertyChange');
+  }
+};
+
+scout.Desktop.TabAndContent.prototype._installPropertyChangeListener = function() {
+  if (this.content instanceof scout.ModelAdapter) {
+    this.content.on('propertyChange', function(event) {
+      if (event.properties.title !== undefined || event.properties.subTitle !== undefined) {
+        this.title = scout.helpers.nvl(event.properties.title, this.title);
+        this.subTitle = scout.helpers.nvl(event.properties.subTitle, this.subTitle);
+        this._desktop._updateTab(this);
+      }
+    }.bind(this));
+  }
 };

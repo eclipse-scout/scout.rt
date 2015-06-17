@@ -22,6 +22,8 @@ scout.ModelAdapter = function() {
   // Adapter structure
   this.owner;
   this.ownedAdapters = [];
+
+  this._addEventSupport();
 };
 scout.inherits(scout.ModelAdapter, scout.Widget);
 
@@ -241,6 +243,9 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
   this._syncPropertiesOnPropertyChange(oldProperties, event.properties);
+  this.trigger('propertyChange', {
+    properties: event.properties
+  });
 
   // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
   if (this.rendered) {

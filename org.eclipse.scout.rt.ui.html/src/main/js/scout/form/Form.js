@@ -44,7 +44,7 @@ scout.Form.prototype._render = function($parent) {
         this.htmlComp.layout();
       }.bind(this)
     });
-    this._setDialogTitle();
+    this._updateDialogTitle();
   }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -63,15 +63,41 @@ scout.Form.prototype._render = function($parent) {
   }
 };
 
-scout.Form.prototype._setDialogTitle = function() {
+scout.Form.prototype._updateDialogTitle = function() {
   if (this.title || this.subTitle) {
-    var $titles = this.$container.appendDiv('title-box');
+    var $titles = getOrAppendChildDiv(this.$container, 'title-box');
+    // Render title
     if (this.title) {
-      $titles.appendDiv('title').text(this.title);
+      getOrAppendChildDiv($titles, 'title').text(this.title);
     }
-    if (this.subTitle) {
-      $titles.appendDiv('sub-title').text(this.subTitle);
+    else {
+      removeChildDiv($titles, 'title');
     }
+    // Render subTitle
+    if (this.title) {
+      getOrAppendChildDiv($titles, 'sub-title').text(this.subTitle);
+    }
+    else {
+      removeChildDiv($titles, 'sub-title');
+    }
+  }
+  else {
+    removeChildDiv(this.$container, 'title-box');
+  }
+  // TODO AWE/CGU: How to update the layout? If title was not visible but now is, dialog height has to be changed!
+
+  // ----- Helper functions -----
+
+  function getOrAppendChildDiv($parent, cssClass) {
+    var $div = $parent.children('.' + cssClass);
+    if ($div.length === 0) {
+      $div = $parent.appendDiv(cssClass);
+    }
+    return $div;
+  }
+
+  function removeChildDiv($parent, cssClass) {
+    $parent.children('.' + cssClass).remove();
   }
 };
 
@@ -110,6 +136,22 @@ scout.Form.prototype._remove = function() {
   if (this._$glassPane) {
     this._$glassPane.fadeOutAndRemove();
   }
+};
+
+scout.Form.prototype._renderTitle = function() {
+  if (this.isDialog()) {
+    this._updateDialogTitle();
+  }
+};
+
+scout.Form.prototype._renderSubTitle = function() {
+  if (this.isDialog()) {
+    this._updateDialogTitle();
+  }
+};
+
+scout.Form.prototype._renderIconId = function() {
+  // TODO render icon
 };
 
 scout.Form.prototype._onFormClosed = function(event) {

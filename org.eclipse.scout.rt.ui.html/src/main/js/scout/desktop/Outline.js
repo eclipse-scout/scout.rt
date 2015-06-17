@@ -170,7 +170,13 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     parentText = node.parentNode.text;
   }
   if (node.detailForm && node.detailForm.title) {
-    nodeText = node.detailForm.title;
+    if (node.detailForm.subTitle) {
+      parentText = node.detailForm.title;
+      nodeText = node.detailForm.subTitle;
+    }
+    else {
+      nodeText = node.detailForm.title;
+    }
   } else {
     nodeText = node.text;
   }

@@ -23,26 +23,27 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
-  public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String PROP_FORM_ID = "formId";
   public static final String PROP_TITLE = IForm.PROP_TITLE;
   public static final String PROP_SUB_TITLE = IForm.PROP_SUB_TITLE;
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
-  public static final String PROP_MINIMIZE_ENABLED = IForm.PROP_MINIMIZE_ENABLED;
-  public static final String PROP_MAXIMIZE_ENABLED = IForm.PROP_MAXIMIZE_ENABLED;
-  public static final String PROP_MINIMIZED = IForm.PROP_MINIMIZED;
-  public static final String PROP_MAXIMIZED = IForm.PROP_MAXIMIZED;
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
   public static final String PROP_CLOSABLE = "closable";
   public static final String PROP_FORM_FIELD = "formField";
+  public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
+
+  public static final String EVENT_FORM_CLOSING = "formClosing";
+  public static final String EVENT_FORM_CLOSED = "formClosed";
+  public static final String EVENT_REQUEST_FOCUS = "requestFocus";
 
   private FormListener m_formListener;
 
@@ -53,6 +54,34 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   @Override
   public String getObjectType() {
     return "Form";
+  }
+
+  @Override
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IForm>(PROP_TITLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTitle();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_SUB_TITLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getSubTitle();
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_ICON_ID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getIconId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
+      }
+    });
   }
 
   @Override
@@ -85,18 +114,11 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     IForm model = getModel();
-    putProperty(json, PROP_TITLE, model.getTitle());
-    putProperty(json, PROP_SUB_TITLE, model.getSubTitle());
-    putProperty(json, PROP_ICON_ID, BinaryResourceUrlUtility.createIconUrl(model.getIconId()));
-    putProperty(json, PROP_MAXIMIZE_ENABLED, model.isMaximizeEnabled());
-    putProperty(json, PROP_MINIMIZE_ENABLED, model.isMinimizeEnabled());
-    putProperty(json, PROP_MAXIMIZED, model.isMaximized());
-    putProperty(json, PROP_MINIMIZED, model.isMinimized());
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     putProperty(json, PROP_CLOSABLE, isClosable());
-    putAdapterIdProperty(json, "rootGroupBox", model.getRootGroupBox());
+    putAdapterIdProperty(json, PROP_ROOT_GROUP_BOX, model.getRootGroupBox());
     return json;
   }
 
@@ -149,7 +171,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
     // Important: The following event must be send _after_ the dispose() call! Otherwise,
     // it would be deleted automatically from the JSON response. This is a special case
     // where we explicitly want to send an event for an already disposed adapter.
-    addActionEvent("formClosed");
+    addActionEvent(EVENT_FORM_CLOSED);
   }
 
   protected void handleModelRequestFocus(IFormField formField) {
@@ -161,7 +183,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
 
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_FORM_FIELD, formFieldAdapter.getId());
-    addActionEvent("requestFocus", jsonEvent);
+    addActionEvent(EVENT_REQUEST_FOCUS, jsonEvent);
   }
 
   @Override
