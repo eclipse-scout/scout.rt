@@ -10,30 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
- * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
- * This may be changed by adding a fragment that uses the swt Browser in swing
- * (org.eclipse.scout.rt.ui.swing.browser.swt.fragment)
+ * This model represents a separate "website" inside the application.
  * <p>
- * The content is either the value (remote file) or the {@link #setExternalURL()}
- * <p>
- * The content of the website is contained in the remote file that is the value of this field. The remote file may be a
- * html file or a zip file containing a html file (with same name) and additional resources such as images, styles etc.
- * <p>
- * Uses {@link RemoteFile#writeZipContentToDirectory(java.io.File)} to unpack zipped content for viewing
- * <p>
- * You can use local urls that call back to the field itself and can be handled by overriding
- * {@link AbstractBrowserField#execLocationChanged(String, String, boolean)} A local URL is one of the form
- * http://local/...
+ * The content is either a URL (location, 3rd party website or webapp) or a {@link BinaryResource} with attachments
+ * (e.g. static HTML content with images, styles etc.).
  */
 public interface IBrowserField extends IFormField {
 
@@ -51,12 +39,12 @@ public interface IBrowserField extends IFormField {
       m_attribute = attribute;
     }
 
-    public static Set<SandboxPermissions> none() {
-      return Collections.emptySet();
+    public static EnumSet<SandboxPermissions> none() {
+      return EnumSet.noneOf(SandboxPermissions.class);
     }
 
     public static Set<SandboxPermissions> all() {
-      return CollectionUtility.hashSet(values());
+      return EnumSet.allOf(SandboxPermissions.class);
     }
 
     /**
@@ -67,7 +55,6 @@ public interface IBrowserField extends IFormField {
     }
   }
 
-  // TODO BSH Update javaDoc
   // TODO BSH doLocationChange()
 
   String PROP_LOCATION = "location";
@@ -134,7 +121,7 @@ public interface IBrowserField extends IFormField {
 
   boolean isSandboxEnabled();
 
-  void setSandboxPermissions(Set<SandboxPermissions> sandboxPermissions);
+  void setSandboxPermissions(EnumSet<SandboxPermissions> sandboxPermissions);
 
-  Set<SandboxPermissions> getSandboxPermissions();
+  EnumSet<SandboxPermissions> getSandboxPermissions();
 }

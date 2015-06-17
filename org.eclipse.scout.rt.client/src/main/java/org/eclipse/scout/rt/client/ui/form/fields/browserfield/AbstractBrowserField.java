@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.HashSet;
 import java.util.List;
@@ -298,14 +299,14 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   @Override
-  public void setSandboxPermissions(Set<SandboxPermissions> sandboxPermissions) {
+  public void setSandboxPermissions(EnumSet<SandboxPermissions> sandboxPermissions) {
     propertySupport.setProperty(PROP_SANDBOX_PERMISSIONS, sandboxPermissions);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public Set<SandboxPermissions> getSandboxPermissions() {
-    return (Set<SandboxPermissions>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
+  public EnumSet<SandboxPermissions> getSandboxPermissions() {
+    return (EnumSet<SandboxPermissions>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
   }
 
   private class P_UIFacade implements IBrowserFieldUIFacade {
