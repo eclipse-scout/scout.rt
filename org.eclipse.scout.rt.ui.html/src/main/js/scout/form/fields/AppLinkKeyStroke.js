@@ -11,7 +11,7 @@ scout.inherits(scout.AppLinkKeyStroke, scout.KeyStroke);
 scout.AppLinkKeyStroke.prototype.accept = function(event) {
   var $target = $(event.target);
   if($target.hasClass('app-link')){
-    return true;
+    return scout.AppLinkKeyStroke.parent.prototype.accept.call(this, event);
   }
   return false;
 };
