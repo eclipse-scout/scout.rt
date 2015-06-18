@@ -60,10 +60,10 @@ scout.DateField.prototype.timestampChanged = function() {
   var date;
   if (this.hasTime && this.hasDate) {
     //both parts needed otherwise field is null
-    if(this.$dateField.val() && this.$timeField.val()){
+    if (this.$dateField.val() && this.$timeField.val()) {
       date = scout.dates.combineDateTime(
-          this.isolatedDateFormat.parse(this.$dateField.val()),
-          this.isolatedTimeFormat.parse(this.$timeField.val())
+        this.isolatedDateFormat.parse(this.$dateField.val()),
+        this.isolatedTimeFormat.parse(this.$timeField.val())
       );
     }
   } else if (this.hasTime) {
@@ -124,9 +124,9 @@ scout.DateField.prototype._renderEnabled = function() {
 
 scout.DateField.prototype._onFieldFocus = function() {
   if (!this._$predict || this._$predict.length === 0) {
-//    setTimeout(function(){
+    //    setTimeout(function(){
     this._$predict = this._createPredictionField();
-//    }.bind(this));
+    //    }.bind(this));
   }
 };
 
@@ -164,10 +164,10 @@ scout.DateField.prototype._onFieldBlurTime = function() {
 };
 
 scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
-  if (!this._picker.isOpen() ) {
+  if (!this._picker.isOpen()) {
     return;
   }
-  if(!this._$predict && this._picker.isOpen()){
+  if (!this._$predict && this._picker.isOpen()) {
     this._picker.close();
     return;
   }
@@ -215,8 +215,8 @@ scout.DateField.prototype.openPicker = function() {
  * Called by datepicker when a date has been selected
  */
 scout.DateField.prototype.onDateSelected = function(date) {
-// FIXME NBU What about this?
-//var text = this.isolatedDateFormat.format(date);
+  // FIXME NBU What about this?
+  //var text = this.isolatedDateFormat.format(date);
   this._renderTimestamp(date.getTime(), true, false);
 };
 
@@ -225,8 +225,8 @@ scout.DateField.prototype.onDateSelected = function(date) {
  */
 scout.DateField.prototype._renderDisplayText = function(text) {
   //nop -> handled in _renderTimestamp
-// FIXME NBU What about this?
-//  this.displayText = text;
+  // FIXME NBU What about this?
+  //  this.displayText = text;
 };
 
 scout.DateField.prototype._renderTimestamp = function(timestamp, updateDate, updateTime) {
@@ -296,7 +296,7 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     diff = 0,
     cursorPos = this.$dateField[0].selectionStart,
     displayText = this.$dateField.val(),
-    prediction = this._$predict? this._$predict.val():undefined;
+    prediction = this._$predict ? this._$predict.val() : undefined;
 
   if (event.which === scout.keys.TAB ||
     event.which === scout.keys.SHIFT) {
@@ -343,8 +343,7 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
       months = diff;
     } else if (modifierCount === 0) {
       days = diff;
-    }
-    else{
+    } else {
       //no navigation impact on date field.
       if (this._picker.isOpen()) {
         this._picker.close();
@@ -377,8 +376,7 @@ scout.DateField.prototype._updateSelection = function(selection) {
   var date;
   if (selection instanceof Date) {
     date = selection;
-  }
-  else {
+  } else {
     date = this._dateFormat.parse(selection);
   }
   this._picker.selectDate(date);
@@ -436,12 +434,11 @@ scout.DateField.prototype._acceptPrediction = function() {
     return;
   }
   var datePrediction = this._predict(predictionText, true);
-  this.$dateField.val(datePrediction.text);
+  this.$dateField.val(this.isolatedDateFormat.format(datePrediction.date));
   this._updateSelection(datePrediction.date);
 };
 
 scout.DateField.prototype._predict = function(validatedText, format) {
-  // TODO BSH Date | Check this code
   var now = new Date();
   var currentYear = String(now.getFullYear());
   var dateInfo = this._dateFormat.analyze(validatedText);
@@ -456,6 +453,11 @@ scout.DateField.prototype._predict = function(validatedText, format) {
     month = ('0' + (now.getMonth() + 1)).slice(-2);
   }
 
+  var dateText = '',
+  yearPatternDefinition = this.isolatedDateFormat.patternDefinitionByType('year'),
+  monthPatternDefinition = this.isolatedDateFormat.patternDefinitionByType('month'),
+  dayPatternDefinition = this.isolatedDateFormat.patternDefinitionByType('day'),
+  yearShortPattern = yearPatternDefinition.terms.indexOf('yy') > -1 || yearPatternDefinition.terms.indexOf('y') > -1;
   if (year) {
     if (year.length === 1 && year.substr(0, 1) === '0') {
       year += '9';
@@ -463,14 +465,17 @@ scout.DateField.prototype._predict = function(validatedText, format) {
     if (year.length === 1 && year.substr(0, 1) === '1') {
       year += year.substr(3, 1);
     }
-    if (year.substr(0, 1) === '2') {
+    if (year.substr(0, 1) === '2' && !yearShortPattern) {
       year += currentYear.substr(year.length, 4 - year.length);
     }
-    if (year.substr(0, 2) === '19') {
+    if (year.substr(0, 2) === '19' && !yearShortPattern) {
       year += '1999'.substr(year.length, 4 - year.length);
     }
   } else {
     year = currentYear;
+  }
+  if(yearShortPattern && year.length > 2){
+    year = year.substr(year.length-2,2);
   }
   var prediction = {};
   var fullDay = scout.strings.padZeroLeft(day, 2);
@@ -482,11 +487,34 @@ scout.DateField.prototype._predict = function(validatedText, format) {
     fullYear = year;
   }
 
+  dateText = this.isolatedDateFormat.pattern;
+  dateText = this._predictionStringReplacement(dayPatternDefinition, day, dateText);
+  dateText = this._predictionStringReplacement(monthPatternDefinition, month, dateText);
+  dateText = this._predictionStringReplacement(yearPatternDefinition, year, dateText);
+
+
   var predictedDate = new Date(fullYear, fullMonth - 1, fullDay, 0, 0, 0, 0);
   return {
     date: predictedDate,
-    text: this.isolatedDateFormat.format(predictedDate)
+    text: dateText //this.isolatedDateFormat.format(predictedDate)
   };
+};
+
+scout.DateField.prototype._predictionStringReplacement = function(pattern, replacementText, dateString) {
+  var replaceTerm;
+  if (Array.isArray(pattern.terms)) {
+    var length=0;
+    for (var i = 0; i < pattern.terms.length; i++) {
+       var term = pattern.terms[i];
+       if(dateString.indexOf(term)>-1 && term.length>length){
+         replaceTerm = term;
+         length = term.length;
+       }
+    }
+  } else {
+    replaceTerm = pattern.terms;
+  }
+  return replaceTerm ? dateString.replace(replaceTerm, replacementText) : dateString;
 };
 
 scout.DateField.prototype._createPredictionField = function() {
@@ -501,7 +529,6 @@ scout.DateField.prototype._createPredictionField = function() {
 };
 
 scout.DateField.prototype._parseTime = function(inputValue) {
-  //TODO nbu time separator : , .
   var timeString = '';
   var isPM = false;
   inputValue = this._formatTimeElement(inputValue);
@@ -530,37 +557,34 @@ scout.DateField.prototype._parseTime = function(inputValue) {
   return this._internalTimeParseDateFormat.parse(timeString);
 };
 
-scout.DateField.prototype._formatTimeElement = function(inputValue){
-  var indexDp =  inputValue.indexOf(':');
+scout.DateField.prototype._formatTimeElement = function(inputValue) {
+  var indexDp = inputValue.indexOf(':');
   var indexCom = inputValue.indexOf(',');
   var indexP = inputValue.indexOf('.');
-  var newInputValue='';
-  while(indexDp+indexCom+indexP>-3){
+  var newInputValue = '';
+  while (indexDp + indexCom + indexP > -3) {
     var cutLocation, separator;
-    if(indexDp>-1 && (indexDp<indexCom || indexCom===-1)&& (indexDp<indexP || indexP===-1)){
+    if (indexDp > -1 && (indexDp < indexCom || indexCom === -1) && (indexDp < indexP || indexP === -1)) {
       separator = ':';
-      cutLocation=indexDp;
-    }
-    else if(indexCom>-1 && (indexCom<indexDp || indexDp===-1)&& (indexCom<indexP || indexP===-1)){
+      cutLocation = indexDp;
+    } else if (indexCom > -1 && (indexCom < indexDp || indexDp === -1) && (indexCom < indexP || indexP === -1)) {
       separator = ',';
-      cutLocation=indexCom;
-    }
-    else if(indexP>-1 && (indexP<indexDp || indexDp===-1)&& (indexP<indexCom || indexCom===-1)){
+      cutLocation = indexCom;
+    } else if (indexP > -1 && (indexP < indexDp || indexDp === -1) && (indexP < indexCom || indexCom === -1)) {
       separator = '.';
-      cutLocation=indexP;
+      cutLocation = indexP;
     }
 
     var inputPart = inputValue.substring(0, cutLocation);
-    newInputValue +=scout.strings.padZeroLeft(inputPart,2);
-    inputValue = inputValue.replace(inputPart+separator,'');
-    indexDp =  inputValue.indexOf(':');
+    newInputValue += scout.strings.padZeroLeft(inputPart, 2);
+    inputValue = inputValue.replace(inputPart + separator, '');
+    indexDp = inputValue.indexOf(':');
     indexCom = inputValue.indexOf(',');
     indexP = inputValue.indexOf('.');
   }
-  newInputValue += scout.strings.padZeroLeft(inputValue,2);
+  newInputValue += scout.strings.padZeroLeft(inputValue, 2);
   return newInputValue;
 };
-
 
 scout.DateField.prototype._createKeyStrokeAdapter = function() {
   return new scout.DateFieldKeyStrokeAdapter(this);
