@@ -294,13 +294,31 @@
       }
 
       & > .table-cell {
-        padding-top: @desktop-table-row-padding-y;
-        padding-bottom: @desktop-table-row-padding-y;
+        /* Replace first and last pixel of specified row padding by a transparent border. This border will be */
+        /* set to the selection color when the row is selected, thus creating the illusion that the 2px selection */
+        /* border is drawn around the cell. See CSS rules below. */
+        padding-top: @desktop-table-row-padding-y - 1px;
+        padding-bottom: @desktop-table-row-padding-y - 1px;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
 
         &.checkable {
-          padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
-          padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+          padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+          padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
         }
+      }
+
+      &.select-top > .table-cell {
+        border-top-color: @item-selection-border-color;
+      }
+
+      &.select-bottom > .table-cell {
+        border-bottom-color: @item-selection-border-color;
+      }
+
+      &.select-single > .table-cell {
+        border-top-color: @item-selection-border-color;
+        border-bottom-color: @item-selection-border-color;
       }
     }
 
