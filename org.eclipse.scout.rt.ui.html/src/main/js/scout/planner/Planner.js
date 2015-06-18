@@ -39,12 +39,12 @@ scout.Planner.Direction = {
 };
 
 scout.Planner.DisplayMode = {
-  DAY:  1,
-  WEEK:  2,
-  MONTH:  3,
-  WORK:  4,
-  CALENDAR_WEEK:  5,
-  YEAR:  6
+  DAY: 1,
+  WEEK: 2,
+  MONTH: 3,
+  WORK: 4,
+  CALENDAR_WEEK: 5,
+  YEAR: 6
 };
 
 scout.Planner.SelectionMode = {
@@ -87,7 +87,11 @@ scout.Planner.prototype._render = function($parent) {
   // main elements
   this.$header = this.$container.appendDiv('planner-header');
   this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
-  this.$grid = this.$container.appendDiv('planner-grid').mousedown(this._onCellMousedown.bind(this));
+  this.$grid = this.$container.appendDiv('planner-grid')
+    .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
+    .on('mousedown', '.resource-title', this._onResourceTitleMousedown.bind(this))
+    .on('contextmenu', '.resource-title', this._onResourceTitleContextMenu.bind(this))
+    .on('contextmenu', '.activity', this._onActivityContextMenu.bind(this));
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render(this.$container);
 
@@ -175,13 +179,25 @@ scout.Planner.prototype._onClickYear = function(event) {
   this._updateScreen();
 };
 
-scout.Planner.prototype._onRangeSelectorContextMenu = function(event) {
-  this._showContextMenu(event, 'Planner.Range');
+scout.Planner.prototype._onResourceTitleMousedown = function(event) {
+  var $resource = $(event.target).parent();
+  if ($resource.isSelected()) {
+    if (event.which === 3 || event.which === 1 && event.ctrlKey) {
+      // Right click on an already selected resource must not clear the selection -> context menu will be opened
+      return;
+    }
+  }
+  this.startRow = $resource.data('resource');
+  this.lastRow = this.startRow;
+  this._select();
 };
 
-scout.Planner.prototype._onResourceContextMenu = function(event) {
-  //FIXME CGU only show contextmenu for selected resource
+scout.Planner.prototype._onResourceTitleContextMenu = function(event) {
   this._showContextMenu(event, 'Planner.Resource');
+};
+
+scout.Planner.prototype._onRangeSelectorContextMenu = function(event) {
+  this._showContextMenu(event, 'Planner.Range');
 };
 
 scout.Planner.prototype._onActivityContextMenu = function(event) {
@@ -487,8 +503,7 @@ scout.Planner.prototype._build$Resource = function(resource) {
   var i, $activity,
     $resource = $.makeDiv('resource');
   $resource.appendDiv('resource-title')
-    .text(resource.resourceCell.text)
-    .on('contextmenu', this._onResourceContextMenu.bind(this));
+    .text(resource.resourceCell.text);
   var $cells = $resource.appendDiv('resource-cells');
   for (i = 0; i < resource.activities.length; i++) {
     $activity = this._build$Activity(resource.activities[i]);
@@ -508,8 +523,7 @@ scout.Planner.prototype._build$Activity = function(activity) {
   $activity.text(activity.text)
     .data('activity', activity)
     .css('left', 'calc(' + this.transformLeft(begin) + '% + 2px)')
-    .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px')
-    .on('contextmenu', this._onActivityContextMenu.bind(this));
+    .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px');
 
   if (activity.cssClass) {
     $activity.addClass(activity.cssClass);
@@ -530,6 +544,7 @@ scout.Planner.prototype._build$Activity = function(activity) {
 scout.Planner.prototype._onCellMousedown = function(event) {
   var $activity,
     $resource,
+    $target = $(event.target),
     SELECTION_MODE = scout.Planner.SelectionMode;
 
   if (this.selectionMode == SELECTION_MODE.NONE) {
@@ -547,10 +562,13 @@ scout.Planner.prototype._onCellMousedown = function(event) {
       this.selectResources([$resource.data('resource')]);
     }
   } else {
-    if (event.which === 3 || event.which === 1 && event.ctrlKey) {
-      // don't select, context menu will be opened
-      return;
+    if ($target.hasClass('selector')) {
+      if (event.which === 3 || event.which === 1 && event.ctrlKey) {
+        // Right click on the selector must not clear the selection -> context menu will be opened
+        return;
+      }
     }
+
     // init selector
     this.startRow = this._findRow(event.pageY);
     this.lastRow = this.startRow;
@@ -610,9 +628,24 @@ scout.Planner.prototype._onCellMouseup = function(event) {
 };
 
 scout.Planner.prototype._select = function(whileSelecting) {
-  if (this.startRow === null || this.lastRow === null || this.startRange === null || this.lastRange === null) {
+  if (!this.startRow || !this.lastRow) {
     return;
   }
+  // If startRange or lastRange are not given, use the existing range selection
+  // Happens if the user clicks a resource instead of making a range selection
+  if (!this.startRange || !this.lastRange) {
+    if (this.selectionRange.from) {
+      this.startRange = {};
+      this.startRange.from = this.selectionRange.from.getTime();
+      this.startRange.to = this.startRange.from;
+    }
+    if (this.selectionRange.to) {
+      this.lastRange = {};
+      this.lastRange.from = this.selectionRange.to.getTime();
+      this.lastRange.to = this.lastRange.from;
+    }
+  }
+  var rangeSelected = !! (this.startRange && this.lastRange);
   var $startRow = this.startRow.$resource,
     $lastRow = this.lastRow.$resource;
 
@@ -637,17 +670,19 @@ scout.Planner.prototype._select = function(whileSelecting) {
 
   this.selectResources(resources.map(function(i) {
     return $(i).data('resource');
-  }), false);
+  }), !rangeSelected);
 
-  // left and width
-  var from = Math.min(this.lastRange.from, this.startRange.from),
-    to = Math.max(this.lastRange.to, this.startRange.to);
-  var selectionRange = {
-    from: new Date(from),
-    to: new Date(to)
-  };
+  if (rangeSelected) {
+    // left and width
+    var from = Math.min(this.lastRange.from, this.startRange.from),
+      to = Math.max(this.lastRange.to, this.startRange.to);
+    var selectionRange = {
+      from: new Date(from),
+      to: new Date(to)
+    };
 
-  this.selectRange(selectionRange, !whileSelecting);
+    this.selectRange(selectionRange, !whileSelecting);
+  }
 };
 
 scout.Planner.prototype._findRow = function(y) {
@@ -962,7 +997,7 @@ scout.Planner.prototype._renderSelectionRange = function() {
     this.$selector.remove();
   }
 
-  if (!startRow || !lastRow) {
+  if (!startRow || !lastRow || !this.selectionRange.from || !this.selectionRange.to) {
     return;
   }
   $startRow = startRow.$resource;

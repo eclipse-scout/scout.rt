@@ -293,3 +293,15 @@ immer garantiert true oder false, dummerweise noch verkehrt (true wenn 'value' f
 false, wenn er truthy ist). Mit dem zweiten Ausrufezeichen wird das korrigiert.
 
 Zwischen !! und dem Wert kein Leerzeichen verwenden (macht man ja bei einem einzelnen ! auch nicht.)
+
+### Events
+Möchte man auf Events reagieren, so kann man $elem.on(type, func) verwenden. Bind() ist veraltet und soll nicht mehr verwendet werden.
+Um die Lesbarkeit zu erhöhen ist folgende Notation für den Funktions-Namen zu empfehlen:
+
+- this._onElementType.bind(this) z.B. this._onRowMousedown.bind(this) oder this._onButtonClick.bind(this)
+
+Durch das bind(this) zeigt this auf die Instanz der Klasse und nicht mehr auf das target. Wenn man auf das target zugreifen möchte, muss man dies über den event tun.
+
+scout.Example.prototype._onRowMousedown = function(event) {
+  var $target = $(event.target);
+}
