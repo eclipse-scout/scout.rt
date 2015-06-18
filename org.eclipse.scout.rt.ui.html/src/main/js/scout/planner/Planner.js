@@ -97,6 +97,8 @@ scout.Planner.prototype._render = function($parent) {
 
   scout.scrollbars.install(this.$grid);
   this.session.detachHelper.pushScrollable(this.$grid);
+  this._gridScrollHandler = this._onGridScroll.bind(this);
+  this.$grid.on('scroll', this._gridScrollHandler);
 
   // header contains all controls
   this.$range = this.$header.appendDiv('planner-range');
@@ -217,6 +219,16 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
   popup.setLocation(new scout.Point(x, y));
 };
 
+scout.Planner.prototype._onGridScroll = function() {
+  this._reconcileScrollPos();
+};
+
+scout.Planner.prototype._reconcileScrollPos = function() {
+  // When scrolling horizontally scroll scale as well
+  var scrollLeft = this.$grid.scrollLeft();
+  this.$scale.scrollLeft(scrollLeft);
+};
+
 /* --  set display mode and range ------------------------------------- */
 
 scout.Planner.prototype._updateModel = function() {};
@@ -259,6 +271,9 @@ scout.Planner.prototype._updateScreen = function() {
 };
 
 scout.Planner.prototype._layoutRange = function() {
+  if (!this.viewRange.from || !this.viewRange.to) {
+    return;
+  }
   var text,
     toDate = new Date(this.viewRange.to.valueOf() - 1),
     toText = ' bis ',
@@ -286,8 +301,12 @@ scout.Planner.prototype._layoutRange = function() {
   // set text
   $('.planner-select', this.$range).text(text);
 };
+
 scout.Planner.prototype._layoutScale = function() {
-  var $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width,
+  if (!this.viewRange.from || !this.viewRange.to) {
+    return;
+  }
+  var $timeline, $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width,
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
   // empty scale
@@ -295,8 +314,9 @@ scout.Planner.prototype._layoutScale = function() {
 
   // append main elements
   this.$scale.appendDiv('planner-scale-title', "Titel");
-  $timelineLarge = this.$scale.appendDiv('timeline-large');
-  $timelineSmall = this.$scale.appendDiv('timeline-small');
+  $timeline = this.$scale.appendDiv('timeline');
+  $timelineLarge = $timeline.appendDiv('timeline-large');
+  $timelineSmall = $timeline.appendDiv('timeline-small');
 
   // fill timeline large depending on mode
   // TODO: depending on screen size: smaller or large representation
@@ -1078,6 +1098,21 @@ scout.Planner.prototype.selectResources = function(resources, notifyServer) {
   }
 };
 
+/**
+ * Returns true if a deselection happened. False if the given resources were not selected at all.
+ */
+scout.Planner.prototype.deselectResources = function(resources, notifyServer) {
+  var deselected = false;
+  resources = scout.arrays.ensure(resources);
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
+  var selectedResources = this.selectedResources.slice(); // copy
+  if (scout.arrays.removeAll(selectedResources, resources)) {
+    this.selectResources(selectedResources, notifyServer);
+    deselected = true;
+  }
+  return deselected;
+};
+
 scout.Planner.prototype._insertResources = function(resources) {
   // Update model
   resources.forEach(function(resource) {
@@ -1094,10 +1129,13 @@ scout.Planner.prototype._insertResources = function(resources) {
 };
 
 scout.Planner.prototype._deleteResources = function(resources) {
+  if (this.deselectResources(resources, false)) {
+    this.selectRange({}, false);
+  }
   resources.forEach(function(resource) {
     // Update model
     scout.arrays.remove(this.resources, resource);
-    delete this.resourcesMap[resource.id];
+    delete this.resourceMap[resource.id];
 
     // Update HTML
     if (this.rendered) {
@@ -1116,7 +1154,9 @@ scout.Planner.prototype._deleteAllResources = function() {
 
   // Update model
   this.resources = [];
-  this.resourcesMap = {};
+  this.resourceMap = {};
+  this.selectResources([], false);
+  this.selectRange({}, false);
 };
 
 scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {

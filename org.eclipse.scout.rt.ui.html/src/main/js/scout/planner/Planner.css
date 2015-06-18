@@ -239,67 +239,69 @@
   height: @planner-header-height;
   border-bottom:  1px solid @palette-gray-4;
   width: 100%;
-
-  & .planner-scale-title {
-    height: 100%;
-    float: left;
-    padding: 0px @resource-padding-x;
-    font-size: 17px;
-    color: @palette-gray-6;
-    line-height: @planner-header-height;
-    width: @planner-resource-title-width;
-  }
+  /* for horizontal scrollbars */
+  overflow: hidden;
+  white-space: nowrap;
 
   & .scale-item {
     display: inline-block;
     position: relative;
-    white-space:nowrap;
+    white-space: nowrap;
     padding: 0px 5px;
-  }
 
-  & .timeline-large {
-    height: 50%;
-    float: right;
-    width: calc(~"100%" - @planner-resource-title-width);
-    background-color: @palette-gray-2;
-    line-height: @planner-header-height / 2;
-
-    & .scale-item::after{
-      position: absolute;
-      height: 1000px;
-      width: 1px;
-      left: 0px;
-      top: 0px;
-      content: " ";
-      background-color: rgba(0, 0, 0, 0.10);
-    }
-
-  }
-
-  & .timeline-small {
-    height: 50%;
-    float: right;
-    width: calc(~"100%" - @planner-resource-title-width);
-    //background-color: @palette-gray-1;
-    line-height: @planner-header-height / 2;
-
-    & .selected {
+    &.selected {
       background-color: @item-selection-background-color;
     }
-
-    & .scale-item::after{
-      position: absolute;
-      height: 1000px;
-      width: 1px;
-      left: 0px;
-      top: 0px;
-      content: " ";
-      background-color: rgba(0, 0, 0, 0.07);
-    }
-
   }
 
+  & > .timeline {
+    display: inline-block;
+    width: calc(~"100%" - @planner-resource-title-width);
+
+    & > .timeline-large {
+      height: 50%;
+      background-color: @palette-gray-2;
+      line-height: @planner-header-height / 2;
+
+      & > .scale-item::after{
+        position: absolute;
+        height: 1000px;
+        width: 1px;
+        left: 0px;
+        top: 0px;
+        content: " ";
+        background-color: rgba(0, 0, 0, 0.10);
+      }
+
+    }
+
+    & > .timeline-small {
+      height: 50%;
+      //background-color: @palette-gray-1;
+      line-height: @planner-header-height / 2;
+
+      & > .scale-item::after{
+        position: absolute;
+        height: 1000px;
+        width: 1px;
+        left: 0px;
+        top: 0px;
+        content: " ";
+        background-color: rgba(0, 0, 0, 0.07);
+      }
+    }
+  }
 }
+
+.planner-scale-title {
+   height: 100%;
+   float: left;
+   padding: 0px @resource-padding-x;
+   font-size: 17px;
+   color: @palette-gray-6;
+   line-height: @planner-header-height;
+   width: @planner-resource-title-width;
+ }
 
 .planner-grid {
   position: absolute;
@@ -307,80 +309,77 @@
   width: 100%;
   overflow: hidden;
 
-  & .selector {
-    position: absolute;
-    border-top: 2px solid @item-selection-border-color;
-    border-bottom: 2px solid @item-selection-border-color;
-    z-index: 2;
-    top: 0;
-
-    & .selector-resize-left {
-      background-color: @palette-white;
-      border-left: 2px solid @item-selection-border-color;
-      border-right: 2px solid @item-selection-border-color;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 6px;
-      height: 100%;
-      cursor: col-resize;
-    }
-
-    & .selector-resize-right {
-      background-color: @palette-white;
-      border-left: 2px solid @item-selection-border-color;
-      border-right: 2px solid @item-selection-border-color;
-      position: absolute;
-      top: 0px;
-      right: 0px;
-      width: 6px;
-      height: 100%;
-      cursor: col-resize;
-    }
-
-  }
-
-  & .resource {
+  & > .resource {
     height: @planner-resource-minheight;
     width: 100%;
     border-bottom: 1px solid @palette-gray-4;
 
-    &.selected .resource-title{
+    & > .resource-title {
+      line-height: @planner-resource-minheight;
+      height: 100%;
+      width: @planner-resource-title-width;
+      padding: 0px @resource-padding-x;
+      float: left;
+    }
+
+    &.selected > .resource-title{
       background-color: @item-selection-background-color;
     }
-  }
 
-  & .resource-title {
-    line-height: @planner-resource-minheight;
-    height: 100%;
-    width: @planner-resource-title-width;
-    padding: 0px @resource-padding-x;
-    float: left;
-  }
+    & > .resource-cells {
+      position: relative;
+      height: 100%;
+      width: calc(~"100%" - @planner-resource-title-width);
+      float: left;
 
-  & .resource-cells {
-    position: relative;
-    height: 100%;
-    width: calc(~"100%" - @planner-resource-title-width);
-    float: left;
+      & > .activity {
+        position: absolute;
+        top: 1px;
+        width: 0px;
+        height: @planner-resource-minheight - 3px;
+        line-height: @planner-resource-minheight - 3px;
+        background-color: @palette-cyan-4;
+        text-align: center;
+        border: 1px solid @palette-gray-4;
 
-    & .activity {
-      position: absolute;
-      top: 1px;
-      width: 0px;
-      height: @planner-resource-minheight - 3px;
-      line-height: @planner-resource-minheight - 3px;
-      background-color: @palette-cyan-4;
-      text-align: center;
-      border: 1px solid @palette-gray-4;
+        &.selected {
+          outline: 2px solid @item-selection-border-color;
+        }
+      }
 
-      &.selected {
-        outline: 2px solid @item-selection-border-color;
+      & > .selector {
+        position: absolute;
+        border-top: 2px solid @item-selection-border-color;
+        border-bottom: 2px solid @item-selection-border-color;
+        z-index: 2;
+        top: 0;
+
+        & > .selector-resize-left {
+          background-color: @palette-white;
+          border-left: 2px solid @item-selection-border-color;
+          border-right: 2px solid @item-selection-border-color;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          width: 6px;
+          height: 100%;
+          cursor: col-resize;
+        }
+
+        & > .selector-resize-right {
+          background-color: @palette-white;
+          border-left: 2px solid @item-selection-border-color;
+          border-right: 2px solid @item-selection-border-color;
+          position: absolute;
+          top: 0px;
+          right: 0px;
+          width: 6px;
+          height: 100%;
+          cursor: col-resize;
+        }
       }
     }
-
   }
-
 }
 
 
