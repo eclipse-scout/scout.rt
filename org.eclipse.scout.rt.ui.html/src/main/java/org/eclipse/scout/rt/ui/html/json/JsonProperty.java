@@ -37,6 +37,14 @@ public abstract class JsonProperty<T> {
     return m_propertyName;
   }
 
+  /**
+   * Returns the property name to be used in the JSON. By default, the model property name ({@link #getPropertyName()})
+   * is used, but implementing classes may choose to overwrite this method to use a different property name in the UI.
+   */
+  public String jsonPropertyName() {
+    return getPropertyName();
+  }
+
   protected T getModel() {
     return m_model;
   }

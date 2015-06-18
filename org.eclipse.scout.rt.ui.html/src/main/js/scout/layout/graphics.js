@@ -24,7 +24,7 @@ scout.graphics = {
         $div.addClass(className);
       }
     }
-    $div.html(text.replace(/\s/g, "&nbsp;"));
+    $div.html(text.replace(/\s/g, '&nbsp;'));
     var dimension = new scout.Dimension($div.width(), $div.height());
     $div.html(''); // clear text after measurement (faster than removing the entire element from the DOM tree)
     return dimension;

@@ -18,56 +18,63 @@ scout.WizardProgressField.prototype._render = function($parent) {
 scout.WizardProgressField.prototype._renderProperties = function() {
   scout.WizardProgressField.parent.prototype._renderProperties.call(this);
   this._renderWizardSteps(this.wizardSteps);
-  this._renderActiveWizardStep(this.activeWizardStep);
+  this._renderActiveWizardStepIndex(this.activeWizardStepIndex);
 };
 
 scout.WizardProgressField.prototype._renderWizardSteps = function(wizardSteps) {
   this._$stepList.empty();
-  if (wizardSteps) {
-    for (var i = 0; i < wizardSteps.length; i++) {
-      var wizardStep = wizardSteps[i];
+  wizardSteps.forEach(function(wizardStep, index) {
+    var $wizardStep, $content, $title, $subTitle, $separator;
 
-      var $wizardStep = $.makeDiv('wizard-step')
-        .attr('data-index', wizardStep.index)
-        .appendTo(this._$stepList);
-      var $wizardStepLabel = $.makeDiv('wizard-step-label')
-        .appendTo($wizardStep);
-      if (wizardStep.title) {
-        $wizardStepLabel.text(wizardStep.title);
-      } else {
-        $wizardStepLabel.html('&nbsp;');
-      }
-      // TODO BSH Wizard | Add icon
-
-      if (wizardStep.enabled) {
-        $wizardStep.on('click', this._onWizardStepClick.bind(this));
-      } else {
-        $wizardStep.addClass('disabled');
-      }
-      this._updateWizardStepActiveClasses($wizardStep, this.activeWizardStep);
+    // Step
+    $wizardStep = $.makeDiv('wizard-step')
+      .attr('data-index', wizardStep.index)
+      .appendTo(this._$stepList);
+    if (wizardStep.enabled) {
+      $wizardStep.on('click', this._onWizardStepClick.bind(this));
+    } else {
+      $wizardStep.addClass('disabled');
     }
-  }
+
+    // Content
+    $content = $wizardStep.appendDiv('wizard-step-content');
+    $title = $content.appendDiv('wizard-step-title').textOrNbsp(wizardStep.title);
+    if (wizardStep.subTitle) {
+      $subTitle = $content.appendDiv('wizard-step-sub-title').textOrNbsp(wizardStep.subTitle);
+    }
+
+    // Separator
+    if (index < wizardSteps.length - 1) {
+      $separator = $wizardStep.appendDiv('wizard-step-separator');
+    }
+
+    // TODO BSH Wizard | Add icon
+
+    this._updateWizardStepActiveClasses($wizardStep, this.activeWizardStep);
+  }.bind(this));
 };
 
-scout.WizardProgressField.prototype._renderActiveWizardStep = function(activeWizardStep) {
-  if (this.wizardSteps) {
-    var $wizardSteps = this._$stepList.children('.wizard-step');
-    for (var i = 0; i < this.wizardSteps.length; i++) {
-      var wizardStep = this.wizardSteps[i];
-      var $wizardStep = $wizardSteps.eq(i);
-      this._updateWizardStepActiveClasses($wizardStep, activeWizardStep);
-    }
-  }
+scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function(activeWizardStepIndex) {
+  var $wizardSteps = this._$stepList.children('.wizard-step');
+  this.wizardSteps.forEach(function(wizardStep, index) {
+    this._updateWizardStepActiveClasses($wizardSteps.eq(index), activeWizardStepIndex);
+  }.bind(this));
 };
 
-scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep, activeWizardStep){
-  $wizardStep.removeClass('before-active active after-active');
+scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep, activeWizardStepIndex){
+  $wizardStep.removeClass('all-before-active before-active active all-after-active after-active');
   var wizardStepIndex = this._wizardStepIndex($wizardStep);
-  if (activeWizardStep >= 0 && wizardStepIndex >= 0) {
-    if (wizardStepIndex < activeWizardStep) {
-      $wizardStep.addClass('before-active');
-    } else if (wizardStepIndex > activeWizardStep) {
-      $wizardStep.addClass('after-active');
+  if (activeWizardStepIndex >= 0 && wizardStepIndex >= 0) {
+    if (wizardStepIndex < activeWizardStepIndex) {
+      $wizardStep.addClass('all-before-active');
+      if (wizardStepIndex === activeWizardStepIndex - 1) {
+        $wizardStep.addClass('before-active');
+      }
+    } else if (wizardStepIndex > activeWizardStepIndex) {
+      $wizardStep.addClass('all-after-active');
+      if (wizardStepIndex === activeWizardStepIndex + 1) {
+        $wizardStep.addClass('after-active');
+      }
     } else {
       $wizardStep.addClass('active');
     }

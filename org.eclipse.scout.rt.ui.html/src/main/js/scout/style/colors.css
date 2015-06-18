@@ -123,8 +123,9 @@
 @tooltip-border-color: @palette-orange-3;
 @wizard-progress-step-background-color: @palette-gray-2;
 @wizard-progress-step-foreground-color: @text-color;
-@wizard-progress-active-step-background-color: @palette-gray-3;
-@wizard-progress-active-step-foreground-color: @active-color;
+@wizard-progress-step-separator-color: @palette-gray-4;
+@wizard-progress-active-step-background-color: @item-selection-background-color;
+@wizard-progress-active-step-foreground-color: @wizard-progress-step-foreground-color;
+@wizard-progress-active-step-separator-color: @wizard-progress-step-separator-color;
 @wizard-progress-disabled-step-background-color: @background-color;
 @wizard-progress-disabled-step-foreground-color: @text-disabled-color;
-@wizard-progress-separator-color: @palette-gray-4;

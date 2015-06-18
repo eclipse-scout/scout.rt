@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 public class JsonWizardProgressField<T extends IWizardProgressField> extends JsonFormField<T> {
 
+  private static final String PROP_ACTIVE_WIZARD_STEP_INDEX = "activeWizardStepIndex";
   // from UI
   private static final String EVENT_STEP_CLICKED = "stepClicked";
 
@@ -56,7 +57,9 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
         JSONArray jsonSteps = new JSONArray();
         if (wizardSteps != null) {
           for (IWizardStep<? extends IForm> wizardStep : wizardSteps) {
-            jsonSteps.put(wizardStepToJson(wizardStep));
+            if (wizardStep.isVisible()) {
+              jsonSteps.put(wizardStepToJson(wizardStep));
+            }
           }
         }
         return jsonSteps;
@@ -74,18 +77,22 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
         IWizardStep<? extends IForm> activeWizardStep = (IWizardStep<? extends IForm>) value;
         return getStepIndex(activeWizardStep);
       }
+
+      @Override
+      public String jsonPropertyName() {
+        return PROP_ACTIVE_WIZARD_STEP_INDEX;
+      }
     });
   }
 
   protected JSONObject wizardStepToJson(IWizardStep<? extends IForm> wizardStep) {
     JSONObject jsonStep = JsonObjectUtility.newOrderedJSONObject();
-    // TODO BSH Html??? Visible???
     jsonStep.put("index", getStepIndex(wizardStep));
     jsonStep.put("title", wizardStep.getTitle());
-    jsonStep.put("description", wizardStep.getDescriptionHtml());
-    jsonStep.put("enabled", wizardStep.isEnabled());
-    jsonStep.put("iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
+    jsonStep.put("subTitle", wizardStep.getSubTitle());
     jsonStep.put("tooltipText", wizardStep.getTooltipText());
+    jsonStep.put("iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
+    jsonStep.put("enabled", wizardStep.isEnabled());
     return jsonStep;
   }
 
