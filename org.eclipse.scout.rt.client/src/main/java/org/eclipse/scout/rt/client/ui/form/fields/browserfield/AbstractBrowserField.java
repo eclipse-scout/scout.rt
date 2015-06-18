@@ -76,7 +76,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
 
   @Order(220)
   @ConfigProperty(ConfigProperty.OBJECT)
-  protected Set<SandboxPermissions> getConfiguredSandboxRestrictions() {
+  protected EnumSet<SandboxPermissions> getConfiguredSandboxPermissions() {
     return null;
   }
 
@@ -122,7 +122,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     super.initConfig();
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setSandboxEnabled(getConfiguredSandboxEnabled());
-    setSandboxPermissions(getSandboxPermissions());
+    setSandboxPermissions(getConfiguredSandboxPermissions());
   }
 
   @Override
