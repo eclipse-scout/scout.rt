@@ -215,8 +215,6 @@ scout.DateField.prototype.openPicker = function() {
  * Called by datepicker when a date has been selected
  */
 scout.DateField.prototype.onDateSelected = function(date) {
-  // FIXME NBU What about this?
-  //var text = this.isolatedDateFormat.format(date);
   this._renderTimestamp(date.getTime(), true, false);
 };
 
@@ -225,8 +223,6 @@ scout.DateField.prototype.onDateSelected = function(date) {
  */
 scout.DateField.prototype._renderDisplayText = function(text) {
   //nop -> handled in _renderTimestamp
-  // FIXME NBU What about this?
-  //  this.displayText = text;
 };
 
 scout.DateField.prototype._renderTimestamp = function(timestamp, updateDate, updateTime) {
@@ -367,8 +363,12 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     if (displayText && valid) {
       datePrediction = this._predict(displayText);
     }
-    this._$predict.val(datePrediction.text);
-    this._updateSelection(datePrediction.date);
+    if(datePrediction){
+      this._$predict.val(datePrediction.text);
+      this._updateSelection(datePrediction.date);
+    }else{
+      this._$predict.val('');
+    }
   }.bind(this), 1);
 };
 
@@ -390,7 +390,7 @@ scout.DateField.prototype._updateSelection = function(selection) {
  */
 scout.DateField.prototype._validateDisplayText = function(text) {
   if (!text) {
-    return;
+    return null;
   }
 
   //FIXME CGU what if text is 12. Juli 2014 -> wrong? actually depends on pattern... check with cru prototype
@@ -399,14 +399,16 @@ scout.DateField.prototype._validateDisplayText = function(text) {
   var day = dateInfo.day,
     month = dateInfo.month,
     year = dateInfo.year;
-  var valid = false;
-
-  if (year) {
-    valid = day >= 0 && day < 32 && month >= 0 && month < 13 && year > 0 && year < 9999;
-  } else if (month) {
-    valid = day >= 0 && day < 32 && month >= 0 && month < 13;
-  } else if (day) {
-    valid = day >= 0 && day < 32;
+  var valid = false,
+    yearShortPattern = dateInfo.yearPatternDefinition.terms.indexOf('yy') > -1 || dateInfo.yearPatternDefinition.terms.indexOf('y') > -1;
+  if (year > -1 && !yearShortPattern) {
+    valid = day > 0 && day < 32 && month > 0 && month < 13 && ((year >= 0 && !dateInfo.yearComplete) || year > 0) && year < 9999;
+  } else if (year > -1 && yearShortPattern) {
+    valid = day > 0 && day < 32 && month > 0 && month < 13 && ((year >= 0 && !dateInfo.yearComplete) || year > 0) && year < 99;
+  } else if (month > -1) {
+    valid = day > 0 && day < 32 && ((month >= 0 && !dateInfo.monthComplete) || month > 0) && month < 13;
+  } else if (day > -1) {
+    valid = ((day >= 0 && !dateInfo.dayComplete) || day > 0) && day < 32;
   }
   this.dateError = !valid;
   if (!valid) {
@@ -421,6 +423,7 @@ scout.DateField.prototype._validateDisplayText = function(text) {
  */
 scout.DateField.prototype.validateDisplayText = function(text) {
   this.errorStatusUi = this._validateDisplayText(text);
+  this.dateError = !! this.errorStatusUi;
   this._renderErrorStatus(this.errorStatusUi);
   return !this.errorStatusUi;
 };
@@ -449,15 +452,15 @@ scout.DateField.prototype._predict = function(validatedText, format) {
   if (!day) {
     day = ('0' + (now.getDate())).slice(-2);
   }
-  if (!month) {
+  if ((day.length === 1 && day.substr(0, 1) === '0')) {
+    day = now.getDate() < 10 ? ('0' + (now.getDate())).slice(-2) : '01';
+  }
+  if (!month || (month.length === 1 && month.substr(0, 1) === '0')) {
     month = ('0' + (now.getMonth() + 1)).slice(-2);
   }
 
   var dateText = '',
-  yearPatternDefinition = this.isolatedDateFormat.patternDefinitionByType('year'),
-  monthPatternDefinition = this.isolatedDateFormat.patternDefinitionByType('month'),
-  dayPatternDefinition = this.isolatedDateFormat.patternDefinitionByType('day'),
-  yearShortPattern = yearPatternDefinition.terms.indexOf('yy') > -1 || yearPatternDefinition.terms.indexOf('y') > -1;
+    yearShortPattern = dateInfo.yearPatternDefinition.terms.indexOf('yy') > -1 || dateInfo.yearPatternDefinition.terms.indexOf('y') > -1;
   if (year) {
     if (year.length === 1 && year.substr(0, 1) === '0') {
       year += '9';
@@ -474,8 +477,8 @@ scout.DateField.prototype._predict = function(validatedText, format) {
   } else {
     year = currentYear;
   }
-  if(yearShortPattern && year.length > 2){
-    year = year.substr(year.length-2,2);
+  if (yearShortPattern && year.length > 2) {
+    year = year.substr(year.length - 2, 2);
   }
   var prediction = {};
   var fullDay = scout.strings.padZeroLeft(day, 2);
@@ -488,12 +491,19 @@ scout.DateField.prototype._predict = function(validatedText, format) {
   }
 
   dateText = this.isolatedDateFormat.pattern;
-  dateText = this._predictionStringReplacement(dayPatternDefinition, day, dateText);
-  dateText = this._predictionStringReplacement(monthPatternDefinition, month, dateText);
-  dateText = this._predictionStringReplacement(yearPatternDefinition, year, dateText);
-
+  dateText = this._predictionStringReplacement(dateInfo.dayPatternDefinition, day, dateText);
+  dateText = this._predictionStringReplacement(dateInfo.monthPatternDefinition, month, dateText);
+  dateText = this._predictionStringReplacement(dateInfo.yearPatternDefinition, year, dateText);
 
   var predictedDate = new Date(fullYear, fullMonth - 1, fullDay, 0, 0, 0, 0);
+  if(isNaN( predictedDate.getTime() )){
+    this.errorStatusUi = {
+      message: this.session.text('InvalidDateFormat')
+    };
+    this.dateError = true;
+    this._renderErrorStatus(this.errorStatusUi);
+    return null;
+  }
   return {
     date: predictedDate,
     text: dateText //this.isolatedDateFormat.format(predictedDate)
@@ -502,14 +512,14 @@ scout.DateField.prototype._predict = function(validatedText, format) {
 
 scout.DateField.prototype._predictionStringReplacement = function(pattern, replacementText, dateString) {
   var replaceTerm;
-  if (Array.isArray(pattern.terms)) {
-    var length=0;
+  if (pattern && Array.isArray(pattern.terms)) {
+    var length = 0;
     for (var i = 0; i < pattern.terms.length; i++) {
-       var term = pattern.terms[i];
-       if(dateString.indexOf(term)>-1 && term.length>length){
-         replaceTerm = term;
-         length = term.length;
-       }
+      var term = pattern.terms[i];
+      if (dateString.indexOf(term) > -1 && term.length > length) {
+        replaceTerm = term;
+        length = term.length;
+      }
     }
   } else {
     replaceTerm = pattern.terms;

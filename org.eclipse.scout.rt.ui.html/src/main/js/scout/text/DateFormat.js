@@ -134,7 +134,7 @@ scout.DateFormat = function(locale, pattern) {
       }, function(dateString, date, patternTextAfter) {
         //TODO nbu
         return date.setMonth(that.symbols.monthsShortToNumber[dateString.toUpperCase()]);
-      }, false, 'month' ),
+      }, false, 'month'),
       new DateFormatPatternDefinition('MM', function(date) {
         return scout.strings.padZeroLeft(date.getMonth() + 1, 2);
       }, function(dateString, date, patternTextAfter) {
@@ -373,42 +373,47 @@ scout.DateFormat.prototype.format = function(date) {
   return ret;
 };
 
-scout.DateFormat.prototype.patternDefinitionByType = function(type) {
-    for(var i = 0; i<this.patternDefinitions.length; i++){
-      var patternDefinition =  this.patternDefinitions[i];
-      if(patternDefinition && patternDefinition.type===type){
-        return patternDefinition;
-      }
-    }
-};
-
 scout.DateFormat.prototype.analyze = function(text, asNumber) {
   var result = {};
+  result.yearPatternDefinition,
+  result.monthPatternDefinition,
+  result.dayPatternDefinition;
   if (text) {
-    var patternDefinition, parsedElements = false, firstPatternDefinition;
+    var patternDefinition, parsedElements = false,
+      firstPatternDefinition;
 
-    for(var i = 0; i<this.patternDefinitions.length; i++){
+    for (var i = 0; i < this.patternDefinitions.length; i++) {
       patternDefinition = this.patternDefinitions[i];
-      if(patternDefinition){
-        if(!firstPatternDefinition){
+      if (patternDefinition) {
+        if (!firstPatternDefinition) {
           firstPatternDefinition = patternDefinition;
         }
+        if (patternDefinition.type === 'day') {
+          result.dayPatternDefinition = patternDefinition;
+        } else if (patternDefinition.type === 'month') {
+          result.monthPatternDefinition = patternDefinition;
+        } else if (patternDefinition.type === 'year') {
+          result.yearPatternDefinition = patternDefinition;
+        }
         //not parsable construct. only last element should have a empty separator
-        if(i<this.patternDefinitions.length-1 && patternDefinition.patternTextAfter===''){
+        if (i < this.patternDefinitions.length - 1 && patternDefinition.patternTextAfter === '') {
           return {};
         }
-        var partIndex = patternDefinition.patternTextAfter === ''? -1 : text.indexOf(patternDefinition.patternTextAfter);
-        if(text.length>0){
-          var endIndex = partIndex>-1? partIndex : text.length;
-          var part = text.substring(0,endIndex);
-          if(patternDefinition.type ==='day'){
+        var partIndex = patternDefinition.patternTextAfter === '' ? -1 : text.indexOf(patternDefinition.patternTextAfter);
+        if (text.length > 0) {
+          var endIndex = partIndex > -1 ? partIndex : text.length;
+          var part = text.substring(0, endIndex);
+          if (patternDefinition.type === 'day') {
+            result.dayComplete = partIndex > -1;
             result.day = part;
-          } else if(patternDefinition.type ==='month'){
+          } else if (patternDefinition.type === 'month') {
+            result.monthComplete = partIndex > -1;
             result.month = part;
-          } else if(patternDefinition.type ==='year'){
+          } else if (patternDefinition.type === 'year') {
+            result.yearComplete = partIndex > -1;
             result.year = part;
           }
-          text = text.substring(endIndex+1,text.length);
+          text = text.substring(endIndex + 1, text.length);
         }
       }
     }

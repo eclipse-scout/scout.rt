@@ -58,7 +58,7 @@ scout.dates = {
     var d = date || new Date();
     return '' + d.getUTCFullYear() +
       scout.strings.padZeroLeft((d.getUTCMonth() + 1), 2) + // (0-indexed)
-      scout.strings.padZeroLeft(d.getUTCDate(), 2) +
+    scout.strings.padZeroLeft(d.getUTCDate(), 2) +
       scout.strings.padZeroLeft(d.getUTCHours(), 2) +
       scout.strings.padZeroLeft(d.getUTCMinutes(), 2) +
       scout.strings.padZeroLeft(d.getUTCSeconds(), 2) +
@@ -67,7 +67,7 @@ scout.dates = {
 
   orderWeekdays: function(weekdays, firstDayOfWeek) {
     var weekdaysOrdered = [];
-    for (var i=0; i < 7; i++) {
+    for (var i = 0; i < 7; i++) {
       weekdaysOrdered[i] = weekdays[(i + firstDayOfWeek) % 7];
     }
     return weekdaysOrdered;
@@ -98,28 +98,27 @@ scout.dates = {
       else if (option.decimalFormatSymbols !== undefined && option.decimalFormatSymbols.firstDayOfWeek !== undefined) {
         firstDayOfWeek = option.decimalFormatSymbols.firstDayOfWeek;
       }
-    }
-    else if (typeof option === 'number') {
+    } else if (typeof option === 'number') {
       firstDayOfWeek = option;
     }
 
-     // Thursday of current week decides the year
-     var thursday = this._thursdayOfWeek(date, firstDayOfWeek);
+    // Thursday of current week decides the year
+    var thursday = this._thursdayOfWeek(date, firstDayOfWeek);
 
-     // In ISO format, the week with January 4th is the first week
-     var jan4 = new Date(thursday.getFullYear(), 0, 4);
+    // In ISO format, the week with January 4th is the first week
+    var jan4 = new Date(thursday.getFullYear(), 0, 4);
 
-     // If the date is before the beginning of the year, it belongs to the year before
-     var startJan4 = this._firstDayOfWeek(jan4, firstDayOfWeek);
-     if (date.getTime() < startJan4.getTime()) {
-       jan4 = new Date(thursday.getFullYear() - 1, 0, 4);
-     }
+    // If the date is before the beginning of the year, it belongs to the year before
+    var startJan4 = this._firstDayOfWeek(jan4, firstDayOfWeek);
+    if (date.getTime() < startJan4.getTime()) {
+      jan4 = new Date(thursday.getFullYear() - 1, 0, 4);
+    }
 
-     // Get the Thursday of the first week, to be able to compare it to 'thursday'
-     var thursdayFirstWeek = this._thursdayOfWeek(jan4, firstDayOfWeek);
+    // Get the Thursday of the first week, to be able to compare it to 'thursday'
+    var thursdayFirstWeek = this._thursdayOfWeek(jan4, firstDayOfWeek);
 
-     var diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
-     return 1 + parseInt(diffInDays / 7, 10);
+    var diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
+    return 1 + parseInt(diffInDays / 7, 10);
   },
 
   _thursdayOfWeek: function(date, firstDayOfWeek) {
@@ -160,8 +159,13 @@ scout.dates = {
       return undefined;
     }
 
-    var year = '1970', month = '01', day = '01',
-      hours = '00', minutes = '00', seconds = '00', milliseconds = '000',
+    var year = '1970',
+      month = '01',
+      day = '01',
+      hours = '00',
+      minutes = '00',
+      seconds = '00',
+      milliseconds = '000',
       utc = false;
 
     // Date + Time
@@ -175,8 +179,7 @@ scout.dates = {
       seconds = matches[6];
       milliseconds = matches[7];
       utc = (matches[8] === 'Z');
-    }
-    else {
+    } else {
       // Date only
       matches = /^(\d{4})-(\d{2})-(\d{2})(Z?)$/.exec(jsonDate);
       if (matches !== null) {
@@ -184,8 +187,7 @@ scout.dates = {
         month = matches[2];
         day = matches[3];
         utc = (matches[4] === 'Z');
-      }
-      else {
+      } else {
         // Time only
         matches = /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
         if (matches !== null) {
@@ -194,8 +196,7 @@ scout.dates = {
           seconds = matches[3];
           milliseconds = matches[4];
           utc = (matches[5] === 'Z');
-        }
-        else {
+        } else {
           throw new Error('Unparsable date: ' + jsonDate);
         }
       }
@@ -204,8 +205,7 @@ scout.dates = {
     if (utc) {
       // UTC date
       return new Date(Date.UTC(year, (month - 1), day, hours, minutes, seconds, milliseconds));
-    }
-    else {
+    } else {
       // local date
       return new Date(year, (month - 1), day, hours, minutes, seconds, milliseconds);
     }
@@ -233,17 +233,16 @@ scout.dates = {
     if (utc) {
       datePart = date.getUTCFullYear() + '-' +
         scout.strings.padZeroLeft((date.getUTCMonth() + 1), 2) + '-' + // (0-indexed)
-        scout.strings.padZeroLeft(date.getUTCDate(), 2);
+      scout.strings.padZeroLeft(date.getUTCDate(), 2);
       timePart = scout.strings.padZeroLeft(date.getUTCHours(), 2) + ':' +
         scout.strings.padZeroLeft(date.getUTCMinutes(), 2) + ':' +
         scout.strings.padZeroLeft(date.getUTCSeconds(), 2) + '.' +
         scout.strings.padZeroLeft(date.getUTCMilliseconds(), 3);
       utcPart = 'Z';
-    }
-    else {
+    } else {
       datePart = date.getFullYear() + '-' +
-        scout.strings.padZeroLeft((date.getMonth() + 1), 2) + '-' +// (0-indexed)
-        scout.strings.padZeroLeft(date.getDate(), 2);
+        scout.strings.padZeroLeft((date.getMonth() + 1), 2) + '-' + // (0-indexed)
+      scout.strings.padZeroLeft(date.getDate(), 2);
       timePart = scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
         scout.strings.padZeroLeft(date.getMinutes(), 2) + ':' +
         scout.strings.padZeroLeft(date.getSeconds(), 2) + '.' +
@@ -289,24 +288,23 @@ scout.dates = {
       var date;
       if (matches[8] === 'Z') {
         date = new Date(Date.UTC(
-            matches[1], // fullYear
-            ((matches[2] || 1) - 1), // month (0-indexed)
-            (matches[3] || 1), // day of month
-            (matches[4] || 0), // hours
-            (matches[5] || 0), // minutes
-            (matches[6] || 0), // seconds
-            (matches[7] || 0) // milliseconds
+          matches[1], // fullYear
+          ((matches[2] || 1) - 1), // month (0-indexed)
+          (matches[3] || 1), // day of month
+          (matches[4] || 0), // hours
+          (matches[5] || 0), // minutes
+          (matches[6] || 0), // seconds
+          (matches[7] || 0) // milliseconds
         ));
-      }
-      else {
+      } else {
         date = new Date(
-            matches[1], // fullYear
-            ((matches[2] || 1) - 1), // month (0-indexed)
-            (matches[3] || 1), // day of month
-            (matches[4] || 0), // hours
-            (matches[5] || 0), // minutes
-            (matches[6] || 0), // seconds
-            (matches[7] || 0) // milliseconds
+          matches[1], // fullYear
+          ((matches[2] || 1) - 1), // month (0-indexed)
+          (matches[3] || 1), // day of month
+          (matches[4] || 0), // hours
+          (matches[5] || 0), // minutes
+          (matches[6] || 0), // seconds
+          (matches[7] || 0) // milliseconds
         );
       }
       return date;
@@ -322,8 +320,12 @@ scout.dates = {
 
   compare: function(a, b) {
     var diff = a.valueOf() - b.valueOf();
-    if (diff < -1) { return -1; }
-    if (diff >  1) { return 1;  }
+    if (diff < -1) {
+      return -1;
+    }
+    if (diff > 1) {
+      return 1;
+    }
     return diff;
   },
 
@@ -337,12 +339,10 @@ scout.dates = {
       newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDay());
     }
     if (time) {
-      newDate.setHours(
-        scout.helpers.nvl(time.getHours(), 0),
-        scout.helpers.nvl(time.getMinutes(), 0),
-        scout.helpers.nvl(time.getSeconds(), 0),
-        scout.helpers.nvl(time.getMilliseconds, 0)
-      );
+      newDate.setHours(time.getHours() ? time.getHours() : 0);
+      newDate.setMinutes(time.getMinutes() ? time.getMinutes() : 0);
+      newDate.setSeconds(time.getSeconds() ? time.getSeconds() : 0);
+      newDate.setMilliseconds(time.getMilliseconds() ? time.getMilliseconds() : 0);
     }
     return newDate;
   }
