@@ -207,6 +207,8 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, true, -1, content);
     // Suppress automatic "compatibility mode" in IE in intranet zone
     httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor("X-UA-Compatible", "IE=edge") {
+      private static final long serialVersionUID = 1L;
+
       @Override
       public void intercept(UiServlet httpServlet, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         BrowserInfo browserInfo = BrowserInfo.createFrom(httpReq);

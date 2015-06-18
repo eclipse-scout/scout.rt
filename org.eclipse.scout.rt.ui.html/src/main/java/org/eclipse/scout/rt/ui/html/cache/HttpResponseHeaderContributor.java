@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
  * An {@link IHttpResponseInterceptor} that adds a HTTP header from the given key/value pair to the response.
  */
 public class HttpResponseHeaderContributor implements IHttpResponseInterceptor {
+  private static final long serialVersionUID = 1L;
 
   private final String m_name;
   private final String m_value;

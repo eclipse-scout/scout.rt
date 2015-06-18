@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
  * Interceptor that is called before the HTTP response is sent back to the client. This can be useful to alter the
  * answer, e.g. to add HTTP response headers.
  */
-public interface IHttpResponseInterceptor {
+public interface IHttpResponseInterceptor extends Serializable {
 
   /**
    * Called before the HTTP response is sent back to the client.
