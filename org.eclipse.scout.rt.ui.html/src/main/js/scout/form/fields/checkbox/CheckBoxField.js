@@ -31,6 +31,11 @@ scout.CheckBoxField.prototype._createKeyStrokeAdapter = function(){
   return new scout.CheckBoxKeyStrokeAdapter(this);
 };
 
+scout.CheckBoxField.prototype.displayTextChanged = function(whileTyping, forceSend) {
+  //nop;
+};
+
+
 scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
   //nop;
 };
