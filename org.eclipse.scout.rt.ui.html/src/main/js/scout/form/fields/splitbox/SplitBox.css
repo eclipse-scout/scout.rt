@@ -47,6 +47,14 @@
         background-color: @border-color;
         opacity: 0.25;
       }
+
+      &.disabled {
+        &:hover {
+          background-color: @border-color;
+        }
+
+        cursor: default;
+      }
     }
 
     & > .temp-splitter {

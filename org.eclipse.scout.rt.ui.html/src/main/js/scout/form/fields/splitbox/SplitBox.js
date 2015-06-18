@@ -44,32 +44,34 @@ scout.SplitBox.prototype._render = function($parent) {
   // --- Helper functions ---
 
   function resizeSplitter() {
-    // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
-    $(window)
-      .on('mousemove.splitbox', resizeMove.bind(this))
-      .one('mouseup', resizeEnd.bind(this));
-    // Ensure the correct cursor is always shown while moving
-    $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+    if (this.splitterEnabled) {
+      // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
+      $(window)
+        .on('mousemove.splitbox', resizeMove.bind(this))
+        .one('mouseup', resizeEnd.bind(this));
+      // Ensure the correct cursor is always shown while moving
+      $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
 
-    // Get initial area and splitter bounds
-    var splitAreaPosition = this._$splitArea.offset();
-    var splitAreaSize = scout.graphics.getSize(this._$splitArea, true);
-    var splitterPosition = this._$splitter.offset();
-    var splitterSize = scout.graphics.getSize(this._$splitter, true);
+      // Get initial area and splitter bounds
+      var splitAreaPosition = this._$splitArea.offset();
+      var splitAreaSize = scout.graphics.getSize(this._$splitArea, true);
+      var splitterPosition = this._$splitter.offset();
+      var splitterSize = scout.graphics.getSize(this._$splitter, true);
 
-    // Create temporary splitter
-    var $tempSplitter = $.makeDiv('temp-splitter')
-      .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
-      .appendTo(this._$splitArea);
-    if (this.splitHorizontal) { // "|"
-      $tempSplitter.cssLeft(splitterPosition.left - splitAreaPosition.left);
-    } else { // "--"
-      $tempSplitter.cssTop(splitterPosition.top - splitAreaPosition.top);
+      // Create temporary splitter
+      var $tempSplitter = $.makeDiv('temp-splitter')
+        .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
+        .appendTo(this._$splitArea);
+      if (this.splitHorizontal) { // "|"
+        $tempSplitter.cssLeft(splitterPosition.left - splitAreaPosition.left);
+      } else { // "--"
+        $tempSplitter.cssTop(splitterPosition.top - splitAreaPosition.top);
+      }
+      this._$splitter.addClass('dragging');
+
+      var newSplitterPosition = this.splitterPosition;
+      var SNAP_SIZE = 25;
     }
-    this._$splitter.addClass('dragging');
-
-    var newSplitterPosition = this.splitterPosition;
-    var SNAP_SIZE = 25;
 
     function resizeMove(event) {
       if (this.splitHorizontal) { // "|"
@@ -116,15 +118,17 @@ scout.SplitBox.prototype._render = function($parent) {
     function resizeEnd(event) {
       // Remove listeners and reset cursor
       $(window).off('mousemove.splitbox');
-      $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
+      if ($tempSplitter) { // instead of check for this.splitterEnabled, if splitter is currently moving it must be finished correctly
+        $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
 
-      // Remove temporary splitter
-      $tempSplitter.remove();
-      this._$splitter.removeClass('dragging');
+        // Remove temporary splitter
+        $tempSplitter.remove();
+        this._$splitter.removeClass('dragging');
 
-      // Update split box
-      this.newSplitterPosition(newSplitterPosition);
-      scout.HtmlComponent.get(this._$splitArea).revalidate();
+        // Update split box
+        this.newSplitterPosition(newSplitterPosition);
+        scout.HtmlComponent.get(this._$splitArea).revalidate();
+      }
     }
 
     return false;
@@ -134,10 +138,15 @@ scout.SplitBox.prototype._render = function($parent) {
 scout.SplitBox.prototype._renderProperties = function() {
   scout.SplitBox.parent.prototype._renderProperties.call(this);
   this._renderSplitterPosition(this.splitterPosition);
+  this._renderSplitterEnabled(this.splitterEnabled);
 };
 
 scout.SplitBox.prototype._renderSplitterPosition = function() {
   this.newSplitterPosition(this.splitterPosition);
+};
+
+scout.SplitBox.prototype._renderSplitterEnabled = function(enabled) {
+  this._$splitter.setEnabled(enabled);
 };
 
 scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
