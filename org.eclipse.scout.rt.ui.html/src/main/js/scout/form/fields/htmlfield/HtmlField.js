@@ -66,7 +66,10 @@ scout.HtmlField.prototype._renderScrollToEnd = function() {
 
 scout.HtmlField.prototype._renderScrollToPosition = function(anchor) {
   if (this.scrollBarsEnabled && anchor && this.$field.find(anchor)) {
-    scout.scrollbars.scrollTo(this.$fieldContainer, this.$field.find(anchor));
+    var anchorElem = this.$field.find('#'.concat(anchor));
+    if (anchorElem && anchorElem.length > 0) {
+      scout.scrollbars.scrollTo(this.$fieldContainer, anchorElem);
+    }
   }
 };
 
