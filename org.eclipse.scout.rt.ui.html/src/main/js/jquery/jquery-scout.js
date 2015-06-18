@@ -106,7 +106,7 @@
   /**
    * color calculation
    */
-  $.ColorOpacity = function(hex, opacity) {
+  $.colorOpacity = function(hex, opacity) {
     // validate hex string
     hex = String(hex).replace(/[^0-9a-f]/gi, '');
     if (hex.length < 6) {
@@ -115,12 +115,11 @@
     opacity = opacity || 0;
 
     // convert to decimal and change luminosity
-    var rgb = "#",
-      c, i;
-    for (i = 0; i < 3; i++) {
-      c = parseInt(hex.substr(i * 2, 2), 16);
+    var rgb = '#';
+    for (var i = 0; i < 3; i++) {
+      var c = parseInt(hex.substr(i * 2, 2), 16);
       c = Math.round(Math.min(Math.max(0, 255 - (255 - c) * opacity), 255)).toString(16);
-      rgb += ("00" + c).substr(c.length);
+      rgb += ('00' + c).substr(c.length);
     }
 
     return rgb;
