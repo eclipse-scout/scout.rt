@@ -198,7 +198,7 @@ scout.CalendarComponent.prototype._description = function() {
   if (this.fullDay) {
     // NOP
   } else if (scout.dates.isSameDay(fromDate, toDate)) {
-    range = 'von ' + this._format(fromDate, 'HH:mm') + ' bis ' + this._format(fromDate, 'HH:mm');
+    range = 'von ' + this._format(fromDate, 'HH:mm') + ' bis ' + this._format(toDate, 'HH:mm');
   } else {
     range = range = 'von ' + this._format(fromDate, 'EEEE HH:mm ') + ' bis ' + this._format(toDate, ' EEEE HH:mm');
   }
