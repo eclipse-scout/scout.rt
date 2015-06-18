@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>SwtScoutFieldComposite</h3> ...
- * 
+ *
  * @since 1.0.0 19.05.2008
  */
 public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtScoutComposite<T> implements ISwtScoutFormField<T> {
@@ -126,10 +126,8 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     boolean updateLayout = false;
     if (getSwtContainer() != null) {
       if (getSwtContainer().getVisible() != b) {
-        boolean wasVisible = getSwtContainer().isVisible();
         getSwtContainer().setVisible(b);
-        //Update only if really changed (visibility does not get changed if parent is invisible)
-        updateLayout = wasVisible != getSwtContainer().isVisible();
+        updateLayout = true; // Also update the layout if not really visible because the parent group box is not visible. For example, let's take the TabBox, where only the active tab's GroupBox is visible. Otherwise, subsequent elements are not positioned correctly, meaning that their position is not changed at all.
       }
     }
     else if (getSwtField() != null && getSwtField().getVisible() != b) {
@@ -174,7 +172,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
 
   /**
    * used to change enabled into read only
-   * 
+   *
    * @param swtField
    * @param enabled
    */
