@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -42,14 +43,20 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
   public static final float EPS = 1E-6f;
 
   private boolean m_debug;
-  private int m_hgap;
-  private int m_vgap;
+  private final int m_hgap;
+  private final int m_vgap;
+  private final int m_minWidth;
   private LogicalGridLayoutInfo m_info;
   private CompositeObject m_infoCacheKey;
 
   public LogicalGridLayout(int hgap, int vgap) {
+    this(hgap, vgap, -1);
+  }
+
+  public LogicalGridLayout(int hgap, int vgap, int minWidth) {
     m_hgap = hgap;
     m_vgap = vgap;
+    m_minWidth = minWidth;
   }
 
   public LogicalGridLayoutInfo getInfo() {
@@ -116,7 +123,12 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     Point size = new Point(0, 0);
     switch (sizeFlag) {
       case MIN:
-        size.x = min.x;
+        if (m_minWidth < 0) {
+          size.x = min.x;
+        }
+        else {
+          size.x = m_minWidth;
+        }
         size.y = min.y;
         break;
       case MAX:
@@ -133,7 +145,7 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
           size.x = Math.min(max.x, size.x);
           size.x = Math.max(min.x, size.x);
         }
-        // adjust heigth
+        // adjust height
         if (hHint == SWT.DEFAULT) {
           size.y = pref.y;
         }
@@ -152,8 +164,8 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     if (flushCache) {
       m_info = null;
     }
-    validateLayout(parent, parent.getSize().x, flushCache);
     Rectangle clientArea = parent.getClientArea();
+    validateLayout(parent, clientArea.width, flushCache);
     Point size = new Point(clientArea.width, clientArea.height);
     Rectangle[][] cellBounds = m_info.layoutCellBounds(size);
     if (m_debug || LOG.isDebugEnabled()) {
@@ -267,8 +279,8 @@ public class LogicalGridLayout extends Layout implements ILayoutExtension {
     if (m_info != null && m_infoCacheKey != null) {
       return;
     }
-    ArrayList<Control> visibleComps = new ArrayList<Control>();
-    ArrayList<LogicalGridData> visibleCons = new ArrayList<LogicalGridData>();
+    List<Control> visibleComps = new ArrayList<>();
+    List<LogicalGridData> visibleCons = new ArrayList<>();
     for (Control comp : parent.getChildren()) {
       if (comp.getVisible() && comp.getLayoutData() instanceof LogicalGridData) {
         visibleComps.add(comp);

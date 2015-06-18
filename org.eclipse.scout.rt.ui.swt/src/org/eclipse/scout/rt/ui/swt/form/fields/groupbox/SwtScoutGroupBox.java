@@ -58,7 +58,7 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     m_containerBorderEnabled = getScoutObject().isBorderVisible();
     Composite rootPane = createContainer(parent);
     if (getScoutObject().isScrollable()) {
-      m_scrolledForm = getEnvironment().getFormToolkit().createScrolledFormEx(rootPane, SWT.V_SCROLL);
+      m_scrolledForm = getEnvironment().getFormToolkit().createScrolledFormEx(rootPane, SWT.H_SCROLL | SWT.V_SCROLL);
       m_swtBodyPart = m_scrolledForm.getBody();
       m_scrolledForm.setData(ISwtScoutPart.MARKER_SCOLLED_FORM, new Object());
 
@@ -89,7 +89,11 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
     createButtonbar(rootPane);
 
     IUiDecoration deco = UiDecorationExtensionPoint.getLookAndFeel();
-    LogicalGridLayout bodyLayout = new LogicalGridLayout(deco.getLogicalGridLayoutHorizontalGap(), deco.getLogicalGridLayoutVerticalGap());
+    int minWidth = -1;
+    if (getScoutObject().isScrollable()) {
+      minWidth = (int) (getScoutObject().getGridData().w * deco.getLogicalGridLayoutDefaultColumnWidth() * 0.8);
+    }
+    LogicalGridLayout bodyLayout = new LogicalGridLayout(deco.getLogicalGridLayoutHorizontalGap(), deco.getLogicalGridLayoutVerticalGap(), minWidth);
     m_swtBodyPart.setLayout(bodyLayout);
     installSwtContainerBorder();
     // FIELDS:
