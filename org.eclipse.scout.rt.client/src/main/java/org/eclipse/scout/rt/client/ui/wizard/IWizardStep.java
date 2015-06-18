@@ -12,18 +12,22 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITypeWithClassId, IOrdered {
+public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
 
-  String PROP_ENABLED = "enabled";
   String PROP_TITLE = "title";
+  String PROP_SUB_TITLE = "subTitle";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_TITLE_HTML = "titleHtml";
   String PROP_DESCRIPTION_HTML = "descriptionHtml";
   String PROP_ICON_ID = "iconId";
+  String PROP_ENABLED = "enabled";
+  String PROP_VISIBLE = "visible";
   String PROP_VIEW_ORDER = "viewOrder";
 
   /**
@@ -40,31 +44,56 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
   /**
    * Do not call this internal method.
    */
+  @Internal
   void setWizardInternal(IWizard w);
 
   String getTitle();
 
-  void setTitle(String s);
+  void setTitle(String title);
 
-  String getIconId();
+  String getSubTitle();
 
-  void setIconId(String s);
+  void setSubTitle(String subTitle);
 
   String getTooltipText();
 
-  void setTooltipText(String s);
+  void setTooltipText(String tooltipText);
+
+  /**
+   * @deprecated Use getTitle()
+   */
+  @Deprecated
+  String getTitleHtml();
+
+  /**
+   * @deprecated Use setTitle() and/or setCssClass()
+   */
+  @Deprecated
+  void setTitleHtml(String s);
+
+  /**
+   * @deprecated Use getSubTitle()
+   */
+  @Deprecated
+  String getDescriptionHtml();
+
+  /**
+   * @deprecated Use setSubTitle() and/or setCssClass()
+   */
+  @Deprecated
+  void setDescriptionHtml(String s);
+
+  String getIconId();
+
+  void setIconId(String iconId);
 
   boolean isEnabled();
 
-  void setEnabled(boolean b);
+  void setEnabled(boolean enabled);
 
-  String getTitleHtml();
+  boolean isVisible();
 
-  void setTitleHtml(String s);
-
-  String getDescriptionHtml();
-
-  void setDescriptionHtml(String s);
+  void setVisible(boolean visible);
 
   /**
    * @return the cached for this step or null

@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPropertyObserver implements IWizardStep<FORM>, IPropertyObserver, IExtensibleObject {
+
   private IWizard m_wizard;
   private FORM m_form;
   private FormListener m_formListener;
@@ -66,15 +67,15 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   /*
    * Configuration
    */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
-  protected boolean getConfiguredEnabled() {
-    return true;
+  protected String getConfiguredTitle() {
+    return null;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
-  protected String getConfiguredTitle() {
+  protected String getConfiguredSubTitle() {
     return null;
   }
 
@@ -84,12 +85,20 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     return null;
   }
 
+  /**
+   * @deprecated use getConfiguredTitle()
+   */
+  @Deprecated
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(35)
   protected String getConfiguredTitleHtml() {
     return null;
   }
 
+  /**
+   * @deprecated use getConfiguredSubTitle()
+   */
+  @Deprecated
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(38)
   protected String getConfiguredDescriptionHtml() {
@@ -99,6 +108,31 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(40)
   protected String getConfiguredIconId() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(50)
+  protected boolean getConfiguredEnabled() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(60)
+  protected boolean getConfiguredVisible() {
+    return true;
+  }
+
+  /**
+   * Configures the css class(es) of this field.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(70)
+  protected String getConfiguredCssClass() {
     return null;
   }
 
@@ -112,7 +146,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    * @return View order of this wizard step.
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
-  @Order(60)
+  @Order(80)
   protected double getConfiguredViewOrder() {
     return IOrdered.DEFAULT_ORDER;
   }
@@ -230,11 +264,14 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   protected void initConfig() {
     setTitle(getConfiguredTitle());
+    setSubTitle(getConfiguredSubTitle());
     setTooltipText(getConfiguredTooltipText());
     setTitleHtml(getConfiguredTitleHtml());
     setDescriptionHtml(getConfiguredDescriptionHtml());
     setIconId(getConfiguredIconId());
     setEnabled(getConfiguredEnabled());
+    setVisible(getConfiguredVisible());
+    setCssClass((getConfiguredCssClass()));
     setOrder(calculateViewOrder());
   }
 
@@ -319,23 +356,23 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public String getIconId() {
-    return propertySupport.getPropertyString(PROP_ICON_ID);
-  }
-
-  @Override
-  public void setIconId(String s) {
-    propertySupport.setPropertyString(PROP_ICON_ID, s);
-  }
-
-  @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
   }
 
   @Override
-  public void setTitle(String s) {
-    propertySupport.setPropertyString(PROP_TITLE, s);
+  public void setTitle(String title) {
+    propertySupport.setPropertyString(PROP_TITLE, title);
+  }
+
+  @Override
+  public String getSubTitle() {
+    return propertySupport.getPropertyString(PROP_SUB_TITLE);
+  }
+
+  @Override
+  public void setSubTitle(String subTitle) {
+    propertySupport.setPropertyString(PROP_SUB_TITLE, subTitle);
   }
 
   @Override
@@ -344,28 +381,46 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public void setTooltipText(String s) {
-    propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, s);
+  public void setTooltipText(String tooltipText) {
+    propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, tooltipText);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public String getTitleHtml() {
     return propertySupport.getPropertyString(PROP_TITLE_HTML);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setTitleHtml(String s) {
     propertySupport.setPropertyString(PROP_TITLE_HTML, s);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public String getDescriptionHtml() {
     return propertySupport.getPropertyString(PROP_DESCRIPTION_HTML);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setDescriptionHtml(String s) {
     propertySupport.setPropertyString(PROP_DESCRIPTION_HTML, s);
+  }
+
+  @Override
+  public String getIconId() {
+    return propertySupport.getPropertyString(PROP_ICON_ID);
+  }
+
+  @Override
+  public void setIconId(String iconId) {
+    propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
   @Override
@@ -374,8 +429,28 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public void setEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_ENABLED, b);
+  public void setEnabled(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isVisible() {
+    return propertySupport.getPropertyBool(PROP_VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    propertySupport.setPropertyBool(PROP_VISIBLE, visible);
+  }
+
+  @Override
+  public String getCssClass() {
+    return (String) propertySupport.getProperty(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
   }
 
   @Override
