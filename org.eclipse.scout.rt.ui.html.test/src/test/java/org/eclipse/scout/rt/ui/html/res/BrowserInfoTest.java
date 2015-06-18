@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.rt.ui.html.res.BrowserInfo.BrowserVersion;
+import org.eclipse.scout.rt.ui.html.res.BrowserInfo.EngineType;
 import org.junit.Test;
 
 /**
@@ -125,36 +126,36 @@ public class BrowserInfoTest {
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; Maxthon 2.0)", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US) AppleWebKit/533.1 (KHTML, like Gecko) Maxthon/3.0.8.2 Safari/533.1", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML like Gecko) Maxthon/4.0.0.2000 Chrome/22.0.1229.79 Safari/537.1", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/5.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; Trident/5.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; WOW64; Trident/5.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; Media Center PC 6.0; InfoPath.3; MS-RTC LM 8; Zune 4.7)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/6.0)", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)", FLAGS_DESKTOP_WINDOWS);
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; WOW64; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; Media Center PC 6.0; InfoPath.3; MS-RTC LM 8; Zune 4.7)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Opera/9.80 (Windows NT 6.1; U; en) Presto/2.7.62 Version/11.01", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.16", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.12 Safari/537.36 OPR/14.0.1116.4", FLAGS_DESKTOP_WINDOWS);
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.12 Safari/537.36 OPR/14.0.1116.4", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.CHROME));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.29 Safari/537.36 OPR/15.0.1147.24 (Edition Next)", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36 OPR/18.0.1284.49", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.76 Safari/537.36 OPR/19.0.1326.56", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36 OPR/20.0.1387.91", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 5.2; en-US) AppleWebKit/533.17.8 (KHTML, like Gecko) Version/5.0.1 Safari/533.17.8", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.2 Safari/533.18.5", FLAGS_DESKTOP_WINDOWS);
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 5.2; en-US) AppleWebKit/533.17.8 (KHTML, like Gecko) Version/5.0.1 Safari/533.17.8", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.SAFARI));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.2 Safari/533.18.5", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.SAFARI));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.2; es-US ) AppleWebKit/540.0 (KHTML like Gecko) Version/6.0 Safari/8900.00", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.71 (KHTML like Gecko) WebVideo/1.0.1.10 Version/7.0 Safari/537.71", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.1.17) Gecko/20110123 (like Firefox/3.x) SeaMonkey/2.0.12", FLAGS_DESKTOP_WINDOWS);
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.71 (KHTML like Gecko) WebVideo/1.0.1.10 Version/7.0 Safari/537.71", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.SAFARI));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.1.17) Gecko/20110123 (like Firefox/3.x) SeaMonkey/2.0.12", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.FIREFOX));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20120422 Firefox/12.0 SeaMonkey/2.9", FLAGS_DESKTOP_WINDOWS);
 
@@ -787,6 +788,9 @@ public class BrowserInfoTest {
     if (flags.isLinux() != null && flags.isLinux() != isLinux) {
       failedTests.add("LINUX [expected " + flags.m_isLinux + ", but is " + isLinux + "; system=" + info.getSystem() + "]");
     }
+    if (flags.getEngineType() != null && flags.getEngineType() != info.getEngineType()) {
+      failedTests.add("ENGINE TYPE [expected " + flags.m_engineType + ", but is " + info.getEngineType() + "]");
+    }
 
     if (!failedTests.isEmpty()) {
       m_failCount++;
@@ -812,6 +816,7 @@ public class BrowserInfoTest {
     private Boolean m_isWindows;
     private Boolean m_isMac;
     private Boolean m_isLinux;
+    private EngineType m_engineType;
 
     public P_BrowserTestFlags() {
     }
@@ -827,6 +832,7 @@ public class BrowserInfoTest {
       copy.m_isWindows = this.m_isWindows;
       copy.m_isMac = this.m_isMac;
       copy.m_isLinux = this.m_isLinux;
+      copy.m_engineType = this.m_engineType;
       return copy;
     }
 
@@ -850,53 +856,62 @@ public class BrowserInfoTest {
       return m_isLinux;
     }
 
+    public EngineType getEngineType() {
+      return m_engineType;
+    }
+
     public P_BrowserTestFlags mobile() {
-      this.m_isMobile = true;
+      m_isMobile = true;
       return this;
     }
 
     public P_BrowserTestFlags notMobile() {
-      this.m_isMobile = false;
+      m_isMobile = false;
       return this;
     }
 
     public P_BrowserTestFlags tablet() {
-      this.m_isTablet = true;
+      m_isTablet = true;
       return this;
     }
 
     public P_BrowserTestFlags notTablet() {
-      this.m_isTablet = false;
+      m_isTablet = false;
       return this;
     }
 
     public P_BrowserTestFlags windows() {
-      this.m_isWindows = true;
+      m_isWindows = true;
       return this;
     }
 
     public P_BrowserTestFlags notWindows() {
-      this.m_isWindows = false;
+      m_isWindows = false;
       return this;
     }
 
     public P_BrowserTestFlags mac() {
-      this.m_isMac = true;
+      m_isMac = true;
       return this;
     }
 
     public P_BrowserTestFlags notMac() {
-      this.m_isMac = false;
+      m_isMac = false;
       return this;
     }
 
     public P_BrowserTestFlags linux() {
-      this.m_isLinux = true;
+      m_isLinux = true;
       return this;
     }
 
     public P_BrowserTestFlags notLinux() {
-      this.m_isLinux = false;
+      m_isLinux = false;
+      return this;
+    }
+
+    public P_BrowserTestFlags engineType(EngineType engineType) {
+      m_engineType = engineType;
       return this;
     }
   }

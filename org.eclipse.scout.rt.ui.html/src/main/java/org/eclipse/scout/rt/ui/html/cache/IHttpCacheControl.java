@@ -15,6 +15,8 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+
 /**
  * Support for automatic caching of html resources.
  * <p>
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * In production it makes heavy use of the max-age concept.
  */
+@ApplicationScoped
 public interface IHttpCacheControl extends Serializable {
   String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$

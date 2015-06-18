@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.ui.html.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
@@ -65,7 +66,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     LOG.debug("processing resource request: " + pathInfo);
 
     // lookup cache or load
-    IHttpCacheControl httpCacheControl = servlet.getHttpCacheControl();
+    IHttpCacheControl httpCacheControl = BEANS.get(IHttpCacheControl.class);
     HttpCacheObject cacheObj = httpCacheControl.getCacheObject(req, pathInfo);
     if (cacheObj == null) {
       cacheObj = loadResource(servlet, req, pathInfo);
@@ -98,8 +99,8 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       }
     }
 
-    // Set additional headers requested by object itself
-    cacheObj.applyAdditionalHttpResponseHeaders(resp);
+    // Apply response interceptors
+    cacheObj.applyHttpResponseInterceptors(servlet, req, resp);
 
     if (!"HEAD".equals(req.getMethod())) {
       resp.getOutputStream().write(cacheObj.getResource().getContent());
@@ -205,10 +206,17 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     // forwarded to the login using a GET request BEFORE the first json POST request
     HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, true, -1, content);
     // Suppress automatic "compatibility mode" in IE in intranet zone
-    BrowserInfo browserInfo = BrowserInfo.createFrom(req);
-    if (browserInfo.isMshtml()) {
-      httpCacheObject.putAdditionalHttpResponseHeader("X-UA-Compatible", "IE=edge");
-    }
+    httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor("X-UA-Compatible", "IE=edge") {
+      @Override
+      public void intercept(UiServlet httpServlet, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        BrowserInfo browserInfo = BrowserInfo.createFrom(httpReq);
+        if (browserInfo.isMshtml()) {
+          // Send headers only for IE
+          super.intercept(httpServlet, httpReq, httpResp);
+        }
+        return;
+      }
+    });
     return httpCacheObject;
   }
 
@@ -266,7 +274,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     if (binaryResource.isDownload()) {
       // Set hint for browser to show the "save as" dialog (no in-line display, not even for known types, e.g. XML)
-      httpCacheObject.putAdditionalHttpResponseHeader("Content-Disposition", "attachment");
+      httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor("Content-Disposition", "attachment"));
     }
     return httpCacheObject;
   }

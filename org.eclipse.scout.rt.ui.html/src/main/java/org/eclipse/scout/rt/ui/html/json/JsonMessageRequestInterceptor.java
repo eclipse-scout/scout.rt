@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.json.JSONObject;
 import org.slf4j.MDC;
 
@@ -56,7 +57,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
     JsonRequest jsonReq = null;
     try {
       //disable cache
-      servlet.getHttpCacheControl().disableCacheHeaders(httpReq, httpResp);
+      BEANS.get(IHttpCacheControl.class).disableCacheHeaders(httpReq, httpResp);
       JSONObject jsonReqObj = decodeJSONRequest(httpReq);
       if (isPingRequest(jsonReqObj)) {
         writeResponse(httpResp, createPingResponse());

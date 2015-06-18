@@ -201,6 +201,16 @@ public class BrowserInfo {
       return;
     }
 
+    // Internet Explorer
+    regex = "(MSIE\\s+|Trident/)([^\\);]+)(\\)|;)";
+    boolean isMshtml = StringUtility.contains(m_userAgent, regex);
+    if (isMshtml) {
+      setMshtml(true);
+      setEngineType(EngineType.IE);
+      setEngineVersion(extractVersion(m_userAgent, regex));
+      return;
+    }
+
     // Gecko Browsers (Mozilla)
     regex = "rv\\:([^\\);]+)(\\)|;)";
     boolean isGecko = (m_userAgent.indexOf("Gecko") != -1) && StringUtility.contains(m_userAgent, regex);
@@ -208,18 +218,6 @@ public class BrowserInfo {
       setGecko(true);
       if (m_userAgent.indexOf("Firefox") != -1) {
         setEngineType(EngineType.FIREFOX);
-      }
-      setEngineVersion(extractVersion(m_userAgent, regex));
-      return;
-    }
-
-    // Internet Explorer
-    regex = "MSIE\\s+([^\\);]+)(\\)|;)";
-    boolean isMshtml = StringUtility.contains(m_userAgent, regex);
-    if (isMshtml) {
-      setMshtml(true);
-      if (m_userAgent.indexOf("MSIE") != -1) {
-        setEngineType(EngineType.IE);
       }
       setEngineVersion(extractVersion(m_userAgent, regex));
       return;

@@ -27,8 +27,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
-import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestInterceptor;
 
@@ -48,22 +46,12 @@ public class UiServlet extends HttpServlet {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiServlet.class);
 
-  private final IHttpCacheControl m_httpCacheControl;
   private final P_AbstractRequestHandler m_requestHandlerGet;
   private final P_AbstractRequestHandler m_requestHandlerPost;
 
   public UiServlet() {
-    m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
-  }
-
-  protected IHttpCacheControl createHttpCacheControl() {
-    return new DefaultHttpCacheControl();
-  }
-
-  public IHttpCacheControl getHttpCacheControl() {
-    return m_httpCacheControl;
   }
 
   protected P_AbstractRequestHandler createRequestHandlerGet() {
