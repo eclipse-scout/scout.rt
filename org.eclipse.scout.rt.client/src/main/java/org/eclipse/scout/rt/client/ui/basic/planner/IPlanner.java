@@ -273,7 +273,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   void isSelectedResource(Resource<RI> resource);
 
-  void deselectResources(List<? extends Resource> resources);
+  boolean deselectResources(List<? extends Resource> resources);
 
   void deselectAllResources();
 

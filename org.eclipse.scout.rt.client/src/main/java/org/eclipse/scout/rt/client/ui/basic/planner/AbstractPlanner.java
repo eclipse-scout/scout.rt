@@ -590,10 +590,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       if (deletedResources.size() == resourceCountBefore) {
         fireAllResourcesDeleted();
         deselectAllResources();
+        setSelectionRange(new Range<Date>());
       }
       else {
         fireResourcesDeleted(deletedResources);
-        deselectResources(deletedResources);
+        if (deselectResources(deletedResources)) {
+          // Adjust selection range too if selected resources were deleted
+          setSelectionRange(new Range<Date>());
+        }
       }
     }
     finally {
@@ -699,12 +703,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public void deselectResources(List<? extends Resource> resources) {
+  public boolean deselectResources(List<? extends Resource> resources) {
     List<Resource<RI>> selectedResources = getSelectedResources();
     boolean selectionChanged = selectedResources.removeAll(resources);
     if (selectionChanged) {
       setSelectedResources(selectedResources);
     }
+    return selectionChanged;
   }
 
   @Override
@@ -1050,8 +1055,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {
