@@ -576,6 +576,27 @@
     return _oldhide.apply(this, arguments);
   };
 
+  /**
+   * Sets the given 'text' as text to the jQuery element, using the text() function (i.e. HTML is encoded automatically).
+   * If the text does not contain any non-space characters, the text '&nbsp;' is set instead (using the html() function).
+   * If an 'emptyCssClass' is provided, this CSS class is removed in the former and added in the later case.
+   */
+  $.fn.textOrNbsp = function(text, emptyCssClass) {
+    if (scout.strings.hasText(text)) {
+      this.text(text);
+      if (emptyCssClass) {
+        this.removeClass(emptyCssClass);
+      }
+    }
+    else {
+      this.html('&nbsp;');
+      if (emptyCssClass) {
+        this.addClass(emptyCssClass);
+      }
+    }
+    return this;
+  };
+
   // === helpers for projects, may not necesserily be used by scout itself ===
   $.fn.appendAppLink = function(appLinkBean, func) {
     return this.appendSpan().appLink(appLinkBean, func);
