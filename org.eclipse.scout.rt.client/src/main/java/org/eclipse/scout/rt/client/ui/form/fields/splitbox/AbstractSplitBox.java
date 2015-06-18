@@ -86,7 +86,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     m_grid = new SplitBoxGrid(this);
     super.initConfig();
     setSplitHorizontal(getConfiguredSplitHorizontal());
-    setSpliterEnabled(getConfiguredSplitterEnabled());
+    setSplitterEnabled(getConfiguredSplitterEnabled());
     setSplitterPosition(getConfiguredSplitterPosition());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     setCacheSplitterPositionPropertyName(getConfiguredCacheSplitterPositionPropertyName());
@@ -136,7 +136,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   }
 
   @Override
-  public void setSpliterEnabled(boolean enabled) {
+  public void setSplitterEnabled(boolean enabled) {
     propertySupport.setPropertyBool(PROP_SPLITTER_ENABLED, enabled);
   }
 

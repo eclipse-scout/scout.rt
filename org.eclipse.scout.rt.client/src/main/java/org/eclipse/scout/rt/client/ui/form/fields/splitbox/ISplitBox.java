@@ -28,7 +28,7 @@ public interface ISplitBox extends ICompositeField {
 
   boolean isSplitterEnabled();
 
-  void setSpliterEnabled(boolean enabled);
+  void setSplitterEnabled(boolean enabled);
 
   /**
    * Relative position of the splitter in the range 0..1
