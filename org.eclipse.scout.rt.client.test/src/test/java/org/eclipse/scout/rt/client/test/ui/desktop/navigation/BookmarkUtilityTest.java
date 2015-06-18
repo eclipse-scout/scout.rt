@@ -158,10 +158,6 @@ public class BookmarkUtilityTest {
       LOG.debug(input);
       LOG.debug(output);
     }
-    else {
-      System.out.println(input);
-      System.out.println(output);
-    }
 
     assertTrue(CompareUtility.equals(in, out));
     if (in != null && out != null) {
@@ -175,10 +171,6 @@ public class BookmarkUtilityTest {
     if (LOG.isDebugEnabled()) {
       LOG.debug(input);
       LOG.debug(output);
-    }
-    else {
-      System.out.println(input);
-      System.out.println(output);
     }
 
     assertTrue(CompareUtility.equals(VerboseUtility.dumpObject(in), VerboseUtility.dumpObject(out)));

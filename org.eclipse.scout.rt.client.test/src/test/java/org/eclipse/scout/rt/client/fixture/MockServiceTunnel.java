@@ -40,7 +40,6 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   }
 
   public static void resetRequestSequenceGenerator() throws Exception {
-    System.out.println(MockServiceTunnel.class.getSimpleName() + ".resetRequestSequenceGenerator");
     Field f = ServiceTunnelRequest.class.getDeclaredField("requestSequenceGenerator");
     f.setAccessible(true);
     AtomicLong gen = (AtomicLong) f.get(null);
