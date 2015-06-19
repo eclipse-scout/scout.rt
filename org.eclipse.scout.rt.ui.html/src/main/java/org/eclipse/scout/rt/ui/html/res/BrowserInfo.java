@@ -202,7 +202,7 @@ public class BrowserInfo {
     }
 
     // Internet Explorer
-    regex = "(MSIE\\s+|Trident/)([^\\);]+)(\\)|;)";
+    regex = "(?:MSIE\\s+|Trident/)([^\\);]+)(\\)|;)";
     boolean isMshtml = StringUtility.contains(m_userAgent, regex);
     if (isMshtml) {
       setMshtml(true);
