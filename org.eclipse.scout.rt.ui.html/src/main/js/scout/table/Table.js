@@ -2019,6 +2019,10 @@ scout.Table.prototype._renderMultiSelect = function() {
   // nop
 };
 
+scout.Table.prototype._renderMultiCheck = function() {
+  // nop
+};
+
 scout.Table.prototype._renderMultilineText = function() {
   // nop
 };

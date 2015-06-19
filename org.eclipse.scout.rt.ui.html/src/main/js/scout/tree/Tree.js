@@ -169,6 +169,14 @@ scout.Tree.prototype._renderAutoCheckChildren = function() {
   // NOP
 };
 
+scout.Tree.prototype._renderCheckable = function() {
+  // nop
+};
+
+scout.Tree.prototype._renderMultiCheck = function() {
+  // nop
+};
+
 scout.Tree.prototype.onResize = function() {
   this.updateScrollbar();
 };
