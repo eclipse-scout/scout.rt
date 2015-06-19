@@ -606,7 +606,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
         continue;
       }
-      jsonRowIds.put(getOrCreatedRowId(row));
+      String rowId = getRowId(row);
+      if (rowId == null) { // Ignore rows that are not yet sent to the UI
+        continue;
+      }
+      jsonRowIds.put(rowId);
     }
     return jsonRowIds;
   }
@@ -655,6 +659,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return row;
   }
 
+  protected String getRowId(ITableRow row) {
+    if (row == null) {
+      return null;
+    }
+    return m_tableRowIds.get(row);
+  }
+
   protected void handleModelTableEvent(TableEvent event) {
     event = m_tableEventFilter.filter(event);
     if (event == null) {
@@ -676,7 +687,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         List<ITableRow> rowsToInsert = new ArrayList<>();
         List<ITableRow> rowsToDelete = new ArrayList<>();
         for (ITableRow row : getModel().getRows()) {
-          String existingRowId = m_tableRowIds.get(row);
+          String existingRowId = getRowId(row);
           if (row.isFilterAccepted()) {
             if (existingRowId == null) {
               // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
@@ -802,16 +813,31 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (modelRows.isEmpty()) {
       return;
     }
-    JSONObject jsonEvent = new JSONObject();
+    if (getModel().getFilteredRowCount() == 0) {
+      handleModelAllRowsDeleted();
+      return;
+    }
+    JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      String rowId = m_tableRowIds.get(row);
-      jsonEvent.append(PROP_ROW_IDS, rowId);
+      String rowId = getRowId(row);
+      if (rowId == null) { // Ignore rows that are not yet sent to the UI (may happen when a filtered row is deleted)
+        continue;
+      }
+      jsonRowIds.put(rowId);
       disposeRow(row);
     }
+    if (jsonRowIds.length() == 0) {
+      return;
+    }
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    jsonEvent.put(PROP_ROW_IDS, jsonRowIds);
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
   }
 
   protected void handleModelAllRowsDeleted() {
+    if (m_tableRows.isEmpty()) {
+      return;
+    }
     m_tableRows.clear();
     m_tableRowIds.clear();
     addActionEvent(EVENT_ALL_ROWS_DELETED);
@@ -830,7 +856,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         continue;
       }
       JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
-      putProperty(jsonRow, "id", getOrCreatedRowId(row));
+      putProperty(jsonRow, "id", getRowId(row));
       putProperty(jsonRow, "checked", row.isChecked());
       jsonRows.put(jsonRow);
     }
@@ -848,8 +874,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
         continue;
       }
-      String rowId = m_tableRowIds.get(row);
-      jsonRowIds.put(rowId);
+      jsonRowIds.put(getRowId(row));
     }
     if (jsonRowIds.length() == 0) {
       return;

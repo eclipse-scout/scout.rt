@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiException;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
@@ -82,6 +83,9 @@ public class JsonTableTest {
 
     ITableRow row = table.getRow(2);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event);
@@ -102,6 +106,10 @@ public class JsonTableTest {
     assertTrue(row1.isSelected());
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
+
     JsonEvent event = createJsonSelectedEvent(null);
 
     jsonTable.handleUiEvent(event);
@@ -118,6 +126,9 @@ public class JsonTableTest {
 
     ITableRow row = table.getRow(2);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event);
@@ -145,6 +156,10 @@ public class JsonTableTest {
     ITableRow row4 = table.getRow(4);
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
+
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
     assertFalse(row2.isSelected());
@@ -184,6 +199,10 @@ public class JsonTableTest {
     table.selectRow(row2);
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
+
     JsonEvent event = createJsonSelectedEvent(null);
 
     assertTrue(row2.isSelected());
@@ -212,6 +231,9 @@ public class JsonTableTest {
     IColumn<?> column0 = table.getColumns().get(0);
     IColumn<?> column1 = table.getColumns().get(1);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     assertEquals(table.getColumnSet().getVisibleColumn(0), column0);
     assertEquals(table.getColumnSet().getVisibleColumn(1), column1);
@@ -236,6 +258,9 @@ public class JsonTableTest {
 
     IColumn<?> column0 = table.getColumns().get(0);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     JSONObject jsonRow = jsonTable.tableRowToJson(table.getRow(0));
     JSONArray jsonCells = (JSONArray) jsonRow.get("cells");
@@ -265,6 +290,9 @@ public class JsonTableTest {
 
     IColumn<?> column = table.getColumns().get(0);
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     JsonEvent event = createJsonColumnMovedEvent(column.getColumnId(), 2);
     jsonTable.handleUiEvent(event);
@@ -287,7 +315,10 @@ public class JsonTableTest {
 
     IColumn<?> column0 = table.getColumns().get(0);
     IColumn<?> column1 = table.getColumns().get(1);
-    m_uiSession.newJsonAdapter(table, null);
+    IJsonAdapter<? super TableWith3Cols> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     ((HeaderCell) column0.getHeaderCell()).setText("newHeaderText");
     table.getColumnSet().updateColumn(column0);
@@ -315,7 +346,11 @@ public class JsonTableTest {
     table.resetDisplayableColumns();
     table.getColumnSet().getColumn(0).setVisible(false);
 
-    m_uiSession.newJsonAdapter(table, null);
+    IJsonAdapter<? super TableWith3Cols> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----
+
     table.getColumnSet().getColumn(0).setVisible(true);
 
     JsonResponse response = m_uiSession.currentJsonResponse();
@@ -339,6 +374,10 @@ public class JsonTableTest {
     table.initTable();
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
+
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
     JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class));
     JsonMenu<IMenu> jsonNonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.NonDisplayableMenu.class));
@@ -358,6 +397,10 @@ public class JsonTableTest {
     ITable table = new TableWithoutMenus();
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
+
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
 
     Menu menu1 = new Menu();
@@ -378,6 +421,10 @@ public class JsonTableTest {
     table.initTable();
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
+
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
 
     DisplayableMenu displayableMenu = table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class);
@@ -398,6 +445,9 @@ public class JsonTableTest {
     ITable table = new TableWithoutMenus();
     table.initTable();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     TableControl control = new TableControl();
     table.addTableControl(control);
@@ -413,6 +463,9 @@ public class JsonTableTest {
     ITable table = new TableWithoutMenus();
     table.initTable();
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    // ----------
 
     TableControl tableControl1 = new TableControl();
     TableControl tableControl2 = new TableControl();
@@ -715,6 +768,43 @@ public class JsonTableTest {
     response = m_uiSession.currentJsonResponse().toJson();
     assertEquals(0, jsonTable.eventBuffer().size());
     JSONArray events = response.optJSONArray("events");
+    assertNull(events); // No events should be emitted
+  }
+
+  @Test
+  public void testTableEventCoalesceInUi_DeleteEventOnFilteredRow() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.initTable();
+    table.fill(1, false);
+    table.resetDisplayableColumns();
+    JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTable);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // -------------
+
+    table.fill(2, false);
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return false; // filter all rows
+      }
+    });
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    JSONArray events = response.optJSONArray("events");
+    assertEquals(1, events.length());
+    assertEquals("allRowsDeleted", events.getJSONObject(0).getString("type"));
+
+    // -------------
+
+    table.deleteRow(0); // should not trigger any events
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    events = response.optJSONArray("events");
     assertNull(events); // No events should be emitted
   }
 
