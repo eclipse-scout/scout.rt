@@ -34,7 +34,7 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
   this._allRows = this.table.filteredRows();
   if (this.table.multiSelect && event.shiftKey) {
     this.fromIndex = this._allRows.indexOf(this.lastActionRow);
-  } else if (this.table.multiSelect && event.ctrlKey) {
+  } else if (event.ctrlKey) {
     this.select = !oldSelectedState;
   } else {
     this.select = true;
@@ -104,7 +104,9 @@ scout.TableSelectionHandler.prototype.handleSelection = function(event) {
     this._prevSelectedRowIndex = thisIndex;
   } else {
     // Single selection -> unselect previously selected row
-    this.table.clearSelection(true);
+    if (this.select) {
+      this.table.clearSelection(true);
+    }
 
     // Adjust the indexes
     this.fromIndex = this.toIndex;
