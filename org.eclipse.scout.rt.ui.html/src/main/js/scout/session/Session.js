@@ -522,32 +522,28 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   // Default values for fatal message boxes
   var boxOptions = {
-    title: this.text('ServerError'),
-    text: jsonError.message,
+    header: this.text('ServerError'),
+    body: jsonError.message,
     yesButtonText: this.text('Reload'),
     yesButtonAction: function() {
-      // Hide everything (on entire page, not only $entryPoint)
-      $('body').html('');
-      // Reload window (using setTimeout, to overcome drawing issues in IE)
-      setTimeout(function() {
-        window.location.reload();
-      });
-    }.bind(this)
+      scout.reloadPage();
+    }
   };
 
   // Customize for specific error codes
   if (jsonError.code === 5) { // JsonResponse.ERR_STARTUP_FAILED
     // there are no texts yet if session startup failed
-    boxOptions.title = '';
-    boxOptions.text = jsonError.message;
+    boxOptions.header = jsonError.message;
+    boxOptions.body = null;
     boxOptions.yesButtonText = 'Retry';
   } else if (jsonError.code === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
-    boxOptions.title = this.optText('SessionTimeout', boxOptions.title);
-    boxOptions.text = this.optText('SessionExpiredMsg', boxOptions.text);
+    boxOptions.header = this.optText('SessionTimeout', boxOptions.header);
+    boxOptions.body = this.optText('SessionExpiredMsg', boxOptions.body);
   } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
-    boxOptions.title = this.optText('UiProcessingErrorTitle', boxOptions.title);
-    boxOptions.text = this.optText('UiProcessingErrorText', boxOptions.text);
-    boxOptions.body = this.optText('UiProcessingErrorAction', boxOptions.body);
+    boxOptions.header = this.optText('UiProcessingErrorTitle', boxOptions.header);
+    boxOptions.body = scout.strings.join('\n\n',
+        this.optText('UiProcessingErrorText', boxOptions.body, ' ( ' + this.optText('UiErrorCodeX', 'Code 20', '20') + ')'),
+        this.optText('UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.text('Ignore');
   }
   this.showFatalMessage(boxOptions);
@@ -572,10 +568,9 @@ scout.Session.prototype._fireRequestFinished = function(message) {
 scout.Session.prototype.showFatalMessage = function(options) {
   options = options || {};
   var model = {
-    title: options.title,
     iconId: options.iconId,
     severity: options.severity || 4,
-    header: options.text || options.header,
+    header: options.header,
     body: options.body,
     hiddenText: options.hiddenText,
     yesButtonText: options.yesButtonText,
@@ -910,23 +905,9 @@ scout.Session.prototype._onInitialized = function(event) {
 };
 
 scout.Session.prototype._onLogout = function(event) {
-  // Clear everything and reload the page. Scheduling this ensures, that any
-  // other events may still be executed normally.
+  // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
   setTimeout(function() {
-    // Hide everything (on entire page, not only $entryPoint)
-    $('body').html('');
-
-    // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
-    $(window).off('unload.' + this.id);
-
-    // Reload window (using setTimeout, to overcome drawing issues in IE)
-    setTimeout(function() {
-      if (event.redirectUrl) {
-        window.location.href = event.redirectUrl;
-      } else {
-        window.location.reload();
-      }
-    });
+    scout.reloadPage(event.redirectUrl, true);
   });
 };
 

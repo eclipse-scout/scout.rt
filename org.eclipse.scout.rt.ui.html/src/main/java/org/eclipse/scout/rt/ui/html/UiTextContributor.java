@@ -71,15 +71,16 @@ public class UiTextContributor implements IUiTextContributor {
         "remove",
         "add",
         "FilterBy",
-        "Reconnecting",
         "Show",
         "Up",
         "Back",
         "Continue",
         "Ignore",
+        "UiErrorCodeX",
+        "UiErrorText",
+        "UiInconsistentMsg",
         "UiProcessingErrorTitle",
         "UiProcessingErrorText",
-        "UiProcessingErrorAction",
         "PleaseWait_",
         "ShowAllNodes"
         ));

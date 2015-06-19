@@ -184,7 +184,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     // Resolve texts with the given locale
     JSONObject map = JsonObjectUtility.newOrderedJSONObject();
     for (String textKey : textKeys) {
-      map.put(textKey, TEXTS.get(locale, textKey));
+      String text = TEXTS.getWithFallback(locale, textKey, null);
+      if (text != null) {
+        map.put(textKey, text);
+      }
+      else {
+        LOG.warn("Could not find text for contributed UI text key '" + textKey + "'");
+      }
     }
     return map;
   }

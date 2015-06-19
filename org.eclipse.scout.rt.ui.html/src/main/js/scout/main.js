@@ -52,15 +52,52 @@ scout._installGlobalJavascriptErrorHandler = function() {
       // FIXME Improve this!
       if (scout.sessions.length > 0) {
         var session = scout.sessions[0];
-        session.showFatalMessage({
-          title: 'Internal UI Error',
-          text: errorMessage,
-          hiddenText: logStr,
-          yesButtonText: 'OK'
-        });
+        var errorCode = getJsErrorCode(error);
+        var boxOptions = {
+          header: session.optText('UiProcessingErrorTitle', 'Internal UI Error'),
+          body: scout.strings.join('\n\n',
+              session.optText('UiErrorText', errorMessage, ' (' + session.optText('UiErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
+              session.optText('UiInconsistentMsg', '')),
+          yesButtonText: session.optText('Reload', 'Reload'),
+          yesButtonAction: function() {
+            scout.reloadPage();
+          },
+          noButtonText: session.optText('Ignore', 'Ignore'),
+          hiddenText: logStr
+        };
+        session.showFatalMessage(boxOptions);
       }
     } catch (err) {
-      throw new Error('Error in global JavaScript error handler: ' + errorMessage + ' at ' + fileName + ':' + lineNumber);
+      throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');
+    }
+
+    // ----- Helper functions -----
+
+    function getJsErrorCode(error) {
+      if (error) {
+        if (error.name === 'EvalError') {
+          return 'E1';
+        }
+        if (error.name === 'InternalError') {
+          return 'I2';
+        }
+        if (error.name === 'RangeError') {
+          return 'A3';
+        }
+        if (error.name === 'ReferenceError') {
+          return 'R4';
+        }
+        if (error.name === 'SyntaxError') {
+          return 'S5';
+        }
+        if (error.name === 'TypeError') {
+          return 'T6';
+        }
+        if (error.name === 'URIError') {
+          return 'U6';
+        }
+      }
+      return 'J0';
     }
   };
 };
@@ -92,4 +129,32 @@ scout.adapter = function(adapterId, sessionIndex) {
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
+};
+
+/**
+ * Reloads the entire browser window.
+ *
+ * @param redirectUrl
+ *          The new URL to load. If not specified, the current location is used (window.location).
+ * @param suppressUnload
+ *          If this argument is set to true, 'unload' events are not fired on the window. This can
+ *          be used to disable sending the session 'unload' event to the server.
+ */
+scout.reloadPage = function(redirectUrl, suppressUnload) {
+  // Hide everything (on entire page, not only $entryPoint)
+  $('body').html('');
+
+  // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
+  if (suppressUnload) {
+    $(window).off('unload.' + this.id);
+  }
+
+  // Reload window (using setTimeout, to overcome drawing issues in IE)
+  setTimeout(function() {
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    } else {
+      window.location.reload();
+    }
+  });
 };
