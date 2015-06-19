@@ -14,7 +14,6 @@ scout.Tree = function() {
   this._treeItemPaddingLeft = 23;
   this._treeItemCheckBoxPaddingLeft = 29;
   this._treeItemPaddingLevel = 15;
-  this.staticMenus = [];
   this.menus = [];
   this.menuBar;
 };
@@ -128,7 +127,6 @@ scout.Tree.prototype._renderProperties = function() {
 
 scout.Tree.prototype._renderMenus = function() {
   var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection']);
-  menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };
 
