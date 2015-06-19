@@ -78,7 +78,17 @@ scout.DateField.prototype.timestampChanged = function() {
   }
 };
 
+
+scout.DateField.prototype.displayTextChanged = function(whileTyping, forceSend) {
+  this.timestampChanged();
+};
+
 scout.DateField.prototype._sendTimestampChanged = function(timestamp) {
+  //Only update model if date is valid (according to ui)
+  if (this.errorStatusUi) {
+    //TODO nbu send error
+    return;
+  }
   this.session.send(this.id, 'timestampChanged', {
     timestamp: timestamp
   });
@@ -173,10 +183,8 @@ scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
   }
   this._acceptPrediction();
 
-  // Only update model if date is valid (according to ui)
-  if (!this.errorStatusUi) {
+
     this.timestampChanged();
-  }
 
   this._$predict.remove();
   this._$predict = null;
