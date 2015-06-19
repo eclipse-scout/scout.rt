@@ -73,7 +73,7 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean isPeriodic();
 
   /**
-   * Waits if necessary for the job to complete, or to get cancelled. This method does not throw an exception if
+   * Waits if necessary for the job to complete, or until cancelled. This method does not throw an exception if
    * cancelled or the computation failed.
    *
    * @throws ProcessingException
@@ -83,8 +83,8 @@ public interface IFuture<RESULT> extends ICancellable {
   void awaitDone() throws ProcessingException;
 
   /**
-   * Waits if necessary for the job to complete, or to get cancelled, or until the timeout elapses. This method does not
-   * throw an exception if cancelled, or the timeout elapses, or the computation failed.
+   * Waits if necessary for the job to complete, or until cancelled, or the timeout elapses. This method does not throw
+   * an exception if cancelled, or the timeout elapses, or the computation failed.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
