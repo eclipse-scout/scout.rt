@@ -78,7 +78,6 @@ scout.DateField.prototype.timestampChanged = function() {
   }
 };
 
-
 scout.DateField.prototype.displayTextChanged = function(whileTyping, forceSend) {
   this.timestampChanged();
 };
@@ -183,8 +182,7 @@ scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
   }
   this._acceptPrediction();
 
-
-    this.timestampChanged();
+  this.timestampChanged();
 
   this._$predict.remove();
   this._$predict = null;
@@ -371,10 +369,10 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     if (displayText && valid) {
       datePrediction = this._predict(displayText);
     }
-    if(datePrediction){
+    if (datePrediction) {
       this._$predict.val(datePrediction.text);
       this._updateSelection(datePrediction.date);
-    }else{
+    } else {
       this._$predict.val('');
     }
   }.bind(this), 1);
@@ -398,6 +396,9 @@ scout.DateField.prototype._updateSelection = function(selection) {
  */
 scout.DateField.prototype._validateDisplayText = function(text) {
   if (!text) {
+    return null;
+  }
+  if (text.match(/^[+-][0-9]*$/)) {
     return null;
   }
 
@@ -456,7 +457,14 @@ scout.DateField.prototype._predict = function(validatedText, format) {
   var day = dateInfo.day,
     month = dateInfo.month,
     year = dateInfo.year;
-
+  if (validatedText.match(/^[+-][0-9]*$/)) {
+    var daysToAdd = isNaN(validatedText)? 0 : Number(validatedText);
+    now.setDate(now.getDate() + daysToAdd);
+    return {
+      date: now,
+      text: validatedText
+    };
+  }
   if (!day) {
     day = ('0' + (now.getDate())).slice(-2);
   }
@@ -504,7 +512,7 @@ scout.DateField.prototype._predict = function(validatedText, format) {
   dateText = this._predictionStringReplacement(dateInfo.yearPatternDefinition, year, dateText);
 
   var predictedDate = new Date(fullYear, fullMonth - 1, fullDay, 0, 0, 0, 0);
-  if(isNaN( predictedDate.getTime() )){
+  if (isNaN(predictedDate.getTime())) {
     this.errorStatusUi = {
       message: this.session.text('InvalidDateFormat')
     };
