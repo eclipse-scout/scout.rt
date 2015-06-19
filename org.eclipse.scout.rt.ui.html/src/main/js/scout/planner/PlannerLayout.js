@@ -9,7 +9,7 @@ scout.PlannerLayout.prototype.layout = function($container) {
     $scale = this.planner.$scale,
     $grid = this.planner.$grid,
     menuBar = this.planner.menuBar,
-    $yearContainer = this.planner.$year.parent(),
+    $yearContainer = this.planner._yearPanel.$container,
     menuBarHeight = 0,
     gridHeight = 0,
     yearContainerHeight = 0,
@@ -78,7 +78,7 @@ scout.PlannerLayout.prototype._minWidth = function() {
   } else if (this.planner.displayMode === DISPLAY_MODE.MONTH) {
     scaleItemMinWidth = 250;
   } else if (this.planner.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
-    scaleItemMinWidth = 100;
+    scaleItemMinWidth = 150;
   } else if (this.planner.displayMode === DISPLAY_MODE.YEAR) {
     scaleItemMinWidth = 550;
   }

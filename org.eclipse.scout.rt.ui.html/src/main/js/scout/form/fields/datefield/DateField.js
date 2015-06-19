@@ -3,7 +3,6 @@ scout.DateField = function() {
   this.$timeField;
   this.$dateField;
   this.$timeFieldIcon;
-
 };
 scout.inherits(scout.DateField, scout.ValueField);
 

@@ -10,9 +10,6 @@ scout.Calendar = function() {
   this.$header;
   this.$range;
   this.$modes;
-  this.$yearContainer;
-  this.$yearTitle;
-  this.$yearList;
   this.$grid;
   this.$list;
   this.$progress;
@@ -72,8 +69,12 @@ scout.Calendar.prototype._isWork = function() {
 
 scout.Calendar.prototype.init = function(model, session) {
   scout.Calendar.parent.prototype.init.call(this, model, session);
+  this._yearPanel = new scout.YearPanel(session);
+  this.addChild(this._yearPanel);
   this._syncSelectedDate(model.selectedDate);
+  this._syncDisplayMode(model.displayMode);
   this._exactRange = this._calcExactRange();
+  this._yearPanel.setViewRange(this._exactRange);
   this.viewRange = this._calcViewRange();
   // We must send the view-range to the client-model on the server.
   // The view-range is determined by the UI. Thus the calendar cannot
@@ -83,6 +84,12 @@ scout.Calendar.prototype.init = function(model, session) {
 
 scout.Calendar.prototype._syncSelectedDate = function(dateString) {
   this.selectedDate = scout.dates.create(dateString);
+  this._yearPanel.selectDate(this.selectedDate);
+};
+
+scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
+  this.displayMode = displayMode;
+  this._yearPanel.setDisplayMode(this.displayMode);
 };
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
@@ -104,10 +111,8 @@ scout.Calendar.prototype._render = function($parent) {
 
   // main elements
   this.$header = this.$container.appendDiv('calendar-header');
-  this.$yearContainer = this.$container.appendDiv('calendar-year-container');
-  this.$yearTitle = this.$yearContainer.appendDiv('calendar-year-title');
-  this.$yearList = this.$yearContainer.appendDiv('calendar-year-list');
-  scout.scrollbars.install(this.$yearList);
+  this._yearPanel.render(this.$container);
+  this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
 
   this.$grid = this.$container.appendDiv('calendar-grid');
   this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
@@ -260,6 +265,7 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
 
 scout.Calendar.prototype._updateModel = function(animate) {
   this._exactRange = this._calcExactRange();
+  this._yearPanel.setViewRange(this._exactRange);
   this.viewRange = this._calcViewRange();
   this._sendModelChanged();
   this._updateScreen(animate);
@@ -333,6 +339,7 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
   displayMode = $(event.target).data('mode');
   if (oldDisplayMode != displayMode) {
     this.displayMode = displayMode;
+    this._yearPanel.setDisplayMode(displayMode);
     if (this._isWork()) {
       // change date if selectedDate is on a weekend
       p = this._dateParts(this.selectedDate, true);
@@ -401,14 +408,11 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
 
   if (changed) {
     this._sendSelectionChanged();
-    this._colorYear();
     this._updateListPanel();
   }
 
-  // if year shown and changed, redraw year
-  if (this.selectedDate.getFullYear() !== this.$yearTitle.data('year') && this._showYearPanel) {
-    $('.year-month', this.$yearList).remove();
-    this.drawYear();
+  if (this._showYearPanel) {
+    this._yearPanel.selectDate(this.selectedDate);
   }
 };
 
@@ -456,13 +460,10 @@ scout.Calendar.prototype._updateScreen = function(animate) {
   this.layoutSize(animate);
   this.layoutAxis();
 
-  // if year shown and changed, redraw year
-  if (this.selectedDate.getFullYear() !== this.$yearTitle.data('year') && this._showYearPanel) {
-    $('.year-month', this.$yearList).remove();
-    this.drawYear();
+  if (this._showYearPanel) {
+    this._yearPanel.selectDate(this.selectedDate);
   }
 
-  this._colorYear();
   this._updateListPanel();
 };
 
@@ -479,10 +480,10 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   // show or hide year
   $('.calendar-toggle-year', this.$modes).select(this._showYearPanel);
   if (this._showYearPanel) {
-    this.$yearContainer.data('new-width', 215);
+    this._yearPanel.$container.data('new-width', 215);
     gridW -= 215;
   } else {
-    this.$yearContainer.data('new-width', 0);
+    this._yearPanel.$container.data('new-width', 0);
   }
 
   // show or hide work list
@@ -655,174 +656,12 @@ scout.Calendar.prototype.layoutAxis = function() {
   }
 };
 
-/* -- year, draw and color ---------------------------------------- */
+/* -- year events ---------------------------------------- */
 
-scout.Calendar.prototype.drawYear = function() {
-  var first, month, $month, d, day, $day,
-    year = this.selectedDate.getFullYear();
-
-  // append 3 years
-  this.$yearTitle
-    .data('year', year)
-    .empty();
-
-  this.$yearTitle.appendDiv('year-title-item', year - 1)
-    .data('year-diff', -1)
-    .click(this._onYearClick.bind(this));
-
-  this.$yearTitle.appendDiv('year-title-item selected', year);
-
-  this.$yearTitle.appendDiv('year-title-item', year + 1)
-    .data('year-diff', +1)
-    .click(this._onYearClick.bind(this));
-
-  // add months and days
-  for (month = 0; month < 12; month++) {
-    first = new Date(year, month, 1);
-    $month = this.$yearList.appendDiv('year-month').attr('data-title', this._format(first, 'MMMM'));
-    for (d = 1; d <= 31; d++) {
-      day = new Date(year, month, d);
-
-      // stop if day is already out of range
-      if (day.getMonth() !== month) {
-        break;
-      }
-
-      // add div per day
-      $day = $month.appendDiv('year-day', d).data('date', day);
-
-      if (day.getDay() === 0 || day.getDay() == 6) {
-        $day.addClass('weekend');
-      }
-
-
-      // first day has margin depending on weekday
-      if (d === 1) {
-        $day.css('margin-left', ((day.getDay() + 6) % 7) * $day.outerWidth());
-      }
-    }
-  }
-
-  // bind events for days divs
-  $('.year-day', this.$yearList)
-    .click(this._onYearDayClick.bind(this))
-    .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
-
-  // update scrollbar
-  scout.scrollbars.update(this.$yearList);
-};
-
-
-scout.Calendar.prototype._colorYear = function() {
-  // color is only needed if visible
-  if (!this._showYearPanel) {
-    return;
-  }
-
-  // remove color information
-  $('.year-day.year-range, .year-day.year-range-day', this.$yearList).removeClass('year-range year-range-day');
-
-  // loop all days and colorize based on range and selected
-  var that = this,
-    $day, date;
-
-  $('.year-day', this.$yearList).each(function() {
-    $day = $(this);
-    date = $day.data('date');
-
-    if (!that._isDay() && date >= that._exactRange.from && date <= that._exactRange.to) {
-      $day.addClass('year-range');
-    }
-
-    if (scout.dates.isSameDay(date, that.selectedDate)) {
-      $day.addClass('year-range-day');
-    }
-  });
-
-  // selected has to be visible day
-  this._scrollYear();
-
-};
-
-scout.Calendar.prototype._scrollYear = function() {
-  var $day = $('.year-range-day', this.$yearList),
-    $month = $day.parent(),
-    $year = $day.parent().parent(),
-    top = $month[0].offsetTop,
-    halfMonth = $month.outerHeight() / 2,
-    halfYear = $year.outerHeight() / 2;
-
-  this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
-};
-
-/* -- year, events ---------------------------------------- */
-
-scout.Calendar.prototype._onYearClick = function(event) {
-  var diff = $(event.target).data('year-diff'),
-    year = this.selectedDate.getFullYear(),
-    month = this.selectedDate.getMonth(),
-    date = this.selectedDate.getDate();
-  this.selectedDate = new Date(year + diff, month, date);
+scout.Calendar.prototype._onYearPanelDateSelect = function(event) {
+  this.selectedDate = event.date;
   this._updateModel(false);
 };
-
-scout.Calendar.prototype._onYearDayClick = function(event) {
-  this.selectedDate = $(event.target).data('date');
-  this._updateModel(false);
-};
-
-scout.Calendar.prototype._onYearHoverIn = function(event) {
-  // init vars
-  var $day = $(event.target),
-    date1 = $day.data('date'),
-    year = date1.getFullYear(),
-    month = date1.getMonth(),
-    date = date1.getDate(),
-    day = (date1.getDay() + 6) % 7,
-    that = this,
-    startHover,
-    endHover,
-    $day2, date2;
-
-  // find hover based on mode
-  if (this._isDay()) {
-    startHover = new Date(year, month, date);
-    endHover = new Date(year, month, date);
-  } else if (this._isWeek()) {
-    startHover = new Date(year, month, date - day);
-    endHover = new Date(year, month, date - day + 6);
-  } else if (this._isMonth()) {
-    startHover = new Date(year, month, 1);
-    endHover = new Date(year, month + 1, 0);
-  } else if (this._isWork()) {
-    startHover = new Date(year, month, date - day);
-    endHover = new Date(year, month, date - day + 4);
-    // in case of work week: selected date has to be opart of range
-    if (date1 > endHover) {
-      date1 = endHover;
-    }
-  }
-
-  // loop days and colorize based on hover start and hover end
-  $('.year-day', this.$yearList).each(function() {
-    $day2 = $(this);
-    date2 = $day2.data('date');
-    if (date2 >= startHover && date2 <= endHover) {
-      $day2.addClass('year-hover');
-    } else {
-      $day2.removeClass('year-hover');
-    }
-    if (scout.dates.isSameDay(date1, date2)) {
-      $day2.addClass('year-hover-day');
-    }
-  });
-};
-
-// remove all hover effects
-scout.Calendar.prototype._onYearHoverOut = function(event) {
-  $('.year-day.year-hover, .year-day.year-hover-day', this.$yearList).removeClass('year-hover year-hover-day');
-};
-
 
 scout.Calendar.prototype._updateListPanel = function() {
   if (this._showListPanel) {

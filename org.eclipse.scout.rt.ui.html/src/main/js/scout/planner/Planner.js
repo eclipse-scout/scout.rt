@@ -16,7 +16,6 @@ scout.Planner = function() {
   this.$header;
   this.$range;
   this.$modes;
-  this.$year;
   this.$grid;
 
   // scale calculator
@@ -28,7 +27,7 @@ scout.Planner = function() {
   };
 
   // additional modes; should be stored in model
-  this.showYearPanel = false;
+  this.yearPanelVisible = false;
   this._addAdapterProperties(['menus']);
 };
 scout.inherits(scout.Planner, scout.ModelAdapter);
@@ -56,6 +55,8 @@ scout.Planner.SelectionMode = {
 
 scout.Planner.prototype.init = function(model, session) {
   scout.Planner.parent.prototype.init.call(this, model, session);
+  this._yearPanel = new scout.YearPanel(session);
+  this.addChild(this._yearPanel);
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }
@@ -86,7 +87,7 @@ scout.Planner.prototype._render = function($parent) {
 
   // main elements
   this.$header = this.$container.appendDiv('planner-header');
-  this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
+  this._yearPanel.render(this.$container);
   this.$grid = this.$container.appendDiv('planner-grid')
     .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
     .on('mousedown', '.resource-title', this._onResourceTitleMousedown.bind(this))
@@ -109,21 +110,20 @@ scout.Planner.prototype._render = function($parent) {
   // and modes
   this.$commands = this.$header.appendDiv('planner-commands');
   this._renderAvailableDisplayModes();
-
-  this._updateModel();
-  this._updateScreen();
 };
 
 scout.Planner.prototype._renderProperties = function() {
   scout.Planner.parent.prototype._renderProperties.call(this);
 
-  //TODO CGU/CRU vermutlich nicht nötig, da in updateScreen gemacht
-  //this._renderSelectedResources();
-  // render with setTimeout because the planner needs to be layouted first
-  setTimeout(this._renderSelectionRange.bind(this));
+  this._renderViewRange();
   this._renderDisplayMode();
   this._renderHeaderVisible();
   this._renderMenus();
+  this._renderYearPanelVisible();
+  this._renderResources();
+  this._renderSelectedResources();
+  // render with setTimeout because the planner needs to be layouted first
+  setTimeout(this._renderSelectionRange.bind(this));
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -137,35 +137,35 @@ scout.Planner.prototype._onClickNext = function(event) {
 };
 
 scout.Planner.prototype._navigateDate = function(direction) {
-  var DISPLAY_MODE = scout.Planner.DisplayMode;
+  var viewRange = this.viewRange,
+    DISPLAY_MODE = scout.Planner.DisplayMode;
+
   if (this.displayMode == DISPLAY_MODE.DAY) {
-    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
-    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
+    viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
+    viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
   } else if (this.displayMode == DISPLAY_MODE.WEEK || this.displayMode == DISPLAY_MODE.WORK) {
-    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
-    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
+    viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
+    viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
   } else if (this.displayMode == DISPLAY_MODE.MONTH) {
-    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
+    viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
+    viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode == DISPLAY_MODE.CALENDAR_WEEK) {
-    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
+    viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
+    viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode == DISPLAY_MODE.YEAR) {
-    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
-    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 3 * direction, 0);
+    viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
+    viewRange.to = scout.dates.shift(this.viewRange.to, 0, 3 * direction, 0);
   }
 
-  this._updateModel();
-  this._updateScreen();
+  this.setViewRange(viewRange);
 };
 
 scout.Planner.prototype._onClickToday = function(event) {
   // new selected date
   this.selected = new Date();
-
-  // update calendar
-  this._updateModel();
-  this._updateScreen();
+  //FIXME CGU
+//  viewRange = this.viewRange;
+//  this.setViewRange()
 };
 
 scout.Planner.prototype._onClickDisplayMode = function(event) {
@@ -174,11 +174,7 @@ scout.Planner.prototype._onClickDisplayMode = function(event) {
 };
 
 scout.Planner.prototype._onClickYear = function(event) {
-  // set flag
-  this.showYearPanel = !this.showYearPanel;
-
-  // update screen
-  this._updateScreen();
+  this.setYearPanelVisible(!this.yearPanelVisible);
 };
 
 scout.Planner.prototype._onResourceTitleMousedown = function(event) {
@@ -229,48 +225,7 @@ scout.Planner.prototype._reconcileScrollPos = function() {
   this.$scale.scrollLeft(scrollLeft);
 };
 
-/* --  set display mode and range ------------------------------------- */
-
-scout.Planner.prototype._updateModel = function() {};
-
-scout.Planner.prototype._updateScreen = function() {
-  // clear before draw
-  if (this.rendered) {
-    this._removeAllResources();
-  }
-
-  // update
-  this._layoutRange();
-  this._layoutScale();
-
-  this._renderResources();
-  this._renderSelectedResources();
-
-  // if year shown and changed, redraw year
-  if (this.showYearPanel) {
-    this.$year.empty();
-    this.drawYear();
-
-    this.$year.parent().animateAVCSD('width', 270);
-    this.$grid.animateAVCSD('width', '-=270', function() {
-      this.$grid.css('width', 'calc(100% - 270px)');
-    }.bind(this));
-    this.$scale.animateAVCSD('width', '-=270', function() {
-      this.$scale.css('width', 'calc(100% - 270px)');
-    }.bind(this));
-  }
-  if (this.$year.parent().width() !== 0) {
-    this.$year.parent().animateAVCSD('width', 0);
-    this.$grid.animateAVCSD('width', '100%');
-    this.$scale.animateAVCSD('width', '100%');
-  }
-  this.$year.parent().setVisible(this.showYearPanel);
-
-  // color year
-  this.colorYear();
-};
-
-scout.Planner.prototype._layoutRange = function() {
+scout.Planner.prototype._renderRange = function() {
   if (!this.viewRange.from || !this.viewRange.to) {
     return;
   }
@@ -302,7 +257,7 @@ scout.Planner.prototype._layoutRange = function() {
   $('.planner-select', this.$range).text(text);
 };
 
-scout.Planner.prototype._layoutScale = function() {
+scout.Planner.prototype._renderScale = function() {
   if (!this.viewRange.from || !this.viewRange.to) {
     return;
   }
@@ -730,161 +685,6 @@ scout.Planner.prototype._findScale = function(x) {
   }
 };
 
-/* -- year, draw and color ---------------------------------------- */
-
-scout.Planner.prototype.drawYear = function() {
-  // init vars
-  var year = this.viewRange.from.getFullYear(),
-    first, $month, day, $day;
-
-  // set title
-  var $title = this.$year.appendDiv('year-title').data('year', year);
-
-  // append 3 years
-  $title.appendDiv('year-title-item', year - 1)
-    .data('year-diff', -1)
-    .click(this._onYearClick.bind(this));
-
-  $title.appendDiv('year-title-item selected', year);
-
-  $title.appendDiv('year-title-item', year + 1)
-    .data('year-diff', +1)
-    .click(this._onYearClick.bind(this));
-
-  // add months and days
-  for (var month = 0; month < 12; month++) {
-    first = new Date(year, month, 1);
-    $month = this.$year.appendDiv('year-month').attr('data-title', this._dateFormat(first, 'MMMM'));
-    for (var d = 1; d <= 31; d++) {
-      day = new Date(year, month, d);
-
-      // stop if day is already out of range
-      if (day.getMonth() !== month) {
-        break;
-      }
-
-      // add div per day
-      $day = $month.appendDiv('year-day', d).data('date', day);
-
-      // first day has margin depending on weekday
-      if (d === 1) {
-        $day.css('margin-left', ((day.getDay() + 6) % 7) * $day.outerWidth());
-      }
-    }
-  }
-
-  // bind events for days divs
-  $('.year-day', this.$year)
-    .click(this._onYearDayClick.bind(this))
-    .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
-};
-
-scout.Planner.prototype.colorYear = function() {
-  // color is only needed if visible
-  if (!this.showYearPanel) {
-    return;
-  }
-  /*
-  // remove color information
-  $('.year-day.year-range, .year-day.year-range-day', this.$year).removeClass('year-range year-range-day');
-
-  // loop all days and colorize based on range and selected
-  var that = this,
-    $day, date;
-
-  $('.year-day', this.$year).each(function() {
-    $day = $(this);
-    date = $day.data('date');
-
-    if (that.displayMode !== that.DAY && date >= that.start && date <= that.end) {
-      $day.addClass('year-range');
-    }
-
-    if (scout.dates.isSameDay(date, that.selected)) {
-      $day.addClass('year-range-day');
-    }
-  });*/
-};
-
-/* -- year, events ---------------------------------------- */
-
-scout.Planner.prototype._onYearClick = function(event) {
-  // prepare calculation
-  var diff = $(event.target).data('year-diff'),
-    year = this.selected.getFullYear(),
-    month = this.selected.getMonth(),
-    date = this.selected.getDate();
-
-  // find new selected date
-  this.selected = new Date(year + diff, month, date);
-
-  // update calendar
-  this._updateModel();
-  this._updateScreen();
-};
-
-scout.Planner.prototype._onYearDayClick = function(event) {
-  // new selected day
-  this.selected = $('.year-hover-day', this.$year).data('date');
-
-  // update calendar
-  this._updateModel();
-  this._updateScreen();
-};
-
-scout.Planner.prototype._onYearHoverIn = function(event) {
-  // init vars
-  var startHover, endHover, $day2, date2,
-    $day = $(event.target),
-    date1 = $day.data('date'),
-    year = date1.getFullYear(),
-    month = date1.getMonth(),
-    date = date1.getDate(),
-    day = (date1.getDay() + 6) % 7,
-    DISPLAY_MODE = scout.Planner.DisplayMode;
-
-  // find hover based on mode
-  if (this.displayMode === DISPLAY_MODE.DAY) {
-    startHover = new Date(year, month, date);
-    endHover = new Date(year, month, date);
-  } else if (this.displayMode === DISPLAY_MODE.WEEK) {
-    startHover = new Date(year, month, date - day);
-    endHover = new Date(year, month, date - day + 6);
-  } else if (this.displayMode === DISPLAY_MODE.MONTH) {
-    startHover = new Date(year, month, 1);
-    endHover = new Date(year, month + 1, 0);
-  } else if (this.displayMode === DISPLAY_MODE.WORK) {
-    startHover = new Date(year, month, date - day);
-    endHover = new Date(year, month, date - day + 4);
-
-    // in case of work week: selected date has to be opart of range
-    if (date1 > endHover) {
-      date1 = endHover;
-    }
-  }
-
-  // loop days and colorize based on hover start and hover end
-  $('.year-day', this.$year).each(function() {
-    $day2 = $(this);
-    date2 = $day2.data('date');
-
-    if (date2 >= startHover && date2 <= endHover) {
-      $day2.addClass('year-hover');
-    } else {
-      $day2.removeClass('year-hover');
-    }
-
-    if (scout.dates.isSameDay(date1, date2)) {
-      $day2.addClass('year-hover-day');
-    }
-  });
-};
-
-scout.Planner.prototype._onYearHoverOut = function(event) {
-  // remove all hover effects
-  $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
-};
-
 /* -- helper ---------------------------------------------------- */
 
 scout.Planner.prototype._dateFormat = function(date, pattern) {
@@ -895,13 +695,48 @@ scout.Planner.prototype._dateFormat = function(date, pattern) {
 };
 
 scout.Planner.prototype._renderViewRange = function() {
-  //FIXME CGU/CRU always redraw whole screen? what if several properties change?
-  this._updateScreen();
+  this._renderRange();
+  this._renderScale();
+  this.invalidateTree();
 };
 
 scout.Planner.prototype._renderHeaderVisible = function() {
   this.$header.setVisible(this.headerVisible);
   this.invalidateTree();
+};
+
+scout.Planner.prototype._renderYearPanelVisible = function() {
+  var yearPanelWidth;
+  if (this.yearPanelVisible) {
+    this._yearPanel.renderContent();
+  }
+
+  // show or hide year panel
+  $('.calendar-toggle-year', this.$modes).select(this.yearPanelVisible);
+  if (this.yearPanelVisible) {
+    yearPanelWidth = 210;
+  } else {
+    yearPanelWidth = 0;
+  }
+  this._yearPanel.$container.animate({
+    width: yearPanelWidth
+  }, {
+    duration: 500,
+    progress: this._onYearPanelWidthChange.bind(this),
+    complete: this._afterYearPanelWidthChange.bind(this)
+  });
+};
+
+scout.Planner.prototype._onYearPanelWidthChange = function() {
+  var yearPanelWidth = this._yearPanel.$container.outerWidth();
+  this.$grid.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
+  this.$scale.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
+};
+
+scout.Planner.prototype._afterYearPanelWidthChange = function() {
+  if (!this.yearPanelVisible) {
+    this._yearPanel.removeContent();
+  }
 };
 
 scout.Planner.prototype._renderMenus = function() {
@@ -975,6 +810,13 @@ scout.Planner.prototype._syncViewRange = function(viewRange) {
     from: scout.dates.create(viewRange.from),
     to: scout.dates.create(viewRange.to)
   };
+  this._yearPanel.setViewRange(this.viewRange);
+  this._yearPanel.selectDate(this.viewRange.from);
+};
+
+scout.Planner.prototype._syncDisplayMode = function(displayMode) {
+  this.displayMode = displayMode;
+  this._yearPanel.setDisplayMode(this.displayMode);
 };
 
 scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
@@ -1069,10 +911,37 @@ scout.Planner.prototype._resourceById = function(id) {
 
 scout.Planner.prototype.setDisplayMode = function(displayMode) {
   this.displayMode = displayMode;
+  this._yearPanel.setDisplayMode(displayMode);
   this._sendSetDisplayMode(displayMode);
+  if (this.rendered) {
+    this._renderDisplayMode();
+  }
+};
 
-  //FIXME CGU/CRU currently only triggered by server, because end time is not known here
-  //  this._updateScreen();
+if (this.yearPanelVisible) {
+  this._yearPanel.renderContent();
+}
+
+scout.Planner.prototype.setYearPanelVisible = function(visible) {
+  if (this.yearPanelVisible === visible) {
+    return;
+  }
+  this.yearPanelVisible = visible;
+  if (this.rendered) {
+    this._renderYearPanelVisible();
+  }
+};
+
+scout.Planner.prototype.setViewRange = function(viewRange) {
+  this.viewRange = viewRange;
+  this._yearPanel.setViewRange(viewRange);
+  this._yearPanel.selectDate(this.viewRange.from);
+  this._sendSetViewRange(viewRange);
+
+  if (this.rendered) {
+    this._renderViewRange();
+    this.validateLayout();
+  }
 };
 
 scout.Planner.prototype.selectRange = function(range, notifyServer) {
@@ -1162,6 +1031,12 @@ scout.Planner.prototype._deleteAllResources = function() {
 scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {
   this.session.send(this.id, 'setDisplayMode', {
     displayMode: displayMode
+  });
+};
+
+scout.Planner.prototype._sendSetViewRange = function(viewRange) {
+  this.session.send(this.id, 'setViewRange', {
+    viewRange: scout.dates.toJsonDateRange(viewRange)
   });
 };
 

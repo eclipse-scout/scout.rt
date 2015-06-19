@@ -46,6 +46,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 
   // from UI
   private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
+  private static final String EVENT_SET_VIEW_RANGE = "setViewRange";
   private static final String EVENT_SET_SELECTION = "setSelection";
   private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
   private static final String EVENT_CELL_ACTION = "cellAction";
@@ -381,6 +382,9 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
       handleUiSetDisplayMode(event);
     }
+    else if (EVENT_SET_VIEW_RANGE.equals(event.getType())) {
+      handleUiSetViewRange(event);
+    }
     else if (EVENT_SET_SELECTION.equals(event.getType())) {
       handleUiSetSelection(event);
     }
@@ -398,7 +402,16 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   protected void handleUiSetDisplayMode(JsonEvent event) {
     JSONObject data = event.getData();
     int displayMode = data.getInt("displayMode");
+    addPropertyEventFilterCondition(IPlanner.PROP_DISPLAY_MODE, displayMode);
     getModel().getUIFacade().setDisplayModeFromUI(displayMode);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiSetViewRange(JsonEvent event) {
+    JSONObject data = event.getData();
+    Range<Date> viewRange = extractViewRange(data);
+    addPropertyEventFilterCondition(IPlanner.PROP_VIEW_RANGE, viewRange);
+    getModel().getUIFacade().setViewRangeFromUI(viewRange);
   }
 
   @SuppressWarnings("unchecked")
@@ -415,6 +428,13 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     JSONObject selectionRange = data.optJSONObject("selectionRange");
     Date fromDate = toJavaDate(selectionRange, "from");
     Date toDate = toJavaDate(selectionRange, "to");
+    return new Range<Date>(fromDate, toDate);
+  }
+
+  private Range<Date> extractViewRange(JSONObject data) {
+    JSONObject range = data.optJSONObject("viewRange");
+    Date fromDate = toJavaDate(range, "from");
+    Date toDate = toJavaDate(range, "to");
     return new Range<Date>(fromDate, toDate);
   }
 

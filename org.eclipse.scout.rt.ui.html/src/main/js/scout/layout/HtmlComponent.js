@@ -89,6 +89,13 @@ scout.HtmlComponent.prototype.invalidateTree = function() {
  */
 scout.HtmlComponent.prototype.revalidate = function() {
   this.invalidateTree();
+  this.validate();
+};
+//FIXME CGU rename to revalidateLayout, invalidateLayoutTree etc
+/**
+ * Layouts all invalid components
+ */
+scout.HtmlComponent.prototype.validate = function() {
   this.session.layoutValidator.validate();
 };
 

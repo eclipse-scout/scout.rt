@@ -109,6 +109,15 @@ scout.Widget.prototype.invalidateTree = function() {
   }
 };
 
+/**
+ * Calls validate of this.htmlComp, but only if the widget is already rendered.
+ */
+scout.Widget.prototype.validateLayout = function() {
+  if (this.rendered) {
+    this.htmlComp.validate();
+  }
+};
+
 //--- Event handling methods ---
 
 /**
