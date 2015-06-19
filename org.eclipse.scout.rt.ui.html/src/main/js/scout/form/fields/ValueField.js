@@ -91,7 +91,7 @@ scout.ValueField.prototype._renderUpdateDisplayTextOnModify = function() {
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
-  this.displayTextChanged(false, true);
+  this.displayTextChanged(false);
 };
 
 // FIXME AWE: (naming) in JavaStyleGuide ergänzen:
@@ -102,18 +102,17 @@ scout.ValueField.prototype._onFieldBlur = function() {
 //   ruft typischerweise auch sendDisplayText(displayText) auf
 
 scout.ValueField.prototype.displayTextChanged = function(whileTyping, forceSend) {
-  whileTyping = whileTyping===undefined ? false: whileTyping;
   var displayText = scout.helpers.nvl(this._readDisplayText(), ''),
     oldDisplayText = scout.helpers.nvl(this.displayText, '');
-  if (displayText === oldDisplayText && !forceSend) {
-    return;
+
+  if (forceSend || displayText !== oldDisplayText) {
+    this.displayText = displayText;
+    this._sendDisplayTextChanged(displayText, !!whileTyping);
   }
-  this.displayText = displayText;
-  this._sendDisplayTextChanged(displayText, whileTyping);
 };
 
 scout.ValueField.prototype._onFieldKeyUp = function() {
-  this.displayTextChanged(true, false);
+  this.displayTextChanged(true);
 };
 
 scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
