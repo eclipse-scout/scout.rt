@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
 import static org.eclipse.scout.rt.testing.commons.ScoutAssert.assertComparableEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -23,14 +24,20 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -40,6 +47,24 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   private static Locale ORIGINAL_LOCALE;
   private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
   private static final BigDecimal DEFAULT_MAX_VALUE = new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
+
+  private AtomicInteger m_displayTextChangedCounter;
+  private List<String> m_displayTextChangedHistory;
+
+  @Before
+  public void setup() {
+    m_displayTextChangedCounter = new AtomicInteger();
+    m_displayTextChangedHistory = new ArrayList<>();
+    addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IValueField.PROP_DISPLAY_TEXT.equals(evt.getPropertyName())) {
+          m_displayTextChangedCounter.incrementAndGet();
+          m_displayTextChangedHistory.add((String) evt.getNewValue());
+        }
+      }
+    });
+  }
 
   @BeforeClass
   public static void setupBeforeClass() {
@@ -401,4 +426,51 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     assertEquals("expect default for minValue=getMinPossibleValue() after calling setter with null-param", getMinPossibleValue(), getMinValue());
   }
 
+  // FIXME ASA This test currently fails, but it should not!
+  @Ignore
+  @Test
+  public void testDisplayTextInitialState() throws Exception {
+    assertEquals("", getDisplayText()); // FIXME ASA null or ""?
+    assertEquals(0, m_displayTextChangedCounter.get());
+    assertArrayEquals(new String[]{}, m_displayTextChangedHistory.toArray());
+  }
+
+  @Test
+  public void testDisplayTextSameTextTwiceUnformatted() throws Exception {
+    getUIFacade().parseAndSetValueFromUI("12345");
+    assertEquals("12'345", getDisplayText());
+    getUIFacade().parseAndSetValueFromUI("12345"); // input does not match display text
+    assertEquals("12'345", getDisplayText());
+
+    assertEquals(2, m_displayTextChangedCounter.get());
+    assertArrayEquals(new String[]{"12'345", "12'345"}, m_displayTextChangedHistory.toArray());
+  }
+
+  @Test
+  public void testDisplayTextSameTextTwiceFormatted() throws Exception {
+    getUIFacade().parseAndSetValueFromUI("12'345");
+    assertEquals("12'345", getDisplayText());
+    getUIFacade().parseAndSetValueFromUI("12'345"); // input matches display text
+    assertEquals("12'345", getDisplayText());
+
+    assertEquals(1, m_displayTextChangedCounter.get());
+    assertArrayEquals(new String[]{"12'345"}, m_displayTextChangedHistory.toArray());
+  }
+
+  // FIXME ASA This test currently fails, but it should not!
+  @Ignore
+  @Test
+  public void testDisplayTextNoValueChangeOnEmptyText() throws Exception {
+    getUIFacade().parseAndSetValueFromUI("123");
+    assertEquals("123", getDisplayText());
+    getUIFacade().parseAndSetValueFromUI("");
+    assertEquals("", getDisplayText()); // FIXME ASA null or ""?
+    getUIFacade().parseAndSetValueFromUI("");
+    assertEquals("", getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(null);
+    assertEquals("", getDisplayText());
+
+    assertEquals(2, m_displayTextChangedCounter.get());
+    assertArrayEquals(new String[]{"123", ""}, m_displayTextChangedHistory.toArray());
+  }
 }
