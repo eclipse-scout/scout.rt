@@ -69,7 +69,7 @@ scout.Tooltip.prototype.renderText = function(text) {
   if (this.htmlEnabled) {
     this.$content.html(text);
   } else {
-    this.$content.text(text);
+    this.$content.text(scout.strings.removeAmpersand(text));
   }
 };
 
