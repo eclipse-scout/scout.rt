@@ -102,13 +102,17 @@ scout.helpers = {
 
   /**
    * Returns a string with CSS definitions for use in an element's "style" attribute. All CSS relevant
-   * properties of the given cell are converted to CSS definitions, namely foreground color, background
+   * properties of the given object are converted to CSS definitions, namely foreground color, background
    * color and font.
    *
    * If an $element is provided, the CSS definitions are directly applied to the element. This can be
    * useful if the "style" attribute is shared and cannot be replaced in it's entirety.
+   *
+   * If propertyPrefix is provided, the prefix will be applied to the properties, e.g. if the prefix is
+   * 'label' the properties labelFont, labelBackgroundColor and labelForegroundColor are used instead of
+   * just font, backgroundColor and foregroundColor.
    */
-  legacyCellStyle: function(cell, $element) {
+  legacyStyle: function(obj, $element, propertyPrefix) {
     var cssColor = '',
       cssBackgroundColor = '',
       cssFontWeight = '',
@@ -116,12 +120,14 @@ scout.helpers = {
       cssFontSize = '',
       cssFontFamily = '';
 
-    if (typeof cell === 'object' && cell !== null) {
-      cssColor = scout.helpers.modelToCssColor(cell.foregroundColor);
-      cssBackgroundColor = scout.helpers.modelToCssColor(cell.backgroundColor);
+    propertyPrefix = propertyPrefix || '';
 
-      if (cell.font) {
-        var fontSpec = this.parseFontSpec(cell.font);
+    if (typeof obj === 'object' && obj !== null) {
+      cssColor = scout.helpers.modelToCssColor(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor')]);
+      cssBackgroundColor = scout.helpers.modelToCssColor(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor')]);
+
+      if (obj.font) {
+        var fontSpec = this.parseFontSpec(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'Font')]);
         if (fontSpec.bold) {
           cssFontWeight = 'bold';
         }

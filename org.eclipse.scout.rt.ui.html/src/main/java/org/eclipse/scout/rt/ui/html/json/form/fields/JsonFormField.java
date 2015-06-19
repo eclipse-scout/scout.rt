@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -82,6 +83,52 @@ public abstract class JsonFormField<T extends IFormField> extends AbstractJsonPr
       @Override
       protected String modelValue() {
         return getModel().getCssClass();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_FONT, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getFont();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return value instanceof FontSpec ? ((FontSpec) value).toPattern() : null;
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_BACKGROUND_COLOR, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getBackgroundColor();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_FOREGROUND_COLOR, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getForegroundColor();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_LABEL_FONT, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getLabelFont();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return value instanceof FontSpec ? ((FontSpec) value).toPattern() : null;
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_LABEL_BACKGROUND_COLOR, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLabelBackgroundColor();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_LABEL_FOREGROUND_COLOR, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLabelForegroundColor();
       }
     });
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {

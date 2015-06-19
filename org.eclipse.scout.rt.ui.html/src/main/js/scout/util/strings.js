@@ -138,5 +138,17 @@ scout.strings = {
       }
     }
     return s;
+  },
+
+  /**
+   * If the given 'string' has text, its first letter is returned in lower case,
+   * the remainder is unchanged. Otherwise, the empty string is returned.
+   */
+  lowercaseFirstLetter: function(string) {
+    var s = '';
+    if(this.hasText(string)) {
+      s = string.charAt(0).toLowerCase() + string.slice(1);
+    }
+    return s;
   }
 };

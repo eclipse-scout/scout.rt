@@ -921,7 +921,7 @@ scout.Tree.prototype._decorateNode = function(node) {
     .append(preservedChildren)
     .append(node.text);
 
-  scout.helpers.legacyCellStyle(node, $node);
+  scout.helpers.legacyStyle(node, $node);
 
   if (scout.strings.hasText(node.tooltipText)) {
     $node.attr('title', node.tooltipText);

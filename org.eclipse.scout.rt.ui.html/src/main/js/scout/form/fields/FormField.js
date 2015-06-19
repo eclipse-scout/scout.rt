@@ -70,6 +70,12 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelVisible(this.labelVisible);
   this._renderStatusVisible(this.statusVisible);
   this._renderCssClass(this.cssClass);
+  this._renderFont(this.font);
+  this._renderForegroundColor(this.foregroundColor);
+  this._renderBackgroundColor(this.backgroundColor);
+  this._renderLabelFont(this.labelFont);
+  this._renderLabelForegroundColor(this.labelForegroundColor);
+  this._renderLabelBackgroundColor(this.labelBackgroundColor);
 };
 
 scout.FormField.prototype._remove = function() {
@@ -178,6 +184,30 @@ scout.FormField.prototype._renderEnabled = function() {
 scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
   this.$container.removeClass(oldCssClass);
   this.$container.addClass(cssClass);
+};
+
+scout.FormField.prototype._renderFont = function() {
+  scout.helpers.legacyStyle(this, this.$field);
+};
+
+scout.FormField.prototype._renderForegroundColor = function() {
+  scout.helpers.legacyStyle(this, this.$field);
+};
+
+scout.FormField.prototype._renderBackgroundColor = function() {
+  scout.helpers.legacyStyle(this, this.$field);
+};
+
+scout.FormField.prototype._renderLabelFont = function() {
+  scout.helpers.legacyStyle(this, this.$label, 'label');
+};
+
+scout.FormField.prototype._renderLabelForegroundColor = function() {
+  scout.helpers.legacyStyle(this, this.$label, 'label');
+};
+
+scout.FormField.prototype._renderLabelBackgroundColor = function() {
+  scout.helpers.legacyStyle(this, this.$label, 'label');
 };
 
 scout.FormField.prototype._renderGridData = function(gridData) {

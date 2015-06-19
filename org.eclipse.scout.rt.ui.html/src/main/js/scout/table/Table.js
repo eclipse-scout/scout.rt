@@ -903,7 +903,7 @@ scout.Table.prototype.cellStyle = function(column, cell) {
   }
 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-  style += scout.helpers.legacyCellStyle(cell);
+  style += scout.helpers.legacyStyle(cell);
   hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
   return style + (hAlign === 'left' || !hAlign ? '' : 'text-align: ' + hAlign + '; ');
 };
