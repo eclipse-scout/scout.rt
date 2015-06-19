@@ -243,7 +243,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * the generic type declaration.
    */
   protected Class<SERVICE> resolveServiceClass() {
-    return this.<SERVICE> resolveGenericTypeArguments(getClass())[0];
+    return this.<SERVICE> resolveGenericTypeArguments()[0];
   }
 
   /**
@@ -251,7 +251,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
    * the generic type declaration.
    */
   protected Class<PORT> resolvePortClass() {
-    return this.<PORT> resolveGenericTypeArguments(getClass())[1];
+    return this.<PORT> resolveGenericTypeArguments()[1];
   }
 
   /**
@@ -270,7 +270,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   /**
    * Resolves the generic type arguments in the super hierarchy of the actual class.
    */
-  protected <T> Class<T>[] resolveGenericTypeArguments(final Type type) {
+  protected <T> Class<T>[] resolveGenericTypeArguments() {
     Type candidate = getClass().getGenericSuperclass();
 
     // Find the class which declares the generic parameters.
