@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField.MainBox.StringField;
 
 public class FormWithOneField extends AbstractForm {
 
@@ -39,6 +40,12 @@ public class FormWithOneField extends AbstractForm {
   public class FormHandler extends AbstractFormHandler {
     @Override
     protected void execLoad() throws ProcessingException {
+    }
+
+    @Override
+    protected void execPostLoad() throws ProcessingException {
+      super.execPostLoad();
+      getFieldByClass(StringField.class).requestFocus();
     }
   }
 

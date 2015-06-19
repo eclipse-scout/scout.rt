@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -40,6 +41,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   public static final String PROP_CLOSABLE = "closable";
   public static final String PROP_FORM_FIELD = "formField";
   public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
+  public static final String PROP_INITIAL_FOCUS = "initialFocus";
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String EVENT_FORM_CLOSED = "formClosed";
@@ -119,7 +121,26 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     putProperty(json, PROP_CLOSABLE, isClosable());
     putAdapterIdProperty(json, PROP_ROOT_GROUP_BOX, model.getRootGroupBox());
+    setInitialFocusProperty(json);
     return json;
+  }
+
+  public void setInitialFocusProperty(JSONObject json) {
+    //check for request focus events in history
+    IEventHistory<FormEvent> h = getModel().getEventHistory();
+    if (h != null) {
+      for (FormEvent e : h.getRecentEvents()) {
+        if (e.getType() == FormEvent.TYPE_REQUEST_FOCUS) {
+          IJsonAdapter<?> formFieldAdapter = JsonAdapterUtility.findChildAdapter(this, e.getFormField());
+          if (formFieldAdapter == null) {
+            LOG.error("Cannot handle requestFocus event, because adapter for " + e.getFormField() + " could not be resolved in " + toString());
+            return;
+          }
+
+          putProperty(json, PROP_INITIAL_FOCUS, formFieldAdapter.getId());
+        }
+      }
+    }
   }
 
   protected boolean isClosable() {

@@ -63,6 +63,10 @@ scout.Form.prototype._render = function($parent) {
   }
 };
 
+scout.Form.prototype._renderProperties = function() {
+  this._renderInitialFocus(this.initialFocus);
+};
+
 scout.Form.prototype._updateDialogTitle = function() {
   if (this.title || this.subTitle) {
     var $titles = getOrAppendChildDiv(this.$container, 'title-box');
@@ -152,6 +156,13 @@ scout.Form.prototype._renderSubTitle = function() {
 
 scout.Form.prototype._renderIconId = function() {
   // TODO render icon
+};
+
+scout.Form.prototype._renderInitialFocus = function(formFieldId) {
+  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
+  if (formField) {
+    formField.$field.focus();
+  }
 };
 
 scout.Form.prototype._onFormClosed = function(event) {

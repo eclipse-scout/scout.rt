@@ -15,9 +15,12 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.junit.Before;
@@ -48,5 +51,18 @@ public class JsonFormTest {
 
     form.doClose();
     assertNull(m_uiSession.getJsonAdapter(form, m_uiSession.getRootJsonAdapter()));
+  }
+
+  /**
+   * {@link IForm#requestFocus(org.eclipse.scout.rt.client.ui.form.fields.IFormField)} in
+   * {@link AbstractFormHandler#execPostLoad()} must set <i>initialFocus</i> property.
+   */
+  @Test
+  public void testRequestFocusInPostLoad() throws ProcessingException {
+    FormWithOneField form = new FormWithOneField();
+    IJsonAdapter<?> adapter = m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter());
+    form.start();
+    assertNotNull(adapter.toJson().get(JsonForm.PROP_INITIAL_FOCUS));
+    form.doClose();
   }
 }
