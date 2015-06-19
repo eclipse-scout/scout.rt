@@ -41,4 +41,30 @@ describe("scout-jquery", function() {
 
   });
 
+  describe("toggleAttr", function() {
+
+    it("is toggles attribute", function() {
+      expect($e.attr('test')).toBeUndefined();
+      $e.toggleAttr('test');
+      expect($e.attr('test')).toBe('test');
+      $e.toggleAttr('test');
+      expect($e.attr('test')).toBeUndefined();
+      $e.toggleAttr('test', false);
+      expect($e.attr('test')).toBeUndefined();
+      $e.toggleAttr('test', true);
+      expect($e.attr('test')).toBe('test');
+      $e.toggleAttr('test', true);
+      expect($e.attr('test')).toBe('test');
+      $e.toggleAttr('test');
+      expect($e.attr('test')).toBeUndefined();
+      $e.toggleAttr('test', true, 1);
+      expect($e.attr('test')).toBe('1');
+      $e.toggleAttr('test', true, 'one');
+      expect($e.attr('test')).toBe('one');
+      $e.toggleAttr('test', false, 'bla');
+      expect($e.attr('test')).toBeUndefined();
+    });
+
+  });
+
  });

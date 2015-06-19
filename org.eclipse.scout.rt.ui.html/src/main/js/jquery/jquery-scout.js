@@ -231,11 +231,7 @@
     this.toggleClass('disabled', !enabled);
     // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
     if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
-      if (enabled) {
-        this.removeAttr('disabled');
-      } else {
-        this.attr('disabled', 'disabled');
-      }
+      this.toggleAttr('disabled', enabled);
     }
     return this;
   };
@@ -278,12 +274,7 @@
   };
 
   $.fn.placeholder = function(placeholder) {
-    if (placeholder) {
-      this.attr('placeholder', placeholder);
-    } else {
-      this.removeAttr('placeholder');
-    }
-    return this;
+    return this.toggleAttr('placeholder', !!placeholder, placeholder);
   };
 
   /**
@@ -595,6 +586,43 @@
     }
     return this;
   };
+
+  /**
+   * Like toggleClass(), this toggles a HTML attribute on a set of jquery elements.
+   *
+   * @param attr
+   *          Name of the attribute to toggle.
+   * @param state
+   *          Specifies if the attribute should be added or removed (based on whether the argument is truthy or falsy).
+   *          If this argument is not defined, the attribute is added when it exists, and vice-versa. If this behavior
+   *          is not desired, explicitly cast the argument to a boolean using "!!".
+   * @param value
+   *          Value to use when adding the attribute.
+   *          If this argument is not specified, 'attr' is used as value.
+   */
+  $.fn.toggleAttr = function(attr, state, value) {
+    if (!attr) {
+      return this;
+    }
+    if (value === undefined) {
+      value = attr;
+    }
+    return this.each(function() {
+      var $element = $(this);
+      if (state === undefined) {
+        // set state according to the current value
+        state = ($element.attr(attr) === undefined);
+      }
+      if (state) {
+        // set attr
+        $element.attr(attr, value);
+      }
+      else {
+        // remove attr
+        $element.removeAttr(attr);
+      }
+    });
+};
 
   // === helpers for projects, may not necesserily be used by scout itself ===
   $.fn.appendAppLink = function(appLinkBean, func) {
