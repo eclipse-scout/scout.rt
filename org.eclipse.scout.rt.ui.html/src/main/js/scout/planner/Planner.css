@@ -320,6 +320,7 @@
       width: @planner-resource-title-width;
       padding: 0px @resource-padding-x;
       float: left;
+      .overflow-ellipsis-nowrap;
     }
 
     &.selected > .resource-title{
