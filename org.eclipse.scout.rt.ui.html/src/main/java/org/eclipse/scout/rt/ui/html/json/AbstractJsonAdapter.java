@@ -211,7 +211,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   protected final List<IJsonAdapter<?>> attachGlobalAdapters(Collection<?> models) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
     for (Object model : models) {
-      adapters.add(attachAdapter(model));
+      adapters.add(attachGlobalAdapter(model));
     }
     return adapters;
   }
