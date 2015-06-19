@@ -55,8 +55,10 @@ scout.CheckBoxField.prototype._toggleChecked = function(){
     checked: uiChecked
   });
 };
-
-scout.CheckBoxField.prototype._renderEnabled=function(){
+/**
+ * @override
+ */
+scout.CheckBoxField.prototype._renderEnabled=function(enabled){
   scout.CheckBoxField.parent.prototype._renderEnabled .call(this);
   if (this._$checkBox) {
     if(this.enabled){
@@ -66,6 +68,7 @@ scout.CheckBoxField.prototype._renderEnabled=function(){
       this._$checkBox.removeAttr('tabindex');
     }
     this._$checkBox.toggleClass('disabled', !this.enabled);
+    this._$checkBox.setEnabled(this.enabled);
   }
 };
 
@@ -76,13 +79,6 @@ scout.CheckBoxField.prototype._renderProperties = function() {
 
 scout.CheckBoxField.prototype._renderValue = function(value) {
   this._$checkBox.toggleClass('checked', value);
-};
-
-/**
- * @override
- */
-scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
-  this._$checkBox.setEnabled(enabled);
 };
 
 /**
