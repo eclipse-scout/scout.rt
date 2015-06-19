@@ -21,6 +21,7 @@ scout.Menu.prototype._render = function($parent) {
   } else {
     this._renderItem($parent);
   }
+  this.$container.data('menu', this);
 };
 
 scout.Menu.prototype._renderSeparator = function($parent) {

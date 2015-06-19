@@ -96,6 +96,7 @@
 
   &:focus {
     outline: none;
+    color: @hover-color;
   }
 
   /* Draw border for icon only items */
@@ -243,6 +244,12 @@
 
   &:hover :not(:disabled) {
     color: @hover-color;
+  }
+
+  &:not(.disabled):active {
+    border-style: inset;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
   }
 
   &:focus {

@@ -66,7 +66,7 @@ scout.Button.prototype._render = function($parent) {
       $button.addClass('has-submenu');
     }
   }
-
+  $button.data('button', this);
   this._registerButtonKeyStroke();
 };
 

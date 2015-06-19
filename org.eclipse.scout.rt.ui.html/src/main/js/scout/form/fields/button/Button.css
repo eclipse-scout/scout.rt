@@ -40,6 +40,12 @@
     .button-focus;
   }
 
+  &:not(.disabled):active {
+    border-style: inset;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
   &:disabled {
     background-color: @palette-white;
     color: @disabled-color;
@@ -74,7 +80,14 @@ button > img {
 /* Link buttons in a form must have an underline, but link buttons in the menu-bar shouldn't */
 .form-field.link-button > div {
   text-decoration: underline;
+
+  &:focus :not(:disabled) {
+    color: @hover-color;
+  }
 }
+
+
+
 
 .table .button > .key-box {
   top: 8px;
