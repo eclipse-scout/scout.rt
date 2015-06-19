@@ -231,7 +231,7 @@
     this.toggleClass('disabled', !enabled);
     // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
     if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
-      this.toggleAttr('disabled', enabled);
+      this.toggleAttr('disabled', !enabled);
     }
     return this;
   };
