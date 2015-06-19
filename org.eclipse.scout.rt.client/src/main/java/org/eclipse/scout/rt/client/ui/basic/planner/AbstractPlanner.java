@@ -1055,8 +1055,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {
@@ -1159,6 +1159,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     @Override
     public void setDisplayModeFromUI(int displayMode) {
       setDisplayMode(displayMode);
+    }
+
+    @Override
+    public void setViewRangeFromUI(Range<Date> viewRange) {
+      setViewRange(viewRange);
     }
 
     @Override
