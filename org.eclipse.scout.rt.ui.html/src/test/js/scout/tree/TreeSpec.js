@@ -194,7 +194,8 @@ describe("Tree", function() {
       tree.checkable = true;
       tree.render(session.$entryPoint);
 
-      var $checkbox = tree.$container.find('.tree-node:first').find('.tree-node-checkbox label').first();
+      var $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
+      .children('div');
       $checkbox.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -1156,22 +1157,22 @@ describe("Tree", function() {
     it("disables checkboxes when tree is disabled", function() {
       tree.render(session.$entryPoint);
 
-      expect(node0.$node.find('input').eq(0)[0]).not.toHaveAttr('disabled');
-      expect(node2.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+      expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');
+      expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
 
       // Disable tree
       var message = { events: [ createTreeEnabledEvent(model, false) ] };
       session._processSuccessResponse(message);
 
-      expect(node0.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
-      expect(node2.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+      expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
+      expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
 
       // Re-enable tree
       message = { events: [ createTreeEnabledEvent(model, true) ] };
       session._processSuccessResponse(message);
 
-      expect(node0.$node.find('input').eq(0)[0]).not.toHaveAttr('disabled');
-      expect(node2.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+      expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');
+      expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
     });
   });
 

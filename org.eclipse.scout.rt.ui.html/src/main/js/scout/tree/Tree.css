@@ -10,7 +10,7 @@
     }
 
     /*first child is the scrollbar*/
-    .tree-node:nth-of-type(2).selected {
+    .tree-node:nth-of-type(1).selected {
       border-top-color: @item-selection-nonfocus-background-color;
     }
 
@@ -57,7 +57,7 @@
   }
 
   /*first child is the scrollbar*/
-  &:nth-of-type(2).selected {
+  &:nth-of-type(1).selected {
     border-top-color: @item-selection-nonfocus-background-color;
   }
 }
@@ -72,55 +72,38 @@
   width: @tree-node-checkbox-size;
   height: @tree-node-checkbox-size;
 
-  & label {
+  & div {
     cursor: pointer;
     display: inline-block;
     position: relative;
     font-size: 13px;
   }
 
-  & label::before {
+  & div::before {
     .checkboxLabelBefore(0px, 0px, 0px, 0px, -12px);
   }
 
-  & input[type=checkbox] {
-    /* no visiblity and display change to be focusable */
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    opacity: 0;
-  }
-
-  & input[type=checkbox]:disabled + label:hover::before {
+  & div.disabled:hover::before {
     .checkboxLabelBeforeDisabledBorder;
   }
 
-  & input[type=checkbox]:focus + label::before {
-    .checkboxLabelBeforeFocus;
-  }
-
-  & input[type=checkbox]:checked + label::before {
+  & div.checked::before {
     .checkboxLabelBeforeChecked;
   }
 
-  & label::before {
+  & div::before {
     .checkboxLabelBeforeBorder;
   }
 
-  & label.childrenChecked::before {
+  & div.childrenChecked::before {
     .checkboxLabelBeforeChildChecked;
   }
 
-  & input[type=checkbox]:disabled + label::before {
+  & div.disabled::before {
     .checkboxLabelBeforeDisabled;
   }
 
-  & input[type=checkbox]:disabled + label {
+  & div.disabled {
     .checkboxLabelDisabled;
   }
 }
