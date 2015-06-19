@@ -66,6 +66,8 @@ scout.ImageField.prototype._renderImageOrId = function() {
   } else if (this.image) {
     this.$field.attr('src', scout.helpers.dynamicResourceUrl(this, this.image));
   }
+  // Hide <img> when it has no content to suppress the browser's 'broken image' icon
+  this.$field.toggleClass('empty', !(this.imageId || this.image));
 };
 
 scout.ImageField.prototype._renderAutoFit = function() {
