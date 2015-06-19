@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * "busy/free" timespans.
  * <p>
  * This class strintly uses java.util.Date staticly AND dynamicly<br>
- * All Date-Objects and subclasses are run through {@link com.bsiag.DateUtility#toUtilDate(java.util.Date)}()
+ * All Date-Objects and subclasses are run through {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#toUtilDate(java.util.Date)}()
  * <p>
  * The planner field contains one inner class extending {@link ITable} and another one extending {@link IActivityMap}<br>
  * The inner table contains a primary key column, the type of the primary key column corresponds with RI the type

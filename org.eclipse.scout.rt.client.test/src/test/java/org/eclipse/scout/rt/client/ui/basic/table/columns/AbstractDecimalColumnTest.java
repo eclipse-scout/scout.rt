@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -26,6 +25,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest.P_PropertyTracker;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -54,7 +55,7 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
   @Test
   public void testDecimalFormatHandling() {
     DecimalFormat format = getFormat();
-    String percentSuffix = ((DecimalFormat) NumberFormat.getPercentInstance(NlsLocale.get())).getPositiveSuffix();
+    String percentSuffix = (BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get())).getPositiveSuffix();
     assertTrue("expected groupingUsed-property set to true as default", format.isGroupingUsed());
     assertTrue("expected groupingUsed-property set to true as default", isGroupingUsed());
     assertEquals("expected minFractionDigits-property set to 2 as default", 2, getMinFractionDigits());

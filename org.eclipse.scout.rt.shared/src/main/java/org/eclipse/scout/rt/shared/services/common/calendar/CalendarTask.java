@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 import java.util.Date;
 import java.util.Map;
 
-import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.rt.platform.util.DateUtility;
 
 public class CalendarTask extends AbstractCalendarItem implements ICalendarTask, java.io.Serializable {
   private static final long serialVersionUID = 0L;

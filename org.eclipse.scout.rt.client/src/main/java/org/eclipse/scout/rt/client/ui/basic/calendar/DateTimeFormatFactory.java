@@ -14,6 +14,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 
 public class DateTimeFormatFactory {
 
@@ -21,19 +23,19 @@ public class DateTimeFormatFactory {
   }
 
   public DateFormat getDayMonthYear(int style) {
-    return DateFormat.getDateInstance(style, NlsLocale.get());
+    return BEANS.get(DateFormatProvider.class).getDateInstance(style, NlsLocale.get());
   }
 
   public DateFormat getHourMinute() {
-    return DateFormat.getTimeInstance(DateFormat.SHORT, NlsLocale.get());
+    return BEANS.get(DateFormatProvider.class).getTimeInstance(DateFormat.SHORT, NlsLocale.get());
   }
 
   public DateFormat getHourMinuteSecond() {
-    return DateFormat.getTimeInstance(DateFormat.MEDIUM, NlsLocale.get());
+    return BEANS.get(DateFormatProvider.class).getTimeInstance(DateFormat.MEDIUM, NlsLocale.get());
   }
 
   public DateFormat getDayMonthYearHourMinuteSecond(int dateStyle, int timeStyle) {
-    return DateFormat.getDateTimeInstance(dateStyle, timeStyle, NlsLocale.get());
+    return BEANS.get(DateFormatProvider.class).getDateTimeInstance(dateStyle, timeStyle, NlsLocale.get());
   }
 
   /**

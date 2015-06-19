@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons;
+package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ public class NumberUtilityTest {
       Integer.valueOf(45)};
 
   /**
-   * Test method for {@link org.eclipse.scout.commons.NumberUtility#numberToBigDecimal(java.lang.Number)}.
+   * Test method for {@link org.eclipse.scout.rt.platform.util.NumberUtility#numberToBigDecimal(java.lang.Number)}.
    */
   @Test
   public void testToBigDecimalNumber() {

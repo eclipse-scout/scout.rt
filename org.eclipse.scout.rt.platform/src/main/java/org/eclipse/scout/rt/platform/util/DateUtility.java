@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons;
+package org.eclipse.scout.rt.platform.util;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -19,7 +19,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BEANS;
 
 public final class DateUtility {
 
@@ -43,7 +45,7 @@ public final class DateUtility {
       return "";
     }
     Locale loc = NlsLocale.get();
-    return DateFormat.getDateInstance(DateFormat.DEFAULT, loc).format(d);
+    return BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.DEFAULT, loc).format(d);
   }
 
   /**
@@ -54,7 +56,7 @@ public final class DateUtility {
       return "";
     }
     Locale loc = NlsLocale.get();
-    return DateFormat.getTimeInstance(DateFormat.SHORT, loc).format(d);
+    return BEANS.get(DateFormatProvider.class).getTimeInstance(DateFormat.SHORT, loc).format(d);
   }
 
   /**
@@ -65,7 +67,7 @@ public final class DateUtility {
       return "";
     }
     Locale loc = NlsLocale.get();
-    return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(d);
+    return BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(d);
   }
 
   /**
@@ -745,21 +747,5 @@ public final class DateUtility {
     long startL = startDate.getTimeInMillis() + startDate.getTimeZone().getOffset(startDate.getTimeInMillis());
     int numDays = (int) ((endL - startL) / DAY_MILLIS);
     return Math.abs(numDays);
-  }
-
-  /**
-   * Fast, accurate formatting of nanoseconds <b>as milliseconds</b>.
-   * <p>
-   * The resulting string always matches the regular expression <code>/^-?[0-9]+\.[0-9]{6}$/</code> (optional minus
-   * sign, one or more digits, exactly one dot sign, exactly 6 digits). The method is therefore mostly suitable for
-   * technical purposes (e.g. logging).
-   */
-  public static String formatNanos(long nanos) {
-    String x = "" + nanos;
-    if (nanos < 0) {
-      x = x.substring(1);
-    }
-    x = StringUtility.lpad(x, "0", 7);
-    return (nanos < 0 ? "-" : "") + x.substring(0, x.length() - 6) + "." + x.substring(x.length() - 6);
   }
 }

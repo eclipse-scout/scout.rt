@@ -66,8 +66,8 @@
 
     <!-- Test Dependencies -->
     <dependency>
-      <artifactId>org.eclipse.scout.commons.test</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.commons.test</artifactId>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>

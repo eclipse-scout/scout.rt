@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.csv;
+package org.eclipse.scout.rt.platform.util.csv;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -30,6 +30,8 @@ import java.util.List;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
+import org.eclipse.scout.rt.platform.util.csv.CsvHelper;
+import org.eclipse.scout.rt.platform.util.csv.IDataConsumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

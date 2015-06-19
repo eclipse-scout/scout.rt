@@ -33,6 +33,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.DateFormatProvider;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -581,13 +583,13 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
     DateFormat df = null;
     if (hasDate && !hasTime) {
-      df = DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
+      df = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
     }
     else if (!hasDate && hasTime) {
-      df = DateFormat.getTimeInstance(DateFormat.SHORT, NlsLocale.get());
+      df = BEANS.get(DateFormatProvider.class).getTimeInstance(DateFormat.SHORT, NlsLocale.get());
     }
     else {
-      df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get());
+      df = BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get());
     }
     df.setLenient(true);
 
@@ -615,10 +617,10 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
     NumberFormat fmt = null;
     if (percent) {
-      fmt = NumberFormat.getPercentInstance(NlsLocale.get());
+      fmt = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
     }
     else {
-      fmt = NumberFormat.getNumberInstance(NlsLocale.get());
+      fmt = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get());
     }
 
     if (fmt instanceof DecimalFormat) {
@@ -648,7 +650,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   protected String formatInteger(Object rawValue, boolean groupingUsed) {
     Integer value = TypeCastUtility.castValue(rawValue, Integer.class);
 
-    NumberFormat fmt = NumberFormat.getNumberInstance(NlsLocale.get());
+    NumberFormat fmt = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get());
     fmt.setMinimumFractionDigits(0);
     fmt.setMaximumFractionDigits(0);
     fmt.setGroupingUsed(groupingUsed);
@@ -671,7 +673,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   protected String formatLong(Object rawValue, boolean groupingUsed) {
     Long value = TypeCastUtility.castValue(rawValue, Long.class);
 
-    NumberFormat fmt = NumberFormat.getNumberInstance(NlsLocale.get());
+    NumberFormat fmt = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get());
     fmt.setMinimumFractionDigits(0);
     fmt.setMaximumFractionDigits(0);
     fmt.setGroupingUsed(groupingUsed);

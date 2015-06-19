@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.StringUtility;
@@ -54,6 +53,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.internal.CalendarContextM
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;

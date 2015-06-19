@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.testing.shared;
 
 import java.lang.reflect.Field;
-import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +21,12 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.mockito.Mockito;
 
 /**
@@ -289,7 +290,7 @@ public final class TestingUtility {
    * @return
    */
   public static String createLocaleSpecificNumberString(Locale loc, boolean minus, String integerPart, String fractionPart, NumberStringPercentSuffix percentSuffix) {
-    DecimalFormatSymbols symbols = ((DecimalFormat) DecimalFormat.getPercentInstance(loc)).getDecimalFormatSymbols();
+    DecimalFormatSymbols symbols = (BEANS.get(NumberFormatProvider.class).getPercentInstance(loc)).getDecimalFormatSymbols();
     StringBuilder sb = new StringBuilder();
     if (minus) {
       sb.append(symbols.getMinusSign());

@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
 /**
  * This class is Thread safe
@@ -186,7 +188,7 @@ public final class DesktopProfiler {
       synchronized (m_listLock) {
         manageListsWithoutLocking();
         //
-        NumberFormat fmt = NumberFormat.getIntegerInstance(NlsLocale.get());
+        NumberFormat fmt = BEANS.get(NumberFormatProvider.class).getIntegerInstance(NlsLocale.get());
         out.println("Max memory:   " + fmt.format(Runtime.getRuntime().maxMemory()));
         out.println("Total memory: " + fmt.format(Runtime.getRuntime().totalMemory()));
         out.println("Free memory:  " + fmt.format(Runtime.getRuntime().freeMemory()));

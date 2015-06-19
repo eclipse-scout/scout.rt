@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons;
+package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -702,21 +703,6 @@ public class DateUtilityTest {
     assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.UK));
 
     assertEquals(DateUtility.isWeekend(todayCalendar.getTime()), DateUtility.isWeekend(todayCalendar.getTime(), Locale.getDefault()));
-  }
-
-  @Test
-  public void testFormatNanos() {
-    assertEquals("0.000000", DateUtility.formatNanos(0L));
-    assertEquals("0.000000", DateUtility.formatNanos(-0L));
-    assertEquals("0.000001", DateUtility.formatNanos(1L));
-    assertEquals("1.000000", DateUtility.formatNanos((long) (1 * 1000 * 1000)));
-    assertEquals("1.234567", DateUtility.formatNanos(1234567L));
-    assertEquals("12.345678", DateUtility.formatNanos(12345678L));
-    assertEquals("123.456789", DateUtility.formatNanos(123456789L));
-    assertEquals("123.000000", DateUtility.formatNanos(123000000L));
-    assertEquals("-0.000001", DateUtility.formatNanos(-1L));
-    assertEquals("9223372036854.775807", DateUtility.formatNanos(Long.MAX_VALUE));
-    assertEquals("-9223372036854.775808", DateUtility.formatNanos(Long.MIN_VALUE));
   }
 
   @Test

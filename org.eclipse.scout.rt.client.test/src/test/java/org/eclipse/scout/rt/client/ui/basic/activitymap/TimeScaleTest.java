@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNull;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.junit.Before;
 import org.junit.Test;
 

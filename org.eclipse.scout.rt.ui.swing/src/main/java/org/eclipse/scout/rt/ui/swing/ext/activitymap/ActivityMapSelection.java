@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.swing.ext.activitymap;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.NumberUtility;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 
 public class ActivityMapSelection {
 

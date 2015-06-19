@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -34,6 +33,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")
@@ -118,7 +119,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   }
 
   protected void initFormat() {
-    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(NlsLocale.get());
+    DecimalFormat format = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get());
     format.setParseBigDecimal(true);
     format.setMinimumFractionDigits(0);
     format.setMaximumFractionDigits(0);

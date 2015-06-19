@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -36,6 +35,7 @@ import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IServiceInventory;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SqlDirectJdbcConnectionProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcDriverNameProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcMappingNameProperty;

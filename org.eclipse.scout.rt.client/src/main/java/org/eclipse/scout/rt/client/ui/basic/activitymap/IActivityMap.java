@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldO
 public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   /**
-   * {@link java.util.Date}[] truncated to day using {@link com.bsiag.DateUtility#truncDate(Date)}
+   * {@link java.util.Date}[] truncated to day using {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#truncDate(Date)}
    */
   String PROP_DAYS = "days";
   /**

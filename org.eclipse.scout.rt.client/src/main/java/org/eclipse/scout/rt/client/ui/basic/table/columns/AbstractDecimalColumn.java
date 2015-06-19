@@ -12,23 +12,29 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDecimalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
 /**
  * Column holding Decimal number
  */
 @ClassId("961989bf-d585-40a2-ab9f-b7e545baaac9")
 public abstract class AbstractDecimalColumn<NUMBER extends Number> extends AbstractNumberColumn<NUMBER> implements IDecimalColumn<NUMBER> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDecimalColumn.class);
 
   public AbstractDecimalColumn() {
     super();
@@ -153,7 +159,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
 
   @Override
   public void setPercent(boolean b) {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
+    DecimalFormat percentDF = (DecimalFormat) BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
     DecimalFormat format = getFormat();
     if (b) {
       format.setPositiveSuffix(percentDF.getPositiveSuffix());
@@ -170,9 +176,15 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
 
   @Override
   public boolean isPercent() {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
-    DecimalFormat internalDF = getFormatInternal();
-    return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
+    NumberFormat percentNF = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
+    if (percentNF instanceof DecimalFormat) {
+      DecimalFormat percentDF = (DecimalFormat) percentNF;
+      DecimalFormat internalDF = getFormatInternal();
+      return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
+    }
+    else {
+      throw new NumberFormatException();
+    }
   }
 
   @Override

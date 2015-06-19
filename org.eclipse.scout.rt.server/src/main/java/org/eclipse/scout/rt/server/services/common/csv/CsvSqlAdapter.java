@@ -29,10 +29,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.csv.CsvHelper;
-import org.eclipse.scout.commons.csv.IDataConsumer;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.util.csv.CsvHelper;
+import org.eclipse.scout.rt.platform.util.csv.IDataConsumer;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISelectStreamHandler;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;

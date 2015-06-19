@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldPars
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyWithFormatField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

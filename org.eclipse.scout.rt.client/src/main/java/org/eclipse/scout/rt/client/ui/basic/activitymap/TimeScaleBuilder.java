@@ -15,8 +15,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.DateFormatProvider;
+import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class TimeScaleBuilder {
@@ -130,11 +132,11 @@ public class TimeScaleBuilder {
     StringBuilder ttBuf = new StringBuilder();
     ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
+    ttBuf.append(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
     ttBuf.append(" - ");
     ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(justBeforeEnd));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(justBeforeEnd));
+    ttBuf.append(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.LONG, NlsLocale.get()).format(justBeforeEnd));
     col.setTooltipText(ttBuf.toString());
     return col;
   }
@@ -148,7 +150,7 @@ public class TimeScaleBuilder {
     // Date b=cal.getTime();
     MajorTimeColumn col = new MajorTimeColumn(scale);
     col.setLargeText(createDayFormatWithWeekDay(DateFormat.MEDIUM).format(a));
-    col.setMediumText(DateFormat.getDateInstance(DateFormat.SHORT, NlsLocale.get()).format(a));
+    col.setMediumText(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, NlsLocale.get()).format(a));
     col.setSmallText(new SimpleDateFormat("dd.MM.", NlsLocale.get()).format(a));
     return col;
   }
@@ -167,7 +169,7 @@ public class TimeScaleBuilder {
     StringBuilder ttBuf = new StringBuilder();
     ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
+    ttBuf.append(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
     col.setTooltipText(ttBuf.toString());
     return col;
   }
@@ -194,7 +196,7 @@ public class TimeScaleBuilder {
     StringBuilder ttBuf = new StringBuilder();
     ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
+    ttBuf.append(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
     ttBuf.append(", ");
     ttBuf.append(new SimpleDateFormat("HH:mm", NlsLocale.get()).format(a));
     ttBuf.append(" - ");
@@ -205,7 +207,7 @@ public class TimeScaleBuilder {
 
   protected SimpleDateFormat createDayFormatWithWeekDay(int dateStyle) {
     String pat;
-    DateFormat df = DateFormat.getDateInstance(dateStyle, NlsLocale.get());
+    DateFormat df = BEANS.get(DateFormatProvider.class).getDateInstance(dateStyle, NlsLocale.get());
     if (df instanceof SimpleDateFormat) {
       pat = ((SimpleDateFormat) df).toPattern();
     }
@@ -219,7 +221,7 @@ public class TimeScaleBuilder {
 
   protected SimpleDateFormat createIntradayFormatWithWeekDay(int dateStyle, int timeStyle) {
     String pat;
-    DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, NlsLocale.get());
+    DateFormat df = BEANS.get(DateFormatProvider.class).getDateTimeInstance(dateStyle, timeStyle, NlsLocale.get());
     if (df instanceof SimpleDateFormat) {
       pat = ((SimpleDateFormat) df).toPattern();
     }

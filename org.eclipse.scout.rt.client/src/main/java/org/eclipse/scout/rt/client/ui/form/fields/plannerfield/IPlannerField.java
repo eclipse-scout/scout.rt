@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * "busy/free" timespans.
  * <p>
  * This class strintly uses java.util.Date staticly AND dynamicly<br>
- * All Date-Objects and subclasses are run through {@link com.bsiag.DateUtility#toUtilDate(java.util.Date)}()
+ * All Date-Objects and subclasses are run through {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#toUtilDate(java.util.Date)}()
  */
 public interface IPlannerField<P extends IPlanner<?, ?>> extends IFormField {
 

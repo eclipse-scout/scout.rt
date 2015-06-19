@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -27,6 +26,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 
 /**
  * Column holding Number
@@ -118,7 +120,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   protected void initFormat() {
-    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(NlsLocale.get());
+    DecimalFormat format = BEANS.get(NumberFormatProvider.class).getNumberInstance(NlsLocale.get());
     format.setParseBigDecimal(true);
     format.setMinimumFractionDigits(0);
     format.setMaximumFractionDigits(0);

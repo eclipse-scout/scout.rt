@@ -8,17 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons;
+package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BEANS;
 
 public final class FormattingUtility {
   private FormattingUtility() {
@@ -49,7 +49,7 @@ public final class FormattingUtility {
       ret = (String) o;
     }
     else if (o instanceof Date) {
-      ret = DateFormat.getDateInstance(DateFormat.MEDIUM, loc).format(o);
+      ret = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, loc).format(o);
 
       // get time hours, minutes, seconds
       Calendar cal = Calendar.getInstance();
@@ -60,17 +60,17 @@ public final class FormattingUtility {
       // if time different to 00:00:00
       // format with time
       if (hour != 0 || minute != 0 || second != 0) {
-        ret = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(o);
+        ret = BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(o);
       }
     }
     else if (o instanceof Float || o instanceof Double || o instanceof BigDecimal) {
-      NumberFormat f = DecimalFormat.getInstance(loc);
+      NumberFormat f = BEANS.get(NumberFormatProvider.class).getNumberInstance(loc);
       f.setMinimumFractionDigits(2);
       f.setMaximumFractionDigits(2);
       ret = f.format(o);
     }
     else if (o instanceof Number) {
-      ret = NumberFormat.getNumberInstance(loc).format(o);
+      ret = BEANS.get(NumberFormatProvider.class).getNumberInstance(loc).format(o);
     }
     else if (o instanceof Boolean) {
       ret = ((Boolean) o) ? "X" : "";

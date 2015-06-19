@@ -22,6 +22,8 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.decimalfield.IDecimalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
 @ClassId("f4ec575e-f572-418d-a49c-3d0811ea7540")
 public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T> implements IDecimalField<T> {
@@ -166,7 +168,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   @Override
   public void setPercent(boolean b) {
     try {
-      DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
+      DecimalFormat percentDF = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
       DecimalFormat format = getFormat();
       if (b) {
         format.setPositiveSuffix(percentDF.getPositiveSuffix());
@@ -187,7 +189,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public boolean isPercent() {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
+    DecimalFormat percentDF = BEANS.get(NumberFormatProvider.class).getPercentInstance(NlsLocale.get());
     DecimalFormat internalDF = getFormatInternal();
     return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
   }

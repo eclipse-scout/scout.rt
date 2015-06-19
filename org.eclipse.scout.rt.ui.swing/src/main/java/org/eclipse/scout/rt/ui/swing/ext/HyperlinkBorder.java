@@ -26,9 +26,9 @@ import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
 import javax.swing.plaf.ColorUIResource;
 
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 
 public class HyperlinkBorder extends AbstractBorder {
   private static final long serialVersionUID = 1L;

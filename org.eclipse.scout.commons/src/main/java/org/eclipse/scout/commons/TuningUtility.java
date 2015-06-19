@@ -179,7 +179,7 @@ public final class TuningUtility {
     }
     b.append(label);
     b.append(" took ");
-    b.append(DateUtility.formatNanos(dtNanos));
+    b.append(StringUtility.formatNanos(dtNanos));
     b.append("ms");
     System.out.println(b);
   }
@@ -194,20 +194,20 @@ public final class TuningUtility {
       for (long n : seriesSorted) {
         sum += n;
       }
-      b.append(" sum=" + DateUtility.formatNanos((long) sum));
+      b.append(" sum=" + StringUtility.formatNanos((long) sum));
       long avg = (long) (sum / seriesSorted.length);
       b.append("ms");
       b.append(" min=");
-      b.append(DateUtility.formatNanos(seriesSorted[0]));
+      b.append(StringUtility.formatNanos(seriesSorted[0]));
       b.append("ms");
       b.append(" avg=");
-      b.append(DateUtility.formatNanos(avg));
+      b.append(StringUtility.formatNanos(avg));
       b.append("ms");
       b.append(" median=");
-      b.append(DateUtility.formatNanos(seriesSorted[seriesSorted.length / 2]));
+      b.append(StringUtility.formatNanos(seriesSorted[seriesSorted.length / 2]));
       b.append("ms");
       b.append(" max=");
-      b.append(DateUtility.formatNanos(seriesSorted[seriesSorted.length - 1]));
+      b.append(StringUtility.formatNanos(seriesSorted[seriesSorted.length - 1]));
       b.append("ms");
       // remove smallest and largest 1%
       int start = Math.max(1, seriesSorted.length / 100);
@@ -218,19 +218,19 @@ public final class TuningUtility {
         for (int i = start; i <= end; i++) {
           sum += seriesSorted[i];
         }
-        b.append(" sum=" + DateUtility.formatNanos((long) sum));
+        b.append(" sum=" + StringUtility.formatNanos((long) sum));
         avg = (long) (sum / (end - start));
         b.append(" min=");
-        b.append(DateUtility.formatNanos(seriesSorted[start]));
+        b.append(StringUtility.formatNanos(seriesSorted[start]));
         b.append("ms");
         b.append(" avg=");
-        b.append(DateUtility.formatNanos(avg));
+        b.append(StringUtility.formatNanos(avg));
         b.append("ms");
         b.append(" median=");
-        b.append(DateUtility.formatNanos(seriesSorted[seriesSorted.length / 2]));
+        b.append(StringUtility.formatNanos(seriesSorted[seriesSorted.length / 2]));
         b.append("ms");
         b.append(" max=");
-        b.append(DateUtility.formatNanos(seriesSorted[end]));
+        b.append(StringUtility.formatNanos(seriesSorted[end]));
         b.append("ms");
         b.append("]");
       }

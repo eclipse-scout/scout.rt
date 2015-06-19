@@ -542,4 +542,19 @@ public class StringUtilityTest {
     assertNotNull(StringUtility.nullIfEmpty("test"));
   }
 
+  @Test
+  public void testFormatNanos() {
+    assertEquals("0.000000", StringUtility.formatNanos(0L));
+    assertEquals("0.000000", StringUtility.formatNanos(-0L));
+    assertEquals("0.000001", StringUtility.formatNanos(1L));
+    assertEquals("1.000000", StringUtility.formatNanos((long) (1 * 1000 * 1000)));
+    assertEquals("1.234567", StringUtility.formatNanos(1234567L));
+    assertEquals("12.345678", StringUtility.formatNanos(12345678L));
+    assertEquals("123.456789", StringUtility.formatNanos(123456789L));
+    assertEquals("123.000000", StringUtility.formatNanos(123000000L));
+    assertEquals("-0.000001", StringUtility.formatNanos(-1L));
+    assertEquals("9223372036854.775807", StringUtility.formatNanos(Long.MAX_VALUE));
+    assertEquals("-9223372036854.775808", StringUtility.formatNanos(Long.MIN_VALUE));
+  }
+
 }

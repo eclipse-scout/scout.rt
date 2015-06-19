@@ -14,13 +14,14 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +64,7 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
     BigInteger testValue = BigInteger.valueOf(-123456789);
     cell.setValue(testValue);
 
-    DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.CANADA_FRENCH);
+    DecimalFormat df = BEANS.get(NumberFormatProvider.class).getNumberInstance(Locale.CANADA_FRENCH);
     setFormat(df);
 
     decorateCellInternal(cell, row);

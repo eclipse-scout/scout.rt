@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.csv;
+package org.eclipse.scout.rt.platform.util.csv;
 
 import java.util.List;
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.csv;
+package org.eclipse.scout.rt.platform.util.csv;
 
 /**
  * Title: BSI Scout V3
@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +41,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.DateFormatProvider;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 
 public class CsvHelper {
   /**
@@ -145,7 +147,7 @@ public class CsvHelper {
           ((DecimalFormat) f).setParseIntegerOnly(true);
         }
         else {
-          f = NumberFormat.getIntegerInstance(m_locale);
+          f = BEANS.get(NumberFormatProvider.class).getIntegerInstance(m_locale);
         }
       }
       else if ("float".startsWith(sLow)) {
@@ -153,7 +155,7 @@ public class CsvHelper {
           f = new DecimalFormat(s.substring(6), new DecimalFormatSymbols(m_locale));
         }
         else {
-          f = NumberFormat.getNumberInstance(m_locale);
+          f = BEANS.get(NumberFormatProvider.class).getNumberInstance(m_locale);
         }
       }
       else if ("date".startsWith(sLow)) {
@@ -161,7 +163,7 @@ public class CsvHelper {
           f = new SimpleDateFormat(s.substring(5), m_locale);
         }
         else {
-          f = DateFormat.getDateInstance(DateFormat.SHORT, m_locale);
+          f = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, m_locale);
         }
       }
       else {

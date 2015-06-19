@@ -8,19 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons;
+package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Random;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BEANS;
 
 public final class NumberUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(NumberUtility.class);
@@ -384,7 +387,7 @@ public final class NumberUtility {
       return "";
     }
     Locale loc = NlsLocale.get();
-    return NumberFormat.getInstance(loc).format(n);
+    return BEANS.get(NumberFormatProvider.class).getNumberInstance(loc).format(n);
   }
 
   /**
