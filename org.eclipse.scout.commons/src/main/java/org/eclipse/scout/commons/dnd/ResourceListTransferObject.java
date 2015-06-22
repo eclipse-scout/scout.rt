@@ -16,10 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
 
-/**
- * @since Build 202
- */
-
 public class ResourceListTransferObject extends TransferObject {
   private List<BinaryResource> m_resources;
 
