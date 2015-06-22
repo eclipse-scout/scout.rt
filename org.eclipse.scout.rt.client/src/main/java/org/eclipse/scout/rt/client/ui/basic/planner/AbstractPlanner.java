@@ -118,6 +118,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
    * Configuration
    */
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(5)
+  protected String getConfiguredLabel() {
+    return null;
+  }
+
   @Order(10)
   protected Set<Integer> getConfiguredAvailableDisplayModes() {
     return CollectionUtility.hashSet(
@@ -289,6 +295,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     m_activityMapUIFacade = createUIFacade();
 //    m_cellObserver = new P_ActivityCellObserver();
     //
+    setLabel(getConfiguredLabel());
     setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
@@ -972,6 +979,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
+  public void setLabel(String label) {
+    propertySupport.setPropertyString(PROP_LABEL, label);
+  }
+
+  @Override
+  public String getLabel() {
+    return propertySupport.getPropertyString(PROP_LABEL);
+  }
+
+  @Override
   public void setHeaderVisible(boolean visible) {
     propertySupport.setPropertyBool(PROP_HEADER_VISIBLE, visible);
   }
@@ -1055,8 +1072,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {

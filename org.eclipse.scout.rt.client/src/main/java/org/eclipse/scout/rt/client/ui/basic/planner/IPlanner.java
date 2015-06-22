@@ -59,6 +59,11 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   String PROP_INTRADAY_INTERVAL = "intradayInterval";
 
   /**
+   * {@link String}
+   */
+  String PROP_LABEL = "label";
+
+  /**
    * {@link Boolean}
    */
   String PROP_HEADER_VISIBLE = "headerVisible";
@@ -132,6 +137,10 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    * </pre>
    */
   void setPlannerChanging(boolean b);
+
+  String getLabel();
+
+  void setLabel(String label);
 
   Range<Date> getViewRange();
 
