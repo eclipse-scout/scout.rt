@@ -29,6 +29,7 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   String PROP_INSERT_TEXT = "insertText";
   String PROP_SELECTION_START = "selectionStart";
   String PROP_SELECTION_END = "selectionEnd";
+  String PROP_SPELL_CHECK_ENABLED = "spellCheckEnabled";
 
   /* enum for formats */
   String FORMAT_UPPER = "A";
@@ -77,22 +78,7 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   @Override
   IStringFieldUIFacade getUIFacade();
 
-  /**
-   * Returns whether this field is spell checkable.
-   */
   boolean isSpellCheckEnabled();
 
-  /**
-   * Returns whether this field should be monitored for spelling errors in the
-   * background ("check as you type"). If it is not defined, null is returned,
-   * then the application default is used.
-   */
-  Boolean isSpellCheckAsYouTypeEnabled();
-
-  /**
-   * Sets whether to monitor this field for spelling errors in the background
-   * ("check as you type"). Use null for application default.
-   */
-  void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling);
-
+  void setSpellCheckEnabled(boolean spellCheckEnabled);
 }

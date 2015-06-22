@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFi
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDropRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldLinkActionChain;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -39,7 +38,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
-  private Boolean m_monitorSpelling = null; // If null the application-wide
 
   // default is used
 
@@ -227,6 +225,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     }
     setDropType(configuredDropType);
     setHtmlEnabled(getConfiguredHtmlEnabled());
+    setSpellCheckEnabled(computeSpellCheckEnabled());
   }
 
   @Override
@@ -454,36 +453,26 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
-   * Returns whether this text component is spell checkable.
+   * Compute whether this field is spell checkable (based on several field settings).
+   * <p>
+   * Method called by {@link AbstractStringField#initConfig()} to set an initial value for
+   * {@link AbstractStringField#setSpellCheckEnabled(boolean)}.
    */
-  @Override
-  public boolean isSpellCheckEnabled() {
-    return (!this.isDecorationLink()
+  protected boolean computeSpellCheckEnabled() {
+    return !this.isDecorationLink()
         && !this.isFormatUpper()
         && !this.isFormatLower()
-        && this.isEnabled()
-        && this.isEnabledGranted() && (!(this.getForm() instanceof ISearchForm)));
+        && this.isMultilineText();
   }
 
-  /**
-   * Returns whether this text component should be monitored for spelling errors
-   * in the background ("check as you type").<br>
-   * If it is not defined, null is returned, then the application default is
-   * used.
-   */
   @Override
-  public Boolean isSpellCheckAsYouTypeEnabled() {
-    return m_monitorSpelling;
+  public void setSpellCheckEnabled(boolean spellCheckEnabled) {
+    propertySupport.setPropertyBool(PROP_SPELL_CHECK_ENABLED, spellCheckEnabled);
   }
 
-  /**
-   * Sets whether to monitor this text component for spelling errors in the
-   * background ("check as you type").<br>
-   * Use null for application default.
-   */
   @Override
-  public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
-    m_monitorSpelling = Boolean.valueOf(monitorSpelling);
+  public boolean isSpellCheckEnabled() {
+    return propertySupport.getPropertyBool(PROP_SPELL_CHECK_ENABLED);
   }
 
   @Override
