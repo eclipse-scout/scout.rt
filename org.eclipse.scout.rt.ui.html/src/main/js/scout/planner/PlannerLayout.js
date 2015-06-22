@@ -5,7 +5,7 @@ scout.PlannerLayout = function(planner) {
 scout.inherits(scout.PlannerLayout, scout.AbstractLayout);
 
 scout.PlannerLayout.prototype.layout = function($container) {
-  var $header = this.planner.$header,
+  var $header = this.planner._header.$container,
     $scale = this.planner.$scale,
     $grid = this.planner.$grid,
     menuBar = this.planner.menuBar,
@@ -115,7 +115,7 @@ scout.PlannerLayout.prototype._minWidth = function() {
   } else if ((this.planner.displayMode === DISPLAY_MODE.WORK) || (this.planner.displayMode === DISPLAY_MODE.WEEK)) {
     scaleItemMinWidth = 170;
   } else if (this.planner.displayMode === DISPLAY_MODE.MONTH) {
-    scaleItemMinWidth = 250;
+    scaleItemMinWidth = 450;
   } else if (this.planner.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
     scaleItemMinWidth = 150;
   } else if (this.planner.displayMode === DISPLAY_MODE.YEAR) {

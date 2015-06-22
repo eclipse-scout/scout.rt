@@ -89,6 +89,7 @@ __include("scout/messagebox/MessageBoxControlKeyStrokes.js");
 __include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
 __include("scout/messagebox/MessageBoxModelAdapter.js");
 __include("scout/planner/Planner.js");
+__include("scout/planner/PlannerHeader.js");
 __include("scout/planner/PlannerLayout.js");
 __include("scout/planner/PlannerMenuItemsOrder.js");
 __include("scout/filechooser/FileChooser.js");

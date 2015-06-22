@@ -1,4 +1,4 @@
-@planner-header-height: 45px;
+@planner-scale-height: 45px;
 @planner-resource-minheight: 30px;
 @planner-resource-title-width: 150px;
 @resource-padding-x: 5px;
@@ -32,107 +32,10 @@
   }
 }
 
-.planner-header {
-  height: @planner-header-height;
-  min-width: 100px;
-  overflow: hidden;
-
-  & .planner-range {
-    display:inline-block;
-
-    & .planner-minus,
-    & .planner-plus {
-      cursor: pointer;
-      display: inline-block;
-    }
-
-    & .planner-select {
-      display: inline-block;
-      font-size: 17px;
-      position: relative;
-      top: -5px;
-      left: 2px;
-    }
-
-    & .planner-minus:hover::before,
-    & .planner-plus:hover::before {
-      color: @hover-color;
-    }
-
-    & .planner-minus::before {
-      .planner-icon(@icon-angle-left, 29px);
-    }
-
-    & .planner-plus::before {
-      .planner-icon(@icon-angle-right, 29px);
-    }
-  }
-
-  & .planner-commands {
-    float: right;
-
-    & * {
-      display: inline-block;
-      cursor: pointer;
-    }
-
-    & .planner-today::before {
-      .planner-icon(@icon-target, 20px);
-    }
-
-    & .planner-mode-day::before {
-      .planner-icon("1", 20px);
-     }
-
-    & .planner-mode-work::before {
-      .planner-icon("5", 20px);
-     }
-
-    & .planner-mode-week::before {
-      .planner-icon("7", 20px);
-     }
-
-    & .planner-mode-month::before {
-      .planner-icon("31", 20px);
-     }
-
-     & .planner-mode-cw::before {
-      .planner-icon("52", 20px);
-     }
-
-     & .planner-mode-year::before {
-      .planner-icon("365", 20px);
-      padding: 0 35px 0px 8px;
-     }
-
-
-    & .planner-toggle-year::before {
-      .planner-icon(@icon-clock, 20px);
-     }
-
-    & .planner-toggle-list::before {
-      .planner-icon(@icon-menu, 20px);
-     }
-
-    & .planner-separator {
-      box-sizing: content-box;
-      width: 20px;
-      height: 25px;
-    }
-
-    & *:hover::before, & *:hover,
-    & .selected::before, & .selected {
-      color: @hover-color;
-    }
-
-  }
-
-}
-
 .planner-scale {
   position: absolute;
   right: 0px;
-  height: @planner-header-height;
+  height: @planner-scale-height;
   border-bottom:  1px solid @palette-gray-4;
   width: 100%;
   /* for horizontal scrollbars */
@@ -157,16 +60,16 @@
     & > .timeline-large {
       height: 50%;
       background-color: @palette-gray-2;
-      line-height: @planner-header-height / 2;
+      line-height: @planner-scale-height / 2;
 
       & > .scale-item > .planner-large-scale-item-line {
-        height: @planner-header-height;
+        height: @planner-scale-height;
       }
     }
 
     & > .timeline-small {
       height: 50%;
-      line-height: @planner-header-height / 2;
+      line-height: @planner-scale-height / 2;
     }
   }
 }
@@ -177,7 +80,7 @@
    padding: 0px @resource-padding-x;
    font-size: 17px;
    color: @palette-gray-6;
-   line-height: @planner-header-height;
+   line-height: @planner-scale-height;
    width: @planner-resource-title-width;
  }
 

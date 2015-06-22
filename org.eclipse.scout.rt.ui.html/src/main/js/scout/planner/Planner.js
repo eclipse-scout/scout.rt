@@ -13,7 +13,6 @@ scout.Planner = function() {
 
   // main elements
   this.$container;
-  this.$header;
   this.$range;
   this.$modes;
   this.$grid;
@@ -57,9 +56,13 @@ scout.Planner.prototype.init = function(model, session) {
   scout.Planner.parent.prototype.init.call(this, model, session);
   this._yearPanel = new scout.YearPanel(session);
   this.addChild(this._yearPanel);
+  this._header = new scout.PlannerHeader(session);
+  this.addChild(this._header);
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }
+  this._syncDisplayMode(this.displayMode);
+  this._syncAvailableDisplayModes(this.availableDisplayModes);
   this._syncViewRange(this.viewRange);
   this._syncSelectedResources(this.selectedResources);
   this._syncSelectionRange(this.selectionRange);
@@ -86,7 +89,12 @@ scout.Planner.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   // main elements
-  this.$header = this.$container.appendDiv('planner-header');
+  this._header.render(this.$container);
+  this._header.on('todayClick', this._onTodayClick.bind(this));
+  this._header.on('yearClick', this._onYearClick.bind(this));
+  this._header.on('previousClick', this._onPreviousClick.bind(this));
+  this._header.on('nextClick', this._onNextClick.bind(this));
+  this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
   this._yearPanel.render(this.$container);
   this.$grid = this.$container.appendDiv('planner-grid')
     .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
@@ -96,27 +104,17 @@ scout.Planner.prototype._render = function($parent) {
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render(this.$container);
 
+  // scrollbars
   scout.scrollbars.install(this.$grid);
   this.session.detachHelper.pushScrollable(this.$grid);
   this._gridScrollHandler = this._onGridScroll.bind(this);
   this.$grid.on('scroll', this._gridScrollHandler);
-
-  // header contains all controls
-  this.$range = this.$header.appendDiv('planner-range');
-  this.$range.appendDiv('planner-minus').click(this._onClickPrevious.bind(this));
-  this.$range.appendDiv('planner-plus').click(this._onClickNext.bind(this));
-  this.$range.appendDiv('planner-select');
-
-  // and modes
-  this.$commands = this.$header.appendDiv('planner-commands');
-  this._renderAvailableDisplayModes();
 };
 
 scout.Planner.prototype._renderProperties = function() {
   scout.Planner.parent.prototype._renderProperties.call(this);
 
   this._renderViewRange();
-  this._renderDisplayMode();
   this._renderHeaderVisible();
   this._renderMenus();
   this._renderYearPanelVisible();
@@ -129,11 +127,11 @@ scout.Planner.prototype._renderProperties = function() {
 
 /* -- basics, events -------------------------------------------- */
 
-scout.Planner.prototype._onClickPrevious = function(event) {
+scout.Planner.prototype._onPreviousClick = function(event) {
   this._navigateDate(scout.Planner.Direction.BACKWARD);
 };
 
-scout.Planner.prototype._onClickNext = function(event) {
+scout.Planner.prototype._onNextClick = function(event) {
   this._navigateDate(scout.Planner.Direction.FORWARD);
 };
 
@@ -161,7 +159,7 @@ scout.Planner.prototype._navigateDate = function(direction) {
   this.setViewRange(viewRange);
 };
 
-scout.Planner.prototype._onClickToday = function(event) {
+scout.Planner.prototype._onTodayClick = function(event) {
   // new selected date
   this.selected = new Date();
   //FIXME CGU
@@ -169,12 +167,12 @@ scout.Planner.prototype._onClickToday = function(event) {
 //  this.setViewRange()
 };
 
-scout.Planner.prototype._onClickDisplayMode = function(event) {
-  var displayMode = $(event.target).data('mode');
+scout.Planner.prototype._onDisplayModeClick = function(event) {
+  var displayMode = event.displayMode;
   this.setDisplayMode(displayMode);
 };
 
-scout.Planner.prototype._onClickYear = function(event) {
+scout.Planner.prototype._onYearClick = function(event) {
   this.setYearPanelVisible(!this.yearPanelVisible);
 };
 
@@ -255,7 +253,7 @@ scout.Planner.prototype._renderRange = function() {
   }
 
   // set text
-  $('.planner-select', this.$range).text(text);
+  $('.planner-select', this._header.$range).text(text);
 };
 
 scout.Planner.prototype._renderScale = function() {
@@ -737,7 +735,7 @@ scout.Planner.prototype._renderViewRange = function() {
 };
 
 scout.Planner.prototype._renderHeaderVisible = function() {
-  this.$header.setVisible(this.headerVisible);
+  this._header.setVisible(this.headerVisible);
   this.invalidateTree();
 };
 
@@ -809,36 +807,11 @@ scout.Planner.prototype._renderLastHourOfDay = function() {};
 scout.Planner.prototype._renderIntradayInterval = function() {};
 
 scout.Planner.prototype._renderAvailableDisplayModes = function() {
-  var DISPLAY_MODE = scout.Planner.DisplayMode;
-  this.$commands.empty();
-
-  this.$commands.appendDiv('planner-today').click(this._onClickToday.bind(this));
-  this.$commands.appendDiv('planner-separator');
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.DAY) > -1) {
-    this.$commands.appendDiv('planner-mode-day planner-mode').attr('data-mode', DISPLAY_MODE.DAY).click(this._onClickDisplayMode.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WORK) > -1) {
-    this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', DISPLAY_MODE.WORK).click(this._onClickDisplayMode.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WEEK) > -1) {
-    this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', DISPLAY_MODE.WEEK).click(this._onClickDisplayMode.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.MONTH) > -1) {
-    this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', DISPLAY_MODE.MONTH).click(this._onClickDisplayMode.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.CALENDAR_WEEK) > -1) {
-    this.$commands.appendDiv('planner-mode-cw planner-mode').attr('data-mode', DISPLAY_MODE.CALENDAR_WEEK).click(this._onClickDisplayMode.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.YEAR) > -1) {
-    this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', DISPLAY_MODE.YEAR).click(this._onClickDisplayMode.bind(this));
-  }
-  this.$commands.appendDiv('planner-separator');
-  this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
+  // done by PlannerHeader.js
 };
 
 scout.Planner.prototype._renderDisplayMode = function() {
-  $('.planner-mode', this.$commands).select(false);
-  $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
+  // done by PlannerHeader.js
 };
 
 scout.Planner.prototype._syncViewRange = function(viewRange) {
@@ -853,6 +826,12 @@ scout.Planner.prototype._syncViewRange = function(viewRange) {
 scout.Planner.prototype._syncDisplayMode = function(displayMode) {
   this.displayMode = displayMode;
   this._yearPanel.setDisplayMode(this.displayMode);
+  this._header.setDisplayMode(this.displayMode);
+};
+
+scout.Planner.prototype._syncAvailableDisplayModes = function(availableDisplayModes) {
+  this.availableDisplayModes = availableDisplayModes;
+  this._header.setAvailableDisplayModes(this.availableDisplayModes);
 };
 
 scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
@@ -937,7 +916,9 @@ scout.Planner.prototype._renderSelectedActivity = function() {
 
 scout.Planner.prototype._renderLabel = function() {
   var label = this.label || '';
-  this.$scaleTitle.text(label);
+  if (this.$scaleTitle) {
+    this.$scaleTitle.text(label);
+  }
 };
 
 scout.Planner.prototype._resourcesByIds = function(ids) {
