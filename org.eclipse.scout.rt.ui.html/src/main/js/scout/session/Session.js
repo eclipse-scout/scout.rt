@@ -77,6 +77,7 @@ scout.Session = function($entryPoint, options) {
   this.detachHelper = new scout.DetachHelper(this);
   this._backgroundJobPollingEnabled = (options.backgroundJobPollingEnabled!== false);
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
+  this._fatalMessagesOnScreen = {};
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -546,7 +547,7 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
         this.optText('UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.text('Ignore');
   }
-  this.showFatalMessage(boxOptions);
+  this.showFatalMessage(boxOptions, jsonError.code);
 };
 
 scout.Session.prototype._fireRequestFinished = function(message) {
@@ -565,7 +566,24 @@ scout.Session.prototype._fireRequestFinished = function(message) {
   }
 };
 
-scout.Session.prototype.showFatalMessage = function(options) {
+/**
+ * Shows a UI-only message box.
+ *
+ * @param options
+ *          Options for the message box, see scout.MessageBox
+ * @param errorCode
+ *          If defined, a second call to this method with the same errorCode will
+ *          do nothing. Can be used to prevent double messages for the same error.
+ */
+scout.Session.prototype.showFatalMessage = function(options, errorCode) {
+  if (errorCode) {
+    if (this._fatalMessagesOnScreen[errorCode]) {
+      return;
+    }
+    this._fatalMessagesOnScreen[errorCode] = true;
+  }
+  this._setApplicationLoading(false);
+
   options = options || {};
   var model = {
     iconId: options.iconId,
@@ -577,10 +595,19 @@ scout.Session.prototype.showFatalMessage = function(options) {
     noButtonText: options.noButtonText,
     cancelButtonText: options.cancelButtonText
   };
+
   var ui = new scout.MessageBox(model, this);
-  ui.on('buttonClick', function(event) {
+  ui.on('buttonClick', onButtonClick.bind(this));
+  ui.render(this.$entryPoint);
+
+  // ----- Helper functions -----
+
+  function onButtonClick(event) {
+    delete this._fatalMessagesOnScreen[errorCode];
+
     // Close message box
     ui.remove();
+
     // Custom actions
     var option = event.option;
     if (option === 'yes' && options.yesButtonAction) {
@@ -590,10 +617,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
     } else if (option === 'cancel' && options.cancelButtonAction) {
       options.cancelButtonAction.apply(this);
     }
-  }.bind(this));
-
-  this._setApplicationLoading(false);
-  ui.render(this.$entryPoint);
+  }
 };
 
 scout.Session.prototype.uploadFiles = function(target, files) {

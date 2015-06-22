@@ -65,7 +65,7 @@ scout._installGlobalJavascriptErrorHandler = function() {
           noButtonText: session.optText('Ignore', 'Ignore'),
           hiddenText: logStr
         };
-        session.showFatalMessage(boxOptions);
+        session.showFatalMessage(boxOptions, errorCode);
       }
     } catch (err) {
       throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');
@@ -73,6 +73,12 @@ scout._installGlobalJavascriptErrorHandler = function() {
 
     // ----- Helper functions -----
 
+    /**
+     * Generate a "cool looking" error code from the JS error object, that
+     * does not reveal too much technical information, but at least indicates
+     * that a JS runtime error has occurred. (In contrast, fatal errors from
+     * the server have numeric error codes.)
+     */
     function getJsErrorCode(error) {
       if (error) {
         if (error.name === 'EvalError') {
