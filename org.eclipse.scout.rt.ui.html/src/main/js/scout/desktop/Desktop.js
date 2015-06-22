@@ -58,7 +58,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.splitter = new scout.Splitter({
     $anchor: this.navigation.$navigation,
     $root: this.$container,
-    maxRatio: 0.33
+    maxRatio: 0.5
   });
   this.splitter.render($parent);
   this.splitter.on('resize', this.onSplitterResize.bind(this));
@@ -488,6 +488,15 @@ scout.Desktop.TabAndContent = function(desktop, content, title, subTitle) {
   this._desktop = desktop;
   this.$container;
   this.$storage;
+
+  this._contentPropertyChangeListener = function(event) {
+    if (event.properties.title !== undefined || event.properties.subTitle !== undefined) {
+      this.title = scout.helpers.nvl(event.properties.title, this.title);
+      this.subTitle = scout.helpers.nvl(event.properties.subTitle, this.subTitle);
+      this._desktop._updateTab(this);
+    }
+  }.bind(this);
+
   this._update(content, title, subTitle);
 };
 
@@ -499,20 +508,14 @@ scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitl
   this._installPropertyChangeListener();
 };
 
-scout.Desktop.TabAndContent.prototype._uninstallPropertyChangeListener = function() {
+scout.Desktop.TabAndContent.prototype._installPropertyChangeListener = function() {
   if (this.content instanceof scout.ModelAdapter) {
-    this.content.off('propertyChange');
+    this.content.on('propertyChange', this._contentPropertyChangeListener);
   }
 };
 
-scout.Desktop.TabAndContent.prototype._installPropertyChangeListener = function() {
+scout.Desktop.TabAndContent.prototype._uninstallPropertyChangeListener = function() {
   if (this.content instanceof scout.ModelAdapter) {
-    this.content.on('propertyChange', function(event) {
-      if (event.properties.title !== undefined || event.properties.subTitle !== undefined) {
-        this.title = scout.helpers.nvl(event.properties.title, this.title);
-        this.subTitle = scout.helpers.nvl(event.properties.subTitle, this.subTitle);
-        this._desktop._updateTab(this);
-      }
-    }.bind(this));
+    this.content.off('propertyChange', this._contentPropertyChangeListener);
   }
 };
