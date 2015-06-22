@@ -17,6 +17,14 @@ scout.MenuBar = function(session, menuSorter) {
   this.visibleMenuItems = [];
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+
+  this._menuItemPropertyChangeListener = function() {
+    // We do not update the items directly, because this listener may be fired many times in one
+    // user request (because many menus change one or more properties). Therefore, we just invalidate
+    // the MenuBarLayout. It will be updated automatically after the user request has finished,
+    // because the layout calls rebuildItems().
+    scout.HtmlComponent.get(this.$container).invalidateTree();
+  }.bind(this);
 };
 scout.inherits(scout.MenuBar, scout.Widget);
 
@@ -63,6 +71,7 @@ scout.MenuBar.prototype.large = function() {
 scout.MenuBar.prototype._remove = function() {
   scout.MenuBar.parent.prototype._remove.call(this);
   this.menuItems.forEach(function(item) {
+    item.off('propertyChange', this._menuItemPropertyChangeListener);
     item.remove();
   });
 };
@@ -81,7 +90,7 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   } else {
     this._updateItems(menuItems);
     // Re-layout menubar (because items might have changed)
-    scout.HtmlComponent.get(this.$container).revalidate();
+    scout.HtmlComponent.get(this.$container).invalidateTree();
   }
 
   function isNotSeparator(item) {
@@ -97,6 +106,7 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   // remove DOM for existing menu items and destroy items that have
   // been created by the menuSorter (e.g. separators).
   this.menuItems.forEach(function(item) {
+    item.off('propertyChange', this._menuItemPropertyChangeListener);
     if (item.createdBy === this.menuSorter) {
       item.destroy();
     } else {
@@ -114,6 +124,7 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   this.visibleMenuItems = this.menuItems;
   this._lastVisibleItemLeft = null;
   this._lastVisibleItemRight = null;
+  this._defaultMenu = null;
 
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
   // float:right. In Firefox elements with float:right must come first in the HTML order
@@ -123,6 +134,9 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   var lastVisibleItem = this._lastVisibleItemRight || this._lastVisibleItemLeft;
   if (lastVisibleItem) {
     lastVisibleItem.$container.addClass('last');
+  }
+  if (this._defaultMenu) {
+    this._defaultMenu.$container.addClass('default-menu');
   }
 
   // Make first valid MenuItem tabbable so that it can be focused. All other items
@@ -206,6 +220,13 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
         this._lastVisibleItemLeft = item;
       }
     }
+    // First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
+    if (!this._defaultMenu && item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
+      this._defaultMenu = item;
+    }
+    // Attach a propertyChange listener to the item, so the menubar can be updated when one of
+    // its items changes (e.g. visible, keystroke etc.)
+    item.on('propertyChange', this._menuItemPropertyChangeListener);
   }.bind(this));
 };
 

@@ -4,7 +4,6 @@ scout.Menu = function() {
   this._addAdapterProperties('childActions');
   this.popup;
   this.keyStrokeAdapter;
-  this.defaultMenu = false;
 
   /**
    * This property is true when the menu instance was moved into a overflow-menu
@@ -48,9 +47,6 @@ scout.Menu.prototype._renderItem = function($parent) {
     if (scout.Action.ActionStyle.BUTTON === this.actionStyle ||
         scout.Action.ActionStyle.TOGGLE === this.actionStyle) {
       this.$container.addClass('menu-button');
-    }
-    if (this.defaultMenu) {
-      this.$container.addClass('default-menu');
     }
   }
 };

@@ -3,11 +3,15 @@ scout.EventSupport = function() {
 };
 
 scout.EventSupport.prototype.on = function(type, func) {
+  if (!func) {
+    $.log.warn('Missing callback function');
+    return; // TODO CGU Should we throw an error?
+  }
+
   var listener = {
     type: type,
     func: func
   };
-
   this.addListener(listener);
   return listener;
 };
@@ -20,13 +24,15 @@ scout.EventSupport.prototype.off = function(type, func) {
   var listeners = this._eventListeners.slice();
   for (var i = 0; i < listeners.length; i++) {
     var listener = listeners[i];
+    var funcMatches = (func === listener.func);
+    var typeMatches = (type === listener.type);
     var remove = false;
     if (func && type) {
-      remove = func === listener.func && type === listener.type;
+      remove = (funcMatches && typeMatches);
     } else if (func) {
-      remove = func === listener.func;
+      remove = funcMatches;
     } else if (type) {
-      remove = type === listener.type;
+      remove = typeMatches;
     }
 
     if (remove) {
@@ -47,13 +53,15 @@ scout.EventSupport.prototype.trigger = function(type, event) {
   event = event || {};
   event.type = type;
 
-  var listener;
-  for (var i = 0; i < this._eventListeners.length; i++) {
-    listener = this._eventListeners[i];
+  var listeners = this._eventListeners.slice();
+  for (var i = 0; i < listeners.length; i++) {
+    var listener = listeners[i];
     if (!listener.type || typeMatches(event.type, listener.type)) {
       listener.func(event);
     }
   }
+
+  // ---- Helper functions -----
 
   function typeMatches(eventType, listenerType) {
     var i, types = listenerType.split(' ');

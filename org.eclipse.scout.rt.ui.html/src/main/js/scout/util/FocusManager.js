@@ -38,7 +38,7 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container, $fo
     var $focusableElement = $($focusableElements[i]);
     var menuParents = $focusableElement.parents('div.menubar');
     var tabParents = $focusableElement.parents('div.tab-area');
-    if (!firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
+    if (!firstDefaultButton && $($focusableElements[i]).is('.default-menu')) {
       firstDefaultButton = $focusableElements[i];
     }
     if (!$firstButton && ($focusableElement.hasClass('button') || $focusableElement.hasClass('menu-item'))) {

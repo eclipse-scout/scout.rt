@@ -54,10 +54,6 @@ scout.Button.prototype._render = function($parent) {
   .on('mousedown', function(event) {
     event.preventDefault();
   });
-  if (this.systemType === scout.Button.SYSTEM_TYPE.OK ||
-      this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
-    $button.addClass('default-button');
-  }
   if (this.menus && this.menus.length > 0) {
     this.menus.forEach(function(menu) {
       this.keyStrokeAdapter.registerKeyStroke(menu);

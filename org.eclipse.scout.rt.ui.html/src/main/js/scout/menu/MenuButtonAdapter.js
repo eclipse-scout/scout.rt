@@ -6,7 +6,6 @@
 scout.MenuButtonAdapter = function() {
   scout.MenuButtonAdapter.parent.call(this);
 
-  this.defaultMenu = false;
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
 
   // FIXME AWE: Da der Button von AbstractFormField erbt, MenuButtonAdapter.js aber nicht,
@@ -55,11 +54,6 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
   button._renderSelected = this._renderSelected.bind(this);
   this._button = button;
-
-  if (button.systemType === scout.Button.SYSTEM_TYPE.OK ||
-      button.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
-    this.defaultMenu = true;
-  }
 
   if (button.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
     this.actionStyle = scout.Action.ActionStyle.TOGGLE;
