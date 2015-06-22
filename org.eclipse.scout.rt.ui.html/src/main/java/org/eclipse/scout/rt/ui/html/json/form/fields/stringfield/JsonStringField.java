@@ -60,6 +60,12 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isWrapText();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_FORMAT, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getFormat();
+      }
+    });
   }
 
   // FIXME AWE: (display-text) rename to handleUiValueChanged after renaming in Scout RT

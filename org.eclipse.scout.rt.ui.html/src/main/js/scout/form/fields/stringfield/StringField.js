@@ -3,6 +3,11 @@ scout.StringField = function() {
 };
 scout.inherits(scout.StringField, scout.ValueField);
 
+scout.StringField.FORMAT = {
+    LOWER: 'a' /* IStringField.FORMAT_LOWER */,
+    UPPER: 'A' /* IStringField.FORMAT_UPPER */
+  };
+
 scout.StringField.prototype._createKeyStrokeAdapter = function(){
   return new scout.StringFieldKeyStrokeAdapter(this);
 };
@@ -31,6 +36,7 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderUpdateDisplayTextOnModify();
   this._renderInputMasked(this.inputMasked);
   this._renderWrapText(this.wrapText);
+  this._renderFormat(this.format);
 };
 
 scout.StringField.prototype._renderInputMasked = function(inputMasked){
@@ -38,6 +44,14 @@ scout.StringField.prototype._renderInputMasked = function(inputMasked){
     return;
   }
   this.$field.attr('type', (inputMasked ? 'password' : 'text'));
+};
+
+scout.StringField.prototype._renderFormat = function(fmt){
+  if (fmt === scout.StringField.FORMAT.LOWER) {
+    this.$field.css('text-transform', 'lowercase');
+  } else if (fmt === scout.StringField.FORMAT.UPPER) {
+    this.$field.css('text-transform', 'uppercase');
+  }
 };
 
 //Not called in _renderProperties() because this is not really a property (more like an event)
