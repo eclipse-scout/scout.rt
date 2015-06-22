@@ -235,7 +235,6 @@
   height: @menubar-height;
   line-height: @menubar-height;
   min-width: 110px;
-  margin-right: @menu-item-margin-right;
 
   /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
   /* ellipsis, but this breaks the focus, because the ::before inline element gets */
@@ -291,4 +290,7 @@
    .button-sub-menu-icon;
   }
 
+  &:not(.last) {
+    margin-right: @menu-item-margin-right;
+  }
 }

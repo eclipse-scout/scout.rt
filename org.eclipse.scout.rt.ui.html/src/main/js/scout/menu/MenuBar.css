@@ -46,10 +46,12 @@
   margin-right: @bench-margin-x;
   height: 55px;
   padding-top: 11px;
-  padding-right: 5px;
 
   & > .menu-item[data-icon]::before {
     font-size: 22px;
   }
-}
 
+  & > .menu-item[data-icon].last {
+    margin-right: 5px;
+  }
+}

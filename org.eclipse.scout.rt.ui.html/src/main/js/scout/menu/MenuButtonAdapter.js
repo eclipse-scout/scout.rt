@@ -49,7 +49,8 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
       text: button.label,
       keyStroke: button.keyStroke,
       keyStrokes: button.keyStrokes,
-      modelClass: button.modelClass
+      modelClass: button.modelClass,
+      horizontalAlignment: (button.gridData ? button.gridData.horizontalAlignment : null)
   };
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
   button._renderSelected = this._renderSelected.bind(this);
