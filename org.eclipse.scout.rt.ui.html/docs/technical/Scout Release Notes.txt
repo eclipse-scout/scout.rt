@@ -376,3 +376,10 @@ Migration:
 MOT 22.06.2015:
 removed IStringField.isSelectAllOnFocus(), IStringField.setSelectAllOnFocus(boolean)
 removed IStringColumn.isSelectAllOnEdit(), IStringColumn.setSelectAllOnEdit(boolean)
+
+AWE 22.06.2015:
+removed AbstractBrowserField#execAcceptLocationChange
+removed AbstractBrowserField#execLocationChanged
+removed AbstractBrowserField#doLocationChange
+added AbstractBrowserField#execPostMessage as replacement
+More infos: https://loop.bsi-software.com/groups/scout-html-ui/blog/2015/06/22/browserfield-mit-html-ui
