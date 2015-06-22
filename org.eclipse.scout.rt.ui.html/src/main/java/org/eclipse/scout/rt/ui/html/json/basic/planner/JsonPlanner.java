@@ -101,6 +101,12 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_LABEL, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLabel();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IPlanner.PROP_AVAILABLE_DISPLAY_MODES, model) {
       @Override
       protected Set<Integer> modelValue() {
