@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -112,11 +111,6 @@ public interface IBrowserField extends IFormField {
 
   boolean isScrollBarEnabled();
 
-  /**
-   * emulate a location change in order to handle it in the model
-   */
-  void doLocationChange(String location) throws ProcessingException;
-
   void setSandboxEnabled(boolean sandboxEnabled);
 
   boolean isSandboxEnabled();
@@ -124,4 +118,5 @@ public interface IBrowserField extends IFormField {
   void setSandboxPermissions(EnumSet<SandboxPermissions> sandboxPermissions);
 
   EnumSet<SandboxPermissions> getSandboxPermissions();
+
 }

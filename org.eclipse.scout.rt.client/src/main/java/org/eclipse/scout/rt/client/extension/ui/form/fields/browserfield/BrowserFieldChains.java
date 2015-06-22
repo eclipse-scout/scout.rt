@@ -26,39 +26,18 @@ public final class BrowserFieldChains {
       super(extensions);
     }
 
-    public void execLocationChanged(final String location, final String path, final boolean local) throws ProcessingException {
+    public void execPostMessage(final String data, final String origin) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) throws ProcessingException {
-          next.execLocationChanged(BrowserFieldLocationChangedChain.this, location, path, local);
+          next.execPostMessage(BrowserFieldLocationChangedChain.this, data, origin);
         }
       };
-      callChain(methodInvocation, location, path, local);
+      callChain(methodInvocation, data, origin);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
 
-    }
-  }
-
-  public static class BrowserFieldAcceptLocationChangeChain extends AbstractBrowserFieldChain {
-
-    public BrowserFieldAcceptLocationChangeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
-      super(extensions);
-    }
-
-    public boolean execAcceptLocationChange(final String location, final String path, final boolean local) throws ProcessingException {
-      MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
-        @Override
-        protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) throws ProcessingException {
-          setReturnValue(next.execAcceptLocationChange(BrowserFieldAcceptLocationChangeChain.this, location, path, local));
-        }
-      };
-      callChain(methodInvocation, location, path, local);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-      return methodInvocation.getReturnValue();
     }
   }
 }

@@ -14,12 +14,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 
 public interface IBrowserFieldUIFacade {
 
-  /**
-   * return true to accept, false to veto the change
-   */
-  boolean fireBeforeLocationChangedFromUI(String location);
-
-  void fireAfterLocationChangedFromUI(String location);
+  void firePostMessageFromUI(String data, String origin);
 
   BinaryResource requestBinaryResourceFromUI(String filename);
 }

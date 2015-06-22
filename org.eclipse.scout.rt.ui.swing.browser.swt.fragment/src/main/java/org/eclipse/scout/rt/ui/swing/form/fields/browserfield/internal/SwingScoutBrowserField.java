@@ -9,7 +9,6 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IOUtility;
@@ -20,7 +19,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -137,11 +135,6 @@ public class SwingScoutBrowserField extends SwingScoutFieldComposite<IBrowserFie
 
           // Install Link and mouse listener.
           m_swtBrowser.addLocationListener(new LocationAdapter() {
-            @Override
-            public void changing(LocationEvent event) {
-              event.doit = fireBeforeLocationChangedFromSwt(event.location);
-            }
-
             @Override
             public void changed(LocationEvent event) {
               fireAfterLocationChangedFromSwt(event.location);
@@ -287,28 +280,13 @@ public class SwingScoutBrowserField extends SwingScoutFieldComposite<IBrowserFie
     });
   }
 
-  protected boolean fireBeforeLocationChangedFromSwt(final String location) {
-    IFuture<Boolean> future = ModelJobs.schedule(new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
-
-    try {
-      return future.awaitDoneAndGet(10, TimeUnit.SECONDS);
-    }
-    catch (ProcessingException e) {
-      LOG.warn("Failed to wait for the Scout model to accept a location change.", e);
-      return false;
-    }
-  }
-
+  // UI facade has been changed for Html UI - we send the location changed event as post-message.
+  // Doesn't matter since Swing is deleted anyway.
   protected void fireAfterLocationChangedFromSwt(final String location) {
     ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
-        getScoutObject().getUIFacade().fireAfterLocationChangedFromUI(location);
+        getScoutObject().getUIFacade().firePostMessageFromUI(location, null);
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
   }

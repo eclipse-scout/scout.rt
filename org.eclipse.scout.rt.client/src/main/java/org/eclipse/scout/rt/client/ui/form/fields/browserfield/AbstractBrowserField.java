@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.HashSet;
@@ -34,10 +33,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
@@ -81,39 +81,20 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
-   * This callback is invoked before the link is followed, it can be used as handler and vetoer. The default returns
-   * true.<br>
-   *
-   * @return true to accept this location, false to prevent the browser from going to that location (equal to browser
-   *         esc/stop button)
-   * @param location
-   * @param path
-   *          may be null for locations like about:blank or javascript:... {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
-   */
-  @ConfigOperation
-  @Order(230)
-  protected boolean execAcceptLocationChange(String location, String path, boolean local) throws ProcessingException {
-    return true;
-  }
-
-  /**
-   * This callback is invoked after the link was followed, thus it is already at that location
+   * This callback is invoked when the application has received a post-message from the embedded browser (IFRAME).
    * <p>
-   * The default does noting.
+   * The default does nothing.
+   * <p>
+   * <b>Important:</b> this callback is only invoked when the IFRAME is not restricted by the sandbox property. You must
+   * either disable sandbox completely or grant the required permissions {@link SandboxPermissions}.
    *
-   * @param location
-   * @param path
-   *          may be null for locations like about:blank or javascript:... {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
+   * @param data
+   * @param orgin
+   *          The origin of the window that sent the message at the time postMessage was called
    */
   @ConfigOperation
   @Order(230)
-  protected void execLocationChanged(String location, String path, boolean local) throws ProcessingException {
+  protected void execPostMessage(String data, String orgin) throws ProcessingException {
   }
 
   @Override
@@ -282,13 +263,6 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   @Override
-  public void doLocationChange(String location) throws ProcessingException {
-    if (getUIFacade().fireBeforeLocationChangedFromUI(location)) {
-      getUIFacade().fireAfterLocationChangedFromUI(location);
-    }
-  }
-
-  @Override
   public void setSandboxEnabled(boolean sandboxEnabled) {
     propertySupport.setProperty(PROP_SANDBOX_ENABLED, sandboxEnabled);
   }
@@ -312,37 +286,12 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   private class P_UIFacade implements IBrowserFieldUIFacade {
 
     @Override
-    public boolean fireBeforeLocationChangedFromUI(String location) {
+    public void firePostMessageFromUI(String data, String origin) {
       try {
-        URL url = null;
-        try {
-          url = new URL(location);
-        }
-        catch (Exception t) {
-          //nop
-        }
-        return interceptAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
+        interceptPostMessage(data, origin);
       }
-      catch (Exception t) {
-        LOG.error("location: " + location, t);
-      }
-      return false;
-    }
-
-    @Override
-    public void fireAfterLocationChangedFromUI(String location) {
-      try {
-        URL url = null;
-        try {
-          url = new URL(location);
-        }
-        catch (Exception t) {
-          //nop
-        }
-        interceptLocationChanged(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
-      }
-      catch (Exception t) {
-        LOG.error("location: " + location, t);
+      catch (ProcessingException pe) {
+        BEANS.get(ExceptionHandler.class).handle(pe);
       }
     }
 
@@ -352,16 +301,10 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
   }
 
-  protected final void interceptLocationChanged(String location, String path, boolean local) throws ProcessingException {
+  protected final void interceptPostMessage(String data, String origin) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     BrowserFieldLocationChangedChain chain = new BrowserFieldLocationChangedChain(extensions);
-    chain.execLocationChanged(location, path, local);
-  }
-
-  protected final boolean interceptAcceptLocationChange(String location, String path, boolean local) throws ProcessingException {
-    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    BrowserFieldAcceptLocationChangeChain chain = new BrowserFieldAcceptLocationChangeChain(extensions);
-    return chain.execAcceptLocationChange(location, path, local);
+    chain.execPostMessage(data, origin);
   }
 
   protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER> implements IBrowserFieldExtension<OWNER> {
@@ -371,13 +314,8 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
 
     @Override
-    public void execLocationChanged(BrowserFieldLocationChangedChain chain, String location, String path, boolean local) throws ProcessingException {
-      getOwner().execLocationChanged(location, path, local);
-    }
-
-    @Override
-    public boolean execAcceptLocationChange(BrowserFieldAcceptLocationChangeChain chain, String location, String path, boolean local) throws ProcessingException {
-      return getOwner().execAcceptLocationChange(location, path, local);
+    public void execPostMessage(BrowserFieldLocationChangedChain chain, String data, String origin) throws ProcessingException {
+      getOwner().execPostMessage(data, origin);
     }
   }
 

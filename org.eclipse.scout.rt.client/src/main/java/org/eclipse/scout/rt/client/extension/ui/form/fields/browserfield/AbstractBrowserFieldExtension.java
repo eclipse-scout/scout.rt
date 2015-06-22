@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 
@@ -13,12 +12,8 @@ public abstract class AbstractBrowserFieldExtension<OWNER extends AbstractBrowse
   }
 
   @Override
-  public void execLocationChanged(BrowserFieldLocationChangedChain chain, String location, String path, boolean local) throws ProcessingException {
-    chain.execLocationChanged(location, path, local);
+  public void execPostMessage(BrowserFieldLocationChangedChain chain, String data, String origin) throws ProcessingException {
+    chain.execPostMessage(data, origin);
   }
 
-  @Override
-  public boolean execAcceptLocationChange(BrowserFieldAcceptLocationChangeChain chain, String location, String path, boolean local) throws ProcessingException {
-    return chain.execAcceptLocationChange(location, path, local);
-  }
 }
