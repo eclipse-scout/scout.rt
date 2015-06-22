@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
@@ -157,5 +158,15 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);
     replaceActionEvent("pageChanged", jsonEvent);
+  }
+
+  @Override
+  protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
+    super.putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, virtualNode);
+    if (getUiSession().isInspectorHint()) {
+      IPage page = (IPage) node;
+      putProperty(jsonNode, "modelClass", page.getClass().getName());
+      putProperty(jsonNode, "classId", page.classId());
+    }
   }
 }

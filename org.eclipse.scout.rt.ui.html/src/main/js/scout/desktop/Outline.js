@@ -223,6 +223,19 @@ scout.Outline.prototype.selectedRow = function() {
   return table.selectedRows[0];
 };
 
+scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode) {
+  var propertiesChanged = scout.Outline.parent.prototype._applyUpdatedNodeProperties.call(this, oldNode, updatedNode);
+  if (oldNode.modelClass !== updatedNode.modelClass) {
+    oldNode.modelClass = updatedNode.modelClass;
+    propertiesChanged = true;
+  }
+  if (oldNode.classId !== updatedNode.classId) {
+    oldNode.classId = updatedNode.classId;
+    propertiesChanged = true;
+  }
+  return propertiesChanged;
+};
+
 /* event handling */
 
 scout.Outline.prototype._onPageChanged = function(event) {

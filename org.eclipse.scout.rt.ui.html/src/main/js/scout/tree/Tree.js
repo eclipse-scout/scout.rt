@@ -594,32 +594,21 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 
 scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
   // Update model
-  var propertiesChanged = false;
+  var anyPropertiesChanged = false;
   for (var i = 0; i < nodes.length; i++) {
     var updatedNode = nodes[i];
     var oldNode = this.nodesMap[updatedNode.id];
 
-    // Only update _some_ of the properties. Everything else will be handled with separate events.
-    // --> See also: JsonTree.java/handleModelNodesUpdated()
     scout.defaultValues.applyTo(updatedNode, 'TreeNode');
-    if (oldNode.leaf !== updatedNode.leaf) {
-      oldNode.leaf = updatedNode.leaf;
-      propertiesChanged = true;
-    }
-    if (oldNode.enabled !== updatedNode.enabled) {
-      oldNode.enabled = updatedNode.enabled;
-      oldNode.$node.children('.tree-node-checkbox')
-      .children('div')
-      .toggleClass('disabled', !(this.enabled && oldNode.enabled));
-      propertiesChanged = true;
-    }
+    var propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
+    anyPropertiesChanged = anyPropertiesChanged || propertiesChanged;
 
     if (this.rendered && propertiesChanged) {
       this._decorateNode(oldNode);
     }
   }
 
-  if (this.rendered && propertiesChanged) {
+  if (this.rendered && anyPropertiesChanged) {
     this._updateItemPath();
   }
 };
@@ -1292,6 +1281,37 @@ scout.Tree.prototype._onRequestFocus = function() {
 
 scout.Tree.prototype._onScrollToSelection = function() {
   this.revealSelection();
+};
+
+/**
+ * Called by _onNodesUpdated for every updated node. The function is expected to apply
+ * all updated properties from the updatedNode to the oldNode. May be overridden by
+ * subclasses so update their specific node properties.
+ *
+ * @param oldNode
+ *          The target node to be updated
+ * @param updatedNode
+ *          The new node with potentially updated properties. Default values are already applied!
+ * @returns
+ *          true if at least one property has changed, false otherwise. This value is used to
+ *          determine if the node has to be rendered again.
+ */
+scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode) {
+  // Note: We only update _some_ of the properties, because everything else will be handled
+  // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
+  var propertiesChanged = false;
+  if (oldNode.leaf !== updatedNode.leaf) {
+    oldNode.leaf = updatedNode.leaf;
+    propertiesChanged = true;
+  }
+  if (oldNode.enabled !== updatedNode.enabled) {
+    oldNode.enabled = updatedNode.enabled;
+    oldNode.$node.children('.tree-node-checkbox')
+      .children('div')
+      .toggleClass('disabled', !(this.enabled && oldNode.enabled));
+    propertiesChanged = true;
+  }
+  return propertiesChanged;
 };
 
 scout.Tree.prototype.onModelAction = function(event) {

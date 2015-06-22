@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -367,6 +368,17 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       // --> See also: Tree.js/_onNodesUpdated()
       putProperty(jsonNode, "leaf", node.isLeaf());
       putProperty(jsonNode, "enabled", node.isEnabled());
+
+      // Check for virtual nodes that were replaces with real nodes (this will have triggered an NODES_UPDATED event).
+      // This would not really be necessary, as both nodes are considered "equal" (see implementation of VirtualTreeNode),
+      // but some properties have to be updated in the UI, therefore we replace the nodes in our internal maps.
+      ITreeNode cachedNode = getNode(nodeId);
+      if (cachedNode instanceof IVirtualTreeNode && cachedNode != node) {
+        m_treeNodeIds.put(node, nodeId);
+        m_treeNodes.put(nodeId, node);
+        putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, (IVirtualTreeNode) cachedNode);
+      }
+
       jsonNodes.put(jsonNode);
     }
     if (jsonNodes.length() == 0) {
@@ -700,6 +712,22 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       }
     }
     return checkInfo;
+  }
+
+  /**
+   * Called by {@link #handleModelNodesUpdated(TreeEvent)} when it has detected that a virtual tree node was resolved by
+   * a real node. Subclasses may override this method to put any updated properties to the JSON response.
+   *
+   * @param jsonNode
+   *          {@link JSONObject} sent to the UI for the resolved node. Updated properties may be put in here.
+   * @param nodeId
+   *          The ID of the resolved node.
+   * @param node
+   *          The new, resolved node
+   * @param cachedNode
+   *          The old, virtual node
+   */
+  protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
   }
 
   protected static class CheckedInfo {
