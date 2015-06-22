@@ -122,6 +122,7 @@ scout.Planner.prototype._renderProperties = function() {
   this._renderYearPanelVisible();
   this._renderResources();
   this._renderSelectedResources();
+  this._renderLabel();
   // render with setTimeout because the planner needs to be layouted first
   setTimeout(this._renderSelectionRange.bind(this));
 };
@@ -271,7 +272,7 @@ scout.Planner.prototype._renderScale = function() {
   this.$grid.children('.planner-large-scale-item-line').remove();
 
   // append main elements
-  this.$scaleTitle = this.$scale.appendDiv('planner-scale-title', "Titel");
+  this.$scaleTitle = this.$scale.appendDiv('planner-scale-title');
   this.$timeline = this.$scale.appendDiv('timeline');
   this.$timelineLarge = this.$timeline.appendDiv('timeline-large');
   this.$timelineSmall = this.$timeline.appendDiv('timeline-small');
@@ -934,7 +935,10 @@ scout.Planner.prototype._renderSelectedActivity = function() {
   }
 };
 
-scout.Planner.prototype._renderDrawSections = function() {};
+scout.Planner.prototype._renderLabel = function() {
+  var label = this.label || '';
+  this.$scaleTitle.text(label);
+};
 
 scout.Planner.prototype._resourcesByIds = function(ids) {
   return ids.map(this._resourceById.bind(this));
