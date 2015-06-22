@@ -88,7 +88,8 @@ scout.Form.prototype._updateDialogTitle = function() {
   else {
     removeChildDiv(this.$container, 'title-box');
   }
-  // TODO AWE/CGU: How to update the layout? If title was not visible but now is, dialog height has to be changed!
+  // Layout could have been changed, e.g. if subtitle becomes visible
+  this.invalidateTree();
 
   // ----- Helper functions -----
 
