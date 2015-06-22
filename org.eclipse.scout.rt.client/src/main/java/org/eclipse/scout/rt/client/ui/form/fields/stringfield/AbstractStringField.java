@@ -214,7 +214,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     setDecorationLink(getConfiguredDecorationLink());
     setWrapText(getConfiguredWrapText());
     setMultilineText(getConfiguredMultilineText());
-    setSelectAllOnFocus(getConfiguredSelectAllOnFocus() && !getConfiguredMultilineText());
     int configuredDragType = getConfiguredDragType();
     if (IDNDSupport.TYPE_TEXT_TRANSFER == configuredDragType) {
       LOG.warn("Drag and drop TextTransfer is default behaviour (Configuration will not be considered).");
@@ -339,16 +338,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   @Override
   public void insertText(String s) {
     propertySupport.setPropertyAlwaysFire(PROP_INSERT_TEXT, s);
-  }
-
-  @Override
-  public boolean isSelectAllOnFocus() {
-    return propertySupport.getPropertyBool(PROP_SELECT_ALL_ON_FOCUS);
-  }
-
-  @Override
-  public void setSelectAllOnFocus(boolean b) {
-    propertySupport.setPropertyBool(PROP_SELECT_ALL_ON_FOCUS, b);
   }
 
   @Override

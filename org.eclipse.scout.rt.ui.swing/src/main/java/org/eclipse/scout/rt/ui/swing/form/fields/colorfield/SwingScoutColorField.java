@@ -258,11 +258,6 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
     //Nothing to do: Selection is not stored in model for DateField.
   }
 
-  @Override
-  protected boolean isSelectAllOnFocusInScout() {
-    return true; //No such property in Scout for DateField.
-  }
-
   private class P_SwingColorPickerAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 

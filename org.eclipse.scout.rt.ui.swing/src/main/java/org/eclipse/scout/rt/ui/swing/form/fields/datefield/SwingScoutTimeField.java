@@ -97,11 +97,6 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
   }
 
   @Override
-  protected boolean isSelectAllOnFocusInScout() {
-    return true; //No such property in Scout for DecimalField.
-  }
-
-  @Override
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();
     container.setOpaque(false);

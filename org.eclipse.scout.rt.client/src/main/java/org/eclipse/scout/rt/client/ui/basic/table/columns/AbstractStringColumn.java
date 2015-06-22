@@ -115,7 +115,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     setDisplayFormat(getConfiguredDisplayFormat());
     setMaxLength(getConfiguredMaxLength());
     setTextWrap(getConfiguredTextWrap());
-    setSelectAllOnEdit(getConfiguredSelectAllOnEdit());
   }
 
   /*
@@ -149,16 +148,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   public boolean isTextWrap() {
     return propertySupport.getPropertyBool(IStringField.PROP_WRAP_TEXT);
-  }
-
-  @Override
-  public boolean isSelectAllOnEdit() {
-    return propertySupport.getPropertyBool(IStringField.PROP_SELECT_ALL_ON_FOCUS);
-  }
-
-  @Override
-  public void setSelectAllOnEdit(boolean b) {
-    propertySupport.setPropertyBool(IStringField.PROP_SELECT_ALL_ON_FOCUS, b);
   }
 
   @Override
@@ -240,7 +229,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     super.mapEditorFieldProperties(f);
     f.setInputMasked(isInputMasked());
     f.setFormat(getDisplayFormat());
-    f.setSelectAllOnFocus(isSelectAllOnEdit());
     f.setMaxLength(getMaxLength());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);

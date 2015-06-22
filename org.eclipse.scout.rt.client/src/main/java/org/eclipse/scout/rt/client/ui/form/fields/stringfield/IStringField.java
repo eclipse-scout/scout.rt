@@ -74,10 +74,6 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
 
   void select(int startIndex, int endIndex);
 
-  boolean isSelectAllOnFocus();
-
-  void setSelectAllOnFocus(boolean b);
-
   @Override
   IStringFieldUIFacade getUIFacade();
 

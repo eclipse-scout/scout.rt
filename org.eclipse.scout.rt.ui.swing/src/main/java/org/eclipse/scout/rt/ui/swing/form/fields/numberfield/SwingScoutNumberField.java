@@ -137,11 +137,6 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
     //Nothing to do: Selection is not stored in model for DecimalField.
   }
 
-  @Override
-  protected boolean isSelectAllOnFocusInScout() {
-    return true; //No such property in Scout for DecimalField.
-  }
-
   private final class P_DocumentFilter extends DocumentFilter {
     @Override
     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {

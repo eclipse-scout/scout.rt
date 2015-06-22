@@ -422,11 +422,6 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
     //Nothing to do: Selection is not stored in model for DateField.
   }
 
-  @Override
-  protected boolean isSelectAllOnFocusInScout() {
-    return true; //No such property in Scout for DateField.
-  }
-
   /*
    * Swing actions
    */

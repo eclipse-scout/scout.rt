@@ -90,11 +90,6 @@ public class SwingScoutBasicFieldCompositeTest {
     @Override
     protected void setSelectionFromSwing() {
     }
-
-    @Override
-    protected boolean isSelectAllOnFocusInScout() {
-      return true;
-    }
   }
 
 }

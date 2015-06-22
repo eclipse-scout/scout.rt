@@ -112,11 +112,6 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
     updateDropTransferTypesFromScout();
   }
 
-  @Override
-  protected boolean isSelectAllOnFocusInScout() {
-    return getScoutObject().isSelectAllOnFocus();
-  }
-
   protected void setDecorationLinkFromScout(boolean b) {
     if (m_decorationLink != b) {
       m_decorationLink = b;

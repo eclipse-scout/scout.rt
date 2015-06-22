@@ -41,10 +41,6 @@ public interface IStringColumn extends IColumn<String> {
 
   boolean isTextWrap();
 
-  boolean isSelectAllOnEdit();
-
-  void setSelectAllOnEdit(boolean b);
-
   void setMaxLength(int len);
 
   int getMaxLength();

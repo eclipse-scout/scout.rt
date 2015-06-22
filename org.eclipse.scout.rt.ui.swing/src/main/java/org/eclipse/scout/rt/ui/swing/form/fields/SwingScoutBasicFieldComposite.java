@@ -120,8 +120,6 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
 
   protected abstract void setSelectionFromSwing();
 
-  protected abstract boolean isSelectAllOnFocusInScout();
-
   @Override
   protected boolean handleSwingInputVerifier() {
     final String text = getSwingField().getText();
@@ -155,11 +153,6 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   @Override
   protected void handleSwingFocusGained() {
     super.handleSwingFocusGained();
-    JTextComponent swingField = getSwingField();
-    if (!isMenuOpened() && isSelectAllOnFocusInScout() && swingField.getDocument().getLength() > 0) {
-      swingField.setCaretPosition(swingField.getDocument().getLength());
-      swingField.moveCaretPosition(0);
-    }
     setMenuOpened(false);
   }
 
