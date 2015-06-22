@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
 import java.util.Set;
 
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermissions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
@@ -28,6 +30,8 @@ import org.json.JSONObject;
 public class JsonBrowserField<T extends IBrowserField> extends JsonFormField<T> implements IBinaryResourceProvider {
 
   private BrowserFieldListener m_browserFieldListener;
+
+  private static final String EVENT_POST_MESSAGE = "postMessage";
 
   public JsonBrowserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -114,10 +118,27 @@ public class JsonBrowserField<T extends IBrowserField> extends JsonFormField<T> 
     addPropertyChangeEvent(IBrowserField.PROP_LOCATION, getLocation());
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_POST_MESSAGE.equals(event.getType())) {
+      handleUiPostMessage(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiPostMessage(JsonEvent event) {
+    String data = event.getData().optString("data");
+    String origin = event.getData().optString("origin");
+    getModel().getUIFacade().firePostMessageFromUI(data, origin);
+  }
+
   protected String getLocation() {
     String location = getModel().getLocation();
-    if (location == null && getModel().getBinaryResource() != null) {
-      location = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, getModel().getBinaryResource().getFilename());
+    BinaryResource binaryResource = getModel().getBinaryResource();
+    if (location == null && binaryResource != null) {
+      location = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, binaryResource.getFilename());
     }
     return location;
   }
@@ -126,7 +147,9 @@ public class JsonBrowserField<T extends IBrowserField> extends JsonFormField<T> 
 
     @Override
     public void browserFieldChanged(BrowserFieldEvent e) {
-      handleModelContentChanged();
+      if (BrowserFieldEvent.TYPE_CONTENT_CHANGED == e.getType()) {
+        handleModelContentChanged();
+      }
     }
   }
 }

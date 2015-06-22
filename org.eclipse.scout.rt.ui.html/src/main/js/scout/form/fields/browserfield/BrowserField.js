@@ -1,5 +1,6 @@
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
+  this._postMessageListener;
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
@@ -9,6 +10,9 @@ scout.BrowserField.prototype._render = function($parent) {
   this.addField($('<iframe>'));
   this.addMandatoryIndicator();
   this.addStatus();
+
+  this._postMessageListener = this._onPostMessage.bind(this);
+  window.addEventListener('message', this._postMessageListener);
 };
 
 /**
@@ -49,4 +53,20 @@ scout.BrowserField.prototype._renderSandbox = function() {
     this.$field.removeAttr('sandbox');
     this.$field.removeAttr('security');
   }
+};
+
+scout.BrowserField.prototype._onPostMessage = function(event) {
+  $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
+  this.session.send(this.id, 'postMessage',  {
+    data: event.data,
+    origin: event.origin});
+};
+
+/**
+ * @override FormField.js
+ */
+scout.BrowserField.prototype._remove = function() {
+  scout.BrowserField.parent.prototype._remove.call(this);
+  window.removeEventListener('message', this._postMessageListener);
+  this._postMessageListener = null;
 };
