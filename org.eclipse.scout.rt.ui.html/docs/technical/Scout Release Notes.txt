@@ -372,3 +372,7 @@ Migration:
 - Instead of execChangedValue() use a BrowserFieldListener
 - If you relied on the browser field to be "save needed" when setting the value (RemoteFile), you have to call touch() manually,
   because the browser field will never report "save needed" by itself (because it has no value).
+
+MOT 22.06.2015:
+removed IStringField.isSelectAllOnFocus(), IStringField.setSelectAllOnFocus(boolean)
+removed IStringColumn.isSelectAllOnEdit(), IStringColumn.setSelectAllOnEdit(boolean)
