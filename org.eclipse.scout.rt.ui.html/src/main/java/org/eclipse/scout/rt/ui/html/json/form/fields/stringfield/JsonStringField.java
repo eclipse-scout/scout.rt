@@ -13,10 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.stringfield;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
+
+  public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
 
   public JsonStringField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -72,12 +75,33 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isSpellCheckEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_DECORATION_LINK, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isDecorationLink();
+      }
+    });
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_CALL_LINK_ACTION.equals(event.getType())) {
+      handleUiCallLinkAction();
+    }
+    else {
+      super.handleUiEvent(event);
+    }
   }
 
   // FIXME AWE: (display-text) rename to handleUiValueChanged after renaming in Scout RT
   @Override
   protected void handleUiTextChangedImpl(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
+  }
+
+  private void handleUiCallLinkAction() {
+    getModel().getUIFacade().fireLinkActionFromUI(getModel().getDisplayText());
+
   }
 
   @Override

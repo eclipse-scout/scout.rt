@@ -38,6 +38,7 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderWrapText(this.wrapText);
   this._renderFormat(this.format);
   this._renderSpellCheckEnabled(this.spellCheckEnabled);
+  this._renderDecorationLink(this.decorationLink);
 };
 
 scout.StringField.prototype._renderInputMasked = function(inputMasked){
@@ -45,6 +46,19 @@ scout.StringField.prototype._renderInputMasked = function(inputMasked){
     return;
   }
   this.$field.attr('type', (inputMasked ? 'password' : 'text'));
+};
+
+scout.StringField.prototype._renderDecorationLink = function(decorationLink){
+  if (decorationLink) {
+    this.$container.addClass("decoration-link");
+    this.addIcon();
+    this.revalidateLayout();
+  } else {
+    if (this.$icon) {
+      this.$icon.remove();
+      this.$container.removeClass("decoration-link");
+    }
+  }
 };
 
 scout.StringField.prototype._renderFormat = function(fmt){
@@ -83,4 +97,10 @@ scout.StringField.prototype._renderInsertText = function() {
 scout.StringField.prototype._renderWrapText = function() {
   this.$field.toggleClass('white-space-nowrap', !this.wrapText);
 };
+
+scout.StringField.prototype._onIconClick = function(event) {
+  scout.StringField.parent.prototype._onIconClick.call(this, event);
+  this.session.send(this.id, 'callLinkAction');
+};
+
 
