@@ -12,9 +12,9 @@ scout.YearPanel = function(session) {
 scout.inherits(scout.YearPanel, scout.Widget);
 
 scout.YearPanel.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('calendar-year-container');
-  this.$yearTitle = this.$container.appendDiv('calendar-year-title');
-  this.$yearList = this.$container.appendDiv('calendar-year-list');
+  this.$container = $parent.appendDiv('year-panel-container');
+  this.$yearTitle = this.$container.appendDiv('year-panel-title');
+  this.$yearList = this.$container.appendDiv('year-panel-list');
 };
 
 scout.YearPanel.prototype.renderContent = function() {

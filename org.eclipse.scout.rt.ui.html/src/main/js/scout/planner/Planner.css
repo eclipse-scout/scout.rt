@@ -24,7 +24,6 @@
   & > .menubar {
     padding-left: @resource-padding-x;
     padding-right: @resource-padding-x;
-    background-color: @control-background-color;
   }
 
   & > .menubar.bottom {
@@ -130,109 +129,6 @@
 
 }
 
-.planner-year-container {
-  display: inline-block;
-  width: 0%;
-  padding: 0;
-  background-color: @palette-white;
-  overflow: hidden;
-
-  & .planner-year {
-    width: 270px;
-    padding: 0px 10px;
-    height: 100%;
-
-    & .year-title {
-      position: relative;
-      width: calc(~"100%" - 20px);
-      height: 45px;
-    }
-
-    & .year-title-item {
-      display: inline-block;
-      padding-right: 15px;
-      line-height: 45px;
-      font-size: 17px;
-      color: @palette-gray-4;
-      cursor: pointer;
-
-      &.selected {
-        color: @palette-gray-6;
-        cursor: default;
-      }
-
-      &:hover {
-        color: @palette-gray-6;
-      }
-    }
-
-
-     & .year-title::after{
-      position: absolute;
-      height: 1px;
-      width: 100%;
-      left: 0px;
-      bottom: 0px;
-      content: " ";
-      background-color: @palette-gray-4;
-    }
-
-    & .year-month{
-      margin-top: 18px;
-      position: relative;
-      padding-top: 20px;
-      padding-right: 15px;
-      float: left;
-      height: 85px;
-      width: 125px;
-
-      font-size: 17px;
-      color: red;
-    }
-
-      & .year-month::before{
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      height: 100px;
-      width: 100%;
-      content: attr(data-title);
-      font-size: 17px;
-      color: @palette-green-4;
-    }
-
-    & .year-day{
-      position: relative;
-      float: left;
-      width: 15px;
-      text-align: right;
-      color: @palette-gray-6;
-      font-size: 10px;
-      height: 12px;
-      padding: 1px;
-      line-height: 12px;
-      cursor: pointer;
-    }
-
-    & .year-range{
-      background-color: @palette-green-0;
-    }
-
-    & .year-range-day{
-      background-color: @palette-green-3;
-    }
-
-    & .year-hover{
-      background-color: @palette-orange-0 !important;
-    }
-
-    & .year-hover-day{
-      background-color: @palette-orange-2 !important;
-    }
-  }
-
-}
-
 .planner-scale {
   position: absolute;
   right: 0px;
@@ -263,32 +159,14 @@
       background-color: @palette-gray-2;
       line-height: @planner-header-height / 2;
 
-      & > .scale-item::after{
-        position: absolute;
-        height: 1000px;
-        width: 1px;
-        left: 0px;
-        top: 0px;
-        content: " ";
-        background-color: rgba(0, 0, 0, 0.10);
+      & > .scale-item > .planner-large-scale-item-line {
+        height: @planner-header-height;
       }
-
     }
 
     & > .timeline-small {
       height: 50%;
-      //background-color: @palette-gray-1;
       line-height: @planner-header-height / 2;
-
-      & > .scale-item::after{
-        position: absolute;
-        height: 1000px;
-        width: 1px;
-        left: 0px;
-        top: 0px;
-        content: " ";
-        background-color: rgba(0, 0, 0, 0.07);
-      }
     }
   }
 }
@@ -383,5 +261,18 @@
   }
 }
 
+.planner-small-scale-item-line {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  top: 0px;
+  background-color: rgba(0, 0, 0, 0.07);
+}
 
-
+.planner-large-scale-item-line {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  top: 0px;
+  background-color: rgba(0, 0, 0, 0.2);
+}

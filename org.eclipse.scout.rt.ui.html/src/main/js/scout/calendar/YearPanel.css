@@ -1,0 +1,115 @@
+.year-panel-container {
+  display: inline-block;
+  width: 0%;
+  height: calc(~"100%" - @calendar-header-height);
+  background-color: @palette-white;
+  overflow: hidden;
+}
+
+.year-panel-title {
+  position: relative;
+  margin-left: 10px;
+  width: calc(~"100%" - 40px);
+  height: @calendar-title-height;
+  white-space: nowrap;
+
+  & > .year-title-item {
+    display: inline-block;
+    padding-right: 15px;
+    line-height: @calendar-title-height;
+    color: @palette-gray-5;
+    cursor: pointer;
+    font-weight: bold;
+
+    &.selected {
+      color: @text-color;
+      cursor: default;
+    }
+
+    &:hover {
+      color: @text-color;
+    }
+  }
+
+   &::after{
+    position: absolute;
+    height: 1px;
+    width: 100%;
+    left: 0px;
+    bottom: -1px;
+    content: " ";
+    background-color: @palette-gray-4;
+  }
+
+}
+
+.year-panel-list {
+  position: relative;
+  width: 180px;
+  margin-left: 10px;
+
+  height: calc(~"100%" -  @calendar-title-height);
+  overflow: hidden;
+
+  & > .year-month {
+    margin-top: 18px;
+    margin-bottom: 8px;
+    position: relative;
+    padding-top: 20px;
+    padding-right: 15px;
+    float: left;
+    width: 180px;
+
+    & > .year-day {
+      position: relative;
+      float: left;
+      width: 23px;
+      text-align: right;
+      color: @text-color;
+      height: 18px;
+      padding-right: 5px;
+      line-height: 19px;
+      cursor: pointer;
+
+      &.year-range{
+        background-color: @item-selection-background-color;
+      }
+
+      &.year-hover{
+        background-color: @item-selection-background-color;
+      }
+
+      &.year-range-day{
+        background-color: @item-selection-border-color;
+        color: @palette-white;
+      }
+
+      &.year-hover-day{
+        background-color: @item-selection-border-color;
+        color: @palette-white;
+      }
+    }
+  }
+
+  & > .year-month::before{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    content: attr(data-title);
+    font-weight: bold;
+    color: @text-color;
+  }
+
+  & > .year-month::after{
+    position: absolute;
+    bottom: 0px;
+    right: 19px;
+    height: calc(~"100%" -  20px);
+    width: 26%;
+    content: ' ';
+    background-color: @palette-gray-6;
+    opacity: 0.10;
+    pointer-events: none
+  }
+}

@@ -261,17 +261,23 @@ scout.Planner.prototype._renderScale = function() {
   if (!this.viewRange.from || !this.viewRange.to) {
     return;
   }
-  var $timeline, $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width,
+  var $timeline, $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width, newLargeGroup,
+    that = this,
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
   // empty scale
   this.$scale.empty();
+  this.$grid.children('.planner-small-scale-item-line').remove();
+  this.$grid.children('.planner-large-scale-item-line').remove();
 
   // append main elements
-  this.$scale.appendDiv('planner-scale-title', "Titel");
-  $timeline = this.$scale.appendDiv('timeline');
-  $timelineLarge = $timeline.appendDiv('timeline-large');
-  $timelineSmall = $timeline.appendDiv('timeline-small');
+  this.$scaleTitle = this.$scale.appendDiv('planner-scale-title', "Titel");
+  this.$timeline = this.$scale.appendDiv('timeline');
+  this.$timelineLarge = this.$timeline.appendDiv('timeline-large');
+  this.$timelineSmall = this.$timeline.appendDiv('timeline-small');
+  $timeline = this.$timeline;
+  $timelineLarge = this.$timelineLarge;
+  $timelineSmall = this.$timelineSmall;
 
   // fill timeline large depending on mode
   // TODO: depending on screen size: smaller or large representation
@@ -281,8 +287,10 @@ scout.Planner.prototype._renderScale = function() {
 
     // from start to end
     while (loop < this.viewRange.to) {
+      newLargeGroup = false;
       if ((loop.getMinutes() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'HH')).data('count', 0);
+        newLargeGroup = true;
       }
 
       $divSmall = $timelineSmall
@@ -290,7 +298,8 @@ scout.Planner.prototype._renderScale = function() {
         .data('date-from', new Date(loop.valueOf()));
 
       loop.setMinutes(loop.getMinutes() + 30);
-      $divSmall.data('date-to', new Date(loop.valueOf()));
+      $divSmall.data('date-to', new Date(loop.valueOf()))
+        .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
@@ -299,6 +308,7 @@ scout.Planner.prototype._renderScale = function() {
 
     // from start to end
     while (loop < this.viewRange.to) {
+      newLargeGroup = false;
       if ((loop.getHours() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
         if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd. MMMM yyyy')).data('count', 0);
@@ -307,6 +317,7 @@ scout.Planner.prototype._renderScale = function() {
         } else {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd.')).data('count', 0);
         }
+        newLargeGroup = true;
       }
 
       $divSmall = $timelineSmall
@@ -314,7 +325,8 @@ scout.Planner.prototype._renderScale = function() {
         .data('date-from', new Date(loop.valueOf()));
 
       loop.setHours(loop.getHours() + 6);
-      $divSmall.data('date-to', new Date(loop.valueOf()));
+      $divSmall.data('date-to', new Date(loop.valueOf()))
+        .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
@@ -324,12 +336,14 @@ scout.Planner.prototype._renderScale = function() {
 
     // from start to end
     while (loop < this.viewRange.to) {
+      newLargeGroup = false;
       if ((loop.getDate() == 1) || (loop.valueOf() == this.viewRange.from.valueOf())) {
         if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
         } else {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
         }
+        newLargeGroup = true;
       }
 
       $divSmall = $timelineSmall
@@ -337,7 +351,8 @@ scout.Planner.prototype._renderScale = function() {
         .data('date-from', new Date(loop.valueOf()));
 
       loop.setDate(loop.getDate() + 1);
-      $divSmall.data('date-to', new Date(loop.valueOf()));
+      $divSmall.data('date-to', new Date(loop.valueOf()))
+        .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
@@ -347,12 +362,14 @@ scout.Planner.prototype._renderScale = function() {
 
     // from start to end
     while (loop < this.viewRange.to) {
+      newLargeGroup = false;
       if ((loop.getDate() < 8) || (loop.valueOf() == this.viewRange.from.valueOf())) {
         if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
         } else {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
         }
+        newLargeGroup = true;
       }
 
       $divSmall = $timelineSmall
@@ -362,7 +379,8 @@ scout.Planner.prototype._renderScale = function() {
         .mouseleave(this._onScaleHoverOut.bind(this));
 
       loop.setDate(loop.getDate() + 7);
-      $divSmall.data('date-to', new Date(loop.valueOf()));
+      $divSmall.data('date-to', new Date(loop.valueOf()))
+        .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
@@ -372,8 +390,10 @@ scout.Planner.prototype._renderScale = function() {
 
     // from start to end
     while (loop < this.viewRange.to) {
+      newLargeGroup = false;
       if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'yyyy')).data('count', 0);
+        newLargeGroup = true;
       }
 
       $divSmall = $timelineSmall
@@ -381,18 +401,33 @@ scout.Planner.prototype._renderScale = function() {
         .data('date-from', new Date(loop.valueOf()));
 
       loop.setMonth(loop.getMonth() + 1);
-      $divSmall.data('date-to', new Date(loop.valueOf()));
+      $divSmall.data('date-to', new Date(loop.valueOf()))
+        .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
   }
 
-  // set sizes
-  width = 100 / $timelineSmall.children().length;
-  $timelineLarge.children().each(function() {
-    $(this).css('width', $(this).data('count') * width + '%');
+  // set sizes and append scale lines
+  var $smallScaleItems = $timelineSmall.children('.scale-item');
+  var $largeScaleItems = $timelineLarge.children('.scale-item');
+  width = 100 / $smallScaleItems.length;
+  $largeScaleItems.each(function() {
+    var $scaleItem = $(this);
+    $scaleItem.css('width', $scaleItem.data('count') * width + '%')
+      .data('scale-item-line', that.$grid.appendDiv('planner-large-scale-item-line'));
+    $scaleItem.appendDiv('planner-large-scale-item-line')
+      .css('left', 0);
   });
-  $timelineSmall.children().css('width', width + '%');
+  $smallScaleItems.each(function(index) {
+    var $scaleItem = $(this);
+    $scaleItem.css('width', width + '%');
+    if (!$scaleItem.data('first')) {
+      $scaleItem.data('scale-item-line', that.$grid.appendDiv('planner-small-scale-item-line'));
+      $scaleItem.appendDiv('planner-small-scale-item-line')
+        .css('left', 0);
+    }
+  });
 
   // find transfer function
   var beginScale = $timelineSmall.children().first().data('date-from').valueOf(),
@@ -993,7 +1028,7 @@ scout.Planner.prototype._insertResources = function(resources) {
   // Update HTML
   if (this.rendered) {
     this._renderResources(resources);
-    this.htmlComp.invalidateTree();
+    this.invalidateTree();
   }
 };
 
@@ -1012,13 +1047,15 @@ scout.Planner.prototype._deleteResources = function(resources) {
       delete resource.$resource;
     }
   }.bind(this));
+
+  this.invalidateTree();
 };
 
 scout.Planner.prototype._deleteAllResources = function() {
   // Update HTML
   if (this.rendered) {
     this._removeAllResources();
-    this.htmlComp.invalidateTree();
+    this.invalidateTree();
   }
 
   // Update model
