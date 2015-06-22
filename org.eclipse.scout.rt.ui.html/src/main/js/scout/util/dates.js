@@ -335,6 +335,7 @@ scout.dates = {
    */
   combineDateTime: function(date, time) {
     var newDate = new Date(0);
+    newDate.setHours(0,0,0,0);
     if (date) {
       newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDay());
     }

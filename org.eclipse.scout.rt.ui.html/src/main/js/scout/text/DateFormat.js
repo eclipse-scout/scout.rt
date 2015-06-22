@@ -145,8 +145,13 @@ scout.DateFormat = function(locale, pattern) {
       new DateFormatPatternDefinition('M', function(date) {
         return date.getMonth() + 1;
       }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setMonth(dateString - 1);
+        //Can only parse day with pattern text after
+        if(patternTextAfter){
+          var month = dateString.substring(0, dateString.indexOf(patternTextAfter));
+          date.setMonth(month-1);
+          return dateString.replace(month+patternTextAfter, '');
+        }
+        return dateString;
       }, false, 'month')
     ],
     // Week in year
@@ -176,8 +181,13 @@ scout.DateFormat = function(locale, pattern) {
       new DateFormatPatternDefinition('d', function(date) {
         return date.getDate();
       }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setMonth(dateString);
+        //Can only parse day with pattern text after
+        if(patternTextAfter){
+          var day = dateString.substring(0, dateString.indexOf(patternTextAfter));
+          date.setDate(day);
+          return dateString.replace(day+patternTextAfter, '');
+        }
+        return dateString;
       }, false, 'day')
     ],
     // Weekday
@@ -439,6 +449,7 @@ scout.DateFormat.prototype.parse = function(text) {
   //  }
   //
   var date = new Date(0);
+  date.setHours(0,0,0,0);
   var ret = text;
   for (var i = 0; i < this.parseFunc.length; i++) {
     ret = this.parseFunc[i](ret, date);

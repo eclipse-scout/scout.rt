@@ -52,6 +52,25 @@ describe("DateFormat", function() {
 
   });
 
+  describe("parse", function() {
+
+    it("considers d M y", function() {
+      var pattern = 'dd.MM.yy';
+      var dateFormat = new scout.DateFormat(locale, pattern);
+
+      expect(dateFormat.parse('21.03.14').getTime()).toBe(scout.dates.create('2014-03-21').getTime());
+
+      pattern = 'dd.MM.yyyy';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.parse('21.03.2014').getTime()).toBe(scout.dates.create('2014-03-21').getTime());
+
+      pattern = 'd.M.y';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.parse('21.3.14').getTime()).toBe(scout.dates.create('2014-03-21').getTime());
+      expect(dateFormat.parse('1.3.04').getTime()).toBe(scout.dates.create('2004-03-01').getTime());
+    });
+  });
+
   describe("analyze", function() {
     describe("analyzes the text and returns an object with months, years and days", function() {
       it('considers pattern dd.MM.yyyy', function() {
