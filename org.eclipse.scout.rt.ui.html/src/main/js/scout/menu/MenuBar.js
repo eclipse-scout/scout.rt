@@ -23,7 +23,7 @@ scout.MenuBar = function(session, menuSorter) {
     // user request (because many menus change one or more properties). Therefore, we just invalidate
     // the MenuBarLayout. It will be updated automatically after the user request has finished,
     // because the layout calls rebuildItems().
-    scout.HtmlComponent.get(this.$container).invalidateTree();
+    scout.HtmlComponent.get(this.$container).invalidateLayoutTree();
   }.bind(this);
 };
 scout.inherits(scout.MenuBar, scout.Widget);

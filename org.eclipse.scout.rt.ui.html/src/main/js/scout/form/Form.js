@@ -88,7 +88,7 @@ scout.Form.prototype._updateDialogTitle = function() {
     removeChildDiv(this.$container, 'title-box');
   }
   // Layout could have been changed, e.g. if subtitle becomes visible
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 
   // ----- Helper functions -----
 
