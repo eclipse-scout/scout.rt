@@ -1,21 +1,24 @@
 /* global MenuSpecHelper */
 describe("Menu", function() {
 
-  var helper, session, $sandbox, menu1;
+  var helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
     helper = new MenuSpecHelper(session);
-    menu1 = helper.createMenu(helper.createModel('foo'));
+    modelMenu1 = helper.createModel('foo');
+    menu1 = helper.createMenu(modelMenu1);
+    modelMenu2 = helper.createModel('foo');
+    modelMenu2.keyStroke = 'enter';
+    menu2 = helper.createMenu(modelMenu2);
   });
 
   describe('defaults', function() {
 
     it('should have expected defaults', function() {
       expect(menu1.overflow).toBe(false);
-      expect(menu1.defaultMenu).toBe(false);
     });
 
   });
@@ -39,10 +42,8 @@ describe("Menu", function() {
       menu1.remove();
 
       menu1.overflow = false;
-      menu1.defaultMenu = true;
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
-      expect(menu1.$container.hasClass('default-menu')).toBe(true);
     });
 
     it('render as separator', function() {
