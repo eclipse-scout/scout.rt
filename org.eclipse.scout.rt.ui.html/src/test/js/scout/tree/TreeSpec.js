@@ -104,6 +104,14 @@ describe("Tree", function() {
     };
   }
 
+  function createNodesInsertedEventTopNode(model, nodes) {
+    return {
+      target: model.id,
+      nodes: nodes,
+      type: 'nodesInserted'
+    };
+  }
+
   function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
     return {
       target: model.id,
@@ -620,6 +628,7 @@ describe("Tree", function() {
           expect(Object.keys(tree.nodesMap).length).toBe(13);
         });
 
+
         it("updates html document if parent is expanded", function() {
           tree.render(session.$entryPoint);
 
@@ -634,6 +643,52 @@ describe("Tree", function() {
           expect(findAllNodes(tree).length).toBe(13);
           expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
         });
+
+
+        it("updates html document on specific position", function() {
+          tree.render(session.$entryPoint);
+
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3',2);
+          var newNode0Child4 = createModelNode('0_4', 'newNode0Child4',3);
+          expect(findAllNodes(tree).length).toBe(12);
+
+          var message = {
+            events: [createNodesInsertedEvent(model, [newNode0Child3, newNode0Child4], node0.id)]
+          };
+          session._processSuccessResponse(message);
+
+          expect(findAllNodes(tree).length).toBe(14);
+          expect(node0.childNodes[2].$node.text()).toBe(newNode0Child3.text);
+          expect(node0.childNodes[3].$node.text()).toBe(newNode0Child4.text);
+          expect(node0.childNodes[3].$node.attr('data-level')).toBe('1');
+          expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
+          expect(node0.childNodes[3].$node.next().text()).toBe('node 2');
+
+
+          var newNode1Child3 = createModelNode('1_3', 'newNode1Child3',1);
+          var newNode1Child4 = createModelNode('1_4', 'newNode1Child4',2);
+
+
+          var message2 = {
+              events: [createNodesInsertedEventTopNode(model, [newNode1Child3, newNode1Child4])]
+            };
+            session._processSuccessResponse(message2);
+
+            expect(findAllNodes(tree).length).toBe(16);
+            expect(tree.nodes[1].$node.prev().text()).toBe('node 2');
+            expect(tree.nodes[1].$node.prev().attr('data-level')).toBe('1');
+            expect(tree.nodes[1].$node.text()).toBe(newNode1Child3.text);
+            expect(tree.nodes[1].$node.attr('data-level')).toBe('0');
+            expect(tree.nodes[2].$node.text()).toBe(newNode1Child4.text);
+            expect(tree.nodes[2].$node.attr('data-level')).toBe('0');
+            expect(tree.nodes[2].$node.next().attr('data-level')).toBe('0');
+            expect(tree.nodes[2].$node.next().text()).toBe('node 1');
+
+
+
+        });
+
+
 
       });
 
