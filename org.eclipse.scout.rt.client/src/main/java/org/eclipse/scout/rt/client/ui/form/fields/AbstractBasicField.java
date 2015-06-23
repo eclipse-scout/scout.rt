@@ -40,8 +40,8 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
     @Override
     public void parseAndSetValueFromUI(String value) {
-      if (value != null && value.length() == 0) {
-        value = null;
+      if (value == null) {
+        value = "";
       }
       // parse always, validity might change even if text is same
       parseAndSetValue(value);
@@ -121,7 +121,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    * any further chain elements.
    */
   protected static class LocalBasicFieldExtension<VALUE_TYPE, OWNER_FIELD extends AbstractBasicField<VALUE_TYPE>> extends AbstractValueField.LocalValueFieldExtension<VALUE_TYPE, OWNER_FIELD>
-  implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
+      implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
 
     public LocalBasicFieldExtension(OWNER_FIELD owner) {
       super(owner);

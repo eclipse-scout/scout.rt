@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,11 +54,9 @@ public class AbstractStringFieldTest extends AbstractStringField {
     });
   }
 
-  // FIXME ASA This test currently fails, but it should not!
-  @Ignore
   @Test
   public void testDisplayTextInitialState() throws Exception {
-    assertEquals("", getDisplayText()); // FIXME ASA null or ""?
+    assertEquals("", getDisplayText());
     assertEquals(0, m_displayTextChangedCounter.get());
     assertArrayEquals(new String[]{}, m_displayTextChangedHistory.toArray());
   }
@@ -75,14 +72,12 @@ public class AbstractStringFieldTest extends AbstractStringField {
     assertArrayEquals(new String[]{"Test"}, m_displayTextChangedHistory.toArray());
   }
 
-  // FIXME ASA This test currently fails, but it should not!
-  @Ignore
   @Test
   public void testDisplayTextNoValueChangeOnEmptyText() throws Exception {
     getUIFacade().parseAndSetValueFromUI("Test");
     assertEquals("Test", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("");
-    assertEquals("", getDisplayText()); // FIXME ASA null or ""?
+    assertEquals("", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("");
     assertEquals("", getDisplayText());
     getUIFacade().parseAndSetValueFromUI(null);

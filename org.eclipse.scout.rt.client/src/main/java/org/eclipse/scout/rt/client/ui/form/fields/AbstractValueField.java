@@ -68,6 +68,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   private VALUE m_initValue;
   private EventListenerList m_listeningSlaves;// my slaves
 
+  {
+    propertySupport.setPropertyNoFire(PROP_DISPLAY_TEXT, "");
+  }
+
   public AbstractValueField() {
     this(true);
   }

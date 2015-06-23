@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -426,11 +425,9 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     assertEquals("expect default for minValue=getMinPossibleValue() after calling setter with null-param", getMinPossibleValue(), getMinValue());
   }
 
-  // FIXME ASA This test currently fails, but it should not!
-  @Ignore
   @Test
   public void testDisplayTextInitialState() throws Exception {
-    assertEquals("", getDisplayText()); // FIXME ASA null or ""?
+    assertEquals("", getDisplayText());
     assertEquals(0, m_displayTextChangedCounter.get());
     assertArrayEquals(new String[]{}, m_displayTextChangedHistory.toArray());
   }
@@ -457,14 +454,12 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     assertArrayEquals(new String[]{"12'345"}, m_displayTextChangedHistory.toArray());
   }
 
-  // FIXME ASA This test currently fails, but it should not!
-  @Ignore
   @Test
   public void testDisplayTextNoValueChangeOnEmptyText() throws Exception {
     getUIFacade().parseAndSetValueFromUI("123");
     assertEquals("123", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("");
-    assertEquals("", getDisplayText()); // FIXME ASA null or ""?
+    assertEquals("", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("");
     assertEquals("", getDisplayText());
     getUIFacade().parseAndSetValueFromUI(null);
