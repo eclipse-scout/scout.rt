@@ -413,7 +413,7 @@ OSC 24.06.2015:
 IClientSession.stopSession() was renamed to stop() to match IServerSession.stop().
 Migration: Rename stopSession() to stop().
 
-MOT 25.06.2015:
+MOT 25.06.2015/01.07.2015:
 API changes AbstractHtmlField:
 - For IHtmlField attachments RemoteFile has been replaced by BinaryResource, therefore method signatures of getAttachments() and setAttachments have changed.
 --> Migration: Replace RemoteFile with BinaryResource.
@@ -428,3 +428,6 @@ API changes AbstractStringField:
 --> Migration: Replace old method name with new name.
 - Method renaming/signature change: execLinkAction(java.net.URL) -> execAction()
 --> Migration: execAction() can access value using getValue(), it could create the old URL using org.eclipse.scout.commons.IOUtility.urlTextToUrl(getValue())
+- New property for selection tracking, changeable with methods isSelectionTrackingEnabled() and setSelectionTrackingEnabled(boolean)
+--> Selection tracking with getSelectionStart() and getSelectionEnd() is only possible when selection tracking is enabled.
+

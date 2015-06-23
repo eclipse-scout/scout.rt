@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
 
   public static final String EVENT_CALL_ACTION = "callAction";
+  public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
+  public static final String EVENT_SELECTION_CHANGED = "selectionChanged";
 
   public JsonStringField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -81,12 +83,33 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isHasAction();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_SELECTION_START, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getSelectionStart();
+      }
+    });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_SELECTION_END, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getSelectionEnd();
+      }
+    });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_SELECTION_TRACKING_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isSelectionTrackingEnabled();
+      }
+    });
   }
 
   @Override
   public void handleUiEvent(JsonEvent event) {
     if (EVENT_CALL_ACTION.equals(event.getType())) {
       handleUiCallAction();
+    }
+    else if (EVENT_SELECTION_CHANGED.equals(event.getType())) {
+      handleUiSelectionChanged(event);
     }
     else {
       super.handleUiEvent(event);
@@ -101,7 +124,14 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
 
   private void handleUiCallAction() {
     getModel().getUIFacade().fireActionFromUI();
+  }
 
+  private void handleUiSelectionChanged(JsonEvent event) {
+    int selectionStart = (int) event.getData().get(IStringField.PROP_SELECTION_START);
+    int selectionEnd = (int) event.getData().get(IStringField.PROP_SELECTION_END);
+    addPropertyEventFilterCondition(IStringField.PROP_SELECTION_START, selectionStart);
+    addPropertyEventFilterCondition(IStringField.PROP_SELECTION_END, selectionEnd);
+    getModel().getUIFacade().setSelectionFromUI(selectionStart, selectionEnd);
   }
 
   @Override

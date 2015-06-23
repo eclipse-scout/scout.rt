@@ -25,6 +25,7 @@ scout.StringField.prototype._render = function($parent) {
     $field = scout.fields.new$TextField();
   }
   $field.on('blur', this._onFieldBlur.bind(this));
+  $field.on('select', this._onSelect.bind(this));
   this.addField($field);
 
   this.addStatus();
@@ -39,6 +40,17 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderFormat(this.format);
   this._renderSpellCheckEnabled(this.spellCheckEnabled);
   this._renderHasAction(this.hasAction);
+  this._renderSelectionStart(this.selectionStart);
+  this._renderSelectionStart(this.selectionEnd);
+  // no render operation necessary: this._renderSelectionTrackingEnabled(...);
+};
+
+scout.StringField.prototype._renderSelectionStart = function(selectionStart){
+  this.$field[0].selectionStart = selectionStart;
+};
+
+scout.StringField.prototype._renderSelectionEnd = function(selectionEnd){
+  this.$field[0].selectionEnd = selectionEnd;
 };
 
 scout.StringField.prototype._renderInputMasked = function(inputMasked){
@@ -104,4 +116,24 @@ scout.StringField.prototype._onIconClick = function(event) {
   this.session.send(this.id, 'callAction');
 };
 
+scout.StringField.prototype._onSelect = function(event) {
+  if (this.selectionTrackingEnabled) {
+    this._sendSelectionChanged();
+  }
+};
+
+scout.StringField.prototype._sendSelectionChanged = function() {
+  var event = new scout.Event(this.id, 'selectionChanged', {
+    selectionStart: this.$field[0].selectionStart,
+    selectionEnd: this.$field[0].selectionEnd
+  });
+
+  // Only send the latest selection changed event for a field
+  event.coalesce = function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  };
+
+  // send delayed to avoid a lot of requests while selecting
+  this.session.sendEvent(event, 500);
+};
 
