@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -329,18 +328,18 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     IWizardStep<? extends IForm> prev = getPreviousStep();
     IWizardStep<? extends IForm> next = getNextStep();
     //
-    IButton b;
-    b = getContainerForm().getWizardPreviousStepButton();
-    if (b != null) {
-      b.setView(true, prev != null, false);
+    IWizardAction action;
+    action = getContainerForm().getWizardPreviousStepButton();
+    if (action != null) {
+      action.setView(true, prev != null);
     }
-    b = getContainerForm().getWizardNextStepButton();
-    if (b != null) {
-      b.setView(next != null, true, false);
+    action = getContainerForm().getWizardNextStepButton();
+    if (action != null) {
+      action.setView(next != null, true);
     }
-    b = getContainerForm().getWizardFinishButton();
-    if (b != null) {
-      b.setView(next == null, true, false);
+    action = getContainerForm().getWizardFinishButton();
+    if (action != null) {
+      action.setView(next == null, true);
     }
   }
 

@@ -697,6 +697,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_horizontalAlignment = horizontalAlignment;
   }
 
+  @Override
+  public void setView(boolean visible, boolean enabled) {
+    setVisible(visible);
+    setEnabled(enabled);
+  }
+
   protected class P_UIFacade implements IActionUIFacade {
     @Override
     public void fireActionFromUI() {

@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.AbstractWizardProgressField;
@@ -47,7 +46,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *             will be deleted in the O-Release.
  */
 @Deprecated
-public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainerForm implements IWizardContainerForm {
+public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainerForm {
 
   public LegacyHtmlStatusWizardContainerForm(IWizard wizard) throws ProcessingException {
     this(wizard, true);
@@ -85,32 +84,32 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
   }
 
   @Override
-  public IButton getWizardCancelButton() {
+  public IWizardAction getWizardCancelButton() {
     return getFieldByClass(WizardCancelButton.class);
   }
 
   @Override
-  public IButton getWizardSuspendButton() {
+  public IWizardAction getWizardSuspendButton() {
     return getFieldByClass(WizardSuspendButton.class);
   }
 
   @Override
-  public IButton getWizardResetButton() {
+  public IWizardAction getWizardResetButton() {
     return getFieldByClass(WizardResetButton.class);
   }
 
   @Override
-  public IButton getWizardPreviousStepButton() {
+  public IWizardAction getWizardPreviousStepButton() {
     return getFieldByClass(WizardPreviousStepButton.class);
   }
 
   @Override
-  public IButton getWizardNextStepButton() {
+  public IWizardAction getWizardNextStepButton() {
     return getFieldByClass(WizardNextStepButton.class);
   }
 
   @Override
-  public IButton getWizardFinishButton() {
+  public IWizardAction getWizardFinishButton() {
     return getFieldByClass(WizardFinishButton.class);
   }
 
@@ -229,7 +228,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(30.0)
-    public class WizardPreviousStepButton extends AbstractButton {
+    public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
       protected String getConfiguredIconId() {
@@ -258,7 +257,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(40.0)
-    public class WizardNextStepButton extends AbstractButton {
+    public class WizardNextStepButton extends AbstractButton implements IWizardAction {
 
       @Override
       protected String getConfiguredIconId() {
@@ -287,7 +286,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(50.0)
-    public class WizardFinishButton extends AbstractButton {
+    public class WizardFinishButton extends AbstractButton implements IWizardAction {
 
       @Override
       protected String getConfiguredLabel() {
@@ -311,7 +310,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(60.0)
-    public class WizardCancelButton extends AbstractButton implements IButton {
+    public class WizardCancelButton extends AbstractButton implements IWizardAction {
 
       @Override
       protected String getConfiguredLabel() {
@@ -340,7 +339,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(70.0)
-    public class WizardSuspendButton extends AbstractButton {
+    public class WizardSuspendButton extends AbstractButton implements IWizardAction {
 
       @Override
       protected String getConfiguredLabel() {
@@ -369,7 +368,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(80.0)
-    public class WizardResetButton extends AbstractButton implements IButton {
+    public class WizardResetButton extends AbstractButton implements IWizardAction {
 
       @Override
       protected String getConfiguredLabel() {

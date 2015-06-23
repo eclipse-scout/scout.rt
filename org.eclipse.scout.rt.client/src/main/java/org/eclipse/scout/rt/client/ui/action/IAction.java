@@ -228,4 +228,5 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
 
   int getHorizontalAlignment();
 
+  void setView(boolean visible, boolean enabled);
 }

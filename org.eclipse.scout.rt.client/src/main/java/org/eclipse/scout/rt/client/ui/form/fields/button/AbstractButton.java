@@ -425,6 +425,12 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
   }
 
+  @Override
+  public void setView(boolean visible, boolean enabled) {
+    setVisible(visible);
+    setEnabled(enabled);
+  }
+
   /**
    * Default implementation for buttons
    */

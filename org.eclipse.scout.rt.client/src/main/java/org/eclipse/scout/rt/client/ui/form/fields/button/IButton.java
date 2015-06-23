@@ -125,4 +125,6 @@ public interface IButton extends IFormField {
    * @return
    */
   IContextMenu getContextMenu();
+
+  void setView(boolean visible, boolean enabled);
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,25 +13,23 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 public interface IWizardContainerForm extends IForm {
+
   /**
    * Normally starts the {@link IFormHandler} with the name WizardHandler.
-   * 
-   * @throws ProcessingException
    */
   void startWizard() throws ProcessingException;
 
-  IButton getWizardCancelButton();
+  IWizardAction getWizardCancelButton();
 
-  IButton getWizardSuspendButton();
+  IWizardAction getWizardSuspendButton();
 
-  IButton getWizardPreviousStepButton();
+  IWizardAction getWizardPreviousStepButton();
 
-  IButton getWizardNextStepButton();
+  IWizardAction getWizardNextStepButton();
 
-  IButton getWizardFinishButton();
+  IWizardAction getWizardFinishButton();
 
-  IButton getWizardResetButton();
+  IWizardAction getWizardResetButton();
 }

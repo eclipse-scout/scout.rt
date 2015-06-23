@@ -420,6 +420,11 @@ public class OutlineMenuWrapper implements IMenu {
   }
 
   @Override
+  public void setView(boolean visible, boolean enabled) {
+    throw new UnsupportedOperationException("read only wrapper");
+  }
+
+  @Override
   public String toString() {
     return super.toString() + " wrapping '" + m_wrappedMenu.toString() + "'";
   }
