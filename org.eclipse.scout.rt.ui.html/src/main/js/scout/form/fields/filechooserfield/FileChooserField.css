@@ -2,6 +2,10 @@
 
   & > input[type=text] {
     .text-field-with-icon(@icon-file);
+
+      ~ .icon {
+        cursor: pointer;
+      }
   }
 
   & > input[type=file] {
