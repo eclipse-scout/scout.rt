@@ -23,7 +23,6 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   String PROP_INPUT_MASKED = "inputMasked";
   String PROP_WRAP_TEXT = "wrapText";
   String PROP_MULTILINE_TEXT = "multilineText";
-  String PROP_SELECT_ALL_ON_FOCUS = "selectAllOnFocus";
   String PROP_FORMAT = "format";
   String PROP_MAX_LENGTH = "maxLength";
   String PROP_INSERT_TEXT = "insertText";
