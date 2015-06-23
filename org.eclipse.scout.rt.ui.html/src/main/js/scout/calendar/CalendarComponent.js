@@ -191,20 +191,20 @@ scout.CalendarComponent.prototype._description = function() {
 
   // subject
   if (scout.strings.hasText(this.item.subject)) {
-    descParts.push({text: this.item.subject, style: 'bold'});
+    descParts.push({text: this.item.subject, cssClass: 'bold'});
   }
 
   // time-range
   if (this.fullDay) {
     // NOP
   } else if (scout.dates.isSameDay(fromDate, toDate)) {
-    range = 'von ' + this._format(fromDate, 'HH:mm') + ' bis ' + this._format(toDate, 'HH:mm');
+    range = this.session.text('ui.FromXToY', this._format(fromDate, 'HH:mm'), this._format(toDate, 'HH:mm'));
   } else {
-    range = range = 'von ' + this._format(fromDate, 'EEEE HH:mm ') + ' bis ' + this._format(toDate, ' EEEE HH:mm');
+    range = this.session.text('ui.FromXToY', this._format(fromDate, 'EEEE HH:mm '), this._format(toDate, 'EEEE HH:mm'));
   }
 
   if (scout.strings.hasText(range)) {
-    descParts.push({text: range, style: 'small'});
+    descParts.push({text: range, cssClass: 'small'});
   }
 
   // body
@@ -214,7 +214,7 @@ scout.CalendarComponent.prototype._description = function() {
 
   // build text
   descParts.forEach(function(part) {
-    text += (part.style ? '<span class = "' + part.style + '">' + part.text + '</span>' : part.text) + '<br/>';
+    text += (part.cssClass ? '<span class="' + part.cssClass + '">' + part.text + '</span>' : part.text) + '<br/>';
   });
 
   return text;
