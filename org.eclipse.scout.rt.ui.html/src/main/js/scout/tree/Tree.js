@@ -315,7 +315,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded) {
   }
 };
 
-scout.Tree.prototype._renderExpansion = function(node) {
+scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
   var $wrapper,
     $node = node.$node,
     expanded = node.expanded;
@@ -335,7 +335,7 @@ scout.Tree.prototype._renderExpansion = function(node) {
   }
 
   if (expanded) {
-    this._addNodes(node.childNodes, $node);
+    this._addNodes(node.childNodes, $node,$predecessor);
     this._updateItemPath();
 
     if (this._breadcrumb) {
@@ -505,8 +505,34 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
   }
 };
 
+scout.Tree.prototype._updateChildNodeIndex = function(parentNode, startIndex){
+  for(var i = startIndex ; i< parentNode.childNodes.length; i++){
+    parentNode.childNodes[i].childNodeIndex = i;
+  }
+};
+
+scout.Tree.prototype._onNodesInsertedCalcPredecessor = function(nodeBefore){
+  if(!nodeBefore){
+    return undefined;
+  }
+  if(nodeBefore&&(!nodeBefore.childNodes || nodeBefore.childNodes.length===0) && nodeBefore.$node){
+    return nodeBefore.$node;
+  }
+  else{
+    var $node = this._onNodesInsertedCalcPredecessor(nodeBefore.childNodes[nodeBefore.childNodes.length-1]);
+    if($node){
+      return $node;
+    }
+    else if(nodeBefore.$node){
+      return nodeBefore.$node;
+    }
+    return undefined;
+  }
+};
+
 scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var parentNode, $parentNode;
+  //Append continous node blocks
 
   if (parentNodeId >= 0) {
     parentNode = this.nodesMap[parentNodeId];
@@ -516,25 +542,33 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   }
   this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
+  var $predecessor;
   // Update parent with new child nodes
   if (parentNode) {
     if (parentNode.childNodes && parentNode.childNodes.length > 0) {
       nodes.forEach(function(entry) {
-        scout.arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex ? entry.childNodeIndex : 0);
+        var nodeIndex = entry.childNodeIndex ? entry.childNodeIndex : 0;
+        scout.arrays.insert(parentNode.childNodes, entry, nodeIndex);
       }.bind(this));
+      this._updateChildNodeIndex(parentNode, nodes[0].childNodeIndex);
     } else {
       scout.arrays.pushAll(parentNode.childNodes, nodes);
     }
 
     if (this.rendered && parentNode.$node) {
       $parentNode = parentNode.$node;
+      if(nodes[0].childNodeIndex === 0 ){
+        $predecessor=$parentNode;
+      } else {
+        $predecessor=scout.Tree.prototype._onNodesInsertedCalcPredecessor(parentNode.childNodes[nodes[0].childNodeIndex-1]);
+      }
       if (parentNode.expanded) {
         // If parent is already expanded just add the nodes at the end.
         // Otherwise render the expansion
         if ($parentNode.hasClass('expanded')) {
-          this._addNodes(nodes, $parentNode);
+          this._addNodes(nodes, $parentNode, $predecessor);
         } else {
-          this._renderExpansion(parentNode);
+          this._renderExpansion(parentNode, $predecessor);
         }
       }
     }
@@ -543,12 +577,17 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
       nodes.forEach(function(entry) {
         scout.arrays.insert(this.nodes, entry, entry.childNodeIndex ? entry.childNodeIndex : 0);
       }.bind(this));
+      if(nodes[0].childNodeIndex === 0 ){
+        $predecessor=this.$data;
+      } else {
+        $predecessor=scout.Tree.prototype._onNodesInsertedCalcPredecessor(this.nodes[nodes[0].childNodeIndex-1]);
+      }
     } else {
       scout.arrays.pushAll(this.nodes, nodes);
     }
 
     if (this.rendered) {
-      this._addNodes(nodes);
+      this._addNodes(nodes, undefined, $predecessor);
     }
   }
 };
@@ -795,12 +834,12 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
   this.updateScrollbar();
 };
 
-scout.Tree.prototype._addNodes = function(nodes, $parent) {
+scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
   if (!nodes || nodes.length === 0) {
     return;
   }
 
-  var $predecessor = $parent;
+  $predecessor = !$predecessor? $parent : $predecessor;
   var parentNode = ($parent ? $parent.data('node') : undefined);
   var hasHiddenNodes = false;
 
@@ -818,18 +857,9 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     }
     // append first node and successors
     if ($predecessor) {
-      if (parentNode && parentNode.childNodes.indexOf(node) > 0) {
-        $predecessor = parentNode.childNodes[parentNode.childNodes.indexOf(node) - 1].$node;
-      }
       $node.insertAfter($predecessor);
     } else {
-      //insert on top level
-      if (this.nodes && this.nodes.indexOf(node) > 0) {
-        $predecessor = this.nodes[this.nodes.indexOf(node) - 1].$node;
-        $node.insertAfter($predecessor);
-      } else {
-        $node.prependTo(this.$data);
-      }
+      $node.appendTo(this.$data);
     }
 
     // if model demands children, create them
