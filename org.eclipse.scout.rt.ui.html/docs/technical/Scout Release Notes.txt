@@ -383,3 +383,9 @@ removed AbstractBrowserField#execLocationChanged
 removed AbstractBrowserField#doLocationChange
 added AbstractBrowserField#execPostMessage as replacement
 More infos: https://loop.bsi-software.com/groups/scout-html-ui/blog/2015/06/22/browserfield-mit-html-ui
+
+MOT 23.06.2015:
+removed IStringField.isSpellCheckAsYouTypeEnabled(), IStringField.setSpellCheckAsYouTypeEnabled(boolean)
+added IStringField.setSpellCheckEnabled(boolean)
+new ui delegates spell checker to browser, new property can be used to enable/disable spell checker for certain fields
+(by default it is enabled for multi-line fields, see org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField.computeSpellCheckEnabled()).

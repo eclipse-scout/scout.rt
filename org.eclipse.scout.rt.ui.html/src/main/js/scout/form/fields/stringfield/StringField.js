@@ -37,6 +37,7 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderInputMasked(this.inputMasked);
   this._renderWrapText(this.wrapText);
   this._renderFormat(this.format);
+  this._renderSpellCheckEnabled(this.spellCheckEnabled);
 };
 
 scout.StringField.prototype._renderInputMasked = function(inputMasked){
@@ -51,6 +52,14 @@ scout.StringField.prototype._renderFormat = function(fmt){
     this.$field.css('text-transform', 'lowercase');
   } else if (fmt === scout.StringField.FORMAT.UPPER) {
     this.$field.css('text-transform', 'uppercase');
+  }
+};
+
+scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnabled){
+  if (spellCheckEnabled) {
+    this.$field.attr('spellcheck', 'true');
+  } else {
+    this.$field.attr('spellcheck', 'false');
   }
 };
 

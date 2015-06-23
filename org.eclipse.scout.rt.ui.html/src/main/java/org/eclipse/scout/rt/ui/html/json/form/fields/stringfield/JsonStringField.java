@@ -66,6 +66,12 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().getFormat();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_SPELL_CHECK_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isSpellCheckEnabled();
+      }
+    });
   }
 
   // FIXME AWE: (display-text) rename to handleUiValueChanged after renaming in Scout RT
