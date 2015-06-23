@@ -68,6 +68,11 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
   public static final int LEVEL_COLOR_BIT = 9;
 
   /**
+   * String
+   */
+  public static final int CSS_CLASS_BIT = 9;
+
+  /**
    * int
    */
   public static final int DURATION_MINUTES_BIT = 12;
@@ -77,10 +82,6 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
    */
   public static final int TOOLTIP_TEXT_BIT = 13;
 
-  /**
-   * String
-   */
-  public static final int ICON_ID_BIT = 14;
   /**
    * String
    */
@@ -98,18 +99,16 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
    * @param endTime
    * @param text
    * @param tooltipText
-   * @param iconId
-   * @param majorValue
+   * @param level
    */
-  public Activity(RI resource, AI activityId, Date startTime, Date endTime, String text, String tooltipText, String iconId, float majorValue, float minorValue) {
+  public Activity(RI resource, AI activityId, Date startTime, Date endTime, String text, String tooltipText, float level) {
     setValueInternal(RESOURCE_ID_BIT, resource);
     setValueInternal(ACTIVITY_ID_BIT, activityId);
     setValueInternal(BEGIN_TIME_BIT, startTime);
     setValueInternal(END_TIME_BIT, endTime);
     setValueInternal(TEXT_BIT, text);
     setValueInternal(TOOLTIP_TEXT_BIT, tooltipText);
-    setValueInternal(ICON_ID_BIT, iconId);
-    setValueInternal(LEVEL_BIT, majorValue);
+    setValueInternal(LEVEL_BIT, level);
   }
 
   /**
@@ -121,9 +120,7 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
    *          <li>endTime of type {@link Date}
    *          <li>text of type {@link String}
    *          <li>tooltipText of type {@link String}
-   *          <li>iconId of type {@link String}
-   *          <li>majorValue of type {@link Number}
-   *          <li>minorValue of type {@link Number}
+   *          <li>value of type {@link Number}
    *          </ul>
    */
   public Activity(Object[] row) {
@@ -164,10 +161,6 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
             break;
           }
           case 6: {
-            setIconId((String) row[i]);
-            break;
-          }
-          case 7: {
             setLevel(((Number) row[i]).floatValue());
             break;
           }
@@ -244,6 +237,14 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
     setValueInternal(LEVEL_COLOR_BIT, s);
   }
 
+  public String getCssClass() {
+    return (String) getValueInternal(CSS_CLASS_BIT);
+  }
+
+  public void setCssClass(String s) {
+    setValueInternal(CSS_CLASS_BIT, s);
+  }
+
   public String getTooltipText() {
     return (String) getValueInternal(TOOLTIP_TEXT_BIT);
   }
@@ -258,14 +259,6 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
 
   public void setText(String s) {
     setValueInternal(TEXT_BIT, s);
-  }
-
-  public String getIconId() {
-    return (String) getValueInternal(ICON_ID_BIT);
-  }
-
-  public void setIconId(String icon) {
-    setValueInternal(ICON_ID_BIT, icon);
   }
 
   public String getBackgroundColor() {
