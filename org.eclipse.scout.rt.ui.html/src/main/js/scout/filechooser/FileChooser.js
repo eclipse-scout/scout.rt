@@ -25,18 +25,18 @@ scout.FileChooser.prototype._render = function($parent) {
 
   this.$content = this.$container.appendDiv('file-chooser-content');
   this.$title = $.makeDiv('file-chooser-title')
-    .text('Choose files') // XXX BSH
+    .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'))
     .appendTo(this.$content);
   this.$files = $.makeDiv('file-chooser-files')
     .appendTo(this.$content);
   this.$buttons = $.makeDiv('file-chooser-buttons')
     .appendTo(this.$content);
   this.$addFileButton = $('<button>')
-    .text('Add file') // XXX BSH
+    .text(this.session.text('ui.Browse')) // XXX BSH
     .on('click', this._onAddFileButtonClicked.bind(this))
     .appendTo(this.$buttons);
   this.$okButton = $('<button>')
-    .text(this.session.text('Ok'))
+    .text(this.session.text('ui.Upload'))
     .on('click', this._onOkButtonClicked.bind(this))
     .appendTo(this.$buttons);
   this.$cancelButton = $('<button>')

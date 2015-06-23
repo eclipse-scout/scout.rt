@@ -26,19 +26,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   if (table.header.columns.length > 1) {
     var $commandMove = $menuHeader.appendDiv('header-group');
     $commandMove.appendDiv('header-text')
-      .data('label', session.text('Move'));
+      .data('label', session.text('ui.Move'));
 
     $commandMove.appendDiv('header-command move-top')
-      .data('label', session.text('toBegin'))
+      .data('label', session.text('ui.toBegin'))
       .click(moveTop);
     $commandMove.appendDiv('header-command move-up')
-      .data('label', session.text('forward'))
+      .data('label', session.text('ui.forward'))
       .click(moveUp);
     $commandMove.appendDiv('header-command move-down')
-      .data('label', session.text('backward'))
+      .data('label', session.text('ui.backward'))
       .click(moveDown);
     $commandMove.appendDiv('header-command move-bottom')
-      .data('label', session.text('toEnd'))
+      .data('label', session.text('ui.toEnd'))
       .click(moveBottom);
   }
 
@@ -48,26 +48,26 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .data('label', session.text('ColumnSorting'));
 
   var $sortAsc = $commandSort.appendDiv('header-command sort-asc')
-    .data('label', session.text('ascending'))
+    .data('label', session.text('ui.ascending'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('asc', false, $(this).hasClass('selected'));
     });
   var $sortDesc = $commandSort.appendDiv('header-command sort-desc')
-    .data('label', session.text('descending'))
+    .data('label', session.text('ui.descending'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('desc', false, $(this).hasClass('selected'));
     });
 
   var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
-    .data('label', session.text('ascendingAdditionally'))
+    .data('label', session.text('ui.ascendingAdditionally'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('asc', true, $(this).hasClass('selected'));
     });
   var $sortDescAdd = $commandSort.appendDiv('header-command sort-desc-add')
-    .data('label', session.text('descendingAdditionally'))
+    .data('label', session.text('ui.descendingAdditionally'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('desc', true, $(this).hasClass('selected'));
@@ -83,22 +83,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   if (containsNumberColumn) {
     var $commandGroup = $menuHeader.appendDiv('header-group');
     $commandGroup.appendDiv('header-text')
-      .data('label', session.text('Sum'));
+      .data('label', session.text('ui.Sum'));
 
     var $groupAll = $commandGroup.appendDiv('header-command group-all')
-      .data('label', session.text('overEverything'))
+      .data('label', session.text('ui.overEverything'))
       .click(this.remove.bind(this))
       .click(groupAll);
 
     var $groupSelection = $commandGroup.appendDiv('header-command group-selection')
-    .data('label', session.text('overSelection'))
+    .data('label', session.text('ui.overSelection'))
     .click(this.remove.bind(this))
     .click(groupSelection);
 
 
     if (column.type !== 'number') {
       var $groupSort = $commandGroup.appendDiv('header-command group-sort')
-        .data('label', session.text('grouped'))
+        .data('label', session.text('ui.grouped'))
         .click(this.remove.bind(this))
         .click(groupSort);
     }
@@ -109,22 +109,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   if (column.type === 'number') {
     var $commandColor = $menuHeader.appendDiv('header-group');
     $commandColor.appendDiv('header-text')
-      .data('label', session.text('ColorCells'));
+      .data('label', session.text('ui.ColorCells'));
 
     $commandColor.appendDiv('header-command color-red')
-      .data('label', session.text('fromRedToGreen'))
+      .data('label', session.text('ui.fromRedToGreen'))
       .click(this.remove.bind(this))
       .click(colorRed);
     $commandColor.appendDiv('header-command color-green')
-      .data('label', session.text('fromGreenToRed'))
+      .data('label', session.text('ui.fromGreenToRed'))
       .click(this.remove.bind(this))
       .click(colorGreen);
     $commandColor.appendDiv('header-command color-bar')
-      .data('label', session.text('withBarGraph'))
+      .data('label', session.text('ui.withBarGraph'))
       .click(this.remove.bind(this))
       .click(colorBar);
     $commandColor.appendDiv('header-command color-remove')
-      .data('label', session.text('remove'))
+      .data('label', session.text('ui.remove'))
       .click(this.remove.bind(this))
       .click(colorRemove);
   }
@@ -137,17 +137,17 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .data('label', session.text('Column'));
 
   $commandColumn.appendDiv('header-command column-add')
-    .data('label', session.text('add'))
+    .data('label', session.text('ui.add'))
     .click(columnAdd);
   $commandColumn.appendDiv('header-command column-remove')
-    .data('label', session.text('remove'))
+    .data('label', session.text('ui.remove'))
     .click(columnRemove);
    */
 
   // filter
   var $headerFilter = $menuHeader.appendDiv('header-group-filter');
   $headerFilter.appendDiv('header-text')
-    .data('label', session.text('FilterBy'));
+    .data('label', session.text('ui.FilterBy'));
 
   var group = (column.type === 'date') ? 3 : -1,
     matrix = new scout.ChartTableControlMatrix(table, session),
@@ -222,7 +222,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   function enterCommand() {
     var $command = $(this),
       $text = $command.siblings('.header-text'),
-      text = $command.hasClass('selected') ? session.text('remove') : $command.data('label');
+      text = $command.hasClass('selected') ? session.text('ui.remove') : $command.data('label');
 
     $text.text($text.data('label') + ' ' + text);
   }

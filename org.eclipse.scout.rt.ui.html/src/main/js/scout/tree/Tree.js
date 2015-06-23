@@ -960,7 +960,7 @@ scout.Tree.prototype._decorateNode = function(node) {
 
 scout.Tree.prototype._decorateShowAllNode = function($showAllNode, parentNode) {
   $showAllNode
-    .text(this.session.text('ShowAllNodes', parentNode.childNodes.length));
+    .text(this.session.text('ui.ShowAllNodes', parentNode.childNodes.length));
 };
 
 scout.Tree.prototype._renderNodeChecked = function(node) {

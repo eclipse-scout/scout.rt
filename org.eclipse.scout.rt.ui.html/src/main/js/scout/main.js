@@ -54,15 +54,15 @@ scout._installGlobalJavascriptErrorHandler = function() {
         var session = scout.sessions[0];
         var errorCode = getJsErrorCode(error);
         var boxOptions = {
-          header: session.optText('UiProcessingErrorTitle', 'Internal UI Error'),
+          header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
           body: scout.strings.join('\n\n',
-              session.optText('UiErrorText', errorMessage, ' (' + session.optText('UiErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
-              session.optText('UiInconsistentMsg', '')),
-          yesButtonText: session.optText('Reload', 'Reload'),
+              session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
+              session.optText('ui.UiInconsistentMsg', '')),
+          yesButtonText: session.optText('ui.Reload', 'Reload'),
           yesButtonAction: function() {
             scout.reloadPage();
           },
-          noButtonText: session.optText('Ignore', 'Ignore'),
+          noButtonText: session.optText('ui.Ignore', 'Ignore'),
           hiddenText: logStr
         };
         session.showFatalMessage(boxOptions, errorCode);

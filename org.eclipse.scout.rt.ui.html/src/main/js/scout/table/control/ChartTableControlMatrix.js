@@ -81,7 +81,7 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
 scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale,
-    emptyCell = this.session.text('EmptyCell');
+    emptyCell = this.session.text('ui.EmptyCell');
 
   // collect all axis
   this._allAxis.push(keyAxis);

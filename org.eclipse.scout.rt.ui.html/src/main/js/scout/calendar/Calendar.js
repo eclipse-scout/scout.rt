@@ -122,16 +122,16 @@ scout.Calendar.prototype._render = function($parent) {
   this.$progress = this.$header.appendDiv('busyindicator-label');
   this.$range = this.$header.appendDiv('calendar-range');
   this.$range.appendDiv('calendar-previous').click(this._onClickPrevious.bind(this));
-  this.$range.appendDiv('calendar-today', this.session.text('CalendarToday')).click(this._onClickToday.bind(this));
+  this.$range.appendDiv('calendar-today', this.session.text('ui.CalendarToday')).click(this._onClickToday.bind(this));
   this.$range.appendDiv('calendar-next').click(this._onClickNext.bind(this));
   this.$range.appendDiv('calendar-select');
 
   // ... and modes
   this.$commands = this.$header.appendDiv('calendar-commands');
-  this.$commands.appendDiv('calendar-mode-day calendar-mode first', this.session.text('CalendarDay')).attr('data-mode', scout.Calendar.DisplayMode.DAY).click(this._onClickDisplayMode.bind(this));
-  this.$commands.appendDiv('calendar-mode-work calendar-mode', this.session.text('CalendarWork')).attr('data-mode', scout.Calendar.DisplayMode.WORK).click(this._onClickDisplayMode.bind(this));
-  this.$commands.appendDiv('calendar-mode-week calendar-mode', this.session.text('CalendarWeek')).attr('data-mode', scout.Calendar.DisplayMode.WEEK).click(this._onClickDisplayMode.bind(this));
-  this.$commands.appendDiv('calendar-mode-month calendar-mode last', this.session.text('CalendarMonth')).attr('data-mode', scout.Calendar.DisplayMode.MONTH).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode-day calendar-mode first', this.session.text('ui.CalendarDay')).attr('data-mode', scout.Calendar.DisplayMode.DAY).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode-work calendar-mode', this.session.text('ui.CalendarWork')).attr('data-mode', scout.Calendar.DisplayMode.WORK).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode-week calendar-mode', this.session.text('ui.CalendarWeek')).attr('data-mode', scout.Calendar.DisplayMode.WEEK).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('calendar-mode-month calendar-mode last', this.session.text('ui.CalendarMonth')).attr('data-mode', scout.Calendar.DisplayMode.MONTH).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('calendar-toggle-year').click(this._onClickYear.bind(this));
   this.$commands.appendDiv('calendar-toggle-list').click(this._onClickList.bind(this));
 
@@ -640,10 +640,11 @@ scout.Calendar.prototype.layoutAxis = function() {
 
   // set weekname or day schedule
   if (this._isMonth()) {
+    var session = this.session;
     $('.calendar-week-name').each(function(index) {
       if (index > 0) {
         $e = $(this);
-        $e.text('KW ' + scout.dates.weekInYear($e.next().data('date')));
+        $e.text(session.text('ui.CW' , scout.dates.weekInYear($e.next().data('date'))));
       }
     });
   } else {

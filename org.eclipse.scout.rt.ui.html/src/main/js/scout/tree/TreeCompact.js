@@ -16,7 +16,7 @@ scout.TreeCompact.prototype._render = function($parent) {
 
   this.$filter = $('<input>').
     attr('type', 'text').
-    placeholder(this.session.text('FilterBy_')).
+    placeholder(this.session.text('ui.FilterBy_')).
     addClass('text-field').
     appendTo(this.$container).
     on('input', this._onInput.bind(this)).

@@ -20,7 +20,7 @@ scout.BaseDesktop.prototype._renderTitle = function(title) {
 };
 
 scout.BaseDesktop.prototype._goOffline = function() {
-  var message = this.session.text('ConnectionInterrupted'),
+  var message = this.session.text('ui.ConnectionInterrupted'),
     $reconnect;
 
   if (this.$offline) {
@@ -31,7 +31,7 @@ scout.BaseDesktop.prototype._goOffline = function() {
   this.$offline.text(message);
   $reconnect = this.$offline.appendDiv('reconnect');
   $reconnect
-    .text(this.session.text('Reconnecting_'))
+    .text(this.session.text('ui.Reconnecting_'))
     .hide();
   if (scout.device.supportsCssAnimation()) {
     $reconnect.addClass('reconnect-animated');
@@ -64,7 +64,7 @@ scout.BaseDesktop.prototype.onReconnecting = function() {
 };
 
 scout.BaseDesktop.prototype.onReconnectingSucceeded = function() {
-  var message = this.session.text('ConnectionReestablished');
+  var message = this.session.text('ui.ConnectionReestablished');
   if (!this.$offline) {
     return;
   }

@@ -160,7 +160,7 @@ scout.DateField.prototype._onFieldBlurTime = function() {
   if (isNaN(date.getTime())) {
     this.timeError = true;
     this.errorStatus = {
-      message: this.session.text('InvalidDateFormat')
+      message: this.session.text('ui.InvalidDateFormat')
     };
   }
   this._renderErrorStatus(this.errorStatus);
@@ -421,7 +421,7 @@ scout.DateField.prototype._validateDisplayText = function(text) {
   this.dateError = !valid;
   if (!valid) {
     return {
-      message: this.session.text('InvalidDateFormat')
+      message: this.session.text('ui.InvalidDateFormat')
     };
   }
 };
@@ -513,7 +513,7 @@ scout.DateField.prototype._predict = function(validatedText, format) {
   var predictedDate = new Date(fullYear, fullMonth - 1, fullDay, 0, 0, 0, 0);
   if (isNaN(predictedDate.getTime())) {
     this.errorStatusUi = {
-      message: this.session.text('InvalidDateFormat')
+      message: this.session.text('ui.InvalidDateFormat')
     };
     this.dateError = true;
     this._renderErrorStatus(this.errorStatusUi);

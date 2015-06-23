@@ -523,9 +523,9 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   // Default values for fatal message boxes
   var boxOptions = {
-    header: this.text('ServerError'),
+    header: this.text('ui.ServerError'),
     body: jsonError.message,
-    yesButtonText: this.text('Reload'),
+    yesButtonText: this.text('ui.Reload'),
     yesButtonAction: function() {
       scout.reloadPage();
     }
@@ -538,14 +538,14 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
     boxOptions.body = null;
     boxOptions.yesButtonText = 'Retry';
   } else if (jsonError.code === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
-    boxOptions.header = this.optText('SessionTimeout', boxOptions.header);
-    boxOptions.body = this.optText('SessionExpiredMsg', boxOptions.body);
+    boxOptions.header = this.optText('ui.SessionTimeout', boxOptions.header);
+    boxOptions.body = this.optText('ui.SessionExpiredMsg', boxOptions.body);
   } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
-    boxOptions.header = this.optText('UiProcessingErrorTitle', boxOptions.header);
+    boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
     boxOptions.body = scout.strings.join('\n\n',
-        this.optText('UiProcessingErrorText', boxOptions.body, ' ( ' + this.optText('UiErrorCodeX', 'Code 20', '20') + ')'),
-        this.optText('UiInconsistentMsg', ''));
-    boxOptions.noButtonText = this.text('Ignore');
+        this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' ( ' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
+        this.optText('ui.UiInconsistentMsg', ''));
+    boxOptions.noButtonText = this.text('ui.Ignore');
   }
   this.showFatalMessage(boxOptions, jsonError.code);
 };

@@ -25,7 +25,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
   }
 
   // Render properties
-  this.$label.text(this._session.text('PleaseWait_'));
+  this.$label.text(this._session.text('ui.PleaseWait_'));
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
