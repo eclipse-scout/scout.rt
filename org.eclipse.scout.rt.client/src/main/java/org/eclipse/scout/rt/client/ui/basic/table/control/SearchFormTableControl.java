@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * @since 5.1.0
@@ -25,7 +26,7 @@ public class SearchFormTableControl extends AbstractTableControl {
   protected void initConfig() {
     super.initConfig();
     setIconId("font:\uF002"); // Icons.Search
-    setTooltipText("Search");
+    setTooltipText(TEXTS.get("Search"));
   }
 
   public void setSearchForm(ISearchForm searchForm) {
