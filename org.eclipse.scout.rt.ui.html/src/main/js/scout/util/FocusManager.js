@@ -282,7 +282,7 @@ scout.FocusContext.prototype._validatePotentialFocus = function(element) {
     //glasspane can not gain focus if there is a click on it.
     return false;
   }
-  else if ($element.data('menu') || $element.data('button')){
+  else if ($element.data('menu') || $element.data('button') || $element.data('buttonOption')){
     //buttons can not gain focus with mouse down. only over keynavigation
     return false;
   }

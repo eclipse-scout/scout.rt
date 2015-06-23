@@ -46,13 +46,13 @@ scout.BusyIndicator.prototype._createButton = function(option, text) {
   return $('<button>')
     .text(text)
     .on('click', this._onButtonClicked.bind(this))
-    .data('option', option)
+    .data('buttonOption', option)
     .appendTo(this.$buttons);
 };
 
 scout.BusyIndicator.prototype._onButtonClicked = function(event) {
   var $button = $(event.target);
   this.trigger('buttonClick', {
-    option: $button.data('option')
+    option: $button.data('buttonOption')
   });
 };
