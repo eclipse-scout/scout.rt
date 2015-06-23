@@ -11,6 +11,7 @@ scout.Action = function() {
   this.bubbleUp = false;
   this.drawHint = true;
   this.preventDefaultOnEvent = true;
+  this.stopImmediate = true;
 
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.

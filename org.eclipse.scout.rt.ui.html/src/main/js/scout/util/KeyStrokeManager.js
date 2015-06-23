@@ -67,6 +67,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     if ((!adapter.keyStrokes || !adapter.accept(event)) && !adapter.preventBubbleUp(event)) {
       return;
     }
+    var stopImmediate = false;
     var bubbleUp = true;
     for (var i = 0; i < adapter.keyStrokes.length; i++) {
       var keyStroke = adapter.keyStrokes[i];
@@ -75,6 +76,10 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
         bubbleUp = bubbleUp && keyStroke.bubbleUp;
         if (keyStroke.removeKeyBox) {
           adapter.removeKeyBox();
+        }
+        if(keyStroke.stopImmediate){
+          stopImmediate = true;
+          break;
         }
       }
     }
@@ -85,6 +90,9 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     if (!bubbleUp || adapter.preventBubbleUp(event)) {
       adapter.removeKeyBox();
       this._adaptersToDraw = [];
+      if(stopImmediate){
+        event.stopImmediatePropagation();
+      }
       event.stopPropagation();
       scout.focusManager.validateFocus(adapter.uiSessionId(), 'KeyStrokeManager');
     }
