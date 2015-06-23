@@ -352,6 +352,11 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   int getSortIndex();
 
   /**
+   * Parse row and set value to ensure correct type and valid value
+   */
+  void parseValueAndSet(ITableRow row, Object rawValue);
+
+  /**
    * @param rawValue
    * @return value in correct type, derived from rawValue
    * @throws ProcessingException

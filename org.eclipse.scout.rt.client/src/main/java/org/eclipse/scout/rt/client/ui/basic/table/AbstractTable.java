@@ -2815,12 +2815,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       //
       int oldRowCount = m_rows.size();
       initCells(newRows);
-      List<ITableRow> newIRows = createInternalRows(newRows, markAsInserted);
+      if (markAsInserted) {
+        updateStatus(newRows, ITableRow.STATUS_INSERTED);
+      }
+      List<ITableRow> newIRows = createInternalRows(newRows);
+
       // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
       for (ITableRow newIRow : newIRows) {
         addInternalRow((InternalTableRow) newIRow);
       }
+
       if (getColumnSet().getSortColumnCount() > 0) {
         // restore order of rows according to sort criteria
         if (isTableChanging()) {
@@ -2874,14 +2879,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  private List<ITableRow> createInternalRows(List<? extends ITableRow> newRows, boolean markAsInserted) throws ProcessingException {
+  private void updateStatus(List<? extends ITableRow> rows, int status) {
+    for (ITableRow newRow : rows) {
+      newRow.setStatus(status);
+    }
+  }
+
+  private List<ITableRow> createInternalRows(List<? extends ITableRow> newRows) throws ProcessingException {
     List<ITableRow> newIRows = new ArrayList<>(newRows.size());
     for (ITableRow newRow : newRows) {
-      if (markAsInserted) {
-        newRow.setStatus(ITableRow.STATUS_INSERTED);
-      }
-      InternalTableRow newIRow = new InternalTableRow(this, newRow);
-      newIRows.add(newIRow);
+      newIRows.add(new InternalTableRow(this, newRow));
     }
     return newIRows;
   }
@@ -3144,7 +3151,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableChanging(true);
       //
       for (ITableRow row : rows) {
-        ((InternalTableRow) row).setStatus(ITableRow.STATUS_INSERTED);
+        row.setStatus(ITableRow.STATUS_INSERTED);
       }
       deleteRows(rows);
     }

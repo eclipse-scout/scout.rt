@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -25,8 +24,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -49,51 +46,25 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     m_table = table;
   }
 
-  @SuppressWarnings("unchecked")
   public InternalTableRow(ITable table, ITableRow row) throws ProcessingException {
     super(table.getColumnSet(), row);
     setEnabled(row.isEnabled());
     m_rowIndex = row.getRowIndex();
-
-    int columnCount = table.getColumnCount();
-    // import and validate cell values
-    for (int i = 0; i < table.getColumnCount(); i++) {
-      Cell newCell = row.getCellForUpdate(i);
-      IColumn col = table.getColumnSet().getColumn(i);
-      tryParseAndSetValue(col, m_cells.get(i), newCell);
+    for (IColumn<?> c : table.getColumns()) {
+      c.parseValueAndSet(this, c.getValue(row));
     }
     // reset status
     setStatus(row.getStatus());
-
-    //add observer
-    for (int i = 0; i < columnCount; i++) {
-      Cell cell = m_cells.get(i);
-      cell.setObserver(this);
-    }
-
+    observeCells();
     // set table at end to avoid events before the row is even attached
     m_table = table;
   }
 
-  @SuppressWarnings("unchecked")
-  private <T> void tryParseAndSetValue(IColumn<T> col, Cell internalCell, ICell newCell) {
-    internalCell.removeErrorStatus(ParsingFailedStatus.class);
-    internalCell.removeErrorStatus(ValidationFailedStatus.class);
-    T value = (T) newCell.getValue();
-    try {
-      internalCell.setText(newCell.getText());
-      T parsedValue = col.parseValue(this, value);
-      col.setValue(this, parsedValue);
-      internalCell.setValue(parsedValue);
+  private void observeCells() {
+    for (int i = 0; i < m_cells.size(); i++) {
+      Cell cell = m_cells.get(i);
+      cell.setObserver(this);
     }
-    catch (ProcessingException e) {
-      internalCell.setText(format(value));
-      internalCell.addErrorStatus(new ValidationFailedStatus<Object>(e, value));
-    }
-  }
-
-  private <T> String format(T value) {
-    return StringUtility.nvl(value, "");
   }
 
   @Override

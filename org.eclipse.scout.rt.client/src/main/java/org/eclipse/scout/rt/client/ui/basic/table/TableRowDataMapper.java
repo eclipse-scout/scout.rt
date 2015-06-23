@@ -143,7 +143,6 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void importTableRowData(ITableRow row, AbstractTableRowData rowData) throws ProcessingException {
     for (IColumn column : m_columnSet.getColumns()) {
       if (m_ignoredColumns.contains(column)) {
@@ -163,7 +162,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       else {
         value = rowData.getCustomColumnValue(column.getColumnId());
       }
-      column.setValue(row, value);
+      column.parseValueAndSet(row, value);
     }
     row.setStatus(rowData.getRowState());
   }

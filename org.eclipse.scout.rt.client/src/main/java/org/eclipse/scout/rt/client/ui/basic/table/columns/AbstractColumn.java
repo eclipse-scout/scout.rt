@@ -34,8 +34,6 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.status.IMultiStatus;
-import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
@@ -55,7 +53,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -66,8 +63,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -86,7 +81,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private final HeaderCell m_headerCell;
   private boolean m_primaryKey;
   private boolean m_summary;
-  private boolean m_isValidating;
   private boolean m_initialized;
   /**
    * A column is presented to the user when it is displayable AND visible this
@@ -1022,49 +1016,29 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setValue(ITableRow r, VALUE value) throws ProcessingException {
-    setValueInternal(r, value, null);
-  }
-
-  private void setValueInternal(ITableRow row, VALUE value, IFormField editingField) throws ProcessingException {
+  public void setValue(ITableRow r, VALUE value) {
     try {
-      Cell cell = row.getCellForUpdate(this);
+      Cell cell = r.getCellForUpdate(this);
       cell.removeErrorStatus(ValidationFailedStatus.class);
-      VALUE newValue = validateValue(row, value);
+      VALUE newValue = validateValue(r, value);
 
       // set newValue into the cell only if there's no error.
       if (cell.isContentValid()) {
-        row.setCellValue(getColumnIndex(), newValue);
-        decorateCellInternal(cell, row);
+        r.setCellValue(getColumnIndex(), newValue);
+        decorateCellInternal(cell, r);
       }
 
-      ensureVisibileIfInvalid(row);
-    }
-    catch (ProcessingException v) {
-      Cell cell = row.getCellForUpdate(this);
-      //add
-      cell.addErrorStatus(new ValidationFailedStatus<VALUE>(v, value));
-      //update cell displayText
-      cell.setText(value == null ? null : value.toString());
-    }
-  }
-
-  /**
-   * Refresh all column values to trigger re-validate and re-format
-   */
-  public void refreshValues() {
-    try {
-      if (isInitialized()) {
-        if (getTable() != null) {
-          List<ITableRow> rows = getTable().getRows();
-          for (ITableRow row : rows) {
-            setValue(row, getValue(row));
-          }
-        }
-      }
+      ensureVisibileIfInvalid(r);
     }
     catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Error setting column value ", e);
+      }
+      Cell cell = r.getCellForUpdate(this);
+      //add
+      cell.addErrorStatus(new ValidationFailedStatus<VALUE>(e, value));
+      //update cell displayText
+      cell.setText(value == null ? null : value.toString());
     }
   }
 
@@ -1348,6 +1322,34 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       c = StringUtility.compareIgnoreCase(o1.toString(), o2.toString());
     }
     return c;
+  }
+
+  /**
+   * Refresh all column values to trigger re-validate and re-format
+   */
+  public void refreshValues() {
+    if (isInitialized()) {
+      if (getTable() != null) {
+        List<ITableRow> rows = getTable().getRows();
+        for (ITableRow row : rows) {
+          setValue(row, getValue(row));
+        }
+      }
+    }
+  }
+
+  /**
+   * Parses values in table row and sets it to the table row
+   */
+  @Override
+  public final void parseValueAndSet(ITableRow row, Object rawValue) {
+    try {
+      VALUE parsedValue = interceptParseValue(row, rawValue);
+      setValue(row, parsedValue);
+    }
+    catch (ProcessingException e) {
+      row.getCellForUpdate(this).addErrorStatus(new ParsingFailedStatus(e, StringUtility.emptyIfNull(rawValue)));
+    }
   }
 
   @Override
@@ -1735,96 +1737,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * @throws ProcessingException
    */
   protected void persistRowChange(ITableRow row) throws ProcessingException {
-  }
-
-  /**
-   * @deprecated use {@link #refreshValues()}
-   */
-  @Deprecated
-  public void validateColumnValues() {
-    if (getTable() != null) {
-      for (ITableRow row : getTable().getRows()) {
-        @SuppressWarnings("unchecked")
-        VALUE value = (VALUE) row.getCell(this).getValue();
-        validateColumnValue(row, null, true, value);
-      }
-    }
-  }
-
-  /**
-   * This method should be called if single column validation should be used for performance reason and/or
-   * if a value is set in the Scout model (and not by the UI component). In this case, the parameter editor
-   * is null and the passed value will be used.
-   *
-   * @param row
-   *          The row changed in the table
-   * @param editor
-   *          The form field editor used for validation of the value
-   * @param singleColValidation
-   *          Defines if single column validation should be used
-   * @param value
-   *          The value that is set in the Scout model and not in the UI component
-   * @deprecated use {@link #execValidateValue(ITableRow, Object)}
-   */
-  @Deprecated
-  @SuppressWarnings({"unchecked"})
-  public void validateColumnValue(ITableRow row, IFormField editor, boolean singleColValidation, VALUE value) {
-    if (row == null) {
-      LOG.error("validateColumnValue called with row=null");
-      return;
-    }
-    if (!(row instanceof InternalTableRow)) {
-      return;
-    }
-    if (m_isValidating) {
-      LOG.warn("validateColumnValue called during running validation. Value " + String.valueOf(value) + " will not be set.");
-      Cell cell = row.getCellForUpdate(this);
-      cell.addErrorStatus(new ValidationFailedStatus(ScoutTexts.get("RunningColumnValidation")));
-      return;
-    }
-
-    if (isCellEditable(row)) {
-      try {
-        if (editor == null) {
-          m_isValidating = true;
-          try {
-            editor = prepareEdit(row);
-            if (editor instanceof IValueField<?>) {
-              ((IValueField<VALUE>) editor).setValue(value);
-            }
-          }
-          finally {
-            m_isValidating = false;
-          }
-        }
-        if (editor != null) {
-          Cell cell = row.getCellForUpdate(this);
-          cell.removeErrorStatus(ParsingFailedStatus.class);
-          cell.removeErrorStatus(ValidationFailedStatus.class);
-          IMultiStatus editorError = ((IValueField<VALUE>) editor).getErrorStatus();
-          MultiStatus status = editorError == null ? new MultiStatus() : new MultiStatus(editorError);
-          if (!status.isOK()) {
-            cell.addErrorStatus(status);
-            cell.setText(((IValueField<VALUE>) editor).getDisplayText());
-          }
-          else {
-            /*
-             * Workaround for bugs 396848 & 408741
-             * Currently, we set the error status and value directly on the cell before calling the decorator.
-             * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(List<ITableRow> rows)}
-             * to propagate the new error status and value.
-             */
-            cell.setValue(value);
-            decorateCellInternal(cell, row);
-          }
-          ensureVisibileIfInvalid(row);
-        }
-      }
-      catch (Exception e) {
-        LOG.error("validating " + getTable().getClass().getSimpleName() + " for new row for column " + getClass().getSimpleName(), e);
-        return;
-      }
-    }
   }
 
   /**
