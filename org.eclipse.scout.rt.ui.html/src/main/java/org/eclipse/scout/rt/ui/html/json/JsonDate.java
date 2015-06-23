@@ -70,17 +70,17 @@ public class JsonDate implements IJsonObject {
     return m_jsonString;
   }
 
+  @Override
+  public Object toJson() {
+    return asJsonString();
+  }
+
   /**
    * Returns the value as a JSON string in one of the canonical formats. Both date and time parts
    * are returned. The local time zone is used (non-UTC-mode).
    */
   public String asJsonString() {
     return asJsonString(false);
-  }
-
-  @Override
-  public Object toJson() {
-    return asJsonString();
   }
 
   /**

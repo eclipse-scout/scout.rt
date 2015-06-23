@@ -15,11 +15,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 
-import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -126,11 +126,14 @@ public final class JsonObjectUtility {
       return null;
     }
     //basic types
-    if (type == byte[].class) {
-      return (T) jval;
-    }
     if (type == String.class) {
       return (T) jval;
+    }
+    if (type == byte[].class) {
+      return (T) new JsonByteArray((String) jval).getBytes();
+    }
+    if (type == Date.class) {
+      return (T) new JsonDate((String) jval).asJavaDate();
     }
     if (type == int.class || type == Integer.class) {
       return (T) jval;
@@ -220,7 +223,11 @@ public final class JsonObjectUtility {
     }
     //blob
     if (type == byte[].class) {
-      return Base64Utility.decode(jsonObject.getJSONObject(propertyName).getString("b64"));
+      return jsonObject.getString(propertyName);
+    }
+    //date
+    if (type == Date.class) {
+      return jsonObject.getString(propertyName);
     }
     //array
     if (jval instanceof JSONArray) {
@@ -257,7 +264,11 @@ public final class JsonObjectUtility {
     }
     //blob
     if (type == byte[].class) {
-      return Base64Utility.decode(jsonArray.getJSONObject(index).getString("b64"));
+      return jsonArray.getString(index);
+    }
+    //date
+    if (type == Date.class) {
+      return jsonArray.getString(index);
     }
     //array
     if (jval instanceof JSONArray) {

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.json.JSONObject;
 
 public class JsonByteArray implements IJsonObject {
   private byte[] m_bytes;
@@ -20,12 +19,20 @@ public class JsonByteArray implements IJsonObject {
     m_bytes = bytes;
   }
 
+  public JsonByteArray(String jsonString) {
+    m_bytes = Base64Utility.decode(jsonString);
+  }
+
+  public byte[] getBytes() {
+    return m_bytes;
+  }
+
   @Override
   public Object toJson() {
-    //TODO CGU/IMO is a json object necessary?
-    JSONObject b64 = new JSONObject();
-    b64.put("b64", Base64Utility.encode((byte[]) m_bytes));
-    return b64;
+    if (m_bytes == null) {
+      return null;
+    }
+    return Base64Utility.encode((byte[]) m_bytes);
   }
 
 }
