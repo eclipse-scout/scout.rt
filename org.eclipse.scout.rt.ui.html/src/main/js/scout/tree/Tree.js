@@ -155,8 +155,8 @@ scout.Tree.prototype._renderEnabled = function() {
         node = $node.data('node');
 
       $node.children('.tree-node-checkbox')
-      .children('div')
-      .toggleClass('disabled', !(enabled && node.enabled));
+        .children('div')
+        .toggleClass('disabled', !(enabled && node.enabled));
     });
   }
 };
@@ -202,9 +202,9 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
         childrenFound = true;
         if (this.rendered && node.$node) {
           node.$node
-          .children('.tree-node-checkbox')
-          .children('div')
-          .toggleClass('childrenChecked', true);
+            .children('.tree-node-checkbox')
+            .children('div')
+            .toggleClass('childrenChecked', true);
         }
         break;
       }
@@ -213,8 +213,8 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
       node.childrenChecked = false;
       if (this.rendered && node.$node) {
         node.$node.children('.tree-node-checkbox')
-        .children('div')
-        .toggleClass('childrenChecked', false);
+          .children('div')
+          .toggleClass('childrenChecked', false);
       }
     }
   }
@@ -249,12 +249,12 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
     if (this.rendered && node.parentNode.$node) {
       if (checked) {
         node.parentNode.$node.children('.tree-node-checkbox')
-        .children('div')
-        .toggleClass('childrenChecked', true);
+          .children('div')
+          .toggleClass('childrenChecked', true);
       } else {
         node.parentNode.$node.children('.tree-node-checkbox')
-        .children('div')
-        .toggleClass('childrenChecked', false);
+          .children('div')
+          .toggleClass('childrenChecked', false);
       }
     }
   }
@@ -335,7 +335,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
   }
 
   if (expanded) {
-    this._addNodes(node.childNodes, $node,$predecessor);
+    this._addNodes(node.childNodes, $node, $predecessor);
     this._updateItemPath();
 
     if (this._breadcrumb) {
@@ -505,28 +505,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
   }
 };
 
-scout.Tree.prototype._updateChildNodeIndex = function(parentNode, startIndex){
-  for(var i = startIndex ; i< parentNode.childNodes.length; i++){
+scout.Tree.prototype._updateChildNodeIndex = function(parentNode, startIndex) {
+  for (var i = startIndex; i < parentNode.childNodes.length; i++) {
     parentNode.childNodes[i].childNodeIndex = i;
-  }
-};
-
-scout.Tree.prototype._onNodesInsertedCalcPredecessor = function(nodeBefore){
-  if(!nodeBefore){
-    return undefined;
-  }
-  if(nodeBefore&&(!nodeBefore.childNodes || nodeBefore.childNodes.length===0) && nodeBefore.$node){
-    return nodeBefore.$node;
-  }
-  else{
-    var $node = this._onNodesInsertedCalcPredecessor(nodeBefore.childNodes[nodeBefore.childNodes.length-1]);
-    if($node){
-      return $node;
-    }
-    else if(nodeBefore.$node){
-      return nodeBefore.$node;
-    }
-    return undefined;
   }
 };
 
@@ -557,10 +538,10 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 
     if (this.rendered && parentNode.$node) {
       $parentNode = parentNode.$node;
-      if(nodes[0].childNodeIndex === 0 ){
-        $predecessor=$parentNode;
+      if (nodes[0].childNodeIndex === 0) {
+        $predecessor = $parentNode;
       } else {
-        $predecessor=scout.Tree.prototype._onNodesInsertedCalcPredecessor(parentNode.childNodes[nodes[0].childNodeIndex-1]);
+        $predecessor = calcPredecessor(parentNode.childNodes[nodes[0].childNodeIndex - 1]);
       }
       if (parentNode.expanded) {
         // If parent is already expanded just add the nodes at the end.
@@ -577,10 +558,10 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
       nodes.forEach(function(entry) {
         scout.arrays.insert(this.nodes, entry, entry.childNodeIndex ? entry.childNodeIndex : 0);
       }.bind(this));
-      if(nodes[0].childNodeIndex === 0 ){
-        $predecessor=this.$data;
+      if (nodes[0].childNodeIndex === 0) {
+        $predecessor = this.$data;
       } else {
-        $predecessor=scout.Tree.prototype._onNodesInsertedCalcPredecessor(this.nodes[nodes[0].childNodeIndex-1]);
+        $predecessor = calcPredecessor(this.nodes[nodes[0].childNodeIndex - 1]);
       }
     } else {
       scout.arrays.pushAll(this.nodes, nodes);
@@ -589,6 +570,24 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
     if (this.rendered) {
       this._addNodes(nodes, undefined, $predecessor);
     }
+  }
+
+  // ----- Helper functions -----
+
+  function calcPredecessor(nodeBefore) {
+    if (!nodeBefore) {
+      return undefined;
+    }
+    if (nodeBefore && (!nodeBefore.childNodes || nodeBefore.childNodes.length === 0) && nodeBefore.$node) {
+      return nodeBefore.$node;
+    }
+    var $node = calcPredecessor(nodeBefore.childNodes[nodeBefore.childNodes.length - 1]);
+    if ($node) {
+      return $node;
+    } else if (nodeBefore.$node) {
+      return nodeBefore.$node;
+    }
+    return undefined;
   }
 };
 
@@ -828,7 +827,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     return;
   }
 
-  $predecessor = !$predecessor? $parent : $predecessor;
+  $predecessor = !$predecessor ? $parent : $predecessor;
   var parentNode = ($parent ? $parent.data('node') : undefined);
   var hasHiddenNodes = false;
 
