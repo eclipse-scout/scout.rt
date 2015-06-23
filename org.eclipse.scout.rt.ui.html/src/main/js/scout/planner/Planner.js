@@ -101,7 +101,7 @@ scout.Planner.prototype._render = function($parent) {
     .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
     .on('mousedown', '.resource-title', this._onResourceTitleMousedown.bind(this))
     .on('contextmenu', '.resource-title', this._onResourceTitleContextMenu.bind(this))
-    .on('contextmenu', '.activity', this._onActivityContextMenu.bind(this));
+    .on('contextmenu', '.planner-activity', this._onActivityContextMenu.bind(this));
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render(this.$container);
 
@@ -511,7 +511,7 @@ scout.Planner.prototype._renderResources = function(resources) {
 
 scout.Planner.prototype._build$Resource = function(resource) {
   var i, $activity,
-    $resource = $.makeDiv('resource');
+    $resource = $.makeDiv('planner-resource');
   $resource.appendDiv('resource-title')
     .text(resource.resourceCell.text);
   var $cells = $resource.appendDiv('resource-cells');
@@ -524,7 +524,7 @@ scout.Planner.prototype._build$Resource = function(resource) {
 
 scout.Planner.prototype._build$Activity = function(activity) {
   var i,
-    $activity = $.makeDiv('activity'),
+    $activity = $.makeDiv('planner-activity'),
     level = 100 - Math.min(activity.level * 100, 100),
     levelColor = scout.helpers.modelToCssColor(activity.levelColor),
     begin = scout.dates.parseJsonDate(activity.beginTime).valueOf(),
@@ -545,8 +545,37 @@ scout.Planner.prototype._build$Activity = function(activity) {
   // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
   $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
 
+  if (activity.tooltipText) {
+    $activity.mouseenter(this._onActivityHoverIn.bind(this))
+      .mouseleave(this._onActivityHoverOut.bind(this));
+  }
+
   activity.$activity = $activity;
   return $activity;
+};
+
+scout.Planner.prototype._onActivityHoverIn = function(event) {
+  var $activity = $(event.target),
+    activity = $activity.data('activity'),
+    text = activity.tooltipText;
+
+  this._tooltipDelay = setTimeout(function() {
+    this._tooltip = new scout.Tooltip({
+      text: text,
+      $anchor: $activity,
+      arrowPosition: 50,
+      arrowPositionUnit: '%'
+    });
+    this._tooltip.render();
+  }.bind(this), 750);
+};
+
+scout.Planner.prototype._onActivityHoverOut = function(event) {
+  clearTimeout(this._tooltipDelay);
+  if (this._tooltip) {
+    this._tooltip.remove();
+    this._tooltip = null;
+  }
 };
 
 /* -- selector -------------------------------------------------- */
@@ -564,7 +593,7 @@ scout.Planner.prototype._onCellMousedown = function(event) {
   if (this.selectionMode == SELECTION_MODE.ACTIVITY) {
     $activity = $(document.elementFromPoint(event.pageX, event.pageY));
 
-    if ($activity.hasClass('activity')) {
+    if ($activity.hasClass('planner-activity')) {
       $('.selected', this.$grid).removeClass('selected');
       $activity.addClass('selected');
 
@@ -667,7 +696,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
   // select rows
   var $upperRow = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow,
     $lowerRow = ($startRow[0].offsetTop > $lastRow[0].offsetTop) ? $startRow : $lastRow,
-    resources = $('.resource', this.$grid).toArray(),
+    resources = $('.planner-resource', this.$grid).toArray(),
     top = $upperRow[0].offsetTop,
     low = $lowerRow[0].offsetTop;
 
@@ -699,7 +728,7 @@ scout.Planner.prototype._findRow = function(y) {
   var x = this.$grid.offset().left + 10,
     $row = $(document.elementFromPoint(x, y)).parent();
 
-  if ($row.hasClass('resource')) {
+  if ($row.hasClass('planner-resource')) {
     return $row.data('resource');
   } else {
     return null;

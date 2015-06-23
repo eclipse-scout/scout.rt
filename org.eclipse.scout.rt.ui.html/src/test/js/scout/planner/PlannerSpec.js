@@ -40,7 +40,7 @@ describe("Planner", function() {
   }
 
   function find$Resources(planner) {
-    return planner.$grid.find('.resource');
+    return planner.$grid.find('.planner-resource');
   }
 
   describe("deleteResources", function() {
@@ -71,7 +71,7 @@ describe("Planner", function() {
       expect(planner.resourceMap.length).toBe(0);
     });
 
-    it("deletes resources from model html document", function() {
+    it("deletes resources from html document", function() {
       planner.render(session.$entryPoint);
       expect(find$Resources(planner).length).toBe(3);
 

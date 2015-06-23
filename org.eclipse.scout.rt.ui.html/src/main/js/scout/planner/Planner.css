@@ -89,78 +89,78 @@
   right: 0px;
   width: 100%;
   overflow: hidden;
+}
 
-  & > .resource {
-    height: @planner-resource-minheight;
-    width: 100%;
-    border-bottom: 1px solid @palette-gray-4;
+.planner-resource {
+  height: @planner-resource-minheight;
+  width: 100%;
+  border-bottom: 1px solid @palette-gray-4;
 
-    & > .resource-title {
-      line-height: @planner-resource-minheight;
-      height: 100%;
-      width: @planner-resource-title-width;
-      padding: 0px @resource-padding-x;
-      float: left;
-      .overflow-ellipsis-nowrap;
-    }
+  & > .resource-title {
+    line-height: @planner-resource-minheight;
+    height: 100%;
+    width: @planner-resource-title-width;
+    padding: 0px @resource-padding-x;
+    float: left;
+    .overflow-ellipsis-nowrap;
+  }
 
-    &.selected > .resource-title{
-      background-color: @item-selection-background-color;
-    }
+  &.selected > .resource-title {
+    background-color: @item-selection-background-color;
+  }
 
-    & > .resource-cells {
-      position: relative;
-      height: 100%;
-      width: calc(~"100%" - @planner-resource-title-width);
-      float: left;
+  & > .resource-cells {
+    position: relative;
+    height: 100%;
+    width: calc(~"100%" - @planner-resource-title-width);
+    float: left;
 
-      & > .activity {
+    & > .selector {
+      position: absolute;
+      border-top: 2px solid @item-selection-border-color;
+      border-bottom: 2px solid @item-selection-border-color;
+      z-index: 2;
+      top: 0;
+
+      & > .selector-resize-left {
+        background-color: @palette-white;
+        border-left: 2px solid @item-selection-border-color;
+        border-right: 2px solid @item-selection-border-color;
         position: absolute;
-        top: 1px;
-        width: 0px;
-        height: @planner-resource-minheight - 3px;
-        line-height: @planner-resource-minheight - 3px;
-        background-color: @palette-cyan-4;
-        text-align: center;
-        border: 1px solid @palette-gray-4;
-
-        &.selected {
-          outline: 2px solid @item-selection-border-color;
-        }
+        top: 0px;
+        left: 0px;
+        width: 6px;
+        height: 100%;
+        cursor: col-resize;
       }
 
-      & > .selector {
+      & > .selector-resize-right {
+        background-color: @palette-white;
+        border-left: 2px solid @item-selection-border-color;
+        border-right: 2px solid @item-selection-border-color;
         position: absolute;
-        border-top: 2px solid @item-selection-border-color;
-        border-bottom: 2px solid @item-selection-border-color;
-        z-index: 2;
-        top: 0;
-
-        & > .selector-resize-left {
-          background-color: @palette-white;
-          border-left: 2px solid @item-selection-border-color;
-          border-right: 2px solid @item-selection-border-color;
-          position: absolute;
-          top: 0px;
-          left: 0px;
-          width: 6px;
-          height: 100%;
-          cursor: col-resize;
-        }
-
-        & > .selector-resize-right {
-          background-color: @palette-white;
-          border-left: 2px solid @item-selection-border-color;
-          border-right: 2px solid @item-selection-border-color;
-          position: absolute;
-          top: 0px;
-          right: 0px;
-          width: 6px;
-          height: 100%;
-          cursor: col-resize;
-        }
+        top: 0px;
+        right: 0px;
+        width: 6px;
+        height: 100%;
+        cursor: col-resize;
       }
     }
+  }
+}
+
+.planner-activity {
+  position: absolute;
+  top: 1px;
+  width: 0px;
+  height: @planner-resource-minheight - 3px;
+  line-height: @planner-resource-minheight - 3px;
+  background-color: @palette-cyan-4;
+  text-align: center;
+  border: 1px solid @palette-gray-4;
+
+  &.selected {
+    outline: 2px solid @item-selection-border-color;
   }
 }
 

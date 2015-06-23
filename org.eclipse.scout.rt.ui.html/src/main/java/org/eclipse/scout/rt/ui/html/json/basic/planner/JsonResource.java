@@ -43,7 +43,7 @@ public class JsonResource implements IJsonObject {
   protected JSONArray cellsToJson() {
     JSONArray jsonCells = new JSONArray();
     for (Activity<?, ?> cell : m_resource.getActivities()) {
-      JsonActivityCell jsonCell = new JsonActivityCell(cell, m_cellIdProvider);
+      JsonActivity jsonCell = new JsonActivity(cell, m_cellIdProvider);
       jsonCells.put(jsonCell.toJson());
     }
     return jsonCells;
