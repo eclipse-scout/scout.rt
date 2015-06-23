@@ -389,3 +389,15 @@ removed IStringField.isSpellCheckAsYouTypeEnabled(), IStringField.setSpellCheckA
 added IStringField.setSpellCheckEnabled(boolean)
 new ui delegates spell checker to browser, new property can be used to enable/disable spell checker for certain fields
 (by default it is enabled for multi-line fields, see org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField.computeSpellCheckEnabled()).
+
+BSH 23.06.2015:
+getWizard[...]Button() methods in IWizardContainerForm no longer return IButton, but IWizardAction. This change allows returning
+menus instead of buttons. IWizardAction serves as a common interface for IButton and IAction and provides some methods that
+are commonly used for the wizard buttons (e.g. setVisible, setEnabled). Because IAction calls its label "text", those menus
+have to override getLabel/setLabel and delegate the calls to the corresponding "text" methods. Alternatively, the class
+AbstractWizardMenu may be used instead of AbstractMenu.
+Migration:
+- For own implementations of IWizardContainerForm, replace the return value IButton by IWizardAction.
+- For code that previously used the setView(boolean, boolean, boolean) method on wizard buttons, a new setView(boolean, boolean)
+  method was introduced on IButton and IAction (because it does not make sense to make a button "mandatory"). This can be
+  migrated by just deleting the third argument.
