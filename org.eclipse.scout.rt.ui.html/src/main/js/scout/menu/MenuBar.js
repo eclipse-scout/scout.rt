@@ -70,10 +70,21 @@ scout.MenuBar.prototype.large = function() {
 
 scout.MenuBar.prototype._remove = function() {
   scout.MenuBar.parent.prototype._remove.call(this);
+  this._removeMenuItems();
+};
+
+scout.MenuBar.prototype._removeMenuItems = function() {
   this.menuItems.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeListener);
-    item.remove();
-  });
+    // remove DOM for existing menu items and destroy items that have
+    // been created by the menuSorter (e.g. separators).
+    if (item.createdBy === this.menuSorter) {
+      item.destroy();
+    } else {
+      item.overflow = false;
+      item.remove();
+    }
+  }, this);
 };
 
 scout.MenuBar.prototype.rebuildItems = function() {
@@ -103,17 +114,7 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
 };
 
 scout.MenuBar.prototype._updateItems = function(menuItems) {
-  // remove DOM for existing menu items and destroy items that have
-  // been created by the menuSorter (e.g. separators).
-  this.menuItems.forEach(function(item) {
-    item.off('propertyChange', this._menuItemPropertyChangeListener);
-    if (item.createdBy === this.menuSorter) {
-      item.destroy();
-    } else {
-      item.overflow = false;
-      item.remove();
-    }
-  }, this);
+  this._removeMenuItems();
 
   // The menuSorter may add separators to the list of items, that's why we
   // store the return value of menuSorter in this.menuItems and not the
