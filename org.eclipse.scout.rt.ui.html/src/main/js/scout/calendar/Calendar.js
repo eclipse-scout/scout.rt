@@ -70,6 +70,7 @@ scout.Calendar.prototype._isWork = function() {
 scout.Calendar.prototype.init = function(model, session) {
   scout.Calendar.parent.prototype.init.call(this, model, session);
   this._yearPanel = new scout.YearPanel(session);
+  this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
   this.addChild(this._yearPanel);
   this._syncSelectedDate(model.selectedDate);
   this._syncDisplayMode(model.displayMode);
@@ -112,7 +113,6 @@ scout.Calendar.prototype._render = function($parent) {
   // main elements
   this.$header = this.$container.appendDiv('calendar-header');
   this._yearPanel.render(this.$container);
-  this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
 
   this.$grid = this.$container.appendDiv('calendar-grid');
   this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');

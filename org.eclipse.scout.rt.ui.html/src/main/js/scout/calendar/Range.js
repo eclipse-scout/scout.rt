@@ -1,6 +1,6 @@
 scout.Range = function(from, to) {
- this.from = from;
- this.to = to;
+  this.from = from;
+  this.to = to;
 };
 
 // FIXME AWE: (calendar) unit-test scout.Range

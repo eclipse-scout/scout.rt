@@ -55,8 +55,14 @@ scout.Planner.SelectionMode = {
 scout.Planner.prototype.init = function(model, session) {
   scout.Planner.parent.prototype.init.call(this, model, session);
   this._yearPanel = new scout.YearPanel(session);
+  this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
   this.addChild(this._yearPanel);
   this._header = new scout.PlannerHeader(session);
+  this._header.on('todayClick', this._onTodayClick.bind(this));
+  this._header.on('yearClick', this._onYearClick.bind(this));
+  this._header.on('previousClick', this._onPreviousClick.bind(this));
+  this._header.on('nextClick', this._onNextClick.bind(this));
+  this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
   this.addChild(this._header);
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
@@ -90,11 +96,6 @@ scout.Planner.prototype._render = function($parent) {
 
   // main elements
   this._header.render(this.$container);
-  this._header.on('todayClick', this._onTodayClick.bind(this));
-  this._header.on('yearClick', this._onYearClick.bind(this));
-  this._header.on('previousClick', this._onPreviousClick.bind(this));
-  this._header.on('nextClick', this._onNextClick.bind(this));
-  this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
   this._yearPanel.render(this.$container);
   this.$grid = this.$container.appendDiv('planner-grid')
     .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
@@ -136,7 +137,7 @@ scout.Planner.prototype._onNextClick = function(event) {
 };
 
 scout.Planner.prototype._navigateDate = function(direction) {
-  var viewRange = this.viewRange,
+  var viewRange = new scout.Range(this.viewRange.from, this.viewRange.to),
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
   if (this.displayMode == DISPLAY_MODE.DAY) {
@@ -160,11 +161,7 @@ scout.Planner.prototype._navigateDate = function(direction) {
 };
 
 scout.Planner.prototype._onTodayClick = function(event) {
-  // new selected date
-  this.selected = new Date();
-  //FIXME CGU
-//  viewRange = this.viewRange;
-//  this.setViewRange()
+  this.setViewRangeFrom(new Date());
 };
 
 scout.Planner.prototype._onDisplayModeClick = function(event) {
@@ -174,6 +171,10 @@ scout.Planner.prototype._onDisplayModeClick = function(event) {
 
 scout.Planner.prototype._onYearClick = function(event) {
   this.setYearPanelVisible(!this.yearPanelVisible);
+};
+
+scout.Planner.prototype._onYearPanelDateSelect = function(event) {
+  this.setViewRangeFrom(event.date);
 };
 
 scout.Planner.prototype._onResourceTitleMousedown = function(event) {
@@ -815,10 +816,10 @@ scout.Planner.prototype._renderDisplayMode = function() {
 };
 
 scout.Planner.prototype._syncViewRange = function(viewRange) {
-  this.viewRange = {
-    from: scout.dates.create(viewRange.from),
-    to: scout.dates.create(viewRange.to)
-  };
+  this.viewRange = new scout.Range(
+    scout.dates.create(viewRange.from),
+    scout.dates.create(viewRange.to)
+  );
   this._yearPanel.setViewRange(this.viewRange);
   this._yearPanel.selectDate(this.viewRange.from);
 };
@@ -872,6 +873,7 @@ scout.Planner.prototype._renderSelectionRange = function() {
   // remove old selector
   if (this.$selector) {
     this.$selector.remove();
+    $('.selected', this.$scale).select(false);
   }
 
   if (!startRow || !lastRow || !this.selectionRange.from || !this.selectionRange.to) {
@@ -892,7 +894,6 @@ scout.Planner.prototype._renderSelectionRange = function() {
     .on('contextmenu', this._onRangeSelectorContextMenu.bind(this));
 
   // colorize scale
-  $('.selected', this.$scale).removeClass('selected');
   var $scaleItems = $('.timeline-small', this.$scale).children();
   for (var i = 0; i < $scaleItems.length; i++) {
     var $item = $scaleItems.eq(i);
@@ -950,6 +951,15 @@ scout.Planner.prototype.setYearPanelVisible = function(visible) {
   if (this.rendered) {
     this._renderYearPanelVisible();
   }
+};
+
+scout.Planner.prototype.setViewRangeFrom = function(date) {
+  var diff = this.viewRange.to.getTime() - this.viewRange.from.getTime(),
+    viewRange = new scout.Range(this.viewRange.from, this.viewRange.to);
+
+  viewRange.from = date;
+  viewRange.to = new Date(date.getTime() + diff);
+  this.setViewRange(viewRange);
 };
 
 scout.Planner.prototype.setViewRange = function(viewRange) {
