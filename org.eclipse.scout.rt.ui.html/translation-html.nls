@@ -3,4 +3,4 @@
 # To ensure a properly working nls support     #
 # keep this file untouched.                    #
 ################################################
-Nls-Class=org.eclipse.scout.rt.ui.html.HtmlTextProviderService
+Nls-Class=org.eclipse.scout.rt.ui.html.UiTextProviderService
