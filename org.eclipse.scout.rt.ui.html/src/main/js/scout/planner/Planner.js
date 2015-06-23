@@ -430,20 +430,20 @@ scout.Planner.prototype._renderScale = function() {
   });
 
   // find transfer function
-  var beginScale = $timelineSmall.children().first().data('date-from').valueOf(),
-    endScale = $timelineSmall.children().last().data('date-to').valueOf();
+  this.beginScale = $timelineSmall.children().first().data('date-from').valueOf();
+  this.endScale = $timelineSmall.children().last().data('date-to').valueOf();
 
   this.transformLeft = function(begin, end) {
     return function(t) {
       return (t - begin) / (end - begin) * 100;
     };
-  }(beginScale, endScale);
+  }(this.beginScale, this.endScale);
 
   this.transformWidth = function(begin, end) {
     return function(t) {
       return t / (end - begin) * 100;
     };
-  }(beginScale, endScale);
+  }(this.beginScale, this.endScale);
 };
 
 /* -- scale events --------------------------------------------------- */
@@ -453,7 +453,7 @@ scout.Planner.prototype._onScaleHoverIn = function(event) {
     var $scale = $(event.currentTarget),
       tooltip,
       text,
-      toText = ' bis ',
+      toText = ' bis ',//FIXME CGU translate
       from = new Date($scale.data('date-from').valueOf()),
       to = new Date($scale.data('date-to').valueOf());
 
@@ -530,6 +530,10 @@ scout.Planner.prototype._build$Activity = function(activity) {
     begin = scout.dates.parseJsonDate(activity.beginTime).valueOf(),
     end = scout.dates.parseJsonDate(activity.endTime).valueOf();
 
+  // Make sure activity fits into scale
+  begin = Math.max(begin, this.beginScale);
+  end = Math.min(end, this.endScale);
+
   $activity.text(activity.text)
     .data('activity', activity)
     .css('left', 'calc(' + this.transformLeft(begin) + '% + 2px)')
@@ -567,7 +571,7 @@ scout.Planner.prototype._onActivityHoverIn = function(event) {
       arrowPositionUnit: '%'
     });
     this._tooltip.render();
-  }.bind(this), 750);
+  }.bind(this), 350);
 };
 
 scout.Planner.prototype._onActivityHoverOut = function(event) {
