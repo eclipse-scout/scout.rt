@@ -98,7 +98,7 @@ scout.AbstractSmartField.prototype._resizePopup = function() {
   // Invalidate is required, when the $popup is already opened and the proposal chooser is rendered later
   // when the popup size is the same as before, the proposal chooser would not layout its children (like
   // the table) without invalidate.
-  htmlPopup.invalidate();
+  htmlPopup.invalidateLayout();
   htmlPopup.setBounds(bounds);
 };
 

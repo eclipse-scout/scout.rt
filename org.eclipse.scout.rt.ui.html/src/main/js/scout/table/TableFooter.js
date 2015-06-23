@@ -221,7 +221,7 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
 /* open, close and resize of the container */
 
 scout.TableFooter.prototype._revalidateTableLayout = function() {
-  this._table.htmlComp.revalidate();
+  this._table.htmlComp.revalidateLayoutTree();
 };
 
 scout.TableFooter.prototype.openControlContainer = function() {

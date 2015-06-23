@@ -52,10 +52,20 @@ scout.HtmlComponent.prototype.getAvailableSize = function() {
 };
 
 /**
- * Calls the layout of the component to layout its children.
+ * Invalidates the component (sets the valid property to false).
+ */
+scout.HtmlComponent.prototype.invalidateLayout = function() {
+  this.valid = false;
+  if (this._layout) {
+    this._layout.invalidate();
+  }
+};
+
+/**
+ * Calls the layout of the component to layout its children but only if the component is not valid.
  * @exception when component has no layout
  */
-scout.HtmlComponent.prototype.layout = function() {
+scout.HtmlComponent.prototype.validateLayout = function() {
   if (!this._layout) {
     throw new Error('Called layout() but component has no layout');
   }
@@ -68,35 +78,38 @@ scout.HtmlComponent.prototype.layout = function() {
 };
 
 /**
- * Invalidates the component (sets the valid property to false).
+ * Performs invalidateLayout() and validateLayout() subsequently.
  */
-scout.HtmlComponent.prototype.invalidate = function() {
-  this.valid = false;
-  if (this._layout) {
-    this._layout.invalidate();
+scout.HtmlComponent.prototype.revalidateLayout = function() {
+  this.invalidateLayout();
+  this.validateLayout();
+};
+
+/**
+ * Invalidates the component-tree up to the next validate root, but only if invalidateParents is set to true.
+ */
+scout.HtmlComponent.prototype.invalidateLayoutTree = function(invalidateParents) {
+  invalidateParents = invalidateParents !== undefined ? invalidateParents : true;
+  if (invalidateParents) {
+    this.session.layoutValidator.invalidateTree(this);
+  } else {
+    this.session.layoutValidator.invalidate(this);
   }
 };
 
 /**
- * Invalidates the component-tree up to the next validate root.
+ * Layouts all invalid components
  */
-scout.HtmlComponent.prototype.invalidateTree = function() {
-  this.session.layoutValidator.invalidateTree(this);
+scout.HtmlComponent.prototype.validateLayoutTree = function() {
+  this.session.layoutValidator.validate();
 };
 
 /**
- * Performs invalidateTree() and validate() subsequently.
+ * Performs invalidateLayoutTree() and validateLayoutTree() subsequently.
  */
-scout.HtmlComponent.prototype.revalidate = function() {
-  this.invalidateTree();
-  this.validate();
-};
-//FIXME CGU rename to revalidateLayout, invalidateLayoutTree etc
-/**
- * Layouts all invalid components
- */
-scout.HtmlComponent.prototype.validate = function() {
-  this.session.layoutValidator.validate();
+scout.HtmlComponent.prototype.revalidateLayoutTree = function() {
+  this.invalidateLayoutTree();
+  this.validateLayoutTree();
 };
 
 /**
@@ -162,12 +175,12 @@ scout.HtmlComponent.prototype.getSize = function(includeMargins) {
 scout.HtmlComponent.prototype.setSize = function(size) {
   var oldSize = this.size;
   if (!size.equals(oldSize)) {
-    this.invalidate();
+    this.invalidateLayout();
   }
   if (this.pixelBasedSizing) {
     scout.graphics.setSize(this.$comp, size);
   }
-  this.layout();
+  this.validateLayout();
 };
 
 scout.HtmlComponent.prototype.getBounds = function() {
@@ -177,10 +190,10 @@ scout.HtmlComponent.prototype.getBounds = function() {
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
   var oldBounds = this.getBounds();
   if (!oldBounds.equals(bounds)) {
-    this.invalidate();
+    this.invalidateLayout();
   }
   scout.graphics.setBounds(this.$comp, bounds);
-  this.layout();
+  this.validateLayout();
 };
 
 /**

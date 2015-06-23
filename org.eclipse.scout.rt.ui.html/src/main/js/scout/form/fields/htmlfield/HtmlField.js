@@ -36,7 +36,7 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   // this method replaces the content, also the scroll bars get lost
   this._renderScrollBarsEnabled(this.scrollBarsEnabled);
 
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 scout.HtmlField.prototype.init = function(model, session) {

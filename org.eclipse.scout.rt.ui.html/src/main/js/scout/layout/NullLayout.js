@@ -10,7 +10,7 @@ scout.NullLayout.prototype.layout = function($container) {
   $container.children().each(function() {
     var htmlComp = scout.HtmlComponent.get($(this));
     if (htmlComp) {
-      htmlComp.layout();
+      htmlComp.validateLayout();
     }
   });
 };

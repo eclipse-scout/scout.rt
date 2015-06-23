@@ -101,7 +101,7 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   } else {
     this._updateItems(menuItems);
     // Re-layout menubar (because items might have changed)
-    scout.HtmlComponent.get(this.$container).invalidateTree();
+    scout.HtmlComponent.get(this.$container).invalidateLayoutTree();
   }
 
   function isNotSeparator(item) {
@@ -186,7 +186,7 @@ scout.MenuBar.prototype.updateVisibility = function() {
   // Update visibility, layout and key-strokes
   if (visible !== oldVisible) {
     this.$container.setVisible(visible);
-    htmlComp.invalidateTree();
+    htmlComp.invalidateLayoutTree();
     if (visible) {
       this._installKeyStrokeAdapter();
     } else {

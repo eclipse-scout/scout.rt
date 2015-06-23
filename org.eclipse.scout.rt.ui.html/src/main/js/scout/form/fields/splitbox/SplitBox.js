@@ -127,7 +127,7 @@ scout.SplitBox.prototype._render = function($parent) {
 
         // Update split box
         this.newSplitterPosition(newSplitterPosition);
-        scout.HtmlComponent.get(this._$splitArea).revalidate();
+        scout.HtmlComponent.get(this._$splitArea).revalidateLayoutTree();
       }
     }
 

@@ -41,8 +41,7 @@ scout.TableControl.prototype._renderContent = function($parent) {
   //FIXME CGU make this more easy to use
   this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
-  this.form.htmlComp.invalidate();
-  this.form.htmlComp.layout();
+  this.form.htmlComp.revalidateLayout();
 };
 
 scout.TableControl.prototype._removeContent = function() {

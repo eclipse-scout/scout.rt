@@ -180,7 +180,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
 
   this.outline = outline;
   this.outline.render(this.$container);
-  this.outline.htmlComp.layout();
+  this.outline.htmlComp.validateLayout();
   this.outline.pixelBasedSizing = true;
   this.$outlineTitle.html(this.outline.title);
 

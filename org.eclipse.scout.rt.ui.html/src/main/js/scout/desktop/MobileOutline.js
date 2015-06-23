@@ -44,7 +44,7 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
     prefSize = node.detailForm.htmlComp.getPreferredSize();
     node.detailForm.$container.height(prefSize.height);
     node.detailForm.$container.width(node.$node.width());
-    node.detailForm.htmlComp.layout();
+    node.detailForm.htmlComp.validateLayout();
     this._currentDetailForm = node.detailForm;
   } else {
     // Temporary set menubar to invisible and await response to recompute visibility again

@@ -731,12 +731,12 @@ scout.Planner.prototype._dateFormat = function(date, pattern) {
 scout.Planner.prototype._renderViewRange = function() {
   this._renderRange();
   this._renderScale();
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Planner.prototype._renderHeaderVisible = function() {
   this._header.setVisible(this.headerVisible);
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Planner.prototype._renderYearPanelVisible = function() {
@@ -960,7 +960,7 @@ scout.Planner.prototype.setViewRange = function(viewRange) {
 
   if (this.rendered) {
     this._renderViewRange();
-    this.validateLayout();
+    this.validateLayoutTree();
   }
 };
 
@@ -1013,7 +1013,7 @@ scout.Planner.prototype._insertResources = function(resources) {
   // Update HTML
   if (this.rendered) {
     this._renderResources(resources);
-    this.invalidateTree();
+    this.invalidateLayoutTree();
   }
 };
 
@@ -1033,14 +1033,14 @@ scout.Planner.prototype._deleteResources = function(resources) {
     }
   }.bind(this));
 
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Planner.prototype._deleteAllResources = function() {
   // Update HTML
   if (this.rendered) {
     this._removeAllResources();
-    this.invalidateTree();
+    this.invalidateLayoutTree();
   }
 
   // Update model

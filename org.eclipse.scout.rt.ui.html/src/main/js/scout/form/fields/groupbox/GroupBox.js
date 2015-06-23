@@ -207,7 +207,7 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
   if (this.borderDecoration === 'line') {
     this.$container.toggleClass('with-line', !expanded);
   }
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 /**

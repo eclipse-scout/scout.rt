@@ -12,7 +12,7 @@ describe("LayoutValidator", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = new scout.HtmlComponent($comp, session);
 
-      htmlComp.invalidateTree();
+      htmlComp.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
     });
@@ -24,7 +24,7 @@ describe("LayoutValidator", function() {
       var $compChild = $('<div>').appendTo($comp);
       var htmlCompChild = new scout.HtmlComponent($compChild, session);
 
-      htmlCompChild.invalidateTree();
+      htmlCompChild.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
     });
@@ -37,7 +37,7 @@ describe("LayoutValidator", function() {
       var htmlCompChild = new scout.HtmlComponent($compChild, session);
       htmlCompChild.validateRoot = true;
 
-      htmlCompChild.invalidateTree();
+      htmlCompChild.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlCompChild);
     });
@@ -45,26 +45,26 @@ describe("LayoutValidator", function() {
 
   describe("layout", function() {
 
-    it("calls layout for each invalid html component", function() {
+    it("calls validateLayout for each invalid html component", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = new scout.HtmlComponent($comp, session);
-      spyOn(htmlComp, 'layout');
+      spyOn(htmlComp, 'validateLayout');
 
-      htmlComp.invalidateTree();
+      htmlComp.invalidateLayoutTree();
       session.layoutValidator.validate();
-      expect(htmlComp.layout).toHaveBeenCalled();
-      expect(htmlComp.layout.calls.count()).toEqual(1);
+      expect(htmlComp.validateLayout).toHaveBeenCalled();
+      expect(htmlComp.validateLayout.calls.count()).toEqual(1);
     });
 
-    it("does not call layout if component has been removed", function() {
+    it("does not call validateLayout if component has been removed", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = new scout.HtmlComponent($comp, session);
-      spyOn(htmlComp, 'layout');
+      spyOn(htmlComp, 'validateLayout');
 
-      htmlComp.invalidateTree();
+      htmlComp.invalidateLayoutTree();
       $comp.remove();
       session.layoutValidator.validate();
-      expect(htmlComp.layout).not.toHaveBeenCalled();
+      expect(htmlComp.validateLayout).not.toHaveBeenCalled();
     });
 
   });

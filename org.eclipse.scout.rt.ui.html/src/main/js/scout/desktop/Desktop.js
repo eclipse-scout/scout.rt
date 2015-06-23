@@ -123,8 +123,7 @@ scout.Desktop.prototype.onResize = function(event) {
 
 scout.Desktop.prototype._layoutTaskBar = function() {
   var htmlTaskBar = scout.HtmlComponent.get(this.$taskBar);
-  htmlTaskBar.invalidate();
-  htmlTaskBar.layout();
+  htmlTaskBar.revalidateLayout();
 };
 
 scout.Desktop.prototype.onSplitterResize = function(event) {
@@ -291,7 +290,7 @@ scout.Desktop.prototype._renderView = function(view) {
   scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
 
   // FIXME CGU: maybe include in render?
-  view.htmlComp.layout();
+  view.htmlComp.validateLayout();
   view.htmlComp.validateRoot = true;
   view.tab = tab;
 };
@@ -383,7 +382,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     scout.focusManager.validateFocus(this.session.uiSessionId);
 
     // FIXME CGU: maybe include in render?
-    content.htmlComp.layout();
+    content.htmlComp.validateLayout();
     content.htmlComp.validateRoot = true;
   }
   //request focus on first element in new outlineTab.

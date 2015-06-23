@@ -608,7 +608,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
   this._renderRowsInProgress = false;
   if (rows.length > numRowsLoaded) {
     this._renderRowsInProgress = true;
-    // FIXME CGU: von A.WE - siehe E-Mail. Das hier macht Probleme, weil später invalidateTree() aufgerufen wird
+    // FIXME CGU: von A.WE - siehe E-Mail. Das hier macht Probleme, weil später invalidateLayoutTree() aufgerufen wird
     // prüfen ob auf setTimeout verzichtet werden kann, oder _renderRows ohne Seiteneffekte funktionieren kann.
     // siehe _installRows
     setTimeout(function() {
@@ -646,7 +646,7 @@ scout.Table.prototype._installRows = function($rows) {
       that._startCellEdit(that.cellEditorPopup.column, row, editorField.id);
     }
   });
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 
   // update grouping if data was grouped
   this._group();
@@ -765,7 +765,7 @@ scout.Table.prototype.onResize = function() {
     // Delegate window resize events to footer (actually only width changes are relevant)
     this.footer.onResize();
   }
-  this.htmlComp.revalidate();
+  this.htmlComp.revalidateLayoutTree();
 };
 
 scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
@@ -1303,7 +1303,7 @@ scout.Table.prototype._deleteRows = function(rows) {
   }.bind(this));
 
   if (invalidate) {
-    this.invalidateTree();
+    this.invalidateLayoutTree();
   }
 };
 
@@ -1330,7 +1330,7 @@ scout.Table.prototype._deleteAllRows = function() {
     }
 
     this._removeRows();
-    this.invalidateTree();
+    this.invalidateLayoutTree();
   }
 };
 
@@ -1975,7 +1975,7 @@ scout.Table.prototype._renderTableHeader = function() {
   } else if (!this.headerVisible && this.header) {
     this._removeTableHeader();
   }
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Table.prototype._removeTableHeader = function() {
@@ -1997,7 +1997,7 @@ scout.Table.prototype._renderTableFooter = function() {
     this.footer.remove();
     this.footer = null;
   }
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Table.prototype._renderEnabled = function() {
@@ -2029,7 +2029,7 @@ scout.Table.prototype._renderMultilineText = function() {
 
 scout.Table.prototype._renderAutoResizeColumns = function() {
   if (this.autoResizeColumns) {
-    this.invalidateTree();
+    this.invalidateLayoutTree();
   }
 };
 

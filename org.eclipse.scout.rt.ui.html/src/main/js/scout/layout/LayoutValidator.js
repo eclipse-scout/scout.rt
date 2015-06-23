@@ -12,7 +12,7 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
   // Mark every parent as invalid until validate root
   while (htmlCompParent) {
     htmlComp = htmlCompParent;
-    htmlComp.invalidate();
+    htmlComp.invalidateLayout();
     if (htmlComp.isValidateRoot()) {
       validateRoot = htmlComp;
       break;
@@ -24,9 +24,13 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
     validateRoot = htmlComp;
   }
 
+  this.invalidate(validateRoot);
+};
+
+scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
   // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
   if (this._invalidComponents.indexOf(htmlComp) < 0) {
-    this._invalidComponents.push(validateRoot);
+    this._invalidComponents.push(htmlComp);
   }
 };
 
@@ -36,7 +40,7 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
 scout.LayoutValidator.prototype.validate = function() {
   this._invalidComponents.forEach(function(comp){
     if (!comp.isRemoved()) { // don't layout components which don't exist anymore
-      comp.layout();
+      comp.validateLayout();
     }
   });
   this._invalidComponents = [];

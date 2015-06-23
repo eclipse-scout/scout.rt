@@ -93,29 +93,73 @@ scout.Widget.prototype.removeChild = function(child) {
 //--- Layouting / HtmlComponent methods ---
 
 scout.Widget.prototype.pack = function() {
+  if (!this.rendered) {
+    return;
+  }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
   this.htmlComp.pack();
 };
 
-scout.Widget.prototype.layout = function() {
-  this.htmlComp.layout();
-};
-
-/**
- * Calls invalidateTree of this.htmlComp, but only if the widget is already rendered.
- */
-scout.Widget.prototype.invalidateTree = function() {
-  if (this.rendered) {
-    this.htmlComp.invalidateTree();
+scout.Widget.prototype.invalidateLayout = function() {
+  if (!this.rendered) {
+    return;
   }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.invalidateLayout();
 };
 
-/**
- * Calls validate of this.htmlComp, but only if the widget is already rendered.
- */
 scout.Widget.prototype.validateLayout = function() {
-  if (this.rendered) {
-    this.htmlComp.validate();
+  if (!this.rendered) {
+    return;
   }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.validateLayout();
+};
+
+scout.Widget.prototype.revalidateLayout = function() {
+  if (!this.rendered) {
+    return;
+  }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.revalidateLayout();
+};
+
+scout.Widget.prototype.invalidateLayoutTree = function() {
+  if (!this.rendered) {
+    return;
+  }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.invalidateLayoutTree();
+};
+
+scout.Widget.prototype.validateLayoutTree = function() {
+  if (!this.rendered) {
+    return;
+  }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.validateLayoutTree();
+};
+
+scout.Widget.prototype.revalidateLayoutTree = function() {
+  if (!this.rendered) {
+    return;
+  }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.revalidateLayoutTree();
 };
 
 //--- Event handling methods ---

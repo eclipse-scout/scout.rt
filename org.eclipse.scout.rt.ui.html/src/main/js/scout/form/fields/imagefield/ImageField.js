@@ -36,8 +36,7 @@ scout.ImageField.prototype._render = function($parent) {
 
 scout.ImageField.prototype._onImageLoad = function(event) {
   scout.scrollbars.update(this.$fieldContainer);
-  this.invalidateTree();
-  this.session.layoutValidator.validate();
+  this.revalidateLayoutTree();
 };
 
 scout.ImageField.prototype._renderProperties = function() {

@@ -117,9 +117,9 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
     this.tabItems[oldSelectedTab].setTabActive(false);
     this.tabItems[this.selectedTab].setTabActive(true);
 
-    // revalidate layout when tab-area has changed, because overflow tabs must be re-arranged
+    // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
     if (!this.tabItems[this.selectedTab]._tabRendered) {
-      scout.HtmlComponent.get(this._$tabArea).revalidate();
+      scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
     }
 
     this.tabItems[this.selectedTab].focusTab();
@@ -182,7 +182,7 @@ scout.TabBox.prototype._renderTabContent = function($tabContent) {
     this.tabItems[this.selectedTab]._renderLabelVisible(false);
   }
   if (this.rendered) {
-    scout.HtmlComponent.get(this._$tabContent).revalidate();
+    scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
   }
 };
 

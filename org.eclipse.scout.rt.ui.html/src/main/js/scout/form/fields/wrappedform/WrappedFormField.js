@@ -26,7 +26,7 @@ scout.WrappedFormField.prototype._renderInnerForm = function() {
     this.innerForm.displayHint = 'wrappedForm'; // TODO BSH Check this
     this.innerForm.render(this.$container);
     this.addField(this.innerForm.$container);
-    this.innerForm.invalidateTree();
+    this.innerForm.invalidateLayoutTree();
   }
 };
 

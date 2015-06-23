@@ -40,8 +40,7 @@ scout.Form.prototype._render = function($parent) {
     }
     this.$container.resizable({
       resize: function(event, ui) {
-        this.htmlComp.invalidate();
-        this.htmlComp.layout();
+        this.htmlComp.revalidateLayout();
       }.bind(this)
     });
     this._updateDialogTitle();

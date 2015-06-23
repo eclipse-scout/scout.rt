@@ -117,7 +117,7 @@ scout.FormField.prototype._renderVisible = function(visible) {
   if (this.rendered) {
     var htmlComp = scout.HtmlComponent.get(this.$container).getParent();
     if (htmlComp) { // may be null if $container is detached
-      htmlComp.invalidateTree();
+      htmlComp.invalidateLayoutTree();
     }
   }
 };
@@ -136,7 +136,7 @@ scout.FormField.prototype._renderLabel = function() {
 
     // Invalidate layout if label width depends on its content
     if (this.labelUseUiWidth) {
-      this.invalidateTree();
+      this.invalidateLayoutTree();
     }
   }
 };
@@ -166,7 +166,7 @@ scout.FormField.prototype._renderChildVisible = function($child, visible) {
     return;
   }
   $child.setVisible(visible);
-  this.invalidateTree();
+  this.invalidateLayoutTree();
 };
 
 // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel

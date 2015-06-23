@@ -48,7 +48,7 @@ scout.DateField.prototype._renderHasTime = function() {
     this.$timeField = null;
   }
   this.htmlComp.valid = false;
-  this.layout();
+  this.validateLayout();
 };
 
 scout.DateField.prototype._onIconClickTime = function(event) {
@@ -114,7 +114,7 @@ scout.DateField.prototype._renderHasDate = function() {
   }
   this.addStatus(this.$field);
   this.htmlComp.valid = false;
-  this.layout();
+  this.validateLayout();
 };
 /**
  * @Override FormField.js
