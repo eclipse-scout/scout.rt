@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
@@ -176,11 +177,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
 
       @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return 1;
-      }
-
-      @Override
       protected void execClickAction() throws ProcessingException {
         getWizard().doPreviousStep();
       }
@@ -205,13 +201,13 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
 
       @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return 1;
+      protected void execClickAction() throws ProcessingException {
+        getWizard().doNextStep();
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
-        getWizard().doNextStep();
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ENTER;
       }
     }
 
@@ -229,13 +225,13 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
 
       @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return 1;
+      protected void execClickAction() throws ProcessingException {
+        getWizard().doFinish();
       }
 
       @Override
-      protected void execClickAction() throws ProcessingException {
-        getWizard().doFinish();
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ENTER;
       }
     }
 
@@ -255,11 +251,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       @Override
       protected boolean getConfiguredVisible() {
         return false;
-      }
-
-      @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return -1;
       }
 
       @Override
@@ -287,11 +278,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
 
       @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return -1;
-      }
-
-      @Override
       protected void execClickAction() throws ProcessingException {
         getWizard().doSuspend();
       }
@@ -313,11 +299,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       @Override
       protected boolean getConfiguredVisible() {
         return false;
-      }
-
-      @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return -1;
       }
 
       @Override
