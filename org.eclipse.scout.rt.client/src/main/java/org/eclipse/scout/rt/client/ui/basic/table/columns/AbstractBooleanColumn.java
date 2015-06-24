@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBooleanColumnExtension;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
@@ -46,6 +47,17 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   @Override
   public void setVerticalAlignment(int verticalAlignment) {
     propertySupport.setProperty(PROP_VERTICAL_ALIGNMENT, verticalAlignment);
+  }
+
+  @Override
+  protected void decorateCellInternal(Cell cell, ITableRow row) {
+    super.decorateCellInternal(cell, row);
+    updateDisplayText(row, cell);
+  }
+
+  @Override
+  protected String formatValueInternal(ITableRow row, Boolean value) {
+    return (BooleanUtility.nvl(value)) ? "X" : "";
   }
 
   @Override

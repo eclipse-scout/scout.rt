@@ -209,7 +209,7 @@ public class TableUtilityTest {
   private void assertRow2(Object[] row2) {
     assertEquals(COLUMNS_AMOUNT, row2.length);
     Date date = new Date(DATE_IN_MILLIS_2);
-    assertNull(row2[0]);
+    assertEquals("", row2[0]);
     assertEquals(date, row2[1]);
     assertEquals(date, row2[2]);
     assertEquals(date, row2[3]);
