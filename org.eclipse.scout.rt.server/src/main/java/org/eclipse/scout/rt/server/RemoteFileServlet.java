@@ -65,6 +65,14 @@ public class RemoteFileServlet extends HttpServlet {
     return m_configManager;
   }
 
+  protected String getFolder() {
+    return m_folder;
+  }
+
+  protected void setFolder(String folder) {
+    m_folder = folder;
+  }
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
     handleHttpRequest(req, res);
@@ -76,7 +84,7 @@ public class RemoteFileServlet extends HttpServlet {
   }
 
   protected void handleHttpRequest(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
-    String pathInfo = req.getPathInfo();
+    String pathInfo = extractPathInfo(req);
 
     // will try to get all files in fileList.
     List<String> fileList = Arrays.asList(pathInfo);
@@ -96,7 +104,7 @@ public class RemoteFileServlet extends HttpServlet {
           prefix + "default.htm", //$NON-NLS-1$
           prefix + "index.jsp", //$NON-NLS-1$
           prefix + "index.php" //$NON-NLS-1$
-      );
+          );
     }
     //
     try {
@@ -123,9 +131,23 @@ public class RemoteFileServlet extends HttpServlet {
     }
   }
 
+  /**
+   * Returns the path information from the request.
+   */
+  protected String extractPathInfo(final HttpServletRequest request) {
+    return request.getPathInfo();
+  }
+
+  /**
+   * @return the remote file service class to use to load the remote file.
+   */
+  protected Class<? extends IRemoteFileService> getConfiguredRemoteFileServiceClass() {
+    return IRemoteFileService.class;
+  }
+
   private boolean writeResource(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath) throws ProcessingException, IOException {
-    IRemoteFileService rfs = BEANS.get(IRemoteFileService.class);
-    RemoteFile spec = new RemoteFile((resourcePath == null) ? null : m_folder + resourcePath, -1);
+    IRemoteFileService rfs = BEANS.get(getConfiguredRemoteFileServiceClass());
+    RemoteFile spec = new RemoteFile((resourcePath == null) ? null : StringUtility.join("", m_folder, resourcePath), -1);
     RemoteFile remoteFile = rfs.getRemoteFileHeader(spec);
     if (!remoteFile.exists()) {
       return false;
