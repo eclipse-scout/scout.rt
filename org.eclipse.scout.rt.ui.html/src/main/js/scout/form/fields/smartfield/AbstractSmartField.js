@@ -240,7 +240,7 @@ scout.AbstractSmartField.prototype._onFieldBlur = function() {
   $.log.debug('AbstractSmartField#_onFieldBlur');
   this._browseOnce = false;
   this._requestedProposal = false;
-  this._closeProposal();
+  this._acceptProposal();
 };
 
 /**
@@ -344,6 +344,6 @@ scout.AbstractSmartField.prototype._popupBounds = function(fieldBounds, prefSize
 /**
  * @override
  */
-scout.AbstractSmartField.prototype.acceptDisplayText = function() {
+scout.AbstractSmartField.prototype.displayTextChanged = function() {
   this._acceptProposal();
 };
