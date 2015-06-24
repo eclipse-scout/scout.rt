@@ -16,6 +16,7 @@ scout.Tree = function() {
   this._treeItemPaddingLevel = 15;
   this.menus = [];
   this.menuBar;
+  this.checkedNodes=[];
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -46,6 +47,9 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   this.nodesMap[node.id] = node;
   if (parentNode) {
     node.parentNode = parentNode;
+  }
+  if(node.checked){
+    this.checkedNodes.push(node);
   }
   scout.defaultValues.applyTo(node, 'TreeNode');
   if (node.childNodes === undefined) {
@@ -981,18 +985,20 @@ scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
     return updatedNodes;
   }
   if (!this.multiCheck && checked) {
-    for (var i = 0; i < this.nodes.length; i++) {
-      if (this.nodes[i].checked) {
-        this.nodes[i].checked = false;
-        this._updateMarkChildrenChecked(this.nodes[i], false, false, true);
-        updatedNodes.push(this.nodes[i]);
+    for (var i = 0; i < this.checkedNodes.length; i++) {
+        this.checkedNodes[i].checked = false;
+        this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
+        updatedNodes.push(this.checkedNodes[i]);
         if (this.rendered) {
-          this._renderNodeChecked(this.nodes[i]);
+          this._renderNodeChecked(this.checkedNodes[i]);
         }
-      }
     }
+    this.checkedNodes = [];
   }
   node.checked = checked;
+  if(node.checked){
+    this.checkedNodes.push(node);
+  }
   updatedNodes.push(node);
   this._updateMarkChildrenChecked(node, false, checked, true);
   updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
