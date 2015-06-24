@@ -36,7 +36,12 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
-    cell.setText((String) cell.getValue());
+    updateDisplayText(row, cell);
+  }
+
+  @Override
+  protected String formatValueInternal(ITableRow row, String value) {
+    return value;
   }
 
   @Override

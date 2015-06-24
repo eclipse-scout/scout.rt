@@ -1015,6 +1015,15 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setValue(getTable().getRow(rowIndex), rawValue);
   }
 
+  @SuppressWarnings("unchecked")
+  protected void updateDisplayText(ITableRow row, Cell cell) {
+    cell.setText(formatValueInternal(row, (VALUE) cell.getValue()));
+  }
+
+  protected String formatValueInternal(ITableRow row, VALUE value) {
+    return value != null ? value.toString() : "";
+  }
+
   @Override
   public void setValue(ITableRow r, VALUE value) {
     try {

@@ -219,10 +219,11 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
-    cell.setText(formatValueInternal((Date) cell.getValue()));
+    updateDisplayText(row, cell);
   }
 
-  private String formatValueInternal(Date value) {
+  @Override
+  protected String formatValueInternal(ITableRow row, Date value) {
     if (value != null) {
       return getDateFormat().format(value);
     }

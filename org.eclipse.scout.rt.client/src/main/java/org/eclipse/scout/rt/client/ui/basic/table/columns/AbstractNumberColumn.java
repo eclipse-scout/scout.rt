@@ -264,10 +264,11 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
-    cell.setText(formatValueInternal(cell.getValue()));
+    updateDisplayText(row, cell);
   }
 
-  private String formatValueInternal(Object value) {
+  @Override
+  protected String formatValueInternal(ITableRow row, NUMBER value) {
     return (value != null) ? getFormat().format(value) : "";
   }
 

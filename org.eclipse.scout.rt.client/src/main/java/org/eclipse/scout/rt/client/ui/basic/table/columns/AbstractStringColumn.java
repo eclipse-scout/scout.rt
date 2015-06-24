@@ -239,10 +239,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
-    cell.setText(formatValueInternal((String) cell.getValue()));
+    updateDisplayText(row, cell);
   }
 
-  private String formatValueInternal(String value) {
+  @Override
+  protected String formatValueInternal(ITableRow row, String value) {
     String format = getDisplayFormat();
     if (format != null && value != null) {
       if (FORMAT_LOWER.equals(format)) {
