@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -21,6 +23,24 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 public class BinaryResourceUrlUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryResourceUrlUtility.class);
+
+  /**
+   * Regular expression pattern to find icons, e.g. to find &lt;img src="iconid:some_icon"&gt;.
+   * <p>
+   * Pattern does a search for iconid:some_icon (in quotation marks) and has three groups:
+   * <li>1. Type of quotation mark, either " or '.
+   * <li>2. Icon name, in the example <b>some_icon</b>
+   */
+  public static final Pattern ICON_REGEX_PATTERN = Pattern.compile("([\"'])iconid:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
+
+  /**
+   * Regular expression pattern to find icons, e.g. to find &lt;img src="binaryResource:some_res"&gt;.
+   * <p>
+   * Pattern does a search for binaryResource:some_res (in quotation marks) and has three groups:
+   * <li>1. Type of quotation mark, either " or '.
+   * <li>2. Icon name, in the example <b>some_res</b>
+   */
+  public static final Pattern BINARY_RESOURCE_REGEX_PATTERN = Pattern.compile("([\"'])binaryResource:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
 
   // FIXME AWE: (font icons) extend syntax for icon-ID so a font-name can be configured
   // font:[char] --> uses default scoutIcons.ttf (CSS class .font-icon)

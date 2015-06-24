@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
+import java.util.Set;
+import java.util.regex.Matcher;
+
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -18,11 +23,14 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 
 /**
  * This class creates JSON output for an <code>IHtmlField</code>.
  */
-public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
+public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> implements IBinaryResourceProvider {
 
   public JsonHtmlField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -43,6 +51,27 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
       @Override
       protected String modelValue() {
         return getModel().getDisplayText();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value0) {
+        value0 = super.prepareValueForToJson(value0);
+        if (value0 != null) {
+          Matcher m = BinaryResourceUrlUtility.ICON_REGEX_PATTERN.matcher(String.valueOf(value0));
+          StringBuffer ret = new StringBuffer(); // StringBuffer must be used, Java API does not accept a StringBuilder
+          while (m.find()) {
+            m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createIconUrl(m.group(2)) + m.group(1));
+          }
+          m.appendTail(ret);
+          m = BinaryResourceUrlUtility.BINARY_RESOURCE_REGEX_PATTERN.matcher(ret.toString());
+          ret = new StringBuffer();
+          while (m.find()) {
+            m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(JsonHtmlField.this, m.group(2)) + m.group(1));
+          }
+          m.appendTail(ret);
+          return ret.toString();
+        }
+        return null;
       }
     });
 
@@ -79,5 +108,16 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
   protected void handleUiAppLinkAction(JsonEvent event) {
     String ref = event.getData().getString("ref");
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
+  }
+
+  @Override
+  public BinaryResourceHolder provideBinaryResource(String filename) {
+    Set<BinaryResource> attachments = getModel().getAttachments();
+    for (BinaryResource att : attachments) {
+      if (CompareUtility.equals(filename, att.getFilename())) {
+        return new BinaryResourceHolder(att);
+      }
+    }
+    return null;
   }
 }
