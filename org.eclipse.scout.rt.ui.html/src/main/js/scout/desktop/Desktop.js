@@ -17,7 +17,7 @@ scout.Desktop = function() {
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
   this.selectedTool;
-  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -111,7 +111,7 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype.onResize = function(event) {
-  // FIXME AWE/CGU this is called by jquery ui when the dialog gets resized, why?
+  // FIXME AWE/CGU this is called by JQuery ui when the dialog gets resized, why?
   if (this._selectedTab && this._selectedTab.content) {
     this._selectedTab.content.onResize();
   }
@@ -240,12 +240,12 @@ scout.Desktop.prototype._selectTab = function(tab) {
       scout.keyStrokeManager.installAdapter(this.$container, tab.content.keyStrokeAdapter);
     }
   }
-  if (tab.$storage && tab.$storage.length > 0) {
-    this.$bench.append(tab.$storage);
-    this.session.detachHelper.afterAttach(tab.$storage);
+  if (tab.$content && tab.$content.length > 0) {
+    this.$bench.append(tab.$content);
+    this.session.detachHelper.afterAttach(tab.$content);
 
-    //If the parent has been resized while the content was not visible, the content has the wrong size -> update
-    var htmlComp = scout.HtmlComponent.get(tab.$storage);
+    // If the parent has been resized while the content was not visible, the content has the wrong size -> update
+    var htmlComp = scout.HtmlComponent.get(tab.$content);
     var htmlParent = htmlComp.getParent();
     htmlComp.setSize(htmlParent.getSize());
   }
@@ -259,10 +259,10 @@ scout.Desktop.prototype._unselectTab = function(tab) {
     scout.keyStrokeManager.uninstallAdapter(tab.content.keyStrokeAdapter);
   }
 
-  tab.$storage = this.$bench.children();
-  if (tab.$storage.length > 0) {
-    this.session.detachHelper.beforeDetach(tab.$storage);
-    tab.$storage.detach();
+  tab.$content = this.$bench.children();
+  if (tab.$content.length > 0) {
+    this.session.detachHelper.beforeDetach(tab.$content);
+    tab.$content.detach();
   }
   tab.$container.select(false);
 };
@@ -363,7 +363,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     }
     this._outlineTab.content.remove();
     // Also remove storage to make sure selectTab does not restore the content
-    this._outlineTab.$storage = null;
+    this._outlineTab.$content = null;
     this._outlineTab.content.tab = null;
   }
 
@@ -482,8 +482,6 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this._showForm(form);
   } else if (event.type === 'outlineChanged') {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
-  } else if (event.type === 'searchPerformed') {
-    this.navigation.onSearchPerformed(event);
   } else if (event.type === 'messageBoxAdded') {
     this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
   } else if (event.type === 'fileChooserAdded') {
@@ -505,7 +503,7 @@ scout.Desktop.prototype.tabCount = function() {
 scout.Desktop.TabAndContent = function(desktop, content, title, subTitle) {
   this._desktop = desktop;
   this.$container;
-  this.$storage;
+  this.$content;
 
   this._contentPropertyChangeListener = function(event) {
     if (event.properties.title !== undefined || event.properties.subTitle !== undefined) {
