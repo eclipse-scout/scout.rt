@@ -5,14 +5,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
+import org.json.JSONObject;
 
-public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAction<T> {
+public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonViewButton<T> {
 
   public JsonOutlineViewButton(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -46,21 +44,10 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAct
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (JsonEventType.CLICKED.matches(event)) {
-      handleUiClick(event);
-    }
-    else if (EVENT_DO_ACTION.equals(event.getType())) {
-      handleUiClick(event);
-    }
-    else {
-      throw new IllegalArgumentException("unsupported event type");
-    }
-  }
-
-  protected void handleUiClick(JsonEvent event) {
-    getModel().getUIFacade().setSelectedFromUI(true);
-    getModel().getUIFacade().fireActionFromUI();
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put("displayStyle", getModel().getDisplayStyle());
+    return json;
   }
 
 }

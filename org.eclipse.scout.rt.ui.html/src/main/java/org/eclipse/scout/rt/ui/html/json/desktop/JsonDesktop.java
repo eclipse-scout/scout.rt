@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.desktop.TargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -38,12 +37,14 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.json.JSONObject;
 
 public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IBinaryResourceProvider {
+
+  private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_FORM = "form";
@@ -76,7 +77,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
       attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
-      attachGlobalAdapter(getSearchOutline(), new DisplayableOutlineFilter<IOutline>());
     }
   }
 
@@ -154,7 +154,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
       putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
-      putAdapterIdProperty(json, "searchOutline", getSearchOutline(), new DisplayableOutlineFilter<IOutline>());
     }
     return json;
   }
@@ -259,7 +258,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     JSONObject jsonEvent = new JSONObject();
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
     putProperty(jsonEvent, PROP_OUTLINE, jsonAdapter.getId());
-    addActionEvent("outlineChanged", jsonEvent);
+    addActionEvent(EVENT_OUTLINE_CHANGED, jsonEvent);
   }
 
   protected void handleModelFormAdded(IForm form) {
@@ -309,18 +308,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     addActionEvent("fileChooserAdded", jsonEvent);
   }
 
-  protected ISearchOutline getSearchOutline() {
-    for (IOutline outline : getModel().getAvailableOutlines()) {
-      if (outline instanceof ISearchOutline) {
-        return (ISearchOutline) outline;
-      }
-    }
-    return null;
-  }
-
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if ("outlineChanged".equals(event.getType())) {
+    if (EVENT_OUTLINE_CHANGED.equals(event.getType())) {
       handleUiOutlineChanged(event);
     }
     else {

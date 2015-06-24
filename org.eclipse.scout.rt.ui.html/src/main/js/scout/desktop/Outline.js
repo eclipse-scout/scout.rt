@@ -24,7 +24,6 @@ scout.Outline.prototype._installKeyStrokeAdapter = function() {
  */
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
-
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
   }
@@ -271,4 +270,8 @@ scout.Outline.prototype.onModelAction = function(event) {
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }
+};
+
+scout.Outline.prototype.validateFocus = function() {
+  scout.focusManager.validateFocus(this.session.uiSessionId);
 };

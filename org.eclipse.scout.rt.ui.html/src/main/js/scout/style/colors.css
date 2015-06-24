@@ -30,6 +30,7 @@
 @palette-gray-4: #CCCCCC;
 @palette-gray-5: #999999;
 @palette-gray-6: #666666;
+@palette-gray-65: #5C5C5C; /* XXX AWE */
 @palette-gray-7: #4C4C4C;
 @palette-gray-8: #333333;
 
@@ -121,6 +122,10 @@
 @tooltip-color: @palette-gray-8;
 @tooltip-background-color: @palette-orange-0;
 @tooltip-border-color: @palette-orange-3;
+@view-button-tab-background-color: @palette-gray-3;
+@view-button-tab-color: @palette-gray-65;
+@view-button-tab-active-background-color: @navigation-background-color;
+@view-button-tab-active-color: @active-inverted-color;
 @wizard-progress-step-background-color: @palette-gray-2;
 @wizard-progress-step-foreground-color: @text-color;
 @wizard-progress-step-separator-color: @palette-gray-4;

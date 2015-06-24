@@ -1,5 +1,5 @@
-scout.SearchFieldKeyStrokeAdapter = function(desktopNavigation) {
-  scout.SearchFieldKeyStrokeAdapter.parent.call(this, desktopNavigation);
+scout.SearchFieldKeyStrokeAdapter = function(searchOutline) {
+  scout.SearchFieldKeyStrokeAdapter.parent.call(this, searchOutline);
 
   this.keyStrokes.push(new scout.SearchFieldEnterKeyStroke());
   this.keyStrokes.push(new scout.SearchFieldBackspaceKeyStroke());
@@ -8,15 +8,15 @@ scout.inherits(scout.SearchFieldKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter
 
 
 scout.SearchFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
-  //nop
+  // NOP
 };
 
 scout.SearchFieldKeyStrokeAdapter.prototype.removeKeyBox = function() {
-  //nop
+  // NOP
 };
 
 scout.SearchFieldKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
- //nop
+  // NOP
 };
 /**
  * It is possible that key strokes should only be accepted if a precondition is true.
@@ -30,7 +30,6 @@ scout.SearchFieldKeyStrokeAdapter.prototype.accept = function(event) {
 scout.SearchFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
   return false;
 };
-
 
 scout.SearchFieldEnterKeyStroke = function() {
   scout.SearchFieldEnterKeyStroke.parent.call(this);
@@ -46,7 +45,7 @@ scout.SearchFieldEnterKeyStroke.prototype.checkAndDrawKeyBox = function($contain
   if (drawedKeys[this.keyStrokeName()]) {
     return;
   }
-    drawedKeys[this.keyStrokeName()] = true;
+  drawedKeys[this.keyStrokeName()] = true;
 };
 
 scout.SearchFieldBackspaceKeyStroke = function() {

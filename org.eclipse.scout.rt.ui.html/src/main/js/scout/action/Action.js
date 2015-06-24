@@ -148,12 +148,20 @@ scout.Action.prototype._goOnline = function() {
   this._renderEnabled(true);
 };
 
+scout.Action.prototype.doAction = function() {
+  if (this.enabled) {
+    this.sendDoAction();
+  }
+};
+
 scout.Action.prototype.sendDoAction = function() {
   var activeValueField = $(document.activeElement).data('valuefield');
   if (activeValueField) {
     activeValueField.displayTextChanged();
   }
+  this.beforeSendDoAction();
   this.session.send(this.id, 'doAction');
+  this.afterSendDoAction();
 };
 
 scout.Action.prototype.sendSelected = function(selected) {
@@ -250,3 +258,20 @@ scout.Action.prototype.keyStrokeName = function() {
   name += this.shift ? 'shift+' : '';
   return name + this.keyStrokeKeyPart;
 };
+
+/**
+ * Override this method to do something before 'doAction' is sent to the server.
+ * The default impl. does nothing.
+ */
+scout.Action.prototype.beforeSendDoAction = function() {
+  // NOP
+};
+
+/**
+ * Override this method to do something after 'doAction' has been sent to the server.
+ * The default impl. does nothing.
+ */
+scout.Action.prototype.afterSendDoAction = function() {
+  // NOP
+};
+

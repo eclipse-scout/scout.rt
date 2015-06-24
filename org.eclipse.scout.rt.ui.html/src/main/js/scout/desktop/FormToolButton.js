@@ -1,7 +1,7 @@
 scout.FormToolButton = function() {
   scout.FormToolButton.parent.call(this);
   this.desktop;
-  this.$storage;
+  this.$content;
   this.popup;
   this._addAdapterProperties('form');
 };

@@ -124,7 +124,7 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
     }
   }
 
-  public void handleUiDoAction(JsonEvent event) {
+  protected void handleUiDoAction(JsonEvent event) {
     getModel().getUIFacade().fireActionFromUI();
   }
 

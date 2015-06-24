@@ -5,18 +5,14 @@ scout.OutlineViewButton = function() {
   scout.OutlineViewButton.parent.call(this);
   this._addAdapterProperties('outline');
 };
-scout.inherits(scout.OutlineViewButton, scout.Action);
-
-scout.OutlineViewButton.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('outline-menu-item');
-};
+scout.inherits(scout.OutlineViewButton, scout.ViewButton);
 
 scout.OutlineViewButton.prototype._renderOutline = function(outline) {
-  // nop
+  // NOP
 };
 
 scout.OutlineViewButton.prototype._goOffline = function() {
-  //Disable if outline has not been loaded yet
+  // Disable if outline has not been loaded yet
   if (!this.outline) {
     this._renderEnabled(false);
   }
@@ -24,22 +20,19 @@ scout.OutlineViewButton.prototype._goOffline = function() {
 
 scout.OutlineViewButton.prototype.onModelPropertyChange = function(event) {
   scout.OutlineViewButton.parent.prototype.onModelPropertyChange.call(this, event);
-
-  //Update navigation as well if properties for current outline have changed
+  // Update navigation as well if properties for current outline have changed
   var navigation = this.session.desktop.navigation;
   if (navigation.outline === this.outline) {
     navigation.onOutlinePropertyChange(event);
   }
 };
 
-scout.OutlineViewButton.prototype.doAction = function() {
-  if (!this.$container.isEnabled()) {
-    return;
-  }
-
-  // don't await server response to make it more responsive and offline capable
+/**
+ * Don't await server response to make it more responsive and offline capable.
+ * @override Action.js
+ */
+scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
   if (this.outline) {
     this.desktop.changeOutline(this.outline);
   }
-  this.session.send(this.id, 'clicked');
 };

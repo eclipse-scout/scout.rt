@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
 
+  public static final String EVENT_SEARCH = "search";
+
   public JsonSearchOutline(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
@@ -47,7 +49,7 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if ("search".equals(event.getType())) {
+    if (EVENT_SEARCH.equals(event.getType())) {
       handleUiSearch(event);
     }
     else {

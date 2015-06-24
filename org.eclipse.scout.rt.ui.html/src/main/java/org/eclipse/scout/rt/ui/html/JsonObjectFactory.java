@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -98,6 +99,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
@@ -301,6 +303,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IOutlineViewButton) {
       return new JsonOutlineViewButton<IOutlineViewButton>((IOutlineViewButton) model, session, id, parent);
+    }
+    if (model instanceof IViewButton) {
+      return new JsonViewButton<IViewButton>((IViewButton) model, session, id, parent);
     }
     if (model instanceof IFormToolButton<?>) {
       return new JsonFormToolButton((IFormToolButton<?>) model, session, id, parent);

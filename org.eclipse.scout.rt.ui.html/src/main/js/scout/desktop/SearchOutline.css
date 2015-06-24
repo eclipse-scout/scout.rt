@@ -1,0 +1,35 @@
+.search-field {
+  border: 1px solid @navigation-background-color;
+  height: 35px;
+  border-radius: 5px;
+  margin: 13px 13px 9px 10px;
+  background-color: @palette-gray-2;
+  width: calc(~"100%" - (13px + 10x));
+
+  &:focus {
+    border-color: @navigation-background-color;
+    .glow(@palette-white);
+  }
+
+  /* FIXME AWE (desktop) search, breadcrumb mode
+  .navigation-breadcrumb & {
+    position: absolute;
+    margin-right: 12px;
+    top:  @desktop-taskbar-height;
+    left: -100%;
+    width: calc(~"200%" - (12px + 12x));
+  }
+  */
+}
+
+& .search-status {
+  .overflow-ellipsis-nowrap;
+  padding-right: 13px;
+  margin-bottom: 18px;
+  text-align: right;
+}
+
+.navigation-breadcrumb & .search-status {
+  padding-top: 0px;
+  padding-right: 14px;
+}

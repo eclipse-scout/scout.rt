@@ -1,5 +1,4 @@
-@desktop-taskbar-height: 50px;
-@navigation-tab-button-size: @desktop-taskbar-height;
+@view-buttons-height: 50px;
 
 /* main element */
 
@@ -11,173 +10,79 @@
   color: @navigation-color;
 }
 
-.navigation-header {
+.view-buttons {
   width: 100%;
-  height: @desktop-taskbar-height;
+  height: @view-buttons-height;
+  background-color: @view-button-tab-background-color;
   .font-text-large;
 
+  /* XXX AWE: check 2x */
   .navigation-breadcrumb & {
-    height: 2 * @desktop-taskbar-height;
+    height: 2 * @view-buttons-height;
+  }
+}
+
+.view-button-tab {
+  display: inline-block;
+  height: @view-buttons-height;
+  padding: 0 10px;
+  background-color: @view-button-tab-background-color;
+  color: @view-button-tab-color;
+  border-right: solid 1px @navigation-background-color;
+
+  &.selected {
+    background-color: @view-button-tab-active-background-color;
+    color: @view-button-tab-active-color;
+  }
+
+  & .view-button-tab-title {
+    .font-text-large;
+    .overflow-ellipsis-nowrap;
+    /*display: none; */
+
+    /*
+    .tab-active > & {
+      display: block;
+    }
+
+    .navigation-breadcrumb & {
+      width: 200%;
+      text-align: center;
+      border-bottom: 1px solid @navigation-color;
+    }
+    */
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &[data-icon]::before {
+      .font-icon;
+      font-size: 20px;
+      content: attr(data-icon);
+    }
+  }
+}
+
+& .view-menu-button {
+  float: right;
+
+  &::before {
+    .font-icon;
+    content: @icon-caret-down;
+  }
+
+  &:hover {
+  color: @palette-orange-3;
   }
 }
 
 .navigation-container {
   width: 100%;
-  height: calc(~"100%" - @desktop-taskbar-height);
+  height: calc(~"100%" - @view-buttons-height);
 
+  /* XXX AWE: check 2x */
   .navigation-breadcrumb & {
-    height: calc(~"100%" - 2 * @desktop-taskbar-height);
-  }
-
-  & .search-status {
-    padding: 10px;
-    padding-left: 15px;
-    text-align: right;
-    .overflow-ellipsis-nowrap;
-  }
-
-  .navigation-breadcrumb & .search-status {
-    padding-top: 0px;
-    padding-right: 14px;
-  }
-}
-
-.navigation-tab-outline,
-.navigation-tab-search {
-  position: relative;
-  float: left;
-  cursor: pointer;
-  display: inline-block;
-
-  &.tab-active {
-    width: 100%;
-  }
-
-  .search-available > &.tab-active {
-    width: calc(~"100%" - @navigation-tab-button-size);
-  }
-
-  &:not(.tab-active) {
-    background-color: @palette-gray-4;
-    color: @text-color;
-    width: @navigation-tab-button-size;
-  }
-
-  .navigation-breadcrumb > .navigation-header > & {
-    width: 50%;
-  }
-
-  & > .key-box {
-    top:10px;
-  }
-}
-
-/* navigation header buttons*/
-
-.popup-head.navigation-header.navigation-tab-outline-button,
-.navigation-tab-outline-button,
-.navigation-tab-search-button {
-  padding: 0px 10px 0px 10px;
-  text-align: center;
-  height: @navigation-tab-button-size;
-  width: @navigation-tab-button-size;
-  line-height: @navigation-tab-button-size;
-  .font-text-large;
-  border-top: none;
-
-  &::before {
-    .font-icon;
-    font-size: 24px;
-  }
-
-  .navigation-breadcrumb & {
-    width: 100%;
-  }
-}
-
-.navigation-tab-outline-button {
-  float: left;
-
-  .tab-menu-open & {
-    color: @active-color;
-    background-color: @control-background-color;
-  }
-
-  &::before {
-    content: @icon-menu;
-  }
-}
-
-.navigation-tab-search-button {
-  float: right;
-
-  &::before {
-    content: @icon-search;
-  }
-}
-
-/* navigation header fields */
-
-.navigation-tab-outline-title {
-  padding: 0px 10px 0px 10px;
-  height: 100%;
-  line-height: @desktop-taskbar-height;
-  .font-text-large;
-  .overflow-ellipsis-nowrap;
-  display: none;
-
-  .tab-active > & {
-    display: block;
-  }
-
-  .navigation-breadcrumb & {
-    width: 200%;
-    text-align: center;
-    border-bottom: 1px solid @navigation-color;
-  }
-}
-
-.navigation-tab-search-field {
-  float: left;
-  border: 1px solid @navigation-background-color;
-  height: 32px;
-  border-radius: 5px;
-  margin: 10px 2px 10px 12px;
-  width: calc(~"100%" - (@navigation-tab-button-size + 2px + 12x));
-  display: none;
-  background-color: @palette-gray-2;
-  .tab-active > & {
-    display: block;
-  }
-
-   &:focus {
-    border-color: @navigation-background-color;
-    .glow(@palette-white);
-  }
-
-  .navigation-breadcrumb & {
-    position: absolute;
-    margin-right: 12px;
-    top:  @desktop-taskbar-height;
-    left: -100%;
-    width: calc(~"200%" - (12px + 12x));
-  }
-
-}
-
-/* navigation outline menu */
-
-.navigation-tab-outline-menu {
-  position: absolute;
-  top: @desktop-taskbar-height;
-  background-color: @control-background-color;
-  z-index: 10;
-  white-space: nowrap;
-  .menu-context;
-  border-top: 1px solid transparent;
-  display: none;
-
-  .tab-menu-open & {
-    display: block;
+    height: calc(~"100%" - 2 * @view-buttons-height);
   }
 }

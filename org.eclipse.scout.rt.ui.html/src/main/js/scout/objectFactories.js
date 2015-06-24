@@ -17,6 +17,11 @@ scout.defaultObjectFactories = [{
     return new scout.Outline();
   }
 }, {
+  objectType: 'ViewButton',
+  create: function() {
+    return new scout.ViewButton();
+  }
+}, {
   objectType: 'OutlineViewButton',
   create: function() {
     return new scout.OutlineViewButton();
