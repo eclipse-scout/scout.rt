@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -28,6 +27,7 @@ import org.eclipse.scout.commons.html.IHtmlTableRow;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -151,23 +151,33 @@ public class ScoutInfoForm extends AbstractForm {
     }
   }
 
-  protected void createHtmlAttachments(Collection<RemoteFile> collection) {
+  protected void createHtmlAttachments(Collection<BinaryResource> collection) {
     RemoteFile f = getLogoImage();
+    BinaryResource res = null;
     if (f != null && !f.hasContent()) {
       // try to load bundle resource
       try {
         IconSpec iconSpec = IconLocator.instance().getIconSpec(AbstractIcons.ApplicationLogo);
-        ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
-        f.readData(is);
-        is.close();
+        if (iconSpec != null) {
+          res = new BinaryResource(iconSpec.getName(), iconSpec.getContent());
+        }
       }
       catch (Exception ex2) {
         LOG.info(null, ex2);
-        f = null;
+        res = null;
       }
     }
-    if (f != null && f.hasContent()) {
-      collection.add(f);
+    else if (f != null && f.hasContent()) {
+      try {
+        res = new BinaryResource(f.getName(), f.extractData());
+      }
+      catch (Exception e) {
+        LOG.info(null, e);
+        res = null;
+      }
+    }
+    if (res != null && res.getContentLength() > 0) {
+      collection.add(res);
     }
   }
 
@@ -239,7 +249,7 @@ public class ScoutInfoForm extends AbstractForm {
 
     @Override
     protected void execLoad() throws ProcessingException {
-      ArrayList<RemoteFile> attachments = new ArrayList<RemoteFile>();
+      ArrayList<BinaryResource> attachments = new ArrayList<BinaryResource>();
       createHtmlAttachments(attachments);
       if (attachments.size() > 0) {
         getHtmlField().setAttachments(attachments);

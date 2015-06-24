@@ -14,12 +14,12 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.IDocumentField;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
  * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
@@ -61,9 +61,9 @@ public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlC
   /**
    * local images and local resources bound to the html text
    */
-  Set<RemoteFile> getAttachments();
+  Set<BinaryResource> getAttachments();
 
-  void setAttachments(Collection<? extends RemoteFile> attachments);
+  void setAttachments(Collection<? extends BinaryResource> attachments);
 
   String getPlainText();
 

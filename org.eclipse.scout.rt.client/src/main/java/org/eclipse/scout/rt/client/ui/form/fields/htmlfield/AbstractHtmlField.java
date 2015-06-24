@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocument
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
  * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
@@ -53,7 +53,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   private IHtmlFieldUIFacade m_uiFacade;
   private boolean m_htmlEditor;
   private boolean m_scrollBarEnabled;
-  private Set<RemoteFile> m_attachments;
+  private Set<BinaryResource> m_attachments;
   private Boolean m_monitorSpelling = null; // If null the application-wide
 
   public AbstractHtmlField() {
@@ -231,13 +231,13 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    * local images and local resources bound to the html text
    */
   @Override
-  public Set<RemoteFile> getAttachments() {
+  public Set<BinaryResource> getAttachments() {
     return CollectionUtility.hashSet(m_attachments);
   }
 
   @Override
-  public void setAttachments(Collection<? extends RemoteFile> attachments) {
-    m_attachments = CollectionUtility.<RemoteFile> hashSetWithoutNullElements(attachments);
+  public void setAttachments(Collection<? extends BinaryResource> attachments) {
+    m_attachments = CollectionUtility.<BinaryResource> hashSetWithoutNullElements(attachments);
   }
 
   @Override
@@ -256,11 +256,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
         // parse always, validity might change even if text is same
         parseAndSetValue(htmlText);
       }
-    }
-
-    @Override
-    public void setAttachmentsFromUI(Collection<? extends RemoteFile> attachments) {
-      setAttachments(attachments);
     }
 
     @Override

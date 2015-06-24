@@ -13,11 +13,8 @@ package org.eclipse.scout.rt.ui.swing.form.fields.htmlfield;
 /**
  *  Copyright (c) 2001,2004 BSI AG
  */
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +37,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
@@ -191,16 +187,17 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
   @Override
   protected void setDisplayTextFromScout(String rawHtml) {
     // create attachments
-    for (RemoteFile f : getScoutObject().getAttachments()) {
-      if (f != null && f.exists()) {
-        try {
-          writeTempFile(f.getPath(), new ByteArrayInputStream(f.extractData()));
-        }
-        catch (Exception e1) {
-          LOG.warn("could not read remote file '" + f.getName() + "'", e1);
-        }
-      }
-    }
+// MOT: Swing will be removed
+//    for (RemoteFile f : getScoutObject().getAttachments()) {
+//      if (f != null && f.exists()) {
+//        try {
+//          writeTempFile(f.getPath(), new ByteArrayInputStream(f.extractData()));
+//        }
+//        catch (Exception e1) {
+//          LOG.warn("could not read remote file '" + f.getName() + "'", e1);
+//        }
+//      }
+//    }
 
     // style HTML
     rawHtml = StringUtility.nvl(rawHtml, "");
@@ -244,45 +241,46 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     textPane.setSize(preferredWidth, Integer.MAX_VALUE);
   }
 
-  private File writeTempFile(String relFullName, InputStream content) {
-    relFullName = relFullName.replaceAll("\\\\", "/");
-    if (relFullName == null || relFullName.length() == 0) {
-      return null;
-    }
-    if (!relFullName.startsWith("/")) {
-      relFullName = "/" + relFullName;
-    }
-    File ioF = new File(getTempFolder(true), relFullName);
-    ioF.getParentFile().mkdirs();
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(ioF);
-      byte[] buffer = new byte[1026];
-      int bytesRead;
-
-      while ((bytesRead = content.read(buffer)) != -1) {
-        out.write(buffer, 0, bytesRead); // write
-      }
-      out.flush();
-      ioF.deleteOnExit();
-      return ioF;
-    }
-    catch (IOException e) {
-      LOG.error("could not create file in temp dir: '" + relFullName + "'", e);
-      return null;
-    }
-    finally {
-      if (out != null) {
-        try {
-          out.close();
-        }
-        catch (IOException e) {
-
-        }
-      }
-    }
-
-  }
+// MOT: Swing will be removed
+//  private File writeTempFile(String relFullName, InputStream content) {
+//    relFullName = relFullName.replaceAll("\\\\", "/");
+//    if (relFullName == null || relFullName.length() == 0) {
+//      return null;
+//    }
+//    if (!relFullName.startsWith("/")) {
+//      relFullName = "/" + relFullName;
+//    }
+//    File ioF = new File(getTempFolder(true), relFullName);
+//    ioF.getParentFile().mkdirs();
+//    FileOutputStream out = null;
+//    try {
+//      out = new FileOutputStream(ioF);
+//      byte[] buffer = new byte[1026];
+//      int bytesRead;
+//
+//      while ((bytesRead = content.read(buffer)) != -1) {
+//        out.write(buffer, 0, bytesRead); // write
+//      }
+//      out.flush();
+//      ioF.deleteOnExit();
+//      return ioF;
+//    }
+//    catch (IOException e) {
+//      LOG.error("could not create file in temp dir: '" + relFullName + "'", e);
+//      return null;
+//    }
+//    finally {
+//      if (out != null) {
+//        try {
+//          out.close();
+//        }
+//        catch (IOException e) {
+//
+//        }
+//      }
+//    }
+//
+//  }
 
   @Override
   protected void setEnabledFromScout(boolean b) {

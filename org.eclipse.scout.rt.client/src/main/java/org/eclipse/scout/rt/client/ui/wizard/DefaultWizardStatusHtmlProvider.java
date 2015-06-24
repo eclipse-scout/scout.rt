@@ -19,10 +19,10 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
@@ -41,7 +41,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     m_htmlTemplate = initHtmlTemplate();
 
     // collect attachments for HTML field
-    List<RemoteFile> attachments = collectAttachments();
+    List<BinaryResource> attachments = collectAttachments();
     if (attachments != null && attachments.size() > 0) {
       htmlField.setAttachments(attachments);
     }
@@ -111,7 +111,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     String spacerCssClass = "selected".equals(cssClass) ? "spacerselected" : "spacer";
     appendHtmlForSpacerLine(buf, spacerCssClass, 7, AbstractWizardStatusField.STEP_ANCHOR_IDENTIFIER + index);
     buf.append("<tr class=\"" + cssClass + "\">\n");
-    buf.append(" <td width=\"15\"><img src=\"empty.png\" width=\"1\" height=\"30\"></td>\n");
+    buf.append(" <td width=\"15\"><img src=\"binaryResource:empty.png\" width=\"1\" height=\"30\"></td>\n");
     buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:0px;padding-top:" + (UserAgentUtility.isRichClient() ? "4" : "5") + "px;\">" + index + "</td>\n");
     buf.append(" <td width=\"17\"></td>\n");
     buf.append(" <td style=\"padding-top:2px;\">" + StringUtility.nvl(step.getTitleHtml(), step.getTitle()) + "</td>\n");
@@ -127,7 +127,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     if (!StringUtility.isNullOrEmpty(anchor)) {
       buf.append("<a name=\"" + anchor + "\"/>");
     }
-    buf.append("<img src=\"empty.png\" width=\"1\" height=\"" + height + "\"></td></tr>\n");
+    buf.append("<img src=\"binaryResource:empty.png\" width=\"1\" height=\"" + height + "\"></td></tr>\n");
   }
 
   /**
@@ -135,8 +135,8 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
    * The default implementation provides default icons for
    * wizard steps.
    */
-  protected List<RemoteFile> collectAttachments() {
-    List<RemoteFile> attachments = new LinkedList<RemoteFile>();
+  protected List<BinaryResource> collectAttachments() {
+    List<BinaryResource> attachments = new LinkedList<BinaryResource>();
 
     loadIcon(attachments, AbstractIcons.Empty + ".png");
     loadIcon(attachments, AbstractIcons.WizardBullet + ".png");
@@ -149,7 +149,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
   /**
    * To load an icon into the given attachments live list
    */
-  protected void loadIcon(List<RemoteFile> attachments, String iconName) {
+  protected void loadIcon(List<BinaryResource> attachments, String iconName) {
     if (attachments == null || iconName == null) {
       return;
     }
@@ -158,10 +158,8 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     try {
       int index;
       // determine file format
-      String format = null;
       index = tempIconName.lastIndexOf('.');
       if (index > 0) {
-        format = tempIconName.substring(index);
         tempIconName = tempIconName.substring(0, index);
       }
       // determine icon base name
@@ -178,11 +176,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       }
 
       if (iconSpec != null) {
-        RemoteFile iconFile = new RemoteFile(StringUtility.join("", tempIconName, format), 0);
-        is = new ByteArrayInputStream(iconSpec.getContent());
-        iconFile.readData(is);
-        is.close();
-        attachments.add(iconFile);
+        attachments.add(new BinaryResource(iconSpec.getName(), iconSpec.getContent()));
       }
     }
     catch (Exception t) {
