@@ -35,7 +35,7 @@ public class InternalTableRowTest {
     assertEquals(row.getStatus(), ir.getStatus());
     assertEquals(table, ir.getTable());
     assertEquals("Test", ir.getCellForUpdate(0).getValue());
-    assertEquals("Test", ir.getCellForUpdate(0).getText());
+    assertEquals("TestText", ir.getCellForUpdate(0).getText());
   }
 
   @Test

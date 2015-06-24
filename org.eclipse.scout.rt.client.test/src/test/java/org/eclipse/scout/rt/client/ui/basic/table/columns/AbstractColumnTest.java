@@ -158,6 +158,40 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     assertErrorStatus(c0);
   }
 
+  @Test
+  public void testNoInitialDecoration() throws Exception {
+    TestVetoTable table = new TestVetoTable();
+    table.addRowsByArray(new String[]{"a"});
+    ICell c0 = table.getCell(0, 0);
+    assertEquals(null, c0.getCssClass());
+    assertEquals(1, table.getValidateTestColumn().getDecorateCount());
+  }
+
+  @Test
+  public void testInitialDecoration() throws Exception {
+    TestVetoTable table = new TestVetoTable();
+    table.addRowsByArray(new String[]{"decorate"});
+    ICell c0 = table.getCell(0, 0);
+    assertEquals("decorated", c0.getCssClass());
+    assertEquals(1, table.getValidateTestColumn().getDecorateCount());
+  }
+
+  @Test
+  public void testDecoration_SetValue() throws Exception {
+    TestVetoTable table = new TestVetoTable();
+    table.addRowsByArray(new String[]{"b"});
+    table.getValidateTestColumn().setValue(0, "decorate");
+    ICell c0 = table.getCell(0, 0);
+    assertEquals("decorated", c0.getCssClass());
+    assertEquals(2, table.getValidateTestColumn().getDecorateCount());
+  }
+
+  @Test
+  public void testDecorationsAfterAllInserts() throws Exception {
+    TestDecorationTable table = new TestDecorationTable();
+    table.addRowsByArray(new String[]{"a", "b"});
+  }
+
   private void assertErrorStatus(ICell c) {
     assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue()), c.getErrorStatus());
     assertEquals(INVALID_MESSAGE, c.getErrorStatus().getMessage());
@@ -203,6 +237,19 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
 
     @Order(70.0)
     public class ValidateTestColumn extends AbstractStringColumn {
+      private int m_decorateCount = 0;
+
+      public int getDecorateCount() {
+        return m_decorateCount;
+      }
+
+      @Override
+      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+        m_decorateCount++;
+        if ("decorate".equals(cell.getValue())) {
+          cell.setCssClass("decorated");
+        }
+      }
 
       @Override
       protected boolean getConfiguredEditable() {
@@ -215,6 +262,32 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
           throw new VetoException(INVALID_MESSAGE);
         }
         return rawValue;
+      }
+    }
+  }
+
+  public class TestDecorationTable extends AbstractTable {
+
+    public C1Column getC1Column() {
+      return getColumnSet().getColumnByClass(C1Column.class);
+    }
+
+    public C2Column getC2Column() {
+      return getColumnSet().getColumnByClass(C2Column.class);
+    }
+
+    @Order(70.0)
+    public class C1Column extends AbstractStringColumn {
+    }
+
+    @Order(70.0)
+    public class C2Column extends AbstractStringColumn {
+
+      @Override
+      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+        if (getC1Column().getValue(row) == null) {
+          throw new ProcessingException("decoration on empty column");
+        }
       }
     }
   }

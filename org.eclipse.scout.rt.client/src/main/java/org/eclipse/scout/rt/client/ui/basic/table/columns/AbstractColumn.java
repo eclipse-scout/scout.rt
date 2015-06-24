@@ -1034,7 +1034,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       // set newValue into the cell only if there's no error.
       if (cell.isContentValid()) {
         r.setCellValue(getColumnIndex(), newValue);
-        decorateCellInternal(cell, r);
       }
 
       ensureVisibileIfInvalid(r);
@@ -1343,6 +1342,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         for (ITableRow row : rows) {
           setValue(row, getValue(row));
         }
+        decorateCells();
       }
     }
   }
