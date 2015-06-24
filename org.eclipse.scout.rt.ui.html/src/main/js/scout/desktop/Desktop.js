@@ -86,11 +86,11 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation.onOutlineChanged(this.outline);
 
   // FIXME AWE: (user-prefs) Use user-preferences instead of sessionStorage
-  var storedSplitterSize = sessionStorage.getItem('splitter.size');
-  if (storedSplitterSize) {
-    var splitterSize = parseInt(storedSplitterSize, 10);
-    this.navigation.onResize({data: splitterSize});
-    this.splitter.position(splitterSize);
+  var storedSplitterPosition = sessionStorage.getItem('scout:desktopSplitterPosition');
+  if (storedSplitterPosition) {
+    var splitterPosition = parseInt(storedSplitterPosition, 10);
+    this.splitter.updatePosition(splitterPosition);
+    this._handleUpdateSplitterPosition(splitterPosition);
   }
 
   this.views.forEach(this._renderView.bind(this));
@@ -127,21 +127,40 @@ scout.Desktop.prototype._layoutTaskBar = function() {
 };
 
 scout.Desktop.prototype.onSplitterResize = function(event) {
-  this.navigation.onResize(event);
-  this.onResize(event);
+  this._handleUpdateSplitterPosition(event.data);
 };
 
 scout.Desktop.prototype.onSplitterResizeEnd = function(event) {
-  var w = event.data;
-  if (w < this.navigation.breadcrumbSwitchWidth) {
-    this.navigation.$navigation.animateAVCSD('width', this.navigation.breadcrumbSwitchWidth);
-    this.$taskBar.animateAVCSD('left', this.navigation.breadcrumbSwitchWidth);
-    this.$bench.animate({
-      left: this.navigation.breadcrumbSwitchWidth
+  var splitterPosition = event.data;
+
+  // Store size
+  sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+
+  // Check if splitter is smaller than min size
+  if (splitterPosition < this.navigation.breadcrumbSwitchWidth) {
+    // Set width of navigation to breadcrumbSwitchWidth, using an animation.
+    // While animating, update the desktop layout.
+    // At the end of the animation, update the desktop layout, and store the splitter position.
+    this.navigation.$navigation.animate({
+      width: this.navigation.breadcrumbSwitchWidth
     }, {
-      progress: this.splitter.position.bind(this.splitter)
+      progress: function() {
+        this.splitter.updatePosition();
+        this._handleUpdateSplitterPosition(this.splitter.position);
+      }.bind(this),
+      complete: function() {
+        this.splitter.updatePosition();
+        // Store size
+        sessionStorage.setItem('scout:desktopSplitterPosition', this.splitter.position);
+        this._handleUpdateSplitterPosition(this.splitter.position);
+      }.bind(this)
     });
   }
+};
+
+scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
+  this.navigation.onResize({data: newPosition});
+  this.onResize({data: newPosition});
 };
 
 /* Tab-handling */

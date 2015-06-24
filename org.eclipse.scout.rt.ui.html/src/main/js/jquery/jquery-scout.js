@@ -411,31 +411,31 @@
   };
 
   $.fn.cssLeft = function(position) {
-    return this.css('left', position + 'px');
+    return this.cssPxValue('left', position);
   };
 
   $.fn.cssTop = function(position) {
-    return this.css('top', position + 'px');
+    return this.cssPxValue('top', position);
   };
 
   $.fn.cssBottom = function(position) {
-    return this.css('bottom', position + 'px');
+    return this.cssPxValue('bottom', position);
   };
 
   $.fn.cssRight = function(position) {
-    return this.css('right', position + 'px');
+    return this.cssPxValue('right', position);
   };
 
   $.fn.cssWidth = function(width) {
-    return this.css('width', width + 'px');
+    return this.cssPxValue('width', width);
   };
 
   $.fn.cssHeight = function(height) {
-    return this.css('height', height + 'px');
+    return this.cssPxValue('height', height);
   };
 
   $.fn.cssLineHeight = function(height) {
-    return this.css('line-height', height + 'px');
+    return this.cssPxValue('line-height', height);
   };
 
   $.fn.cssPxValue = function(prop, value) {
