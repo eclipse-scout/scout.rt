@@ -159,6 +159,12 @@
 
     <!-- Test Dependencies -->
     <dependency>
+      <artifactId>org.eclipse.scout.rt.platform</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <artifactId>org.eclipse.scout.rt.client</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
       <type>test-jar</type>
