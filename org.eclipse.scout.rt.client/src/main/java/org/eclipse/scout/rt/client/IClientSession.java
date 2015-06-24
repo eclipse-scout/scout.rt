@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
@@ -21,7 +22,9 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
-public interface IClientSession extends ISession {
+public interface IClientSession extends ISession, IPropertyObserver {
+
+  String PROP_LOCALE = "locale";
 
   /**
    * @return the session's {@link Locale} or <code>null</code> if not set.
@@ -57,18 +60,18 @@ public interface IClientSession extends ISession {
   /**
    * Invoke this method to initialize the session. The session is active just after this method returns.
    */
-  void startSession() throws ProcessingException;
+  void start() throws ProcessingException;
 
   /**
    * send a stop signal to the session event queue<br>
    * check {@link #isActive()} to wait until the queue has in fact closed
    */
-  void stopSession();
+  void stop();
 
-  void stopSession(int exitCode);
+  void stop(int exitCode);
 
   /**
-   * @return <code>true</code> if session shutdown is in progress (i.g. {@link #stopSession()} was called). While
+   * @return <code>true</code> if session shutdown is in progress (i.g. {@link #stop()} was called). While
    *         shutting down, the session is still considered "active".
    */
   boolean isStopping();
@@ -87,8 +90,7 @@ public interface IClientSession extends ISession {
   /**
    * @return the desktop model assiciated with this client session
    *         <p>
-   *         Desktop is available only after {@link #startSession()} and
-   *         <code>AbstractClientSession.execLoadSession()</code>
+   *         Desktop is available only after {@link #start()} and <code>AbstractClientSession.execLoadSession()</code>
    */
   IDesktop getDesktop();
 
@@ -115,8 +117,4 @@ public interface IClientSession extends ISession {
   Subject getOfflineSubject();
 
   void goOffline() throws ProcessingException;
-
-  void addLocaleListener(ILocaleListener listener);
-
-  void removeLocaleListener(ILocaleListener listener);
 }

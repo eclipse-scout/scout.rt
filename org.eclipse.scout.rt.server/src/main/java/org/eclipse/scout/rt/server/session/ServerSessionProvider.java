@@ -55,7 +55,7 @@ public class ServerSessionProvider {
 
           @Override
           public void run() throws Exception {
-            serverSession.loadSession();
+            serverSession.start();
           }
         });
 

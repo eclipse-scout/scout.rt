@@ -21,7 +21,7 @@ public interface IServerSession extends ISession {
   /**
    * Invoke this method to initialize the session. The session is active just after this method returns.
    */
-  void loadSession() throws ProcessingException;
+  void start() throws ProcessingException;
 
   /**
    * Set the session id. Should only be done during initialization.
@@ -34,4 +34,9 @@ public interface IServerSession extends ISession {
    * @return a unique id
    */
   String getId();
+
+  /**
+   * Invoke this method to stop the session. This is the last call on the session.
+   */
+  void stop();
 }

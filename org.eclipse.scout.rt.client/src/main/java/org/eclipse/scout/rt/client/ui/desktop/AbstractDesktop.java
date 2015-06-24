@@ -17,7 +17,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1687,12 +1686,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   // main handler
-  private void fireDesktopEvent(DesktopEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(DesktopListener.class);
+  private void fireDesktopEvent(DesktopEvent event) {
+    DesktopListener[] listeners = m_listenerList.getListeners(DesktopListener.class);
     if (listeners != null && listeners.length > 0) {
-      for (EventListener element : listeners) {
+      for (DesktopListener listener : listeners) {
         try {
-          ((DesktopListener) element).desktopChanged(e);
+          listener.desktopChanged(event);
         }
         catch (Exception ex) {
           LOG.error(null, ex);
@@ -2088,7 +2087,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       if (forcedClosing) {
         setOpenedInternal(false);
       }
-      ClientSessionProvider.currentSession().stopSession();
+      ClientSessionProvider.currentSession().stop();
     }
 
     @Override

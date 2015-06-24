@@ -23,6 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
@@ -256,8 +258,22 @@ public class ServiceTunnelServlet extends HttpServlet {
       synchronized (servletRequest.getSession()) {
         serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), servletRequest, servletResponse); // double checking
         if (serverSession == null) {
-          serverSession = provideServerSession(serverRunContext);
-          cacheService.put(IServerSession.class.getName(), serverSession, servletRequest, servletResponse);
+          final IServerSession newServerSession = provideServerSession(serverRunContext);
+
+          servletRequest.getSession(true).setAttribute("scout.httpsession.binding.listener", new HttpSessionBindingListener() {
+            @Override
+            public void valueBound(HttpSessionBindingEvent event) {
+              // NOOP
+            }
+
+            @Override
+            public void valueUnbound(HttpSessionBindingEvent event) {
+              newServerSession.stop();
+            }
+          });
+
+          cacheService.put(IServerSession.class.getName(), newServerSession, servletRequest, servletResponse);
+          return newServerSession;
         }
       }
     }

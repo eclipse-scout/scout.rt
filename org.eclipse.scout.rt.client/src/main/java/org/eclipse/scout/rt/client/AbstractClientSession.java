@@ -13,11 +13,9 @@ package org.eclipse.scout.rt.client;
 import java.beans.PropertyChangeListener;
 import java.security.AccessController;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -29,7 +27,9 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -66,11 +66,15 @@ import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedN
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
+import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
-public abstract class AbstractClientSession implements IClientSession, IExtensibleObject {
+public abstract class AbstractClientSession extends AbstractPropertyObserver implements IClientSession, IExtensibleObject {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
+
+  private final EventListenerList m_eventListeners;
 
   // state
   private final Object m_stateLock;
@@ -87,22 +91,22 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private IMemoryPolicy m_memoryPolicy;
   private final Map<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
-  private Locale m_locale;
   private UserAgent m_userAgent;
-  private final Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
   private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
 
   public AbstractClientSession(boolean autoInitConfig) {
+    m_eventListeners = new EventListenerList();
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_isStopping = false;
     m_sharedVariableMap = new SharedVariableMap();
-    m_locale = NlsLocale.get();
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
     m_scoutTexts = new ScoutTexts();
+
+    setLocale(NlsLocale.get()); // TODO [cgu] This is not every transparent. Change this please.
 
     if (autoInitConfig) {
       interceptInitConfig();
@@ -158,17 +162,13 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   @Override
   public final Locale getLocale() {
-    return m_locale;
+    return (Locale) propertySupport.getProperty(PROP_LOCALE);
   }
 
   @Override
   public final void setLocale(Locale locale) {
-    NlsLocale.set(locale);
-    Locale oldLocale = m_locale;
-    m_locale = locale;
-    if (!locale.equals(oldLocale)) {
-      notifyLocaleChangedListeners(locale);
-    }
+    propertySupport.setProperty(PROP_LOCALE, locale);
+    NlsLocale.set(locale); // TODO [cgu] This is not every transparent. Change this please.
   }
 
   @Override
@@ -278,12 +278,15 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public void startSession() throws ProcessingException {
+  public void start() throws ProcessingException {
     if (isActive()) {
       throw new IllegalStateException("session is active");
     }
     interceptLoadSession();
     setActive(true);
+
+    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STARTED));
+    LOG.info("Client session started [session={}, user={}]", this, getUserId());
   }
 
   /**
@@ -373,12 +376,12 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
    * Close the session
    */
   @Override
-  public void stopSession() {
-    stopSession(m_exitCode);
+  public void stop() {
+    stop(m_exitCode);
   }
 
   @Override
-  public void stopSession(int exitCode) {
+  public void stop(int exitCode) {
     synchronized (m_stateLock) {
       if (isStopping()) {
         // we are already stopping. ignore event
@@ -405,9 +408,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
         LOG.error("Failed to close the desktop.", t);
       }
       m_desktop = null;
-    }
-    if (!m_localeListener.isEmpty()) {
-      m_localeListener.clear();
     }
 
     final long shutdownWaitTime = getMaxShutdownWaitTime();
@@ -445,9 +445,9 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }
     }
     setActive(false);
-    if (LOG.isInfoEnabled()) {
-      LOG.info("Client session was shutdown successfully [session={0}, user={1}]", AbstractClientSession.this, getUserId());
-    }
+
+    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+    LOG.info("Client session stopped [session={}, user={}]", this, getUserId());
   }
 
   /**
@@ -565,25 +565,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     return m_clientSessionData.get(key);
   }
 
-  @Override
-  public void addLocaleListener(ILocaleListener listener) {
-    m_localeListener.add(listener);
-  }
-
-  @Override
-  public void removeLocaleListener(ILocaleListener listener) {
-    m_localeListener.remove(listener);
-  }
-
-  protected void notifyLocaleChangedListeners(Locale locale) {
-    LocaleChangeEvent event = new LocaleChangeEvent(this, locale);
-    Iterator it = ((Vector) m_localeListener.clone()).iterator();
-    while (it.hasNext()) {
-      ILocaleListener listener = (ILocaleListener) it.next();
-      listener.localeChanged(event);
-    }
-  }
-
   /**
    * Sets the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before
    * it is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without
@@ -633,5 +614,28 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     List<? extends IClientSessionExtension<? extends AbstractClientSession>> extensions = getAllExtensions();
     ClientSessionLoadSessionChain chain = new ClientSessionLoadSessionChain(extensions);
     chain.execLoadSession();
+  }
+
+  @Override
+  public void addListener(ISessionListener sessionListener) {
+    m_eventListeners.add(ISessionListener.class, sessionListener);
+  }
+
+  @Override
+  public void removeListener(ISessionListener sessionListener) {
+    m_eventListeners.remove(ISessionListener.class, sessionListener);
+  }
+
+  @Internal
+  protected void fireSessionChangedEvent(final SessionEvent event) {
+    final ISessionListener[] listeners = m_eventListeners.getListeners(ISessionListener.class);
+    for (final ISessionListener listener : listeners) {
+      try {
+        listener.sessionChanged(event);
+      }
+      catch (final Exception e) {
+        LOG.error("Failed to notify listener about session state change", e);
+      }
+    }
   }
 }

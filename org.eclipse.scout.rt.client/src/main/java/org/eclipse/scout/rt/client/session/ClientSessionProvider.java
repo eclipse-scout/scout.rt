@@ -54,7 +54,7 @@ public class ClientSessionProvider {
           @Override
           public void run() throws Exception {
             beforeStartSession(clientSession);
-            clientSession.startSession();
+            clientSession.start();
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)).name("initialize ClientSession [user=%s]", runContext.subject()).logOnError(false)).awaitDoneAndGet();
 

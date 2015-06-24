@@ -42,6 +42,7 @@ public class AbstractServerSessionTest {
     m_objs = SerializationUtility.createObjectSerializer();
     m_testSession = new TestServerSession();
   }
+
   @Test
   public void testSerialize() throws IOException {
     m_objs.serialize(m_testSession);
@@ -57,7 +58,7 @@ public class AbstractServerSessionTest {
 
   @Test
   public void testDeserializeLoadedSession() throws IOException, ProcessingException, ClassNotFoundException {
-    m_testSession.loadSession();
+    m_testSession.start();
     byte[] serializedSession = m_objs.serialize(m_testSession);
     IServerSession deserializedSession = m_objs.deserialize(serializedSession, IServerSession.class);
     assertSessionsEquals(m_testSession, deserializedSession);

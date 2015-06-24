@@ -65,7 +65,7 @@ public class NestedMenusTest {
 
         @Override
         protected void execAction() throws ProcessingException {
-          ClientSessionProvider.currentSession(TestEnvironmentClientSession.class).stopSession();
+          ClientSessionProvider.currentSession(TestEnvironmentClientSession.class).stop();
         }
       }
 

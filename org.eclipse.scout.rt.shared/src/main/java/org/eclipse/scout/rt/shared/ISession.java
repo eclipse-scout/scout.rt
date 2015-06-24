@@ -15,6 +15,8 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
+import org.eclipse.scout.rt.shared.session.ISessionListener;
 
 /**
  * @since 3.8.0
@@ -59,5 +61,16 @@ public interface ISession {
   Subject getSubject();
 
   void setSubject(Subject subject);
+
+  /**
+   * Registers the given listener to be notified about session state changes. Typically, a listener is installed in
+   * <code>execLoadSession</code>.
+   */
+  void addListener(ISessionListener sessionListener);
+
+  /**
+   * Removes the given listener; has no effect if not registered.
+   */
+  void removeListener(ISessionListener sessionListener);
 
 }

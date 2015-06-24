@@ -23,10 +23,14 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
@@ -41,10 +45,16 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.SessionEvent;
 
 public abstract class AbstractServerSession implements IServerSession, Serializable, IExtensibleObject {
 
   private static final long serialVersionUID = 1L;
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
+
+  private final EventListenerList m_eventListeners;
 
   private boolean m_initialized;
   private boolean m_active;
@@ -57,6 +67,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
+    m_eventListeners = new EventListenerList();
     m_attributesLock = new Object();
     m_attributes = new HashMap<>();
     m_sharedVariableMap = new SharedVariableMap();
@@ -191,11 +202,15 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public final void loadSession() throws ProcessingException {
+  public final void start() throws ProcessingException {
     Assertions.assertFalse(isActive(), "Session already started");
-    m_active = true;
     assignUserId();
     interceptLoadSession();
+
+    m_active = true;
+
+    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STARTED));
+    LOG.info("Server session started [session={}, user={}]", this, getUserId());
   }
 
   /**
@@ -253,5 +268,36 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     List<? extends IServerSessionExtension<? extends AbstractServerSession>> extensions = getAllExtensions();
     ServerSessionLoadSessionChain chain = new ServerSessionLoadSessionChain(extensions);
     chain.execLoadSession();
+  }
+
+  @Override
+  public void stop() {
+    m_active = false;
+
+    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+    LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
+  }
+
+  @Override
+  public void addListener(ISessionListener sessionListener) {
+    m_eventListeners.add(ISessionListener.class, sessionListener);
+  }
+
+  @Override
+  public void removeListener(ISessionListener sessionListener) {
+    m_eventListeners.remove(ISessionListener.class, sessionListener);
+  }
+
+  @Internal
+  protected void fireSessionChangedEvent(final SessionEvent event) {
+    final ISessionListener[] listeners = m_eventListeners.getListeners(ISessionListener.class);
+    for (final ISessionListener listener : listeners) {
+      try {
+        listener.sessionChanged(event);
+      }
+      catch (final Exception e) {
+        LOG.error("Failed to notify listener about session state change", e);
+      }
+    }
   }
 }

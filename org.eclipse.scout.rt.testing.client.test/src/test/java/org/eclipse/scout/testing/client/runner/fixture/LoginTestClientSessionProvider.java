@@ -64,10 +64,10 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   public static class LoginTestClientSession extends TestEnvironmentClientSession {
 
     @Override
-    public void startSession() throws ProcessingException {
+    public void start() throws ProcessingException {
       String runAs = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
       s_beforeStartRunAs.add(runAs);
-      super.startSession();
+      super.start();
       s_afterStartRunAs.add(runAs);
     }
   }
