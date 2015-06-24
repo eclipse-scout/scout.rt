@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2014 BSI Business Systems Integration AG. All rights reserved.
-  This program and the accompanying materials are made available under the
-  terms of the BSI AG Software License v1.0 which accompanies this distribution
-  as bsi-v10.html -->
-<project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!--
+  Copyright (c) 2014 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,27 +23,18 @@
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <version>5.1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-      <version>5.1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20140107</version>
-    </dependency>
-  </dependencies>
-
-  <!-- TODO AWE: move the src config to html.parent, remove here -->
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+
+      <!-- TODO AWE: move the src config to html.parent, remove here -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -80,4 +72,19 @@
     </plugins>
   </build>
 
+  <dependencies>
+      <!-- Build Dependencies -->
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+    </dependency>
+  </dependencies>
 </project>

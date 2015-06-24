@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2014 BSI Business Systems Integration AG.
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution, and is available at
-   http://www.eclipse.org/legal/epl-v10.html
+  Copyright (c) 2014 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
 -->
-<project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.bsiag.tools.rt</groupId>
-    <artifactId>tools.rt</artifactId>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>org.eclipse.scout.rt</artifactId>
     <version>5.1.0-SNAPSHOT</version>
   </parent>
 
@@ -21,23 +19,80 @@
   <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
   <packaging>pom</packaging>
 
-  <properties>
-    <!-- use tools target as build platform -->
-    <target-platform>tools-rt-build</target-platform>
-    <target-groupid>com.bsiag.tools</target-groupid>
-    <target-artifactid>com.bsiag.tools.rt.target</target-artifactid>
-
-    <compileSource>1.7</compileSource>
-  </properties>
-
   <modules>
     <module>../org.eclipse.scout.rt.ui.html</module>
-    <module>../org.eclipse.scout.rt.ui.html.test</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
     <module>../org.eclipse.scout.rt.ui.html.client.ext</module>
     <module>../org.eclipse.scout.rt.officeaddin.parent</module>
     <module>../org.eclipse.scout.rt.svg.ui.html</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Build Dependencies -->
+      <dependency>
+        <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
+        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <artifactId>org.eclipse.scout.rt.ui.html.client.ext</artifactId>
+        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20140107</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.3.1</version>
+      </dependency>
+
+      <!-- Build Dependencies (Provided) -->
+      <dependency>
+        <groupId>com.yahoo.platform.yui</groupId>
+        <artifactId>yuicompressor</artifactId>
+        <version>2.4.8</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.asual.lesscss</groupId>
+        <artifactId>lesscss-engine</artifactId>
+        <version>1.7.4-SNAPSHOT</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-cli</groupId>
+        <artifactId>commons-cli</artifactId>
+        <version>1.2</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.2</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mozilla</groupId>
+        <artifactId>rhino</artifactId>
+        <version>1.7R4</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
