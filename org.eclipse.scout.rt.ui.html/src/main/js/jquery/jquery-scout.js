@@ -265,7 +265,6 @@
         this.attr('data-iconFont', icon.font);
       } else {
         // FIXME BSH Handle URL icons. Check also: Button.js
-        // scout.helpers.dynamicResourceUrl(this, this.iconId)
       }
     } else {
       this.removeAttr('data-icon');

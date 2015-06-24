@@ -17,6 +17,7 @@
   background-color: @tooltip-background-color;
   padding: 8px 12px;
   position: relative;
+  min-width: 60px; /* Prevents tooltips with very short text from looking "strange" */
 
   & span.bold {
     font-weight: bold;

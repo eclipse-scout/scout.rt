@@ -178,12 +178,6 @@ scout.helpers = {
     return style;
   },
 
-  // TODO IMO Is this still needed???
-  dynamicResourceUrl: function(adapter, url) {
-    return url;
-  },
-
-
   /**
    * If 'value' is undefined or null, 'defaultValue' is returned. Otherwise, 'value' is returned.
    */

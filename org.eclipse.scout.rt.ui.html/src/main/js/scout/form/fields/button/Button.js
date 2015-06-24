@@ -181,7 +181,7 @@ scout.Button.prototype._renderIconId = function() {
         .text(icon.iconCharacter);
     } else {
       $icon = $('<img>')
-        .attr('src', scout.helpers.dynamicResourceUrl(this, icon.iconUrl));
+        .attr('src', icon.iconUrl);
     }
     $icon.toggleClass('with-label', !! this.label);
     this.$field.prepend($icon);

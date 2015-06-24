@@ -1,8 +1,11 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.zip.Adler32;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -15,12 +18,17 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.json.JSONObject;
 
 public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IBinaryResourceProvider, IJsonContextMenuOwner {
+
+  public static final String PROP_IMAGE_URL = "imageUrl";
+
+  private PropertyChangeListener m_imagePropertyChangeListener;
+  private PropertyChangeListener m_contextMenuListener;
 
   public JsonImageField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -34,31 +42,6 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE_ID, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getImageId();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return BinaryResourceUrlUtility.createIconUrl((String) value);
-      }
-    });
-    putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().getImage();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
-        // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
-        BinaryResource image = extractBinaryResource(value);
-        return image != null ? BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(JsonImageField.this, image.getFilename()) : null;
-      }
-    });
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
@@ -71,6 +54,104 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
         return getModel().isAutoFit();
       }
     });
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+    // field
+    if (m_imagePropertyChangeListener != null) {
+      throw new IllegalStateException();
+    }
+    m_imagePropertyChangeListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (CompareUtility.isOneOf(evt.getPropertyName(), IImageField.PROP_IMAGE, IImageField.PROP_IMAGE_ID)) {
+          handleModelImageOrImageIdChanged();
+        }
+      }
+    };
+    getModel().addPropertyChangeListener(m_imagePropertyChangeListener);
+    // context menu
+    if (m_contextMenuListener != null) {
+      throw new IllegalStateException();
+    }
+    m_contextMenuListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+          handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
+        }
+      }
+    };
+    getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+    // field
+    if (m_imagePropertyChangeListener == null) {
+      throw new IllegalStateException();
+    }
+    getModel().removePropertyChangeListener(m_imagePropertyChangeListener);
+    m_imagePropertyChangeListener = null;
+    // context menu
+    if (m_contextMenuListener == null) {
+      throw new IllegalStateException();
+    }
+    getModel().getContextMenu().removePropertyChangeListener(m_contextMenuListener);
+    m_contextMenuListener = null;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put(PROP_IMAGE_URL, getImageUrl());
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
+      json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
+    }
+    return json;
+  }
+
+  protected void handleModelImageOrImageIdChanged() {
+    addPropertyChangeEvent(PROP_IMAGE_URL, getImageUrl());
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  protected void handleModelContextMenuVisibleChanged(boolean visible) {
+    addPropertyChangeEvent(PROP_MENUS_VISIBLE, visible);
+  }
+
+  /**
+   * Returns an URL for the image or imageId, respectively (first one that is not <code>null</code>).
+   * If no image is set, <code>null</code> is returned.
+   */
+  protected String getImageUrl() {
+    if (getModel().getImage() != null) {
+      // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
+      // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
+      BinaryResource imageResource = extractBinaryResource(getModel().getImage());
+      if (imageResource != null) {
+        return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource.getFilename());
+      }
+    }
+    if (getModel().getImageId() != null) {
+      return BinaryResourceUrlUtility.createIconUrl(getModel().getImageId());
+    }
+    return null;
   }
 
   protected BinaryResource extractBinaryResource(Object raw) {
@@ -94,26 +175,5 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
       return new BinaryResourceHolder(res, false);
     }
     return null;
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
-    }
-    return json;
-  }
-
-  @Override
-  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 }

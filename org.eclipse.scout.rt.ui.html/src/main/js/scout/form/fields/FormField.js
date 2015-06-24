@@ -106,9 +106,10 @@ scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
 };
 
 scout.FormField.prototype._renderTooltipText = function(tooltipText) {
-  this.$container.toggleClass('has-tooltip', !!tooltipText);
+  var hasTooltipText = scout.strings.hasText(tooltipText);
+  this.$container.toggleClass('has-tooltip', hasTooltipText);
   if (this.$field) {
-    this.$field.toggleClass('has-tooltip', !!tooltipText);
+    this.$field.toggleClass('has-tooltip', hasTooltipText);
   }
 };
 
@@ -243,6 +244,11 @@ scout.FormField.prototype._showStatusMessage = function(options) {
   } else if (this.errorStatus) {
     text = this.errorStatus.message;
     cssClass = 'tooltip-error';
+  }
+
+  if (!scout.strings.hasText(text)) {
+    // Refuse to show empty tooltip
+    return;
   }
 
   if (this.tooltip && this.tooltip.rendered) {

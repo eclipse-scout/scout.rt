@@ -74,6 +74,9 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
   @Override
   protected void attachModel() {
     super.attachModel();
+    if (m_contextMenuListener != null) {
+      throw new IllegalStateException();
+    }
     m_contextMenuListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
@@ -83,6 +86,16 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
       }
     };
     getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+    if (m_contextMenuListener == null) {
+      throw new IllegalStateException();
+    }
+    getModel().getContextMenu().removePropertyChangeListener(m_contextMenuListener);
+    m_contextMenuListener = null;
   }
 
   @Override
