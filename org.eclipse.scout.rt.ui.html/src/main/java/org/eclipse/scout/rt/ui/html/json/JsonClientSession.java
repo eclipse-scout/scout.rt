@@ -10,15 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Locale;
+
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.ILocaleListener;
-import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 
 public class JsonClientSession<T extends IClientSession> extends AbstractJsonAdapter<T> {
 
-  private ILocaleListener m_localeListener;
+  private PropertyChangeListener m_localeListener;
 
   public JsonClientSession(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -34,7 +36,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
   protected void attachModel() {
     if (m_localeListener == null) {
       m_localeListener = new P_LocaleListener();
-      getModel().addLocaleListener(m_localeListener);
+      getModel().addPropertyChangeListener(IClientSession.PROP_LOCALE, m_localeListener);
     }
   }
 
@@ -46,7 +48,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
   @Override
   protected void detachModel() {
     if (m_localeListener != null) {
-      getModel().removeLocaleListener(m_localeListener);
+      getModel().removePropertyChangeListener(m_localeListener);
       m_localeListener = null;
     }
   }
@@ -58,11 +60,12 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     return json;
   }
 
-  private class P_LocaleListener implements ILocaleListener {
+  private class P_LocaleListener implements PropertyChangeListener {
 
     @Override
-    public void localeChanged(LocaleChangeEvent event) {
-      getUiSession().sendLocaleChangedEvent(event.getLocale());
+    public void propertyChange(PropertyChangeEvent evt) {
+      getUiSession().sendLocaleChangedEvent((Locale) evt.getNewValue());
     }
+
   }
 }
