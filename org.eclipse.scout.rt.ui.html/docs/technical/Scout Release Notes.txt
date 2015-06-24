@@ -401,3 +401,7 @@ Migration:
 - For code that previously used the setView(boolean, boolean, boolean) method on wizard buttons, a new setView(boolean, boolean)
   method was introduced on IButton and IAction (because it does not make sense to make a button "mandatory"). This can be
   migrated by just deleting the third argument.
+
+OSC 24.04.2015:
+IClientSession.stopSession() was renamed to stop() to match IServerSession.stop().
+Migration: Rename stopSession() to stop().
