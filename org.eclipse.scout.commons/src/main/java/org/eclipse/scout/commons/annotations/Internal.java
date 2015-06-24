@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  *
  * @since 5.1
  */
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Internal {
 }
