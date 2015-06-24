@@ -60,18 +60,13 @@ public final class BinaryResource implements Serializable {
    */
   public BinaryResource(String filename, String contentType, byte[] content, long lastModified) {
     m_filename = filename;
-    if (contentType != null) {
-      m_contentType = contentType;
-    }
-    else {
+    if (contentType == null && filename != null) {
       int i = filename.lastIndexOf('.');
       if (i >= 0) {
-        m_contentType = FileUtility.getContentTypeForExtension(filename.substring(i + 1));
-      }
-      else {
-        m_contentType = null;
+        contentType = FileUtility.getContentTypeForExtension(filename.substring(i + 1));
       }
     }
+    m_contentType = contentType;
     m_content = content;
     m_lastModified = lastModified;
     if (content != null) {
