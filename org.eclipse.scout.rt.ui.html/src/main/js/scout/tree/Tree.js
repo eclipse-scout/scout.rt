@@ -562,9 +562,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
       nodes.forEach(function(entry) {
         scout.arrays.insert(this.nodes, entry, entry.childNodeIndex ? entry.childNodeIndex : 0);
       }.bind(this));
-      if (nodes[0].childNodeIndex === 0) {
-        $predecessor = this.$data;
-      } else {
+      if (nodes[0].childNodeIndex !== 0) {
         $predecessor = calcPredecessor(this.nodes[nodes[0].childNodeIndex - 1]);
       }
     } else {
@@ -851,7 +849,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     if ($predecessor) {
       $node.insertAfter($predecessor);
     } else {
-      $node.appendTo(this.$data);
+      $node.prependTo(this.$data);
     }
 
     // if model demands children, create them
