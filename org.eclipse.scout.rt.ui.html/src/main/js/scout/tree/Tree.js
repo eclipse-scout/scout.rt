@@ -519,12 +519,16 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var parentNode, $parentNode;
   //Append continous node blocks
 
+
   if (parentNodeId >= 0) {
     parentNode = this.nodesMap[parentNodeId];
     if (!parentNode) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
+  nodes.sort(function(a, b) {
+    return a.childNodeIndex - b.childNodeIndex;
+  });
   this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
   var $predecessor;
