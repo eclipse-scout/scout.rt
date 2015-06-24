@@ -5,15 +5,6 @@
   background-color: @background-color;
 }
 
-.detach-menu {
-  &::before {
-    .menu-icon(@icon-detach);
-  }
-  &:hover::before {
-     color:@hover-color;
-  }
-}
-
 .dialog {
   position: absolute;
   background-color: @background-color;

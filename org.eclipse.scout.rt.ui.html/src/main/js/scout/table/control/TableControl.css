@@ -11,23 +11,22 @@
   margin-top: -1px;
   padding-top: 1px;
 
-  &[data-icon]::before {
-    .font-icon;
+  & > .font-icon {
     font-size: 22px;
     color: @icon-light-color;
-    content: attr(data-icon);
   }
 
-  &:hover::before {
+  &:hover > .font-icon {
     color: @hover-color;
   }
 
-  &.disabled:hover, &.disabled::before {
+  &.disabled:hover,
+  &.disabled > .font-icon {
     cursor: default;
     color: @icon-disabled-color;
   }
 
-  &.selected::before {
+  &.selected > .font-icon {
     color: @active-color;
   }
 

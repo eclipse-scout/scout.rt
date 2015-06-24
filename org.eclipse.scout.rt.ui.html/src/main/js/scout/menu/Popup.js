@@ -51,7 +51,7 @@ scout.Popup.prototype.rerenderHead = function() {
 };
 
 /**
- * Will not be called by this._render, sub classes have explicitly call this method
+ * Will not be called by this._render, sub classes have explicitly call this method. Copies html from this.$headBlueprint, if set
  */
 scout.Popup.prototype._renderHead = function() {
   this.$head = $.makeDiv('popup-head');
@@ -60,9 +60,8 @@ scout.Popup.prototype._renderHead = function() {
     .prepend(this.$head)
     .append(this.$deco);
   this.$head.on('mousedown', '', this._onHeadMouseDown.bind(this));
-  this.$head.text(this.headText);
-  if (this.headIcon) {
-    this.$head.attr('data-icon', this.headIcon);
+  if (this.$headBlueprint) {
+    this.$head.html(this.$headBlueprint.html());
   }
 };
 

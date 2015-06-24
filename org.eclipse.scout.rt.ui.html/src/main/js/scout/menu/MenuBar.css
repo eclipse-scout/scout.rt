@@ -47,11 +47,11 @@
   height: 55px;
   padding-top: 11px;
 
-  & > .menu-item[data-icon]::before {
+  & > .menu-item > .font-icon {
     font-size: 22px;
   }
 
-  & > .menu-item[data-icon].last {
+  & > .menu-item.last {
     margin-right: 5px;
   }
 }

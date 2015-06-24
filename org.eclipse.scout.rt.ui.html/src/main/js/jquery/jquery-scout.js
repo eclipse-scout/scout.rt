@@ -258,16 +258,26 @@
   };
 
   $.fn.icon = function(iconId) {
+    var icon, $icon;
     if (iconId) {
-      var icon = scout.icons.parseIconId(iconId);
+      icon = scout.icons.parseIconId(iconId);
       if (icon.isFontIcon()) {
-        this.attr('data-icon', icon.iconCharacter);
-        this.attr('data-iconFont', icon.font);
+        $icon = $('<span>')
+          .addClass(icon.appendCssClass('font-icon'))
+          .addClass('icon')
+          .text(icon.iconCharacter);
       } else {
-        // FIXME BSH Handle URL icons. Check also: Button.js
+        $icon = $('<img>')
+          .attr('src', icon.iconUrl)
+          .addClass('icon');
       }
+      this.data('$icon', $icon);
+      this.prepend($icon);
     } else {
-      this.removeAttr('data-icon');
+      $icon = this.data('$icon');
+      if ($icon) {
+        $icon.remove();
+      }
     }
     return this;
   };

@@ -32,8 +32,7 @@ scout.FormToolPopup.prototype._copyCssClassToHead = function(className) {
 };
 
 scout.FormToolPopup.prototype._renderHead = function() {
-  this.headText = this.$formToolButton.text();
-  this.headIcon = this.$formToolButton.attr('data-icon');
+  this.$headBlueprint = this.$formToolButton;
   scout.FormToolPopup.parent.prototype._renderHead.call(this);
   this._copyCssClassToHead('taskbar-tool-item');
   this.$head.addClass('selected');

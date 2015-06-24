@@ -171,20 +171,11 @@ scout.Button.prototype._renderLabel = function(label) {
  * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
  */
 scout.Button.prototype._renderIconId = function() {
-  var icon, $icon;
-  this.$field.find('img, span').remove();
+  var $icon;
+  this.$field.icon(this.iconId);
+  $icon = this.$field.data('$icon');
   if (this.iconId) {
-    icon = scout.icons.parseIconId(this.iconId);
-    if (icon.isFontIcon()) {
-      $icon = $('<span>')
-        .addClass(icon.appendCssClass('font-icon'))
-        .text(icon.iconCharacter);
-    } else {
-      $icon = $('<img>')
-        .attr('src', icon.iconUrl);
-    }
     $icon.toggleClass('with-label', !! this.label);
-    this.$field.prepend($icon);
   }
 };
 

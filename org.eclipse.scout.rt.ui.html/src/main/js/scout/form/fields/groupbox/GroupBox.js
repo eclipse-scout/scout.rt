@@ -48,6 +48,8 @@ scout.GroupBox.prototype._render = function($parent) {
     .append(this.$label);
   if (this.menuBar.position === 'top') {
     this.menuBar.render(this.$container);
+    // move after title
+    this.menuBar.$container.appendTo(this.$container);
   }
   this.$body = this.$container.appendDiv('group-box-body');
   htmlBody = new scout.HtmlComponent(this.$body, this.session);

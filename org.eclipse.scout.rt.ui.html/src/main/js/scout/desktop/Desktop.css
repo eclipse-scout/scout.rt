@@ -51,21 +51,22 @@
   line-height: normal;
 }
 
-.popup.form-tool>.popup-body {
+.popup.form-tool > .popup-body {
   border-bottom: 1px solid @border-color;
 }
 
 .popup-head.taskbar-tool-item.has-submenu::after {
   font-size: 17px;
-  top:0px;
+  top: 0px;
 }
 
-.popup-head[data-icon].taskbar-tool-item.selected::before {
+.popup-head.taskbar-tool-item.selected > .font-icon {
   font-size: 17px;
-  vertical-align:0px;
+  vertical-align: 0;
 }
 
-.taskbar-tabs, .taskbar-tools {
+.taskbar-tabs,
+.taskbar-tools {
   position: absolute;
   word-wrap: none;
   vertical-align:top;
@@ -97,7 +98,7 @@
    float: right;
 }
 
-.taskbar.menu-textandicon[data-icon]::before {
+.taskbar.menu-textandicon > .font-icon {
   padding-right: @taskbar-menu-textandicon-padding-right;
 }
 
@@ -177,15 +178,13 @@
     padding-right: 4px;
   }
 
-  &::before {
-    .font-icon;
+  & > .font-icon {
     color: @icon-color;
     font-size: 17px;
     padding-right: @taskbar-menu-textandicon-padding-right;
-    content: attr(data-icon);
   }
 
-  &:hover::before {
+  &:hover > .font-icon {
     color: @hover-color;
   }
 
@@ -195,12 +194,12 @@
     border-bottom: 1px solid @background-color;
     cursor: pointer;
 
-    &::before {
+    & > .font-icon {
       color: @active-color;
     }
   }
 
-  &.disabled::before {
+  &.disabled > .font-icon {
     color: @disabled-color;
   }
 }

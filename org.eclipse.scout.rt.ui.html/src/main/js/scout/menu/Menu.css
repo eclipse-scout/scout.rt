@@ -5,11 +5,9 @@
 @menu-item-height: 39px;
 
 /* Mixins */
-.menu-icon(@icon) {
-  .font-icon;
+.menu-icon {
   display: inline-block;
   font-size: 18px;
-  content: @icon;
   color: @icon-color;
   vertical-align: -3px;
 }
@@ -47,8 +45,8 @@
   cursor: pointer;
   display: inline-block;
 
-  &[data-icon]::before {
-    .menu-icon(attr(data-icon));
+  & > .font-icon {
+    .menu-icon;
     font-size: 18px;
     height: @logical-grid-height;
     line-height: @logical-grid-height - 4px;
@@ -122,7 +120,7 @@
   float: right;
 }
 
-.menu-textandicon[data-icon]::before {
+.menu-textandicon > .icon {
   padding-right: 5px;
 }
 
@@ -202,12 +200,12 @@
     top: 5px;
   }
 
-  &[data-icon]::before {
-    .menu-icon(attr(data-icon));
+  & > .font-icon {
+    .menu-icon;
     color: @active-color;
   }
 
-  &.in-main-menubar[data-icon]::before {
+  &.in-main-menubar > .font-icon {
     font-size: 22px;
     display: inline-block;
   }
