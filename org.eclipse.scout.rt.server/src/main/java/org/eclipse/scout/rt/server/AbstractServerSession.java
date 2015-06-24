@@ -54,7 +54,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
 
-  private final EventListenerList m_eventListeners;
+  transient private final EventListenerList m_eventListeners;
 
   private boolean m_initialized;
   private boolean m_active;
