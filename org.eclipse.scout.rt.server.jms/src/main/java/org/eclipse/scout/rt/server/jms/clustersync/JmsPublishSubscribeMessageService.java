@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.server.jms.clustersync;
 
 import java.util.List;
@@ -13,8 +23,13 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService;
+import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiConnectionFactory;
+import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiInitialContextFactory;
+import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiProviderUrl;
+import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.PublishSubscribeTopic;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribeMessageListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribeMessageService;
@@ -39,8 +54,20 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   @Override
   protected void initializeService() {
     try {
-      m_connectionFactory = InitialContext.doLookup("BSIConnectionFactory");
-      m_destination = InitialContext.doLookup("BSIJMSDistTopic");
+      InitialContext context = new InitialContext();
+
+      String value = CONFIG.getPropertyValue(JndiInitialContextFactory.class);
+      if (value != null) {
+        context.addToEnvironment("java.naming.factory.initial", value);
+      }
+
+      value = CONFIG.getPropertyValue(JndiProviderUrl.class);
+      if (value != null) {
+        context.addToEnvironment("java.naming.provider.url", value);
+      }
+
+      m_connectionFactory = (ConnectionFactory) context.lookup(CONFIG.getPropertyValue(JndiConnectionFactory.class));
+      m_destination = (Destination) context.lookup(CONFIG.getPropertyValue(PublishSubscribeTopic.class));
     }
     catch (NamingException e) {
       throw new PlatformException("cannot setup jms", e);
