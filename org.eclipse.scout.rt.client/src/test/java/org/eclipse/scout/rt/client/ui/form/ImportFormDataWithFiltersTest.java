@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.test.ui.form;
+package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -16,9 +16,8 @@ import static org.junit.Assert.assertNull;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.test.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.SubBox.TestSubStringField;
-import org.eclipse.scout.rt.client.test.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.TestStringField;
-import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.SubBox.TestSubStringField;
+import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.TestStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.ExcludeFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
