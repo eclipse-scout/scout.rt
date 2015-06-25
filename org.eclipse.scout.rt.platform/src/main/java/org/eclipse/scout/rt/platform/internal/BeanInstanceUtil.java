@@ -87,7 +87,7 @@ public final class BeanInstanceUtil {
         }
       }
       catch (Exception e) {
-        LOG.error(String.format("Could not call initialze method '%s' on '%s'.", method.getName(), instance.getClass()), e);
+        LOG.error(String.format("Could not call initialize method '%s' on '%s'.", method.getName(), instance.getClass()), e);
       }
     }
   }
