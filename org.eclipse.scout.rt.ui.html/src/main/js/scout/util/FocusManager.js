@@ -317,13 +317,19 @@ scout.FocusContext.prototype.onHideField = function() {
 scout.FocusContext.prototype.bindHideListener = function() {
   //ensure only one of each listenertype exists.
   var $focusedElement = this._$focusedElement;
-  $focusedElement.off('hide', this.hideListener);
+  if(this.hideListener){
+    $focusedElement.off('hide', this.hideListener);
+  }
   this.hideListener = this.onHideField.bind(this);
   $focusedElement.on('hide', this.hideListener);
-  $focusedElement.off('remove', this.removeListener);
+  if(this.removeListener){
+    $focusedElement.off('remove', this.removeListener);
+  }
   this.removeListener = this.onRemoveField.bind(this);
   $focusedElement.on('remove', this.removeListener);
-  $focusedElement.off('focusout', this.focusoutListener);
+  if(this.focusoutListener){
+    $focusedElement.off('focusout', this.focusoutListener);
+  }
   this.focusoutListener = this.onFieldFocusOff.bind(this, $focusedElement);
   $focusedElement.on('focusout', this.focusoutListener);
   $.log.trace('hidelistner bound on ' + $focusedElement.attr('class') + ' id ' + $focusedElement.attr('id')+' context: ' + this.name);
