@@ -7,8 +7,6 @@ package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.Principal;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 import javax.security.auth.Subject;
 import javax.servlet.FilterChain;
@@ -23,6 +21,8 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Checks whether the user is already logged in or the request has valid auth info or the request path is excluded from
@@ -46,11 +46,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  *
  * @since 5.0
  */
+@Bean
 public class TrivialAuthenticator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TrivialAuthenticator.class);
 
-  public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = Principal.class.getName();
-
+  private long m_principalCacheTimeout = 300000L;
   private PathInfoFilter m_excludePathFilter;
 
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -76,7 +76,7 @@ public class TrivialAuthenticator {
     // already authenticated?
     Principal principal = findPrincipal(req);
     if (principal != null) {
-      continueChainAsSubject(principal, req, resp, chain);
+      BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, req, resp, chain);
       return true;
     }
 
@@ -90,7 +90,7 @@ public class TrivialAuthenticator {
     if ("POST".equals(req.getMethod())) {
       if (("" + req.getContentType()).startsWith("application/json")) {
         LOG.debug("Returning session timeout error as json.");
-        writeSessionTimeout(resp);
+        sendSessionTimeout(resp);
         return true;
       }
       else {
@@ -128,12 +128,15 @@ public class TrivialAuthenticator {
   protected Principal findPrincipal(HttpServletRequest req) {
     Principal principal = null;
 
-    // on session
+    // on session cache
     final HttpSession session = req.getSession(false);
     if (session != null) {
-      principal = (Principal) session.getAttribute(SESSION_ATTRIBUTE_FOR_PRINCIPAL);
+      principal = (Principal) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
       if (principal != null) {
-        return principal;
+        //check principal timeout
+        if (checkPrincipalTimeout(req, principal)) {
+          return principal;
+        }
       }
     }
 
@@ -153,55 +156,28 @@ public class TrivialAuthenticator {
     return null;
   }
 
-  protected Subject createSubject(Principal principal) {
-    // create subject if necessary
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null || subject.isReadOnly()) {
-      subject = new Subject();
-    }
-    subject.getPrincipals().add(principal);
-    subject.setReadOnly();
-    return subject;
-  }
-
-  protected void continueChainAsSubject(final Principal principal, final HttpServletRequest req, final HttpServletResponse res, final FilterChain chain) throws IOException, ServletException {
-    try {
-      Subject.doAs(
-          createSubject(principal),
-          new PrivilegedExceptionAction<Object>() {
-            @Override
-            public Object run() throws Exception {
-              HttpServletRequest secureReq = new SecureHttpServletRequestWrapper(req, principal);
-              chain.doFilter(secureReq, res);
-              return null;
-            }
+  protected boolean checkPrincipalTimeout(HttpServletRequest req, Principal principal) {
+    HttpSession session = req.getSession(false);
+    if (session != null) {
+      synchronized (principal) {
+        Long timestamp = (Long) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
+        if (timestamp != null) {
+          if (timestamp.longValue() + m_principalCacheTimeout > System.currentTimeMillis()) {
+            session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
+            session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
+            return false;
           }
-          );
-    }
-    catch (PrivilegedActionException e) {
-      Throwable t = e.getCause();
-      if (t instanceof IOException) {
-        throw (IOException) t;
-      }
-      else if (t instanceof ServletException) {
-        throw (ServletException) t;
-      }
-      else {
-        throw new ServletException(t);
+        }
       }
     }
+    return true;
   }
 
-  protected void writeSessionTimeout(HttpServletResponse resp) throws IOException {
+  protected void sendSessionTimeout(HttpServletResponse resp) throws IOException {
     resp.setContentType("application/json");
     resp.setCharacterEncoding("UTF-8");
     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     resp.getWriter().print(("{\"errorMessage\":\"The session has expired, please reload the page.\",\"errorCode\":10}")); // JsonResponse.ERR_SESSION_TIMEOUT
-  }
-
-  protected void forwardToLoginPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LOG.debug("Forwarding '{0}' to /login.html", req.getPathInfo());
-    req.getRequestDispatcher("/login.html").forward(req, resp);
   }
 
 }
