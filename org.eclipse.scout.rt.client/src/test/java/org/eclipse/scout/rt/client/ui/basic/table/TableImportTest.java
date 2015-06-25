@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -27,30 +28,44 @@ import org.junit.Test;
  */
 public class TableImportTest {
   private static final String TEST_VALUE = "test";
+  private P_Table m_table = new P_Table();
 
   @Test
   public void testSuccessfulImport() throws ProcessingException {
-    P_Table table = new P_Table();
     P_TableBean tableBean = new P_TableBean();
     P_TableBean.TableBeanRowData row = tableBean.addRow();
     row.setDefault(TEST_VALUE);
-    table.importFromTableBeanData(tableBean);
-    String value = table.getDefaultColumn().getValue(0);
+    m_table.importFromTableBeanData(tableBean);
+    String value = m_table.getDefaultColumn().getValue(0);
     assertEquals(TEST_VALUE, value);
-    assertEquals(1, table.getDefaultColumn().getParseCount());
-    assertEquals(1, table.getDefaultColumn().getValidateCount());
-    assertEquals(1, table.getDefaultColumn().getDecorateCount());
+    assertEquals(1, m_table.getDefaultColumn().getParseCount());
+    assertEquals(1, m_table.getDefaultColumn().getValidateCount());
+    assertEquals(1, m_table.getDefaultColumn().getDecorateCount());
   }
 
   @Test
   public void testInvalidValue() throws ProcessingException {
-    P_Table table = new P_Table();
     P_TableBean tableBean = new P_TableBean();
     P_TableBean.TableBeanRowData row = tableBean.addRow();
     row.setDefault("invalid");
-    table.importFromTableBeanData(tableBean);
-    assertEquals("invalid", table.getCell(0, 0).getText());
-    assertFalse(table.getCell(0, 0).isContentValid());
+    m_table.importFromTableBeanData(tableBean);
+    assertEquals("invalid", m_table.getCell(0, 0).getText());
+    assertFalse(m_table.getCell(0, 0).isContentValid());
+  }
+
+  /**
+   * Tests that properties are unchanged after importing data twice.
+   */
+  @Test
+  public void testSuccessfulImportProps() throws ProcessingException {
+    P_TableBean tableBean = new P_TableBean();
+    P_TableBean.TableBeanRowData row = tableBean.addRow();
+    row.setDefault(TEST_VALUE);
+    m_table.getDefaultColumn().setBackgroundColor("black");
+    m_table.importFromTableBeanData(tableBean);
+    m_table.importFromTableBeanData(tableBean);
+    assertEquals("black", m_table.getCell(0, 0).getBackgroundColor());
+    assertTrue(m_table.getCell(0, 0).isHtmlEnabled());
   }
 
   public static class P_Table extends AbstractTable {
@@ -61,6 +76,11 @@ public class TableImportTest {
 
     @Order(10.0)
     public class DefaultColumn extends AbstractStringColumn {
+
+      @Override
+      protected boolean getConfiguredHtmlEnabled() {
+        return true;
+      }
 
       private int m_parseCount = 0;
       private int m_validateCount = 0;

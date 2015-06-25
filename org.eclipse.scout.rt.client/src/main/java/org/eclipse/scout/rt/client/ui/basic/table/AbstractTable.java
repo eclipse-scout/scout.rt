@@ -2018,15 +2018,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  /**
+   * Replace rows discarding deleted rows
+   */
   private void replaceRowsCase1(List<? extends ITableRow> newRows) throws ProcessingException {
     try {
       setTableChanging(true);
       //
       List<CompositeObject> selectedKeys = getSelectedKeys();
-
       discardAllRows();
       addRows(newRows, false);
-
       restoreSelection(selectedKeys);
     }
     finally {
@@ -2082,33 +2083,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       List<ITableRow> updatedRows = new ArrayList<ITableRow>(mappedCount);
       for (int i = 0; i < oldToNew.length; i++) {
         if (oldToNew[i] >= 0) {
-          ITableRow oldRow = getRow(i);
+          ITableRow existingRow = getRow(i);
           ITableRow newRow = newRows.get(oldToNew[i]);
-          try {
-            oldRow.setRowChanging(true);
-            //
-            oldRow.setEnabled(newRow.isEnabled());
-            oldRow.setStatus(newRow.getStatus());
-            for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
-              if (columnIndex < newRow.getCellCount()) {
-                oldRow.getCellForUpdate(columnIndex).updateFrom(newRow.getCell(columnIndex));
-              }
-              else {
-                // reset the visible values
-                oldRow.getCellForUpdate(columnIndex).setText(null);
-                oldRow.getCellForUpdate(columnIndex).setValue(null);
-              }
-            }
-          }
-          finally {
-            oldRow.setRowPropertiesChanged(false);
-            oldRow.setRowChanging(false);
-          }
-          //
 
-          updatedRows.add(oldRow);
+          replaceRowValues(existingRow, newRow);
+          updatedRows.add(existingRow);
         }
       }
+
       List<ITableRow> deletedRows = new ArrayList<ITableRow>(getRowCount() - mappedCount);
       for (int i = 0; i < oldToNew.length; i++) {
         if (oldToNew[i] < 0) {
@@ -2132,6 +2114,34 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     finally {
       setTableChanging(false);
+    }
+  }
+
+  /**
+   * Update existing row with values from new row
+   */
+  private void replaceRowValues(ITableRow existingRow, ITableRow newRow) throws ProcessingException {
+    try {
+      existingRow.setRowChanging(true);
+      //
+      existingRow.setEnabled(newRow.isEnabled());
+      existingRow.setStatus(newRow.getStatus());
+
+      //map values
+      for (IColumn<?> col : getColumns()) {
+
+        int columnIndex = col.getColumnIndex();
+        Object newValue = null;
+        if (columnIndex < newRow.getCellCount()) {
+          newValue = newRow.getCellValue(columnIndex);
+        }
+
+        col.parseValueAndSet(existingRow, newValue);
+      }
+    }
+    finally {
+      existingRow.setRowPropertiesChanged(false);
+      existingRow.setRowChanging(false);
     }
   }
 
