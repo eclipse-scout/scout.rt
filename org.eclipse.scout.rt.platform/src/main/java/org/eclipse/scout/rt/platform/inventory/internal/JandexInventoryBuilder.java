@@ -85,14 +85,14 @@ public class JandexInventoryBuilder {
     try {
       if (urlText.startsWith("jar:file:")) {
         Indexer indexer = new Indexer();
-        File jarFile = new File(urlText.substring(9, urlText.lastIndexOf("!")));
+        File jarFile = new File(new URI("file:" + urlText.substring(9, urlText.lastIndexOf("!"))));
         Index index = JarIndexer.createJarIndex(jarFile, indexer, false, false, false).getIndex();
         m_indexList.add(index);
         return;
       }
       if (urlText.startsWith("file:")) {
         Indexer indexer = new Indexer();
-        File scoutXmlFolder = new File(urlText.substring(5));
+        File scoutXmlFolder = new File(url.toURI());
         File classesFolder = scoutXmlFolder.getParentFile().getParentFile();
         Index index = JandexFolderIndexer.createFolderIndex(classesFolder, indexer);
         m_indexList.add(index);
@@ -121,5 +121,13 @@ public class JandexInventoryBuilder {
 
   public IndexView finish() {
     return CompositeIndex.create(m_indexList);
+  }
+
+  protected List<IndexView> getIndexList() {
+    return m_indexList;
+  }
+
+  protected boolean isForceRebuildFolderIndexe() {
+    return m_forceRebuildFolderIndexes;
   }
 }
