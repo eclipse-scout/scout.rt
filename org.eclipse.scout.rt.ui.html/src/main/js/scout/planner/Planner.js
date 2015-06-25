@@ -796,6 +796,10 @@ scout.Planner.prototype._renderYearPanelVisible = function() {
 };
 
 scout.Planner.prototype._onYearPanelWidthChange = function() {
+  if (!this._yearPanel.$container) {
+    // If container has been removed in the meantime (e.g. user navigates away while animation is in progress)
+    return;
+  }
   var yearPanelWidth = this._yearPanel.$container.outerWidth();
   this.$grid.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
   this.$scale.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
