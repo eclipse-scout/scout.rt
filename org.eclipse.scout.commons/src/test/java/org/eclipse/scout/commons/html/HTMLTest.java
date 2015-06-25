@@ -133,6 +133,8 @@ public class HTMLTest {
 
   @Test
   public void testFragment() {
+    assertEquals("", HTML.fragment((CharSequence) null).toEncodedHtml());
+
     final IHtmlContent fragment = HTML.fragment(HTML.div(BIND_TEXT), BIND_TEXT);
     assertEquals("<div>" + ENCODED_BIND_TEXT + "</div>" + ENCODED_BIND_TEXT, fragment.toEncodedHtml());
   }
@@ -232,6 +234,7 @@ public class HTMLTest {
 
   @Test
   public void testPlain() {
+    assertEquals("", HTML.plain((CharSequence) null).toEncodedHtml());
     assertEquals(BIND_TEXT, HTML.plain(BIND_TEXT).toEncodedHtml());
     IHtmlContent plainLink = HTML.plain(BIND_TEXT, HTML.appLink("REF", BIND_TEXT));
     String plainLinkString = String.format("%s<span class=\"app-link\" data-ref=\"REF\">%s</span>", BIND_TEXT, ENCODED_BIND_TEXT);

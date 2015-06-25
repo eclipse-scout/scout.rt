@@ -30,6 +30,9 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
   protected ArrayList<? extends CharSequence> importTexts(List<? extends CharSequence> texts) {
     ArrayList<CharSequence> bindTexts = new ArrayList<CharSequence>();
     for (CharSequence text : texts) {
+      if (text == null) {
+        continue;
+      }
       if (text instanceof IHtmlContent) {
         bindTexts.add(importHtml((IHtmlContent) text));
       }
