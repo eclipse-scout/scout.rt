@@ -95,7 +95,6 @@ scout.DateField.prototype._sendTimestampChanged = function(timestamp) {
 scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate) {
     this.$dateField = scout.fields.new$TextField()
-      .focus(this._onFieldFocus.bind(this))
       .blur(this._onFieldBlurDate.bind(this))
       .keydown(this._onKeyDownDate.bind(this))
       .click(this._onClick.bind(this))
@@ -130,13 +129,6 @@ scout.DateField.prototype._renderEnabled = function() {
   }
 };
 
-scout.DateField.prototype._onFieldFocus = function() {
-  if (!this._$predict || this._$predict.length === 0) {
-    //    setTimeout(function(){
-    this._$predict = this._createPredictionField();
-    //    }.bind(this));
-  }
-};
 
 scout.DateField.prototype._onFieldBlurDate = function() {
   this.closeOnClickOutsideOrFocusLost();
@@ -358,11 +350,14 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
 
   // Use set timeout because field value is not set when keyDown is fired (keyDown is used because keyUp feels laggy).
   setTimeout(function(e) {
+    displayText = this.$dateField.val();
+    if ((!this._$predict || this._$predict.length === 0)&& displayText.length>0 && this.$dateField[0] === document.activeElement) {
+      this._$predict = this._createPredictionField();
+    }
     if (!this._$predict) {
       // Return if $predict was already removed (e.g. by focus lost)
       return;
     }
-    displayText = this.$dateField.val();
     var datePrediction = {};
     var valid = this.validateDisplayText(displayText);
     if (displayText && valid) {

@@ -53,6 +53,8 @@ describe("DateField", function() {
 
   function writeText(dateField, displayText) {
     dateField.$dateField.val(displayText);
+    dateField._onKeyDownDate({which:99});
+    jasmine.clock().tick(101);
     dateField.validateDisplayText(dateField.$dateField.val());
   }
 
