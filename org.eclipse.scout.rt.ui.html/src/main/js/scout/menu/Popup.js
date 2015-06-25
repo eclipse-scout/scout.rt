@@ -1,11 +1,16 @@
-scout.Popup = function(session) {
+scout.Popup = function(session, options) {
   scout.Popup.parent.call(this);
+  options = options || {};
   this.$body;
   this.$head;
   this.$deco;
   this._mouseDownHandler;
   this.session = session;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  this.anchorBounds = options.anchorBounds;
+  this.$anchor = options.$anchor;
+  this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
+  this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -22,6 +27,7 @@ scout.Popup.prototype.render = function($parent) {
     }
   }.bind(this), 0);
   this._attachCloseHandler();
+  this.position();
 };
 
 scout.Popup.prototype.remove = function() {
@@ -130,6 +136,72 @@ scout.Popup.prototype.appendToBody = function($element) {
 
 scout.Popup.prototype.addClassToBody = function(clazz) {
   this.$body.addClass(clazz);
+};
+
+scout.Popup.prototype.prefLocation = function(openingDirectionY) {
+  var x, y, anchorBounds, height, $container;
+
+  if (!this.anchorBounds && !this.$anchor) {
+    return;
+  }
+  $container = this.$body;
+  height = $container.outerHeight(),
+
+  anchorBounds = this.anchorBounds;
+  if (!anchorBounds) {
+    anchorBounds = this.$anchor && scout.graphics.offsetBounds(this.$anchor);
+  }
+
+  x = anchorBounds.x;
+  y = anchorBounds.y;
+  if (openingDirectionY === 'up') {
+    y -= height;
+  } else {
+    y += anchorBounds.height;
+  }
+  return {x: x, y: y};
+};
+
+scout.Popup.prototype.overlap = function($container, location, anchorBounds) {
+  if (!$container || !location) {
+    return;
+  }
+  var overlapX, overlapY,
+    height = $container.outerHeight(),
+    width = $container.outerWidth(),
+    left = location.x,
+    top = location.y;
+
+  overlapX = left + width + this.windowPaddingX - $(window).width();
+  overlapY = top + height + this.windowPaddingY  - $(window).height();
+  return {x: overlapX, y: overlapY};
+};
+
+scout.Popup.prototype.adjustLocation = function($container, location, anchorBounds) {
+  var openingDirection, left, top,
+    overlap = this.overlap($container, location, anchorBounds);
+
+  if (overlap.y > 0) {
+    // switch opening direction
+    openingDirection = 'up';
+    location = this.prefLocation(openingDirection);
+  }
+  left = location.x,
+  top = location.y;
+  if (overlap.x > 0) {
+    // Move popup to the left until it gets fully visible
+    left -= overlap.x;
+  }
+  return {x: left, y: top};
+};
+
+scout.Popup.prototype.position = function() {
+  var location = this.prefLocation();
+  if (!location) {
+    return;
+  }
+  location = this.adjustLocation(this.$body, location);
+  this.setLocation(location);
 };
 
 scout.Popup.prototype.setLocation = function(location) {

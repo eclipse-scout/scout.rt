@@ -23,7 +23,7 @@ scout.ValueField.prototype.init = function(model, session) {
 scout.ValueField.prototype._syncMenus = function(menus) {
   if (this._hasMenus()) {
     this.menus.forEach(function(menu) {
-       this.keyStrokeAdapter.unregisterKeyStroke(menu);
+      this.keyStrokeAdapter.unregisterKeyStroke(menu);
     }, this);
   }
   this.menus = menus;
@@ -42,11 +42,11 @@ scout.ValueField.prototype._syncMenus = function(menus) {
 scout.ValueField.prototype._onStatusClick = function(event) {
   if (this._hasMenus()) {
     // showing menus is more important than showing tooltips
-    var popup = new scout.ContextMenuPopup(this.session, this.menus, {cloneMenuItems: false}),
-      bounds = scout.graphics.getBounds(this.$status),
-      pos = this.$status.position();
-    popup.render(this.$container);
-    popup.setLocation(new scout.Point(pos.left + bounds.width / 2, pos.top + bounds.height / 2));
+    var popup = new scout.ContextMenuPopup(this.session, this.menus, {
+      cloneMenuItems: false,
+      $anchor: this.$status
+    });
+    popup.render();
   } else {
     // super call shows tooltip
     scout.ValueField.parent.prototype._onStatusClick.call(this);
@@ -107,7 +107,7 @@ scout.ValueField.prototype.displayTextChanged = function(whileTyping, forceSend)
 
   if (forceSend || displayText !== oldDisplayText) {
     this.displayText = displayText;
-    this._sendDisplayTextChanged(displayText, !!whileTyping);
+    this._sendDisplayTextChanged(displayText, !! whileTyping);
   }
 };
 
@@ -118,11 +118,11 @@ scout.ValueField.prototype._onFieldKeyUp = function() {
 scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
   this.session.send(this.id, 'displayTextChanged', {
     displayText: displayText,
-    whileTyping: whileTyping});
+    whileTyping: whileTyping
+  });
 };
 
 scout.ValueField.prototype.addField = function($field) {
   scout.ValueField.parent.prototype.addField.call(this, $field);
   this.$field.data('valuefield', this);
 };
-

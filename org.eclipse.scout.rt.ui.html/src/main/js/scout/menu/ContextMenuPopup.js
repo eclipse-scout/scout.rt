@@ -1,5 +1,5 @@
 scout.ContextMenuPopup = function(session, menuItems, options) {
-  scout.ContextMenuPopup.parent.call(this, session);
+  scout.ContextMenuPopup.parent.call(this, session, options);
   this.menuItems = menuItems;
   this.options = $.extend({
     cloneMenuItems: true
