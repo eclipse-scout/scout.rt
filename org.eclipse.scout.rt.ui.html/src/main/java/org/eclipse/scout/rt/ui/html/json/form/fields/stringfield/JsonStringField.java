@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
 
-  public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
+  public static final String EVENT_CALL_ACTION = "callAction";
 
   public JsonStringField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -75,18 +75,18 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isSpellCheckEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_DECORATION_LINK, model) {
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_HAS_ACTION, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isDecorationLink();
+        return getModel().isHasAction();
       }
     });
   }
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_CALL_LINK_ACTION.equals(event.getType())) {
-      handleUiCallLinkAction();
+    if (EVENT_CALL_ACTION.equals(event.getType())) {
+      handleUiCallAction();
     }
     else {
       super.handleUiEvent(event);
@@ -99,8 +99,8 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 
-  private void handleUiCallLinkAction() {
-    getModel().getUIFacade().fireLinkActionFromUI(getModel().getDisplayText());
+  private void handleUiCallAction() {
+    getModel().getUIFacade().fireActionFromUI();
 
   }
 

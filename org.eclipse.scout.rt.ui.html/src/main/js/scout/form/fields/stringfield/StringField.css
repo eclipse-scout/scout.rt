@@ -1,5 +1,5 @@
 .string-field  {
-  &.decoration-link {
+  &.has-action {
     & > input[type=text] {
       .text-field-with-icon(@icon-arrow-right);
 
