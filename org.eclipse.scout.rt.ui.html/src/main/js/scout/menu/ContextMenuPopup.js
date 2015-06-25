@@ -5,7 +5,7 @@ scout.ContextMenuPopup = function(session, menuItems, options) {
     cloneMenuItems: true
   }, options);
 };
-scout.inherits(scout.ContextMenuPopup, scout.Popup);
+scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);

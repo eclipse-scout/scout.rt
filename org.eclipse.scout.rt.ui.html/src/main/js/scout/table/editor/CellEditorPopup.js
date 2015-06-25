@@ -20,7 +20,6 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   if (firstCell) {
     this.$container.addClass('first');
   }
-  this.$body.addClass('cell-editor-popup-body');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 

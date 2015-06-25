@@ -19,7 +19,6 @@ scout.MenuBarPopup.prototype._getMenuItems = function() {
  *  @override
  */
 scout.MenuBarPopup.prototype._beforeRenderMenuItems = function() {
-  this._renderHead();
 };
 
 /**

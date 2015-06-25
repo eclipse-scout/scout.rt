@@ -10,13 +10,12 @@ scout.FormToolPopup = function(formToolButton, session) {
     this.keyStrokeAdapter.registerKeyStroke(closeKeyStroke);
   }
 };
-scout.inherits(scout.FormToolPopup, scout.Popup);
+scout.inherits(scout.FormToolPopup, scout.PopupWithHead);
 
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
   this.$container.addClass('form-tool-popup');
 
-  this._renderHead($parent);
   var form = this.formToolButton.form;
   form.render(this.$body);
   form.htmlComp.pixelBasedSizing = true;

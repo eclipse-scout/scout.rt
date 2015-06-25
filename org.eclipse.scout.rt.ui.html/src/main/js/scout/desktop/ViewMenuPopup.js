@@ -4,11 +4,10 @@ scout.ViewMenuPopup = function($tab, viewMenus, naviBounds, session) {
   this.viewMenus = viewMenus;
   this.naviBounds = naviBounds;
 };
-scout.inherits(scout.ViewMenuPopup, scout.Popup);
+scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
 scout.ViewMenuPopup.prototype._render = function($parent) {
   scout.ViewMenuPopup.parent.prototype._render.call(this, $parent);
-  this._renderHead();
 
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.render(this.$body);

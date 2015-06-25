@@ -1,9 +1,6 @@
 scout.Popup = function(session, options) {
   scout.Popup.parent.call(this);
   options = options || {};
-  this.$body;
-  this.$head;
-  this.$deco;
   this._mouseDownHandler;
   this.session = session;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
@@ -45,39 +42,8 @@ scout.Popup.prototype._render = function($parent) {
   if (!$parent) {
     $parent = this.session.$entryPoint;
   }
-  this.$body = $.makeDiv('popup-body');
   this.$container = $.makeDiv('popup')
-    .append(this.$body)
     .appendTo($parent);
-};
-
-scout.Popup.prototype.rerenderHead = function() {
-  this._removeHead();
-  this._renderHead();
-};
-
-/**
- * Will not be called by this._render, sub classes have explicitly call this method. Copies html from this.$headBlueprint, if set
- */
-scout.Popup.prototype._renderHead = function() {
-  this.$head = $.makeDiv('popup-head');
-  this.$deco = $.makeDiv('popup-deco');
-  this.$container
-    .prepend(this.$head)
-    .append(this.$deco);
-  this.$head.on('mousedown', '', this._onHeadMouseDown.bind(this));
-  if (this.$headBlueprint) {
-    this.$head.html(this.$headBlueprint.html());
-  }
-};
-
-scout.Popup.prototype._removeHead = function() {
-  if (this.$head) {
-    this.$head.remove();
-  }
-  if (this.$deco) {
-    this.$deco.remove();
-  }
 };
 
 scout.Popup.prototype.closePopup = function() {
@@ -120,31 +86,16 @@ scout.Popup.prototype._onMouseDownOutside = function(event) {
   this.closePopup();
 };
 
-scout.Popup.prototype._onHeadMouseDown = function(event) {
-  if (this.$head && this.$head.isOrHas(event.target)) {
-    this.closePopup();
-  }
-};
-
 scout.Popup.prototype._onAnchorScroll = function(event) {
   this.remove();
 };
 
-scout.Popup.prototype.appendToBody = function($element) {
-  this.$body.append($element);
-};
-
-scout.Popup.prototype.addClassToBody = function(clazz) {
-  this.$body.addClass(clazz);
-};
-
-scout.Popup.prototype.prefLocation = function(openingDirectionY) {
-  var x, y, anchorBounds, height, $container;
+scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
+  var x, y, anchorBounds, height;
 
   if (!this.anchorBounds && !this.$anchor) {
     return;
   }
-  $container = this.$body;
   height = $container.outerHeight(),
 
   anchorBounds = this.anchorBounds;
@@ -184,7 +135,7 @@ scout.Popup.prototype.adjustLocation = function($container, location, anchorBoun
   if (overlap.y > 0) {
     // switch opening direction
     openingDirection = 'up';
-    location = this.prefLocation(openingDirection);
+    location = this.prefLocation($container, openingDirection);
   }
   left = location.x,
   top = location.y;
@@ -196,11 +147,15 @@ scout.Popup.prototype.adjustLocation = function($container, location, anchorBoun
 };
 
 scout.Popup.prototype.position = function() {
-  var location = this.prefLocation();
+  this._position(this.$container);
+};
+
+scout.Popup.prototype._position = function($container) {
+  var location = this.prefLocation($container);
   if (!location) {
     return;
   }
-  location = this.adjustLocation(this.$body, location);
+  location = this.adjustLocation($container, location);
   this.setLocation(location);
 };
 
