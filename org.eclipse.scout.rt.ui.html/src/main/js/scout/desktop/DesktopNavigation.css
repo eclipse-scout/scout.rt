@@ -25,14 +25,30 @@
 .view-button-tab {
   display: inline-block;
   height: @view-buttons-height;
-  padding: 0 10px;
+  padding: 10px;
   background-color: @view-button-tab-background-color;
   color: @view-button-tab-color;
   border-right: solid 1px @navigation-background-color;
+  white-space: nowrap;
+  min-width: 50px;
+  vertical-align: top;
 
   &.selected {
     background-color: @view-button-tab-active-background-color;
     color: @view-button-tab-active-color;
+  }
+
+  &:not(.selected) {
+    text-align: center;
+
+    & > .icon {
+
+    }
+  }
+
+  & > .icon {
+    font-size: 20px;
+    padding-top: 3px;
   }
 
   & .view-button-tab-title {
@@ -54,12 +70,6 @@
 
     &:hover {
       cursor: pointer;
-    }
-
-    &[data-icon]::before {
-      .font-icon;
-      font-size: 20px;
-      content: attr(data-icon);
     }
   }
 }

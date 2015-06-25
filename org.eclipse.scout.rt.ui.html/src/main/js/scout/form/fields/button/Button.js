@@ -1,6 +1,6 @@
 scout.Button = function() {
   scout.Button.parent.call(this);
-  this._$icon;
+  this._$label;
   this._addAdapterProperties('menus');
   this.keyStroke;
   this.defaultKeyStroke;
@@ -45,7 +45,7 @@ scout.Button.prototype._render = function($parent) {
     $button = $('<button>');
     cssClass = 'button';
   }
-
+  this._$label = $button.appendSpan('button-label');
   this.addContainer($parent, cssClass, new scout.ButtonLayout(this));
   this.addField($button);
 
@@ -164,18 +164,17 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function(label) {
-  this.$field.textOrNbsp(scout.strings.removeAmpersand(label));
+  this._$label.textOrNbsp(scout.strings.removeAmpersand(label));
 };
 
 /**
  * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
  */
 scout.Button.prototype._renderIconId = function() {
-  var $icon;
   this.$field.icon(this.iconId);
-  $icon = this.$field.data('$icon');
   if (this.iconId) {
-    $icon.toggleClass('with-label', !! this.label);
+    var $icon = this.$field.data('$icon');
+    $icon.toggleClass('with-label', !!this.label);
   }
 };
 

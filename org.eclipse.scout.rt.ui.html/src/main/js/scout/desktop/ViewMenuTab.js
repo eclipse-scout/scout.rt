@@ -17,13 +17,6 @@ scout.ViewMenuTab = function(viewMenus, session) {
   this.iconId;
 
   this._update();
-
-//  // add a listener on each view-menu, because we must update
-//  // the view-menu-tab when the selected state of one of its
-//  // menus changes
-//  viewMenus.forEach(function(viewMenu) {
-//    viewMenu.on('propertyChange', this._onViewMenuPropertyChange.bind(this));
-//  }, this);
 };
 
 /**
@@ -76,7 +69,7 @@ scout.ViewMenuTab.prototype._renderSelected = function() {
 };
 
 scout.ViewMenuTab.prototype._renderIconId = function() {
-  this.$title.icon(this.iconId);
+  this.$container.icon(this.iconId);
 };
 
 /**

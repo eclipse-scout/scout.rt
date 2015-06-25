@@ -258,28 +258,32 @@
   };
 
   $.fn.icon = function(iconId) {
-    var icon, $icon;
+    var icon, $icon = this.data('$icon');
     if (iconId) {
       icon = scout.icons.parseIconId(iconId);
       if (icon.isFontIcon()) {
-        $icon = $('<span>')
+        getOrCreateIconElement.call(this, $icon, '<span>')
           .addClass(icon.appendCssClass('font-icon'))
           .addClass('icon')
           .text(icon.iconCharacter);
       } else {
-        $icon = $('<img>')
+        getOrCreateIconElement.call(this, $icon, '<img>')
           .attr('src', icon.iconUrl)
           .addClass('icon');
       }
-      this.data('$icon', $icon);
-      this.prepend($icon);
-    } else {
-      $icon = this.data('$icon');
-      if ($icon) {
-        $icon.remove();
-      }
+    } else  if ($icon) {
+      $icon.remove();
     }
     return this;
+
+    function getOrCreateIconElement($icon, newElement) {
+      if (!$icon) {
+        $icon = $(newElement);
+        this.data('$icon', $icon);
+        this.prepend($icon);
+      }
+      return $icon;
+    }
   };
 
   $.fn.placeholder = function(placeholder) {

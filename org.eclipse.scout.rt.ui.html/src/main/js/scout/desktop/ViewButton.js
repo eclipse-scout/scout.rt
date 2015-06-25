@@ -31,7 +31,7 @@ scout.ViewButton.prototype._renderAsMenu = function($parent) {
 scout.ViewButton.prototype._renderAsTab = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .on('click', this._onClick.bind(this));
-  this.$title = this.$container.appendDiv('view-button-tab-title');
+  this.$title = this.$container.appendSpan('view-button-tab-title');
 };
 
 /**
@@ -55,7 +55,7 @@ scout.ViewButton.prototype._renderSelected = function(selected) {
       this.$container.removeAttr('title');
       this.$title.text(this.text);
     } else {
-      this.$container.attr('title', this.text);
+      this.$container.attr('title', this.text); // FIXME AWE: (desktop) use pretty tooltips here
       this.$title.text('');
     }
   }
@@ -67,7 +67,7 @@ scout.ViewButton.prototype._renderSelected = function(selected) {
  */
 scout.ViewButton.prototype._renderIconId = function(iconId) {
   if (this._isTab()) {
-    this.$title.icon(this.getIconId(iconId));
+    this.$container.icon(this.getIconId(iconId));
   }
 };
 
