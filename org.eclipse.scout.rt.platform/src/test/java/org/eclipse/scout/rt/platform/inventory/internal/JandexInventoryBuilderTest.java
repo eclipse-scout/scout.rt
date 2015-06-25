@@ -23,7 +23,7 @@ public class JandexInventoryBuilderTest {
   public void testScanModuleWithSpaceInPath() throws IOException {
     JandexInventoryBuilder builder = new JandexInventoryBuilder();
     builder.scanModule(getClass().getResource("test repository/META-INF/scout.xml"));
-    builder.scanModule(new URL("jar:" + getClass().getResource("test repository/test.jar").toExternalForm() + "!/META-INF/scout.xml"));
+    builder.scanModule(new URL("jar:" + getClass().getResource("test repository/test.jar_").toExternalForm() + "!/META-INF/scout.xml"));
     assertEquals(2, builder.getIndexList().size());
   }
 }
