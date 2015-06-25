@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -82,7 +82,7 @@ public class ClientJobCancelTest {
     MockServiceTunnel tunnel = new MockServiceTunnel(m_session);
     m_session.setServiceTunnel(tunnel);
     m_serviceReg = TestingUtility.registerBeans(
-        new BeanMetaData(MockServerProcessingCancelService.class).
+        BEANS.get(IBeanMetaDataFacotry.class).create(MockServerProcessingCancelService.class).
             initialInstance(new MockServerProcessingCancelService(tunnel)).
             applicationScoped(true).order(-1)
         );
@@ -156,7 +156,7 @@ public class ClientJobCancelTest {
 
           @Override
           public String call() throws Exception {
-            IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(PingService.class).initialInstance(new PingService()).applicationScoped(true));
+            IBean<?> bean = TestingUtility.registerBean(BEANS.get(IBeanMetaDataFacotry.class).create(PingService.class).initialInstance(new PingService()).applicationScoped(true));
             try {
               return ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel()).ping(pingRequest);
             }

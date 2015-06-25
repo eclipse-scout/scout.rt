@@ -18,8 +18,9 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
@@ -60,7 +61,7 @@ public class CodeLookupCallTest {
   @BeforeClass
   public static void beforeClass() throws Exception {
     s_services = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class).
+        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeService.class).
             initialInstance(new TestingCodeService(new CodeLookupCallTestCodeType())).
             applicationScoped(true)
         );

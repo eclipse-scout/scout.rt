@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 
-public class BeanMetaData {
+public class BeanMetaData implements IBeanMetaData {
   private final Class<?> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private Object m_initialInstance;
@@ -68,10 +68,12 @@ public class BeanMetaData {
     }
   }
 
+  @Override
   public Class<?> getBeanClazz() {
     return m_beanClazz;
   }
 
+  @Override
   public Object getInitialInstance() {
     return m_initialInstance;
   }
@@ -81,6 +83,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
+  @Override
   public BeanMetaData initialInstance(Object initialInstance) {
     m_initialInstance = initialInstance;
     return this;
@@ -91,11 +94,13 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
+  @Override
   public BeanMetaData producer(IBeanInstanceProducer<?> producer) {
     m_producer = producer;
     return this;
   }
 
+  @Override
   public IBeanInstanceProducer<?> getProducer() {
     return m_producer;
   }
@@ -105,6 +110,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
+  @Override
   public BeanMetaData replace(boolean set) {
     if (set) {
       addAnnotation(AnnotationFactory.createReplace());
@@ -120,6 +126,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
+  @Override
   public BeanMetaData order(double order) {
     addAnnotation(AnnotationFactory.createOrder(order));
     return this;
@@ -130,6 +137,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
+  @Override
   public BeanMetaData applicationScoped(boolean set) {
     if (set) {
       addAnnotation(AnnotationFactory.createApplicationScoped());
@@ -140,15 +148,18 @@ public class BeanMetaData {
     return this;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
     return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
   }
 
+  @Override
   public Map<Class<? extends Annotation>, Annotation> getBeanAnnotations() {
     return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
   }
 
+  @Override
   public void setBeanAnnotations(Map<Class<? extends Annotation>, Annotation> annotations) {
     m_beanAnnotations.clear();
     m_beanAnnotations.putAll(annotations);
@@ -159,6 +170,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
+  @Override
   public BeanMetaData addAnnotation(Annotation annotation) {
     m_beanAnnotations.put(annotation.annotationType(), annotation);
     return this;
@@ -169,7 +181,8 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData removeAnnotation(Class<? extends Annotation> annotationType) {
+  @Override
+  public IBeanMetaData removeAnnotation(Class<? extends Annotation> annotationType) {
     m_beanAnnotations.remove(annotationType);
     return this;
   }

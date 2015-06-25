@@ -19,8 +19,8 @@ import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -56,8 +56,8 @@ public class DefaultAuthTokenTest {
   public static void beforeClass() throws ProcessingException {
     s_pair = SecurityUtility.generateKeyPair();
     s_beans.addAll(TestingUtility.registerBeans(
-        new BeanMetaData(AuthTokenPrivateKeyProperty.class).applicationScoped(true).initialInstance(new AuthTokenPrivateKeyPropertyEx()),
-        new BeanMetaData(AuthTokenPublicKeyProperty.class).applicationScoped(true).initialInstance(new AuthTokenPublicKeyPropertyEx())
+        BEANS.get(IBeanMetaDataFacotry.class).create(AuthTokenPrivateKeyProperty.class).applicationScoped(true).initialInstance(new AuthTokenPrivateKeyPropertyEx()),
+        BEANS.get(IBeanMetaDataFacotry.class).create(AuthTokenPublicKeyProperty.class).applicationScoped(true).initialInstance(new AuthTokenPublicKeyPropertyEx())
         ));
   }
 

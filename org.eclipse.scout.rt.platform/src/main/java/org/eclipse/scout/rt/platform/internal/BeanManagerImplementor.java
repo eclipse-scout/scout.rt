@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.IBeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 
 public class BeanManagerImplementor implements IBeanManager {
@@ -109,7 +110,7 @@ public class BeanManagerImplementor implements IBeanManager {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> IBean<T> registerBean(BeanMetaData beanData) {
+  public <T> IBean<T> registerBean(IBeanMetaData beanData) {
     m_lock.writeLock().lock();
     try {
       IBean<T> bean = new BeanImplementor<T>(beanData, this);

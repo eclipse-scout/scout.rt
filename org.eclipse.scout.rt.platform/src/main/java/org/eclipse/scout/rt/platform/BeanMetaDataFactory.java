@@ -8,27 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.internal;
+package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.PlatformStateLatch;
+public class BeanMetaDataFactory implements IBeanMetaDataFacotry {
 
-/**
- * Starts the main platform
- *
- * @since 5.1
- */
-public class PlatformStarter extends Thread {
-  private final IPlatform m_platform;
-  private final PlatformStateLatch m_platformStateLatch;
-
-  public PlatformStarter(IPlatform platform, PlatformStateLatch platformStateLatch) {
-    m_platform = platform;
-    m_platformStateLatch = platformStateLatch;
+  @Override
+  public IBeanMetaData create(Class<?> clazz) {
+    return new BeanMetaData(clazz);
   }
 
   @Override
-  public void run() {
-    m_platform.start(m_platformStateLatch);
+  public IBeanMetaData create(Class<?> clazz, Object initialInstance) {
+    return new BeanMetaData(clazz, initialInstance);
   }
+
+  @Override
+  public IBeanMetaData create(IBean<?> template) {
+    return new BeanMetaData(template);
+  }
+
 }

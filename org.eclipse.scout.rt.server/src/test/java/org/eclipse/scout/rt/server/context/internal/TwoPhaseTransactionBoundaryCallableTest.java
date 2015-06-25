@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
@@ -61,7 +62,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     MockitoAnnotations.initMocks(this);
 
     m_txErrors = new ArrayList<>();
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(ITransaction.class).order(-1000).producer(new IBeanInstanceProducer<ITransaction>() {
+    m_beans = TestingUtility.registerBeans(BEANS.get(IBeanMetaDataFacotry.class).create(ITransaction.class).order(-1000).producer(new IBeanInstanceProducer<ITransaction>() {
       @Override
       public ITransaction produce(IBean<ITransaction> bean) {
         return m_transaction;

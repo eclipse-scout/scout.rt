@@ -64,6 +64,7 @@
 
   <modules>
     <module>org.eclipse.scout.commons</module>
+    <module>org.eclipse.scout.rt.platform.api</module>
     <module>org.eclipse.scout.rt.platform</module>
     <module>org.eclipse.scout.rt.shared</module>
     <module>org.eclipse.scout.rt.server.commons</module>

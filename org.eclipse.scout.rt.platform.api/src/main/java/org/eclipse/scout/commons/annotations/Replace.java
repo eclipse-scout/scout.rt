@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-
 /**
  * Annotation on a class used to replace the first occurrence of its super class. The Annotation can be applied to
  * several scout objects types like columns, menus, form fields. Further, the annotation can be applied recursively

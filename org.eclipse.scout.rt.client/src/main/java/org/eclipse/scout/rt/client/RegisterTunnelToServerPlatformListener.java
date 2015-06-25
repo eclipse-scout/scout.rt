@@ -2,8 +2,9 @@ package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -41,7 +42,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
         if (!event.getSource().getBeanManager().getBeans(c).isEmpty()) {
           continue;
         }
-        event.getSource().getBeanManager().registerBean(new BeanMetaData(c).applicationScoped(false));
+        event.getSource().getBeanManager().registerBean(BEANS.get(IBeanMetaDataFacotry.class).create(c).applicationScoped(false));
       }
     }
   }

@@ -25,8 +25,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
@@ -56,7 +57,7 @@ public class TreeBoxTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(TreeBoxLookupCall.class));
+    m_beans = TestingUtility.registerBeans(BEANS.get(IBeanMetaDataFacotry.class).create(TreeBoxLookupCall.class));
   }
 
   @AfterClass

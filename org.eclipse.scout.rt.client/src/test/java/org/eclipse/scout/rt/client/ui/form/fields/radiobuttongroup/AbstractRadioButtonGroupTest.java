@@ -26,8 +26,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
@@ -58,7 +59,7 @@ public class AbstractRadioButtonGroupTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(P_CompanyLookupCall.class));
+    m_beans = TestingUtility.registerBeans(BEANS.get(IBeanMetaDataFacotry.class).create(P_CompanyLookupCall.class));
   }
 
   @AfterClass

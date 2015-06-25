@@ -15,8 +15,8 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -37,7 +37,7 @@ public class SelectIntoTest {
   @Before
   public void before() throws Exception {
     SqlServiceMock sqlService = new SqlServiceMock();
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(ISqlService.class).initialInstance(sqlService).applicationScoped(true));
+    m_beans = TestingUtility.registerBeans(BEANS.get(IBeanMetaDataFacotry.class).create(ISqlService.class).initialInstance(sqlService).applicationScoped(true));
   }
 
   @After

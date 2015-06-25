@@ -19,8 +19,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
@@ -47,10 +48,10 @@ public class AbstractProposalColumnTest {
     TestingCodeService codeService = new TestingCodeService(new TestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_regs = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class).
+        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeService.class).
         initialInstance(codeService).
         applicationScoped(true),
-        new BeanMetaData(ICodeLookupCallFactoryService.class).
+        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeLookupCallFactoryService.class).
         initialInstance(codeLookupCallFactoryService).
         applicationScoped(true)
         );

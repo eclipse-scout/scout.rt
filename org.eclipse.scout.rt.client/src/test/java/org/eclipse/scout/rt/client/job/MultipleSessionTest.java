@@ -26,8 +26,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -50,7 +51,7 @@ public class MultipleSessionTest {
   @Before
   public void before() {
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobManager.class).
+        BEANS.get(IBeanMetaDataFacotry.class).create(JobManager.class).
             applicationScoped(true));
     m_clientSession1 = mock(IClientSession.class);
     m_clientSession2 = mock(IClientSession.class);

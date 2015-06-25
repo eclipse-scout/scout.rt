@@ -21,8 +21,8 @@ import java.util.Set;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
@@ -47,7 +47,7 @@ public class PermissionServiceTest {
 
   private void testImpl(IPermissionService testService, boolean testPermission1Expected, boolean testPermission2Expected) {
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanMetaData(IPermissionService.class).
+        BEANS.get(IBeanMetaDataFacotry.class).create(IPermissionService.class).
         initialInstance(testService).
         applicationScoped(true));
     try {

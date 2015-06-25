@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
@@ -36,14 +37,19 @@ public class TunnelToServerBeanInterceptor<T> implements IBeanInterceptor<T> {
   }
 
   @Override
-  public Object invoke(IBeanInvocationContext<T> context) throws ProcessingException {
+  public Object invoke(IBeanInvocationContext<T> context) throws PlatformException {
     Method method = context.getTargetMethod();
     Object[] args = context.getTargetArgs();
     if (LOG.isDebugEnabled()) {
       LOG.debug("Soap call to " + m_serviceInterfaceClass.getName() + "." + method.getName() + "(" + VerboseUtility.dumpObjects(args) + ")");
     }
     IClientSession session = ClientSessionProvider.currentSession();
-    return session.getServiceTunnel().invokeService(m_serviceInterfaceClass, method, args);
+    try {
+      return session.getServiceTunnel().invokeService(m_serviceInterfaceClass, method, args);
+    }
+    catch (ProcessingException e) {
+      throw new PlatformException(e.getMessage(), e);
+    }
   }
 
 }

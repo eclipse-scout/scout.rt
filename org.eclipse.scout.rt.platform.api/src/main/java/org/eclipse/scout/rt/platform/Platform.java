@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.internal.PlatformStarter;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * This is the main scout platform, automatically started on first access to this class.
@@ -28,7 +27,6 @@ import org.eclipse.scout.rt.platform.internal.PlatformStarter;
  * Tests use a PlatformTestRunner.
  */
 public final class Platform {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Platform.class);
 
   private static IPlatform platform;
 
@@ -57,13 +55,13 @@ public final class Platform {
 
   // static initializer used for platform auto-start
   static {
-    ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
-    for (IPlatform p : loader) {
-      platform = p;
-      break;
+    Iterator<IPlatform> availablePlatforms = ServiceLoader.load(IPlatform.class).iterator();
+    // we only expect one and just take the first
+    if (availablePlatforms.hasNext()) {
+      platform = availablePlatforms.next();
     }
-    if (platform == null) {
-      platform = new DefaultPlatform();
+    else {
+      throw new PlatformException("Platform could not be loaded.");
     }
     PlatformStateLatch platformStateLatch = new PlatformStateLatch();
     // Start platform initialization in separate thread to let class initialization complete
@@ -72,7 +70,27 @@ public final class Platform {
       platformStateLatch.await();
     }
     catch (InterruptedException e) {
-      LOG.error("Interrupted while waiting for platform state latch", e);
+      throw new PlatformException("Interrupted while waiting for platform state latch.", e);
+    }
+  }
+
+  /**
+   * Starts the main platform
+   *
+   * @since 5.1
+   */
+  protected static class PlatformStarter extends Thread {
+    private final IPlatform m_platform;
+    private final PlatformStateLatch m_platformStateLatch;
+
+    public PlatformStarter(IPlatform platform, PlatformStateLatch platformStateLatch) {
+      m_platform = platform;
+      m_platformStateLatch = platformStateLatch;
+    }
+
+    @Override
+    public void run() {
+      m_platform.start(m_platformStateLatch);
     }
   }
 }

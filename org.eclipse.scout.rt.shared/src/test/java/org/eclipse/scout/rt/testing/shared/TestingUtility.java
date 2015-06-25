@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.IBeanMetaData;
 import org.eclipse.scout.rt.platform.Platform;
 import org.mockito.Mockito;
 
@@ -155,12 +156,12 @@ public final class TestingUtility {
    *
    * @return the registrations
    */
-  public static List<IBean<?>> registerBeans(BeanMetaData... beanDatas) {
+  public static List<IBean<?>> registerBeans(IBeanMetaData... beanDatas) {
     if (beanDatas == null) {
       return CollectionUtility.emptyArrayList();
     }
     List<IBean<?>> registeredBeans = new ArrayList<>();
-    for (BeanMetaData beanData : beanDatas) {
+    for (IBeanMetaData beanData : beanDatas) {
       registeredBeans.add(registerBean(beanData));
     }
     return registeredBeans;
@@ -174,7 +175,7 @@ public final class TestingUtility {
    *
    * @return the registration
    */
-  public static IBean<?> registerBean(BeanMetaData beanData) {
+  public static IBean<?> registerBean(IBeanMetaData beanData) {
     if (beanData == null) {
       return null;
     }

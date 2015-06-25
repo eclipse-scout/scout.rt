@@ -85,25 +85,25 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
       }
 
       @Override
-      public Object proceed() throws ProcessingException {
+      public Object proceed() throws PlatformException {
         try {
           return method.invoke(m_impl, args);
         }
         catch (IllegalAccessException e) {
-          throw new ProcessingException("access denied", e);
+          throw new PlatformException("access denied", e);
         }
         catch (IllegalArgumentException e) {
-          throw new ProcessingException("argument mismatch", e);
+          throw new PlatformException("argument mismatch", e);
         }
         catch (InvocationTargetException e) {
           Throwable t = e.getTargetException();
           if (t instanceof ProcessingException) {
-            throw (ProcessingException) t;
+            throw (PlatformException) t;
           }
           if (t instanceof PlatformException) {
             throw (PlatformException) t;
           }
-          throw new ProcessingException("unexpected", t);
+          throw new PlatformException("unexpected", t);
         }
       }
     };
