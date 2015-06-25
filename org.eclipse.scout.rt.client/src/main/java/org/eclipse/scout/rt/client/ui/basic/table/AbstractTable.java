@@ -2022,29 +2022,39 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       setTableChanging(true);
       //
-      ArrayList<CompositeObject> selectedKeys = new ArrayList<CompositeObject>();
-      for (ITableRow r : getSelectedRows()) {
-        selectedKeys.add(new CompositeObject(getRowKeys(r)));
-      }
+      List<CompositeObject> selectedKeys = getSelectedKeys();
+
       discardAllRows();
       addRows(newRows, false);
-      // restore selection
-      ArrayList<ITableRow> selectedRows = new ArrayList<ITableRow>();
-      if (selectedKeys.size() > 0) {
-        for (ITableRow r : m_rows) {
-          if (selectedKeys.remove(new CompositeObject(getRowKeys(r)))) {
-            selectedRows.add(r);
-            if (selectedKeys.size() == 0) {
-              break;
-            }
-          }
-        }
-      }
-      selectRows(selectedRows, false);
+
+      restoreSelection(selectedKeys);
     }
     finally {
       setTableChanging(false);
     }
+  }
+
+  private List<CompositeObject> getSelectedKeys() {
+    ArrayList<CompositeObject> selectedKeys = new ArrayList<CompositeObject>();
+    for (ITableRow r : getSelectedRows()) {
+      selectedKeys.add(new CompositeObject(getRowKeys(r)));
+    }
+    return selectedKeys;
+  }
+
+  private void restoreSelection(List<CompositeObject> selectedKeys) {
+    ArrayList<ITableRow> selectedRows = new ArrayList<ITableRow>();
+    if (selectedKeys.size() > 0) {
+      for (ITableRow r : m_rows) {
+        if (selectedKeys.remove(new CompositeObject(getRowKeys(r)))) {
+          selectedRows.add(r);
+          if (selectedKeys.size() == 0) {
+            break;
+          }
+        }
+      }
+    }
+    selectRows(selectedRows, false);
   }
 
   private void replaceRowsCase2(List<? extends ITableRow> newRows) throws ProcessingException {

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ColumnData;
@@ -49,12 +50,8 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   private final Set<IColumn<?>> m_ignoredColumns;
 
   public TableRowDataMapper(Class<? extends AbstractTableRowData> rowType, ColumnSet columnSet) throws ProcessingException {
-    if (rowType == null) {
-      throw new IllegalArgumentException("rowType must not be null");
-    }
-    if (columnSet == null) {
-      throw new IllegalArgumentException("columnSet must not be null");
-    }
+    Assertions.assertNotNull(rowType);
+    Assertions.assertNotNull(columnSet);
 
     m_columnSet = columnSet;
     IPropertyFilter filter = createPropertyFilter();
@@ -148,23 +145,28 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       if (m_ignoredColumns.contains(column)) {
         continue;
       }
-      Object value = null;
-      FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
-      if (propertyDesc != null) {
-        try {
-          Object dto = getDataContainer(column, rowData);
-          value = propertyDesc.getReadMethod().invoke(dto);
-        }
-        catch (Exception e) {
-          LOG.warn("Error reading row data property for column [" + column.getClass().getName() + "]", e);
-        }
-      }
-      else {
-        value = rowData.getCustomColumnValue(column.getColumnId());
-      }
-      column.parseValueAndSet(row, value);
+      Object value = getValue(column, rowData);
+      row.getCellForUpdate(column).setValue(value);
     }
     row.setStatus(rowData.getRowState());
+  }
+
+  private Object getValue(IColumn<?> column, AbstractTableRowData rowData) {
+    Object value = null;
+    FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
+    if (propertyDesc != null) {
+      try {
+        Object dto = getDataContainer(column, rowData);
+        value = propertyDesc.getReadMethod().invoke(dto);
+      }
+      catch (Exception e) {
+        LOG.warn("Error reading row data property for column [" + column.getClass().getName() + "]", e);
+      }
+    }
+    else {
+      value = rowData.getCustomColumnValue(column.getColumnId());
+    }
+    return value;
   }
 
   @Override

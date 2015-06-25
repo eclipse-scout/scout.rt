@@ -11,9 +11,12 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -34,8 +37,20 @@ public class TableImportTest {
     table.importFromTableBeanData(tableBean);
     String value = table.getDefaultColumn().getValue(0);
     assertEquals(TEST_VALUE, value);
-    //TODO parse should be called only once
-    //assertEquals(1, table.getDefaultColumn().getParseCount());
+    assertEquals(1, table.getDefaultColumn().getParseCount());
+    assertEquals(1, table.getDefaultColumn().getValidateCount());
+    assertEquals(1, table.getDefaultColumn().getDecorateCount());
+  }
+
+  @Test
+  public void testInvalidValue() throws ProcessingException {
+    P_Table table = new P_Table();
+    P_TableBean tableBean = new P_TableBean();
+    P_TableBean.TableBeanRowData row = tableBean.addRow();
+    row.setDefault("invalid");
+    table.importFromTableBeanData(tableBean);
+    assertEquals("invalid", table.getCell(0, 0).getText());
+    assertFalse(table.getCell(0, 0).isContentValid());
   }
 
   public static class P_Table extends AbstractTable {
@@ -47,18 +62,42 @@ public class TableImportTest {
     @Order(10.0)
     public class DefaultColumn extends AbstractStringColumn {
 
-      private int parseCount = 0;
+      private int m_parseCount = 0;
+      private int m_validateCount = 0;
+      private int m_decorateCount = 0;
+
+      public int getDecorateCount() {
+        return m_decorateCount;
+      }
+
+      public int getValidateCount() {
+        return m_validateCount;
+      }
 
       public int getParseCount() {
-        return parseCount;
+        return m_parseCount;
       }
 
       @Override
       public String execParseValue(ITableRow row, Object rawValue) throws ProcessingException {
-        parseCount++;
+        m_parseCount++;
         return super.execParseValue(row, rawValue);
       }
 
+      @Override
+      protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
+        m_validateCount++;
+        if (rawValue == "invalid") {
+          throw new VetoException("invalid value");
+        }
+        return super.execValidateValue(row, rawValue);
+      }
+
+      @Override
+      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+        m_decorateCount++;
+        super.execDecorateCell(cell, row);
+      }
     }
   }
 
