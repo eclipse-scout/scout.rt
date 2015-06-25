@@ -12,15 +12,10 @@ scout.inherits(scout.DesktopNavigationKeyStroke, scout.KeyStroke);
  */
 scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
   if (event && event.which === scout.keys.F4 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
-    this._desktopNavigation.searchTab.$tab.trigger('click');
+    this._desktopNavigation.searchTab.$tab.trigger('click'); // FIXME AWE/NBU: (desktop) use API
   }
-
   if (event && event.which === scout.keys.F2) {
-    if (this._desktopNavigation.activeTab === this._desktopNavigation.outlineTab) {
-      this._desktopNavigation.outlineTab.$tab.find('.navigation-tab-outline-button').trigger('mousedown');
-    } else {
-      this._desktopNavigation.outlineTab.$tab.find('.navigation-tab-outline-button').trigger('click');
-    }
+    this._desktopNavigation.doViewMenuAction();
   }
   event.preventDefault();
 };

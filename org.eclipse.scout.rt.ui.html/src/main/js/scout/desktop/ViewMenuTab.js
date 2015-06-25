@@ -46,10 +46,10 @@ scout.ViewMenuTab.prototype._update = function() {
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .on('click', this._onClickTab.bind(this));
-  this.$menuButton = this.$container.appendDiv('view-menu-button')
-    .on('click', this._onClickMenuButton.bind(this));
-  this.$title = this.$container.appendDiv('view-button-tab-title')
+  this.$title = this.$container.appendSpan('view-button-tab-title')
     .icon(this.iconId);
+  this.$menuButton = this.$container.appendSpan('view-menu-button')
+    .on('click', this._onClickMenuButton.bind(this));
   this._renderProperties();
 };
 

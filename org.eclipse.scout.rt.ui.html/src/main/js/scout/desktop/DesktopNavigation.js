@@ -111,6 +111,10 @@ scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
   }
 };
 
+scout.DesktopNavigation.prototype.doViewMenuAction = function() {
+  this.viewMenuTab._onClickTab();
+};
+
 /* --- INNER TYPES ---------------------------------------------------------------- */
 
 scout.DesktopNavigation.TabAndContent = function($tab) {
