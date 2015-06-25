@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.
  * <p>
  *
  * @since 1.0.3 06.02.2009
+ *        TODO imo remove in 6.0
  */
 public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
   public static final String PROP_BASIC_ATTEMPT = "BasicSecurityFilter.basicAttempt";

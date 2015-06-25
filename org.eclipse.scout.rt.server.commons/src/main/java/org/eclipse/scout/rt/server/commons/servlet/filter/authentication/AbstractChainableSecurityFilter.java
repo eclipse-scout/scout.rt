@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
  * </pre>
  *
  * @since 1.0.3 06.02.2009
+ *        TODO imo remove in 6.0
  */
 public abstract class AbstractChainableSecurityFilter implements Filter {
   public static final String PROP_SUBJECT = Subject.class.getName();

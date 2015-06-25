@@ -41,7 +41,10 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
  * <p>
  * This filter is registered in the scout server plugin.xml as /process by default with order 1'000'000 and has the
  * active flag set to true
+ *
+ * @deprecated merged into {@link FormBasedLoginFilter}, will be deleted in 6.0
  */
+@Deprecated
 public class HttpAuthJaasFilter implements Filter {
 
   @Override

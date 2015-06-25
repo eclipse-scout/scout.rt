@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.
  * <p>
  *
  * @since 1.0.0 02.07.2008
+ *        TODO imo remove in 6.0, convert to LDAPAuthenticator
  */
 public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LDAPSecurityFilter.class);

@@ -74,6 +74,7 @@ import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.
  *
  * @author Michael Rudolf
  * @since 1.0.3 06.02.2009
+ *        TODO imo remove in 6.0 and convert to DataSourceAuthenticator
  */
 public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
 
