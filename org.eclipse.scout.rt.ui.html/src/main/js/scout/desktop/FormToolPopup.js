@@ -14,7 +14,7 @@ scout.inherits(scout.FormToolPopup, scout.Popup);
 
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
-  this.$container.addClass('form-tool');
+  this.$container.addClass('form-tool-popup');
 
   this._renderHead($parent);
   var form = this.formToolButton.form;
@@ -57,8 +57,8 @@ scout.FormToolPopup.prototype.attach = function() {
 };
 
 scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {
-  // close popup only if source of event is not this button.
-  if (this.formToolButton.$container[0] === event.target) {
+  // close popup only if source of event is not this button or it's child (icon).
+  if (this.formToolButton.$container.isOrHas(event.target)) {
     return;
   }
   this.formToolButton.setSelected(false);

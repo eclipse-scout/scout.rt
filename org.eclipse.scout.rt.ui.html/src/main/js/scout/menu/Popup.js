@@ -115,7 +115,7 @@ scout.Popup.prototype._onMouseDownOutside = function(event) {
 };
 
 scout.Popup.prototype._onHeadMouseDown = function(event) {
-  if (this.$head && this.$head[0] === event.target) {
+  if (this.$head && this.$head.isOrHas(event.target)) {
     this.closePopup();
   }
 };

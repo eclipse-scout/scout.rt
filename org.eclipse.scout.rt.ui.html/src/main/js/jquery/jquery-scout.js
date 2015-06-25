@@ -521,6 +521,13 @@
   };
 
   /**
+   * Returns whether the current element is the given element or has a child which is the given element.
+   */
+  $.fn.isOrHas = function(elem) {
+    return this[0] === elem || this.has(elem).length > 0;
+  };
+
+  /**
    * Makes any element movable with the mouse. If the argument '$handle' is missing, the entire
    * element can be used as a handle.
    */

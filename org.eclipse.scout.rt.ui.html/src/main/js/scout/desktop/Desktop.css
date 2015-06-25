@@ -51,7 +51,7 @@
   line-height: normal;
 }
 
-.popup.form-tool > .popup-body {
+.popup.form-tool-popup > .popup-body {
   border-bottom: 1px solid @border-color;
 }
 
