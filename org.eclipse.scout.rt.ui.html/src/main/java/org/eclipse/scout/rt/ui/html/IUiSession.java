@@ -42,6 +42,12 @@ public interface IUiSession {
   void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
 
   /**
+   * @return <code>true</code> if {@link #init(HttpServletRequest, JsonStartupRequest)} was been called. Note: This will
+   *         also be <code>true</code> after the session has been disposed.
+   */
+  boolean isInitialized();
+
+  /**
    * Returns a reentrant lock that can be used to synchronize on the {@link IUiSession}.
    */
   ReentrantLock uiSessionLock();
@@ -61,6 +67,11 @@ public interface IUiSession {
   long getLastAccessedTime();
 
   void dispose();
+
+  /**
+   * @return <code>true</code> if {@link #dispose()} has been called.
+   */
+  boolean isDisposed();
 
   void logout();
 

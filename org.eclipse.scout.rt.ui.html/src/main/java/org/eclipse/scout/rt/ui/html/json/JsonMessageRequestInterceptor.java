@@ -40,6 +40,8 @@ import org.slf4j.MDC;
 public class JsonMessageRequestInterceptor extends AbstractJsonRequestInterceptor implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
 
+  private static final int BACKGROUND_POLLING_INTERVAL_SECONDS = 60;
+
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
@@ -78,15 +80,17 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
 
         if (jsonReq.isPollForBackgroundJobsRequest()) {
-          // Blocks the current thread until:
-          // - a model job terminates
-          // - the max. wait time has exceeded
           int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
           int maxIdle = httpReq.getSession().getMaxInactiveInterval();
-          int pollWait = Math.max(Math.min(maxIdle - curIdle, 60), 0);
+          // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
+          // because that might trigger many very short polling calls until the ui session is really disposed.
+          int pollWait = Math.max(Math.min(maxIdle - curIdle, BACKGROUND_POLLING_INTERVAL_SECONDS), 3);
           if (LOG.isDebugEnabled()) {
             LOG.debug("polling begin for " + pollWait + " seconds");
           }
+          // Blocks the current thread until:
+          // - a model job terminates
+          // - the max. wait time has exceeded
           uiSession.waitForBackgroundJobs(pollWait);
           if (LOG.isDebugEnabled()) {
             LOG.debug("polling end after " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
@@ -104,8 +108,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         }
         uiSession.uiSessionLock().lock();
         try {
-          if (uiSession.currentJsonResponse() == null) {
-            // Missing current JSON response, probably because the UiSession is disposed -> send empty answer
+          if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
             writeResponse(httpResp, createSessionTerminatedResponse());
             return true;
           }
@@ -212,8 +215,9 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
 
       //check timeout
       int idleSeconds = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
-      if (idleSeconds > httpSession.getMaxInactiveInterval()) {
-        LOG.info("detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + httpSession.getMaxInactiveInterval() + ")");
+      int maxIdleSeconds = httpSession.getMaxInactiveInterval();
+      if (idleSeconds > maxIdleSeconds) {
+        LOG.info("detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + maxIdleSeconds + ")");
         httpSession.invalidate();
         writeResponse(resp, createSessionTimeoutResponse());
         return null;

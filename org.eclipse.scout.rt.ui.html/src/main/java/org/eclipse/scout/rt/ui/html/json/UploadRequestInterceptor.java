@@ -95,8 +95,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
         // GUI requests for the same session must be processed consecutively
         uiSession.uiSessionLock().lock();
         try {
-          if (uiSession.currentJsonResponse() == null) {
-            // Missing current JSON response, probably because the UiSession is disposed -> send empty answer
+          if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
             writeResponse(httpResp, createSessionTerminatedResponse());
             return true;
           }
@@ -165,6 +164,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
     if (uiSession == null) {
       throw new IllegalStateException("Could not resolve UI session with ID " + uiSessionId);
     }
+    uiSession.touch();
     return uiSession;
   }
 }

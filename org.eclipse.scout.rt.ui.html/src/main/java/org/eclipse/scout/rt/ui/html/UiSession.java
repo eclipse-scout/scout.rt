@@ -97,7 +97,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private HttpSession m_currentHttpSession;
   private final JsonEventProcessor m_jsonEventProcessor;
-  private boolean m_disposing;
+  private volatile boolean m_disposing;
+  private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private IJobListener m_modelJobFinishedListener;
   private final ArrayBlockingQueue<Object> m_backgroundJobNotificationQueue = new ArrayBlockingQueue<>(1, true);
@@ -157,10 +158,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }, m_modelJobFinishedListener);
   }
 
-  protected boolean isInitialized() {
-    return m_initialized;
-  }
-
   protected JsonResponse createJsonResponse() {
     return new JsonResponse();
   }
@@ -204,6 +201,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       throw new IllegalStateException("Already initialized");
     }
     m_initialized = true;
+    if (isDisposed()) {
+      throw new IllegalStateException("UiSession is disposed");
+    }
     touch();
 
     try {
@@ -239,6 +239,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentHttpRequest.set(null);
       m_currentJsonRequest = null;
     }
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return m_initialized;
   }
 
   @Override
@@ -408,6 +413,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void dispose() {
+    m_disposed = true;
     if (isProcessingJsonRequest()) {
       // If there is a request in progress just mark the session as being disposed.
       // The actual disposing happens before returning to the client, see processRequest.
@@ -422,6 +428,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
     m_currentHttpSession = null;
+  }
+
+  @Override
+  public boolean isDisposed() {
+    return m_disposed;
   }
 
   protected JsonAdapterRegistry getJsonAdapterRegistry() {
@@ -770,17 +781,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-      LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session");
-      // Dispose model (if session was not already stopped earlier by itself)
-      if (m_clientSession.isActive()) {
-        JobUtility.runModelJobAndAwait("fireDesktopClosingFromUI", m_clientSession, false, Callables.callable(new IRunnable() {
-          @Override
-          public void run() throws Exception {
+      // Ensure client session is stopped. Do this inside a model job, but do _not_ wait for it, because closing the
+      // desktop will eventually call logout(), where we try to invalidate the HTTP session again (which would block
+      // forever, if this method was still executing).
+      ModelJobs.schedule(new IRunnable() {
+        @Override
+        public void run() {
+          LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session");
+          // Dispose model (if session was not already stopped earlier by itself)
+          if (m_clientSession.isActive()) {
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
-        }));
-      }
-      LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
+          LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
+        }
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession)).name("Close desktop due to HTTP session invalidation"));
     }
   }
 

@@ -38,6 +38,7 @@ public class UiSessionTest {
 
     JsonTestUtility.endRequest(session);
     session.dispose();
+    assertTrue(session.isDisposed());
     session = null;
     JsonTestUtility.assertGC(ref);
   }
@@ -48,6 +49,7 @@ public class UiSessionTest {
     HttpSession httpSession = uiSession.currentHttpSession();
 
     uiSession.logout();
+    JsonTestUtility.endRequest(uiSession);
 
     Mockito.verify(httpSession).invalidate();
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(uiSession.currentJsonResponse(), "logout");
@@ -58,6 +60,7 @@ public class UiSessionTest {
   public void testSessionInvalidation() throws Exception {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
     IClientSession clientSession = uiSession.getClientSession();
+    assertFalse(uiSession.isDisposed());
 
     // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
     ((AbstractClientSession) clientSession).setMaxShutdownWaitTime(0);
@@ -69,6 +72,7 @@ public class UiSessionTest {
     uiSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
     assertFalse(clientSession.isActive());
+    assertTrue(uiSession.isDisposed());
 
     uiSession = null;
     JsonTestUtility.assertGC(ref);
