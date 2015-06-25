@@ -80,14 +80,6 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapter(getModel().getSelectedComponent());
-    attachAdapters(getModel().getComponents());
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
-  }
-
-  @Override
   protected void detachModel() {
     super.detachModel();
     if (m_calendarListener == null) {
@@ -95,6 +87,14 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     }
     getModel().removeCalendarListener(m_calendarListener);
     m_calendarListener = null;
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getSelectedComponent());
+    attachAdapters(getModel().getComponents());
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override

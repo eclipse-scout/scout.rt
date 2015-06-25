@@ -34,23 +34,28 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
 
   @Override
   protected void attachModel() {
-    if (m_localeListener == null) {
-      m_localeListener = new P_LocaleListener();
-      getModel().addPropertyChangeListener(IClientSession.PROP_LOCALE, m_localeListener);
+    super.attachModel();
+    if (m_localeListener != null) {
+      throw new IllegalStateException();
     }
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    attachAdapter(getModel().getDesktop());
+    m_localeListener = new P_LocaleListener();
+    getModel().addPropertyChangeListener(IClientSession.PROP_LOCALE, m_localeListener);
   }
 
   @Override
   protected void detachModel() {
-    if (m_localeListener != null) {
-      getModel().removePropertyChangeListener(m_localeListener);
-      m_localeListener = null;
+    super.detachModel();
+    if (m_localeListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removePropertyChangeListener(m_localeListener);
+    m_localeListener = null;
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getDesktop());
   }
 
   @Override

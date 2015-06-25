@@ -27,7 +27,6 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
 
   public static final String PROP_IMAGE_URL = "imageUrl";
 
-  private PropertyChangeListener m_imagePropertyChangeListener;
   private PropertyChangeListener m_contextMenuListener;
 
   public JsonImageField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -65,20 +64,6 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   @Override
   protected void attachModel() {
     super.attachModel();
-    // field
-    if (m_imagePropertyChangeListener != null) {
-      throw new IllegalStateException();
-    }
-    m_imagePropertyChangeListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (CompareUtility.isOneOf(evt.getPropertyName(), IImageField.PROP_IMAGE, IImageField.PROP_IMAGE_ID)) {
-          handleModelImageOrImageIdChanged();
-        }
-      }
-    };
-    getModel().addPropertyChangeListener(m_imagePropertyChangeListener);
-    // context menu
     if (m_contextMenuListener != null) {
       throw new IllegalStateException();
     }
@@ -96,13 +81,6 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   @Override
   protected void detachModel() {
     super.detachModel();
-    // field
-    if (m_imagePropertyChangeListener == null) {
-      throw new IllegalStateException();
-    }
-    getModel().removePropertyChangeListener(m_imagePropertyChangeListener);
-    m_imagePropertyChangeListener = null;
-    // context menu
     if (m_contextMenuListener == null) {
       throw new IllegalStateException();
     }
@@ -120,6 +98,16 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
       json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
     }
     return json;
+  }
+
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+    if (CompareUtility.isOneOf(propertyName, IImageField.PROP_IMAGE, IImageField.PROP_IMAGE_ID)) {
+      handleModelImageOrImageIdChanged();
+    }
+    else {
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
+    }
   }
 
   protected void handleModelImageOrImageIdChanged() {
