@@ -61,8 +61,7 @@ public class JsonCellToJsonTest {
   }
 
   /**
-   * Don't send value and text if they are equal. They may be equal if the date column uses the same pattern as
-   * {@link JsonDate}.
+   * Don't send value and text if they are equal.
    */
   @Test
   public void testLongColumn() throws ProcessingException, JSONException {
@@ -126,10 +125,6 @@ public class JsonCellToJsonTest {
     assertTrue(jsonObj instanceof String);
   }
 
-  /**
-   * Don't send value and text if they are equal. They may be equal if the date column uses the same pattern as
-   * {@link JsonDate}.
-   */
   @Test
   public void testBooleanColumn() throws ProcessingException, JSONException {
     TableWithBooleanColumn table = new TableWithBooleanColumn();
@@ -139,7 +134,6 @@ public class JsonCellToJsonTest {
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
 
     JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
-    Assert.assertNull(jsonObj.optString("text", null));
     Assert.assertEquals(true, jsonObj.get("value"));
 
     table.getColumn().setValue(row, false);
