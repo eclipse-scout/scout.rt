@@ -402,6 +402,22 @@ Migration:
   method was introduced on IButton and IAction (because it does not make sense to make a button "mandatory"). This can be
   migrated by just deleting the third argument.
 
-OSC 24.04.2015:
+OSC 24.06.2015:
 IClientSession.stopSession() was renamed to stop() to match IServerSession.stop().
 Migration: Rename stopSession() to stop().
+
+MOT 25.06.2015:
+API changes AbstractHtmlField:
+- For IHtmlField attachments RemoteFile has been replaced by BinaryResource, therefore method signatures of getAttachments() and setAttachments have changed.
+--> Migration: Replace RemoteFile with BinaryResource.
+- Attachments must be used within the IHtmlField's value as [...] src="binaryResource:test.png" [...] (instead of src="test.png").
+--> Migration: Preprend binaryResource: where attachments are used.
+- New feature: Icons can be used w/o adding them as attachment using [...] src="iconid:ApplicationLogo" [...].
+--> No migration needed (new feature), but old attachments refering to icons could be replaced with this new feature.
+API changes AbstractStringField:
+- Method renaming: getConfiguredDecorationLink() -> getConfiguredHasAction()
+- Method renaming: isDecorationLink() -> isHasAction()
+- Method renaming: setDecorationLink(boolean) -> setHasAction(boolean)
+--> Migration: Replace old method name with new name.
+- Method renaming/signature change: execLinkAction(java.net.URL) -> execAction()
+--> Migration: execAction() can access value using getValue(), it could create the old URL using org.eclipse.scout.commons.IOUtility.urlTextToUrl(getValue())
