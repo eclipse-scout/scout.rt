@@ -18,8 +18,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -31,11 +35,18 @@ import org.junit.Test;
  * Test for {@link TableEventBuffer}
  */
 public class TableEventBufferTest {
+
   private TableEventBuffer m_testBuffer;
+
+  // Maps to generate each row/column only once (TableEventBuffer checks for reference equality)
+  private Map<Integer, ITableRow> m_mockRows;
+  private Map<Integer, IColumn<?>> m_mockColumns;
 
   @Before
   public void setup() {
     m_testBuffer = new TableEventBuffer();
+    m_mockRows = new HashMap<>();
+    m_mockColumns = new HashMap<>();
   }
 
   /**
@@ -412,6 +423,33 @@ public class TableEventBufferTest {
     assertEquals(5, events.get(0).getRowCount());
   }
 
+  /**
+   * If two rows are deleted separately, both should be present in the event list. This test checks that checks are
+   * _not_
+   * done by checking for the same rowIndex.
+   */
+  @Test
+  public void testDeleteTwoRows() {
+    List<ITableRow> mockRows = mockRows(0, 1, 2, 3, 4);
+    ITable table = mock(ITable.class);
+    final TableEvent event1 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(mockRows.get(2)));
+    final TableEvent event2 = new TableEvent(table, TableEvent.TYPE_ROWS_DELETED, Collections.singletonList(mockRows.get(2)));
+    final TableEvent event3 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(mockRows.get(3)));
+    final TableEvent event4 = new TableEvent(table, TableEvent.TYPE_ROWS_DELETED, Collections.singletonList(mockRows.get(3)));
+    final TableEvent event5 = new TableEvent(table, TableEvent.TYPE_ROW_ORDER_CHANGED, Arrays.asList(mockRows.get(4), mockRows.get(1), mockRows.get(0)));
+    m_testBuffer.add(event1);
+    m_testBuffer.add(event2);
+    m_testBuffer.add(event3);
+    m_testBuffer.add(event4);
+    m_testBuffer.add(event5);
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(2, events.size());
+    assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(0).getType());
+    assertEquals(2, events.get(0).getRowCount());
+    assertEquals(TableEvent.TYPE_ROW_ORDER_CHANGED, events.get(1).getType());
+    assertEquals(3, events.get(1).getRowCount());
+  }
+
   private TableEvent createTestUpdateEvent() {
     return new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1));
   }
@@ -440,14 +478,22 @@ public class TableEventBufferTest {
   }
 
   private ITableRow mockRow(int rowIndex) {
-    final ITableRow row = mock(ITableRow.class, "MockRow[" + rowIndex + "]");
-    when(row.getRowIndex()).thenReturn(rowIndex);
+    ITableRow row = m_mockRows.get(rowIndex);
+    if (row == null) {
+      row = mock(ITableRow.class, "MockRow[" + rowIndex + "]");
+      when(row.getRowIndex()).thenReturn(rowIndex);
+      m_mockRows.put(rowIndex, row);
+    }
     return row;
   }
 
   private IColumn<?> mockColumn(int colIndex) {
-    final IColumn column = mock(IColumn.class, "MockColumn[" + colIndex + "]");
-    when(column.getColumnIndex()).thenReturn(colIndex);
+    IColumn<?> column = m_mockColumns.get(colIndex);
+    if (column == null) {
+      column = mock(IColumn.class, "MockColumn[" + colIndex + "]");
+      when(column.getColumnIndex()).thenReturn(colIndex);
+      m_mockColumns.put(colIndex, column);
+    }
     return column;
   }
 }

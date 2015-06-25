@@ -13,12 +13,10 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -45,10 +43,10 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   protected List<TableEvent> coalesce(List<TableEvent> events) {
     removeObsolete(events);
     replacePrevious(events, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED);
-    coalesceSameType(events);
-    applyRowOrderChangedToRowsInserted(events);
     removeEmptyEvents(events);
     removeIdenticalEvents(events);
+    coalesceSameType(events);
+    applyRowOrderChangedToRowsInserted(events);
     return events;
   }
 
@@ -117,7 +115,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     List<ITableRow> rows = event.getRows();
     for (Iterator<ITableRow> it = rows.iterator(); it.hasNext();) {
       ITableRow row = it.next();
-      if (row.getRowIndex() == rowToRemove.getRowIndex()) {
+      if (row == rowToRemove) {
         it.remove();
         removed = true;
       }
@@ -192,7 +190,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     List<ITableRow> targetRows = new ArrayList<>();
     boolean replaced = false;
     for (ITableRow row : event.getRows()) {
-      if (row.getRowIndex() == newRow.getRowIndex()) {
+      if (row == newRow) {
         row = newRow;
         replaced = true;
       }
@@ -232,14 +230,13 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   }
 
   /**
-   * Merge list of rows, such that, if a row of the same index is in both lists, only the one of the second list (later
-   * event) is kept.
+   * Merge list of rows, such that, if a row is in both lists, only the one of the second list (later event) is kept.
    */
   protected List<ITableRow> mergeRows(List<ITableRow> first, List<ITableRow> second) {
     List<ITableRow> rows = new ArrayList<>();
-    Map<Integer, ITableRow> rowIndexes = getRowsByRowIndexMap(second);
+    Set<ITableRow> secondRowSet = new HashSet<>(second);
     for (ITableRow row : first) {
-      if (!rowIndexes.containsKey(row.getRowIndex())) {
+      if (!secondRowSet.contains(row)) {
         rows.add(row);
       }
     }
@@ -249,34 +246,14 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     return rows;
   }
 
-  protected Map<Integer, ITableRow> getRowsByRowIndexMap(List<ITableRow> rows) {
-    Map<Integer, ITableRow> rowsByRowIndex = new HashMap<>();
-    for (ITableRow row : rows) {
-      rowsByRowIndex.put(row.getRowIndex(), row);
-    }
-    return rowsByRowIndex;
-  }
-
-  protected Set<Integer> getRowIndexSet(List<ITableRow> rows) {
-    Set<Integer> rowIndexes = new HashSet<>();
-    for (ITableRow row : rows) {
-      rowIndexes.add(row.getRowIndex());
-    }
-    return rowIndexes;
-  }
-
   /**
-   * Merge list of cols, such that, if a column of the same index is in both lists, only the one of the second list
-   * (later event) is kept.
+   * Merge list of cols, such that, if a column is in both lists, only the one of the second list (later event) is kept.
    */
   protected Collection<IColumn<?>> mergeColumns(Collection<IColumn<?>> first, Collection<IColumn<?>> second) {
     List<IColumn<?>> cols = new ArrayList<>();
-    Map<Integer, IColumn<?>> colIndexes = new HashMap<>();
-    for (IColumn<?> column : second) {
-      colIndexes.put(column.getColumnIndex(), column);
-    }
+    Set<IColumn<?>> secondColumnSet = new HashSet<>(second);
     for (IColumn<?> column : first) {
-      if (!colIndexes.containsKey(column.getColumnIndex())) {
+      if (!secondColumnSet.contains(column)) {
         cols.add(column);
       }
     }
@@ -299,7 +276,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         TableEvent previous = findInsertionBeforeRowOrderChanged(events.subList(0, i));
         // Check if previous is ROWS_INSERTED and they have the same rows
         if (previous != null && previous.getType() == TableEvent.TYPE_ROWS_INSERTED &&
-            event.getRowCount() == previous.getRowCount() && getRowIndexSet(event.getRows()).equals(getRowIndexSet(previous.getRows()))) {
+            event.getRowCount() == previous.getRowCount() && CollectionUtility.equalsCollection(event.getRows(), previous.getRows(), false)) {
           // replace rows and remove ROW_ORDER_CHANGED event
           previous.setRows(event.getRows());
           events.remove(i);

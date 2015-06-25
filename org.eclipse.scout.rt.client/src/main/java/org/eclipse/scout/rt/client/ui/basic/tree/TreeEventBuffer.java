@@ -42,9 +42,9 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     removeNodesContainedInPreviousEvents(events, TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODES_INSERTED);
     removeNodesContainedInPreviousEvents(events, TreeEvent.TYPE_NODE_CHANGED, TreeEvent.TYPE_NODES_INSERTED);
     removeNodesContainedInPreviousEvents(events, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_INSERTED);
-    coalesceSameType(events);
     removeEmptyEvents(events);
     removeIdenticalEvents(events);
+    coalesceSameType(events);
     return events;
   }
 
