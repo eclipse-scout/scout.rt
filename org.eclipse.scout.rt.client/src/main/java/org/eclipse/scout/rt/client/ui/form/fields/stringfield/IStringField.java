@@ -19,7 +19,7 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   /**
    * @see IDNDSupport
    */
-  String PROP_DECORATION_LINK = "decorationLink";
+  String PROP_HAS_ACTION = "hasAction";
   String PROP_INPUT_MASKED = "inputMasked";
   String PROP_WRAP_TEXT = "wrapText";
   String PROP_MULTILINE_TEXT = "multilineText";
@@ -54,9 +54,9 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
 
   boolean isFormatLower();
 
-  void setDecorationLink(boolean b);
+  void setHasAction(boolean b);
 
-  boolean isDecorationLink();
+  boolean isHasAction();
 
   void setWrapText(boolean b);
 

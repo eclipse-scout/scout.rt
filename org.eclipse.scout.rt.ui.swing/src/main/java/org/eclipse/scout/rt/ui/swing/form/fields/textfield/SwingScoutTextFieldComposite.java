@@ -97,7 +97,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
   @Override
   protected void attachScout() {
     IStringField f = getScoutObject();
-    setDecorationLinkFromScout(f.isDecorationLink());
+    setDecorationLinkFromScout(f.isHasAction());
     setFormatFromScout(f.getFormat());
     setMaxLengthFromScout(f.getMaxLength());
     setMultilineTextFromScout(f.isMultilineText());
@@ -298,7 +298,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(IStringField.PROP_DECORATION_LINK)) {
+    if (name.equals(IStringField.PROP_HAS_ACTION)) {
       setDecorationLinkFromScout(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IStringField.PROP_MAX_LENGTH)) {
@@ -319,12 +319,11 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
   }
 
   protected void handleSwingLinkTrigger() {
-    final String text = getSwingTextComponent().getText();
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().fireLinkActionFromUI(text);
+        getScoutObject().getUIFacade().fireActionFromUI();
       }
     };
 

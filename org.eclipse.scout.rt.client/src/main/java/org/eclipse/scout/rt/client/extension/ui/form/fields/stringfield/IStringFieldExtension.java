@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield;
 
-import java.net.URL;
-
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension;
@@ -27,7 +25,7 @@ public interface IStringFieldExtension<OWNER extends AbstractStringField> extend
 
   void execDropRequest(StringFieldDropRequestChain chain, TransferObject transferObject);
 
-  void execLinkAction(StringFieldLinkActionChain chain, URL url) throws ProcessingException;
+  void execAction(StringFieldLinkActionChain chain) throws ProcessingException;
 
   TransferObject execDragRequest(StringFieldDragRequestChain chain);
 

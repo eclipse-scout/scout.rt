@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -45,14 +44,14 @@ public final class StringFieldChains {
       super(extensions);
     }
 
-    public void execLinkAction(final URL url) throws ProcessingException {
+    public void execAction() throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IStringFieldExtension<? extends AbstractStringField> next) throws ProcessingException {
-          next.execLinkAction(StringFieldLinkActionChain.this, url);
+          next.execAction(StringFieldLinkActionChain.this);
         }
       };
-      callChain(methodInvocation, url);
+      callChain(methodInvocation);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

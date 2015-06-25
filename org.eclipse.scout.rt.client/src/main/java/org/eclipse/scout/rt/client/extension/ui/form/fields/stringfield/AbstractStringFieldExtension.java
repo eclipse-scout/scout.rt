@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield;
 
-import java.net.URL;
-
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractBasicFieldExtension;
@@ -38,8 +36,8 @@ public abstract class AbstractStringFieldExtension<OWNER extends AbstractStringF
   }
 
   @Override
-  public void execLinkAction(StringFieldLinkActionChain chain, URL url) throws ProcessingException {
-    chain.execLinkAction(url);
+  public void execAction(StringFieldLinkActionChain chain) throws ProcessingException {
+    chain.execAction();
   }
 
   @Override

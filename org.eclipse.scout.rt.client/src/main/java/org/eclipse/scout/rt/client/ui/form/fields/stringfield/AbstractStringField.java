@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
-import java.net.URL;
 import java.util.List;
 
-import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -59,7 +57,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(260)
-  protected boolean getConfiguredDecorationLink() {
+  protected boolean getConfiguredHasAction() {
     return false;
   }
 
@@ -186,12 +184,12 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
-   * When a link is marked as link this method will be called. Implement it to
+   * When a field is marked as link this method will be called. Implement it to
    * add a link action behaviour.
    */
   @ConfigOperation
   @Order(240)
-  protected void execLinkAction(URL url) throws ProcessingException {
+  protected void execAction() throws ProcessingException {
   }
 
   @Override
@@ -209,7 +207,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     else {
       setFormat(getConfiguredFormat());
     }
-    setDecorationLink(getConfiguredDecorationLink());
+    setHasAction(getConfiguredHasAction());
     setWrapText(getConfiguredWrapText());
     setMultilineText(getConfiguredMultilineText());
     int configuredDragType = getConfiguredDragType();
@@ -305,13 +303,13 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   @Override
-  public void setDecorationLink(boolean b) {
-    propertySupport.setPropertyBool(PROP_DECORATION_LINK, b);
+  public void setHasAction(boolean b) {
+    propertySupport.setPropertyBool(PROP_HAS_ACTION, b);
   }
 
   @Override
-  public boolean isDecorationLink() {
-    return propertySupport.getPropertyBool(PROP_DECORATION_LINK);
+  public boolean isHasAction() {
+    return propertySupport.getPropertyBool(PROP_HAS_ACTION);
   }
 
   @Override
@@ -426,13 +424,12 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
      * #fireLinkActionFromUI(java.lang.String)
      */
     @Override
-    public void fireLinkActionFromUI(String text) {
-      URL url = IOUtility.urlTextToUrl(text);
+    public void fireActionFromUI() {
       try {
-        interceptLinkAction(url);
+        interceptAction();
       }
       catch (ProcessingException e) {
-        LOG.warn("execLinkAction failed", e);
+        LOG.warn("execAction failed", e);
       }
     }
 
@@ -459,7 +456,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * {@link AbstractStringField#setSpellCheckEnabled(boolean)}.
    */
   protected boolean computeSpellCheckEnabled() {
-    return !this.isDecorationLink()
+    return !this.isHasAction()
         && !this.isFormatUpper()
         && !this.isFormatLower()
         && this.isMultilineText();
@@ -502,8 +499,8 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     }
 
     @Override
-    public void execLinkAction(StringFieldLinkActionChain chain, URL url) throws ProcessingException {
-      getOwner().execLinkAction(url);
+    public void execAction(StringFieldLinkActionChain chain) throws ProcessingException {
+      getOwner().execAction();
     }
 
     @Override
@@ -519,10 +516,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     chain.execDropRequest(transferObject);
   }
 
-  protected final void interceptLinkAction(URL url) throws ProcessingException {
+  protected final void interceptAction() throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     StringFieldLinkActionChain chain = new StringFieldLinkActionChain(extensions);
-    chain.execLinkAction(url);
+    chain.execAction();
   }
 
   protected final TransferObject interceptDragRequest() {
