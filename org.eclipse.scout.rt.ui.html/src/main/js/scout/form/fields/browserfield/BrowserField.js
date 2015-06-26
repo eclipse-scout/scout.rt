@@ -45,7 +45,7 @@ scout.BrowserField.prototype._renderScrollBarsEnabled = function() {
 
 scout.BrowserField.prototype._renderSandbox = function() {
   if (this.sandboxEnabled) {
-    this.$field.attr('sandbox', scout.helpers.nvl(this.sandboxRestrictions, ''));
+    this.$field.attr('sandbox', scout.helpers.nvl(this.sandboxPermissions, ''));
     if (scout.device.supportsIframeSecurityAttribute()) {
       this.$field.attr('security', 'restricted');
     }
