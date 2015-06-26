@@ -3,7 +3,7 @@ scout.SmartFieldMultiline = function(lookupStrategy) {
   this.options;
   this._$multilineField;
 };
-scout.inherits(scout.SmartFieldMultiline, scout.AbstractSmartField);
+scout.inherits(scout.SmartFieldMultiline, scout.SmartField);
 
 scout.SmartFieldMultiline.prototype._render = function($parent) {
   var $field, htmlComp;
@@ -29,6 +29,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
     .appendTo(this.$fieldContainer);
 
   this.addStatus();
+  this.addSmartFieldPopup();
 };
 
 /**
@@ -41,7 +42,7 @@ scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
 };
 
 /**
- * @override AbstractSmartField
+ * @override SmartField
  */
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   var fieldBounds = scout.graphics.offsetBounds(this.$fieldContainer),

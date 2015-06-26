@@ -57,6 +57,14 @@
   background-color: white;
   .drop-shadow();
   .focus-border;
+
+  &.down {
+    margin-top: 5px;
+  }
+
+  &.up {
+    margin-bottom: 5px;
+  }
 }
 
 .measurement {

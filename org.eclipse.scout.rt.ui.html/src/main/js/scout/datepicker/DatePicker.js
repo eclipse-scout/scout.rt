@@ -13,7 +13,6 @@ scout.inherits(scout.DatePicker, scout.Widget);
 
 scout.DatePicker.prototype._render = function($parent) {
   this.$container = $.makeDiv('date-picker')
-    .mousedown(this._onMouseDown.bind(this))
     .appendTo($parent);
 
   this._$header = this._build$Header().appendTo(this.$container);
@@ -145,12 +144,6 @@ scout.DatePicker.prototype._onMouseWheel = function(event) {
   this.shiftViewDate(0, diff, 0);
 
   event.preventDefault();
-};
-
-scout.DatePicker.prototype._onMouseDown = function(event) {
-  // Make sure field blur won't be triggered (using preventDefault).
-  // Also makes sure event does not get propagated (and handled by another mouse down handler, e.g. the one from CellEditorPopup.js)
-  return false;
 };
 
 scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {

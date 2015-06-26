@@ -1,6 +1,6 @@
-describe("AbstractSmartField", function() {
+describe("SmartField", function() {
 
-  var smartField = new scout.AbstractSmartField();
+  var smartField = new scout.SmartField();
 
   describe("_onKeyUp", function() {
 
@@ -16,6 +16,7 @@ describe("AbstractSmartField", function() {
 
     it("calls _openProposal() when a character key has been pressed", function() {
       smartField._browseOnce = true;
+      smartField._popup = {};
       smartField._openProposal = function(searchText, selectCurrentValue) {};
       smartField.$field = $('<input>');
       var event = {

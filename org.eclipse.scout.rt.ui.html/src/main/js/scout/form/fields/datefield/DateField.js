@@ -104,6 +104,7 @@ scout.DateField.prototype._renderHasDate = function() {
       dateFormat: this.isolatedDateFormat,
       $anchor: this.$field
     });
+    this.addChild(this._datePickerPopup);
     this._datePickerPopup.picker.on('dateSelect', this._onDateSelected.bind(this));
     if (this.timestamp) {
       this.$dateField.val(this.isolatedDateFormat.format(new Date(this.timestamp)));
