@@ -338,7 +338,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   protected void handleModelResourcesUpdated(List<? extends Resource> resources) {
     JSONArray jsonResources = new JSONArray();
     for (Resource resource : resources) {
-      Object jsonResource = resourceToJson(resource);
+      Object jsonResource = resourceToJson(resource, new P_GetOrCreateResourceIdProvider(), new P_GetOrCreateCellIdProvider());
       jsonResources.put(jsonResource);
     }
     JSONObject jsonEvent = new JSONObject();

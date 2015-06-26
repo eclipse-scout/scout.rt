@@ -741,7 +741,7 @@ scout.Planner.prototype._findRow = function(y) {
 
 scout.Planner.prototype._findScale = function(x) {
   var y = this.$scale.offset().top + this.$scale.height() * 0.75,
-    $scale = $(document.elementFromPoint(event.pageX, y));
+    $scale = $(document.elementFromPoint(x, y));
 
   if ($scale.data('date-from') !== undefined) {
     return {
