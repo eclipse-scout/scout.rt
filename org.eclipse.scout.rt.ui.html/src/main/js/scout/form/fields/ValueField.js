@@ -101,11 +101,13 @@ scout.ValueField.prototype._onFieldBlur = function() {
 //   wird typischerweise auch im _onChange oder _onKeyUp aufgerufen.
 //   ruft typischerweise auch sendDisplayText(displayText) auf
 
-scout.ValueField.prototype.displayTextChanged = function(whileTyping, forceSend) {
+scout.ValueField.prototype.displayTextChanged = function(whileTyping) {
   var displayText = scout.helpers.nvl(this._readDisplayText(), ''),
     oldDisplayText = scout.helpers.nvl(this.displayText, '');
 
-  if (forceSend || displayText !== oldDisplayText) {
+  // send only if displayText has really changed OR if updateDisplayTextOnModify is true
+  // 2. check is necessary to make sure the value and not only the display text gets written to the model (IBasicFieldUIFacade.parseAndSetValueFromUI vs setDisplayTextFromUI)
+  if (displayText !== oldDisplayText || !whileTyping && this.updateDisplayTextOnModify) {
     this.displayText = displayText;
     this._sendDisplayTextChanged(displayText, !! whileTyping);
   }
