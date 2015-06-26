@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
-import org.json.JSONObject;
 
 public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonViewButton<T> {
 
@@ -41,13 +40,6 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonVie
       }
     });
     getJsonProperty(IAction.PROP_SELECTED).addSlaveProperty(getJsonProperty("outline"));
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    json.put("displayStyle", getModel().getDisplayStyle());
-    return json;
   }
 
 }
