@@ -51,13 +51,13 @@ import org.junit.runner.RunWith;
 public class SwingEnvironmentUiTest {
 
   private TestForm m_testForm;
-  private static final String TEST_CLASS_ID = "testClassId";
+  private static final String TEST_STRING_FIELD_CLASS_ID = "testClassId";
   private static final String TEST_MAIN_BOX_CLASS_ID = "mainBoxId";
 
   @Before
   public void setUp() throws ProcessingException {
     m_testForm = new TestForm();
-    m_testForm.setClassId(TEST_CLASS_ID);
+    m_testForm.setClassId(TEST_STRING_FIELD_CLASS_ID);
   }
 
   @After
@@ -73,7 +73,7 @@ public class SwingEnvironmentUiTest {
     System.setProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwingEnvironment env = createEnvironment();
     ISwingScoutForm f = env.createForm((JComponent) null, m_testForm);
-    assertEquals(TEST_CLASS_ID, getTestId(f));
+    assertEquals(TEST_STRING_FIELD_CLASS_ID, getTestId(f));
   }
 
   /**
@@ -88,7 +88,7 @@ public class SwingEnvironmentUiTest {
     System.setProperty(AbstractSwingEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwingEnvironment env = createEnvironment();
     ISwingScoutFormField f = env.createFormField((JComponent) null, m_testForm.getStringField());
-    assertEquals(TEST_CLASS_ID, getTestId(f));
+    assertEquals(TEST_STRING_FIELD_CLASS_ID, getTestId(f));
   }
 
   /**
@@ -183,7 +183,7 @@ public class SwingEnvironmentUiTest {
     public class MainBox extends AbstractGroupBox {
 
       @Order(10.0)
-      @ClassId(TEST_CLASS_ID)
+      @ClassId(TEST_STRING_FIELD_CLASS_ID)
       public class StringField extends AbstractStringField {
       }
     }
