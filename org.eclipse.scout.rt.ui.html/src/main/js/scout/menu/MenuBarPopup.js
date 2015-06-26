@@ -105,7 +105,3 @@ scout.MenuBarPopup.prototype.alignTo = function() {
 
   this.setLocation(new scout.Point(left, top));
 };
-
-scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.PopupMenuItemKeyStrokeAdapter(this);
-};

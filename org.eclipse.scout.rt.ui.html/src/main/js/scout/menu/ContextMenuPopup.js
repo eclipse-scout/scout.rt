@@ -92,6 +92,6 @@ scout.ContextMenuPopup.prototype._cloneMenuItem = function(menuItem) {
 };
 
 scout.ContextMenuPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.PopupMenuItemKeyStrokeAdapter(this);
+  return new scout.ContextMenuKeyStrokeAdapter(this);
 };
 
