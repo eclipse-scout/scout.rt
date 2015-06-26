@@ -11,7 +11,11 @@
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.VerboseUtility;
@@ -36,6 +40,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   private int m_rowChanging = 0;
   private boolean m_rowPropertiesChanged;
   private boolean m_filterAccepted = true;
+  private final Set<ICell> m_updatedCells = new HashSet<>();
 
   private InternalTableRow() {
     super(null);
@@ -232,6 +237,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
         if (getTable() != null) {
           getTable().updateRow(this);
         }
+        m_updatedCells.clear();
       }
     }
   }
@@ -244,6 +250,24 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   @Override
   public void setRowPropertiesChanged(boolean b) {
     m_rowPropertiesChanged = b;
+  }
+
+  @Override
+  public Set<Integer> getUpdatedColumnIndexes() {
+    // Prepare index
+    Map<ICell, Integer> indexesByCell = new HashMap<>();
+    for (int i = 0; i < m_cells.size(); i++) {
+      indexesByCell.put(m_cells.get(i), i);
+    }
+    // Build result set
+    Set<Integer> result = new HashSet<>();
+    for (ICell cell : m_updatedCells) {
+      Integer index = indexesByCell.get(cell);
+      if (index != null) {
+        result.add(index);
+      }
+    }
+    return result;
   }
 
   @Override
@@ -443,6 +467,8 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
         }
       }
       m_rowPropertiesChanged = true;
+      // Remember changed column
+      m_updatedCells.add(cell);
     }
     finally {
       setRowChanging(false);

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,6 +32,7 @@ public class TableRow implements ITableRow {
   private String m_cssClass;
   protected final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
+  private Set<Integer> m_updatedColumnIndexes;
 
   /**
    * @param columnSet
@@ -390,8 +392,17 @@ public class TableRow implements ITableRow {
   }
 
   @Override
+  public Set<Integer> getUpdatedColumnIndexes() {
+    return CollectionUtility.hashSet(m_updatedColumnIndexes);
+  }
+
+  @Override
+  public void setUpdatedColumnIndexes(Set<Integer> updatedColumnIndexes) {
+    m_updatedColumnIndexes = updatedColumnIndexes;
+  }
+
+  @Override
   public String toString() {
     return getClass().getSimpleName() + m_cells;
   }
-
 }

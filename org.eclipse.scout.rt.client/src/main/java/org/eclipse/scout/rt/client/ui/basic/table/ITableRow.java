@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -162,6 +163,18 @@ public interface ITableRow {
   boolean isRowPropertiesChanged();
 
   void setRowPropertiesChanged(boolean b);
+
+  /**
+   * @return set of column indexes that have been updated on the current table row (only valid during "rowChanging", by
+   *         default only on InternalTableRow). Return value is never <code>null</code>.
+   */
+  Set<Integer> getUpdatedColumnIndexes();
+
+  /**
+   * Manually set result for {@link #getUpdatedColumnIndexes()}. May have no effect when
+   * {@link #getUpdatedColumnIndexes()} is overridden by subclass.
+   */
+  void setUpdatedColumnIndexes(Set<Integer> updatedColumnIndexes);
 
   boolean isRowChanging();
 

@@ -3869,7 +3869,25 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;
     }
-    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_UPDATED, rows));
+    TableEvent e = new TableEvent(this, TableEvent.TYPE_ROWS_UPDATED, rows);
+    // For each row, add information about updated columns to the event. (A row may also be updated if
+    // not specific column was changed, e.g. when a row's enabled state changes.)
+    for (ITableRow row : rows) {
+      // Convert column indexes to IColumns
+      Set<Integer> columnIndexes = row.getUpdatedColumnIndexes();
+      if (!columnIndexes.isEmpty()) {
+        Set<IColumn<?>> columns = new HashSet<>();
+        for (Integer columnIndex : columnIndexes) {
+          IColumn<?> column = getColumns().get(columnIndex);
+          if (column != null) {
+            columns.add(column);
+          }
+        }
+        // Put updated columns into event
+        e.setUpdatedColumns(row, columns);
+      }
+    }
+    fireTableEventInternal(e);
   }
 
   /**

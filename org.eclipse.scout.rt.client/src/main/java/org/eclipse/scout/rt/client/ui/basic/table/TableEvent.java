@@ -14,8 +14,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -149,6 +152,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   private TransferObject m_dropObject;
   private TransferObject m_copyObject;
   private Collection<? extends IColumn<?>> m_columns;
+  private Map<ITableRow, Set<IColumn<?>>> m_updatedColumns;
   private boolean m_sortInMemoryAllowed;
 
   public TableEvent(ITable source, int type) {
@@ -288,6 +292,33 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
 
   protected void setColumns(Collection<? extends IColumn<?>> columns) {
     m_columns = columns;
+  }
+
+  /**
+   * Used by {@link #TYPE_ROWS_UPDATED}
+   */
+  protected void setUpdatedColumns(ITableRow row, Set<IColumn<?>> updateColumns) {
+    if (m_updatedColumns == null) {
+      m_updatedColumns = new HashMap<>();
+    }
+    m_updatedColumns.put(row, updateColumns);
+  }
+
+  /**
+   * Used by {@link #TYPE_ROWS_UPDATED}. Return value is never <code>null</code>.
+   */
+  public Map<ITableRow, Set<IColumn<?>>> getUpdatedColumns() {
+    if (m_updatedColumns == null) {
+      return new HashMap<>();
+    }
+    return new HashMap<>(m_updatedColumns);
+  }
+
+  /**
+   * Used by {@link #TYPE_ROWS_UPDATED}. Return value is never <code>null</code>.
+   */
+  public Set<IColumn<?>> getUpdatedColumns(ITableRow row) {
+    return CollectionUtility.hashSet(m_updatedColumns == null ? null : m_updatedColumns.get(row));
   }
 
   /**
