@@ -21,7 +21,9 @@
 
   <modules>
     <module>../org.eclipse.scout.rt.ui.html</module>
+    <module>../org.eclipse.scout.rt.ui.html.test</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
+    <module>../org.eclipse.scout.rt.ui.html.scriptprocessor.test</module>
     <module>../org.eclipse.scout.rt.ui.html.client.ext</module>
     <module>../org.eclipse.scout.rt.officeaddin.parent</module>
     <module>../org.eclipse.scout.rt.svg.ui.html</module>
@@ -31,20 +33,20 @@
     <dependencies>
       <!-- Build Dependencies -->
       <dependency>
+        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
-        <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <artifactId>org.eclipse.scout.rt.ui.html.client.ext</artifactId>
         <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+        <artifactId>org.eclipse.scout.rt.ui.html.client.ext</artifactId>
         <version>${project.version}</version>
       </dependency>
 

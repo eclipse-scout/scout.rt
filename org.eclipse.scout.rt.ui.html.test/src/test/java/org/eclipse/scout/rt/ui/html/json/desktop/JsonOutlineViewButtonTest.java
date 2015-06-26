@@ -54,7 +54,7 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
     button.setSelected(true);
@@ -71,11 +71,11 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
-
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
-    JsonEvent event = createJsonClickedEvent(jsonViewButton.getId());
+    JsonEvent event = createJsonDoActionEvent(jsonViewButton.getId());
+    assertEquals("doAction", event.getType());
     jsonViewButton.handleUiEvent(event);
 
     // Outline needs to be created and sent if selection changes to true
@@ -92,7 +92,7 @@ public class JsonOutlineViewButtonTest {
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
     button.setSelected(true);
-    JsonViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
 
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);
@@ -102,8 +102,8 @@ public class JsonOutlineViewButtonTest {
     assertNull(outlineId);
   }
 
-  public static JsonEvent createJsonClickedEvent(String adapterId) throws JSONException {
-    return new JsonEvent(adapterId, "clicked", null);
+  private static JsonEvent createJsonDoActionEvent(String adapterId) throws JSONException {
+    return new JsonEvent(adapterId, "doAction", null);
   }
 
 }

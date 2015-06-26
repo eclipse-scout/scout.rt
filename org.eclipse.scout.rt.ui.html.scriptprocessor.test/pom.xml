@@ -16,12 +16,8 @@
     <relativePath>../org.eclipse.scout.rt.ui.html.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
+  <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor.test</artifactId>
   <packaging>jar</packaging>
-
-  <properties>
-    <scout.script.version>5.0.0</scout.script.version>
-  </properties>
 
   <build>
     <plugins>
@@ -33,39 +29,26 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
-
-      <!-- TODO AWE: move the src config to html.parent, remove here -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>add-resource</id>
-            <phase>generate-resources</phase>
             <goals>
-              <goal>add-resource</goal>
+              <goal>test-jar</goal>
             </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>src/main/js</directory>
-                </resource>
-              </resources>
-            </configuration>
           </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
           <execution>
-            <id>add-test-resource</id>
-            <phase>generate-resources</phase>
+            <id>attach-test-sources</id>
             <goals>
-              <goal>add-resource</goal>
+              <goal>test-jar</goal>
             </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>src/test/js</directory>
-                </resource>
-              </resources>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -73,18 +56,16 @@
   </build>
 
   <dependencies>
-    <!-- Build Dependencies -->
+    <!-- Build Dependencies (Provided) -->
     <dependency>
-      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-      <groupId>org.eclipse.scout.rt</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
       <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
     </dependency>
+
+    <!-- Test Dependencies -->
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
 </project>

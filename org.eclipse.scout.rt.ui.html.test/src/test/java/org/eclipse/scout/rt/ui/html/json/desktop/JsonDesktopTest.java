@@ -253,8 +253,8 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
 
-    JsonViewButton<IOutlineViewButton> jsonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.DisplayableOutlineViewButton.class));
-    JsonViewButton<IOutlineViewButton> jsonNonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.NonDisplayableOutlineViewButton.class));
+    JsonOutlineViewButton<IOutlineViewButton> jsonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.DisplayableOutlineViewButton.class));
+    JsonOutlineViewButton<IOutlineViewButton> jsonNonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.NonDisplayableOutlineViewButton.class));
 
     // Adapter for NonDisplayableMenu must not exist
     assertNull(jsonNonDisplayableAction);
