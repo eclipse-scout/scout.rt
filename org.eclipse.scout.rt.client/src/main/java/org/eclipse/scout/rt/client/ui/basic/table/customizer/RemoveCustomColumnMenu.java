@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
@@ -75,7 +75,7 @@ public class RemoveCustomColumnMenu extends AbstractMenu {
       ITableCustomizer cst = m_table.getTableCustomizer();
       IColumn<?> col = m_table.getContextColumn();
       if (cst != null && col instanceof ICustomColumn<?>) {
-        if (MessageBox.showDeleteConfirmationMessage(TEXTS.get("Columns"), col.getHeaderCell().getText())) {
+        if (MessageBoxes.showDeleteConfirmationMessage(TEXTS.get("Columns"), col.getHeaderCell().getText())) {
           cst.removeColumn((ICustomColumn<?>) col);
         }
       }

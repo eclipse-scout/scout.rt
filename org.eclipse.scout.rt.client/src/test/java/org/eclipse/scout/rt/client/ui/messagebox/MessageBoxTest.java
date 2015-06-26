@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -55,122 +56,122 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a single object.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a single object.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageOneObject() throws Exception {
-    MessageBox.showDeleteConfirmationMessage("Alice");
+    MessageBoxes.showDeleteConfirmationMessage("Alice");
     assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a single object in a list.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a single object in a list.
    * Bug 440433.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageSingletonList() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(Collections.singletonList("Alice"));
+    MessageBoxes.showDeleteConfirmationMessage(Collections.singletonList("Alice"));
     assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a null parameter.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a null parameter.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageNull() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(null);
+    MessageBoxes.showDeleteConfirmationMessage(null);
     assertMessageBox(TEXTS.get("DeleteConfirmationTextNoItemList"), null);
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a null object as parameter.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a null object as parameter.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageNullObject() throws Exception {
     String s = null;
-    MessageBox.showDeleteConfirmationMessage("Items", s);
+    MessageBoxes.showDeleteConfirmationMessage("Items", s);
     assertMessageBox(TEXTS.get("DeleteConfirmationTextNoItemListX", "Items"), null);
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty array.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty array.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyArray() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(new String[]{});
+    MessageBoxes.showDeleteConfirmationMessage(new String[]{});
     assertMessageBox(TEXTS.get("DeleteConfirmationTextNoItemList", "Company"), null);
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty list.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list.
    * Bug 440433.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyList() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(Collections.emptyList());
+    MessageBoxes.showDeleteConfirmationMessage(Collections.emptyList());
     assertMessageBox(TEXTS.get("DeleteConfirmationTextNoItemList", "Company"), null);
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty array.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty array.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyArrayTextX() throws Exception {
-    MessageBox.showDeleteConfirmationMessage("Company", new String[]{});
+    MessageBoxes.showDeleteConfirmationMessage("Company", new String[]{});
     assertMessageBox(TEXTS.get("DeleteConfirmationTextNoItemListX", "Company"), null);
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty list.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list.
    * Bug 440433.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageEmptyListTextX() throws Exception {
-    MessageBox.showDeleteConfirmationMessage("Company", Collections.emptyList());
+    MessageBoxes.showDeleteConfirmationMessage("Company", Collections.emptyList());
     assertMessageBox(TEXTS.get("DeleteConfirmationTextNoItemListX", "Company"), null);
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an simple array.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple array.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageArray() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(new String[]{"Alice", "Bob", "Cleo"});
+    MessageBoxes.showDeleteConfirmationMessage(new String[]{"Alice", "Bob", "Cleo"});
     assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an simple list.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list.
    * Bug 440433.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageList() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(Arrays.asList("Alice", "Bob", "Cleo"));
+    MessageBoxes.showDeleteConfirmationMessage(Arrays.asList("Alice", "Bob", "Cleo"));
     assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an simple list.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list.
    * Bug 440433.
    *
    * @throws Exception
@@ -178,63 +179,86 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageListAsObject() throws Exception {
     Object o = Arrays.asList("Alice", "Bob", "Cleo");
-    MessageBox.showDeleteConfirmationMessage(o);
+    MessageBoxes.showDeleteConfirmationMessage(o);
     assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an array containing a null.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an array containing a null.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageArrayTextX() throws Exception {
-    MessageBox.showDeleteConfirmationMessage("Person", new String[]{"Alice", null, "Cleo"});
+    MessageBoxes.showDeleteConfirmationMessage("Person", new String[]{"Alice", null, "Cleo"});
     assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Person"), "- Alice\n- \n- Cleo\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a list containing a null.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a list containing a null.
    * Bug 440433.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageListTextX() throws Exception {
-    MessageBox.showDeleteConfirmationMessage("Person", Arrays.asList("Alice", null, "Cleo"));
+    MessageBoxes.showDeleteConfirmationMessage("Person", Arrays.asList("Alice", null, "Cleo"));
     assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Person"), "- Alice\n- \n- Cleo\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a big array.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a big array.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageBigArray() throws Exception {
-    MessageBox.showDeleteConfirmationMessage(new String[]{"Alice", "Bob", "Cleo", "Dominic", "Emma", "Fiona", "George", "Heidi", "Ingrid", "James", "Kyla", "Louis"});
+    MessageBoxes.showDeleteConfirmationMessage(new String[]{"Alice", "Bob", "Cleo", "Dominic", "Emma", "Fiona", "George", "Heidi", "Ingrid", "James", "Kyla", "Louis"});
     assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n- Dominic\n- Emma\n- Fiona\n- George\n- Heidi\n- Ingrid\n- James\n  ...\n- Louis\n");
   }
 
   /**
-   * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a big list.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a big list.
    * Bug 440433.
    *
    * @throws Exception
    */
   @Test
   public void testShowDeleteConfirmationMessageBigList() throws Exception {
-    MessageBox.showDeleteConfirmationMessage("Numbers", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    MessageBoxes.showDeleteConfirmationMessage("Numbers", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Numbers"), "- 1\n- 2\n- 3\n- 4\n- 5\n- 6\n- 7\n- 8\n- 9\n- 10\n");
   }
 
+  @Test
+  public void testYesNoMessageBox() throws Exception {
+    MessageBoxes.createYesNo().header("header").body("body").show();
+    assertMessageBox("header", "body");
+  }
+
+  @Test
+  public void testYesNoMessageBoxWithHtml() throws Exception {
+    MessageBoxes.createYesNo().header("header").body("body").html(HTML.plain("<h1>title</h1>")).show();
+    assertMessageBox("header", "body", "<h1>title</h1>");
+  }
+
+  @Test
+  public void testYesNoMessageBoxWithEncodedHtml() throws Exception {
+    MessageBoxes.createYesNo().header("header").body("body").html(HTML.h1("title & sub-title")).show();
+    assertMessageBox("header", "body", "<h1>title &amp; sub-title</h1>");
+  }
+
   private void assertMessageBox(String expectedIntro, String expectedAction) {
+    assertMessageBox(expectedIntro, expectedAction, null);
+  }
+
+  private void assertMessageBox(String expectedIntro, String expectedAction, String expectedHtml) {
     ArgumentCaptor<MessageBox> argument = ArgumentCaptor.forClass(MessageBox.class);
     Mockito.verify(m_desktopSpy).addMessageBox(argument.capture());
 
     MessageBox messageBox = argument.getValue();
     assertEquals("Intro text", expectedIntro, messageBox.header());
     assertEquals("Action text", expectedAction, messageBox.body());
+    assertEquals("Html", expectedHtml, messageBox.html() == null ? null : messageBox.html().toEncodedHtml());
     assertEquals("Yes button text", TEXTS.get("YesButton"), messageBox.yesButtonText());
     assertEquals("No button text", TEXTS.get("NoButton"), messageBox.noButtonText());
     assertEquals("Cancel button text", null, messageBox.cancelButtonText());

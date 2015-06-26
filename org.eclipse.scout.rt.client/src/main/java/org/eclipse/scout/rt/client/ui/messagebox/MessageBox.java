@@ -11,17 +11,16 @@
 package org.eclipse.scout.rt.client.ui.messagebox;
 
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -35,6 +34,10 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+/**
+ * Implementation of message box.<br/>
+ * Use {@link MessageBoxes} to create a message box.
+ */
 @Bean
 public class MessageBox extends AbstractPropertyObserver implements IMessageBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
@@ -43,98 +46,6 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
    * Do not use, use {@link MessageBoxes#create()} instead.
    */
   public MessageBox() {
-  }
-
-  /**
-   * Convenience function for simple delete confirmation message box
-   *
-   * @param items
-   *          one item or array of multiple items
-   */
-  public static boolean showDeleteConfirmationMessage(Object items) {
-    return showDeleteConfirmationMessage(null, items);
-  }
-
-  /**
-   * Convenience function for simple delete confirmation message box
-   *
-   * @param items
-   *          a list of multiple items
-   * @since Scout 4.0.1
-   */
-  public static boolean showDeleteConfirmationMessage(Collection<?> items) {
-    return showDeleteConfirmationMessage(null, items);
-  }
-
-  /**
-   * Convenience function for simple delete confirmation message box
-   *
-   * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets",
-   *          ...
-   * @param items
-   *          one item or array of multiple items
-   */
-  public static boolean showDeleteConfirmationMessage(String itemType, Object items) {
-    if (items == null) {
-      return showDeleteConfirmationMessage(itemType, Collections.emptyList());
-    }
-    else if (items instanceof Object[]) {
-      return showDeleteConfirmationMessage(itemType, Arrays.asList((Object[]) items));
-    }
-    else if (items instanceof Collection) {
-      return showDeleteConfirmationMessage(itemType, (Collection) items);
-    }
-    else {
-      return showDeleteConfirmationMessage(itemType, Collections.singletonList(items));
-    }
-  }
-
-  /**
-   * Convenience function for simple delete confirmation message box
-   *
-   * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets",
-   *          ...
-   * @param items
-   *          a list of multiple items
-   * @since Scout 4.0.1
-   */
-  public static boolean showDeleteConfirmationMessage(String itemType, Collection<?> items) {
-    StringBuilder t = new StringBuilder();
-
-    int n = 0;
-    if (items != null) {
-      n = items.size();
-      int i = 0;
-      for (Object item : items) {
-        if (i < 10 || i == n - 1) {
-          t.append("- ");
-          t.append(StringUtility.emptyIfNull(item));
-          t.append("\n");
-        }
-        else if (i == 10) {
-          t.append("  ...\n");
-        }
-        else {
-        }
-        i++;
-      }
-    }
-    //
-    String header = null;
-    String body = null;
-    if (itemType != null) {
-      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationTextX", itemType) : ScoutTexts.get("DeleteConfirmationTextNoItemListX", itemType));
-      body = (n > 0 ? t.toString() : null);
-    }
-    else {
-      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationText") : ScoutTexts.get("DeleteConfirmationTextNoItemList"));
-      body = (n > 0 ? t.toString() : null);
-    }
-
-    int result = MessageBoxes.createYesNo().header(header).body(body).show();
-    return result == IMessageBox.YES_OPTION;
   }
 
   /**
@@ -149,6 +60,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   private String m_header;
   private String m_body;
+  private IHtmlContent m_html;
 
   private String m_yesButtonText;
   private String m_noButtonText;
@@ -206,6 +118,18 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   @Override
   public MessageBox body(String body) {
     m_body = body;
+    m_copyPasteTextInternal = null;
+    return this;
+  }
+
+  @Override
+  public IHtmlContent html() {
+    return m_html;
+  }
+
+  @Override
+  public MessageBox html(IHtmlContent html) {
+    m_html = html;
     m_copyPasteTextInternal = null;
     return this;
   }
@@ -307,7 +231,11 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   protected void updateCopyPasteTextInternal() {
     if (m_copyPasteTextInternal == null) {
-      m_copyPasteTextInternal = StringUtility.join("\n\n", m_header, m_body, m_hiddenText);
+      m_copyPasteTextInternal = StringUtility.join("\n\n",
+          m_header,
+          m_body,
+          m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
+              m_hiddenText);
     }
   }
 

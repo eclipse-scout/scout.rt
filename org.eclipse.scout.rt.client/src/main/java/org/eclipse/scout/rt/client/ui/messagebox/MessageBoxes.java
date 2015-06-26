@@ -10,11 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.messagebox;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * Factory for message boxes.
+ * <p>
+ * Example usages:
+ * <ul>
+ * <li>MessageBoxes.createOk().header(TEXTS.get("HeaderText)).show()</li>
+ * <li>MessageBoxes.createOk().header(TEXTS.get("HeaderText)).body(TEXTS.get("BodyText)).show()</li>
+ * <li>MessageBoxes.createYesNo().header(TEXTS.get("HeaderText)).body(TEXTS.get("BodyText)).show()</li>
+ * <li>MessageBoxes.showDeleteConfirmationMessage(getNameColumn().getSelectedDisplayTexts())</li>
+ * </ul>
  *
  * @since 6.0.0
  */
@@ -58,5 +71,97 @@ public final class MessageBoxes {
   public static IMessageBox createYesNoCancel() {
     return MessageBoxes.createYesNo().
         cancelButtonText(ScoutTexts.get("CancelButton"));
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   *
+   * @param items
+   *          one item or array of multiple items
+   */
+  public static boolean showDeleteConfirmationMessage(Object items) {
+    return showDeleteConfirmationMessage(null, items);
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   *
+   * @param items
+   *          a list of multiple items
+   * @since Scout 4.0.1
+   */
+  public static boolean showDeleteConfirmationMessage(Collection<?> items) {
+    return showDeleteConfirmationMessage(null, items);
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   *
+   * @param itemType
+   *          display text in plural such as "Persons", "Relations", "Tickets",
+   *          ...
+   * @param items
+   *          one item or array of multiple items
+   */
+  public static boolean showDeleteConfirmationMessage(String itemType, Object items) {
+    if (items == null) {
+      return showDeleteConfirmationMessage(itemType, Collections.emptyList());
+    }
+    else if (items instanceof Object[]) {
+      return showDeleteConfirmationMessage(itemType, Arrays.asList((Object[]) items));
+    }
+    else if (items instanceof Collection) {
+      return showDeleteConfirmationMessage(itemType, (Collection) items);
+    }
+    else {
+      return showDeleteConfirmationMessage(itemType, Collections.singletonList(items));
+    }
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   *
+   * @param itemType
+   *          display text in plural such as "Persons", "Relations", "Tickets",
+   *          ...
+   * @param items
+   *          a list of multiple items
+   * @since Scout 4.0.1
+   */
+  public static boolean showDeleteConfirmationMessage(String itemType, Collection<?> items) {
+    StringBuilder t = new StringBuilder();
+
+    int n = 0;
+    if (items != null) {
+      n = items.size();
+      int i = 0;
+      for (Object item : items) {
+        if (i < 10 || i == n - 1) {
+          t.append("- ");
+          t.append(StringUtility.emptyIfNull(item));
+          t.append("\n");
+        }
+        else if (i == 10) {
+          t.append("  ...\n");
+        }
+        else {
+        }
+        i++;
+      }
+    }
+    //
+    String header = null;
+    String body = null;
+    if (itemType != null) {
+      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationTextX", itemType) : ScoutTexts.get("DeleteConfirmationTextNoItemListX", itemType));
+      body = (n > 0 ? t.toString() : null);
+    }
+    else {
+      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationText") : ScoutTexts.get("DeleteConfirmationTextNoItemList"));
+      body = (n > 0 ? t.toString() : null);
+    }
+
+    int result = createYesNo().header(header).body(body).show();
+    return result == IMessageBox.YES_OPTION;
   }
 }

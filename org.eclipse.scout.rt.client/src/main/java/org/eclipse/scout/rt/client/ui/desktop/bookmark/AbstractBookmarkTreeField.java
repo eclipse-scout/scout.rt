@@ -48,7 +48,6 @@ import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IOpenBookmarkCommand
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IPublishBookmarkCommand;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -627,7 +626,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             names.add(((Bookmark) bookmark.getCell().getValue()).getTitle());
           }
         }
-        if (MessageBox.showDeleteConfirmationMessage(names.toArray(new String[names.size()]))) {
+        if (MessageBoxes.showDeleteConfirmationMessage(names.toArray(new String[names.size()]))) {
           // delete bookmarks
           for (ITreeNode bookmark : bookmarks) {
             tree.removeNode(bookmark);
@@ -872,7 +871,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             filteredNodes.add(node);
           }
         }
-        if (items.size() <= 1 || MessageBox.showDeleteConfirmationMessage(items.toArray(new String[0]))) {
+        if (items.size() <= 1 || MessageBoxes.showDeleteConfirmationMessage(items.toArray(new String[0]))) {
           for (ITreeNode node : filteredNodes) {
             tree.removeNode(node);
           }
