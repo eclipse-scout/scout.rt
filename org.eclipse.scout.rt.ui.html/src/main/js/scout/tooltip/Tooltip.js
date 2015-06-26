@@ -69,7 +69,8 @@ scout.Tooltip.prototype.renderText = function(text) {
   if (this.htmlEnabled) {
     this.$content.html(text);
   } else {
-    this.$content.text(scout.strings.removeAmpersand(text));
+    // use nl2br to allow tooltips with line breaks
+    this.$content.html(scout.strings.nl2br(scout.strings.removeAmpersand(text)));
   }
 };
 
