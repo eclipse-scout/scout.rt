@@ -1,18 +1,17 @@
-.date-field .field input {
+.date-field > .field > input {
   position: absolute;
 }
 
-.date-field .field input.date {
+.date-field > .field > input.date {
   .text-field-with-icon(@icon-calendar);
 }
 
-.date-field .field input.time {
+.date-field > .field > input.time {
   .text-field-with-icon(@icon-clock,~'.time');
 }
 
-
 /** Prediction input field is in the back of the actual input field -> make actual input field transparent */
-.date-field .field .predict {
+.date-field > .field > .predict {
   color: @disabled-color;
   background-color: @control-background-color;
 
@@ -21,153 +20,12 @@
   }
 }
 
-/* date box */
-.date-box.has-error {
-  border-color: @error-border-color;
-}
-
-.date-box {
-  margin-top: 5px;
-  height: 233px;
-  width: 252px;
-  position: absolute;
-  background-color: @control-background-color;
-  z-index: 10;
-  border: 1px solid @popup-border-color;
-  border-radius: @border-radius;
-  .drop-shadow();
-
-  /* necessary for animation */
-  overflow: hidden;
-}
-
-/* necessary for animation */
-.date-box-scrollable {
-  position: relative;
-  height: 100%;
-  padding: 0px 6px;
-}
-
-/* necessary for animation */
-.date-box-month {
-  display: inline-block;
-}
-
-/* weekday header */
-.date-box-weekday {
-  width: 34px;
-  height: 30px;
-  line-height: 30px;
-  float: left;
-  text-align: center;
-}
-
-.date-box-day {
-  width: 26px;
-  margin: 1px 4px 1px 4px;
-  height: 26px;
-  line-height: 25px;
-  float: left;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 50%;
-  border: 1px solid transparent;
-
-  &.center-nice {
-    padding-right: 2px;
+.date-picker-popup {
+  &.down {
+    margin-top: 5px;
   }
 
-  &:hover {
-    color: @hover-color;
-    font-weight: bold;
+  &.up {
+    margin-bottom: 5px;
   }
-
-  &.date-box-out {
-    color: @palette-gray-4;
-  }
-
-  &.date-box-weekend {
-    color: @palette-blue-4;
-  }
-
-  &.date-box-out-weekend {
-    color: @palette-blue-2 ;
-  }
-
-  &.date-box-now {
-    background-color: @palette-orange-0;
-    border: 1px solid @palette-orange-3;
-  }
-
-  &.date-box-selected {
-    background-color: @palette-blue-0;
-    border: 1px solid @palette-blue-3 ;
-  }
-}
-
-.date-box-header {
-  line-height: 30px;
-  height: 30px;
-  padding: 0px 18px;
-  background-color: @panel-background-color;
-  border-bottom: 1px solid @border-color;
-}
-
-.date-box-separator {
-  position: absolute;
-  top: 59px;
-  left: 0px;
-  height: 1px;
-  width: 100%;
-  border-bottom: 1px solid @border-color;
-}
-
-.date-box-header-month {
-  text-align: center;
-  cursor: default;
-  font-size: 13px;
-  padding-top: 1px;
-}
-
-.date-box-left-y,
-.date-box-left-m,
-.date-box-right-y,
-.date-box-right-m {
-  text-align: center;
-  width: 22px;
-  line-height: 30px;
-  height: 30px;
-  cursor: pointer;
-  .font-icon;
-  font-size: 17px;
-
-  &:hover {
-    color: @hover-color;
-  }
-}
-
-.date-box-left-y,
-.date-box-left-m {
-  float: left;
-}
-
-.date-box-left-y::before {
-  content: @icon-angle-double-left;
-}
-
-.date-box-left-m::before {
-  content: @icon-angle-left;
-}
-
-.date-box-right-y,
-.date-box-right-m {
-  float: right;
-}
-
-.date-box-right-y::before {
-  content: @icon-angle-double-right;
-}
-
-.date-box-right-m::before {
-  content: @icon-angle-right;
 }

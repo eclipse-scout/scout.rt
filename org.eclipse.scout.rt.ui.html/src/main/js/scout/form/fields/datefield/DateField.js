@@ -16,7 +16,6 @@ scout.DateField.prototype._render = function($parent) {
   this.addField($.makeDiv());
   this.addLabel();
   this.addMandatoryIndicator();
-  this._mouseDownListener = this._onMouseDownFocusContext.bind(this);
   this._dateFormat = new scout.DateFormat(this.session.locale, this.fullDatePattern);
 };
 
@@ -101,7 +100,11 @@ scout.DateField.prototype._renderHasDate = function() {
       .addClass('date');
     this.$field.prepend(this.$dateField);
     this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
-    this._picker = new scout.DatePicker(this.isolatedDateFormat, this);
+    this._datePickerPopup = new scout.DatePickerPopup(this.session, {
+      dateFormat: this.isolatedDateFormat,
+      $anchor: this.$field
+    });
+    this._datePickerPopup.picker.on('dateSelect', this._onDateSelected.bind(this));
     if (this.timestamp) {
       this.$dateField.val(this.isolatedDateFormat.format(new Date(this.timestamp)));
     }
@@ -129,10 +132,17 @@ scout.DateField.prototype._renderEnabled = function() {
   }
 };
 
-
 scout.DateField.prototype._onFieldBlurDate = function() {
-  this.closeOnClickOutsideOrFocusLost();
+  this._acceptPrediction();
   this.timestampChanged();
+
+  if (this._$predict) {
+    this._$predict.remove();
+    this._$predict = null;
+  }
+  if (this._datePickerPopup.isOpen()) {
+    this._datePickerPopup.close();
+  }
 };
 
 scout.DateField.prototype._onFieldBlurTime = function() {
@@ -163,34 +173,6 @@ scout.DateField.prototype._onFieldBlurTime = function() {
   this.timestampChanged();
 };
 
-scout.DateField.prototype.closeOnClickOutsideOrFocusLost = function() {
-  if (!this._picker.isOpen()) {
-    return;
-  }
-  if (!this._$predict && this._picker.isOpen()) {
-    this._picker.close();
-    return;
-  }
-  this._acceptPrediction();
-
-  this.timestampChanged();
-
-  this._$predict.remove();
-  this._$predict = null;
-  this._picker.close();
-
-};
-
-scout.DateField.prototype._onMouseDownFocusContext = function(event) {
-  var $target = $(event.target),
-    insidePopup = (this._picker && this._picker.$popup && this._picker.$popup.has($target).length > 0),
-    insideContainer = (this.$container && this.$container.has($target).length > 0);
-  // close the popup only if the click happened outside of the popup
-  if (!insidePopup && !insideContainer) {
-    this.closeOnClickOutsideOrFocusLost();
-  }
-};
-
 scout.DateField.prototype._onClick = function() {
   this.openPicker();
 };
@@ -205,14 +187,15 @@ scout.DateField.prototype._onIconClick = function(event) {
  * Opens picker and selects date
  */
 scout.DateField.prototype.openPicker = function() {
-  this._updateSelection(this.$dateField.val());
+  this._pickerSelectDate(this.$dateField.val());
 };
 
-/**
- * Called by datepicker when a date has been selected
- */
-scout.DateField.prototype.onDateSelected = function(date) {
+scout.DateField.prototype._onDateSelected = function(event) {
+  var date = event.date;
   this._renderTimestamp(date.getTime(), true, false);
+  if (!event.shifting) {
+    this._datePickerPopup.close();
+  }
 };
 
 /**
@@ -277,8 +260,8 @@ scout.DateField.prototype._renderErrorStatus = function(errorStatus) {
   if (this._$predict) {
     this._$predict.toggleClass('has-error', !! errorStatus);
   }
-  if (this.hasDate && this._picker.$popup) {
-    this._picker.$popup.toggleClass('has-error', !! errorStatus);
+  if (this.hasDate && this._datePickerPopup.$container) {
+    this._datePickerPopup.$container.toggleClass('has-error', !! errorStatus);
   }
 };
 
@@ -300,15 +283,15 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
   if (event.which === scout.keys.ENTER) {
     // Update model and close picker
     this.timestampChanged();
-    if (this._picker.isOpen()) {
-      this._picker.close(true);
+    if (this._datePickerPopup.isOpen()) {
+      this._datePickerPopup.close(true);
       event.stopPropagation();
     }
     return;
   }
   if (event.which === scout.keys.ESC) {
-    if (this._picker.isOpen()) {
-      this._picker.close(true);
+    if (this._datePickerPopup.isOpen()) {
+      this._datePickerPopup.close(true);
       event.stopPropagation();
     }
     return;
@@ -324,7 +307,7 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
 
   if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
     months = (event.which === scout.keys.PAGE_UP ? -1 : 1);
-    this._picker.shiftSelectedDate(0, months, 0);
+    this._datePickerPopup.shiftSelectedDate(0, months, 0);
     return;
   }
 
@@ -340,20 +323,20 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
       days = diff;
     } else {
       //no navigation impact on date field.
-      if (this._picker.isOpen()) {
-        this._picker.close();
+      if (this._datePickerPopup.isOpen()) {
+        this._datePickerPopup.close();
       }
       return true;
     }
 
-    this._picker.shiftSelectedDate(years, months, days);
+    this._datePickerPopup.shiftSelectedDate(years, months, days);
     return false;
   }
 
   // Use set timeout because field value is not set when keyDown is fired (keyDown is used because keyUp feels laggy).
   setTimeout(function(e) {
     displayText = this.$dateField.val();
-    if ((!this._$predict || this._$predict.length === 0)&& displayText.length>0 && this.$dateField[0] === document.activeElement) {
+    if ((!this._$predict || this._$predict.length === 0) && displayText.length > 0 && this.$dateField[0] === document.activeElement) {
       this._$predict = this._createPredictionField();
     }
     if (!this._$predict) {
@@ -367,21 +350,21 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     }
     if (datePrediction) {
       this._$predict.val(datePrediction.text);
-      this._updateSelection(datePrediction.date);
+      this._pickerSelectDate(datePrediction.date);
     } else {
       this._$predict.val('');
     }
   }.bind(this), 1);
 };
 
-scout.DateField.prototype._updateSelection = function(selection) {
+scout.DateField.prototype._pickerSelectDate = function(selection) {
   var date;
   if (selection instanceof Date) {
     date = selection;
   } else {
     date = this._dateFormat.parse(selection);
   }
-  this._picker.selectDate(date);
+  this._datePickerPopup.selectDate(date);
 };
 
 /**
@@ -443,7 +426,7 @@ scout.DateField.prototype._acceptPrediction = function() {
   }
   var datePrediction = this._predict(predictionText, true);
   this.$dateField.val(this.isolatedDateFormat.format(datePrediction.date));
-  this._updateSelection(datePrediction.date);
+  this._pickerSelectDate(datePrediction.date);
 };
 
 scout.DateField.prototype._predict = function(validatedText, format) {
@@ -454,7 +437,7 @@ scout.DateField.prototype._predict = function(validatedText, format) {
     month = dateInfo.month,
     year = dateInfo.year;
   if (validatedText.match(/^[+-][0-9]*$/)) {
-    var daysToAdd = isNaN(validatedText)? 0 : Number(validatedText);
+    var daysToAdd = isNaN(validatedText) ? 0 : Number(validatedText);
     now.setDate(now.getDate() + daysToAdd);
     return {
       date: now,

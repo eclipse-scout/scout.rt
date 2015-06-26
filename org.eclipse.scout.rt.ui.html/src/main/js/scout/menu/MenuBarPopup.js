@@ -48,7 +48,7 @@ scout.MenuBarPopup.prototype._renderHead = function() {
 };
 
 scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
-  this.closePopup();
+  this.close();
   menu.sendDoAction();
 };
 

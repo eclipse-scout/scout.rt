@@ -1,12 +1,34 @@
-scout.DatePicker = function(dateFormat, dateField) {
+scout.DatePicker = function(dateFormat) {
+  scout.DatePicker.parent.call(this);
   this._dateFormat = dateFormat;
-  this._dateField = dateField;
-  this.selectedDate = null;
-  this.viewDate = null;
-  this.$popup = null;
-  this.$currentBox = null;
-  this.$scrollable = null;
+  this.selectedDate;
+  this.viewDate;
+  this.$container;
+  this.$currentBox;
+  this.$scrollable;
   this._scrollableLeft;
+  this._addEventSupport();
+};
+scout.inherits(scout.DatePicker, scout.Widget);
+
+scout.DatePicker.prototype._render = function($parent) {
+  this.$container = $.makeDiv('date-picker')
+    .mousedown(this._onMouseDown.bind(this))
+    .appendTo($parent);
+
+  this._$header = this._build$Header().appendTo(this.$container);
+  this._$header.find('.date-picker-left-y, .date-picker-left-m, .date-picker-right-m, .date-picker-right-y').mousedown(this._onNavigationMouseDown.bind(this));
+
+  this.$container.appendDiv('date-picker-separator');
+  this.$scrollable = this.$container.appendDiv('date-picker-scrollable');
+  this._scrollableTop = this.$scrollable.position().top;
+  this._scrollableLeft = this.$scrollable.position().left;
+  // Fix the position of the scrollable in order to do proper scrollable shifting (see _appendAnimated)
+  this.$scrollable.css({
+    'position': 'absolute',
+    left: this._scrollableLeft,
+    top: this._scrollableTop
+  });
 };
 
 scout.DatePicker.prototype.selectDate = function(date, animated) {
@@ -15,32 +37,6 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
-  var origin = scout.graphics.offsetBounds(this._dateField.$dateField);
-  if (!this.$popup) {
-    var $parent = $('body'); // TODO BSH Try this: this._dateField.$dateField.closest('.desktop .glasspane') || $('body');
-    this.$popup = $.makeDiv('date-box')
-      .cssLeft(origin.x)
-      .cssTop(origin.y + origin.height)
-      .mousedown(this._onMouseDown.bind(this))
-      .appendTo($parent);
-
-    this._scrollHandler = this.close.bind(this);
-    scout.scrollbars.onScroll(this._dateField.$dateField, this._scrollHandler);
-
-    this._$header = this._createHeader().appendTo(this.$popup);
-    this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
-
-    this.$popup.appendDiv('date-box-separator');
-    this.$scrollable = this.$popup.appendDiv('date-box-scrollable');
-    this._scrollableTop = this.$scrollable.position().top;
-    this._scrollableLeft = this.$scrollable.position().left;
-    // Fix the position of the scrollable in order to do proper scrollable shifting (see _appendAnimated)
-    this.$scrollable.css({
-      'position': 'absolute',
-      left: this._scrollableLeft,
-      top: this._scrollableTop
-    });
-  }
 
   this.selectedDate = selectedDate;
 
@@ -58,8 +54,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
 
   this._updateHeader(viewDate);
 
-  var $box = this._createDateBox();
-  $box.find('.date-box-day').click(this._onDayClick.bind(this));
+  var $box = this._build$DateBox();
+  $box.find('.date-picker-day').click(this._onDayClick.bind(this));
   $box[0].addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
 
   if (animated && this.$currentBox && viewDateDiff) {
@@ -80,14 +76,13 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     }
   }
   this.$currentBox = $box;
-  $(document).on('mousedown', this._dateField._mouseDownListener);
 };
 
 scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var $currentBox = this.$currentBox;
   var newLeft = 0,
     that = this;
-  var monthBoxCount = this.$scrollable.find('.date-box-month').length + 1;
+  var monthBoxCount = this.$scrollable.find('.date-picker-month').length + 1;
   var scrollableWidth = monthBoxCount * this._boxWidth;
 
   // Fix the size of the boxes
@@ -120,7 +115,7 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
     // Remove every month box beside the new one
     // Its important to use that.$currentBox because $box may already be removed
     // if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
-    that.$currentBox.siblings('.date-box-month').remove();
+    that.$currentBox.siblings('.date-picker-month').remove();
 
     // Reset scrollable settings
     that.$scrollable
@@ -133,19 +128,14 @@ scout.DatePicker.prototype._onNavigationMouseDown = function(event) {
   var $target = $(event.currentTarget);
   var diff = $target.data('shift');
   this.shiftViewDate(0, diff, 0);
-
-  // Don't propagate
-  return false;
 };
 
 scout.DatePicker.prototype._onDayClick = function(event) {
   var $target = $(event.currentTarget);
   var date = $target.data('date');
-  this._dateField.onDateSelected(date);
-  this.close(true);
-
-  // Don't propagate
-  return false;
+  this.trigger('dateSelect', {
+    date: date
+  });
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
@@ -163,32 +153,6 @@ scout.DatePicker.prototype._onMouseDown = function(event) {
   return false;
 };
 
-scout.DatePicker.prototype.close = function(focusDateField) {
-  if (this.$popup) {
-    this.$popup.remove();
-    this.$popup = null;
-    if (focusDateField && this._dateField) {
-      this._dateField.$dateField.focus();
-    }
-  }
-  $(document).off('mousedown', this._dateField._mouseDownListener);
-  if (this._scrollHandler) {
-    scout.scrollbars.offScroll(this._scrollHandler);
-    this._scrollHandler = null;
-  }
-};
-
-scout.DatePicker.prototype.isOpen = function() {
-  return !!this.$popup;
-};
-
-scout.DatePicker.prototype._onCloseEvent = function() {
-  if ($.contains(this.$popup[0], event.target)) {
-    return;
-  }
-  this.close(true);
-};
-
 scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
   var date = this.viewDate;
 
@@ -203,21 +167,24 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   }
   date = scout.dates.shift(date, years, months, days);
 
-  this._dateField.onDateSelected(date);
+  this.trigger('dateSelect', {
+    date: date,
+    shifting: true
+  });
   this.selectDate(date, true);
 };
 
-scout.DatePicker.prototype._createDateBox = function() {
+scout.DatePicker.prototype._build$DateBox = function() {
   var cl, i, now = new Date();
   var day, dayInMonth, $day;
   var weekdays = this._dateFormat.symbols.weekdaysShortOrdered;
   var start = new Date(this.viewDate);
 
-  var $box = $.makeDiv('date-box-month').data('viewDate', this.viewDate);
+  var $box = $.makeDiv('date-picker-month').data('viewDate', this.viewDate);
 
   // Create weekday header
   for (i in weekdays) {
-    $box.appendDiv('date-box-weekday', weekdays[i]);
+    $box.appendDiv('date-picker-weekday', weekdays[i]);
   }
 
   // Find start date (-1)
@@ -235,17 +202,17 @@ scout.DatePicker.prototype._createDateBox = function() {
     dayInMonth = start.getDate();
 
     if ((start.getDay() === 6) || (start.getDay() === 0)) {
-      cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out-weekend' : ' date-box-weekend');
+      cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-picker-out-weekend' : ' date-picker-weekend');
     } else {
-      cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out' : '');
+      cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-picker-out' : '');
     }
 
     if (scout.dates.isSameDay(start, now)) {
-      cl += ' date-box-now';
+      cl += ' date-picker-now';
     }
 
     if (this.selectedDate && scout.dates.isSameDay(start, this.selectedDate)) {
-      cl += ' date-box-selected';
+      cl += ' date-picker-selected';
     }
 
     if (dayInMonth > 9 && dayInMonth < 20) {
@@ -254,28 +221,28 @@ scout.DatePicker.prototype._createDateBox = function() {
 
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box.
-    appendDiv('date-box-day ' + cl, day).
+    appendDiv('date-picker-day ' + cl, day).
     data('date', new Date(start));
   }
 
   return $box;
 };
 
-scout.DatePicker.prototype._createHeader = function() {
+scout.DatePicker.prototype._build$Header = function() {
   var headerHtml =
-    '<div class="date-box-header">' +
-    '  <div class="date-box-left-y" data-shift="-12"></div>' +
-    '  <div class="date-box-left-m" data-shift="-1"></div>' +
-    '  <div class="date-box-right-y" data-shift="12"></div>' +
-    '  <div class="date-box-right-m" data-shift="1"></div>' +
-    '  <div class="date-box-header-month"></div>' +
+    '<div class="date-picker-header">' +
+    '  <div class="date-picker-left-y" data-shift="-12"></div>' +
+    '  <div class="date-picker-left-m" data-shift="-1"></div>' +
+    '  <div class="date-picker-right-y" data-shift="12"></div>' +
+    '  <div class="date-picker-right-m" data-shift="1"></div>' +
+    '  <div class="date-picker-header-month"></div>' +
     '</div>';
 
   return $(headerHtml);
 };
 
 scout.DatePicker.prototype._updateHeader = function(viewDate) {
-  this._$header.find('.date-box-header-month').text(this._createHeaderText(viewDate));
+  this._$header.find('.date-picker-header-month').text(this._createHeaderText(viewDate));
 };
 
 scout.DatePicker.prototype._createHeaderText = function(viewDate) {

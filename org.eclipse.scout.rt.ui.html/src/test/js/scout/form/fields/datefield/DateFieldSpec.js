@@ -17,7 +17,7 @@ describe("DateField", function() {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $('.tooltip').remove();
-    $('.date-box').remove();
+    $('.date-picker').remove();
   });
 
   function createField(model) {
@@ -48,7 +48,7 @@ describe("DateField", function() {
   }
 
   function findPicker() {
-    return $('.date-box');
+    return $('.date-picker');
   }
 
   function writeText(dateField, displayText) {
@@ -116,7 +116,6 @@ describe("DateField", function() {
       expect(date.getFullYear()).toBe(2015);
       expect(date.getMonth()).toBe(1);
       expect(date.getDate()).toBe(11);
-
     });
 
   });

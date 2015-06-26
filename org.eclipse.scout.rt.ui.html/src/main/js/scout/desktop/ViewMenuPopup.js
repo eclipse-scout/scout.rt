@@ -11,7 +11,7 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
 
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.render(this.$body);
-    viewMenu.afterSendDoAction = this.closePopup.bind(this);
+    viewMenu.afterSendDoAction = this.close.bind(this);
     this.addChild(viewMenu);
   }, this);
   this.alignTo();

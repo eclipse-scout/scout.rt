@@ -11,5 +11,5 @@ scout.inherits(scout.PopupCloseKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.PopupCloseKeyStroke.prototype.handle = function(event) {
-  this._popup.closePopup();
+  this._popup.close();
 };

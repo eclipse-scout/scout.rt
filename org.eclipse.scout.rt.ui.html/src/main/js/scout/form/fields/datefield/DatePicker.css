@@ -1,0 +1,148 @@
+.date-picker.has-error {
+  border-color: @error-border-color;
+}
+
+.date-picker {
+  height: 233px;
+  width: 252px;
+  position: absolute;
+  background-color: @control-background-color;
+  z-index: 10;
+  border: 1px solid @popup-border-color;
+  border-radius: @border-radius;
+  .drop-shadow();
+
+  /* necessary for animation */
+  overflow: hidden;
+}
+
+/* necessary for animation */
+.date-picker-scrollable {
+  position: relative;
+  height: 100%;
+  padding: 0px 6px;
+}
+
+/* necessary for animation */
+.date-picker-month {
+  display: inline-block;
+}
+
+/* weekday header */
+.date-picker-weekday {
+  width: 34px;
+  height: 30px;
+  line-height: 30px;
+  float: left;
+  text-align: center;
+}
+
+.date-picker-day {
+  width: 26px;
+  margin: 1px 4px 1px 4px;
+  height: 26px;
+  line-height: 25px;
+  float: left;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 1px solid transparent;
+
+  &.center-nice {
+    padding-right: 2px;
+  }
+
+  &:hover {
+    color: @hover-color;
+    font-weight: bold;
+  }
+
+  &.date-picker-out {
+    color: @palette-gray-4;
+  }
+
+  &.date-picker-weekend {
+    color: @palette-blue-4;
+  }
+
+  &.date-picker-out-weekend {
+    color: @palette-blue-2 ;
+  }
+
+  &.date-picker-now {
+    background-color: @palette-orange-0;
+    border: 1px solid @palette-orange-3;
+  }
+
+  &.date-picker-selected {
+    background-color: @palette-blue-0;
+    border: 1px solid @palette-blue-3 ;
+  }
+}
+
+.date-picker-header {
+  line-height: 30px;
+  height: 30px;
+  padding: 0px 18px;
+  background-color: @panel-background-color;
+  border-bottom: 1px solid @border-color;
+}
+
+.date-picker-separator {
+  position: absolute;
+  top: 59px;
+  left: 0px;
+  height: 1px;
+  width: 100%;
+  border-bottom: 1px solid @border-color;
+}
+
+.date-picker-header-month {
+  text-align: center;
+  cursor: default;
+  font-size: 13px;
+  padding-top: 1px;
+}
+
+.date-picker-left-y,
+.date-picker-left-m,
+.date-picker-right-y,
+.date-picker-right-m {
+  text-align: center;
+  width: 22px;
+  line-height: 30px;
+  height: 30px;
+  cursor: pointer;
+  .font-icon;
+  font-size: 17px;
+
+  &:hover {
+    color: @hover-color;
+  }
+}
+
+.date-picker-left-y,
+.date-picker-left-m {
+  float: left;
+}
+
+.date-picker-left-y::before {
+  content: @icon-angle-double-left;
+}
+
+.date-picker-left-m::before {
+  content: @icon-angle-left;
+}
+
+.date-picker-right-y,
+.date-picker-right-m {
+  float: right;
+}
+
+.date-picker-right-y::before {
+  content: @icon-angle-double-right;
+}
+
+.date-picker-right-m::before {
+  content: @icon-angle-right;
+}

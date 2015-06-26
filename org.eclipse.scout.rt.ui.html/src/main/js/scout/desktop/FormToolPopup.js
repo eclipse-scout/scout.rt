@@ -90,6 +90,6 @@ scout.FormToolPopup.prototype.alignTo = function() {
   this.setLocation(new scout.Point(left, top));
 };
 
-scout.FormToolPopup.prototype.closePopup = function() {
+scout.FormToolPopup.prototype.close = function() {
   this.formToolButton.setSelected(false);
 };

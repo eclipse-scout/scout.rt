@@ -8,6 +8,7 @@ scout.Popup = function(session, options) {
   this.$anchor = options.$anchor;
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
+  this.installFocusContext = options.installFocusContext !== undefined ? options.installFocusContext : true;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -17,12 +18,14 @@ scout.inherits(scout.Popup, scout.Widget);
  */
 scout.Popup.prototype.render = function($parent) {
   scout.Popup.parent.prototype.render.call(this, $parent);
-  setTimeout(function() {
-    // $container maybe null if removed directly after render
-    if (this.$container) {
-      this.$container.installFocusContext('auto', this.session.uiSessionId);
-    }
-  }.bind(this), 0);
+  if (this.installFocusContext) {
+    setTimeout(function() {
+      // $container maybe null if removed directly after render
+      if (this.$container) {
+        this.$container.installFocusContext('auto', this.session.uiSessionId);
+      }
+    }.bind(this), 0);
+  }
   this._attachCloseHandler();
   this.position();
 };
@@ -31,7 +34,9 @@ scout.Popup.prototype.remove = function() {
   if (!this.rendered) {
     return;
   }
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
+  if (this.installFocusContext) {
+    this.$container.uninstallFocusContext(this.session.uiSessionId);
+  }
   scout.Popup.parent.prototype.remove.call(this);
   // remove all clean-up handlers
   this._detachCloseHandler();
@@ -46,7 +51,7 @@ scout.Popup.prototype._render = function($parent) {
     .appendTo($parent);
 };
 
-scout.Popup.prototype.closePopup = function() {
+scout.Popup.prototype.close = function() {
   this.remove();
 };
 
@@ -83,7 +88,7 @@ scout.Popup.prototype._onMouseDown = function(event) {
 };
 
 scout.Popup.prototype._onMouseDownOutside = function(event) {
-  this.closePopup();
+  this.close();
 };
 
 scout.Popup.prototype._onAnchorScroll = function(event) {
@@ -92,11 +97,13 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
 
 scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   var x, y, anchorBounds, height;
-
   if (!this.anchorBounds && !this.$anchor) {
     return;
   }
-  height = $container.outerHeight(),
+  openingDirectionY = openingDirectionY || 'down';
+  $container.removeClass('up down');
+  $container.addClass(openingDirectionY);
+  height = $container.outerHeight(true),
 
   anchorBounds = this.anchorBounds;
   if (!anchorBounds) {
@@ -107,7 +114,7 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   y = anchorBounds.y;
   if (openingDirectionY === 'up') {
     y -= height;
-  } else {
+  } else if (openingDirectionY === 'down'){
     y += anchorBounds.height;
   }
   return {x: x, y: y};

@@ -50,7 +50,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
       menu = menuClone;
     }
     menu.render(this.$body);
-    menu.afterSendDoAction = this.closePopup.bind(this);
+    menu.afterSendDoAction = this.close.bind(this);
   }, this);
 };
 
