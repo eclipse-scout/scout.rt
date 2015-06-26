@@ -14,6 +14,7 @@
   width: 100%;
   height: @view-buttons-height;
   background-color: @view-button-tab-background-color;
+  white-space: nowrap;
   .font-text-large;
 }
 
@@ -27,6 +28,10 @@
   white-space: nowrap;
   min-width: 50px;
   vertical-align: top;
+
+  &:hover {
+    cursor: pointer;
+  }
 
   &.selected {
     background-color: @view-button-tab-active-background-color;
@@ -49,10 +54,6 @@
   & .view-button-tab-title {
     .font-text-large;
     .overflow-ellipsis-nowrap;
-
-    &:hover {
-      cursor: pointer;
-    }
   }
 }
 

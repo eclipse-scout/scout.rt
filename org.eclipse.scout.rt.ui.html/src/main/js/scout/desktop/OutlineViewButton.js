@@ -18,15 +18,6 @@ scout.OutlineViewButton.prototype._goOffline = function() {
   }
 };
 
-scout.OutlineViewButton.prototype.onModelPropertyChange = function(event) {
-  scout.OutlineViewButton.parent.prototype.onModelPropertyChange.call(this, event);
-  // Update navigation as well if properties for current outline have changed
-  var navigation = this.session.desktop.navigation;
-  if (navigation.outline === this.outline) {
-    navigation.onOutlinePropertyChange(event);
-  }
-};
-
 /**
  * Don't await server response to make it more responsive and offline capable.
  * @override Action.js

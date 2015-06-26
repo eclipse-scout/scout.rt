@@ -1,6 +1,6 @@
 .view-button-menu {
   padding: 0px 15px 0px 15px;
-  line-height: calc(@desktop-taskbar-height - 1px);
+  line-height: @desktop-taskbar-height - 1px;
   border-top: solid 1px @border-color;
   cursor: pointer;
   color: @text-color;

@@ -3,14 +3,15 @@ scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
 
+  this.BREADCRUMB_SWITCH_WIDTH = 190;
+
   this.$navigation;
   this.$viewButtons;
   this.$container;
+  this.htmlViewButtons;
 
   this.activeTab;
   this.outlineTab;
-  this.$outlineTitle;
-  this.breadcrumbSwitchWidth = 190;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.viewMenuTab;
 };
@@ -18,12 +19,18 @@ scout.DesktopNavigation = function(desktop) {
 scout.DesktopNavigation.prototype.render = function($parent) {
   this.$navigation = $parent.appendDiv('desktop-navigation');
   this.$viewButtons = this.$navigation.appendDiv('view-buttons');
+  this.htmlViewButtons = new scout.HtmlComponent(this.$viewButtons, this.session);
+  this.htmlViewButtons.setLayout(new scout.ViewButtonsLayout(this.htmlViewButtons));
 
   this.viewMenuTab = new scout.ViewMenuTab(this._viewButtons('MENU'), this.session);
   this.viewMenuTab.render(this.$viewButtons);
 
   this._viewButtons('TAB').forEach(function(viewTab) {
     viewTab.render(this.$viewButtons);
+  }, this);
+
+  this._viewButtons().forEach(function(viewButton) {
+    viewButton.on('propertyChange', this._onViewButtonPropertyChange.bind(this));
   }, this);
 
   this.$container = this.$navigation.appendDiv('navigation-container');
@@ -33,34 +40,31 @@ scout.DesktopNavigation.prototype.render = function($parent) {
 scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
   var viewButtons = [];
   this.desktop.viewButtons.forEach(function(viewButton) {
-    if (viewButton.displayStyle === displayStyle) {
+    if (displayStyle === undefined ||
+        displayStyle === viewButton.displayStyle) {
       viewButtons.push(viewButton);
     }
   });
   return viewButtons;
 };
 
-scout.DesktopNavigation.prototype._selectTab = function(tab, outline) {
-  this.desktop.changeOutline(outline);
-  this.session.send(this.desktop.id, 'outlineChanged', {
-    outlineId: outline.id
-  });
+scout.DesktopNavigation.prototype._onViewButtonPropertyChange = function(event) {
+  if (event.selected !== undefined) {
+    this.htmlViewButtons.revalidateLayout();
+  }
 };
 
 scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   if (this.outline === outline) {
     return;
   }
-
   if (this.outline) {
     this.outline.remove();
   }
-
   this.outline = outline;
   this.outline.render(this.$container);
   this.outline.htmlComp.validateLayout();
   this.outline.pixelBasedSizing = true;
-//  this.$outlineTitle.html(this.outline.title); // FIXME AWE (desktop) remove 1st tab
   this.viewMenuTab.onOutlineChanged(outline);
   this.outline.validateFocus();
 };
@@ -70,10 +74,11 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
   var w = event.data; // data = newSize
 
   this.$navigation.width(w);
+  this.htmlViewButtons.revalidateLayout();
   this.desktop.$taskBar.css('left', w);
   this.desktop.$bench.css('left', w);
 
-  if (w <= this.breadcrumbSwitchWidth) {
+  if (w <= this.BREADCRUMB_SWITCH_WIDTH) {
     if (!this.$navigation.hasClass('navigation-breadcrumb')) {
       this.$navigation.addClass('navigation-breadcrumb');
       this.outline.setBreadcrumbEnabled(true);
@@ -81,17 +86,6 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
   } else {
     this.$navigation.removeClass('navigation-breadcrumb');
     this.outline.setBreadcrumbEnabled(false);
-  }
-};
-
-/**
- * Called by OutlineViewButton.js
- */
-scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
-  for (var propertyName in event.properties) {
-    if (propertyName === 'text') {
-      this.$outlineTitle.text(event.properties[propertyName]);
-    }
   }
 };
 
@@ -113,11 +107,4 @@ scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function() {
   this.viewMenuTab._onClickTab();
-};
-
-/* --- INNER TYPES ---------------------------------------------------------------- */
-
-scout.DesktopNavigation.TabAndContent = function($tab) {
-  this.$tab = $tab;
-  this.$content = null;
 };

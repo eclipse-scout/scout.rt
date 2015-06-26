@@ -243,14 +243,15 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
   this._syncPropertiesOnPropertyChange(oldProperties, event.properties);
-  this.trigger('propertyChange', {
-    properties: event.properties
-  });
 
   // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
   if (this.rendered) {
     this._renderPropertiesOnPropertyChange(oldProperties, event.properties);
   }
+
+  // fire propertyChange after properties have been rendered. This is required to make sure the
+  // DOM is in the right state, when the propertyChange event is consumed.
+  this.trigger('propertyChange', event.properties);
 };
 
 /**

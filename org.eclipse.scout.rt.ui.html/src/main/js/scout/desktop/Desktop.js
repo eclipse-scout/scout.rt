@@ -514,9 +514,9 @@ scout.Desktop.TabAndContent = function(desktop, content, title, subTitle) {
   this.$content;
 
   this._contentPropertyChangeListener = function(event) {
-    if (event.properties.title !== undefined || event.properties.subTitle !== undefined) {
-      this.title = scout.helpers.nvl(event.properties.title, this.title);
-      this.subTitle = scout.helpers.nvl(event.properties.subTitle, this.subTitle);
+    if (event.title !== undefined || event.subTitle !== undefined) {
+      this.title = scout.helpers.nvl(event.title, this.title);
+      this.subTitle = scout.helpers.nvl(event.subTitle, this.subTitle);
       this._desktop._updateTab(this);
     }
   }.bind(this);
