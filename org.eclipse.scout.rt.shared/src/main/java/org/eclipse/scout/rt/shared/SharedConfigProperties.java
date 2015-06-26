@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.TierState.Tier;
 
 /**
@@ -80,11 +81,34 @@ public final class SharedConfigProperties {
     }
   }
 
+  public static class BackendUrlProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getDefaultValue() {
+      return ConfigUtility.getProperty("server.url");//legacy
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.server.url";
+    }
+
+    @Override
+    protected String parse(String value) {
+      int i = value.lastIndexOf("/process");
+      if (i >= 0) {
+        value = value.substring(0, i);
+      }
+      return super.parse(value);
+    }
+
+  }
+
   public static class ServiceTunnelTargetUrlProperty extends AbstractStringConfigProperty {
 
     @Override
     public String getDefaultValue() {
-      return ConfigUtility.getProperty("server.url") /* legacy */;
+      return CONFIG.getProperty(BackendUrlProperty.class).getValue() + "/process";
     }
 
     @Override
