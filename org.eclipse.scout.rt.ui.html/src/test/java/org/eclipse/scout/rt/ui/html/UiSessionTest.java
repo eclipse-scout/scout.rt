@@ -3,6 +3,7 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -49,11 +50,11 @@ public class UiSessionTest {
     HttpSession httpSession = uiSession.currentHttpSession();
 
     uiSession.logout();
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(uiSession.currentJsonResponse(), "logout");
     JsonTestUtility.endRequest(uiSession);
 
     Mockito.verify(httpSession).invalidate();
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(uiSession.currentJsonResponse(), "logout");
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
   }
 
   @Test
@@ -71,6 +72,7 @@ public class UiSessionTest {
     JsonTestUtility.endRequest(uiSession);
     uiSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
+    JobUtility.awaitAllModelJobs(clientSession);
     assertFalse(clientSession.isActive());
     assertTrue(uiSession.isDisposed());
 
