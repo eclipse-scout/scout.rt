@@ -69,6 +69,12 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
         return getModel().body();
       }
     });
+    putJsonProperty(new JsonProperty<IMessageBox>("html", model) {
+      @Override
+      protected String modelValue() {
+        return getModel().html() == null ? null : getModel().html().toEncodedHtml();
+      }
+    });
     putJsonProperty(new JsonProperty<IMessageBox>("hiddenText", model) {
       @Override
       protected String modelValue() {

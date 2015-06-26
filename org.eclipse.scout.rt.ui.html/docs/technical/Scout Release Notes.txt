@@ -311,7 +311,7 @@ The behavior may be controlled using:
 - int getConfiguredLazyAddChildPagesToOutlineThreshold() --> setting for AbstractPageWithTable, after how many child pages the lazy setting should be active (default 1)
 
 JGU 11.06.2015
-getConfiguredTreat0AsNull in Smartfield has been deleted. (ses also Bugzill 469902)
+getConfiguredTreat0AsNull in Smartfield has been deleted. (ses also Bugzilla 469902)
 
 SME 12.06.2015
 MessageBox
@@ -329,6 +329,8 @@ MessageBox
     -> MessageBoxes.create().header(introText).body(actionText).yesButtonText(yesButtonText).noButtonText(noButtonText).cancelButtonText(cancelButtonText);
 - Removed MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText, String hiddenText, String iconId)
     -> MessageBoxes.create().header(introText).body(actionText).yesButtonText(yesButtonText).noButtonText(noButtonText).cancelButtonText(cancelButtonText).hiddenText(hiddenText).iconId(iconId);
+- Moved MessageBox.showDeleteConfirmationMessage methods to MessagesBoxes class
+- If html needs to be displayed, use the new html(IHtmlContent) method. Header / body methods do not support html.
 
 In some cases of message boxes usage something like TEXTS.get("key", text) is used as argument.
 To handle these, we first replace the inner , by another string, run the regex belows, and then restore the , again.
@@ -359,6 +361,11 @@ As a last step, header(null) or body(null) can be removed, because they have no 
 
   Find:    MessageBoxes.create(.+)\(\)([^\n]*)?(\.header\(null\)|\.body\(null\))([^\n]*)?.show\(\)
   Replace: MessageBoxes.create\1()\2\4.show()
+
+To handle calls to showDeleteConfirmationMessage, use the following replacement (no regex)
+
+  Find:    MessageBox.showDeleteConfirmationMessage(
+  Replace: MessageBoxes.showDeleteConfirmationMessage(
 
 SME 16.06.2015
 org.eclipse.scout.commons.dnd.TransferObject

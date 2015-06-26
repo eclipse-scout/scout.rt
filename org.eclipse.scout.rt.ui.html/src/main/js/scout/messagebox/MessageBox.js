@@ -20,6 +20,15 @@ scout.MessageBox = function(model, session) {
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
+// represents severity codes from IStatus
+scout.MessageBox.SEVERITY = {
+    OK: 1,
+    INFO: 256,
+    WARNING: 65536,
+    ERROR: 16777216
+};
+
+
 scout.MessageBox.prototype._render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
@@ -34,6 +43,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$content = this.$container.appendDiv('messagebox-content');
   this.$header = this.$content.appendDiv('messagebox-label messagebox-header');
   this.$body = this.$content.appendDiv('messagebox-label messagebox-body');
+  this.$html = this.$content.appendDiv('messagebox-label messagebox-html');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
   this._$closeButton = null; // button to be executed when close() is called, e.g. when ESCAPE is pressed
@@ -56,6 +66,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderSeverity(this.severity);
   this._renderHeader(this.header);
   this._renderBody(this.body);
+  this._renderHtml(this.html);
   this._renderHiddenText(this.hiddenText);
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
@@ -109,7 +120,7 @@ scout.MessageBox.prototype._renderIconId = function(iconId) {
 
 scout.MessageBox.prototype._renderSeverity = function(severity) {
   this.$container.removeClass('severity-error');
-  if (severity === 4) {
+  if (severity === scout.MessageBox.SEVERITY.ERROR) {
     this.$container.addClass('severity-error');
   }
 };
@@ -122,6 +133,11 @@ scout.MessageBox.prototype._renderHeader = function(text) {
 scout.MessageBox.prototype._renderBody = function(text) {
   this.$body.html(scout.strings.nl2br(text));
   this.$body.setVisible(text);
+};
+
+scout.MessageBox.prototype._renderHtml = function(text) {
+  this.$html.html(text);
+  this.$html.setVisible(text);
 };
 
 scout.MessageBox.prototype._renderHiddenText = function(text) {
