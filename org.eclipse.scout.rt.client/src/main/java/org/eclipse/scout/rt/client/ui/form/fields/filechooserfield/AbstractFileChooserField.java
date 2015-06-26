@@ -171,7 +171,11 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
       try {
         IFileChooser fileChooser = getFileChooser();
         List<BinaryResource> result = fileChooser.startChooser();
-        setValue(CollectionUtility.firstElement(result));
+        // If "cancel" was clicked, the result is empty. We do not want to override the existing value in
+        // this case. (It may also have been "OK with no file", but this state is not distinguishable.)
+        if (!result.isEmpty()) {
+          setValue(CollectionUtility.firstElement(result));
+        }
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
