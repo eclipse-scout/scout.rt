@@ -314,7 +314,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       for (Map.Entry<String, String> e : sessionInitParams.entrySet()) {
         ctx.propertyMap().put(e.getKey(), e.getValue());
       }
-      return BEANS.get(ClientSessionProvider.class).provide(ctx);
+      return BEANS.get(ClientSessionProvider.class).provide(ctx, getClientSessionId());
     }
     catch (ProcessingException e) {
       throw new UiException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
