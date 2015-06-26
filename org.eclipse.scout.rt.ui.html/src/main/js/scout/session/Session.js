@@ -587,7 +587,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   options = options || {};
   var model = {
     iconId: options.iconId,
-    severity: options.severity || 4,
+    severity: options.severity !== undefined ? options.severity: scout.MessageBox.SEVERITY.ERROR,
     header: options.header,
     body: options.body,
     hiddenText: options.hiddenText,
