@@ -292,7 +292,9 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     prediction = this._$predict ? this._$predict.val() : undefined;
 
   if (event.which === scout.keys.TAB ||
-    event.which === scout.keys.SHIFT) {
+    event.which === scout.keys.SHIFT ||
+    event.which === scout.keys.CTRL ||
+    event.which === scout.keys.ALT) {
     return;
   }
   if (event.which === scout.keys.ENTER) {
