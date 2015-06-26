@@ -3,9 +3,6 @@ scout.MenuBarKeyStrokeAdapter = function(menuBar) {
 
   this.keyStrokes.push(new scout.MenuBarLeftKeyStroke(menuBar));
   this.keyStrokes.push(new scout.MenuBarRightKeyStroke(menuBar));
-  if (this._field && this._field.menuItems && this._field.menuItems.length > 0 && this._field.menuItems[0].session) {
-    this._uiSessionId = this._field.menuItems[0].session.uiSessionId;
-  }
 };
 scout.inherits(scout.MenuBarKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
