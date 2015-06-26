@@ -64,21 +64,32 @@
 
   <modules>
     <module>org.eclipse.scout.commons</module>
+    <module>org.eclipse.scout.commons.test</module>
     <module>org.eclipse.scout.rt.platform.api</module>
+    <module>org.eclipse.scout.rt.platform.api.test</module>
     <module>org.eclipse.scout.rt.platform</module>
+    <module>org.eclipse.scout.rt.platform.test</module>
     <module>org.eclipse.scout.rt.shared</module>
+    <module>org.eclipse.scout.rt.shared.test</module>
     <module>org.eclipse.scout.rt.server.commons</module>
+    <module>org.eclipse.scout.rt.server.commons.test</module>
 
     <module>org.eclipse.scout.rt.server</module>
+    <module>org.eclipse.scout.rt.server.test</module>
     <module>org.eclipse.scout.rt.server.jms</module>
     <module>org.eclipse.scout.rt.server.jaxws</module>
+    <module>org.eclipse.scout.rt.server.jaxws.test</module>
     <module>org.eclipse.scout.jaxws.apt</module>
 
     <module>org.eclipse.scout.rt.client</module>
+    <module>org.eclipse.scout.rt.client.test</module>
     <module>org.eclipse.scout.rt.client.mobile</module>
+    <module>org.eclipse.scout.rt.client.mobile.test</module>
     <module>org.eclipse.scout.rt.svg.client</module>
+    <module>org.eclipse.scout.rt.svg.client.test</module>
 
     <module>org.eclipse.scout.rt.ui.swing</module>
+    <module>org.eclipse.scout.rt.ui.swing.test</module>
     <module>org.eclipse.scout.rt.ui.swing.browser.swt.fragment</module>
     <module>org.eclipse.scout.rt.svg.ui.swing</module>
 
@@ -113,32 +124,68 @@
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.commons</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.commons.test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.platform.api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.platform.api.test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <artifactId>org.eclipse.scout.rt.server</artifactId>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.test</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -149,20 +196,32 @@
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.client.test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.client.mobile</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <artifactId>org.eclipse.scout.rt.ui.swing</artifactId>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.ui.swing</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -225,41 +284,6 @@
         <artifactId>commons-math</artifactId>
         <version>2.2</version>
       </dependency>
-
-      <dependency>
-        <artifactId>org.eclipse.scout.commons</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-
-      <dependency>
-        <artifactId>org.eclipse.scout.rt.platform</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-
-      <dependency>
-        <artifactId>org.eclipse.scout.rt.shared</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-
-      <dependency>
-        <artifactId>org.eclipse.scout.rt.server</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
-
-      <dependency>
-        <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <version>${project.version}</version>
-        <type>test-jar</type>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -297,13 +321,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.6</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>test-jar</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
 
         <plugin>
@@ -315,12 +332,6 @@
               <id>attach-sources</id>
               <goals>
                 <goal>jar</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>attach-test-sources</id>
-              <goals>
-                <goal>test-jar</goal>
               </goals>
             </execution>
           </executions>
@@ -342,24 +353,6 @@
             </execution>
           </executions>
         </plugin>
-
-<!--         <plugin> -->
-<!--           <groupId>com.github.ferstl</groupId> -->
-<!--           <artifactId>depgraph-maven-plugin</artifactId> -->
-<!--           <version>1.0.1</version> -->
-<!--           <configuration> -->
-<!--             <createImage>true</createImage> -->
-<!--             <detail>true</detail> -->
-<!--             <includeParentProjects>true</includeParentProjects> -->
-<!--             <showConflicts>true</showConflicts> -->
-<!--             <showDuplicates>true</showDuplicates> -->
-<!--             <showVersions>true</showVersions> -->
-<!--             <includes> -->
-<!--               <include>*scout*</include> -->
-<!--             </includes> -->
-<!--             <scope>compile</scope> -->
-<!--           </configuration> -->
-<!--         </plugin> -->
 
         <!--This plugin's configuration is used to store Eclipse m2e settings
           only. It has no influence on the Maven build itself. -->

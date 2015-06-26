@@ -44,12 +44,5 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-swing</artifactId>
     </dependency>
-
-      <!-- Test Dependencies -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>
