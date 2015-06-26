@@ -2,7 +2,7 @@
   border: 1px solid @navigation-background-color;
   height: 35px;
   border-radius: 5px;
-  margin: 13px 13px 9px 10px;
+  margin: 3px 13px 9px 10px;
   background-color: @palette-gray-2;
   width: calc(~"100%" - (13px + 10x));
 

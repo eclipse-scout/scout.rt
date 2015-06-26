@@ -199,6 +199,10 @@ scout.Desktop.prototype._isTabVisible = function(tab) {
 };
 
 scout.Desktop.prototype._updateTab = function(tab) {
+  if (!tab.$container) {
+    return;
+  }
+
   var setTitle = function(selector, title) {
     var $e = tab.$container.children(selector);
     if (title) {
@@ -229,8 +233,9 @@ scout.Desktop.prototype._selectTab = function(tab) {
   if (this._selectedTab) {
     this._unselectTab(this._selectedTab);
   }
-
-  tab.$container.select(true);
+  if (tab.$container) {
+    tab.$container.select(true);
+  }
   this._selectedTab = tab;
   if (tab.content instanceof scout.Table) {
     // Install adapter on parent (no table focus required)
@@ -264,7 +269,10 @@ scout.Desktop.prototype._unselectTab = function(tab) {
     this.session.detachHelper.beforeDetach(tab.$content);
     tab.$content.detach();
   }
-  tab.$container.select(false);
+
+  if (tab.$container) {
+    tab.$container.select(false);
+  }
 };
 
 /* handling of forms */
@@ -375,9 +383,9 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
 
   this._outlineTab._update(content, title, subTitle);
   content.tab = this._outlineTab;
-  if (!this._isTabVisible(this._outlineTab)) {
-    this._addTab(this._outlineTab, true);
-  }
+//  if (!this._isTabVisible(this._outlineTab)) {
+//    this._addTab(this._outlineTab, true);
+//  }
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
   // FIXME CGU: create DesktopTable or OutlineTable

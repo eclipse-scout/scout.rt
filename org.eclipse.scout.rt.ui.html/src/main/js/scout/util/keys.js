@@ -208,14 +208,23 @@ scout.keyStrokeBox = {
     if (shift) {
       keyBoxText = 'Shift ' + keyBoxText;
     }
-
     if (alt) {
       keyBoxText = 'Alt ' + keyBoxText;
     }
     if (ctrl) {
       keyBoxText = 'Ctrl ' + keyBoxText;
     }
-    $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
+    if ($container.css('position') === 'absolute') {
+      $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
+    } else {
+      var pos = $container.position();
+      if (pos) {
+        $container.prependDiv('key-box ', keyBoxText).css(align, '' + (pos.left + offset) + 'px');
+      } else {
+        // FIXME NBU: (key-strokes) check why sometimes pos is undefined even though we have a valid $container
+        $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $container=' +  $container);
+      }
+    }
   },
 
   keyStrokeName: function(ctrl, alt, shift, keyStroke) {
