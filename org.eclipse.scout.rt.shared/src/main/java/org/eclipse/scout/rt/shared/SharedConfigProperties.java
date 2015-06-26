@@ -95,6 +95,9 @@ public final class SharedConfigProperties {
 
     @Override
     protected String parse(String value) {
+      if (value == null) {
+        return null;
+      }
       int i = value.lastIndexOf("/process");
       if (i >= 0) {
         value = value.substring(0, i);
