@@ -22,6 +22,7 @@ scout.ImageField.prototype._render = function($parent) {
   }
 
   var $field = $('<img>')
+    .addClass('image')
     .appendTo(this.$fieldContainer)
     .on('load', this._onImageLoad.bind(this))
     .on('error', this._onImageError.bind(this));

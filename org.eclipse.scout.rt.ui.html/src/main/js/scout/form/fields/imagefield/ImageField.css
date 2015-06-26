@@ -1,11 +1,14 @@
-.image-field > .field > img {
+.image-field > .field {
+  overflow: hidden;
 
-  &.autofit {
-    max-width: 100%;
-    max-height: 100%;
-  }
+  & > .image {
+    &.autofit {
+      max-width: 100%;
+      max-height: 100%;
+    }
 
-  &.empty {
-    visibility: hidden;
+    &.empty {
+      visibility: hidden;
+    }
   }
 }
