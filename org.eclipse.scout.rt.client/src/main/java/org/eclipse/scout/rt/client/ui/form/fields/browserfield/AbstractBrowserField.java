@@ -68,12 +68,25 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     return false;
   }
 
+  /**
+   * Configures whether the sandbox mode is enabled.
+   *
+   * @return {@code true} if the sandbox mode of the embedded browser (iframe) must be enabled, {@code false} otherwise.
+   */
   @Order(220)
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredSandboxEnabled() {
     return true;
   }
 
+  /**
+   * Configures the sandbox permissions.
+   * <p>
+   * This property is only relevant when sandbox is enabled (see {@link #getConfiguredSandboxEnabled()}).
+   *
+   * @return Sandbox permissions to enabled or {@code null} / {@link IBrowserField.SandboxPermissions#none()} if no
+   *         permissions should be enabled.
+   */
   @Order(220)
   @ConfigProperty(ConfigProperty.OBJECT)
   protected EnumSet<SandboxPermissions> getConfiguredSandboxPermissions() {
@@ -86,11 +99,19 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * The default does nothing.
    * <p>
    * <b>Important:</b> this callback is only invoked when the IFRAME is not restricted by the sandbox property. You must
-   * either disable sandbox completely or grant the required permissions {@link SandboxPermissions}.
+   * either disable sandbox completely ({@link #getConfiguredSandboxEnabled()} returns false) or grant the required
+   * permissions ({@link SandboxPermissions#AllowScripts}).
+   * <p>
+   * Example java script call:
+   *
+   * <pre>
+   * window.parent.postMessage('hello application!', 'http://localhost:8082')
+   * </pre>
    *
    * @param data
    * @param orgin
    *          The origin of the window that sent the message at the time postMessage was called
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">Window.postMessage()</a>
    */
   @ConfigOperation
   @Order(230)
