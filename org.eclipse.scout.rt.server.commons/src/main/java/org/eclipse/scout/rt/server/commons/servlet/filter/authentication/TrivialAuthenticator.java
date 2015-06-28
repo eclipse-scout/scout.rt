@@ -12,11 +12,8 @@ import javax.security.auth.Subject;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -63,13 +60,10 @@ public class TrivialAuthenticator {
   /**
    * @return true if the request was handled (caller returns), false if nothing was done (caller continues)
    */
-  public boolean handle(final ServletRequest in, final ServletResponse out, final FilterChain chain) throws IOException, ServletException {
-    final HttpServletRequest req = (HttpServletRequest) in;
-    final HttpServletResponse resp = (HttpServletResponse) out;
-
+  public boolean handle(final HttpServletRequest req, final HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
     //within subject?
     if (currentSubjectHasValidPrincipal(req)) {
-      chain.doFilter(in, out);
+      chain.doFilter(req, resp);
       return true;
     }
 
@@ -82,7 +76,7 @@ public class TrivialAuthenticator {
 
     //excluded path
     if (m_excludePathFilter.accepts(req.getPathInfo())) {
-      chain.doFilter(in, out);
+      chain.doFilter(req, resp);
       return true;
     }
 
@@ -129,15 +123,9 @@ public class TrivialAuthenticator {
     Principal principal = null;
 
     // on session cache
-    final HttpSession session = req.getSession(false);
-    if (session != null) {
-      principal = (Principal) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
-      if (principal != null) {
-        //check principal timeout
-        if (checkPrincipalTimeout(req, principal)) {
-          return principal;
-        }
-      }
+    principal = BEANS.get(ServletFilterHelper.class).getPrincipalOnSession(req, m_principalCacheTimeout);
+    if (principal != null) {
+      return principal;
     }
 
     // on request as principal
@@ -154,23 +142,6 @@ public class TrivialAuthenticator {
     }
 
     return null;
-  }
-
-  protected boolean checkPrincipalTimeout(HttpServletRequest req, Principal principal) {
-    HttpSession session = req.getSession(false);
-    if (session != null) {
-      synchronized (principal) {
-        Long timestamp = (Long) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
-        if (timestamp != null) {
-          if (timestamp.longValue() + m_principalCacheTimeout > System.currentTimeMillis()) {
-            session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
-            session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
-            return false;
-          }
-        }
-      }
-    }
-    return true;
   }
 
   protected void sendSessionTimeout(HttpServletResponse resp) throws IOException {

@@ -16,6 +16,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.rt.platform.Bean;
@@ -33,6 +34,39 @@ public class ServletFilterHelper {
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
   public static final String HTTP_BASIC_AUTH_NAME = "Basic";
   public static final String HTTP_BASIC_AUTH_CHARSET = "ISO-8859-1";
+
+  public Principal getPrincipalOnSession(HttpServletRequest req, long principalCacheTimeout) {
+    final HttpSession session = req.getSession(false);
+    if (session != null) {
+      Principal principal = (Principal) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
+      if (principal != null) {
+        if (checkPrincipalTimeout(session, principal, principalCacheTimeout)) {
+          return principal;
+        }
+      }
+    }
+    return null;
+  }
+
+  public void putPrincipalOnSession(HttpServletRequest req, Principal principal) {
+    HttpSession session = req.getSession();
+    session.setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL, principal);
+    session.setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP, System.currentTimeMillis());
+  }
+
+  protected boolean checkPrincipalTimeout(HttpSession session, Principal principal, long principalCacheTimeout) {
+    synchronized (principal) {
+      Long timestamp = (Long) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
+      if (timestamp != null) {
+        if (timestamp.longValue() + principalCacheTimeout > System.currentTimeMillis()) {
+          session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
+          session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   public Subject createSubject(Principal principal) {
     // create subject if necessary
