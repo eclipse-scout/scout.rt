@@ -18,9 +18,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.colorfield.IColorFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -46,7 +48,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     setIconId(getConfiguredIconId());
 
   }

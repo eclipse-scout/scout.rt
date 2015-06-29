@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
@@ -57,7 +58,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 @ScoutSdkIgnore
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
-  private P_UIFacadeLegacy m_uiFacadeLegacy;
+  @SuppressWarnings("deprecation")
+  private IContentAssistFieldUIFacadeLegacy m_uiFacadeLegacy;
   private AtomicReference<IFuture<List<ILookupRow<LOOKUP_KEY>>>> m_backgroundJobFuture;
   private IContentAssistFieldUIFacade m_uiFacade;
 
@@ -99,8 +101,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected void initConfig() {
     m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
-    m_uiFacadeLegacy = new P_UIFacadeLegacy();
-    m_uiFacade = new ContentAssistFieldUIFacade<LOOKUP_KEY>(this);
+    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).install(new P_UIFacadeLegacy(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), this);
   }
 
   @Override

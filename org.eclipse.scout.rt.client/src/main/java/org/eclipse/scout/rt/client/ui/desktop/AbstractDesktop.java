@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +43,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
@@ -77,20 +77,18 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
-import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -136,16 +134,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IOutline m_outline;
   private boolean m_outlineChanging = false;
   private P_ActiveOutlineListener m_activeOutlineListener;
-  private final P_ActivatedFormListener m_activatedFormListener;
-  private final List<WeakReference<IForm>> m_lastActiveFormList;
   private ITable m_pageDetailTable;
   private IOutlineTableForm m_outlineTableForm;
   private boolean m_outlineTableFormVisible;
   private IForm m_pageDetailForm;
   private IForm m_pageSearchForm;
-  private final List<IForm> m_viewStack;
-  private final List<IForm> m_dialogStack;
-  private final List<IMessageBox> m_messageBoxStack;
+  private final FormStore m_formStore;
+  private final MessageBoxStore m_messageBoxStore;
+  private final FormActivationTracker m_formActivationTracker;
   private final List<IFileChooser> m_fileChooserStack;
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
@@ -172,18 +168,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public AbstractDesktop(boolean callInitializer) {
     m_localDesktopExtension = new P_LocalDesktopExtension();
     m_listenerList = new EventListenerList();
-    m_dataChangeListenerList = new HashMap<Object, EventListenerList>();
-    m_dataChangeEventBuffer = new ArrayList<Object[]>();
-    m_viewStack = new ArrayList<IForm>();
-    m_dialogStack = new ArrayList<IForm>();
-    m_messageBoxStack = new ArrayList<IMessageBox>();
-    m_fileChooserStack = new ArrayList<IFileChooser>();
-    m_uiFacade = new P_UIFacade();
+    m_dataChangeListenerList = new HashMap<>();
+    m_dataChangeEventBuffer = new ArrayList<>();
+    m_formStore = BEANS.get(FormStore.class);
+    m_messageBoxStore = BEANS.get(MessageBoxStore.class);
+    m_formActivationTracker = BEANS.get(FormActivationTracker.class);
+    m_fileChooserStack = new ArrayList<>();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     m_outlineTableFormVisible = true;
-    m_activatedFormListener = new P_ActivatedFormListener();
-    m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
-    m_addOns = new ArrayList<Object>();
-    m_objectExtensions = new ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>>(this);
+    m_addOns = new ArrayList<>();
+    m_objectExtensions = new ObjectExtensions<>(this);
     if (callInitializer) {
       callInitializer();
     }
@@ -507,6 +501,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void initConfig() {
+    m_formActivationTracker.start(this);
+
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
@@ -661,31 +657,40 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return form.getOuterForm().isShowing();
     }
 
-    for (IForm f : m_viewStack) {
-      if (f == form) {
-        return true;
-      }
-    }
-    for (IForm f : m_dialogStack) {
-      if (f == form) {
-        return true;
-      }
-    }
-    return false;
+    return m_formStore.contains(form);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <T extends IForm> T findForm(Class<T> formType) {
-    ArrayList<IForm> list = new ArrayList<IForm>();
-    list.addAll(m_viewStack);
-    list.addAll(m_dialogStack);
-    for (IForm f : list) {
-      if (formType.isAssignableFrom(f.getClass())) {
-        return (T) f;
+  public <FORM extends IForm> FORM findForm(Class<FORM> formType) {
+    if (formType == null) {
+      return null;
+    }
+
+    for (final IForm candidate : m_formStore.values()) {
+      if (formType.isAssignableFrom(candidate.getClass())) {
+        @SuppressWarnings("unchecked")
+        FORM form = (FORM) candidate;
+        return form;
       }
     }
     return null;
+  }
+
+  @Override
+  public <FORM extends IForm> List<FORM> findForms(final Class<FORM> formType) {
+    if (formType == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+
+    final List<FORM> forms = new ArrayList<FORM>();
+    for (final IForm candidate : m_formStore.values()) {
+      if (formType.isAssignableFrom(candidate.getClass())) {
+        @SuppressWarnings("unchecked")
+        FORM form = (FORM) candidate;
+        forms.add(form);
+      }
+    }
+    return forms;
   }
 
   @Override
@@ -724,34 +729,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return fireFindActiveForm();
   }
 
+  //TODO [dwi] remove this oder getActiveForm
   @Override
-  @SuppressWarnings("unchecked")
-  public <T extends IForm> List<T> findForms(Class<T> formType) {
-    List<T> resultList = new ArrayList<T>();
-    if (formType != null) {
-      List<IForm> list = new ArrayList<IForm>();
-      list.addAll(m_viewStack);
-      list.addAll(m_dialogStack);
-      for (IForm f : list) {
-        if (formType.isAssignableFrom(f.getClass())) {
-          resultList.add((T) f);
-        }
-      }
-    }
-    return resultList;
+  public <T extends IForm> T findActiveForm() {
+    return m_formActivationTracker.getActiveForm();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <T extends IForm> T findLastActiveForm(Class<T> formType) {
-    if (m_lastActiveFormList != null && formType != null) {
-      for (WeakReference<IForm> formRef : m_lastActiveFormList) {
-        if (formRef.get() != null && formType.isAssignableFrom(formRef.get().getClass())) {
-          return (T) formRef.get();
-        }
-      }
-    }
-    return null;
+  // TODO [dwi] rename to findActiveForm
+  public <FORM extends IForm> FORM findLastActiveForm(Class<FORM> formType) {
+    return m_formActivationTracker.getActiveForm(formType);
   }
 
   @Override
@@ -762,179 +749,150 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public List<IForm> getViewStack() {
-    return CollectionUtility.arrayList(m_viewStack);
+    return new ArrayList<>(m_formStore.getViews());
+  }
+
+  @Override
+  public Set<IForm> getViews(IFormParent formParent) {
+    return m_formStore.getViewsByFormParent(formParent);
   }
 
   @Override
   public List<IForm> getDialogStack() {
-    return CollectionUtility.arrayList(m_dialogStack);
+    return new ArrayList<>(m_formStore.getDialogs());
   }
 
-  /**
-   * returns all forms except the searchform and the current detail form with
-   * the same fully qualified classname and an equal primary key different from
-   * null.
-   *
-   * @param form
-   * @return
-   */
   @Override
-  public List<IForm> getSimilarViewForms(IForm form) {
-    List<IForm> forms = new ArrayList<IForm>(3);
-    try {
-      if (form != null && form.computeExclusiveKey() != null) {
-        Object originalKey = form.computeExclusiveKey();
-        for (IForm f : m_viewStack) {
-          Object candidateKey = f.computeExclusiveKey();
-          if (getPageDetailForm() == f || getPageSearchForm() == f) {
-            continue;
-          }
-          else if (candidateKey == null || originalKey == null) {
-            continue;
-          }
-          else {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("form: " + candidateKey + " vs " + originalKey);
-            }
+  public Set<IForm> getDialogs(IFormParent formParent) {
+    return m_formStore.getDialogsByFormParent(formParent);
+  }
 
-            if (f.getClass().getName().equals(form.getClass().getName()) && originalKey.equals(candidateKey)) {
-              forms.add(f);
-            }
-          }
-        }
+  @Override
+  public List<IMessageBox> getMessageBoxStack() {
+    return new ArrayList<>(m_messageBoxStore.values());
+  }
+
+  @Override
+  public Set<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
+    return m_messageBoxStore.getByMessageBoxParent(messageBoxParent);
+  }
+
+  @Override
+  // TODO [dwi] Clarify whether this method is still used.
+  public List<IForm> getSimilarViewForms(final IForm form) {
+    if (form == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+
+    final Object formKey;
+    try {
+      formKey = form.computeExclusiveKey();
+    }
+    catch (final ProcessingException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
+      return CollectionUtility.emptyArrayList();
+    }
+
+    if (formKey == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+
+    final IForm currentDetailForm = getPageDetailForm();
+    final IForm currentSearchForm = getPageSearchForm();
+
+    final List<IForm> similarForms = new ArrayList<>();
+    for (final IForm candidateView : m_formStore.getViewsByKey(formKey)) {
+      if (candidateView == currentDetailForm) {
+        continue;
+      }
+      if (candidateView == currentSearchForm) {
+        continue;
+      }
+
+      if (candidateView.getClass().equals(form.getClass())) {
+        similarForms.add(candidateView);
       }
     }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    return forms;
+
+    return similarForms;
   }
 
   @Override
-  public void ensureViewStackVisible() {
-    if (CollectionUtility.isEmpty(m_viewStack)) {
-      return;
-    }
-    for (IForm form : m_viewStack) {
-      ensureVisible(form);
+  public void ensureViewStackVisible() { // TODO [dwi] Clarify whether this method is still used.
+    for (IForm view : m_formStore.getViews()) {
+      ensureVisible(view);
     }
   }
 
   @Override
-  public void ensureVisible(IForm form) {
-    if (form != null && (m_viewStack.contains(form) || m_dialogStack.contains(form))) {
+  public void ensureVisible(IForm form) { // TODO [dwi] Rename with better name
+    if (form != null && m_formStore.contains(form)) {
       fireFormEnsureVisible(form);
     }
   }
 
   @Override
   public void addForm(IForm form) {
-    //Allow DesktopExtensions to do any modifications on forms before UI is informed
-    final IHolder<IForm> formHolder = new Holder<IForm>(IForm.class, form);
-    for (IDesktopExtension ext : getDesktopExtensions()) {
-      try {
-        ContributionCommand cc = ext.customFormModificationDelegate(formHolder);
-        if (cc == ContributionCommand.Stop) {
-          break;
+    form = interceptAddForm(form);
+    if (form == null || m_formStore.contains(form)) {
+      return;
+    }
+
+    // TODO [dwi] Clarify whether this method is still used.
+    // If the Form is not a View, close all open PopUp windows.
+    if (form.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
+      for (IForm popupWindow : m_formStore.getByDisplayHint(IForm.DISPLAY_HINT_POPUP_WINDOW)) {
+        try {
+          popupWindow.doClose();
         }
-      }
-      catch (ProcessingException e) {
-        formHolder.setValue(form);
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      catch (Exception t) {
-        formHolder.setValue(form);
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Formmodification error: " + form, t));
+        catch (Exception e) {
+          LOG.error("Failed to close popup window: " + popupWindow, e);
+        }
       }
     }
-    form = formHolder.getValue();
-    if (form != null) {
-      switch (form.getDisplayHint()) {
-        case IForm.DISPLAY_HINT_POPUP_WINDOW:
-        case IForm.DISPLAY_HINT_POPUP_DIALOG:
-        case IForm.DISPLAY_HINT_DIALOG: {
-          if (m_viewStack.remove(form)) {
-            fireFormRemoved(form);
-          }
-          //remove all open popup windows
-          if (form.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
-            for (IForm f : new ArrayList<IForm>(m_dialogStack)) {
-              if (f.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
-                try {
-                  f.doClose();
-                }
-                catch (Exception t) {
-                  LOG.error("Failed closing popup " + f, t);
-                }
-              }
-            }
-          }
-          if (!m_dialogStack.contains(form)) {
-            m_dialogStack.add(form);
-            fireFormAdded(form);
-          }
-          break;
-        }
-        case IForm.DISPLAY_HINT_VIEW: {
-          if (m_dialogStack.remove(form)) {
-            fireFormRemoved(form);
-          }
-          if (!m_viewStack.contains(form)) {
-            m_viewStack.add(form);
-            fireFormAdded(form);
-          }
-          break;
-        }
-      }
-      m_lastActiveFormList.add(new WeakReference<IForm>(form));
-      form.addFormListener(m_activatedFormListener);
-    }
+
+    m_formStore.add(form);
+    fireFormAdded(form);
   }
 
   @Override
   public void removeForm(IForm form) {
-    if (form != null) {
-      // remove form from last active form list
-      if (m_lastActiveFormList != null) {
-        for (Iterator<WeakReference<IForm>> it = m_lastActiveFormList.iterator(); it.hasNext();) {
-          WeakReference<IForm> formRef = it.next();
-          if (formRef.get() == null || form.equals(formRef.get())) {
-            it.remove();
-          }
-        }
-      }
-      form.removeFormListener(m_activatedFormListener);
-      boolean b1 = m_dialogStack.remove(form);
-      boolean b2 = m_viewStack.remove(form);
-      if (b1 || b2) {
-        fireFormRemoved(form);
-      }
+    if (form == null || !m_formStore.contains(form)) {
+      return;
     }
+
+    m_formStore.remove(form);
+    fireFormRemoved(form);
   }
 
   @Override
-  public List<IMessageBox> getMessageBoxStack() {
-    return CollectionUtility.arrayList(m_messageBoxStack);
+  public boolean containsForm(IForm form) {
+    return m_formStore.contains(form);
   }
 
   @Override
-  public void addMessageBox(final IMessageBox mb) {
-    m_messageBoxStack.add(mb);
-    mb.addMessageBoxListener(new MessageBoxListener() {
-      @Override
-      public void messageBoxChanged(MessageBoxEvent e) {
-        switch (e.getType()) {
-          case MessageBoxEvent.TYPE_CLOSED: {
-            removeMessageBoxInternal(mb);
-          }
-        }
-      }
-    });
-    fireMessageBoxAdded(mb);
+  public void addMessageBox(final IMessageBox messageBox) {
+    if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
+      return;
+    }
+
+    m_messageBoxStore.add(messageBox);
+    fireMessageBoxAdded(messageBox);
   }
 
-  private void removeMessageBoxInternal(IMessageBox mb) {
-    m_messageBoxStack.remove(mb);
+  @Override
+  public void removeMessageBox(IMessageBox messageBox) {
+    if (messageBox == null || !m_messageBoxStore.contains(messageBox)) {
+      return;
+    }
+
+    m_messageBoxStore.remove(messageBox);
+    fireMessageBoxRemoved(messageBox);
+  }
+
+  @Override
+  public boolean containsMessageBox(IMessageBox messageBox) {
+    return m_messageBoxStore.contains(messageBox);
   }
 
   @Override
@@ -1653,8 +1611,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireMessageBoxAdded(IMessageBox mb) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_ADDED, mb);
+  private void fireMessageBoxAdded(IMessageBox messageBox) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_ADDED, messageBox);
+    fireDesktopEvent(e);
+  }
+
+  private void fireMessageBoxRemoved(IMessageBox messageBox) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_REMOVED, messageBox);
     fireDesktopEvent(e);
   }
 
@@ -1932,6 +1895,30 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
+   * Method invoked to intercept a {@link IForm} before being added to the {@link IDesktop}.<br/>
+   * The default implementation delegates interception to installed desktop extensions via
+   * {@link IDesktopExtension#customFormModificationDelegate(IHolder)}.
+   *
+   * @return the {@link IForm} to be added to the {@link IDesktop}, or <code>null</code> to not add the {@link IForm} to
+   *         the {@link IDesktop}.
+   */
+  protected IForm interceptAddForm(IForm form) {
+    final IHolder<IForm> formHolder = new Holder<>(form);
+    for (IDesktopExtension extension : getDesktopExtensions()) {
+      try {
+        if (extension.customFormModificationDelegate(formHolder) == ContributionCommand.Stop) {
+          break;
+        }
+      }
+      catch (Exception e) {
+        formHolder.setValue(form);
+        BEANS.get(ExceptionHandler.class).handle(e);
+      }
+    }
+    return formHolder.getValue();
+  }
+
+  /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
   private class P_LocalDesktopExtension implements IDesktopExtension {
@@ -2140,25 +2127,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
         setPageSearchForm(((IOutline) e.getSource()).getSearchForm());
       }
-    }
-  }
-
-  private class P_ActivatedFormListener implements FormListener {
-    @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
-      if (e.getType() != FormEvent.TYPE_ACTIVATED) {
-        return;
-      }
-      // remove garbage collected references and the one of the given form event
-      for (Iterator<WeakReference<IForm>> it = m_lastActiveFormList.iterator(); it.hasNext();) {
-        WeakReference<IForm> formRef = it.next();
-        if (formRef.get() == null || formRef.get().equals(e.getForm())) {
-          it.remove();
-        }
-      }
-
-      // add changed form at the beginning -> last activated form
-      m_lastActiveFormList.add(0, new WeakReference<IForm>(e.getForm()));
     }
   }
 

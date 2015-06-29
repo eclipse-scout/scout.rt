@@ -39,14 +39,16 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    * @see IDesktop#setOutline(IOutline)
    */
   public static final int TYPE_OUTLINE_CHANGED = 200;
-  public static final int TYPE_FORM_ADDED = 600;
   /**
    * Necessary for page forms that "close" in the gui even if they are not
    * closed in model
    */
+  public static final int TYPE_FORM_ADDED = 600;
   public static final int TYPE_FORM_REMOVED = 610;
   public static final int TYPE_FORM_ENSURE_VISIBLE = 620;
+
   public static final int TYPE_MESSAGE_BOX_ADDED = 700;
+  public static final int TYPE_MESSAGE_BOX_REMOVED = 710;
   /**
    * print a form using properties printDevice, printParameters
    */

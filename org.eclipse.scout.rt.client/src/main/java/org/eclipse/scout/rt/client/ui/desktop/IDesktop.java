@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeListener;
+import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
@@ -57,7 +60,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>top-level menus (menu tree)
  * </ul>
  */
-public interface IDesktop extends IPropertyObserver {
+public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxParent {
   /**
    * String
    */
@@ -89,10 +92,25 @@ public interface IDesktop extends IPropertyObserver {
 
   void initDesktop() throws ProcessingException;
 
+  /**
+   * Returns the first {@link Form} which is of the given type or a sub type of the given type.
+   */
   <T extends IForm> T findForm(Class<T> formType);
 
+  /**
+   * Returns all registered Forms which are of the given type or a sub type of the given type.
+   */
   <T extends IForm> List<T> findForms(Class<T> formType);
 
+  /**
+   * @return the currently active {@link IForm}, or <code>null</code> if not available.
+   */
+  <T extends IForm> T findActiveForm();
+
+  /**
+   * @return the most recent activated {@link IForm} of the given type, or <code>null</code> if not available. However,
+   *         that IForm must not be the currently active {@link IForm}.
+   */
   <T extends IForm> T findLastActiveForm(Class<T> formType);
 
   /**
@@ -120,9 +138,8 @@ public interface IDesktop extends IPropertyObserver {
   void setTrayVisible(boolean b);
 
   /**
-   * @param form
-   * @return all forms except the searchform and the current detail form with
-   *         the same fully qualified classname and the same primary key.
+   * Returns all registered Views of the same class and with the same exclusive key, except the current Search- or
+   * Detail Form.
    */
   List<IForm> getSimilarViewForms(IForm form);
 
@@ -144,14 +161,35 @@ public interface IDesktop extends IPropertyObserver {
   void ensureVisible(IForm form);
 
   /**
-   * DISPLAY_HINT_VIEW
+   * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW}.
    */
-  List<IForm> getViewStack();
+  List<IForm> getViewStack(); // TODO [dwi] rename to getViews() and change to Set
 
   /**
-   * DISPLAY_HINT_DIALOG
+   * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW} and which are attached to the given
+   * {@link IFormParent}.
    */
-  List<IForm> getDialogStack();
+  Set<IForm> getViews(IFormParent formParent);
+
+  /**
+   * Returns all {@link IForm}s with dialog character:
+   * <ul>
+   * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
+   * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
+   * </ul>
+   */
+  List<IForm> getDialogStack(); // TODO [dwi] rename to getDialogs() and change to Set
+
+  /**
+   * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IFormParent}.
+   * <ul>
+   * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
+   * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
+   * </ul>
+   */
+  Set<IForm> getDialogs(IFormParent formParent);
 
   /**
    * Open dialogs or views that need to be saved
@@ -159,18 +197,46 @@ public interface IDesktop extends IPropertyObserver {
   List<IForm> getUnsavedForms();
 
   /**
-   * add form to desktop and notify attached listeners (incl. gui)
+   * Adds the given {@link IForm} to the desktop and notifies attached listeners like the UI.
    */
   void addForm(IForm form);
 
   /**
-   * remove form from desktop and notify attached listeners (incl. gui)
+   * Removes the given {@link IForm} from desktop and notifies attached listeners like the UI. However, the
+   * form is not closed, meaning that it can be added to the display anew in order to be displayed.
    */
   void removeForm(IForm form);
 
-  List<IMessageBox> getMessageBoxStack();
+  /**
+   * Returns whether the given {@link IForm} is registered on {@link IDesktop}.
+   */
+  boolean containsForm(IForm form);
 
-  void addMessageBox(IMessageBox mb);
+  /**
+   * Returns all message boxes registered on {@link IDesktop}.
+   */
+  List<IMessageBox> getMessageBoxStack(); // TODO [dwi] rename to getMessageBoxes() and change to Set
+
+  /**
+   * Returns all message boxes which are attached to the given {@link IMessageBox}.
+   */
+  Set<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent);
+
+  /**
+   * Adds the given {@link IMessageBox} to the desktop and notifies attached listeners like the UI.
+   */
+  void addMessageBox(IMessageBox messageBox);
+
+  /**
+   * Removes the given {@link IMessageBox} from desktop and notifies attached listeners like the UI. However, the
+   * message box is not closed, meaning that it can be added to the display anew in order to be displayed.
+   */
+  void removeMessageBox(IMessageBox messageBox);
+
+  /**
+   * Returns whether the given {@link IMessageBox} is registered on {@link IDesktop}.
+   */
+  boolean containsMessageBox(IMessageBox messageBox);
 
   List<IOutline> getAvailableOutlines();
 
@@ -433,6 +499,7 @@ public interface IDesktop extends IPropertyObserver {
    */
   void setStatusText(String s);
 
+  // TODO [dwi] implement with FileChooserStore
   List<IFileChooser> getFileChooserStack();
 
   /**
@@ -584,5 +651,4 @@ public interface IDesktop extends IPropertyObserver {
    * @since 5.1.0
    */
   boolean isOutlineChanging();
-
 }

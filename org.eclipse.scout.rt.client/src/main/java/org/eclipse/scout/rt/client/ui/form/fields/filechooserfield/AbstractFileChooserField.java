@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserfield.IFileChooserFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -66,7 +67,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     setShowFileExtension(getConfiguredShowFileExtension());
     setFileExtensions(getConfiguredFileExtensions());

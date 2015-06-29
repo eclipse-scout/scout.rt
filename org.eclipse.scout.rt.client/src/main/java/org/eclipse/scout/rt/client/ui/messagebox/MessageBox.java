@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IRunnable;
@@ -23,11 +24,15 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -40,19 +45,13 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  */
 @Bean
 public class MessageBox extends AbstractPropertyObserver implements IMessageBox {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
 
-  /**
-   * Do not use, use {@link MessageBoxes#create()} instead.
-   */
-  public MessageBox() {
-  }
-
-  /**
-   * Instance
-   */
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final IMessageBoxUIFacade m_uiFacade = new P_UIFacade();
+  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+
+  private IMessageBoxParent m_messageBoxParent;
 
   private long m_autoCloseMillis = -1;
 
@@ -72,11 +71,30 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private String m_copyPasteTextInternal;
   // modality
   private final IBlockingCondition m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
-  private IFuture<Void> m_autoCloseJob;
   // result
   private int m_answer;
   private boolean m_answerSet;
   private int m_severity;
+
+  /**
+   * Do not use, use {@link MessageBoxes#create()} instead.
+   */
+  public MessageBox() {
+    m_messageBoxParent = deriveMessageBoxParent();
+  }
+
+  @Override
+  public IMessageBoxParent messageBoxParent() {
+    return m_messageBoxParent;
+  }
+
+  @Override
+  public IMessageBox messageBoxParent(IMessageBoxParent messageBoxParent) {
+    Assertions.assertNotNull(messageBoxParent, "Property 'messageBoxParent' must not be null");
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().containsMessageBox(this), "Property 'messageBoxParent' cannot be changed because MessageBox is already attached to Desktop [msgBox=%s]", this);
+    m_messageBoxParent = messageBoxParent;
+    return this;
+  }
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -235,7 +253,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           m_header,
           m_body,
           m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
-              m_hiddenText);
+          m_hiddenText);
     }
   }
 
@@ -252,17 +270,37 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     m_listenerList.remove(MessageBoxListener.class, listener);
   }
 
-  private void fireClosed() {
+  protected void fireClosed() {
     fireMessageBoxEvent(new MessageBoxEvent(this, MessageBoxEvent.TYPE_CLOSED));
   }
 
-  private void fireMessageBoxEvent(MessageBoxEvent e) {
+  protected void fireMessageBoxEvent(MessageBoxEvent e) {
     EventListener[] listeners = m_listenerList.getListeners(MessageBoxListener.class);
     if (listeners != null && listeners.length > 0) {
       for (int i = 0; i < listeners.length; i++) {
         ((MessageBoxListener) listeners[i]).messageBoxChanged(e);
       }
     }
+  }
+
+  /**
+   * Derives the {@link IMessageBoxParent} from the calling context.
+   */
+  protected IMessageBoxParent deriveMessageBoxParent() {
+    ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
+
+    // Check whether a Form is currently the MessageBoxParent.
+    if (currentRunContext.form() != null) {
+      return currentRunContext.form();
+    }
+
+    // Check whether an Outline is currently the MessageBoxParent.
+    if (currentRunContext.outline() != null) {
+      return currentRunContext.outline();
+    }
+
+    // Take the desktop as MessageBoxParent.
+    return currentRunContext.session().getDesktop();
   }
 
   @Override
@@ -295,52 +333,55 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   public int show(int defaultResult) {
     m_answerSet = false;
     m_answer = defaultResult;
-    if (ClientSessionProvider.currentSession() != null) {
-      m_blockingCondition.setBlocking(true);
-      try {
-        // check if the desktop is observing this process
-        IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-        if (desktop == null || !desktop.isOpened()) {
-          LOG.warn("there is no desktop or the desktop has not yet been opened in the ui, default answer is CANCEL");
-          m_answerSet = true;
-          m_answer = CANCEL_OPTION;
-        }
-        else {
-          // request a gui
-          desktop.addMessageBox(this);
-          // attach auto-cancel timer
-          if (autoCloseMillis() > 0) {
-            final long dt = autoCloseMillis();
-            m_autoCloseJob = ClientJobs.schedule(new IRunnable() {
-              @Override
-              public void run() throws Exception {
-                if (IFuture.CURRENT.get() == m_autoCloseJob) {
-                  closeMessageBox();
-                }
-              }
-            }, dt, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Auto-close %s", header()));
-          }
-          // start sub event dispatch thread
-          waitFor();
-          if (m_autoCloseJob != null) {
-            m_autoCloseJob.cancel(true);
-            m_autoCloseJob = null;
-          }
-        }
-      }
-      finally {// end request gui
-        fireClosed();
-      }
-    }
-    else {
+
+    if (ClientSessionProvider.currentSession() == null) {
       LOG.warn("outside ScoutSessionThread, default answer is CANCEL");
       m_answerSet = true;
       m_answer = CANCEL_OPTION;
+      return m_answer;
+    }
+
+    m_blockingCondition.setBlocking(true);
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
+    try {
+      // check if the desktop is observing this process
+      if (desktop == null || !desktop.isOpened()) {
+        LOG.warn("there is no desktop or the desktop has not yet been opened in the ui, default answer is CANCEL");
+        m_answerSet = true;
+        m_answer = CANCEL_OPTION;
+      }
+      else {
+        // request a gui
+        desktop.addMessageBox(this);
+        // attach auto-cancel timer
+        IFuture<Void> autoCloseFuture = null;
+        if (autoCloseMillis() > 0) {
+          final long dt = autoCloseMillis();
+          autoCloseFuture = ClientJobs.schedule(new IRunnable() {
+            @Override
+            public void run() throws Exception {
+              closeMessageBox();
+            }
+          }, dt, TimeUnit.MILLISECONDS);
+        }
+        // start sub event dispatch thread
+        waitFor();
+
+        if (autoCloseFuture != null && !autoCloseFuture.isDone()) {
+          autoCloseFuture.cancel(true);
+        }
+      }
+    }
+    finally {
+      if (desktop != null) {
+        desktop.removeMessageBox(this);
+      }
+      fireClosed();
     }
     return m_answer;
   }
 
-  private void waitFor() {
+  protected void waitFor() {
     try {
       m_blockingCondition.waitFor();
     }
@@ -352,18 +393,16 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
         LOG.error("Failed to wait for the MessageBox to close", e);
       }
 
-      if (ModelJobs.isModelJob(IFuture.CURRENT.get())) {
-        throw new IllegalStateException("Failed to wait for the message box to close. Exit processing because not synchronized with the model-thread anymore.", e);
-      }
+      // Make sure to continue run in model thread.
+      Assertions.assertTrue(ModelJobs.isModelThread(), "Failed to wait for the message box to close. Exit processing because not synchronized with the model-thread anymore.");
     }
   }
 
-  private void closeMessageBox() {
-    m_autoCloseJob = null;
+  protected void closeMessageBox() {
     m_blockingCondition.setBlocking(false);
   }
 
-  private class P_UIFacade implements IMessageBoxUIFacade {
+  protected class P_UIFacade implements IMessageBoxUIFacade {
 
     @Override
     public void setResultFromUI(int option) {
@@ -381,5 +420,4 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       }
     }
   }
-
 }

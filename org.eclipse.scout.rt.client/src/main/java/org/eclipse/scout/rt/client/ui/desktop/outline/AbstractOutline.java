@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -29,6 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
@@ -76,6 +78,22 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   public AbstractOutline(boolean callInitialzier) {
     super(callInitialzier);
+  }
+
+  @Override
+  protected void callInitializer() {
+    // Run the initialization on behalf of the this Outline.
+    try {
+      ClientRunContexts.copyCurrent().outline(this).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          AbstractOutline.super.callInitializer();
+        }
+      });
+    }
+    catch (ProcessingException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
+    }
   }
 
   /*

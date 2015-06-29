@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -45,8 +46,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacadeLegacy = new P_UIFacadeLegacy();
-    m_uiFacade = new ContentAssistFieldUIFacade<LOOKUP_KEY>(this);
+    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).install(new P_UIFacadeLegacy(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), this);
   }
 
   @Override

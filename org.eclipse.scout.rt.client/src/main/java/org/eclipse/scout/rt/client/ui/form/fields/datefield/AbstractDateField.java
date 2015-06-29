@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
@@ -207,7 +208,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     setFormat(getConfiguredFormat());
     setHasDate(getConfiguredHasDate());

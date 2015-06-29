@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.IPlannerFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourcesChain;
@@ -108,7 +109,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   @SuppressWarnings("unchecked")
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_PlannerFieldUIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     setSplitterPosition(getConfiguredSplitterPosition());
 
@@ -171,7 +172,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     return m_uiFacade;
   }
 
-  private class P_PlannerFieldUIFacade implements IPlannerFieldUIFacade {
+  private class P_UIFacade implements IPlannerFieldUIFacade {
 
     @Override
     public void refreshFromUI() {

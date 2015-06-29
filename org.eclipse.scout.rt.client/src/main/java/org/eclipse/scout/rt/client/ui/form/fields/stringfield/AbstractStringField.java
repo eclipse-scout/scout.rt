@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.IStringFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDragRequestChain;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFi
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
@@ -194,7 +196,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     setMaxLength(getConfiguredMaxLength());
     setInputMasked(getConfiguredInputMasked());
     super.initConfig();

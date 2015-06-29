@@ -29,24 +29,24 @@ import java.util.Set;
  * // Define an indexed store with the indices registered.
  * public class PersonStore extends IndexedStore&lt;Person&gt; {
  * 
- *   private final PersonIdIndex IDX_ID = registerIndex(new PersonIdIndex());
- *   private final PersonNameIndex IDX_NAME = registerIndex(new PersonNameIndex());
+ *   private final P_PersonIdIndex m_idxId = registerIndex(new P_PersonIdIndex());
+ *   private final P_PersonNameIndex m_idxName = registerIndex(new P_PersonNameIndex());
  * 
  *   public Person getById(long id) {
- *     return IDX_ID.get(id);
+ *     return m_idxId.get(id);
  *   }
  * 
  *   public Set&lt;Person&gt; getByName(String name) {
- *     return IDX_NAME.get(name);
+ *     return m_idxName.get(name);
  *   }
  * 
  *   public Set&lt;String&gt; getNames() {
- *     return IDX_NAME.indexValues();
+ *     return m_idxName.indexValues();
  *   }
  * 
- *   // ===  Definition of indicies === //
+ *   // ====  Index definitions ==== //
  * 
- *   private class PersonIdIndex extends AbstractSingleValueIndex&lt;Long, Person&gt; {
+ *   private class P_PersonIdIndex extends AbstractSingleValueIndex&lt;Long, Person&gt; {
  * 
  *     &#064;Override
  *     protected Long calculateIndexFor(Person person) {
@@ -54,7 +54,7 @@ import java.util.Set;
  *     }
  *   }
  * 
- *   private class PersonNameIndex extends AbstractMultiValueIndex&lt;String, Person&gt; {
+ *   private class P_PersonNameIndex extends AbstractMultiValueIndex&lt;String, Person&gt; {
  * 
  *     &#064;Override
  *     protected String calculateIndexFor(Person person) {
@@ -115,6 +115,13 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
    */
   public Set<ELEMENT> values() {
     return m_elementIndex.values();
+  }
+
+  /**
+   * Returns whether the element is contained in this store.
+   */
+  public boolean contains(ELEMENT element) {
+    return m_elementIndex.contains(element);
   }
 
   /**

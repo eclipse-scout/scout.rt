@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.splitbox.ISplitBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal.SplitBoxGrid;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * <h3>AbstractSplitBox</h3> ...
@@ -82,7 +84,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     m_grid = new SplitBoxGrid(this);
     super.initConfig();
     setSplitHorizontal(getConfiguredSplitHorizontal());

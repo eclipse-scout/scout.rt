@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
+public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IFormParent, IMessageBoxParent {
 
   /**
    * {@link Boolean}
@@ -159,5 +159,4 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
   List<IMenu> getMenusForPage(IPage<?> page);
 
   void firePageChanged(IPage<?> page);
-
 }

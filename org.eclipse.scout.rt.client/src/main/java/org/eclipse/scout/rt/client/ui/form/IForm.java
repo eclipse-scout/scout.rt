@@ -23,6 +23,9 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -48,7 +51,7 @@ import org.w3c.dom.Element;
  * <b>handler</b> is responsible for loading from data and storing data. This usually involves calling process services
  * on the server. These will in turn contact a persistence layer such as a database.
  */
-public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
+public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFormParent, IMessageBoxParent {
 
   String PROP_TITLE = "title";
   String PROP_SUB_TITLE = "subTitle";
@@ -101,6 +104,23 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    * By default any of the #start* methods of the form call this method
    */
   void initForm() throws ProcessingException;
+
+  /**
+   * @return the {@link IFormParent} to attach this {@link IForm} to; is never <code>null</code>.
+   */
+  IFormParent getFormParent();
+
+  /**
+   * Sets the model element to attach this {@link IForm} to. By default, the {@link IFormParent} is automatically picked
+   * from the current calling context when the {@link IForm} is created. However, that parent can be overwritten
+   * manually, unless the {@link IForm} is started yet.
+   * <p>
+   * By default, a view's parent is the {@link IDesktop} and not the parent of the calling context.
+   *
+   * @param formParent
+   *          like {@link IDesktop}, {@link IOutline} or {@link IForm}; must not be <code>null</code>.
+   */
+  void setFormParent(IFormParent formParent);
 
   /**
    * This method is called to get an exclusive key of the form. The key is used

@@ -27,11 +27,13 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.numberfield.INumberFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")
@@ -106,7 +108,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     initFormat();
     setRoundingMode(getConfiguredRoundingMode());

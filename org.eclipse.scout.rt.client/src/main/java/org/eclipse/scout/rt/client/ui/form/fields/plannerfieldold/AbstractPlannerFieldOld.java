@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.IPlannerFieldOldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.PlannerFieldOldChains.PlannerFieldOldLoadActivityMapDataChain;
@@ -160,7 +161,7 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
   @Override
   @SuppressWarnings("unchecked")
   protected void initConfig() {
-    m_uiFacade = new P_PlannerFieldUIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     setMiniCalendarCount(getConfiguredMiniCalendarCount());
     setSplitterPosition(getConfiguredSplitterPosition());
@@ -379,7 +380,7 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
     return m_uiFacade;
   }
 
-  private class P_PlannerFieldUIFacade implements IPlannerFieldOldUIFacade {
+  private class P_UIFacade implements IPlannerFieldOldUIFacade {
 
     @Override
     public void refreshFromUI() {

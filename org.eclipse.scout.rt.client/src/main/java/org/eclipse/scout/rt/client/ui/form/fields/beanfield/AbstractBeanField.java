@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.BeanFieldChains.BeanFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.IBeanFieldExtension;
@@ -32,7 +33,7 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
   }
 
   @Override

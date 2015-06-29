@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
@@ -490,7 +491,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_enabledGranted = true;
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
-    m_uiFacade = createUIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(createUIFacade(), this);
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setTitle(getConfiguredTitle());

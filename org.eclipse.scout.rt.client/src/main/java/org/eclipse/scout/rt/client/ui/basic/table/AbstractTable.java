@@ -47,6 +47,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
@@ -867,7 +868,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void initConfig() {
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
-    m_uiFacade = createUIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(createUIFacade(), this);
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setTitle(getConfiguredTitle());

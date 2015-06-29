@@ -21,7 +21,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 
 /**
- * Represents an index which multiple elements can result in the very same index value.
+ * Represents an index for which multiple elements can result in the very same index value.
  *
  * @since 5.1
  */

@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAdditionalOrNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAttributeNodeChain;
@@ -312,7 +313,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     m_dataModel = interceptCreateDataModel();
     // tree

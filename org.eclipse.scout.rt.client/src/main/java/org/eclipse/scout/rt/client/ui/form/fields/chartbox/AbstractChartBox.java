@@ -16,8 +16,10 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.chartbox.IChartBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.platform.BEANS;
 
 @ClassId("4b06de6a-09c5-4500-ba64-8d886467ffd8")
 public abstract class AbstractChartBox extends AbstractFormField implements IChartBox {
@@ -48,7 +50,7 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     super.initConfig();
     setChartQName(getConfiguredChartQName());
   }

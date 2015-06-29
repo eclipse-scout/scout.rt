@@ -36,6 +36,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -280,12 +282,32 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void removeForm(IForm form) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean containsForm(IForm form) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     throw createUnsupportedOperationException();
   }
 
   @Override
   public void addMessageBox(IMessageBox mb) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void removeMessageBox(IMessageBox messageBox) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean containsMessageBox(IMessageBox messageBox) {
     throw createUnsupportedOperationException();
   }
 
@@ -360,6 +382,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public <T extends IForm> T findActiveForm() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public <T extends IForm> T findLastActiveForm(Class<T> formType) {
     throw createUnsupportedOperationException();
   }
@@ -376,6 +403,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public List<IForm> getDialogStack() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public Set<IForm> getDialogs(IFormParent formParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -401,6 +433,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public List<IMessageBox> getMessageBoxStack() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public Set<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -510,6 +547,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public Set<IForm> getViews(IFormParent formParent) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void initDesktop() throws ProcessingException {
     throw createUnsupportedOperationException();
   }
@@ -547,11 +589,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void removeForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 
@@ -633,5 +670,4 @@ public class VirtualDesktop implements IDesktop {
   public boolean isOutlineChanging() {
     throw createUnsupportedOperationException();
   }
-
 }

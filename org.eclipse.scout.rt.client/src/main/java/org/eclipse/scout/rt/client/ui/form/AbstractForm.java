@@ -34,11 +34,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -58,6 +60,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -88,6 +92,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -186,11 +191,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private int m_toolbarLocation;
 
+  private final PreferredValue<IFormParent> m_formParent;
+
   public AbstractForm() throws ProcessingException {
     this(true);
   }
 
   public AbstractForm(boolean callInitializer) throws ProcessingException {
+    m_formParent = new PreferredValue<>(deriveFormParent(), false); // set derived FormParent as non-preferred value.
+
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerForm(this);
     }
@@ -201,10 +210,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_formLoading = true;
     m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
     m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this);
+
     if (callInitializer) {
       callInitializer();
     }
+  }
 
+  @Override
+  public IFormParent getFormParent() {
+    return m_formParent.get();
+  }
+
+  @Override
+  public void setFormParent(IFormParent formParent) {
+    Assertions.assertNotNull(formParent, "Property 'formParent' must not be null");
+    Assertions.assertFalse(getDesktop().containsForm(this), "Property 'formParent' cannot be changed because Form is already attached to Desktop [form=%s]", this);
+    m_formParent.set(formParent, true);
   }
 
   @Override
@@ -233,11 +254,20 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void callInitializer() throws ProcessingException {
-    if (!m_initialized) {
-      interceptInitConfig();
-      postInitConfig();
-      m_initialized = true;
+    if (m_initialized) {
+      return;
     }
+
+    // Run the initialization on behalf of the this Form.
+    ClientRunContexts.copyCurrent().form(this).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        interceptInitConfig();
+        postInitConfig();
+        m_initialized = true;
+      }
+    });
   }
 
   protected IFormExtension<? extends AbstractForm> createLocalExtension() {
@@ -573,7 +603,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void initConfig() throws ProcessingException {
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+
     m_timerFutureMap = new HashMap<>();
     m_autoRegisterInDesktopOnStart = true;
     m_contributionHolder = new ContributionComposite(this);
@@ -920,6 +951,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         desktop.addForm(this);
       }
     }
+
     return this;
   }
 
@@ -2725,28 +2757,28 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setDisplayHint(int i) {
-    switch (i) {
-      case DISPLAY_HINT_DIALOG: {
-        m_displayHint = i;
+  public void setDisplayHint(int displayHint) {
+    Assertions.assertFalse(getDesktop().containsForm(this), "Property 'displayHint' cannot be changed because Form is already attached to Desktop [form=%s]", this);
+
+    switch (displayHint) {
+      case DISPLAY_HINT_DIALOG:
+      case DISPLAY_HINT_POPUP_DIALOG: {
+        m_displayHint = displayHint;
         break;
       }
       case DISPLAY_HINT_POPUP_WINDOW: {
-        m_displayHint = i;
+        m_displayHint = displayHint;
         setModal(false);
-        break;
-      }
-      case DISPLAY_HINT_POPUP_DIALOG: {
-        m_displayHint = i;
         break;
       }
       case DISPLAY_HINT_VIEW: {
-        m_displayHint = i;
+        m_displayHint = displayHint;
         setModal(false);
+        m_formParent.set(getDesktop(), false); // by default, a View has the Desktop as FormParent.
         break;
       }
       default: {
-        throw new IllegalArgumentException("invalid displayHint " + i);
+        throw new IllegalArgumentException("Unsupported displayHint " + displayHint);
       }
     }
   }
@@ -2864,6 +2896,26 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         break;
       }
     }
+  }
+
+  /**
+   * Derives the {@link IFormParent} from the calling context.
+   */
+  protected IFormParent deriveFormParent() {
+    ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
+
+    // Check whether a Form is currently the FormParent.
+    if (currentRunContext.form() != null) {
+      return currentRunContext.form();
+    }
+
+    // Check whether an Outline is currently the FormParent.
+    if (currentRunContext.outline() != null) {
+      return currentRunContext.outline();
+    }
+
+    // Take the desktop as FormParent.
+    return currentRunContext.session().getDesktop();
   }
 
   /**
