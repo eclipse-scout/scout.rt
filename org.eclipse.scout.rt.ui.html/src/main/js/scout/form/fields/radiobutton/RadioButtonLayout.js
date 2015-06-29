@@ -13,7 +13,7 @@ scout.inherits(scout.RadioButtonLayout, scout.FormFieldLayout);
  * @param formField
  * @returns {scout.Dimension}
  */
-scout.FormFieldLayout.prototype.naturalSize = function(formField) {
+scout.RadioButtonLayout.prototype.naturalSize = function(formField) {
   var radioButtonBubbleWidth = this.formField.$field.retriveBeforeElementCss('width');
 
   return new scout.Dimension(Number(formField.$fieldContainer.outerWidth(true))+Number(radioButtonBubbleWidth.replace('px','')), formField.$fieldContainer.outerHeight(true));
