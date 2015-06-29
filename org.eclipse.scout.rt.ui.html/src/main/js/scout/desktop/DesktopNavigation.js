@@ -4,6 +4,7 @@ scout.DesktopNavigation = function(desktop) {
   this.session = desktop.session;
 
   this.BREADCRUMB_SWITCH_WIDTH = 190;
+  this.MIN_SPLITTER_SIZE = 50;
 
   this.$navigation;
   this.$viewButtons;
@@ -71,14 +72,13 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
 
 // vertical splitter
 scout.DesktopNavigation.prototype.onResize = function(event) {
-  var w = event.data; // data = newSize
+  var w = Math.max(event.data, this.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
 
   this.$navigation.width(w);
   this.htmlViewButtons.revalidateLayout();
   this.desktop.$taskBar.css('left', w);
   this.desktop.$bench.css('left', w);
 
-  //FIXME AWE bounce effect is broken
   if (w <= this.BREADCRUMB_SWITCH_WIDTH) {
     if (!this.$navigation.hasClass('navigation-breadcrumb')) {
       this.$navigation.addClass('navigation-breadcrumb');

@@ -88,9 +88,15 @@ scout.Desktop.prototype._render = function($parent) {
   // FIXME AWE: (user-prefs) Use user-preferences instead of sessionStorage
   var storedSplitterPosition = sessionStorage.getItem('scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
+    // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
     this.splitter.updatePosition(splitterPosition);
     this._handleUpdateSplitterPosition(splitterPosition);
+  }
+  else {
+    // Set initial splitter position
+    this.splitter.updatePosition();
+    this._handleUpdateSplitterPosition(this.splitter.positoin);
   }
 
   this.views.forEach(this._renderView.bind(this));
@@ -137,12 +143,12 @@ scout.Desktop.prototype.onSplitterResizeEnd = function(event) {
   sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
 
   // Check if splitter is smaller than min size
-  if (splitterPosition < this.navigation.breadcrumbSwitchWidth) {
-    // Set width of navigation to breadcrumbSwitchWidth, using an animation.
+  if (splitterPosition < this.navigation.BREADCRUMB_SWITCH_WIDTH) {
+    // Set width of navigation to BREADCRUMB_SWITCH_WIDTH, using an animation.
     // While animating, update the desktop layout.
     // At the end of the animation, update the desktop layout, and store the splitter position.
     this.navigation.$navigation.animate({
-      width: this.navigation.breadcrumbSwitchWidth
+      width: this.navigation.BREADCRUMB_SWITCH_WIDTH
     }, {
       progress: function() {
         this.splitter.updatePosition();
