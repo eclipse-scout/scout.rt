@@ -1,6 +1,7 @@
 scout.ViewMenuPopup = function($tab, viewMenus, naviBounds, session) {
   scout.ViewMenuPopup.parent.call(this, session);
   this.$tab = $tab;
+  this.$headBlueprint = this.$tab;
   this.viewMenus = viewMenus;
   this.naviBounds = naviBounds;
 };
@@ -21,12 +22,6 @@ scout.ViewMenuPopup.prototype._renderHead = function() {
   scout.ViewMenuPopup.parent.prototype._renderHead.call(this);
   this._copyCssClassToHead('navigation-tab-outline-button');
   this.$head.addClass('navigation-header');
-};
-
-scout.ViewMenuPopup.prototype._copyCssClassToHead = function(className) {
-  if (this.$tab.hasClass(className)) {
-    this.$head.addClass(className);
-  }
 };
 
 scout.ViewMenuPopup.prototype.alignTo = function() {

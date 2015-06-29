@@ -42,6 +42,12 @@ scout.PopupWithHead.prototype._removeHead = function() {
   }
 };
 
+scout.PopupWithHead.prototype._copyCssClassToHead = function(className) {
+  if (this.$headBlueprint && this.$headBlueprint.hasClass(className)) {
+    this.$head.addClass(className);
+  }
+};
+
 scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
   if (this.$head && this.$head.isOrHas(event.target)) {
     this.close();

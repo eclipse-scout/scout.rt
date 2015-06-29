@@ -50,14 +50,14 @@
     font-size: 20px;
     padding-top: 3px;
   }
-
-  & .view-button-tab-title {
-    .font-text-large;
-    .overflow-ellipsis-nowrap;
-  }
 }
 
-& .view-menu-button {
+.view-button-tab-title {
+ .font-text-large;
+ .overflow-ellipsis-nowrap;
+}
+
+.view-menu-button {
   margin-left: 8px;
 
   &::before {

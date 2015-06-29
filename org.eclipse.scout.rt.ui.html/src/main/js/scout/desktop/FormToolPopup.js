@@ -1,6 +1,7 @@
 scout.FormToolPopup = function(formToolButton, session) {
   scout.FormToolPopup.parent.call(this, session);
   this.$formToolButton = formToolButton.$container;
+  this.$headBlueprint = this.$formToolButton;
   this.formToolButton = formToolButton;
   formToolButton.form.rootGroupBox.menuBar.bottom();
   if (formToolButton.keyStroke) {
@@ -24,14 +25,7 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.alignTo();
 };
 
-scout.FormToolPopup.prototype._copyCssClassToHead = function(className) {
-  if (this.$formToolButton.hasClass(className)) {
-    this.$head.addClass(className);
-  }
-};
-
 scout.FormToolPopup.prototype._renderHead = function() {
-  this.$headBlueprint = this.$formToolButton;
   scout.FormToolPopup.parent.prototype._renderHead.call(this);
   this._copyCssClassToHead('taskbar-tool-item');
   this.$head.addClass('selected');
@@ -65,7 +59,7 @@ scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {
 };
 
 scout.FormToolPopup.prototype.alignTo = function() {
-  //TODO nbu add hack to trigger this function after resources loaded(fonts);
+  // TODO nbu add hack to trigger this function after resources loaded(fonts);
   var pos = this.$formToolButton.offset(),
     headSize = scout.graphics.getSize(this.$head, true),
     bodyWidth = scout.graphics.getSize(this.$body, true).width;

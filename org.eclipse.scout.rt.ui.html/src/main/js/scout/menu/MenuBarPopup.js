@@ -5,34 +5,34 @@
 scout.MenuBarPopup = function(menu, session) {
   scout.MenuBarPopup.parent.call(this, session);
   this.menu = menu;
+  this.$headBlueprint = this.menu.$container;
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
 /**
- *  @override
+ * @override
  */
 scout.MenuBarPopup.prototype._getMenuItems = function() {
   return this.menu.childActions || this.menu.menus;
 };
 
 /**
- *  @override
+ * @override
  */
 scout.MenuBarPopup.prototype._beforeRenderMenuItems = function() {
 };
 
 /**
- *  @override
+ * @override
  */
 scout.MenuBarPopup.prototype._afterRenderMenuItems = function() {
   this.alignTo();
 };
 
 scout.MenuBarPopup.prototype._renderHead = function() {
-  this.$headBlueprint = this.menu.$container;
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
 
-  //FIXME AWE throws exception if this.menu is a button because button is not rendered (MenuButtonAdapter is)
+  // FIXME AWE throws exception if this.menu is a button because button is not rendered (MenuButtonAdapter is)
   if (this.menu.$container.parent().hasClass('main-menubar')) {
     this.$head.addClass('in-main-menubar');
   }
@@ -50,12 +50,6 @@ scout.MenuBarPopup.prototype._renderHead = function() {
 scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
   this.close();
   menu.sendDoAction();
-};
-
-scout.MenuBarPopup.prototype._copyCssClassToHead = function(className) {
-  if (this.menu.$container.hasClass(className)) {
-    this.$head.addClass(className);
-  }
 };
 
 scout.MenuBarPopup.prototype.alignTo = function() {
