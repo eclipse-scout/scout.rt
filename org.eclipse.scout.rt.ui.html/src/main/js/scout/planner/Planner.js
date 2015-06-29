@@ -503,9 +503,7 @@ scout.Planner.prototype._renderResources = function(resources) {
   for (i = 0; i < resources.length; i++) {
     resource = resources[i];
     $resource = this._build$Resource(resource, this.$grid);
-    $resource.data('resource', resource)
-      .appendTo(this.$grid);
-    resource.$resource = $resource;
+    $resource.appendTo(this.$grid);
   }
 };
 
@@ -519,6 +517,8 @@ scout.Planner.prototype._build$Resource = function(resource) {
     $activity = this._build$Activity(resource.activities[i]);
     $activity.appendTo($cells);
   }
+  $resource.data('resource', resource);
+  resource.$resource = $resource;
   return $resource;
 };
 
@@ -1097,6 +1097,26 @@ scout.Planner.prototype._deleteAllResources = function() {
   this.selectRange({}, false);
 };
 
+scout.Planner.prototype._updateResources = function(resources) {
+  resources.forEach(function(updatedResource) {
+    var oldResource = this.resourceMap[updatedResource.id];
+    if (!oldResource) {
+      throw new Error('Update event received for non existing resource. ResourceId: ' + updatedResource.id);
+    }
+
+    // Replace old resource
+    this._initResource(updatedResource);
+    scout.arrays.replace(this.resources, oldResource, updatedResource);
+    scout.arrays.replace(this.selectedResources, oldResource, updatedResource);
+
+    // Replace old $resource
+    if (this.rendered && oldResource.$resource) {
+      var $updatedResource = this._build$Resource(updatedResource);
+      oldResource.$resource.replaceWith($updatedResource);
+    }
+  }.bind(this));
+};
+
 scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {
   this.session.send(this.id, 'setDisplayMode', {
     displayMode: displayMode
@@ -1134,11 +1154,11 @@ scout.Planner.prototype._onAllResourcesDeleted = function() {
 };
 
 scout.Planner.prototype._onResourcesUpdated = function(resources) {
-
+  this._updateResources(resources);
 };
 
 scout.Planner.prototype._onResourceOrderChanged = function(resourceIds) {
-
+  //FIXME CGU implement
 };
 
 scout.Planner.prototype.onModelAction = function(event) {

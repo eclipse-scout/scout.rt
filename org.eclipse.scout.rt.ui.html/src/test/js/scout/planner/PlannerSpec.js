@@ -93,4 +93,45 @@ describe("Planner", function() {
     });
 
   });
+
+
+  describe("_updateResources", function() {
+    var model, planner, resource0, resource1, resource2, $resource1;
+
+    beforeEach(function() {
+      model = createPlannerModel(3);
+      planner = createPlanner(model);
+      resource0 = model.resources[0];
+      resource1 = model.resources[1];
+      resource2 = model.resources[2];
+    });
+
+    it("updates resources in model", function() {
+      expect(planner.resources[1]).toBe(resource1);
+      expect(planner.resources[1].resourceCell.text).toBe('resource1');
+      expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
+
+      var updatedResource = createResource('new resource1');
+      updatedResource.id = resource1.id;
+      planner._updateResources([updatedResource]);
+      expect(planner.resources[1]).not.toBe(resource1);
+      expect(planner.resources[1].resourceCell.text).toBe('new resource1');
+      expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
+    });
+
+    it("updates resources in html document", function() {
+      planner.render(session.$entryPoint);
+      $resource1 = find$Resources(planner).eq(1);
+      expect($resource1.children('.resource-title').text()).toBe('resource1');
+      expect($resource1[0]).toBe(resource1.$resource[0]);
+
+      var updatedResource = createResource('new resource1');
+      updatedResource.id = resource1.id;
+      planner._updateResources([updatedResource]);
+      $resource1 = find$Resources(planner).eq(1);
+      expect($resource1.children('.resource-title').text()).toBe('new resource1');
+      expect($resource1[0]).toBe(updatedResource.$resource[0]);
+      expect($resource1.data('resource')).toBe(updatedResource);
+    });
+  });
 });
