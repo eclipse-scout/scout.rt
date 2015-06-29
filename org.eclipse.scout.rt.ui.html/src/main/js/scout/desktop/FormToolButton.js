@@ -2,6 +2,7 @@ scout.FormToolButton = function() {
   scout.FormToolButton.parent.call(this);
   this.desktop;
   this.$content;
+  this.$title;
   this.popup;
   this._addAdapterProperties('form');
 };
@@ -9,6 +10,7 @@ scout.inherits(scout.FormToolButton, scout.Action);
 
 scout.FormToolButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('taskbar-tool-item');
+  this.$title = this.$container.appendSpan('taskbar-tool-item-title');
 };
 
 scout.FormToolButton.prototype.toggle = function() {
@@ -56,7 +58,7 @@ scout.FormToolButton.prototype._closeContainer = function() {
 
 scout.FormToolButton.prototype._renderForm = function() {
   if (!this.rendered) {
-    //Don't execute initially since _renderSelected will be executed
+    // Don't execute initially since _renderSelected will be executed
     return;
   }
   this._renderSelected(this.selected);
@@ -72,7 +74,7 @@ scout.FormToolButton.prototype._renderSelected = function(selected) {
     if (this.form) {
       this._closeContainer();
     }
-    //Don't update the desktop initially -> only the selected tool is allowed to set it
+    // Don't update the desktop initially -> only the selected tool is allowed to set it
     if (this.rendered) {
       this.desktop.selectedTool = null;
     }
@@ -95,8 +97,12 @@ scout.FormToolButton.prototype.handle = function(event) {
   }
 };
 
+/**
+ * @override Action.js
+ */
 scout.FormToolButton.prototype._renderText = function(text) {
-  scout.FormToolButton.parent.prototype._renderText.call(this, text);
+  text = text || '';
+  this.$title.text(text);
   if (this.popup) {
     this.popup.rerenderHead();
     this.popup.alignTo();

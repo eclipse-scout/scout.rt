@@ -53,7 +53,8 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     $item.removeClass('min-padding');
     var dataText = $item.data('item-text');
     if (dataText) {
-      $item.text(dataText);
+      var $title = $item.find('.taskbar-tool-item-title');
+      $title.text(dataText);
     }
   });
 
@@ -93,8 +94,9 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // 2nd remove text from tool-bar items, only show icon
     $tools.find('.taskbar-tool-item').each(function() {
       var $item = $(this),
-        text = $item.text();
-      $item.empty();
+        $title = $item.find('.taskbar-tool-item-title'),
+        text = $title.text();
+      $title.empty();
       $item.data('item-text', text);
     });
 
@@ -119,7 +121,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
     // FIXME AWE: display correct range of tabs (around visible tab)
     // FIXME AWE: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
-    // Never put first tab into overflow (this will change when desktop is refactored)
+    // Never put selected tab into overflow
     var i = 0, selectedIndex, tab;
     $tabs.find('.taskbar-tab-item').each(function() {
       if ($(this).hasClass('selected')) {
