@@ -729,13 +729,16 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
   event.preventDefault();
   event.stopPropagation();
   var filteredMenus = scout.menus.filter(this.menus, [allowedType]),
-  popup = new scout.ContextMenuPopup(this.session, filteredMenus),
     $part = $(event.currentTarget),
-    x = event.pageX,
-    y = event.pageY;
-  popup.$anchor = $part;
-  popup.render();
-  popup.setLocation(new scout.Point(x, y));
+    popup = new scout.ContextMenuPopup(this.session, {
+      menuItems: filteredMenus,
+      location: {
+        x: event.pageX,
+        y: event.pageY
+      },
+      $anchor: $part
+    });
+    popup.render();
 };
 
 /* -- components, arrangement------------------------------------ */

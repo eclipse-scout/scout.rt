@@ -5,6 +5,9 @@ scout.Popup = function(session, options) {
   this.session = session;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.anchorBounds = options.anchorBounds;
+  if (options.location) {
+    this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
+  }
   this.$anchor = options.$anchor;
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
@@ -111,7 +114,7 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   return {x: x, y: y};
 };
 
-scout.Popup.prototype.overlap = function($container, location, anchorBounds) {
+scout.Popup.prototype.overlap = function($container, location) {
   if (!$container || !location) {
     return;
   }
@@ -128,7 +131,7 @@ scout.Popup.prototype.overlap = function($container, location, anchorBounds) {
 
 scout.Popup.prototype.adjustLocation = function($container, location, anchorBounds) {
   var openingDirection, left, top,
-    overlap = this.overlap($container, location, anchorBounds);
+    overlap = this.overlap($container, location);
 
   if (overlap.y > 0) {
     // switch opening direction

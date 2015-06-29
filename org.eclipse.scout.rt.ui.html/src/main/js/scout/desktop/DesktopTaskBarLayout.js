@@ -70,8 +70,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     $tabs.find('.taskbar-tab-item').each(function() {
       $(this).outerWidth(tabWidth);
     });
-  }
-  else {
+  } else {
 
     // 1st try to minimize padding around tool-bar items
     // re-calculate tabsWidth with reduced padding on the tool-bar-items
@@ -122,7 +121,8 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // FIXME AWE: display correct range of tabs (around visible tab)
     // FIXME AWE: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
     // Never put selected tab into overflow
-    var i = 0, selectedIndex, tab;
+    var i = 0,
+      selectedIndex, tab;
     $tabs.find('.taskbar-tab-item').each(function() {
       if ($(this).hasClass('selected')) {
         selectedIndex = i;
@@ -186,8 +186,13 @@ scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
     overflowMenus.push(menu);
   });
 
-  popup = new scout.ContextMenuPopup(desktop.session, overflowMenus, {cloneMenuItems: false});
+  popup = new scout.ContextMenuPopup(desktop.session, {
+    menuItems: overflowMenus,
+    cloneMenuItems: false,
+    location: {
+      x: event.pageX,
+      y: event.pageY
+    }
+  });
   popup.render();
-  popup.setLocation(new scout.Point(event.pageX, event.pageY));
 };
-

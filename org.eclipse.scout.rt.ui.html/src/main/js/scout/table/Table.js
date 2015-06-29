@@ -118,7 +118,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
   this.rowIconColumn = column;
 };
 
-scout.Table.prototype.handleAppLinkAction = function(event){
+scout.Table.prototype.handleAppLinkAction = function(event) {
   var $appLink = $(event.target);
   var column = this._columnAtX($appLink.offset().left);
   this.sendAppLinkAction(column.id, $appLink.data('ref'));
@@ -198,10 +198,15 @@ scout.Table.prototype._render = function($parent) {
     if (that.selectedRows.length > 0) {
       menuItems = that._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
       if (menuItems.length > 0) {
-        popup = new scout.ContextMenuPopup(that.session, menuItems);
-        popup.$anchor = that.$data;
+        popup = new scout.ContextMenuPopup(that.session, {
+          menuItems: menuItems,
+          location: {
+            x: event.pageX,
+            y: event.pageY
+          },
+          $anchor: that.$data
+        });
         popup.render();
-        popup.setLocation(new scout.Point(event.pageX, event.pageY));
       }
     }
   }

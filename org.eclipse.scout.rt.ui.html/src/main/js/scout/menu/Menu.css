@@ -135,8 +135,16 @@
     white-space: nowrap;
     background-color: white;
     border: solid 1px @border-color;
+  }
+
+  &.down > .popup-head {
     border-bottom: none;
     .drop-shadow();
+  }
+
+  &.up > .popup-head {
+    border-top: none;
+    .drop-shadow(@y: -6px;);
   }
 
   &:focus {
@@ -146,10 +154,34 @@
 
 .popup-body {
   position: absolute;
-  border: solid 1px @border-color;
-  border-bottom: none;
+  border: 1px solid @border-color;
   background-color: @palette-white;
-  .drop-shadow();
+  border-bottom: none;
+
+  &.down  {
+    .drop-shadow();
+
+    & > .menu-item:first-child {
+      border-top-color: transparent;
+    }
+
+    & > .menu-item:last-child {
+      border-bottom: 1px solid @border-color;
+    }
+  }
+
+  &.up {
+    border-top: none;
+    .drop-shadow(@y: -6px;);
+
+    .popup-head ~ & > .menu-item:last-child {
+      border-bottom: 1px solid transparent;
+
+      &.selected {
+        border-color: @item-selection-border-color;
+      }
+    }
+  }
 
   & > .menu-item {
     border-top: solid 1px @border-color;
@@ -177,14 +209,6 @@
     &:focus {
       text-decoration: none;
     }
-  }
-
-  & > .menu-item:first-child {
-    border-top-color: transparent;
-  }
-
-  & > .menu-item:last-child {
-    border-bottom: 1px solid @border-color;
   }
 }
 

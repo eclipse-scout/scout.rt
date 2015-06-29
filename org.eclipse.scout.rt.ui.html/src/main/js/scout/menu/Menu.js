@@ -50,14 +50,14 @@ scout.Menu.prototype._renderItem = function($parent) {
   // render as regular menu, ignore button styles.
   if (!this.overflow) {
     if (scout.Action.ActionStyle.BUTTON === this.actionStyle ||
-        scout.Action.ActionStyle.TOGGLE === this.actionStyle) {
+      scout.Action.ActionStyle.TOGGLE === this.actionStyle) {
       this.$container.addClass('menu-button');
     }
   }
 };
 
 scout.Menu.prototype._onClick = function() {
-    this.sendDoAction();
+  this.sendDoAction();
 };
 
 scout.Menu.prototype._onMouseDown = function(event) {
@@ -99,7 +99,7 @@ scout.Menu.prototype.isTabTarget = function() {
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   if (scout.Action.ActionStyle.TASK_BAR !== this.actionStyle) {
     var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-    this.$container.toggleClass('menu-textandicon', !!textAndIcon);
+    this.$container.toggleClass('menu-textandicon', !! textAndIcon);
   }
 };
 
@@ -107,12 +107,14 @@ scout.Menu.prototype._openPopup = function(event) {
   if (!this.enabled) {
     return;
   }
-  this.popup = new scout.MenuBarPopup(this, this.session, event);
+  this.popup = new scout.MenuBarPopup(this, this.session, {
+    ignoreEvent: event
+  });
   this.popup.render();
 };
 
 scout.Menu.prototype.doAction = function() {
-  if(!this.enabled){
+  if (!this.enabled) {
     return;
   }
   if (this.childActions.length > 0) {

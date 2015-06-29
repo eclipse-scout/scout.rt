@@ -36,8 +36,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
     if (clientWidth > bounds.width) {
       // in case of overflow, place selected tab at the left-most position...
-      var
-        viewWidth = bounds.width,
+      var viewWidth = bounds.width,
         delta = bounds.x, // delta used to start from x=0
         leftMostTab = selectedTab,
         rightMostTab = selectedTab,
@@ -84,7 +83,6 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   }
 };
 
-
 scout.TabAreaLayout.prototype._createAndRenderEllipsis = function($container) {
   this._$ellipsis = $container
     .appendDiv('overflow-tab-item')
@@ -115,11 +113,16 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     overflowMenus.push(menu);
   });
 
-  popup = new scout.ContextMenuPopup(this._tabBox.session, overflowMenus, {cloneMenuItems: false});
+  popup = new scout.ContextMenuPopup(this._tabBox.session, {
+    menuItems: overflowMenus,
+    cloneMenuItems: false,
+    location: {
+      x: event.pageX,
+      y: event.pageY
+    }
+  });
   popup.render();
-  popup.setLocation(new scout.Point(event.pageX, event.pageY));
 };
-
 
 scout.TabAreaLayout.prototype.preferredLayoutSize = function($container) {
   return scout.graphics.getSize($container);

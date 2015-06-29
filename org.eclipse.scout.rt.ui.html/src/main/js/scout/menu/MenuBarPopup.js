@@ -2,11 +2,13 @@
  * The MenuBarPopup is a special Popup that is used in the menu-bar. It is tightly coupled with a menu-item and shows a header
  * which has a different size than the popup-body.
  */
-scout.MenuBarPopup = function(menu, session, event) {
-  scout.MenuBarPopup.parent.call(this, session);
+scout.MenuBarPopup = function(menu, session, options) {
+  options = options || {};
+  options.$anchor = menu.$container;
+  scout.MenuBarPopup.parent.call(this, session, options);
   this.menu = menu;
   this.$headBlueprint = this.menu.$container;
-  this.ignoreEvent = event;
+  this.ignoreEvent = options.ignoreEvent;
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
@@ -18,27 +20,13 @@ scout.MenuBarPopup.prototype._getMenuItems = function() {
 };
 
 /**
- * @override
- */
-scout.MenuBarPopup.prototype._beforeRenderMenuItems = function() {
-};
-
-/**
  * @override popup
  * @param event
  */
-scout.MenuBarPopup.prototype.close = function(event){
-  if(!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent){
+scout.MenuBarPopup.prototype.close = function(event) {
+  if (!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent) {
     scout.MenuBarPopup.parent.prototype.close.call(this);
   }
-};
-
-
-/**
- * @override
- */
-scout.MenuBarPopup.prototype._afterRenderMenuItems = function() {
-  this.alignTo();
 };
 
 scout.MenuBarPopup.prototype._renderHead = function() {
@@ -64,10 +52,32 @@ scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
   menu.sendDoAction();
 };
 
-scout.MenuBarPopup.prototype.alignTo = function() {
-  var pos = this.menu.$container.offset(),
-    headSize = scout.graphics.getSize(this.$head, true),
-    bodyWidth = scout.graphics.getSize(this.$body, true).width;
+scout.MenuBarPopup.prototype._position = function($container) {
+  var openingDirection, left, top, overlap, pos;
+
+  this.alignTo();
+  pos = this.$container.offset();
+  overlap = this.overlap($container, {x: pos.left, y: pos.top});
+  if (overlap.y > 0) {
+    // switch opening direction
+    openingDirection = 'up';
+    this.alignTo(openingDirection);
+  }
+};
+
+scout.MenuBarPopup.prototype.alignTo = function(openingDirectionY) {
+  var pos, headSize, bodySize, bodyWidth;
+
+  openingDirectionY = openingDirectionY || 'down';
+  this.$container.removeClass('up down');
+  this.$body.removeClass('up down');
+  this.$container.addClass(openingDirectionY);
+  this.$body.addClass(openingDirectionY);
+
+  pos = this.menu.$container.offset();
+  headSize = scout.graphics.getSize(this.$head, true);
+  bodySize = scout.graphics.getSize(this.$body, true);
+  bodyWidth = bodySize.width;
 
   // body min-width
   if (bodyWidth < headSize.width) {
@@ -79,12 +89,24 @@ scout.MenuBarPopup.prototype.alignTo = function() {
   var left = pos.left,
     top = pos.top - 6,
     headInsets = scout.graphics.getInsets(this.$head),
-    bodyTop = headSize.height;
+    bodyTop = 0,
+    headTop = 0,
+    decoTop = 0;
+
+  if (openingDirectionY === 'up') {
+    top -= bodySize.height;
+    headTop = bodySize.height;
+    decoTop = headTop - 1;
+  } else if (openingDirectionY === 'down'){
+    bodyTop += headSize.height;
+    decoTop = bodyTop;
+  }
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
+  this.$head.cssTop(headTop);
   this.$body.cssTop(bodyTop);
-  this.$deco.cssTop(bodyTop);
+  this.$deco.cssTop(decoTop);
 
   if (this.menu.$container.hasClass('right-aligned')) {
     // when we use float:right, browser uses fractions of pixels, that's why we must
