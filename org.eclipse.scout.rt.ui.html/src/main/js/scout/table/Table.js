@@ -1971,6 +1971,7 @@ scout.Table.prototype._redraw = function() {
 scout.Table.prototype._renderTableHeader = function() {
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
+    this.addChild(this.header);
     this.header.render();
   } else if (!this.headerVisible && this.header) {
     this._removeTableHeader();
@@ -1981,6 +1982,7 @@ scout.Table.prototype._renderTableHeader = function() {
 scout.Table.prototype._removeTableHeader = function() {
   if (this.header) {
     this.header.remove();
+    this.removeChild(this.header);
     this.header = null;
   }
 };
@@ -1990,14 +1992,22 @@ scout.Table.prototype._renderTableFooter = function() {
   if (footerVisible) {
     if (!this.footer) {
       this.footer = this._createFooter();
+      this.addChild(this.footer);
     } else {
       this.footer.update();
     }
   } else if (!footerVisible && this.footer) {
-    this.footer.remove();
-    this.footer = null;
+    this._removeTableFooter();
   }
   this.invalidateLayoutTree();
+};
+
+scout.Table.prototype._removeTableFooter = function() {
+  if (this.footer) {
+    this.footer.remove();
+    this.removeChild(this.footer);
+    this.footer = null;
+  }
 };
 
 scout.Table.prototype._renderEnabled = function() {

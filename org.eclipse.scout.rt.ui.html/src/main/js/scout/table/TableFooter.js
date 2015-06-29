@@ -1,8 +1,10 @@
 scout.TableFooter = function(table) {
+  scout.TableFooter.parent.call(this);
   this._table = table;
   this.filterKeyStrokeAdapter = new scout.FilterInputKeyStrokeAdapter(this._table);
   this._render(table.$container);
 };
+scout.inherits(scout.TableFooter, scout.Widget);
 
 scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
 scout.TableFooter.CONTAINER_SIZE = 345;
@@ -39,8 +41,6 @@ scout.TableFooter.prototype._render = function($parent) {
     this._$filterField.val(filter.text);
   }
 
-  scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
-
   this._updateTableControls();
   this._updateInfoLoad();
   this._updateInfoLoadVisibility();
@@ -70,9 +70,14 @@ scout.TableFooter.prototype._render = function($parent) {
   });
 };
 
-scout.TableFooter.prototype.remove = function() {
+scout.TableFooter.prototype._installKeyStrokeAdapter = function() {
+  scout.TableFooter.parent.prototype._installKeyStrokeAdapter.call(this);
+  scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
+};
+
+scout.TableFooter.prototype._uninstallKeyStrokeAdapter = function() {
+  scout.TableFooter.parent.prototype._uninstallKeyStrokeAdapter.call(this);
   scout.keyStrokeManager.uninstallAdapter(this.filterKeyStrokeAdapter);
-  this.$container.remove();
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
