@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -159,6 +161,18 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
+  public void testCompleteEdit_ParsingError() throws Exception {
+    ParsingTestTable table = new ParsingTestTable();
+    table.addRowsByArray(new Integer[]{0});
+    IIntegerField field = new AbstractIntegerField() {
+    };
+    field.parseAndSetValue("invalid number");
+    table.getIntTestColumn().completeEdit(table.getRow(0), field);
+    ICell c = table.getCell(0, 0);
+    assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
+  }
+
+  @Test
   public void testNoInitialDecoration() throws Exception {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"a"});
@@ -193,7 +207,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   private void assertErrorStatus(ICell c) {
-    assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue()), c.getErrorStatus());
+    assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
     assertEquals(INVALID_MESSAGE, c.getErrorStatus().getMessage());
   }
 
@@ -288,6 +302,22 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
         if (getC1Column().getValue(row) == null) {
           throw new ProcessingException("decoration on empty column");
         }
+      }
+    }
+  }
+
+  public class ParsingTestTable extends AbstractTable {
+
+    public IntTestColumn getIntTestColumn() {
+      return getColumnSet().getColumnByClass(IntTestColumn.class);
+    }
+
+    @Order(70.0)
+    public class IntTestColumn extends AbstractIntegerColumn {
+
+      @Override
+      protected boolean getConfiguredEditable() {
+        return true;
       }
     }
   }
