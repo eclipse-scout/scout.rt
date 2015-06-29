@@ -169,16 +169,16 @@ describe("Tree", function() {
 
   describe("node click", function() {
 
-    it("calls tree._onNodeClick", function() {
+    it("calls tree._onNodeMouseDown", function() {
       var model = createModelFixture(1);
       var tree = createTree(model);
-      spyOn(tree, '_onNodeClick');
+      spyOn(tree, '_onNodeMouseDown');
       tree.render(session.$entryPoint);
 
       var $node = tree.$container.find('.tree-node:first');
-      $node.click();
+      $node.triggerMouseDown();
 
-      expect(tree._onNodeClick).toHaveBeenCalled();
+      expect(tree._onNodeMouseDown).toHaveBeenCalled();
     });
 
     it("sends selection and click events in one call in this order", function() {

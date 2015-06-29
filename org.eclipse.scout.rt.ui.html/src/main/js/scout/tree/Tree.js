@@ -103,10 +103,10 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   this.$data = this.$container.appendDiv('tree-data')
-    .on('click', '.tree-node', this._onNodeClick.bind(this))
+    .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
-    .on('click', '.tree-node-control', this._onNodeControlClick.bind(this))
-    .on('dblclick', '.tree-node-control', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
+    .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
+    .on('dblclick', '.tree-node-control', this._onNodeControlMouseDown.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 
   scout.scrollbars.install(this.$data, {
     axis: 'y'
@@ -1060,7 +1060,7 @@ scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   }
 };
 
-scout.Tree.prototype._onNodeClick = function(event) {
+scout.Tree.prototype._onNodeMouseDown = function(event) {
   if (event.originalEvent.detail > 1) {
     //don't execute on double click events
     return;
@@ -1114,7 +1114,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
   this.setNodeExpanded(node, expanded);
 };
 
-scout.Tree.prototype._onNodeControlClick = function(event) {
+scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   if (event.originalEvent.detail > 1) {
     //don't execute on double click events
     return false;
