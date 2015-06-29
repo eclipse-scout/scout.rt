@@ -17,14 +17,13 @@ scout.RadioButton.prototype._mouseDown = function() {
   this._toggleChecked();
 };
 
-scout.RadioButton.prototype._toggleChecked = function(){
-  if(!this.enabled){
+scout.RadioButton.prototype._toggleChecked = function() {
+  if (!this.enabled) {
     return;
   }
-  if(this.parent instanceof scout.RadioButtonGroup){
+  if (this.parent instanceof scout.RadioButtonGroup) {
     this.parent.setNewSelection(this);
-  }
-  else{
+  } else {
     this.selected = true;
     this.$field.toggleClass('checked', true);
     this.session.send(this.id, 'selected');
@@ -57,18 +56,16 @@ scout.RadioButton.prototype._renderRadioValue = function(radioValue) {
   this.$field.attr('value', radioValue);
 };
 
-scout.RadioButton.prototype._renderTabbable = function(tabbable){
-  if(tabbable){
+scout.RadioButton.prototype._renderTabbable = function(tabbable) {
+  if (tabbable) {
     this.$field.attr('tabindex', '0');
-  }
-  else{
+  } else {
     this.$field.removeAttr('tabindex');
   }
 };
 
-
-scout.RadioButton.prototype._handleTabIndex  = function(){
-  if(this.parent instanceof scout.RadioButtonGroup){
+scout.RadioButton.prototype._handleTabIndex = function() {
+  if (this.parent instanceof scout.RadioButtonGroup) {
     return;
   }
   this._renderTabbable(this.enabled);
@@ -77,5 +74,3 @@ scout.RadioButton.prototype._handleTabIndex  = function(){
 scout.RadioButton.prototype._renderSelected = function(selected) {
   this.$field.toggleClass('checked', selected);
 };
-
-

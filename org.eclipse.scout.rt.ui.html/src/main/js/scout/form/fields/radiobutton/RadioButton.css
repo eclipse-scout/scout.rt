@@ -12,6 +12,7 @@
     margin-right: 15px;
     font-size: 13px;
     outline: none;
+    white-space: nowrap;
   }
 
   & > div::before {

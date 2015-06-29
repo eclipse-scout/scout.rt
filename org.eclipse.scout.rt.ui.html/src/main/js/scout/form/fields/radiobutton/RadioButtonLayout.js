@@ -7,13 +7,14 @@ scout.RadioButtonLayout = function(formField) {
 };
 scout.inherits(scout.RadioButtonLayout, scout.FormFieldLayout);
 
-scout.RadioButtonLayout.prototype.layout = function($container) {
-  var field = this.formField,
-    bounds;
-  scout.RadioButtonLayout.parent.prototype.layout.call(this, $container);
+/**
+ * Adds the width of the bubble to the natural with because before element is not included in calculation.
+ * @Override FormFieldLayout.js
+ * @param formField
+ * @returns {scout.Dimension}
+ */
+scout.FormFieldLayout.prototype.naturalSize = function(formField) {
+  var radioButtonBubbleWidth = this.formField.$field.retriveBeforeElementCss('width');
 
-  //move radio button behind radiobutton icon in label::before
-  bounds = scout.graphics.getBounds(field.$fieldContainer);
-  bounds.x = 0;
-  scout.graphics.setBounds(field.$fieldContainer, bounds);
+  return new scout.Dimension(Number(formField.$fieldContainer.outerWidth(true))+Number(radioButtonBubbleWidth.replace('px','')), formField.$fieldContainer.outerHeight(true));
 };

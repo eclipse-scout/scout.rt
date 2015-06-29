@@ -144,6 +144,14 @@
     return $.makeDiv(cssClass, htmlContent, id).prependTo(this);
   };
 
+  $.fn.retriveBeforeElementCss = function(propertyName) {
+    return window.getComputedStyle(this[0], ':before').getPropertyValue(propertyName);
+  };
+
+  $.fn.retriveAfterElementCss = function(propertyName) {
+    return window.getComputedStyle(this[0], ':after').getPropertyValue(propertyName);
+  };
+
   // append - and return new div for chaining
   $.fn.appendDiv = function(cssClass, htmlContent, id) {
     return $.makeDiv(cssClass, htmlContent, id).appendTo(this);
@@ -271,7 +279,7 @@
           .attr('src', icon.iconUrl)
           .addClass('icon');
       }
-    } else  if ($icon) {
+    } else if ($icon) {
       $icon.remove();
     }
     return this;
@@ -287,7 +295,7 @@
   };
 
   $.fn.placeholder = function(placeholder) {
-    return this.toggleAttr('placeholder', !!placeholder, placeholder);
+    return this.toggleAttr('placeholder', !! placeholder, placeholder);
   };
 
   /**
@@ -597,8 +605,7 @@
       if (emptyCssClass) {
         this.removeClass(emptyCssClass);
       }
-    }
-    else {
+    } else {
       this.html('&nbsp;');
       if (emptyCssClass) {
         this.addClass(emptyCssClass);
@@ -636,13 +643,12 @@
       if (state) {
         // set attr
         $element.attr(attr, value);
-      }
-      else {
+      } else {
         // remove attr
         $element.removeAttr(attr);
       }
     });
-};
+  };
 
   // === helpers for projects, may not necesserily be used by scout itself ===
   $.fn.appendAppLink = function(appLinkBean, func) {
