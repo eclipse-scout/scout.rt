@@ -29,8 +29,9 @@ public abstract class AbstractIcons implements Serializable {
   /**
    * marker icon for an empty (transparent white) icon
    */
-  public static final String ApplicationLogo = "application_logo_large";
   public static final String Empty = "empty";
+
+  public static final String ApplicationLogo = "application_logo_large";
   public static final String Bookmark = "bookmark";
   public static final String ComposerFieldAggregation = "composerfield_aggregation";
   public static final String ComposerFieldAttribute = "composerfield_attribute";
@@ -57,5 +58,4 @@ public abstract class AbstractIcons implements Serializable {
   public static final String WizardBackButton = "wizard_back";
   public static final String WizardBullet = "wizard_bullet";
   public static final String WizardNextButton = "wizard_next";
-
 }
