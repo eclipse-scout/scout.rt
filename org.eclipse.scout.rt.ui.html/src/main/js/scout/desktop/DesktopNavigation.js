@@ -109,3 +109,14 @@ scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
 scout.DesktopNavigation.prototype.doViewMenuAction = function() {
   this.viewMenuTab._onClickTab();
 };
+
+scout.DesktopNavigation.prototype.sendToBack = function() {
+  this.viewMenuTab.sendToBack();
+  this.outline.sendToBack();
+};
+
+scout.DesktopNavigation.prototype.bringToFront = function() {
+  this.viewMenuTab.bringToFront();
+  this.outline.bringToFront();
+};
+

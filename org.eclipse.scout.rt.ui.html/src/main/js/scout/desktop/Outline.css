@@ -8,6 +8,11 @@
   & .scrollbar-thumb:hover {
     background-color: rgba(205, 205, 205, 0.6);
   }
+
+  &.in-background .tree-node.selected {
+    background-color: @palette-blue-35;
+    color: @palette-white;
+  }
 }
 
 .outline > .tree-data {

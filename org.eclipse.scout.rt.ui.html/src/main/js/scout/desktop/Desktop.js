@@ -1,3 +1,7 @@
+// FIXME AWE: (desktop):
+// - fix !content.rendered exception
+// - add mouse listener for bringToFront() when user clicks on outline-tree
+// - use same gray as for form-tabs in view-tabs (incl. vertical lines)
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
@@ -186,6 +190,7 @@ scout.Desktop.prototype._removeTab = function(tab) {
     this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
   } else {
     this._attachOutlineContent();
+    this.navigation.bringToFront();
     this._selectedTab = null;
   }
 
@@ -194,6 +199,7 @@ scout.Desktop.prototype._removeTab = function(tab) {
 
 scout.Desktop.prototype._setSelectedTab = function(tab) {
   if (this._selectedTab !== tab) {
+    this.navigation.sendToBack();
     this._detachOutlineContent();
     this._deselectTab();
     this._selectTab(tab);
@@ -336,6 +342,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
 
   this._outlineContent = content;
   this._deselectTab();
+  this.navigation.bringToFront();
 
   if (!content.rendered) {
     if (content instanceof scout.Table) {
@@ -438,4 +445,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
 
 scout.Desktop.prototype.tabCount = function() {
   return this._allTabs.length;
+};
+
+scout.Desktop.prototype.bringOutlineToFront = function() {
+  this._deselectTab();
+  this._attachOutlineContent();
+  this.navigation.bringToFront();
 };

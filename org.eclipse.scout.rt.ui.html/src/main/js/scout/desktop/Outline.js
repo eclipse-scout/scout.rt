@@ -276,3 +276,11 @@ scout.Outline.prototype.onModelAction = function(event) {
 scout.Outline.prototype.validateFocus = function() {
   scout.focusManager.validateFocus(this.session.uiSessionId);
 };
+
+scout.Outline.prototype.sendToBack = function() {
+  this.$container.addClass('in-background');
+};
+
+scout.Outline.prototype.bringToFront = function() {
+  this.$container.removeClass('in-background');
+};

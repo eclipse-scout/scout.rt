@@ -15,6 +15,7 @@ scout.ViewMenuTab = function(viewMenus, session) {
   this.selected = false;
   this.text;
   this.iconId;
+  this._inBackground = false;
 
   this._update();
 };
@@ -65,7 +66,7 @@ scout.ViewMenuTab.prototype._renderText = function() {
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
-  this.$menuButton.setVisible(this.selected);
+  this.$menuButton.setVisible(this.selected && !this._inBackground);
 };
 
 scout.ViewMenuTab.prototype._renderIconId = function() {
@@ -91,9 +92,13 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
 };
 
 scout.ViewMenuTab.prototype._onClickTab = function(event) {
-  if (this.selected) {
+  if (this._inBackground) {
+    this.session.desktop.bringOutlineToFront();
+  }
+  else if (this.selected) {
     this._openMenu();
-  } else if (this.outlineViewButton) {
+  }
+  else if (this.outlineViewButton) {
     this.outlineViewButton.doAction();
   }
 };
@@ -133,3 +138,12 @@ scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {
   this._renderProperties();
 };
 
+scout.ViewMenuTab.prototype.sendToBack = function() {
+  this._inBackground = true;
+  this._renderSelected();
+};
+
+scout.ViewMenuTab.prototype.bringToFront = function() {
+  this._inBackground = false;
+  this._renderSelected();
+};
