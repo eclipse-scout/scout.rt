@@ -10,7 +10,6 @@
   .drop-shadow();
   max-width: 300px;
   white-space: normal;
-  z-index: 1000;
 }
 
 .tooltip-content {

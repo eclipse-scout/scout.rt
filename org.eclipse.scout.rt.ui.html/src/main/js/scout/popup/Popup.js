@@ -12,10 +12,6 @@ scout.Popup = function(session, options) {
 };
 scout.inherits(scout.Popup, scout.Widget);
 
-/**
- * The popup is always appended to the HTML document body.
- * That way we never have z-index issues with the rendered popups.
- */
 scout.Popup.prototype.render = function($parent) {
   scout.Popup.parent.prototype.render.call(this, $parent);
   if (this.installFocusContext) {

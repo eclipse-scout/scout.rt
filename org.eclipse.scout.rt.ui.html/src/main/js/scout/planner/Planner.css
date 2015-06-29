@@ -119,7 +119,7 @@
       position: absolute;
       border-top: 2px solid @item-selection-border-color;
       border-bottom: 2px solid @item-selection-border-color;
-      z-index: 2;
+      z-index: 1; /* TODO CRU/BSH/CGU Instead of assigning a z-index, find a better insertion point for the selector */
       top: 0;
 
       & > .selector-resize-left {

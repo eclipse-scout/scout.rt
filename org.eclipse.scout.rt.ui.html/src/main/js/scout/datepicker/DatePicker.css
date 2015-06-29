@@ -7,7 +7,6 @@
   width: 252px;
   position: absolute;
   background-color: @control-background-color;
-  z-index: 10;
   border: 1px solid @popup-border-color;
   border-radius: @border-radius;
   .drop-shadow();

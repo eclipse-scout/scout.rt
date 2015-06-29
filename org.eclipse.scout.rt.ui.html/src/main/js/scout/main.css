@@ -217,3 +217,23 @@ button::-moz-focus-inner {
     }
   }
 }
+
+/* --- z-index --- */
+/* Rule: All child elements of .scout get the same z-index 0 assigned. This spawns a new stacking context for each */
+/* of these elements (iff they are "positioned"). To bring a new element to the top, add it to the end of the list. */
+/* https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context */
+.scout > .desktop-navigation,
+.scout > .desktop-taskbar,
+.scout > .desktop-bench,
+.scout > .splitter,
+.scout > .glasspane,
+.scout > .tooltip,
+.scout > .smart-field-popup,
+.scout > .date-picker-popup {
+  z-index: 0;
+}
+/* The .offline-message div is inserted as first child of .scout, therefore we increase the z-index by 1. The */
+/* element will therefore always be drawn at the top. */
+.scout > .offline-message {
+  z-index: 1;
+}

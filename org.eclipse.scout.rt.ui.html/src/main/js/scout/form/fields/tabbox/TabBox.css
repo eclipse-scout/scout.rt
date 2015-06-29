@@ -18,7 +18,6 @@
     border-bottom: solid 3px transparent;
     border-top: solid 1px transparent;
     cursor: pointer;
-    z-index: 2;
 
     &.selected {
       color: @active-color;
@@ -51,7 +50,6 @@
     width: 100%;
     height: 3px;
     margin-top: -3px;
-    z-index: 1;
     background-color: @palette-gray-4;
     content: '';
     display: block;

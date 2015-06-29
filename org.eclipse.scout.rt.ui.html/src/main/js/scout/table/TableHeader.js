@@ -135,8 +135,7 @@ scout.TableHeader.prototype._render = function() {
       that.dragging = true;
 
       // change css of dragged header
-      $header.css('z-index', 50)
-        .addClass('header-move');
+      $header.addClass('header-move');
       that.$container.addClass('header-move');
 
       // move dragged header
@@ -211,8 +210,7 @@ scout.TableHeader.prototype._render = function() {
         $(this).css('left', '');
       });
 
-      $header.css('z-index', '')
-        .css('background', '')
+      $header.css('background', '')
         .removeClass('header-move');
       that.$container.removeClass('header-move');
     }

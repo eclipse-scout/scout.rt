@@ -127,7 +127,6 @@
 .popup {
   position: absolute;
   margin: auto;
-  z-index: 10;
 
   & > .popup-head {
     position: absolute;

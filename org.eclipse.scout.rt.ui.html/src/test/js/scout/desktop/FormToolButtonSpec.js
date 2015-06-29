@@ -7,7 +7,7 @@ describe("FormToolButton", function() {
     session = sandboxSession();
     desktop = {
       $parent: session.$entryPoint,
-      $toolContainer: session.$entryPoint.appendDiv('desktop-tool-container').hide()
+      $toolContainer: session.$entryPoint.appendDiv('taskbar-tools').hide()
     };
   });
 

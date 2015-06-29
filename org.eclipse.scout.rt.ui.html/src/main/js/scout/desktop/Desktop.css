@@ -20,15 +20,6 @@
   background-color: @background-color;
 }
 
-.desktop-tool-container {
-  position: absolute;
-  top: @desktop-taskbar-height;
-  z-index: 1;
-  .menu-context;
-  background-color: @background-color;
-  border-top: 1px solid transparent;
-}
-
 /* taskbar */
 
 .desktop-taskbar {
@@ -130,15 +121,13 @@
     border-bottom: 1px solid @background-color;
   }
 
-  &> div {
+  & > .title {
     .overflow-ellipsis-nowrap;
+  .font-text-large;
   }
 
-  &> .title {
-    .font-text-large;
-  }
-
-  &> .sub-title {
+  & > .sub-title {
+    .overflow-ellipsis-nowrap;
     .font-text-normal;
   }
 
@@ -152,7 +141,6 @@
     padding-left: 10px;
     content: @icon-angle-down;
   }
-
 }
 
 .taskbar-tab-item {
@@ -331,7 +319,6 @@
   background-color: @palette-gray-2;
   padding: 6px 5px;
   margin: 20px auto;
-  z-index: 1;
   position: fixed;
   right: 10px;
   top: 55px;
@@ -372,7 +359,6 @@
   .animation(fadeIn ease-in 1);
   .animation-duration(0.25s);
   outline: none;
-  z-index: 9;
 
   &.busy {
     /* Make glasspane transparent and disable animation */

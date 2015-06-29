@@ -105,9 +105,9 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
 
   $container.detach();
   var $measurementDiv = $.makeDiv('measurement')
-      .appendTo($('body'))
-      .append($container),
-    prefSize = scout.graphics.getVisibleSize($measurementDiv);
+      .append($container)
+      .appendTo(this._proposalChooser.session.$entryPoint);
+  var prefSize = scout.graphics.getVisibleSize($measurementDiv);
 
   $container.detach();
   $measurementDiv.remove();

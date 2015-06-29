@@ -21,7 +21,7 @@ scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
   if (cssClasses) {
     $items.addClass(cssClasses);
   }
-  $clone.width('auto').appendTo($('body'));
+  $clone.width('auto').appendTo(this._desktop.session.$entryPoint);
   var toolsWidth = scout.graphics.getSize($clone, true).width;
   $clone.remove();
   return toolsWidth;

@@ -285,7 +285,7 @@
     display: inline-block;
     overflow: hidden;
     height: 100%;
-    z-index: 2;
+    z-index: 1; /* draw over grid */
 
     &.ui-selected {
       background-color: @palette-cyan-0;
@@ -336,7 +336,7 @@
     color: @palette-gray-6;
     left: 7px;
     top: 7px;
-    z-index: 2;
+    z-index: 1; /* draw over calendar items */
   }
 
   & .out::before {
@@ -416,7 +416,6 @@
   & .calendar-week-task::after {
     position: absolute;
     height: 1px;
-    z-index: 2;
     width: 100%;
     content: '';
     background-color: @palette-gray-4;

@@ -52,7 +52,6 @@
   border: solid 1px @popup-border-color;
   border-radius:  @border-radius;
   overflow: hidden;
-  z-index: 10;
   margin-top: 5px;
   background-color: white;
   .drop-shadow();
@@ -71,7 +70,6 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: 999;
 }
 
 .proposal-chooser {

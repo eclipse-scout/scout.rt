@@ -111,7 +111,8 @@
   z-index: 1;
 
   .header-move & {
-    background-color: @panel-background-color;
+    /* Hide separators while moving, because their position will not be updated until the move-end event */
+    visibility: hidden;
   }
 
   .menu-open + &.header-resize {
