@@ -84,6 +84,8 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
       $scaleItemLine.cssHeight(0);
     }
   });
+  // also make sure there is no scrollbar anymore which could influence scrollHeight
+  scout.scrollbars.reset(this.planner.$grid);
 
   // Loop again and update height and left
   height = this.planner.$grid[0].scrollHeight;

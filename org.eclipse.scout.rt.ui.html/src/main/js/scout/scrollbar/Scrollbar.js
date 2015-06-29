@@ -16,7 +16,6 @@ scout.Scrollbar = function(options) {
   this._thumbRange;
   this._scrollSize;
   this._offsetSize;
-  this._updateThumbPending = false;
   this._addEventSupport();
 };
 scout.inherits(scout.Scrollbar, scout.Widget);
@@ -43,15 +42,13 @@ scout.Scrollbar.prototype._render = function($parent) {
 
   // event handling
   $parent.on('DOMMouseScroll mousewheel', '', scrollWheel.bind(this))
-    .on('scroll', this.updateThumb.bind(this));
+    .on('scroll', this.update.bind(this));
   $parent.data('scrollbars').forEach(function(scrollbar) {
     scrollbar.on('scrollstart', this._fixScrollbar.bind(this));
     scrollbar.on('scrollend', this._unfixScrollbar.bind(this));
   }, this);
   this._$scrollbar.on('mousedown', onScrollbarMousedown.bind(this));
   this._$thumb.on('mousedown', '', onThumbMousedown.bind(this));
-
-  this.updateThumb();
 
   function scrollWheel(event) {
     var w, d;
@@ -104,43 +101,15 @@ scout.Scrollbar.prototype._render = function($parent) {
 };
 
 /**
- * Use this function (from outside) if size of tree content changes
- * @force set to true to immediately update the scrollbar, If set to false, it will be queued in order to prevent unnecessary updates.
- */
-scout.Scrollbar.prototype.updateThumb = function(force) {
-  if (force) {
-    this._updateThumbImpl();
-    return;
-  }
-  // Thumb is (re)initialized, but only after the current thread has finished.
-  // Additionally, the call is scheduled at most once. This prevents unnecessary
-  // executions of the same code while the UI is updated.
-  if (this._updateThumbPending) {
-    return;
-  }
-  setTimeout(function() {
-    this._updateThumbImpl();
-    this._updateThumbPending = false;
-  }.bind(this), 0);
-  this._updateThumbPending = true;
-};
-
-/**
  * do not use this internal method
  */
-scout.Scrollbar.prototype._updateThumbImpl = function() {
+scout.Scrollbar.prototype.update = function() {
   var margin = this._$scrollbar['cssMargin' + this.axis.toUpperCase()](),
     scrollPos = this._$parent[this._scrollDir](),
     scrollLeft = this._$parent.scrollLeft(),
     scrollTop = this._$parent.scrollTop();
 
-  // Reset thumb size and scrollbar position to make sure it does not extend the scrollSize
-  this._$thumb.css(this._dim.toLowerCase(), 0);
-  if (this.updateScrollbarPos) {
-    this._$scrollbar.cssRight(0);
-    this._$scrollbar.cssBottom(0);
-  }
-
+  this.reset();
   this._offsetSize = this._$parent[0]['offset' + this._dim];
   this._scrollSize = this._$parent[0]['scroll' + this._dim];
 
@@ -168,6 +137,17 @@ scout.Scrollbar.prototype._updateThumbImpl = function() {
     // Always update both to make sure every scrollbar (x and y) is positioned correctly
     this._$scrollbar.cssRight(-1 * scrollLeft);
     this._$scrollbar.cssBottom(-1 * scrollTop);
+  }
+};
+
+/*
+ * Resets thumb size and scrollbar position to make sure it does not extend the scrollSize
+ */
+scout.Scrollbar.prototype.reset = function() {
+  this._$thumb.css(this._dim.toLowerCase(), 0);
+  if (this.updateScrollbarPos) {
+    this._$scrollbar.cssRight(0);
+    this._$scrollbar.cssBottom(0);
   }
 };
 

@@ -78,6 +78,7 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
   this.desktop.$taskBar.css('left', w);
   this.desktop.$bench.css('left', w);
 
+  //FIXME AWE bounce effect is broken
   if (w <= this.BREADCRUMB_SWITCH_WIDTH) {
     if (!this.$navigation.hasClass('navigation-breadcrumb')) {
       this.$navigation.addClass('navigation-breadcrumb');

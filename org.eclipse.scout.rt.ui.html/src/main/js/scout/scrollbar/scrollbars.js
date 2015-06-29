@@ -67,17 +67,53 @@ scout.scrollbars = {
       $container.data('scrollbars', scrollbars);
       scrollbars.forEach(function(scrollbar) {
         scrollbar.render($container);
+        scrollbar.update();
       });
     }
   },
 
-  update: function($scrollable) {
+  /**
+   * Recalculates the scrollbar size and position.
+   * @immediate set to true to immediately update the scrollbar, If set to false, it will be queued in order to prevent unnecessary updates.
+   */
+  update: function($scrollable, immediate) {
+    var scrollbars = $scrollable.data('scrollbars');
+    if (!scrollbars) {
+      return;
+    }
+    if (immediate) {
+      doUpdate();
+      return;
+    }
+
+    if ($scrollable.data('scrollbarUpdatePending')) {
+      return;
+    }
+    // Executes the update later to prevent unnecessary updates
+    setTimeout(function() {
+      doUpdate();
+      $scrollable.removeData('scrollbarUpdatePending');
+    }.bind(this), 0);
+    $scrollable.data('scrollbarUpdatePending', true);
+
+    function doUpdate() {
+      // Reset the scrollbars first to make sure they don't extend the scrollSize
+      scrollbars.forEach(function(scrollbar) {
+        scrollbar.reset();
+      });
+      scrollbars.forEach(function(scrollbar) {
+        scrollbar.update();
+      });
+    }
+  },
+
+  reset: function($scrollable) {
     var scrollbars = $scrollable.data('scrollbars');
     if (!scrollbars) {
       return;
     }
     scrollbars.forEach(function(scrollbar) {
-      scrollbar.updateThumb();
+      scrollbar.reset();
     });
   },
 
