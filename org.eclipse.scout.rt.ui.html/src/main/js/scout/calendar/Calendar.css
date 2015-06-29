@@ -150,7 +150,7 @@
   padding-left: 4px;
   .overflow-ellipsis;
   min-height: 20px;
-  width: calc(~"100%" - 32px);
+  width: calc(~'100%' - 32px);
   border-left: 4px solid;
   text-align: left;
 
@@ -215,7 +215,7 @@
   display: inline-block;
   width: 0%;
   padding: 0;
-  height: calc(~"100%" - @calendar-header-height);
+  height: calc(~'100%' - @calendar-header-height);
   background-color: @palette-white;
   overflow: hidden;
 
@@ -226,7 +226,7 @@
 
     & .list-title {
       position: relative;
-      width: calc(~"100%" - 10px);
+      width: calc(~'100%' - 10px);
       height: @calendar-title-height;
       line-height: @calendar-title-height;
       font-weight: bold;
@@ -238,14 +238,14 @@
         width: 100%;
         left: 0px;
         bottom: -1px;
-        content: " ";
+        content: '';
         background-color: @palette-gray-4;
       }
     }
 
     & .calendar-component {
       height: auto;
-      width: calc(~"100%" - 10px);
+      width: calc(~'100%' - 10px);
       background-color: @palette-white !important;
       margin-top: 12px;
     }
@@ -255,7 +255,7 @@
 .calendar-grid {
   display: inline-block;
   width: 60%;
-  height: calc(~"100%" - @calendar-header-height);
+  height: calc(~'100%' - @calendar-header-height);
   overflow: hidden;
 
   & .calendar-week-header,
@@ -271,7 +271,7 @@
 
   & .calendar-week {
     position: relative;
-    height: calc(~"(100%" - @calendar-title-height ~") / 6");
+    height: calc(~'(100%' - @calendar-title-height ~') / 6');
   }
 
   & .calendar-week-name{
@@ -310,7 +310,7 @@
     height: 100%;
     left: 0px;
     top: 0px;
-    content: " ";
+    content: '';
     background-color: @palette-gray-4;
   }
 
@@ -320,7 +320,7 @@
     width: 100%;
     left: 0px;
     top: 0px;
-    content: " ";
+    content: '';
     background-color: @palette-gray-4;
   }
 
@@ -387,14 +387,14 @@
   & .calendar-week-axis {
     position: absolute;
     left: @calendar-header-height - 6px;
-    width:  calc(~"100%" - 8px);
+    width:  calc(~'100%' - 8px);
   }
 
   & .calendar-week-axis::after {
     position: absolute;
     height: 1px;
     width: 100%;
-    content: " ";
+    content: '';
     background-color: @palette-gray-2;
   }
 
@@ -418,7 +418,7 @@
     height: 1px;
     z-index: 2;
     width: 100%;
-    content: " ";
+    content: '';
     background-color: @palette-gray-4;
   }
 
@@ -456,10 +456,10 @@
     &::before {
       position: absolute;
       display: block;
-      content: "";
+      content: '';
       width: 16px;
       height: 16px;
-      left: calc(~"50%" - 8px);
+      left: calc(~'50%' - 8px);
       top: -8px;
       transform: rotate(45deg);
       background-color: @palette-white;
@@ -472,14 +472,13 @@
     &::after {
       position: absolute;
       display: block;
-      content: "";
+      content: '';
       width: 16px;
       height: 16px;
-      left: calc(~"50%" - 8px);
+      left: calc(~'50%' - 8px);
       bottom: -8px;
       transform: rotate(45deg);
       background-color: inherit;
     }
   }
 }
-
