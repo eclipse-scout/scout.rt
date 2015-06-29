@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 
 /**
  * {@code ClientExceptionHandler} is the central point for handling client-side exceptions. For processing exceptions,
@@ -41,7 +41,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
   @Override
   protected void handleThrowable(final Throwable t) {
     // Same error handling for all exceptions, except InterruptedException which is ignored.
-    handleProcessingException(BEANS.get(ExceptionTranslator.class).translate(t));
+    handleProcessingException(BEANS.get(ProcessingExceptionTranslator.class).translate(t));
   }
 
   @Override

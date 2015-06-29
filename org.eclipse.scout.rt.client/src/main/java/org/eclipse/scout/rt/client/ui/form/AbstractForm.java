@@ -258,7 +258,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return;
     }
 
-    // Run the initialization on behalf of the this Form.
+    // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().form(this).run(new IRunnable() {
 
       @Override
@@ -2388,8 +2388,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-              header(TEXTS.get("LoadFormXmlFailedText")).
-              show();
+          header(TEXTS.get("LoadFormXmlFailedText")).
+          show();
         }
       }
     }

@@ -13,11 +13,13 @@ package org.eclipse.scout.rt.platform.job.internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -52,10 +54,10 @@ class DonePromise<RESULT> {
     try {
       // Event creation
       try {
-        m_doneEvent = new DoneEvent<>(m_future.awaitDoneAndGet(), null, false);
+        m_doneEvent = new DoneEvent<>(m_future.awaitDoneAndGet(BEANS.get(ExceptionTranslator.class)), null, false);
       }
-      catch (final ProcessingException e) {
-        if (e.isCancellation()) {
+      catch (final Exception e) {
+        if (e instanceof CancellationException) {
           m_doneEvent = new DoneEvent<>(null, null, true);
         }
         else {
@@ -63,7 +65,7 @@ class DonePromise<RESULT> {
         }
       }
       catch (final Throwable t) {
-        m_doneEvent = new DoneEvent<>(null, new ProcessingException("Unexpected exception while querying the Future's result", t), m_future.isCancelled());
+        m_doneEvent = new DoneEvent<>(null, new Exception("Unexpected exception while querying the Future's result", t), m_future.isCancelled());
       }
 
       // Callback notification

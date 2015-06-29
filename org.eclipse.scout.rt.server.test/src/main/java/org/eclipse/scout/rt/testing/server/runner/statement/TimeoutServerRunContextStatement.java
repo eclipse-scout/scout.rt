@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -65,12 +67,7 @@ public class TimeoutServerRunContextStatement extends Statement {
 
     if (m_timeoutMillis <= 0) {
       // no timeout specified. Hence run in a nested transaction that uses the calling thread
-      try {
-        runContext.run(nestedRunnable);
-      }
-      catch (ProcessingException e) {
-        throw e.getCause(); // re-throw wrapped exception
-      }
+      runContext.run(nestedRunnable, BEANS.get(ThrowableTranslator.class));
     }
     else {
       // timeout specified. Run statement in a new server job and wait the amount specified.

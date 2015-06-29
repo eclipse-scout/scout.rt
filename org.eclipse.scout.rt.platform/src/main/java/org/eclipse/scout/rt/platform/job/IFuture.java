@@ -15,11 +15,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.context.ICancellable;
+import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 
 /**
  * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's
  * computation result. Exceptions thrown during the job's execution are propagated in the form of a
- * {@link ProcessingException}.
+ * {@link ProcessingException}, or translated according to the given {@link IThrowableTranslator}.
  *
  * @see Future
  * @since 5.1
@@ -113,6 +114,19 @@ public interface IFuture<RESULT> extends ICancellable {
   RESULT awaitDoneAndGet() throws ProcessingException;
 
   /**
+   * Waits if necessary for the computation to complete, and then retrieves its result, or throws an exception according
+   * to the given {@link IThrowableTranslator} if the computation failed, or if cancelled, or if the calling thread was
+   * interrupted.
+   *
+   * @param throwableTranslator
+   *          to translate execution, cancellation and interruption exceptions.
+   * @return the computed result.
+   * @throws ERROR
+   *           thrown according to the given {@link IThrowableTranslator}.
+   */
+  <ERROR extends Throwable> RESULT awaitDoneAndGet(IThrowableTranslator<ERROR> throwableTranslator) throws ERROR;
+
+  /**
    * Waits if necessary for the computation to complete, and then retrieves its result, or throws a
    * {@link ProcessingException} if the computation failed, or if cancelled, or if the calling thread was interrupted,
    * or the timeout elapses.
@@ -132,6 +146,23 @@ public interface IFuture<RESULT> extends ICancellable {
    *           </ul>
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;
+
+  /**
+   * Waits if necessary for the computation to complete, and then retrieves its result, or throws an exception according
+   * to the given {@link IThrowableTranslator} if the computation failed, or if cancelled, or if the calling thread was
+   * interrupted, or the timeout elapses.
+   *
+   * @param timeout
+   *          the maximal time to wait for the job to complete.
+   * @param unit
+   *          unit of the timeout.
+   * @param throwableTranslator
+   *          to translate execution, cancellation, timeout and interruption exceptions.
+   * @return the computed result.
+   * @throws ERROR
+   *           thrown according to the given {@link IThrowableTranslator}.
+   */
+  <ERROR extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, IThrowableTranslator<ERROR> throwableTranslator) throws ERROR;
 
   /**
    * Registers the given <code>callback</code> to be notified once the Future enters 'done' state. That is once the

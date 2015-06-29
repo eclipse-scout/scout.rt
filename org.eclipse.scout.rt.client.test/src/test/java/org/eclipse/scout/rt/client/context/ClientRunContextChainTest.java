@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -163,7 +164,19 @@ public class ClientRunContextChainTest {
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
     assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    return c9;
+    // 10. InitThreadLocalCallable for CurrentControlTracker.CURRENT_OUTLINE
+    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
+    assertSame(CurrentControlTracker.CURRENT_OUTLINE, ((InitThreadLocalCallable) c10).getThreadLocal());
+
+    // 11. InitThreadLocalCallable for CurrentControlTracker.CURRENT_FORM
+    InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
+    assertSame(CurrentControlTracker.CURRENT_FORM, ((InitThreadLocalCallable) c11).getThreadLocal());
+
+    // 12. InitThreadLocalCallable for CurrentControlTracker.CURRENT_MODEL_ELEMENT
+    InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);
+    assertSame(CurrentControlTracker.CURRENT_MODEL_ELEMENT, ((InitThreadLocalCallable) c12).getThreadLocal());
+
+    return c12;
   }
 
   @SuppressWarnings("unchecked")

@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
@@ -123,7 +124,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
         public Subject call() throws Exception {
           return m_authenticationMethod.authenticate(context, m_authenticator);
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
   }
 }

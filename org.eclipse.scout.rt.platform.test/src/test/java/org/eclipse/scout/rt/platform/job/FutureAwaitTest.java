@@ -39,7 +39,6 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class FutureAwaitTest {
 
-//  private IJobManager m_jobManager;
   private static ExecutorService s_executor;
   private IBean<Object> m_bean;
 

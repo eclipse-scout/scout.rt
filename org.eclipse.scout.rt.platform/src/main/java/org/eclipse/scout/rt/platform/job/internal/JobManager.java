@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
+import org.eclipse.scout.rt.platform.job.internal.callable.LogOnErrorCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -291,7 +291,7 @@ public class JobManager implements IJobManager {
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final JobInput input) {
     final Callable<RESULT> c3 = new RunContextCallable<RESULT>(next, input.runContext());
     final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.threadName(), input.name());
-    final Callable<RESULT> c1 = new HandleExceptionCallable<>(c2, input);
+    final Callable<RESULT> c1 = new LogOnErrorCallable<>(c2, input);
 
     return c1;
   }

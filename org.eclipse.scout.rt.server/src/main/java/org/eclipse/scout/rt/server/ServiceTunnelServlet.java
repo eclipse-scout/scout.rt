@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -84,9 +85,9 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           invokeAdminService(serverRunContext);
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       throw new ServletException("Failed to invoke AdminServlet", e);
     }
   }
@@ -130,7 +131,7 @@ public class ServiceTunnelServlet extends HttpServlet {
             BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
           }
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
       if (isConnectionError(e)) {
@@ -148,7 +149,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Method invoked to delegate the HTTP request to the 'admin service'.
    */
-  protected void invokeAdminService(final ServerRunContext serverRunContext) throws ProcessingException {
+  protected void invokeAdminService(final ServerRunContext serverRunContext) throws Exception {
     serverRunContext.run(new IRunnable() {
 
       @Override
@@ -163,20 +164,20 @@ public class ServiceTunnelServlet extends HttpServlet {
         }
         adminSession.serviceRequest(servletRequest, servletResponse);
       }
-    });
+    }, BEANS.get(ExceptionTranslator.class));
   }
 
   /**
    * Method invoked to delegate the HTTP request to the 'process service'.
    */
-  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws Exception {
     return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
         return new DefaultTransactionDelegate(isDebug()).invoke(serviceTunnelRequest);
       }
-    });
+    }, BEANS.get(ExceptionTranslator.class));
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

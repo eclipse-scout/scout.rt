@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
+import org.eclipse.scout.rt.platform.job.internal.callable.LogOnErrorCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -47,7 +47,7 @@ public class JobCallableChainTest {
     Callable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. HandleExceptionCallable
-    HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
+    LogOnErrorCallable c1 = getFirstAndAssert(actualCallable, LogOnErrorCallable.class);
 
     // 2. ThreadNameDecorator
     ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
@@ -77,7 +77,7 @@ public class JobCallableChainTest {
     Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. HandleExceptionCallable
-    HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
+    LogOnErrorCallable c1 = getFirstAndAssert(actualCallable, LogOnErrorCallable.class);
 
     // 2. ThreadNameDecorator
     ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
@@ -119,7 +119,7 @@ public class JobCallableChainTest {
     Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
 
     // 3. HandleExceptionCallable
-    HandleExceptionCallable c3 = getNextAndAssert(c2, HandleExceptionCallable.class);
+    LogOnErrorCallable c3 = getNextAndAssert(c2, LogOnErrorCallable.class);
 
     // 4. ThreadNameDecorator
     ThreadNameDecorator c4 = getNextAndAssert(c3, ThreadNameDecorator.class);

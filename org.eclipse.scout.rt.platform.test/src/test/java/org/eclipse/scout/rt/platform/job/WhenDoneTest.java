@@ -174,14 +174,14 @@ public class WhenDoneTest {
   public void testErrorWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final ProcessingException pe = new ProcessingException();
+    final Exception error = new ProcessingException();
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
         protocol.add("1");
-        throw pe;
+        throw error;
       }
     }, Jobs.newInput(null).logOnError(false));
     try {
@@ -208,7 +208,7 @@ public class WhenDoneTest {
 
       assertTrue(verifyLatch.await());
       assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
-      assertSame(pe, eventHolder.getValue().getError());
+      assertSame(error, eventHolder.getValue().getError());
       assertNull(eventHolder.getValue().getResult());
       assertFalse(eventHolder.getValue().isCancelled());
       assertTrue(eventHolder.getValue().isFailed());

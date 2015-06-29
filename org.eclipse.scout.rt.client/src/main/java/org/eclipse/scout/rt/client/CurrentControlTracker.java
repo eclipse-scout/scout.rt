@@ -16,14 +16,15 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.ReflectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 
 /**
- * This class tracks the current focus control, {@link IForm} and {@link IOutline} of the current thread's calling
+ * This class tracks the current model element, {@link IForm} and {@link IOutline} of the current thread's calling
  * context.
  * <p>
  * This class is intended to be used by the model thread only.
@@ -68,17 +69,17 @@ public class CurrentControlTracker {
   }
 
   /**
-   * Creates a Java Proxy for the given 'UI facade' to install the current control, {@link IForm} and {@link IOutline}
-   * in the calling context of an invoking thread.
+   * Creates a Java Proxy for the given 'UI facade' to install the current model element, {@link IForm} and
+   * {@link IOutline} in the calling context of an invoking thread.
    *
    * @param facade
    *          The 'UI facade' to be proxied.
    * @param modelElement
    *          The model element the facade belongs to.
    * @param form
-   *          The {@link IForm} to be set on the calling context of an invoking thread.
+   *          The {@link IForm} to be set onto the calling context of an invoking thread.
    * @param outline
-   *          The {@link IOutline} to be set on the calling context of an invoking thread.
+   *          The {@link IOutline} to be set onto the calling context of an invoking thread.
    * @return proxied facade.
    */
   @SuppressWarnings("unchecked")
@@ -87,18 +88,13 @@ public class CurrentControlTracker {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        try {
-          return ClientRunContexts.copyCurrent().outline(outline).form(form).modelElement(modelElement).call(new Callable<Object>() {
+        return ClientRunContexts.copyCurrent().outline(outline).form(form).modelElement(modelElement).call(new Callable<Object>() {
 
-            @Override
-            public Object call() throws Exception {
-              return method.invoke(facade, args);
-            }
-          });
-        }
-        catch (ProcessingException e) {
-          throw e.getCause();
-        }
+          @Override
+          public Object call() throws Exception {
+            return method.invoke(facade, args);
+          }
+        }, BEANS.get(ThrowableTranslator.class));
       }
     });
   }

@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.holders.HolderUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.service.internal.AbstractHolderArgumentVisitor;
 
 /**
@@ -45,7 +45,7 @@ public final class ServiceUtility {
       return serviceClass.getMethod(operation, paramTypes);
     }
     catch (Throwable t) {
-      throw BEANS.get(ExceptionTranslator.class).translate(t);
+      throw BEANS.get(ProcessingExceptionTranslator.class).translate(t);
     }
   }
 

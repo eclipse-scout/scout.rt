@@ -22,14 +22,14 @@ import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
- * Processor to translate computing exceptions into {@link ProcessingException}s.
+ * Processor to log uncaught exceptions.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+public class LogOnErrorCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
   @Internal
   protected final Callable<RESULT> m_next;
@@ -44,7 +44,7 @@ public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, IChain
    * @param input
    *          input that describes the job.
    */
-  public HandleExceptionCallable(final Callable<RESULT> next, final JobInput input) {
+  public LogOnErrorCallable(final Callable<RESULT> next, final JobInput input) {
     m_input = input;
     m_next = Assertions.assertNotNull(next);
   }
@@ -55,16 +55,16 @@ public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, IChain
       return m_next.call();
     }
     catch (final Throwable t) {
-      // If logging is enabled for the current job, pass the exception to the ExceptionHandler. That is important if the job's result is not queried by the submitter, so that the exception is not swallowed silently.
       if (m_input.logOnError()) {
         try {
           BEANS.get(ExceptionHandler.class).handle(t);
         }
         catch (final Throwable unhandledThrowable) {
-          // NOOP
+          // NOOP: ExceptionHandler is not expected to throw an Exception; However, this catch-block is for safety purpose.
         }
       }
-      // Translate and propagate the exception.
+
+      // Propagate the exception.
       throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
   }

@@ -17,23 +17,20 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * Used to translate {@link Throwable}s into {@link Exception}s. Thereby, wrapper exceptions like
- * {@link UndeclaredThrowableException}, {@link InvocationTargetException} or {@link ExecutionException} are unwrapped
- * and their cause translated accordingly. Solely, an {@link Error} is not translated but re-throw instead. That is
- * because an {@link Error} indicates a serious problem due to a abnormal condition.
+ * This translator simply returns the given {@link Throwable}, unless being a wrapper exceptions like
+ * {@link UndeclaredThrowableException}, {@link InvocationTargetException} or {@link ExecutionException}. Those are
+ * unwrapped and their cause translated accordingly.
  */
 @ApplicationScoped
-public class ExceptionTranslator implements IThrowableTranslator<Exception> {
+public class ThrowableTranslator implements IThrowableTranslator<Throwable> {
 
   /**
-   * Translates the given {@link Throwable} into an {@link Exception}. Solely, an {@link Error} is not
-   * translated but re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
+   * Returns the given {@link Throwable}, unless being a wrapper exceptions like {@link UndeclaredThrowableException},
+   * {@link InvocationTargetException} or {@link ExecutionException}. Those are unwrapped and their cause translated
+   * accordingly.
    */
   @Override
-  public Exception translate(final Throwable t) {
-    if (t instanceof Error) {
-      throw (Error) t;
-    }
+  public Throwable translate(final Throwable t) {
     if (t instanceof UndeclaredThrowableException && t.getCause() != null) {
       return translate(t.getCause());
     }
@@ -43,10 +40,7 @@ public class ExceptionTranslator implements IThrowableTranslator<Exception> {
     else if (t instanceof ExecutionException && t.getCause() != null) {
       return translate(t.getCause());
     }
-    else if (t instanceof Exception) {
-      return (Exception) t;
-    }
 
-    return new Exception(t);
+    return t;
   }
 }

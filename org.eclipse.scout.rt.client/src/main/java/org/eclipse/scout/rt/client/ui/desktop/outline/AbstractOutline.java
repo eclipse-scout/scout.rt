@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
@@ -82,16 +83,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   protected void callInitializer() {
-    // Run the initialization on behalf of the this Outline.
+    // Run the initialization on behalf of this Outline.
     try {
       ClientRunContexts.copyCurrent().outline(this).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           AbstractOutline.super.callInitializer();
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }

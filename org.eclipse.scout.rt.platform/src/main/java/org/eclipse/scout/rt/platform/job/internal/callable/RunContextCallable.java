@@ -14,7 +14,9 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 
 /**
  * Processor to run the subsequent sequence of actions on behalf of the given {@link RunContext}.
@@ -43,7 +45,7 @@ public class RunContextCallable<RESULT> implements Callable<RESULT>, IChainable<
   @Override
   public RESULT call() throws Exception {
     if (m_runContext != null) {
-      return m_runContext.call(m_next);
+      return m_runContext.call(m_next, BEANS.get(ExceptionTranslator.class));
     }
     else {
       return m_next.call();

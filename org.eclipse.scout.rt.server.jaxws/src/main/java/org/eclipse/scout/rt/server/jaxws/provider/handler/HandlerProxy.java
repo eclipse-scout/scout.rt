@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
@@ -117,7 +118,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
           public T call() throws Exception {
             return callable.call();
           }
-        });
+        }, BEANS.get(ExceptionTranslator.class));
       }
     }
     catch (final Exception e) {

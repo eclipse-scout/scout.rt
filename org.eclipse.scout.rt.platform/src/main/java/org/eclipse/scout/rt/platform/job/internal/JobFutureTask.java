@@ -29,7 +29,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -71,17 +72,17 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * Factory method to create a {@link JobFutureTask} for the given {@link Callable}.
    */
   public static <RESULT> JobFutureTask<RESULT> create(final JobManager jobManager, final JobInput input, final boolean periodic, final Callable<RESULT> callable) {
-    final AtomicReference<JobFutureTask<RESULT>> holder = new AtomicReference<>();
+    final AtomicReference<JobFutureTask<RESULT>> futureTask = new AtomicReference<>();
 
-    // Provide a wrapped Callable to the FutureTask to control its execution.
+    // Provide the FutureTask with a wrapped Callable to control its execution.
     final JobFutureTask<RESULT> task = new JobFutureTask<>(jobManager, input, periodic, new Callable<RESULT>() {
 
       @Override
       public RESULT call() throws Exception {
-        return holder.get().invoke(callable);
+        return futureTask.get().invoke(callable);
       }
     });
-    holder.set(task);
+    futureTask.set(task);
     return task;
   }
 
@@ -271,36 +272,46 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public RESULT awaitDoneAndGet() throws ProcessingException {
+    return awaitDoneAndGet(BEANS.get(ProcessingExceptionTranslator.class));
+  }
+
+  @Override
+  public <ERROR extends Throwable> RESULT awaitDoneAndGet(final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
     try {
       return get();
     }
     catch (final CancellationException e) {
-      throw new ProcessingException(String.format("The job was cancelled. [job=%s]", m_input.name()), e);
+      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.name())), throwableTranslator);
     }
     catch (final InterruptedException e) {
-      throw new ProcessingException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
+      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name())), throwableTranslator);
     }
     catch (final Throwable t) {
-      throw BEANS.get(ExceptionTranslator.class).translate(t);
+      return throwElseReturnNull(t, throwableTranslator);
     }
   }
 
   @Override
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws ProcessingException {
+    return awaitDoneAndGet(timeout, unit, BEANS.get(ProcessingExceptionTranslator.class));
+  }
+
+  @Override
+  public <ERROR extends Throwable> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
     try {
       return get(timeout, unit);
     }
     catch (final CancellationException e) {
-      throw new ProcessingException(String.format("The job was cancelled. [job=%s]", m_input.name()), e);
+      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.name())), throwableTranslator);
     }
     catch (final InterruptedException e) {
-      throw new ProcessingException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
+      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name())), throwableTranslator);
     }
     catch (final TimeoutException e) {
-      throw new ProcessingException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.name()), e);
+      return throwElseReturnNull(new TimeoutException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.name())), throwableTranslator);
     }
     catch (final Throwable t) {
-      throw BEANS.get(ExceptionTranslator.class).translate(t);
+      return throwElseReturnNull(t, throwableTranslator);
     }
   }
 
@@ -317,5 +328,15 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     builder.attr("blocked", m_blocked);
     builder.attr("expirationDate", m_expirationDate);
     return builder.toString();
+  }
+
+  private <ERROR extends Throwable> RESULT throwElseReturnNull(final Throwable t, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
+    final ERROR error = throwableTranslator.translate(t);
+    if (error != null) {
+      throw error;
+    }
+    else {
+      return null;
+    }
   }
 }

@@ -45,7 +45,6 @@ import javax.xml.ws.http.HTTPException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.apt.internal.HandlerArtifactProcessor;
@@ -59,7 +58,7 @@ import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.Logger;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
@@ -282,26 +281,22 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     }
 
     // Create exception handling logic.
-    final JCatchBlock catchBlock = tryBlock._catch(model.ref(ProcessingException.class));
+    final JCatchBlock catchBlock = tryBlock._catch(model.ref(Exception.class));
     final JVar caughtException = catchBlock.param("e");
     final JBlock catchBody = catchBlock.body();
-
-    final JInvocation rootCauseInvocation = model.ref(ExceptionHandler.class).staticInvoke("getRootCause").arg(caughtException);
 
     // Create exception handling.
     if (throwTypes.isEmpty()) {
       // webservice method has not faults declared.
-      catchBody._throw(JExpr.invoke(HANDLE_UNDECLARED_FAULT_METHOD_NAME).arg(rootCauseInvocation));
+      catchBody._throw(JExpr.invoke(HANDLE_UNDECLARED_FAULT_METHOD_NAME).arg(caughtException));
     }
     else {
       // handle declared webservice faults.
-      final JVar cause = catchBody.decl(model.ref(Throwable.class), "cause", rootCauseInvocation);
-
       final JConditionalEx condition = new JConditionalEx(catchBody);
       for (final JClass throwType : throwTypes) {
-        condition._elseif(cause._instanceof(throwType))._throw(JExprEx.cast(throwType, cause));
+        condition._elseif(caughtException._instanceof(throwType))._throw(JExprEx.cast(throwType, caughtException));
       }
-      condition._else()._throw(JExpr.invoke(HANDLE_UNDECLARED_FAULT_METHOD_NAME).arg(cause));
+      condition._else()._throw(JExpr.invoke(HANDLE_UNDECLARED_FAULT_METHOD_NAME).arg(caughtException));
     }
   }
 
@@ -343,8 +338,10 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     }
 
     // Create RunContext invocations.
-    final JInvocation jaxwsRunContextInvocation = jaxwsRunContext.invoke(runMethodName).arg(JExpr._new(jaxwsRunContextCallable));
-    final JInvocation handlerRunContextInvocation = handlerRunContext.invoke(runMethodName).arg(JExpr._new(handlerRunContextCallable));
+    final JInvocation exceptionTranslator = model.ref(BEANS.class).staticInvoke("get").arg(model.ref(ExceptionTranslator.class).dotclass());
+
+    final JInvocation jaxwsRunContextInvocation = jaxwsRunContext.invoke(runMethodName).arg(JExpr._new(jaxwsRunContextCallable)).arg(exceptionTranslator);
+    final JInvocation handlerRunContextInvocation = handlerRunContext.invoke(runMethodName).arg(JExpr._new(handlerRunContextCallable)).arg(exceptionTranslator);
 
     // Implement JaxWsRunContext callable.
     final JMethod jaxwsRunContextRunMethod = jaxwsRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
@@ -373,21 +370,17 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     final JMethod method = portTypeProxy.method(JMod.PROTECTED, RuntimeException.class, HANDLE_UNDECLARED_FAULT_METHOD_NAME);
     method.annotate(Internal.class);
 
-    final JVar throwableParam = method.param(JMod.FINAL, Throwable.class, "t");
+    final JVar exceptionParam = method.param(JMod.FINAL, Exception.class, "e");
 
     final JConditionalEx condition = new JConditionalEx(method.body());
 
     // Handle RuntimeException
     final JType runtimeException = model._ref(RuntimeException.class);
-    condition._if(throwableParam._instanceof(runtimeException))._throw(JExprEx.cast(runtimeException, throwableParam));
-
-    // Handle Error
-    final JType error = model._ref(Error.class);
-    condition._elseif(throwableParam._instanceof(error))._throw(JExprEx.cast(error, throwableParam));
+    condition._if(exceptionParam._instanceof(runtimeException))._throw(JExprEx.cast(runtimeException, exceptionParam));
 
     // Handle other exception
     final JBlock otherExceptionBlock = condition._else();
-    otherExceptionBlock.invoke(logger, "error").arg(JExpr.lit("Undeclared exception while processing webservice request")).arg(throwableParam);
+    otherExceptionBlock.invoke(logger, "error").arg(JExpr.lit("Undeclared exception while processing webservice request")).arg(exceptionParam);
     otherExceptionBlock._throw(JExpr._new(model.ref(HTTPException.class)).arg(model.ref(HttpServletResponse.class).staticRef("SC_INTERNAL_SERVER_ERROR")));
   }
 

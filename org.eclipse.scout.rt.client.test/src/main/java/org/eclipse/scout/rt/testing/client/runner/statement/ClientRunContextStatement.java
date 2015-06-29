@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -76,7 +77,7 @@ public class ClientRunContextStatement extends Statement {
                 throw new Error(e);
               }
             }
-          });
+          }, BEANS.get(ThrowableTranslator.class));
         }
       }, BEANS.get(IBeanMetaDataFacotry.class).create(clientSessionClass).order(-Long.MAX_VALUE)).evaluate();
     }

@@ -28,7 +28,8 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
 /**
@@ -60,8 +61,8 @@ public class RunContext {
   protected PropertyMap m_propertyMap = new PropertyMap();
 
   /**
-   * Runs the given runnable on behalf of this {@link RunContext}. Use this method if you run code that does not return
-   * a result.
+   * Runs the given {@link IRunnable} on behalf of this {@link RunContext}. Use this method if you run code that does
+   * not return a result.
    *
    * @param runnable
    *          runnable to be run.
@@ -73,8 +74,23 @@ public class RunContext {
   }
 
   /**
-   * Runs the given callable on behalf of this {@link RunContext}. Use this method if you run code that returns a
-   * result.
+   * Runs the given {@link IRunnable} on behalf of this {@link RunContext}, and allows translation of exceptions thrown
+   * during execution.
+   *
+   * @param runnable
+   *          runnable to be run.
+   * @param throwableTranslator
+   *          to translate exceptions thrown during execution.
+   * @throws ERROR
+   *           thrown according to the given {@link IThrowableTranslator}.
+   */
+  public <ERROR extends Throwable> void run(final IRunnable runnable, final IThrowableTranslator<? extends ERROR> throwableTranslator) throws ERROR {
+    call(Callables.callable(runnable), throwableTranslator);
+  }
+
+  /**
+   * Runs the given {@link Callable} on behalf of this {@link RunContext}. Use this method if you run code that returns
+   * a result.
    *
    * @param callable
    *          callable to be run.
@@ -83,11 +99,33 @@ public class RunContext {
    *           exception thrown during the callable's execution.
    */
   public <RESULT> RESULT call(final Callable<RESULT> callable) throws ProcessingException {
+    return call(callable, BEANS.get(ProcessingExceptionTranslator.class));
+  }
+
+  /**
+   * Runs the given {@link Callable} on behalf of this {@link RunContext}, and allows translation of exceptions thrown
+   * during execution.
+   *
+   * @param callable
+   *          callable to be run.
+   * @param throwableTranslator
+   *          to translate exceptions thrown during execution.
+   * @return the return value of the callable.
+   * @throws ERROR
+   *           thrown according to the given {@link IThrowableTranslator}.
+   */
+  public <RESULT, ERROR extends Throwable> RESULT call(final Callable<RESULT> callable, final IThrowableTranslator<? extends ERROR> throwableTranslator) throws ERROR {
     try {
       return interceptCallable(callable).call();
     }
-    catch (final Exception e) {
-      throw BEANS.get(ExceptionTranslator.class).translate(e);
+    catch (final Throwable t) {
+      final ERROR error = throwableTranslator.translate(t);
+      if (error != null) {
+        throw error;
+      }
+      else {
+        return null;
+      }
     }
   }
 

@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -1001,7 +1001,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             lookupRunnable.run();
           }
           catch (Exception e) {
-            fetcher.dataFetched(null, BEANS.get(ExceptionTranslator.class).translate(e));
+            fetcher.dataFetched(null, BEANS.get(ProcessingExceptionTranslator.class).translate(e));
           }
         }
       }
@@ -1107,7 +1107,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             lookupRunnable.run();
           }
           catch (Exception e) {
-            fetcher.dataFetched(null, BEANS.get(ExceptionTranslator.class).translate(e));
+            fetcher.dataFetched(null, BEANS.get(ProcessingExceptionTranslator.class).translate(e));
           }
         }
       }

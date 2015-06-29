@@ -17,20 +17,20 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * Used to translate {@link Throwable}s into {@link Exception}s. Thereby, wrapper exceptions like
+ * Used to translate {@link Throwable}s into {@link RuntimeException}s. Thereby, wrapper exceptions like
  * {@link UndeclaredThrowableException}, {@link InvocationTargetException} or {@link ExecutionException} are unwrapped
  * and their cause translated accordingly. Solely, an {@link Error} is not translated but re-throw instead. That is
  * because an {@link Error} indicates a serious problem due to a abnormal condition.
  */
 @ApplicationScoped
-public class ExceptionTranslator implements IThrowableTranslator<Exception> {
+public class RuntimeExceptionTranslator implements IThrowableTranslator<RuntimeException> {
 
   /**
-   * Translates the given {@link Throwable} into an {@link Exception}. Solely, an {@link Error} is not
-   * translated but re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
+   * Translates the given {@link Throwable} into a {@link RuntimeException}. Solely, an {@link Error} is not translated
+   * but re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
    */
   @Override
-  public Exception translate(final Throwable t) {
+  public RuntimeException translate(final Throwable t) {
     if (t instanceof Error) {
       throw (Error) t;
     }
@@ -43,10 +43,10 @@ public class ExceptionTranslator implements IThrowableTranslator<Exception> {
     else if (t instanceof ExecutionException && t.getCause() != null) {
       return translate(t.getCause());
     }
-    else if (t instanceof Exception) {
-      return (Exception) t;
+    else if (t instanceof RuntimeException) {
+      return (RuntimeException) t;
     }
 
-    return new Exception(t);
+    return new RuntimeException(t);
   }
 }

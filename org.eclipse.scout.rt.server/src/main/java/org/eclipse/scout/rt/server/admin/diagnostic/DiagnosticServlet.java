@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -60,9 +60,9 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
           invokeDiagnosticService(serverRunContext);
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       throw new ServletException("Failed to invoke DiagnosticServlet", e);
     }
   }
@@ -70,7 +70,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
   /**
    * Method invoked to delegate the HTTP request to the 'diagnostic service'.
    */
-  protected void invokeDiagnosticService(final ServerRunContext serverRunContext) throws ProcessingException {
+  protected void invokeDiagnosticService(final ServerRunContext serverRunContext) throws Exception {
     serverRunContext.run(new IRunnable() {
 
       @Override
@@ -85,6 +85,6 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
         }
         diagnosticSession.serviceRequest(servletRequest, servletResponse);
       }
-    });
+    }, BEANS.get(ExceptionTranslator.class));
   }
 }

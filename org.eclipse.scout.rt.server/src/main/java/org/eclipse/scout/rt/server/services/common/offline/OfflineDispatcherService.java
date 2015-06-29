@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -74,7 +75,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   /**
    * Method invoked to delegate the request to the 'process service'.
    */
-  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws Exception {
     return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
 
       @Override
@@ -93,6 +94,6 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
         serviceResponse.setClientNotifications(BEANS.get(IClientNotificationService.class).getNextNotifications(0));
         return serviceResponse;
       }
-    });
+    }, BEANS.get(ExceptionTranslator.class));
   }
 }

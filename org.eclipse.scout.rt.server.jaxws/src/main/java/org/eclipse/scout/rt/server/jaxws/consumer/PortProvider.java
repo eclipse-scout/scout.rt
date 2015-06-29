@@ -33,9 +33,9 @@ import javax.xml.ws.handler.PortInfo;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
 import org.eclipse.scout.rt.server.jaxws.ServerRunContextProvider;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -116,28 +116,23 @@ public class PortProvider<SERVICE extends Service, PORT> {
     }
 
     // Proxy the handler to run on behalf of a RunContext when being invoked.
-    final ServerRunContextProvider provider = BEANS.get(runWithRunContext.provider());
+    final ServerRunContextProvider serverRunContextProvider = BEANS.get(runWithRunContext.provider());
 
     return (Handler<?>) Proxy.newProxyInstance(handler.getClass().getClassLoader(), handler.getClass().getInterfaces(), new InvocationHandler() {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        try {
-          if (PROXIED_HANDLER_METHODS.contains(method)) {
-            return provider.provide(Subject.getSubject(AccessController.getContext())).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
+        if (PROXIED_HANDLER_METHODS.contains(method)) {
+          return serverRunContextProvider.provide(Subject.getSubject(AccessController.getContext())).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
 
-              @Override
-              public Object call() throws Exception {
-                return method.invoke(handler, args);
-              }
-            });
-          }
-          else {
-            return method.invoke(handler, args);
-          }
+            @Override
+            public Object call() throws Exception {
+              return method.invoke(handler, args);
+            }
+          }, BEANS.get(ThrowableTranslator.class));
         }
-        catch (final ProcessingException e) {
-          return e.getCause();
+        else {
+          return method.invoke(handler, args);
         }
       }
     });

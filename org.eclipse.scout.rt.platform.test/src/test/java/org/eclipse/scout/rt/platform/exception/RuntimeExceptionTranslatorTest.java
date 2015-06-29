@@ -19,31 +19,31 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-public class ExceptionTranslatorTest {
-
-  @Test
-  public void testException() {
-    Exception e = new Exception();
-    assertSame(e, new ExceptionTranslator().translate(e));
-  }
+public class RuntimeExceptionTranslatorTest {
 
   @Test
   public void testRuntimeException() {
     RuntimeException re = new RuntimeException();
-    assertSame(re, new ExceptionTranslator().translate(re));
+    assertSame(re, new RuntimeExceptionTranslator().translate(re));
+  }
+
+  @Test
+  public void testException() {
+    Exception e = new Exception();
+    assertSame(e, new RuntimeExceptionTranslator().translate(e).getCause());
   }
 
   @Test
   public void testThrowable() {
     Throwable t = new Throwable();
-    assertSame(t, new ExceptionTranslator().translate(t).getCause());
+    assertSame(t, new RuntimeExceptionTranslator().translate(t).getCause());
   }
 
   @Test
   public void testError() {
     Error e = new Error();
     try {
-      new ExceptionTranslator().translate(e);
+      new RuntimeExceptionTranslator().translate(e);
       fail("error is expected to be re-thrown");
     }
     catch (Error actualError) {
@@ -55,38 +55,38 @@ public class ExceptionTranslatorTest {
   public void testUndeclaredThrowableException() {
     Exception cause = new Exception();
     UndeclaredThrowableException ute = new UndeclaredThrowableException(cause);
-    assertSame(cause, new ExceptionTranslator().translate(ute));
+    assertSame(cause, new RuntimeExceptionTranslator().translate(ute).getCause());
   }
 
   @Test
   public void testExecutionException() {
     Exception cause = new Exception();
     ExecutionException ee = new ExecutionException(cause);
-    assertSame(cause, new ExceptionTranslator().translate(ee));
+    assertSame(cause, new RuntimeExceptionTranslator().translate(ee).getCause());
   }
 
   @Test
   public void testInvocationTargetException() {
     Exception cause = new Exception();
     InvocationTargetException ite = new InvocationTargetException(cause);
-    assertSame(cause, new ExceptionTranslator().translate(ite));
+    assertSame(cause, new RuntimeExceptionTranslator().translate(ite).getCause());
   }
 
   @Test
   public void testUndeclaredThrowableWithNullCauseException() {
     UndeclaredThrowableException ute = new UndeclaredThrowableException(null);
-    assertSame(ute, new ExceptionTranslator().translate(ute));
+    assertSame(ute, new RuntimeExceptionTranslator().translate(ute));
   }
 
   @Test
   public void testExecutionExceptionWithNullCause() {
     ExecutionException ee = new ExecutionException(null);
-    assertSame(ee, new ExceptionTranslator().translate(ee));
+    assertSame(ee, new RuntimeExceptionTranslator().translate(ee).getCause());
   }
 
   @Test
   public void testInvocationTargetExceptionWithNullCause() {
     InvocationTargetException ite = new InvocationTargetException(null);
-    assertSame(ite, new ExceptionTranslator().translate(ite));
+    assertSame(ite, new RuntimeExceptionTranslator().translate(ite).getCause());
   }
 }

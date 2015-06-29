@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-
 /**
- * Event fired once a job is done.
+ * Event fired once a job is done, meaning completed, failed or cancelled.
  *
  * @see IFuture#whenDone(IDoneCallback)
  * @since 5.1
@@ -21,10 +19,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public class DoneEvent<RESULT> {
 
   private final RESULT m_result;
-  private final ProcessingException m_error;
+  private final Exception m_error;
   private final boolean m_cancelled;
 
-  public DoneEvent(final RESULT result, final ProcessingException error, final boolean cancelled) {
+  public DoneEvent(final RESULT result, final Exception error, final boolean cancelled) {
     m_result = result;
     m_error = error;
     m_cancelled = cancelled;
@@ -41,7 +39,7 @@ public class DoneEvent<RESULT> {
    * @return error due to abnormal completion.
    * @see #isFailed()
    */
-  public ProcessingException getError() {
+  public Exception getError() {
     return m_error;
   }
 

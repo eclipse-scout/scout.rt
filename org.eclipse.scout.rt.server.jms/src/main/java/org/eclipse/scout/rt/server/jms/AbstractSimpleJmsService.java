@@ -26,8 +26,10 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.jms.JmsConfigProperties.JmsRequestTimeoutProperty;
@@ -187,7 +189,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
                 public void run() throws Exception {
                   onMessage(jmsMessage);
                 }
-              });
+              }, BEANS.get(ExceptionTranslator.class));
             }
           }
           catch (final Exception e) {
