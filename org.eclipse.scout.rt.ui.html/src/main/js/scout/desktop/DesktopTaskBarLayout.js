@@ -31,7 +31,7 @@ scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
  * @override AbstractLayout.js
  */
 scout.DesktopTabBarLayout.prototype.layout = function($container) {
-  var $tabs = $container.find('.taskbar-tabs'),
+  var $tabs = $container.find('.desktop-view-tabs'),
     $tools = $container.find('.taskbar-tools'),
     $logo = $container.find('.taskbar-logo'),
     contWidth = scout.graphics.getSize($container).width,
@@ -46,7 +46,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     this._$overflowTab.remove();
   }
 
-  $tabs.find('.taskbar-tab-item').setVisible(true);
+  $tabs.find('.desktop-view-tab').setVisible(true);
 
   $tools.find('.taskbar-tool-item').each(function() {
     var $item = $(this);
@@ -67,7 +67,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
   if (smallPrefTabsWidth <= tabsWidth) {
     tabWidth = Math.min(this.TAB_WIDTH_LARGE, Math.floor(tabsWidth / numTabs));
     // 2nd - all Tabs fit when they have small size
-    $tabs.find('.taskbar-tab-item').each(function() {
+    $tabs.find('.desktop-view-tab').each(function() {
       $(this).outerWidth(tabWidth);
     });
   } else {
@@ -84,7 +84,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
     if (smallPrefTabsWidth <= tabsWidth) {
       tabWidth = this.TAB_WIDTH_SMALL;
-      $tabs.find('.taskbar-tab-item').each(function() {
+      $tabs.find('.desktop-view-tab').each(function() {
         $(this).outerWidth(tabWidth);
       });
       return;
@@ -105,7 +105,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
     if (smallPrefTabsWidth <= tabsWidth) {
       tabWidth = this.TAB_WIDTH_SMALL;
-      $tabs.find('.taskbar-tab-item').each(function() {
+      $tabs.find('.desktop-view-tab').each(function() {
         $(this).outerWidth(tabWidth);
       });
       return;
@@ -123,7 +123,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // Never put selected tab into overflow
     var i = 0,
       selectedIndex, tab;
-    $tabs.find('.taskbar-tab-item').each(function() {
+    $tabs.find('.desktop-view-tab').each(function() {
       if ($(this).hasClass('selected')) {
         selectedIndex = i;
       }
@@ -153,7 +153,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     var that = this;
     tabWidth = this.TAB_WIDTH_SMALL;
     i = 0;
-    $tabs.find('.taskbar-tab-item').each(function() {
+    $tabs.find('.desktop-view-tab').each(function() {
       if (i >= leftEnd && i <= rightEnd) {
         $(this).outerWidth(tabWidth);
       } else {
@@ -170,18 +170,14 @@ scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
     desktop = this._desktop;
   this._overflowTabsIndizes.forEach(function(i) {
     tab = desktop._allTabs[i];
-    text = tab.title;
-    if (tab.subTitle) {
-      text += ' (' + tab.subTitle + ')';
-    }
     menu = desktop.session.createUiObject({
       objectType: 'Menu',
-      text: text,
+      text: tab.getMenuText(),
       tab: tab
     });
     menu.sendDoAction = function() {
       $.log.debug('(DesktopTaskBarLayout#_onClickOverflow) tab=' + this.tab);
-      desktop._selectTab(this.tab);
+      desktop._setSelectedTab(this.tab);
     };
     overflowMenus.push(menu);
   });

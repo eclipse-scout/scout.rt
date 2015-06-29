@@ -1,13 +1,17 @@
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
-  this.navigation;
+  this._$viewTabBar;
   this.$taskBar;
-  this.$tabbar;
   this.$toolbar;
   this.$bench;
 
+  this.navigation;
   this._allTabs = [];
+  /**
+   * outline-content = outline form or table
+   */
+  this._outlineContent;
   this._selectedTab;
 
   /**
@@ -48,7 +52,7 @@ scout.Desktop.prototype._render = function($parent) {
     .delay(1000)
     .animateAVCSD('width', 40, null, null, 1000);
 
-  this.$tabbar = this.$taskBar.appendDiv('taskbar-tabs');
+  this._$viewTabBar = this.$taskBar.appendDiv('desktop-view-tabs');
 
   // FIXME AWE: (menu) hier menu-bar verwenden?
   this.$toolbar = this.$taskBar.appendDiv('taskbar-tools');
@@ -63,8 +67,6 @@ scout.Desktop.prototype._render = function($parent) {
   this.splitter.render($parent);
   this.splitter.on('resize', this.onSplitterResize.bind(this));
   this.splitter.on('resizeend', this.onSplitterResizeEnd.bind(this));
-
-  this._outlineTab = new scout.Desktop.TabAndContent(this);
 
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
@@ -116,10 +118,10 @@ scout.Desktop.prototype._render = function($parent) {
   scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
+// FIXME AWE/CGU this is called by JQuery UI when a dialog gets resized, why?
 scout.Desktop.prototype.onResize = function(event) {
-  // FIXME AWE/CGU this is called by JQuery ui when the dialog gets resized, why?
-  if (this._selectedTab && this._selectedTab.content) {
-    this._selectedTab.content.onResize();
+  if (this._selectedTab) {
+    this._selectedTab.onResize();
   }
   if (this.outline) {
     this.outline.onResize();
@@ -169,116 +171,71 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
   this.onResize({data: newPosition});
 };
 
-/* Tab-handling */
-
-// TODO AWE/CGU: (dialoge) Über modale Dialoge sprechen, v.a. über folgenden Fall:
-// - Outline-Tab > Autrag Xyz > Auftrag bearbeiten
-// - Tab geht auf, nun wieder auf Outline-Tab wechseln und nochmals Auftrag bearbeiten
-// - ein weiterer Tab geht auf, kann man beliebig wiederholen
-// Lösungen besprechen. Eine Möglichkeit wäre, bei Klick auf Auftrag bearbeiten in den
-// bereits geöffneten Tab/Dialog zu wecheseln. Oder das Menü-Item disablen.
-
-// ist schon in AbstractForm mit execStartExclusive gelöst - muss von CRM überall implementiert werden.
-
-scout.Desktop.prototype._addTab = function(tab, prepend) {
-  tab.$container = $.makeDiv('taskbar-tab-item')
-    .append($.makeDiv('title', tab.title))
-    .append($.makeDiv('sub-title', tab.subTitle));
-  if (prepend) {
-    tab.$container.prependTo(this.$tabbar);
-  } else {
-    tab.$container.appendTo(this.$tabbar);
-  }
-
-  tab.$container.on('click', function() {
-    if (tab !== this._selectedTab) {
-      this._selectTab(tab);
-    }
-  }.bind(this));
-
+scout.Desktop.prototype._addTab = function(tab) {
   this._allTabs.push(tab);
+  this._setSelectedTab(tab);
   this._layoutTaskBar();
-};
-
-scout.Desktop.prototype._isTabVisible = function(tab) {
-  return this._allTabs.indexOf(tab) >= 0;
-};
-
-scout.Desktop.prototype._updateTab = function(tab) {
-  if (!tab.$container) {
-    return;
-  }
-
-  var setTitle = function(selector, title) {
-    var $e = tab.$container.children(selector);
-    if (title) {
-      $e.text(title).setVisible(true);
-    } else {
-      $e.setVisible(false);
-    }
-  };
-  setTitle('.title', tab.title);
-  setTitle('.sub-title', tab.subTitle);
 };
 
 scout.Desktop.prototype._removeTab = function(tab) {
   scout.arrays.remove(this._allTabs, tab);
+  tab.removeTab();
 
-  // If tab was already rendered, unrender it
-  if (tab.$container) {
-    if (tab.$container.isSelected() && this._allTabs.length > 0) {
-      this._selectTab(this._allTabs[this._allTabs.length - 1]);
-    }
-    tab.$container.remove();
+  // FIXME AWE: use activeForm here or when no form is active, show outline again
+  if (this._allTabs.length > 0) {
+    this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
+  } else {
+    this._attachOutlineContent();
+    this._selectedTab = null;
   }
 
   this._layoutTaskBar();
 };
 
-scout.Desktop.prototype._selectTab = function(tab) {
-  if (this._selectedTab) {
-    this._unselectTab(this._selectedTab);
+scout.Desktop.prototype._setSelectedTab = function(tab) {
+  if (this._selectedTab !== tab) {
+    this._detachOutlineContent();
+    this._deselectTab();
+    this._selectTab(tab);
+    this._layoutTaskBar();
+    scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
   }
-  if (tab.$container) {
-    tab.$container.select(true);
+};
+
+scout.Desktop.prototype._detachOutlineContent = function() {
+  if (this._outlineContent) {
+    var $outlineContent = this._outlineContent.$container;
+    this.session.detachHelper.beforeDetach($outlineContent);
+    $outlineContent.detach();
   }
-  this._selectedTab = tab;
-  if (tab.content instanceof scout.Table) {
-    // Install adapter on parent (no table focus required)
-    if (!(tab.content.keyStrokeAdapter instanceof scout.DesktopTableKeyStrokeAdapter)) {
-      tab.content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(tab.content), this.$container);
-    } else {
-      scout.keyStrokeManager.installAdapter(this.$container, tab.content.keyStrokeAdapter);
-    }
-  }
-  if (tab.$content && tab.$content.length > 0) {
-    this.$bench.append(tab.$content);
-    this.session.detachHelper.afterAttach(tab.$content);
+};
+
+scout.Desktop.prototype._attachOutlineContent = function() {
+  if (this._outlineContent) {
+    var $outlineContent = this._outlineContent.$container;
+    this.$bench.append($outlineContent);
+    this.session.detachHelper.afterAttach($outlineContent);
 
     // If the parent has been resized while the content was not visible, the content has the wrong size -> update
-    var htmlComp = scout.HtmlComponent.get(tab.$content);
+    var htmlComp = scout.HtmlComponent.get($outlineContent);
     var htmlParent = htmlComp.getParent();
     htmlComp.setSize(htmlParent.getSize());
   }
-  this._layoutTaskBar();
-  scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
 };
 
-scout.Desktop.prototype._unselectTab = function(tab) {
-  //remove registered keyStrokeAdapters
-  if (tab.content && scout.keyStrokeManager.isAdapterInstalled(tab.content.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(tab.content.keyStrokeAdapter);
-  }
+/**
+ * De-selects the currently selected tab.
+ */
+scout.Desktop.prototype._deselectTab = function() {
+ if (this._selectedTab) {
+   this._selectedTab.deselect();
+   this._selectedTab = null;
+ }
+};
 
-  tab.$content = this.$bench.children();
-  if (tab.$content.length > 0) {
-    this.session.detachHelper.beforeDetach(tab.$content);
-    tab.$content.detach();
-  }
-
-  if (tab.$container) {
-    tab.$container.select(false);
-  }
+scout.Desktop.prototype._selectTab = function(tab) {
+  tab.select();
+  this._selectedTab = tab;
 };
 
 /* handling of forms */
@@ -314,25 +271,23 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
     .cssMarginTop(marginTop);
 };
 
+/**
+ * We only render the tab here. Because only the view of the currently selected tab is visible.
+ * Thus it makes no sense to render all forms now.
+ */
 scout.Desktop.prototype._renderView = function(view) {
-  var tab = new scout.Desktop.TabAndContent(this, view, view.title, view.subTitle);
+  var tab = new scout.DesktopViewTab(view, this.$bench);
+  tab.events.on('tabClicked', this._setSelectedTab.bind(this));
+  tab.renderTab(this._$viewTabBar);
   this._addTab(tab);
-  this._selectTab(tab);
-  view.render(this.$bench);
-
   scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
-
-  // FIXME CGU: maybe include in render?
-  view.htmlComp.validateLayout();
-  view.htmlComp.validateRoot = true;
-  view.tab = tab;
 };
 
 scout.Desktop.prototype._showForm = function(form) {
   if (this._isDialog(form)) {
     // FIXME AWE: (modal dialog) - show dialogs
   } else {
-    this._selectTab(form.tab);
+    this._setSelectedTab(form.tab);
   }
 };
 
@@ -370,40 +325,18 @@ scout.Desktop.prototype._openUri = function(event) {
 
 /* communication with outline */
 
-scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
-  if (this._outlineTab.content && this._outlineTab.content !== content) {
-    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineTab.content.keyStrokeAdapter)) {
-      scout.keyStrokeManager.uninstallAdapter(this._outlineTab.content.keyStrokeAdapter);
+scout.Desktop.prototype.setOutlineContent = function(content) {
+  if (this._outlineContent && this._outlineContent !== content) {
+    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineContent.keyStrokeAdapter)) {
+      scout.keyStrokeManager.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
     }
-    this._outlineTab.content.remove();
-    // Also remove storage to make sure selectTab does not restore the content
-    this._outlineTab.$content = null;
-    this._outlineTab.content.tab = null;
+    this._outlineContent.remove();
+    this._outlineContent = null;
   }
 
-  // Remove tab completely if no content is available (neither a table nor a form)
-  if (!content) {
-    this._removeTab(this._outlineTab);
-    return;
-  }
+  this._outlineContent = content;
+  this._deselectTab();
 
-  this._outlineTab._update(content, title, subTitle);
-  content.tab = this._outlineTab;
-//  if (!this._isTabVisible(this._outlineTab)) {
-//    this._addTab(this._outlineTab, true);
-//  }
-  this._updateTab(this._outlineTab);
-  this._selectTab(this._outlineTab);
-  // FIXME CGU: create DesktopTable or OutlineTable
-  if (content instanceof scout.Table) {
-    if (!scout.keyStrokeManager.isAdapterInstalled(content.keyStrokeAdapter)) {
-      if (!(content.keyStrokeAdapter instanceof scout.DesktopTableKeyStrokeAdapter)) {
-        content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(content), this.$container);
-      } else {
-        scout.keyStrokeManager.installAdapter(this.$container, content.keyStrokeAdapter);
-      }
-    }
-  }
   if (!content.rendered) {
     if (content instanceof scout.Table) {
       content.menuBar.top();
@@ -411,14 +344,15 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     }
     content.render(this.$bench);
 
-    //request focus on first element in new outlineTab.
+    // Request focus on first element in new outlineTab.
     scout.focusManager.validateFocus(this.session.uiSessionId);
 
     // FIXME CGU: maybe include in render?
     content.htmlComp.validateLayout();
     content.htmlComp.validateRoot = true;
   }
-  //request focus on first element in new outlineTab.
+
+  // Request focus on first element in new outlineTab.
   scout.focusManager.validateFocus(this.session.uiSessionId, 'update');
 };
 
@@ -444,8 +378,6 @@ scout.Desktop.prototype.removeForm = function(id) {
   form.remove();
 };
 
-/* message boxes */
-
 scout.Desktop.prototype._renderMessageBox = function(messageBox) {
   messageBox.render(this.$container);
 };
@@ -454,8 +386,6 @@ scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
   scout.arrays.remove(this.messageBoxes, messageBox);
 };
 
-/* file chooser */
-
 scout.Desktop.prototype._renderFileChooser = function(fileChooser) {
   fileChooser.render(this.$container);
 };
@@ -463,8 +393,6 @@ scout.Desktop.prototype._renderFileChooser = function(fileChooser) {
 scout.Desktop.prototype.onFileChooserClosed = function(fileChooser) {
   scout.arrays.remove(this.fileChoosers, fileChooser);
 };
-
-/* event handling */
 
 scout.Desktop.prototype._onModelFormAdded = function(event) {
   var form = this.session.getOrCreateModelAdapter(event.form, this);
@@ -510,42 +438,4 @@ scout.Desktop.prototype.onModelAction = function(event) {
 
 scout.Desktop.prototype.tabCount = function() {
   return this._allTabs.length;
-};
-
-/* --- INNER TYPES ---------------------------------------------------------------- */
-
-scout.Desktop.TabAndContent = function(desktop, content, title, subTitle) {
-  this._desktop = desktop;
-  this.$container;
-  this.$content;
-
-  this._contentPropertyChangeListener = function(event) {
-    if (event.title !== undefined || event.subTitle !== undefined) {
-      this.title = scout.helpers.nvl(event.title, this.title);
-      this.subTitle = scout.helpers.nvl(event.subTitle, this.subTitle);
-      this._desktop._updateTab(this);
-    }
-  }.bind(this);
-
-  this._update(content, title, subTitle);
-};
-
-scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitle) {
-  this._uninstallPropertyChangeListener();
-  this.content = content;
-  this.title = title;
-  this.subTitle = subTitle;
-  this._installPropertyChangeListener();
-};
-
-scout.Desktop.TabAndContent.prototype._installPropertyChangeListener = function() {
-  if (this.content instanceof scout.ModelAdapter) {
-    this.content.on('propertyChange', this._contentPropertyChangeListener);
-  }
-};
-
-scout.Desktop.TabAndContent.prototype._uninstallPropertyChangeListener = function() {
-  if (this.content instanceof scout.ModelAdapter) {
-    this.content.off('propertyChange', this._contentPropertyChangeListener);
-  }
 };

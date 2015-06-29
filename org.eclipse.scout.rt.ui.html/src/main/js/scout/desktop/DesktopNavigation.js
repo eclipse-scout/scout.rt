@@ -3,7 +3,7 @@ scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
 
-  this.BREADCRUMB_SWITCH_WIDTH = 190;
+  this.BREADCRUMB_SWITCH_WIDTH = 190; // FIXME AWE: make animation work again, cannot use hardcoded width anymore (dynamic number of view-buttons)
   this.MIN_SPLITTER_SIZE = 50;
 
   this.$navigation;

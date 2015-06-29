@@ -56,14 +56,14 @@
   vertical-align: 0;
 }
 
-.taskbar-tabs,
+.desktop-view-tabs,
 .taskbar-tools {
   position: absolute;
   word-wrap: none;
   vertical-align:top;
 }
 
-.taskbar-tabs > .overflow-tab-item {
+.desktop-view-tabs > .overflow-tab-item {
   border-right: 1px solid @border-color;
   display: inline-block;
   height: 50px;
@@ -93,7 +93,7 @@
   padding-right: @taskbar-menu-textandicon-padding-right;
 }
 
-.taskbar-tab-item,
+.desktop-view-tab,
 .taskbar-tool-item {
   position: relative;
   vertical-align: top;
@@ -143,7 +143,7 @@
   }
 }
 
-.taskbar-tab-item {
+.desktop-view-tab {
   border-right: 1px solid @border-color;
   width: 220px;
   &.small {
@@ -192,7 +192,7 @@
   }
 }
 
-.taskbar-tab-item .key-box,
+.desktop-view-tab .key-box,
 .taskbar-tool-item .key-box {
   top: 8px;
 

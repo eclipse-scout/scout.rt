@@ -135,6 +135,7 @@ __include("scout/desktop/DesktopKeyStrokeAdapter.js");
 __include("scout/desktop/DesktopNavigationKeyStroke.js");
 __include("scout/desktop/DesktopNavigationKeyStrokeAdapter.js");
 __include("scout/desktop/DesktopTaskBarLayout.js");
+__include("scout/desktop/DesktopViewTab.js");
 __include("scout/desktop/SearchFieldKeyStrokeAdapter.js");
 __include("scout/desktop/ViewMenuPopup.js");
 __include("scout/desktop/ViewMenuPopupKeyStrokeAdapter.js");

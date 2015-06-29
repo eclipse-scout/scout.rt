@@ -120,7 +120,7 @@ scout.Outline.prototype._renderSelection = function() {
   // Outline does not support multi selection -> [0]
   var node = this.nodesMap[this.selectedNodeIds[0]];
   if (node) {
-    this._updateOutlineTab(node);
+    this._updateOutlineNode(node);
   } else {
     this._showDefaultDetailForm();
   }
@@ -140,20 +140,19 @@ scout.Outline.prototype.setNodesSelected = function(nodes) {
 };
 
 scout.Outline.prototype._showDefaultDetailForm = function() {
-  var form = this.defaultDetailForm;
-  if (form) {
-    this.session.desktop.updateOutlineTab(form, form.title, form.subTitle);
-    this.events.trigger('outlineUpdated', {});
+  if (this.defaultDetailForm) {
+    this.session.desktop.setOutlineContent(this.defaultDetailForm);
+    this.events.trigger('outlineUpdated', {}); // XXX AWE: check/refactor event name
   }
 };
 
-scout.Outline.prototype._updateOutlineTab = function(node) {
+scout.Outline.prototype._updateOutlineNode = function(node) {
   // FIXME AWE: (outline) remove these errors if error never occurs in application
   if (!node) {
-    throw new Error('called updateOutlineTab without node, should call showDefaultDetailForm instead?');
+    throw new Error('called _updateOutlineNode without node, should call showDefaultDetailForm instead?');
   }
   if (this.session.desktop.outline !== this) {
-    throw new Error('called updateOutlineTab but event affects another outline');
+    throw new Error('called _updateOutlineNode but event affects another outline');
   }
 
   // Unlink detail form if it was closed.
@@ -186,6 +185,8 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     nodeText = node.text;
   }
 
+  // XXX AWE: remove this title stuff, not used anymore
+
   if (parentText && nodeText) {
     title = parentText;
     subTitle = nodeText;
@@ -196,8 +197,8 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     title = nodeText;
     subTitle = this.title;
   }
-  this.session.desktop.updateOutlineTab(content, title, subTitle);
-  this.events.trigger('outlineUpdated', {
+  this.session.desktop.setOutlineContent(content);
+  this.events.trigger('outlineUpdated', { // XXX AWE: check/refactor event name
     node: node
   });
 };
@@ -256,7 +257,7 @@ scout.Outline.prototype._onPageChanged = function(event) {
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodeIds.indexOf(node.id) !== -1) {
-      this._updateOutlineTab(node);
+      this._updateOutlineNode(node);
     }
   } else {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
