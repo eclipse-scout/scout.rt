@@ -229,7 +229,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   Date getSelectedEndTime();
 
-  void decorateActivityCell(Activity<RI, AI> p);
+  void decorateResource(Resource<RI> resource);
 
   void replaceResources(List<Resource<RI>> resources);
 
@@ -239,37 +239,17 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   void addResources(List<Resource<RI>> resources);
 
+  void addResource(Resource<RI> resource);
+
   List<Resource<RI>> getResources();
 
-//  ActivityCell<RI, AI> resolveActivityCell(ActivityCell<RI, AI> cell);
-//
-//  List<ActivityCell<RI, AI>> resolveActivityCells(List<? extends ActivityCell<RI, AI>> cells);
-//
-//  List<ActivityCell<RI, AI>> getActivityCells(RI resource);
-//
-//  List<ActivityCell<RI, AI>> getActivityCells(List<Resource<RI>> resources);
-//
-//  List<ActivityCell<RI, AI>> getAllActivityCells();
-
-//  void addActivityCells(List<? extends ActivityCell<RI, AI>> cells);
-//
-//  void updateActivityCells(List<? extends ActivityCell<RI, AI>> cells);
-//
-//  void updateActivityCellsById(List<Resource<RI>> resources);
-//
-//  void removeActivityCells(List<? extends ActivityCell<RI, AI>> cells);
-//
-//  void removeActivityCellsById(List<Resource<RI>> resources);
-//
-//  void removeAllActivityCells();
+  void decorateActivity(Activity<RI, AI> p);
 
   Activity<RI, AI> getSelectedActivity();
 
   void setSelectedActivityCell(Activity<RI, AI> cell);
 
   boolean isSelectedActivityCell(Activity<RI, AI> cell);
-
-//  void setResources(List<Resource<RI>> resources);
 
   /**
    * selected resources in arbitrary order

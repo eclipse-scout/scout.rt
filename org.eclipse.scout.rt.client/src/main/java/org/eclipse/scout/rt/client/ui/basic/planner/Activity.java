@@ -170,11 +170,11 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
   }
 
   @SuppressWarnings("unchecked")
-  public IActivityCellObserver<RI, AI> getObserver() {
-    return (IActivityCellObserver) getValueInternal(OBSERVER_BIT);
+  public IActivityObserver<RI, AI> getObserver() {
+    return (IActivityObserver) getValueInternal(OBSERVER_BIT);
   }
 
-  public void setObserver(IActivityCellObserver<RI, AI> observer) {
+  public void setObserver(IActivityObserver<RI, AI> observer) {
     setValueInternal(OBSERVER_BIT, observer);
   }
 
@@ -183,7 +183,7 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
     boolean b = super.setValueInternal(bitPos, o);
     if (getObserver() != null) {
       if (bitPos != OBSERVER_BIT) {
-        getObserver().cellChanged(this, bitPos);
+        getObserver().activityChanged(this, bitPos);
       }
     }
     return b;

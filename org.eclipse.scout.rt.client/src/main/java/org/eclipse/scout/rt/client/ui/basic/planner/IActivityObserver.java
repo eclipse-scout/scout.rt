@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
-public interface IActivityCellObserver<RI, AI> {
+public interface IActivityObserver<RI, AI> {
 
-  void cellChanged(Activity<RI, AI> cell, int bitPos);
+  void activityChanged(Activity<RI, AI> activity, int bitPos);
 }

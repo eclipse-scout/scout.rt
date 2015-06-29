@@ -60,17 +60,17 @@ public final class PlannerChains {
     }
   }
 
-  public static class PlannerDecorateActivityCellChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
+  public static class PlannerDecorateActivityChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
 
-    public PlannerDecorateActivityCellChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
+    public PlannerDecorateActivityChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
       super(extensions);
     }
 
-    public void execDecorateActivityCell(final Activity<RI, AI> cell) throws ProcessingException {
+    public void execDecorateActivity(final Activity<RI, AI> cell) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
-          next.execDecorateActivityCell(PlannerDecorateActivityCellChain.this, cell);
+          next.execDecorateActivityCell(PlannerDecorateActivityChain.this, cell);
         }
       };
       callChain(methodInvocation, cell);

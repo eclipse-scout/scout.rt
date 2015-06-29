@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.extension.ui.basic.planner;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivityCellSelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerCellActionChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityCellChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisposePlannerChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerInitPlannerChain;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
@@ -38,8 +38,8 @@ public abstract class AbstractPlannerExtension<RI, AI, OWNER extends AbstractPla
   }
 
   @Override
-  public void execDecorateActivityCell(PlannerDecorateActivityCellChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
-    chain.execDecorateActivityCell(cell);
+  public void execDecorateActivityCell(PlannerDecorateActivityChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
+    chain.execDecorateActivity(cell);
   }
 
   @Override
