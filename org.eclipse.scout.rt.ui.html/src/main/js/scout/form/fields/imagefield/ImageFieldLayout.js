@@ -10,5 +10,8 @@ scout.ImageFieldLayout.prototype.layout = function($container) {
 
 scout.ImageFieldLayout.prototype.naturalSize = function(formField) {
   var img = formField.$field[0];
-  return new scout.Dimension(img.naturalWidth, img.naturalHeight);
+  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+    return new scout.Dimension(img.naturalWidth, img.naturalHeight);
+  }
+  return scout.ImageFieldLayout.parent.prototype.naturalSize.call(this, formField);
 };

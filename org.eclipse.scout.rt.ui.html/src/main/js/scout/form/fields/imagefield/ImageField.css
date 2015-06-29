@@ -1,5 +1,6 @@
 .image-field > .field {
   overflow: hidden;
+  margin-left: @mandatory-indicator-width;
 
   & > .image {
     &.autofit {

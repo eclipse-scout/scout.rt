@@ -28,7 +28,6 @@ scout.ImageField.prototype._render = function($parent) {
     .on('error', this._onImageError.bind(this));
 
   this.addLabel();
-  this.addMandatoryIndicator();
   this.addField($field);
   this.addStatus();
   if (this.menus) {
