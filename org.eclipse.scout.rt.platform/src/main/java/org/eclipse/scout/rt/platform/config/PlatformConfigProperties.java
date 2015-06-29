@@ -29,7 +29,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Boolean getDefaultValue() {
+    protected Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }
@@ -42,7 +42,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public String getDefaultValue() {
+    protected String getDefaultValue() {
       return "0.0.0";
     }
   }
@@ -55,7 +55,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public String getDefaultValue() {
+    protected String getDefaultValue() {
       return "unknown";
     }
   }
@@ -71,7 +71,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Boolean getDefaultValue() {
+    protected Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }
@@ -87,7 +87,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return Integer.valueOf(10);
     }
   }
@@ -103,7 +103,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return Integer.MAX_VALUE;
     }
   }
@@ -120,7 +120,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return Integer.valueOf(60);
     }
   }
@@ -136,7 +136,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Boolean getDefaultValue() {
+    protected Boolean getDefaultValue() {
       return Boolean.FALSE;
     }
   }
@@ -153,7 +153,7 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return Integer.valueOf(1);
     }
   }

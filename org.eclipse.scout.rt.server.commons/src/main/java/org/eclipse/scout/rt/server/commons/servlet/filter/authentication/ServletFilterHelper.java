@@ -58,9 +58,9 @@ public class ServletFilterHelper {
     synchronized (principal) {
       Long timestamp = (Long) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
       if (timestamp != null) {
-        if (timestamp.longValue() + principalCacheTimeout > System.currentTimeMillis()) {
-          session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
+        if (timestamp.longValue() + principalCacheTimeout < System.currentTimeMillis()) {
           session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
+          session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
           return false;
         }
       }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import org.eclipse.scout.commons.StringUtility;
 
 /**
  *
@@ -18,6 +19,9 @@ public abstract class AbstractStringConfigProperty extends AbstractConfigPropert
 
   @Override
   protected String parse(String value) {
-    return value;
+    if (StringUtility.hasText(value)) {
+      return value;
+    }
+    return null;
   }
 }

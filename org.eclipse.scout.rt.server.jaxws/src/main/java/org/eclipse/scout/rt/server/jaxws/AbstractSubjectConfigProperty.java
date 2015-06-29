@@ -28,14 +28,12 @@ public abstract class AbstractSubjectConfigProperty extends AbstractConfigProper
   }
 
   protected Subject convertToSubject(final String user) {
-    if (user != null) {
-      final Subject subject = new Subject();
-      subject.getPrincipals().add(new SimplePrincipal(user));
-      subject.setReadOnly();
-      return subject;
-    }
-    else {
+    if (user == null) {
       return null;
     }
+    final Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal(user));
+    subject.setReadOnly();
+    return subject;
   }
 }

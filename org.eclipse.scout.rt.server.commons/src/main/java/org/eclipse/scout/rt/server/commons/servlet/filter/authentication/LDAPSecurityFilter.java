@@ -31,10 +31,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterBaseDnProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterGroupAttributeIdProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterGroupDnProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterServerProperty;
 
 /**
  * <h4>LDAPSecurityFilter</h4> The following properties can be set in the <code>config.properties</code> file:
@@ -72,10 +68,10 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
   @Override
   public void init(FilterConfig config) throws ServletException {
     super.init(config);
-    m_serverUrl = getConfigManager().getPropertyValue(LdapFilterServerProperty.class);
-    m_baseDn = getConfigManager().getPropertyValue(LdapFilterBaseDnProperty.class);
-    m_groupDn = getConfigManager().getPropertyValue(LdapFilterGroupDnProperty.class);
-    m_groupAttr = getConfigManager().getPropertyValue(LdapFilterGroupAttributeIdProperty.class);
+    m_serverUrl = config.getInitParameter("ldapServer");
+    m_baseDn = config.getInitParameter("ldapBaseDN");
+    m_groupDn = config.getInitParameter("ldapGroupDN");
+    m_groupAttr = config.getInitParameter("ldapGroupAttributeId");
   }
 
   @Override

@@ -10,107 +10,55 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import java.util.List;
-
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigPropertyWithStatus<DATA_TYPE> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractConfigProperty.class);
+public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigProperty<DATA_TYPE> {
 
-  private boolean m_valueInitialized;
   private DATA_TYPE m_value;
+  private boolean m_valueInitialized;
+  private PlatformException m_error;
+
+  protected DATA_TYPE getDefaultValue() {
+    return null;
+  }
 
   @Override
-  public DATA_TYPE getValue() {
+  public final DATA_TYPE getValue() {
     if (!m_valueInitialized) {
-      m_value = createValue();
+      try {
+        m_value = createValue();
+      }
+      catch (PlatformException t) {
+        m_error = t;
+      }
+      catch (Throwable t) {
+        m_error = new PlatformException(t.getMessage(), t);
+      }
       m_valueInitialized = true;
+    }
+    if (m_error != null) {
+      throw m_error;
     }
     return m_value;
   }
 
   protected DATA_TYPE createValue() {
-    String prop = getRawValue();
-    if (!StringUtility.hasText(prop)) {
+    String rawValue = ConfigUtility.getProperty(getKey());
+    if (rawValue == null && !ConfigUtility.hasProperty(getKey())) {
       return getDefaultValue();
     }
-
-    IProcessingStatus status = getStatusRaw(prop);
-    if (status.isOK()) {
-      DATA_TYPE ret = parse(prop);
-      if (ret != null && getStatus(ret).isOK()) {
-        return ret;
-      }
-    }
-
-    return getDefaultValue();
+    return parse(rawValue);
   }
 
-  protected String getRawValue() {
-    return ConfigUtility.getProperty(getKey());
-  }
-
-  @Override
-  public IProcessingStatus getStatus() {
-    String prop = getRawValue();
-    IProcessingStatus status = getStatusRaw(prop);
-    if (!status.isOK()) {
-      return status;
-    }
-    DATA_TYPE ret = parse(prop);
-    return getStatus(ret);
-  }
-
+  /**
+   * @throws PlatformException
+   */
   protected abstract DATA_TYPE parse(String value);
 
-  protected IProcessingStatus getStatus(DATA_TYPE value) {
-    return ProcessingStatus.OK_STATUS;
+  @Override
+  public PlatformException getError() {
+    return m_error;
   }
 
-  protected IProcessingStatus getStatusRaw(String rawValue) {
-    return ProcessingStatus.OK_STATUS;
-  }
-
-  public static void checkStatus(IConfigPropertyWithStatus config) {
-    checkStatus(CollectionUtility.arrayList(config));
-  }
-
-  public static void checkStatus(List<IConfigPropertyWithStatus> configs) {
-    if (!CollectionUtility.hasElements(configs)) {
-      return;
-    }
-
-    MultiStatus fatals = new MultiStatus();
-    for (IConfigPropertyWithStatus property : configs) {
-      IProcessingStatus s = property.getStatus();
-      if (s != ProcessingStatus.OK_STATUS) {
-        switch (s.getSeverity()) {
-          case IProcessingStatus.FATAL:
-          case IProcessingStatus.ERROR:
-            fatals.add(s);
-            break;
-          default:
-            LOG.log(s);
-            break;
-        }
-      }
-    }
-
-    if (!fatals.isOK()) {
-      StringBuilder msg = new StringBuilder();
-      for (IStatus ps : fatals.getChildren()) {
-        msg.append(ps.toString()).append("\n");
-      }
-      throw new PlatformException(msg.toString());
-    }
-  }
 }

@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  *
@@ -24,20 +23,13 @@ public abstract class AbstractBooleanConfigProperty extends AbstractConfigProper
       return null;
     }
 
-    return Boolean.parseBoolean(value);
-  }
-
-  @Override
-  protected IProcessingStatus getStatusRaw(String rawValue) {
-    // property is not mandatory
-    if (!StringUtility.hasText(rawValue)) {
-      return ProcessingStatus.OK_STATUS;
-    }
-
     // if specified: it must be true or false
-    if (Boolean.TRUE.toString().equalsIgnoreCase(rawValue) || Boolean.FALSE.toString().equalsIgnoreCase(rawValue)) {
-      return ProcessingStatus.OK_STATUS;
+    if ("true".equalsIgnoreCase(value)) {
+      return Boolean.TRUE;
     }
-    return new ProcessingStatus("Invalid boolean value '" + rawValue + "' for property '" + getKey() + "'.", new Exception("origin"), 0, IProcessingStatus.ERROR);
+    if ("false".equalsIgnoreCase(value)) {
+      return Boolean.TRUE;
+    }
+    throw new PlatformException("Invalid boolean value '" + value + "' for property '" + getKey() + "'.");
   }
 }

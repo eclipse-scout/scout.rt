@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferencesStorageService;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  *
@@ -30,22 +28,18 @@ public final class ClientConfigProperties {
    */
   public static class MemoryPolicyProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
-    protected IProcessingStatus getStatus(String value) {
-      if (!StringUtility.hasText(value)) {
-        return ProcessingStatus.OK_STATUS;
+    protected String parse(String value) {
+      String p = super.parse(value);
+      if (p == null) {
+        return p;
       }
-
-      if (CompareUtility.isOneOf(value, "small", "medium", "large")) {
-        return ProcessingStatus.OK_STATUS;
+      if (CompareUtility.isOneOf(p, "small", "medium", "large")) {
+        return p;
       }
-
-      return new ProcessingStatus("Invalid value for property '" + getKey() + "': '" + value + "'. Valid values are small, medium or large", new Exception("origin"), 0, IProcessingStatus.ERROR);
+      throw new PlatformException("Invalid value for property '" + getKey() + "': '" + value + "'. Valid values are small, medium or large");
     }
 
     @Override
@@ -62,10 +56,7 @@ public final class ClientConfigProperties {
    */
   public static class UserAreaProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {

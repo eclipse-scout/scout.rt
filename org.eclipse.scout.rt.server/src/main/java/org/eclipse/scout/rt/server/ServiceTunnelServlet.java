@@ -33,11 +33,9 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.ServerConfigProperties.HttpServerDebugProperty;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
@@ -63,7 +61,6 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   private transient IServiceTunnelContentHandler m_contentHandler;
   private boolean m_debug;
-  private WebXmlConfigManager m_configManager;
 
   // === HTTP-GET ===
 
@@ -213,15 +210,8 @@ public class ServiceTunnelServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-
-    m_configManager = new WebXmlConfigManager(config);
-
     // read config
-    m_debug = m_configManager.getPropertyValue(HttpServerDebugProperty.class);
-  }
-
-  protected WebXmlConfigManager getConfigManager() {
-    return m_configManager;
+    m_debug = "true".equals(config.getInitParameter("debug"));
   }
 
   /**

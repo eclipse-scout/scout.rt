@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Represents a scout application configuration property. This property may be stored in any source.
@@ -18,7 +20,15 @@ import org.eclipse.scout.rt.platform.Bean;
  * A config property has a constant value never changing during runtime.
  */
 @Bean
+@ApplicationScoped
 public interface IConfigProperty<DATA_TYPE> {
+
+  /**
+   * Gets the key of this property
+   *
+   * @return The key of this property. May not be <code>null</code>
+   */
+  String getKey();
 
   /**
    * Gets the configured value. If nothing is configured the default value ({@link #getDefaultValue()}) is returned.
@@ -27,21 +37,14 @@ public interface IConfigProperty<DATA_TYPE> {
    * <p>
    * Callers may therefore cache or reference the returned value.
    *
-   * @return The actual value of this property. May be <code>null</code>.
+   * @return The actual value of this property. May be <code>null</code>
+   * @throws PlatformException
    */
   DATA_TYPE getValue();
 
   /**
-   * Gets the default value of this property.
-   *
-   * @return The default value. May be <code>null</code>.
+   * @return the error that occured when creating this property value. This error is thrown in {@link #getValue()}
    */
-  DATA_TYPE getDefaultValue();
+  PlatformException getError();
 
-  /**
-   * Gets the key of this property
-   *
-   * @return The key of this property. May not be <code>null</code>.
-   */
-  String getKey();
 }

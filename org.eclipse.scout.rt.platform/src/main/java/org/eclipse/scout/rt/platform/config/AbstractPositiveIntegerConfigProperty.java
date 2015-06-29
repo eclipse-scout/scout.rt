@@ -13,8 +13,7 @@ package org.eclipse.scout.rt.platform.config;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  *
@@ -29,20 +28,11 @@ public abstract class AbstractPositiveIntegerConfigProperty extends AbstractConf
       return null;
     }
 
-    return Integer.parseInt(value);
-  }
-
-  @Override
-  protected IProcessingStatus getStatusRaw(String rawValue) {
-    // property is not mandatory
-    if (!StringUtility.hasText(rawValue)) {
-      return ProcessingStatus.OK_STATUS;
-    }
-
     // if specified: it must be a valid integer
-    if (INT_PAT.matcher(rawValue).matches()) {
-      return ProcessingStatus.OK_STATUS;
+    if (!INT_PAT.matcher(value).matches()) {
+      throw new PlatformException("Invalid integer value '" + value + "' for property '" + getKey() + "'.");
     }
-    return new ProcessingStatus("Invalid integer value '" + rawValue + "' for property '" + getKey() + "'.", new Exception("origin"), 0, IProcessingStatus.ERROR);
+
+    return Integer.parseInt(value);
   }
 }

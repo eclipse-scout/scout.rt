@@ -16,15 +16,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.HexUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.SessionCacheExpirationProperty;
 
 /**
  * Service for caching server side data dependent on request/response.
@@ -40,7 +40,7 @@ public abstract class AbstractHttpSessionCacheService extends AbstractService im
   private final IObjectSerializer m_objs;
 
   //expiration time in milliseconds
-  private final AtomicLong m_defaultExpirationTime = new AtomicLong(CONFIG.getPropertyValue(SessionCacheExpirationProperty.class));
+  private final AtomicLong m_defaultExpirationTime = new AtomicLong(Long.parseLong(StringUtility.nvl(ConfigUtility.getProperty("org.eclipse.scout.rt.server.commons.cache.AbstractHttpSessionCacheService#expiration"), "3600000")));
 
   protected AbstractHttpSessionCacheService() {
     m_objs = SerializationUtility.createObjectSerializer();

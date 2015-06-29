@@ -24,8 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.rt.server.ServerConfigProperties.ResourceServletPathProperty;
-import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
+import org.eclipse.scout.commons.StringUtility;
 
 /**
  * Init parameters for WAR resources<br>
@@ -40,19 +39,21 @@ public class ResourceServlet extends HttpServlet {
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
   private String m_warPath;
-  private WebXmlConfigManager m_configManager;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    m_configManager = new WebXmlConfigManager(config);
-
-    // read config
-    m_warPath = m_configManager.getPropertyValue(ResourceServletPathProperty.class);
+    m_warPath = parseWarPath(config.getInitParameter("war-path"));
   }
 
-  protected WebXmlConfigManager getConfigManager() {
-    return m_configManager;
+  protected String parseWarPath(String value) throws ServletException {
+    if (value != null && value.endsWith("/")) {
+      return value.substring(0, value.length() - 1);
+    }
+    if (!StringUtility.hasText(value)) {
+      throw new ServletException("Missing init parameters. Set 'war-path' parameter.");
+    }
+    return value;
   }
 
   @Override

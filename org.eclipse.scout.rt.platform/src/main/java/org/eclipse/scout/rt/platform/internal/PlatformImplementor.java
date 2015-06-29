@@ -30,9 +30,8 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
-import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.IConfigPropertyWithStatus;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
@@ -113,8 +112,19 @@ public class PlatformImplementor implements IPlatform {
       }
     }
 
-    List<IConfigPropertyWithStatus> configs = BEANS.all(IConfigPropertyWithStatus.class);
-    AbstractConfigProperty.checkStatus(configs);
+    int errorCount = 0;
+    for (IConfigProperty prop : BEANS.all(IConfigProperty.class)) {
+      try {
+        prop.getValue();
+      }
+      catch (Exception ex) {
+        errorCount++;
+        LOG.error("Failed reading config property '{0}'", prop.getKey(), ex);
+      }
+    }
+    if (errorCount > 0) {
+      throw new PlatformException("Cannot start platform due to " + errorCount + " invalid config properties");
+    }
   }
 
   protected BeanManagerImplementor createBeanManager() {

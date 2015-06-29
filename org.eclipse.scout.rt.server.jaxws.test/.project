@@ -21,6 +21,7 @@
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+<<<<<<< Upstream, based on branch 'develop' of ssh://imotsch@git.eclipse.org:29418/scout/org.eclipse.scout.rt.git
 	<linkedResources>
 		<link>
 			<name>.settings/de.loskutov.anyedit.AnyEditTools.prefs</name>
@@ -53,4 +54,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.commons/.settings/org.eclipse.m2e.core.prefs</locationURI>
 		</link>
 	</linkedResources>
+=======
+>>>>>>> faf07fa simplify, verify and fix security filters
 </projectDescription>

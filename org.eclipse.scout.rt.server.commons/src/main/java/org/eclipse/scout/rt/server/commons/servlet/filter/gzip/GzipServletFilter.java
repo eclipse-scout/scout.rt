@@ -23,14 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterGetMinSizeProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterGetPatternProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterPostMinSizeProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterPostPatternProperty;
-import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 
 /**
  * Supports the servlet init-params
@@ -52,7 +48,6 @@ public class GzipServletFilter implements Filter {
   public static final String URL_PARAM_COMPRESS_HINT = "compress";
   public static final String SESSION_ATTRIBUTE_COMPRESS_HINT = GzipServletFilter.class.getName() + "#compress";
 
-  private WebXmlConfigManager m_configManager;
   private int m_getMinSize;
   private int m_postMinSize;
   private Pattern m_getPattern;
@@ -60,17 +55,11 @@ public class GzipServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig config) throws ServletException {
-    m_configManager = new WebXmlConfigManager(config);
-
     // read config
-    m_getMinSize = m_configManager.getPropertyValue(GzipFilterGetMinSizeProperty.class);
-    m_postMinSize = m_configManager.getPropertyValue(GzipFilterPostMinSizeProperty.class);
-    m_getPattern = Pattern.compile(m_configManager.getPropertyValue(GzipFilterGetPatternProperty.class), Pattern.CASE_INSENSITIVE);
-    m_postPattern = Pattern.compile(m_configManager.getPropertyValue(GzipFilterPostPatternProperty.class), Pattern.CASE_INSENSITIVE);
-  }
-
-  protected WebXmlConfigManager getConfigManager() {
-    return m_configManager;
+    m_getMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("get_min_size"), "64"));
+    m_postMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("post_min_size"), "64"));
+    m_getPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("get_pattern"), ".*\\.(html|css|js)"), Pattern.CASE_INSENSITIVE);
+    m_postPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("post_pattern"), ".*/json"), Pattern.CASE_INSENSITIVE);
   }
 
   @Override

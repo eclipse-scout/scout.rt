@@ -271,11 +271,18 @@ public class PropertiesHelper {
 
   /**
    * Gets all properties and the corresponding values loaded from the .properties file.
-   * 
+   *
    * @return A {@link Map} copy containing all entries.
    */
   public Map<String, String> getAllEntries() {
     return CollectionUtility.copyMap(m_configProperties);
+  }
+
+  /**
+   * @return true if the config.properties contains the key
+   */
+  public boolean hasProperty(String key) {
+    return m_configProperties.containsKey(key);
   }
 
   /**

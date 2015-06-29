@@ -33,8 +33,8 @@ import org.eclipse.scout.rt.platform.Bean;
  * <p>
  * <h2>init-params</h2>
  * <ul>
- * <li>path.exclude: resource paths (with wildcard '*') that are excluded from this filter, comma, newline or whitespace
- * separated</li>
+ * <li>filter-exclude: resource paths (with wildcard '*') that are excluded from this filter, comma, newline or
+ * whitespace separated</li>
  * </ul>
  * <p>
  * POST requests with json message are responded with a json timeout message
@@ -51,7 +51,7 @@ public class TrivialAuthenticator {
   private PathInfoFilter m_excludePathFilter;
 
   public void init(FilterConfig filterConfig) throws ServletException {
-    m_excludePathFilter = new PathInfoFilter(filterConfig.getInitParameter("path.exclude"));
+    m_excludePathFilter = new PathInfoFilter(filterConfig.getInitParameter("filter-exclude"));
   }
 
   public void destroy() {
@@ -78,19 +78,6 @@ public class TrivialAuthenticator {
     if (m_excludePathFilter.accepts(req.getPathInfo())) {
       chain.doFilter(req, resp);
       return true;
-    }
-
-    //json post
-    if ("POST".equals(req.getMethod())) {
-      if (("" + req.getContentType()).startsWith("application/json")) {
-        LOG.debug("Returning session timeout error as json.");
-        sendSessionTimeout(resp);
-        return true;
-      }
-      else {
-        LOG.warn("The request for {0} is a POST request. Forwarding to the login page will most likely fail because StaticResourceRequestInterceptor doesn't handle post.", req.getPathInfo());
-        return false;
-      }
     }
 
     // this is a copy from UiServlet.doGet

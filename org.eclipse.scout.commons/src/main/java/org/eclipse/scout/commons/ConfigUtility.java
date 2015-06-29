@@ -172,8 +172,15 @@ public final class ConfigUtility {
    *
    * @return A {@link Map} copy containing all entries.
    */
-  public Map<String, String> getAllEntries() {
+  public static Map<String, String> getAllEntries() {
     return INSTANCE.getAllEntries();
+  }
+
+  /**
+   * @return true if the config.properties contains the key
+   */
+  public static boolean hasProperty(String key) {
+    return INSTANCE.hasProperty(key);
   }
 
   /**

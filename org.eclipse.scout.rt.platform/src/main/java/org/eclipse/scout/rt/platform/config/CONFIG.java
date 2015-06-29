@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Class to simplify access to scout project configuration
@@ -24,25 +24,16 @@ public final class CONFIG {
   }
 
   /**
-   * Gets the {@link IConfigProperty} instance for the given class
-   *
-   * @param clazz
-   *          The config class
-   * @return the {@link IConfigProperty} instance or null if it cannot be found in the {@link IBeanManager}.
-   */
-  public static <DATA_TYPE, CFGCLASS extends IConfigProperty<DATA_TYPE>> IConfigProperty<DATA_TYPE> getProperty(Class<CFGCLASS> clazz) {
-    return BEANS.get(clazz);
-  }
-
-  /**
    * Gets the configured value of the given {@link IConfigProperty}. If no value is configured the default of the
    * property is returned ({@link IConfigProperty#getDefaultValue()}).
    *
    * @param clazz
    *          the config class
    * @return The value of the given {@link IConfigProperty}.
+   * @throws PlatformException
+   *           if the property is invalid
    */
-  public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) {
-    return getProperty(clazz).getValue();
+  public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) throws PlatformException {
+    return BEANS.get(clazz).getValue();
   }
 }

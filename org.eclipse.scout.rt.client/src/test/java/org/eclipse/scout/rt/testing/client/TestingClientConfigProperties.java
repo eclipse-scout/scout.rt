@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.jms;
+package org.eclipse.scout.rt.testing.client;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,23 +17,23 @@ import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 /**
  *
  */
-public final class JmsConfigProperties {
-  private JmsConfigProperties() {
+public final class TestingClientConfigProperties {
+  private TestingClientConfigProperties() {
   }
 
   /**
-   * timeout in milliseconds
+   * Client session expiration in milliseconds. Default is one day.
    */
-  public static class JmsRequestTimeoutProperty extends AbstractPositiveLongConfigProperty {
+  public static class ClientSessionCacheExpirationProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
     protected Long getDefaultValue() {
-      return TimeUnit.SECONDS.toMillis(1);
+      return Long.valueOf(TimeUnit.DAYS.toMillis(1));
     }
 
     @Override
     public String getKey() {
-      return "org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService#requestTimeout";
+      return "org.eclipse.scout.testing.client.ClientSessionProviderWithCache#expiration";
     }
   }
 }

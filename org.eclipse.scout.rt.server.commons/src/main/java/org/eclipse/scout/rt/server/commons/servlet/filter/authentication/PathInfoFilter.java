@@ -59,7 +59,6 @@ public class PathInfoFilter {
     if (patSet.isEmpty()) {
       return null;
     }
-    System.out.println("regex: " + "(" + CollectionUtility.format(patSet, "|") + ")");
     return Pattern.compile("(" + CollectionUtility.format(patSet, "|") + ")", Pattern.CASE_INSENSITIVE);
   }
 

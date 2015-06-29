@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthCredentialsProperty;
 
@@ -48,7 +48,7 @@ public class ConfigFileAuthenticator implements IAuthenticator {
    */
   @Internal
   protected Map<String, String> readCredentials() {
-    final IConfigProperty<String> credentialsProperty = CONFIG.getProperty(JaxWsAuthCredentialsProperty.class);
+    final IConfigProperty<String> credentialsProperty = BEANS.get(JaxWsAuthCredentialsProperty.class);
     final String credentialsRaw = credentialsProperty.getValue();
     if (credentialsRaw == null) {
       return Collections.emptyMap();

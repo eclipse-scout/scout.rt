@@ -21,10 +21,7 @@ public final class JmsPublishSubscribeMessageProperties {
 
   public static class JndiInitialContextFactory extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -34,10 +31,7 @@ public final class JmsPublishSubscribeMessageProperties {
 
   public static class JndiProviderUrl extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -47,10 +41,7 @@ public final class JmsPublishSubscribeMessageProperties {
 
   public static class JndiConnectionFactory extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -60,10 +51,7 @@ public final class JmsPublishSubscribeMessageProperties {
 
   public static class PublishSubscribeTopic extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {

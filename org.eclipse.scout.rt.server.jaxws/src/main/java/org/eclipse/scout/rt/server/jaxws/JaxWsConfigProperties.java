@@ -44,7 +44,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Subject getDefaultValue() {
+    protected Subject getDefaultValue() {
       return convertToSubject("jaxws-authenticator");
     }
   }
@@ -61,7 +61,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Subject getDefaultValue() {
+    protected Subject getDefaultValue() {
       return convertToSubject("jaxws-handler");
     }
   }
@@ -77,7 +77,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Boolean getDefaultValue() {
+    protected Boolean getDefaultValue() {
       return false;
     }
   }
@@ -92,10 +92,7 @@ public final class JaxWsConfigProperties {
       return "jaxws.implementor";
     }
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
   }
 
   /**
@@ -108,10 +105,7 @@ public final class JaxWsConfigProperties {
       return "jaxws.provider.authentication.credentials";
     }
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
   }
 
   /**
@@ -125,7 +119,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public String getDefaultValue() {
+    protected String getDefaultValue() {
       return "JAX-WS";
     }
   }
@@ -149,7 +143,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Boolean getDefaultValue() {
+    protected Boolean getDefaultValue() {
       return Boolean.TRUE;
     }
   }
@@ -167,7 +161,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return 10;
     }
   }
@@ -186,7 +180,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Long getDefaultValue() {
+    protected Long getDefaultValue() {
       return TimeUnit.MINUTES.toSeconds(15);
     }
   }
@@ -203,7 +197,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return null; // infinite timeout
     }
   }
@@ -220,7 +214,7 @@ public final class JaxWsConfigProperties {
     }
 
     @Override
-    public Integer getDefaultValue() {
+    protected Integer getDefaultValue() {
       return null; // infinite timeout
     }
   }

@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -60,7 +59,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   protected static URL getConfiguredServerUrl() {
-    IConfigProperty<String> targetUrlProperty = CONFIG.getProperty(ServiceTunnelTargetUrlProperty.class);
+    IConfigProperty<String> targetUrlProperty = BEANS.get(ServiceTunnelTargetUrlProperty.class);
     String url = targetUrlProperty.getValue();
     try {
       URL targetUrl = UriUtility.toUrl(url);

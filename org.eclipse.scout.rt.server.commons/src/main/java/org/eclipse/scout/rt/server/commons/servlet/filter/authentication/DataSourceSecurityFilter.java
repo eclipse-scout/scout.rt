@@ -36,16 +36,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcDriverNameProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcMappingNameProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcPasswordProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcSelectUserPassProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcUsernameProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiInitialContextFactoryProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiNameProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiProviderUrlProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiUrlPkgPrefixesProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterUseJndiProperty;
 
 /**
  * <h4>DataSourceSecurityFilter</h4> The following properties can be set in the <code>web.xml</code> file:
@@ -107,16 +97,16 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     super.init(config);
 
     // read config
-    m_useJndiConnection = getConfigManager().getPropertyValue(DataSourceFilterUseJndiProperty.class);
-    m_jdbcDriverName = getConfigManager().getPropertyValue(DataSourceFilterJdbcDriverNameProperty.class);
-    m_jdbcMappingName = getConfigManager().getPropertyValue(DataSourceFilterJdbcMappingNameProperty.class);
-    m_jdbcUserName = getConfigManager().getPropertyValue(DataSourceFilterJdbcUsernameProperty.class);
-    m_jdbcPassword = getConfigManager().getPropertyValue(DataSourceFilterJdbcPasswordProperty.class);
-    m_selectStatement = getConfigManager().getPropertyValue(DataSourceFilterJdbcSelectUserPassProperty.class);
-    m_jndiName = getConfigManager().getPropertyValue(DataSourceFilterJndiNameProperty.class);
-    m_jndiInitialContextFactory = getConfigManager().getPropertyValue(DataSourceFilterJndiInitialContextFactoryProperty.class);
-    m_jndiProviderUrl = getConfigManager().getPropertyValue(DataSourceFilterJndiProviderUrlProperty.class);
-    m_jndiUrlPkgPrefixes = getConfigManager().getPropertyValue(DataSourceFilterJndiUrlPkgPrefixesProperty.class);
+    m_useJndiConnection = "true".equals(config.getInitParameter("useJndiConnection"));
+    m_jdbcDriverName = config.getInitParameter("jdbcDriverName");
+    m_jdbcMappingName = config.getInitParameter("jdbcMappingName");
+    m_jdbcUserName = config.getInitParameter("jdbcUsername");
+    m_jdbcPassword = config.getInitParameter("jdbcPassword");
+    m_selectStatement = config.getInitParameter("selectUserPass");
+    m_jndiName = config.getInitParameter("jndiName");
+    m_jndiInitialContextFactory = config.getInitParameter("jndiInitialContextFactory");
+    m_jndiProviderUrl = config.getInitParameter("jndiProviderUrl");
+    m_jndiUrlPkgPrefixes = config.getInitParameter("jndiUrlPkgPrefixes");
   }
 
   @Override

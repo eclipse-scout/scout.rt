@@ -30,9 +30,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.ChainableFilterFailoverProperty;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.ChainableFilterRealmProperty;
-import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 
 /**
  * <h4>AbstractChainableSecurityFilter</h4> The following properties can be set
@@ -62,7 +59,6 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
   public static final int STATUS_BREAK_CHAIN = 2;
   public static final int STATUS_CONTINUE_WITH_PRINCIPAL = 3;
 
-  private WebXmlConfigManager m_configManager;
   private boolean m_failover;
   private String m_realm;
 
@@ -77,15 +73,10 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
 
   @Override
   public void init(FilterConfig config) throws ServletException {
-    m_configManager = new WebXmlConfigManager(config);
 
     // read config
-    m_failover = m_configManager.getPropertyValue(ChainableFilterFailoverProperty.class);
-    m_realm = m_configManager.getPropertyValue(ChainableFilterRealmProperty.class);
-  }
-
-  protected WebXmlConfigManager getConfigManager() {
-    return m_configManager;
+    m_failover = "true".equals(config.getInitParameter("failover"));
+    m_realm = StringUtility.nvl(config.getInitParameter("realm"), "Default");
   }
 
   @Override

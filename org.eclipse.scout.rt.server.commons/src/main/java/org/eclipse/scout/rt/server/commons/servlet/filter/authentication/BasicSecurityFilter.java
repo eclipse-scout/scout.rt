@@ -23,9 +23,7 @@ import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.BasicFilterUsersProperty;
 
 /**
  * <h4>BasicSecurityFilter</h4> A simple security filter using username,password
@@ -50,10 +48,9 @@ public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
     super.init(config);
 
     // read config
-    IConfigProperty<String> param = getConfigManager().getProperty(BasicFilterUsersProperty.class);
-    String usersParam = param.getValue();
+    String usersParam = config.getInitParameter("users");
     if (!StringUtility.hasText(usersParam)) {
-      throw new ServletException("missing init-param with name '" + param.getKey() + "'.");
+      throw new ServletException("missing init-param with name 'users'.");
     }
 
     m_userDatabase = new HashMap<>();

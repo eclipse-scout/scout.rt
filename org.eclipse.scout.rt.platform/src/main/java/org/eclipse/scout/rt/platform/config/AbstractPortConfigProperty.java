@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  *
@@ -19,21 +18,15 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 public abstract class AbstractPortConfigProperty extends AbstractPositiveIntegerConfigProperty {
 
   @Override
-  protected IProcessingStatus getStatus(Integer value) {
-    IProcessingStatus status = super.getStatus(value);
-    if (!status.isOK()) {
-      return status;
+  protected Integer parse(String value) {
+    Integer i = super.parse(value);
+    if (i == null) {
+      return i;
     }
-
-    if (value == null) {
-      return ProcessingStatus.OK_STATUS;
+    int port = i.intValue();
+    if (port >= 1 && port <= 65535) {
+      return i;
     }
-
-    int val = value.intValue();
-    if (val >= 1 && val <= 65535) {
-      return ProcessingStatus.OK_STATUS;
-    }
-
-    return new ProcessingStatus("Invalid value for port config with key '" + getKey() + "': '" + value + "'. Valid values are integers in range [1, 65535].", new Exception("origin"), 0, IProcessingStatus.ERROR);
+    throw new PlatformException("Invalid value for port config with key '" + getKey() + "': '" + value + "'. Valid values are integers in range [1, 65535].");
   }
 }

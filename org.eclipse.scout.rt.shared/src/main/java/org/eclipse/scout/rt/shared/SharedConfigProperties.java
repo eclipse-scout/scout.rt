@@ -12,17 +12,14 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.TierState.Tier;
 
 /**
@@ -38,10 +35,7 @@ public final class SharedConfigProperties {
    */
   public static class AuthTokenPrivateKeyProperty extends AbstractBinaryConfigProperty {
 
-    @Override
-    public byte[] getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -54,10 +48,7 @@ public final class SharedConfigProperties {
    */
   public static class AuthTokenPublicKeyProperty extends AbstractBinaryConfigProperty {
 
-    @Override
-    public byte[] getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -71,7 +62,7 @@ public final class SharedConfigProperties {
   public static class AuthTokenTimeToLifeProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
-    public Long getDefaultValue() {
+    protected Long getDefaultValue() {
       return Long.valueOf(TimeUnit.MINUTES.toMillis(10));
     }
 
@@ -84,7 +75,7 @@ public final class SharedConfigProperties {
   public static class BackendUrlProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
+    protected String getDefaultValue() {
       return ConfigUtility.getProperty("server.url");//legacy
     }
 
@@ -110,8 +101,8 @@ public final class SharedConfigProperties {
   public static class ServiceTunnelTargetUrlProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
-      return CONFIG.getProperty(BackendUrlProperty.class).getValue() + "/process";
+    protected String getDefaultValue() {
+      return BEANS.get(BackendUrlProperty.class).getValue() + "/process";
     }
 
     @Override
@@ -123,7 +114,7 @@ public final class SharedConfigProperties {
   public static class CompressServiceTunnelRequestProperty extends AbstractBooleanConfigProperty {
 
     @Override
-    public Boolean getDefaultValue() {
+    protected Boolean getDefaultValue() {
       // no default value. means the response decides
       return null;
     }
@@ -140,32 +131,13 @@ public final class SharedConfigProperties {
   public static class TierProperty extends AbstractConfigProperty<Tier> {
 
     @Override
-    public Tier getDefaultValue() {
+    protected Tier getDefaultValue() {
       return parse(ConfigUtility.getProperty("scout.osgi.tier")); // legacy
     }
 
     @Override
     public String getKey() {
       return "scout.tier";
-    }
-
-    @Override
-    protected IProcessingStatus getStatusRaw(String rawValue) {
-      if (!StringUtility.hasText(rawValue)) {
-        return ProcessingStatus.OK_STATUS;
-      }
-
-      Tier[] values = Tier.class.getEnumConstants();
-      Object[] valueNames = new String[values.length];
-      for (int i = 0; i < values.length; i++) {
-        valueNames[i] = values[i].name();
-      }
-
-      if (CompareUtility.isOneOf(rawValue, valueNames)) {
-        return ProcessingStatus.OK_STATUS;
-      }
-
-      return super.getStatusRaw(rawValue);
     }
 
     @Override

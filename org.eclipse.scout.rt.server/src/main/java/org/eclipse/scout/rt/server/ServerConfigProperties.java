@@ -12,16 +12,11 @@ package org.eclipse.scout.rt.server;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPortConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
-import org.eclipse.scout.rt.server.commons.config.AbstractServletBooleanConfigProperty;
-import org.eclipse.scout.rt.server.commons.config.AbstractServletStringConfigProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
 /**
@@ -31,27 +26,10 @@ public final class ServerConfigProperties {
   private ServerConfigProperties() {
   }
 
-  /**
-   * Specifies if the {@link ServiceTunnelServlet} runs in debug mode. If <code>true</code> each remote call will be
-   * logged. Default is <code>false</code>.
-   */
-  public static class HttpServerDebugProperty extends AbstractServletBooleanConfigProperty {
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.FALSE;
-    }
-
-    @Override
-    public String getKey() {
-      return "debug";
-    }
-  }
-
   public static class ClusterSyncUserProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
+    protected String getDefaultValue() {
       return "system";
     }
 
@@ -63,10 +41,7 @@ public final class ServerConfigProperties {
 
   public static class ClusterSyncNodeIdProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -80,7 +55,7 @@ public final class ServerConfigProperties {
   public static class ServerSessionCacheExpirationProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
-    public Long getDefaultValue() {
+    protected Long getDefaultValue() {
       return Long.valueOf(TimeUnit.DAYS.toMillis(1));
     }
 
@@ -92,10 +67,7 @@ public final class ServerConfigProperties {
 
   public static class RemoteFilesRootDirProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -105,10 +77,7 @@ public final class ServerConfigProperties {
 
   public static class ImapHostProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -118,10 +87,7 @@ public final class ServerConfigProperties {
 
   public static class ImapPortProperty extends AbstractPortConfigProperty {
 
-    @Override
-    public Integer getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -131,10 +97,7 @@ public final class ServerConfigProperties {
 
   public static class ImapMailboxProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -144,10 +107,7 @@ public final class ServerConfigProperties {
 
   public static class ImapUsernameProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -157,10 +117,7 @@ public final class ServerConfigProperties {
 
   public static class ImapPasswordProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -170,10 +127,7 @@ public final class ServerConfigProperties {
 
   public static class ImapSslProtocolsProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -183,10 +137,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpHostProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -196,10 +147,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpPortProperty extends AbstractPortConfigProperty {
 
-    @Override
-    public Integer getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -209,10 +157,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpUsernameProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -222,10 +167,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpPasswordProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -235,10 +177,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpSubjectPrefixProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -248,10 +187,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpDefaultFromEmailProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -261,10 +197,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpDebugReceiverEmailProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -274,10 +207,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpSslProtocolsProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -287,10 +217,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpUseAuthenticationProperty extends AbstractBooleanConfigProperty {
 
-    @Override
-    public Boolean getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -300,10 +227,7 @@ public final class ServerConfigProperties {
 
   public static class SmtpUseSmtpsProperty extends AbstractBooleanConfigProperty {
 
-    @Override
-    public Boolean getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -313,10 +237,7 @@ public final class ServerConfigProperties {
 
   public static class SqlTransactionMemberIdProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -326,10 +247,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJndiNameProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -339,10 +257,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJndiInitialContextFactoryProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -352,10 +267,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJndiProviderUrlProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -365,10 +277,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJndiUrlPkgPrefixesProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -378,10 +287,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcMappingNameProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -391,10 +297,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcDriverNameProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -404,10 +307,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcPropertiesProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -417,10 +317,7 @@ public final class ServerConfigProperties {
 
   public static class SqlUsernameProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -430,10 +327,7 @@ public final class ServerConfigProperties {
 
   public static class SqlPasswordProperty extends AbstractStringConfigProperty {
 
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -443,10 +337,7 @@ public final class ServerConfigProperties {
 
   public static class SqlDirectJdbcConnectionProperty extends AbstractBooleanConfigProperty {
 
-    @Override
-    public Boolean getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -456,10 +347,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcPoolConnectionLifetimeProperty extends AbstractPositiveLongConfigProperty {
 
-    @Override
-    public Long getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -469,10 +357,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcPoolConnectionBusyTimeoutProperty extends AbstractPositiveLongConfigProperty {
 
-    @Override
-    public Long getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -482,10 +367,7 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcStatementCacheSizeProperty extends AbstractPositiveIntegerConfigProperty {
 
-    @Override
-    public Integer getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
@@ -495,72 +377,11 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcPoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
 
-    @Override
-    public Integer getDefaultValue() {
-      return null;
-    }
+
 
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcPoolSize";
-    }
-  }
-
-  public static class RemoteFileServletFolderProperty extends AbstractServletStringConfigProperty {
-
-    @Override
-    public String getDefaultValue() {
-      return "";
-    }
-
-    @Override
-    protected String parse(String value) {
-      if (!StringUtility.hasText(value)) {
-        return "";
-      }
-
-      value = value.replaceAll("\\\\", "/"); //$NON-NLS-1$
-      while (value.startsWith("/")) {
-        value = value.substring(1);
-      }
-      while (value.endsWith("/")) {
-        value = value.substring(0, value.lastIndexOf('/'));
-      }
-      return '/' + value;
-    }
-
-    @Override
-    public String getKey() {
-      return "folder";
-    }
-  }
-
-  public static class ResourceServletPathProperty extends AbstractServletStringConfigProperty {
-
-    @Override
-    public String getDefaultValue() {
-      return null;
-    }
-
-    @Override
-    protected IProcessingStatus getStatus(String value) {
-      if (!StringUtility.hasText(value)) {
-        return new ProcessingStatus("Missing init parameters. Set '" + getKey() + "' parameter.", new Exception("origin"), 0, IProcessingStatus.ERROR);
-      }
-      return super.getStatus(value);
-    }
-
-    @Override
-    protected String parse(String value) {
-      if (value != null && value.endsWith("/")) {
-        return value.substring(0, value.length() - 1);
-      }
-      return value;
-    }
-
-    @Override
-    public String getKey() {
-      return "war-path";
     }
   }
 }

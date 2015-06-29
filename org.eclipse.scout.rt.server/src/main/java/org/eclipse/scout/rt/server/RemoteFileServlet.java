@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.ServerConfigProperties.RemoteFileServletFolderProperty;
-import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -47,7 +45,6 @@ public class RemoteFileServlet extends HttpServlet {
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
   private String m_folder;
-  private WebXmlConfigManager m_configManager;
 
   public RemoteFileServlet() {
   }
@@ -55,14 +52,22 @@ public class RemoteFileServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    m_configManager = new WebXmlConfigManager(config);
-
-    // read config
-    m_folder = m_configManager.getPropertyValue(RemoteFileServletFolderProperty.class);
+    m_folder = parseFolderParam(config.getInitParameter("folder"));
   }
 
-  protected WebXmlConfigManager getConfigManager() {
-    return m_configManager;
+  protected String parseFolderParam(String value) {
+    if (!StringUtility.hasText(value)) {
+      return "";
+    }
+
+    value = value.replaceAll("\\\\", "/"); //$NON-NLS-1$
+    while (value.startsWith("/")) {
+      value = value.substring(1);
+    }
+    while (value.endsWith("/")) {
+      value = value.substring(0, value.lastIndexOf('/'));
+    }
+    return '/' + value;
   }
 
   protected String getFolder() {
@@ -104,7 +109,7 @@ public class RemoteFileServlet extends HttpServlet {
           prefix + "default.htm", //$NON-NLS-1$
           prefix + "index.jsp", //$NON-NLS-1$
           prefix + "index.php" //$NON-NLS-1$
-          );
+      );
     }
     //
     try {

@@ -13,8 +13,7 @@ package org.eclipse.scout.rt.platform.config;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  *
@@ -29,20 +28,12 @@ public abstract class AbstractPositiveLongConfigProperty extends AbstractConfigP
       return null;
     }
 
+    // if specified: it must be a valid long
+    if (!LONG_PAT.matcher(value).matches()) {
+      throw new PlatformException("Invalid long value '" + value + "' for property '" + getKey() + "'.");
+    }
+
     return Long.parseLong(value);
   }
 
-  @Override
-  protected IProcessingStatus getStatusRaw(String rawValue) {
-    // property is not mandatory
-    if (!StringUtility.hasText(rawValue)) {
-      return ProcessingStatus.OK_STATUS;
-    }
-
-    // if specified: it must be a valid long
-    if (LONG_PAT.matcher(rawValue).matches()) {
-      return ProcessingStatus.OK_STATUS;
-    }
-    return new ProcessingStatus("Invalid long value '" + rawValue + "' for property '" + getKey() + "'.", new Exception("origin"), 0, IProcessingStatus.ERROR);
-  }
 }
