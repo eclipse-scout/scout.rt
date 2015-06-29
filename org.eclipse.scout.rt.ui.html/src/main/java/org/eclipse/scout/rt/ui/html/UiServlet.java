@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -125,7 +124,7 @@ public class UiServlet extends HttpServlet {
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
     }

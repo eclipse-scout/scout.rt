@@ -22,6 +22,9 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.DateFormatProvider;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -75,7 +78,7 @@ public class JsonLocale implements IJsonObject {
   }
 
   protected static DecimalFormat getDefaultDecimalFormat(Locale locale) {
-    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+    NumberFormat numberFormat = BEANS.get(NumberFormatProvider.class).getNumberInstance(locale);
     if (numberFormat instanceof DecimalFormat) {
       return (DecimalFormat) numberFormat;
     }
@@ -84,7 +87,7 @@ public class JsonLocale implements IJsonObject {
   }
 
   protected static SimpleDateFormat getDefaultSimpleDateFormat(Locale locale) {
-    DateFormat format = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+    DateFormat format = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.DEFAULT, locale);
     if (format instanceof SimpleDateFormat) {
       return (SimpleDateFormat) format;
     }

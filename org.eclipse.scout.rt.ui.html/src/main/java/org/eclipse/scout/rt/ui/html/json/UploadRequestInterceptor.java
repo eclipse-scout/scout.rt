@@ -28,7 +28,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -109,7 +108,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
           uiSession.uiSessionLock().unlock();
         }
         if (LOG.isDebugEnabled()) {
-          LOG.debug("completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
       finally {

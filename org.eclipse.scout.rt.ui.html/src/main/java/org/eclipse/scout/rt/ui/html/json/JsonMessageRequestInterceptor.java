@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -93,7 +93,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
           // - the max. wait time has exceeded
           uiSession.waitForBackgroundJobs(pollWait);
           if (LOG.isDebugEnabled()) {
-            LOG.debug("polling end after " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+            LOG.debug("polling end after " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
           }
         }
         else if (jsonReq.isCancelRequest()) {
@@ -122,7 +122,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
           uiSession.uiSessionLock().unlock();
         }
         if (LOG.isDebugEnabled()) {
-          LOG.debug("completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
       finally {
