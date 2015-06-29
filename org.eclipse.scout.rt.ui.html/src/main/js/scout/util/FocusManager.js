@@ -1,6 +1,7 @@
 scout.FocusManager = function() {
   this._sessionFocusContexts = {};
   var that = this;
+  this.installationPending = false;
 };
 
 scout.FocusManager.prototype.installManagerForSession = function(session, options) {
@@ -68,6 +69,16 @@ scout.FocusManager.prototype.focusFirstElement = function($container, $focusable
   if (focusableElement) {
     focusableElement.focus();
   }
+};
+
+scout.FocusManager.prototype.installFocusContextAsync = function($container, uiSessionId,$firstFocusElement, isRoot){
+  this.installationPending = true;
+  setTimeout(function() {
+    if ($container) {
+      this.installFocusContext($container, uiSessionId, $firstFocusElement,isRoot);
+    }
+    this.installationPending = false;
+  }.bind(this));
 };
 
 scout.FocusManager.prototype.installFocusContext = function($container, uiSessionId, $firstFocusElement, isRoot) {
@@ -139,7 +150,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSe
     focusContexts.splice(index, 1);
   }
   var prevFocusContext = focusContexts[focusContexts.length - 1];
-  if (index === oldLength - 1 && prevFocusContext) {
+  if (index === oldLength - 1 && prevFocusContext && !this.installationPending) {
     //when focuscontext was on top(active) install old focusContext and set focus to focused element
     $.log.trace('focuscontext uninstalled');
     setTimeout(function() {

@@ -33,7 +33,12 @@ scout.Menu.prototype._renderItem = function($parent) {
   } else {
     this.$container = $parent.appendDiv('menu-item');
   }
-  this.$container.on('click', '', this._onClick.bind(this));
+
+  if (this.childActions.length > 0) {
+    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
+  } else {
+    this.$container.on('click', '', this._onClick.bind(this));
+  }
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }
@@ -52,9 +57,11 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._onClick = function() {
-  if (this.enabled) {
-    this.doAction();
-  }
+    this.sendDoAction();
+};
+
+scout.Menu.prototype._onMouseDown = function(event) {
+  this._openPopup(event);
 };
 
 scout.Menu.prototype._renderEnabled = function(enabled) {
@@ -96,10 +103,20 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
   }
 };
 
+scout.Menu.prototype._openPopup = function(event) {
+  if (!this.enabled) {
+    return;
+  }
+  this.popup = new scout.MenuBarPopup(this, this.session, event);
+  this.popup.render();
+};
+
 scout.Menu.prototype.doAction = function() {
+  if(!this.enabled){
+    return;
+  }
   if (this.childActions.length > 0) {
-    this.popup = new scout.MenuBarPopup(this, this.session);
-    this.popup.render();
+    this._openPopup();
   } else {
     this.sendDoAction();
   }

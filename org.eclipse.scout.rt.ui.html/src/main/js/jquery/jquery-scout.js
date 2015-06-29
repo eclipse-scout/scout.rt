@@ -575,6 +575,18 @@
     scout.focusManager.installFocusContext(this, uiSessionId, $firstFocusElement);
   };
 
+  /**
+   * Async Installs listeners to the given element to ensure that the focus cannot leave it with the TAB key. Instead,
+   * when the last focusable child element is reached, the focus is set the first focusable element automatically.
+   *
+   * @param $firstFocusElement If the argument is a jQuery object, the current focus is set to this element. If the
+   *   argument is the string 'auto', the current focus is set to the first focusable element inside the parent
+   *   element. All other values don't change the current focus.
+   */
+  $.fn.installFocusContextAsync = function($firstFocusElement, uiSessionId) {
+    scout.focusManager.installFocusContextAsync(this, uiSessionId, $firstFocusElement);
+  };
+
   $.fn.uninstallFocusContext = function(uiSessionId) {
     scout.focusManager.uninstallFocusContextForContainer(this, uiSessionId);
   };

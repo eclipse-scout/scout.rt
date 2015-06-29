@@ -78,12 +78,9 @@ scout.TableControl.prototype.renderContent = function() {
     }
     this._renderContent(this.tableFooter.$controlContent);
     this.contentRendered = true;
-    var that =this;
     this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-    setTimeout(function() {
-      that.tableFooter.$controlContainer.installFocusContext('auto', that.tableFooter._table.session.uiSessionId);
-    });
+      this.tableFooter.$controlContainer.installFocusContextAsync('auto', this.tableFooter._table.session.uiSessionId);
   }
 };
 

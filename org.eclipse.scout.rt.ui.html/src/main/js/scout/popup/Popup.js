@@ -19,12 +19,7 @@ scout.inherits(scout.Popup, scout.Widget);
 scout.Popup.prototype.render = function($parent) {
   scout.Popup.parent.prototype.render.call(this, $parent);
   if (this.installFocusContext) {
-    setTimeout(function() {
-      // $container maybe null if removed directly after render
-      if (this.$container) {
-        this.$container.installFocusContext('auto', this.session.uiSessionId);
-      }
-    }.bind(this), 0);
+     this.$container.installFocusContextAsync('auto', this.session.uiSessionId);
   }
   this._attachCloseHandler();
   this.position();
@@ -51,7 +46,7 @@ scout.Popup.prototype._render = function($parent) {
     .appendTo($parent);
 };
 
-scout.Popup.prototype.close = function() {
+scout.Popup.prototype.close = function(event) {
   this.remove();
 };
 
@@ -88,7 +83,7 @@ scout.Popup.prototype._onMouseDown = function(event) {
 };
 
 scout.Popup.prototype._onMouseDownOutside = function(event) {
-  this.close();
+  this.close(event);
 };
 
 scout.Popup.prototype._onAnchorScroll = function(event) {

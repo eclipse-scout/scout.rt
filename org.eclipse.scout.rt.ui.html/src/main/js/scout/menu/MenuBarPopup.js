@@ -2,10 +2,11 @@
  * The MenuBarPopup is a special Popup that is used in the menu-bar. It is tightly coupled with a menu-item and shows a header
  * which has a different size than the popup-body.
  */
-scout.MenuBarPopup = function(menu, session) {
+scout.MenuBarPopup = function(menu, session, event) {
   scout.MenuBarPopup.parent.call(this, session);
   this.menu = menu;
   this.$headBlueprint = this.menu.$container;
+  this.ignoreEvent = event;
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
@@ -21,6 +22,17 @@ scout.MenuBarPopup.prototype._getMenuItems = function() {
  */
 scout.MenuBarPopup.prototype._beforeRenderMenuItems = function() {
 };
+
+/**
+ * @override popup
+ * @param event
+ */
+scout.MenuBarPopup.prototype.close = function(event){
+  if(!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent){
+    scout.MenuBarPopup.parent.prototype.close.call(this);
+  }
+};
+
 
 /**
  * @override
