@@ -22,10 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestInterceptor;
@@ -70,9 +70,9 @@ public class UiServlet extends HttpServlet {
         public void run() throws Exception {
           m_requestHandlerGet.handleRequest(req, resp);
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       LOG.error("Failed to process HTTP-GET request from UI", e);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
@@ -86,9 +86,9 @@ public class UiServlet extends HttpServlet {
         public void run() throws Exception {
           m_requestHandlerPost.handleRequest(req, resp);
         }
-      });
+      }, BEANS.get(ExceptionTranslator.class));
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
