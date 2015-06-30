@@ -324,13 +324,18 @@
     background-color: @palette-gray-4;
   }
 
-
-  & .calendar-day-name {
+  & .calendar-day-name::before   {
+    position: absolute;
+    content: attr(data-day-name);
+    color: @palette-gray-6;
+    left: 7px;
+    bottom: 0px;
+    z-index: 1; /* draw over calendar items */
     line-height: @calendar-title-height;
-    padding-left: 7px;
   }
 
-  & .calendar-day::before {
+
+  & .calendar-day::before  {
     position: absolute;
     content: attr(data-day-name);
     color: @palette-gray-6;
