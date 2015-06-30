@@ -235,6 +235,19 @@ scout.Table.prototype._renderTableControls = function(dummy) {
   this._renderTableFooter();
 };
 
+scout.Table.prototype._syncTableControls = function(controls) {
+  var i;
+  for (i = 0; i < this.tableControls.length; i++) {
+    this.keyStrokeAdapter.unregisterKeyStroke(this.tableControls[i]);
+  }
+  this.tableControls = controls;
+  for (i = 0; i < this.tableControls.length; i++) {
+    if (this.tableControls[i].enabled) {
+      this.keyStrokeAdapter.registerKeyStroke(this.tableControls[i]);
+    }
+  }
+};
+
 scout.Table.prototype._renderTableStatusVisible = function(dummy) {
   this._renderTableFooter();
 };
