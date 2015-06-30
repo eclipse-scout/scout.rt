@@ -57,7 +57,7 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormFieldTest {
   private static final String DUPLICATE_CLASS_ID = "DUPLICATE";
-  private static final String TEST_CLASS_ID = "TEST_CLASS_ID1";
+  private static final String TEST_FIELD_CLASS_ID = "TEST_FIELD_CLASS_ID";
   private static final String TEST_FORM_ID = "TEST_FORM_CLASS_ID";
   private static final String TEST_GROUP_BOX_ID = "TEST_GROUP_BOX_CLASS_ID";
 
@@ -68,7 +68,7 @@ public class FormFieldTest {
   public void testClassIdAnnotated() {
     TestClassWithClassId testClassWithClassId = new TestClassWithClassId();
     String classId = testClassWithClassId.classId();
-    assertEquals("classId should match annotated id", TEST_CLASS_ID, classId);
+    assertEquals("classId should match annotated id", TEST_FIELD_CLASS_ID, classId);
   }
 
   /**
@@ -144,7 +144,7 @@ public class FormFieldTest {
   }
 
   //test classes
-  @ClassId(TEST_CLASS_ID)
+  @ClassId(TEST_FIELD_CLASS_ID)
   class TestClassWithClassId extends AbstractFormField {
   }
 
