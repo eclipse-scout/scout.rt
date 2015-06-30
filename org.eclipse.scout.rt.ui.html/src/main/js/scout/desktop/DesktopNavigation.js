@@ -26,9 +26,15 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   this.viewMenuTab = new scout.ViewMenuTab(this._viewButtons('MENU'), this.session);
   this.viewMenuTab.render(this.$viewButtons);
 
-  this._viewButtons('TAB').forEach(function(viewTab) {
+  var i, viewTab,
+    viewTabs = this._viewButtons('TAB');
+  for (i = 0; i < viewTabs.length; i++) {
+    viewTab = viewTabs[i];
     viewTab.render(this.$viewButtons);
-  }, this);
+    if (i === viewTabs.length - 1) {
+      viewTab.last();
+    }
+  }
 
   this._viewButtons().forEach(function(viewButton) {
     viewButton.on('propertyChange', this._onViewButtonPropertyChange.bind(this));

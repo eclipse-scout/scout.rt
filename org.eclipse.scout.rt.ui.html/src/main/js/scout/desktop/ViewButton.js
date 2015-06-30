@@ -87,3 +87,7 @@ scout.ViewButton.prototype.getIconId = function(iconId) {
 scout.ViewButton.prototype._onClick = function() {
   this.doAction();
 };
+
+scout.ViewButton.prototype.last = function() {
+  this.$container.addClass('last');
+};

@@ -26,7 +26,6 @@
   border-right: solid 1px @border-color;
   white-space: nowrap;
   min-width: 50px;
-  vertical-align: top;
 
   &:hover {
     cursor: pointer;
@@ -37,7 +36,19 @@
     color: @view-button-tab-active-color;
 
     & > .view-button-tab-title {
+      display: inline-block;
+       /* subtract icon-width and gap */
+      width: calc(~"100%" - 20px);
       margin-left: 8px;
+
+      &.has-menu {
+        /* subtract icon-width and gap and menu-button width and gap */
+        width: calc(~"100%" - 48px);
+      }
+    }
+
+    &.last {
+      border-right: none;
     }
   }
 
@@ -46,17 +57,21 @@
   }
 
   & > .icon {
+    display: inline-block;
     font-size: 20px;
     padding-top: 3px;
   }
 }
 
 .view-button-tab-title {
- .font-text-large;
- .overflow-ellipsis-nowrap;
+  display: none;
+  vertical-align: text-bottom;
+  .font-text-large;
+  .overflow-ellipsis-nowrap;
 }
 
 .view-menu-button {
+  display: inline-block;
   margin-left: 8px;
 
   &::before {
