@@ -34,11 +34,19 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageF
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.SecondTemplateBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.TemplateStringFieldExtension;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCase {
 
   @Test

@@ -28,10 +28,18 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.To
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox.SalutationField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormStringFieldContribution;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormStringFieldExtension;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTestCase {
 
   /**

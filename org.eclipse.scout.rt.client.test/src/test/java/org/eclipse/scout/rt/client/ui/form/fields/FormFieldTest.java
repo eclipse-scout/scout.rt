@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestForm2.MainBox.SimpleGroupBox2;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId1;
@@ -39,7 +40,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithGrou
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTemplateUsingOtherTemplateGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +52,9 @@ import org.junit.runner.RunWith;
  *
  * @since 3.10.0
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormFieldTest {
   private static final String DUPLICATE_CLASS_ID = "DUPLICATE";
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID1";

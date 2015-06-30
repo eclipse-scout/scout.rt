@@ -199,7 +199,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   public AbstractForm(boolean callInitializer) throws ProcessingException {
-    m_formParent = new PreferredValue<>(deriveFormParent(), false); // set derived FormParent as non-preferred value.
+    m_formParent = new PreferredValue<>(null, false); // FormParent set in 'callInitializer'.
 
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerForm(this);
@@ -258,6 +258,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (m_initialized) {
       return;
     }
+
+    // Derive the FormParent from the calling context. This value is set as non preferred value.
+    m_formParent.set(deriveFormParent(), false);
 
     // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().form(this).run(new IRunnable() {
@@ -2404,8 +2407,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-              header(TEXTS.get("LoadFormXmlFailedText")).
-              show();
+          header(TEXTS.get("LoadFormXmlFailedText")).
+          show();
         }
       }
     }

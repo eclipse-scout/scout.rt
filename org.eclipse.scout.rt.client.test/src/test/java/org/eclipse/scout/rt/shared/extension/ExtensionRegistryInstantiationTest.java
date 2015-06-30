@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicFormExtension;
@@ -22,8 +23,15 @@ import org.eclipse.scout.rt.shared.extension.fixture.NameFieldExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.NameFieldExtension02;
 import org.eclipse.scout.rt.shared.extension.fixture.NestedBasicFormExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.StaticPojoContainerExtension;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTestCase {
 
   @Test

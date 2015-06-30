@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.extension.dto;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.FormPropertyExtension;
@@ -24,12 +25,16 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxPropertyExtensio
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxPropertyExtensionData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateFieldData;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-/**
- *
- */
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testPropertyExtensionFormFieldExplicit() throws Exception {

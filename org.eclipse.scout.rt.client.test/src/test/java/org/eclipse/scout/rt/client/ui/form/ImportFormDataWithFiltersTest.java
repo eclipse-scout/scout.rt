@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.SubBox.TestSubStringField;
 import org.eclipse.scout.rt.client.ui.form.ImportFormDataWithFiltersTest.FilterImportTestForm.MainBox.TestStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.ExcludeFormFieldFilter;
@@ -25,7 +26,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,7 +36,9 @@ import org.junit.runner.RunWith;
  * Test for
  * {@link org.eclipse.scout.rt.client.ui.form.AbstractForm#importFormData(AbstractFormData, boolean,IPropertyFilter, IFormFieldFilter) }
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class ImportFormDataWithFiltersTest {
 
   /**

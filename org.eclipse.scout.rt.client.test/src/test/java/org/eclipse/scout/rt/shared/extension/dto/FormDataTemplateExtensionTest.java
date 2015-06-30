@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
@@ -30,11 +31,15 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.SpecialStringField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.SpecialStringFieldData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateFieldData;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-/**
- *
- */
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("anna")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
