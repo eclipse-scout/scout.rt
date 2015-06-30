@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Platform;
 
 /**
  * Convenience authentication filter for development mode using the system property user.name
@@ -33,17 +34,26 @@ public class DevelopmentAuthenticator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DevelopmentAuthenticator.class);
 
   private boolean m_showWarning = true;
+  private boolean m_active;
 
   public void init(FilterConfig config) throws ServletException {
+    m_active = Platform.get().inDevelopmentMode();
   }
 
   public void destroy() {
+  }
+
+  public boolean isActive() {
+    return m_active;
   }
 
   /**
    * @return true if the request was handled (caller returns), false if nothing was done (caller continues)
    */
   public boolean handle(HttpServletRequest req, HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
+    if (!isActive()) {
+      return false;
+    }
     if (m_showWarning) {
       LOG.warn("+++Development security: Create Subject based on System.getProperty('user.name')");
       m_showWarning = false;

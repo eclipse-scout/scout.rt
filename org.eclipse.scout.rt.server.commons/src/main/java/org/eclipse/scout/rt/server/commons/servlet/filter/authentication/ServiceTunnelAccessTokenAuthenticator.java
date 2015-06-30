@@ -22,17 +22,24 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 @Bean
 public class ServiceTunnelAccessTokenAuthenticator {
 
+  private boolean m_active;
+
   public void init(FilterConfig config) throws ServletException {
+    m_active = DefaultAuthToken.isActive();
   }
 
   public void destroy() {
+  }
+
+  public boolean isActive() {
+    return m_active;
   }
 
   /**
    * @return true if the request was handled (caller returns), false if nothing was done (caller continues)
    */
   public boolean handle(HttpServletRequest req, HttpServletResponse resp, final FilterChain chain) throws IOException, ServletException {
-    if (!DefaultAuthToken.isActive()) {
+    if (!m_active) {
       return false;
     }
 

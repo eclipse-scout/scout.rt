@@ -28,7 +28,7 @@ public abstract class AbstractBooleanConfigProperty extends AbstractConfigProper
       return Boolean.TRUE;
     }
     if ("false".equalsIgnoreCase(value)) {
-      return Boolean.TRUE;
+      return Boolean.FALSE;
     }
     throw new PlatformException("Invalid boolean value '" + value + "' for property '" + getKey() + "'.");
   }
