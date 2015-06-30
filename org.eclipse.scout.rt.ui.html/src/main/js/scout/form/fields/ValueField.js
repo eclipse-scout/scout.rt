@@ -103,14 +103,15 @@ scout.ValueField.prototype._onFieldBlur = function() {
 //   ruft typischerweise auch sendDisplayText(displayText) auf
 
 scout.ValueField.prototype.displayTextChanged = function(whileTyping) {
+  whileTyping = !!whileTyping; // cast to boolean
   var displayText = scout.helpers.nvl(this._readDisplayText(), ''),
     oldDisplayText = scout.helpers.nvl(this.displayText, '');
 
   // send only if displayText has really changed OR if updateDisplayTextOnModify is true
   // 2. check is necessary to make sure the value and not only the display text gets written to the model (IBasicFieldUIFacade.parseAndSetValueFromUI vs setDisplayTextFromUI)
-  if (displayText !== oldDisplayText || !whileTyping && this.updateDisplayTextOnModify) {
+  if (displayText !== oldDisplayText || (this.updateDisplayTextOnModify && !whileTyping)) {
     this.displayText = displayText;
-    this._sendDisplayTextChanged(displayText, !! whileTyping);
+    this._sendDisplayTextChanged(displayText, whileTyping);
   }
 };
 
@@ -119,6 +120,25 @@ scout.ValueField.prototype._onFieldKeyUp = function() {
 };
 
 scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
+  // In 'updateDisplayTextOnModify' mode, each change of text is sent to the server with whileTyping=true.
+  // On field blur, the text is sent again with whileTyping=false. The following logic prevents sending
+  // to many events to the server. When whileTyping is false, the text has only to be send to the server
+  // when there have been any whileTyping=true events. When the field looses the focus without any
+  // changes, no request should be sent.
+  if (this.updateDisplayTextOnModify) {
+    if (whileTyping) {
+      // Remember that we sent some events to the server with "whileTyping=true".
+      this._displayTextChangedWhileTyping = true;
+    }
+    else {
+      if (!this._displayTextChangedWhileTyping) {
+        // If there were no "whileTyping=true" events, don't send anything to the server.
+        return;
+      }
+      this._displayTextChangedWhileTyping = false; // Reset
+    }
+  }
+
   this.session.send(this.id, 'displayTextChanged', {
     displayText: displayText,
     whileTyping: whileTyping
