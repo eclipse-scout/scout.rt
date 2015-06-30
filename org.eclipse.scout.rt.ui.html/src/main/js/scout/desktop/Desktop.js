@@ -340,6 +340,10 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
     this._outlineContent = null;
   }
 
+  if (!content) {
+    return;
+  }
+
   this._outlineContent = content;
   this._deselectTab();
   this.navigation.bringToFront();
