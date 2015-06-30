@@ -14,7 +14,7 @@ scout.DatePickerPopup.prototype._render = function($parent) {
   this.picker.render($parent);
   this.$container = this.picker.$container;
   this.$container.addClass('date-picker-popup');
-  this.$container.mousedown(this._onMouseDown.bind(this));
+  this.$container.mousedown(this._onMousedown.bind(this));
 };
 
 scout.DatePickerPopup.prototype.selectDate = function(date, animated) {
@@ -42,7 +42,7 @@ scout.DatePickerPopup.prototype.isOpen = function() {
   return this.rendered;
 };
 
-scout.DatePicker.prototype._onMouseDown = function(event) {
+scout.DatePickerPopup.prototype._onMousedown = function(event) {
   // Make sure field blur won't be triggered (using preventDefault).
   // Also makes sure event does not get propagated (and handled by another mouse down handler, e.g. the one from CellEditorPopup.js)
   return false;
