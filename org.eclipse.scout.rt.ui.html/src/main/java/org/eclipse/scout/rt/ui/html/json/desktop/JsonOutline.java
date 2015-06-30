@@ -157,7 +157,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);
-    replaceActionEvent("pageChanged", jsonEvent);
+    addActionEvent("pageChanged", jsonEvent);
   }
 
   @Override

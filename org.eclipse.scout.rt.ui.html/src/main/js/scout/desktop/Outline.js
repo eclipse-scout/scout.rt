@@ -59,12 +59,8 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
 scout.Outline.prototype._decorateNode = function(node) {
   scout.Outline.parent.prototype._decorateNode.call(this, node);
   if (node.$node) {
-    if (node.modelClass) {
-      node.$node.attr('data-modelclass', node.modelClass);
-    }
-    if (node.classId) {
-      node.$node.attr('data-classid', node.classId);
-    }
+    node.$node.toggleAttr('data-modelclass', node.modelClass, node.modelClass);
+    node.$node.toggleAttr('data-classid', node.classId, node.classId);
   }
 };
 
