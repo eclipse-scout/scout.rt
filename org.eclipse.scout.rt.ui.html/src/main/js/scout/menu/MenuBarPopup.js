@@ -9,6 +9,7 @@ scout.MenuBarPopup = function(menu, session, options) {
   this.menu = menu;
   this.$headBlueprint = this.menu.$container;
   this.ignoreEvent = options.ignoreEvent;
+  this._headVisible = true;
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
@@ -96,7 +97,7 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionY) {
   if (openingDirectionY === 'up') {
     top -= bodySize.height;
     headTop = bodySize.height;
-    decoTop = headTop - 1;
+    decoTop = headTop;
   } else if (openingDirectionY === 'down'){
     bodyTop += headSize.height;
     decoTop = bodyTop;

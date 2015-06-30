@@ -4,6 +4,8 @@ scout.ContextMenuPopup = function(session, options) {
   this.options = $.extend({
     cloneMenuItems: true
   }, options);
+  // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
+  this._headVisible = false;
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 

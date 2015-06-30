@@ -4,13 +4,16 @@ scout.PopupWithHead = function(session, options) {
   this.$head;
   this.$body;
   this.$deco;
+  this._headVisible = true;
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);
 
 scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);
   this.$body = this.$container.appendDiv('popup-body');
-  this._renderHead();
+  if (this._headVisible) {
+    this._renderHead();
+  }
 };
 
 scout.PopupWithHead.prototype.rerenderHead = function() {

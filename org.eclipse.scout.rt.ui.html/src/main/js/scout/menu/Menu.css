@@ -158,15 +158,15 @@
   background-color: @palette-white;
   border-bottom: none;
 
+  & > .menu-item:last-child {
+    border-bottom: 1px solid @border-color;
+  }
+
   &.down  {
     .drop-shadow();
 
     & > .menu-item:first-child {
       border-top-color: transparent;
-    }
-
-    & > .menu-item:last-child {
-      border-bottom: 1px solid @border-color;
     }
   }
 
