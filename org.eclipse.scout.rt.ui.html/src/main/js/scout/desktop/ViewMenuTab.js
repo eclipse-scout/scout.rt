@@ -110,7 +110,7 @@ scout.ViewMenuTab.prototype._onClickMenuButton = function(event) {
 };
 
 scout.ViewMenuTab.prototype._openMenu = function() {
-  var naviBounds = scout.graphics.getBounds(this.$container.parent());
+  var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
   this.popup = new scout.ViewMenuPopup(this.$container, this.viewMenus, naviBounds, this.session);
   this.popup.headText = this.text;
   this.popup.render();

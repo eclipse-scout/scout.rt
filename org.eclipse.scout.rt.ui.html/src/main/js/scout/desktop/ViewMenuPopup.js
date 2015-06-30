@@ -3,7 +3,9 @@ scout.ViewMenuPopup = function($tab, viewMenus, naviBounds, session) {
   this.$tab = $tab;
   this.$headBlueprint = this.$tab;
   this.viewMenus = viewMenus;
-  this.naviBounds = naviBounds;
+  this._naviBounds = naviBounds;
+
+  this.MAX_MENU_WIDTH = 300;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
@@ -44,7 +46,7 @@ scout.ViewMenuPopup.prototype.alignTo = function() {
     this.$deco.cssWidth(headSize.width - 2);
   }
 
-  this.$body.cssWidth(this.naviBounds.width - 2);
+  this.$body.cssWidth(Math.min(this.MAX_MENU_WIDTH, this._naviBounds.width));
   this.$deco.cssTop(bodyTop);
   this.$head.cssLeft(0);
   this.$deco.cssLeft(1);
