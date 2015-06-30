@@ -16,7 +16,7 @@ scout.Desktop = function() {
   this._selectedTab;
 
   /**
-   * // FIXME DWI: (activeForm): selectedTool wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
+   * FIXME DWI: (activeForm): selectedTool wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
    * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
    * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
@@ -453,16 +453,12 @@ scout.Desktop.prototype.tabCount = function() {
   return this._allTabs.length;
 };
 
-scout.Desktop.prototype.bringDetachedOutlineToFront = function() {
-  this._deselectTab();
-  this._attachOutlineContent();
-  this.navigation.bringToFront();
-};
-
 scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   this._deselectTab();
   if (this.outline === outline) {
-    this._attachOutlineContent();
+    if (this.outline.inBackground) {
+      this._attachOutlineContent();
+    }
   } else {
     this.setOutline(outline);
   }

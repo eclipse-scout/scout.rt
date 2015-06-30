@@ -6,6 +6,7 @@ scout.Outline = function() {
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
   this._tableSelectionListener;
+  this.inBackground = false;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -237,9 +238,15 @@ scout.Outline.prototype.validateFocus = function() {
 };
 
 scout.Outline.prototype.sendToBack = function() {
-  this.$container.addClass('in-background');
+  this.inBackground = true;
+  this._renderInBackground();
 };
 
 scout.Outline.prototype.bringToFront = function() {
-  this.$container.removeClass('in-background');
+  this.inBackground = false;
+  this._renderInBackground();
+};
+
+scout.Outline.prototype._renderInBackground = function() {
+  this.$container.toggleClass('in-background', this.inBackground);
 };

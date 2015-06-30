@@ -92,13 +92,13 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
 };
 
 scout.ViewMenuTab.prototype._onClickTab = function(event) {
-  if (this._inBackground) {
-     this.session.desktop.bringDetachedOutlineToFront();
-  }
-  else if (this.selected) {
-    this._openMenu();
-  }
-  else if (this.outlineViewButton) {
+  if (this.selected) {
+    if (this._inBackground) {
+      this.session.desktop.bringOutlineToFront(this.outlineViewButton.outline);
+    } else {
+      this._openMenu();
+    }
+  } else {
     this.outlineViewButton.doAction();
   }
 };
