@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,9 +49,7 @@ public class ClientTestRunnerTimeoutTest {
     Result result = runClientTestRunner(ClientTestRunnerTimeoutTestFixture.class, m_name.getMethodName(), 1);
     Failure f = result.getFailures().get(0);
     assertNotNull(f);
-    Throwable exception = f.getException();
-    assertTrue(exception instanceof ProcessingException);
-    assertTrue(exception.getCause() instanceof TestTimedOutException);
+    assertTrue(f.getException() instanceof TestTimedOutException);
   }
 
   protected static Result runClientTestRunner(Class<?> testClass, String testMethod, int expectedFailureCount) throws Exception {

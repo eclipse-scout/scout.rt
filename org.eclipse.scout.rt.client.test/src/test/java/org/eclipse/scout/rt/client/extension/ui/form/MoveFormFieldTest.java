@@ -224,7 +224,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     assertAbstractTemplateFieldsBox(form.getTemplateUsageBox(), false);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ProcessingException.class)
   public void testSingleTemplateUsageFormMoveTemplateFieldOutOfTemplate() throws Exception {
     BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, SingleTemplateUsageForm.MainBox.class);
     new SingleTemplateUsageForm();
@@ -431,7 +431,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     assertClasses(secondTemplateBox.getBottomFieldsBox().getFields(), TopStringField.class, BottomStringField.class);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ProcessingException.class)
   public void testMultiTemplateUsageFormMoveTopStringFieldOutOfContainer() throws Exception {
     BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, MultiTemplateUsageForm.MainBox.class);
     new MultiTemplateUsageForm();

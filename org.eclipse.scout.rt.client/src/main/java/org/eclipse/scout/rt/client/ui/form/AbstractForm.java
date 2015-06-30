@@ -192,15 +192,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private int m_toolbarLocation;
 
-  private final PreferredValue<IFormParent> m_formParent;
+  private final PreferredValue<IFormParent> m_formParent = new PreferredValue<>(null, false);
 
   public AbstractForm() throws ProcessingException {
     this(true);
   }
 
   public AbstractForm(boolean callInitializer) throws ProcessingException {
-    m_formParent = new PreferredValue<>(null, false); // FormParent set in 'callInitializer'.
-
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerForm(this);
     }
@@ -2407,8 +2405,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-          header(TEXTS.get("LoadFormXmlFailedText")).
-          show();
+              header(TEXTS.get("LoadFormXmlFailedText")).
+              show();
         }
       }
     }
