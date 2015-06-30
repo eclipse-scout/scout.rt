@@ -1600,7 +1600,7 @@ scout.Table.prototype.filter = function() {
   // Remember current selection
   var oldSelectedRows = {};
   for (i = 0; i < this.selectedRows.length; i++) {
-    oldSelectedRows[this.selectedRows[i]] = true;
+    oldSelectedRows[this.selectedRows[i].id] = true;
   }
 
   // Filter rows
@@ -1640,8 +1640,8 @@ scout.Table.prototype.filter = function() {
     that.hideRow($row, useAnimation);
     // Remove hidden rows from the map of previously selected rows
     var row = $row.data('row');
-    if (oldSelectedRows[row]) {
-      oldSelectedRows[row] = false;
+    if (oldSelectedRows[row.id]) {
+      oldSelectedRows[row.id] = false;
     }
   });
   $(rowsToShow).each(function() {
@@ -1650,9 +1650,9 @@ scout.Table.prototype.filter = function() {
 
   // Restore selection
   var newSelectedRows = [];
-  for (var row in oldSelectedRows) {
-    if (oldSelectedRows[row]) {
-      newSelectedRows.push(row);
+  for (var rowId in oldSelectedRows) {
+    if (oldSelectedRows[rowId]) {
+      newSelectedRows.push(this.rowById(rowId));
     }
   }
   this.selectRows(newSelectedRows); // this will update the server model if necessary
