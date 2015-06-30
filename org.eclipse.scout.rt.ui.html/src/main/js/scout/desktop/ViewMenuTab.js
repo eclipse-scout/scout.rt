@@ -93,7 +93,7 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
 
 scout.ViewMenuTab.prototype._onClickTab = function(event) {
   if (this._inBackground) {
-    this.session.desktop.bringOutlineToFront();
+     this.session.desktop.bringDetachedOutlineToFront();
   }
   else if (this.selected) {
     this._openMenu();

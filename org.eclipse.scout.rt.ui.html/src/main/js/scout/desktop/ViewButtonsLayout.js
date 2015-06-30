@@ -5,8 +5,9 @@ scout.ViewButtonsLayout = function(htmlComp) {
 scout.inherits(scout.ViewButtonsLayout, scout.AbstractLayout);
 
 scout.ViewButtonsLayout.prototype.layout = function($container) {
-  var containerWidth = this._htmlComp.getBounds().width;
-  var $selectedTab, selectedTabWidth, fixedWidth = 0;
+  var $selectedTab, selectedTabWidth,
+    fixedWidth = 0,
+    containerBounds = this._htmlComp.getBounds();
   $container.children().each(function() {
     var $tab = $(this);
     $tab.removeAttr('style');
@@ -16,8 +17,10 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
       fixedWidth += scout.graphics.getBounds($tab).width;
     }
   });
-  selectedTabWidth = containerWidth - fixedWidth;
-  scout.graphics.setSize($selectedTab, new scout.Dimension(selectedTabWidth, 50)); // FIXME AWE
+  if ($selectedTab) { // when no view-buttons exist
+    selectedTabWidth = containerBounds.width - fixedWidth;
+    scout.graphics.setSize($selectedTab, new scout.Dimension(selectedTabWidth, containerBounds.height));
+  }
 };
 
 scout.ViewButtonsLayout.prototype.preferredLayoutSize = function($container) {

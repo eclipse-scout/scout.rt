@@ -369,7 +369,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   scout.focusManager.validateFocus(this.session.uiSessionId, 'update');
 };
 
-scout.Desktop.prototype.changeOutline = function(outline) {
+scout.Desktop.prototype.setOutline = function(outline) {
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
 };
@@ -436,7 +436,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     this._showForm(form);
   } else if (event.type === 'outlineChanged') {
-    this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else if (event.type === 'messageBoxAdded') {
     this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
   } else if (event.type === 'fileChooserAdded') {
@@ -453,8 +453,18 @@ scout.Desktop.prototype.tabCount = function() {
   return this._allTabs.length;
 };
 
-scout.Desktop.prototype.bringOutlineToFront = function() {
+scout.Desktop.prototype.bringDetachedOutlineToFront = function() {
   this._deselectTab();
   this._attachOutlineContent();
+  this.navigation.bringToFront();
+};
+
+scout.Desktop.prototype.bringOutlineToFront = function(outline) {
+  this._deselectTab();
+  if (this.outline === outline) {
+    this._attachOutlineContent();
+  } else {
+    this.setOutline(outline);
+  }
   this.navigation.bringToFront();
 };

@@ -72,8 +72,18 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.render(this.$container);
   this.outline.htmlComp.validateLayout();
   this.outline.pixelBasedSizing = true;
-  this.viewMenuTab.onOutlineChanged(outline);
+  this._updateViewButtons(outline);
   this.outline.validateFocus();
+};
+
+scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
+  this.viewMenuTab.onOutlineChanged(outline);
+  this._viewButtons('TAB').forEach(function(viewTab) {
+    if (viewTab instanceof scout.OutlineViewButton) {
+      viewTab.onOutlineChanged(outline);
+    }
+  });
+  this.htmlViewButtons.revalidateLayout();
 };
 
 // vertical splitter

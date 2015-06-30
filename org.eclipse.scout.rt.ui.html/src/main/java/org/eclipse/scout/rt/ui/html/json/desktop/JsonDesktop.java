@@ -159,6 +159,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     return json;
   }
 
+  // FIXME AWE: send this to JS-client, remove desktop-navigation and desktop-taskbar in UI when formBased is true
   protected boolean isFormBased() {
     return false;
   }
@@ -238,7 +239,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     String fileName = handler.getResource().getFilename();
     m_downloads.put(fileName, handler);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, fileName);
-    handleModelOpenUri(downloadUrl, TargetWindow.BLANK);//FIXME awe (from imo) AUTO causes in
+    handleModelOpenUri(downloadUrl, TargetWindow.BLANK); // FIXME AWE: (from imo) AUTO causes in
   }
 
   @Override

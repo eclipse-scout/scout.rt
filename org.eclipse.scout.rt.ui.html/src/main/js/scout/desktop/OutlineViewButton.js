@@ -24,6 +24,15 @@ scout.OutlineViewButton.prototype._goOffline = function() {
  */
 scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
   if (this.outline) {
-    this.desktop.changeOutline(this.outline);
+    this.desktop.bringOutlineToFront(this.outline);
+  }
+};
+
+scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {
+  var oldSelected = this.selected,
+    selected = this.outline === outline;
+  if (selected !== oldSelected) {
+    this.selected = selected;
+    this._renderSelected(selected);
   }
 };
