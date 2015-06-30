@@ -239,7 +239,8 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var oldProperties = {};
+  var oldProperties = {},
+    uiEvent = {};
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
   this._syncPropertiesOnPropertyChange(oldProperties, event.properties);
@@ -251,7 +252,9 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
 
   // fire propertyChange after properties have been rendered. This is required to make sure the
   // DOM is in the right state, when the propertyChange event is consumed.
-  this.trigger('propertyChange', event.properties);
+  // creating an uiEvent object is necessary because it will be modified by EventSupport.trigger -> prevents modifying event.properties
+  $.extend(uiEvent, event.properties);
+  this.trigger('propertyChange', uiEvent);
 };
 
 /**
@@ -297,7 +300,7 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
     } else {
       var funcTarget = this.ui || this;
       if (!funcTarget[renderFuncName]) {
-        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? 'model adapter' : 'UI'));
+        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? this.toString() : 'UI'));
       } // FIXME AWE/CGU: value and oldValue should be switched to conform with other functions.
       // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
       // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
