@@ -17,8 +17,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  *
@@ -52,7 +52,7 @@ public abstract class AbstractKeyboardNavigationSupport {
         if (m_navigationJob != null) {
           m_navigationJob.cancel(true);
         }
-        m_navigationJob = ClientJobs.schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)));
+        m_navigationJob = ClientJobs.schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_session, true)));
         m_timeoutTimestamp = System.currentTimeMillis() + m_delay;
       }
     }

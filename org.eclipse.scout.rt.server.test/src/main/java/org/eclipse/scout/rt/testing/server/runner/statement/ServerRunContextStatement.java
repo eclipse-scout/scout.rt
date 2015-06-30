@@ -63,7 +63,7 @@ public class ServerRunContextStatement extends Statement {
           final IServerSession serverSession = BEANS.get(serverSessionProvider).provide(ServerRunContexts.copyCurrent());
 
           // Run the test in a new ServerRunContext. The subject is set explicitly to not use the one defined on the session.
-          ServerRunContexts.copyCurrent().session(serverSession).subject(subject).run(new IRunnable() {
+          ServerRunContexts.copyCurrent().session(serverSession, true).subject(subject).run(new IRunnable() {
 
             @Override
             public void run() throws Exception {

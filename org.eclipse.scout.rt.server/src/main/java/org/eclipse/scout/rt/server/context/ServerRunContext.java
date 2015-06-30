@@ -16,7 +16,6 @@ import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.BooleanUtility;
-import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -72,7 +71,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ServerRunContext extends RunContext {
 
   protected IServerSession m_session;
-  protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
+  protected UserAgent m_userAgent;
   protected TransactionScope m_transactionScope;
   protected ITransaction m_transaction;
   protected boolean m_offline;
@@ -113,22 +112,27 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * Sets the session, and the session's subject, but only if not set as explicit value yet.
+   * Sets the session.
+   *
+   * @param applySessionProperties
+   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}.
    */
-  public ServerRunContext session(final IServerSession session) {
+  public ServerRunContext session(final IServerSession session, final boolean applySessionProperties) {
     m_session = session;
-    if (session != null) {
-      m_subject.set(session.getSubject(), false);
+
+    if (applySessionProperties) {
+      m_subject = (session != null ? session.getSubject() : null);
     }
+
     return this;
   }
 
   public UserAgent userAgent() {
-    return m_userAgent.get();
+    return m_userAgent;
   }
 
   public ServerRunContext userAgent(final UserAgent userAgent) {
-    m_userAgent.set(userAgent, true);
+    m_userAgent = userAgent;
     return this;
   }
 
@@ -199,7 +203,7 @@ public class ServerRunContext extends RunContext {
 
     super.copyValues(originRunContext);
     m_session = originRunContext.m_session;
-    m_userAgent = originRunContext.m_userAgent.copy();
+    m_userAgent = originRunContext.m_userAgent;
     m_transactionScope = originRunContext.m_transactionScope;
     m_transaction = originRunContext.m_transaction;
     m_offline = originRunContext.m_offline;
@@ -208,21 +212,21 @@ public class ServerRunContext extends RunContext {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
+    m_userAgent = UserAgent.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
     m_offline = BooleanUtility.nvl(OfflineState.CURRENT.get(), false);
-    session(ServerSessionProvider.currentSession()); // method call to derive other values.
+    m_session = ServerSessionProvider.currentSession();
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
-    m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
+    m_userAgent = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;
     m_offline = false;
-    session(null); // method call to derive other values.
+    m_session = null;
   }
 
   @Override

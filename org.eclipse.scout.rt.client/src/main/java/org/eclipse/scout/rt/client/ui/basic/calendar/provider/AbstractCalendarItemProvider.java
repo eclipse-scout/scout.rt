@@ -153,7 +153,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       public void run() throws Exception {
         interceptLoadItems(minDate, maxDate, result);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session))).awaitDone();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session, true))).awaitDone();
   }
 
   @ConfigOperation
@@ -376,7 +376,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       long refreshInterval = getRefreshIntervalMillis();
       P_ReloadJob runnable = new P_ReloadJob(minDate, maxDate);
 
-      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session);
+      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session, true);
       if (refreshInterval > 0) {
         // interval load
         m_reloadJob = ClientJobs.scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext));

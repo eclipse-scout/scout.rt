@@ -42,7 +42,7 @@ public class ServiceWithSessionInterceptorTest {
 
   @Test
   public void testService() throws Exception {
-    ServerRunContexts.empty().session(m_serverSession).run(new IRunnable() {
+    ServerRunContexts.empty().session(m_serverSession, true).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {

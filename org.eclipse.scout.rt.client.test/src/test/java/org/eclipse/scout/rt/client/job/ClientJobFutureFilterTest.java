@@ -49,10 +49,10 @@ public class ClientJobFutureFilterTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    JobInput clientJobInput = ClientJobs.newInput(ClientRunContexts.empty().session(m_clientSession1));
+    JobInput clientJobInput = ClientJobs.newInput(ClientRunContexts.empty().session(m_clientSession1, true));
     when(m_clientJobFuture.getJobInput()).thenReturn(clientJobInput);
 
-    JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1));
+    JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1, true));
     when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
 
     JobInput jobInput = Jobs.newInput(RunContexts.empty());

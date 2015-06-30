@@ -19,7 +19,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -56,8 +55,8 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
 public class RunContext {
 
   protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
-  protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
-  protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
+  protected Subject m_subject;
+  protected Locale m_locale;
   protected PropertyMap m_propertyMap = new PropertyMap();
 
   /**
@@ -205,26 +204,20 @@ public class RunContext {
   }
 
   public Subject subject() {
-    return m_subject.get();
+    return m_subject;
   }
 
-  /**
-   * Sets a specific {@link Subject} as preferred value, meaning that is not updated by other values like the session.
-   */
   public RunContext subject(final Subject subject) {
-    m_subject.set(subject, true);
+    m_subject = subject;
     return this;
   }
 
   public Locale locale() {
-    return m_locale.get();
+    return m_locale;
   }
 
-  /**
-   * Sets a specific {@link Locale} as preferred value, meaning that is not updated by other values like the session.
-   */
   public RunContext locale(final Locale locale) {
-    m_locale.set(locale, true);
+    m_locale = locale;
     return this;
   }
 
@@ -246,8 +239,8 @@ public class RunContext {
    */
   protected void copyValues(final RunContext origin) {
     m_runMonitor = origin.m_runMonitor;
-    m_subject = origin.m_subject.copy();
-    m_locale = origin.m_locale.copy();
+    m_subject = origin.m_subject;
+    m_locale = origin.m_locale;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
   }
 
@@ -259,14 +252,10 @@ public class RunContext {
    *             to be cancelled as well once the current calling {@link RunContext} is cancelled,
    *             but DOES NOT cancel the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is
    *             cancelled.
-   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
-   *          session.
-   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
-   *         session.
    */
   protected void fillCurrentValues() {
-    m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
-    m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
+    m_subject = Subject.getSubject(AccessController.getContext());
+    m_locale = NlsLocale.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
     m_runMonitor = BEANS.get(RunMonitor.class);
     if (RunMonitor.CURRENT.get() != null) {
@@ -280,14 +269,10 @@ public class RunContext {
    * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is
    *             NOT registered as child monitor, meaning that it will not be cancelled once the current
    *             {@link RunMonitor} is cancelled.
-   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
-   *          the session.
-   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
-   *         the session.
    */
   protected void fillEmptyValues() {
-    m_subject = new PreferredValue<>(null, true); // null as preferred Subject
-    m_locale = new PreferredValue<>(null, true); // null as preferred Locale
+    m_subject = null;
+    m_locale = null;
     m_runMonitor = BEANS.get(RunMonitor.class);
     m_propertyMap = new PropertyMap();
   }

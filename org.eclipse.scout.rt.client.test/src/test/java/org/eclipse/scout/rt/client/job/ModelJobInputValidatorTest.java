@@ -36,7 +36,7 @@ public class ModelJobInputValidatorTest {
 
   @Test
   public void test() {
-    new ModelJobInputValidator().validate(new JobInput().mutex(m_clientSession).runContext(ClientRunContexts.empty().session(m_clientSession)));
+    new ModelJobInputValidator().validate(new JobInput().mutex(m_clientSession).runContext(ClientRunContexts.empty().session(m_clientSession, true)));
     assertTrue(true);
   }
 
@@ -52,12 +52,12 @@ public class ModelJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testNullSession() {
-    new ModelJobInputValidator().validate(new JobInput().mutex(null).runContext(ClientRunContexts.empty().session(null)));
+    new ModelJobInputValidator().validate(new JobInput().mutex(null).runContext(ClientRunContexts.empty().session(null, true)));
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongMutex() {
-    new ModelJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().session(m_clientSession)));
+    new ModelJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().session(m_clientSession, true)));
   }
 
   @Test(expected = AssertionException.class)
@@ -67,6 +67,6 @@ public class ModelJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testNullClientSession2() {
-    new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(null)));
+    new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(null, true)));
   }
 }

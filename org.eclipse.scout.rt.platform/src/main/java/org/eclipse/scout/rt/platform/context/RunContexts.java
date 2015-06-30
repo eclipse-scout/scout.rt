@@ -49,10 +49,6 @@ public final class RunContexts {
    * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is
    *             NOT registered as child monitor, meaning that it will not be cancelled once the current
    *             {@link RunMonitor} is cancelled.
-   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
-   *          the session.
-   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
-   *         the session.
    */
   public static final RunContext empty() {
     final RunContext runContext = BEANS.get(RunContext.class);
@@ -67,10 +63,6 @@ public final class RunContexts {
    *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
    *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
    *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
-   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
-   *          session.
-   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
-   *         session.
    */
   public static RunContext copyCurrent() {
     final RunContext runContext = BEANS.get(RunContext.class);

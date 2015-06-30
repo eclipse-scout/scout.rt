@@ -116,7 +116,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSe
         // cancel the old
         m_pollingJob.cancel(true);
       }
-      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(getSession());
+      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(getSession(), true);
       m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext).name("Client notification fetcher"));
     }
     else {

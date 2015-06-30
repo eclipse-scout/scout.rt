@@ -15,7 +15,6 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
@@ -51,6 +50,9 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>{@link ISession#CURRENT}</li>
  * <li>{@link UserAgent#CURRENT}</li>
  * <li>{@link ScoutTexts#CURRENT}</li>
+ * <li>{@link CurrentControlTracker#CURRENT_MODEL_ELEMENT}</li>
+ * <li>{@link CurrentControlTracker#CURRENT_FORM}</li>
+ * <li>{@link CurrentControlTracker#CURRENT_OUTLINE}</li>
  * </ul>
  *
  * @since 5.1
@@ -60,7 +62,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ClientRunContext extends RunContext {
 
   protected IClientSession m_session;
-  protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
+  protected UserAgent m_userAgent;
   protected Object m_modelElement;
   protected IForm m_form;
   protected IOutline m_outline;
@@ -102,24 +104,29 @@ public class ClientRunContext extends RunContext {
   }
 
   /**
-   * Set the session with its {@link Locale}, {@link UserAgent} and {@link Subject} if not set yet.
+   * Sets the session.
+   *
+   * @param applySessionProperties
+   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}.
    */
-  public ClientRunContext session(final IClientSession session) {
+  public ClientRunContext session(final IClientSession session, final boolean applySessionProperties) {
     m_session = session;
-    if (session != null) {
-      m_locale.set(session.getLocale(), false);
-      m_userAgent.set(session.getUserAgent(), false);
-      m_subject.set(session.getSubject(), false);
+
+    if (applySessionProperties) {
+      m_locale = (session != null ? session.getLocale() : null);
+      m_userAgent = (session != null ? session.getUserAgent() : null);
+      m_subject = (session != null ? session.getSubject() : null);
     }
+
     return this;
   }
 
   public UserAgent userAgent() {
-    return m_userAgent.get();
+    return m_userAgent;
   }
 
   public ClientRunContext userAgent(final UserAgent userAgent) {
-    m_userAgent.set(userAgent, true);
+    m_userAgent = userAgent;
     return this;
   }
 
@@ -196,7 +203,7 @@ public class ClientRunContext extends RunContext {
     final ClientRunContext originRunContext = (ClientRunContext) origin;
 
     super.copyValues(originRunContext);
-    m_userAgent = originRunContext.m_userAgent.copy();
+    m_userAgent = originRunContext.m_userAgent;
     m_modelElement = originRunContext.m_modelElement;
     m_outline = originRunContext.m_outline;
     m_form = originRunContext.m_form;
@@ -206,21 +213,21 @@ public class ClientRunContext extends RunContext {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
+    m_userAgent = UserAgent.CURRENT.get();
     m_modelElement = CurrentControlTracker.CURRENT_MODEL_ELEMENT.get();
     m_outline = CurrentControlTracker.CURRENT_OUTLINE.get();
     m_form = CurrentControlTracker.CURRENT_FORM.get();
-    session(ClientSessionProvider.currentSession()); // method call to derive other values.
+    m_session = ClientSessionProvider.currentSession();
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
-    m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
+    m_userAgent = null;
     m_modelElement = null;
     m_outline = null;
     m_form = null;
-    session(null); // method call to derive other values.
+    m_session = null;
   }
 
   @Override

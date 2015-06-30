@@ -73,7 +73,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
         public void run() throws Exception {
           fireEvent(session, notifications, false);
         }
-      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(session)).name("Dispatch client notifications"));
+      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(session, true)).name("Dispatch client notifications"));
     }
   }
 

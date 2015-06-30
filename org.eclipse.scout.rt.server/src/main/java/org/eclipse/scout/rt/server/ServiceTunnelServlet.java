@@ -81,7 +81,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.userAgent(UserAgent.createDefault());
-          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           invokeAdminService(serverRunContext);
         }
@@ -117,7 +117,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           serverRunContext.locale(serviceRequest.getLocale());
           serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
           serverRunContext.runMonitor(runMonitor);
-          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           IServerSession session = serverRunContext.session();
           long requestSequence = serviceRequest.getRequestSequence();

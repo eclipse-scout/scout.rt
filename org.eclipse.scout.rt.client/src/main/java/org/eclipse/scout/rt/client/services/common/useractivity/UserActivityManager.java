@@ -149,7 +149,7 @@ public class UserActivityManager {
             }
           }
         }
-      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession)).name("user activity %s", newStatus));
+      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession, true)).name("user activity %s", newStatus));
     }
   }
 

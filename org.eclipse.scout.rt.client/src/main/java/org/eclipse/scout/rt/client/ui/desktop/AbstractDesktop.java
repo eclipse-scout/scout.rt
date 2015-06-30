@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -850,6 +851,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
+
+    // Ensure FormParent to be set.
+    Assertions.assertNotNull(form.getFormParent(), "Property 'formParent' must not be null");
 
     m_formStore.add(form);
     fireFormAdded(form);

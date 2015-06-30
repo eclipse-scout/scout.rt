@@ -41,7 +41,7 @@ public class ServerRunContextProvider {
     final ServerRunContext runContext = ServerRunContexts.copyCurrent().subject(subject);
 
     if (runContext.session() == null || !subject.equals(Subject.getSubject(AccessController.getContext()))) {
-      runContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(runContext.copy()));
+      runContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(runContext.copy()), true);
     }
     return runContext;
   }

@@ -155,7 +155,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
             String ref = url.toExternalForm();
             getScoutObject().getUIFacade().fireAppLinkActionFromUI(ref);
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession(), true)));
         // end notify
       }
       catch (Exception t) {

@@ -50,7 +50,7 @@ public abstract class AbstractGuiMock implements IGuiMock {
           }
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession, true)));
 
     future.awaitDoneAndGet(runTimeout, TimeUnit.MILLISECONDS);
     Throwable t = throwables.get();

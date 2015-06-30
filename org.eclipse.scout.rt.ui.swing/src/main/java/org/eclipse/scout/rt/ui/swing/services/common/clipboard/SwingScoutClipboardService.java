@@ -26,8 +26,8 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.dnd.TransferObjectRequest;
@@ -65,7 +65,7 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
               public void run() throws Exception {
                 clipboardConsumer.consume(transferObjects);
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)));
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession, true)));
           }
           catch (Throwable t) {
             LOG.debug("Cannot get system clipboard's contents", t);

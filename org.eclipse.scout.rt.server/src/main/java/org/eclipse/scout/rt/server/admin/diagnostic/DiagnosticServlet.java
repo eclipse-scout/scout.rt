@@ -56,7 +56,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
         public void run() throws Exception {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.userAgent(UserAgent.createDefault());
-          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           invokeDiagnosticService(serverRunContext);
         }

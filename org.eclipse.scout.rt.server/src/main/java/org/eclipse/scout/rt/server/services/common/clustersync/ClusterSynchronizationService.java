@@ -269,7 +269,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     ServerRunContext serverRunContext = ServerRunContexts.empty();
     serverRunContext.subject(m_subject);
-    serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
+    serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()), true);
     serverRunContext.run(new IRunnable() {
 
       @Override

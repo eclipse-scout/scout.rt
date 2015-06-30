@@ -508,7 +508,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
                   }
                 });
               }
-            }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
+            }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession(), true)));
             future.awaitDone(1, TimeUnit.MINUTES); // wait no longer than one minute
           }
           catch (ProcessingException ex) {

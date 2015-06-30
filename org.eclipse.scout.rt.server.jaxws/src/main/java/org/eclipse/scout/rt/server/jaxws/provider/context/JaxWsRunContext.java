@@ -96,9 +96,11 @@ public class JaxWsRunContext extends ServletRunContext {
     m_servletRequest = (HttpServletRequest) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_REQUEST);
     m_servletResponse = (HttpServletResponse) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
 
-    final Principal userPrincipal = m_webServiceContext.getUserPrincipal();
-    if (userPrincipal != null) {
-      m_subject.set(new Subject(true, Collections.singleton(userPrincipal), Collections.emptySet(), Collections.emptySet()), false);
+    if (m_subject == null) {
+      final Principal userPrincipal = m_webServiceContext.getUserPrincipal();
+      if (userPrincipal != null) {
+        m_subject = new Subject(true, Collections.singleton(userPrincipal), Collections.emptySet(), Collections.emptySet());
+      }
     }
     return this;
   }

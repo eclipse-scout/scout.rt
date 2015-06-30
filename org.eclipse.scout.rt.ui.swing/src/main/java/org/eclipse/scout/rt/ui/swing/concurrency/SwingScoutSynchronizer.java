@@ -63,7 +63,7 @@ public class SwingScoutSynchronizer {
           j.run();
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_env.getScoutSession())).name("Swing post::%s", j));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_env.getScoutSession(), true)).name("Swing post::%s", j));
     return future;
   }
 

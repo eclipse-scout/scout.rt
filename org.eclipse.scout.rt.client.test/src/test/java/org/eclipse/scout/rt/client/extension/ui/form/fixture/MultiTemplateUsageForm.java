@@ -19,10 +19,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageF
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.junit.runner.RunWith;
 
-@RunWith(ClientTestRunner.class)
 public class MultiTemplateUsageForm extends AbstractForm {
 
   public MultiTemplateUsageForm() throws ProcessingException {

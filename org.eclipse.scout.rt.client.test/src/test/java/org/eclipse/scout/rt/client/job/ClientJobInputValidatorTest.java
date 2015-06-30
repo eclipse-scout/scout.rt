@@ -27,8 +27,8 @@ public class ClientJobInputValidatorTest {
 
   @Test
   public void test1() {
-    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(mock(IClientSession.class))));
-    new ClientJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().session(mock(IClientSession.class))));
+    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(mock(IClientSession.class), true)));
+    new ClientJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().session(mock(IClientSession.class), true)));
     assertTrue(true);
   }
 
@@ -44,7 +44,7 @@ public class ClientJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testSessionMutex() {
-    new ClientJobInputValidator().validate(new JobInput().mutex(mock(IClientSession.class)).runContext(ClientRunContexts.empty().session(mock(IClientSession.class))));
+    new ClientJobInputValidator().validate(new JobInput().mutex(mock(IClientSession.class)).runContext(ClientRunContexts.empty().session(mock(IClientSession.class), true)));
   }
 
   @Test(expected = AssertionException.class)
@@ -54,6 +54,6 @@ public class ClientJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testNullClientSession2() {
-    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(null)));
+    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(null, true)));
   }
 }

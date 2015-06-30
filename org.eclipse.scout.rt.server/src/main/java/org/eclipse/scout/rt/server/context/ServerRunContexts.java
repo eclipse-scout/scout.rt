@@ -10,15 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
-import java.util.Locale;
-
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Factory methods to create new {@link ServerRunContext} objects to propagate server-side state and to control
@@ -58,12 +53,6 @@ public final class ServerRunContexts {
    *             NOT registered as child monitor, meaning that it will not be cancelled once the current
    *             {@link RunMonitor} is cancelled.
    * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
-   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
-   *          the session.
-   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
-   *         the session.
-   * @UserAgent current {@link UserAgent} as non-preferred value, meaning that it will be updated by other values like
-   *            the session.
    */
   public static final ServerRunContext empty() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);
@@ -84,12 +73,6 @@ public final class ServerRunContexts {
    *              completion. To work on behalf of the current transaction, set the scope to
    *              {@link TransactionScope#MANDATORY}.
    * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
-   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
-   *          session.
-   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
-   *         session.
-   * @UserAgent current {@link UserAgent} as non-preferred value, meaning that it will be updated by other values like
-   *            the session.
    */
   public static ServerRunContext copyCurrent() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);

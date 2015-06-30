@@ -51,7 +51,7 @@ public class ServerSessionProvider {
         serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
         // 2. Load the session.
-        ServerRunContexts.copyCurrent().session(serverSession).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
+        ServerRunContexts.copyCurrent().session(serverSession, true).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {

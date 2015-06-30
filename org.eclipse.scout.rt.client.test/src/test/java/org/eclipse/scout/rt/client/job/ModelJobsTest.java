@@ -96,7 +96,7 @@ public class ModelJobsTest {
           }
         });
         // Test model thread for other session
-        ClientRunContexts.copyCurrent().session(clientSession2).run(new IRunnable() {
+        ClientRunContexts.copyCurrent().session(clientSession2, true).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -104,7 +104,7 @@ public class ModelJobsTest {
           }
         });
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(clientSession1))).awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(clientSession1, true))).awaitDoneAndGet();
   }
 
   @Test
@@ -144,7 +144,7 @@ public class ModelJobsTest {
 
   @Test
   public void testNewInput() {
-    ClientRunContext runContext = ClientRunContexts.empty().session(m_clientSession);
+    ClientRunContext runContext = ClientRunContexts.empty().session(m_clientSession, true);
 
     assertSame(runContext, ModelJobs.newInput(runContext).runContext());
     assertEquals("scout-model-thread", ModelJobs.newInput(runContext).threadName());
@@ -158,6 +158,6 @@ public class ModelJobsTest {
 
   @Test(expected = AssertionException.class)
   public void testNewInputNullSession() {
-    ModelJobs.newInput(ClientRunContexts.empty().session(null));
+    ModelJobs.newInput(ClientRunContexts.empty().session(null, true));
   }
 }
