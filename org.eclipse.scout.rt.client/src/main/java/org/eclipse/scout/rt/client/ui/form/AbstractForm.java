@@ -150,6 +150,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IFormUIFacade m_uiFacade;
   private IWizardStep m_wizardStep;
   private boolean m_modal;// no property, is fixed
+  private int m_modalityHint;// no property, is fixed
   private boolean m_cacheBounds; // no property is fixed
   private boolean m_askIfNeedSave;
   private boolean m_buttonsArmed;
@@ -368,6 +369,20 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Order(120)
   protected boolean getConfiguredModal() {
     return true;
+  }
+
+  /**
+   * Overwrite to set the modality hint for this {@link IForm}.
+   * <ul>
+   * <li>{@link #MODALITY_HINT_NONE}</li>
+   * <li>{@link #MODALITY_HINT_PARENT}</li>
+   * <li>{@link #MODALITY_HINT_APPLICATION}</li>
+   * </ul>
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(120)
+  protected int getConfiguredModalityHint() {
+    return IForm.MODALITY_HINT_NONE;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -687,6 +702,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       setTimer("custom", getConfiguredCustomTimer());
     }
     setModal(getConfiguredModal());
+    setModalityHint(getConfiguredModalityHint());
     setDisplayHint(getConfiguredDisplayHint());
     setDisplayViewId(getConfiguredDisplayViewId());
     if (getConfiguredCancelVerificationText() != null) {
@@ -2734,6 +2750,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     else {
       m_modal = b;
     }
+  }
+
+  @Override
+  public int getModalityHint() {
+    return m_modalityHint;
+  }
+
+  @Override
+  public void setModalityHint(int modalityHint) {
+    m_modalityHint = modalityHint;
   }
 
   @Override

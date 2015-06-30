@@ -81,6 +81,22 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
    */
   int DISPLAY_HINT_VIEW = 20;
 
+  /**
+   * Use this modality hint to not make the {@link IForm} modal.
+   */
+  int MODALITY_HINT_NONE = 0;
+
+  /**
+   * Use this modality hint to make a {@link IForm} modal in respect to its {@link IFormParent}. That prevents the user
+   * from interacting with controls of the {@link IFormParent}.
+   */
+  int MODALITY_HINT_PARENT = 10;
+
+  /**
+   * Use this modality hint to make the {@link IForm} application modal.
+   */
+  int MODALITY_HINT_APPLICATION = 20;
+
   int TOOLBAR_FORM_HEADER = 30;
   int TOOLBAR_VIEW_PART = 31;
 
@@ -496,6 +512,21 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
   boolean isModal();
 
   void setModal(boolean modal);
+
+  /**
+   * @return the modality hint of this {@link IForm}.
+   */
+  int getModalityHint();
+
+  /**
+   * Set this modality hint to control modality of this {@link IForm}.
+   * <ul>
+   * <li>{@link #MODALITY_HINT_NONE}</li>
+   * <li>{@link #MODALITY_HINT_PARENT}</li>
+   * <li>{@link #MODALITY_HINT_APPLICATION}</li>
+   * </ul>
+   */
+  void setModalityHint(int modalityHint);
 
   void setCacheBounds(boolean cacheBounds);
 
