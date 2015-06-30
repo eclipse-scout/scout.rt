@@ -43,17 +43,21 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     return;
   }
   menus.forEach(function(menu) {
-    if (!menu.visible || menu.separator) {
+    // Invisible menus are rendered as well because their visibility might change dynamically
+    if (menu.separator) {
       return;
     }
     if (this.options.cloneMenuItems) {
       menuClone = this._cloneMenuItem(menu);
       this.session.registerAdapterClone(menu, menuClone);
+      menu.hasClone = true;
       menu = menuClone;
     }
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
+    menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
   }, this);
+  this._updateFirstLastClass();
 };
 
 /**
@@ -69,8 +73,9 @@ scout.ContextMenuPopup.prototype._remove = function() {
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
   this._getMenuItems().forEach(function(menu) {
     if (this.options.cloneMenuItems) {
-      if (menu.visible && !menu.separator) {
+      if (menu.hasClone) {
         this.session.unregisterAllAdapterClones(menu);
+        menu.hasClone = false;
       }
     } else {
       menu.remove();
@@ -97,3 +102,40 @@ scout.ContextMenuPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.ContextMenuKeyStrokeAdapter(this);
 };
 
+/**
+ * Updates the first and last visible menu items with the according css classes.
+ * Necessary because invisible menu-items are rendered.
+ */
+scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
+  var $firstMenuItem, $lastMenuItem;
+
+  //TODO CGU after refactoring of menu-item to context-menu-item we can use last/first instead of a fully qualified name. We also could move this function to jquery-scout to make it reusable.
+  this.$body.children('.menu-item').each(function() {
+    var $menuItem = $(this);
+    $menuItem.removeClass('context-menu-item-first context-menu-item-last');
+
+    if ($menuItem.isVisible()) {
+      if (!$firstMenuItem) {
+        $firstMenuItem = $menuItem;
+      }
+      $lastMenuItem = $menuItem;
+    }
+  });
+  if ($firstMenuItem) {
+    $firstMenuItem.addClass('context-menu-item-first');
+  }
+  if ($lastMenuItem) {
+    $lastMenuItem.addClass('context-menu-item-last');
+  }
+};
+
+scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
+  if (!this.rendered) {
+    return;
+  }
+  if (event.visible !== undefined) {
+    this._updateFirstLastClass();
+  }
+  // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)
+  this.position();
+};

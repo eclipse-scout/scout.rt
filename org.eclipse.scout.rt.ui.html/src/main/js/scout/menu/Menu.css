@@ -158,14 +158,14 @@
   background-color: @palette-white;
   border-bottom: none;
 
-  & > .menu-item:last-child {
+  & > .menu-item.context-menu-item-last {
     border-bottom: 1px solid @border-color;
   }
 
   &.down  {
     .drop-shadow();
 
-    & > .menu-item:first-child {
+    & > .menu-item.context-menu-item-first {
       border-top-color: transparent;
     }
   }
@@ -174,7 +174,7 @@
     border-top: none;
     .drop-shadow(@y: -6px;);
 
-    .popup-head ~ & > .menu-item:last-child {
+    .popup-head ~ & > .menu-item.context-menu-item-last {
       border-bottom: 1px solid transparent;
 
       &.selected {
@@ -198,11 +198,11 @@
       border-top-color: @item-selection-border-color;
     }
 
-    &.selected:first-child {
+    &.selected.context-menu-item-first {
       border-top: 1px solid @item-selection-border-color;
     }
 
-    &.selected:last-child {
+    &.selected.context-menu-item-last {
       border-color: @item-selection-border-color;
     }
 
