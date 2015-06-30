@@ -34,11 +34,8 @@ scout.Menu.prototype._renderItem = function($parent) {
     this.$container = $parent.appendDiv('menu-item');
   }
 
-  if (this.childActions.length > 0) {
-    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
-  } else {
-    this.$container.on('click', '', this._onClick.bind(this));
-  }
+  this.$container.on('mousedown', '', this._onMouseEvent.bind(this));
+  this.$container.on('click', '', this._onMouseEvent.bind(this));
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }
@@ -56,12 +53,12 @@ scout.Menu.prototype._renderItem = function($parent) {
   }
 };
 
-scout.Menu.prototype._onClick = function() {
-  this.sendDoAction();
-};
-
-scout.Menu.prototype._onMouseDown = function(event) {
-  this._openPopup(event);
+scout.Menu.prototype._onMouseEvent = function(event) {
+  if (this.childActions.length > 0 && event.type === 'mousedown') {
+    this._openPopup(event);
+  } else if(this.childActions.length === 0 && event.type === 'click'){
+    this.sendDoAction();
+  }
 };
 
 scout.Menu.prototype._renderEnabled = function(enabled) {
