@@ -794,7 +794,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           }
           LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession)).name("Close desktop due to HTTP session invalidation"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession, true)).name("Close desktop due to HTTP session invalidation"));
     }
   }
 
