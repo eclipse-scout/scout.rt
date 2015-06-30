@@ -220,9 +220,7 @@ public class ColumnFilterForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            for (ITableRow row : getValuesTableField().getTable().getRows()) {
-              row.setChecked(true);
-            }
+            getValuesTableField().getTable().checkAllRows();
           }
         }
 
@@ -241,9 +239,7 @@ public class ColumnFilterForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            for (ITableRow row : getValuesTableField().getTable().getRows()) {
-              row.setChecked(false);
-            }
+            getValuesTableField().getTable().uncheckAllRows();
           }
         }
       }
