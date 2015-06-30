@@ -127,6 +127,9 @@ scout.Desktop.prototype.onResize = function(event) {
   if (this.outline) {
     this.outline.onResize();
   }
+  if (this._outlineContent) {
+    this._outlineContent.onResize();
+  }
   this._layoutTaskBar();
 };
 
