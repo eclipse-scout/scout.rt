@@ -2,7 +2,7 @@ scout.TableFooter = function(table) {
   scout.TableFooter.parent.call(this);
   this._table = table;
   this.filterKeyStrokeAdapter = new scout.FilterInputKeyStrokeAdapter(this._table);
-  this._render(table.$container);
+  this.render(table.$container);
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
@@ -68,6 +68,7 @@ scout.TableFooter.prototype._render = function($parent) {
     that._updateInfoSelection(numRows, event.allSelected);
     that._updateInfoSelectionVisibility();
   });
+  this._installKeyStrokeAdapter();
 };
 
 scout.TableFooter.prototype._installKeyStrokeAdapter = function() {
