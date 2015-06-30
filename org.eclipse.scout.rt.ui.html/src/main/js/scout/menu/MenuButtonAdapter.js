@@ -70,7 +70,7 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
  * @override Menu.js
  */
 scout.MenuButtonAdapter.prototype._onMouseEvent = function(event) {
-  if (this.enabled) {
+  if( event.type === 'click'){
     this._button.doAction();
   }
 };
