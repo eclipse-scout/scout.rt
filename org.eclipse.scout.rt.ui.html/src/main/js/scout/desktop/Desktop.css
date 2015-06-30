@@ -70,7 +70,6 @@
 .desktop-view-tabs,
 .taskbar-tools {
   position: absolute;
-  word-wrap: none;
   vertical-align:top;
 }
 
