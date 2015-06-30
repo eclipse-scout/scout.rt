@@ -95,6 +95,11 @@ scout.DesktopNavigation.prototype.onResize = function(event) {
   this.desktop.$taskBar.css('left', w);
   this.desktop.$bench.css('left', w);
 
+  if (this.outline === undefined) {
+    // FIXME awe handle form-only mode
+    return;
+  }
+
   if (w <= this.BREADCRUMB_SWITCH_WIDTH) {
     if (!this.$navigation.hasClass('navigation-breadcrumb')) {
       this.$navigation.addClass('navigation-breadcrumb');
@@ -128,6 +133,11 @@ scout.DesktopNavigation.prototype.doViewMenuAction = function() {
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
   this.viewMenuTab.sendToBack();
+
+  if (this.outline === undefined) {
+    // FIXME awe handle form-only mode
+    return;
+  }
   this.outline.sendToBack();
 };
 

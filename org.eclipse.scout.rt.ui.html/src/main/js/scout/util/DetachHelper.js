@@ -33,7 +33,13 @@ scout.DetachHelper.prototype.afterAttach = function($container) {
 };
 
 scout.DetachHelper.prototype._storeFocus = function($container) {
-  var $focusedElement =  scout.focusManager._sessionFocusContexts[this.session.uiSessionId].focusContexts[0]._$focusedElement;
+  var focusContext = scout.focusManager._sessionFocusContexts[this.session.uiSessionId].focusContexts[0];
+  if (focusContext === undefined) {
+      // FIXME awe handle form-only mode
+      return;
+  }
+
+  var $focusedElement =  focusContext._$focusedElement;
   if ($focusedElement) {
     $container.data('lastFocus', $focusedElement);
     $.log.debug('Stored focused element =' + scout.graphics.debugOutput($focusedElement));
