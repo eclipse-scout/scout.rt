@@ -203,6 +203,7 @@ scout.Desktop.prototype._setSelectedTab = function(tab) {
     this._detachOutlineContent();
     this._deselectTab();
     this._selectTab(tab);
+    this.$bench.addClass('drop-shadow');
     this._layoutTaskBar();
     scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
   }
@@ -236,6 +237,7 @@ scout.Desktop.prototype._deselectTab = function() {
  if (this._selectedTab) {
    this._selectedTab.deselect();
    this._selectedTab = null;
+   this.$bench.removeClass('drop-shadow');
  }
 };
 
