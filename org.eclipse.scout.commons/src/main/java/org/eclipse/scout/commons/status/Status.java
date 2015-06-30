@@ -12,9 +12,9 @@ package org.eclipse.scout.commons.status;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.status.IStatus;
 
 /**
  * Status
@@ -92,7 +92,7 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public String getMessage() {
-    return m_message == null ? "" : m_message;
+    return StringUtility.emptyIfNull(m_message);
   }
 
   @Override

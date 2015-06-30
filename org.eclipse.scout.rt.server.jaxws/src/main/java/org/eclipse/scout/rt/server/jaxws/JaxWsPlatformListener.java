@@ -14,9 +14,8 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -53,7 +52,7 @@ public class JaxWsPlatformListener implements IPlatformListener {
       Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(implementorClazz), "Implementor class must be of type '%s'.", JaxWsImplementorSpecifics.class.getName());
 
       beanManager.unregisterClass(implementorClazz); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
-      beanManager.registerBean(BEANS.get(IBeanMetaDataFacotry.class).create(implementorClazz).replace(true));
+      beanManager.registerBean(new BeanMetaData(implementorClazz).replace(true));
 
       LOG.info("JAX-WS implementor specific class installed: {}", implementorClazz.getName());
     }

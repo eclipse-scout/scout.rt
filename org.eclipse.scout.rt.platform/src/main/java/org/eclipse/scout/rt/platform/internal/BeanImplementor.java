@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
-import org.eclipse.scout.rt.platform.IBeanMetaData;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
 
@@ -31,7 +31,7 @@ public class BeanImplementor<T> implements IBean<T> {
   private BeanManagerImplementor m_beanManager;
 
   @SuppressWarnings("unchecked")
-  public BeanImplementor(IBeanMetaData beanData, BeanManagerImplementor beanManager) {
+  public BeanImplementor(BeanMetaData beanData, BeanManagerImplementor beanManager) {
     m_beanManager = beanManager;
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));

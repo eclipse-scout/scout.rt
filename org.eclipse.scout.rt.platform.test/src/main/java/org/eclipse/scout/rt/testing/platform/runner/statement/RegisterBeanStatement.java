@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.IBeanMetaData;
 import org.eclipse.scout.rt.platform.Platform;
 import org.junit.runners.model.Statement;
 
@@ -25,7 +25,7 @@ import org.junit.runners.model.Statement;
 public class RegisterBeanStatement extends Statement {
 
   protected final Statement m_next;
-  protected final IBeanMetaData m_beanMetaData;
+  protected final BeanMetaData m_beanMetaData;
 
   /**
    * Creates a statement to register a bean during the time of executing subsequent statements.
@@ -35,7 +35,7 @@ public class RegisterBeanStatement extends Statement {
    * @param beanMetaData
    *          describes the bean to be registered.
    */
-  public RegisterBeanStatement(final Statement next, final IBeanMetaData beanMetaData) {
+  public RegisterBeanStatement(final Statement next, final BeanMetaData beanMetaData) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
     m_beanMetaData = Assertions.assertNotNull(beanMetaData, "BeanMetaData must not be null");
   }

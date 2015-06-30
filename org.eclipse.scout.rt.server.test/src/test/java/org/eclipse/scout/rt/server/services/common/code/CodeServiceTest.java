@@ -23,8 +23,8 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
@@ -57,7 +57,7 @@ public class CodeServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerBeans(BEANS.get(IBeanMetaDataFacotry.class).create(ICodeService.class).initialInstance(testService).applicationScoped(true).addAnnotation(AnnotationFactory.createOrder(-1000)));
+    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).initialInstance(testService).applicationScoped(true).addAnnotation(AnnotationFactory.createOrder(-1000)));
     try {
       ICodeService service = BEANS.get(ICodeService.class);
       assertSame(testService, service);
@@ -154,7 +154,7 @@ public class CodeServiceTest {
   public void testReloadCodeType() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(IClientNotificationService.class).
+        new BeanMetaData(IClientNotificationService.class).
             initialInstance(clientNotificationService).
             applicationScoped(true));
     try {
@@ -178,7 +178,7 @@ public class CodeServiceTest {
   public void testReloadCodeTypes() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(IClientNotificationService.class).
+        new BeanMetaData(IClientNotificationService.class).
             initialInstance(clientNotificationService).
             applicationScoped(true));
     try {

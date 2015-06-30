@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -79,7 +79,7 @@ public class ClientRunContextStatement extends Statement {
             }
           }, BEANS.get(ThrowableTranslator.class));
         }
-      }, BEANS.get(IBeanMetaDataFacotry.class).create(clientSessionClass).order(-Long.MAX_VALUE)).evaluate();
+      }, new BeanMetaData(clientSessionClass).order(-Long.MAX_VALUE)).evaluate();
     }
   }
 }

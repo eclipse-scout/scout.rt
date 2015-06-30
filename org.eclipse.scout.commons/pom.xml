@@ -37,10 +37,6 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.platform.api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
     </dependency>

@@ -30,9 +30,8 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
@@ -67,10 +66,10 @@ public class DataModelAttributeTest {
     TestingCodeService codeService = new TestingCodeService(new AttributeTestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_services = TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeService.class).
+        new BeanMetaData(ICodeService.class).
         initialInstance(codeService).
         applicationScoped(true),
-        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeLookupCallFactoryService.class).
+        new BeanMetaData(ICodeLookupCallFactoryService.class).
         initialInstance(codeLookupCallFactoryService).
         applicationScoped(true)
         );

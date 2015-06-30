@@ -15,13 +15,12 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanMetaData;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +49,7 @@ public class SERVICESTest {
   }
 
   private IBean<?> registerService(Class<? extends ITestService> serviceClazz, double order) {
-    IBeanMetaData bean = new BeanMetaData(serviceClazz);
+    BeanMetaData bean = new BeanMetaData(serviceClazz);
     bean.addAnnotation(AnnotationFactory.createOrder(order));
     return Platform.get().getBeanManager().registerBean(bean);
   }
@@ -89,7 +88,7 @@ public class SERVICESTest {
   /**
    * Test for {@link SERVICES#getService(Class)} for a service that was not registered.
    */
-  @Test(expected = PlatformException.class)
+  @Test(expected = AssertionException.class)
   public void testGetServiceNull() {
     IUnregisteredTestService service = BEANS.get(IUnregisteredTestService.class);
     assertNull("No service should be found. ", service);

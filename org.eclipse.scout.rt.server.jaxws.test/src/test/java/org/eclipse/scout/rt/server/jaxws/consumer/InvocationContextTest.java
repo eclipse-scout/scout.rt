@@ -34,9 +34,8 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -82,7 +81,7 @@ public class InvocationContextTest {
 
     when(m_commitListener.onCommitPhase1()).thenReturn(true);
 
-    m_beans = TestingUtility.registerBeans(BEANS.get(IBeanMetaDataFacotry.class).create(JaxWsImplementorSpecifics.class, m_implementorSpecifics).replace(true));
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(JaxWsImplementorSpecifics.class, m_implementorSpecifics).replace(true));
   }
 
   @After

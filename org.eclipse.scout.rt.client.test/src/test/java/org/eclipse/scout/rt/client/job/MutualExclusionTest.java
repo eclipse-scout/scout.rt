@@ -39,9 +39,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -95,7 +94,7 @@ public class MutualExclusionTest {
 
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(JobManager.class).
+        new BeanMetaData(JobManager.class).
         initialInstance(m_jobManager).
         applicationScoped(true));
 
@@ -599,7 +598,7 @@ public class MutualExclusionTest {
 
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(IJobManager.class).
+        new BeanMetaData(IJobManager.class).
         order(-1000).
         initialInstance(jobManager).
         applicationScoped(true)));
@@ -726,7 +725,7 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
 
     m_beans.addAll(TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(IJobManager.class).
+        new BeanMetaData(IJobManager.class).
         order(-1000).
         initialInstance(jobManager).
         applicationScoped(true)));

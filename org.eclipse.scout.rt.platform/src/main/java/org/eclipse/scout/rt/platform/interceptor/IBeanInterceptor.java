@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.interceptor;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Interface for bean decorator/interceptor used in {@link IBeanDecorationFactory}
@@ -22,7 +22,7 @@ public interface IBeanInterceptor<T> {
    * A method is being called on a {@link IBeanInvocationContext}
    *
    * @return the result of the call
-   * @throws PlatformException
+   * @throws ProcessingException
    */
-  Object invoke(IBeanInvocationContext<T> context) throws PlatformException;
+  Object invoke(IBeanInvocationContext<T> context) throws ProcessingException;
 }

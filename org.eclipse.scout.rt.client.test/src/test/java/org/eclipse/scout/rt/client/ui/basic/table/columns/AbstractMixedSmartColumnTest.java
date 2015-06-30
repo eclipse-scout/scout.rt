@@ -28,9 +28,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanMetaDataFacotry;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
@@ -62,13 +61,13 @@ public class AbstractMixedSmartColumnTest {
     TestingCodeService codeService = new TestingCodeService(new TestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_regs = TestingUtility.registerBeans(
-        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeService.class).
+        new BeanMetaData(ICodeService.class).
         initialInstance(codeService).
         applicationScoped(true),
-        BEANS.get(IBeanMetaDataFacotry.class).create(ICodeLookupCallFactoryService.class).
+        new BeanMetaData(ICodeLookupCallFactoryService.class).
         initialInstance(codeLookupCallFactoryService).
         applicationScoped(true),
-        BEANS.get(IBeanMetaDataFacotry.class).create(ILookupCallProvisioningService.class).
+        new BeanMetaData(ILookupCallProvisioningService.class).
         initialInstance(new DefaultLookupCallProvisioningService()).
         applicationScoped(true)
         );

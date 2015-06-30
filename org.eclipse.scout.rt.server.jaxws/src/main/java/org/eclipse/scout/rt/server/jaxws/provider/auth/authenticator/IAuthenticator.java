@@ -14,8 +14,8 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.RunWithServerRunContext;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorSubjectProperty;
 
 /**
  * Authenticator to authenticate webservice requests against a database, config.properties, LDAP, or others.

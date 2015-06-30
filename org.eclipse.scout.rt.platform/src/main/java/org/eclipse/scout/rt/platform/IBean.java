@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.platform;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+import org.eclipse.scout.commons.annotations.Internal;
+
 /**
  * This is the registration for one {@link IBean} in the {@link IBeanManager}
  */
@@ -38,6 +40,7 @@ public interface IBean<T> {
    *         <p>
    *         used in {@link IBeanDecorationFactory}
    */
+  @Internal
   T getInitialInstance();
 
   /**
