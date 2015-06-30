@@ -13,7 +13,6 @@
 .view-buttons {
   width: 100%;
   height: @view-buttons-height;
-  background-color: @view-button-tab-background-color;
   white-space: nowrap;
   .font-text-large;
 }
@@ -22,9 +21,9 @@
   display: inline-block;
   height: @view-buttons-height;
   padding: 10px;
-  background-color: @view-button-tab-background-color;
+  background-color: @panel-background-color;
   color: @view-button-tab-color;
-  border-right: solid 1px @navigation-background-color;
+  border-right: solid 1px @border-color;
   white-space: nowrap;
   min-width: 50px;
   vertical-align: top;

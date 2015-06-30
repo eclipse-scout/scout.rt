@@ -43,7 +43,6 @@ scout.Outline.prototype._renderEnabled = function() {
 scout.Outline.prototype._initTreeNode = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNode.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
-  // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
   if (node.detailTable) {
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
     this._addOutlineNavigationButtons(node.detailTable, node);
@@ -142,65 +141,29 @@ scout.Outline.prototype.setNodesSelected = function(nodes) {
 scout.Outline.prototype._showDefaultDetailForm = function() {
   if (this.defaultDetailForm) {
     this.session.desktop.setOutlineContent(this.defaultDetailForm);
-    this.events.trigger('outlineUpdated', {}); // XXX AWE: check/refactor event name
   }
 };
 
 scout.Outline.prototype._updateOutlineNode = function(node) {
-  // FIXME AWE: (outline) remove these errors if error never occurs in application
   if (!node) {
-    throw new Error('called _updateOutlineNode without node, should call showDefaultDetailForm instead?');
-  }
-  if (this.session.desktop.outline !== this) {
-    throw new Error('called _updateOutlineNode but event affects another outline');
+    throw new Error('called _updateOutlineNode without node');
   }
 
-  // Unlink detail form if it was closed.
-  // May happen in the following case:
-  // The form gets closed on execPageDeactivated.
-  // No pageChanged event will be fired because the deactivated page is not selected anymore
-  var content, parentText, nodeText, title, subTitle;
+  // Unlink detail form if it was closed. May happen in the following case:
+  // The form gets closed on execPageDeactivated. No pageChanged event will
+  // be fired because the deactivated page is not selected anymore.
   if (node.detailForm && node.detailForm.destroyed) {
     node.detailForm = null;
   }
 
+  var content;
   if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     content = node.detailForm;
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;
   }
 
-  if (node.parentNode && node.parentNode.text) {
-    parentText = node.parentNode.text;
-  }
-  if (node.detailForm && node.detailForm.title) {
-    if (node.detailForm.subTitle) {
-      parentText = node.detailForm.title;
-      nodeText = node.detailForm.subTitle;
-    }
-    else {
-      nodeText = node.detailForm.title;
-    }
-  } else {
-    nodeText = node.text;
-  }
-
-  // XXX AWE: remove this title stuff, not used anymore
-
-  if (parentText && nodeText) {
-    title = parentText;
-    subTitle = nodeText;
-  } else if (parentText) {
-    title = parentText;
-    subTitle = this.title;
-  } else if (nodeText) {
-    title = nodeText;
-    subTitle = this.title;
-  }
   this.session.desktop.setOutlineContent(content);
-  this.events.trigger('outlineUpdated', { // XXX AWE: check/refactor event name
-    node: node
-  });
 };
 
 /**

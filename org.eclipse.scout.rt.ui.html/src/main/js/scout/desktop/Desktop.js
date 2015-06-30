@@ -1,7 +1,4 @@
-// FIXME AWE: (desktop):
-// - fix !content.rendered exception
-// - add mouse listener for bringToFront() when user clicks on outline-tree
-// - use same gray as for form-tabs in view-tabs (incl. vertical lines)
+// FIXME AWE: (desktop):  add mouse listener for bringToFront() when user clicks on outline-tree
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
@@ -19,7 +16,7 @@ scout.Desktop = function() {
   this._selectedTab;
 
   /**
-   * TODO AWE/CGU: (key-handling, forms) wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
+   * // FIXME DWI: (activeForm): selectedTool wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
    * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
    * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
@@ -185,7 +182,7 @@ scout.Desktop.prototype._removeTab = function(tab) {
   scout.arrays.remove(this._allTabs, tab);
   tab.removeTab();
 
-  // FIXME AWE: use activeForm here or when no form is active, show outline again
+  // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
   if (this._allTabs.length > 0) {
     this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
   } else {

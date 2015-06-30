@@ -34,10 +34,10 @@ scout.ViewMenuPopup.prototype.alignTo = function() {
   $.log.debug(' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize + ' left=' + left + ' top=' + top);
   this.$body.cssTop(bodyTop);
   var offsetBounds;
-  if(this.$tab.parents('.navigation-breadcrumb').length > 0) { // XXX
-    offsetBounds = scout.graphics.offsetBounds(this.desktopNavigation.activeTab.$tab.parent());
-    this.$head.cssWidth(offsetBounds.width/2);
-    this.$deco.cssWidth(offsetBounds.width/2-2);
+  if (this.$tab.parents('.navigation-breadcrumb').length) {
+    offsetBounds = scout.graphics.offsetBounds(this.$tab.parent());
+    this.$head.cssWidth(offsetBounds.width / 2);
+    this.$deco.cssWidth(offsetBounds.width / 2 - 2);
   }
   else {
     offsetBounds = scout.graphics.offsetBounds(this.$tab);

@@ -123,7 +123,7 @@
 @tooltip-color: @palette-gray-8;
 @tooltip-background-color: @palette-orange-0;
 @tooltip-border-color: @palette-orange-3;
-@view-button-tab-background-color: @palette-gray-3;
+//@view-button-tab-background-color: @palette-gray-3;
 @view-button-tab-color: @palette-gray-65;
 @view-button-tab-active-background-color: @navigation-background-color;
 @view-button-tab-active-color: @active-inverted-color;

@@ -50,6 +50,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
   public static final String PROP_FILE_CHOOSER = "fileChooser";
+  public static final String PROP_ACTIVE_FORM = "activeForm";
 
   private DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
