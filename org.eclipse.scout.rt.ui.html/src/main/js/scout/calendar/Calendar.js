@@ -178,16 +178,11 @@ scout.Calendar.prototype._renderProperties = function() {
 };
 
 scout.Calendar.prototype._renderComponents = function() {
-  var taskOffset = 1;
-
   this.components.forEach(function(component) {
     component.remove();
     component.render(this.$container);
-    if (component._isTask()) {
-      component._arrangeTask(taskOffset);
-      taskOffset += 26;
-    }
   });
+
   this._arrangeComponents();
   this._updateListPanel();
 };

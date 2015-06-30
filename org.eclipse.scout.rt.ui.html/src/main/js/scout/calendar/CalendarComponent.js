@@ -55,6 +55,8 @@ scout.CalendarComponent.prototype._render = function($parent) {
 
     if (!this.parent._isMonth()) {
       if (this.fullDay) {
+        var count = $('.component-task', $day).length;
+        this._arrangeTask(1 + 26 * count);
         $part.addClass('component-task');
       } else {
         var
