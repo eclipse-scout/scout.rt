@@ -18,7 +18,6 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     }
   });
   if ($selectedTab) { // when no view-buttons exist
-    // FIXME awe handle form-only mode
     selectedTabWidth = containerBounds.width - fixedWidth;
     scout.graphics.setSize($selectedTab, new scout.Dimension(selectedTabWidth, containerBounds.height));
   }

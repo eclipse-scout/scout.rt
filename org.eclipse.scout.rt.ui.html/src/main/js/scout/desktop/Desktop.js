@@ -3,8 +3,8 @@ scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
   this._$viewTabBar;
-  this.$taskBar;
-  this.$toolbar;
+  this._$taskBar;
+  this._$toolBar;
   this.$bench;
 
   this.navigation;
@@ -41,49 +41,58 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
 };
 
 scout.Desktop.prototype._render = function($parent) {
-  var i, action;
+  var hasNavigation = this._hasNavigation(),
+    hasTaskBar = this._hasTaskBar();
 
   this.$container = $parent;
+  this.$container.toggleClass('has-navigation', hasNavigation);
   this._renderUniqueId($parent);
   this._renderModelClass($parent);
 
-  this.navigation = new scout.DesktopNavigation(this);
+  this.navigation = hasNavigation ? new scout.DesktopNavigation(this) : scout.NullDesktopNavigation;
   this.navigation.render($parent);
+  this._renderTaskBar($parent);
 
-  this.$taskBar = $parent.appendDiv('desktop-taskbar');
-  var htmlTabbar = new scout.HtmlComponent(this.$taskBar, this.session);
-  htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
-
-  this.$taskBar.appendDiv('taskbar-logo')
-    .delay(1000)
-    .animateAVCSD('width', 40, null, null, 1000);
-
-  this._$viewTabBar = this.$taskBar.appendDiv('desktop-view-tabs');
-
-  // FIXME AWE: (menu) hier menu-bar verwenden?
-  this.$toolbar = this.$taskBar.appendDiv('taskbar-tools');
   this.$bench = this.$container.appendDiv('desktop-bench');
+  this.$bench.toggleClass('has-taskbar', hasTaskBar);
   new scout.HtmlComponent(this.$bench, this.session);
-
-  this.splitter = new scout.Splitter({
-    $anchor: this.navigation.$navigation,
-    $root: this.$container,
-    maxRatio: 0.5
-  });
-  this.splitter.render($parent);
-  this.splitter.on('resize', this.onSplitterResize.bind(this));
-  this.splitter.on('resizeend', this.onSplitterResizeEnd.bind(this));
-
+  this._createSplitter($parent);
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
   });
 
+  this._renderToolMenus();
+  this.navigation.onOutlineChanged(this.outline);
+  this._setSplitterPosition();
+
+  this.views.forEach(this._renderView.bind(this));
+  this.dialogs.forEach(this._renderDialog.bind(this));
+  // TODO BSH: How to determine order of messageboxes and filechoosers?
+  this.messageBoxes.forEach(this._renderMessageBox.bind(this));
+  this.fileChoosers.forEach(this._renderFileChooser.bind(this));
+
+  $(window).on('resize', this.onResize.bind(this));
+
+  // Switch off browser's default context menu for the entire scout desktop (except input fields)
+  $parent.bind('contextmenu', function(event) {
+    if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
+      event.preventDefault();
+    }
+  });
+  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
+};
+
+scout.Desktop.prototype._renderToolMenus = function() {
+  if (!this._hasTaskBar()) {
+    return;
+  }
   // we set the menuStyle property to render a menu with a different style
   // depending on where the menu is located (taskbar VS menubar).
+  var i, action;
   for (i = 0; i < this.actions.length; i++) {
     action = this.actions[i];
     action.actionStyle = scout.Action.ActionStyle.TASK_BAR;
-    action.render(this.$toolbar);
+    action.render(this._$toolBar);
   }
   if (action) {
     action.$container.addClass('last');
@@ -91,8 +100,40 @@ scout.Desktop.prototype._render = function($parent) {
   if (this.selectedTool) {
     this.selectedTool.popup.alignTo();
   }
-  this.navigation.onOutlineChanged(this.outline);
+};
 
+scout.Desktop.prototype._renderTaskBar = function($parent) {
+  if (!this._hasTaskBar()) {
+    return;
+  }
+  this._$taskBar = $parent.appendDiv('desktop-taskbar');
+  var htmlTabbar = new scout.HtmlComponent(this._$taskBar, this.session);
+  htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
+  this._$taskBar.appendDiv('taskbar-logo')
+    .delay(1000)
+    .animateAVCSD('width', 40, null, null, 1000);
+  this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
+  this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
+};
+
+scout.Desktop.prototype._createSplitter = function($parent) {
+  if (!this._hasNavigation()) {
+    return;
+  }
+  this.splitter = new scout.Splitter({
+    $anchor: this.navigation.$navigation,
+    $root: this.$container,
+    maxRatio: 0.5
+  });
+  this.splitter.render($parent);
+  this.splitter.on('resize', this._onSplitterResize.bind(this));
+  this.splitter.on('resizeend', this._onSplitterResizeEnd.bind(this));
+};
+
+scout.Desktop.prototype._setSplitterPosition = function() {
+  if (!this._hasNavigation()) {
+    return;
+  }
   // FIXME AWE: (user-prefs) Use user-preferences instead of sessionStorage
   var storedSplitterPosition = sessionStorage.getItem('scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
@@ -106,22 +147,14 @@ scout.Desktop.prototype._render = function($parent) {
     this.splitter.updatePosition();
     this._handleUpdateSplitterPosition(this.splitter.positoin);
   }
+};
 
-  this.views.forEach(this._renderView.bind(this));
-  this.dialogs.forEach(this._renderDialog.bind(this));
-  // TODO BSH How to determine order of messageboxes and filechoosers?
-  this.messageBoxes.forEach(this._renderMessageBox.bind(this));
-  this.fileChoosers.forEach(this._renderFileChooser.bind(this));
+scout.Desktop.prototype._hasNavigation = function() {
+  return this.desktopStyle === scout.DesktopStyle.DEFAULT;
+};
 
-  $(window).on('resize', this.onResize.bind(this));
-
-  // Switch off browser's default context menu for the entire scout desktop (except input fields)
-  $parent.bind('contextmenu', function(event) {
-    if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
-      event.preventDefault();
-    }
-  });
-  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
+scout.Desktop.prototype._hasTaskBar = function() {
+  return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
 
 // FIXME AWE/CGU this is called by JQuery UI when a dialog gets resized, why?
@@ -139,15 +172,17 @@ scout.Desktop.prototype.onResize = function(event) {
 };
 
 scout.Desktop.prototype._layoutTaskBar = function() {
-  var htmlTaskBar = scout.HtmlComponent.get(this.$taskBar);
-  htmlTaskBar.revalidateLayout();
+  if (this._hasTaskBar()) {
+    var htmlTaskBar = scout.HtmlComponent.get(this._$taskBar);
+    htmlTaskBar.revalidateLayout();
+  }
 };
 
-scout.Desktop.prototype.onSplitterResize = function(event) {
+scout.Desktop.prototype._onSplitterResize = function(event) {
   this._handleUpdateSplitterPosition(event.data);
 };
 
-scout.Desktop.prototype.onSplitterResizeEnd = function(event) {
+scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
   var splitterPosition = event.data;
 
   // Store size
@@ -183,7 +218,7 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
 scout.Desktop.prototype._addTab = function(tab) {
   this._allTabs.push(tab);
   this._setSelectedTab(tab);
-  this._layoutTaskBar();
+//  this._layoutTaskBar();
 };
 
 scout.Desktop.prototype._removeTab = function(tab) {
@@ -208,9 +243,15 @@ scout.Desktop.prototype._setSelectedTab = function(tab) {
     this._detachOutlineContent();
     this._deselectTab();
     this._selectTab(tab);
-    this.$bench.addClass('drop-shadow');
+    this._renderBenchDropShadow(true);
     this._layoutTaskBar();
     scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
+  }
+};
+
+scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
+  if (this._hasNavigation()) {
+    this.$bench.toggleClass('drop-shadow', showShadow);
   }
 };
 
@@ -242,7 +283,7 @@ scout.Desktop.prototype._deselectTab = function() {
  if (this._selectedTab) {
    this._selectedTab.deselect();
    this._selectedTab = null;
-   this.$bench.removeClass('drop-shadow');
+   this._renderBenchDropShadow(false);
  }
 };
 
@@ -291,7 +332,9 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
 scout.Desktop.prototype._renderView = function(view) {
   var tab = new scout.DesktopViewTab(view, this.$bench);
   tab.events.on('tabClicked', this._setSelectedTab.bind(this));
-  tab.renderTab(this._$viewTabBar);
+  if (this._hasTaskBar()) {
+    tab.renderTab(this._$viewTabBar);
+  }
   this._addTab(tab);
   scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
 };
@@ -473,3 +516,14 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   }
   this.navigation.bringToFront();
 };
+
+/**
+ * Called after width of navigation has been updated.
+ */
+scout.Desktop.prototype.navigationWidthUpdated = function(navigationWidth) {
+  if (this._hasNavigation()) {
+    this._$taskBar.css('left', navigationWidth);
+    this.$bench.css('left', navigationWidth);
+  }
+};
+

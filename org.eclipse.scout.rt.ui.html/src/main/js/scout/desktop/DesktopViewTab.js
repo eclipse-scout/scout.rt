@@ -31,7 +31,9 @@ scout.DesktopViewTab.prototype._uninstallPropertyChangeListener = function() {
 };
 
 scout.DesktopViewTab.prototype.removeTab = function($parent) {
-  this.$container.remove();
+  if (this.$container) {
+    this.$container.remove();
+  }
 };
 
 scout.DesktopViewTab.prototype.renderTab = function($parent) {
@@ -54,7 +56,7 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
 };
 
 scout.DesktopViewTab.prototype.select = function() {
-  this.$container.select(true);
+  this._cssSelect(true);
   if (!this._viewRendered) {
     this._renderView();
   }
@@ -74,6 +76,12 @@ scout.DesktopViewTab.prototype.select = function() {
   }
 };
 
+scout.DesktopViewTab.prototype._cssSelect = function(selected) {
+  if (this.$container) {
+    this.$container.select(selected);
+  }
+};
+
 scout.DesktopViewTab.prototype.deselect = function() {
   if (scout.keyStrokeManager.isAdapterInstalled(this._view.keyStrokeAdapter)) {
     scout.keyStrokeManager.uninstallAdapter(this._view.keyStrokeAdapter);
@@ -84,7 +92,7 @@ scout.DesktopViewTab.prototype.deselect = function() {
     $viewContainer.detach();
     this._viewAttached = false;
   }
-  this.$container.select(false);
+  this._cssSelect(false);
 };
 
 scout.DesktopViewTab.prototype._onClick = function(event) {

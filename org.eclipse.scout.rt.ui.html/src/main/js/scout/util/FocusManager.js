@@ -10,23 +10,22 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
     focusContexts: []
   };
 
-  // Set default options
-  if (options.focusFirstPart === undefined) {
-    options.focusFirstPart = true;
-  }
-
   var $container = session.$entryPoint;
   var portletPartId = $container.data('partid') || '0';
   var firstPartFocusApplied = false;
-  //Make container focusable and install focus context
+  // Make container focusable and install focus context
   $container.attr('tabindex', portletPartId);
 
-  if (options.focusFirstPart && !firstPartFocusApplied) {
-    firstPartFocusApplied = true;
+  var setInitialFocus = scout.helpers.nvl(options.setInitialFocus, true);
+  if (setInitialFocus) {
+    // FIXME: AWE/NBU: mit IMO diskutieren, was die anforderungen an fokus für die office integration sind
+    // a.) wir brauchen _immer_ einen focus context, weil sonst z.B. message-box handling kaputt geht
+    // b.) -vermutlich- darf in office die Html app keinen initialen fokus haben (Ivan fragen)
+    // Sobald diese frage geklärt ist, kann im DetachHelper#storeFocus der check für den focusContext entfernt
+    // werden, weil wir denken, dass wir immer einen focusContext haben sollten.
     this.installFocusContext($container, session.uiSessionId, undefined, true);
     $container[0].focus();
   }
-
 };
 
 scout.FocusManager.prototype.getFirstFocusableElement = function($container, $focusableElements) {
@@ -71,7 +70,7 @@ scout.FocusManager.prototype.focusFirstElement = function($container, $focusable
   }
 };
 
-scout.FocusManager.prototype.installFocusContextAsync = function($container, uiSessionId,$firstFocusElement, isRoot){
+scout.FocusManager.prototype.installFocusContextAsync = function($container, uiSessionId,$firstFocusElement, isRoot) {
   this.installationPending = true;
   setTimeout(function() {
     if ($container) {
@@ -86,16 +85,13 @@ scout.FocusManager.prototype.installFocusContext = function($container, uiSessio
   if ($container.attr('tabindex') === undefined) {
     $container.attr('tabindex', '-1');
   }
-
   // Set initial focus
   if ($firstFocusElement === 'auto') {
     $firstFocusElement = $(this.getFirstFocusableElement($container));
   }
   var focusContext = new scout.FocusContext($container, $firstFocusElement, uiSessionId, isRoot);
-
   $.log.trace('install focuscontext ');
   focusContext.activate(true);
-
   return this;
 };
 
@@ -165,6 +161,7 @@ scout.FocusManager.prototype.checkFocusContextIsActive = function(focusContext) 
   var index = focusContexts.indexOf(focusContext);
   return index === focusContexts.length - 1;
 };
+
 scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
   $.log.trace('validate focus, caller: ' + caller);
   if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
@@ -181,8 +178,8 @@ scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) 
   this._$container = $container;
   this.name = 'name' + $container.attr('class');
   this._$focusedElement = $focusedElement;
-  if(this._$focusedElement && this._$focusedElement.length>0 && this._$container[0]===this._$focusedElement[0]){
-    this._$lastFocusedInput=this._$focusedElement;
+  if (this._$focusedElement && this._$focusedElement.length > 0 && this._$container[0] === this._$focusedElement[0]) {
+    this._$lastFocusedInput = this._$focusedElement;
   }
   this._uiSessionId = uiSessionId;
   this._isRoot = isRoot;
@@ -257,7 +254,6 @@ scout.FocusContext.prototype.activate = function(disposeOld) {
   }
   scout.focusManager.activateFocusContext(this);
   if (this._$focusedElement && this._$focusedElement.length > 0) {
-
     $.log.trace('activated context: ' + this.name);
   }
   this._validateFocus();

@@ -88,19 +88,13 @@ scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
 
 // vertical splitter
 scout.DesktopNavigation.prototype.onResize = function(event) {
-  var w = Math.max(event.data, this.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
+  var newWidth = Math.max(event.data, this.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
 
-  this.$navigation.width(w);
+  this.$navigation.width(newWidth);
   this.htmlViewButtons.revalidateLayout();
-  this.desktop.$taskBar.css('left', w);
-  this.desktop.$bench.css('left', w);
+  this.desktop.navigationWidthUpdated(newWidth);
 
-  if (this.outline === undefined) {
-    // FIXME awe handle form-only mode
-    return;
-  }
-
-  if (w <= this.BREADCRUMB_SWITCH_WIDTH) {
+  if (newWidth <= this.BREADCRUMB_SWITCH_WIDTH) {
     if (!this.$navigation.hasClass('navigation-breadcrumb')) {
       this.$navigation.addClass('navigation-breadcrumb');
       this.outline.setBreadcrumbEnabled(true);
