@@ -196,6 +196,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return SELECTION_MODE_MULTI_RANGE;
   }
 
+  @Order(150)
+  protected int getConfiguredDisplayMode() {
+    return DISPLAY_MODE_CALENDAR_WEEK;
+  }
+
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
@@ -297,6 +302,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     //
     setLabel(getConfiguredLabel());
     setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
+    setDisplayMode(getConfiguredDisplayMode());
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
     setWorkDayCount(getConfiguredWorkDayCount());
@@ -945,8 +951,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {
