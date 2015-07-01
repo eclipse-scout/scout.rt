@@ -1,12 +1,21 @@
 scout.StringFieldKeyStrokeAdapter = function(field) {
   scout.StringFieldKeyStrokeAdapter.parent.call(this, field);
   this.keyStrokes.push(new scout.StringFieldEnterKeyStroke());
+  this.keyStrokes.push(new scout.StringFieldCtrlEnterKeyStroke(field));
 };
 scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
 scout.StringFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
   scout.StringFieldKeyStrokeAdapter.parent.prototype.drawKeyBox.call(this, drawedKeys);
 };
+
+scout.StringFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
+  if (this.preventBubbleUpKeys.indexOf(event.which) > -1) {
+    return true;
+  }
+  return false;
+};
+
 
 scout.StringFieldEnterKeyStroke = function() {
   scout.StringFieldEnterKeyStroke.parent.call(this);
@@ -40,9 +49,29 @@ scout.StringFieldEnterKeyStroke.prototype.checkAndDrawKeyBox = function($contain
   }
 };
 
-scout.StringFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
-  if (this.preventBubbleUpKeys.indexOf(event.which) > -1) {
+
+scout.StringFieldCtrlEnterKeyStroke = function(field) {
+  scout.StringFieldCtrlEnterKeyStroke.parent.call(this);
+  this.keyStroke = 'control-enter';
+  this._field = field;
+  this.initKeyStrokeParts();
+};
+scout.inherits(scout.StringFieldCtrlEnterKeyStroke, scout.KeyStroke);
+
+scout.StringFieldCtrlEnterKeyStroke.prototype.accept = function(event) {
+  var acceptKey = scout.StringFieldCtrlEnterKeyStroke.parent.prototype.accept.call(this, event);
+  if (acceptKey && this._field.hasAction) {
     return true;
   }
   return false;
+};
+
+scout.StringFieldCtrlEnterKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+  if (this._field.hasAction) {
+    scout.StringFieldCtrlEnterKeyStroke.parent.prototype.checkAndDrawKeyBox.call(this, $container, drawedKeys);
+  }
+};
+
+scout.StringFieldCtrlEnterKeyStroke.prototype.handle = function(event) {
+  this._field._onIconClick();
 };
