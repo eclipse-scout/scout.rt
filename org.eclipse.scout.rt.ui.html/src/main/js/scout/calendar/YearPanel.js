@@ -182,11 +182,11 @@ scout.YearPanel.prototype._isDisplayModeWork = function() {
 };
 
 scout.YearPanel.prototype._isDisplayModeCalendarWeek = function() {
-  return this.displayMode === scout.Planner.DisplayMode.MONTH;
+  return this.displayMode === scout.Planner.DisplayMode.CALENDAR_WEEK;
 };
 
 scout.YearPanel.prototype._isDisplayModeYear = function() {
-  return this.displayMode === scout.Planner.DisplayMode.WORK;
+  return this.displayMode === scout.Planner.DisplayMode.YEAR;
 };
 
 /* -- events ---------------------------------------- */
@@ -234,6 +234,9 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     } else if (this._isDisplayModeWork()) {
       startHover = new Date(year, month, date - day);
       endHover = new Date(year, month, date - day + 4);
+    } else if (this._isDisplayModeYear()) {
+      startHover = new Date(year, month, 1);
+      endHover = startHover;
     } else {
       startHover = new Date(year, month, date - day);
       endHover = startHover;
