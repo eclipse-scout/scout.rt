@@ -26,6 +26,11 @@ scout.Desktop = function() {
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
+scout.DesktopStyle = {
+  DEFAULT: 'DEFAULT',
+  BENCH: 'BENCH'
+};
+
 scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) {
   if (propertyName === 'viewButtons') {
     adapter.desktop = this;
@@ -422,21 +427,25 @@ scout.Desktop.prototype._onModelFormRemoved = function(event) {
   this.removeForm(event.form);
 };
 
+scout.Desktop.prototype._onModelOutlineChanged = function(event) {
+  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
+    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+  }
+};
+
 scout.Desktop.prototype._isDialog = function(form) {
   return form.displayHint === 'dialog';
 };
 
 scout.Desktop.prototype.onModelAction = function(event) {
-  var form;
   if (event.type === 'formAdded') {
     this._onModelFormAdded(event);
   } else if (event.type === 'formRemoved') {
     this._onModelFormRemoved(event);
   } else if (event.type === 'formEnsureVisible') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
-    this._showForm(form);
+    this._showForm(this.session.getOrCreateModelAdapter(event.form, this));
   } else if (event.type === 'outlineChanged') {
-    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+    this._onModelOutlineChanged(event);
   } else if (event.type === 'messageBoxAdded') {
     this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
   } else if (event.type === 'fileChooserAdded') {

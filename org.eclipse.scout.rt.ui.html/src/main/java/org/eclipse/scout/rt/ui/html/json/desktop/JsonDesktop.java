@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop.DesktopStyle;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.TargetWindow;
@@ -75,10 +76,14 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
-    if (!isFormBased()) {
+    if (hasDefaultStyle()) {
       attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
       attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
     }
+  }
+
+  private boolean hasDefaultStyle() {
+    return DesktopStyle.DEFAULT == getModel().getDesktopStyle();
   }
 
   /**
@@ -92,7 +97,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       if (action instanceof IKeyStroke || action instanceof IViewButton) {
         continue; // skip
       }
-      //  && !a.getClass().getName().startsWith("org.eclipsescout.demo")
       result.addOrdered(action);
     }
     return result.getOrderedList();
@@ -144,6 +148,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
+    json.put(IDesktop.PROP_DESKTOP_STYLE, getModel().getDesktopStyle());
     putAdapterIdsProperty(json, "views", getViews());
     putAdapterIdsProperty(json, "dialogs", getDialogs());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
@@ -151,17 +156,12 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
-    if (!isFormBased()) {
+    if (hasDefaultStyle()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
       putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
     }
     return json;
-  }
-
-  // FIXME AWE: send this to JS-client, remove desktop-navigation and desktop-taskbar in UI when formBased is true
-  protected boolean isFormBased() {
-    return false;
   }
 
   protected List<IForm> getViews() {
@@ -186,7 +186,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected boolean isFormBlocked(IForm form) {
     // FIXME CGU: ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
-    return (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm));
+    return (hasDefaultStyle() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm));
   }
 
   protected void handleModelDesktopEvent(DesktopEvent event) {
@@ -254,7 +254,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected void handleModelOutlineChanged(IOutline outline) {
-    if (isFormBased()) {
+    if (!hasDefaultStyle()) {
       return;
     }
     JSONObject jsonEvent = new JSONObject();
@@ -321,6 +321,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected void handleUiOutlineChanged(JsonEvent event) {
+    if (!hasDefaultStyle()) {
+      return;
+    }
     String outlineId = event.getData().getString("outlineId");
     IJsonAdapter<?> jsonOutline = getUiSession().getJsonAdapter(outlineId);
     getModel().setOutline((IOutline) jsonOutline.getModel());
