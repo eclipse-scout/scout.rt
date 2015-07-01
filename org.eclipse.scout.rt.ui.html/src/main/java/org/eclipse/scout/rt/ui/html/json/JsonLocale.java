@@ -14,7 +14,6 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -78,12 +77,7 @@ public class JsonLocale implements IJsonObject {
   }
 
   protected static DecimalFormat getDefaultDecimalFormat(Locale locale) {
-    NumberFormat numberFormat = BEANS.get(NumberFormatProvider.class).getNumberInstance(locale);
-    if (numberFormat instanceof DecimalFormat) {
-      return (DecimalFormat) numberFormat;
-    }
-    LOG.info("No locale specific decimal format available, using default locale");
-    return new DecimalFormat();
+    return BEANS.get(NumberFormatProvider.class).getNumberInstance(locale);
   }
 
   protected static SimpleDateFormat getDefaultSimpleDateFormat(Locale locale) {
