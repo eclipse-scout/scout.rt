@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
 import java.util.Set;
-import java.util.regex.Matcher;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -55,23 +54,9 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> imple
 
       @Override
       public Object prepareValueForToJson(Object value0) {
-        value0 = super.prepareValueForToJson(value0);
-        if (value0 != null) {
-          Matcher m = BinaryResourceUrlUtility.ICON_REGEX_PATTERN.matcher(String.valueOf(value0));
-          StringBuffer ret = new StringBuffer(); // StringBuffer must be used, Java API does not accept a StringBuilder
-          while (m.find()) {
-            m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createIconUrl(m.group(2)) + m.group(1));
-          }
-          m.appendTail(ret);
-          m = BinaryResourceUrlUtility.BINARY_RESOURCE_REGEX_PATTERN.matcher(ret.toString());
-          ret = new StringBuffer();
-          while (m.find()) {
-            m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(JsonHtmlField.this, m.group(2)) + m.group(1));
-          }
-          m.appendTail(ret);
-          return ret.toString();
-        }
-        return null;
+        String value = (String) value0;
+        value = BinaryResourceUrlUtility.replaceIconIdHandlerWithUrl(value);
+        return BinaryResourceUrlUtility.replaceBinaryResourceHandlerWithUrl(JsonHtmlField.this, value);
       }
     });
 

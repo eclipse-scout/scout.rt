@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IOUtility;
@@ -73,6 +74,22 @@ public class BinaryResourceUrlUtility {
   }
 
   /**
+   * Helper method for {@link #ICON_REGEX_PATTERN} to replace all occurrences with the proper url.
+   */
+  public static String replaceIconIdHandlerWithUrl(String str) {
+    if (str == null) {
+      return null;
+    }
+    Matcher m = BinaryResourceUrlUtility.ICON_REGEX_PATTERN.matcher(String.valueOf(str));
+    StringBuffer ret = new StringBuffer(); // StringBuffer must be used, Java API does not accept a StringBuilder
+    while (m.find()) {
+      m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createIconUrl(m.group(2)) + m.group(1));
+    }
+    m.appendTail(ret);
+    return ret.toString();
+  }
+
+  /**
    * @return a relative URL for a resource handled by an adapter, see
    *         {@link ResourceRequestInterceptor#loadDynamicAdapterResource(javax.servlet.http.HttpServletRequest, String)}
    *         <p>
@@ -91,4 +108,21 @@ public class BinaryResourceUrlUtility {
     }
     return "dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + IOUtility.urlEncode(filename);
   }
+
+  /**
+   * Helper method for {@link #BINARY_RESOURCE_REGEX_PATTERN} to replace all occurrences with the proper url.
+   */
+  public static String replaceBinaryResourceHandlerWithUrl(IJsonAdapter<?> jsonAdapter, String str) {
+    if (str == null) {
+      return null;
+    }
+    Matcher m = BinaryResourceUrlUtility.BINARY_RESOURCE_REGEX_PATTERN.matcher(str);
+    StringBuffer ret = new StringBuffer(); // StringBuffer must be used, Java API does not accept a StringBuilder
+    while (m.find()) {
+      m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(jsonAdapter, m.group(2)) + m.group(1));
+    }
+    m.appendTail(ret);
+    return ret.toString();
+  }
+
 }
