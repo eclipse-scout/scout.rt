@@ -528,6 +528,41 @@
     return this.position().left + this.outerWidth(true) - this.cssMarginRight() - this.cssBorderRightWidth();
   };
 
+  $.fn.copyCss = function($origin, props) {
+    var properties = props.split(' ');
+    var newProperties = [];
+    var $this = this;
+    properties.forEach(function(prop) {
+      if (prop === 'margin' || prop === 'padding') {
+        newProperties.push(prop + '-top');
+        newProperties.push(prop + '-right');
+        newProperties.push(prop + '-bottom');
+        newProperties.push(prop + '-left');
+      } else if (prop === 'border') {
+        newProperties.push('border-top-style');
+        newProperties.push('border-right-style');
+        newProperties.push('border-bottom-style');
+        newProperties.push('border-left-style');
+
+        newProperties.push('border-top-color');
+        newProperties.push('border-right-color');
+        newProperties.push('border-bottom-color');
+        newProperties.push('border-left-color');
+
+        newProperties.push('border-top-width');
+        newProperties.push('border-right-width');
+        newProperties.push('border-bottom-width');
+        newProperties.push('border-left-width');
+      } else {
+        newProperties.push(prop);
+      }
+    });
+    newProperties.forEach(function(prop) {
+      $this.css(prop, $origin.css(prop));
+    });
+    return $this;
+  };
+
   $.fn.disableSpellcheck = function() {
     return this.attr('spellcheck', false);
   };

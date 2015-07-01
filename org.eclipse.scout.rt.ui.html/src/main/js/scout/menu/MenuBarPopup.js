@@ -54,26 +54,50 @@ scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
 };
 
 scout.MenuBarPopup.prototype._position = function($container) {
-  var openingDirection, left, top, overlap, pos;
+  var openingDirectionX, openingDirectionY, left, top, overlap, pos;
 
   this.alignTo();
-  pos = this.$container.offset();
-  overlap = this.overlap($container, {x: pos.left, y: pos.top});
+  pos = $container.offset();
+  overlap = this.overlap($container, {
+    x: pos.left,
+    y: pos.top
+  });
   if (overlap.y > 0) {
     // switch opening direction
-    openingDirection = 'up';
-    this.alignTo(openingDirection);
+    openingDirectionY = 'up';
+  }
+  if (overlap.x > 0) {
+    // switch opening direction
+    openingDirectionX = 'left';
+  }
+  if (openingDirectionX || openingDirectionY) {
+    // Align again if openingDirection has to be switched
+    this.alignTo(openingDirectionX, openingDirectionY);
   }
 };
 
-scout.MenuBarPopup.prototype.alignTo = function(openingDirectionY) {
+scout.MenuBarPopup.prototype.alignTo = function(openingDirectionX, openingDirectionY) {
   var pos, headSize, bodySize, bodyWidth;
 
+  if (this.menu.$container.hasClass('right-aligned')) {
+    openingDirectionX = 'left';
+  }
+  openingDirectionX = openingDirectionX || 'right';
   openingDirectionY = openingDirectionY || 'down';
   this.$container.removeClass('up down');
   this.$body.removeClass('up down');
   this.$container.addClass(openingDirectionY);
   this.$body.addClass(openingDirectionY);
+
+  // Make sure the elements inside the header have the same style as to blueprint (menu)
+  // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint
+  this.$head.copyCss(this.menu.$container, 'line-height');
+  var $blueprintChildren = this.menu.$container.children();
+  this.$head.children().each(function(i) {
+    var $headChild = $(this);
+    var $blueprintChild = $blueprintChildren.eq(i);
+    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align');
+  });
 
   pos = this.menu.$container.offset();
   headSize = scout.graphics.getSize(this.$head, true);
@@ -88,19 +112,22 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionY) {
 
   // horiz. alignment
   var left = pos.left,
-    top = pos.top - 6,
+    top = pos.top,
     headInsets = scout.graphics.getInsets(this.$head),
+    menuInsets = scout.graphics.getInsets(this.menu.$container),
     bodyTop = 0,
     headTop = 0,
     decoTop = 0;
 
+  top = pos.top;
   if (openingDirectionY === 'up') {
     top -= bodySize.height;
     headTop = bodySize.height;
-    decoTop = headTop;
-  } else if (openingDirectionY === 'down'){
+    decoTop = headTop - 1; // -1 is body border (the purpose of deco is to hide the body border)
+  } else if (openingDirectionY === 'down') {
     bodyTop += headSize.height;
     decoTop = bodyTop;
+    top -= headInsets.top - menuInsets.top;
   }
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
@@ -109,16 +136,17 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionY) {
   this.$body.cssTop(bodyTop);
   this.$deco.cssTop(decoTop);
 
-  if (this.menu.$container.hasClass('right-aligned')) {
+  if (openingDirectionX === 'left') {
     // when we use float:right, browser uses fractions of pixels, that's why we must
     // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
     var widthDiff = bodyWidth - headSize.width,
       subPixelCorr = left - Math.floor(left);
-    left -= widthDiff + headInsets.left;
-    this.$head.cssLeft(widthDiff + 1);
-    this.$body.cssLeft(subPixelCorr + 1);
+    left -= widthDiff + headInsets.left - menuInsets.left;
+    this.$head.cssLeft(widthDiff);
+    this.$body.cssLeft(subPixelCorr);
     this.$deco.cssLeft(widthDiff + 2).width(headSize.width - 2 + subPixelCorr);
     $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
+    //FIXME CGU remove this block. Fix deco width diff
   } else if (this.menu.$container.hasClass('taskbar-tool-item')) {
     top = pos.top;
     bodyTop = headSize.height - 1;
