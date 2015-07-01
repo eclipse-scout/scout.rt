@@ -124,10 +124,17 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return null;
   }
 
+  /**
+   * Define whether selection tracking should be enabled (might increase number of events between client and fronted
+   * server).
+   * <p>
+   * If <code>false</code>, {@link #getSelectionStart()} and {@link #getSelectionEnd()} might not reflect the actual
+   * selection.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(340)
-  protected boolean getConfiguredSelectAllOnFocus() {
-    return true;
+  protected boolean getConfiguredSelectionTrackingEnabled() {
+    return false;
   }
 
   /**
@@ -224,6 +231,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
       configuredDropType = 0;
     }
     setDropType(configuredDropType);
+    setSelectionTrackingEnabled(getConfiguredSelectionTrackingEnabled());
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setSpellCheckEnabled(computeSpellCheckEnabled());
   }
@@ -352,14 +360,42 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     }
   }
 
+  /**
+   * Use {@link #getConfiguredSelectionTrackingEnabled()}, {@link #isSelectionTrackingEnabled()} and
+   * {@link #setSelectionTrackingEnabled(boolean)} to enable selection tracking. If
+   * {@link #isSelectionTrackingEnabled()} is not <code>true</code> the return value of this method might not reflect
+   * the actual selection start.
+   */
   @Override
   public int getSelectionStart() {
     return propertySupport.getPropertyInt(PROP_SELECTION_START);
   }
 
+  /**
+   * Use {@link #getConfiguredSelectionTrackingEnabled()}, {@link #isSelectionTrackingEnabled()} and
+   * {@link #setSelectionTrackingEnabled(boolean)} to enable selection tracking. If
+   * {@link #isSelectionTrackingEnabled()} is not <code>true</code> the return value of this method might not reflect
+   * the actual selection end.
+   */
   @Override
   public int getSelectionEnd() {
     return propertySupport.getPropertyInt(PROP_SELECTION_END);
+  }
+
+  /**
+   * @see {@link #getConfiguredSelectionTrackingEnabled()}
+   */
+  @Override
+  public boolean isSelectionTrackingEnabled() {
+    return propertySupport.getPropertyBool(PROP_SELECTION_TRACKING_ENABLED);
+  }
+
+  /**
+   * @see {@link #getConfiguredSelectionTrackingEnabled()}
+   */
+  @Override
+  public void setSelectionTrackingEnabled(boolean selectionTrackingEnabled) {
+    propertySupport.setPropertyBool(PROP_SELECTION_TRACKING_ENABLED, selectionTrackingEnabled);
   }
 
   @Override
@@ -489,7 +525,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-  implements IStringFieldExtension<OWNER_FIELD> {
+      implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);

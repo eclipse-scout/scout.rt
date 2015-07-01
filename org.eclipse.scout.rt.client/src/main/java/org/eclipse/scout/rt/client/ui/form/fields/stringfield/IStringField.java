@@ -29,6 +29,7 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   String PROP_SELECTION_START = "selectionStart";
   String PROP_SELECTION_END = "selectionEnd";
   String PROP_SPELL_CHECK_ENABLED = "spellCheckEnabled";
+  String PROP_SELECTION_TRACKING_ENABLED = "selectionTrackingEnabled";
 
   /* enum for formats */
   String FORMAT_UPPER = "A";
@@ -73,6 +74,10 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   int getSelectionEnd();
 
   void select(int startIndex, int endIndex);
+
+  boolean isSelectionTrackingEnabled();
+
+  void setSelectionTrackingEnabled(boolean selectionTrackingEnabled);
 
   @Override
   IStringFieldUIFacade getUIFacade();
