@@ -2011,6 +2011,7 @@ scout.Table.prototype._renderTableFooter = function() {
     if (!this.footer) {
       this.footer = this._createFooter();
       this.addChild(this.footer);
+      this.footer.render();
     } else {
       this.footer.update();
     }

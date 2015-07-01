@@ -2,7 +2,6 @@ scout.TableFooter = function(table) {
   scout.TableFooter.parent.call(this);
   this._table = table;
   this.filterKeyStrokeAdapter = new scout.FilterInputKeyStrokeAdapter(this._table);
-  this.render(table.$container);
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
@@ -11,6 +10,7 @@ scout.TableFooter.CONTAINER_SIZE = 345;
 
 scout.TableFooter.prototype._render = function($parent) {
   var filter, that = this;
+  $parent = $parent||this._table.$container;
 
   this.$container = $parent.appendDiv('table-footer');
   this.$controlContainer = this.$container.appendDiv('control-container').hide();
