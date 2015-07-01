@@ -1,6 +1,6 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
-  this._addAdapterProperties('defaultDetailForm', 'views', 'dialogs', 'messageBoxes');
+  this._addAdapterProperties('defaultDetailForm');
   this.navigateUpInProgress = false; // see NavigateUpButton.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
@@ -24,10 +24,6 @@ scout.Outline.prototype._installKeyStrokeAdapter = function() {
  */
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
-
-  this.views.forEach(this.session.desktop._renderView.bind(this.session.desktop));
-  this.dialogs.forEach(this.session.desktop._renderDialog.bind(this.session.desktop));
-
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
   }
@@ -228,44 +224,9 @@ scout.Outline.prototype._onPageChanged = function(event) {
   }
 };
 
-scout.Outline.prototype._onModelFormAdded = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-
-  if (this.session.desktop._isDialog(form)) {
-    this.dialogs.push(form);
-  } else {
-    this.views.push(form);
-  }
-
-  this.session.desktop._addForm(form);
-};
-
-scout.Outline.prototype._onModelFormRemoved = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-
-  if (this.session.desktop._isDialog(form)) {
-    scout.arrays.remove(this.dialogs, form);
-  } else {
-    scout.arrays.remove(this.views, form);
-  }
-
-  this.session.desktop._removeForm(form);
-};
-
-scout.Outline.prototype._onModelFormEnsureVisible = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-  this.session.desktop._showForm(form);
-};
-
 scout.Outline.prototype.onModelAction = function(event) {
   if (event.type === 'pageChanged') {
     this._onPageChanged(event);
-  } else if (event.type === 'formAdded') {
-    this._onModelFormAdded(event);
-  } else if (event.type === 'formRemoved') {
-    this._onModelFormRemoved(event);
-  } else if (event.type === 'formEnsureVisible') {
-    this._onModelFormEnsureVisible(event);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }
@@ -281,15 +242,4 @@ scout.Outline.prototype.sendToBack = function() {
 
 scout.Outline.prototype.bringToFront = function() {
   this.$container.removeClass('in-background');
-};
-
-scout.Outline.prototype.getGlassPaneLayout = function($glassPane) {
-  var position = this.$container.position();
-
-  return {
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0
-  };
 };

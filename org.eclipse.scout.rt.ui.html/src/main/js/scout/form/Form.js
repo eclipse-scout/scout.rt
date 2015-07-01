@@ -1,10 +1,9 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
   this.rootGroupBox;
-  this._addAdapterProperties('rootGroupBox', 'views', 'dialogs', 'messageBoxes');
+  this._addAdapterProperties(['rootGroupBox']);
   this._locked;
-  this._$modalityGlassPane;
-  this._originalContainer;
+  this._$glassPane;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -18,52 +17,16 @@ scout.Form.prototype.init = function(model, session) {
 };
 
 scout.Form.prototype._render = function($parent) {
-  if (this.modalityHint !== 'none') {
-    var layout;
-    switch(this.modalityHint) {
-      case 'application':
-        this._$modalityGlassPane = $.makeDiv('glasspane').appendTo(this.session.desktop.$container);
-        break;
-      case 'parent':
-        this._$modalityGlassPane = $.makeDiv('glasspane').appendTo(this.parent.$container);
-        break;
-    }
-
-    this._layoutModalityGlassPane();
-  }
-
-
   if (this.isDialog()) {
-//    $parent = $.makeDiv('glasspane');
     // FIXME BSH Try to consolidate management of glass-panes in desktop (but: Session.showFatalMessage())
-//    this._$applicationGlassPane = scout.fields.new$Glasspane(this.session.uiSessionId).appendTo($parent);
-//    this._$applicationGlassPane = $.makeDiv('dwi').appendTo($parent);
-
-//    $parent = this._$applicationGlassPane;
+    this._$glassPane = scout.fields.new$Glasspane(this.session.uiSessionId).appendTo($parent);
+    $parent = this._$glassPane;
   }
 
   this.$container = $('<div>')
     .appendTo($parent)
     .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: (modal dialog) rename class 'form' to view so we can use the displayHint as class-name
     .data('model', this);
-
-   var css = {
-       position: "absolute",
-       top: 0, left: 0, bottom: 0, right:100
-   };
-
-   if (this.isDialog() && this.modalityHint == 'application' || this.modalityHint == 'parent') {
-     css.zIndex=100;
-   }
-
-   this.$container.css(css);
-
-   this._originalContainer = this.$container;
-
-
-//  this.$container.css('position', 'relative');
-//  this.$container.css('z-index', 10);
-
 
   if (this.isDialog()) {
     var $handle = this.$container.appendDiv('drag-handle');
@@ -95,11 +58,8 @@ scout.Form.prototype._render = function($parent) {
   if (this.isDialog()) {
     this.$container.addClass('shown');
     $.log.warn('startInstall');
-//    this._$applicationGlassPane.installFocusContext('auto', this.session.uiSessionId);
+    this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
   }
-
-  this.views.forEach(this.session.desktop._renderView.bind(this));
-  this.dialogs.forEach(this.session.desktop._renderDialog.bind(this));
 };
 
 scout.Form.prototype._renderProperties = function() {
@@ -177,13 +137,8 @@ scout.Form.prototype.appendTo = function($parent) {
 
 scout.Form.prototype._remove = function() {
   scout.Form.parent.prototype._remove.call(this);
-
-  // Remove the glasspane
-  if (this._$modalityGlassPane) {
-    $(this._$modalityGlassPane).fadeOut('slow', function() {
-      this._$modalityGlassPane.remove();
-      this._$modalityGlassPane = null;
-    }.bind(this));
+  if (this._$glassPane) {
+    this._$glassPane.fadeOutAndRemove();
   }
 };
 
@@ -211,6 +166,14 @@ scout.Form.prototype._renderInitialFocus = function(formFieldId) {
 };
 
 scout.Form.prototype._onFormClosed = function(event) {
+  // 'formClosed' implies a 'formRemoved' event on the desktop. Because the form adapter is disposed
+  // after 'formClosed', the 'formRemoved' event is not sent. Therefore, we manually call the
+  // remove method on the desktop (e.g. to remove the tab).
+  if (this.session.desktop) {
+    this.session.desktop.removeForm(this.id);
+  }
+
+  // Now destroy the form, it will never be used again.
   this.destroy();
 };
 
@@ -221,81 +184,14 @@ scout.Form.prototype._onRequestFocus = function(formFieldId) {
   }
 };
 
-scout.Form.prototype._onModelFormAdded = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-
-  if (this.session.desktop._isDialog(form)) {
-    this.dialogs.push(form);
-  } else {
-    this.views.push(form);
-  }
-
-  this.session.desktop._addForm(form);
-};
-
-scout.Form.prototype._onModelFormRemoved = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-
-  if (this.session.desktop._isDialog(form)) {
-    scout.arrays.remove(this.dialogs, form);
-  } else {
-    scout.arrays.remove(this.views, form);
-  }
-
-  this.session.desktop._removeForm(form);
-};
-
-scout.Form.prototype._onModelFormEnsureVisible = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-  this.session.desktop._showForm(form);
-};
-
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type === 'formClosed') {
     this._onFormClosed(event);
-  } else if (event.type === 'requestFocus') {
+  }
+  else if (event.type === 'requestFocus') {
     this._onRequestFocus(event.formField);
-  } else if (event.type === 'formAdded') {
-    this._onModelFormAdded(event);
-  } else if (event.type === 'formRemoved') {
-    this._onModelFormRemoved(event);
-  } else if (event.type === 'formEnsureVisible') {
-    this._onModelFormEnsureVisible(event);
-  } else {
+  }
+  else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };
-
-scout.Form.prototype._layoutModalityGlassPane = function() {
-  var layout;
-  switch(this.modalityHint) {
-    case 'application':
-      layout = {
-        top:      0,
-        left:     0,
-        bottom:   0,
-        right:    0
-      };
-      break;
-    case 'parent':
-      layout = this.parent.getGlassPaneLayout();
-      break;
-  }
-
-  layout.zIndex = 10;
-  layout.position = 'absolute';
-
-  this._$modalityGlassPane.css(layout);
-};
-
-scout.Form.prototype.getGlassPaneLayout = function() {
-  var position = this.$container.position();
-
-  return {
-    top: position.top,
-    left: position.left,
-    bottom: 0,
-    right: 0
-  };
-};
-

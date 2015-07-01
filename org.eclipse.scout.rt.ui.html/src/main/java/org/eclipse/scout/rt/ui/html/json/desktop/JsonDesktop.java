@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.TargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -35,15 +37,12 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
-import org.eclipse.scout.rt.ui.html.json.form.FormFilter;
-import org.eclipse.scout.rt.ui.html.json.form.FormParentFilter;
-import org.eclipse.scout.rt.ui.html.json.messagebox.MessageBoxParentFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyObserver<DESKTOP> implements IBinaryResourceProvider {
+public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IBinaryResourceProvider {
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
 
@@ -53,19 +52,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   public static final String PROP_FILE_CHOOSER = "fileChooser";
   public static final String PROP_ACTIVE_FORM = "activeForm";
 
-  private final DownloadHandlerStorage m_downloads;
+  private DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
 
-  private final FormFilter m_formFilter;
-  private final FormParentFilter m_desktopFormFilter;
-  private final MessageBoxParentFilter m_desktopMessageBoxFilter;
-
-  public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
-    super(desktop, uiSession, id, parent);
+  public JsonDesktop(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
     m_downloads = new DownloadHandlerStorage();
-    m_formFilter = new FormFilter(isFormBased());
-    m_desktopFormFilter = new FormParentFilter(desktop);
-    m_desktopMessageBoxFilter = new MessageBoxParentFilter(desktop);
   }
 
   @Override
@@ -76,10 +68,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapters(getModel().getViews(getModel()), m_formFilter);
-    attachAdapters(getModel().getDialogs(getModel()), m_formFilter);
-    attachAdapters(getModel().getMessageBoxes(getModel()));
-    attachGlobalAdapters(getModel().getFileChooserStack()); // TODO [dwi] incomplete
+    attachGlobalAdapters(getViews());
+    attachGlobalAdapters(getDialogs());
+    attachGlobalAdapters(getModel().getMessageBoxStack());
+    attachGlobalAdapters(getModel().getFileChooserStack());
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
@@ -127,21 +119,21 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   @Override
-  protected void initJsonProperties(DESKTOP model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<T>(IDesktop.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getTitle();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_AUTO_TAB_KEY_STROKES_ENABLED, model) {
+    putJsonProperty(new JsonProperty<T>(IDesktop.PROP_AUTO_TAB_KEY_STROKES_ENABLED, model) {
       @Override
       protected Object modelValue() {
         return getModel().isAutoTabKeyStrokesEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_AUTO_TAB_KEY_STROKE_MODIFIER, model) {
+    putJsonProperty(new JsonProperty<T>(IDesktop.PROP_AUTO_TAB_KEY_STROKE_MODIFIER, model) {
       @Override
       protected Object modelValue() {
         return getModel().getAutoTabKeyStrokeModifier();
@@ -152,9 +144,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putAdapterIdsProperty(json, "views", getModel().getViews(getModel()), m_formFilter);
-    putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel()), m_formFilter);
-    putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
+    putAdapterIdsProperty(json, "views", getViews());
+    putAdapterIdsProperty(json, "dialogs", getDialogs());
+    putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChooserStack());
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
@@ -170,6 +162,31 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   // FIXME AWE: send this to JS-client, remove desktop-navigation and desktop-taskbar in UI when formBased is true
   protected boolean isFormBased() {
     return false;
+  }
+
+  protected List<IForm> getViews() {
+    List<IForm> views = new ArrayList<>();
+    for (IForm form : getModel().getViewStack()) {
+      if (!isFormBlocked(form)) {
+        views.add(form);
+      }
+    }
+    return views;
+  }
+
+  protected List<IForm> getDialogs() {
+    List<IForm> dialogs = new ArrayList<>();
+    for (IForm form : getModel().getDialogStack()) {
+      if (!isFormBlocked(form)) {
+        dialogs.add(form);
+      }
+    }
+    return dialogs;
+  }
+
+  protected boolean isFormBlocked(IForm form) {
+    // FIXME CGU: ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
+    return (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm));
   }
 
   protected void handleModelDesktopEvent(DesktopEvent event) {
@@ -194,9 +211,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         break;
       case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
         handleModelMessageBoxAdded(event.getMessageBox());
-        break;
-      case DesktopEvent.TYPE_MESSAGE_BOX_REMOVED:
-        handleModelMessageBoxRemoved(event.getMessageBox());
         break;
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
@@ -250,38 +264,39 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelFormAdded(IForm form) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(form, new AndFilter<>(m_desktopFormFilter, m_formFilter));
-    if (jsonAdapter != null) {
-      addActionEvent("formAdded", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+    if (isFormBlocked(form)) {
+      return;
     }
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
+    putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
+    addActionEvent("formAdded", jsonEvent);
   }
 
   protected void handleModelFormRemoved(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getAdapter(form, new AndFilter<>(m_desktopFormFilter, m_formFilter));
+    IJsonAdapter<?> jsonAdapter = getAdapter(form);
+    // When the form is closed, it is disposed automatically. Therefore, we cannot resolve
+    // the adapter anymore, hence the null check. (This is no problem, because 'formClosed'
+    // event implies 'formRemoved', see Form.js/_onFormClosed.)
     if (jsonAdapter != null) {
-      addActionEvent("formRemoved", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+      JSONObject jsonEvent = new JSONObject();
+      putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
+      addActionEvent("formRemoved", jsonEvent);
     }
   }
 
   protected void handleModelFormEnsureVisible(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getAdapter(form, new AndFilter<>(m_desktopFormFilter, m_formFilter));
-    if (jsonAdapter != null) {
-      addActionEvent("formEnsureVisible", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
-    }
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = getAdapter(form);
+    putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
+    addActionEvent("formEnsureVisible", jsonEvent);
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_desktopMessageBoxFilter);
-    if (jsonAdapter != null) {
-      addActionEvent("messageBoxAdded", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
-    }
-  }
-
-  protected void handleModelMessageBoxRemoved(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_desktopMessageBoxFilter);
-    if (jsonAdapter != null) {
-      addActionEvent("messageBoxRemoved", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
-    }
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox);
+    putProperty(jsonEvent, PROP_MESSAGE_BOX, jsonAdapter.getId());
+    addActionEvent("messageBoxAdded", jsonEvent);
   }
 
   protected void handleModelDesktopClosed() {

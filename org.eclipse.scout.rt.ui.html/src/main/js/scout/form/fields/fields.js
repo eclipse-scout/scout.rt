@@ -8,11 +8,11 @@ scout.fields = {
 
   new$Glasspane: function(uiSessionId) {
     var $glassPane = $.makeDiv('glasspane');
-//    var keyStrokeAdapter = new scout.GlassPaneKeyStrokeAdapter($glassPane, uiSessionId);
-//    scout.keyStrokeManager.installAdapter($glassPane, keyStrokeAdapter);
-//    $glassPane.on('remove', function () {
-//      scout.keyStrokeManager.uninstallAdapter(keyStrokeAdapter);
-//    });
+    var keyStrokeAdapter = new scout.GlassPaneKeyStrokeAdapter($glassPane, uiSessionId);
+    scout.keyStrokeManager.installAdapter($glassPane, keyStrokeAdapter);
+    $glassPane.on('remove', function () {
+      scout.keyStrokeManager.uninstallAdapter(keyStrokeAdapter);
+    });
     return $glassPane;
   }
 

@@ -55,7 +55,6 @@
 
 .popup.form-tool-popup > .popup-body {
   border-bottom: 1px solid @border-color;
-  z-index:20;
 }
 
 .popup-head.taskbar-tool-item.has-submenu::after {
@@ -366,8 +365,7 @@
   left: 0;
   bottom: 0;
   right: 0;
-  /* background-color: rgba(0, 0, 0, 0.2); */
-  background-color: rgba(255, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.2);
   .animation(fadeIn ease-in 1);
   .animation-duration(0.25s);
   outline: none;
@@ -384,14 +382,4 @@
       .animation-duration(0.25s);
     }
   }
-}
-
-.dwi {
-  position: absolute;
-  top: 20px;
-  left: 100px;
-  bottom: 0;
-  background-color: rgba(255, 0, 0, 0.5);
-  right: 0;
-  z-index: 9;
 }

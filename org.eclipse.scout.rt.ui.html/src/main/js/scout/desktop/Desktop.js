@@ -102,7 +102,6 @@ scout.Desktop.prototype._render = function($parent) {
     this._handleUpdateSplitterPosition(this.splitter.positoin);
   }
 
-  // [dwi] for each form
   this.views.forEach(this._renderView.bind(this));
   this.dialogs.forEach(this._renderDialog.bind(this));
   // TODO BSH How to determine order of messageboxes and filechoosers?
@@ -375,6 +374,23 @@ scout.Desktop.prototype.setOutline = function(outline) {
   this.navigation.onOutlineChanged(this.outline);
 };
 
+scout.Desktop.prototype.removeForm = function(id) {
+  var form = this.session.getOrCreateModelAdapter(id, this);
+  if (!form.rendered) {
+    // Form has already been removed (either by form close or form removed event) -> no need to do it twice
+    return;
+  }
+  if (this._isDialog(form)) {
+    scout.arrays.remove(this.dialogs, form);
+  } else {
+    scout.arrays.remove(this.views, form);
+  }
+  if (form.tab) {
+    this._removeTab(form.tab);
+  }
+  form.remove();
+};
+
 scout.Desktop.prototype._renderMessageBox = function(messageBox) {
   messageBox.render(this.$container);
 };
@@ -393,17 +409,17 @@ scout.Desktop.prototype.onFileChooserClosed = function(fileChooser) {
 
 scout.Desktop.prototype._onModelFormAdded = function(event) {
   var form = this.session.getOrCreateModelAdapter(event.form, this);
-  this._addForm(form, true);
+  if (this._isDialog(form)) {
+    this.dialogs.push(form);
+    this._renderDialog(form);
+  } else {
+    this.views.push(form);
+    this._renderView(form);
+  }
 };
 
 scout.Desktop.prototype._onModelFormRemoved = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-  this._removeForm(form, true);
-};
-
-scout.Desktop.prototype._onModelFormEnsureVisible = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-  this._showForm(form);
+  this.removeForm(event.form);
 };
 
 scout.Desktop.prototype._isDialog = function(form) {
@@ -417,13 +433,12 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else if (event.type === 'formRemoved') {
     this._onModelFormRemoved(event);
   } else if (event.type === 'formEnsureVisible') {
-    this._onModelFormEnsureVisible(event);
+    form = this.session.getOrCreateModelAdapter(event.form, this);
+    this._showForm(form);
   } else if (event.type === 'outlineChanged') {
     this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else if (event.type === 'messageBoxAdded') {
     this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
-  } else if (event.type === 'messageBoxRemoved') {
-    // TODO [dwi]
   } else if (event.type === 'fileChooserAdded') {
     this._renderFileChooser(this.session.getOrCreateModelAdapter(event.fileChooser, this));
   } else if (event.type === 'openUri') {
@@ -444,7 +459,6 @@ scout.Desktop.prototype.bringDetachedOutlineToFront = function() {
   this.navigation.bringToFront();
 };
 
-
 scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   this._deselectTab();
   if (this.outline === outline) {
@@ -453,37 +467,4 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
     this.setOutline(outline);
   }
   this.navigation.bringToFront();
-};
-
-scout.Desktop.prototype._addForm = function(form, register) {
-  if (this._isDialog(form)) {
-    if (register) {
-      this.dialogs.push(form);
-    }
-    this._renderDialog(form);
-  } else {
-    if (register) {
-      this.views.push(form);
-    }
-    this._renderView(form);
-  }
-};
-
-scout.Desktop.prototype._removeForm = function(form, unregister) {
-  if (unregister) {
-    if (this._isDialog(form)) {
-      scout.arrays.remove(this.dialogs, form);
-    } else {
-      scout.arrays.remove(this.views, form);
-    }
-  }
-
-  if (!form.rendered) {
-    // Form has already been removed (either by form close or form removed event) -> no need to do it twice
-    return;
-  }
-  if (form.tab) {
-    this._removeTab(form.tab);
-  }
-  form.remove();
 };
