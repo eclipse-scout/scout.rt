@@ -13,20 +13,21 @@ package org.eclipse.scout.rt.client.ui.desktop;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.CancelButton;
-import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.UnsavedChangesBox;
 import org.eclipse.scout.rt.client.ui.desktop.UnsavedFormChangesForm.MainBox.UnsavedChangesBox.OpenFormsField;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -60,20 +61,12 @@ public class UnsavedFormChangesForm extends AbstractForm {
     startInternal(new NewHandler());
   }
 
-  public CancelButton getCancelButton() {
-    return getFieldByClass(CancelButton.class);
-  }
-
   public MainBox getMainBox() {
     return getFieldByClass(MainBox.class);
   }
 
   public UnsavedChangesBox getUnsavedChangesBox() {
     return getFieldByClass(UnsavedChangesBox.class);
-  }
-
-  public OkButton getOkButton() {
-    return getFieldByClass(OkButton.class);
   }
 
   public OpenFormsField getOpenFormsField() {
@@ -154,33 +147,46 @@ public class UnsavedFormChangesForm extends AbstractForm {
         protected boolean getConfiguredLabelVisible() {
           return false;
         }
-      }
 
-      @Order(30.0)
-      @ClassId("215a6594-5fb2-435e-85ec-f612afb36a05")
-      public class CheckAllButton extends AbstractButton {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("CheckAllWithMnemonic");
-        }
+        @Order(10.0)
+        public class Tree extends DefaultListBoxTable {
+          @Order(10.0)
+          public class CheckAllMenu extends AbstractMenu {
 
-        @Override
-        protected void execClickAction() throws ProcessingException {
-          getOpenFormsField().checkAllKeys();
-        }
-      }
+            @Override
+            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+              return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+            }
 
-      @Order(30.0)
-      @ClassId("b7f69fff-f7ff-4474-8a27-be9083ff731d")
-      public class UnCheckAllButton extends AbstractButton {
-        @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("UncheckAllWithMnemonic");
-        }
+            @Override
+            protected String getConfiguredText() {
+              return TEXTS.get("CheckAllWithMnemonic");
+            }
 
-        @Override
-        protected void execClickAction() throws ProcessingException {
-          getOpenFormsField().uncheckAllKeys();
+            @Override
+            protected void execAction() throws ProcessingException {
+              checkAllKeys();
+            }
+          }
+
+          @Order(20.0)
+          public class UncheckAllMenu extends AbstractMenu {
+
+            @Override
+            protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+              return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+            }
+
+            @Override
+            protected String getConfiguredText() {
+              return TEXTS.get("UncheckAllWithMnemonic");
+            }
+
+            @Override
+            protected void execAction() throws ProcessingException {
+              uncheckAllKeys();
+            }
+          }
         }
       }
     }
