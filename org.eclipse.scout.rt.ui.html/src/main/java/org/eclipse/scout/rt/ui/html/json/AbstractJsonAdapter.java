@@ -18,9 +18,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
@@ -192,26 +190,52 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    */
   @Override
   public final <A extends IJsonAdapter<?>> A getAdapter(Object model) {
+    return getAdapter(model, null);
+  }
+
+  @Override
+  public <A extends IJsonAdapter<?>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter) {
+    if (model == null) {
+      return null;
+    }
+    if (filter != null && !filter.accept(model)) {
+      return null;
+    }
     return m_uiSession.getJsonAdapter(model, this);
+  }
+
+  @Override
+  public final Collection<IJsonAdapter<?>> getAdapters(Collection<?> models) {
+    return getAdapters(models, null);
+  }
+
+  @Override
+  public <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, IFilter<MODEL> filter) {
+    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
+    for (MODEL model : models) {
+      IJsonAdapter<?> adapter = getAdapter(model, filter);
+      if (adapter != null) {
+        adapters.add(adapter);
+      }
+    }
+    return adapters;
   }
 
   public final <A extends IJsonAdapter<?>> A getGlobalAdapter(Object model) {
     return m_uiSession.getJsonAdapter(model, getUiSession().getRootJsonAdapter());
   }
 
-  @Override
-  public final Collection<IJsonAdapter<?>> getAdapters(Collection<?> models) {
-    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
-    for (Object model : models) {
-      adapters.add(getAdapter(model));
-    }
-    return adapters;
+  protected final <MODEL> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<MODEL> models) {
+    return attachGlobalAdapters(models, null);
   }
 
-  protected final List<IJsonAdapter<?>> attachGlobalAdapters(Collection<?> models) {
+  protected final <MODEL> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<MODEL> models, IFilter<MODEL> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
-    for (Object model : models) {
-      adapters.add(attachGlobalAdapter(model));
+    for (MODEL model : models) {
+      IJsonAdapter<?> adapter = attachGlobalAdapter(model, filter);
+      if (adapter != null) {
+        adapters.add(adapter);
+      }
     }
     return adapters;
   }
