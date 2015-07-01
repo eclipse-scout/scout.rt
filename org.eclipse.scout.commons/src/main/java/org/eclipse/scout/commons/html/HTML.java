@@ -271,6 +271,34 @@ public final class HTML {
   }
 
   /**
+   * Create a html element for an image: &lt;img src="binaryResource:resourceName"&gt;&lt;/img&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.imgByBinaryResource("resourceName").toEncodedHtml(); <br>
+   * </p>
+   *
+   * @param src
+   *          image source path as bind
+   */
+  public static IHtmlElement imgByBinaryResource(CharSequence binaryResource) {
+    return new HtmlImageBuilder("binaryResource:" + binaryResource);
+  }
+
+  /**
+   * Create a html element for an image: &lt;img src="iconid:icon_name"&gt;&lt;/img&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.imgByIconId("icon_name").toEncodedHtml(); <br>
+   * </p>
+   *
+   * @param iconId
+   *          image source path as bind
+   */
+  public static IHtmlElement imgByIconId(CharSequence iconId) {
+    return new HtmlImageBuilder("iconId:" + iconId);
+  }
+
+  /**
    * Create a html list element with encoded text: &lt;li&gt;text&lt;/li&gt;.
    * <p>
    * Example:<br>
