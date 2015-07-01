@@ -16,8 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -45,10 +43,8 @@ import org.eclipse.scout.rt.platform.Bean;
  */
 @Bean
 public class TrivialAuthenticator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TrivialAuthenticator.class);
-
-  private long m_principalCacheTimeout = 300000L;
-  private PathInfoFilter m_excludePathFilter;
+  protected long m_principalCacheTimeout = 300000L;
+  protected PathInfoFilter m_excludePathFilter;
 
   public void init(FilterConfig filterConfig) throws ServletException {
     m_excludePathFilter = new PathInfoFilter(filterConfig.getInitParameter("filter-exclude"));
