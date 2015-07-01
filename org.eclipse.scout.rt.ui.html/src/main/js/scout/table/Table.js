@@ -50,7 +50,6 @@ scout.Table.prototype.init = function(model, session) {
   this.addChild(this.menuBar);
 
   this._syncSelectedRows(this.selectedRows);
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 

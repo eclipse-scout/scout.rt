@@ -27,7 +27,6 @@ scout.Tree.prototype.init = function(model, session) {
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
   this.addChild(this.menuBar);
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.Tree.prototype._syncMenus = function(menus) {
