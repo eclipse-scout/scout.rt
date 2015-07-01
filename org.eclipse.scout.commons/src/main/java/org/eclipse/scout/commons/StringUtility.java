@@ -396,11 +396,18 @@ public final class StringUtility {
   /**
    * @return a start tag (ignores single tags) <foo> (not <foo/>)
    */
-  private static TagBounds getStartTag(String text, String tagName, int pos) {
+  private static TagBounds getStartTag(String text, String tagName, boolean ignoreCase, int pos) {
     if (text == null) {
       return TAG_BOUNDS_NOT_FOUND;
     }
-    Pattern pat = Pattern.compile("<" + tagName + "(\\s[^<>]*[^/])?>", Pattern.DOTALL);
+    int flags;
+    if (ignoreCase) {
+      flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
+    }
+    else {
+      flags = Pattern.DOTALL;
+    }
+    Pattern pat = Pattern.compile("<" + tagName + "(\\s[^<>]*[^/])?>", flags);
     Matcher m = pat.matcher(text);
     if (m.find(pos)) {
       return new TagBounds(m.start(), m.end());
@@ -411,11 +418,18 @@ public final class StringUtility {
   /**
    * @return an end tag </foo>
    */
-  private static TagBounds getEndTag(String text, String tagName, int pos) {
+  private static TagBounds getEndTag(String text, String tagName, boolean ignoreCase, int pos) {
     if (text == null) {
       return TAG_BOUNDS_NOT_FOUND;
     }
-    Pattern pat = Pattern.compile("</" + tagName + ">");
+    int flags;
+    if (ignoreCase) {
+      flags = Pattern.CASE_INSENSITIVE;
+    }
+    else {
+      flags = 0;
+    }
+    Pattern pat = Pattern.compile("</" + tagName + ">", flags);
     Matcher m = pat.matcher(text);
     if (m.find(pos)) {
       return new TagBounds(m.start(), m.end());
@@ -428,12 +442,16 @@ public final class StringUtility {
    *         when the tag is not found in the text.
    */
   public static String getTag(String text, String tagName) {
+    return getTag(text, tagName, false);
+  }
+
+  public static String getTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
     }
     TagBounds a;
     TagBounds b;
-    if ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    if ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       return text.substring(a.end, b.begin).trim();
     }
     if ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
@@ -443,6 +461,10 @@ public final class StringUtility {
   }
 
   public static String replaceTags(String text, String tagName, final String replacement) {
+    return replaceTags(text, tagName, false, replacement);
+  }
+
+  public static String replaceTags(String text, String tagName, boolean ignoreCase, final String replacement) {
     return replaceTags(text, tagName, new ITagProcessor() {
       @Override
       public String processTag(String name, String tagContent) {
@@ -459,6 +481,10 @@ public final class StringUtility {
    * be careful to not replace the tag again with the tag, this will result in an endless loop
    */
   public static String replaceTags(String text, String tagName, ITagProcessor processor) {
+    return replaceTags(text, tagName, false, processor);
+  }
+
+  public static String replaceTags(String text, String tagName, boolean ignoreCase, ITagProcessor processor) {
     if (text == null) {
       return null;
     }
@@ -469,7 +495,7 @@ public final class StringUtility {
       String replacement = processor.processTag(tagName, tagContent);
       text = text.substring(0, a.begin) + replacement + text.substring(a.end);
     }
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    while ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       String tagContent = text.substring(a.end, b.begin);
       String replacement = processor.processTag(tagName, tagContent);
       text = text.substring(0, a.begin) + replacement + text.substring(b.end);
@@ -487,6 +513,10 @@ public final class StringUtility {
    * <code>removeTag(text, "b")</code> will return '&lt;html>some text&lt;/html&gt;'</code>
    */
   public static String removeTag(String text, String tagName) {
+    return removeTag(text, tagName, false);
+  }
+
+  public static String removeTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
     }
@@ -498,7 +528,7 @@ public final class StringUtility {
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(a.end);
     }
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    while ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(b.end);
     }
     return text;
@@ -526,6 +556,10 @@ public final class StringUtility {
   }
 
   public static String removeTagBounds(String text, String tagName) {
+    return removeTagBounds(text, tagName, false);
+  }
+
+  public static String removeTagBounds(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
     }
@@ -534,20 +568,24 @@ public final class StringUtility {
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(a.end);
     }
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    while ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(a.end, b.begin) + text.substring(b.end);
     }
     return text;
   }
 
   public static String replaceTagBounds(String text, String tagName, String start, String end) {
+    return replaceTagBounds(text, tagName, false, start, end);
+  }
+
+  public static String replaceTagBounds(String text, String tagName, boolean ignoreCase, String start, String end) {
     if (text == null) {
       return null;
     }
     TagBounds a;
     int b;
     int startPos = 0;
-    while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
+    while (startPos < text.length() && (a = getStartTag(text, tagName, ignoreCase, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
           start +
@@ -907,6 +945,13 @@ public final class StringUtility {
     return s;
   }
 
+  // whitespace patterns
+  private static final String ZERO_OR_MORE_WHITESPACES = "\\s*?";
+  private static final String ONE_OR_MORE_WHITESPACES = "\\s+?";
+
+  private static final Pattern BR = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "br" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
+  private static final Pattern TABS = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "span" + ONE_OR_MORE_WHITESPACES + "style" + ZERO_OR_MORE_WHITESPACES + "=" + ZERO_OR_MORE_WHITESPACES + "\"white-space:pre\"" + ZERO_OR_MORE_WHITESPACES + ">&#9;<" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + "span" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
+
   /**
    * @return decoded text, ready to be printed as text
    *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
@@ -924,14 +969,10 @@ public final class StringUtility {
     s = s.replace("&gt;", ">");
     s = s.replace("&amp;", "&");
 
-    // whitespace patterns
-    String zeroOrMoreWhitespaces = "\\s*?";
-    String oneOrMoreWhitespaces = "\\s+?";
-
     // replace <br/> by \n
-    s = s.replaceAll("<" + zeroOrMoreWhitespaces + "br" + zeroOrMoreWhitespaces + "/" + zeroOrMoreWhitespaces + ">", "\n");
+    s = BR.matcher(s).replaceAll("\n");
     // replace HTML-tabs by \t
-    s = s.replaceAll("<" + zeroOrMoreWhitespaces + "span" + oneOrMoreWhitespaces + "style" + zeroOrMoreWhitespaces + "=" + zeroOrMoreWhitespaces + "\"white-space:pre\"" + zeroOrMoreWhitespaces + ">&#9;<" + zeroOrMoreWhitespaces + "/" + zeroOrMoreWhitespaces + "span" + zeroOrMoreWhitespaces + ">", "\t");
+    s = TABS.matcher(s).replaceAll("\t");
 
     return s;
   }

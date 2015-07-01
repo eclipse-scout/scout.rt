@@ -268,7 +268,7 @@ public class ColumnFilterForm extends AbstractForm {
           List<ITableRow> rowList = new ArrayList<ITableRow>(hist.size() + 1);
           for (Object o : hist) {
             LookupRow histRow = (LookupRow) o;
-            String text = StringUtility.isNullOrEmpty(StringUtility.getTag(histRow.getText(), "body")) ? histRow.getText() : HTMLUtility.getPlainText(histRow.getText());
+            String text = StringUtility.isNullOrEmpty(StringUtility.getTag(histRow.getText(), "body", true)) ? histRow.getText() : HTMLUtility.getPlainText(histRow.getText());
             TableRow tableRow = new TableRow(getTable().getColumnSet(), CollectionUtility.arrayList(histRow.getKey(), text));
             tableRow.setIconId(histRow.getIconId());
             tableRow.setForegroundColor(histRow.getForegroundColor());

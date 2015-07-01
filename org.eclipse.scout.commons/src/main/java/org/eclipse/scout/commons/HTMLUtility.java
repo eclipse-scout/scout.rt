@@ -49,6 +49,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * Utility to manipulate HTML documents regardless of ui.
  */
 public final class HTMLUtility {
+  private static final Pattern HTML_PARAGRAPH_TAGS = Pattern.compile("<br>|<br/>|</p>|<p/>|</tr>|</table>", Pattern.CASE_INSENSITIVE);
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HTMLUtility.class);
 
   private static HashMap<String, CSS.Attribute> cssMap;
@@ -566,13 +568,14 @@ public final class HTMLUtility {
    *         |</tr>|</table> create newlines </xmp></pre>
    */
   public static String getPlainText(String s) {
-    s = StringUtility.getTag(s, "body");
+    s = StringUtility.getTag(s, "body", true);
     if (s == null || s.length() == 0) {
       return s;
     }
     //newlines
     s = s.replaceAll("\n", " ");
-    s = s.replaceAll("<br>|<br/>|</p>|<p/>|</tr>|</table>", "\n");
+    Matcher matcher = HTML_PARAGRAPH_TAGS.matcher(s);
+    s = matcher.replaceAll("\n");
     //remove tags
     s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
     //remove multiple spaces
@@ -610,12 +613,12 @@ public final class HTMLUtility {
     s = Pattern.compile("<!\\-\\-(.*?)\\-\\->", Pattern.DOTALL).matcher(s).replaceAll("");
 
     //find body or sanitize head:
-    String body = StringUtility.getTag(s, "body");
+    String body = StringUtility.getTag(s, "body", true);
     if (body == null || body.length() == 0) {
-      s = StringUtility.replaceTags(s, "head", "");
-      s = StringUtility.replaceTags(s, "title", "");
-      s = StringUtility.replaceTags(s, "meta", "");
-      s = StringUtility.replaceTags(s, "link", "");
+      s = StringUtility.replaceTags(s, "head", true, "");
+      s = StringUtility.replaceTags(s, "title", true, "");
+      s = StringUtility.replaceTags(s, "meta", true, "");
+      s = StringUtility.replaceTags(s, "link", true, "");
     }
     else {
       s = body;
