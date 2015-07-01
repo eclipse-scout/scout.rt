@@ -135,18 +135,6 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.platform.api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.platform.api.test</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform</artifactId>
         <version>${project.version}</version>
       </dependency>
