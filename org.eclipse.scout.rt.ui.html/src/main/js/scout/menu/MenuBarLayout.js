@@ -11,7 +11,7 @@ scout.inherits(scout.MenuBarLayout, scout.AbstractLayout);
 scout.MenuBarLayout.prototype.layout = function($container) {
   // check if all menu items have enough room to be displayed without ellipsis
   this._destroyEllipsis();
-  this._menuBar.rebuildItems();
+  this._menuBar.rebuildItemsInternal();
 
   var ellipsisSize, leftEnd = 0, rightEnd, overflown,
     oldOverflow = $container.css('overflow');

@@ -25,7 +25,11 @@ scout.MenuBar = function(session, menuSorter) {
     // the MenuBarLayout. It will be updated automatically after the user request has finished,
     // because the layout calls rebuildItems().
     if (event.changedProperties.length > 0) {
-      scout.HtmlComponent.get(this.$container).invalidateLayoutTree();
+      if (event.changedProperties.length == 1 && event.changedProperties[0] === 'enabled') {
+        // Optimization: don't update when only the enabled state has changed (this should not affect the layout).
+        return;
+      }
+      this.htmlComp.invalidateLayoutTree();
     }
   }.bind(this);
 };
@@ -48,8 +52,8 @@ scout.MenuBar.prototype._render = function($parent) {
     .toggleClass('main-menubar', this.size === 'large')
     .setVisible(this.menuItems.length > 0);
 
-  var htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  htmlComp.setLayout(new scout.MenuBarLayout(this));
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.MenuBarLayout(this));
 
   if (this.position === 'top') {
     $parent.prepend(this.$container);
@@ -90,9 +94,21 @@ scout.MenuBar.prototype._removeMenuItems = function() {
   }, this);
 };
 
-scout.MenuBar.prototype.rebuildItems = function() {
+/**
+ * Forces the MenuBarLayout to be revalidated, which includes rebuilding the menu items.
+ */
+scout.MenuBar.prototype.rebuildItems = function(revalidateLayoutTree) {
+  this.htmlComp.revalidateLayoutTree();
+};
+
+/**
+ * Rebuilds the menu items without relayouting the menubar.
+ * Do not call this internal method from outside (except from the MenuBarLayout).
+ */
+scout.MenuBar.prototype.rebuildItemsInternal = function() {
   this._updateItems(this._internalMenuItems);
 };
+
 
 scout.MenuBar.prototype.updateItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
@@ -103,10 +119,10 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
     this._internalMenuItems = menuItems;
 
     // Rebuild items
-    this.rebuildItems();
+    this.rebuildItemsInternal();
 
     // Re-layout menubar
-    scout.HtmlComponent.get(this.$container).invalidateLayoutTree();
+    this.htmlComp.invalidateLayoutTree();
   }
 };
 
@@ -181,14 +197,13 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
-  var htmlComp = scout.HtmlComponent.get(this.$container),
-    oldVisible = htmlComp.isVisible(),
+  var oldVisible = this.htmlComp.isVisible(),
     visible = !this.hiddenByUi && this.menuItems.length > 0;
 
   // Update visibility, layout and key-strokes
   if (visible !== oldVisible) {
     this.$container.setVisible(visible);
-    htmlComp.invalidateLayoutTree();
+    this.htmlComp.invalidateLayoutTree();
     if (visible) {
       this._installKeyStrokeAdapter();
     } else {
