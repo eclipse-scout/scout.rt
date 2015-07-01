@@ -670,4 +670,10 @@ public class VirtualDesktop implements IDesktop {
   public boolean isOutlineChanging() {
     throw createUnsupportedOperationException();
   }
+
+  @Override
+  public DesktopStyle getDesktopStyle() {
+    return DesktopStyle.DEFAULT;
+  }
+
 }

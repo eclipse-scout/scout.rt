@@ -90,6 +90,20 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    */
   String PROP_AUTO_TAB_KEY_STROKE_MODIFIER = "autoTabKeyStrokeModifier";
 
+  String PROP_DESKTOP_STYLE = "desktopStyle";
+
+  public enum DesktopStyle {
+    /**
+     * Default desktop style with header, navigation (tree) and bench (forms).
+     */
+    DEFAULT,
+
+    /**
+     * Reduced desktop style. Only bench is visible.
+     */
+    BENCH
+  }
+
   void initDesktop() throws ProcessingException;
 
   /**
@@ -651,4 +665,11 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    * @since 5.1.0
    */
   boolean isOutlineChanging();
+
+  /**
+   * @return the desktop style. Default value is <code>DesktopStyle.DEFAULT</code>.
+   * @since 6.0.0
+   */
+  DesktopStyle getDesktopStyle();
+
 }

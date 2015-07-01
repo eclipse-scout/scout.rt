@@ -278,6 +278,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return IKeyStroke.CONTROL;
   }
 
+  /**
+   * Configures the desktop style which defines the basic layout of the application in the UI. Currently the desktop
+   * style cannot be changed at runtime.
+   * <p>
+   * Subclasses can override this method. Default is {@code DesktopStyle.DEFAULT}.
+   *
+   * @return {@code true} if this application should be visible in the system tray, {@code false} otherwise
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(50)
+  protected DesktopStyle getConfiguredDesktopStyle() {
+    return DesktopStyle.DEFAULT;
+  }
+
   private List<Class<? extends IAction>> getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
@@ -509,6 +523,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setTrayVisible(getConfiguredTrayVisible());
     setAutoTabKeyStrokesEnabled(getConfiguredAutoTabKeyStrokesEnabled());
     setAutoTabKeyStrokeModifier(getConfiguredAutoTabKeyStrokeModifier());
+    setDesktopStyle(getConfiguredDesktopStyle());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
 
@@ -718,6 +733,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public <T extends IViewButton> T findViewButton(Class<T> viewButtonType) {
     return findAction(viewButtonType);
+  }
+
+  @Override
+  public DesktopStyle getDesktopStyle() {
+    return (DesktopStyle) propertySupport.getProperty(PROP_DESKTOP_STYLE);
+  }
+
+  protected void setDesktopStyle(DesktopStyle desktopStyle) {
+    propertySupport.setProperty(PROP_DESKTOP_STYLE, desktopStyle);
   }
 
   @Override
