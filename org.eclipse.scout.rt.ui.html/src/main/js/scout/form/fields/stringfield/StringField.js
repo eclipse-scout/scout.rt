@@ -107,7 +107,7 @@ scout.StringField.prototype._renderInsertText = function() {
 };
 
 scout.StringField.prototype._renderWrapText = function() {
-  this.$field.toggleClass('white-space-nowrap', !this.wrapText);
+  this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
 };
 
 scout.StringField.prototype._onIconClick = function(event) {
@@ -136,4 +136,3 @@ scout.StringField.prototype._sendSelectionChanged = function() {
   // send delayed to avoid a lot of requests while selecting
   this.session.sendEvent(event, 500);
 };
-
