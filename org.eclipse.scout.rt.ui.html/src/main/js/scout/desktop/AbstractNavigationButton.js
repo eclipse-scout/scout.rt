@@ -51,6 +51,9 @@ scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
   this.outline._updateOutlineNode(this.node);
 };
 
+/**
+ * @override Menu.js
+ */
 scout.AbstractNavigationButton.prototype.doAction = function() {
   this._onClickFunc();
 };

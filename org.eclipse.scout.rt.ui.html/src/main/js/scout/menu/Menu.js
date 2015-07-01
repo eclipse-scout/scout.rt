@@ -56,8 +56,8 @@ scout.Menu.prototype._renderItem = function($parent) {
 scout.Menu.prototype._onMouseEvent = function(event) {
   if (this.childActions.length > 0 && event.type === 'mousedown') {
     this._openPopup(event);
-  } else if(this.childActions.length === 0 && event.type === 'click'){
-    this.sendDoAction();
+  } else if (this.childActions.length === 0 && event.type === 'click') {
+    this.doAction();
   }
 };
 
