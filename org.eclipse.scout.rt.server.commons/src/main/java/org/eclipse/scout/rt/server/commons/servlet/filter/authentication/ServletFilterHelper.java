@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
@@ -27,45 +29,35 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  */
 @Bean
 public class ServletFilterHelper {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServletFilterHelper.class);
+
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = Principal.class.getName();
-  public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP = SESSION_ATTRIBUTE_FOR_PRINCIPAL + ".timestamp";
 
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
   public static final String HTTP_BASIC_AUTH_NAME = "Basic";
   public static final String HTTP_BASIC_AUTH_CHARSET = "ISO-8859-1";
 
-  public Principal getPrincipalOnSession(HttpServletRequest req, long principalCacheTimeout) {
+  /**
+   * get a cached principal from the {@link HttpSession} as {@link #SESSION_ATTRIBUTE_FOR_PRINCIPAL}
+   */
+  public Principal getPrincipalOnSession(HttpServletRequest req) {
     final HttpSession session = req.getSession(false);
     if (session != null) {
       Principal principal = (Principal) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
       if (principal != null) {
-        if (checkPrincipalTimeout(session, principal, principalCacheTimeout)) {
-          return principal;
-        }
+        return principal;
       }
     }
     return null;
   }
 
+  /**
+   * put a principal to the {@link HttpSession} as {@link #SESSION_ATTRIBUTE_FOR_PRINCIPAL}
+   */
   public void putPrincipalOnSession(HttpServletRequest req, Principal principal) {
     HttpSession session = req.getSession();
     session.setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL, principal);
-    session.setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP, System.currentTimeMillis());
-  }
-
-  protected boolean checkPrincipalTimeout(HttpSession session, Principal principal, long principalCacheTimeout) {
-    synchronized (principal) {
-      Long timestamp = (Long) session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
-      if (timestamp != null) {
-        if (timestamp.longValue() + principalCacheTimeout < System.currentTimeMillis()) {
-          session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL_TIMESTAMP);
-          session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_PRINCIPAL);
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   public Subject createSubject(Principal principal) {
@@ -130,6 +122,42 @@ public class ServletFilterHelper {
     catch (UnsupportedEncodingException e) {
       throw new PlatformException("charset " + HTTP_BASIC_AUTH_CHARSET, e);
     }
+  }
+
+  /**
+   * forward the request to the login.html
+   * <p>
+   * Detect if the request is a POST. For json send a timeout message, otherwise log a warning
+   *
+   * @throws IOException
+   * @throws ServletException
+   */
+  public void forwardToLoginForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    //check if POST request
+    if ("POST".equals(req.getMethod())) {
+      if (("" + req.getContentType()).startsWith("application/json")) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Returning session timeout error as json.");
+        }
+        sendJsonSessionTimeout(resp);
+        return;
+      }
+      else {
+        LOG.warn("The request for {0} is a POST request. Forwarding to the login page will most likely fail because StaticResourceRequestInterceptor doesn't handle post.", req.getPathInfo());
+      }
+    }
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Forwarding '{0}' to /login.html", (req).getPathInfo());
+    }
+    req.getRequestDispatcher("/login.html").forward(req, resp);
+  }
+
+  protected void sendJsonSessionTimeout(HttpServletResponse resp) throws IOException {
+    resp.setContentType("application/json");
+    resp.setCharacterEncoding("UTF-8");
+    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    resp.getWriter().print(("{\"errorMessage\":\"The session has expired, please reload the page.\",\"errorCode\":10}")); // JsonResponse.ERR_SESSION_TIMEOUT
   }
 
 }

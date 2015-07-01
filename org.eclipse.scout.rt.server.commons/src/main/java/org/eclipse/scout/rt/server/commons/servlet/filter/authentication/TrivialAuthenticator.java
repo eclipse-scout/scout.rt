@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.platform.Bean;
  */
 @Bean
 public class TrivialAuthenticator {
-  protected long m_principalCacheTimeout = 300000L;
   protected PathInfoFilter m_excludePathFilter;
 
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -106,7 +105,7 @@ public class TrivialAuthenticator {
     Principal principal = null;
 
     // on session cache
-    principal = BEANS.get(ServletFilterHelper.class).getPrincipalOnSession(req, m_principalCacheTimeout);
+    principal = BEANS.get(ServletFilterHelper.class).getPrincipalOnSession(req);
     if (principal != null) {
       return principal;
     }
