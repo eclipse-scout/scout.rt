@@ -68,6 +68,7 @@ scout.FormFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
       scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, true, false, false, this.ctrlPreventBubbleUpKeys[i]);
     }
   }
+  scout.FormFieldKeyStrokeAdapter.parent.prototype.drawKeyBox.call(this, drawedKeys);
 };
 
 scout.FormFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
