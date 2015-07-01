@@ -239,8 +239,7 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var oldProperties = {},
-    uiEvent = {};
+  var oldProperties = {};
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
   this._syncPropertiesOnPropertyChange(oldProperties, event.properties);
@@ -250,11 +249,24 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
     this._renderPropertiesOnPropertyChange(oldProperties, event.properties);
   }
 
-  // fire propertyChange after properties have been rendered. This is required to make sure the
-  // DOM is in the right state, when the propertyChange event is consumed.
-  // creating an uiEvent object is necessary because it will be modified by EventSupport.trigger -> prevents modifying event.properties
-  $.extend(uiEvent, event.properties);
-  this.trigger('propertyChange', uiEvent);
+  // step 3 notify - fire propertyChange _after_ properties have been rendered. (This is important
+  // to make sure the DOM is in the right state, when the propertyChange event is consumed.)
+  // Note: A new event object has to be created, because it is altered in EventSuppor.trigger().
+  var propertyChangeEvent = {
+      newProperties: event.properties,
+      oldProperties: oldProperties,
+      changedProperties: []
+  };
+  // To allow a listener to react only to properties that have really changed their value, we
+  // calculate the list of "changedProperties". This may be relevant, when the value on the model
+  // changes from A to B and back to A, which emits a property change event when in fact, the
+  // property has not really changed for the UI.
+  for (var prop in event.properties) {
+    if (event.properties[prop] !== oldProperties[prop]) {
+      propertyChangeEvent.changedProperties.push(prop);
+    }
+  }
+  this.trigger('propertyChange', propertyChangeEvent);
 };
 
 /**
@@ -301,7 +313,8 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
       var funcTarget = this.ui || this;
       if (!funcTarget[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? this.toString() : 'UI'));
-      } // FIXME AWE/CGU: value and oldValue should be switched to conform with other functions.
+      }
+      // FIXME AWE/CGU: value and oldValue should be switched to conform with other functions.
       // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
       // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
       // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem

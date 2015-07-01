@@ -19,12 +19,14 @@ scout.MenuBar = function(session, menuSorter) {
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 
-  this._menuItemPropertyChangeListener = function() {
+  this._menuItemPropertyChangeListener = function(event) {
     // We do not update the items directly, because this listener may be fired many times in one
     // user request (because many menus change one or more properties). Therefore, we just invalidate
     // the MenuBarLayout. It will be updated automatically after the user request has finished,
     // because the layout calls rebuildItems().
-    scout.HtmlComponent.get(this.$container).invalidateLayoutTree();
+    if (event.changedProperties.length > 0) {
+      scout.HtmlComponent.get(this.$container).invalidateLayoutTree();
+    }
   }.bind(this);
 };
 scout.inherits(scout.MenuBar, scout.Widget);

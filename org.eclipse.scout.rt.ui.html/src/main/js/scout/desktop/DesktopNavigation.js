@@ -56,7 +56,7 @@ scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
 };
 
 scout.DesktopNavigation.prototype._onViewButtonPropertyChange = function(event) {
-  if (event.selected !== undefined) {
+  if (scout.helpers.isOneOf(event.changedProperties, 'selected')) {
     this.htmlViewButtons.revalidateLayout();
   }
 };

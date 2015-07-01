@@ -14,7 +14,7 @@ scout.DesktopViewTab = function(view, $bench) {
   this._$detachedDom;
 
   this._contentPropertyChangeListener = function(event) {
-    if (event.title !== undefined || event.subTitle !== undefined) {
+    if (scout.helpers.isOneOf(event.changedProperties, 'title' ,'subTitle')) {
       this._titlesUpdated();
     }
   }.bind(this);
