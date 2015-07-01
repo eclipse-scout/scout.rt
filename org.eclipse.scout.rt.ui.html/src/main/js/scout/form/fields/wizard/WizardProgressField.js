@@ -17,13 +17,13 @@ scout.WizardProgressField.prototype._render = function($parent) {
 
 scout.WizardProgressField.prototype._renderProperties = function() {
   scout.WizardProgressField.parent.prototype._renderProperties.call(this);
-  this._renderWizardSteps(this.wizardSteps);
-  this._renderActiveWizardStepIndex(this.activeWizardStepIndex);
+  this._renderWizardSteps();
+  this._renderActiveWizardStepIndex();
 };
 
-scout.WizardProgressField.prototype._renderWizardSteps = function(wizardSteps) {
+scout.WizardProgressField.prototype._renderWizardSteps = function() {
   this._$stepList.empty();
-  wizardSteps.forEach(function(wizardStep, index) {
+  this.wizardSteps.forEach(function(wizardStep, index) {
     var $wizardStep, $content, $title, $subTitle, $separator;
 
     // Step
@@ -44,35 +44,35 @@ scout.WizardProgressField.prototype._renderWizardSteps = function(wizardSteps) {
     }
 
     // Separator
-    if (index < wizardSteps.length - 1) {
+    if (index < this.wizardSteps.length - 1) {
       $separator = $wizardStep.appendDiv('wizard-step-separator');
     }
 
     // TODO BSH Wizard | Add icon
 
-    this._updateWizardStepActiveClasses($wizardStep, this.activeWizardStep);
+    this._updateWizardStepActiveClasses($wizardStep);
   }.bind(this));
 };
 
-scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function(activeWizardStepIndex) {
+scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
   var $wizardSteps = this._$stepList.children('.wizard-step');
   this.wizardSteps.forEach(function(wizardStep, index) {
-    this._updateWizardStepActiveClasses($wizardSteps.eq(index), activeWizardStepIndex);
+    this._updateWizardStepActiveClasses($wizardSteps.eq(index));
   }.bind(this));
 };
 
-scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep, activeWizardStepIndex){
+scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep){
   $wizardStep.removeClass('all-before-active before-active active all-after-active after-active');
   var wizardStepIndex = this._wizardStepIndex($wizardStep);
-  if (activeWizardStepIndex >= 0 && wizardStepIndex >= 0) {
-    if (wizardStepIndex < activeWizardStepIndex) {
+  if (this.activeWizardStepIndex >= 0 && wizardStepIndex >= 0) {
+    if (wizardStepIndex < this.activeWizardStepIndex) {
       $wizardStep.addClass('all-before-active');
-      if (wizardStepIndex === activeWizardStepIndex - 1) {
+      if (wizardStepIndex === this.activeWizardStepIndex - 1) {
         $wizardStep.addClass('before-active');
       }
-    } else if (wizardStepIndex > activeWizardStepIndex) {
+    } else if (wizardStepIndex > this.activeWizardStepIndex) {
       $wizardStep.addClass('all-after-active');
-      if (wizardStepIndex === activeWizardStepIndex + 1) {
+      if (wizardStepIndex === this.activeWizardStepIndex + 1) {
         $wizardStep.addClass('after-active');
       }
     } else {
@@ -84,7 +84,7 @@ scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($w
 scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
   var $wizardStep = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
   var targetStepIndex = this._wizardStepIndex($wizardStep);
-  if (targetStepIndex !== this.activeWizardStep) {
+  if (targetStepIndex !== this.activeWizardStepIndex) {
     this.session.send(this.id, 'stepClicked', {
       stepIndex: targetStepIndex
     });
