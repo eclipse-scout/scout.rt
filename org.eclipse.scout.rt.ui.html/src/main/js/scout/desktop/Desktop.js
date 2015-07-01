@@ -71,6 +71,24 @@ scout.Desktop.prototype._render = function($parent) {
 
   $(window).on('resize', this.onResize.bind(this));
 
+  // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
+  $parent.on('dragstart', function (event) {
+    event.stopPropagation();
+    event.preventDefault();
+    // change cursor to forbidden (no dropping allowed)
+    event.originalEvent.dataTransfer.dropEffect = "none";
+  });
+  $parent.on('dragover', function (event) {
+    event.stopPropagation();
+    event.preventDefault();
+    // change cursor to forbidden (no dropping allowed)
+    event.originalEvent.dataTransfer.dropEffect = "none";
+  });
+  $parent.on('drop', function (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  });
+
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
   $parent.bind('contextmenu', function(event) {
     if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {

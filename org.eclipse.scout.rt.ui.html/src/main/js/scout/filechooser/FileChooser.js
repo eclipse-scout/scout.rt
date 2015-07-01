@@ -11,6 +11,10 @@ scout.FileChooser.prototype._render = function($parent) {
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
 
+  this.$container.on('dragenter', this._onDragEnterOrOver.bind(this))
+    .on('dragover', this._onDragEnterOrOver.bind(this))
+    .on('drop', this._onDrop.bind(this));
+
   this.$container.appendDiv('closable')
     .on('click', function() {
       this._doCancel();
@@ -99,7 +103,12 @@ scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
 };
 
 scout.FileChooser.prototype._onFileChange = function(event) {
-  var files = this.$fileInputField[0].files;
+  this.addFiles(this.$fileInputField[0].files);
+};
+
+scout.FileChooser.prototype.addFiles = function(files) {
+  // FIXME mot d'n'd check content-type
+  // FIXME mot d'n'd check length (what is the maximum length?)
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
     if (this.multiSelect) {
@@ -123,3 +132,25 @@ scout.FileChooser.prototype._onFileChooserClosed = function() {
   this.destroy();
   this.session.desktop.onFileChooserClosed(this);
 };
+
+scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
+  event.stopPropagation();
+  event.preventDefault();
+
+  if (event.originalEvent.dataTransfer.types.indexOf && event.originalEvent.dataTransfer.types.indexOf('Files') < 0) {
+    // Array: indexOf function
+    event.originalEvent.dataTransfer.dropEffect = "none";
+  }
+  else if (event.originalEvent.dataTransfer.types.contains && !event.originalEvent.dataTransfer.types.contains('Files')) {
+    // DOMStringList: contains function
+    event.originalEvent.dataTransfer.dropEffect = "none";
+  }
+};
+
+scout.FileChooser.prototype._onDrop = function(event) {
+  event.stopPropagation();
+  event.preventDefault();
+
+  this.addFiles(event.originalEvent.dataTransfer.files);
+};
+

@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonFileChooserField<T extends IFileChooserField> extends JsonValueField<T> {
+public class JsonFileChooserField<T extends IFileChooserField> extends JsonValueField<T> implements IBinaryResourceConsumer {
 
   public static final String EVENT_CHOOSE_FILE = "chooseFile";
 
@@ -46,5 +51,12 @@ public class JsonFileChooserField<T extends IFileChooserField> extends JsonValue
 
   private void handleUiChooseFile() {
     getModel().getUIFacade().startFileChooserFromUI();
+  }
+
+  @Override
+  public void consumeBinaryResource(List<BinaryResource> binaryResources) {
+    if (!CollectionUtility.isEmpty(binaryResources)) {
+      getModel().setValue(CollectionUtility.firstElement(binaryResources));
+    }
   }
 }
