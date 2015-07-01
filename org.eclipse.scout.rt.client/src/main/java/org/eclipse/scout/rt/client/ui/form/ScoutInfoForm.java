@@ -83,7 +83,7 @@ public class ScoutInfoForm extends AbstractForm {
   protected IHtmlElement createLogoHtml() {
     IconSpec logo = IconLocator.instance().getIconSpec(AbstractIcons.ApplicationLogo);
     if (logo != null) {
-      return HTML.p(HTML.img("iconId:" + AbstractIcons.ApplicationLogo).cssClass("scout-info-form-logo"));
+      return HTML.p(HTML.imgByIconId(AbstractIcons.ApplicationLogo).cssClass("scout-info-form-logo"));
     }
     return null;
   }
