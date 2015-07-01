@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 
 /**
  * a security filter allowing anonymous access to the application.
- * TODO imo remove in 6.0
  */
 public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   public static final String ANONYMOUS_USER_NAME = "anonymous";
