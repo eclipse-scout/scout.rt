@@ -166,19 +166,27 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
 };
 
 scout.YearPanel.prototype._isDisplayModeDay = function() {
-  return this.displayMode === scout.Calendar.DisplayMode.DAY;
+  return this.displayMode === scout.Planner.DisplayMode.DAY;
 };
 
 scout.YearPanel.prototype._isDisplayModeWeek = function() {
-  return this.displayMode === scout.Calendar.DisplayMode.WEEK;
+  return this.displayMode === scout.Planner.DisplayMode.WEEK;
 };
 
 scout.YearPanel.prototype._isDisplayModeMonth = function() {
-  return this.displayMode === scout.Calendar.DisplayMode.MONTH;
+  return this.displayMode === scout.Planner.DisplayMode.MONTH;
 };
 
 scout.YearPanel.prototype._isDisplayModeWork = function() {
-  return this.displayMode === scout.Calendar.DisplayMode.WORK;
+  return this.displayMode === scout.Planner.DisplayMode.WORK;
+};
+
+scout.YearPanel.prototype._isDisplayModeCalendarWeek = function() {
+  return this.displayMode === scout.Planner.DisplayMode.MONTH;
+};
+
+scout.YearPanel.prototype._isDisplayModeYear = function() {
+  return this.displayMode === scout.Planner.DisplayMode.WORK;
 };
 
 /* -- events ---------------------------------------- */
@@ -195,7 +203,7 @@ scout.YearPanel.prototype._onYearClick = function(event) {
 };
 
 scout.YearPanel.prototype._onYearDayClick = function(event) {
-  this.selectedDate = $(event.target).data('date');
+  this.selectedDate = $('.year-hover-day', this.$yearList).data('date');
   this.trigger('dateSelect', {
     date: this.selectedDate
   });
@@ -215,21 +223,40 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     $day2, date2;
 
   // find hover based on mode
-  if (this._isDisplayModeDay()) {
-    startHover = new Date(year, month, date);
-    endHover = new Date(year, month, date);
-  } else if (this._isDisplayModeWeek()) {
-    startHover = new Date(year, month, date - day);
-    endHover = new Date(year, month, date - day + 6);
-  } else if (this._isDisplayModeMonth()) {
-    startHover = new Date(year, month, 1);
-    endHover = new Date(year, month + 1, 0);
-  } else if (this._isDisplayModeWork()) {
-    startHover = new Date(year, month, date - day);
-    endHover = new Date(year, month, date - day + 4);
-    // in case of work week: selected date has to be opart of range
-    if (date1 > endHover) {
-      date1 = endHover;
+  // in case of planner: selected day is first day of week, hover only for days and weeks
+  if (this.$container.parent().hasClass('planner')) {
+    if (this._isDisplayModeDay()) {
+      startHover = new Date(year, month, date);
+      endHover = new Date(year, month, date);
+    } else if (this._isDisplayModeWeek()) {
+      startHover = new Date(year, month, date - day);
+      endHover = new Date(year, month, date - day + 6);
+    } else if (this._isDisplayModeWork()) {
+      startHover = new Date(year, month, date - day);
+      endHover = new Date(year, month, date - day + 4);
+    } else {
+      startHover = new Date(year, month, date - day);
+      endHover = startHover;
+    }
+
+    date1 = startHover;
+  } else {
+    if (this._isDisplayModeDay()) {
+      startHover = new Date(year, month, date);
+      endHover = new Date(year, month, date);
+    } else if (this._isDisplayModeWeek()) {
+      startHover = new Date(year, month, date - day);
+      endHover = new Date(year, month, date - day + 6);
+    } else if (this._isDisplayModeMonth()) {
+      startHover = new Date(year, month, 1);
+      endHover = new Date(year, month + 1, 0);
+    } else if (this._isDisplayModeWork()) {
+      startHover = new Date(year, month, date - day);
+      endHover = new Date(year, month, date - day + 4);
+      // in case of work week: selected date has to be opart of range
+      if (date1 > endHover) {
+        date1 = endHover;
+      }
     }
   }
 
