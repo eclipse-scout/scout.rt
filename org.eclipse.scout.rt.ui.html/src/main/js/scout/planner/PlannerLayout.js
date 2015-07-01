@@ -113,13 +113,13 @@ scout.PlannerLayout.prototype._minWidth = function() {
 
   var scaleItemMinWidth = 0;
   if (this.planner.displayMode === DISPLAY_MODE.DAY) {
-    scaleItemMinWidth = 75;
+    scaleItemMinWidth = 52;
   } else if ((this.planner.displayMode === DISPLAY_MODE.WORK) || (this.planner.displayMode === DISPLAY_MODE.WEEK)) {
-    scaleItemMinWidth = 170;
+    scaleItemMinWidth = 160;
   } else if (this.planner.displayMode === DISPLAY_MODE.MONTH) {
     scaleItemMinWidth = 450;
   } else if (this.planner.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
-    scaleItemMinWidth = 150;
+    scaleItemMinWidth = 88;
   } else if (this.planner.displayMode === DISPLAY_MODE.YEAR) {
     scaleItemMinWidth = 550;
   }

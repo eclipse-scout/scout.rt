@@ -350,7 +350,7 @@ scout.Planner.prototype._renderScale = function() {
       }
 
       $divSmall = $timelineSmall
-        .appendDiv('scale-item', this._dateFormat(loop, 'dd'))
+        .appendDiv('scale-item', loop.getDate() % 2 == 1 ? this._dateFormat(loop, 'dd') : '')
         .data('date-from', new Date(loop.valueOf()));
 
       loop.setDate(loop.getDate() + 1);
