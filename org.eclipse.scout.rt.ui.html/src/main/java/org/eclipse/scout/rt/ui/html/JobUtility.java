@@ -86,7 +86,7 @@ public final class JobUtility {
     }
 
     // Otherwise, schedule a model job and wait for it to finish
-    JobInput jobInput = ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)).name(jobName);
+    JobInput jobInput = ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession, true)).name(jobName);
     if (pollingRequest) {
       jobInput.propertyMap().put(POLLING_REQUEST_HINT, pollingRequest);
     }
