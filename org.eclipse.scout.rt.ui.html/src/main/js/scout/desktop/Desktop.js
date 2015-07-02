@@ -329,13 +329,6 @@ scout.Desktop.prototype._openUri = function(event) {
     newWindow = true;
   } else if (scout.Desktop.TargetWindow.SELF === event.uriTarget) {
     newWindow = false;
-  } else if (scout.Desktop.TargetWindow.AUTO === event.uriTarget) {
-    // this is important for download resources with Firefox. Firefox cancels all running
-    // requests (also the background polling job) when a resource is opened in the same
-    // windows as the Scout application. This would lead to a connection failure, thus
-    // we always want to open the resource in a new window (Firefox automatically closes
-    // this window as soon as the download is started).
-    newWindow = !scout.device.supportsDownloadInSameWindow();
   }
 
   $.log.debug('(Desktop#_openUri) uri=' + event.uri + ' target=' + event.uriTarget + ' newWindow=' + newWindow);
