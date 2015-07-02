@@ -118,7 +118,7 @@ scout.Planner.prototype._renderProperties = function() {
   this._renderViewRange();
   this._renderHeaderVisible();
   this._renderMenus();
-  this._renderYearPanelVisible();
+  this._renderYearPanelVisible(false);
   this._renderResources();
   this._renderSelectedResources();
   this._renderLabel();
@@ -793,7 +793,7 @@ scout.Planner.prototype._renderHeaderVisible = function() {
   this.invalidateLayoutTree();
 };
 
-scout.Planner.prototype._renderYearPanelVisible = function() {
+scout.Planner.prototype._renderYearPanelVisible = function(animated) {
   var yearPanelWidth;
   if (this.yearPanelVisible) {
     this._yearPanel.renderContent();
@@ -809,7 +809,7 @@ scout.Planner.prototype._renderYearPanelVisible = function() {
   this._yearPanel.$container.animate({
     width: yearPanelWidth
   }, {
-    duration: 500,
+    duration: animated ? 500 : 0,
     progress: this._onYearPanelWidthChange.bind(this),
     complete: this._afterYearPanelWidthChange.bind(this)
   });
@@ -996,9 +996,12 @@ scout.Planner.prototype.setDisplayMode = function(displayMode) {
   }
 };
 
-if (this.yearPanelVisible) {
-  this._yearPanel.renderContent();
-}
+scout.Planner.prototype.layoutYearPanel = function() {
+  if (this.yearPanelVisible) {
+    scout.scrollbars.update(this._yearPanel.$yearList);
+    this._yearPanel._scrollYear();
+  }
+};
 
 scout.Planner.prototype.setYearPanelVisible = function(visible) {
   if (this.yearPanelVisible === visible) {
@@ -1006,7 +1009,7 @@ scout.Planner.prototype.setYearPanelVisible = function(visible) {
   }
   this.yearPanelVisible = visible;
   if (this.rendered) {
-    this._renderYearPanelVisible();
+    this._renderYearPanelVisible(true);
   }
 };
 

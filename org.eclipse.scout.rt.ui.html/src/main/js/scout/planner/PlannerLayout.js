@@ -47,6 +47,7 @@ scout.PlannerLayout.prototype.layout = function($container) {
   this._updateMinWidth();
   this._layoutScaleLines();
   scout.scrollbars.update(this.planner.$grid);
+  this.planner.layoutYearPanel();
 };
 
 /**
