@@ -1,7 +1,7 @@
 scout.icons = {
 
   OUTLINE: 'font:\uE030',
-  ELLIPSIS_V: 'font:\uF143',
+  ELLIPSIS_V: 'font:\uE040',
 
   /**
    * Returns an Icon object with structured info contained in the iconId string.

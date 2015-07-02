@@ -24,9 +24,11 @@
 @icon-star: '\E032';
 @icon-share: '\E033';
 @icon-person: '\E034'; /* FIXME CGU change to E12*/
+@icon-ellipsis-v: '\E040';
+@icon-list-ul: '\E041 ';
 
 /* scoutIcons: awesome icons */
-@icon-search: '\F002';
+@icon-search: '\E042';
 @icon-th-list: '\F00B';
 @icon-remove: '\F00D'; /* close */
 @icon-rotate-right: '\F01E'; /* repeat */
@@ -39,7 +41,6 @@
 @icon-chevron-down: '\F078';
 @icon-square: '\F0C8';
 @icon-menu: '\F0C9'; /* bars */
-@icon-list-ul: '\F0CA';
 @icon-list-ol: '\F0CB';
 @icon-caret-down: '\F0D7';
 @icon-caret-up: '\F0D8';
@@ -59,6 +60,5 @@
 @icon-long-arrow-up: '\F176';
 @icon-long-arrow-left: '\F177';
 @icon-long-arrow-right: '\F178';
-@icon-ellipsis-v: '\F143';
 @icon-file: '\F15B';
 @icon-arrow-right: '\F061';
