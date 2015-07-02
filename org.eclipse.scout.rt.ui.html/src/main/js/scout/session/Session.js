@@ -620,8 +620,15 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   }
 };
 
-scout.Session.prototype.uploadFiles = function(target, files) {
+scout.Session.prototype.uploadFiles = function(target, files, uploadProperties) {
   var formData = new FormData();
+
+  if (uploadProperties) {
+    $.each(uploadProperties, function(key, value) {
+      formData.append(key, value);
+  });
+  }
+
   formData.append('uiSessionId', this.uiSessionId);
   formData.append('target', target.id);
   files.forEach(function(file) {

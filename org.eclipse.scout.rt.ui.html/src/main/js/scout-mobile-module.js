@@ -14,6 +14,7 @@ __include("scout/util/dates.js");
 __include("scout/util/defaultValues.js");
 __include("scout/util/DetachHelper.js");
 __include("scout/util/Device.js");
+__include("scout/util/dragAndDrop.js");
 __include("scout/util/EventSupport.js");
 __include("scout/util/helpers.js");
 __include("scout/util/icons.js");

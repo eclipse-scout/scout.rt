@@ -87,7 +87,7 @@ scout.Desktop.prototype._render = function($parent) {
   $(window).on('resize', this.onResize.bind(this));
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
-  $parent.on('dragstart', function (event) {
+  $parent.on('dragenter', function (event) {
     event.stopPropagation();
     event.preventDefault();
     // change cursor to forbidden (no dropping allowed)

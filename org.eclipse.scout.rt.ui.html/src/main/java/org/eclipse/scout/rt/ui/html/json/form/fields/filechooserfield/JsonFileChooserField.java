@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -54,7 +55,7 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
   }
 
   @Override
-  public void consumeBinaryResource(List<BinaryResource> binaryResources) {
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
     if (!CollectionUtility.isEmpty(binaryResources)) {
       getModel().setValue(CollectionUtility.firstElement(binaryResources));
     }

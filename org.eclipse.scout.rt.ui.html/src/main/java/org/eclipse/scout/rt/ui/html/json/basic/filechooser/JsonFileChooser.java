@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.filechooser;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.FileUtility;
@@ -113,7 +114,7 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   }
 
   @Override
-  public void consumeBinaryResource(List<BinaryResource> binaryResources) {
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
     getModel().getUIFacade().setResultFromUI(binaryResources);
   }
 

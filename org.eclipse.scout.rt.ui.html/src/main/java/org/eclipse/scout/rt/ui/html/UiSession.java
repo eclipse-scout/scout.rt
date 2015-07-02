@@ -684,7 +684,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     IBinaryResourceConsumer resourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
 
     // Consume
-    resourceConsumer.consumeBinaryResource(uploadFiles);
+    resourceConsumer.consumeBinaryResource(uploadFiles, uploadProperties);
   }
 
   @Override

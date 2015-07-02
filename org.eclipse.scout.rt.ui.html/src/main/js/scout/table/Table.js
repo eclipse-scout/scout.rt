@@ -133,7 +133,10 @@ scout.Table.prototype._render = function($parent) {
   this.$data.on('mousedown', '.table-row', onMouseDown)
     .on('mouseup', '.table-row', onMouseUp)
     .on('dblclick', '.table-row', onDoubleClick)
-    .on('contextmenu', '.table-row', onContextMenu);
+    .on('contextmenu', '.table-row', onContextMenu)
+    .on('dragenter', onDragEnterOrOver.bind(this))
+    .on('dragover', onDragEnterOrOver.bind(this))
+    .on('drop', onDrop.bind(this));
   scout.scrollbars.install(this.$data, {
     axis: 'both'
   });
@@ -206,6 +209,29 @@ scout.Table.prototype._render = function($parent) {
           $anchor: that.$data
         });
         popup.render();
+      }
+    }
+  }
+
+  function onDragEnterOrOver(event) {
+    scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
+  }
+
+  function onDrop(event) {
+    if (this.dropType & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
+        scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      var files = event.originalEvent.dataTransfer.files;
+      if (files.length >= 1) {
+        // FIXME mot d'n'd check content-type
+        // FIXME mot d'n'd check length (what is the maximum length?)
+        var row = this._rowAtY(event.originalEvent.pageY);
+        var data = {
+            'rowId': (row ? row.id : '')
+        };
+        this.session.uploadFiles(that, [files[0]], data);
       }
     }
   }
@@ -717,6 +743,24 @@ scout.Table.prototype._columnAtX = function(x) {
       return true;
     }
     columnOffsetLeft = columnOffsetRight;
+  });
+};
+
+/**
+ * @returns the row at position y (e.g. from event.pageY)
+ */
+scout.Table.prototype._rowAtY = function(y) {
+  var rowOffsetBottom = 0,
+    rowOffsetTop = this.$data.offset().top,
+    scrollTop = this.$data.scrollTop();
+
+  rowOffsetTop -= scrollTop;
+  return scout.arrays.find(this.rows, function(row) {
+    rowOffsetBottom = rowOffsetTop + row.$row.height();
+    if (rowOffsetTop >= 0 && y >= rowOffsetTop && y < rowOffsetBottom) {
+      return true;
+    }
+    rowOffsetTop = rowOffsetBottom;
   });
 };
 

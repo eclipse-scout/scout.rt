@@ -134,23 +134,15 @@ scout.FileChooser.prototype._onFileChooserClosed = function() {
 };
 
 scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
-  event.stopPropagation();
-  event.preventDefault();
-
-  if (event.originalEvent.dataTransfer.types.indexOf && event.originalEvent.dataTransfer.types.indexOf('Files') < 0) {
-    // Array: indexOf function
-    event.originalEvent.dataTransfer.dropEffect = "none";
-  }
-  else if (event.originalEvent.dataTransfer.types.contains && !event.originalEvent.dataTransfer.types.contains('Files')) {
-    // DOMStringList: contains function
-    event.originalEvent.dataTransfer.dropEffect = "none";
-  }
+  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
 };
 
 scout.FileChooser.prototype._onDrop = function(event) {
-  event.stopPropagation();
-  event.preventDefault();
+  if(scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+    event.stopPropagation();
+    event.preventDefault();
 
-  this.addFiles(event.originalEvent.dataTransfer.files);
+    this.addFiles(event.originalEvent.dataTransfer.files);
+  }
 };
 

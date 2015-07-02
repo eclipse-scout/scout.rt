@@ -17,10 +17,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -52,10 +56,11 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserver<TABLE> implements IJsonContextMenuOwner {
+public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserver<TABLE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
@@ -201,6 +206,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       @Override
       protected List<ITableControl> modelValue() {
         return getModel().getTableControls();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_DROP_TYPE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getDropType();
       }
     });
   }
@@ -986,6 +997,21 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public void cleanUpEventFilters() {
     super.cleanUpEventFilters();
     m_tableEventFilter.removeAllConditions();
+  }
+
+  @Override
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
+    if ((getModel().getDropType() & IDNDSupport.TYPE_FILE_TRANSFER) == IDNDSupport.TYPE_FILE_TRANSFER) {
+      ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);
+      ITableRow row = null;
+      if (uploadProperties != null && uploadProperties.containsKey("rowId")) {
+        String rowId = uploadProperties.get("rowId");
+        if (!StringUtility.isNullOrEmpty(rowId)) {
+          row = getTableRowForRowId(uploadProperties.get("rowId"));
+        }
+      }
+      getModel().getUIFacade().fireRowDropActionFromUI(row, transferObject);
+    }
   }
 
   protected CheckedInfo jsonToCheckedInfo(JSONObject data) {
