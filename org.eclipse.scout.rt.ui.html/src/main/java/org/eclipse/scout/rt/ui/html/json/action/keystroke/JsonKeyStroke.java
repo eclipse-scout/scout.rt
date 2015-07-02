@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 
-public class JsonKeyStroke<T extends IKeyStroke> extends JsonAction<T> {
+public class JsonKeyStroke<KEY_STROKE extends IKeyStroke> extends JsonAction<KEY_STROKE> {
 
-  public JsonKeyStroke(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonKeyStroke(KEY_STROKE model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
-public class JsonCalendarField<T extends ICalendarField<? extends ICalendar>> extends JsonFormField<T> {
+public class JsonCalendarField<CALENDAR_FIELD extends ICalendarField<? extends ICalendar>> extends JsonFormField<CALENDAR_FIELD> {
 
-  public JsonCalendarField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonCalendarField(CALENDAR_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

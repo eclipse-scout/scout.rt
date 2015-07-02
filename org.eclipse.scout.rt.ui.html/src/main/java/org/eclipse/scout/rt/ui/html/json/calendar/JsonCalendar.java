@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner {
+public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonPropertyObserver<CALENDAR> implements IJsonContextMenuOwner {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
 
@@ -60,7 +60,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   private CalendarListener m_calendarListener;
 
-  public JsonCalendar(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonCalendar(CALENDAR model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -98,14 +98,14 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   @Override
-  protected void initJsonProperties(T model) {
-    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
+  protected void initJsonProperties(CALENDAR model) {
+    putJsonProperty(new JsonAdapterProperty<CALENDAR>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
         return getModel().getComponents();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_SELECTED_COMPONENT, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<CALENDAR>(ICalendar.PROP_SELECTED_COMPONENT, model, getUiSession()) {
       @Override
       protected CalendarComponent modelValue() {
         return getModel().getSelectedComponent();
@@ -116,25 +116,25 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_DISPLAY_MODE, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_DISPLAY_MODE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getDisplayMode();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_DISPLAY_CONDENSED, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_DISPLAY_CONDENSED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isDisplayCondensed();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getTitle();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_VIEW_RANGE, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_VIEW_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
         return getModel().getViewRange();
@@ -149,7 +149,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_SELECTED_DATE, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_SELECTED_DATE, model) {
       @Override
       protected Date modelValue() {
         return getModel().getSelectedDate();
@@ -160,43 +160,43 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         return new JsonDate((Date) value).asJsonString();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_LOAD_IN_PROGRESS, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_LOAD_IN_PROGRESS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isLoadInProgress();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_START_HOUR, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_START_HOUR, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getStartHour();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_END_HOUR, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_END_HOUR, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getEndHour();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_USE_OVERFLOW_CELLS, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_USE_OVERFLOW_CELLS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().getUseOverflowCells();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_SHOW_DISPLAY_MODE_SELECTION, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_SHOW_DISPLAY_MODE_SELECTION, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().getShowDisplayModeSelection();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_MARK_NOON_HOUR, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_MARK_NOON_HOUR, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().getMarkNoonHour();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_MARK_OUT_OF_MONTH_DAYS, model) {
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_MARK_OUT_OF_MONTH_DAYS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().getMarkOutOfMonthDays();

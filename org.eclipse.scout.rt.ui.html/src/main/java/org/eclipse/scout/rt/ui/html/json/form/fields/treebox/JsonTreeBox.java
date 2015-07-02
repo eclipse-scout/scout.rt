@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-public class JsonTreeBox<T extends ITreeBox> extends JsonValueField<T> {
+public class JsonTreeBox<TREE_BOX extends ITreeBox> extends JsonValueField<TREE_BOX> {
 
-  public JsonTreeBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTreeBox(TREE_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

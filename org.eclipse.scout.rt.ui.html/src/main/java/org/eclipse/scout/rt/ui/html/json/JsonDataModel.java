@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> {
+public class JsonDataModel<DATA_MODEL extends IDataModel> extends AbstractJsonAdapter<DATA_MODEL> {
 
-  public JsonDataModel(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonDataModel(DATA_MODEL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

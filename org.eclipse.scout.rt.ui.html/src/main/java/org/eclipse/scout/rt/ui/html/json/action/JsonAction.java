@@ -22,10 +22,10 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
-public abstract class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
+public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPropertyObserver<ACTION> {
   public static final String EVENT_DO_ACTION = "doAction";
 
-  public JsonAction(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonAction(ACTION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -35,16 +35,16 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(ACTION model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_TEXT, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_TEXT, model) {
       @Override
       protected String modelValue() {
         return getModel().getText();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_ICON_ID, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
         return getModel().getIconId();
@@ -56,49 +56,49 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_TOOLTIP_TEXT, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_TOOLTIP_TEXT, model) {
       @Override
       protected String modelValue() {
         return getModel().getTooltipText();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_SELECTED, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_SELECTED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isSelected();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isEnabled();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isVisible();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_KEY_STROKE, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_KEY_STROKE, model) {
       @Override
       protected String modelValue() {
         return getModel().getKeyStroke();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_HORIZONTAL_ALIGNMENT, model) {
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_HORIZONTAL_ALIGNMENT, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getHorizontalAlignment();
       }
     });
 
-    putJsonProperty(new JsonAdapterProperty<T>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<ACTION>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
         return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();

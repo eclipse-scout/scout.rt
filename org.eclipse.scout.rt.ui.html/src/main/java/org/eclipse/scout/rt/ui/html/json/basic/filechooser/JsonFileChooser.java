@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonFileChooser<T extends IFileChooser> extends AbstractJsonAdapter<T> implements IBinaryResourceConsumer {
+public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends AbstractJsonAdapter<FILE_CHOOSER> implements IBinaryResourceConsumer {
 
   private static final String EVENT_CLOSED = "closed";
   // UI events
@@ -35,7 +35,7 @@ public class JsonFileChooser<T extends IFileChooser> extends AbstractJsonAdapter
 
   private FileChooserListener m_fileChooserListener;
 
-  public JsonFileChooser(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonFileChooser(FILE_CHOOSER model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

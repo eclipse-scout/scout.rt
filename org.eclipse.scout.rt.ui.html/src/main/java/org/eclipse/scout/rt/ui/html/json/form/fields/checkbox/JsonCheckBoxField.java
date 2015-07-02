@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 /**
  * This class creates JSON output for an IBooleanField used as a check-box.
  */
-public class JsonCheckBoxField<T extends IBooleanField> extends JsonValueField<T> {
+public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends JsonValueField<CHECK_BOX_FIELD> {
 
-  public JsonCheckBoxField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonCheckBoxField(CHECK_BOX_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -34,7 +34,7 @@ public class JsonCheckBoxField<T extends IBooleanField> extends JsonValueField<T
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(CHECK_BOX_FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_VALUE, model) {
       @Override

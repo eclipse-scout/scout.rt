@@ -30,7 +30,7 @@ import org.json.JSONObject;
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
-public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> implements IJsonContextMenuOwner {
+public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeField<GROUP_BOX, IFormField> implements IJsonContextMenuOwner {
 
   // from UI
   public static final String EVENT_EXPANDED = "expanded";
@@ -38,7 +38,7 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
   public static final String PROP_MAIN_BOX = "mainBox";
   public static final String PROP_SCROLLABLE = "scrollable";
 
-  public JsonGroupBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonGroupBox(GROUP_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -54,7 +54,7 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(GROUP_BOX model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, model) {

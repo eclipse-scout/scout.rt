@@ -26,13 +26,13 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonWizardProgressField<T extends IWizardProgressField> extends JsonFormField<T> {
+public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgressField> extends JsonFormField<WIZARD_PROGRESS_FIELD> {
 
   private static final String PROP_ACTIVE_WIZARD_STEP_INDEX = "activeWizardStepIndex";
   // from UI
   private static final String EVENT_STEP_CLICKED = "stepClicked";
 
-  public JsonWizardProgressField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonWizardProgressField(WIZARD_PROGRESS_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -42,9 +42,9 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(WIZARD_PROGRESS_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IWizardProgressField.PROP_WIZARD_STEPS, model) {
+    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_WIZARD_STEPS, model) {
       @Override
       protected List<IWizardStep<? extends IForm>> modelValue() {
         return getModel().getWizardSteps();
@@ -65,7 +65,7 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
         return jsonSteps;
       }
     });
-    putJsonProperty(new JsonProperty<T>(IWizardProgressField.PROP_ACTIVE_WIZARD_STEP, model) {
+    putJsonProperty(new JsonProperty<WIZARD_PROGRESS_FIELD>(IWizardProgressField.PROP_ACTIVE_WIZARD_STEP, model) {
       @Override
       protected IWizardStep<? extends IForm> modelValue() {
         return getModel().getActiveWizardStep();

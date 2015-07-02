@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner {
+public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<PLANNER> implements IJsonContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonPlanner.class);
 
   // from model
@@ -58,7 +58,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   private final Map<Resource<?>, String> m_resourceIds;
   private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
 
-  public JsonPlanner(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonPlanner(PLANNER model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_cells = new HashMap<>();
     m_cellIds = new HashMap<>();
@@ -99,27 +99,27 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(PLANNER model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_LABEL, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_LABEL, model) {
       @Override
       protected String modelValue() {
         return getModel().getLabel();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_AVAILABLE_DISPLAY_MODES, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_AVAILABLE_DISPLAY_MODES, model) {
       @Override
       protected Set<Integer> modelValue() {
         return getModel().getAvailableDisplayModes();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_DISPLAY_MODE, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_DISPLAY_MODE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getDisplayMode();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_VIEW_RANGE, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_VIEW_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
         return getModel().getViewRange();
@@ -134,13 +134,13 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_HEADER_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_HEADER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isHeaderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTION_RANGE, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTION_RANGE, model) {
       @Override
       protected Range<Date> modelValue() {
         return getModel().getSelectionRange();
@@ -188,7 +188,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 //        return getModel().getIntradayInterval();
 //      }
 //    });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_RESOURCES, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTED_RESOURCES, model) {
       @Override
       protected List<?> modelValue() {
         return getModel().getSelectedResources();
@@ -200,7 +200,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return resourceIdsToJson((List<Resource<?>>) value, new P_GetOrCreateResourceIdProvider());
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
       @Override
       protected Activity<?, ?> modelValue() {
         return getModel().getSelectedActivity();
@@ -212,7 +212,7 @@ public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
-    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTION_MODE, model) {
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTION_MODE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getSelectionMode();

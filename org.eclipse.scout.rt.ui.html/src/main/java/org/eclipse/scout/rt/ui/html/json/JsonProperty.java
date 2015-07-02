@@ -17,18 +17,18 @@ import java.util.List;
  * This property class is used to map a model object property to a JSON property and is used to automatically create a
  * JSON object for a model and also to propagate property change events to the browser-side client.
  *
- * @param <T>
+ * @param <MODEL_ELEMENT>
  *          Type of model object
  */
-public abstract class JsonProperty<T> {
+public abstract class JsonProperty<MODEL_ELEMENT> {
 
   private final String m_propertyName;
-  private final T m_model;
+  private final MODEL_ELEMENT m_model;
   private IJsonAdapter<?> m_parentJsonAdapter;
   private List<JsonProperty<?>> m_slaveProperties = new LinkedList<JsonProperty<?>>();
   private boolean m_valueSent;
 
-  public JsonProperty(String propertyName, T model) {
+  public JsonProperty(String propertyName, MODEL_ELEMENT model) {
     m_propertyName = propertyName;
     m_model = model;
   }
@@ -45,7 +45,7 @@ public abstract class JsonProperty<T> {
     return getPropertyName();
   }
 
-  protected T getModel() {
+  protected MODEL_ELEMENT getModel() {
     return m_model;
   }
 

@@ -23,14 +23,14 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.DisplayableFormFieldFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
-public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupBox> {
+public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_BOX, IGroupBox> {
 
-  public JsonTabBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTabBox(TAB_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(TAB_BOX model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model) {

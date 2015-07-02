@@ -20,14 +20,14 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
-public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyObserver<T> {
+public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJsonPropertyObserver<MESSAGE_BOX> {
 
   public static final String EVENT_ACTION = "action";
   public static final String EVENT_CLOSED = "closed";
 
   private MessageBoxListener m_messageBoxListener;
 
-  public JsonMessageBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonMessageBox(MESSAGE_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -37,7 +37,7 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(MESSAGE_BOX model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IMessageBox>("iconId", model) {

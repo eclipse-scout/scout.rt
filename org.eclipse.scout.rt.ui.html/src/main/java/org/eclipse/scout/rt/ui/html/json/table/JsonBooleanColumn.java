@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 
-public class JsonBooleanColumn<T extends IBooleanColumn> extends JsonColumn<T> {
+public class JsonBooleanColumn<BOOLEAN_COLUMN extends IBooleanColumn> extends JsonColumn<BOOLEAN_COLUMN> {
 
-  public JsonBooleanColumn(T model) {
+  public JsonBooleanColumn(BOOLEAN_COLUMN model) {
     super(model);
   }
 

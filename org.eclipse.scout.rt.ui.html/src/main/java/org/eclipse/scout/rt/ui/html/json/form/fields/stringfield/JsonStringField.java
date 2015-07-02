@@ -17,13 +17,13 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
+public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValueField<STRING_FIELD> {
 
   public static final String EVENT_CALL_ACTION = "callAction";
   public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
   public static final String EVENT_SELECTION_CHANGED = "selectionChanged";
 
-  public JsonStringField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonStringField(STRING_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -33,7 +33,7 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(STRING_FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_MULTILINE_TEXT, model) {
       @Override

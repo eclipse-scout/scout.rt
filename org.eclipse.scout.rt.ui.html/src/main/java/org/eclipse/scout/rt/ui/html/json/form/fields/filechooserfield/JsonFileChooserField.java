@@ -21,11 +21,11 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonFileChooserField<T extends IFileChooserField> extends JsonValueField<T> implements IBinaryResourceConsumer {
+public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> extends JsonValueField<FILE_CHOOSER_FIELD> implements IBinaryResourceConsumer {
 
   public static final String EVENT_CHOOSE_FILE = "chooseFile";
 
-  public JsonFileChooserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonFileChooserField(FILE_CHOOSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

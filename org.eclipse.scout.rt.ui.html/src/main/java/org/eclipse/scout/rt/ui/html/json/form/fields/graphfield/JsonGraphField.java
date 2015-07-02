@@ -21,10 +21,10 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-public class JsonGraphField<T extends IGraphField> extends JsonValueField<T> {
+public class JsonGraphField<GRAPH_FIELD extends IGraphField> extends JsonValueField<GRAPH_FIELD> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraphField.class);
 
-  public JsonGraphField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonGraphField(GRAPH_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -34,7 +34,7 @@ public class JsonGraphField<T extends IGraphField> extends JsonValueField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(GRAPH_FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IGraphField>(IValueField.PROP_VALUE, model) {
       @Override

@@ -28,13 +28,13 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
-public class JsonButton<T extends IButton> extends JsonFormField<T> implements IJsonContextMenuOwner {
+public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> implements IJsonContextMenuOwner {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";
   public static final String PROP_DISPLAY_STYLE = "displayStyle";
 
-  public JsonButton(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonButton(BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -44,7 +44,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> implements I
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(BUTTON model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {
       @Override

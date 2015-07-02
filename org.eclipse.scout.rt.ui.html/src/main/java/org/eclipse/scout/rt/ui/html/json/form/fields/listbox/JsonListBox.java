@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
+public class JsonListBox<LIST_BOX_KEY, LIST_BOX extends IListBox<LIST_BOX_KEY>> extends JsonFormField<LIST_BOX> {
 
-  public JsonListBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonListBox(LIST_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -31,9 +31,9 @@ public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(LIST_BOX model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<IListBox<V>>("table", model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<IListBox<LIST_BOX_KEY>>("table", model, getUiSession()) {
       @Override
       protected ITable modelValue() {
         return getModel().getTable();
@@ -41,7 +41,7 @@ public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
     });
 
     if (getModel() instanceof AbstractListBox) {
-      putJsonProperty(new JsonAdapterProperty<IListBox<V>>("filterBox", model, getUiSession()) {
+      putJsonProperty(new JsonAdapterProperty<IListBox<LIST_BOX_KEY>>("filterBox", model, getUiSession()) {
         @Override
         protected AbstractListBoxFilterBox modelValue() {
           return ((AbstractListBox) getModel()).getListBoxFilterBox();

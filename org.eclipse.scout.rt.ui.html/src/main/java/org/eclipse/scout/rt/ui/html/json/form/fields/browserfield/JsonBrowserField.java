@@ -27,13 +27,13 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonBrowserField<T extends IBrowserField> extends JsonFormField<T> implements IBinaryResourceProvider {
+public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonFormField<BROWSER_FIELD> implements IBinaryResourceProvider {
 
   private BrowserFieldListener m_browserFieldListener;
 
   private static final String EVENT_POST_MESSAGE = "postMessage";
 
-  public JsonBrowserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonBrowserField(BROWSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -43,7 +43,7 @@ public class JsonBrowserField<T extends IBrowserField> extends JsonFormField<T> 
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(BROWSER_FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SCROLLBARS_ENABLED, model) {
       @Override

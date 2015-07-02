@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.json.JSONObject;
 
-public class JsonGraphTableControl<T extends IGraphTableControl> extends JsonTableControl<T> {
+public class JsonGraphTableControl<GRAPH_TABLE_CONTROL extends IGraphTableControl> extends JsonTableControl<GRAPH_TABLE_CONTROL> {
 
   //FIXME add to model
   private static final String GRAPH = "{\"nodes\": [{\"id\": 0, \"name\": \"Daniel Anders\", \"type\": \"center\"}," +
@@ -36,7 +36,7 @@ public class JsonGraphTableControl<T extends IGraphTableControl> extends JsonTab
       "                           {\"source\": 6, \"target\": 8, \"label\": \"Mitarbeiter\"}," +
       "                           {\"source\": 7, \"target\": 8, \"label\": \"Mitarbeiter\"}]}";
 
-  public JsonGraphTableControl(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonGraphTableControl(GRAPH_TABLE_CONTROL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonTagCloudField<T extends ITagCloudField> extends JsonFormField<T> {
+public class JsonTagCloudField<TAG_CLOUD_FIELD extends ITagCloudField> extends JsonFormField<TAG_CLOUD_FIELD> {
 
-  public JsonTagCloudField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTagCloudField(TAG_CLOUD_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

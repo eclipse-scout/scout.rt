@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
-public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
+public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField<DATE_FIELD> {
 
-  public JsonDateField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonDateField(DATE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -38,7 +38,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(DATE_FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IDateField>(IDateField.PROP_HAS_TIME, model) {
       @Override

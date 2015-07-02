@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonPlaceholderField<T extends IPlaceholderField> extends JsonFormField<T> {
+public class JsonPlaceholderField<PLACEHOLDER_FIELD extends IPlaceholderField> extends JsonFormField<PLACEHOLDER_FIELD> {
 
-  public JsonPlaceholderField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonPlaceholderField(PLACEHOLDER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

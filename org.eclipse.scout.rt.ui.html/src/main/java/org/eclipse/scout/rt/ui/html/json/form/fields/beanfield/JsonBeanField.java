@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonBeanField<T extends IBeanField<?>> extends JsonValueField<T> {
+public class JsonBeanField<BEAN_FIELD extends IBeanField<?>> extends JsonValueField<BEAN_FIELD> {
 
-  public JsonBeanField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonBeanField(BEAN_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -32,9 +32,9 @@ public class JsonBeanField<T extends IBeanField<?>> extends JsonValueField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(BEAN_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IValueField.PROP_VALUE, model) {
+    putJsonProperty(new JsonProperty<BEAN_FIELD>(IValueField.PROP_VALUE, model) {
       @Override
       protected Object modelValue() {
         return getModel().getValue();

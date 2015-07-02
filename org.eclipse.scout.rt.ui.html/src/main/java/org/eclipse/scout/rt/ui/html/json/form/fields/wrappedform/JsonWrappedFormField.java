@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonWrappedFormField<T extends IWrappedFormField<? extends IForm>> extends JsonFormField<T> {
+public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<? extends IForm>> extends JsonFormField<WRAPPED_FORM_FIELD> {
 
-  public JsonWrappedFormField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonWrappedFormField(WRAPPED_FORM_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -31,9 +31,9 @@ public class JsonWrappedFormField<T extends IWrappedFormField<? extends IForm>> 
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(WRAPPED_FORM_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<T>(IWrappedFormField.PROP_INNER_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<WRAPPED_FORM_FIELD>(IWrappedFormField.PROP_INNER_FORM, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
         return JsonAdapterPropertyConfigBuilder.globalConfig();

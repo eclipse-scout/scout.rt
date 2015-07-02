@@ -8,9 +8,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonComposerField<T extends IComposerField> extends JsonFormField<T> {
+public class JsonComposerField<COMPOSER_FIELD extends IComposerField> extends JsonFormField<COMPOSER_FIELD> {
 
-  public JsonComposerField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonComposerField(COMPOSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -20,10 +20,10 @@ public class JsonComposerField<T extends IComposerField> extends JsonFormField<T
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(COMPOSER_FIELD model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonAdapterProperty<T>(ITreeField.PROP_TREE, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<COMPOSER_FIELD>(ITreeField.PROP_TREE, model, getUiSession()) {
       @Override
       protected ITree modelValue() {
         return getModel().getTree();

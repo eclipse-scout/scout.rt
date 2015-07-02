@@ -23,9 +23,9 @@ import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.json.JSONObject;
 
-public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
+public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<DATE_COLUMN> {
 
-  public JsonDateColumn(T model) {
+  public JsonDateColumn(DATE_COLUMN model) {
     super(model);
   }
 

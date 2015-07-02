@@ -21,15 +21,15 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 
-public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
+public class JsonTableControl<TABLE_CONTROL extends ITableControl> extends JsonAction<TABLE_CONTROL> {
   protected boolean m_contentLoaded = false;
 
-  public JsonTableControl(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTableControl(TABLE_CONTROL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(TABLE_CONTROL model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, getUiSession()) {
       @Override

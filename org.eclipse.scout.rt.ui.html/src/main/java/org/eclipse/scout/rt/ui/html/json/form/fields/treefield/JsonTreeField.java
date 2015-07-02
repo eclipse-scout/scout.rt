@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
+public class JsonTreeField<TREE_FIELD extends ITreeField> extends JsonFormField<TREE_FIELD> {
 
-  public JsonTreeField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTreeField(TREE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -29,10 +29,10 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(TREE_FIELD model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonAdapterProperty<T>(ITreeField.PROP_TREE, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<TREE_FIELD>(ITreeField.PROP_TREE, model, getUiSession()) {
       @Override
       protected ITree modelValue() {
         return getModel().getTree();

@@ -15,11 +15,11 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.json.JSONObject;
 
-public class JsonSearchForm<T extends ISearchForm> extends JsonForm<T> {
+public class JsonSearchForm<SEARCH_FORM extends ISearchForm> extends JsonForm<SEARCH_FORM> {
 
   public static final String PROP_SEARCH_FORM = "searchForm";
 
-  public JsonSearchForm(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSearchForm(SEARCH_FORM model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

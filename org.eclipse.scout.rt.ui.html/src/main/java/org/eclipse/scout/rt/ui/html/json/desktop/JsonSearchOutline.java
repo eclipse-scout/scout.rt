@@ -16,11 +16,11 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
-public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
+public class JsonSearchOutline<SEARCH_OUTLINE extends ISearchOutline> extends JsonOutline<SEARCH_OUTLINE> {
 
   public static final String EVENT_SEARCH = "search";
 
-  public JsonSearchOutline(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSearchOutline(SEARCH_OUTLINE model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -30,16 +30,16 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(SEARCH_OUTLINE model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<T>(ISearchOutline.PROP_SEARCH_QUERY, model) {
+    putJsonProperty(new JsonProperty<SEARCH_OUTLINE>(ISearchOutline.PROP_SEARCH_QUERY, model) {
       @Override
       protected String modelValue() {
         return getModel().getSearchQuery();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ISearchOutline.PROP_SEARCH_STATUS, model) {
+    putJsonProperty(new JsonProperty<SEARCH_OUTLINE>(ISearchOutline.PROP_SEARCH_STATUS, model) {
       @Override
       protected String modelValue() {
         return getModel().getSearchStatus();

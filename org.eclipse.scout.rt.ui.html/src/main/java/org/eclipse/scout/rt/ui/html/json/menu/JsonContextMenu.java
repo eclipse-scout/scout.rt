@@ -27,12 +27,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // FIXME AWE: (menu) diese klasse soll kein JsonAdapter mehr sein. Parent der menus ist dann die Table
-public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropertyObserver<T> {
+public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends AbstractJsonPropertyObserver<CONTEXT_MENU> {
 
   private ContextMenuListener m_contextMenuListener;
   private Set<IJsonAdapter<?>> m_jsonMenuAdapters = new HashSet<IJsonAdapter<?>>();
 
-  public JsonContextMenu(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonContextMenu(CONTEXT_MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

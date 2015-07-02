@@ -8,9 +8,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
-public class JsonPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends JsonFormField<IPlannerField<P>> {
+public class JsonPlannerField<PLANNER extends IPlanner<RESOURCE_ID, ACTIVITY_ID>, RESOURCE_ID, ACTIVITY_ID> extends JsonFormField<IPlannerField<PLANNER>> {
 
-  public JsonPlannerField(IPlannerField<P> model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonPlannerField(IPlannerField<PLANNER> model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -20,9 +20,9 @@ public class JsonPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends JsonFo
   }
 
   @Override
-  protected void initJsonProperties(IPlannerField<P> model) {
+  protected void initJsonProperties(IPlannerField<PLANNER> model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IPlannerField<P>>(IPlannerField.PROP_SPLITTER_POSITION, model) {
+    putJsonProperty(new JsonProperty<IPlannerField<PLANNER>>(IPlannerField.PROP_SPLITTER_POSITION, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getSplitterPosition();

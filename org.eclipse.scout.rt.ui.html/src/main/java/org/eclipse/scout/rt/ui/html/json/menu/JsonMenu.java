@@ -20,12 +20,12 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 
-public class JsonMenu<T extends IMenu> extends JsonAction<T> {
+public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
 
   public static final String PROP_SEPARATOR = "separator";
   public static final String PROP_SYSTEM_TYPE = "systemType";
 
-  public JsonMenu(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonMenu(MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -35,17 +35,17 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(MENU model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<T>(PROP_SEPARATOR, model) {
+    putJsonProperty(new JsonProperty<MENU>(PROP_SEPARATOR, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isSeparator();
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IMenu.PROP_MENU_TYPES, model) {
+    putJsonProperty(new JsonProperty<MENU>(IMenu.PROP_MENU_TYPES, model) {
       @Override
       protected Set<IMenuType> modelValue() {
         return getModel().getMenuTypes();

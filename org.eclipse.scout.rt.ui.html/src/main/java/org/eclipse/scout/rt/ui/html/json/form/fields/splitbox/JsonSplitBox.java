@@ -22,13 +22,13 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
-public class JsonSplitBox<T extends ISplitBox> extends JsonFormField<T> {
+public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPLIT_BOX> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSplitBox.class);
 
   private final IFormField m_firstField;
   private final IFormField m_secondField;
 
-  public JsonSplitBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSplitBox(SPLIT_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     List<IFormField> fields = model.getFields();
     IFormField firstField = null;
@@ -52,7 +52,7 @@ public class JsonSplitBox<T extends ISplitBox> extends JsonFormField<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(SPLIT_BOX model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_SPLITTER_POSITION, model) {

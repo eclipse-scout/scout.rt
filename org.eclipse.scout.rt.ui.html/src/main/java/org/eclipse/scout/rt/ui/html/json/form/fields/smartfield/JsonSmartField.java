@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends JsonValueField<T> {
+public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends IContentAssistField<VALUE, LOOKUP_KEY>> extends JsonValueField<CONTENT_ASSIST_FIELD> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
   private static final String PROP_LOOKUP_STRATEGY = "lookupStrategy";
@@ -31,7 +31,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
 
   private boolean m_proposal;
 
-  public JsonSmartField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSmartField(CONTENT_ASSIST_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_proposal = model instanceof IProposalField;
   }
@@ -45,15 +45,15 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(CONTENT_ASSIST_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<IContentAssistField<K, V>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<IContentAssistField<VALUE, LOOKUP_KEY>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getUiSession()) {
       @Override
       protected Object modelValue() {
         return getModel().getProposalChooser();
       }
     });
-    putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_LOOKUP_STRATEGY, model) {
+    putJsonProperty(new JsonProperty<IContentAssistField<VALUE, LOOKUP_KEY>>(PROP_LOOKUP_STRATEGY, model) {
       @Override
       protected String modelValue() {
         return getLookupStrategy();

@@ -29,9 +29,9 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 /**
  * This class creates JSON output for an <code>IHtmlField</code>.
  */
-public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> implements IBinaryResourceProvider {
+public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField<HTML_FIELD> implements IBinaryResourceProvider {
 
-  public JsonHtmlField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonHtmlField(HTML_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -41,7 +41,7 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> imple
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(HTML_FIELD model) {
     super.initJsonProperties(model);
 
     // Prevent sending the value to the UI --> only use the (cleaned) display text

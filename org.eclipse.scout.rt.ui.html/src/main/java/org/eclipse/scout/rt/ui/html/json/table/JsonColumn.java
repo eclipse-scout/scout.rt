@@ -20,13 +20,13 @@ import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
-public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
+public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
 
   private IUiSession m_uiSession;
-  private T m_column;
+  private COLUMN m_column;
   private int m_indexOffset;
 
-  public JsonColumn(T model) {
+  public JsonColumn(COLUMN model) {
     m_column = model;
   }
 
@@ -89,7 +89,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     return null;
   }
 
-  public T getColumn() {
+  public COLUMN getColumn() {
     return m_column;
   }
 

@@ -7,9 +7,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.json.JSONObject;
 
-public class JsonViewButton<T extends IViewButton> extends JsonAction<T> {
+public class JsonViewButton<VIEW_BUTTON extends IViewButton> extends JsonAction<VIEW_BUTTON> {
 
-  public JsonViewButton(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonViewButton(VIEW_BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

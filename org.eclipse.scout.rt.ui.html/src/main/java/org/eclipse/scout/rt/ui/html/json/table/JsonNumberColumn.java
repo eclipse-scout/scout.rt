@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.json.JSONObject;
 
-public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> {
+public class JsonNumberColumn<NUMBER_COLUMN extends INumberColumn<?>> extends JsonColumn<NUMBER_COLUMN> {
 
-  public JsonNumberColumn(T model) {
+  public JsonNumberColumn(NUMBER_COLUMN model) {
     super(model);
   }
 

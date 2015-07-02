@@ -19,13 +19,13 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 
-public class JsonTabItem<T extends IGroupBox> extends JsonGroupBox<T> {
+public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP_BOX> {
 
   public static final String PROP_MARKED = "marked";
 
   private boolean m_marked;
 
-  public JsonTabItem(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTabItem(GROUP_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -35,7 +35,7 @@ public class JsonTabItem<T extends IGroupBox> extends JsonGroupBox<T> {
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(GROUP_BOX model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IGroupBox>(PROP_MARKED, model) {
       @Override

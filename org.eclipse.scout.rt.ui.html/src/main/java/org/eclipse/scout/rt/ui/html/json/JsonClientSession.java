@@ -18,11 +18,11 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 
-public class JsonClientSession<T extends IClientSession> extends AbstractJsonAdapter<T> {
+public class JsonClientSession<CLIENT_SESSION extends IClientSession> extends AbstractJsonAdapter<CLIENT_SESSION> {
 
   private PropertyChangeListener m_localeListener;
 
-  public JsonClientSession(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonClientSession(CLIENT_SESSION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

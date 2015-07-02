@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.json.JSONObject;
 
-public class JsonStringColumn<T extends IStringColumn> extends JsonColumn<T> {
+public class JsonStringColumn<STRING_COLUMN extends IStringColumn> extends JsonColumn<STRING_COLUMN> {
 
-  public JsonStringColumn(T model) {
+  public JsonStringColumn(STRING_COLUMN model) {
     super(model);
   }
 

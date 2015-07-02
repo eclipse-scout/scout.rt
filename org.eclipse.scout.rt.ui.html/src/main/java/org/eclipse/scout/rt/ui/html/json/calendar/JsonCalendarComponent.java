@@ -9,9 +9,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.json.JSONObject;
 
-public class JsonCalendarComponent<T extends CalendarComponent> extends AbstractJsonAdapter<T> {
+public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent> extends AbstractJsonAdapter<CALENDAR_COMPONENT> {
 
-  public JsonCalendarComponent(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonCalendarComponent(CALENDAR_COMPONENT model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

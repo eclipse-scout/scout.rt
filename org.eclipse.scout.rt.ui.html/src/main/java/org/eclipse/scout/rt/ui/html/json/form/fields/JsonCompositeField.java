@@ -18,9 +18,9 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.json.JSONObject;
 
-public class JsonCompositeField<T extends ICompositeField, F extends IFormField> extends JsonFormField<T> {
+public class JsonCompositeField<COMPOSITE_FIELD extends ICompositeField, F extends IFormField> extends JsonFormField<COMPOSITE_FIELD> {
 
-  public JsonCompositeField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonCompositeField(COMPOSITE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

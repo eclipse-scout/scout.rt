@@ -17,11 +17,11 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-public class JsonRadioButtonGroup<T extends IRadioButtonGroup> extends JsonValueField<T> {
+public class JsonRadioButtonGroup<RADIO_BUTTON_GROUP extends IRadioButtonGroup> extends JsonValueField<RADIO_BUTTON_GROUP> {
 
   private static final String FORM_FIELDS = "formFields";
 
-  public JsonRadioButtonGroup(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonRadioButtonGroup(RADIO_BUTTON_GROUP model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -31,7 +31,7 @@ public class JsonRadioButtonGroup<T extends IRadioButtonGroup> extends JsonValue
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(RADIO_BUTTON_GROUP model) {
     super.initJsonProperties(model);
     removeJsonProperty(IValueField.PROP_DISPLAY_TEXT);
   }

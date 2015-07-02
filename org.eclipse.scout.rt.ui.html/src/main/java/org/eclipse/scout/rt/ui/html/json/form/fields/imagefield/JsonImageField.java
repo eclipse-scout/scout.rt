@@ -23,13 +23,13 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IBinaryResourceProvider, IJsonContextMenuOwner {
+public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IJsonContextMenuOwner {
 
   public static final String PROP_IMAGE_URL = "imageUrl";
 
   private PropertyChangeListener m_contextMenuListener;
 
-  public JsonImageField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonImageField(IMAGE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -39,15 +39,15 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(IMAGE_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IMAGE_FIELD>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollBarEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IImageField.PROP_AUTO_FIT, model) {
+    putJsonProperty(new JsonProperty<IMAGE_FIELD>(IImageField.PROP_AUTO_FIT, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isAutoFit();

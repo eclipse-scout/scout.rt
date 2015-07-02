@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner {
+public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE> implements IJsonContextMenuOwner {
 
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_NODES_UPDATED = "nodesUpdated";
@@ -62,7 +62,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   private final TreeEventFilter m_treeEventFilter;
   private final AbstractEventBuffer<TreeEvent> m_eventBuffer;
 
-  public JsonTree(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTree(TREE model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
@@ -76,33 +76,33 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(TREE model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(ITree.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getTitle();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITree.PROP_CHECKABLE, model) {
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_CHECKABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isCheckable();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITree.PROP_MULTI_CHECK, model) {
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_MULTI_CHECK, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isMultiCheck();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITree.PROP_ENABLED, model) {
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isAutoCheckChildNodes();

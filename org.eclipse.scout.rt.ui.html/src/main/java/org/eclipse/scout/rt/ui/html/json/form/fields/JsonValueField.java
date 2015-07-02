@@ -32,9 +32,9 @@ import org.json.JSONObject;
  * <code>valueToJson()</code> method for the value property, it should replace the default JsonProperty for PROP_VALUE ,
  * with it's own implementation by calling <code>putJsonProperty()</code>.
  *
- * @param <T>
+ * @param <VALUE_FIELD>
  */
-public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> implements IJsonContextMenuOwner {
+public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends JsonFormField<VALUE_FIELD> implements IJsonContextMenuOwner {
 
   /**
    * This event is used when display-text has changed after field loses focus or when the display-text has changed
@@ -45,7 +45,7 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
 
   private PropertyChangeListener m_contextMenuListener;
 
-  public JsonValueField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonValueField(VALUE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -55,9 +55,9 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(VALUE_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(IValueField.PROP_DISPLAY_TEXT, model) {
+    putJsonProperty(new JsonProperty<VALUE_FIELD>(IValueField.PROP_DISPLAY_TEXT, model) {
       @Override
       protected String modelValue() {
         return getModel().getDisplayText();

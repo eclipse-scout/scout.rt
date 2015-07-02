@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonNumberField<T extends INumberField> extends JsonValueField<T> {
+public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValueField<NUMBER_FIELD> {
 
-  public JsonNumberField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonNumberField(NUMBER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

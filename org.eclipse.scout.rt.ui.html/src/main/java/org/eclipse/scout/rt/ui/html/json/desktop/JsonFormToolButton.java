@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 
-public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAction<T> {
+public class JsonFormToolButton<FORM_TOOL_BUTTON extends IFormToolButton<IForm>> extends JsonAction<FORM_TOOL_BUTTON> {
 
-  public JsonFormToolButton(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonFormToolButton(FORM_TOOL_BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -31,7 +31,7 @@ public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAc
   }
 
   @Override
-  protected void initJsonProperties(T model) {
+  protected void initJsonProperties(FORM_TOOL_BUTTON model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonAdapterProperty<IFormToolButton<IForm>>(IFormToolButton.PROP_FORM, model, getUiSession()) {
