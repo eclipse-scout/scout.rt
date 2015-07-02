@@ -124,13 +124,22 @@
       "viewButtons": [],
       "messageBoxes": []
     },
+    "Outline": {
+      "dialogs": [],
+      "views": [],
+      "messageBoxes": []
+    },
     "Form": {
       "displayHint": "dialog",
+      "modalityHint": "none",
       "maximizeEnabled": true,
       "maximized": false,
       "minimizeEnabled": true,
       "minimized": false,
-      "modal": false
+      "modal": false,
+      "dialogs": [],
+      "views": [],
+      "messageBoxes": []
     },
     "Tree": {
       "autoCheckChildren": false,

@@ -1,9 +1,10 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
   this.rootGroupBox;
-  this._addAdapterProperties(['rootGroupBox']);
+  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes']);
   this._locked;
   this._$glassPane;
+  this._formController;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -14,6 +15,15 @@ scout.Form.prototype.init = function(model, session) {
     this.rootGroupBox.menuBar.bottom();
     this.rootGroupBox.menuBar.large();
   }
+
+  this._formController = new scout.FormController(this, session,
+      function() { // callback to access dialogs attached to this Form.
+        return this.dialogs;
+      }.bind(this),
+      function() { // callback to access views attached to this Form.
+        return this.views;
+      }.bind(this)
+    );
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -26,7 +36,7 @@ scout.Form.prototype._render = function($parent) {
   this.$container = $('<div>')
     .appendTo($parent)
     .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: (modal dialog) rename class 'form' to view so we can use the displayHint as class-name
-    .data('model', this);
+  .data('model', this);
 
   if (this.isDialog()) {
     var $handle = this.$container.appendDiv('drag-handle');
@@ -60,8 +70,10 @@ scout.Form.prototype._render = function($parent) {
     $.log.warn('startInstall');
     this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
   }
-};
 
+  // Display all Forms registered on this Form.
+  this._formController.showAll();
+};
 scout.Form.prototype._renderProperties = function() {
   this._renderInitialFocus(this.initialFocus);
 };
@@ -72,19 +84,16 @@ scout.Form.prototype._updateDialogTitle = function() {
     // Render title
     if (this.title) {
       getOrAppendChildDiv($titles, 'title').text(this.title);
-    }
-    else {
+    } else {
       removeChildDiv($titles, 'title');
     }
     // Render subTitle
     if (this.title) {
       getOrAppendChildDiv($titles, 'sub-title').text(this.subTitle);
-    }
-    else {
+    } else {
       removeChildDiv($titles, 'sub-title');
     }
-  }
-  else {
+  } else {
     removeChildDiv(this.$container, 'title-box');
   }
   // Layout could have been changed, e.g. if subtitle becomes visible
@@ -166,14 +175,6 @@ scout.Form.prototype._renderInitialFocus = function(formFieldId) {
 };
 
 scout.Form.prototype._onFormClosed = function(event) {
-  // 'formClosed' implies a 'formRemoved' event on the desktop. Because the form adapter is disposed
-  // after 'formClosed', the 'formRemoved' event is not sent. Therefore, we manually call the
-  // remove method on the desktop (e.g. to remove the tab).
-  if (this.session.desktop) {
-    this.session.desktop.removeForm(this.id);
-  }
-
-  // Now destroy the form, it will never be used again.
   this.destroy();
 };
 
@@ -187,11 +188,15 @@ scout.Form.prototype._onRequestFocus = function(formFieldId) {
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type === 'formClosed') {
     this._onFormClosed(event);
-  }
-  else if (event.type === 'requestFocus') {
+  } else if (event.type === 'requestFocus') {
     this._onRequestFocus(event.formField);
-  }
-  else {
+  } else if (event.type === 'formShow') {
+    this._formController.addAndShow(event.form);
+  } else if (event.type === 'formHide') {
+    this._formController.removeAndHide(event.form);
+  } else if (event.type === 'formActivate') {
+    this._formController.activateForm(event.form);
+  } else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };

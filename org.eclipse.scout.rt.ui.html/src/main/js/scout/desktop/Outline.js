@@ -1,14 +1,29 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
-  this._addAdapterProperties('defaultDetailForm');
+  this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes']);
   this.navigateUpInProgress = false; // see NavigateUpButton.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
   this._tableSelectionListener;
   this.inBackground = false;
+  this._formController;
 };
 scout.inherits(scout.Outline, scout.Tree);
+
+scout.Outline.prototype.init = function(model, session) {
+  scout.Outline.parent.prototype.init.call(this, model, session);
+
+  this._formController = new scout.FormController(this, session,
+      function() { // callback to access dialogs attached to this Outline.
+        return this.dialogs;
+      }.bind(this),
+      function() { // callback to access views attached to this Outline.
+        return this.views;
+      }.bind(this)
+    );
+};
+
 
 scout.Outline.prototype._createKeyStrokeAdapter = function() {
   return new scout.OutlineKeyStrokeAdapter(this);
@@ -25,6 +40,10 @@ scout.Outline.prototype._installKeyStrokeAdapter = function() {
  */
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
+
+  // Display all Forms registered on this Outline.
+  this._formController.showAll();
+
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
   }
@@ -229,6 +248,12 @@ scout.Outline.prototype._onPageChanged = function(event) {
 scout.Outline.prototype.onModelAction = function(event) {
   if (event.type === 'pageChanged') {
     this._onPageChanged(event);
+  } else if (event.type === 'formShow') {
+    this._formController.addAndShow(event.form);
+  } else if (event.type === 'formHide') {
+    this._formController.removeAndHide(event.form);
+  } else if (event.type === 'formActivate') {
+    this._formController.activateForm(event.form);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }

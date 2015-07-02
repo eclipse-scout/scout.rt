@@ -13,31 +13,45 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.form.FormParentFilter;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
-public class JsonOutline<T extends IOutline> extends JsonTree<T> {
+public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   private static final String PROP_DETAIL_FORM = IOutline.PROP_DETAIL_FORM;
   private static final String PROP_DETAIL_TABLE = IOutline.PROP_DETAIL_TABLE;
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
   private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
+  public static final String PROP_FORM = "form";
 
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
 
-  public JsonOutline(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
-    super(model, uiSession, id, parent);
+  private DesktopListener m_desktopListener;
+
+  private final IFilter<IForm> m_formParentFilter;
+
+  public JsonOutline(OUTLINE outline, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(outline, uiSession, id, parent);
+
+    m_formParentFilter = new FormParentFilter(outline);
   }
 
   @Override
@@ -49,13 +63,38 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putAdapterIdProperty(json, "defaultDetailForm", getModel().getDefaultDetailForm());
+    putAdapterIdsProperty(json, "views", getDesktop().getViews(getModel()));
+    putAdapterIdsProperty(json, "dialogs", getDesktop().getDialogs(getModel()));
+    putAdapterIdsProperty(json, "messageBoxes", getDesktop().getMessageBoxes(getModel()));
     return json;
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+
+    Assertions.assertNull(m_desktopListener);
+    m_desktopListener = new P_DesktopListener();
+    getDesktop().addDesktopListener(m_desktopListener);
+  }
+
+  @Override
+  protected void detachModel() {
+    Assertions.assertNotNull(m_desktopListener);
+    getDesktop().removeDesktopListener(m_desktopListener);
+    m_desktopListener = null;
+
+    super.detachModel();
   }
 
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getDefaultDetailForm());
+
+    attachAdapters(getDesktop().getViews(getModel()));
+    attachAdapters(getDesktop().getDialogs(getModel()));
+    attachAdapters(getDesktop().getMessageBoxes(getModel()));
   }
 
   @Override
@@ -160,6 +199,43 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     addActionEvent("pageChanged", jsonEvent);
   }
 
+  protected void handleModelDesktopEvent(DesktopEvent event) {
+    switch (event.getType()) {
+      case DesktopEvent.TYPE_FORM_SHOW:
+        handleModelFormShow(event.getForm());
+        break;
+      case DesktopEvent.TYPE_FORM_HIDE:
+        handleModelFormHide(event.getForm());
+        break;
+      case DesktopEvent.TYPE_FORM_ACTIVATE:
+        handleModelFormActivate(event.getForm());
+        break;
+      default:
+        // NOOP
+    }
+  }
+
+  protected void handleModelFormShow(IForm form) {
+    IJsonAdapter<?> jsonAdapter = attachAdapter(form, m_formParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("formShow", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelFormHide(IForm form) {
+    IJsonAdapter<?> jsonAdapter = getAdapter(form, m_formParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("formHide", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelFormActivate(IForm form) {
+    IJsonAdapter<?> jsonAdapter = getAdapter(form, m_formParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+    }
+  }
+
   @Override
   protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
     super.putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, virtualNode);
@@ -167,6 +243,18 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       IPage page = (IPage) node;
       putProperty(jsonNode, "modelClass", page.getClass().getName());
       putProperty(jsonNode, "classId", page.classId());
+    }
+  }
+
+  protected IDesktop getDesktop() {
+    return getUiSession().getClientSession().getDesktop();
+  }
+
+  protected class P_DesktopListener implements DesktopListener {
+
+    @Override
+    public void desktopChanged(DesktopEvent e) {
+      handleModelDesktopEvent(e);
     }
   }
 }
