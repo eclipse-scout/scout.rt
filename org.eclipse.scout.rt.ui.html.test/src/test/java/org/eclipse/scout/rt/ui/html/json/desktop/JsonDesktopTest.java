@@ -92,6 +92,7 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
+    form.setFormParent(desktop);
     form.setShowOnStart(false);
 
     JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
@@ -103,7 +104,7 @@ public class JsonDesktopTest {
     assertNotNull(formAdapter);
 
     JsonResponse jsonResp = m_uiSession.currentJsonResponse();
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formShow");
     assertTrue(responseEvents.size() == 1);
 
     JsonEvent event = responseEvents.get(0);
@@ -126,7 +127,7 @@ public class JsonDesktopTest {
 
     desktop.hideForm(form);
 
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");
     assertTrue(responseEvents.size() == 1);
 
     event = responseEvents.get(0);
@@ -150,6 +151,7 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
+    form.setFormParent(desktop);
     form.setShowOnStart(false);
 
     JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
@@ -160,7 +162,7 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formShow");
     assertEquals(1, responseEvents.size());
 
     form.start();
@@ -174,8 +176,8 @@ public class JsonDesktopTest {
     assertEquals(1, responseEvents.size());
 
     desktop.hideForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formRemoved");
-    // 0 instead of 1, because formClosed includes "formRemoved" implicitly. The event itself cannot be sent, because
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");
+    // 0 instead of 1, because formClosed includes "formHide" implicitly. The event itself cannot be sent, because
     // the form adapter is already disposed when the form is closed.
     assertEquals(0, responseEvents.size());
   }
@@ -186,6 +188,7 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
+    form.setFormParent(desktop);
     form.setShowOnStart(false);
 
     JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
@@ -196,7 +199,7 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formShow");
     assertEquals(1, responseEvents.size());
 
     form.start();
@@ -205,7 +208,7 @@ public class JsonDesktopTest {
     assertEquals(1, responseEvents.size());
 
     desktop.hideForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");
     assertEquals(0, responseEvents.size());
   }
 
