@@ -76,7 +76,8 @@
 
   &::before {
     .font-icon;
-    content: @icon-caret-down;
+    font-size: 17px;
+    content: @icon-angle-down;
   }
 
   &:hover {

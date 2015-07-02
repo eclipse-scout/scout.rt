@@ -39,8 +39,8 @@ scout.ViewMenuTab.prototype._update = function() {
     this.text = this.outlineViewButton.text;
     this.iconId = this.outlineViewButton.getIconId();
   } else {
-    this.text = '%Sichten'; // FIXME AWE: i18n
-    this.iconId = 'font:\uE030'; // XXX AWE: icons.js - constant
+    this.text = this.session.text('ui.outlines');
+    this.iconId = scout.Icons.OUTLINE;
   }
 };
 

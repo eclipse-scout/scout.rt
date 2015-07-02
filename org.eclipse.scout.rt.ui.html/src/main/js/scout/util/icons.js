@@ -41,6 +41,10 @@ scout.Icon.IconType = {
   BITMAP: 1
 };
 
+scout.Icons = {
+  OUTLINE: 'font:\uE030'
+};
+
 scout.Icon.DEFAULT_FONT = 'scoutIcons';
 
 /**

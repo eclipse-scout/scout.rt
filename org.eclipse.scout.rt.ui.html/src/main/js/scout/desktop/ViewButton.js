@@ -79,7 +79,7 @@ scout.ViewButton.prototype.getIconId = function(iconId) {
     iconId = this.iconId;
   }
   if (!scout.strings.hasText(iconId)) {
-    iconId = 'font:\uE030'; // XXX AWE: icons.js - constant
+    iconId = scout.Icons.OUTLINE;
   }
   return iconId;
 };
