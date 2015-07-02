@@ -862,7 +862,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void ensureVisible(IForm form) { // TODO [dwi] Rename with better name
     if (form != null && m_formStore.contains(form)) {
-      fireFormEnsureVisible(form);
+      fireFormActivate(form);
     }
   }
 
@@ -893,6 +893,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     // Ensure FormParent to be set.
+    form.setFormParent(this); // TODO [dwi] Feature disabled until working with View in HTML UI.
     Assertions.assertNotNull(form.getFormParent(), "Property 'formParent' must not be null");
 
     m_formStore.add(form);
@@ -1604,8 +1605,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireFormEnsureVisible(IForm form) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FORM_ENSURE_VISIBLE, form);
+  private void fireFormActivate(IForm form) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FORM_ACTIVATE, form);
     fireDesktopEvent(e);
   }
 
