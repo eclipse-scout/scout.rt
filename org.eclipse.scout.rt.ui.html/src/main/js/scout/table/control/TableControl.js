@@ -63,13 +63,13 @@ scout.TableControl.prototype.removeContent = function() {
  * Opens the container if the container is not already open.<br>
  * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.
  */
-scout.TableControl.prototype.renderContent = function() {
+scout.TableControl.prototype.renderContent = function(animated) {
   if (!this.contentRendered && !this.isContentAvailable()) {
     return;
   }
 
   if (!this.tableFooter.open) {
-    this.tableFooter.openControlContainer();
+    this.tableFooter.openControlContainer(animated);
   }
 
   if (!this.contentRendered) {
@@ -103,7 +103,7 @@ scout.TableControl.prototype._syncForm = function(form) {
 };
 
 scout.TableControl.prototype._renderForm = function(form) {
-  this.renderContent();
+  this.renderContent(false);
 };
 
 /**
@@ -119,24 +119,24 @@ scout.TableControl.prototype._onMouseDown = function() {
 
 scout.TableControl.prototype.toggle = function() {
   if (this.tableFooter.selectedControl === this) {
-    this.setSelected(false);
+    this.setSelected(false, true, true);
   } else {
-    this.setSelected(true);
+    this.setSelected(true, true, true);
   }
 };
 
-scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
+scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected, animated) {
   if (selected === this.selected) {
     return;
   }
 
   if (this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
-    this.tableFooter.selectedControl.setSelected(false, false);
+    this.tableFooter.selectedControl.setSelected(false, false, animated);
   }
 
   this.selected = selected;
   this.sendSelected(selected);
-  this._renderSelected(this.selected, closeWhenUnselected);
+  this._renderSelected(this.selected, closeWhenUnselected, animated);
   var that = this;
   if (!selected){
     scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
@@ -144,13 +144,13 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   }
 };
 
-scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
+scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected, animated) {
   closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
 
   this.$container.select(selected);
 
   if (selected) {
-    this.renderContent();
+    this.renderContent(animated);
     this.tableFooter.selectedControl = this;
   } else {
 
