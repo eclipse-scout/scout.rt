@@ -175,14 +175,23 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
 
   /**
    * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW}.
+   *
+   * @deprecated use {@link #getViews()}; will be removed in version 6.1.
    */
-  List<IForm> getViewStack(); // TODO [dwi] rename to getViews() and change to Set
+  @Deprecated
+  List<IForm> getViewStack();
 
   /**
-   * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW} and which are attached to the given
-   * {@link IFormParent}.
+   * Returns all displayed Forms of the type {@link IForm#DISPLAY_HINT_VIEW} in the order as attached to the
+   * desktop.
    */
-  Set<IForm> getViews(IFormParent formParent);
+  List<IForm> getViews();
+
+  /**
+   * Returns all Forms of the type {@link IForm#DISPLAY_HINT_VIEW} and which are attached to the given
+   * {@link IFormParent}. The forms returned are ordered as inserted.
+   */
+  List<IForm> getViews(IFormParent formParent);
 
   /**
    * Returns all {@link IForm}s with dialog character:
@@ -191,18 +200,32 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
+   *
+   * @deprecated use {@link #getDialogs()}; will be removed in version 6.1.
    */
-  List<IForm> getDialogStack(); // TODO [dwi] rename to getDialogs() and change to Set
+  @Deprecated
+  List<IForm> getDialogStack();
 
   /**
-   * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IFormParent}.
+   * Returns all {@link IForm}s with dialog character in the order as attached to the desktop.
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
    */
-  Set<IForm> getDialogs(IFormParent formParent);
+  List<IForm> getDialogs();
+
+  /**
+   * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IFormParent}. The forms
+   * returned are ordered as inserted.
+   * <ul>
+   * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
+   * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
+   * </ul>
+   */
+  List<IForm> getDialogs(IFormParent formParent);
 
   /**
    * Open dialogs or views that need to be saved
@@ -239,14 +262,23 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void hideForm(IForm form);
 
   /**
-   * Returns all message boxes registered on {@link IDesktop}.
+   * Returns all displayed message boxes in the order as attached to the desktop.
+   *
+   * @deprecated use {@link #getMessageBoxes()}; will be removed in version 6.1.
    */
-  List<IMessageBox> getMessageBoxStack(); // TODO [dwi] rename to getMessageBoxes() and change to Set
+  @Deprecated
+  List<IMessageBox> getMessageBoxStack();
 
   /**
-   * Returns all message boxes which are attached to the given {@link IMessageBox}.
+   * Returns all displayed {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW} in the order as attached to the
+   * desktop.
    */
-  Set<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent);
+  List<IMessageBox> getMessageBoxes();
+
+  /**
+   * Returns all message boxes which are attached to the given {@link IMessageBox} in the order as inserted.
+   */
+  List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent);
 
   /**
    * Adds the given {@link IMessageBox} to the desktop and notifies attached listeners like the UI.

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
@@ -29,9 +29,10 @@ public class MessageBoxStore extends IndexedStore<IMessageBox> {
   private final P_MessageBoxParentIndex m_messageBoxParentIndex = registerIndex(new P_MessageBoxParentIndex());
 
   /**
-   * Returns all <code>MessageBoxes</code> which are attached to the given {@link IMessageBoxParent}.
+   * Returns all <code>MessageBoxes</code> which are attached to the given {@link IMessageBoxParent} in the order as
+   * inserted.
    */
-  public Set<IMessageBox> getByMessageBoxParent(final IMessageBoxParent messageBoxParent) {
+  public List<IMessageBox> getByMessageBoxParent(final IMessageBoxParent messageBoxParent) {
     return m_messageBoxParentIndex.get(messageBoxParent);
   }
 

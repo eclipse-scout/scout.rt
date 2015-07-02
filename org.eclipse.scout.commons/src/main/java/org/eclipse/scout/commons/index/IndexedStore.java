@@ -13,7 +13,6 @@ package org.eclipse.scout.commons.index;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This class represents an in-memory data store that provides functionality to access its elements by an index.
@@ -36,7 +35,7 @@ import java.util.Set;
  *     return m_idxId.get(id);
  *   }
  * 
- *   public Set&lt;Person&gt; getByName(String name) {
+ *   public List&lt;Person&gt; getByName(String name) {
  *     return m_idxName.get(name);
  *   }
  * 
@@ -111,9 +110,9 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
   }
 
   /**
-   * Returns all elements contained in this store.
+   * Returns all elements contained in this store in the order as inserted.
    */
-  public Set<ELEMENT> values() {
+  public List<ELEMENT> values() {
     return m_elementIndex.values();
   }
 

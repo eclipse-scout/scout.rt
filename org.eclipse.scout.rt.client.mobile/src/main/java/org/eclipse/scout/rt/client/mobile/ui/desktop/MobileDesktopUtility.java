@@ -92,8 +92,8 @@ public class MobileDesktopUtility {
   }
 
   public static void closeOpenForms() throws ProcessingException {
-    for (IForm form : getDesktop().getViewStack()) {
-      closeForm(form);
+    for (IForm view : getDesktop().getViews()) {
+      closeForm(view);
     }
   }
 
@@ -122,9 +122,9 @@ public class MobileDesktopUtility {
       return;
     }
 
-    for (IForm form : getDesktop().getViewStack()) {
-      if (form != excludedForm && formClass.isInstance(form) && displayViewId.equals(form.getDisplayViewId())) {
-        getDesktop().hideForm(form);
+    for (IForm view : getDesktop().getViews()) {
+      if (view != excludedForm && formClass.isInstance(view) && displayViewId.equals(view.getDisplayViewId())) {
+        getDesktop().hideForm(view);
       }
     }
   }
@@ -147,8 +147,8 @@ public class MobileDesktopUtility {
       return false;
     }
 
-    for (IForm form : getDesktop().getViewStack()) {
-      if (displayViewId.equals(form.getDisplayViewId())) {
+    for (IForm view : getDesktop().getViews()) {
+      if (displayViewId.equals(view.getDisplayViewId())) {
         return true;
       }
     }

@@ -81,9 +81,9 @@ public class PrintApplicationAction extends AbstractAction {
     getDestinationFolder().mkdirs();
     getDesktop().addDesktopListener(new P_DesktopListener());
     getDesktop().printDesktop(PrintDevice.File, createPrintParameters(createFile(getDestinationFolder(), "Desktop", "jpg")));
-    for (IForm f : getDesktop().getDialogStack()) {
-      if (getFormFilter().acceptForm(f)) {
-        processForm(f);
+    for (IForm dialog : getDesktop().getDialogs()) {
+      if (getFormFilter().acceptForm(dialog)) {
+        processForm(dialog);
       }
     }
     m_taskList.add(new P_EndTask());

@@ -764,33 +764,51 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return new ActionFinder().findAction(getMenus(), searchType);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getViewStack() {
-    return new ArrayList<>(m_formStore.getViews());
+    return getViews();
   }
 
   @Override
-  public Set<IForm> getViews(IFormParent formParent) {
+  public List<IForm> getViews() {
+    return m_formStore.getViews();
+  }
+
+  @Override
+  public List<IForm> getViews(IFormParent formParent) {
     return m_formStore.getViewsByFormParent(formParent);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getDialogStack() {
-    return new ArrayList<>(m_formStore.getDialogs());
+    return getDialogs();
   }
 
   @Override
-  public Set<IForm> getDialogs(IFormParent formParent) {
+  public List<IForm> getDialogs() {
+    return m_formStore.getDialogs();
+  }
+
+  @Override
+  public List<IForm> getDialogs(IFormParent formParent) {
     return m_formStore.getDialogsByFormParent(formParent);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IMessageBox> getMessageBoxStack() {
-    return new ArrayList<>(m_messageBoxStore.values());
+    return getMessageBoxes();
   }
 
   @Override
-  public Set<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
+  public List<IMessageBox> getMessageBoxes() {
+    return m_messageBoxStore.values();
+  }
+
+  @Override
+  public List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
     return m_messageBoxStore.getByMessageBoxParent(messageBoxParent);
   }
 
@@ -1732,15 +1750,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     detachGui();
 
     List<IForm> showedForms = new ArrayList<IForm>();
-    // remove views
-    for (IForm view : getViewStack()) {
-      hideForm(view);
-      showedForms.add(view);
-    }
-    // remove forms
-    for (IForm dialog : getDialogStack()) {
-      hideForm(dialog);
-      showedForms.add(dialog);
+    // Remove showed forms
+    for (IForm form : m_formStore.values()) {
+      hideForm(form);
+      showedForms.add(form);
     }
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
@@ -2183,10 +2196,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public List<IForm> getUnsavedForms() {
     List<IForm> saveNeededForms = new ArrayList<IForm>();
-    List<IForm> openForms = CollectionUtility.combine(getViewStack(), getDialogStack());
+    List<IForm> showedForms = m_formStore.values();
     // last element on the stack is the first that needs to be saved: iterate from end to start
-    for (int i = openForms.size() - 1; i >= 0; i--) {
-      IForm f = openForms.get(i);
+    for (int i = showedForms.size() - 1; i >= 0; i--) {
+      IForm f = showedForms.get(i);
       if (f.isAskIfNeedSave() && f.isSaveNeeded()) {
         saveNeededForms.add(f);
       }

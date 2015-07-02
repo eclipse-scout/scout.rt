@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -59,13 +59,13 @@ public class IndexedStoreTest {
 
   @Test
   public void testMultiValueIndex() {
-    assertEquals(CollectionUtility.hashSet(m_john1, m_john2), m_store.getByName("john"));
-    assertEquals(CollectionUtility.hashSet(m_anna), m_store.getByName("anna"));
-    assertEquals(CollectionUtility.hashSet(m_maria), m_store.getByName("maria"));
-    assertEquals(CollectionUtility.hashSet(m_frank), m_store.getByName("frank"));
-    assertEquals(CollectionUtility.hashSet(m_tom), m_store.getByName("tom"));
+    assertEquals(CollectionUtility.arrayList(m_john1, m_john2), m_store.getByName("john"));
+    assertEquals(CollectionUtility.arrayList(m_anna), m_store.getByName("anna"));
+    assertEquals(CollectionUtility.arrayList(m_maria), m_store.getByName("maria"));
+    assertEquals(CollectionUtility.arrayList(m_frank), m_store.getByName("frank"));
+    assertEquals(CollectionUtility.arrayList(m_tom), m_store.getByName("tom"));
 
-    assertEquals(CollectionUtility.hashSet(m_maria, m_john2), m_store.getRetiredPersons());
+    assertEquals(CollectionUtility.arrayList(m_maria, m_john2), m_store.getRetiredPersons());
   }
 
   @Test
@@ -80,21 +80,16 @@ public class IndexedStoreTest {
 
     m_store.registerIndex(ageIndex);
 
-    assertEquals(CollectionUtility.hashSet(m_john1, m_tom), ageIndex.get(35));
-    assertEquals(CollectionUtility.hashSet(m_anna), ageIndex.get(25));
-    assertEquals(CollectionUtility.hashSet(m_maria), ageIndex.get(80));
-    assertEquals(CollectionUtility.hashSet(m_john2), ageIndex.get(75));
-    assertEquals(CollectionUtility.hashSet(m_frank), ageIndex.get(50));
+    assertEquals(CollectionUtility.arrayList(m_john1, m_tom), ageIndex.get(35));
+    assertEquals(CollectionUtility.arrayList(m_anna), ageIndex.get(25));
+    assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(80));
+    assertEquals(CollectionUtility.arrayList(m_john2), ageIndex.get(75));
+    assertEquals(CollectionUtility.arrayList(m_frank), ageIndex.get(50));
   }
 
   @Test
   public void testValues() {
-    Set<Person> result = new HashSet<>();
-    for (Person person : m_store) {
-      result.add(person);
-    }
-
-    assertEquals(CollectionUtility.hashSet(m_john1, m_john2, m_anna, m_maria, m_frank, m_tom), result);
+    assertEquals(CollectionUtility.arrayList(m_john1, m_anna, m_maria, m_john2, m_frank, m_tom), m_store.values());
   }
 
   @Test
@@ -113,20 +108,20 @@ public class IndexedStoreTest {
       }
     };
     m_store.registerIndex(ageIndex);
-    assertEquals(CollectionUtility.hashSet(m_maria), ageIndex.get(80));
+    assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(80));
 
     m_maria.withAge(81); // was registered with a age of 80 years
-    assertEquals(CollectionUtility.hashSet(m_maria), ageIndex.get(80));
+    assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(80));
     assertTrue(ageIndex.get(81).isEmpty());
 
     m_store.add(m_maria);
     assertTrue(ageIndex.get(80).isEmpty());
-    assertEquals(CollectionUtility.hashSet(m_maria), ageIndex.get(81));
+    assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(81));
   }
 
   @Test
   public void testRemove() {
-    assertEquals(CollectionUtility.hashSet(m_anna), m_store.getByName("anna"));
+    assertEquals(CollectionUtility.arrayList(m_anna), m_store.getByName("anna"));
     m_store.remove(m_anna);
     assertTrue(m_store.getByName("anna").isEmpty());
   }
@@ -141,7 +136,7 @@ public class IndexedStoreTest {
       return IDX_PERSON_ID.get(id);
     }
 
-    public Set<Person> getByName(String name) {
+    public List<Person> getByName(String name) {
       return IDX_PERSON_NAME.get(name);
     }
 
@@ -153,7 +148,7 @@ public class IndexedStoreTest {
       return IDX_PERSON_ID.indexValues();
     }
 
-    public Set<Person> getRetiredPersons() {
+    public List<Person> getRetiredPersons() {
       return IDX_PERSON_RETIRED.get(Boolean.TRUE);
     }
 

@@ -11,6 +11,7 @@
 package org.eclipse.scout.commons.index;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -46,9 +47,9 @@ public interface IIndex<INDEX, ELEMENT> extends Iterable<ELEMENT> {
   Set<INDEX> indexValues();
 
   /**
-   * @return the elements contained in this index.
+   * @return the elements contained in this index in the order as inserted.
    */
-  Set<ELEMENT> values();
+  List<ELEMENT> values();
 
   /**
    * @return <code>true</code> if the given element is contained in this index.

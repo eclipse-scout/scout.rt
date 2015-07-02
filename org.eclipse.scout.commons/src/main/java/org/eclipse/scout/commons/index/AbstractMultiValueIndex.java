@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +29,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 public abstract class AbstractMultiValueIndex<INDEX, ELEMENT> implements IIndex<INDEX, ELEMENT> {
 
   private final Map<INDEX, List<ELEMENT>> m_mapByIndex = new HashMap<>();
-  private final Map<ELEMENT, INDEX> m_mapByElement = new HashMap<>();
+  private final Map<ELEMENT, INDEX> m_mapByElement = new LinkedHashMap<>(); // LinkedHashMap to preserve insertion-order.
 
   @Override
   public boolean addToIndex(final ELEMENT element) {
@@ -74,8 +75,8 @@ public abstract class AbstractMultiValueIndex<INDEX, ELEMENT> implements IIndex<
   }
 
   @Override
-  public Set<ELEMENT> values() {
-    return new HashSet<>(m_mapByElement.keySet());
+  public List<ELEMENT> values() {
+    return new ArrayList<>(m_mapByElement.keySet()); // ordered as inserted because LinkedHashMap is used
   }
 
   @Override
@@ -95,14 +96,14 @@ public abstract class AbstractMultiValueIndex<INDEX, ELEMENT> implements IIndex<
   }
 
   /**
-   * Returns the elements that correspond to the given index value.
+   * Returns the elements that correspond to the given index value in the order as inserted.
    *
    * @param index
    *          the index to look elements for.
-   * @return elements, or an empty {@link Set} if no found.
+   * @return elements ordered as inserted, or an empty {@link List} if no found.
    */
-  public Set<ELEMENT> get(final INDEX index) {
-    return CollectionUtility.hashSet(m_mapByIndex.get(index));
+  public List<ELEMENT> get(final INDEX index) {
+    return CollectionUtility.arrayList(m_mapByIndex.get(index));
   }
 
   /**

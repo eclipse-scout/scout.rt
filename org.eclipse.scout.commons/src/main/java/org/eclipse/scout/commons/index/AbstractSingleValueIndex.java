@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.index;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +27,7 @@ import java.util.Set;
 public abstract class AbstractSingleValueIndex<INDEX, ELEMENT> implements IIndex<INDEX, ELEMENT> {
 
   private final Map<INDEX, ELEMENT> m_mapByIndex = new HashMap<>();
-  private final Map<ELEMENT, INDEX> m_mapByElement = new HashMap<>();
+  private final Map<ELEMENT, INDEX> m_mapByElement = new LinkedHashMap<>(); // LinkedHashMap to preserve insertion-order.
 
   @Override
   public boolean addToIndex(final ELEMENT element) {
@@ -59,8 +62,8 @@ public abstract class AbstractSingleValueIndex<INDEX, ELEMENT> implements IIndex
   }
 
   @Override
-  public Set<ELEMENT> values() {
-    return new HashSet<>(m_mapByElement.keySet());
+  public List<ELEMENT> values() {
+    return new ArrayList<>(m_mapByElement.keySet()); // ordered as inserted because LinkedHashMap is used
   }
 
   @Override

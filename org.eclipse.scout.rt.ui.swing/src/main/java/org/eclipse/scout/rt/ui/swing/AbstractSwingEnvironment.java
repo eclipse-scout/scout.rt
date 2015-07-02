@@ -463,9 +463,9 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       m_rootComposite = createRootComposite(getRootFrame(), m_scoutSession.getDesktop());
       m_rootComposite.showSwingFrame();
       // load state of views
-      for (IForm f : desktop.getViewStack()) {
-        if (f.isShowOnStart()) {
-          showStandaloneForm(getRootFrame(), f);
+      for (IForm view : desktop.getViews()) {
+        if (view.isShowOnStart()) {
+          showStandaloneForm(getRootFrame(), view);
         }
       }
       //tray icon
@@ -473,13 +473,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         m_trayComposite = createTray(desktop);
       }
       // dialogs
-      for (IForm f : desktop.getDialogStack()) {
-        if (f.isShowOnStart()) {
-          showStandaloneForm(getRootFrame(), f);
+      for (IForm dialog : desktop.getDialogs()) {
+        if (dialog.isShowOnStart()) {
+          showStandaloneForm(getRootFrame(), dialog);
         }
       }
       // messageboxes
-      for (IMessageBox mb : desktop.getMessageBoxStack()) {
+      for (IMessageBox mb : desktop.getMessageBoxes()) {
         showMessageBox(getRootFrame(), mb);
       }
       // notify desktop that it is loaded

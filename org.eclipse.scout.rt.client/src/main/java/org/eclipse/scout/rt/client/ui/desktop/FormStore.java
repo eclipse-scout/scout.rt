@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
@@ -41,51 +41,56 @@ public class FormStore extends IndexedStore<IForm> {
   }
 
   /**
-   * Returns all <code>Views</code>.
+   * Returns all <code>Views</code> in the order as inserted.
    */
-  public Set<IForm> getViews() {
+  public List<IForm> getViews() {
     return m_typeIndex.get(FormType.VIEW);
   }
 
   /**
-   * Returns all <code>Dialogs</code>.
+   * Returns all <code>Dialogs</code> in the order as inserted.
    */
-  public Set<IForm> getDialogs() {
+  public List<IForm> getDialogs() {
     return m_typeIndex.get(FormType.DIALOG);
   }
 
   /**
-   * Returns all <code>Views</code> which are attached to the given {@link IFormParent}.
+   * Returns all <code>Views</code> which are attached to the given {@link IFormParent}. The forms returned are ordered
+   * as inserted.
    */
-  public Set<IForm> getViewsByFormParent(final IFormParent formParent) {
+  public List<IForm> getViewsByFormParent(final IFormParent formParent) {
     return m_formParentViewIndex.get(formParent);
   }
 
   /**
-   * Returns all <code>Dialogs</code> which are attached to the given {@link IFormParent}.
+   * Returns all <code>Dialogs</code> which are attached to the given {@link IFormParent}. The forms returned are
+   * ordered as inserted.
    */
-  public Set<IForm> getDialogsByFormParent(final IFormParent formParent) {
+  public List<IForm> getDialogsByFormParent(final IFormParent formParent) {
     return m_formParentDialogIndex.get(formParent);
   }
 
   /**
-   * Returns all <code>Forms</code> of the given <code>displayHint</code>, e.g. to query all Views or Dialogs.
+   * Returns all <code>Forms</code> of the given <code>displayHint</code>, e.g. to query all Views or Dialogs. The forms
+   * returned are ordered as inserted.
    */
-  public Set<IForm> getByDisplayHint(final int displayHint) {
+  public List<IForm> getByDisplayHint(final int displayHint) {
     return m_displayHintIndex.get(displayHint);
   }
 
   /**
-   * Returns all <code>Forms</code> of the given {@link Class type}.
+   * Returns all <code>Forms</code> of the given {@link Class type}. The forms returned are ordered as inserted. The
+   * forms are ordered as inserted.
    */
-  public Set<IForm> getByClass(final Class<? extends IForm> clazz) {
+  public List<IForm> getByClass(final Class<? extends IForm> clazz) {
     return m_clazzIndex.get(clazz);
   }
 
   /**
-   * Returns all <code>Views</code> which compute to the given 'exclusive key'.
+   * Returns all <code>Views</code> which compute to the given 'exclusive key'. The forms returned are ordered as
+   * inserted.
    */
-  public Set<IForm> getViewsByKey(final Object key) {
+  public List<IForm> getViewsByKey(final Object key) {
     return m_viewKeyIndex.get(key);
   }
 

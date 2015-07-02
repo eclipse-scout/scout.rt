@@ -407,13 +407,19 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getDialogStack() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public Set<IForm> getDialogs(IFormParent formParent) {
+  public List<IForm> getDialogs() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public List<IForm> getDialogs(IFormParent formParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -437,13 +443,19 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IMessageBox> getMessageBoxStack() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public Set<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
+  public List<IMessageBox> getMessageBoxes() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -527,13 +539,19 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getViewStack() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public Set<IForm> getViews(IFormParent formParent) {
+  public List<IForm> getViews() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public List<IForm> getViews(IFormParent formParent) {
     throw createUnsupportedOperationException();
   }
 
