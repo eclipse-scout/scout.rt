@@ -69,6 +69,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <!-- Loads phantomjs executable, necessary for jasmine plugin -->
         <groupId>com.github.klieber</groupId>
