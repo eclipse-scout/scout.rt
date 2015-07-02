@@ -514,6 +514,22 @@
     return this.cssPxValue('border-top-width', value);
   };
 
+  $.fn.cssBorderWidthY = function(value) {
+    if (value === undefined) {
+      return this.cssBorderTopWidth() + this.cssBorderBottomWidth();
+    }
+    this.cssBorderTopWidth(value);
+    this.cssBorderBottomWidth(value);
+  };
+
+  $.fn.cssBorderWidthX = function(value) {
+    if (value === undefined) {
+      return this.cssBorderLeftWidth() + this.cssBorderRightWidth();
+    }
+    this.cssBorderLeftWidth(value);
+    this.cssBorderRightWidth(value);
+  };
+
   /**
    * Bottom of a html element without margin and border relative to offset parent. Expects border-box model.
    */
@@ -533,6 +549,7 @@
     var newProperties = [];
     var $this = this;
     properties.forEach(function(prop) {
+      // shorthand css properties may not be copied directly (at least not in firefox) -> copy the actual properties
       if (prop === 'margin' || prop === 'padding') {
         newProperties.push(prop + '-top');
         newProperties.push(prop + '-right');

@@ -51,7 +51,7 @@
   border-bottom: 1px solid @border-color;
 }
 
-.popup-head.taskbar-tool-item.selected {
+.popup-head.taskbar-tool-item {
   border-left: 1px solid @border-color;
   border-right: 1px solid @border-color;
   background-color: @background-color;
@@ -60,21 +60,27 @@
   box-shadow: none;
   border-top: none;
   line-height: normal;
+
+  .popup.down > & {
+    /* above selector is too less specific */
+    padding-top: 16px;
+  }
+
+  &.has-submenu::after {
+    font-size: 17px;
+    top: 0px;
+  }
+
+  &.selected > .font-icon {
+    font-size: 17px;
+    vertical-align: 0;
+  }
 }
 
 .popup.form-tool-popup > .popup-body {
   border-bottom: 1px solid @border-color;
 }
 
-.popup-head.taskbar-tool-item.has-submenu::after {
-  font-size: 17px;
-  top: 0px;
-}
-
-.popup-head.taskbar-tool-item.selected > .font-icon {
-  font-size: 17px;
-  vertical-align: 0;
-}
 
 .desktop-view-tabs,
 .taskbar-tools {

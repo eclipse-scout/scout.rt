@@ -22,7 +22,6 @@ scout.MenuBarPopup.prototype._getMenuItems = function() {
 
 /**
  * @override popup
- * @param event
  */
 scout.MenuBarPopup.prototype.close = function(event) {
   if (!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent) {
@@ -77,7 +76,10 @@ scout.MenuBarPopup.prototype._position = function($container) {
 };
 
 scout.MenuBarPopup.prototype.alignTo = function(openingDirectionX, openingDirectionY) {
-  var pos, headSize, bodySize, bodyWidth;
+  var pos, headSize, bodySize, bodyWidth, widthDiff, subPixelCorr, $blueprintChildren, left, top, headInsets, menuInsets,
+    bodyTop = 0,
+    headTop = 0,
+    decoTop = 0;
 
   if (this.menu.$container.hasClass('right-aligned')) {
     openingDirectionX = 'left';
@@ -92,14 +94,13 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionX, openingDirect
   // Make sure the elements inside the header have the same style as to blueprint (menu)
   // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint
   this.$head.copyCss(this.menu.$container, 'line-height');
-  var $blueprintChildren = this.menu.$container.children();
+  $blueprintChildren = this.menu.$container.children();
   this.$head.children().each(function(i) {
     var $headChild = $(this);
     var $blueprintChild = $blueprintChildren.eq(i);
     $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align');
   });
 
-  pos = this.menu.$container.offset();
   headSize = scout.graphics.getSize(this.$head, true);
   bodySize = scout.graphics.getSize(this.$body, true);
   bodyWidth = bodySize.width;
@@ -110,24 +111,19 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionX, openingDirect
     bodyWidth = headSize.width;
   }
 
-  // horiz. alignment
-  var left = pos.left,
-    top = pos.top,
-    headInsets = scout.graphics.getInsets(this.$head),
-    menuInsets = scout.graphics.getInsets(this.menu.$container),
-    bodyTop = 0,
-    headTop = 0,
-    decoTop = 0;
+  pos = this.menu.$container.offset();
+  left = pos.left;
+  headInsets = scout.graphics.getInsets(this.$head);
+  menuInsets = scout.graphics.getInsets(this.menu.$container);
+  top = pos.top - headInsets.top + menuInsets.top;
 
-  top = pos.top;
   if (openingDirectionY === 'up') {
     top -= bodySize.height;
     headTop = bodySize.height;
     decoTop = headTop - 1; // -1 is body border (the purpose of deco is to hide the body border)
   } else if (openingDirectionY === 'down') {
-    bodyTop += headSize.height;
+    bodyTop += headSize.height - 1;
     decoTop = bodyTop;
-    top -= headInsets.top - menuInsets.top;
   }
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
@@ -139,25 +135,18 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionX, openingDirect
   if (openingDirectionX === 'left') {
     // when we use float:right, browser uses fractions of pixels, that's why we must
     // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
-    var widthDiff = bodyWidth - headSize.width,
-      subPixelCorr = left - Math.floor(left);
+    widthDiff = bodyWidth - headSize.width;
+    subPixelCorr = left - Math.floor(left);
     left -= widthDiff + headInsets.left - menuInsets.left;
     this.$head.cssLeft(widthDiff);
     this.$body.cssLeft(subPixelCorr);
-    this.$deco.cssLeft(widthDiff + 2).width(headSize.width - 2 + subPixelCorr);
-    $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
-    //FIXME CGU remove this block. Fix deco width diff
-  } else if (this.menu.$container.hasClass('taskbar-tool-item')) {
-    top = pos.top;
-    bodyTop = headSize.height - 1;
-    this.$body.cssTop(bodyTop);
-    this.$deco.cssTop(bodyTop);
-    this.$head.cssLeft(0);
-    this.$deco.cssLeft(1).width(headSize.width - 2);
+    this.$deco.cssLeft(widthDiff + this.$head.cssBorderLeftWidth())
+      .width(headSize.width - this.$head.cssBorderWidthX() + subPixelCorr);
   } else {
     left -= headInsets.left;
     this.$head.cssLeft(0);
-    this.$deco.cssLeft(1).width(headSize.width - 2);
+    this.$deco.cssLeft(1)
+      .width(headSize.width - 2);
   }
 
   this.setLocation(new scout.Point(left, top));

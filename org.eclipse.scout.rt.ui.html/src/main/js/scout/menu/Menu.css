@@ -126,23 +126,15 @@
 
 .popup {
   position: absolute;
-  margin: auto;
-
-  & > .popup-head {
-    position: absolute;
-    line-height: @menu-item-height;
-    padding: 5px 13px 0 13px;
-    white-space: nowrap;
-    background-color: white;
-    border: solid 1px @border-color;
-  }
 
   &.down > .popup-head {
+    padding-top: 3px;
     border-bottom: none;
     .drop-shadow();
   }
 
   &.up > .popup-head {
+    padding-bottom: 3px;
     border-top: none;
     .drop-shadow(@y: -6px;);
   }
@@ -150,6 +142,15 @@
   &:focus {
     outline: none;
   }
+}
+
+.popup-head {
+  position: absolute;
+  line-height: @menu-item-height;
+  padding: 0 13px;
+  white-space: nowrap;
+  background-color: white;
+  border: solid 1px @border-color;
 }
 
 .popup-body {
