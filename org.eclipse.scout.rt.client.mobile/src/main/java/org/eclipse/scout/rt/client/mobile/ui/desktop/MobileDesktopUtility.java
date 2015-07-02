@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 
@@ -27,7 +26,6 @@ public class MobileDesktopUtility {
 
   public static void activateOutline(IOutline outline) {
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    desktop.setOutlineTableFormVisible(true);
 
     if (desktop.getOutline() != outline) {
       desktop.setOutline(outline);
@@ -116,12 +114,7 @@ public class MobileDesktopUtility {
   }
 
   public static void removeFormFromDesktop(IForm form) {
-    if (form instanceof IOutlineTableForm) {
-      getDesktop().setOutlineTableFormVisible(false);
-    }
-    else {
-      getDesktop().hideForm(form);
-    }
+    getDesktop().hideForm(form);
   }
 
   public static void removeFormsFromDesktop(Class<? extends IForm> formClass, String displayViewId, IForm excludedForm) {
@@ -137,13 +130,7 @@ public class MobileDesktopUtility {
   }
 
   public static void addFormToDesktop(IForm form) {
-    if (form instanceof IOutlineTableForm) {
-      //Make sure the outline table form is linked with the desktop
-      getDesktop().setOutlineTableForm((IOutlineTableForm) form);
-
-      getDesktop().setOutlineTableFormVisible(true);
-    }
-    else if (isToolForm(form)) {
+    if (isToolForm(form)) {
       openToolForm(form);
     }
     else {

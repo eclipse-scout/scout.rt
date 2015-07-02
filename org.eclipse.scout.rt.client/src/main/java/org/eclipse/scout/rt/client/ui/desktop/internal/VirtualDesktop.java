@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -480,26 +479,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setPageDetailTable(ITable t) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void setOutlineTableForm(IOutlineTableForm f) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public IOutlineTableForm getOutlineTableForm() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isOutlineTableFormVisible() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void setOutlineTableFormVisible(boolean b) {
     throw createUnsupportedOperationException();
   }
 

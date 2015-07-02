@@ -50,14 +50,8 @@ public class BreadCrumb implements IBreadCrumb {
   }
 
   private void autoCloseNavigationForms() throws ProcessingException {
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-
     List<IForm> currentNavigationForms = getBreadCrumbsNavigation().getCurrentNavigationForms();
     for (IForm form : currentNavigationForms) {
-      //Never close the active outline table form
-      if (form == desktop.getOutlineTableForm()) {
-        continue;
-      }
       if (form != getForm() && !getBreadCrumbsNavigation().containsFormInHistory(form)) {
         MobileDesktopUtility.closeForm(form);
       }

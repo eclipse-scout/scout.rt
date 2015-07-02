@@ -30,8 +30,6 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -409,11 +407,6 @@ public class PageFormManager {
   }
 
   public boolean acceptForm(IForm form) {
-    //Outline forms are not used at all -> never show them.
-    if (form instanceof IOutlineTreeForm || form instanceof IOutlineTableForm) {
-      return false;
-    }
-
     //Always block detail forms because they are displayed as inner forms on the page forms.
     if (form == getDesktop().getPageDetailForm()) {
       return false;

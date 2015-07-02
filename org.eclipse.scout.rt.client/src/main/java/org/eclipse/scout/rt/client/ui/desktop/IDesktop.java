@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -443,32 +442,6 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    * see {@link #getPageDetailTable()}, {@link AbstractDesktop#execChangedPageDetailTable(IForm)}
    */
   void setPageDetailTable(ITable t);
-
-  /**
-   * @return the form that displays the table of the (selected) page {@link IPage#getTable()} of the active outline
-   *         {@link IOutline#getDetailTable()}<br>
-   * @see {@link #isOutlineTableFormVisible()}
-   */
-  IOutlineTableForm getOutlineTableForm();
-
-  /**
-   * set the detail table form of the active (selected) page {@link IPage#getTable()} of the active outline
-   * {@link IOutline#getDetailTable()}
-   *
-   * @see {@link #setOutlineTableFormVisible(boolean)}
-   */
-  void setOutlineTableForm(IOutlineTableForm f);
-
-  /**
-   * @return true if the outline table form is visible
-   */
-  boolean isOutlineTableFormVisible();
-
-  /**
-   * set the detail table form of the active (selected) page {@link IPage#getTable()} of the active outline
-   * {@link IOutline#getDetailTable()}
-   */
-  void setOutlineTableFormVisible(boolean b);
 
   /**
    * @return the search form of the active (selected) page {@link IPageWithTable#getSearchFormInternal()} of the active

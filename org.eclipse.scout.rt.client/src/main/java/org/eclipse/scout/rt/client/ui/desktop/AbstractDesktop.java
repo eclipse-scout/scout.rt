@@ -81,7 +81,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -136,8 +135,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private boolean m_outlineChanging = false;
   private P_ActiveOutlineListener m_activeOutlineListener;
   private ITable m_pageDetailTable;
-  private IOutlineTableForm m_outlineTableForm;
-  private boolean m_outlineTableFormVisible;
   private IForm m_pageDetailForm;
   private IForm m_pageSearchForm;
   private final FormStore m_formStore;
@@ -176,7 +173,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_formActivationTracker = BEANS.get(FormActivationTracker.class);
     m_fileChooserStack = new ArrayList<>();
     m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
-    m_outlineTableFormVisible = true;
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this);
     if (callInitializer) {
@@ -438,10 +434,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Order(60)
   @ConfigOperation
   protected void execPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
-    if (m_outlineTableForm != null) {
-      m_outlineTableForm.setCurrentTable(newTable);
-    }
-    setOutlineTableFormVisible(newTable != null);
   }
 
   /**
@@ -1215,48 +1207,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
         catch (Exception t) {
           LOG.error("extension " + ext, t);
-        }
-      }
-    }
-  }
-
-  @Override
-  public IOutlineTableForm getOutlineTableForm() {
-    return m_outlineTableForm;
-  }
-
-  @Override
-  public void setOutlineTableForm(IOutlineTableForm f) {
-    if (f != m_outlineTableForm) {
-      if (m_outlineTableForm != null) {
-        hideForm(m_outlineTableForm);
-      }
-      m_outlineTableForm = f;
-      if (m_outlineTableForm != null) {
-        m_outlineTableForm.setCurrentTable(getPageDetailTable());
-        setOutlineTableFormVisible(getPageDetailTable() != null);
-      }
-      if (m_outlineTableForm != null && m_outlineTableFormVisible) {
-        showForm(m_outlineTableForm);
-      }
-    }
-  }
-
-  @Override
-  public boolean isOutlineTableFormVisible() {
-    return m_outlineTableFormVisible;
-  }
-
-  @Override
-  public void setOutlineTableFormVisible(boolean b) {
-    if (m_outlineTableFormVisible != b) {
-      m_outlineTableFormVisible = b;
-      if (m_outlineTableForm != null) {
-        if (m_outlineTableFormVisible) {
-          showForm(m_outlineTableForm);
-        }
-        else {
-          hideForm(m_outlineTableForm);
         }
       }
     }
