@@ -1,0 +1,33 @@
+/*
+ * Specific CSS rules for jQuery Mouse
+ *
+ * http://api.jqueryui.com/mouse/
+ *
+ * (Contributed by BSI)
+ */
+
+/* CSS classes to set mouse cursor */
+.ui-mouse-cursor-n {
+  cursor: n-resize;
+}
+.ui-mouse-cursor-s {
+  cursor: s-resize;
+}
+.ui-mouse-cursor-e {
+  cursor: e-resize;
+}
+.ui-mouse-cursor-w {
+  cursor: w-resize;
+}
+.ui-mouse-cursor-se {
+  cursor: se-resize;
+}
+.ui-mouse-cursor-sw {
+  cursor: sw-resize;
+}
+.ui-mouse-cursor-nw {
+  cursor: nw-resize;
+}
+.ui-mouse-cursor-ne {
+  cursor: ne-resize;
+}

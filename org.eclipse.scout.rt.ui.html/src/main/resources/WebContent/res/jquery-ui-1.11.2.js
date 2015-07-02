@@ -1075,7 +1075,7 @@ $.widget("ui.resizable", $.ui.mouse, {
         if ("se" === handle) {
           axis.addClass("ui-resizable-gripsmall-se");
           // BSI Change: removed all icons from JQuery UI
-          // defined our own class, defined in resizable.css
+          // defined our own class, defined in ui-resizable.css
           // original line of code was:
           // axis.addClass("ui-icon ui-icon-gripsmall-diagonal-se");
         }
@@ -1261,8 +1261,12 @@ $.widget("ui.resizable", $.ui.mouse, {
       o.aspectRatio :
       ((this.originalSize.width / this.originalSize.height) || 1);
 
-    cursor = $(".ui-resizable-" + this.axis).css("cursor");
-    $("body").css("cursor", cursor === "auto" ? this.axis + "-resize" : cursor);
+    // <customized> BSI: Add class instead of hard coded style
+    $('body').addClass('ui-mouse-cursor-' + this.axis);
+    // Original code:
+    //   cursor = $(".ui-resizable-" + this.axis).css("cursor");
+    //   $("body").css("cursor", cursor === "auto" ? this.axis + "-resize" : cursor);
+    // </customized>
 
     el.addClass("ui-resizable-resizing");
     this._propagate("start", event);
@@ -1346,7 +1350,11 @@ $.widget("ui.resizable", $.ui.mouse, {
       }
     }
 
-    $("body").css("cursor", "auto");
+    // <customized> BSI: Add class instead of hard coded style
+    $('body').removeClass('ui-mouse-cursor-' + this.axis);
+    // Original code:
+    //   $("body").css("cursor", "auto");
+    // </customized>
 
     this.element.removeClass("ui-resizable-resizing");
 
