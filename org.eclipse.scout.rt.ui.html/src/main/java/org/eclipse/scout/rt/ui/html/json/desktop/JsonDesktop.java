@@ -27,8 +27,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.TargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -186,7 +184,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected boolean isFormBlocked(IForm form) {
     // FIXME CGU: ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
-    return (hasDefaultStyle() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm));
+    return !hasDefaultStyle();
   }
 
   protected void handleModelDesktopEvent(DesktopEvent event) {

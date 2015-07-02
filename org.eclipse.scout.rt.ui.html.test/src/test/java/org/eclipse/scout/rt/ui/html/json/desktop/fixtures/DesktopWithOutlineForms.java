@@ -13,23 +13,11 @@ package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
-import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
 
 public class DesktopWithOutlineForms extends DesktopWithOneOutline {
 
   @Override
   protected void execOpened() throws ProcessingException {
-    DefaultOutlineTreeForm treeForm = new DefaultOutlineTreeForm();
-    treeForm.setShowOnStart(false);
-    treeForm.startView();
-    showForm(treeForm);
-
-    DefaultOutlineTableForm tableForm = new DefaultOutlineTableForm();
-    tableForm.setShowOnStart(false);
-    tableForm.startView();
-    showForm(tableForm);
-
     IOutline firstOutline = CollectionUtility.firstElement(getAvailableOutlines());
     setOutline(firstOutline);
   }

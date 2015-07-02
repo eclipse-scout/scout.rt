@@ -431,3 +431,6 @@ API changes AbstractStringField:
 - New property for selection tracking, changeable with methods isSelectionTrackingEnabled() and setSelectionTrackingEnabled(boolean)
 --> Selection tracking with getSelectionStart() and getSelectionEnd() is only possible when selection tracking is enabled.
 
+AWE 02.07.2015
+Removed IOutlineTableForm, IOutlineTreeForm and all sub-classes.
+They're not supported by the new Html UI anymore.
