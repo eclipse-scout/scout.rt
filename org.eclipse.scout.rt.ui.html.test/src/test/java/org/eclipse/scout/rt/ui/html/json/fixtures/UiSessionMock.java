@@ -10,14 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.fixtures;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 
 public class UiSessionMock extends UiSession {
 
   public UiSessionMock() {
-    init(null, null);
+  }
+
+  @Override
+  public void init(HttpServletRequest httpRequest, JsonStartupRequest jsonStartupRequest) {
+    // NOP
   }
 
   @Override
