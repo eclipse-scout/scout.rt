@@ -69,7 +69,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     super.attachChildAdapters();
     attachGlobalAdapters(getViews());
     attachGlobalAdapters(getDialogs());
-    attachGlobalAdapters(getModel().getMessageBoxStack());
+    attachGlobalAdapters(getModel().getMessageBoxes());
     attachGlobalAdapters(getModel().getFileChooserStack());
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
@@ -149,7 +149,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     json.put(IDesktop.PROP_DESKTOP_STYLE, getModel().getDesktopStyle());
     putAdapterIdsProperty(json, "views", getViews());
     putAdapterIdsProperty(json, "dialogs", getDialogs());
-    putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
+    putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes());
     putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChooserStack());
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
@@ -164,9 +164,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected List<IForm> getViews() {
     List<IForm> views = new ArrayList<>();
-    for (IForm form : getModel().getViewStack()) {
-      if (!isFormBlocked(form)) {
-        views.add(form);
+    for (IForm view : getModel().getViews()) {
+      if (!isFormBlocked(view)) {
+        views.add(view);
       }
     }
     return views;
@@ -174,9 +174,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected List<IForm> getDialogs() {
     List<IForm> dialogs = new ArrayList<>();
-    for (IForm form : getModel().getDialogStack()) {
-      if (!isFormBlocked(form)) {
-        dialogs.add(form);
+    for (IForm dialog : getModel().getDialogs()) {
+      if (!isFormBlocked(dialog)) {
+        dialogs.add(dialog);
       }
     }
     return dialogs;
