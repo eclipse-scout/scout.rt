@@ -128,6 +128,7 @@ input {
 
 button {
   padding: 0 @button-padding;
+  border-radius: @border-radius;
 }
 
 textarea {
