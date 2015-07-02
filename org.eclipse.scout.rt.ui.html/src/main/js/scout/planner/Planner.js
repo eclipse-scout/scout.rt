@@ -698,6 +698,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
   // in case of single selection
   if (this.selectionMode == scout.Planner.SelectionMode.SINGLE_RANGE) {
     this.lastRow = this.startRow;
+    $lastRow = this.startRow.$resource;
   }
 
   // select rows
