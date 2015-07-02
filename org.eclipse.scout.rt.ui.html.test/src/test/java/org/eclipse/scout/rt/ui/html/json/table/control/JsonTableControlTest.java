@@ -48,7 +48,7 @@ public class JsonTableControlTest {
   @Test
   public void testLazyLoadingForm_onModelSelectionChanged() throws ProcessingException, JSONException {
     FormWithOneField form = new FormWithOneField();
-    form.setAutoAddRemoveOnDesktop(false);
+    form.setShowOnStart(false);
     TableControl control = new TableControl();
     control.setTable(new Table());
     control.setForm(form);

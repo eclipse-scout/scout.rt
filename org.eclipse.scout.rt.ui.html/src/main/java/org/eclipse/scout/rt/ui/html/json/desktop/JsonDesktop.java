@@ -194,10 +194,10 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       case DesktopEvent.TYPE_OUTLINE_CHANGED:
         handleModelOutlineChanged(event.getOutline());
         break;
-      case DesktopEvent.TYPE_FORM_ADDED:
+      case DesktopEvent.TYPE_FORM_SHOW:
         handleModelFormAdded(event.getForm());
         break;
-      case DesktopEvent.TYPE_FORM_REMOVED:
+      case DesktopEvent.TYPE_FORM_HIDE:
         handleModelFormRemoved(event.getForm());
         break;
       case DesktopEvent.TYPE_FORM_ENSURE_VISIBLE:

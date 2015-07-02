@@ -21,14 +21,14 @@ public class DesktopWithOutlineForms extends DesktopWithOneOutline {
   @Override
   protected void execOpened() throws ProcessingException {
     DefaultOutlineTreeForm treeForm = new DefaultOutlineTreeForm();
-    treeForm.setAutoAddRemoveOnDesktop(false);
+    treeForm.setShowOnStart(false);
     treeForm.startView();
-    addForm(treeForm);
+    showForm(treeForm);
 
     DefaultOutlineTableForm tableForm = new DefaultOutlineTableForm();
-    tableForm.setAutoAddRemoveOnDesktop(false);
+    tableForm.setShowOnStart(false);
     tableForm.startView();
-    addForm(tableForm);
+    showForm(tableForm);
 
     IOutline firstOutline = CollectionUtility.firstElement(getAvailableOutlines());
     setOutline(firstOutline);
