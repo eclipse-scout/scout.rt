@@ -267,7 +267,7 @@
   }
 
   &:not(.disabled):active {
-    border-style: inset;
+    background-color: @palette-gray-3;
     border-right-color: @border-color;
     border-bottom-color: @border-color;
   }
@@ -286,12 +286,12 @@
     color: @default-button-color;
     border-width: 0;
 
-    &:hover {
-      background-color: @default-button-hover-background-color;
-    }
-
     &:focus {
       color: @default-button-color;
+    }
+
+    &:active {
+      background-color: @palette-blue-5;
     }
   }
 

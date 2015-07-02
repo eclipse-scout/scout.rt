@@ -53,6 +53,10 @@
     .overflow-ellipsis-nowrap;
   }
 
+  & > button:active {
+    background-color: @palette-gray-3;
+  }
+
   & > button:first-child {
     border-bottom-left-radius: @border-radius;
   }

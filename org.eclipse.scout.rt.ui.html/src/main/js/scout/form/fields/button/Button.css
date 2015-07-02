@@ -41,7 +41,7 @@
   }
 
   &:not(.disabled):active {
-    border-style: inset;
+    background-color: @palette-gray-3;
     border-right-color: @border-color;
     border-bottom-color: @border-color;
   }
