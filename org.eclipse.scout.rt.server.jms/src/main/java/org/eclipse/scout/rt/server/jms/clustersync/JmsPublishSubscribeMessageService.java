@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jms.clustersync;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Session;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -54,17 +56,18 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   @Override
   protected void initializeService() {
     try {
-      InitialContext context = new InitialContext();
-
+      Hashtable<Object, Object> env = new Hashtable<>();
       String value = CONFIG.getPropertyValue(JndiInitialContextFactory.class);
       if (value != null) {
-        context.addToEnvironment("java.naming.factory.initial", value);
+        env.put(Context.INITIAL_CONTEXT_FACTORY, value);
       }
 
       value = CONFIG.getPropertyValue(JndiProviderUrl.class);
       if (value != null) {
-        context.addToEnvironment("java.naming.provider.url", value);
+        env.put(Context.PROVIDER_URL, value);
       }
+
+      InitialContext context = new InitialContext(env.isEmpty() ? null : env);
 
       m_connectionFactory = (ConnectionFactory) context.lookup(CONFIG.getPropertyValue(JndiConnectionFactory.class));
       m_destination = (Destination) context.lookup(CONFIG.getPropertyValue(PublishSubscribeTopic.class));
