@@ -89,11 +89,11 @@ scout.SplitBoxLayout.prototype.preferredLayoutSize = function($container) {
   if (splitXAxis) { // "|"
     prefSize = new scout.Dimension(
         firstFieldSize.width + secondFieldSize.width + splitterSize.width,
-        Math.max(firstFieldSize.height, secondFieldSize.height) + splitterSize.height
+        Math.max(firstFieldSize.height, secondFieldSize.height)
     );
   } else { // "--"
     prefSize = new scout.Dimension(
-        Math.max(firstFieldSize.width, secondFieldSize.width) + splitterSize.width,
+        Math.max(firstFieldSize.width, secondFieldSize.width),
         firstFieldSize.height + secondFieldSize.height + splitterSize.height
     );
   }
