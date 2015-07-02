@@ -218,7 +218,6 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
 scout.Desktop.prototype._addTab = function(tab) {
   this._allTabs.push(tab);
   this._setSelectedTab(tab);
-//  this._layoutTaskBar();
 };
 
 scout.Desktop.prototype._removeTab = function(tab) {
@@ -230,7 +229,7 @@ scout.Desktop.prototype._removeTab = function(tab) {
     this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
   } else {
     this._attachOutlineContent();
-    this.navigation.bringToFront();
+    this._bringNavigationToFront();
     this._selectedTab = null;
   }
 
@@ -239,19 +238,12 @@ scout.Desktop.prototype._removeTab = function(tab) {
 
 scout.Desktop.prototype._setSelectedTab = function(tab) {
   if (this._selectedTab !== tab) {
-    this.navigation.sendToBack();
+    this._sendNavigationToBack();
     this._detachOutlineContent();
     this._deselectTab();
     this._selectTab(tab);
-    this._renderBenchDropShadow(true);
     this._layoutTaskBar();
     scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
-  }
-};
-
-scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
-  if (this._hasNavigation()) {
-    this.$bench.toggleClass('drop-shadow', showShadow);
   }
 };
 
@@ -283,7 +275,6 @@ scout.Desktop.prototype._deselectTab = function() {
  if (this._selectedTab) {
    this._selectedTab.deselect();
    this._selectedTab = null;
-   this._renderBenchDropShadow(false);
  }
 };
 
@@ -396,7 +387,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
 
   this._outlineContent = content;
   this._deselectTab();
-  this.navigation.bringToFront();
+  this._bringNavigationToFront();
 
   if (!content.rendered) {
     if (content instanceof scout.Table) {
@@ -514,7 +505,7 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   } else {
     this.setOutline(outline);
   }
-  this.navigation.bringToFront();
+  this._bringNavigationToFront();
 };
 
 /**
@@ -527,3 +518,18 @@ scout.Desktop.prototype.navigationWidthUpdated = function(navigationWidth) {
   }
 };
 
+scout.Desktop.prototype._bringNavigationToFront = function () {
+  this.navigation.bringToFront();
+  this._renderBenchDropShadow(false);
+};
+
+scout.Desktop.prototype._sendNavigationToBack = function () {
+  this.navigation.sendToBack();
+  this._renderBenchDropShadow(true);
+};
+
+scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
+  if (this._hasNavigation()) {
+    this.$bench.toggleClass('drop-shadow', showShadow);
+  }
+};
