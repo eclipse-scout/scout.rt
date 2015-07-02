@@ -16,7 +16,7 @@
   position: absolute;
   width: 100%;
   left: 0px;
-  height: 16px;
+  height: 10px;
   cursor: row-resize;
   z-index: 1;
   border-top: 3px solid @border-color;
@@ -69,6 +69,12 @@
     position: absolute;
     top: 31px;
   }
+
+  & .tab-area > button {
+      z-index: 2;
+  }
+
+
 }
 
 .control-group {

@@ -230,7 +230,7 @@ scout.TableFooter.prototype._revalidateTableLayout = function() {
   this._table.htmlComp.revalidateLayoutTree();
 };
 
-scout.TableFooter.prototype.openControlContainer = function() {
+scout.TableFooter.prototype.openControlContainer = function(animated) {
   var insets = scout.graphics.getInsets(this.$controlContainer),
     contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom,
     that = this;
@@ -242,7 +242,7 @@ scout.TableFooter.prototype.openControlContainer = function() {
   this.$controlContainer.stop(true).show().animate({
     height: scout.TableFooter.CONTAINER_SIZE
   }, {
-    duration: 500,
+    duration: animated ? 500 : 0,
     progress: that._revalidateTableLayout.bind(that)
   });
   this.open = true;
