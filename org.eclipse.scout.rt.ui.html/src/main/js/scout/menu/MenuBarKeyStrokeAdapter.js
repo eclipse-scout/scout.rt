@@ -18,15 +18,6 @@ scout.MenuBarKeyStroke = function(menuBar, keyStroke) {
 };
 scout.inherits(scout.MenuBarKeyStroke, scout.KeyStroke);
 
-scout.MenuBarKeyStroke.prototype._handleElementToFocus = function(elementToFocus, $menuItemFocused) {
-  if (elementToFocus) {
-    elementToFocus.setTabbable(true);
-    elementToFocus.$container.focus();
-  } else {
-    $menuItemFocused.attr('tabindex', 0);
-  }
-};
-
 scout.MenuBarKeyStroke.prototype._drawKeyBox = function($container) {
   // NOP
 };
@@ -48,10 +39,10 @@ scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
 
   for (i = 0; i < menuItems.length; i++) {
     menuItem = menuItems[i];
-    menuItem.setTabbable(false);
     if ($menuItemFocused[0] === menuItem.$container[0]) {
       if (lastValidItem) {
-        elementToFocus = lastValidItem;
+        this.menuBar.setTabbableMenu(lastValidItem);
+        lastValidItem.$container.focus();
       }
       break;
     }
@@ -59,7 +50,6 @@ scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
       lastValidItem = menuItem;
     }
   }
-  this._handleElementToFocus(elementToFocus, $menuItemFocused);
 };
 
 /* --- MenuBarRightKeyStroke --- */
@@ -79,15 +69,13 @@ scout.MenuBarRightKeyStroke.prototype.handle = function(event) {
 
   for (i = 0; i < menuItems.length; i++) {
     menuItem = menuItems[i];
-    menuItem.setTabbable(false);
     if (focusNext && menuItem.isTabTarget()) {
-      focusNext = false;
-      elementToFocus = menuItem;
+      this.menuBar.setTabbableMenu(menuItem);
+      menuItem.$container.focus();
       break;
     }
     if ($menuItemFocused[0] === menuItem.$container[0]) {
       focusNext = true;
     }
   }
-  this._handleElementToFocus(elementToFocus, $menuItemFocused);
 };

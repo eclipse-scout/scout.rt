@@ -8,6 +8,7 @@ scout.MenuBar = function(session, menuSorter) {
   this.tabbable = true;
   this._internalMenuItems = []; // original list of menuItems that was passed to updateItems(), only used to check if menubar has changed
   this.menuItems = []; // list of menuItems (ordered, may contain additional UI separators, some menus may not be rendered)
+  this.tabbableItem;
 
   /**
    * This array is === menuItems when menu-bar is not over-sized.
@@ -135,8 +136,8 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   // store the return value of menuSorter in this.menuItems and not the
   // menuItems passed to the updateItems method. We must do this because
   // otherwise we could not remove the added separator later.
-  var orderedMenuItems = this.menuSorter.order(menuItems, this);
-  this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
+  this._orderedMenuItems = this.menuSorter.order(menuItems, this);
+  this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
   this.visibleMenuItems = this.menuItems;
   this._lastVisibleItemLeft = null;
   this._lastVisibleItemRight = null;
@@ -145,17 +146,12 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
   // float:right. In Firefox elements with float:right must come first in the HTML order
   // of elements. Otherwise a strange layout bug occurs.
-  this._renderMenuItems(orderedMenuItems.right, true);
-  this._renderMenuItems(orderedMenuItems.left, false);
+  this._renderMenuItems(this._orderedMenuItems.right, true);
+  this._renderMenuItems(this._orderedMenuItems.left, false);
+  this.recalculateDefaultMenu();
   var lastVisibleItem = this._lastVisibleItemRight || this._lastVisibleItemLeft;
   if (lastVisibleItem) {
     lastVisibleItem.$container.addClass('last');
-  }
-  if (this._defaultMenu) {
-    this._defaultMenu.$container.addClass('default-menu');
-    if(this._defaultMenu.enabled){
-      this._defaultMenu.setTabbable(true);
-    }
   }
 
   // Make first valid MenuItem tabbable so that it can be focused. All other items
@@ -163,15 +159,52 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   if ((!this._defaultMenu || !this._defaultMenu.enabled) && this.tabbable) {
     this.menuItems.some(function(item) {
       if (item.isTabTarget()) {
-        item.setTabbable(true);
+        this.setTabbableMenu(item);
         return true;
       } else {
         return false;
       }
-    });
+    }.bind(this));
   }
 
   this.updateVisibility();
+};
+
+/**
+ * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
+ */
+scout.MenuBar.prototype.recalculateDefaultMenu = function() {
+  if(!this.recalculateDefaultMenuInItems(this._orderedMenuItems.right)){
+    this.recalculateDefaultMenuInItems(this._orderedMenuItems.left);
+  }
+};
+
+scout.MenuBar.prototype.recalculateDefaultMenuInItems = function(items) {
+  var found =false;
+  items.some(function(item) {
+    if (item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
+      if(this._defaultMenu && this._defaultMenu!==item){
+        this._defaultMenu.$container.toggleClass('default-menu', false);
+      }
+      this._defaultMenu = item;
+      this._defaultMenu.$container.toggleClass('default-menu', true);
+      this.setTabbableMenu(this.defaultMenu);
+      found=true;
+      return true;
+    }
+  }.bind(this));
+  return found;
+};
+
+scout.MenuBar.prototype.setTabbableMenu = function(menu){
+  if(!this.tabbable || menu===this.tabbableMenu){
+    return;
+  }
+  if(this.tabbableMenu){
+    this.tabbableMenu.setTabbable(false);
+  }
+  menu.setTabbable(true);
+  this.tabbableMenu = menu;
 };
 
 /**
@@ -223,6 +256,9 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
     // assigned again later in updateItems().
     item.setTabbable(false);
+    if(this.tabbableMenu===item){
+      this.tabbableMenu=undefined;
+    }
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
     if (right) {
@@ -238,10 +274,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
         this._lastVisibleItemLeft = item;
       }
     }
-    // First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
-    if (!this._defaultMenu && item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
-      this._defaultMenu = item;
-    }
+
     // Attach a propertyChange listener to the item, so the menubar can be updated when one of
     // its items changes (e.g. visible, keystroke etc.)
     item.on('propertyChange', this._menuItemPropertyChangeListener);
