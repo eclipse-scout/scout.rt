@@ -220,12 +220,12 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
   sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
 
   // Check if splitter is smaller than min size
-  if (splitterPosition < this.navigation.BREADCRUMB_SWITCH_WIDTH) {
+  if (splitterPosition < scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH) {
     // Set width of navigation to BREADCRUMB_SWITCH_WIDTH, using an animation.
     // While animating, update the desktop layout.
     // At the end of the animation, update the desktop layout, and store the splitter position.
     this.navigation.$navigation.animate({
-      width: this.navigation.BREADCRUMB_SWITCH_WIDTH
+      width: scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH
     }, {
       progress: function() {
         this.splitter.updatePosition();

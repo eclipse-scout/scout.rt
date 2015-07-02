@@ -7,7 +7,7 @@ scout.Button = function() {
 };
 scout.inherits(scout.Button, scout.FormField);
 
-scout.Button.SYSTEM_TYPE = {
+scout.Button.SystemType = {
   NONE: 0,
   CANCEL: 1,
   CLOSE: 2,
@@ -17,7 +17,7 @@ scout.Button.SYSTEM_TYPE = {
   SAVE_WITHOUT_MARKER_CHANGE: 6
 };
 
-scout.Button.DISPLAY_STYLE = {
+scout.Button.DisplayStyle = {
   DEFAULT: 0,
   TOGGLE: 1,
   RADIO: 2,
@@ -30,7 +30,7 @@ scout.Button.DISPLAY_STYLE = {
  */
 scout.Button.prototype._render = function($parent) {
   var cssClass, $button;
-  if (this.displayStyle === scout.Button.DISPLAY_STYLE.LINK) {
+  if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
     /* Render as link-button/ menu-item.
      * This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
      * Probably it would be more reasonable to change the configuration (which would lead to additional
@@ -96,7 +96,7 @@ scout.Button.prototype.doAction = function() {
     activeValueField.displayTextChanged();
   }
 
-  if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
+  if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {
     this.popup = new scout.MenuBarPopup(this, this.session);
@@ -132,7 +132,7 @@ scout.Button.prototype._renderProperties = function() {
  */
 scout.Button.prototype._renderEnabled = function() {
   scout.Button.parent.prototype._renderEnabled.call(this);
-  if (this.displayStyle === scout.Button.DISPLAY_STYLE.LINK) {
+  if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
     this.$field.setTabbable(this.enabled);
   }
 };
@@ -155,7 +155,7 @@ scout.Button.prototype._renderVisible = function(visible) {
 };
 
 scout.Button.prototype._renderSelected = function() {
-  if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
+  if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.$field.toggleClass('selected', this.selected);
   }
 };

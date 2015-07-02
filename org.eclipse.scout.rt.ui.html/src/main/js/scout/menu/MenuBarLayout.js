@@ -112,7 +112,7 @@ scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
   var ellipsis = this._menuBar.session.createUiObject({
     objectType: 'Menu',
     horizontalAlignment: 1,
-    iconId: 'font:\uF143',
+    iconId: scout.icons.ELLIPSIS_V,
     tabbable: false
   });
   ellipsis.render($container);

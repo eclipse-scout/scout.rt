@@ -79,7 +79,7 @@ scout.ViewButton.prototype.getIconId = function(iconId) {
     iconId = this.iconId;
   }
   if (!scout.strings.hasText(iconId)) {
-    iconId = scout.Icons.OUTLINE;
+    iconId = scout.icons.OUTLINE;
   }
   return iconId;
 };

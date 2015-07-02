@@ -3,9 +3,6 @@ scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
 
-  this.BREADCRUMB_SWITCH_WIDTH = 190; // FIXME AWE: make animation work again, cannot use hardcoded width anymore (dynamic number of view-buttons)
-  this.MIN_SPLITTER_SIZE = 50;
-
   this.$navigation;
   this.$viewButtons;
   this.$container;
@@ -16,6 +13,9 @@ scout.DesktopNavigation = function(desktop) {
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.viewMenuTab;
 };
+
+scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 190; // FIXME AWE: make dynamic (min. breadcrumb width)
+scout.DesktopNavigation.MIN_SPLITTER_SIZE = 50;
 
 scout.DesktopNavigation.prototype.render = function($parent) {
   this.$navigation = $parent.appendDiv('desktop-navigation');
@@ -95,13 +95,13 @@ scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
 
 // vertical splitter
 scout.DesktopNavigation.prototype.onResize = function(event) {
-  var newWidth = Math.max(event.data, this.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
+  var newWidth = Math.max(event.data, scout.DesktopNavigation.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
 
   this.$navigation.width(newWidth);
   this.htmlViewButtons.revalidateLayout();
   this.desktop.navigationWidthUpdated(newWidth);
 
-  if (newWidth <= this.BREADCRUMB_SWITCH_WIDTH) {
+  if (newWidth <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH) {
     if (!this.$navigation.hasClass('navigation-breadcrumb')) {
       this.$navigation.addClass('navigation-breadcrumb');
       this.outline.setBreadcrumbEnabled(true);

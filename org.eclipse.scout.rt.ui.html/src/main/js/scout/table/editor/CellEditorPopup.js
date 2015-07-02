@@ -73,7 +73,7 @@ scout.CellEditorPopup.prototype._remove = function() {
   this.$anchor.css('visibility', '');
 };
 
-scout.CellEditorPopup.prototype.alignTo = function(event) {
+scout.CellEditorPopup.prototype.alignTo = function() {
   var cellBounds, rowBounds,
     $tableData = this.table.$data,
     $row = this.row.$row,

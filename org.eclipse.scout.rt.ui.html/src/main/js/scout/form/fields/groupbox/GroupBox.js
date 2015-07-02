@@ -110,7 +110,7 @@ scout.GroupBox.prototype._prepareFields = function() {
     if (field instanceof scout.Button) {
       if (field.processButton) {
         this.processButtons.push(field);
-        if (field.systemType !== scout.Button.SYSTEM_TYPE.NONE) {
+        if (field.systemType !== scout.Button.SystemType.NONE) {
           this.systemButtons.push(field);
         } else {
           this.customButtons.push(field);

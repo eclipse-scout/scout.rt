@@ -55,10 +55,10 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
   button._renderSelected = this._renderSelected.bind(this);
   this._button = button;
 
-  if (button.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
+  if (button.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.actionStyle = scout.Action.ActionStyle.TOGGLE;
   }
-  else if (button.displayStyle === scout.Button.DISPLAY_STYLE.DEFAULT) {
+  else if (button.displayStyle === scout.Button.DisplayStyle.DEFAULT) {
     this.actionStyle = scout.Action.ActionStyle.BUTTON;
   }
   else {

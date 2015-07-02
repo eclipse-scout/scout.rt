@@ -124,8 +124,8 @@ scout.Form.prototype._isClosable = function() {
   for (i = 0; i < systemButtons.length; i++) {
     btn = systemButtons[i];
     if (btn.visible &&
-      btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
-      btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE) {
+      btn.systemType === scout.Button.SystemType.CANCEL ||
+      btn.systemType === scout.Button.SystemType.CLOSE) {
       return true;
     }
   }

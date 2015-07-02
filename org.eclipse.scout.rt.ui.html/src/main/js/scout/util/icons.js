@@ -1,5 +1,8 @@
 scout.icons = {
 
+  OUTLINE: 'font:\uE030',
+  ELLIPSIS_V: 'font:\uF143',
+
   /**
    * Returns an Icon object with structured info contained in the iconId string.
    */
@@ -26,7 +29,6 @@ scout.icons = {
 
     return icon;
   }
-
 };
 
 scout.Icon = function() {
@@ -39,10 +41,6 @@ scout.Icon = function() {
 scout.Icon.IconType = {
   FONT_ICON: 0,
   BITMAP: 1
-};
-
-scout.Icons = {
-  OUTLINE: 'font:\uE030'
 };
 
 scout.Icon.DEFAULT_FONT = 'scoutIcons';
