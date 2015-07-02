@@ -10,32 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.fixtures;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
-import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
-import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
-import org.mockito.Mockito;
 
 public class UiSessionMock extends UiSession {
-  private JsonClientSession m_jsonClientSession;
 
   public UiSessionMock() {
     init(null, null);
-  }
-
-  @Override
-  public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
-    m_jsonClientSession = Mockito.mock(JsonClientSession.class);
-    // For a fully initialized uiSession use TestEnvironmentUiSession
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public JsonClientSession getJsonClientSession() {
-    return m_jsonClientSession;
   }
 
   @Override

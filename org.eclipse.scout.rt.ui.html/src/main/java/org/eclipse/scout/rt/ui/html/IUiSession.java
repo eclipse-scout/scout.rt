@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -110,8 +109,6 @@ public interface IUiSession {
   String getClientSessionId();
 
   IClientSession getClientSession();
-
-  JsonClientSession<? extends IClientSession> getJsonClientSession();
 
   IJsonAdapter<?> getRootJsonAdapter();
 

@@ -52,10 +52,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_uiSession;
   }
 
-  protected JsonDesktop<IDesktop> getJsonDesktop() {
-    return getUiSession().getJsonClientSession().getJsonDesktop();
-  }
-
   @Override
   public IJsonAdapter<?> getParent() {
     return m_parent;

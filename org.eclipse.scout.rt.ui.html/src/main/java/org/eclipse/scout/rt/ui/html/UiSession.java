@@ -86,7 +86,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private boolean m_initialized;
   private String m_clientSessionId;
   private String m_uiSessionId;
-  private JsonClientSession<? extends IClientSession> m_jsonClientSession;
+  private IClientSession m_clientSession;
   private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
@@ -217,13 +217,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentHttpSession = httpSession;
 
       // Look up the requested client session (create and start a new one if necessary)
-      IClientSession clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
+      m_clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
 
       // At this point we have a valid, active clientSession. Therefore, we may now safely store it in the HTTP session
-      storeClientSessionInHttpSession(httpSession, clientSession);
+      storeClientSessionInHttpSession(httpSession, m_clientSession);
 
       // Create a new JsonAdapter for the client session
-      m_jsonClientSession = createClientSessionAdapter(clientSession);
+      JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
       // Handle detach
       handleDetach(jsonStartupRequest, httpSession);
@@ -232,7 +232,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       fireDesktopOpened();
 
       // Send "initialized" event
-      sendInitializationEvent();
+      sendInitializationEvent(jsonClientSessionAdapter.getId());
       LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
     }
     finally {
@@ -359,7 +359,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected void fireDesktopOpened() {
-    JobUtility.runModelJobAndAwait("start up desktop", m_jsonClientSession.getModel(), false, Callables.callable(new IRunnable() {
+    JobUtility.runModelJobAndAwait("start up desktop", m_clientSession, false, Callables.callable(new IRunnable() {
       @Override
       public void run() throws Exception {
         IClientSession clientSession = ClientSessionProvider.currentSession();
@@ -375,13 +375,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }));
   }
 
-  protected void sendInitializationEvent() {
+  protected void sendInitializationEvent(String clientSessionAdapterId) {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
-    jsonEvent.put("clientSession", m_jsonClientSession.getId());
-    Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_jsonClientSession.getModel(), false, new Callable<Locale>() {
+    jsonEvent.put("clientSession", clientSessionAdapterId);
+    Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_clientSession, false, new Callable<Locale>() {
       @Override
       public Locale call() throws Exception {
-        return m_jsonClientSession.getModel().getLocale();
+        return m_clientSession.getLocale();
       }
     });
     putLocaleData(jsonEvent, sessionLocale);
@@ -456,12 +456,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public IClientSession getClientSession() {
-    return (m_jsonClientSession == null ? null : m_jsonClientSession.getModel());
-  }
-
-  @Override
-  public JsonClientSession<? extends IClientSession> getJsonClientSession() {
-    return m_jsonClientSession;
+    return m_clientSession;
   }
 
   public long getJsonAdapterSeq() {
