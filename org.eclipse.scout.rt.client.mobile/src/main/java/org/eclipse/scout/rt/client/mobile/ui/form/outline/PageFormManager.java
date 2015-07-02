@@ -134,7 +134,7 @@ public class PageFormManager {
 
   private void hidePageForms() {
     for (IPageForm pageForm : getDesktop().findForms(IPageForm.class)) {
-      getDesktop().removeForm(pageForm);
+      getDesktop().hideForm(pageForm);
     }
   }
 
@@ -146,7 +146,7 @@ public class PageFormManager {
     LOG.debug("Hiding page: " + page);
     IPageForm pageForm = m_pageFormMap.get(page);
     if (pageForm != null) {
-      getDesktop().removeForm(pageForm);
+      getDesktop().hideForm(pageForm);
     }
   }
 
@@ -216,7 +216,7 @@ public class PageFormManager {
       else {
         pageForm = createPageForm(page);
       }
-      pageForm.setAutoAddRemoveOnDesktop(false);
+      pageForm.setShowOnStart(false);
       pageForm.setDisplayViewId(viewId);
       pageForm.start();
 
@@ -224,7 +224,7 @@ public class PageFormManager {
     }
 
     if (!pageForm.isShowing()) {
-      getDesktop().addForm(pageForm);
+      getDesktop().showForm(pageForm);
     }
 
     return pageForm;
@@ -489,11 +489,11 @@ public class PageFormManager {
     public void desktopChanged(DesktopEvent event) {
       try {
         switch (event.getType()) {
-          case DesktopEvent.TYPE_FORM_ADDED: {
+          case DesktopEvent.TYPE_FORM_SHOW: {
             handleFormAdded(event);
             break;
           }
-          case DesktopEvent.TYPE_FORM_REMOVED: {
+          case DesktopEvent.TYPE_FORM_HIDE: {
             handleFormRemoved(event);
             break;
           }

@@ -108,7 +108,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   }
 
   public void ensureFormStarted() throws ProcessingException {
-    if (getForm() == null || getForm().isFormOpen()) {
+    if (getForm() == null || getForm().isFormStarted()) {
       return;
     }
     startForm();
@@ -138,7 +138,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   }
 
   protected void decorateForm() {
-    getForm().setAutoAddRemoveOnDesktop(false);
+    getForm().setShowOnStart(false);
     getForm().setDisplayHint(IForm.DISPLAY_HINT_VIEW);
     getForm().setDisplayViewId(IForm.VIEW_ID_E);
   }

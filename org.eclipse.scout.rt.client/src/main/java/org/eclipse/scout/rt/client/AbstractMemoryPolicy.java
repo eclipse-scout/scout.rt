@@ -130,7 +130,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     IForm f = p.getSearchFormInternal();
     if (f != null) {
       String pageFormIdentifier = registerPageForm(p, f);
-      if (f.isFormOpen()) {
+      if (f.isFormStarted()) {
         loadSearchFormState(f, pageFormIdentifier);
       }
     }

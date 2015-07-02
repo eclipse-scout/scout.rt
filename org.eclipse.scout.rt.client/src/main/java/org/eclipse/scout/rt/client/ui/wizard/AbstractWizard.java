@@ -1025,7 +1025,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     setCloseTypeInternal(CloseType.Unknown);
     createContainerForm();
     interceptStart();
-    if (m_containerForm != null && !m_containerForm.isFormOpen()) {
+    if (m_containerForm != null && !m_containerForm.isFormStarted()) {
       m_containerForm.startWizard();
     }
   }

@@ -93,9 +93,9 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
   int MODALITY_HINT_PARENT = 10;
 
   /**
-   * Use this modality hint to make the {@link IForm} application modal.
+   * Use this modality hint to make the {@link IForm} desktop or application modal.
    */
-  int MODALITY_HINT_APPLICATION = 20;
+  int MODALITY_HINT_DESKTOP = 20;
 
   int TOOLBAR_FORM_HEADER = 30;
   int TOOLBAR_VIEW_PART = 31;
@@ -236,11 +236,9 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
   void start() throws ProcessingException;
 
   /**
-   * @return true if the form is currently attached to the desktop, false if the
-   *         form is not attached to the desktop<br>
-   *         This method can be used to determine if a possibly active form
-   *         (started with a running form handler) is currently showing on the
-   *         desktop.
+   * @return <code>true</code> if this {@link IForm} is currently attached to the {@link IDesktop} and displayed.
+   *         However, a value of <code>true</code> does not imply that it is the currently active {@link IForm}.
+   * @see IDesktop#showForm(IForm)
    */
   boolean isShowing();
 
@@ -253,8 +251,16 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
   /**
    * @return true if the form is started with a form handler and therefore
    *         active
+   * @deprecated use {@link #isFormStarted()}; will be removed in version 6.1.
    */
+  @Deprecated
   boolean isFormOpen();
+
+  /**
+   * @return <code>true</code> if this {@link IForm} is started with a {@link IFormHandler}. However, it does not
+   *         imply that it is attached to the {@link IDesktop} and displayed in the UI.
+   */
+  boolean isFormStarted();
 
   /**
    * true while the {@link IFormHandler#execLoad()} method is running<br>
@@ -417,21 +423,43 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
 
   /**
    * Property is true by default.<br>
-   * This automatically calls {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#addForm(IForm)} when
+   * This automatically calls {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)} when
    * the form is started.<br>
    * When using forms inside pages such as
    * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage#setDetailForm(IForm)} and
    * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable#getConfiguredSearchForm()} then this
    * flag is set to false, because then the form should not be
    * displayed unless the page it is contained in is activated. This activation
-   * will then call {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#addForm(IForm)}
+   * will then call {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)}
+   *
+   * @deprecated use {@link #isShowOnStart()}; will be removed in version 6.1.
    */
+  @Deprecated
   boolean isAutoAddRemoveOnDesktop();
 
   /**
    * @see #isAutoAddRemoveOnDesktop()
+   * @deprecated use {@link #setShowOnStart(boolean)}; will be removed in version 6.1.
    */
+  @Deprecated
   void setAutoAddRemoveOnDesktop(boolean b);
+
+  /**
+   * @return <code>true</code> if this {@link IForm} should be displayed once being started.
+   */
+  boolean isShowOnStart();
+
+  /**
+   * Controls whether to show this {@link IForm} once started.
+   * <p>
+   * If set to <code>true</code> and this {@link IForm} is started, it is added to the {@link IDesktop} in order to be
+   * displayed. By default, this property is set to <code>true</code>.
+   *
+   * @param showOnStart
+   *          <code>true</code> to show this {@link IForm} on startup, <code>false</code> otherwise.
+   * @see IDesktop#showForm(IForm)
+   */
+  void setShowOnStart(boolean showOnStart);
 
   void setCloseTimer(int seconds);
 
@@ -523,7 +551,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
    * <ul>
    * <li>{@link #MODALITY_HINT_NONE}</li>
    * <li>{@link #MODALITY_HINT_PARENT}</li>
-   * <li>{@link #MODALITY_HINT_APPLICATION}</li>
+   * <li>{@link #MODALITY_HINT_DESKTOP}</li>
    * </ul>
    */
   void setModalityHint(int modalityHint);

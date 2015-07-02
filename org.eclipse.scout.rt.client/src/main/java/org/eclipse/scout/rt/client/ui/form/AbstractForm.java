@@ -158,7 +158,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private boolean m_formStored;
   private boolean m_formLoading;
   private final IBlockingCondition m_blockingCondition;
-  private boolean m_autoRegisterInDesktopOnStart;
+  private boolean m_showOnStart;
   private int m_displayHint;// no property, is fixed
   private String m_displayViewId;// no property, is fixed
   private int m_closeType = IButton.SYSTEM_TYPE_NONE;
@@ -223,7 +223,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setFormParent(IFormParent formParent) {
     Assertions.assertNotNull(formParent, "Property 'formParent' must not be null");
-    Assertions.assertFalse(getDesktop().containsForm(this), "Property 'formParent' cannot be changed because Form is already attached to Desktop [form=%s]", this);
+    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'formParent' cannot be changed because Form is already attached to Desktop [form=%s]", this);
     m_formParent.set(formParent, true);
   }
 
@@ -377,7 +377,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * <ul>
    * <li>{@link #MODALITY_HINT_NONE}</li>
    * <li>{@link #MODALITY_HINT_PARENT}</li>
-   * <li>{@link #MODALITY_HINT_APPLICATION}</li>
+   * <li>{@link #MODALITY_HINT_DESKTOP}</li>
    * </ul>
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -423,6 +423,18 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Order(170)
   protected int getConfiguredToolbarLocation() {
     return TOOLBAR_FORM_HEADER;
+  }
+
+  /**
+   * Configure whether to show this {@link IForm} once started.
+   * <p>
+   * If set to <code>true</code> and this {@link IForm} is started, it is added to the {@link IDesktop} in order to be
+   * displayed. By default, this property is set to <code>true</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(180)
+  protected boolean getConfiguredShowOnStart() {
+    return true;
   }
 
   /**
@@ -622,7 +634,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
 
     m_timerFutureMap = new HashMap<>();
-    m_autoRegisterInDesktopOnStart = true;
+    setShowOnStart(getConfiguredShowOnStart());
     m_contributionHolder = new ContributionComposite(this);
     setToolbarLocation(getConfiguredToolbarLocation());
 
@@ -927,7 +939,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
       loadStateInternal();
       // check if form was made invisible ( = access control denied access)
-      if (!isFormOpen()) {
+      if (!isFormStarted()) {
         disposeFormInternal();
         return this;
       }
@@ -958,15 +970,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       disposeFormInternal();
       throw new ProcessingException("failed showing " + getTitle(), e);
     }
-    // request a gui
+
     setButtonsArmed(true);
     setCloseTimerArmed(true);
-    // register in desktop or wizard (legacy wizard only)
-    if (isAutoAddRemoveOnDesktop()) {
-      IDesktop desktop = getDesktop();
-      if (desktop != null) {
-        desktop.addForm(this);
-      }
+
+    // Notify the UI to display this form.
+    if (isShowOnStart() && getDesktop() != null) {
+      getDesktop().showForm(this);
     }
 
     return this;
@@ -985,7 +995,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     m_wizardStep = wizardStep;
     setModal(false);
-    setAutoAddRemoveOnDesktop(false);
+    setShowOnStart(false);
     setAskIfNeedSave(false);
     // hide top level process buttons with a system type
     for (IFormField f : getRootGroupBox().getFields()) {
@@ -1607,22 +1617,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   protected void loadStateInternal() throws ProcessingException {
     fireFormLoadBefore();
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     getHandler().onLoad();
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     fireFormLoadAfter();
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     // set all values to 'unchanged'
     markSaved();
     setFormLoading(false);
     getHandler().onPostLoad();
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     // if not visible mode, mark form changed
@@ -1817,7 +1827,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doClose() throws ProcessingException {
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     m_closeType = IButton.SYSTEM_TYPE_CLOSE;
@@ -1828,7 +1838,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doCancel() throws ProcessingException {
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     m_closeType = IButton.SYSTEM_TYPE_CANCEL;
@@ -1920,7 +1930,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @Override
   public void doOk() throws ProcessingException {
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     try {
@@ -1943,7 +1953,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doSaveWithoutMarkerChange() throws ProcessingException {
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     try {
@@ -1963,7 +1973,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doSave() throws ProcessingException {
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     try {
@@ -2078,7 +2088,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   private void closeFormInternal(boolean kill) {
-    if (isFormOpen()) {
+    if (isFormStarted()) {
       try {
         // check if there is an active close, cancel or finish button
         final Set<Integer> enabledSystemTypes = new HashSet<Integer>();
@@ -2144,7 +2154,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * do not use or override this internal method
    */
   protected void disposeFormInternal() {
-    if (!isFormOpen()) {
+    if (!isFormStarted()) {
       return;
     }
     try {
@@ -2170,12 +2180,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       LOG.warn("Form " + getClass().getName(), t);
     }
     try {
-      // deregister of wizard / desktop
-      if (isAutoAddRemoveOnDesktop()) {
-        IDesktop desktop = getDesktop();
-        if (desktop != null) {
-          desktop.removeForm(this);
-        }
+      // Detach this Form from Desktop; has no effect if the Form is not attached.
+      IDesktop desktop = getDesktop();
+      if (desktop != null) {
+        desktop.hideForm(this);
       }
     }
     finally {
@@ -2199,11 +2207,17 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isFormClosed() {
-    return !isFormOpen();
+    return !isFormStarted();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public boolean isFormOpen() {
+    return isFormStarted();
   }
 
   @Override
-  public boolean isFormOpen() {
+  public boolean isFormStarted() {
     return m_blockingCondition.isBlocking();
   }
 
@@ -2719,14 +2733,26 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isAutoAddRemoveOnDesktop() {
-    return m_autoRegisterInDesktopOnStart;
+    return isShowOnStart();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void setAutoAddRemoveOnDesktop(boolean b) {
+    setShowOnStart(b);
   }
 
   @Override
-  public void setAutoAddRemoveOnDesktop(boolean b) {
-    m_autoRegisterInDesktopOnStart = b;
+  public boolean isShowOnStart() {
+    return m_showOnStart;
+  }
+
+  @Override
+  public void setShowOnStart(boolean showOnStart) {
+    m_showOnStart = showOnStart;
   }
 
   @Override

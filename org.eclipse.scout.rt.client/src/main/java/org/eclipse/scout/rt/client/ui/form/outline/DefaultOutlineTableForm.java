@@ -70,7 +70,7 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
   }
 
   public void startView() throws ProcessingException {
-    setAutoAddRemoveOnDesktop(false);
+    setShowOnStart(false);
     startInternal(new ViewHandler());
     ClientSessionProvider.currentSession().getDesktop().setOutlineTableForm(this);
   }

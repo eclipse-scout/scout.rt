@@ -212,19 +212,32 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
 
   /**
    * Adds the given {@link IForm} to the desktop and notifies attached listeners like the UI.
+   *
+   * @deprecated use {@link #showForm(IForm)}; will be removed in version 6.1.
    */
+  @Deprecated
   void addForm(IForm form);
 
   /**
-   * Removes the given {@link IForm} from desktop and notifies attached listeners like the UI. However, the
-   * form is not closed, meaning that it can be added to the display anew in order to be displayed.
+   * Attaches the given {@link IForm} to the desktop and displays it.
    */
+  void showForm(IForm form);
+
+  /**
+   * Removes the given {@link IForm} from desktop and notifies attached listeners like the UI. However, the
+   * form is not closed, meaning that it can be added to the {@link IDesktop} anew in order to be displayed.
+   *
+   * @deprecated use {@link #hideForm(IForm)}; will be removed in version 6.1.
+   */
+  @Deprecated
   void removeForm(IForm form);
 
   /**
-   * Returns whether the given {@link IForm} is registered on {@link IDesktop}.
+   * Removes the given {@link IForm} from desktop and UI. However, the form is not closed, meaning that it can be
+   * attached to the desktop anew in order to be displayed. This method has no effect if the {@link IForm} is
+   * not showing.
    */
-  boolean containsForm(IForm form);
+  void hideForm(IForm form);
 
   /**
    * Returns all message boxes registered on {@link IDesktop}.
@@ -265,11 +278,10 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void removeKeyStrokes(IKeyStroke... keyStrokes);
 
   /**
-   * @return true if the form is currently attached to the desktop, false if the
-   *         form is not attached to the desktop<br>
-   *         This method can be used to determine if a possibly active form
-   *         (started with a running form handler) is currently showing on the
-   *         desktop.
+   * @return <code>true</code> if the given {@link IForm} is currently attached to the {@link IDesktop} and displayed.
+   *         However, a value of <code>true</code> does not imply that the {@link IForm} is the currently active
+   *         {@link IForm}.
+   * @see #showForm(IForm)
    */
   boolean isShowing(IForm form);
 

@@ -350,7 +350,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         @Override
         public void desktopChanged(final DesktopEvent e) {
           switch (e.getType()) {
-            case DesktopEvent.TYPE_FORM_ADDED: {
+            case DesktopEvent.TYPE_FORM_SHOW: {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
@@ -360,7 +360,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               invokeSwingLater(t);
               break;
             }
-            case DesktopEvent.TYPE_FORM_REMOVED: {
+            case DesktopEvent.TYPE_FORM_HIDE: {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
@@ -464,7 +464,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       m_rootComposite.showSwingFrame();
       // load state of views
       for (IForm f : desktop.getViewStack()) {
-        if (f.isAutoAddRemoveOnDesktop()) {
+        if (f.isShowOnStart()) {
           showStandaloneForm(getRootFrame(), f);
         }
       }
@@ -474,7 +474,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       }
       // dialogs
       for (IForm f : desktop.getDialogStack()) {
-        if (f.isAutoAddRemoveOnDesktop()) {
+        if (f.isShowOnStart()) {
           showStandaloneForm(getRootFrame(), f);
         }
       }

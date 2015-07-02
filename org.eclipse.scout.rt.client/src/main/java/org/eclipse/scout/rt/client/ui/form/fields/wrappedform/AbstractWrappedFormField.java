@@ -79,7 +79,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   @Override
   protected void execInitField() throws ProcessingException {
     IForm f = getInnerForm();
-    if (f != null && !f.isFormOpen()) {
+    if (f != null && !f.isFormStarted()) {
       if (f instanceof ISearchForm) {
         ((ISearchForm) f).startSearch();
       }
@@ -166,9 +166,9 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     m_innerForm = form;
     m_manageInnerFormLifeCycle = manageFormLifeCycle;
     if (m_innerForm != null) {
-      if (!m_innerForm.isFormOpen()) {
+      if (!m_innerForm.isFormStarted()) {
         m_innerForm.setModal(false);
-        m_innerForm.setAutoAddRemoveOnDesktop(false);
+        m_innerForm.setShowOnStart(false);
       }
       m_innerForm.setWrapperFieldInternal(this);
       m_innerForm.getRootGroupBox().setBorderVisible(false);
@@ -181,7 +181,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     calculateVisibleInternal();
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      if (!m_innerForm.isFormOpen() && m_manageInnerFormLifeCycle) {
+      if (!m_innerForm.isFormStarted() && m_manageInnerFormLifeCycle) {
         m_innerForm.start();
       }
     }

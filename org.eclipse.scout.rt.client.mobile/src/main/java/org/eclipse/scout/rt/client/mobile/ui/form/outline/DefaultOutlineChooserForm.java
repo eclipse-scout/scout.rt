@@ -173,7 +173,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
           if (CollectionUtility.hasElements(rows)) {
             IOutline outline = getOutlineColumn().getValue(CollectionUtility.firstElement(rows));
             MobileDesktopUtility.activateOutline(outline);
-            getDesktop().removeForm(DefaultOutlineChooserForm.this);
+            getDesktop().hideForm(DefaultOutlineChooserForm.this);
 
             clearSelectionDelayed();
           }

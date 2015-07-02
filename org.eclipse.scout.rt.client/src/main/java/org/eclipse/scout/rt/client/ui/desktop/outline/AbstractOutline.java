@@ -643,7 +643,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       if (form.getDisplayViewId() == null) {
         form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
       }
-      form.setAutoAddRemoveOnDesktop(false);
+      form.setShowOnStart(false);
     }
     m_defaultDetailForm = form;
     firePageChanged(null);
@@ -671,7 +671,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   public void ensureDefaultDetailFormStarted() throws ProcessingException {
-    if (getDefaultDetailForm() == null || getDefaultDetailForm().isFormOpen()) {
+    if (getDefaultDetailForm() == null || getDefaultDetailForm().isFormStarted()) {
       return;
     }
     startDefaultDetailForm();

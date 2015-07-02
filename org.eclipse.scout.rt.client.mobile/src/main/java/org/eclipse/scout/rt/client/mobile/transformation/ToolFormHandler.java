@@ -87,7 +87,7 @@ public class ToolFormHandler {
     public void desktopChanged(DesktopEvent e) {
 
       switch (e.getType()) {
-        case DesktopEvent.TYPE_FORM_ADDED: {
+        case DesktopEvent.TYPE_FORM_SHOW: {
           handleFormAdded(e);
           break;
         }

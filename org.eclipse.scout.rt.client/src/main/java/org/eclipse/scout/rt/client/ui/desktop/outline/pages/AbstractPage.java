@@ -590,7 +590,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   protected void ensureDetailFormStarted() throws ProcessingException {
-    if (getDetailForm() == null || getDetailForm().isFormOpen()) {
+    if (getDetailForm() == null || getDetailForm().isFormStarted()) {
       return;
     }
     startDetailForm();
@@ -633,7 +633,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (form.getDisplayViewId() == null) {
       form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
     }
-    form.setAutoAddRemoveOnDesktop(false);
+    form.setShowOnStart(false);
   }
 
   /**

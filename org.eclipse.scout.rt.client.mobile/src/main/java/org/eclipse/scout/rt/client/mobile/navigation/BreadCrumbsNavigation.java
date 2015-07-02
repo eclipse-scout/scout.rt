@@ -314,11 +314,11 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
     public void desktopChanged(DesktopEvent e) {
 
       switch (e.getType()) {
-        case DesktopEvent.TYPE_FORM_ADDED: {
+        case DesktopEvent.TYPE_FORM_SHOW: {
           handleFormAdded(e);
           break;
         }
-        case DesktopEvent.TYPE_FORM_REMOVED: {
+        case DesktopEvent.TYPE_FORM_HIDE: {
           handleFormRemoved(e);
           break;
         }

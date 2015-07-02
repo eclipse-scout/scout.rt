@@ -136,7 +136,7 @@ public class PrintFormsAction extends AbstractAction {
 
   protected void processForm(final IForm f) throws Exception {
     f.setModal(false);
-    f.setAutoAddRemoveOnDesktop(true);
+    f.setShowOnStart(true);
     f.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
     f.setDisplayViewId(null);
     AbstractFormHandler handler = new AbstractFormHandler() {

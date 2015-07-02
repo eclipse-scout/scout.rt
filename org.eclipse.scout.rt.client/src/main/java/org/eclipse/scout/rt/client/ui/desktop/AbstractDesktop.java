@@ -856,14 +856,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void addForm(IForm form) {
+    showForm(form);
+  }
+
+  @Override
+  public void showForm(IForm form) {
     form = interceptAddForm(form);
     if (form == null || m_formStore.contains(form)) {
       return;
     }
 
-    // TODO [dwi] Clarify whether this method is still used.
+    // TODO [dwi] Clarify whether this logic is still required.
     // If the Form is not a View, close all open PopUp windows.
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
       for (IForm popupWindow : m_formStore.getByDisplayHint(IForm.DISPLAY_HINT_POPUP_WINDOW)) {
@@ -880,22 +886,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     Assertions.assertNotNull(form.getFormParent(), "Property 'formParent' must not be null");
 
     m_formStore.add(form);
-    fireFormAdded(form);
+    fireFormShow(form);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void removeForm(IForm form) {
+    hideForm(form);
   }
 
   @Override
-  public void removeForm(IForm form) {
+  public void hideForm(IForm form) {
     if (form == null || !m_formStore.contains(form)) {
       return;
     }
 
     m_formStore.remove(form);
-    fireFormRemoved(form);
-  }
-
-  @Override
-  public boolean containsForm(IForm form) {
-    return m_formStore.contains(form);
+    fireFormHide(form);
   }
 
   @Override
@@ -1222,7 +1229,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public void setOutlineTableForm(IOutlineTableForm f) {
     if (f != m_outlineTableForm) {
       if (m_outlineTableForm != null) {
-        removeForm(m_outlineTableForm);
+        hideForm(m_outlineTableForm);
       }
       m_outlineTableForm = f;
       if (m_outlineTableForm != null) {
@@ -1230,7 +1237,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         setOutlineTableFormVisible(getPageDetailTable() != null);
       }
       if (m_outlineTableForm != null && m_outlineTableFormVisible) {
-        addForm(m_outlineTableForm);
+        showForm(m_outlineTableForm);
       }
     }
   }
@@ -1246,10 +1253,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       m_outlineTableFormVisible = b;
       if (m_outlineTableForm != null) {
         if (m_outlineTableFormVisible) {
-          addForm(m_outlineTableForm);
+          showForm(m_outlineTableForm);
         }
         else {
-          removeForm(m_outlineTableForm);
+          hideForm(m_outlineTableForm);
         }
       }
     }
@@ -1624,8 +1631,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireFormAdded(IForm form) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FORM_ADDED, form);
+  private void fireFormShow(IForm form) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FORM_SHOW, form);
     fireDesktopEvent(e);
   }
 
@@ -1634,8 +1641,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireFormRemoved(IForm form) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FORM_REMOVED, form);
+  private void fireFormHide(IForm form) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FORM_HIDE, form);
     fireDesktopEvent(e);
   }
 
@@ -1774,16 +1781,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setOpenedInternal(false);
     detachGui();
 
-    List<IForm> openForms = new ArrayList<IForm>();
+    List<IForm> showedForms = new ArrayList<IForm>();
     // remove views
     for (IForm view : getViewStack()) {
-      removeForm(view);
-      openForms.add(view);
+      hideForm(view);
+      showedForms.add(view);
     }
     // remove forms
     for (IForm dialog : getDialogStack()) {
-      removeForm(dialog);
-      openForms.add(dialog);
+      hideForm(dialog);
+      showedForms.add(dialog);
     }
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
@@ -1804,14 +1811,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         AbstractFormToolButton<?> formToolButton = (AbstractFormToolButton<?>) toolButton;
         IForm form = formToolButton.getForm();
         if (form != null) {
-          openForms.add(form);
+          showedForms.add(form);
           formToolButton.setForm(null);
         }
       }
     }
 
     // close open forms
-    for (IForm form : openForms) {
+    for (IForm form : showedForms) {
       if (form != null) {
         try {
           form.doClose();

@@ -70,7 +70,7 @@ public class MobileDesktopUtility {
     }
     //Double check to make sure it really will be added
     if (!getDesktop().isShowing(form)) {
-      getDesktop().addForm(form);
+      getDesktop().showForm(form);
     }
   }
 
@@ -81,7 +81,7 @@ public class MobileDesktopUtility {
     }
     //Double check to make sure it really will be removed
     if (getDesktop().isShowing(form)) {
-      getDesktop().removeForm(form);
+      getDesktop().hideForm(form);
     }
   }
 
@@ -107,7 +107,7 @@ public class MobileDesktopUtility {
     if (MobileDesktopUtility.isToolForm(form)) {
       MobileDesktopUtility.closeToolForm(form);
     }
-    else if (form.isAutoAddRemoveOnDesktop()) {
+    else if (form.isShowOnStart()) {
       form.doClose();
     }
     else {
@@ -120,7 +120,7 @@ public class MobileDesktopUtility {
       getDesktop().setOutlineTableFormVisible(false);
     }
     else {
-      getDesktop().removeForm(form);
+      getDesktop().hideForm(form);
     }
   }
 
@@ -131,7 +131,7 @@ public class MobileDesktopUtility {
 
     for (IForm form : getDesktop().getViewStack()) {
       if (form != excludedForm && formClass.isInstance(form) && displayViewId.equals(form.getDisplayViewId())) {
-        getDesktop().removeForm(form);
+        getDesktop().hideForm(form);
       }
     }
   }
@@ -147,7 +147,7 @@ public class MobileDesktopUtility {
       openToolForm(form);
     }
     else {
-      getDesktop().addForm(form);
+      getDesktop().showForm(form);
     }
   }
 

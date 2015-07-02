@@ -276,18 +276,25 @@ public class VirtualDesktop implements IDesktop {
   public void downloadResource(BinaryResource binaryResource) {
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void addForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 
   @Override
+  public void showForm(IForm form) {
+    throw createUnsupportedOperationException();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void removeForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public boolean containsForm(IForm form) {
+  public void hideForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 

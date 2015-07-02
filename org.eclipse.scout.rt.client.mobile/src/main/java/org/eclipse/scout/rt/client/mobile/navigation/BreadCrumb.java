@@ -38,7 +38,7 @@ public class BreadCrumb implements IBreadCrumb {
     //Add form to desktop if it is open but has been removed
     if (getForm() != null) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-      if (getForm().isFormOpen() && !desktop.isShowing(getForm())) {
+      if (getForm().isFormStarted() && !desktop.isShowing(getForm())) {
         if (MobileDesktopUtility.isToolForm(getForm())) {
           MobileDesktopUtility.openToolForm(getForm());
         }

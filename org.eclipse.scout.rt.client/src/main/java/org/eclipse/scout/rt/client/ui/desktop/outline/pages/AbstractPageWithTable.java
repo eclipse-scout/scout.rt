@@ -491,7 +491,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Ensures that the search form is started (lazy starting)
    */
   protected void ensureSearchFormStarted() {
-    if (m_searchForm != null && !m_searchForm.isFormOpen()) {
+    if (m_searchForm != null && !m_searchForm.isFormStarted()) {
       try {
         m_searchForm.startSearch();
         notifyMemoryPolicyOfSearchFormStart();
@@ -520,7 +520,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (m_searchForm.getDisplayViewId() == null) {
       m_searchForm.setDisplayViewId(IForm.VIEW_ID_PAGE_SEARCH);
     }
-    m_searchForm.setAutoAddRemoveOnDesktop(false);
+    m_searchForm.setShowOnStart(false);
     attachSearchTableControl();
     // listen for search action
     m_searchFormListener = new FormListener() {

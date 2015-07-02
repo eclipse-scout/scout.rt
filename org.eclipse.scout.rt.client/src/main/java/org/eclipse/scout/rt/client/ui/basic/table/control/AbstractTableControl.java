@@ -139,14 +139,14 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
   }
 
   public void ensureFormStarted() throws ProcessingException {
-    if (getForm() == null || getForm().isFormOpen()) {
+    if (getForm() == null || getForm().isFormStarted()) {
       return;
     }
     startForm();
   }
 
   public void decorateForm() {
-    getForm().setAutoAddRemoveOnDesktop(false);
+    getForm().setShowOnStart(false);
   }
 
   @Override

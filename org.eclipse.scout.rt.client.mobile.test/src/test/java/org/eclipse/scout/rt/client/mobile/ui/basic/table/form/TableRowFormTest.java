@@ -145,7 +145,7 @@ public class TableRowFormTest {
         public ITableRowForm createTableRowForm(ITableRow row)
             throws ProcessingException {
           ITableRowForm form = super.createTableRowForm(row);
-          form.setAutoAddRemoveOnDesktop(false); // Disable to avoid
+          form.setShowOnStart(false); // Disable to avoid
           // ClientJob usage
           form.addFormListener(new ClearTableSelectionFormCloseListener(
               Table.this));

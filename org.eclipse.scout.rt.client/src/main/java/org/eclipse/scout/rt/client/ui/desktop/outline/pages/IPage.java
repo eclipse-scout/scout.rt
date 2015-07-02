@@ -71,7 +71,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
 
   /**
    * set the detail form, the form must either be in non-started state or
-   * displayHint must be {@link IForm#DISPLAY_HINT_VIEW} and {@link IForm#isAutoAddRemoveOnDesktop()} must be false
+   * displayHint must be {@link IForm#DISPLAY_HINT_VIEW} and {@link IForm#isShowOnStart()} must be false
    */
   void setDetailForm(IForm form);
 

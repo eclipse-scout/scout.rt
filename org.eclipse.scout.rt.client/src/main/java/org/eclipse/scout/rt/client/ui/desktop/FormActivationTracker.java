@@ -70,11 +70,11 @@ public class FormActivationTracker implements FormListener, DesktopListener {
   @Override
   public void desktopChanged(final DesktopEvent e) {
     switch (e.getType()) {
-      case DesktopEvent.TYPE_FORM_ADDED: {
+      case DesktopEvent.TYPE_FORM_SHOW: {
         e.getForm().addFormListener(this);
         break;
       }
-      case DesktopEvent.TYPE_FORM_REMOVED: {
+      case DesktopEvent.TYPE_FORM_HIDE: {
         final IForm form = e.getForm();
         m_formActivationHistory.remove(form);
         form.removeFormListener(this);
