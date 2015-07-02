@@ -59,5 +59,5 @@ public interface ISplitBox extends ICompositeField {
 
   void setCacheSplitterPositionPropertyName(String propName);
 
-  ISplitboxUIFacade getUIFacade();
+  ISplitBoxUIFacade getUIFacade();
 }

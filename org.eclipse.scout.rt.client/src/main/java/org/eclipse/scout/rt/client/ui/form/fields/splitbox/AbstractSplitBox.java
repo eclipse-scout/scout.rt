@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 public abstract class AbstractSplitBox extends AbstractCompositeField implements ISplitBox {
 
   private SplitBoxGrid m_grid;
-  private ISplitboxUIFacade m_uiFacade;
+  private ISplitBoxUIFacade m_uiFacade;
   private boolean m_cacheSplitterPosition;
   private String m_cacheSplitterPositionPropertyName;
 
@@ -173,11 +173,16 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   }
 
   @Override
-  public ISplitboxUIFacade getUIFacade() {
+  public ISplitBoxUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
-  private class P_UIFacade implements ISplitboxUIFacade {
+  private class P_UIFacade implements ISplitBoxUIFacade {
+
+    @Override
+    public void setSplitterPositionFromUI(double splitterPosition) {
+      setSplitterPosition(splitterPosition);
+    }
   } // end UIFacade
 
   protected static class LocalSplitBoxExtension<OWNER extends AbstractSplitBox> extends LocalCompositeFieldExtension<OWNER> implements ISplitBoxExtension<OWNER> {
