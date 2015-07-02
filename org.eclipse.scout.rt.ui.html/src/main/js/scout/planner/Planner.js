@@ -265,6 +265,7 @@ scout.Planner.prototype._renderScale = function() {
     return;
   }
   var $timeline, $timelineLarge, $timelineSmall, loop, $divLarge, $divSmall, width, newLargeGroup,
+    first = true,
     that = this,
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
@@ -291,7 +292,7 @@ scout.Planner.prototype._renderScale = function() {
     // from start to end
     while (loop < this.viewRange.to) {
       newLargeGroup = false;
-      if ((loop.getMinutes() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
+      if ((loop.getMinutes() === 0) || first) {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'HH')).data('count', 0);
         newLargeGroup = true;
       }
@@ -305,6 +306,7 @@ scout.Planner.prototype._renderScale = function() {
         .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
+      first = false;
     }
   } else if ((this.displayMode === DISPLAY_MODE.WORK) || (this.displayMode === DISPLAY_MODE.WEEK)) {
     loop = new Date(this.viewRange.from.valueOf());
@@ -312,11 +314,11 @@ scout.Planner.prototype._renderScale = function() {
     // from start to end
     while (loop < this.viewRange.to) {
       newLargeGroup = false;
-      if ((loop.getHours() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
-        if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
+      if ((loop.getHours() === 0) || first) {
+        if ((loop.getMonth() === 0) || first) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd. MMMM yyyy')).data('count', 0);
         } else if (loop.getDate() === 1) {
-          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd. MMM')).data('count', 0);
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd. MMMM')).data('count', 0);
         } else {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd.')).data('count', 0);
         }
@@ -332,6 +334,7 @@ scout.Planner.prototype._renderScale = function() {
         .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
+      first = false;
     }
 
   } else if (this.displayMode === DISPLAY_MODE.MONTH) {
@@ -340,8 +343,8 @@ scout.Planner.prototype._renderScale = function() {
     // from start to end
     while (loop < this.viewRange.to) {
       newLargeGroup = false;
-      if ((loop.getDate() == 1) || (loop.valueOf() == this.viewRange.from.valueOf())) {
-        if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
+      if ((loop.getDate() == 1) || first) {
+        if ((loop.getMonth() === 0) || first) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
         } else {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
@@ -358,6 +361,7 @@ scout.Planner.prototype._renderScale = function() {
         .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
+      first = false;
     }
 
   } else if (this.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
@@ -366,11 +370,22 @@ scout.Planner.prototype._renderScale = function() {
     // from start to end
     while (loop < this.viewRange.to) {
       newLargeGroup = false;
-      if ((loop.getDate() < 8) || (loop.valueOf() == this.viewRange.from.valueOf())) {
-        if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
-          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
+      if ((loop.getDate() < 8) || first === true) {
+        if ((loop.getMonth() === 0) || first === true) {
+          if (loop.getDate() > 11) {
+            $divLarge = $timelineLarge.appendDiv('scale-item', '&nbsp').data('count', 0);
+            first = 2;
+          } else {
+            $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
+            first = false;
+          }
         } else {
-          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
+          if (first === 2) {
+            $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
+            first = false;
+          } else {
+            $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
+          }
         }
         newLargeGroup = true;
       }
@@ -394,7 +409,7 @@ scout.Planner.prototype._renderScale = function() {
     // from start to end
     while (loop < this.viewRange.to) {
       newLargeGroup = false;
-      if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
+      if ((loop.getMonth() === 0) || first) {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'yyyy')).data('count', 0);
         newLargeGroup = true;
       }
@@ -408,6 +423,7 @@ scout.Planner.prototype._renderScale = function() {
         .data('first', newLargeGroup);
 
       $divLarge.data('count', $divLarge.data('count') + 1);
+      first = false;
     }
   }
 

@@ -204,9 +204,11 @@ scout.YearPanel.prototype._onYearClick = function(event) {
 
 scout.YearPanel.prototype._onYearDayClick = function(event) {
   this.selectedDate = $('.year-hover-day', this.$yearList).data('date');
-  this.trigger('dateSelect', {
-    date: this.selectedDate
-  });
+  if (this.selectedDate) {
+    this.trigger('dateSelect', {
+      date: this.selectedDate
+    });
+  }
 };
 
 scout.YearPanel.prototype._onYearHoverIn = function(event) {
