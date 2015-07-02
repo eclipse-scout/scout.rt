@@ -209,6 +209,27 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
   if (this.borderDecoration === 'line') {
     this.$container.toggleClass('with-line', !expanded);
   }
+
+  // Group boxes have set "useUiHeight=true" by default. When a group box is collapsed, it should not
+  // stretched vertically (no "weight Y"). However, because "weightY" is -1 by default, a calculated value
+  // is assigned (LogicalGridData._inheritWeightY()) that is based on the group boxes height. In collapsed
+  // state, this height would be wrong. Therefore, we manually assign "weightY=0" to collapsed group boxes
+  // to prevent them from beeing stretched.
+  if (this.expanded) {
+    // If group box was previously collapsed, restore original "weightY" griaData value
+    if (this._collapsedWeightY !== undefined) {
+      this.gridData.weightY = this._collapsedWeightY;
+      delete this._collapsedWeightY;
+    }
+  }
+  else {
+    // If group box has a weight different than 0, we set it to zero and back up the old value
+    if (this.gridData.weightY !== 0) {
+      this._collapsedWeightY = this.gridData.weightY;
+      this.gridData.weightY = 0;
+    }
+  }
+
   this.invalidateLayoutTree();
 };
 
