@@ -360,8 +360,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           smartForm.startForm();
           smartForm.dataFetchedDelegate(getLookupRowFetcher().getResult(), getConfiguredBrowseMaxRowCount());
           if (smartForm.isFormOpen()) {
-            doSearch(newText, selectCurrentValue, false);
             registerProposalFormInternal(smartForm);
+            doSearch(newText, selectCurrentValue, false);
           }
         }
         else {
