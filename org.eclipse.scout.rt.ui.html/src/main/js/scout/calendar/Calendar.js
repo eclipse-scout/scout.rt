@@ -100,8 +100,6 @@ scout.Calendar.prototype._syncViewRange = function(viewRange) {
 };
 
 scout.Calendar.prototype._render = function($parent) {
-  $.log.debug('(Calendar#_render)');
-
   this._$parent = $parent;
   this.$container = this._$parent.appendDiv('calendar');
 
@@ -562,6 +560,13 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       }
     }
   });
+};
+
+scout.Calendar.prototype.layoutYearPanel = function() {
+  if (this._showYearPanel) {
+    scout.scrollbars.update(this._yearPanel.$yearList);
+    this._yearPanel._scrollYear();
+  }
 };
 
 scout.Calendar.prototype.layoutLabel = function() {
