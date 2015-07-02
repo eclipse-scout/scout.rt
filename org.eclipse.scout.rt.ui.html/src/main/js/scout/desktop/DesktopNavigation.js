@@ -40,7 +40,8 @@ scout.DesktopNavigation.prototype.render = function($parent) {
     viewButton.on('propertyChange', this._onViewButtonPropertyChange.bind(this));
   }, this);
 
-  this.$container = this.$navigation.appendDiv('navigation-container');
+  this.$container = this.$navigation.appendDiv('navigation-container')
+    .on('mousedown', this._onNavigationMousedown.bind(this));
   this._installKeyStrokeAdapter();
 };
 
@@ -58,6 +59,12 @@ scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
 scout.DesktopNavigation.prototype._onViewButtonPropertyChange = function(event) {
   if (scout.helpers.isOneOf(event.changedProperties, 'selected')) {
     this.htmlViewButtons.revalidateLayout();
+  }
+};
+
+scout.DesktopNavigation.prototype._onNavigationMousedown = function(event) {
+  if (this.outline.inBackground) {
+    this.desktop.bringOutlineToFront(this.outline);
   }
 };
 
@@ -127,11 +134,6 @@ scout.DesktopNavigation.prototype.doViewMenuAction = function() {
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
   this.viewMenuTab.sendToBack();
-
-  if (this.outline === undefined) {
-    // FIXME awe handle form-only mode
-    return;
-  }
   this.outline.sendToBack();
 };
 

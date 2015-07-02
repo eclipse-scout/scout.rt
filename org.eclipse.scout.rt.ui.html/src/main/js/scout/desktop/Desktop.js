@@ -1,4 +1,3 @@
-// FIXME AWE: (desktop):  add mouse listener for bringToFront() when user clicks on outline-tree
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
@@ -34,8 +33,7 @@ scout.DesktopStyle = {
 scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) {
   if (propertyName === 'viewButtons') {
     adapter.desktop = this;
-  }
-  if (propertyName === 'actions') {
+  } else if (propertyName === 'actions') {
     adapter.desktop = this;
   }
 };
