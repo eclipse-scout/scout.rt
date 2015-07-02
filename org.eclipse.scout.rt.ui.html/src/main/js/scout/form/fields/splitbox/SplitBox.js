@@ -17,8 +17,8 @@ scout.SplitBox.prototype._render = function($parent) {
 
   // Prepare split area
   this._$splitArea = $.makeDiv('split-area');
-  var htmlComp = new scout.HtmlComponent(this._$splitArea, this.session);
-  htmlComp.setLayout(new scout.SplitBoxLayout(this));
+  this.htmlComp = new scout.HtmlComponent(this._$splitArea, this.session);
+  this.htmlComp.setLayout(new scout.SplitBoxLayout(this));
   // Add fields and splitter
   if (this.firstField) {
     this.firstField.render(this._$splitArea);
@@ -127,7 +127,7 @@ scout.SplitBox.prototype._render = function($parent) {
 
         // Update split box
         this.newSplitterPosition(newSplitterPosition);
-        scout.HtmlComponent.get(this._$splitArea).revalidateLayout();
+        this.htmlComp.validateLayout(); // validate layout immediately (was invalidated by newSplitterPosition())
       }
     }
 
@@ -137,23 +137,34 @@ scout.SplitBox.prototype._render = function($parent) {
 
 scout.SplitBox.prototype._renderProperties = function() {
   scout.SplitBox.parent.prototype._renderProperties.call(this);
-  this._renderSplitterPosition(this.splitterPosition);
-  this._renderSplitterEnabled(this.splitterEnabled);
+  this._renderSplitterPosition();
+  this._renderSplitterEnabled();
 };
 
 scout.SplitBox.prototype._renderSplitterPosition = function() {
   this.newSplitterPosition(this.splitterPosition);
 };
 
-scout.SplitBox.prototype._renderSplitterEnabled = function(enabled) {
-  this._$splitter.setEnabled(enabled);
+scout.SplitBox.prototype._renderSplitterEnabled = function() {
+  this._$splitter.setEnabled(this.splitterEnabled);
 };
 
 scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
   // Ensure range 0..1
   newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
-  // Update model TODO BSH Scout-model? How to cache position?
+
+  // Set new value (send to server if changed)
+  var positionChanged = (this.splitterPosition !== newSplitterPosition);
   this.splitterPosition = newSplitterPosition;
+  if (positionChanged) {
+    this.session.send(this.id, 'setSplitterPosition', {
+      splitterPosition: newSplitterPosition
+    });
+  }
+
+  // Mark layout as invalid
+  this.htmlComp.invalidateLayout();
+  this.htmlComp.invalidateLayoutTree(false);
 };
 
 /**

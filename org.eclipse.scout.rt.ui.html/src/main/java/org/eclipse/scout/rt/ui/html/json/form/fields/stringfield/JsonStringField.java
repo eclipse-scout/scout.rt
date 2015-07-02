@@ -122,11 +122,11 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 
-  private void handleUiCallAction() {
+  protected void handleUiCallAction() {
     getModel().getUIFacade().fireActionFromUI();
   }
 
-  private void handleUiSelectionChanged(JsonEvent event) {
+  protected void handleUiSelectionChanged(JsonEvent event) {
     int selectionStart = (int) event.getData().get(IStringField.PROP_SELECTION_START);
     int selectionEnd = (int) event.getData().get(IStringField.PROP_SELECTION_END);
     addPropertyEventFilterCondition(IStringField.PROP_SELECTION_START, selectionStart);
@@ -138,5 +138,4 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
   protected void handleUiDisplayTextChangedImpl(String displayText) {
     getModel().getUIFacade().setDisplayTextFromUI(displayText);
   }
-
 }

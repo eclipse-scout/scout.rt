@@ -18,12 +18,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
 public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPLIT_BOX> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSplitBox.class);
+
+  public static final String EVENT_SET_SPLITTER_POSITION = "setSplitterPosition";
 
   private final IFormField m_firstField;
   private final IFormField m_secondField;
@@ -92,5 +95,21 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
 
   protected IFormField getSecondField() {
     return m_secondField;
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_SET_SPLITTER_POSITION.equals(event.getType())) {
+      handleUiSetSplitterPosition(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiSetSplitterPosition(JsonEvent event) {
+    double splitterPosition = event.getData().optDouble("splitterPosition");
+    addPropertyEventFilterCondition(ISplitBox.PROP_SPLITTER_POSITION, splitterPosition);
+    getModel().getUIFacade().setSplitterPositionFromUI(splitterPosition);
   }
 }
