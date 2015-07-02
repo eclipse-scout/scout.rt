@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 /**
  * Representation of an activity containing an ActivityData
  */
-public class Activity<RI, AI> extends MemoryOptimizedObject {
+public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   private static final long serialVersionUID = 1L;
 
   public static final int OBSERVER_BIT = 0;
@@ -87,7 +87,7 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
    */
   public static final int CUSTOM_DATA = 15;
 
-  public Activity(RI resource, AI activityId) {
+  public Activity(RESOURCE_ID resource, ACTIVITY_ID activityId) {
     setValueInternal(RESOURCE_ID_BIT, resource);
     setValueInternal(ACTIVITY_ID_BIT, activityId);
   }
@@ -101,7 +101,7 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
    * @param tooltipText
    * @param level
    */
-  public Activity(RI resource, AI activityId, Date startTime, Date endTime, String text, String tooltipText, float level) {
+  public Activity(RESOURCE_ID resource, ACTIVITY_ID activityId, Date startTime, Date endTime, String text, String tooltipText, float level) {
     setValueInternal(RESOURCE_ID_BIT, resource);
     setValueInternal(ACTIVITY_ID_BIT, activityId);
     setValueInternal(BEGIN_TIME_BIT, startTime);
@@ -170,11 +170,11 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
   }
 
   @SuppressWarnings("unchecked")
-  public IActivityObserver<RI, AI> getObserver() {
+  public IActivityObserver<RESOURCE_ID, ACTIVITY_ID> getObserver() {
     return (IActivityObserver) getValueInternal(OBSERVER_BIT);
   }
 
-  public void setObserver(IActivityObserver<RI, AI> observer) {
+  public void setObserver(IActivityObserver<RESOURCE_ID, ACTIVITY_ID> observer) {
     setValueInternal(OBSERVER_BIT, observer);
   }
 
@@ -190,13 +190,13 @@ public class Activity<RI, AI> extends MemoryOptimizedObject {
   }
 
   @SuppressWarnings("unchecked")
-  public AI getActivityId() {
-    return (AI) getValueInternal(ACTIVITY_ID_BIT);
+  public ACTIVITY_ID getActivityId() {
+    return (ACTIVITY_ID) getValueInternal(ACTIVITY_ID_BIT);
   }
 
   @SuppressWarnings("unchecked")
-  public RI getResourceId() {
-    return (RI) getValueInternal(RESOURCE_ID_BIT);
+  public RESOURCE_ID getResourceId() {
+    return (RESOURCE_ID) getValueInternal(RESOURCE_ID_BIT);
   }
 
   public Date getBeginTime() {

@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldO
  *
  * @since 5.1
  */
-public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
+public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, IContextMenuOwner {
 
   /**
    * type {@link Date}[2]
@@ -229,38 +229,38 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   Date getSelectedEndTime();
 
-  void decorateResource(Resource<RI> resource);
+  void decorateResource(Resource<RESOURCE_ID> resource);
 
-  void replaceResources(List<Resource<RI>> resources);
+  void replaceResources(List<Resource<RESOURCE_ID>> resources);
 
-  void deleteResources(List<Resource<RI>> resources);
+  void deleteResources(List<Resource<RESOURCE_ID>> resources);
 
   void deleteAllResources();
 
-  void addResources(List<Resource<RI>> resources);
+  void addResources(List<Resource<RESOURCE_ID>> resources);
 
-  void addResource(Resource<RI> resource);
+  void addResource(Resource<RESOURCE_ID> resource);
 
-  List<Resource<RI>> getResources();
+  List<Resource<RESOURCE_ID>> getResources();
 
-  void decorateActivity(Activity<RI, AI> p);
+  void decorateActivity(Activity<RESOURCE_ID, ACTIVITY_ID> p);
 
-  Activity<RI, AI> getSelectedActivity();
+  Activity<RESOURCE_ID, ACTIVITY_ID> getSelectedActivity();
 
-  void setSelectedActivityCell(Activity<RI, AI> cell);
+  void setSelectedActivityCell(Activity<RESOURCE_ID, ACTIVITY_ID> cell);
 
-  boolean isSelectedActivityCell(Activity<RI, AI> cell);
+  boolean isSelectedActivityCell(Activity<RESOURCE_ID, ACTIVITY_ID> cell);
 
   /**
    * selected resources in arbitrary order
    */
-  List<? extends Resource<RI>> getSelectedResources();
+  List<? extends Resource<RESOURCE_ID>> getSelectedResources();
 
-  List<RI> getSelectedResourceIds();
+  List<RESOURCE_ID> getSelectedResourceIds();
 
-  void setSelectedResources(List<? extends Resource<RI>> resources);
+  void setSelectedResources(List<? extends Resource<RESOURCE_ID>> resources);
 
-  void isSelectedResource(Resource<RI> resource);
+  void isSelectedResource(Resource<RESOURCE_ID> resource);
 
   boolean deselectResources(List<? extends Resource> resources);
 
