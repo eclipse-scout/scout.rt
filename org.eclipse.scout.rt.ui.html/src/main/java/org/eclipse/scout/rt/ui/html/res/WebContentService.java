@@ -3,32 +3,31 @@ package org.eclipse.scout.rt.ui.html.res;
 import java.net.URL;
 
 /**
- * Default implementation of a {@link IWebContentService} that searches in local osgi bundle
+ * Default implementation of a {@link IWebContentService} that searches on the classpath.
  */
 public class WebContentService implements IWebContentService {
 
+  protected String stripLeadingSlash(String path) {
+    if (path.startsWith("/")) {
+      return path.substring(1);
+    }
+    return path;
+  }
+
   @Override
   public URL getScriptSource(String path) {
-    if (path.startsWith("/")) {
-      path = path.substring(1);
+    if (path == null) {
+      return null;
     }
-    URL url = getResourceImpl(path);
-    if (url != null) {
-      return url;
-    }
-    return null;
+    return getResourceImpl(stripLeadingSlash(path));
   }
 
   @Override
   public URL getWebContentResource(String path) {
-    if (!path.startsWith("/")) {
-      path = "/" + path;
+    if (path == null) {
+      return null;
     }
-    URL url = getResourceImpl("WebContent" + path);
-    if (url != null) {
-      return url;
-    }
-    return null;
+    return getResourceImpl("WebContent/" + stripLeadingSlash(path));
   }
 
   protected URL getResourceImpl(String resourcePath) {
