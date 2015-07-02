@@ -110,7 +110,6 @@ scout.MenuBar.prototype.rebuildItemsInternal = function() {
   this._updateItems(this._internalMenuItems);
 };
 
-
 scout.MenuBar.prototype.updateItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
 
@@ -174,33 +173,35 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
  */
 scout.MenuBar.prototype.recalculateDefaultMenu = function() {
-  if(!this.recalculateDefaultMenuInItems(this._orderedMenuItems.right)){
+  if (this._orderedMenuItems && !this.recalculateDefaultMenuInItems(this._orderedMenuItems.right)) {
     this.recalculateDefaultMenuInItems(this._orderedMenuItems.left);
   }
 };
 
 scout.MenuBar.prototype.recalculateDefaultMenuInItems = function(items) {
-  var found =false;
+  var found = false;
   items.some(function(item) {
     if (item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
-      if(this._defaultMenu && this._defaultMenu!==item){
+      if (this._defaultMenu && this._defaultMenu !== item) {
         this._defaultMenu.$container.toggleClass('default-menu', false);
       }
       this._defaultMenu = item;
-      this._defaultMenu.$container.toggleClass('default-menu', true);
-      this.setTabbableMenu(this.defaultMenu);
-      found=true;
+      if (this._defaultMenu.$container) {
+        this._defaultMenu.$container.toggleClass('default-menu', true);
+        this.setTabbableMenu(this._defaultMenu);
+      }
+      found = true;
       return true;
     }
   }.bind(this));
   return found;
 };
 
-scout.MenuBar.prototype.setTabbableMenu = function(menu){
-  if(!this.tabbable || menu===this.tabbableMenu){
+scout.MenuBar.prototype.setTabbableMenu = function(menu) {
+  if (!this.tabbable || menu === this.tabbableMenu) {
     return;
   }
-  if(this.tabbableMenu){
+  if (this.tabbableMenu) {
     this.tabbableMenu.setTabbable(false);
   }
   menu.setTabbable(true);
@@ -256,8 +257,8 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
     // assigned again later in updateItems().
     item.setTabbable(false);
-    if(this.tabbableMenu===item){
-      this.tabbableMenu=undefined;
+    if (this.tabbableMenu === item) {
+      this.tabbableMenu = undefined;
     }
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
@@ -268,8 +269,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
       if (item.visible && !this._lastVisibleItemRight) {
         this._lastVisibleItemRight = item;
       }
-    }
-    else {
+    } else {
       if (item.visible) {
         this._lastVisibleItemLeft = item;
       }
@@ -280,4 +280,3 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     item.on('propertyChange', this._menuItemPropertyChangeListener);
   }.bind(this));
 };
-
