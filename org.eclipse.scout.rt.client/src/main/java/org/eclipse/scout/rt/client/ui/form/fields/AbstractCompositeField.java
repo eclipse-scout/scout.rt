@@ -62,6 +62,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
+   * This will only set the property of the composite field. If you want to set the property on every child field, you
+   * have to use {@link #setStatusVisible(boolean)} in {@link #execInitField()}.
+   */
+  @Override
+  protected boolean getConfiguredStatusVisible() {
+    return super.getConfiguredStatusVisible();
+  }
+
+  /**
    * Full override: disable
    */
 
@@ -459,6 +468,20 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     if (isInitialized()) {
       for (IFormField f : m_fields) {
         f.setEnabled(b);
+      }
+    }
+  }
+
+  /**
+   * Sets the property on the field and on every child.
+   * @see #getConfiguredStatusVisible() 
+   */
+  @Override
+  public void setStatusVisible(boolean statusVisible) {
+    super.setStatusVisible(statusVisible);
+    if (isInitialized()) {
+      for (IFormField f : m_fields) {
+        f.setStatusVisible(statusVisible);
       }
     }
   }
