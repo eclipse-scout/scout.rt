@@ -118,7 +118,8 @@ scout.dates = {
     var thursdayFirstWeek = this._thursdayOfWeek(jan4, firstDayOfWeek);
 
     var diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
-    return 1 + parseInt(diffInDays / 7, 10);
+
+    return 1 + Math.round(diffInDays / 7);
   },
 
   _thursdayOfWeek: function(date, firstDayOfWeek) {
