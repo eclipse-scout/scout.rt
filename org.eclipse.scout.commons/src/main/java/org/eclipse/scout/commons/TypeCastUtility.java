@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -72,11 +73,10 @@ public final class TypeCastUtility {
   /**
    * fast access to debug flag
    */
-  private boolean m_debugEnabled;
   private final Map<Class, Class> m_wrapperTypeMap = new HashMap<Class, Class>();
   private final Map<Class, Integer> m_typeMap = new HashMap<Class, Integer>();
   private final Map<Class, Integer> m_primitiveTypeMap = new HashMap<Class, Integer>();
-  private final Map<GPCKey, Class<?>> m_genericsParameterClassCache = new HashMap<GPCKey, Class<?>>();
+  private final Map<GPCKey, Class<?>> m_genericsParameterClassCache = new ConcurrentHashMap<GPCKey, Class<?>>();
 
   private TypeCastUtility() {
     m_wrapperTypeMap.put(char.class, Character.class);
@@ -1891,20 +1891,20 @@ public final class TypeCastUtility {
     return instance.getGenericsParameterClassImpl(queryClass, genericsOwnerClass, genericsParameterIndex);
   }
 
-  private synchronized Class getGenericsParameterClassImpl(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
+  private Class getGenericsParameterClassImpl(Class queryClass, Class genericsOwnerClass, int genericsParameterIndex) {
     GPCKey key = new GPCKey(queryClass, genericsOwnerClass, genericsParameterIndex);
     Class result = m_genericsParameterClassCache.get(key);
     if (result != null) {
       return result;
     }
     //
-    m_debugEnabled = LOG.isDebugEnabled();
-    if (m_debugEnabled) {
+    final boolean debugEnabled = LOG.isDebugEnabled();
+    if (debugEnabled) {
       LOG.debug("queryClass=" + queryClass + ", genericsOwnerClass=" + genericsOwnerClass + ", genericsParameterIndex=" + genericsParameterIndex);
     }
     TypeDesc desc = new TypeDesc();
     HashSet<Type> loopDetector = new HashSet<Type>();
-    visitGenericsHierarchy(queryClass, genericsOwnerClass, genericsParameterIndex, desc, loopDetector);
+    visitGenericsHierarchy(queryClass, genericsOwnerClass, genericsParameterIndex, desc, loopDetector, debugEnabled);
     if (desc.resolvedClazz == null) {
       StringBuilder s = new StringBuilder(desc.typeVariable != null ? desc.typeVariable.getName() : "null");
 
@@ -1923,7 +1923,7 @@ public final class TypeCastUtility {
     return result;
   }
 
-  private boolean/* foundStopType */ visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector) {
+  private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector, boolean debugEnabled) {
     if (loopDetector.contains(type)) {
       return false;
     }
@@ -1932,7 +1932,7 @@ public final class TypeCastUtility {
       if (c == stopType) {
         //stop class, set generics index
         desc.parameterizedTypeIndex = stopTypeGenericsParameterIndex;
-        if (m_debugEnabled) {
+        if (debugEnabled) {
           LOG.debug("foundStopClass " + c + ", using generics index " + desc.parameterizedTypeIndex);
         }
         return true;
@@ -1944,7 +1944,7 @@ public final class TypeCastUtility {
         if (a != null) {
           try {
             loopDetector.add(type);
-            foundStopClass = visitGenericsHierarchy(a, stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+            foundStopClass = visitGenericsHierarchy(a, stopType, stopTypeGenericsParameterIndex, desc, loopDetector, debugEnabled);
           }
           finally {
             loopDetector.remove(type);
@@ -1957,7 +1957,7 @@ public final class TypeCastUtility {
           for (int i = 0; i < a.length && !foundStopClass; i++) {
             try {
               loopDetector.add(type);
-              foundStopClass = visitGenericsHierarchy(a[i], stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+              foundStopClass = visitGenericsHierarchy(a[i], stopType, stopTypeGenericsParameterIndex, desc, loopDetector, debugEnabled);
             }
             finally {
               loopDetector.remove(type);
@@ -1966,7 +1966,7 @@ public final class TypeCastUtility {
         }
       }
       if (foundStopClass) {
-        if (m_debugEnabled) {
+        if (debugEnabled) {
           LOG.debug("visit " + VerboseUtility.dumpGenerics(c));
         }
         if (desc.resolvedClazz == null) {
@@ -1975,7 +1975,7 @@ public final class TypeCastUtility {
           TypeVariable<?>[] vars = c.getTypeParameters();
           for (int i = 0; i < vars.length; i++) {
             if (vars[i] == desc.typeVariable) {
-              if (m_debugEnabled) {
+              if (debugEnabled) {
                 LOG.debug(desc.typeVariable + " has index " + i);
               }
               desc.parameterizedTypeIndex = i;
@@ -1993,7 +1993,7 @@ public final class TypeCastUtility {
       Type rawType = pt.getRawType();
       try {
         loopDetector.add(pt);
-        boolean b = visitGenericsHierarchy(rawType, stopType, stopTypeGenericsParameterIndex, desc, loopDetector);
+        boolean b = visitGenericsHierarchy(rawType, stopType, stopTypeGenericsParameterIndex, desc, loopDetector, debugEnabled);
         if (!b) {
           return false;
         }
@@ -2002,13 +2002,13 @@ public final class TypeCastUtility {
         loopDetector.remove(pt);
       }
       //found path to stopClass
-      if (m_debugEnabled) {
+      if (debugEnabled) {
         LOG.debug("visit " + VerboseUtility.dumpGenerics(pt));
       }
       if (desc.resolvedClazz == null) {
         //find next type variable
         Type actualArg = pt.getActualTypeArguments()[desc.parameterizedTypeIndex];
-        if (m_debugEnabled) {
+        if (debugEnabled) {
           LOG.debug("index " + desc.parameterizedTypeIndex + " matches to " + actualArg);
         }
         while (actualArg instanceof GenericArrayType) {
@@ -2027,7 +2027,7 @@ public final class TypeCastUtility {
           desc.typeVariable = (TypeVariable) actualArg;
         }
         else {
-          if (m_debugEnabled) {
+          if (debugEnabled) {
             LOG.debug("failed with " + actualArg);
           }
           throw new IllegalArgumentException("expected ParameterizedType with actual argument of type Class or TypeVariable when encountered " + VerboseUtility.dumpGenerics(type));
