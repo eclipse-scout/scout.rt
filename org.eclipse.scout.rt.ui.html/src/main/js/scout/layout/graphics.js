@@ -36,8 +36,7 @@ scout.graphics = {
    * because in this case the browser reserves the space the element would be using).
    */
   prefSize: function($elem, includeMargin) {
-    var prefSize,
-      props = $elem.css(['width', 'height', 'white-space']);
+    var oldStyle = $elem.attr('style');
 
     // modify properties which prevent reading the preferred size
     $elem.css({
@@ -47,10 +46,10 @@ scout.graphics = {
     });
 
     // measure
-    prefSize = scout.graphics.getSize($elem, includeMargin);
+    var prefSize = scout.graphics.getSize($elem, includeMargin);
 
-    // reset the modified properties
-    $elem.css(props);
+    // reset the modified style attribute
+    $elem.attr('style', oldStyle);
     return prefSize;
   },
 
