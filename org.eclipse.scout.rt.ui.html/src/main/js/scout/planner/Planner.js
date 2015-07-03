@@ -1003,10 +1003,14 @@ scout.Planner.prototype._resourceById = function(id) {
 scout.Planner.prototype.setDisplayMode = function(displayMode) {
   this.displayMode = displayMode;
   this._yearPanel.setDisplayMode(displayMode);
+
   this._sendSetDisplayMode(displayMode);
   if (this.rendered) {
     this._renderDisplayMode();
   }
+
+  this.startRange = null;
+  this.lastRange = null;
 };
 
 scout.Planner.prototype.layoutYearPanel = function() {
