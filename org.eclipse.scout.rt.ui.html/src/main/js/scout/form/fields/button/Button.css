@@ -73,12 +73,18 @@ button > img {
 }
 
 .form-field.button,
-.form-field.link-button {
+.form-field.link-button,
+.form-field.radio-button {
   margin-left: @mandatory-indicator-width;
 }
 
-/* Link buttons in a form must have an underline, but link buttons in the menu-bar shouldn't */
-.form-field.link-button > div {
+.form-field.link-button > .menu-item {
+  line-height: normal; /* override line-height of .menu-item */
+  padding-top: @borderless-field-padding-y;
+  /* add a transparent border to align text with normal buttons which also have a border */
+  border-top: 1px solid transparent;
+
+  /* Link buttons in a form must have an underline, but link buttons in the menu-bar shouldn't */
   text-decoration: underline;
 
   &:focus :not(:disabled) {

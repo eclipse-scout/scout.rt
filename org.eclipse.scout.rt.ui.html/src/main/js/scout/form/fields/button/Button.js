@@ -101,7 +101,7 @@ scout.Button.prototype.doAction = function() {
   } else if (this.menus.length > 0) {
     this.popup = new scout.MenuBarPopup(this, this.session);
     this.popup.render();
-  } else {
+  } else if (this.enabled) {
     this.session.send(this.id, 'clicked');
   }
 };

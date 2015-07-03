@@ -69,7 +69,7 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
  */
 scout.MenuButtonAdapter.prototype._onMouseEvent = function(event) {
   if (event.type === 'click') {
-    this._button.doAction();
+    this.doAction();
   }
 };
 
@@ -133,7 +133,7 @@ scout.MenuButtonAdapter.prototype._syncKeyStroke = function(keyStroke) {
  */
 scout.MenuButtonAdapter.prototype.handle = function(event) {
   if (this.enabled && this.visible) {
-    this._button.doAction();
+    this.doAction();
     if (this.preventDefaultOnEvent) {
       event.preventDefault();
     }
@@ -144,7 +144,11 @@ scout.MenuButtonAdapter.prototype.handle = function(event) {
  * @override Menu.js
  */
 scout.MenuButtonAdapter.prototype.doAction = function(text) {
-  this._button.doAction();
+  if (this.enabled && this.visible) {
+    this.beforeSendDoAction();
+    this._button.doAction();
+    this.afterSendDoAction();
+  }
 };
 
 /**
