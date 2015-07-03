@@ -17,8 +17,8 @@ scout.SplitBox.prototype._render = function($parent) {
 
   // Prepare split area
   this._$splitArea = $.makeDiv('split-area');
-  this.htmlComp = new scout.HtmlComponent(this._$splitArea, this.session);
-  this.htmlComp.setLayout(new scout.SplitBoxLayout(this));
+  this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
+  this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
   // Add fields and splitter
   if (this.firstField) {
     this.firstField.render(this._$splitArea);
@@ -127,7 +127,7 @@ scout.SplitBox.prototype._render = function($parent) {
 
         // Update split box
         this.newSplitterPosition(newSplitterPosition);
-        this.htmlComp.validateLayout(); // validate layout immediately (was invalidated by newSplitterPosition())
+        this.htmlSplitArea.validateLayout(); // validate layout immediately (was invalidated by newSplitterPosition())
       }
     }
 
@@ -163,8 +163,7 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
   }
 
   // Mark layout as invalid
-  this.htmlComp.invalidateLayout();
-  this.htmlComp.invalidateLayoutTree(false);
+  this.htmlSplitArea.invalidateLayoutTree(false);
 };
 
 /**

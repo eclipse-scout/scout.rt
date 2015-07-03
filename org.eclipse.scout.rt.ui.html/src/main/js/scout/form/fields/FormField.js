@@ -116,9 +116,9 @@ scout.FormField.prototype._renderTooltipText = function(tooltipText) {
 scout.FormField.prototype._renderVisible = function(visible) {
   this.$container.setVisible(visible);
   if (this.rendered) {
-    var htmlComp = scout.HtmlComponent.get(this.$container).getParent();
-    if (htmlComp) { // may be null if $container is detached
-      htmlComp.invalidateLayoutTree();
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) { // may be null if $container is detached
+      htmlCompParent.invalidateLayoutTree();
     }
   }
 };

@@ -132,14 +132,14 @@ scout.Widget.prototype.revalidateLayout = function() {
   this.htmlComp.revalidateLayout();
 };
 
-scout.Widget.prototype.invalidateLayoutTree = function() {
+scout.Widget.prototype.invalidateLayoutTree = function(invalidateParents) {
   if (!this.rendered) {
     return;
   }
   if (!this.htmlComp) {
     throw new Error('Function expects a htmlComp property');
   }
-  this.htmlComp.invalidateLayoutTree();
+  this.htmlComp.invalidateLayoutTree(invalidateParents);
 };
 
 scout.Widget.prototype.validateLayoutTree = function() {
