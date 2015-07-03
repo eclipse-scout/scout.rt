@@ -17,6 +17,7 @@
 #login-button {
   position: relative;
   border: 0;
+  border-radius: @border-radius;
   color: @default-button-color;
   background-color: @default-button-background-color;
   cursor: pointer;
@@ -40,27 +41,27 @@
   &.disabled:hover {
     background-color: @default-button-background-color;
   }
+
+  &.login-error {
+    background-color: @palette-red-4;
+
+    /* Also change color of focus glow */
+    &:focus::before {
+      border-color: @palette-red-4;
+      .glow(@palette-red-4);
+    }
+  }
 }
 
-.login-button-loading {
+#login-button-loading {
   .animation(rotation 0.9s linear infinite);
-  content: '';
-  display: block;
-  margin: auto;
+  display: inline-block;
   border-radius: 50%;
   border: 2px solid rgba(0, 0, 0, 0);
   border-top-color: @default-button-color;
   border-left-color: @default-button-color;
+  border-right-color: @default-button-color;
   width: 25px;
   height: 25px;
-}
-
-#login-error {
-  display: none;
-  color: @error-color;
-  background-color: @error-background-color;
-  border: 1px solid @error-border-color;
-  border-radius: @border-radius;
-  padding: 5px @text-field-padding;
-  text-align: center;
+  vertical-align: middle;
 }

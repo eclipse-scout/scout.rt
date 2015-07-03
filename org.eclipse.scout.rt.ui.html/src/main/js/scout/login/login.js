@@ -25,61 +25,73 @@ scout.login = {
 
   init: function() {
     var texts = scout.login.initTexts();
-    var $form = $('<form id="login-box" action="auth" method="post">')
-      .submit(onLoginFormSubmit)
+    this.$form = $('<form action="auth" method="post">')
+      .submit(onLoginFormSubmit.bind(this))
       .appendTo($('body'));
-    var $loginUser = $('<input id="login-user" type="text" autocapitalize="off" autocorrect="off">')
+    this.$container = $('<div id="login-box">')
+      .appendTo(this.$form);
+    this.$user = $('<input id="login-user" type="text" autocapitalize="off" autocorrect="off">')
       .placeholder(texts.get('User'))
-      .appendTo($form);
-    $('<input id="login-password" type="password">')
+      .appendTo(this.$container);
+    this.$password = $('<input id="login-password" type="password">')
       .placeholder(texts.get('Password'))
-      .appendTo($form);
-    $('<div id="login-error">')
-      .appendTo($form);
-    $('<button id="login-button" type="submit">')
+      .appendTo(this.$container);
+    this.$button = $('<button id="login-button" type="submit">')
       .text(texts.get('Login'))
-      .appendTo($form);
+      .appendTo(this.$container);
 
-    $loginUser.focus();
+    this.$user.focus();
+
+    // ----- Helper functions -----
 
     function onLoginFormSubmit(event) {
       // Prevent default submit action
       event.preventDefault();
 
-      var $form = $(this),
-        $user = $form.find('#login-user'),
-        $password = $form.find('#login-password'),
-        $error = $form.find('#login-error'),
-        $button = $form.find('#login-button'),
-        url = $form.attr('action');
-
+      var url = this.$form.attr('action');
       var data = {
-        user: $user.val(),
-        password: $password.val()
+        user: this.$user.val(),
+        password: this.$password.val()
       };
 
-      $button.setEnabled(false);
+      this.$button
+        .removeClass('login-error')
+        .setEnabled(false);
+      this.$user.off('input.resetLoginError');
+      this.$password.off('input.resetLoginError');
       if (scout.device.supportsCssAnimation()) {
-        $button.text('')
-          .appendDiv('login-button-loading');
+        this.$button
+          .html('')
+          .append($('<div id="login-button-loading">'));
       }
 
       $.post(url, data)
-        .done(function(data) {
-          $error.hide();
-          window.location.reload();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-          // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
-          setTimeout(function() {
-            $error.text(texts.get('LoginError'));
-            $error.show();
-            $user.focus();
-            $button.setEnabled(true);
-            $button.html('');
-            $button.text(texts.get('Login'));
-          }, 300);
-        });
+        .done(onPostDone.bind(this))
+        .fail(onPostFail.bind(this));
+    }
+
+    function onPostDone(data) {
+      window.location.reload();
+    }
+
+    function onPostFail(jqXHR, textStatus, errorThrown) {
+      // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
+      setTimeout(function() {
+        this.$button
+          .setEnabled(true)
+          .html('')
+          .text(texts.get('LoginError'))
+          .addClass('login-error');
+        this.$user.focus();
+        this.$user.one('input.resetLoginError', resetButtonText.bind(this));
+        this.$password.one('input.resetLoginError', resetButtonText.bind(this));
+      }.bind(this), 300);
+    }
+
+    function resetButtonText() {
+      this.$button
+        .text(texts.get('Login'))
+        .removeClass('login-error');
     }
   }
 };
