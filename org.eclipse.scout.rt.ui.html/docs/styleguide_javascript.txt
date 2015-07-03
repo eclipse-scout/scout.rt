@@ -60,8 +60,15 @@ Links:
 
 ### Visibility
 
-Wir verwenden _ als Prefix für private Members einer Klasse. Solche Members dürfen von aussen
-nicht zugegriffen werden (Ausnahme: in Tests/Specs)
+Wir verwenden Underscore (_) als Prefix für private und protected Members einer Klasse.
+Solche Members dürfen von nur von der Klasse selber oder Sub-Klassen davon aufgerufen werden.
+Auch Friend-Klassen dürfen auf diese Eigenschaften zugreifen (z.B. darf die Klasse TableLayout
+auf Properties von Table zugreifen). Tests/Spec dürfen ebenfalls auf Underscore-Properties
+zugreifen.
+
+Andere Klassen dürfen nicht auf auf Properties zugreifen, die dieser Konvention folgen.
+Properties die bewusst public sind und auf die von "überall" zugegriffen werden darf haben
+keinen Underscore im Bezeichner.
 
 
 ### Pruefen, ob eine Variable oder ein Property existiert

@@ -16,9 +16,13 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
-public class JsonSequenceBox<SEQUENCE_BOX extends ISequenceBox> extends JsonCompositeField<SEQUENCE_BOX, IFormField> {
+/**
+ * @param <T>
+ *          Model of SequenceBox
+ */
+public class JsonSequenceBox<T extends ISequenceBox> extends JsonCompositeField<T, IFormField> {
 
-  public JsonSequenceBox(SEQUENCE_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSequenceBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

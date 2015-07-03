@@ -1,9 +1,10 @@
-scout.ViewMenuPopup = function($tab, viewMenus, naviBounds, session) {
+scout.ViewMenuPopup = function(session, $tab, viewMenus, naviBounds, breadcrumbEnabled) {
   scout.ViewMenuPopup.parent.call(this, session);
   this.$tab = $tab;
   this.$headBlueprint = this.$tab;
   this.viewMenus = viewMenus;
   this._naviBounds = naviBounds;
+  this._breadcrumbEnabled = breadcrumbEnabled;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
@@ -20,37 +21,69 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
   this.alignTo();
 };
 
+/**
+ * Override PopupWithHead.js
+ */
 scout.ViewMenuPopup.prototype._renderHead = function() {
   scout.ViewMenuPopup.parent.prototype._renderHead.call(this);
-  this._copyCssClassToHead('navigation-tab-outline-button');
-  this.$head.addClass('navigation-header');
+
+  this._copyCssClassToHead('view-button-tab');
+
+  this.$head.removeClass('popup-head');
+  this.$head.css('text-align', 'left');
+  this.$head.css('background-color', 'white');
+  this.$head.css('color', '#006c86');
+};
+
+/**
+ * Override PopupWithHead.js
+ */
+scout.ViewMenuPopup.prototype._modifyBody = function() {
+  this.$body.removeClass('popup-body');
+  this.$body.addClass('view-menu-popup-body');
+};
+
+/**
+ * Override PopupWithHead.js
+ */
+scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
+  var $blueprintTitle = this.$tab.find('.view-button-tab-title');
+
+  var $icon = this.$head.find('.icon'),
+    $title = this.$head.find('.view-button-tab-title'),
+    $viewMenuButton = this.$head.find('.view-menu-button');
+
+  $icon.css('font-size', 20);
+  $icon.css('display', 'inline-block');
+
+  var titleVisible = !this._breadcrumbEnabled;
+  if (titleVisible) {
+    $title.setVisible(true);
+    $title.css('display', 'inline-block');
+    $title.css('text-align', 'left');
+    $title.css('margin-left', '8px');
+    scout.graphics.setSize($title, scout.graphics.getSize($blueprintTitle));
+  }
+
+  $viewMenuButton.css('display', 'inline-block');
+  $viewMenuButton.addClass('menu-open');
 };
 
 scout.ViewMenuPopup.prototype.alignTo = function() {
   var pos = this.$tab.offset(),
-    headSize = scout.graphics.getSize(this.$head, true);
-  // horiz. alignment
-  var left = pos.left,
-    top = pos.top,
+    headSize = scout.graphics.getSize(this.$tab, true),
     bodyTop = headSize.height;
-  $.log.debug(' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize + ' left=' + left + ' top=' + top);
-  this.$body.cssTop(bodyTop);
-  var offsetBounds;
-  if (this.$tab.parents('.navigation-breadcrumb').length) {
-    offsetBounds = scout.graphics.offsetBounds(this.$tab.parent());
-    this.$head.cssWidth(offsetBounds.width / 2);
-    this.$deco.cssWidth(offsetBounds.width / 2 - 2);
-  }
-  else {
-    offsetBounds = scout.graphics.offsetBounds(this.$tab);
-    this.$deco.cssWidth(headSize.width - 2);
-  }
+
+  scout.graphics.setBounds(this.$head, pos.left, pos.top, headSize.width, headSize.height);
+
+  this.$deco.cssLeft(pos.left);
+  this.$deco.cssTop(bodyTop);
+  this.$deco.cssWidth(headSize.width - 1);
 
   this.$body.cssWidth(Math.min(scout.ViewMenuPopup.MAX_MENU_WIDTH, this._naviBounds.width));
-  this.$deco.cssTop(bodyTop);
-  this.$head.cssLeft(0);
-  this.$deco.cssLeft(1);
-  this.setLocation(new scout.Point(left, top));
+  this.$body.cssTop(bodyTop);
+
+  this.setLocation(new scout.Point(0, 0));
 };
 
 scout.ViewMenuPopup.prototype._createKeyStrokeAdapter = function() {

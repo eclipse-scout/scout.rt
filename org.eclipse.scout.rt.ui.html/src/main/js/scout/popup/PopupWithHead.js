@@ -14,6 +14,7 @@ scout.PopupWithHead.prototype._render = function($parent) {
   if (this._headVisible) {
     this._renderHead();
   }
+  this._modifyBody();
 };
 
 scout.PopupWithHead.prototype.rerenderHead = function() {
@@ -22,7 +23,7 @@ scout.PopupWithHead.prototype.rerenderHead = function() {
 };
 
 /**
- * Copies html from this.$headBlueprint, if set
+ * Copies html from this.$headBlueprint, if set.
  */
 scout.PopupWithHead.prototype._renderHead = function() {
   this.$deco = $.makeDiv('popup-deco');
@@ -33,8 +34,24 @@ scout.PopupWithHead.prototype._renderHead = function() {
   this.$head.on('mousedown', '', this._onHeadMouseDown.bind(this));
   if (this.$headBlueprint) {
     this.$head.html(this.$headBlueprint.html());
+    this._modifyHeadChildren();
   }
 };
+
+/**
+ * Sets CSS classes or CSS-properties on the copied children in the head.
+ */
+scout.PopupWithHead.prototype._modifyHeadChildren = function() {
+  // NOP
+};
+
+/**
+ * Sets CSS classes or CSS-properties on the body.
+ */
+scout.PopupWithHead.prototype._modifyBody = function() {
+  // NOP
+};
+
 
 scout.PopupWithHead.prototype._removeHead = function() {
   if (this.$head) {

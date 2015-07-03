@@ -7,7 +7,7 @@ scout.Tree = function() {
   this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
-  this._breadcrumb = false;
+  this._breadcrumbEnabled = false;
   this.events = new scout.EventSupport();
   this._addAdapterProperties(['menus', 'keyStrokes']);
   this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
@@ -264,11 +264,11 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
 };
 
 scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
-  if (this._breadcrumb !== enabled) {
+  if (this._breadcrumbEnabled !== enabled) {
     // update scrollbar if mode has changed (from tree to bc or vice versa)
     this.updateScrollbar();
   }
-  this._breadcrumb = enabled;
+  this._breadcrumbEnabled = enabled;
 
   if (!enabled) {
     return;
@@ -341,7 +341,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
     this._addNodes(node.childNodes, $node, $predecessor);
     this._updateItemPath();
 
-    if (this._breadcrumb) {
+    if (this._breadcrumbEnabled) {
       $node.addClass('expanded');
       return;
     }
@@ -458,7 +458,7 @@ scout.Tree.prototype._renderSelection = function() {
     $node.removeClass('hidden');
 
     // in case of breadcrumb, expand
-    if (this._breadcrumb) {
+    if (this._breadcrumbEnabled) {
       this.setNodeExpanded($nodes[i].data('node'), true);
     }
   }
@@ -1102,7 +1102,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
   var node = $node.data('node'),
     expanded = !$node.hasClass('expanded');
 
-  if (this._breadcrumb) {
+  if (this._breadcrumbEnabled) {
     return;
   }
 
@@ -1130,7 +1130,7 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   var node = $node.data('node'),
     expanded = !$node.hasClass('expanded');
 
-  //TODO cru/cgu: talk about click on not selected nodes
+  // FIXME cru/cgu: talk about click on not selected nodes
   this.setNodesSelected(node);
   this.setNodeExpanded(node, expanded);
 

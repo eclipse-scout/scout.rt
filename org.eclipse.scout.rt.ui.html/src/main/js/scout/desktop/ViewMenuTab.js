@@ -16,6 +16,7 @@ scout.ViewMenuTab = function(viewMenus, session) {
   this.text;
   this.iconId;
   this._inBackground = false;
+  this._breadcrumbEnabled = false;
 
   this._update();
 };
@@ -61,7 +62,12 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
 };
 
 scout.ViewMenuTab.prototype._renderText = function() {
-  this.$title.text(this.selected ? this.text : '');
+  if (this._breadcrumbEnabled) {
+    this.$title.css('display', 'none');
+  } else {
+    this.$title.css('display', 'inline-block');
+    this.$title.text(this.selected ? this.text : '');
+  }
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
@@ -111,7 +117,7 @@ scout.ViewMenuTab.prototype._onClickMenuButton = function(event) {
 
 scout.ViewMenuTab.prototype._openMenu = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
-  this.popup = new scout.ViewMenuPopup(this.$container, this.viewMenus, naviBounds, this.session);
+  this.popup = new scout.ViewMenuPopup(this.session, this.$container, this.viewMenus, naviBounds, this._breadcrumbEnabled);
   this.popup.headText = this.text;
   this.popup.render();
 };
@@ -146,4 +152,10 @@ scout.ViewMenuTab.prototype.sendToBack = function() {
 scout.ViewMenuTab.prototype.bringToFront = function() {
   this._inBackground = false;
   this._renderSelected();
+};
+
+
+scout.ViewMenuTab.prototype.setBreadcrumbEnabled = function(enabled) {
+  this._breadcrumbEnabled = enabled;
+  this._renderText();
 };

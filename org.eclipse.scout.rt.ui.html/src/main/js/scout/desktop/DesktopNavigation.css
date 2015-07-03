@@ -10,6 +10,12 @@
   color: @navigation-color;
 }
 
+.navigation-container {
+  width: 100%;
+  padding-top: 11px;
+  height: calc(~"100%" - @view-buttons-height);
+}
+
 .view-buttons {
   width: 100%;
   height: @view-buttons-height;
@@ -85,13 +91,17 @@
     content: @icon-angle-down;
   }
 
+  &.menu-open::before {
+    content: @icon-angle-up;
+  }
+
   &:hover {
     color: @palette-orange-3;
   }
 }
 
-.navigation-container {
-  width: 100%;
-  padding-top: 11px;
-  height: calc(~"100%" - @view-buttons-height);
+.view-menu-popup-body {
+  background-color: @palette-white;
+  border-right: solid 1px @border-color;
+  border-top: solid 1px @border-color;
 }

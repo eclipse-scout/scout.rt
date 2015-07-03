@@ -12,6 +12,8 @@ scout.DesktopNavigation = function(desktop) {
   this.outlineTab;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.viewMenuTab;
+  this._breadcrumb = false;
+
 };
 
 scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 190; // FIXME AWE: make dynamic (min. breadcrumb width)
@@ -96,19 +98,19 @@ scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
 // vertical splitter
 scout.DesktopNavigation.prototype.onResize = function(event) {
   var newWidth = Math.max(event.data, scout.DesktopNavigation.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
-
   this.$navigation.width(newWidth);
   this.htmlViewButtons.revalidateLayout();
   this.desktop.navigationWidthUpdated(newWidth);
+  this._setBreadcrumbEnabled(newWidth <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH);
+};
 
-  if (newWidth <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH) {
-    if (!this.$navigation.hasClass('navigation-breadcrumb')) {
-      this.$navigation.addClass('navigation-breadcrumb');
-      this.outline.setBreadcrumbEnabled(true);
-    }
-  } else {
-    this.$navigation.removeClass('navigation-breadcrumb');
-    this.outline.setBreadcrumbEnabled(false);
+scout.DesktopNavigation.prototype._setBreadcrumbEnabled = function(enabled) {
+  var oldBreadcrumbEnabled = this._breadcrumbEnabled;
+  if (oldBreadcrumbEnabled !== enabled) {
+    this._breadcrumbEnabled = enabled;
+    this.$navigation.toggleClass('navigation-breadcrumb', enabled);
+    this.outline.setBreadcrumbEnabled(enabled);
+    this.viewMenuTab.setBreadcrumbEnabled(enabled);
   }
 };
 
