@@ -543,7 +543,7 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
     boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
     boxOptions.body = scout.strings.join('\n\n',
-        this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' ( ' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
+        this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
         this.optText('ui.UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.text('ui.Ignore');
   }
