@@ -434,5 +434,9 @@ scout.FocusContext.prototype._validateFocus = function() {
   }
 };
 
+scout.FocusContext.prototype.focusFirstFieldInContainer = function($container) {
+  scout.focusManager.focusFirstElement($container);
+};
+
 //Singleton
 scout.focusManager = new scout.FocusManager();

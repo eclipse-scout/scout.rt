@@ -80,7 +80,7 @@ scout.TableControl.prototype.renderContent = function() {
     this.contentRendered = true;
     this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-    this.tableFooter.$controlContainer.installFocusContextAsync('auto', this.tableFooter._table.session.uiSessionId);
+    scout.focusManager.getActiveFocusContext(this.tableFooter._table.session.uiSessionId).focusFirstFieldInContainer(this.tableFooter.$controlContent);
   }
 
 };
@@ -90,6 +90,7 @@ scout.TableControl.prototype.onControlContainerClosed = function() {
     this.tableFooter.$controlContainer.uninstallFocusContext(this.tableFooter._table.session.uiSessionId);
   }.bind(this));
   this.removeContent();
+  scout.focusManager.validateFocus(this.tableFooter._table.session.uiSessionId, 'onControlContainerClosed');
 };
 
 scout.TableControl.prototype._removeForm = function() {
