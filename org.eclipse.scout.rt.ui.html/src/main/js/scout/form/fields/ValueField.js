@@ -67,7 +67,13 @@ scout.ValueField.prototype._renderMenusVisible = function() {
 };
 
 scout.ValueField.prototype._updateMenus = function() {
+  this._updateStatusVisible();
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
+};
+
+scout.ValueField.prototype._computeStatusVisible = function() {
+  var statusVisible = scout.ValueField.parent.prototype._computeStatusVisible.call(this);
+  return statusVisible || (this._hasMenus() && this.menusVisible);
 };
 
 scout.ValueField.prototype._renderDisplayText = function(displayText) {

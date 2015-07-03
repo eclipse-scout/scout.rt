@@ -57,3 +57,19 @@ FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) 
   });
   return model;
 };
+
+/**
+ * Creates an adapter with rootAdapter as owner.
+ * Expects model.fields to be set, creates an adapter for each field.
+ * Also replaces model.fields with the ids of the fields.
+ */
+FormSpecHelper.prototype.createCompositeField = function(session, model) {
+  var fields = model.fields || [];
+  model.fields = [];
+  fields.forEach(function(field) {
+    field.owner = model.id;
+    model.fields.push(field.id);
+  });
+  model.owner = session.rootAdapter.id;
+  return createAdapter(model, session, fields);
+};

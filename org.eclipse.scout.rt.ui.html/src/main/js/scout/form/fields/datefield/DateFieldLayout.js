@@ -22,7 +22,11 @@ scout.DateFieldLayout.prototype.layout = function($container) {
   if (formField.$label && formField.labelVisible) {
     // currently a gui only flag, necessary for sequencebox
     if (formField.labelUseUiWidth) {
-      labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+      if (formField.$label.hasClass('empty')) {
+        labelWidth = 0;
+      } else {
+        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+      }
     }
     labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
       formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;

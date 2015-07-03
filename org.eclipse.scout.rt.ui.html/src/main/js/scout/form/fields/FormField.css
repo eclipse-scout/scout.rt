@@ -44,13 +44,10 @@
     position: absolute;
     right: 0;
     margin-left: 10px;
-    visibility: hidden;
     cursor: pointer;
 
     &::before  {
       .font-icon();
-      /* set (invisible) info icon to reserve space */
-      content: @icon-info;
       font-size: 16px;
     }
   }

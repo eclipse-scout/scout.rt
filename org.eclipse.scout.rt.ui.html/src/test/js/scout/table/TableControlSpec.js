@@ -1,4 +1,4 @@
-/* global TableSpecHelper, LocaleSpecHelper */
+/* global TableSpecHelper */
 describe("TableControl", function() {
   var session;
   var tableHelper;

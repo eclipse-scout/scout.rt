@@ -1,4 +1,5 @@
-/* exported mostRecentJsonRequest */
+/* exported mostRecentJsonRequest  */
+/* global LocaleSpecHelper */
 function mostRecentJsonRequest() {
   var req = jasmine.Ajax.requests.mostRecent();
   if (req) {
@@ -7,11 +8,14 @@ function mostRecentJsonRequest() {
 }
 
 function sandboxSession(options) {
+  var session;
   options=options || {};
   options.uiSessionId = options.uiSessionId || '1.1';
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
-  return new scout.Session($('#sandbox'), options);
+  session = new scout.Session($('#sandbox'), options);
+  session.locale = new LocaleSpecHelper().createLocale('de');
+  return session;
 }
 
 function sandboxDesktop() {

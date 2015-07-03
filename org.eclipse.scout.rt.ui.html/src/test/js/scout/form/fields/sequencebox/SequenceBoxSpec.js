@@ -10,13 +10,13 @@ describe("SequenceBox", function() {
   });
 
   function createField(model) {
-    var field = new scout.SequenceBox();
-    field.init(model, session);
-    return field;
+    return helper.createCompositeField(session, model);
   }
 
   function createModel() {
-    return helper.createFieldModel('SequenceBox');
+    var model = helper.createFieldModel('SequenceBox');
+    model.fields = [helper.createFieldModel('StringField'), helper.createFieldModel('DateField')];
+    return model;
   }
 
   describe("mandatory indicator", function() {
@@ -29,6 +29,21 @@ describe("SequenceBox", function() {
       field.render(session.$entryPoint);
 
       expect(field.$mandatory).toBeUndefined();
+    });
+
+  });
+
+  describe("label width", function() {
+
+    it("is 0 if it is empty", function() {
+      var model = createModel();
+      var field = createField(model);
+      field.render(session.$entryPoint);
+      // css is not applied, therefore we need to adjust display style here
+      field.fields[0].$label.css('display', 'inline-block');
+      field.validateLayout();
+
+      expect(field.fields[0].$label.outerWidth(true)).toBe(0);
     });
 
   });

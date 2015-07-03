@@ -29,7 +29,11 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (formField.$label && formField.labelVisible) {
     // currently a gui only flag, necessary for sequencebox
     if (formField.labelUseUiWidth) {
-      labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+      if (formField.$label.hasClass('empty')) {
+        labelWidth = 0;
+      } else {
+        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+      }
     }
     labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
       formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
@@ -48,7 +52,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       .cssWidth(this.mandatoryIndicatorWidth);
     left += formField.$mandatory.outerWidth(true);
   }
-  if (formField.$status && formField.statusVisible) {
+  if (formField.$status && (formField.statusVisible || formField.$status.isVisible())) {
     // can not check for $status.isVisible() since we want to reserve
     // space used for status even when $status is invisible.
     formField.$status
@@ -97,7 +101,11 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
 
   if (formField.$label && formField.labelVisible) {
     if (formField.labelUseUiWidth) {
-      labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+      if (formField.$label.hasClass('empty')) {
+        labelWidth = 0;
+      } else {
+        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+      }
     }
     labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
       formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
@@ -110,7 +118,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   if (formField.$mandatory) {
     width += formField.$mandatory.outerWidth(true);
   }
-  if (formField.$status && formField.statusVisible) {
+  if (formField.$status) {
     width += formField.$status.outerWidth(true);
   }
 

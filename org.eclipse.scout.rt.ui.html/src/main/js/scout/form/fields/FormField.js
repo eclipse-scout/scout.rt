@@ -96,6 +96,8 @@ scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
     this.$field.toggleClass('has-error', !!errorStatus);
   }
 
+  this._updateStatusVisible();
+
   if (errorStatus) {
     this._showStatusMessage({
       autoRemove: false
@@ -111,6 +113,7 @@ scout.FormField.prototype._renderTooltipText = function(tooltipText) {
   if (this.$field) {
     this.$field.toggleClass('has-tooltip', hasTooltipText);
   }
+  this._updateStatusVisible();
 };
 
 scout.FormField.prototype._renderVisible = function(visible) {
@@ -158,16 +161,36 @@ scout.FormField.prototype._renderLabelVisible = function(visible) {
   this._renderChildVisible(this.$label, visible);
 };
 
-scout.FormField.prototype._renderStatusVisible = function(visible) {
-  this._renderChildVisible(this.$status, visible);
+scout.FormField.prototype._renderStatusVisible = function(statusVisible) {
+  this._renderChildVisible(this.$status, this._computeStatusVisible());
+};
+
+/**
+ * Visibility of the status not only depends on this.statusVisible but on other attributes as well, computed by _computeStatusVisible.
+ * Call this method if any of the conditions change to recompute the status visibility.
+ */
+scout.FormField.prototype._updateStatusVisible = function() {
+  if (!this.statusVisible) {
+    this._renderStatusVisible();
+  }
+};
+
+scout.FormField.prototype._computeStatusVisible = function() {
+  var statusVisible = this.statusVisible,
+    hasError = this.errorStatusUi || this.errorStatus,
+    hasTooltip = this.tooltipText;
+
+  return statusVisible || hasError || hasTooltip;
 };
 
 scout.FormField.prototype._renderChildVisible = function($child, visible) {
   if (!$child) {
     return;
   }
-  $child.setVisible(visible);
-  this.invalidateLayoutTree();
+  if ($child.isVisible() !== visible) {
+    $child.setVisible(visible);
+    this.invalidateLayoutTree(); //FIXME CGU whole tree?
+  }
 };
 
 // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel

@@ -1,4 +1,4 @@
-/* global LocaleSpecHelper, FormSpecHelper */
+/* global FormSpecHelper */
 describe("DateField", function() {
   var session;
   var helper;
@@ -6,7 +6,6 @@ describe("DateField", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new LocaleSpecHelper().createLocale('de');
     helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();

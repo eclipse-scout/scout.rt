@@ -2,7 +2,6 @@ scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
   this._addAdapterProperties('fields');
 };
-
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
 scout.SequenceBox.prototype._render = function($parent) {

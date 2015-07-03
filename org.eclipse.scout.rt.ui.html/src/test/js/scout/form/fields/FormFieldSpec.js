@@ -73,6 +73,70 @@ describe("FormField", function() {
 
     });
 
+    it("does not display a status if status visible = false", function() {
+      formField.statusVisible = false;
+      formField.render(session.$entryPoint);
+
+      expect(formField.$status.isVisible()).toBe(false);
+    });
+
+  });
+
+  describe("property status visible", function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = new scout.FormField();
+      formField._render = function($parent) {
+        this.addContainer($parent, 'form-field');
+        this.addStatus();
+      };
+      formField.init(model, session);
+    });
+
+    it("shows a status if status visible = true", function() {
+      formField.statusVisible = true;
+      formField.render(session.$entryPoint);
+
+      expect(formField.$status.isVisible()).toBe(true);
+    });
+
+    it("does not show a status if status visible = false", function() {
+      formField.statusVisible = false;
+      formField.render(session.$entryPoint);
+
+      expect(formField.$status.isVisible()).toBe(false);
+    });
+
+    it("shows a status even though status visible is false but tooltipText is set", function() {
+      formField.statusVisible = false;
+      formField.tooltipText = 'hello';
+      formField.render(session.$entryPoint);
+
+      expect(formField.$status.isVisible()).toBe(true);
+
+      var event = createPropertyChangeEvent(formField, {
+        tooltipText: ''
+      });
+      formField.onModelPropertyChange(event);
+      expect(formField.$status.isVisible()).toBe(false);
+    });
+
+    it("shows a status even though status visible is false but errorStatus is set", function() {
+      formField.statusVisible = false;
+      formField.errorStatus = {text: 'error'};
+      formField.render(session.$entryPoint);
+
+      expect(formField.$status.isVisible()).toBe(true);
+
+      var event = createPropertyChangeEvent(formField, {
+        errorStatus: ''
+      });
+      formField.onModelPropertyChange(event);
+      expect(formField.$status.isVisible()).toBe(false);
+    });
+
   });
 
   describe("onModelPropertyChange", function() {
@@ -81,6 +145,9 @@ describe("FormField", function() {
     beforeEach(function() {
       model = helper.createFieldModel();
       formField = new scout.FormField();
+      formField._render = function($parent) {
+        this.addContainer($parent, 'form-field');
+      };
       formField.init(model, session);
     });
 
@@ -107,9 +174,6 @@ describe("FormField", function() {
     });
 
     it("considers custom css class", function() {
-      formField._render = function($parent) {
-        this.addContainer($parent, 'form-field');
-      };
       formField.render(session.$entryPoint);
 
       var event = createPropertyChangeEvent(formField, {cssClass: 'custom-class'});
