@@ -341,7 +341,11 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
       }
     }
     this._updateModel(true);
-    this._renderComponents();
+
+    // only render if components has other layout
+    if (oldDisplayMode == scout.Calendar.DisplayMode.MONTH || this.displayMode == scout.Calendar.DisplayMode.MONTH) {
+      this._renderComponents();
+    }
   }
 };
 

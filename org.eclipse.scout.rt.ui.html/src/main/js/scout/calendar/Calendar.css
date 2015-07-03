@@ -23,9 +23,15 @@
 .calendar-header {
   height: @calendar-header-height;
   line-height: @calendar-header-height;
+  position: relative;
 
   min-width: 420px;
   text-align: center;
+
+  & .busyindicator-label {
+    position: absolute;
+    left: 50%;
+  }
 
   & .busyindicator-label::before {
     margin-top: -14px;
