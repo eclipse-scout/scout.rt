@@ -149,7 +149,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
 
   @Override
   public void setSplitterPosition(double position) {
-    propertySupport.setPropertyAlwaysFire(PROP_SPLITTER_POSITION, position);
+    propertySupport.setPropertyDouble(PROP_SPLITTER_POSITION, position);
   }
 
   @Override
