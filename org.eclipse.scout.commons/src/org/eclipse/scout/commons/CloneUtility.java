@@ -42,7 +42,7 @@ public final class CloneUtility {
       return null;
     }
     try {
-      // 1. use serialization utility that is backed by an optimized class for OSGi environments (no benefits or drawbacks for other environments)
+      // 1. use serialization utility that is backed by an optimized class loader for OSGi environments (no benefits or drawbacks for other environments)
       IObjectSerializer serializer = SerializationUtility.createObjectSerializer();
       byte[] serialData = serializer.serialize(obj);
       @SuppressWarnings("unchecked")
@@ -91,9 +91,6 @@ public final class CloneUtility {
     @Override
     protected void annotateClass(Class<?> c) throws IOException {
       if (c != null) {
-        if (c.getName().startsWith("java.")) {
-          return;
-        }
         m_classesByName.put(c.getName(), c);
       }
     }
