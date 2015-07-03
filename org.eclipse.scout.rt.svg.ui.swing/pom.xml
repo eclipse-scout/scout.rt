@@ -9,7 +9,7 @@
   Contributors:
   BSI Business Systems Integration AG - initial API and implementation
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -20,6 +20,18 @@
 
   <artifactId>org.eclipse.scout.rt.svg.ui.swing</artifactId>
   <packaging>jar</packaging>
+
+  <dependencies>
+    <!-- Build Dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.swing</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -33,16 +45,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-      <!-- Build Dependencies -->
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.ui.swing</artifactId>
-      <groupId>org.eclipse.scout.rt</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-      <groupId>org.eclipse.scout.rt</groupId>
-    </dependency>
-  </dependencies>
 </project>
