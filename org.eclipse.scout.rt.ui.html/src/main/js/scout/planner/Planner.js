@@ -284,8 +284,6 @@ scout.Planner.prototype._renderScale = function() {
   $timelineSmall = this.$timelineSmall;
 
   // fill timeline large depending on mode
-  // TODO: depending on screen size: smaller or large representation
-  // TODO: change to shift
   if (this.displayMode === DISPLAY_MODE.DAY) {
     loop = new Date(this.viewRange.from.valueOf());
 
@@ -356,7 +354,7 @@ scout.Planner.prototype._renderScale = function() {
         .appendDiv('scale-item', loop.getDate() % 2 == 1 ? this._dateFormat(loop, 'dd') : '')
         .data('date-from', new Date(loop.valueOf()));
 
-      loop.setDate(loop.getDate() + 1);
+      loop = scout.dates.shift(loop, 0, 0, 1);
       $divSmall.data('date-to', new Date(loop.valueOf()))
         .data('first', newLargeGroup);
 
@@ -418,7 +416,7 @@ scout.Planner.prototype._renderScale = function() {
         .appendDiv('scale-item', this._dateFormat(loop, 'MMMM'))
         .data('date-from', new Date(loop.valueOf()));
 
-      loop.setMonth(loop.getMonth() + 1);
+      loop = scout.dates.shift(loop, 0, 1, 0);
       $divSmall.data('date-to', new Date(loop.valueOf()))
         .data('first', newLargeGroup);
 
@@ -472,9 +470,9 @@ scout.Planner.prototype._onScaleHoverIn = function(event) {
     var $scale = $(event.currentTarget),
       tooltip,
       text,
-      toText = ' bis ',//FIXME CGU translate
+      toText = ' ' + this.session.text('ui.To') + ' ',
       from = new Date($scale.data('date-from').valueOf()),
-      to = new Date($scale.data('date-to').valueOf());
+      to = new Date($scale.data('date-to').valueOf() - 1);
 
     if (from.getMonth() == to.getMonth()) {
       text = this._dateFormat(from, 'd.') + toText + this._dateFormat(to, 'd. MMMM yyyy');
