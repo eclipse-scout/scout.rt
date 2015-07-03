@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
+import java.util.concurrent.CancellationException;
+
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,7 +33,7 @@ public class ExceptionHandler {
    */
   public void handle(final Throwable t) {
     final Throwable rootCause = ExceptionHandler.getRootCause(t);
-    if (rootCause instanceof InterruptedException) {
+    if (rootCause instanceof InterruptedException || rootCause instanceof CancellationException) {
       handleInterruptedException((InterruptedException) rootCause);
     }
     else if (t instanceof ProcessingException) {
