@@ -161,7 +161,22 @@ scout.Planner.prototype._navigateDate = function(direction) {
 };
 
 scout.Planner.prototype._onTodayClick = function(event) {
-  this.setViewRangeFrom(new Date());
+  var today = new Date(),
+    year = today.getFullYear(),
+    month = today.getMonth(),
+    date = today.getDate(),
+    day = (today.getDay() + 6) % 7,
+    DISPLAY_MODE = scout.Planner.DisplayMode;
+
+  if (this.displayMode == DISPLAY_MODE.DAY ) {
+    today = new Date(year, month, day);
+  } else if (this.displayMode == DISPLAY_MODE.YEAR) {
+    today = new Date(year, month, 1);
+  } else {
+    today = new Date(year, month, date - day);
+  }
+
+  this.setViewRangeFrom(today);
 };
 
 scout.Planner.prototype._onDisplayModeClick = function(event) {
