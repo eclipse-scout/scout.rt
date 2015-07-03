@@ -107,8 +107,6 @@ scout.FileChooser.prototype._onFileChange = function(event) {
 };
 
 scout.FileChooser.prototype.addFiles = function(files) {
-  // FIXME mot d'n'd check content-type
-  // FIXME mot d'n'd check length (what is the maximum length?)
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
     if (this.multiSelect) {

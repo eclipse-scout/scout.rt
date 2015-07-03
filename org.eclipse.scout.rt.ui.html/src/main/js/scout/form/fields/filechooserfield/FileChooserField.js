@@ -38,8 +38,6 @@ scout.FileChooserField.prototype._onDrop = function(event) {
 
     var files = event.originalEvent.dataTransfer.files;
     if (files.length >= 1) {
-      // FIXME mot d'n'd check content-type
-      // FIXME mot d'n'd check length (what is the maximum length?)
       this.session.uploadFiles(this, [files[0]]);
     }
   }

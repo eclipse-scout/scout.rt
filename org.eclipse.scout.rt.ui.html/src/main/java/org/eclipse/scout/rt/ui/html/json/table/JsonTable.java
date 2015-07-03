@@ -1007,7 +1007,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       if (uploadProperties != null && uploadProperties.containsKey("rowId")) {
         String rowId = uploadProperties.get("rowId");
         if (!StringUtility.isNullOrEmpty(rowId)) {
-          row = getTableRowForRowId(uploadProperties.get("rowId"));
+          row = getTableRowForRowId(rowId);
         }
       }
       getModel().getUIFacade().fireRowDropActionFromUI(row, transferObject);

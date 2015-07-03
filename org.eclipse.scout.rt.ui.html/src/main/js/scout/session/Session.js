@@ -621,18 +621,21 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 };
 
 scout.Session.prototype.uploadFiles = function(target, files, uploadProperties) {
+  // FIXME mot d'n'd check content-type?
+  // FIXME mot d'n'd check length (what is the maximum length?)
+
   var formData = new FormData();
 
   if (uploadProperties) {
     $.each(uploadProperties, function(key, value) {
       formData.append(key, value);
-  });
+    });
   }
 
   formData.append('uiSessionId', this.uiSessionId);
   formData.append('target', target.id);
-  files.forEach(function(file) {
-    formData.append('files', file, file.name);
+  $.each(files, function(index, value) {
+    formData.append('files', value, value.name);
   }.bind(this));
 
   var uploadAjaxOptions = {

@@ -105,7 +105,10 @@ scout.Tree.prototype._render = function($parent) {
     .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
-    .on('dblclick', '.tree-node-control', this._onNodeControlMouseDown.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
+    .on('dblclick', '.tree-node-control', this._onNodeControlMouseDown.bind(this)) //_onNodeControlClick immediately returns with false to prevent bubbling
+    .on('dragenter', this._onDragEnter.bind(this))
+    .on('dragover', this._onDragOver.bind(this))
+    .on('drop', this._onDrop.bind(this));
 
   scout.scrollbars.install(this.$data, {
     axis: 'y'
@@ -958,6 +961,9 @@ scout.Tree.prototype._decorateNode = function(node) {
     $node.attr('title', node.tooltipText);
   }
 
+  $node.on('dragenter', this._onDragEnter.bind(this))
+    .on('dragover', this._onDragOver.bind(this))
+    .on('drop', this._onDrop.bind(this));
   // TODO BSH More attributes...
   // iconId
   // tooltipText
@@ -1136,6 +1142,34 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
 
   // prevent immediately reopening
   return false;
+};
+
+
+scout.Tree.prototype._onDragEnter = function(event) {
+  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
+};
+
+scout.Tree.prototype._onDragOver = function(event) {
+  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
+};
+
+scout.Tree.prototype._onDrop = function(event) {
+  var data, target;
+
+  if (this.dropType & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
+      scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    var files = event.originalEvent.dataTransfer.files;
+    if (files.length >= 1) {
+      target = event.currentTarget;
+      data = {
+          'nodeId': (target.classList.contains('tree-node') ? $(target).data('node').id : '')
+      };
+      this.session.uploadFiles(this, files, data);
+    }
+  }
 };
 
 scout.Tree.prototype._showAllNodes = function($showAllNode) {

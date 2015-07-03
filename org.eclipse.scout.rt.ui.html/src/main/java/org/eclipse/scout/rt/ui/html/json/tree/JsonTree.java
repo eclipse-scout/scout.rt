@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -29,10 +33,11 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE> implements IJsonContextMenuOwner {
+public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
 
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_NODES_UPDATED = "nodesUpdated";
@@ -112,6 +117,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollToSelection();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_DROP_TYPE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getDropType();
       }
     });
   }
@@ -308,7 +319,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     // - TYPE_NODE_ACTION
     // - TYPE_NODES_DRAG_REQUEST
     // - TYPE_DRAG_FINISHED
-    // - TYPE_NODE_DROP_ACTION
+    // - TYPE_NODE_DROP_ACTION, partly implemented with consumeBinaryResource(...)
     // - TYPE_NODE_CLICK
     // - TYPE_NODE_DROP_TARGET_CHANGED
   }
@@ -493,6 +504,21 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  @Override
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
+    if ((getModel().getDropType() & IDNDSupport.TYPE_FILE_TRANSFER) == IDNDSupport.TYPE_FILE_TRANSFER) {
+      ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);
+      ITreeNode node = null;
+      if (uploadProperties != null && uploadProperties.containsKey("nodeId")) {
+        String nodeId = uploadProperties.get("nodeId");
+        if (!StringUtility.isNullOrEmpty(nodeId)) {
+          node = getTreeNodeForNodeId(nodeId);
+        }
+      }
+      getModel().getUIFacade().fireNodeDropActionFromUI(node, transferObject);
+    }
   }
 
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean ignoreDeletedNodes, boolean autoCreateNodeId) {

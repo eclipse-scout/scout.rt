@@ -225,13 +225,11 @@ scout.Table.prototype._render = function($parent) {
 
       var files = event.originalEvent.dataTransfer.files;
       if (files.length >= 1) {
-        // FIXME mot d'n'd check content-type
-        // FIXME mot d'n'd check length (what is the maximum length?)
         var row = this._rowAtY(event.originalEvent.pageY);
         var data = {
             'rowId': (row ? row.id : '')
         };
-        this.session.uploadFiles(that, [files[0]], data);
+        this.session.uploadFiles(that, files, data);
       }
     }
   }
