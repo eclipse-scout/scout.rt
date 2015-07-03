@@ -4,14 +4,23 @@
 @wizard-progress-separator-width: 10px;
 @wizard-progress-separator-line-width: 2px;
 
+@wizard-progress-step-background-color: @palette-gray-2;
+@wizard-progress-step-foreground-color: @text-color;
+@wizard-progress-step-separator-color: @palette-gray-4;
+@wizard-progress-active-step-background-color: @item-selection-background-color;
+@wizard-progress-active-step-foreground-color: @wizard-progress-step-foreground-color;
+@wizard-progress-active-step-separator-color: @wizard-progress-step-separator-color;
+@wizard-progress-disabled-step-background-color: @background-color;
+@wizard-progress-disabled-step-foreground-color: @text-disabled-color;
+
 .wizard-steps {
   height: @wizard-progress-height;
   margin-left: @mandatory-indicator-width;
   margin-right: 0;
+  white-space: nowrap; /* Allows the last wizard-step to be 100% without line break */
 
   overflow: hidden;
-  border-top: @wizard-progress-border-width solid @border-color;
-  border-bottom: @wizard-progress-border-width solid @border-color;
+  border: @wizard-progress-border-width solid @border-color;
   /* If wizard progress field is in the root-group-box and there is a menubar, */
   /* disable the top-border (because the menubar already has a border) */
   .menubar ~ .group-box-body > .wizard-progress-field > & {
@@ -29,6 +38,10 @@
   height: @wizard-progress-height - (2 * @wizard-progress-border-width);
   line-height: @wizard-progress-height - (2 * @wizard-progress-border-width);
   position: relative;
+
+  &:last-child {
+    width: 100%; /* Stretch to right border, requires white-space: nowrap on container */
+  }
 
   /* Step types */
   color: @wizard-progress-step-foreground-color;
@@ -62,6 +75,7 @@
   &.all-before-active {
   }
   &.all-after-active {
+    color: @wizard-progress-disabled-step-foreground-color;
     background-color: @wizard-progress-disabled-step-background-color;
 
     & .wizard-step-separator::after {

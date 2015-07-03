@@ -4,15 +4,15 @@
 scout.WizardProgressField = function() {
   scout.WizardProgressField.parent.call(this);
 
-  this._$stepList;
+  this._$wizardSteps;
 };
 scout.inherits(scout.WizardProgressField, scout.FormField);
 
 scout.WizardProgressField.prototype._render = function($parent) {
   this.addContainer($parent, 'wizard-progress-field');
 
-  this._$stepList = $.makeDiv('wizard-steps');
-  this.addField(this._$stepList);
+  this._$wizardSteps = $.makeDiv('wizard-steps');
+  this.addField(this._$wizardSteps);
 };
 
 scout.WizardProgressField.prototype._renderProperties = function() {
@@ -22,14 +22,14 @@ scout.WizardProgressField.prototype._renderProperties = function() {
 };
 
 scout.WizardProgressField.prototype._renderWizardSteps = function() {
-  this._$stepList.empty();
+  this._$wizardSteps.empty();
   this.wizardSteps.forEach(function(wizardStep, index) {
     var $wizardStep, $content, $title, $subTitle, $separator;
 
     // Step
     $wizardStep = $.makeDiv('wizard-step')
       .attr('data-index', wizardStep.index)
-      .appendTo(this._$stepList);
+      .appendTo(this._$wizardSteps);
     if (wizardStep.enabled) {
       $wizardStep.on('click', this._onWizardStepClick.bind(this));
     } else {
@@ -49,13 +49,11 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
     }
 
     // TODO BSH Wizard | Add icon
-
-    this._updateWizardStepActiveClasses($wizardStep);
   }.bind(this));
 };
 
 scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
-  var $wizardSteps = this._$stepList.children('.wizard-step');
+  var $wizardSteps = this._$wizardSteps.children('.wizard-step');
   this.wizardSteps.forEach(function(wizardStep, index) {
     this._updateWizardStepActiveClasses($wizardSteps.eq(index));
   }.bind(this));

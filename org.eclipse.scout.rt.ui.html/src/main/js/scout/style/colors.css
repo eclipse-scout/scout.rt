@@ -123,15 +123,7 @@
 @tooltip-color: @palette-gray-8;
 @tooltip-background-color: @palette-orange-0;
 @tooltip-border-color: @palette-orange-3;
-//@view-button-tab-background-color: @palette-gray-3;
 @view-button-tab-color: @palette-gray-65;
 @view-button-tab-active-background-color: @navigation-background-color;
 @view-button-tab-active-color: @active-inverted-color;
-@wizard-progress-step-background-color: @palette-gray-2;
-@wizard-progress-step-foreground-color: @text-color;
-@wizard-progress-step-separator-color: @palette-gray-4;
-@wizard-progress-active-step-background-color: @item-selection-background-color;
-@wizard-progress-active-step-foreground-color: @wizard-progress-step-foreground-color;
-@wizard-progress-active-step-separator-color: @wizard-progress-step-separator-color;
-@wizard-progress-disabled-step-background-color: @background-color;
-@wizard-progress-disabled-step-foreground-color: @text-disabled-color;
+
