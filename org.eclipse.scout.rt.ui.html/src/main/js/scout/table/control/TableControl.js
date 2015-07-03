@@ -63,13 +63,13 @@ scout.TableControl.prototype.removeContent = function() {
  * Opens the container if the container is not already open.<br>
  * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.
  */
-scout.TableControl.prototype.renderContent = function(animated) {
+scout.TableControl.prototype.renderContent = function() {
   if (!this.contentRendered && !this.isContentAvailable()) {
     return;
   }
 
   if (!this.tableFooter.open) {
-    this.tableFooter.openControlContainer(animated);
+    this.tableFooter.openControlContainer();
   }
 
   if (!this.contentRendered) {
@@ -82,6 +82,7 @@ scout.TableControl.prototype.renderContent = function(animated) {
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
     this.tableFooter.$controlContainer.installFocusContextAsync('auto', this.tableFooter._table.session.uiSessionId);
   }
+
 };
 
 scout.TableControl.prototype.onControlContainerClosed = function() {
@@ -103,7 +104,7 @@ scout.TableControl.prototype._syncForm = function(form) {
 };
 
 scout.TableControl.prototype._renderForm = function(form) {
-  this.renderContent(false);
+  this.renderContent();
 };
 
 /**
@@ -119,24 +120,24 @@ scout.TableControl.prototype._onMouseDown = function() {
 
 scout.TableControl.prototype.toggle = function() {
   if (this.tableFooter.selectedControl === this) {
-    this.setSelected(false, true, true);
+    this.setSelected(false, true);
   } else {
-    this.setSelected(true, true, true);
+    this.setSelected(true, true);
   }
 };
 
-scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected, animated) {
+scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
   if (selected === this.selected) {
     return;
   }
 
   if (this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
-    this.tableFooter.selectedControl.setSelected(false, false, animated);
+    this.tableFooter.selectedControl.setSelected(false, false);
   }
 
   this.selected = selected;
   this.sendSelected(selected);
-  this._renderSelected(this.selected, closeWhenUnselected, animated);
+  this._renderSelected(this.selected, closeWhenUnselected);
   var that = this;
   if (!selected) {
     scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
@@ -144,13 +145,13 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   }
 };
 
-scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected, animated) {
+scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
   closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
 
   this.$container.select(selected);
 
   if (selected) {
-    this.renderContent(animated);
+    this.renderContent();
     this.tableFooter.selectedControl = this;
   } else {
 

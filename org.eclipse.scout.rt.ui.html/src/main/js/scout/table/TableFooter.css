@@ -16,7 +16,7 @@
   position: absolute;
   width: 100%;
   left: 0px;
-  height: 10px;
+  height: 16px;
   cursor: row-resize;
   z-index: 1;
   border-top: 3px solid @border-color;

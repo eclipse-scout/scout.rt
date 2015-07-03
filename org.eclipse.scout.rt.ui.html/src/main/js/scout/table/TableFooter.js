@@ -230,7 +230,7 @@ scout.TableFooter.prototype._revalidateTableLayout = function() {
   this._table.htmlComp.revalidateLayoutTree();
 };
 
-scout.TableFooter.prototype.openControlContainer = function(animated) {
+scout.TableFooter.prototype.openControlContainer = function() {
   var insets = scout.graphics.getInsets(this.$controlContainer),
     contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom,
     that = this;
@@ -239,10 +239,11 @@ scout.TableFooter.prototype.openControlContainer = function(animated) {
   this.$controlContent.outerHeight(contentHeight);
 
   // open container, stop existing (close) animations before
-  this.$controlContainer.stop(true).show().animate({
+  // use delay to make sure form is rendered and layouted with new size
+  this.$controlContainer.stop(true).show().delay(1).animate({
     height: scout.TableFooter.CONTAINER_SIZE
   }, {
-    duration: animated ? 500 : 0,
+    duration: that.rendered ? 500 : 0,
     progress: that._revalidateTableLayout.bind(that)
   });
   this.open = true;
