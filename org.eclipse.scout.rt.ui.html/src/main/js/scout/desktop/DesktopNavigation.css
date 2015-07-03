@@ -26,6 +26,11 @@
   border-right: solid 1px @border-color;
   white-space: nowrap;
   min-width: 50px;
+  position: relative;
+
+  & > .key-box {
+    bottom: 4px;
+  }
 
   &:hover {
     cursor: pointer;

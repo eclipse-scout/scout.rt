@@ -18,9 +18,9 @@ scout.MnemonicKeyStroke.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.MnemonicKeyStroke.prototype._drawKeyBox = function($container) {
-  if (this._field.$container) {
+  if (this._$containerForKeyBox()) {
     var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._field.$container, this.ctrl, this.alt, this.shift, true);
+    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._$containerForKeyBox(), this.ctrl, this.alt, this.shift, true);
   }
 };
 

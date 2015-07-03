@@ -55,7 +55,9 @@ scout.GroupBox.prototype._render = function($parent) {
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
   if (this.scrollable) {
-    scout.scrollbars.install(this.$body, { axis: 'y' });
+    scout.scrollbars.install(this.$body, {
+      axis: 'y'
+    });
     this.session.detachHelper.pushScrollable(this.$body);
   }
   this._prepareFields();
@@ -64,9 +66,9 @@ scout.GroupBox.prototype._render = function($parent) {
   }, this);
   // FIXME AWE: andere lösung finden für das hier
   // only render when 2nd argument is undefined or matches this.position
-//  if (whenPosition !== undefined && this.position !== whenPosition) {
-//    return;
-//  }
+  //  if (whenPosition !== undefined && this.position !== whenPosition) {
+  //    return;
+  //  }
   if (this.menuBar.position === 'bottom') {
     this.menuBar.render(this.$container);
   }
@@ -123,6 +125,7 @@ scout.GroupBox.prototype._prepareFields = function() {
       }
       // Register all button key strokes
       for (var j = 0; j < field.keyStrokes.length; j++) {
+        field.keyStrokes[j].$drawKeyBoxContainer = field.$container;
         this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
       }
     } else if (field instanceof scout.TabBox) {

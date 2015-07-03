@@ -80,7 +80,7 @@ scout.TableControl.prototype.renderContent = function(animated) {
     this.contentRendered = true;
     this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-      this.tableFooter.$controlContainer.installFocusContextAsync('auto', this.tableFooter._table.session.uiSessionId);
+    this.tableFooter.$controlContainer.installFocusContextAsync('auto', this.tableFooter._table.session.uiSessionId);
   }
 };
 
@@ -138,7 +138,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.sendSelected(selected);
   this._renderSelected(this.selected, closeWhenUnselected, animated);
   var that = this;
-  if (!selected){
+  if (!selected) {
     scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
 
   }
@@ -207,7 +207,13 @@ scout.TableControl.prototype.onResize = function() {
 
 scout.TableControl.prototype._drawKeyBox = function($container) {
   if (this.rendered) {
-    scout.TableControl.parent.prototype._drawKeyBox.call(this, this.$container);
+
+    if (!this.drawHint || !this.keyStroke) {
+      return;
+    }
+    var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
+    scout.keyStrokeBox.drawSingleKeyBoxItem(6, keyBoxText, this.$container, this.ctrl, this.alt, this.shift);
+
   }
 };
 

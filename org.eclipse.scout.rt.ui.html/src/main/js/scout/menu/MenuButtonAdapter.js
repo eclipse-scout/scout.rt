@@ -14,7 +14,7 @@ scout.MenuButtonAdapter = function() {
   // ModelAdapter._renderPropertiesOnPropertyChange(). Darum kopieren wir hier als
   // _Workaround_ (!) einfach alle _render* Methoden von FormField.js und stellen
   // eine leere dummy Methode bereit, damit diese Fehler verhindert werden.
-  var  emptyDummyFunction = function() {};
+  var emptyDummyFunction = function() {};
   for (var prop in scout.FormField.prototype) {
     if (/^_render.+/.test(prop) && this[prop] === undefined) {
       this[prop] = emptyDummyFunction.bind(this);
@@ -40,16 +40,16 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
     throw new Error('missing parameter "button"');
   }
   var model = {
-      objectType: 'Menu',
-      id: button.id,
-      enabled: button.enabled,
-      visible: button.visible,
-      selected: button.selected,
-      text: button.label,
-      keyStroke: button.keyStroke,
-      keyStrokes: button.keyStrokes,
-      modelClass: button.modelClass,
-      horizontalAlignment: (button.gridData ? button.gridData.horizontalAlignment : null)
+    objectType: 'Menu',
+    id: button.id,
+    enabled: button.enabled,
+    visible: button.visible,
+    selected: button.selected,
+    text: button.label,
+    keyStroke: button.keyStroke,
+    keyStrokes: button.keyStrokes,
+    modelClass: button.modelClass,
+    horizontalAlignment: (button.gridData ? button.gridData.horizontalAlignment : null)
   };
   scout.MenuButtonAdapter.parent.prototype.init.call(this, model, button.session);
   button._renderSelected = this._renderSelected.bind(this);
@@ -57,11 +57,9 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
 
   if (button.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.actionStyle = scout.Action.ActionStyle.TOGGLE;
-  }
-  else if (button.displayStyle === scout.Button.DisplayStyle.DEFAULT) {
+  } else if (button.displayStyle === scout.Button.DisplayStyle.DEFAULT) {
     this.actionStyle = scout.Action.ActionStyle.BUTTON;
-  }
-  else {
+  } else {
     this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   }
 };
@@ -70,7 +68,7 @@ scout.MenuButtonAdapter.prototype.init = function(button) {
  * @override Menu.js
  */
 scout.MenuButtonAdapter.prototype._onMouseEvent = function(event) {
-  if( event.type === 'click'){
+  if (event.type === 'click') {
     this._button.doAction();
   }
 };
@@ -87,8 +85,8 @@ scout.MenuButtonAdapter.prototype._render = function($parent) {
  * @override Menu.js
  */
 scout.MenuButtonAdapter.prototype._renderText = function(text) {
-   text = text ? scout.strings.removeAmpersand(text) : '';
-   scout.Menu.parent.prototype._renderText.call(this, text);
+  text = text ? scout.strings.removeAmpersand(text) : '';
+  scout.Menu.parent.prototype._renderText.call(this, text);
 };
 
 scout.MenuButtonAdapter.prototype._syncLabel = function(label) {
@@ -142,10 +140,19 @@ scout.MenuButtonAdapter.prototype.handle = function(event) {
   }
 };
 
-
 /**
  * @override Menu.js
  */
 scout.MenuButtonAdapter.prototype.doAction = function(text) {
-   this._button.doAction();
+  this._button.doAction();
+};
+
+/**
+ * @override Menu.js
+ */
+scout.MenuButtonAdapter.prototype._drawKeyBox = function($container) {
+  if (this.$container && this.visible && this.enabled && this.rendered) {
+    var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
+    scout.keyStrokeBox.drawSingleKeyBoxItem(4, keyBoxText, this.$container, this.ctrl, this.alt, this.shift);
+  }
 };

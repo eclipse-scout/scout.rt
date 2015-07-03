@@ -30,6 +30,6 @@ scout.TabItemMnemonicKeyStroke.prototype._drawKeyBox = function($container) {
 /**
  * @Override scout.KeyStroke
  */
-scout.MnemonicKeyStroke.prototype.removeKeyBox = function($container) {
+scout.TabItemMnemonicKeyStroke.prototype.removeKeyBox = function($container) {
   $('.key-box', this._field.$tabContainer).remove();
 };

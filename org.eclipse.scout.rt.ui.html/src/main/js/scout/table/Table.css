@@ -185,7 +185,7 @@
 }
 
 .control-group>.control>.key-box {
-  top: 2px;
+  bottom: 4px;
 }
 
 .table .key-box.char {

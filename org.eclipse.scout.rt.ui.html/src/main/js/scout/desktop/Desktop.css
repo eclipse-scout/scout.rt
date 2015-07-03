@@ -219,7 +219,7 @@
 
 .desktop-view-tab .key-box,
 .taskbar-tool-item .key-box {
-  top: 8px;
+  bottom: 4px;
 
   &.disabled {
     background-color: @disabled-color;

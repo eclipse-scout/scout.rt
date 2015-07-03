@@ -131,7 +131,7 @@ scout.Menu.prototype.handle = function(event) {
 };
 
 scout.Menu.prototype._drawKeyBox = function($container) {
-  scout.Menu.parent.prototype._drawKeyBox.call(this, $container);
+  scout.Menu.parent.prototype._drawKeyBox.call(this, this.$container);
 };
 
 scout.Menu.prototype._registerKeyStrokeAdapter = function() {

@@ -45,6 +45,10 @@
   cursor: pointer;
   display: inline-block;
 
+  & > .key-box {
+    bottom: 2px;
+  }
+
   & > .font-icon {
     .menu-icon;
     font-size: 18px;
