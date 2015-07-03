@@ -921,6 +921,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
     }
+    
+    // Ensure MessageBoxParent to be set.
+    messageBox.messageBoxParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
+    Assertions.assertNotNull(messageBox.messageBoxParent(), "Property 'messageBoxParent' must not be null");
 
     m_messageBoxStore.add(messageBox);
     fireMessageBoxAdded(messageBox);
