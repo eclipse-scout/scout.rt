@@ -454,11 +454,11 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     @Override
     public void setSelectedFromUI(boolean b) {
       try {
-        /*
-         * Ticket 76711: added optimistic lock
-         */
-        if (m_uiFacadeSetSelectedLock.acquire()) {
-          setSelected(b);
+        if (isEnabled() && isVisible()) {
+          // Ticket 76711: added optimistic lock
+          if (m_uiFacadeSetSelectedLock.acquire()) {
+            setSelected(b);
+          }
         }
       }
       finally {
