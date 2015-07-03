@@ -15,6 +15,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
 
   // Calculate available size for split area
   var splitXAxis = this._splitBox.splitHorizontal;
+  $splitter.removeClass('hidden');
   var splitterSize = scout.graphics.getVisibleSize($splitter, true);
   var availableSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -24,40 +25,44 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
     availableSize.height -= splitterSize.height;
   }
 
-  if (htmlFirstField) {
-    // Default case: two fields
-    if (htmlSecondField) {
-      // Distribute available size to the two fields according to the splitter position ratio
-      var firstFieldSize = new scout.Dimension(availableSize);
-      var secondFieldSize = new scout.Dimension(availableSize);
-      if (splitXAxis) { // "|"
-        firstFieldSize.width *= this._splitBox.splitterPosition;
-        secondFieldSize.width *= (1 - this._splitBox.splitterPosition);
-      } else { // "--"
-        firstFieldSize.height *= this._splitBox.splitterPosition;
-        secondFieldSize.height *= (1 - this._splitBox.splitterPosition);
-      }
-      firstFieldSize = firstFieldSize.subtract(htmlFirstField.getMargins());
-      secondFieldSize = secondFieldSize.subtract(htmlSecondField.getMargins());
+  var hasFirstField = (htmlFirstField && htmlFirstField.isVisible());
+  var hasSecondField = (htmlSecondField && htmlSecondField.isVisible());
 
-      // Calculate and set bounds (splitter and second field have to be moved)
-      var firstFieldBounds = new scout.Rectangle(0, 0, firstFieldSize.width, firstFieldSize.height);
-      var secondFieldBounds = new scout.Rectangle(0, 0, secondFieldSize.width, secondFieldSize.height);
-      if (splitXAxis) { // "|"
-        $splitter.cssLeft(firstFieldBounds.width);
-        secondFieldBounds.x = firstFieldBounds.width + splitterSize.width;
-      } else { // "--"
-        $splitter.cssTop(firstFieldBounds.height);
-        secondFieldBounds.y = firstFieldBounds.height + splitterSize.height;
-      }
-      htmlFirstField.setBounds(firstFieldBounds);
-      htmlSecondField.setBounds(secondFieldBounds);
+  // Default case: two fields
+  if (hasFirstField && hasSecondField) {
+    // Distribute available size to the two fields according to the splitter position ratio
+    var firstFieldSize = new scout.Dimension(availableSize);
+    var secondFieldSize = new scout.Dimension(availableSize);
+    if (splitXAxis) { // "|"
+      firstFieldSize.width *= this._splitBox.splitterPosition;
+      secondFieldSize.width *= (1 - this._splitBox.splitterPosition);
+    } else { // "--"
+      firstFieldSize.height *= this._splitBox.splitterPosition;
+      secondFieldSize.height *= (1 - this._splitBox.splitterPosition);
     }
-    // Special case: only first field
-    else {
-      var firstFieldOnlySize = availableSize.subtract(htmlFirstField.getMargins());
-      htmlFirstField.setSize(firstFieldOnlySize);
+    firstFieldSize = firstFieldSize.subtract(htmlFirstField.getMargins());
+    secondFieldSize = secondFieldSize.subtract(htmlSecondField.getMargins());
+
+    // Calculate and set bounds (splitter and second field have to be moved)
+    var firstFieldBounds = new scout.Rectangle(0, 0, firstFieldSize.width, firstFieldSize.height);
+    var secondFieldBounds = new scout.Rectangle(0, 0, secondFieldSize.width, secondFieldSize.height);
+    if (splitXAxis) { // "|"
+      $splitter.cssLeft(firstFieldBounds.width);
+      secondFieldBounds.x = firstFieldBounds.width + splitterSize.width;
+    } else { // "--"
+      $splitter.cssTop(firstFieldBounds.height);
+      secondFieldBounds.y = firstFieldBounds.height + splitterSize.height;
     }
+    htmlFirstField.setBounds(firstFieldBounds);
+    htmlSecondField.setBounds(secondFieldBounds);
+  }
+  // Special case: only one field (or none at all)
+  else {
+    if (hasFirstField || hasSecondField) {
+      var oneFieldOnlySize = availableSize.subtract(htmlFirstField.getMargins());
+      (hasFirstField ? htmlFirstField : htmlSecondField).setSize(oneFieldOnlySize);
+    }
+    $splitter.addClass('hidden');
   }
 };
 

@@ -25,6 +25,7 @@ scout.SplitBox.prototype._render = function($parent) {
     this.firstField.$container
       .addClass('first-field')
       .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
+    this.firstField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
 
     if (this.secondField) {
       this._$splitter = $.makeDiv('splitter')
@@ -36,6 +37,7 @@ scout.SplitBox.prototype._render = function($parent) {
       this.secondField.$container
         .addClass('second-field')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
+      this.secondField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
     }
   }
   // Add splitArea as field
@@ -132,6 +134,13 @@ scout.SplitBox.prototype._render = function($parent) {
     }
 
     return false;
+  }
+
+  function onInnerFieldPropertyChange(event) {
+    if (event.changedProperties.indexOf('visible') != -1) {
+      // Mark layout as invalid
+      this.htmlSplitArea.invalidateLayoutTree(false);
+    }
   }
 };
 

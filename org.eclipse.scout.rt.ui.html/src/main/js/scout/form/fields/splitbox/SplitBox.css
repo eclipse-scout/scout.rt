@@ -23,6 +23,11 @@
         background-color: @hover-color;
       }
 
+      /* used when only one field is visible */
+      &.hidden {
+        display: none;
+      }
+
       /* | */
       &.x-axis {
         margin-left: 0; /* Override margin from Splitter.css TODO BSH Improve this */
@@ -57,6 +62,7 @@
       }
     }
 
+    /* used while dragging */
     & > .temp-splitter {
       position: absolute;
 
