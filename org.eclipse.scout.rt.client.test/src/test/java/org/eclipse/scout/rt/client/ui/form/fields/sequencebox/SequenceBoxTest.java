@@ -224,6 +224,59 @@ public class SequenceBoxTest {
     assertTrue(sb.getThirdField().isContentValid());
   }
 
+  @Test
+  public void testStatusVisible() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertFalse(sb.getSecondField().isStatusVisible());
+    assertTrue(sb.getThirdField().isStatusVisible());
+  }
+
+  @Test
+  public void testStatusVisible_LastIsInvisible() throws Exception {
+    ThreeElementLastInvisibleSequence sb = new ThreeElementLastInvisibleSequence();
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertTrue(sb.getSecondField().isStatusVisible());
+  }
+
+  @Test
+  public void testStatusVisible_DynamicVisibilityChange() throws Exception {
+    ThreeElementLastInvisibleSequence sb = new ThreeElementLastInvisibleSequence();
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertTrue(sb.getSecondField().isStatusVisible());
+
+    sb.getThirdField().setVisible(true);
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertFalse(sb.getSecondField().isStatusVisible());
+    assertTrue(sb.getThirdField().isStatusVisible());
+  }
+
+  /**
+   * If status visible was set manually, visibility changes must not override this state
+   */
+  @Test
+  public void testStatusVisible_PreventVisibleOverride() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertFalse(sb.getSecondField().isStatusVisible());
+    assertTrue(sb.getThirdField().isStatusVisible());
+
+    sb.getThirdField().setStatusVisible(false);
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertFalse(sb.getSecondField().isStatusVisible());
+    assertFalse(sb.getThirdField().isStatusVisible());
+
+    sb.getThirdField().setVisible(false);
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertTrue(sb.getSecondField().isStatusVisible());
+
+    sb.getThirdField().setVisible(true);
+    assertFalse(sb.getFirstField().isStatusVisible());
+    assertFalse(sb.getSecondField().isStatusVisible());
+    // Still false
+    assertFalse(sb.getThirdField().isStatusVisible());
+  }
+
   /**
    * Form with some sequence boxes for testing.
    */
@@ -345,6 +398,63 @@ public class SequenceBoxTest {
       @Override
       protected String getConfiguredLabel() {
         return getClass().getSimpleName();
+      }
+    }
+  }
+
+  @Order(10)
+  public class ThreeElementLastInvisibleSequence extends AbstractSequenceBox {
+
+    @Override
+    protected String getConfiguredLabel() {
+      return "baseLabel";
+    }
+
+    public FirstField getFirstField() {
+      return getFieldByClass(FirstField.class);
+    }
+
+    public SecondField getSecondField() {
+      return getFieldByClass(SecondField.class);
+    }
+
+    public ThirdField getThirdField() {
+      return getFieldByClass(ThirdField.class);
+    }
+
+    /**
+     * force field check
+     */
+    public void execCheckFromTo(int changedIndex) throws ProcessingException {
+      super.execCheckFromTo(new AbstractIntegerField[]{getFirstField(), getSecondField(), getThirdField()}, changedIndex);
+    }
+
+    @Order(10)
+    public class FirstField extends AbstractIntegerField {
+      @Override
+      protected String getConfiguredLabel() {
+        return getClass().getSimpleName();
+      }
+    }
+
+    @Order(20)
+    public class SecondField extends AbstractIntegerField {
+      @Override
+      protected String getConfiguredLabel() {
+        return getClass().getSimpleName();
+      }
+    }
+
+    @Order(30)
+    public class ThirdField extends AbstractIntegerField {
+      @Override
+      protected String getConfiguredLabel() {
+        return getClass().getSimpleName();
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
       }
     }
   }

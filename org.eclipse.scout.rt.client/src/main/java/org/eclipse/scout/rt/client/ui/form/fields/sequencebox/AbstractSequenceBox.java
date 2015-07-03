@@ -231,6 +231,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
           );
     }
     updateLabelComposition();
+    updateFieldStatusVisible();
     // attach change triggers
     attachCheckFromToListeners();
   }
@@ -303,12 +304,14 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
-// box is only visible when it has at least one visible item
   @Override
   protected void handleFieldVisibilityChanged() {
     super.handleFieldVisibilityChanged();
     if (isInitialized()) {
+      // box is only visible when it has at least one visible item
       rebuildFieldGrid();
+      // recompute field status visibility
+      updateFieldStatusVisible();
     }
   }
 
@@ -340,6 +343,34 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     catch (ProcessingException e) {
       LOG.debug("Sequence Error", e);
       valueFields[changedIndex].addErrorStatus(e.getStatus());
+    }
+  }
+
+  /**
+   * Sets the status to invisible of every visible field beside the last one.
+   */
+  protected void updateFieldStatusVisible() {
+    List<IFormField> fields = getFields();
+    List<IFormField> visibleFields = new ArrayList<IFormField>();
+    for (IFormField field : fields) {
+      if (field.isVisible()) {
+        visibleFields.add(field);
+      }
+    }
+    for (int i = 0; i < visibleFields.size(); i++) {
+      IFormField field = visibleFields.get(i);
+      if (i < visibleFields.size() - 1) {
+        field.setProperty("origStatusVisible", field.isStatusVisible());
+        field.setStatusVisible(false);
+      }
+      else {
+        // If status visible was false before, visibility changes must not override this state
+        Boolean wasStatusVisible = (Boolean) field.getProperty("origStatusVisible");
+        if (wasStatusVisible != null) {
+          field.setStatusVisible(wasStatusVisible);
+          field.setProperty("origStatusVisible", null);
+        }
+      }
     }
   }
 
