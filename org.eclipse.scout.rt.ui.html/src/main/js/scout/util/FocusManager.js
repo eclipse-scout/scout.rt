@@ -77,10 +77,10 @@ scout.FocusManager.prototype.focusFirstElement = function($container, $focusable
 /**
  * if uiSessionId is passed FocusManager activates focus of this uiSessionId
  */
-scout.FocusManager.prototype.activate = function(uiSessionId) {
+scout.FocusManager.prototype.activate = function(session) {
   this.active = true;
-  if (uiSessionId) {
-    this.validateFocus(uiSessionId, 'activate');
+  if (session) {
+    this.validateFocus(session.uiSessionId, 'activate');
   }
 };
 
