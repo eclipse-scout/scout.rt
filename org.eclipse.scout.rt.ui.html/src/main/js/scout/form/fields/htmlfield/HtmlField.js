@@ -16,7 +16,6 @@ scout.HtmlField.prototype._render = function($parent) {
 scout.HtmlField.prototype._renderProperties = function() {
   scout.HtmlField.parent.prototype._renderProperties.call(this);
 
-  this._renderScrollBarsEnabled(this.scrollBarsEnabled);
   this._renderScrollToPosition(this.scrollToPosition);
 };
 
