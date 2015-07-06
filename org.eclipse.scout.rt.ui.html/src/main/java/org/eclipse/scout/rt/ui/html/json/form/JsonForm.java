@@ -54,14 +54,15 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String EVENT_FORM_CLOSED = "formClosed";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
 
-  private final IFilter<IForm> m_formParentFilter;
-
   private DesktopListener m_desktopListener;
   private FormListener m_formListener;
+  private final IDesktop m_desktop;
+  private final IFilter<IForm> m_formParentFilter;
 
   public JsonForm(FORM form, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(form, uiSession, id, parent);
     m_formParentFilter = new FormParentFilter(form);
+    m_desktop = uiSession.getClientSession().getDesktop();
   }
 
   @Override
@@ -215,7 +216,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   }
 
   protected IDesktop getDesktop() {
-    return getUiSession().getClientSession().getDesktop();
+    return m_desktop;
   }
 
   // ==== FormListener ==== //

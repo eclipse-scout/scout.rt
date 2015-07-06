@@ -43,15 +43,15 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   public static final String PROP_FORM = "form";
 
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
-
   private DesktopListener m_desktopListener;
-
+  private final IDesktop m_desktop;
   private final IFilter<IForm> m_formParentFilter;
 
   public JsonOutline(OUTLINE outline, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(outline, uiSession, id, parent);
 
     m_formParentFilter = new FormParentFilter(outline);
+    m_desktop = uiSession.getClientSession().getDesktop();
   }
 
   @Override
@@ -247,7 +247,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   protected IDesktop getDesktop() {
-    return getUiSession().getClientSession().getDesktop();
+    return m_desktop;
   }
 
   protected class P_DesktopListener implements DesktopListener {
