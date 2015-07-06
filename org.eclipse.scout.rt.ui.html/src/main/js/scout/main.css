@@ -127,7 +127,7 @@ input {
 }
 
 button {
-  padding: 0 @button-padding;
+  padding: @button-padding;
 }
 
 textarea {

@@ -17,7 +17,6 @@
 
 .button > button {
   position: relative;
-  height: 30px;
   color: @text-color;
   background-color: @button-background-color;
   border: 1px solid @border-color;
@@ -72,9 +71,9 @@ button > img {
   }
 }
 
-.form-field.button,
-.form-field.link-button,
-.form-field.radio-button {
+.form-field.button > .field,
+.form-field.link-button > .field,
+.form-field.radio-button > .field {
   margin-left: @mandatory-indicator-width;
 }
 

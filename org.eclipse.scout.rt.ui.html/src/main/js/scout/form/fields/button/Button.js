@@ -48,6 +48,8 @@ scout.Button.prototype._render = function($parent) {
   this._$label = $button.appendSpan('button-label');
   this.addContainer($parent, cssClass, new scout.ButtonLayout(this));
   this.addField($button);
+  //TODO CGU should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
+  this.addStatus();
 
   $button.on('click', this._onClick.bind(this))
   // prevent focus validation on other field on mouse down. -> Safari workaround

@@ -19,6 +19,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     htmlContainer = scout.HtmlComponent.get($container),
     formField = this.formField,
     labelWidth = this.labelWidth,
+    statusWidth = this.statusWidth,
     left = 0,
     right = 0,
     top = 0;
@@ -26,7 +27,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (formField.$label && formField.labelVisible) {
+  if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
     if (formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
@@ -52,13 +53,13 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       .cssWidth(this.mandatoryIndicatorWidth);
     left += formField.$mandatory.outerWidth(true);
   }
-  if (formField.$status && (formField.statusVisible || formField.$status.isVisible())) {
+  if (this._isStatusVisible()) {
     formField.$status
       .cssTop(top)
-      .cssWidth(this.statusWidth)
+      .cssWidth(statusWidth)
       .cssHeight(this.rowHeight)
       .cssLineHeight(this.rowHeight);
-    right += formField.$status.outerWidth(true);
+    right += statusWidth + formField.$status.cssMarginX();
   }
 
   if (formField.$fieldContainer) {
@@ -89,15 +90,24 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
 };
 
+scout.FormFieldLayout.prototype._isLabelVisible = function() {
+  return this.formField.$label && this.formField.labelVisible;
+};
+
+scout.FormFieldLayout.prototype._isStatusVisible = function() {
+  return this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
+};
+
 scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize, htmlField, labelPositionLeft,
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
     height = scout.HtmlEnvironment.formRowHeight,
     labelWidth = this.labelWidth,
+    statusWidth = this.statusWidth,
     formField = this.formField;
 
-  if (formField.$label && formField.labelVisible) {
+  if (this._isLabelVisible()) {
     if (formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
@@ -116,8 +126,8 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   if (formField.$mandatory) {
     width += formField.$mandatory.outerWidth(true);
   }
-  if (formField.$status) {
-    width += formField.$status.outerWidth(true);
+  if (this._isStatusVisible()) {
+    width += statusWidth + formField.$status.cssMarginX();
   }
 
   if (formField.$fieldContainer) {

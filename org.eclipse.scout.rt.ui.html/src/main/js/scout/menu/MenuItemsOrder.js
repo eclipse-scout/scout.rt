@@ -28,6 +28,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
   }, this);
 
   // add fixed separator between emptySpace and selection
+  //FIXME AWE considier visibility of the menus (-> only create separator if there are visible empty space menus)
   if (emptySpaceItems.length > 0 && selectionItems.length > 0) {
     emptySpaceItems.push(this._createSeparator());
   }

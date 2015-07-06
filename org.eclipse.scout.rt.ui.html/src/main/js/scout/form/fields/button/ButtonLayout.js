@@ -2,24 +2,13 @@
  * Button Layout, for fields with a button.
  */
 scout.ButtonLayout = function(button) {
-  scout.ButtonLayout.parent.call(this);
+  scout.ButtonLayout.parent.call(this, button);
   this.button = button;
 };
-scout.inherits(scout.ButtonLayout, scout.AbstractLayout);
+scout.inherits(scout.ButtonLayout, scout.FormFieldLayout);
 
-scout.ButtonLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.getSize(),
-    containerInsets = htmlContainer.getInsets({includeMargin: true}); // includeMargin=true because of 'margin-left' in Button.css
-
-  var buttonSize = containerSize.subtract(containerInsets);
-  scout.graphics.setSize(this.button.$field, buttonSize);
-};
-
-scout.ButtonLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    fieldSize = scout.graphics.getSize(this.button.$field),
-    containerInsets = htmlContainer.getInsets({includeMargin: true}), // includeMargin=true because of 'margin-left' in Button.css
+scout.ButtonLayout.prototype.naturalSize = function() {
+  var fieldSize = scout.graphics.prefSize(this.button.$field, true),
     iconSize = new scout.Dimension(0, 0);
 
   if (this.button.iconId) {
@@ -31,7 +20,7 @@ scout.ButtonLayout.prototype.preferredLayoutSize = function($container) {
     }
   }
 
-  var prefSize = fieldSize.add(containerInsets);
+  var prefSize = fieldSize;
   prefSize.width += iconSize.width;
   prefSize.height = Math.max(prefSize.height, iconSize.height);
 
