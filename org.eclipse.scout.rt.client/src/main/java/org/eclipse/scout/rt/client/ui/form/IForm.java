@@ -129,7 +129,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
   /**
    * Sets the model element to attach this {@link IForm} to. By default, the {@link IFormParent} is automatically picked
    * from the current calling context when the {@link IForm} is created. However, that parent can be overwritten
-   * manually, unless the {@link IForm} is started yet.
+   * manually. If the Form is already showing, it is linked with the new {@link IFormParent}.
    * <p>
    * By default, a view's parent is the {@link IDesktop} and not the parent of the calling context.
    *

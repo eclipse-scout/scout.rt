@@ -539,6 +539,11 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @Override
+  public List<IForm> getForms(IFormParent formParent) {
+    throw createUnsupportedOperationException();
+  }
+
   @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getViewStack() {

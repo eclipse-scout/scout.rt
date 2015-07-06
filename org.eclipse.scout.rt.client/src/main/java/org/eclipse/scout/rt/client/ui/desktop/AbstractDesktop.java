@@ -764,6 +764,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return new ActionFinder().findAction(getMenus(), searchType);
   }
 
+  @Override
+  public List<IForm> getForms(IFormParent formParent) {
+    return m_formStore.getByFormParent(formParent);
+  }
+
   @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getViewStack() {
@@ -921,7 +926,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
     }
-    
+
     // Ensure MessageBoxParent to be set.
     messageBox.messageBoxParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
     Assertions.assertNotNull(messageBox.messageBoxParent(), "Property 'messageBoxParent' must not be null");

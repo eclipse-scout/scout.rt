@@ -223,8 +223,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setFormParent(IFormParent formParent) {
     Assertions.assertNotNull(formParent, "Property 'formParent' must not be null");
-    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'formParent' cannot be changed because Form is already attached to Desktop [form=%s]", this);
-    m_formParent.set(formParent, true);
+
+    if (m_formParent.get() == formParent) {
+      return;
+    }
+
+    IDesktop desktop = getDesktop();
+    if (desktop == null || !desktop.isShowing(this)) {
+      m_formParent.set(formParent, true); // no Desktop available, or Form is not showing yet.
+    }
+    else {
+      // This Form is already showing and must be attached to the new 'formParent'.
+      desktop.hideForm(this);
+      m_formParent.set(formParent, true);
+      desktop.showForm(this);
+    }
   }
 
   @Override
@@ -2157,39 +2170,41 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (!isFormStarted()) {
       return;
     }
+
     try {
       setButtonsArmed(false);
       setCloseTimerArmed(false);
 
-      for (IFuture<?> future : m_timerFutureMap.values()) {
-        future.cancel(false);
+      // Cancel and remove timers
+      Iterator<IFuture<Void>> iterator = m_timerFutureMap.values().iterator();
+      while (iterator.hasNext()) {
+        iterator.next().cancel(false);
+        iterator.remove();
       }
-      m_timerFutureMap.clear();
-      m_formLoading = true;
-    }
-    catch (Exception t) {
-      LOG.warn("Form " + getClass().getName(), t);
-    }
-    // dispose fields
-    FormUtility.disposeFormFields(this);
-    // dispose form configuration
-    try {
-      interceptDisposeForm();
-    }
-    catch (Exception t) {
-      LOG.warn("Form " + getClass().getName(), t);
-    }
-    try {
-      // Detach this Form from Desktop; has no effect if the Form is not attached.
+
+      // Dispose Fields and Form
+      try {
+        FormUtility.disposeFormFields(this);
+        interceptDisposeForm();
+      }
+      catch (Exception t) {
+        LOG.warn("Failed to dispose Form " + getClass().getName(), t);
+      }
+
+      // Detach Form from Desktop.
       IDesktop desktop = getDesktop();
       if (desktop != null) {
         desktop.hideForm(this);
+
+        // Link all Forms which have this Form as 'formParent' with the Desktop.
+        List<IForm> forms = desktop.getForms(this);
+        for (IForm childForm : forms) {
+          childForm.setFormParent(getDesktop());
+        }
       }
     }
     finally {
-      // unlock
       m_blockingCondition.setBlocking(false);
-      // fire
       fireFormClosed();
     }
   }
@@ -2419,8 +2434,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-              header(TEXTS.get("LoadFormXmlFailedText")).
-              show();
+          header(TEXTS.get("LoadFormXmlFailedText")).
+          show();
         }
       }
     }

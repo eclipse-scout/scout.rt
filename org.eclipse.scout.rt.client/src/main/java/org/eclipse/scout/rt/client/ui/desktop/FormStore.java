@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 public class FormStore extends IndexedStore<IForm> {
 
   private final P_TypeIndex m_typeIndex = registerIndex(new P_TypeIndex());
+  private final P_FormParentIndex m_formParentIndex = registerIndex(new P_FormParentIndex());
   private final P_ViewFormParentIndex m_formParentViewIndex = registerIndex(new P_ViewFormParentIndex());
   private final P_DialogFormParentIndex m_formParentDialogIndex = registerIndex(new P_DialogFormParentIndex());
   private final P_DisplayHintIndex m_displayHintIndex = registerIndex(new P_DisplayHintIndex());
@@ -52,6 +53,14 @@ public class FormStore extends IndexedStore<IForm> {
    */
   public List<IForm> getDialogs() {
     return m_typeIndex.get(FormType.DIALOG);
+  }
+
+  /**
+   * Returns all <code>Forms</code> which are attached to the given {@link IFormParent}. The forms returned are ordered
+   * as inserted.
+   */
+  public List<IForm> getByFormParent(final IFormParent formParent) {
+    return m_formParentIndex.get(formParent);
   }
 
   /**
@@ -101,6 +110,14 @@ public class FormStore extends IndexedStore<IForm> {
     @Override
     protected FormType calculateIndexFor(final IForm form) {
       return (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW ? FormType.VIEW : FormType.DIALOG);
+    }
+  }
+
+  private class P_FormParentIndex extends AbstractMultiValueIndex<IFormParent, IForm> {
+
+    @Override
+    protected IFormParent calculateIndexFor(final IForm form) {
+      return form.getFormParent();
     }
   }
 

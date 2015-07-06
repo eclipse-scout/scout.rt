@@ -174,6 +174,11 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void ensureVisible(IForm form);
 
   /**
+   * Returns all Forms which are attached to the given {@link IFormParent}. The forms returned are ordered as inserted.
+   */
+  List<IForm> getForms(IFormParent formParent);
+
+  /**
    * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW}.
    *
    * @deprecated use {@link #getViews()}; will be removed in version 6.1.
@@ -241,13 +246,13 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void addForm(IForm form);
 
   /**
-   * Attaches the given {@link IForm} to the desktop and displays it.
+   * Attaches the given {@link IForm} to the Form's {@link IFormParent} and displays it.
    */
   void showForm(IForm form);
 
   /**
-   * Removes the given {@link IForm} from desktop and notifies attached listeners like the UI. However, the
-   * form is not closed, meaning that it can be added to the {@link IDesktop} anew in order to be displayed.
+   * Removes the given {@link IForm} from the Form's {@link IFormParent} and hides it. However, the form is not closed,
+   * meaning that it can be added anew in order to be displayed.
    *
    * @deprecated use {@link #hideForm(IForm)}; will be removed in version 6.1.
    */
@@ -255,8 +260,8 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void removeForm(IForm form);
 
   /**
-   * Removes the given {@link IForm} from desktop and UI. However, the form is not closed, meaning that it can be
-   * attached to the desktop anew in order to be displayed. This method has no effect if the {@link IForm} is
+   * Removes the given {@link IForm} from the Form's {@link IFormParent} and hides it. However, the form is not closed,
+   * meaning that it can be added anew in order to be displayed. This method has no effect if the {@link IForm} is
    * not showing.
    */
   void hideForm(IForm form);
