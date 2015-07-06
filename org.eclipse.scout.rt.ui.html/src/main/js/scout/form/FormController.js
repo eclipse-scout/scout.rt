@@ -111,6 +111,7 @@ scout.FormController.prototype._removeAndHideView = function(view) {
 
   if (view.rendered) {
     view.remove();
+    this.session.desktop._removeTab(view.tab);
   }
 };
 
