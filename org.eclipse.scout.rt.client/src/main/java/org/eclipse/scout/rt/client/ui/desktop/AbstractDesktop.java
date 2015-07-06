@@ -921,8 +921,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireFormHide(form);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void addMessageBox(final IMessageBox messageBox) {
+    showMessageBox(messageBox);
+  }
+
+  @Override
+  public void showMessageBox(IMessageBox messageBox) {
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
     }
@@ -932,17 +938,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     Assertions.assertNotNull(messageBox.messageBoxParent(), "Property 'messageBoxParent' must not be null");
 
     m_messageBoxStore.add(messageBox);
-    fireMessageBoxAdded(messageBox);
+    fireMessageBoxShow(messageBox);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void removeMessageBox(IMessageBox messageBox) {
+    hideMessageBox(messageBox);
   }
 
   @Override
-  public void removeMessageBox(IMessageBox messageBox) {
+  public void hideMessageBox(IMessageBox messageBox) {
     if (messageBox == null || !m_messageBoxStore.contains(messageBox)) {
       return;
     }
 
     m_messageBoxStore.remove(messageBox);
-    fireMessageBoxRemoved(messageBox);
+    fireMessageBoxHide(messageBox);
   }
 
   @Override
@@ -1624,13 +1636,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireMessageBoxAdded(IMessageBox messageBox) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_ADDED, messageBox);
+  private void fireMessageBoxShow(IMessageBox messageBox) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_SHOW, messageBox);
     fireDesktopEvent(e);
   }
 
-  private void fireMessageBoxRemoved(IMessageBox messageBox) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_REMOVED, messageBox);
+  private void fireMessageBoxHide(IMessageBox messageBox) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_MESSAGE_BOX_HIDE, messageBox);
     fireDesktopEvent(e);
   }
 

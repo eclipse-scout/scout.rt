@@ -18,8 +18,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDecimalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -34,7 +32,6 @@ import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
  */
 @ClassId("961989bf-d585-40a2-ab9f-b7e545baaac9")
 public abstract class AbstractDecimalColumn<NUMBER extends Number> extends AbstractNumberColumn<NUMBER> implements IDecimalColumn<NUMBER> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDecimalColumn.class);
 
   public AbstractDecimalColumn() {
     super();

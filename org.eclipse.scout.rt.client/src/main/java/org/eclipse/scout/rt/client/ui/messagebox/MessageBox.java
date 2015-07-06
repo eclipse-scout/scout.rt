@@ -352,7 +352,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       }
       else {
         // request a gui
-        desktop.addMessageBox(this);
+        desktop.showMessageBox(this);
         // attach auto-cancel timer
         IFuture<Void> autoCloseFuture = null;
         if (autoCloseMillis() > 0) {
@@ -374,7 +374,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     }
     finally {
       if (desktop != null) {
-        desktop.removeMessageBox(this);
+        desktop.hideMessageBox(this);
       }
       fireClosed();
     }

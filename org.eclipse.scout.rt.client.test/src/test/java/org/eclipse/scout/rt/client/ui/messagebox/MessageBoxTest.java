@@ -253,7 +253,7 @@ public class MessageBoxTest {
 
   private void assertMessageBox(String expectedIntro, String expectedAction, String expectedHtml) {
     ArgumentCaptor<MessageBox> argument = ArgumentCaptor.forClass(MessageBox.class);
-    Mockito.verify(m_desktopSpy).addMessageBox(argument.capture());
+    Mockito.verify(m_desktopSpy).showMessageBox(argument.capture());
 
     MessageBox messageBox = argument.getValue();
     assertEquals("Intro text", expectedIntro, messageBox.header());

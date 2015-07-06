@@ -246,7 +246,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void addForm(IForm form);
 
   /**
-   * Attaches the given {@link IForm} to the Form's {@link IFormParent} and displays it.
+   * Attaches the given {@link IForm} to its {@link IFormParent} and displays it.
    */
   void showForm(IForm form);
 
@@ -260,7 +260,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void removeForm(IForm form);
 
   /**
-   * Removes the given {@link IForm} from the Form's {@link IFormParent} and hides it. However, the form is not closed,
+   * Removes the given {@link IForm} from its {@link IFormParent} and hides it. However, the form is not closed,
    * meaning that it can be added anew in order to be displayed. This method has no effect if the {@link IForm} is
    * not showing.
    */
@@ -287,14 +287,32 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
 
   /**
    * Adds the given {@link IMessageBox} to the desktop and notifies attached listeners like the UI.
+   *
+   * @deprecated use {@link #showMessageBox(IMessageBox)}; will be removed in version 6.1.
    */
+  @Deprecated
   void addMessageBox(IMessageBox messageBox);
+
+  /**
+   * Attaches the given {@link IMessageBox} to its {@link IMessageBoxParent} and displays it.
+   */
+  void showMessageBox(IMessageBox messageBox);
 
   /**
    * Removes the given {@link IMessageBox} from desktop and notifies attached listeners like the UI. However, the
    * message box is not closed, meaning that it can be added to the display anew in order to be displayed.
+   *
+   * @deprecated use {@link #hideMessageBox(IMessageBox)}; will be removed in version 6.1.
    */
+  @Deprecated
   void removeMessageBox(IMessageBox messageBox);
+
+  /**
+   * Removes the given {@link IMessageBox} from its {@link IMessageBoxParent} and hides it. However, the message-box is
+   * not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the
+   * {@link IMessageBox} is not showing.
+   */
+  void hideMessageBox(IMessageBox messageBox);
 
   /**
    * Returns whether the given {@link IMessageBox} is registered on {@link IDesktop}.

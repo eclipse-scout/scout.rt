@@ -60,8 +60,18 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_FORM_ENSURE_VISIBLE = 620;
   public static final int TYPE_FORM_ACTIVATE = 620;
 
+  /**
+   * @deprecated use {@link #TYPE_MESSAGE_BOX_SHOW}; will be removed in version 6.1.
+   */
+  @Deprecated
   public static final int TYPE_MESSAGE_BOX_ADDED = 700;
+  public static final int TYPE_MESSAGE_BOX_SHOW = 700;
+  /**
+   * @deprecated use {@link #TYPE_MESSAGE_BOX_HIDE}; will be removed in version 6.1.
+   */
+  @Deprecated
   public static final int TYPE_MESSAGE_BOX_REMOVED = 710;
+  public static final int TYPE_MESSAGE_BOX_HIDE = 710;
   /**
    * print a form using properties printDevice, printParameters
    */

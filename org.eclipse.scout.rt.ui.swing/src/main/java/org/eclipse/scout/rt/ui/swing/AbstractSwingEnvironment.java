@@ -384,7 +384,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               handleModelOpenUri(e.getUri(), e.getTarget());
               break;
             }
-            case DesktopEvent.TYPE_MESSAGE_BOX_ADDED: {
+            case DesktopEvent.TYPE_MESSAGE_BOX_SHOW: {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {

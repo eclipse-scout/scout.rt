@@ -302,13 +302,25 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void addMessageBox(IMessageBox mb) {
     throw createUnsupportedOperationException();
   }
 
   @Override
+  public void showMessageBox(IMessageBox messageBox) {
+    throw createUnsupportedOperationException();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void removeMessageBox(IMessageBox messageBox) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void hideMessageBox(IMessageBox messageBox) {
     throw createUnsupportedOperationException();
   }
 

@@ -80,7 +80,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
       @Override
       public void desktopChanged(DesktopEvent e) {
         switch (e.getType()) {
-          case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
+          case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
             e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
             break;
         }
