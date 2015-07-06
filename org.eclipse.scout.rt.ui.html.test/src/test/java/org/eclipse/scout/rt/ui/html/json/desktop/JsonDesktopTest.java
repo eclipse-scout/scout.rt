@@ -92,7 +92,7 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
-    form.setFormParent(desktop);
+    form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
     JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
@@ -151,7 +151,7 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
-    form.setFormParent(desktop);
+    form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
     JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
@@ -188,7 +188,7 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
-    form.setFormParent(desktop);
+    form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
     JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);

@@ -31,9 +31,9 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.form.FormParentFilter;
-import org.eclipse.scout.rt.ui.html.json.messagebox.FileChooserParentFilter;
-import org.eclipse.scout.rt.ui.html.json.messagebox.MessageBoxParentFilter;
+import org.eclipse.scout.rt.ui.html.json.form.DisplayParentFormFilter;
+import org.eclipse.scout.rt.ui.html.json.messagebox.DisplayParentFileChooserFilter;
+import org.eclipse.scout.rt.ui.html.json.messagebox.DisplayParentMessageBoxFilter;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -51,18 +51,19 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
   private final IDesktop m_desktop;
   private DesktopListener m_desktopListener;
-  private final IFilter<IForm> m_formParentFilter;
-  private final IFilter<IMessageBox> m_messageBoxParentFilter;
-  private final IFilter<IFileChooser> m_fileChooserParentFilter;
+
+  private final IFilter<IForm> m_displayParentFormFilter;
+  private final IFilter<IMessageBox> m_displayParentMessageBoxFilter;
+  private final IFilter<IFileChooser> m_displayParentFileChooserFilter;
 
   public JsonOutline(OUTLINE outline, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(outline, uiSession, id, parent);
 
     m_desktop = uiSession.getClientSession().getDesktop();
 
-    m_formParentFilter = new FormParentFilter(outline);
-    m_messageBoxParentFilter = new MessageBoxParentFilter(outline);
-    m_fileChooserParentFilter = new FileChooserParentFilter(outline);
+    m_displayParentFormFilter = new DisplayParentFormFilter(outline);
+    m_displayParentMessageBoxFilter = new DisplayParentMessageBoxFilter(outline);
+    m_displayParentFileChooserFilter = new DisplayParentFileChooserFilter(outline);
   }
 
   @Override
@@ -241,49 +242,49 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   protected void handleModelFormShow(IForm form) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form, m_displayParentFormFilter);
     if (jsonAdapter != null) {
       addActionEvent("formShow", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFormHide(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_displayParentFormFilter);
     if (jsonAdapter != null) {
       addActionEvent("formHide", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFormActivate(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_displayParentFormFilter);
     if (jsonAdapter != null) {
       addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox, m_messageBoxParentFilter);
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox, m_displayParentMessageBoxFilter);
     if (jsonAdapter != null) {
       addActionEvent("messageBoxShow", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(messageBox, m_messageBoxParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(messageBox, m_displayParentMessageBoxFilter);
     if (jsonAdapter != null) {
       addActionEvent("messageBoxHide", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFileChooserShow(final IFileChooser fileChooser) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser, m_fileChooserParentFilter);
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser, m_displayParentFileChooserFilter);
     if (jsonAdapter != null) {
       addActionEvent("fileChooserShow", new JSONObject().put(PROP_FILE_CHOOSER, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFileChooserHide(final IFileChooser fileChooser) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(fileChooser, m_fileChooserParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(fileChooser, m_displayParentFileChooserFilter);
     if (jsonAdapter != null) {
       addActionEvent("fileChooserHide", new JSONObject().put(PROP_FILE_CHOOSER, jsonAdapter.getId()));
     }

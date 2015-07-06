@@ -11,22 +11,22 @@
 package org.eclipse.scout.rt.ui.html.json.messagebox;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 
 /**
- * Filter to accept file choosers attached to a specific {@link IFileChooserParent}.
+ * Filter to accept file choosers attached to a specific {@link IDisplayParent}.
  */
-public class FileChooserParentFilter implements IFilter<IFileChooser> {
+public class DisplayParentFileChooserFilter implements IFilter<IFileChooser> {
 
-  private final IFileChooserParent m_fileChooserParent;
+  private final IDisplayParent m_displayParent;
 
-  public FileChooserParentFilter(final IFileChooserParent fileChooserParent) {
-    m_fileChooserParent = fileChooserParent;
+  public DisplayParentFileChooserFilter(final IDisplayParent displayParent) {
+    m_displayParent = displayParent;
   }
 
   @Override
   public boolean accept(final IFileChooser fileChooser) {
-    return m_fileChooserParent == fileChooser.getFileChooserParent();
+    return m_displayParent == fileChooser.getDisplayParent();
   }
 }

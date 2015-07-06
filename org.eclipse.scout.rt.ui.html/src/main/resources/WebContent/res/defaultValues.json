@@ -122,12 +122,14 @@
       "dialogs": [],
       "views": [],
       "viewButtons": [],
-      "messageBoxes": []
+      "messageBoxes": [],
+      "fileChoosers": []
     },
     "Outline": {
       "dialogs": [],
       "views": [],
-      "messageBoxes": []
+      "messageBoxes": [],
+      "fileChoosers": []
     },
     "Form": {
       "displayHint": "dialog",
@@ -139,7 +141,8 @@
       "modal": false,
       "dialogs": [],
       "views": [],
-      "messageBoxes": []
+      "messageBoxes": [],
+      "fileChoosers": []
     },
     "Tree": {
       "autoCheckChildren": false,

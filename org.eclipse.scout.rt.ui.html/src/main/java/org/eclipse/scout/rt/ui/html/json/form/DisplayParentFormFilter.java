@@ -8,25 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.messagebox;
+package org.eclipse.scout.rt.ui.html.json.form;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
-import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * Filter to accept message-boxes attached to a specific {@link IMessageBoxParent}.
+ * Filter to accept {@link IForm}s attached to a specific {@link IDisplayParent}.
  */
-public class MessageBoxParentFilter implements IFilter<IMessageBox> {
+public class DisplayParentFormFilter implements IFilter<IForm> {
 
-  private final IMessageBoxParent m_messageBoxParent;
+  private final IDisplayParent m_displayParent;
 
-  public MessageBoxParentFilter(final IMessageBoxParent messageBoxParent) {
-    m_messageBoxParent = messageBoxParent;
+  public DisplayParentFormFilter(final IDisplayParent displayParent) {
+    m_displayParent = displayParent;
   }
 
   @Override
-  public boolean accept(final IMessageBox messageBox) {
-    return m_messageBoxParent == messageBox.messageBoxParent();
+  public boolean accept(final IForm form) {
+    return m_displayParent == form.getDisplayParent();
   }
 }
