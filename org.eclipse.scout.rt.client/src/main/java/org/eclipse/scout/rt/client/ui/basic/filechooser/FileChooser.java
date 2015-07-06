@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
@@ -37,7 +37,7 @@ public class FileChooser implements IFileChooser {
   private List<BinaryResource> m_files;
   private final IBlockingCondition m_blockingCondition;
 
-  private IFileChooserParent m_fileChooserParent;
+  private IDisplayParent m_displayParent;
 
   public FileChooser() {
     this(null, false);
@@ -57,7 +57,7 @@ public class FileChooser implements IFileChooser {
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_multiSelect = multiSelect;
 
-    m_fileChooserParent = deriveFileChooserParent();
+    m_displayParent = deriveDisplayParent();
   }
 
   @Override
@@ -66,15 +66,15 @@ public class FileChooser implements IFileChooser {
   }
 
   @Override
-  public IFileChooserParent getFileChooserParent() {
-    return m_fileChooserParent;
+  public IDisplayParent getDisplayParent() {
+    return m_displayParent;
   }
 
   @Override
-  public void setFileChooserParent(IFileChooserParent fileChooserParent) {
-    Assertions.assertNotNull(fileChooserParent, "Property 'fileChooserParent' must not be null");
-    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'fileChooserParent' cannot be changed because FileChooser is already attached to Desktop [fileChooser=%s]", this);
-    m_fileChooserParent = fileChooserParent;
+  public void setDisplayParent(IDisplayParent displayParent) {
+    Assertions.assertNotNull(displayParent, "Property 'displayParent' must not be null");
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because FileChooser is already attached to Desktop [fileChooser=%s]", this);
+    m_displayParent = displayParent;
   }
 
   @Override
@@ -148,22 +148,22 @@ public class FileChooser implements IFileChooser {
   }
 
   /**
-   * Derives the {@link IFileChooserParent} from the calling context.
+   * Derives the {@link IDisplayParent} from the calling context.
    */
-  protected IFileChooserParent deriveFileChooserParent() {
+  protected IDisplayParent deriveDisplayParent() {
     ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
 
-    // Check whether a Form is currently the FileChooserParent.
+    // Check whether a Form is currently the 'displayParent'.
     if (currentRunContext.form() != null) {
       return currentRunContext.form();
     }
 
-    // Check whether an Outline is currently the FileChooserParent.
+    // Check whether an Outline is currently the 'displayParent'.
     if (currentRunContext.outline() != null) {
       return currentRunContext.outline();
     }
 
-    // Use the desktop as FileChooserParent.
+    // Use the desktop as 'displayParent'.
     return currentRunContext.session().getDesktop();
   }
 

@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -36,9 +37,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -256,7 +254,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IFileChooser> getFileChoosers(IFileChooserParent fileChooserParent) {
+  public List<IFileChooser> getFileChoosers(IDisplayParent displayParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -449,7 +447,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IForm> getDialogs(IFormParent formParent) {
+  public List<IForm> getDialogs(IDisplayParent displayParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -490,7 +488,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
+  public List<IMessageBox> getMessageBoxes(IDisplayParent displayParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -580,7 +578,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IForm> getForms(IFormParent formParent) {
+  public List<IForm> getForms(IDisplayParent displayParent) {
     throw createUnsupportedOperationException();
   }
 
@@ -596,7 +594,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IForm> getViews(IFormParent formParent) {
+  public List<IForm> getViews(IDisplayParent displayParent) {
     throw createUnsupportedOperationException();
   }
 

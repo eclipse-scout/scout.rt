@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
@@ -26,23 +26,23 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class FileChooserStore extends IndexedStore<IFileChooser> {
 
-  private final P_FileChooserParentIndex m_fileChooserParentIndex = registerIndex(new P_FileChooserParentIndex());
+  private final P_DisplayParentIndex m_displayParentIndex = registerIndex(new P_DisplayParentIndex());
 
   /**
-   * Returns all <code>FileChoosers</code> which are attached to the given {@link IFileChooserParent} in the order as
+   * Returns all <code>FileChoosers</code> which are attached to the given {@link IDisplayParent} in the order as
    * inserted.
    */
-  public List<IFileChooser> getByFileChooserParent(final IFileChooserParent fileChooserParent) {
-    return m_fileChooserParentIndex.get(fileChooserParent);
+  public List<IFileChooser> getByDisplayParent(final IDisplayParent displayParent) {
+    return m_displayParentIndex.get(displayParent);
   }
 
   // ====  Index definitions ==== //
 
-  private class P_FileChooserParentIndex extends AbstractMultiValueIndex<IFileChooserParent, IFileChooser> {
+  private class P_DisplayParentIndex extends AbstractMultiValueIndex<IDisplayParent, IFileChooser> {
 
     @Override
-    protected IFileChooserParent calculateIndexFor(final IFileChooser fileChooser) {
-      return fileChooser.getFileChooserParent();
+    protected IDisplayParent calculateIndexFor(final IFileChooser fileChooser) {
+      return fileChooser.getDisplayParent();
     }
   }
 }

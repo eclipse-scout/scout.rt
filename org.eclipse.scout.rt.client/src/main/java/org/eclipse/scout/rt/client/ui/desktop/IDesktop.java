@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -30,9 +31,6 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -60,7 +58,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>top-level menus (menu tree)
  * </ul>
  */
-public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxParent, IFileChooserParent {
+public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /**
    * String
    */
@@ -187,10 +185,10 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   boolean isOpened();
 
   /**
-   * Returns all Forms which are attached to the given {@link IFormParent}. The forms returned are ordered as
+   * Returns all Forms which are attached to the given {@link IDisplayParent}. The forms returned are ordered as
    * registered.
    */
-  List<IForm> getForms(IFormParent formParent);
+  List<IForm> getForms(IDisplayParent displayParent);
 
   /**
    * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW}.
@@ -207,9 +205,9 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
 
   /**
    * Returns all Forms of the type {@link IForm#DISPLAY_HINT_VIEW} and which are attached to the given
-   * {@link IFormParent}. The forms returned are ordered as registered.
+   * {@link IDisplayParent}. The forms returned are ordered as registered.
    */
-  List<IForm> getViews(IFormParent formParent);
+  List<IForm> getViews(IDisplayParent displayParent);
 
   /**
    * Returns all {@link IForm}s with dialog character:
@@ -235,7 +233,8 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   List<IForm> getDialogs();
 
   /**
-   * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IFormParent}. The forms
+   * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IDisplayParent}. The
+   * forms
    * returned are ordered as registered.
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
@@ -243,7 +242,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
    */
-  List<IForm> getDialogs(IFormParent formParent);
+  List<IForm> getDialogs(IDisplayParent displayParent);
 
   /**
    * Open dialogs or views that need to be saved
@@ -259,12 +258,13 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void addForm(IForm form);
 
   /**
-   * Attaches the given {@link IForm} to its {@link IFormParent} and displays it.
+   * Attaches the given {@link IForm} to its {@link IDisplayParent} and displays it.
    */
   void showForm(IForm form);
 
   /**
-   * Removes the given {@link IForm} from the Form's {@link IFormParent} and hides it. However, the form is not closed,
+   * Removes the given {@link IForm} from the Form's {@link IDisplayParent} and hides it. However, the form is not
+   * closed,
    * meaning that it can be added anew in order to be displayed.
    *
    * @deprecated use {@link #hideForm(IForm)}; will be removed in version 6.1.
@@ -273,7 +273,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void removeForm(IForm form);
 
   /**
-   * Removes the given {@link IForm} from its {@link IFormParent} and hides it. However, the form is not closed,
+   * Removes the given {@link IForm} from its {@link IDisplayParent} and hides it. However, the form is not closed,
    * meaning that it can be added anew in order to be displayed. This method has no effect if the {@link IForm} is
    * not showing.
    */
@@ -285,7 +285,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    * @see #showMessageBox(IMessageBox)
    */
   boolean isShowing(IMessageBox messageBox);
-  
+
   /**
    * Returns all displayed message boxes in the order as attached to the desktop.
    *
@@ -300,9 +300,9 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   List<IMessageBox> getMessageBoxes();
 
   /**
-   * Returns all message boxes which are attached to the given {@link IMessageBoxParent} in the order as registered.
+   * Returns all message boxes which are attached to the given {@link IDisplayParent} in the order as registered.
    */
-  List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent);
+  List<IMessageBox> getMessageBoxes(IDisplayParent displayParent);
 
   /**
    * Adds the given {@link IMessageBox} to the desktop and notifies attached listeners like the UI.
@@ -313,7 +313,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void addMessageBox(IMessageBox messageBox);
 
   /**
-   * Attaches the given {@link IMessageBox} to its {@link IMessageBoxParent} and displays it.
+   * Attaches the given {@link IMessageBox} to its {@link IDisplayParent} and displays it.
    */
   void showMessageBox(IMessageBox messageBox);
 
@@ -327,7 +327,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void removeMessageBox(IMessageBox messageBox);
 
   /**
-   * Removes the given {@link IMessageBox} from its {@link IMessageBoxParent} and hides it. However, the message-box is
+   * Removes the given {@link IMessageBox} from its {@link IDisplayParent} and hides it. However, the message box is
    * not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the
    * {@link IMessageBox} is not showing.
    */
@@ -559,8 +559,8 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    *         <code>true</code> does not imply that the {@link IFileChooser} is the currently active model element.
    * @see #showFileChooser(IFileChooser)
    */
-  boolean isShowing(IFileChooser fileChooser);  
-  
+  boolean isShowing(IFileChooser fileChooser);
+
   /**
    * @deprecated use {@link #getFileChoosers()}; will be removed in version 6.1.
    */
@@ -573,9 +573,9 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   List<IFileChooser> getFileChoosers();
 
   /**
-   * Returns all file choosers which are attached to the given {@link IFileChooserParent} in the order as registered.
+   * Returns all file choosers which are attached to the given {@link IDisplayParent} in the order as registered.
    */
-  List<IFileChooser> getFileChoosers(IFileChooserParent fileChooserParent);
+  List<IFileChooser> getFileChoosers(IDisplayParent displayParent);
 
   /**
    * Retrieve files via a user interface
@@ -586,12 +586,12 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void addFileChooser(IFileChooser fileChooser);
 
   /**
-   * Attaches the given {@link IFileChooser} to its {@link IFileChooserParent} and displays it.
+   * Attaches the given {@link IFileChooser} to its {@link IDisplayParent} and displays it.
    */
   void showFileChooser(IFileChooser fileChooser);
 
   /**
-   * Removes the given {@link IFileChooser} from its {@link IFileChooserParent} and hides it. However, the file chooser
+   * Removes the given {@link IFileChooser} from its {@link IDisplayParent} and hides it. However, the file chooser
    * is not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the file
    * chooser is not showing.
    */

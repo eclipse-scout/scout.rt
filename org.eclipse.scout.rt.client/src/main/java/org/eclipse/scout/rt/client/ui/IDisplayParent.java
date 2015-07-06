@@ -8,16 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.desktop.outline;
+package org.eclipse.scout.rt.client.ui;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * Marker interface for model elements which have the characteristics of an anchor to attach Forms like dialogs, views
- * or pop-up windows. Typical parents are {@link IDesktop}, {@link IOutline} or a {@link IForm}.
+ * Marker interface for model elements which have the characteristics of an anchor to attach Forms, message boxes and
+ * file choosers. Typical parents are {@link IDesktop}, {@link IOutline} or a {@link IForm}.
  *
  * @since 5.1
  */
-public interface IFormParent {
+public interface IDisplayParent {
 }

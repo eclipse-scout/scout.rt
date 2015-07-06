@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTab
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -76,9 +77,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -764,8 +762,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IForm> getForms(IFormParent formParent) {
-    return m_formStore.getByFormParent(formParent);
+  public List<IForm> getForms(IDisplayParent displayParent) {
+    return m_formStore.getByDisplayParent(displayParent);
   }
 
   @SuppressWarnings("deprecation")
@@ -780,8 +778,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IForm> getViews(IFormParent formParent) {
-    return m_formStore.getViewsByFormParent(formParent);
+  public List<IForm> getViews(IDisplayParent displayParent) {
+    return m_formStore.getViewsByDisplayParent(displayParent);
   }
 
   @SuppressWarnings("deprecation")
@@ -796,8 +794,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IForm> getDialogs(IFormParent formParent) {
-    return m_formStore.getDialogsByFormParent(formParent);
+  public List<IForm> getDialogs(IDisplayParent displayParent) {
+    return m_formStore.getDialogsByDisplayParent(displayParent);
   }
 
   @SuppressWarnings("deprecation")
@@ -812,8 +810,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent) {
-    return m_messageBoxStore.getByMessageBoxParent(messageBoxParent);
+  public List<IMessageBox> getMessageBoxes(IDisplayParent displayParent) {
+    return m_messageBoxStore.getByDisplayParent(displayParent);
   }
 
   @Override
@@ -896,9 +894,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
-    // Ensure FormParent to be set.
-    form.setFormParent(this); // TODO [dwi] Feature disabled until working with View in HTML UI.
-    Assertions.assertNotNull(form.getFormParent(), "Property 'formParent' must not be null");
+    // Ensure 'displayParent' to be set.
+    form.setDisplayParent(this); // TODO [dwi] Feature disabled until working with View in HTML UI.
+    Assertions.assertNotNull(form.getDisplayParent(), "Property 'displayParent' must not be null");
 
     m_formStore.add(form);
     fireFormShow(form);
@@ -932,9 +930,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return;
     }
 
-    // Ensure MessageBoxParent to be set.
-    messageBox.messageBoxParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
-    Assertions.assertNotNull(messageBox.messageBoxParent(), "Property 'messageBoxParent' must not be null");
+    // Ensure 'displayParent' to be set.
+    messageBox.displayParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
+    Assertions.assertNotNull(messageBox.displayParent(), "Property 'displayParent' must not be null");
 
     m_messageBoxStore.add(messageBox);
     fireMessageBoxShow(messageBox);
@@ -1349,8 +1347,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IFileChooser> getFileChoosers(IFileChooserParent fileChooserParent) {
-    return m_fileChooserStore.getByFileChooserParent(fileChooserParent);
+  public List<IFileChooser> getFileChoosers(IDisplayParent displayParent) {
+    return m_fileChooserStore.getByDisplayParent(displayParent);
   }
 
   @SuppressWarnings("deprecation")
@@ -1365,9 +1363,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return;
     }
 
-    // Ensure FileChooserParent to be set.
-    fileChooser.setFileChooserParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
-    Assertions.assertNotNull(fileChooser.getFileChooserParent(), "Property 'fileChooserParent' must not be null");
+    // Ensure 'displayParent' to be set.
+    fileChooser.setDisplayParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
+    Assertions.assertNotNull(fileChooser.getDisplayParent(), "Property 'displayParent' must not be null");
 
     m_fileChooserStore.add(fileChooser);
     fireFileChooserShow(fileChooser);

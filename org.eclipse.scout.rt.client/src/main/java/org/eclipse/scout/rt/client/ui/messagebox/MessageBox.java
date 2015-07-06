@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -51,7 +51,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private final EventListenerList m_listenerList = new EventListenerList();
   private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
 
-  private IMessageBoxParent m_messageBoxParent;
+  private IDisplayParent m_displayParent;
 
   private long m_autoCloseMillis = -1;
 
@@ -80,19 +80,19 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
    * Do not use, use {@link MessageBoxes#create()} instead.
    */
   public MessageBox() {
-    m_messageBoxParent = deriveMessageBoxParent();
+    m_displayParent = deriveDisplayParent();
   }
 
   @Override
-  public IMessageBoxParent messageBoxParent() {
-    return m_messageBoxParent;
+  public IDisplayParent displayParent() {
+    return m_displayParent;
   }
 
   @Override
-  public IMessageBox messageBoxParent(IMessageBoxParent messageBoxParent) {
-    Assertions.assertNotNull(messageBoxParent, "Property 'messageBoxParent' must not be null");
-    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'messageBoxParent' cannot be changed because MessageBox is already attached to Desktop [msgBox=%s]", this);
-    m_messageBoxParent = messageBoxParent;
+  public IMessageBox displayParent(IDisplayParent displayParent) {
+    Assertions.assertNotNull(displayParent, "Property 'displayParent' must not be null");
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because MessageBox is already attached to Desktop [msgBox=%s]", this);
+    m_displayParent = displayParent;
     return this;
   }
 
@@ -253,7 +253,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           m_header,
           m_body,
           m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
-              m_hiddenText);
+          m_hiddenText);
     }
   }
 
@@ -284,22 +284,22 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   /**
-   * Derives the {@link IMessageBoxParent} from the calling context.
+   * Derives the {@link IDisplayParent} from the calling context.
    */
-  protected IMessageBoxParent deriveMessageBoxParent() {
+  protected IDisplayParent deriveDisplayParent() {
     ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
 
-    // Check whether a Form is currently the MessageBoxParent.
+    // Check whether a Form is currently the 'displayParent'.
     if (currentRunContext.form() != null) {
       return currentRunContext.form();
     }
 
-    // Check whether an Outline is currently the MessageBoxParent.
+    // Check whether an Outline is currently the 'displayParent'.
     if (currentRunContext.outline() != null) {
       return currentRunContext.outline();
     }
 
-    // Use the desktop as MessageBoxParent.
+    // Use the desktop as 'displayParent'.
     return currentRunContext.session().getDesktop();
   }
 

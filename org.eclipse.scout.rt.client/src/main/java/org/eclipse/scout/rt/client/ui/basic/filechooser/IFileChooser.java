@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -24,19 +24,19 @@ public interface IFileChooser {
   IFileChooserUIFacade getUIFacade();
 
   /**
-   * @return the {@link IFileChooserParent} to attach this {@link IFileChooser} to; is never <code>null</code>.
+   * @return the {@link IDisplayParent} to attach this {@link IFileChooser} to; is never <code>null</code>.
    */
-  IFileChooserParent getFileChooserParent();
+  IDisplayParent getDisplayParent();
 
   /**
-   * Sets the model element to attach this {@link IFileChooser} to. By default, the {@link IFileChooserParent} is set
+   * Sets the model element to attach this {@link IFileChooser} to. By default, the {@link IDisplayParent} is set
    * automatically from the current calling context when the {@link IFileChooser} is created. However, that parent can
    * be overwritten manually as long as not showing.
    *
-   * @param fileChooserParent
+   * @param displayParent
    *          like {@link IDesktop}, {@link IOutline} or {@link IForm}; must not be <code>null</code>.
    */
-  void setFileChooserParent(IFileChooserParent fileChooserParent);
+  void setDisplayParent(IDisplayParent displayParent);
 
   void addFileChooserListener(FileChooserListener listener);
 

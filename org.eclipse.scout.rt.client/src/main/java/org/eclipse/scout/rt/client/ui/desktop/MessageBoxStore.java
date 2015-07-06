@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -26,23 +26,23 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class MessageBoxStore extends IndexedStore<IMessageBox> {
 
-  private final P_MessageBoxParentIndex m_messageBoxParentIndex = registerIndex(new P_MessageBoxParentIndex());
+  private final P_DisplayParentIndex m_displayParentIndex = registerIndex(new P_DisplayParentIndex());
 
   /**
-   * Returns all <code>MessageBoxes</code> which are attached to the given {@link IMessageBoxParent} in the order as
+   * Returns all <code>MessageBoxes</code> which are attached to the given {@link IDisplayParent} in the order as
    * inserted.
    */
-  public List<IMessageBox> getByMessageBoxParent(final IMessageBoxParent messageBoxParent) {
-    return m_messageBoxParentIndex.get(messageBoxParent);
+  public List<IMessageBox> getByDisplayParent(final IDisplayParent displayParent) {
+    return m_displayParentIndex.get(displayParent);
   }
 
   // ====  Index definitions ==== //
 
-  private class P_MessageBoxParentIndex extends AbstractMultiValueIndex<IMessageBoxParent, IMessageBox> {
+  private class P_DisplayParentIndex extends AbstractMultiValueIndex<IDisplayParent, IMessageBox> {
 
     @Override
-    protected IMessageBoxParent calculateIndexFor(final IMessageBox messageBox) {
-      return messageBox.messageBoxParent();
+    protected IDisplayParent calculateIndexFor(final IMessageBox messageBox) {
+      return messageBox.displayParent();
     }
   }
 }

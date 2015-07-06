@@ -85,6 +85,7 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -92,7 +93,6 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -192,7 +192,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private int m_toolbarLocation;
 
-  private final PreferredValue<IFormParent> m_formParent = new PreferredValue<>(null, false);
+  private final PreferredValue<IDisplayParent> m_displayParent = new PreferredValue<>(null, false);
 
   public AbstractForm() throws ProcessingException {
     this(true);
@@ -216,26 +216,26 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public IFormParent getFormParent() {
-    return m_formParent.get();
+  public IDisplayParent getDisplayParent() {
+    return m_displayParent.get();
   }
 
   @Override
-  public void setFormParent(IFormParent formParent) {
-    Assertions.assertNotNull(formParent, "Property 'formParent' must not be null");
+  public void setDisplayParent(IDisplayParent displayParent) {
+    Assertions.assertNotNull(displayParent, "Property 'displayParent' must not be null");
 
-    if (m_formParent.get() == formParent) {
+    if (m_displayParent.get() == displayParent) {
       return;
     }
 
     IDesktop desktop = getDesktop();
     if (desktop == null || !desktop.isShowing(this)) {
-      m_formParent.set(formParent, true); // no Desktop available, or Form is not showing yet.
+      m_displayParent.set(displayParent, true); // no Desktop available, or Form is not showing yet.
     }
     else {
-      // This Form is already showing and must be attached to the new 'formParent'.
+      // This Form is already showing and must be attached to the new 'displayParent'.
       desktop.hideForm(this);
-      m_formParent.set(formParent, true);
+      m_displayParent.set(displayParent, true);
       desktop.showForm(this);
     }
   }
@@ -270,8 +270,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return;
     }
 
-    // Derive the FormParent from the calling context. This value is set as non preferred value.
-    m_formParent.set(deriveFormParent(), false);
+    // Derive the 'displayParent' from the calling context, and set it as non preferred value, meaning that a potential preferred value is not overwritten.
+    m_displayParent.set(deriveDisplayParent(), false);
 
     // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().form(this).run(new IRunnable() {
@@ -2196,10 +2196,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       if (desktop != null) {
         desktop.hideForm(this);
 
-        // Link all Forms which have this Form as 'formParent' with the Desktop.
+        // Link all Forms which have this Form as 'displayParent' with the Desktop.
         List<IForm> forms = desktop.getForms(this);
         for (IForm childForm : forms) {
-          childForm.setFormParent(getDesktop());
+          childForm.setDisplayParent(getDesktop());
         }
       }
     }
@@ -2434,8 +2434,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-              header(TEXTS.get("LoadFormXmlFailedText")).
-              show();
+          header(TEXTS.get("LoadFormXmlFailedText")).
+          show();
         }
       }
     }
@@ -2843,7 +2843,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       case DISPLAY_HINT_VIEW: {
         m_displayHint = displayHint;
         setModal(false);
-        m_formParent.set(getDesktop(), false); // by default, a View has the Desktop as FormParent.
+        m_displayParent.set(getDesktop(), false); // by default, a View has the Desktop as 'displayParent'.
         break;
       }
       default: {
@@ -2968,22 +2968,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Derives the {@link IFormParent} from the calling context.
+   * Derives the {@link IDisplayParent} from the calling context.
    */
-  protected IFormParent deriveFormParent() {
+  protected IDisplayParent deriveDisplayParent() {
     ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
 
-    // Check whether a Form is currently the FormParent.
+    // Check whether a Form is currently the 'displayParent'.
     if (currentRunContext.form() != null) {
       return currentRunContext.form();
     }
 
-    // Check whether an Outline is currently the FormParent.
+    // Check whether an Outline is currently the 'displayParent'.
     if (currentRunContext.outline() != null) {
       return currentRunContext.outline();
     }
 
-    // Use the desktop as FormParent.
+    // Use the desktop as 'displayParent'.
     return currentRunContext.session().getDesktop();
   }
 

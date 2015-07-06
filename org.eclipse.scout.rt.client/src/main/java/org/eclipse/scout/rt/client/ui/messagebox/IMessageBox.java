@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.messagebox;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -38,20 +38,20 @@ public interface IMessageBox extends IPropertyObserver {
   int CANCEL_OPTION = 2;
 
   /**
-   * @return the {@link IMessageBoxParent} to attach this {@link IMessageBox} to; is never <code>null</code>.
+   * @return the {@link IDisplayParent} to attach this {@link IMessageBox} to; is never <code>null</code>.
    */
-  IMessageBoxParent messageBoxParent();
+  IDisplayParent displayParent();
 
   /**
-   * Sets the model element to attach this {@link IMessageBox} to. By default, the {@link IMessageBoxParent} is set
+   * Sets the model element to attach this {@link IMessageBox} to. By default, the {@link IDisplayParent} is set
    * automatically from the current calling context when the {@link IMessageBox} is created. However, that parent can be
    * overwritten manually as long as not showing.
    *
-   * @param messageBoxParent
+   * @param displayParent
    *          like {@link IDesktop}, {@link IOutline} or {@link IForm}; must not be <code>null</code>.
    * @return <code>this</code> to support method chaining.
    */
-  IMessageBox messageBoxParent(IMessageBoxParent messageBoxParent);
+  IMessageBox displayParent(IDisplayParent displayParent);
 
   /*
    * Model observer

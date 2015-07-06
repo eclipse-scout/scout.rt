@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -30,9 +30,9 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 public class FormStore extends IndexedStore<IForm> {
 
   private final P_TypeIndex m_typeIndex = registerIndex(new P_TypeIndex());
-  private final P_FormParentIndex m_formParentIndex = registerIndex(new P_FormParentIndex());
-  private final P_ViewFormParentIndex m_formParentViewIndex = registerIndex(new P_ViewFormParentIndex());
-  private final P_DialogFormParentIndex m_formParentDialogIndex = registerIndex(new P_DialogFormParentIndex());
+  private final P_DisplayParentIndex m_displayParentIndex = registerIndex(new P_DisplayParentIndex());
+  private final P_DisplayParentViewIndex m_displayParentViewIndex = registerIndex(new P_DisplayParentViewIndex());
+  private final P_DisplayParentDialogIndex m_displayParentDialogIndex = registerIndex(new P_DisplayParentDialogIndex());
   private final P_DisplayHintIndex m_displayHintIndex = registerIndex(new P_DisplayHintIndex());
   private final P_ClassIndex m_clazzIndex = registerIndex(new P_ClassIndex());
   private final P_ExclusiveKeyViewIndex m_viewKeyIndex = registerIndex(new P_ExclusiveKeyViewIndex());
@@ -56,27 +56,27 @@ public class FormStore extends IndexedStore<IForm> {
   }
 
   /**
-   * Returns all <code>Forms</code> which are attached to the given {@link IFormParent}. The forms returned are ordered
+   * Returns all <code>Forms</code> which are attached to the given {@link IDisplayParent}. The forms returned are ordered
    * as inserted.
    */
-  public List<IForm> getByFormParent(final IFormParent formParent) {
-    return m_formParentIndex.get(formParent);
+  public List<IForm> getByDisplayParent(final IDisplayParent displayParent) {
+    return m_displayParentIndex.get(displayParent);
   }
 
   /**
-   * Returns all <code>Views</code> which are attached to the given {@link IFormParent}. The forms returned are ordered
+   * Returns all <code>Views</code> which are attached to the given {@link IDisplayParent}. The forms returned are ordered
    * as inserted.
    */
-  public List<IForm> getViewsByFormParent(final IFormParent formParent) {
-    return m_formParentViewIndex.get(formParent);
+  public List<IForm> getViewsByDisplayParent(final IDisplayParent displayParent) {
+    return m_displayParentViewIndex.get(displayParent);
   }
 
   /**
-   * Returns all <code>Dialogs</code> which are attached to the given {@link IFormParent}. The forms returned are
+   * Returns all <code>Dialogs</code> which are attached to the given {@link IDisplayParent}. The forms returned are
    * ordered as inserted.
    */
-  public List<IForm> getDialogsByFormParent(final IFormParent formParent) {
-    return m_formParentDialogIndex.get(formParent);
+  public List<IForm> getDialogsByDisplayParent(final IDisplayParent displayParent) {
+    return m_displayParentDialogIndex.get(displayParent);
   }
 
   /**
@@ -113,20 +113,20 @@ public class FormStore extends IndexedStore<IForm> {
     }
   }
 
-  private class P_FormParentIndex extends AbstractMultiValueIndex<IFormParent, IForm> {
+  private class P_DisplayParentIndex extends AbstractMultiValueIndex<IDisplayParent, IForm> {
 
     @Override
-    protected IFormParent calculateIndexFor(final IForm form) {
-      return form.getFormParent();
+    protected IDisplayParent calculateIndexFor(final IForm form) {
+      return form.getDisplayParent();
     }
   }
 
-  private class P_ViewFormParentIndex extends AbstractMultiValueIndex<IFormParent, IForm> {
+  private class P_DisplayParentViewIndex extends AbstractMultiValueIndex<IDisplayParent, IForm> {
 
     @Override
-    protected IFormParent calculateIndexFor(final IForm form) {
+    protected IDisplayParent calculateIndexFor(final IForm form) {
       if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
-        return form.getFormParent();
+        return form.getDisplayParent();
       }
       else {
         return null;
@@ -134,12 +134,12 @@ public class FormStore extends IndexedStore<IForm> {
     }
   }
 
-  private class P_DialogFormParentIndex extends AbstractMultiValueIndex<IFormParent, IForm> {
+  private class P_DisplayParentDialogIndex extends AbstractMultiValueIndex<IDisplayParent, IForm> {
 
     @Override
-    protected IFormParent calculateIndexFor(final IForm form) {
+    protected IDisplayParent calculateIndexFor(final IForm form) {
       if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
-        return form.getFormParent();
+        return form.getDisplayParent();
       }
       else {
         return null;
