@@ -144,7 +144,7 @@ scout.ImageField.prototype._onDrop = function(event) {
 
     var files = event.originalEvent.dataTransfer.files;
     if (files.length >= 1) {
-      this.session.uploadFiles(this, [files[0]]);
+      this.session.uploadFiles(this, files);
     }
   }
 };

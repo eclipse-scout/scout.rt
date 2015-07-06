@@ -10,14 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.stringfield;
 
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
+import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValueField<STRING_FIELD> {
+public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValueField<STRING_FIELD> implements IBinaryResourceConsumer {
 
   public static final String EVENT_CALL_ACTION = "callAction";
   public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
@@ -101,6 +108,12 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
         return getModel().isSelectionTrackingEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_DROP_TYPE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getDropType();
+      }
+    });
   }
 
   @Override
@@ -137,5 +150,13 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText) {
     getModel().getUIFacade().setDisplayTextFromUI(displayText);
+  }
+
+  @Override
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
+    if ((getModel().getDropType() & IDNDSupport.TYPE_FILE_TRANSFER) == IDNDSupport.TYPE_FILE_TRANSFER) {
+      ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);
+      getModel().getUIFacade().fireDropActionFromUi(transferObject);
+    }
   }
 }
