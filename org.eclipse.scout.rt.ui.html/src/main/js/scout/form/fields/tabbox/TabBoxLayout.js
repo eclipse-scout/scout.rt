@@ -1,17 +1,19 @@
 scout.TabBoxLayout = function(tabBox) {
   scout.TabBoxLayout.parent.call(this);
   this._tabBox = tabBox;
+  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
 };
 scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
 
 scout.TabBoxLayout.prototype.layout = function($container) {
-  var containerSize, tabContentSize, tabAreaMargins,
+  var containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlTabContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
     htmlTabArea = scout.HtmlComponent.get(this._tabBox._$tabArea),
     tabAreaWidth = 0,
     tabAreaHeight = 0,
-    tabAreaSize = new scout.Dimension();
+    tabAreaSize = new scout.Dimension(),
+    $pseudoStatus = this._tabBox.$pseudoStatus;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -20,7 +22,11 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaMargins = htmlTabArea.getMargins();
     tabAreaHeight = htmlTabArea.getPreferredSize().height;
     tabAreaWidth = containerSize.subtract(tabAreaMargins).width;
-    var innerTabAreaSize = new scout.Dimension(tabAreaWidth, tabAreaHeight);
+    if ($pseudoStatus.isVisible()) {
+      $pseudoStatus.cssWidth(this._statusWidth);
+      tabAreaWidth -= $pseudoStatus.outerWidth(true);
+    }
+    innerTabAreaSize = new scout.Dimension(tabAreaWidth, tabAreaHeight);
     htmlTabArea.setSize(innerTabAreaSize);
     tabAreaSize = innerTabAreaSize.add(tabAreaMargins);
   }

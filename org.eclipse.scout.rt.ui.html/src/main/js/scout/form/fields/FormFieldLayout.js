@@ -53,8 +53,6 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     left += formField.$mandatory.outerWidth(true);
   }
   if (formField.$status && (formField.statusVisible || formField.$status.isVisible())) {
-    // can not check for $status.isVisible() since we want to reserve
-    // space used for status even when $status is invisible.
     formField.$status
       .cssTop(top)
       .cssWidth(this.statusWidth)

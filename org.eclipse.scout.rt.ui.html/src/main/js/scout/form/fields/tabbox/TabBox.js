@@ -32,6 +32,7 @@ scout.TabBox.prototype._render = function($parent) {
   this._$tabArea = this.$container
     .appendDiv('tab-area')
     .on('keydown', this._onKeyDown.bind(this));
+  this.addPseudoStatus();
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.TabAreaLayout(this));
 

@@ -1,16 +1,18 @@
 scout.GroupBoxLayout = function(groupBox) {
   scout.GroupBoxLayout.parent.call(this);
   this._groupBox = groupBox;
+  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+  var titleMarginX, menuBarSize, gbBodySize,
+    htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
     htmlGbBodyContainer = this._htmlGbBodyContainer(),
     htmlMenuBar = this._htmlMenuBar(),
-    menuBarSize,
-    gbBodySize;
+    $groupBoxTitle = this._groupBox._$groupBoxTitle,
+    $pseudoStatus = this._groupBox.$pseudoStatus;
 
   if (htmlMenuBar) {
     // required to trigger layout() of menu-bar
@@ -25,6 +27,12 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     .subtract(htmlGbBody.getMargins());
   gbBodySize.height -= this._titleHeight($container);
   gbBodySize.height -= menuBarSize.height;
+
+  if ($pseudoStatus.isVisible()) {
+    $pseudoStatus.cssWidth(this._statusWidth);
+    titleMarginX = $groupBoxTitle.cssMarginX() + $pseudoStatus.outerWidth(true);
+    $groupBoxTitle.css('width', 'calc(100% - ' + titleMarginX + 'px');
+  }
 
   $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);

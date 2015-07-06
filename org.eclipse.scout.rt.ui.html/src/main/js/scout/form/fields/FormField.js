@@ -163,6 +163,8 @@ scout.FormField.prototype._renderLabelVisible = function(visible) {
 
 scout.FormField.prototype._renderStatusVisible = function(statusVisible) {
   this._renderChildVisible(this.$status, this._computeStatusVisible());
+  // Pseudo status is only for layouting purpose, therefore tooltip, errorStatus etc. must not influence its visibility -> not necessary to use _computeStatusVisible
+  this._renderChildVisible(this.$pseudoStatus, statusVisible);
 };
 
 /**
@@ -365,6 +367,17 @@ scout.FormField.prototype.addStatus = function() {
   this.$status = $('<span>')
     .addClass('status')
     .click(this._onStatusClick.bind(this))
+    .appendTo(this.$container);
+};
+
+/**
+ * Appends a SPAN element to this.$container and sets the this.$pseudoStatus property.
+ * The purpose of a pseudo status is to consume the space an ordinary status would.
+ * This makes it possible to make components without a status as width as components with a status.
+ */
+scout.FormField.prototype.addPseudoStatus = function() {
+  this.$pseudoStatus = $('<span>')
+    .addClass('status')
     .appendTo(this.$container);
 };
 
