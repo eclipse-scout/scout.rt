@@ -149,11 +149,11 @@ scout.Form.prototype._remove = function() {
     this._$glassPane.fadeOutAndRemove();
   }
 
+  scout.Form.parent.prototype._remove.call(this);
+
   if (this.tab) {
     this.session.desktop._removeTab(this.tab);
   }
-
-  scout.Form.parent.prototype._remove.call(this);
 };
 
 scout.Form.prototype._renderTitle = function() {
