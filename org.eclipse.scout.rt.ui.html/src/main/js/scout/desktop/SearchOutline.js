@@ -44,7 +44,7 @@ scout.SearchOutline.prototype._renderSearchQuery = function(searchQuery) {
 };
 
 scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
-  this.$searchStatus.text(searchStatus);
+  this.$searchStatus.textOrNbsp(searchStatus);
 };
 
 scout.SearchOutline.prototype._sendSearch  = function() {

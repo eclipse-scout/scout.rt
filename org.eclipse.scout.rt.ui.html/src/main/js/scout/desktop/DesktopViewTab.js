@@ -3,6 +3,9 @@ scout.DesktopViewTab = function(view, $bench) {
   this._$bench = $bench;
   this.events = new scout.EventSupport();
 
+  /**
+   * Container for the _Tab_ (not for the view).
+   */
   this.$container;
   this.$viewContainer;
   this._viewAttached = false;
@@ -30,6 +33,7 @@ scout.DesktopViewTab.prototype._uninstallPropertyChangeListener = function() {
 };
 
 scout.DesktopViewTab.prototype.remove = function() {
+  this._uninstallPropertyChangeListener();
   this._removeTab();
   this._removeView();
 };
