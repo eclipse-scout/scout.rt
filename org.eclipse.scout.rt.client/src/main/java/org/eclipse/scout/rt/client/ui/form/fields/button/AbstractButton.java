@@ -129,15 +129,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * {@inheritDoc} Default for buttons is false because they usually should only take as much place as is needed to
-   * display the button label, but not necessarily more.
-   */
-  @Override
-  protected boolean getConfiguredFillVertical() {
-    return false;
-  }
-
-  /**
    * {@inheritDoc} Default for buttons is true because they usually should only take as much place as is needed to
    * display the button label, but not necessarily more.
    */
