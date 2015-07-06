@@ -150,10 +150,6 @@ scout.Form.prototype._remove = function() {
   }
 
   scout.Form.parent.prototype._remove.call(this);
-
-  if (this.tab) {
-    this.session.desktop._removeTab(this.tab);
-  }
 };
 
 scout.Form.prototype._renderTitle = function() {

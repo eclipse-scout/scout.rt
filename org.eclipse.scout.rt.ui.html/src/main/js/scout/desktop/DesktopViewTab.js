@@ -5,7 +5,6 @@ scout.DesktopViewTab = function(view, $bench) {
 
   this.$container;
   this.$viewContainer;
-  this._viewRendered = false;
   this._viewAttached = false;
 
   /**
@@ -44,20 +43,20 @@ scout.DesktopViewTab.prototype.renderTab = function($parent) {
 };
 
 scout.DesktopViewTab.prototype._renderView = function($parent) {
-  if (this._viewRendered) {
+  if (this._view.rendered) {
     throw new Error('view already rendered');
   }
   this._view.render(this._$bench);
   this._view.htmlComp.validateLayout();
   this._view.htmlComp.validateRoot = true;
   this._view.tab = this; // FIXME AWE: required for Desktop#showForm -> maybe use a map instead?
-  this._viewRendered = true;
+  this._view.rendered = true;
   this._viewAttached = true;
 };
 
 scout.DesktopViewTab.prototype.select = function() {
   this._cssSelect(true);
-  if (!this._viewRendered) {
+  if (!this._view.rendered) {
     this._renderView();
   }
   if (!this._viewAttached) {
@@ -86,7 +85,7 @@ scout.DesktopViewTab.prototype.deselect = function() {
   if (scout.keyStrokeManager.isAdapterInstalled(this._view.keyStrokeAdapter)) {
     scout.keyStrokeManager.uninstallAdapter(this._view.keyStrokeAdapter);
   }
-  if (this._viewRendered) {
+  if (this._view.rendered) {
     var $viewContainer = this._view.$container;
     this._view.session.detachHelper.beforeDetach($viewContainer);
     $viewContainer.detach();
