@@ -13,6 +13,8 @@ scout.WizardProgressField.prototype._render = function($parent) {
 
   this._$wizardSteps = $.makeDiv('wizard-steps');
   this.addField(this._$wizardSteps);
+
+  // TODO BSH Layout? Scrolling?
 };
 
 scout.WizardProgressField.prototype._renderProperties = function() {
@@ -22,7 +24,8 @@ scout.WizardProgressField.prototype._renderProperties = function() {
 };
 
 scout.WizardProgressField.prototype._renderWizardSteps = function() {
-  this._$wizardSteps.empty();
+  this._$wizardSteps.children('.wizard-step').remove();
+
   this.wizardSteps.forEach(function(wizardStep, index) {
     var $wizardStep, $content, $title, $subTitle, $separator;
 
@@ -30,9 +33,10 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
     $wizardStep = $.makeDiv('wizard-step')
       .attr('data-index', wizardStep.index)
       .appendTo(this._$wizardSteps);
-    if (wizardStep.enabled) {
+    if (wizardStep.enabled && wizardStep.actionEnabled) {
+      $wizardStep.addClass('action-enabled');
       $wizardStep.on('click', this._onWizardStepClick.bind(this));
-    } else {
+    } else if (!wizardStep.enabled) {
       $wizardStep.addClass('disabled');
     }
 
@@ -83,7 +87,7 @@ scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
   var $wizardStep = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
   var targetStepIndex = this._wizardStepIndex($wizardStep);
   if (targetStepIndex !== this.activeWizardStepIndex) {
-    this.session.send(this.id, 'stepClicked', {
+    this.session.send(this.id, 'doWizardStepAction', {
       stepIndex: targetStepIndex
     });
   }

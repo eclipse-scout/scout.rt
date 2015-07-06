@@ -30,7 +30,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
 
   private static final String PROP_ACTIVE_WIZARD_STEP_INDEX = "activeWizardStepIndex";
   // from UI
-  private static final String EVENT_STEP_CLICKED = "stepClicked";
+  private static final String EVENT_DO_WIZARD_STEP_ACTION = "doWizardStepAction";
 
   public JsonWizardProgressField(WIZARD_PROGRESS_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -93,6 +93,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
     jsonStep.put("tooltipText", wizardStep.getTooltipText());
     jsonStep.put("iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
     jsonStep.put("enabled", wizardStep.isEnabled());
+    jsonStep.put("actionEnabled", wizardStep.isActionEnabled());
     return jsonStep;
   }
 
@@ -108,16 +109,16 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_STEP_CLICKED.equals(event.getType())) {
-      handleUiStepClicked(event);
+    if (EVENT_DO_WIZARD_STEP_ACTION.equals(event.getType())) {
+      handleUiDoWizardStepAction(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiStepClicked(JsonEvent event) {
+  protected void handleUiDoWizardStepAction(JsonEvent event) {
     int targetStepIndex = event.getData().optInt("stepIndex", -1);
-    getModel().getUIFacade().activateStepFromUI(targetStepIndex);
+    getModel().getUIFacade().wizardStepActionFromUI(targetStepIndex);
   }
 }

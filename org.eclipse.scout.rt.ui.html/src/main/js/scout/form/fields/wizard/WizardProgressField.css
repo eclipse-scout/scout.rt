@@ -41,6 +41,10 @@
 
   &:last-child {
     width: 100%; /* Stretch to right border, requires white-space: nowrap on container */
+
+    & > .wizard-step-content {
+      max-width: none;
+    }
   }
 
   /* Step types */
@@ -74,7 +78,7 @@
   }
   &.all-before-active {
   }
-  &.all-after-active {
+  &.all-after-activeXXXXXXXX {
     color: @wizard-progress-disabled-step-foreground-color;
     background-color: @wizard-progress-disabled-step-background-color;
 
@@ -139,7 +143,7 @@
 
 
   /* Hover state */
-  &:not(.disabled):not(.active):hover {
+  &.action-enabled:hover {
     cursor: pointer;
 
     & > .wizard-step-content > .wizard-step-title {
