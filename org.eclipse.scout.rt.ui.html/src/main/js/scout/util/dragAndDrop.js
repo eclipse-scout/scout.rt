@@ -105,6 +105,53 @@ scout.dragAndDrop = {
       }
     }
     return false;
-  }
+  },
 
+  handler: function(that, supportedScoutTypesArray, dropTypeCallback, additionalDropPropertiesCallback){
+    supportedScoutTypesArray = scout.arrays.ensure(supportedScoutTypesArray);
+
+    // create handler
+    var handlerInternal = {
+      install: function(element) {
+        element.on('dragenter', handlerInternal.onDragEnter)
+          .on('dragover', handlerInternal.onDragOver)
+          .on('drop', handlerInternal.onDrop);
+      },
+
+      onDragEnter: function(event) {
+        handlerInternal.onDragEnterOrOver(event);
+      },
+
+      onDragOver: function(event) {
+        handlerInternal.onDragEnterOrOver(event);
+      },
+
+      onDragEnterOrOver: function(event) {
+        scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, handlerInternal.supportedScoutTypesArray, handlerInternal.dropType());
+      },
+
+      onDrop: function(event) {
+        if (handlerInternal.supportedScoutTypesArray.indexOf(scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
+            handlerInternal.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
+            scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+          event.stopPropagation();
+          event.preventDefault();
+
+          var files = event.originalEvent.dataTransfer.files;
+          if (files.length >= 1) {
+            that.session.uploadFiles(that, files, handlerInternal.additionalDropProperties ? handlerInternal.additionalDropProperties(event) : undefined);
+          }
+        }
+      }
+    };
+
+    // set handler properties (some are functions)
+    handlerInternal.that = that;
+    handlerInternal.supportedScoutTypesArray = supportedScoutTypesArray;
+    handlerInternal.dropType = dropTypeCallback;
+    handlerInternal.additionalDropProperties = additionalDropPropertiesCallback;
+
+    // return handler
+    return handlerInternal;
+  }
 };

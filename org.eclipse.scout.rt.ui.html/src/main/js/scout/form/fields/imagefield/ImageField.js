@@ -21,11 +21,11 @@ scout.ImageField.prototype._render = function($parent) {
     this.session.detachHelper.pushScrollable(this.$fieldContainer);
   }
 
-  // add event listeners to field container, img field might be hidden (e.g. if no image has been set)
-  this.$fieldContainer
-    .on('dragenter', this._onDragEnter.bind(this))
-    .on('dragover', this._onDragOver.bind(this))
-    .on('drop', this._onDrop.bind(this));
+  // add drag and drop event listeners to field container, img field might be hidden (e.g. if no image has been set)
+  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
+      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      function() { return this.dropType; }.bind(this));
+  this.dragAndDropHandler.install(this.$fieldContainer);
 
   var $field = $('<img>')
     .addClass('image')
@@ -127,25 +127,3 @@ scout.ImageField.prototype._onStatusClick = function(event) {
     scout.ValueField.parent.prototype._onStatusClick.call(this);
   }
 };
-
-scout.ImageField.prototype._onDragEnter = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
-};
-
-scout.ImageField.prototype._onDragOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
-};
-
-scout.ImageField.prototype._onDrop = function(event) {
-  if (this.dropType & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
-      scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    var files = event.originalEvent.dataTransfer.files;
-    if (files.length >= 1) {
-      this.session.uploadFiles(this, files);
-    }
-  }
-};
-

@@ -25,10 +25,19 @@ scout.StringField.prototype._render = function($parent) {
     $field = scout.fields.new$TextField();
   }
   $field.on('blur', this._onFieldBlur.bind(this))
-    .on('select', this._onSelect.bind(this))
-    .on('dragenter', this._onDragEnter.bind(this))
-    .on('dragover', this._onDragOver.bind(this))
-    .on('drop', this._onDrop.bind(this));
+    .on('select', this._onSelect.bind(this));
+
+  // add drag and drop support
+  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
+      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      function() { return this.dropType; }.bind(this),
+      function(event) {
+          var target = event.currentTarget;
+          return {
+              'nodeId': (target.classList.contains('tree-node') ? $(target).data('node').id : '')
+          };
+        }.bind(this));
+  this.dragAndDropHandler.install($field);
 
   this.addField($field);
 
@@ -139,25 +148,4 @@ scout.StringField.prototype._sendSelectionChanged = function() {
 
   // send delayed to avoid a lot of requests while selecting
   this.session.sendEvent(event, 500);
-};
-
-scout.StringField.prototype._onDragEnter = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
-};
-
-scout.StringField.prototype._onDragOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
-};
-
-scout.StringField.prototype._onDrop = function(event) {
-  if (this.dropType & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
-      scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    var files = event.originalEvent.dataTransfer.files;
-    if (files.length >= 1) {
-      this.session.uploadFiles(this, files);
-    }
-  }
 };

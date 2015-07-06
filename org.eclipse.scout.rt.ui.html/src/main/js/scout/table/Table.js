@@ -129,19 +129,30 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
+
   this.$data = this.$container.appendDiv('table-data');
   this.$data.on('mousedown', '.table-row', onMouseDown)
     .on('mouseup', '.table-row', onMouseUp)
     .on('dblclick', '.table-row', onDoubleClick)
-    .on('contextmenu', '.table-row', onContextMenu)
-    .on('dragenter', onDragEnterOrOver.bind(this))
-    .on('dragover', onDragEnterOrOver.bind(this))
-    .on('drop', onDrop.bind(this));
+    .on('contextmenu', '.table-row', onContextMenu);
   scout.scrollbars.install(this.$data, {
     axis: 'both'
   });
   this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar.render(this.$container);
+
+
+  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
+      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      function() { return this.dropType; }.bind(this),
+      function(event) {
+          var row = this._rowAtY(event.originalEvent.pageY);
+          return {
+              'rowId': (row ? row.id : '')
+          };
+        }.bind(this));
+  this.dragAndDropHandler.install(this.$data);
+
   this._renderRows();
 
   //----- inline methods: --------
@@ -212,28 +223,6 @@ scout.Table.prototype._render = function($parent) {
       }
     }
   }
-
-  function onDragEnterOrOver(event) {
-    scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER, this.dropType);
-  }
-
-  function onDrop(event) {
-    if (this.dropType & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
-        scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-      event.stopPropagation();
-      event.preventDefault();
-
-      var files = event.originalEvent.dataTransfer.files;
-      if (files.length >= 1) {
-        var row = this._rowAtY(event.originalEvent.pageY);
-        var data = {
-            'rowId': (row ? row.id : '')
-        };
-        this.session.uploadFiles(that, files, data);
-      }
-    }
-  }
-
 };
 
 scout.Table.prototype._renderProperties = function() {
