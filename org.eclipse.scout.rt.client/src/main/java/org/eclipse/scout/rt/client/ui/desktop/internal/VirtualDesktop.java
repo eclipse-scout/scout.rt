@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -204,11 +205,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public boolean isShowing(IForm form) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     throw createUnsupportedOperationException();
   }
@@ -244,12 +240,39 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public boolean isShowing(IFileChooser fileChooser) {
+    throw createUnsupportedOperationException();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public List<IFileChooser> getFileChooserStack() {
     throw createUnsupportedOperationException();
   }
 
   @Override
+  public List<IFileChooser> getFileChoosers() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public List<IFileChooser> getFileChoosers(IFileChooserParent fileChooserParent) {
+    throw createUnsupportedOperationException();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void addFileChooser(IFileChooser fc) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void showFileChooser(IFileChooser fileChooser) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void hideFileChooser(IFileChooser fileChooser) {
     throw createUnsupportedOperationException();
   }
 
@@ -321,11 +344,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void hideMessageBox(IMessageBox messageBox) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public boolean containsMessageBox(IMessageBox messageBox) {
     throw createUnsupportedOperationException();
   }
 
@@ -455,6 +473,11 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @Override
+  public boolean isShowing(IMessageBox messageBox) {
+    throw createUnsupportedOperationException();
+  }
+
   @SuppressWarnings("deprecation")
   @Override
   public List<IMessageBox> getMessageBoxStack() {
@@ -548,6 +571,11 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public IDesktopUIFacade getUIFacade() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isShowing(IForm form) {
     throw createUnsupportedOperationException();
   }
 

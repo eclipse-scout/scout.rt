@@ -2434,8 +2434,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-          header(TEXTS.get("LoadFormXmlFailedText")).
-          show();
+              header(TEXTS.get("LoadFormXmlFailedText")).
+              show();
         }
       }
     }
@@ -2983,7 +2983,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return currentRunContext.outline();
     }
 
-    // Take the desktop as FormParent.
+    // Use the desktop as FormParent.
     return currentRunContext.session().getDesktop();
   }
 

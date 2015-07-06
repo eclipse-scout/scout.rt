@@ -91,7 +91,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   @Override
   public IMessageBox messageBoxParent(IMessageBoxParent messageBoxParent) {
     Assertions.assertNotNull(messageBoxParent, "Property 'messageBoxParent' must not be null");
-    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().containsMessageBox(this), "Property 'messageBoxParent' cannot be changed because MessageBox is already attached to Desktop [msgBox=%s]", this);
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'messageBoxParent' cannot be changed because MessageBox is already attached to Desktop [msgBox=%s]", this);
     m_messageBoxParent = messageBoxParent;
     return this;
   }
@@ -253,7 +253,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           m_header,
           m_body,
           m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
-          m_hiddenText);
+              m_hiddenText);
     }
   }
 
@@ -299,7 +299,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       return currentRunContext.outline();
     }
 
-    // Take the desktop as MessageBoxParent.
+    // Use the desktop as MessageBoxParent.
     return currentRunContext.session().getDesktop();
   }
 

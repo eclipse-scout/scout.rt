@@ -68,8 +68,6 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserEvent;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -78,6 +76,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -139,8 +138,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IForm m_pageSearchForm;
   private final FormStore m_formStore;
   private final MessageBoxStore m_messageBoxStore;
+  private final FileChooserStore m_fileChooserStore;
   private final FormActivationTracker m_formActivationTracker;
-  private final List<IFileChooser> m_fileChooserStack;
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
   private List<IToolButton> m_toolButtons;
@@ -170,8 +169,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_dataChangeEventBuffer = new ArrayList<>();
     m_formStore = BEANS.get(FormStore.class);
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
+    m_fileChooserStore = BEANS.get(FileChooserStore.class);
     m_formActivationTracker = BEANS.get(FormActivationTracker.class);
-    m_fileChooserStack = new ArrayList<>();
     m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this);
@@ -958,7 +957,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public boolean containsMessageBox(IMessageBox messageBox) {
+  public boolean isShowing(IMessageBox messageBox) {
     return m_messageBoxStore.contains(messageBox);
   }
 
@@ -1338,29 +1337,55 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public List<IFileChooser> getFileChooserStack() {
-    return CollectionUtility.arrayList(m_fileChooserStack);
+    return getFileChoosers();
   }
 
   @Override
-  public void addFileChooser(final IFileChooser fc) {
-    m_fileChooserStack.add(fc);
-    fc.addFileChooserListener(new FileChooserListener() {
-      @Override
-      public void fileChooserChanged(FileChooserEvent e) {
-        switch (e.getType()) {
-          case FileChooserEvent.TYPE_CLOSED: {
-            removeFileChooserInternal(fc);
-          }
-        }
-      }
-    });
-    fireFileChooserAdded(fc);
+  public List<IFileChooser> getFileChoosers() {
+    return m_fileChooserStore.values();
   }
 
-  private void removeFileChooserInternal(IFileChooser fc) {
-    m_fileChooserStack.remove(fc);
+  @Override
+  public List<IFileChooser> getFileChoosers(IFileChooserParent fileChooserParent) {
+    return m_fileChooserStore.getByFileChooserParent(fileChooserParent);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void addFileChooser(final IFileChooser fileChooser) {
+    showFileChooser(fileChooser);
+  }
+
+  @Override
+  public void showFileChooser(IFileChooser fileChooser) {
+    if (fileChooser == null || m_fileChooserStore.contains(fileChooser)) {
+      return;
+    }
+
+    // Ensure FileChooserParent to be set.
+    fileChooser.setFileChooserParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
+    Assertions.assertNotNull(fileChooser.getFileChooserParent(), "Property 'fileChooserParent' must not be null");
+
+    m_fileChooserStore.add(fileChooser);
+    fireFileChooserShow(fileChooser);
+  }
+
+  @Override
+  public void hideFileChooser(IFileChooser fileChooser) {
+    if (fileChooser == null || !m_fileChooserStore.contains(fileChooser)) {
+      return;
+    }
+
+    m_fileChooserStore.remove(fileChooser);
+    fireFileChooserHide(fileChooser);
+  }
+
+  @Override
+  public boolean isShowing(IFileChooser fileChooser) {
+    return m_fileChooserStore.contains(fileChooser);
   }
 
   @Override
@@ -1646,8 +1671,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireFileChooserAdded(IFileChooser fc) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FILE_CHOOSER_ADDED, fc);
+  private void fireFileChooserShow(IFileChooser fileChooser) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FILE_CHOOSER_SHOW, fileChooser);
+    fireDesktopEvent(e);
+  }
+
+  private void fireFileChooserHide(IFileChooser fileChooser) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FILE_CHOOSER_HIDE, fileChooser);
     fireDesktopEvent(e);
   }
 

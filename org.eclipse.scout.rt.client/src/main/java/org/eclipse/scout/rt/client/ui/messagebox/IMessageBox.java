@@ -43,9 +43,9 @@ public interface IMessageBox extends IPropertyObserver {
   IMessageBoxParent messageBoxParent();
 
   /**
-   * Sets the model element to attach this {@link IMessageBox} to. By default, the {@link IMessageBoxParent} is
-   * automatically picked from the current calling context when the {@link IMessageBox} is created. However, that parent
-   * can be overwritten manually, unless the {@link IMessageBox} is started yet.
+   * Sets the model element to attach this {@link IMessageBox} to. By default, the {@link IMessageBoxParent} is set
+   * automatically from the current calling context when the {@link IMessageBox} is created. However, that parent can be
+   * overwritten manually as long as not showing.
    *
    * @param messageBoxParent
    *          like {@link IDesktop}, {@link IOutline} or {@link IForm}; must not be <code>null</code>.

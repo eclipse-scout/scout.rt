@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IFormParent, IMessageBoxParent {
+public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IFormParent, IMessageBoxParent, IFileChooserParent {
 
   /**
    * {@link Boolean}

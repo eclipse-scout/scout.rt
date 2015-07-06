@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -59,7 +60,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>top-level menus (menu tree)
  * </ul>
  */
-public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxParent {
+public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxParent, IFileChooserParent {
   /**
    * String
    */
@@ -174,7 +175,20 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void ensureVisible(IForm form);
 
   /**
-   * Returns all Forms which are attached to the given {@link IFormParent}. The forms returned are ordered as inserted.
+   * @return <code>true</code> if the given {@link IForm} is currently displayed. However, a value of <code>true</code>
+   *         does not imply that the {@link IForm} is the currently active {@link IForm}.
+   * @see #showForm(IForm)
+   */
+  boolean isShowing(IForm form);
+
+  /**
+   * @return true after desktop was opened and setup in any UI.
+   */
+  boolean isOpened();
+
+  /**
+   * Returns all Forms which are attached to the given {@link IFormParent}. The forms returned are ordered as
+   * registered.
    */
   List<IForm> getForms(IFormParent formParent);
 
@@ -187,14 +201,13 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   List<IForm> getViewStack();
 
   /**
-   * Returns all displayed Forms of the type {@link IForm#DISPLAY_HINT_VIEW} in the order as attached to the
-   * desktop.
+   * Returns all displayed Forms of the type {@link IForm#DISPLAY_HINT_VIEW} in the order as registered.
    */
   List<IForm> getViews();
 
   /**
    * Returns all Forms of the type {@link IForm#DISPLAY_HINT_VIEW} and which are attached to the given
-   * {@link IFormParent}. The forms returned are ordered as inserted.
+   * {@link IFormParent}. The forms returned are ordered as registered.
    */
   List<IForm> getViews(IFormParent formParent);
 
@@ -212,7 +225,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   List<IForm> getDialogStack();
 
   /**
-   * Returns all {@link IForm}s with dialog character in the order as attached to the desktop.
+   * Returns all {@link IForm}s with dialog character in the order as registered.
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
@@ -223,7 +236,7 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
 
   /**
    * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IFormParent}. The forms
-   * returned are ordered as inserted.
+   * returned are ordered as registered.
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
@@ -267,6 +280,13 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void hideForm(IForm form);
 
   /**
+   * @return <code>true</code> if the given {@link IMessageBox} is currently displayed. However, a value of
+   *         <code>true</code> does not imply that the message box is the currently active message box.
+   * @see #showMessageBox(IMessageBox)
+   */
+  boolean isShowing(IMessageBox messageBox);
+  
+  /**
    * Returns all displayed message boxes in the order as attached to the desktop.
    *
    * @deprecated use {@link #getMessageBoxes()}; will be removed in version 6.1.
@@ -275,13 +295,12 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   List<IMessageBox> getMessageBoxStack();
 
   /**
-   * Returns all displayed {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW} in the order as attached to the
-   * desktop.
+   * Returns all displayed message boxes in the order as registered.
    */
   List<IMessageBox> getMessageBoxes();
 
   /**
-   * Returns all message boxes which are attached to the given {@link IMessageBox} in the order as inserted.
+   * Returns all message boxes which are attached to the given {@link IMessageBoxParent} in the order as registered.
    */
   List<IMessageBox> getMessageBoxes(IMessageBoxParent messageBoxParent);
 
@@ -314,11 +333,6 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    */
   void hideMessageBox(IMessageBox messageBox);
 
-  /**
-   * Returns whether the given {@link IMessageBox} is registered on {@link IDesktop}.
-   */
-  boolean containsMessageBox(IMessageBox messageBox);
-
   List<IOutline> getAvailableOutlines();
 
   void setAvailableOutlines(List<? extends IOutline> availableOutlines);
@@ -330,19 +344,6 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
   void addKeyStrokes(IKeyStroke... keyStrokes);
 
   void removeKeyStrokes(IKeyStroke... keyStrokes);
-
-  /**
-   * @return <code>true</code> if the given {@link IForm} is currently attached to the {@link IDesktop} and displayed.
-   *         However, a value of <code>true</code> does not imply that the {@link IForm} is the currently active
-   *         {@link IForm}.
-   * @see #showForm(IForm)
-   */
-  boolean isShowing(IForm form);
-
-  /**
-   * @return true after desktop was opened and setup in any UI.
-   */
-  boolean isOpened();
 
   /**
    * @return the currently active outline on the desktop
@@ -553,13 +554,48 @@ public interface IDesktop extends IPropertyObserver, IFormParent, IMessageBoxPar
    */
   void setStatusText(String s);
 
-  // TODO [dwi] implement with FileChooserStore
+  /**
+   * @return <code>true</code> if the given {@link IFileChooser} is currently displayed. However, a value of
+   *         <code>true</code> does not imply that the {@link IFileChooser} is the currently active model element.
+   * @see #showFileChooser(IFileChooser)
+   */
+  boolean isShowing(IFileChooser fileChooser);  
+  
+  /**
+   * @deprecated use {@link #getFileChoosers()}; will be removed in version 6.1.
+   */
+  @Deprecated
   List<IFileChooser> getFileChooserStack();
 
   /**
-   * Retrieve files via a user interface
+   * Returns all displayed {@link IFileChooser}s in the order as registered.
    */
-  void addFileChooser(IFileChooser fc);
+  List<IFileChooser> getFileChoosers();
+
+  /**
+   * Returns all file choosers which are attached to the given {@link IFileChooserParent} in the order as registered.
+   */
+  List<IFileChooser> getFileChoosers(IFileChooserParent fileChooserParent);
+
+  /**
+   * Retrieve files via a user interface
+   *
+   * @deprecated use {@link #showFileChooser(IFileChooser)}; will be removed in version 6.1.
+   */
+  @Deprecated
+  void addFileChooser(IFileChooser fileChooser);
+
+  /**
+   * Attaches the given {@link IFileChooser} to its {@link IFileChooserParent} and displays it.
+   */
+  void showFileChooser(IFileChooser fileChooser);
+
+  /**
+   * Removes the given {@link IFileChooser} from its {@link IFileChooserParent} and hides it. However, the file chooser
+   * is not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the file
+   * chooser is not showing.
+   */
+  void hideFileChooser(IFileChooser fileChooser);
 
   /**
    * Opens the given URI (http:, tel:, mailto:, etc.).

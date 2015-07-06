@@ -80,7 +80,16 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    *
    */
   public static final int TYPE_PRINTED = 901;
+
+  /**
+   * @deprecated use {@link #TYPE_FILE_CHOOSER_SHOW}; will be removed in version 6.1.
+   */
+  @Deprecated
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
+  public static final int TYPE_FILE_CHOOSER_SHOW = 910;
+
+  public static final int TYPE_FILE_CHOOSER_HIDE = 915;
+
   /**
    * Opens a given URI.
    *

@@ -14,11 +14,16 @@ import java.util.Collection;
 import java.util.EventListener;
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
@@ -31,6 +36,8 @@ public class FileChooser implements IFileChooser {
   private boolean m_multiSelect;
   private List<BinaryResource> m_files;
   private final IBlockingCondition m_blockingCondition;
+
+  private IFileChooserParent m_fileChooserParent;
 
   public FileChooser() {
     this(null, false);
@@ -49,11 +56,25 @@ public class FileChooser implements IFileChooser {
     m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_multiSelect = multiSelect;
+
+    m_fileChooserParent = deriveFileChooserParent();
   }
 
   @Override
   public IFileChooserUIFacade getUIFacade() {
     return m_uiFacade;
+  }
+
+  @Override
+  public IFileChooserParent getFileChooserParent() {
+    return m_fileChooserParent;
+  }
+
+  @Override
+  public void setFileChooserParent(IFileChooserParent fileChooserParent) {
+    Assertions.assertNotNull(fileChooserParent, "Property 'fileChooserParent' must not be null");
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'fileChooserParent' cannot be changed because FileChooser is already attached to Desktop [fileChooser=%s]", this);
+    m_fileChooserParent = fileChooserParent;
   }
 
   @Override
@@ -80,8 +101,16 @@ public class FileChooser implements IFileChooser {
   public List<BinaryResource> startChooser() throws ProcessingException {
     m_files = null;
     m_blockingCondition.setBlocking(true);
-    ClientSessionProvider.currentSession().getDesktop().addFileChooser(this);
-    waitFor();
+
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
+    desktop.showFileChooser(this);
+    try {
+      waitFor();
+    }
+    finally {
+      desktop.hideFileChooser(this);
+      fireClosed();
+    }
     return getFiles();
   }
 
@@ -116,6 +145,26 @@ public class FileChooser implements IFileChooser {
         ((FileChooserListener) listeners[i]).fileChooserChanged(e);
       }
     }
+  }
+
+  /**
+   * Derives the {@link IFileChooserParent} from the calling context.
+   */
+  protected IFileChooserParent deriveFileChooserParent() {
+    ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
+
+    // Check whether a Form is currently the FileChooserParent.
+    if (currentRunContext.form() != null) {
+      return currentRunContext.form();
+    }
+
+    // Check whether an Outline is currently the FileChooserParent.
+    if (currentRunContext.outline() != null) {
+      return currentRunContext.outline();
+    }
+
+    // Use the desktop as FileChooserParent.
+    return currentRunContext.session().getDesktop();
   }
 
   private class P_UIFacade implements IFileChooserUIFacade {

@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFileChooserParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IMessageBoxParent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -51,7 +52,7 @@ import org.w3c.dom.Element;
  * <b>handler</b> is responsible for loading from data and storing data. This usually involves calling process services
  * on the server. These will in turn contact a persistence layer such as a database.
  */
-public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFormParent, IMessageBoxParent {
+public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFormParent, IMessageBoxParent, IFileChooserParent {
 
   String PROP_TITLE = "title";
   String PROP_SUB_TITLE = "subTitle";
@@ -127,7 +128,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IFor
   IFormParent getFormParent();
 
   /**
-   * Sets the model element to attach this {@link IForm} to. By default, the {@link IFormParent} is automatically picked
+   * Sets the model element to attach this {@link IForm} to. By default, the {@link IFormParent} is set automatically
    * from the current calling context when the {@link IForm} is created. However, that parent can be overwritten
    * manually. If the Form is already showing, it is linked with the new {@link IFormParent}.
    * <p>

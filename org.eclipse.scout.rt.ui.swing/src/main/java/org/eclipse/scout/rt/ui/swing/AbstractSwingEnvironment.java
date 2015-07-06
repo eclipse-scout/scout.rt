@@ -394,7 +394,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               invokeSwingLater(t);
               break;
             }
-            case DesktopEvent.TYPE_FILE_CHOOSER_ADDED: {
+            case DesktopEvent.TYPE_FILE_CHOOSER_SHOW: {
               Runnable t = new Runnable() {
                 @Override
                 public void run() {
