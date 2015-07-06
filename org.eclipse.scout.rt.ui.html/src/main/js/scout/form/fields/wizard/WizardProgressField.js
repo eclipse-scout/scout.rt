@@ -31,13 +31,20 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
 
     // Step
     $wizardStep = $.makeDiv('wizard-step')
-      .attr('data-index', wizardStep.index)
+      .data('wizard-step', wizardStep)
       .appendTo(this._$wizardSteps);
+    wizardStep.$wizardStep = $wizardStep;
     if (wizardStep.enabled && wizardStep.actionEnabled) {
       $wizardStep.addClass('action-enabled');
       $wizardStep.on('click', this._onWizardStepClick.bind(this));
     } else if (!wizardStep.enabled) {
       $wizardStep.addClass('disabled');
+    }
+    if (scout.strings.hasText(wizardStep.tooltipText)) {
+      scout.tooltips.install($wizardStep, {
+        text: wizardStep.tooltipText,
+        position: 'bottom'
+      });
     }
 
     // Content
@@ -66,7 +73,7 @@ scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
 scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep){
   $wizardStep.removeClass('all-before-active before-active active all-after-active after-active');
   var wizardStepIndex = this._wizardStepIndex($wizardStep);
-  if (this.activeWizardStepIndex >= 0 && wizardStepIndex >= 0) {
+  if (wizardStepIndex >= 0 && this.activeWizardStepIndex >= 0) {
     if (wizardStepIndex < this.activeWizardStepIndex) {
       $wizardStep.addClass('all-before-active');
       if (wizardStepIndex === this.activeWizardStepIndex - 1) {
@@ -83,21 +90,23 @@ scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($w
   }
 };
 
-scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
-  var $wizardStep = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
-  var targetStepIndex = this._wizardStepIndex($wizardStep);
-  if (targetStepIndex !== this.activeWizardStepIndex) {
-    this.session.send(this.id, 'doWizardStepAction', {
-      stepIndex: targetStepIndex
-    });
-  }
-};
 
 scout.WizardProgressField.prototype._wizardStepIndex = function($wizardStep) {
   if ($wizardStep) {
-    var index = parseInt($wizardStep.attr('data-index'), 10);
-    if (!isNaN(index)) {
-      return index;
+    var wizardStep = $wizardStep.data('wizard-step');
+    if (wizardStep) {
+      return wizardStep.index;
     }
+  }
+  return -1;
+};
+
+scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
+  var $wizardStep = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
+  var targetStepIndex = this._wizardStepIndex($wizardStep);
+  if (targetStepIndex >= 0 && targetStepIndex !== this.activeWizardStepIndex) {
+    this.session.send(this.id, 'doWizardStepAction', {
+      stepIndex: targetStepIndex
+    });
   }
 };

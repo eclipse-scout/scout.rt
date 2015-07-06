@@ -23,19 +23,17 @@ scout.tooltips = {
 
 scout.TooltipSupport = function(options) {
   this._options = options;
-  this._mouseEnterHandler = this._onMouseEnter.bind(this);
-  this._mouseLeaveHandler = this._onMouseLeave.bind(this);
   this._tooltip;
-  this._tooltipDelay;
+  this._tooltipTimeoutId;
 };
 
 scout.TooltipSupport.prototype.install = function($comp) {
   // prevent multiple installation of tooltip support
   if (!$comp.data('tooltipSupport')) {
     $comp
-    .on('mouseenter', this._mouseEnterHandler)
-    .on('mouseleave', this._mouseLeaveHandler)
-    .data('tooltipSupport', this);
+      .on('mouseenter', this._onMouseEnter.bind(this))
+      .on('mouseleave', this._onMouseLeave.bind(this))
+      .data('tooltipSupport', this);
   }
 };
 
@@ -49,7 +47,8 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
 
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
   var $comp = $(event.currentTarget);
-  this._tooltipDelay = setTimeout(this._showTooltip.bind(this, $comp), this._options.tooltipDelay);
+  clearTimeout(this._tooltipTimeoutId);
+  this._tooltipTimeoutId = setTimeout(this._showTooltip.bind(this, $comp), this._options.tooltipDelay);
 };
 
 scout.TooltipSupport.prototype._onMouseLeave = function(event) {
@@ -57,7 +56,7 @@ scout.TooltipSupport.prototype._onMouseLeave = function(event) {
 };
 
 scout.TooltipSupport.prototype._removeTooltip = function() {
-  clearTimeout(this._tooltipDelay);
+  clearTimeout(this._tooltipTimeoutId);
   if (this._tooltip) {
     this._tooltip.remove();
     this._tooltip = null;
@@ -65,17 +64,25 @@ scout.TooltipSupport.prototype._removeTooltip = function() {
 };
 
 scout.TooltipSupport.prototype._showTooltip = function($comp) {
-  var options = $.extend({
-      $anchor: $comp
-    }, this._options),
+  var text = this._options.text,
     tooltipTextData = $comp.data('tooltipText');
-
   if ($.isFunction(tooltipTextData)) {
-    options.text = tooltipTextData($comp);
+    text = tooltipTextData($comp);
   } else if (tooltipTextData) {
-    options.text = tooltipTextData;
+    text = tooltipTextData;
   }
 
-  this._tooltip = new scout.Tooltip(options);
-  this._tooltip.render();
+  if (this._tooltip && this._tooltip.rendered) {
+    // update existing tooltip
+    this.tooltip.renderText(text);
+  }
+  else {
+    // create new tooltip
+    var options = $.extend({
+      $anchor: $comp,
+      text: text
+    }, this._options);
+    this._tooltip = new scout.Tooltip(options);
+    this._tooltip.render();
+  }
 };
