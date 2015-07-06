@@ -65,7 +65,9 @@ scout.Widget.prototype.remove = function() {
   if (!this.rendered) {
     return;
   }
-  this.children.forEach(function(child) {
+
+  // remove children in reverse order.
+  this.children.slice().reverse().forEach(function(child) {
     child.remove();
   });
   this._remove();

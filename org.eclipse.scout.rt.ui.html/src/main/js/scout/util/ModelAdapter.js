@@ -121,11 +121,12 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
-  var ownedAdapters = this.ownedAdapters.slice();
-  ownedAdapters.forEach(function(ownedAdapter) {
+  this.remove();
+
+  // destroy owned adapters in reverse order.
+  this.ownedAdapters.slice().reverse().forEach(function(ownedAdapter) {
     ownedAdapter.destroy();
   });
-  this.remove();
   this.session.unregisterModelAdapter(this);
 
   // Disconnect from owner

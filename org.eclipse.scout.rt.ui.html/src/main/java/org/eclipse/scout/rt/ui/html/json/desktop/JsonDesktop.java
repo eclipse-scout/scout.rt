@@ -74,9 +74,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapters(getModel().getViews(getModel()));
-    attachAdapters(getModel().getDialogs(getModel()));
-    attachAdapters(getModel().getMessageBoxes(getModel()));
+    attachGlobalAdapters(getModel().getViews(getModel()));
+    attachGlobalAdapters(getModel().getDialogs(getModel()));
+    attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
     attachGlobalAdapters(getModel().getFileChooserStack());
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
@@ -244,21 +244,21 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelFormShow(IForm form) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formShow", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFormHide(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formHide", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFormActivate(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }

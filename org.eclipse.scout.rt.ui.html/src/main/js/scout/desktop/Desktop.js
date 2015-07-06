@@ -257,12 +257,16 @@ scout.Desktop.prototype._removeTab = function(tab) {
   tab.removeTab();
 
   // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
-  if (this._allTabs.length > 0) {
-    this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
-  } else {
-    this._attachOutlineContent();
-    this._bringNavigationToFront();
-    this._selectedTab = null;
+
+  // Only change 'tab selection' if the tab to be removed was the active one.
+  if (this._selectedTab === tab) {
+    if (this._allTabs.length > 0) {
+      this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
+    } else {
+      this._attachOutlineContent();
+      this._bringNavigationToFront();
+      this._selectedTab = null;
+    }
   }
 
   this._layoutTaskBar();

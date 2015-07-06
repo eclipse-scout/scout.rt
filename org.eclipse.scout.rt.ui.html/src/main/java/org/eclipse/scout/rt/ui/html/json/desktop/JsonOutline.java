@@ -92,9 +92,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     super.attachChildAdapters();
     attachAdapter(getModel().getDefaultDetailForm());
 
-    attachAdapters(getDesktop().getViews(getModel()));
-    attachAdapters(getDesktop().getDialogs(getModel()));
-    attachAdapters(getDesktop().getMessageBoxes(getModel()));
+    attachGlobalAdapters(getDesktop().getViews(getModel()));
+    attachGlobalAdapters(getDesktop().getDialogs(getModel()));
+    attachGlobalAdapters(getDesktop().getMessageBoxes(getModel()));
   }
 
   @Override
@@ -216,21 +216,21 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   protected void handleModelFormShow(IForm form) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formShow", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFormHide(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formHide", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelFormActivate(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getAdapter(form, m_formParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
     }

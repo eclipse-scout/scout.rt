@@ -218,6 +218,16 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   public final <A extends IJsonAdapter<?>> A getGlobalAdapter(Object model) {
+    return getGlobalAdapter(model, null);
+  }
+
+  public final <A extends IJsonAdapter<?>, MODEL> A getGlobalAdapter(MODEL model, IFilter<MODEL> filter) {
+    if (model == null) {
+      return null;
+    }
+    if (filter != null && !filter.accept(model)) {
+      return null;
+    }
     return m_uiSession.getJsonAdapter(model, getUiSession().getRootJsonAdapter());
   }
 

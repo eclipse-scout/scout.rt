@@ -145,10 +145,15 @@ scout.Form.prototype.appendTo = function($parent) {
 };
 
 scout.Form.prototype._remove = function() {
-  scout.Form.parent.prototype._remove.call(this);
   if (this._$glassPane) {
     this._$glassPane.fadeOutAndRemove();
   }
+
+  if (this.tab) {
+    this.session.desktop._removeTab(this.tab);
+  }
+
+  scout.Form.parent.prototype._remove.call(this);
 };
 
 scout.Form.prototype._renderTitle = function() {
