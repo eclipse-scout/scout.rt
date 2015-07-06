@@ -19,7 +19,11 @@ scout.StringField.prototype._render = function($parent) {
 
   var $field;
   if (this.multilineText) {
-    $field = $('<textarea>');
+    $field = $('<textarea>').
+      on('DOMMouseScroll mousewheel', function(event) {
+        // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
+        event.stopPropagation();
+      });
   }
   else {
     $field = scout.fields.new$TextField();
