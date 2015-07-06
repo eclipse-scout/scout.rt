@@ -47,7 +47,8 @@ scout.ViewMenuTab.prototype._update = function() {
 
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-    .on('click', this._onClickTab.bind(this));
+    .on('click', this._onClickTab.bind(this))
+    .data('tooltipText', function() { return this.text; }.bind(this));
   this.$title = this.$container.appendSpan('view-button-tab-title has-menu')
     .icon(this.iconId);
   this.$menuButton = this.$container.appendSpan('view-menu-button')
@@ -73,6 +74,11 @@ scout.ViewMenuTab.prototype._renderText = function() {
 scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
   this.$menuButton.setVisible(this.selected && !this._inBackground);
+  if (this.selected) {
+    scout.tooltips.uninstall(this.$container);
+  } else {
+    scout.tooltips.install(this.$container, {text: this.text});
+  }
 };
 
 scout.ViewMenuTab.prototype._renderIconId = function() {

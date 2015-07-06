@@ -5,8 +5,6 @@ scout.CalendarComponent = function() {
    * Selected is a GUI only property (the model doesn't have it)
    */
   this._selected = false;
-  this._tooltip;
-  this._tooltipDelay;
   this._$parts = [];
   this.events = new scout.EventSupport();
 };
@@ -19,11 +17,10 @@ scout.CalendarComponent.prototype._remove = function() {
   // list-components must be informed, that their source has been removed
   this.events.trigger('removed');
 
-  // remove $parts and tooltip, because they're not children of this.$container
-  if (this._tooltip) {
-    this._tooltip.remove();
-  }
+  // remove $parts because they're not children of this.$container
+  var tooltipSupport = this.parent._tooltipSupport;
   this._$parts.forEach(function($part) {
+    tooltipSupport.uninstall($part);
     $part.remove();
   });
   scout.CalendarComponent.parent.prototype._remove.call(this);
@@ -46,11 +43,10 @@ scout.CalendarComponent.prototype._render = function($parent) {
       .addClass(this.item.cssClass)
       .data('component', this)
       .data('partDay', partDay)
+      .data('tooltipText', this._description.bind(this))
       .mousedown(this._onMousedown.bind(this))
-      .mouseenter(this._onHoverIn.bind(this))
-      .mouseleave(this._onHoverOut.bind(this))
       .on('contextmenu', this._onContextMenu.bind(this));
-
+    this.parent._tooltipSupport.install($part);
     this._$parts.push($part);
 
     if (!this.parent._isMonth()) {
@@ -151,33 +147,6 @@ scout.CalendarComponent.prototype._onMousedown = function(event) {
 
 scout.CalendarComponent.prototype._onContextMenu = function(event) {
   this.parent._showContextMenu(event, 'Calendar.CalendarComponent');
-};
-
-/**
- * Show tooltip with delay, so user is not flooded with tooltips when filled with many items.
- * Because of the asynchronous nature of the Calendar, the component may be removed and
- * created again, while the user hovers over a component.
- */
-scout.CalendarComponent.prototype._onHoverIn = function(event) {
-  var $part = $(event.target);
-  this._tooltipDelay = setTimeout(function() {
-    this._tooltip = new scout.Tooltip({
-      text: this._description(),
-      $anchor: $part,
-      arrowPosition: 15,
-      arrowPositionUnit: '%',
-      htmlEnabled: true
-    });
-    this._tooltip.render();
-  }.bind(this), 750);
-};
-
-scout.CalendarComponent.prototype._onHoverOut = function(event) {
-  clearTimeout(this._tooltipDelay);
-  if (this._tooltip) {
-    this._tooltip.remove();
-    this._tooltip = null;
-  }
 };
 
 scout.CalendarComponent.prototype._format = function(date, pattern) {

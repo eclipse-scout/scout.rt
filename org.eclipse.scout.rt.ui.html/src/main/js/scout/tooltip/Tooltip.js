@@ -1,3 +1,8 @@
+/**
+ * <ul>
+ * <li>options.text - either a String or a function which returns a String.</li>
+ * </ul>
+ */
 scout.Tooltip = function(options) {
   scout.Tooltip.parent.call(this);
   options = options || {};

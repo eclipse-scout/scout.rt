@@ -17,6 +17,9 @@ scout.Calendar = function() {
   // additional modes; should be stored in model
   this._showYearPanel = false;
   this._showListPanel = false;
+  this._tooltipSupport = new scout.TooltipSupport({
+    htmlEnabled: true,
+    tooltipDelay: 750});
 
   /**
    * The narrow view range is different from the regular view range.

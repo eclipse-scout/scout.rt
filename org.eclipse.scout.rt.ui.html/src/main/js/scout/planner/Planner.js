@@ -8,8 +8,11 @@ scout.Planner = function() {
   // visual
   this._resourceTitleWidth = 20;
 
-  // tooltip handling
-  this._tooltipDelay;
+  this._tooltipSupport = new scout.TooltipSupport({
+    parent: this,
+    arrowPosition: 50,
+    htmlEnabled: true
+  });
 
   // main elements
   this.$container;
@@ -406,8 +409,8 @@ scout.Planner.prototype._renderScale = function() {
       $divSmall = $timelineSmall
         .appendDiv('scale-item', scout.dates.weekInYear(loop))
         .data('date-from', new Date(loop.valueOf()))
-        .mouseenter(this._onScaleHoverIn.bind(this))
-        .mouseleave(this._onScaleHoverOut.bind(this));
+        .data('tooltipText', this._scaleTooltipText.bind(this));
+      this._tooltipSupport.install($divSmall);
 
       loop.setDate(loop.getDate() + 7);
       $divSmall.data('date-to', new Date(loop.valueOf()))
@@ -480,43 +483,17 @@ scout.Planner.prototype._renderScale = function() {
 
 /* -- scale events --------------------------------------------------- */
 
-scout.Planner.prototype._onScaleHoverIn = function(event) {
-  this._tooltipDelay = setTimeout(function() {
-    var $scale = $(event.currentTarget),
-      tooltip,
-      text,
-      toText = ' ' + this.session.text('ui.To') + ' ',
-      from = new Date($scale.data('date-from').valueOf()),
-      to = new Date($scale.data('date-to').valueOf() - 1);
+scout.Planner.prototype._scaleTooltipText = function($scale) {
+  var toText = ' ' + this.session.text('ui.To') + ' ',
+    from = new Date($scale.data('date-from').valueOf()),
+    to = new Date($scale.data('date-to').valueOf() - 1);
 
-    if (from.getMonth() == to.getMonth()) {
-      text = this._dateFormat(from, 'd.') + toText + this._dateFormat(to, 'd. MMMM yyyy');
-    } else if (from.getFullYear() === to.getFullYear()) {
-      text = this._dateFormat(from, 'd. MMMM') + toText + this._dateFormat(to, 'd. MMMM yyyy');
-    } else {
-      text = this._dateFormat(from, 'd. MMMM yyyy') + toText + this._dateFormat(to, 'd. MMMM yyyy');
-    }
-
-    tooltip = new scout.Tooltip({
-      text: text,
-      $anchor: $scale,
-      arrowPosition: 50,
-      arrowPositionUnit: '%',
-      htmlEnabled: true
-    });
-
-    $scale.data('tooltip', tooltip);
-    tooltip.render();
-  }.bind(this), 350);
-};
-
-scout.Planner.prototype._onScaleHoverOut = function(event) {
-  var $scale = $(event.currentTarget),
-    tooltip = $scale.data('tooltip');
-  clearTimeout(this._tooltipDelay);
-  if (tooltip) {
-    tooltip.remove();
-    $scale.removeData('tooltip');
+  if (from.getMonth() == to.getMonth()) {
+    return this._dateFormat(from, 'd.') + toText + this._dateFormat(to, 'd. MMMM yyyy');
+  } else if (from.getFullYear() === to.getFullYear()) {
+    return this._dateFormat(from, 'd. MMMM') + toText + this._dateFormat(to, 'd. MMMM yyyy');
+  } else {
+    return this._dateFormat(from, 'd. MMMM yyyy') + toText + this._dateFormat(to, 'd. MMMM yyyy');
   }
 };
 
@@ -582,36 +559,12 @@ scout.Planner.prototype._build$Activity = function(activity) {
   $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
 
   if (activity.tooltipText) {
-    $activity.mouseenter(this._onActivityHoverIn.bind(this))
-      .mouseleave(this._onActivityHoverOut.bind(this));
+    $activity.data('tooltipText', activity.tooltipText);
+    this._tooltipSupport.install($activity);
   }
 
   activity.$activity = $activity;
   return $activity;
-};
-
-scout.Planner.prototype._onActivityHoverIn = function(event) {
-  var $activity = $(event.target),
-    activity = $activity.data('activity'),
-    text = activity.tooltipText;
-
-  this._tooltipDelay = setTimeout(function() {
-    this._tooltip = new scout.Tooltip({
-      text: text,
-      $anchor: $activity,
-      arrowPosition: 50,
-      arrowPositionUnit: '%'
-    });
-    this._tooltip.render();
-  }.bind(this), 350);
-};
-
-scout.Planner.prototype._onActivityHoverOut = function(event) {
-  clearTimeout(this._tooltipDelay);
-  if (this._tooltip) {
-    this._tooltip.remove();
-    this._tooltip = null;
-  }
 };
 
 /* -- selector -------------------------------------------------- */

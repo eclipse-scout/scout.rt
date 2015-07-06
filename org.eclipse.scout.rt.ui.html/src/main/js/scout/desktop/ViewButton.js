@@ -30,7 +30,9 @@ scout.ViewButton.prototype._renderAsMenu = function($parent) {
 
 scout.ViewButton.prototype._renderAsTab = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-    .on('click', this._onClick.bind(this));
+    .on('click', this._onClick.bind(this))
+    .data('tooltipText', function() { return this.text; }.bind(this));
+
   this.$title = this.$container.appendSpan('view-button-tab-title');
 };
 
@@ -52,10 +54,10 @@ scout.ViewButton.prototype._renderSelected = function(selected) {
   scout.ViewButton.parent.prototype._renderSelected.call(this, selected);
   if (this._isTab()) {
     if (this.selected) {
-      this.$container.removeAttr('title');
+      scout.tooltips.uninstall(this.$container);
       this.$title.text(this.text);
     } else {
-      this.$container.attr('title', this.text); // FIXME AWE: (desktop) use pretty tooltips here
+      scout.tooltips.install(this.$container, {text: this.text});
       this.$title.text('');
     }
   }

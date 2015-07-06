@@ -57,6 +57,7 @@ __include("scout/text/DateFormat.js");
 __include("scout/text/DecimalFormat.js");
 __include("scout/text/Texts.js");
 __include("scout/tooltip/Tooltip.js");
+__include("scout/util/tooltips.js");
 __include("scout/action/Action.js");
 __include("scout/action/keystroke/AbstractKeyStrokeAdapter.js");
 __include("scout/action/keystroke/KeyStroke.js");

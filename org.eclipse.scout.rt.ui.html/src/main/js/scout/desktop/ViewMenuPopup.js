@@ -5,6 +5,8 @@ scout.ViewMenuPopup = function(session, $tab, viewMenus, naviBounds, breadcrumbE
   this.viewMenus = viewMenus;
   this._naviBounds = naviBounds;
   this._breadcrumbEnabled = breadcrumbEnabled;
+  this._tooltip;
+  this._tooltipDelay;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
@@ -29,7 +31,7 @@ scout.ViewMenuPopup.prototype._renderHead = function() {
 
   this._copyCssClassToHead('view-button-tab');
 
-  this.$head.removeClass('popup-head');
+  this.$head.removeClass('popup-head'); // FIXME AWE: use CSS class?
   this.$head.css('text-align', 'left');
   this.$head.css('background-color', 'white');
   this.$head.css('color', '#006c86');
