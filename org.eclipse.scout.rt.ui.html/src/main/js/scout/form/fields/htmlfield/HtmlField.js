@@ -44,7 +44,7 @@ scout.HtmlField.prototype.init = function(model, session) {
 };
 
 scout.HtmlField.prototype._remove = function() {
-  if (this.scrollBarsEnabled) {
+  if (this.scrollBarsEnabled && this._$scrollables.length > 0) {
     this.session.detachHelper.removeScrollable(this.$field);
   }
   scout.HtmlField.parent.prototype._remove.call(this);
