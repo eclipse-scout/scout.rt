@@ -1,52 +1,46 @@
 @check-box-size: 18px;
 
 .check-box-field > .field {
-  padding: @borderless-field-padding-y 0px @borderless-field-padding-y 0px;
-}
-
-.check-box-field > .field {
-  & > div {
-    cursor: pointer;
-    display: block;
-    position: relative;
-    padding-left: 25px;
-    margin-right: 15px;
-    font-size: 13px;
-    outline: none;
-    white-space: nowrap;
-    /* FIXME NBU overflow cannot be set, checkbox looks ugly because height is too small */
+  cursor: pointer;
+  display: block;
+  position: relative;
+  padding: @borderless-field-padding-y 0px @borderless-field-padding-y 25px;
+  margin-right: 15px;
+  outline: none;
+  white-space: nowrap;
+  /* FIXME NBU overflow cannot be set, checkbox looks ugly because height is too small */
 /*     .overflow-ellipsis-nowrap;     */
+
+  &::before {
+    .checkboxLabelBefore();
+    top: 5px;
   }
 
-  & > div::before {
-    .checkboxLabelBefore(0px, 0px, 0px, 10px, -2px);
-  }
-
-  & > div:focus::before {
+  &:focus::before {
     .checkboxLabelBeforeFocus;
   }
 
-  & > div.disabled:hover::before {
+  &.disabled:hover::before {
     .checkboxLabelBeforeDisabledBorder;
   }
 
-  & > div::before {
+  &::before {
     .checkboxLabelBeforeFocus;
   }
 
-  & > div.checked::before {
+  &.checked::before {
     .checkboxLabelBeforeChecked;
   }
 
-  & > div::before {
+  &::before {
     .checkboxLabelBeforeBorder;
   }
 
-  & > div.disabled::before {
+  &.disabled::before {
     .checkboxLabelBeforeDisabled;
   }
 
-  & > div.disabled {
+  &.disabled {
     .checkboxLabelDisabled;
   }
 }

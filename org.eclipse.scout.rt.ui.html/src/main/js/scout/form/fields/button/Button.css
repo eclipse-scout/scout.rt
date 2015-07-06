@@ -72,8 +72,7 @@ button > img {
 }
 
 .form-field.button > .field,
-.form-field.link-button > .field,
-.form-field.radio-button > .field {
+.form-field.link-button > .field {
   margin-left: @mandatory-indicator-width;
 }
 

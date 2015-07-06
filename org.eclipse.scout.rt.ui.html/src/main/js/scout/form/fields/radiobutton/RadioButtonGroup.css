@@ -1,0 +1,4 @@
+.radiobutton-group-body > .radio-button > .field {
+  /* radio button group has a mandatory indicator, no need to create a margin */
+  margin-left: 0;
+}

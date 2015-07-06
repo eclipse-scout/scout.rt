@@ -80,7 +80,8 @@
   }
 
   & div::before {
-    .checkboxLabelBefore(0px, 0px, 0px, 0px, -12px);
+    .checkboxLabelBefore();
+    margin-top: -12px;
   }
 
   & div.disabled:hover::before {

@@ -150,15 +150,14 @@
   cursor: default;
 }
 
-.checkboxLabelBefore(@left: 0px, @top: 0px, @marginLeft: 0px, @marginRight: 0px,@marginTop: 0px, @marginBottom: 0px) {
+.checkboxLabelBefore() {
   content: "";
   display: inline-block;
   width: @check-box-size;
   height: @check-box-size;
   position: absolute;
-  margin: @marginTop @marginRight @marginBottom @marginLeft;
-  left: @left;
-  top: @top;
+  left: 0;
+  top: 0;
 }
 
 .overflow-ellipsis {

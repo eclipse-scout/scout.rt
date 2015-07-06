@@ -1,21 +1,14 @@
-.radio-button > div {
+.radio-button > .field {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
   padding: @borderless-field-padding-y 0 @borderless-field-padding-y 25px;
-  /* reset mandatory indicator margin set in FormField.css */
-  margin-left: 0;
-}
+  margin-left: @mandatory-indicator-width;
+  margin-right: 15px;
+  outline: none;
+  white-space: nowrap;
 
-.radio-button {
-  & div {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    margin-right: 15px;
-    font-size: 13px;
-    outline: none;
-    white-space: nowrap;
-  }
-
-  & > div::before {
+  &::before {
     content: " ";
     display: inline-block;
     width: 19px;
@@ -26,10 +19,9 @@
     top: 5px;
     border: 2px solid @palette-gray-4;
     border-radius: 50%;
-
   }
 
-  & >  div.checked::after {
+  &.checked::after {
     content: "";
     display: inline-block;
     position: absolute;
@@ -42,15 +34,15 @@
     border-radius: 100%;
   }
 
-  & > div:focus::before {
+  &:focus::before {
     border-color: @focus-border-color;
   }
 
-  & > div.disabled::before {
+  &.disabled::before {
     background-color: @control-disabled-background-color;
   }
 
-  & > div.disabled {
+  &.disabled {
     cursor: default;
   }
 }
