@@ -3,9 +3,11 @@ package org.eclipse.scout.rt.client.extension.ui.wizard;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
+import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class WizardChains {
@@ -206,6 +208,26 @@ public final class WizardChains {
         throw (ProcessingException) methodInvocation.getException();
       }
 
+    }
+  }
+
+  public static class WizardWizardStepActionChain extends AbstractWizardChain {
+
+    public WizardWizardStepActionChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
+      super(extensions);
+    }
+
+    public void execWizardStepAction(final IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
+          next.execWizardStepAction(WizardWizardStepActionChain.this, wizardStep);
+        }
+      };
+      callChain(methodInvocation, wizardStep);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
     }
   }
 

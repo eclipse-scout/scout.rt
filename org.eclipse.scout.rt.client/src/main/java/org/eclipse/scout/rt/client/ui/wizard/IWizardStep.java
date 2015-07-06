@@ -29,6 +29,7 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
   String PROP_ENABLED = "enabled";
   String PROP_VISIBLE = "visible";
   String PROP_VIEW_ORDER = "viewOrder";
+  String PROP_ACTION_ENABLED = "actionEnabled";
 
   /**
    * The step was activated by a "next" operation
@@ -95,6 +96,10 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
 
   void setVisible(boolean visible);
 
+  boolean isActionEnabled();
+
+  void setActionEnabled(boolean actionEnabled);
+
   /**
    * @return the cached for this step or null
    */
@@ -124,4 +129,9 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
    * dispose this step The default implementation closes the form at {@link #getForm()}
    */
   void dispose() throws ProcessingException;
+
+  /**
+   * Performs the "wizard step action"
+   */
+  void doAction() throws ProcessingException;
 }

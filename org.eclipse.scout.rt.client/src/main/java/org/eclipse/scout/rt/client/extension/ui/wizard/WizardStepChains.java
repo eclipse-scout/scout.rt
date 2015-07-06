@@ -144,4 +144,25 @@ public final class WizardStepChains {
 
     }
   }
+
+  public static class WizardStepActionChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
+
+    public WizardStepActionChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+      super(extensions);
+    }
+
+    public void execAction() throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>> next) throws ProcessingException {
+          next.execAction(WizardStepActionChain.this);
+        }
+      };
+      callChain(methodInvocation);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+
+    }
+  }
 }

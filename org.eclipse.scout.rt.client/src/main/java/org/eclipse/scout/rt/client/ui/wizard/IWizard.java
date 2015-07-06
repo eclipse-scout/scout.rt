@@ -359,6 +359,8 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   @Deprecated
   void doHyperlinkAction(URL url, String path, boolean local) throws ProcessingException;
 
+  void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException;
+
   /**
    * The container form is created when it does not exist already. By default
    * the container form is created upon start of the wizard.

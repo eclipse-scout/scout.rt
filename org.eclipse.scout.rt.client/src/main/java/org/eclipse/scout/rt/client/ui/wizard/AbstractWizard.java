@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefres
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardWizardStepActionChain;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -384,6 +385,18 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       }
     }
     execHyperlinkAction(url, ref, local);
+  }
+
+  /**
+   * Called when the "action" for a step has been executed (i.e. the step has been clicked in the step list).
+   * <p>
+   * Subclasses can override this method. The default activates the wizard step that triggered the action.
+   */
+  @ConfigOperation
+  @Order(10)
+  protected void execWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+    int stepKindex = getStepKind(getActiveStep(), wizardStep);
+    activateStep(wizardStep, (stepKindex == IWizardStep.STEP_NEXT), (stepKindex == IWizardStep.STEP_PREVIOUS));
   }
 
   protected final void interceptInitConfig() {
@@ -1227,6 +1240,13 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
   }
 
+  @Override
+  public void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+    if (isOpen()) {
+      interceptWizardStepAction(wizardStep);
+    }
+  }
+
   private void assertClosed() throws ProcessingException {
     if (!isClosed()) {
       throw new ProcessingException("wizard is already started");
@@ -1317,6 +1337,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
 
     @Override
+    public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+      getOwner().execWizardStepAction(wizardStep);
+    }
+
+    @Override
     public void execPreviousStep(WizardPreviousStepChain chain) throws ProcessingException {
       getOwner().execPreviousStep();
     }
@@ -1385,6 +1410,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardAppLinkActionChain chain = new WizardAppLinkActionChain(extensions);
     chain.execAppLinkAction(ref);
+  }
+
+  protected final void interceptWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+    List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
+    WizardWizardStepActionChain chain = new WizardWizardStepActionChain(extensions);
+    chain.execWizardStepAction(wizardStep);
   }
 
   protected final void interceptPreviousStep() throws ProcessingException {

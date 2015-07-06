@@ -12,10 +12,15 @@ package org.eclipse.scout.rt.client.ui.form.fields.wizard;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.WeakEventListener;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wizard.IWizardProgressFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.wizard.WizardProgressFieldChains.WizardProgressFieldWizardStepActionChain;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
@@ -65,7 +70,8 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
 
   @Override
   public void setWizardSteps(List<IWizardStep<? extends IForm>> wizardSteps) {
-    propertySupport.setProperty(PROP_WIZARD_STEPS, wizardSteps);
+    // always fire event, even when only the _content_ of steps changes, not only the step list itself
+    propertySupport.setPropertyAlwaysFire(PROP_WIZARD_STEPS, wizardSteps);
   }
 
   @Override
@@ -106,6 +112,22 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     uninstallWizard();
   }
 
+  /**
+   * Executes the "wizard step action" for the given step index. May throw an exception if
+   * the step index is invalid.
+   * <p>
+   * The default implementation resolves the step and then calls {@link IWizardStep#doAction()} on it.
+   */
+  @Order(10.0)
+  @ConfigOperation
+  protected void execWizardStepAction(int stepIndex) throws ProcessingException {
+    IWizardStep<? extends IForm> step = CollectionUtility.getElement(getWizardSteps(), stepIndex);
+    if (step == null) {
+      throw new IllegalStateException("Invalid stepIndex: " + stepIndex);
+    }
+    step.doAction();
+  }
+
   protected void installWizard(IWizard wizard) {
     uninstallWizard();
     if (wizard != null) {
@@ -137,20 +159,12 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
   private class P_UIFacade implements IWizardProgressFieldUIFacade {
 
     @Override
-    public void activateStepFromUI(int stepIndex) {
+    public void wizardStepActionFromUI(int stepIndex) {
       try {
-        IWizard wizard = getWizard();
-        if (wizard != null && stepIndex >= 0) {
-          IWizardStep<? extends IForm> step = wizard.getStep(stepIndex);
-          if (step == null) {
-            throw new IllegalStateException("Invalid stepIndex: " + stepIndex);
-          }
-          wizard.activateStep(step);
-        }
+        interceptWizardStepAction(stepIndex);
       }
       catch (Exception e) {
-        ProcessingException pe = (e instanceof ProcessingException ? (ProcessingException) e : new ProcessingException("Unexpected error", e));
-        BEANS.get(ExceptionHandler.class).handle(pe);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
   }
@@ -168,10 +182,21 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     }
   }
 
+  protected void interceptWizardStepAction(int stepIndex) throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    WizardProgressFieldWizardStepActionChain chain = new WizardProgressFieldWizardStepActionChain(extensions);
+    chain.execWizardStepIndex(stepIndex);
+  }
+
   protected static class LocalWizardProgressFieldExtension<OWNER extends AbstractWizardProgressField> extends LocalFormFieldExtension<OWNER> implements IWizardProgressFieldExtension<OWNER> {
 
     public LocalWizardProgressFieldExtension(OWNER owner) {
       super(owner);
+    }
+
+    @Override
+    public void execWizardStepAction(WizardProgressFieldWizardStepActionChain wizardProgressFieldWizardStepActionChain, int stepIndex) throws ProcessingException {
+      getOwner().execWizardStepAction(stepIndex);
     }
   }
 

@@ -23,9 +23,12 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefres
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardWizardStepActionChain;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
+import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
 public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER> implements IWizardExtension<OWNER> {
@@ -77,6 +80,11 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   @Override
   public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException {
     chain.execAppLinkAction(ref);
+  }
+
+  @Override
+  public void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) throws ProcessingException {
+    chain.execWizardStepAction(wizardStep);
   }
 
   @Override

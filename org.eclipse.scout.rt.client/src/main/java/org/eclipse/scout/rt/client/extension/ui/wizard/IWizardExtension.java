@@ -23,9 +23,12 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefres
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardWizardStepActionChain;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
+import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
 /**
@@ -50,6 +53,8 @@ public interface IWizardExtension<OWNER extends AbstractWizard> extends IExtensi
   void execReset(WizardResetChain chain) throws ProcessingException;
 
   void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException;
+
+  void execWizardStepAction(WizardWizardStepActionChain chain, IWizardStep<? extends IForm> wizardStep) throws ProcessingException;
 
   void execPreviousStep(WizardPreviousStepChain chain) throws ProcessingException;
 

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDeactivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDisposeChain;
@@ -37,5 +38,7 @@ public interface IWizardStepExtension<FORM extends IForm, OWNER extends Abstract
   void execFormDiscarded(WizardStepFormDiscardedChain<? extends IForm> chain, boolean activation) throws ProcessingException;
 
   void execFormStored(WizardStepFormStoredChain<? extends IForm> chain, boolean activation) throws ProcessingException;
+
+  void execAction(WizardStepActionChain<? extends IForm> chain) throws ProcessingException;
 
 }

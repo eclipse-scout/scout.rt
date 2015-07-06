@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardStepExtension;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDeactivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDisposeChain;
@@ -42,6 +43,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   private IWizard m_wizard;
   private FORM m_form;
   private FormListener m_formListener;
+  private boolean m_performingWizardStepAction;
   private int m_activationCounter;
   private boolean m_initialized;
   private final ObjectExtensions<AbstractWizardStep<FORM>, IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>> m_objectExtensions;
@@ -152,6 +154,17 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
+   * Configures whether the wizard action is initially enabled.
+   * <p>
+   * Subclasses can override this method. The default is <code>false</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  protected boolean getConfiguredActionEnabled() {
+    return false;
+  }
+
+  /**
    * @param stepKind
    *          any of the STEP_* constants activate this step normally creates a
    *          form, calls {@link IForm#startWizardStep(IWizardStep, Class)} on
@@ -233,6 +246,19 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
+   * Called when an "action" is performed on the wizard step (i.e. it is clicked in the UI).
+   * <p>
+   * The default delegates to the wizard.
+   */
+  @Order(70)
+  @ConfigOperation
+  protected void execAction() throws ProcessingException {
+    if (getWizard() != null) {
+      getWizard().doWizardStepAction(this);
+    }
+  }
+
+  /**
    * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
    * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
@@ -273,6 +299,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     setVisible(getConfiguredVisible());
     setCssClass((getConfiguredCssClass()));
     setOrder(calculateViewOrder());
+    setActionEnabled(getConfiguredActionEnabled());
   }
 
   protected IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>> createLocalExtension() {
@@ -444,6 +471,16 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
+  public boolean isActionEnabled() {
+    return propertySupport.getPropertyBool(PROP_ACTION_ENABLED);
+  }
+
+  @Override
+  public void setActionEnabled(boolean actionEnabled) {
+    propertySupport.setPropertyBool(PROP_ACTION_ENABLED, actionEnabled);
+  }
+
+  @Override
   public String getCssClass() {
     return (String) propertySupport.getProperty(PROP_CSS_CLASS);
   }
@@ -493,6 +530,27 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     }
     finally {
       m_activationCounter--;
+    }
+  }
+
+  protected boolean isPerformingWizardStepAction() {
+    return m_performingWizardStepAction;
+  }
+
+  protected void setPerformingWizardStepAction(boolean performingWizardStepAction) {
+    m_performingWizardStepAction = performingWizardStepAction;
+  }
+
+  @Override
+  public void doAction() throws ProcessingException {
+    if (isActionEnabled() && !isPerformingWizardStepAction()) {
+      try {
+        setPerformingWizardStepAction(true);
+        interceptAction();
+      }
+      finally {
+        setPerformingWizardStepAction(false);
+      }
     }
   }
 
@@ -549,6 +607,10 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
       getOwner().execFormStored(activation);
     }
 
+    @Override
+    public void execAction(WizardStepActionChain<? extends IForm> chain) throws ProcessingException {
+      getOwner().execAction();
+    }
   }
 
   protected final void interceptDeactivate(int stepKind) throws ProcessingException {
@@ -585,5 +647,11 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormStoredChain<FORM> chain = new WizardStepFormStoredChain<FORM>(extensions);
     chain.execFormStored(activation);
+  }
+
+  protected final void interceptAction() throws ProcessingException {
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    WizardStepActionChain<FORM> chain = new WizardStepActionChain<FORM>(extensions);
+    chain.execAction();
   }
 }
