@@ -7,16 +7,14 @@
   white-space: nowrap;
   overflow: hidden;
 
-  & > button {
+  & > .tab-item {
     position: relative;
     .font-text-normal(@bold);
     color: @title-color;
     border: none;
     background-color: transparent;
-    height: 32px;
-    padding: 0  @tabbox-padding-x;
+    padding: @group-title-padding-y @tabbox-padding-x;
     border-bottom: solid 3px transparent;
-    border-top: solid 1px transparent;
     cursor: pointer;
 
     &.selected {

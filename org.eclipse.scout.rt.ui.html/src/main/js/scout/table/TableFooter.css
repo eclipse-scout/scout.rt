@@ -70,10 +70,9 @@
     top: 31px;
   }
 
-  & .tab-area > button {
+  & .tab-area > .tab-item {
       z-index: 2;
   }
-
 
 }
 

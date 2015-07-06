@@ -9,7 +9,6 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   var titleMarginX, menuBarSize, gbBodySize,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
-    htmlGbBodyContainer = this._htmlGbBodyContainer(),
     htmlMenuBar = this._htmlMenuBar(),
     $groupBoxTitle = this._groupBox._$groupBoxTitle,
     $pseudoStatus = this._groupBox.$pseudoStatus;
@@ -37,8 +36,8 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
-  if (htmlGbBodyContainer.scrollable) {
-    scout.scrollbars.update(htmlGbBodyContainer.$comp);
+  if (htmlGbBody.scrollable) {
+    scout.scrollbars.update(htmlGbBody.$comp);
   }
 };
 
@@ -67,7 +66,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.group-box-title'), true).height;
+  return scout.graphics.getVisibleSize(this._groupBox._$groupBoxTitle, true).height;
 };
 
 /**
@@ -84,9 +83,5 @@ scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {
-  return scout.HtmlComponent.get(this._groupBox.$body);
-};
-
-scout.GroupBoxLayout.prototype._htmlGbBodyContainer = function() {
   return scout.HtmlComponent.get(this._groupBox.$body);
 };

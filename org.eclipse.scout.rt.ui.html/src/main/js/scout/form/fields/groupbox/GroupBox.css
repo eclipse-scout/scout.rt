@@ -1,5 +1,6 @@
 @group-margin-top: 14px;
 @group-margin-bottom: 16px;
+@group-title-padding-y: 6px;
 
 .root-group-box {
   overflow: hidden;
@@ -27,7 +28,7 @@
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
   border-bottom: 3px solid @border-color;
-  padding-bottom: 6px;
+  padding: @group-title-padding-y 0;
   .overflow-ellipsis-nowrap;
 
   .group-box.collapsed:not(.with-line) > & {
