@@ -3,10 +3,13 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.Adler32;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
@@ -20,10 +23,11 @@ import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IJsonContextMenuOwner {
+public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
 
   public static final String PROP_IMAGE_URL = "imageUrl";
 
@@ -51,6 +55,12 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
       @Override
       protected Boolean modelValue() {
         return getModel().isAutoFit();
+      }
+    });
+    putJsonProperty(new JsonProperty<IMAGE_FIELD>(IImageField.PROP_DROP_TYPE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getDropType();
       }
     });
   }
@@ -163,5 +173,13 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
       return new BinaryResourceHolder(res, false);
     }
     return null;
+  }
+
+  @Override
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
+    if ((getModel().getDropType() & IDNDSupport.TYPE_FILE_TRANSFER) == IDNDSupport.TYPE_FILE_TRANSFER) {
+      ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);
+      getModel().getUIFacade().fireDropActionFromUi(transferObject);
+    }
   }
 }
