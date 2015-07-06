@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJsonPropertyObserver<MESSAGE_BOX> {
 
   public static final String EVENT_ACTION = "action";
-  public static final String EVENT_MESSAGE_BOX_CLOSED = "closed";
+  public static final String EVENT_CLOSED = "closed";
 
   private MessageBoxListener m_messageBoxListener;
 
@@ -130,19 +130,19 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
   protected void handleModelMessageBoxChanged(MessageBoxEvent event) {
     switch (event.getType()) {
       case MessageBoxEvent.TYPE_CLOSED:
-        handleModelMessageBoxClosed();
+        handleModelClosed();
         break;
       default:
         // NOP
     }
   }
 
-  protected void handleModelMessageBoxClosed() {
+  protected void handleModelClosed() {
     dispose();
     // Important: The following event must be send _after_ the dispose() call! Otherwise,
     // it would be deleted automatically from the JSON response. This is a special case
     // where we explicitly want to send an event for an already disposed adapter.
-    addActionEvent(EVENT_MESSAGE_BOX_CLOSED);
+    addActionEvent(EVENT_CLOSED);
   }
 
   @Override

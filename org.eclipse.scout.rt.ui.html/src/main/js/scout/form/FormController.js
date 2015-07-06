@@ -1,5 +1,5 @@
 /**
- * The FormController provides functionality to show forms like dialogs and views.
+ * The FormController provides functionality to manage forms like dialogs and views.
  */
 scout.FormController = function(parent, session, funcDialogStore, funcViewStore) {
   this._parent = parent;

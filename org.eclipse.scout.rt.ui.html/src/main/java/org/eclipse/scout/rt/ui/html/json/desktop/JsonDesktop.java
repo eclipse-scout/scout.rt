@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.FormParentFilter;
+import org.eclipse.scout.rt.ui.html.json.messagebox.FileChooserParentFilter;
 import org.eclipse.scout.rt.ui.html.json.messagebox.MessageBoxParentFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -58,12 +59,14 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   private final IFilter<IForm> m_formParentFilter;
   private final IFilter<IMessageBox> m_messageBoxParentFilter;
+  private final IFilter<IFileChooser> m_fileChooserParentFilter;
 
   public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(desktop, uiSession, id, parent);
     m_downloads = new DownloadHandlerStorage();
     m_formParentFilter = new FormParentFilter(desktop);
     m_messageBoxParentFilter = new MessageBoxParentFilter(desktop);
+    m_fileChooserParentFilter = new FileChooserParentFilter(desktop);
   }
 
   @Override
@@ -77,7 +80,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     attachGlobalAdapters(getModel().getViews(getModel()));
     attachGlobalAdapters(getModel().getDialogs(getModel()));
     attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
-    attachGlobalAdapters(getModel().getFileChooserStack());
+    attachGlobalAdapters(getModel().getFileChoosers(getModel()));
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
@@ -157,7 +160,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     putAdapterIdsProperty(json, "views", getModel().getViews(getModel()));
     putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel()));
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
-    putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChooserStack());
+    putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChoosers(getModel()));
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
@@ -189,6 +192,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       case DesktopEvent.TYPE_MESSAGE_BOX_HIDE:
         handleModelMessageBoxHide(event.getMessageBox());
         break;
+      case DesktopEvent.TYPE_FILE_CHOOSER_SHOW:
+        handleModelFileChooserShow(event.getFileChooser());
+        break;
+      case DesktopEvent.TYPE_FILE_CHOOSER_HIDE:
+        handleModelFileChooserHide(event.getFileChooser());
+        break;
       case DesktopEvent.TYPE_OPEN_URI:
         handleModelOpenUri(event.getUri(), event.getTarget());
         break;
@@ -197,9 +206,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         break;
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
-        break;
-      case DesktopEvent.TYPE_FILE_CHOOSER_ADDED:
-        handleModelFileChooserAdded(event.getFileChooser());
         break;
       default:
         // NOP
@@ -268,28 +274,35 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox, m_messageBoxParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("messageBoxShow", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 
   protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(messageBox, m_messageBoxParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("messageBoxHide", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 
-  protected void handleModelDesktopClosed() {
-    getUiSession().logout();
+  protected void handleModelFileChooserShow(final IFileChooser fileChooser) {
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser, m_fileChooserParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("fileChooserShow", new JSONObject().put(PROP_FILE_CHOOSER, jsonAdapter.getId()));
+    }
   }
 
-  protected void handleModelFileChooserAdded(IFileChooser fileChooser) {
-    JSONObject jsonEvent = new JSONObject();
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser);
-    putProperty(jsonEvent, PROP_FILE_CHOOSER, jsonAdapter.getId());
-    addActionEvent("fileChooserAdded", jsonEvent);
+  protected void handleModelFileChooserHide(final IFileChooser fileChooser) {
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(fileChooser, m_fileChooserParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("fileChooserHide", new JSONObject().put(PROP_FILE_CHOOSER, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelDesktopClosed() {
+    getUiSession().logout();
   }
 
   @Override

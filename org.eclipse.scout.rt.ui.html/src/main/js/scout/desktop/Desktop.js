@@ -31,7 +31,7 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
 scout.Desktop.prototype.init = function(model, session) {
   scout.Desktop.parent.prototype.init.call(this, model, session);
 
-  // FormController
+  // Prepare FormController
   this._formController = new scout.FormController(this, session,
     function() { // callback to access dialogs attached to the Desktop.
       return this.dialogs;
@@ -40,11 +40,16 @@ scout.Desktop.prototype.init = function(model, session) {
       return this.views;
     }.bind(this)
   );
-
-  // MessageBoxController
+  // Prepare MessageBoxController
   this._messageBoxController = new scout.MessageBoxController(this, session,
     function() { // callback to access message boxes attached to the Desktop.
       return this.messageBoxes;
+    }.bind(this)
+  );
+  // Prepare FileChooserController
+  this._fileChooserController = new scout.FileChooserController(this, session,
+    function() { // callback to access file choosers attached to the Desktop.
+      return this.fileChoosers;
     }.bind(this)
   );
 };
@@ -87,13 +92,10 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation.onOutlineChanged(this.outline);
   this._setSplitterPosition();
 
-  // Display all Forms registered on Desktop.
+  // Display attached forms, message boxes and file choosers.
   this._formController.showAll();
-  // Display all MessageBoxes registered on Desktop.
   this._messageBoxController.showAll();
-
-  // TODO BSH: How to determine order of filechoosers?
-  this.fileChoosers.forEach(this._renderFileChooser.bind(this));
+  this._fileChooserController.showAll();
 
   $(window).on('resize', this.onResize.bind(this));
 
@@ -398,14 +400,6 @@ scout.Desktop.prototype.setOutline = function(outline) {
   this.navigation.onOutlineChanged(this.outline);
 };
 
-scout.Desktop.prototype._renderFileChooser = function(fileChooser) {
-  fileChooser.render(this.$container);
-};
-
-scout.Desktop.prototype.onFileChooserClosed = function(fileChooser) {
-  scout.arrays.remove(this.fileChoosers, fileChooser);
-};
-
 scout.Desktop.prototype._onModelOutlineChanged = function(event) {
   if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
     this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
@@ -425,8 +419,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this._messageBoxController.addAndShow(event.messageBox);
   } else if (event.type === 'messageBoxHide') {
     this._messageBoxController.removeAndHide(event.messageBox);
-  } else if (event.type === 'fileChooserAdded') {
-    this._renderFileChooser(this.session.getOrCreateModelAdapter(event.fileChooser, this));
+  } else if (event.type === 'fileChooserShow') {
+    this._fileChooserController.addAndShow(event.fileChooser);
+  } else if (event.type === 'fileChooserHide') {
+    this._fileChooserController.removeAndHide(event.fileChooser);
   } else if (event.type === 'openUri') {
     this._openUri(event);
   } else {

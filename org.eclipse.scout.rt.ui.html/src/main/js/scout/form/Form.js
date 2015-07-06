@@ -1,7 +1,7 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
   this.rootGroupBox;
-  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes']);
+  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
   this._locked;
   this._$glassPane;
   this._formController;
@@ -17,7 +17,7 @@ scout.Form.prototype.init = function(model, session) {
     this.rootGroupBox.menuBar.large();
   }
 
-  // FormController
+  // Prepare FormController
   this._formController = new scout.FormController(this, session,
     function() { // callback to access dialogs attached to this Form.
       return this.dialogs;
@@ -26,11 +26,16 @@ scout.Form.prototype.init = function(model, session) {
       return this.views;
     }.bind(this)
   );
-
-  // MessageBoxController
+  // Prepare MessageBoxController
   this._messageBoxController = new scout.MessageBoxController(this, session,
     function() { // callback to access message boxes attached to this Form.
       return this.messageBoxes;
+    }.bind(this)
+  );
+  // Prepare FileChooserController
+  this._fileChooserController = new scout.FileChooserController(this, session,
+    function() { // callback to access file choosers attached to this Form.
+      return this.fileChoosers;
     }.bind(this)
   );
 };
@@ -80,10 +85,10 @@ scout.Form.prototype._render = function($parent) {
     this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
   }
 
-  // Display all Forms registered on this Form.
+  // Display attached forms, message boxes and file choosers.
   this._formController.showAll();
-  // Display all MessageBoxes registered on Desktop.
   this._messageBoxController.showAll();
+  this._fileChooserController.showAll();
 };
 scout.Form.prototype._renderProperties = function() {
   this._renderInitialFocus(this.initialFocus);
@@ -212,6 +217,10 @@ scout.Form.prototype.onModelAction = function(event) {
     this._messageBoxController.addAndShow(event.messageBox);
   } else if (event.type === 'messageBoxHide') {
     this._messageBoxController.removeAndHide(event.messageBox);
+  } else if (event.type === 'fileChooserShow') {
+    this._fileChooserController.addAndShow(event.fileChooser);
+  } else if (event.type === 'fileChooserHide') {
+    this._fileChooserController.removeAndHide(event.fileChooser);
   } else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }

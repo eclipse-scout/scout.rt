@@ -96,6 +96,9 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
 
   protected void handleModelClosed() {
     dispose();
+    // Important: The following event must be send _after_ the dispose() call! Otherwise,
+    // it would be deleted automatically from the JSON response. This is a special case
+    // where we explicitly want to send an event for an already disposed adapter.
     addActionEvent(EVENT_CLOSED);
   }
 

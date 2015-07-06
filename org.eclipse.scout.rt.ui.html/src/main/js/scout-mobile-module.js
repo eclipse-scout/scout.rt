@@ -97,6 +97,7 @@ __include("scout/planner/PlannerHeader.js");
 __include("scout/planner/PlannerLayout.js");
 __include("scout/planner/PlannerMenuItemsOrder.js");
 __include("scout/filechooser/FileChooser.js");
+__include("scout/filechooser/FileChooserController.js");
 // Table
 __include("scout/table/Column.js");
 __include("scout/table/BeanColumn.js"); // requires Column.js

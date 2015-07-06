@@ -1,6 +1,6 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
-  this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes']);
+  this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
   this.navigateUpInProgress = false; // see NavigateUpButton.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
@@ -15,7 +15,7 @@ scout.inherits(scout.Outline, scout.Tree);
 scout.Outline.prototype.init = function(model, session) {
   scout.Outline.parent.prototype.init.call(this, model, session);
 
-  // FormController
+  // Prepare FormController
   this._formController = new scout.FormController(this, session,
     function() { // callback to access dialogs attached to this Outline.
       return this.dialogs;
@@ -24,11 +24,16 @@ scout.Outline.prototype.init = function(model, session) {
       return this.views;
     }.bind(this)
   );
-
-  // MessageBoxController
+  // Prepare MessageBoxController
   this._messageBoxController = new scout.MessageBoxController(this, session,
     function() { // callback to access message boxes attached to this Outline.
       return this.messageBoxes;
+    }.bind(this)
+  );
+  // Prepare FileChooserController
+  this._fileChooserController = new scout.FileChooserController(this, session,
+    function() { // callback to access file choosers attached to this Outline.
+      return this.fileChoosers;
     }.bind(this)
   );
 };
@@ -49,10 +54,10 @@ scout.Outline.prototype._installKeyStrokeAdapter = function() {
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
-  // Display all Forms registered on this Outline.
+  // Display attached forms, message boxes and file choosers.
   this._formController.showAll();
-  // Display all MessageBoxes registered on Desktop.
   this._messageBoxController.showAll();
+  this._fileChooserController.showAll();
 
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
@@ -268,6 +273,10 @@ scout.Outline.prototype.onModelAction = function(event) {
     this._messageBoxController.addAndShow(event.messageBox);
   } else if (event.type === 'messageBoxHide') {
     this._messageBoxController.removeAndHide(event.messageBox);
+  } else if (event.type === 'fileChooserShow') {
+    this._fileChooserController.addAndShow(event.fileChooser);
+  } else if (event.type === 'fileChooserHide') {
+    this._fileChooserController.removeAndHide(event.fileChooser);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }

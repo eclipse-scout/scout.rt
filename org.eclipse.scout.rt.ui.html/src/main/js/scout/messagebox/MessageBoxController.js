@@ -1,5 +1,5 @@
 /**
- * The MessageBoxController provides functionality to show message boxes.
+ * The MessageBoxController provides functionality to manage message boxes.
  */
 scout.MessageBoxController = function(parent, session, funcMessageBoxStore) {
   this._parent = parent;

@@ -128,7 +128,6 @@ scout.FileChooser.prototype.onModelAction = function(event) {
 
 scout.FileChooser.prototype._onFileChooserClosed = function() {
   this.destroy();
-  this.session.desktop.onFileChooserClosed(this);
 };
 
 scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
