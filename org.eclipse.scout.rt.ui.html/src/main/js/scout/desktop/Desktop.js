@@ -87,22 +87,7 @@ scout.Desktop.prototype._render = function($parent) {
   $(window).on('resize', this.onResize.bind(this));
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
-  $parent.on('dragenter', function (event) {
-    event.stopPropagation();
-    event.preventDefault();
-    // change cursor to forbidden (no dropping allowed)
-    event.originalEvent.dataTransfer.dropEffect = "none";
-  });
-  $parent.on('dragover', function (event) {
-    event.stopPropagation();
-    event.preventDefault();
-    // change cursor to forbidden (no dropping allowed)
-    event.originalEvent.dataTransfer.dropEffect = "none";
-  });
-  $parent.on('drop', function (event) {
-    event.stopPropagation();
-    event.preventDefault();
-  });
+  this._setupDragAndDrop();
 
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
   $parent.bind('contextmenu', function(event) {
@@ -146,6 +131,22 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
   this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
   this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
 };
+
+scout.Desktop.prototype._setupDragAndDrop = function() {
+  var dragEnterOrOver = function (event) {
+    event.stopPropagation();
+    event.preventDefault();
+    // change cursor to forbidden (no dropping allowed)
+    event.originalEvent.dataTransfer.dropEffect = 'none';
+  };
+
+  this.$container.on('dragenter', dragEnterOrOver);
+  this.$container.on('dragover', dragEnterOrOver);
+  this.$container.on('drop', function (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  });
+},
 
 scout.Desktop.prototype._createSplitter = function($parent) {
   if (!this._hasNavigation()) {
