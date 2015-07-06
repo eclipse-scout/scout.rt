@@ -112,6 +112,10 @@ scout.Action.prototype._renderTabbable = function() {
   }
 };
 
+scout.Action.prototype._renderHorizontalAlignment = function() {
+  // nothing to render, property is only considered by the menubar
+};
+
 scout.Action.prototype._onHoverIn = function() {
   // Don't show tooltip if action is selected or not enabled
   if (this.enabled && !this.selected) {
@@ -153,25 +157,82 @@ scout.Action.prototype._goOnline = function() {
   this._renderEnabled(true);
 };
 
-scout.Action.prototype.doAction = function() {
-  if (this.enabled) {
+/**
+ * @param event
+ *          UI event that triggered the action (e.g. 'mouse down'). This argument
+ *          may be used by action implementors to check if the action should really
+ *          be performed. E.g. the MenuBarPopup uses it to prevent the popup from
+ *          being closed again by the same event when it bubbles to other elements.
+ * @return {Boolean}
+ *          <code>true</code> if the action has been performed or <code>false</code> if it
+ *          has not been performed (e.g. when the button is not enabled).
+ */
+scout.Action.prototype.doAction = function(event) {
+  if (!this.prepareDoAction(event)) {
+    return false;
+  }
+
+  if (this.actionStyle === scout.Action.ActionStyle.TOGGLE) {
+    this.setSelected(!this.selected);
+  } else {
     this.sendDoAction();
   }
+  return true;
 };
 
-scout.Action.prototype.sendDoAction = function() {
+/**
+ * @returns {Boolean} <code>true</code> if the action may be executed, <code>false</code> if it should be ignored.
+ */
+scout.Action.prototype.prepareDoAction = function(event) {
+  if (!this.enabled || !this.visible) {
+    return false;
+  }
+
+  // This is required for key-stroke actions. When they are triggered on
+  // key-down, the active field is still focused and its blur-event is not
+  // triggered, which means the displayTextChanged() is never executed so
+  // the executed action works with a wrong value for the active field.
+  // --> Same check in Button.doAction()
   var activeValueField = $(document.activeElement).data('valuefield');
   if (activeValueField) {
     activeValueField.displayTextChanged();
   }
+  return true;
+};
+
+scout.Action.prototype.sendDoAction = function() {
   this.beforeSendDoAction();
   this.session.send(this.id, 'doAction');
   this.afterSendDoAction();
 };
 
-scout.Action.prototype.sendSelected = function(selected) {
+/**
+ * Override this method to do something before 'doAction' is sent to the server.
+ * The default impl. does nothing.
+ */
+scout.Action.prototype.beforeSendDoAction = function() {
+  // NOP
+};
+
+/**
+ * Override this method to do something after 'doAction' has been sent to the server.
+ * The default impl. does nothing.
+ */
+scout.Action.prototype.afterSendDoAction = function() {
+  // NOP
+};
+
+scout.Action.prototype.setSelected = function(selected) {
+  this.selected = selected;
+  if (this.rendered) {
+    this._renderSelected(this.selected);
+  }
+  this.sendSelected();
+};
+
+scout.Action.prototype.sendSelected = function() {
   this.session.send(this.id, 'selected', {
-    selected: selected
+    selected: this.selected
   });
 };
 
@@ -226,11 +287,9 @@ scout.Action.prototype.setTabbable = function(tabbable) {
 };
 
 scout.Action.prototype.handle = function(event) {
-  if (this.enabled && this.visible) {
-    this.sendDoAction();
-    if (this.preventDefaultOnEvent) {
-      event.preventDefault();
-    }
+  var actionPerformed = this.doAction(event);
+  if (actionPerformed && this.preventDefaultOnEvent) {
+    event.preventDefault();
   }
 };
 
@@ -263,20 +322,4 @@ scout.Action.prototype.keyStrokeName = function() {
   name += this.alt ? 'alt+' : '';
   name += this.shift ? 'shift+' : '';
   return name + this.keyStrokeKeyPart;
-};
-
-/**
- * Override this method to do something before 'doAction' is sent to the server.
- * The default impl. does nothing.
- */
-scout.Action.prototype.beforeSendDoAction = function() {
-  // NOP
-};
-
-/**
- * Override this method to do something after 'doAction' has been sent to the server.
- * The default impl. does nothing.
- */
-scout.Action.prototype.afterSendDoAction = function() {
-  // NOP
 };

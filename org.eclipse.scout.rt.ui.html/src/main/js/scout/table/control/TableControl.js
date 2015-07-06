@@ -136,13 +136,16 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
     this.tableFooter.selectedControl.setSelected(false, false);
   }
 
+  // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
+  // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
   this.selected = selected;
-  this.sendSelected(selected);
-  this._renderSelected(this.selected, closeWhenUnselected);
-  var that = this;
+  if (this.rendered) {
+    this._renderSelected(selected, closeWhenUnselected);
+  }
+  this.sendSelected();
+
   if (!selected) {
     scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
-
   }
 };
 

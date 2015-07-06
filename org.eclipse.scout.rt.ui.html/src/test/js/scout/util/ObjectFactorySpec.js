@@ -41,6 +41,11 @@ describe("ObjectFactory", function() {
         objectType: 'TabItem'
       };
     }
+    else if ('ButtonAdapterMenu' === objectType) {
+      model.button = {
+          on: function() {}
+      };
+    }
     return model;
   }
 

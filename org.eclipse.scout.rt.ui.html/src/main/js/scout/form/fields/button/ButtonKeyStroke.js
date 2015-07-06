@@ -11,11 +11,9 @@ scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.ButtonKeyStroke.prototype.handle = function(event) {
-  if (this._button.enabled && this._button.visible) {
-    this._button.doAction();
-    if (this.preventDefaultOnEvent) {
-      event.preventDefault();
-    }
+  var actionPerformed = this._button.doAction();
+  if (actionPerformed && this.preventDefaultOnEvent) {
+    event.preventDefault();
   }
 };
 

@@ -322,4 +322,9 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.FileChooser();
   }
+}, {
+  objectType: 'ButtonAdapterMenu',
+  create: function() {
+    return new scout.ButtonAdapterMenu();
+  }
 }];

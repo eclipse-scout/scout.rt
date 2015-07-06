@@ -56,6 +56,7 @@ scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
  */
 scout.AbstractNavigationButton.prototype.doAction = function() {
   this._onClickFunc();
+  return true;
 };
 
 /**

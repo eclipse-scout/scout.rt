@@ -34,9 +34,7 @@ scout.FormToolButton.prototype.setSelected = function(selected) {
     this.desktop.selectedTool.setSelected(false);
   }
 
-  this.selected = selected;
-  this.sendSelected(selected);
-  this._renderSelected(this.selected);
+  scout.FormToolButton.parent.prototype.setSelected.call(this, selected);
 };
 
 scout.FormToolButton.prototype._openContainer = function() {

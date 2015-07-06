@@ -54,10 +54,14 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._onMouseEvent = function(event) {
-  if (this.childActions.length > 0 && event.type === 'mousedown') {
-    this._openPopup(event);
-  } else if (this.childActions.length === 0 && event.type === 'click') {
-    this.doAction();
+  // If menu has childActions, a popup should be rendered on click. To create
+  // the impression of a faster UI, open the popup already on 'mousedown', not
+  // on 'click'. All other actions are handeld on 'click'.
+  var hasChildActions = (this.childActions.length > 0);
+  if (event.type === 'mousedown' && hasChildActions) {
+    this.doAction(event);
+  } else if (event.type === 'click' && !hasChildActions) {
+    this.doAction(event);
   }
 };
 
@@ -100,34 +104,33 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
   }
 };
 
+/**
+ * @param event
+ *          UI event that triggered the popup (e.g. 'mouse clicked'). This argument
+ *          is passed to the MenuBarPopup  as 'ignoreEvent'. It prevents the popup
+ *          from being closed again by the same event that bubbled to other elements.
+ */
 scout.Menu.prototype._openPopup = function(event) {
-  if (!this.enabled) {
-    return;
-  }
   this.popup = new scout.MenuBarPopup(this, this.session, {
     ignoreEvent: event
   });
   this.popup.render();
 };
 
-scout.Menu.prototype.doAction = function() {
-  if (!this.enabled) {
-    return;
-  }
+/**
+ * @override Action.js
+ */
+scout.Menu.prototype.doAction = function(event) {
   if (this.childActions.length > 0) {
-    this._openPopup();
-  } else {
-    this.sendDoAction();
-  }
-};
-
-scout.Menu.prototype.handle = function(event) {
-  if (this.enabled && this.visible) {
-    this.doAction();
-    if (this.preventDefaultOnEvent) {
-      event.preventDefault();
+    // Special handling if menu has childActions
+    if (!this.prepareDoAction()) {
+      return false;
     }
+    this._openPopup(event);
+    return true;
   }
+  // Default action handling
+  return scout.Menu.parent.prototype.doAction.call(this, event);
 };
 
 scout.Menu.prototype._drawKeyBox = function($container) {

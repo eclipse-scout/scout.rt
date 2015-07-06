@@ -210,11 +210,13 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
  * This method should be used when you create Widgets or Adapters in the UI without a
  * model from the server-side client.
  *
- * The minimum required properties are:
- * - id
- * - objectType
+ * The only model property required is 'objectType'. A unique ID is generated automatically,
+ * when it is not provided by the model.
  */
 scout.Session.prototype.createUiObject = function(model) {
+  if (!model || !model.objectType) {
+    throw new Error('Missing objectType');
+  }
   // in case _registered is not set, set it to false
   // but when it is already set (true or false) we don't change it.
   if (model._registered === undefined) {

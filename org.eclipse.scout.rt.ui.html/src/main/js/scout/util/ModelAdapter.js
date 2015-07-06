@@ -120,6 +120,19 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
   }
 };
 
+/**
+ * Removes  property name(s) of model properties which must be converted automatically to a model adapter.
+ *
+ * Only used for special cases (e.g. when a model adapter wraps another adapter).
+ */
+scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
+  if (Array.isArray(properties)) {
+    scout.arrays.removeAll(this._adapterProperties, properties);
+  } else {
+    scout.arrays.remove(this._adapterProperties, properties);
+  }
+};
+
 scout.ModelAdapter.prototype.destroy = function() {
   this.remove();
 
@@ -140,6 +153,8 @@ scout.ModelAdapter.prototype.destroy = function() {
     this.parent = null;
   }
   this.destroyed = true;
+  // Inform listeners
+  this.trigger('destroy');
 };
 
 scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {

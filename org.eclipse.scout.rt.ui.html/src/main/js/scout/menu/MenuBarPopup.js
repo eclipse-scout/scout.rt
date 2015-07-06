@@ -47,11 +47,6 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this._copyCssClassToHead('has-submenu');
 };
 
-scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
-  this.close();
-  menu.sendDoAction();
-};
-
 scout.MenuBarPopup.prototype._position = function($container) {
   var openingDirectionX, openingDirectionY, left, top, overlap, pos;
 

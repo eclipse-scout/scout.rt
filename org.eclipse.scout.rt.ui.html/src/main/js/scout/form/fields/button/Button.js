@@ -83,11 +83,22 @@ scout.Button.prototype._remove = function() {
   this._unregisterButtonKeyStroke();
 };
 
+/**
+ * @returns {Boolean}
+ *          <code>true</code> if the action has been performed or <code>false</code> if it
+ *          has not been performed (e.g. when the button is not enabled).
+ */
 scout.Button.prototype.doAction = function() {
-  // this is required for key-stroke actions, they're triggered on key-down,
-  // this the active field is still focused and its blur-event is not
+  if (!this.enabled || !this.visible) {
+    return false;
+  }
+
+  // This is required for key-stroke actions. When they are triggered on
+  // key-down, the active field is still focused and its blur-event is not
   // triggered, which means the displayTextChanged() is never executed so
   // the executed action works with a wrong value for the active field.
+  // --> Same check in Action.prepareDoAction()
+  //
   // Note: we could probably improve this with a listener concept. Each
   // value field would register itself as a listener on the form. When a key-
   // stroke action is executed, all listeners will receive an artificial
@@ -103,21 +114,20 @@ scout.Button.prototype.doAction = function() {
   } else if (this.menus.length > 0) {
     this.popup = new scout.MenuBarPopup(this, this.session);
     this.popup.render();
-  } else if (this.enabled) {
+  } else {
     this.session.send(this.id, 'clicked');
   }
+  return true;
 };
 
-scout.Button.prototype.setSelected = function(selected, notifyServer) {
+scout.Button.prototype.setSelected = function(selected) {
   this.selected = selected;
   if (this.rendered) {
     this._renderSelected(this.selected);
   }
-  if (scout.helpers.nvl(notifyServer, true)) {
-    this.session.send(this.id, 'selected', {
-      selected: selected
-    });
-  }
+  this.session.send(this.id, 'selected', {
+    selected: selected
+  });
 };
 
 /**

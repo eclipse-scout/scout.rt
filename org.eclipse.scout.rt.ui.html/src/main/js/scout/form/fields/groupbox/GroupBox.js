@@ -246,12 +246,14 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
 
 scout.GroupBox.prototype._renderMenus = function(menus) {
   // create a menu-adapter for each process button
-  var menuButtonAdapter, menuItems = this.staticMenus.concat(menus);
+  var menuItems = this.staticMenus.concat(menus);
   this.processButtons.forEach(function(button) {
-    menuButtonAdapter = new scout.MenuButtonAdapter();
-    menuButtonAdapter.init(button);
-    menuItems.push(menuButtonAdapter);
-  });
+    var menu = this.session.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
+      objectType: 'ButtonAdapterMenu',
+      button: button
+    }));
+    menuItems.push(menu);
+  }.bind(this));
   this.menuBar.updateItems(menuItems);
 };
 
