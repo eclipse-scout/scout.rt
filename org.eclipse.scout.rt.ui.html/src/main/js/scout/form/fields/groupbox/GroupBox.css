@@ -42,7 +42,7 @@
     /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
     /* because the control div is higher than the title span */
     position: absolute;
-    top: @group-margin-top - 3px;
+    top: @group-margin-top + @group-title-padding-y - 3px;
     left: @mandatory-indicator-width;
 
     /* for good animation, ensure that the control is a square and the icon is centered */
