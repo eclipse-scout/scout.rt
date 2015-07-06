@@ -6,6 +6,10 @@ scout.FormController = function(parent, session, funcDialogStore, funcViewStore)
   this.session = session;
   this._funcDialogStore = funcDialogStore;
   this._funcViewStore = funcViewStore;
+  /**
+   * Key = Form ID, Value = Instance of DesktopViewTab
+   */
+   this._viewTabMap = {};
 };
 
 /**
@@ -29,6 +33,9 @@ scout.FormController.prototype.removeAndHide = function(formAdapterId) {
  */
 scout.FormController.prototype.showAll = function() {
   this._funcDialogStore().forEach(this._showDialog.bind(this));
+  // FIXME DWI: (von A.WE) Problem: _showView ruft Desktop#_addTab auf, dort wird dann die jeweilige view gerendert.
+  // Das darf aber nicht sein. Beim initialen Load soll nur die aktive view gerendert werden. Von allen anderen
+  // Views darf nur der Tab der View gerendert werden.
   this._funcViewStore().forEach(this._showView.bind(this));
 };
 
@@ -108,24 +115,26 @@ scout.FormController.prototype._addAndShowView = function(view) {
 
 scout.FormController.prototype._removeAndHideView = function(view) {
   scout.arrays.remove(this._funcViewStore(), view);
-
   if (view.rendered) {
-    view.remove();
-    this.session.desktop._removeTab(view.tab);
+    var viewTab = this._viewTabMap[view.id];
+    this.session.desktop._removeTab(viewTab);
   }
+  delete this._viewTabMap[view.id];
 };
 
 scout.FormController.prototype._showView = function(view) {
   var desktop = this.session.desktop;
-  var tab = new scout.DesktopViewTab(view, desktop.$bench);
-  tab.events.on('tabClicked', desktop._setSelectedTab.bind(desktop));
+  var viewTab = new scout.DesktopViewTab(view, desktop.$bench);
+  viewTab.events.on('tabClicked', desktop._setSelectedTab.bind(desktop));
   if (desktop._hasTaskBar()) {
-    tab.renderTab(desktop._$viewTabBar);
+    viewTab.renderTab(desktop._$viewTabBar);
   }
-  desktop._addTab(tab);
+  this._viewTabMap[view.id] = viewTab;
+  desktop._addTab(viewTab);
   scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
 };
 
 scout.FormController.prototype._activateView = function(view) {
-  this.session.desktop._setSelectedTab(view.tab);
+  var viewTab = this._viewTabMap[view.id];
+  this.session.desktop._setSelectedTab(viewTab);
 };

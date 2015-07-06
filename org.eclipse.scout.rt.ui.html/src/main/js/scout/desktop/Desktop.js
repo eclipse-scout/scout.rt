@@ -7,12 +7,13 @@ scout.Desktop = function() {
   this.$bench;
 
   this.navigation;
-  this._allTabs = [];
+  // FIXME DWI: (von A.WE) this collection should be moved/merged to/with FormController
+  this._allViewTabs = [];
   /**
    * outline-content = outline form or table
    */
   this._outlineContent;
-  this._selectedTab;
+  this._selectedViewTab;
 
   /**
    * FIXME DWI: (activeForm): selectedTool wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
@@ -191,8 +192,8 @@ scout.Desktop.prototype._hasTaskBar = function() {
 
 // FIXME AWE/CGU this is called by JQuery UI when a dialog gets resized, why?
 scout.Desktop.prototype.onResize = function(event) {
-  if (this._selectedTab) {
-    this._selectedTab.onResize();
+  if (this._selectedViewTab) {
+    this._selectedViewTab.onResize();
   }
   if (this.outline) {
     this.outline.onResize();
@@ -248,36 +249,36 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
 };
 
 scout.Desktop.prototype._addTab = function(tab) {
-  this._allTabs.push(tab);
+  this._allViewTabs.push(tab);
   this._setSelectedTab(tab);
 };
 
-scout.Desktop.prototype._removeTab = function(tab) {
-  scout.arrays.remove(this._allTabs, tab);
-  tab.removeTab();
+scout.Desktop.prototype._removeTab = function(viewTab) {
+  scout.arrays.remove(this._allViewTabs, viewTab);
+  viewTab.remove();
 
   // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
 
   // Only change 'tab selection' if the tab to be removed was the active one.
-  if (this._selectedTab === tab) {
-    if (this._allTabs.length > 0) {
-      this._setSelectedTab(this._allTabs[this._allTabs.length - 1]);
+  if (this._selectedViewTab === viewTab) {
+    if (this._allViewTabs.length > 0) {
+      this._setSelectedTab(this._allViewTabs[this._allViewTabs.length - 1]);
     } else {
       this._attachOutlineContent();
       this._bringNavigationToFront();
-      this._selectedTab = null;
+      this._selectedViewTab = null;
     }
   }
 
   this._layoutTaskBar();
 };
 
-scout.Desktop.prototype._setSelectedTab = function(tab) {
-  if (this._selectedTab !== tab) {
+scout.Desktop.prototype._setSelectedTab = function(viewTab) {
+  if (this._selectedViewTab !== viewTab) {
     this._sendNavigationToBack();
     this._detachOutlineContent();
-    this._deselectTab();
-    this._selectTab(tab);
+    this._deselectViewTab();
+    this._selectViewTab(viewTab);
     this._layoutTaskBar();
     scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
   }
@@ -307,16 +308,16 @@ scout.Desktop.prototype._attachOutlineContent = function() {
 /**
  * De-selects the currently selected tab.
  */
-scout.Desktop.prototype._deselectTab = function() {
- if (this._selectedTab) {
-   this._selectedTab.deselect();
-   this._selectedTab = null;
+scout.Desktop.prototype._deselectViewTab = function() {
+ if (this._selectedViewTab) {
+   this._selectedViewTab.deselect();
+   this._selectedViewTab = null;
  }
 };
 
-scout.Desktop.prototype._selectTab = function(tab) {
-  tab.select();
-  this._selectedTab = tab;
+scout.Desktop.prototype._selectViewTab = function(viewTab) {
+  viewTab.select();
+  this._selectedViewTab = viewTab;
 };
 
 scout.Desktop.TargetWindow = {
@@ -360,7 +361,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   }
 
   this._outlineContent = content;
-  this._deselectTab();
+  this._deselectViewTab();
   this._bringNavigationToFront();
 
   if (!content.rendered) {
@@ -431,11 +432,11 @@ scout.Desktop.prototype.onModelAction = function(event) {
 };
 
 scout.Desktop.prototype.tabCount = function() {
-  return this._allTabs.length;
+  return this._allViewTabs.length;
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function(outline) {
-  this._deselectTab();
+  this._deselectViewTab();
   if (this.outline === outline) {
     if (this.outline.inBackground) {
       this._attachOutlineContent();

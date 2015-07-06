@@ -29,9 +29,20 @@ scout.DesktopViewTab.prototype._uninstallPropertyChangeListener = function() {
   this._view.off('propertyChange', this._contentPropertyChangeListener);
 };
 
-scout.DesktopViewTab.prototype.removeTab = function($parent) {
+scout.DesktopViewTab.prototype.remove = function() {
+  this._removeTab();
+  this._removeView();
+};
+
+scout.DesktopViewTab.prototype._removeTab = function() {
   if (this.$container) {
     this.$container.remove();
+  }
+};
+
+scout.DesktopViewTab.prototype._removeView = function() {
+  if (this._view.rendered) {
+    this._view.remove();
   }
 };
 
@@ -49,7 +60,6 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
   this._view.render(this._$bench);
   this._view.htmlComp.validateLayout();
   this._view.htmlComp.validateRoot = true;
-  this._view.tab = this; // FIXME AWE: required for Desktop#showForm -> maybe use a map instead?
   this._view.rendered = true;
   this._viewAttached = true;
 };
