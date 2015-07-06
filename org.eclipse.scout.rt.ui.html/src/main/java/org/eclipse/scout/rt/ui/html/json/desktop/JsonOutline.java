@@ -26,10 +26,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.form.FormParentFilter;
+import org.eclipse.scout.rt.ui.html.json.messagebox.MessageBoxParentFilter;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -41,17 +43,21 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
   private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
   public static final String PROP_FORM = "form";
+  public static final String PROP_MESSAGE_BOX = "messageBox";
 
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
-  private DesktopListener m_desktopListener;
   private final IDesktop m_desktop;
+  private DesktopListener m_desktopListener;
   private final IFilter<IForm> m_formParentFilter;
+  private final IFilter<IMessageBox> m_messageBoxParentFilter;
 
   public JsonOutline(OUTLINE outline, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(outline, uiSession, id, parent);
 
-    m_formParentFilter = new FormParentFilter(outline);
     m_desktop = uiSession.getClientSession().getDesktop();
+
+    m_formParentFilter = new FormParentFilter(outline);
+    m_messageBoxParentFilter = new MessageBoxParentFilter(outline);
   }
 
   @Override
@@ -210,6 +216,13 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       case DesktopEvent.TYPE_FORM_ACTIVATE:
         handleModelFormActivate(event.getForm());
         break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
+        handleModelMessageBoxShow(event.getMessageBox());
+        break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_HIDE:
+        handleModelMessageBoxHide(event.getMessageBox());
+        break;
+
       default:
         // NOOP
     }
@@ -233,6 +246,20 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
+    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("messageBoxShow", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
+    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("messageBoxHide", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 

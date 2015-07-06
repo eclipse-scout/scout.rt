@@ -24,12 +24,14 @@ import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.messagebox.MessageBoxParentFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
@@ -49,20 +51,24 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_ROOT_GROUP_BOX = "rootGroupBox";
   public static final String PROP_INITIAL_FOCUS = "initialFocus";
   public static final String PROP_FORM = "form";
+  public static final String PROP_MESSAGE_BOX = "messageBox";
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String EVENT_FORM_CLOSED = "formClosed";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
 
+  private final IDesktop m_desktop;
   private DesktopListener m_desktopListener;
   private FormListener m_formListener;
-  private final IDesktop m_desktop;
   private final IFilter<IForm> m_formParentFilter;
+  private final IFilter<IMessageBox> m_messageBoxParentFilter;
 
   public JsonForm(FORM form, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(form, uiSession, id, parent);
-    m_formParentFilter = new FormParentFilter(form);
     m_desktop = uiSession.getClientSession().getDesktop();
+
+    m_formParentFilter = new FormParentFilter(form);
+    m_messageBoxParentFilter = new MessageBoxParentFilter(form);
   }
 
   @Override
@@ -275,6 +281,12 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
       case DesktopEvent.TYPE_FORM_ACTIVATE:
         handleModelFormActivate(event.getForm());
         break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
+        handleModelMessageBoxShow(event.getMessageBox());
+        break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_HIDE:
+        handleModelMessageBoxHide(event.getMessageBox());
+        break;
       default:
         // NOOP
     }
@@ -298,6 +310,20 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_formParentFilter);
     if (jsonAdapter != null) {
       addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
+    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("messageBoxShow", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
+    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("messageBoxHide", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 

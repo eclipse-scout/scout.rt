@@ -183,14 +183,17 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       case DesktopEvent.TYPE_FORM_ACTIVATE:
         handleModelFormActivate(event.getForm());
         break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
+        handleModelMessageBoxShow(event.getMessageBox());
+        break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_HIDE:
+        handleModelMessageBoxHide(event.getMessageBox());
+        break;
       case DesktopEvent.TYPE_OPEN_URI:
         handleModelOpenUri(event.getUri(), event.getTarget());
         break;
       case DesktopEvent.TYPE_DOWNLOAD_RESOURCE:
         handleModelDownloadResource(event.getDownloadHandler());
-        break;
-      case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
-        handleModelMessageBoxAdded(event.getMessageBox());
         break;
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
@@ -264,10 +267,17 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {
+  protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
     IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
     if (jsonAdapter != null) {
-      addActionEvent("messageBoxAdded", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
+      addActionEvent("messageBoxShow", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
+    }
+  }
+
+  protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
+    IJsonAdapter<?> jsonAdapter = attachAdapter(messageBox, m_messageBoxParentFilter);
+    if (jsonAdapter != null) {
+      addActionEvent("messageBoxHide", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
     }
   }
 

@@ -5,6 +5,7 @@ scout.Form = function() {
   this._locked;
   this._$glassPane;
   this._formController;
+  this._messageBoxController;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -16,14 +17,22 @@ scout.Form.prototype.init = function(model, session) {
     this.rootGroupBox.menuBar.large();
   }
 
+  // FormController
   this._formController = new scout.FormController(this, session,
-      function() { // callback to access dialogs attached to this Form.
-        return this.dialogs;
-      }.bind(this),
-      function() { // callback to access views attached to this Form.
-        return this.views;
-      }.bind(this)
-    );
+    function() { // callback to access dialogs attached to this Form.
+      return this.dialogs;
+    }.bind(this),
+    function() { // callback to access views attached to this Form.
+      return this.views;
+    }.bind(this)
+  );
+
+  // MessageBoxController
+  this._messageBoxController = new scout.MessageBoxController(this, session,
+    function() { // callback to access message boxes attached to this Form.
+      return this.messageBoxes;
+    }.bind(this)
+  );
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -73,6 +82,8 @@ scout.Form.prototype._render = function($parent) {
 
   // Display all Forms registered on this Form.
   this._formController.showAll();
+  // Display all MessageBoxes registered on Desktop.
+  this._messageBoxController.showAll();
 };
 scout.Form.prototype._renderProperties = function() {
   this._renderInitialFocus(this.initialFocus);
@@ -197,6 +208,10 @@ scout.Form.prototype.onModelAction = function(event) {
     this._formController.removeAndHide(event.form);
   } else if (event.type === 'formActivate') {
     this._formController.activateForm(event.form);
+  } else if (event.type === 'messageBoxShow') {
+    this._messageBoxController.addAndShow(event.messageBox);
+  } else if (event.type === 'messageBoxHide') {
+    this._messageBoxController.removeAndHide(event.messageBox);
   } else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }

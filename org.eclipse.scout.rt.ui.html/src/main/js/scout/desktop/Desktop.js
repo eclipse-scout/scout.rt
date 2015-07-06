@@ -24,20 +24,29 @@ scout.Desktop = function() {
   this.selectedTool;
   this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
   this._formController;
+  this._messageBoxController;
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
 scout.Desktop.prototype.init = function(model, session) {
   scout.Desktop.parent.prototype.init.call(this, model, session);
 
+  // FormController
   this._formController = new scout.FormController(this, session,
-      function() { // callback to access dialogs attached to the Desktop.
-        return this.dialogs;
-      }.bind(this),
-      function() { // callback to access views attached to the Desktop.
-        return this.views;
-      }.bind(this)
-    );
+    function() { // callback to access dialogs attached to the Desktop.
+      return this.dialogs;
+    }.bind(this),
+    function() { // callback to access views attached to the Desktop.
+      return this.views;
+    }.bind(this)
+  );
+
+  // MessageBoxController
+  this._messageBoxController = new scout.MessageBoxController(this, session,
+    function() { // callback to access message boxes attached to the Desktop.
+      return this.messageBoxes;
+    }.bind(this)
+  );
 };
 
 scout.DesktopStyle = {
@@ -80,9 +89,10 @@ scout.Desktop.prototype._render = function($parent) {
 
   // Display all Forms registered on Desktop.
   this._formController.showAll();
+  // Display all MessageBoxes registered on Desktop.
+  this._messageBoxController.showAll();
 
-  // TODO BSH: How to determine order of messageboxes and filechoosers?
-  this.messageBoxes.forEach(this._renderMessageBox.bind(this));
+  // TODO BSH: How to determine order of filechoosers?
   this.fileChoosers.forEach(this._renderFileChooser.bind(this));
 
   $(window).on('resize', this.onResize.bind(this));
@@ -388,14 +398,6 @@ scout.Desktop.prototype.setOutline = function(outline) {
   this.navigation.onOutlineChanged(this.outline);
 };
 
-scout.Desktop.prototype._renderMessageBox = function(messageBox) {
-  messageBox.render(this.$container);
-};
-
-scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
-  scout.arrays.remove(this.messageBoxes, messageBox);
-};
-
 scout.Desktop.prototype._renderFileChooser = function(fileChooser) {
   fileChooser.render(this.$container);
 };
@@ -419,8 +421,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this._formController.activateForm(event.form);
   } else if (event.type === 'outlineChanged') {
     this._onModelOutlineChanged(event);
-  } else if (event.type === 'messageBoxAdded') {
-    this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
+  } else if (event.type === 'messageBoxShow') {
+    this._messageBoxController.addAndShow(event.messageBox);
+  } else if (event.type === 'messageBoxHide') {
+    this._messageBoxController.removeAndHide(event.messageBox);
   } else if (event.type === 'fileChooserAdded') {
     this._renderFileChooser(this.session.getOrCreateModelAdapter(event.fileChooser, this));
   } else if (event.type === 'openUri') {

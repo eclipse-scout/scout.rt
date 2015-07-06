@@ -8,22 +8,30 @@ scout.Outline = function() {
   this._tableSelectionListener;
   this.inBackground = false;
   this._formController;
+  this._messageBoxController;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
 scout.Outline.prototype.init = function(model, session) {
   scout.Outline.parent.prototype.init.call(this, model, session);
 
+  // FormController
   this._formController = new scout.FormController(this, session,
-      function() { // callback to access dialogs attached to this Outline.
-        return this.dialogs;
-      }.bind(this),
-      function() { // callback to access views attached to this Outline.
-        return this.views;
-      }.bind(this)
-    );
-};
+    function() { // callback to access dialogs attached to this Outline.
+      return this.dialogs;
+    }.bind(this),
+    function() { // callback to access views attached to this Outline.
+      return this.views;
+    }.bind(this)
+  );
 
+  // MessageBoxController
+  this._messageBoxController = new scout.MessageBoxController(this, session,
+    function() { // callback to access message boxes attached to this Outline.
+      return this.messageBoxes;
+    }.bind(this)
+  );
+};
 
 scout.Outline.prototype._createKeyStrokeAdapter = function() {
   return new scout.OutlineKeyStrokeAdapter(this);
@@ -43,6 +51,8 @@ scout.Outline.prototype._render = function($parent) {
 
   // Display all Forms registered on this Outline.
   this._formController.showAll();
+  // Display all MessageBoxes registered on Desktop.
+  this._messageBoxController.showAll();
 
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
@@ -254,6 +264,10 @@ scout.Outline.prototype.onModelAction = function(event) {
     this._formController.removeAndHide(event.form);
   } else if (event.type === 'formActivate') {
     this._formController.activateForm(event.form);
+  } else if (event.type === 'messageBoxShow') {
+    this._messageBoxController.addAndShow(event.messageBox);
+  } else if (event.type === 'messageBoxHide') {
+    this._messageBoxController.removeAndHide(event.messageBox);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }

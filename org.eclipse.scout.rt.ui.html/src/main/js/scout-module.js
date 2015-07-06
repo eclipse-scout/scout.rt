@@ -88,10 +88,6 @@ __include("scout/calendar/CalendarListComponent.js");
 __include("scout/calendar/CalendarLayout.js");
 __include("scout/calendar/Range.js");
 __include("scout/calendar/YearPanel.js");
-__include("scout/messagebox/MessageBox.js");
-__include("scout/messagebox/MessageBoxControlKeyStrokes.js");
-__include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
-__include("scout/messagebox/MessageBoxModelAdapter.js");
 __include("scout/planner/Planner.js");
 __include("scout/planner/PlannerHeader.js");
 __include("scout/planner/PlannerLayout.js");
@@ -166,6 +162,12 @@ __include("scout/form/fields/CompositeField.js");
 __include("scout/form/fields/ValueField.js");
 __include("scout/form/fields/TextFieldLayout.js");
 __include("scout/form/FormController.js");
+// Basics for message boxes
+__include("scout/messagebox/MessageBox.js");
+__include("scout/messagebox/MessageBoxControlKeyStrokes.js");
+__include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
+__include("scout/messagebox/MessageBoxModelAdapter.js");
+__include("scout/messagebox/MessageBoxController.js");
 // Form fields (A-Z)
 __include("scout/form/fields/beanfield/BeanField.js");
 __include("scout/form/fields/browserfield/BrowserField.js");
