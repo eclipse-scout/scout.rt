@@ -55,8 +55,22 @@ public class TypeCastUtilityTest {
     catch (IllegalArgumentException t) {
       //nop
     }
+    try {
+      TypeCastUtility.getGenericsParameterClass(String.class, Object.class, 0);
+      fail("not parametrized at all, must fail");
+    }
+    catch (IllegalArgumentException t) {
+      //nop
+    }
     genericT = TypeCastUtility.getGenericsParameterClass(X2.class, X0.class, 0);
     assertEquals(Data2.class, genericT);
+    try {
+      TypeCastUtility.getGenericsParameterClass(X2.class, X0.class, 1);
+      fail("X2 has only one type parameter, must fail");
+    }
+    catch (ArrayIndexOutOfBoundsException t) {
+      //nop
+    }
     //
     genericT = TypeCastUtility.getGenericsParameterClass(Y3.class, Y0.class, 0);
     assertEquals(Data3.class, genericT);

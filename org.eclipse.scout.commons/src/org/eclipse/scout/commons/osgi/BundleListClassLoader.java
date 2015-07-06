@@ -1,24 +1,18 @@
 package org.eclipse.scout.commons.osgi;
 
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
@@ -26,19 +20,23 @@ import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * Class loader implementation that uses a list of bundles to load classes.
- *
+ * 
  * @since 3.8.2
  */
 public class BundleListClassLoader extends ClassLoader {
 
+  @SuppressWarnings("restriction")
+  private static final String OSGI_RESOURCE_URL_PROTOCOL = org.eclipse.osgi.framework.internal.core.Constants.OSGI_RESOURCE_URL_PROTOCOL;
+
+  @SuppressWarnings("restriction")
+  private static final Pattern BUNDLE_ID_URL_HOST_NAME_PATTERN = Pattern.compile("(\\d+)" + Pattern.quote(org.eclipse.osgi.framework.internal.core.BundleResourceHandler.BID_FWKID_SEPARATOR) + ".*");
+
   /** table mapping primitive type names to corresponding class objects */
-  private static final HashMap<String, Class> PRIMITIVE_TYPES;
+  private static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<String, Class<?>>();
   static {
-    PRIMITIVE_TYPES = new HashMap<String, Class>(8, 1f);
     PRIMITIVE_TYPES.put("boolean", boolean.class);
     PRIMITIVE_TYPES.put("byte", byte.class);
     PRIMITIVE_TYPES.put("char", char.class);
@@ -59,54 +57,42 @@ public class BundleListClassLoader extends ClassLoader {
     PRIMITIVE_TYPES.put("D", double.class);
     PRIMITIVE_TYPES.put("V", void.class);
   }
-  private static final ThreadLocal<Set<String>> LOOP_DETECTOR = new ThreadLocal<Set<String>>();
-  private static final Enumeration<URL> EMPTY_URL_ENUMERATION = new Enumeration<URL>() {
-    @Override
-    public boolean hasMoreElements() {
-      return false;
-    }
 
-    @Override
-    public URL nextElement() {
-      throw new NoSuchElementException();
-    }
-  };
   private static final String BUNDLE_INCLUDE_FILTER_PROPERTY = "org.eclipse.scout.commons.osgi.BundleListClassLoader#includeBundles";
   private static final String BUNDLE_EXCLUDE_FILTER_PROPERTY = "org.eclipse.scout.commons.osgi.BundleListClassLoader#excludeBundles";
   private static final String REGEX_MARKER = "regex:";
 
-  private static ClassLoader s_myClassLoader;
-  static {
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        s_myClassLoader = BundleListClassLoader.class.getClassLoader();
-        return null;
-      }
-    });
-  }
-
+  private final ClassLoader m_parentClassLoader;
+  private final String[] m_bundleOrderPrefixes;
+  private final BundleContext m_bundleContext;
   private final Bundle[] m_bundles;
-  private final Bundle[] m_bundlesSortedByBundleSymbolicNameLenght;
-  private String[] m_bundleOrderPrefixes = null;
-  private final ClassLoader m_parentContextClassLoader;
-  private final ReadWriteLock m_cacheLock = new ReentrantReadWriteLock();
-  private final Map<String, WeakReference<Class<?>>> m_classCache;
+
   private final boolean m_useResourceFiltering;
   private final boolean m_useResourceCaching;
-  private final Map<String, Vector<URL>> m_resourceCache;
+
+  private final Map<String, Class<?>> m_classCache = new ConcurrentHashMap<String, Class<?>>();
+  private final Map<String, List<URL>> m_resourceCache = new ConcurrentHashMap<String, List<URL>>();
+
+  private final ThreadLocal<Set<String>> LOOP_DETECTOR = new ThreadLocal<Set<String>>() {
+    @Override
+    protected Set<String> initialValue() {
+      return new HashSet<String>();
+    }
+  };
 
   public BundleListClassLoader(ClassLoader parent, Bundle... bundles) {
     super(parent);
-    m_parentContextClassLoader = parent != null ? parent : new ClassLoader(Object.class.getClassLoader()) {
-      // boot classloader
+    m_parentClassLoader = parent != null ? parent : new ClassLoader(Object.class.getClassLoader()) {
+      // boot loader
     };
     if (bundles == null || bundles.length == 0) {
       throw new IllegalArgumentException("bundle list must not be null or empty");
     }
+
     // filter given list of bundles.
-    String bundleIncludeFilter = Activator.getDefault().getBundle().getBundleContext().getProperty(BUNDLE_INCLUDE_FILTER_PROPERTY);
-    String bundleExcludeFilter = Activator.getDefault().getBundle().getBundleContext().getProperty(BUNDLE_EXCLUDE_FILTER_PROPERTY);
+    m_bundleContext = Activator.getDefault().getBundle().getBundleContext();
+    String bundleIncludeFilter = m_bundleContext.getProperty(BUNDLE_INCLUDE_FILTER_PROPERTY);
+    String bundleExcludeFilter = m_bundleContext.getProperty(BUNDLE_EXCLUDE_FILTER_PROPERTY);
     Pattern[] bundleIncludePatterns = parseFilterPatterns(bundleIncludeFilter);
     Pattern[] bundleExcludePatterns = parseFilterPatterns(bundleExcludeFilter);
     List<Bundle> filteredBundleList = new ArrayList<Bundle>();
@@ -115,339 +101,253 @@ public class BundleListClassLoader extends ClassLoader {
         filteredBundleList.add(b);
       }
     }
-    m_bundles = filteredBundleList.toArray(new Bundle[filteredBundleList.size()]);
-    if (getBundles().length == 0) {
+    if (filteredBundleList.isEmpty()) {
       throw new IllegalArgumentException("filtered bundle list must not be empty. [bundles=" + Arrays.toString(bundles) + "]");
     }
+    m_bundles = filteredBundleList.toArray(new Bundle[filteredBundleList.size()]);
     //
-    m_bundlesSortedByBundleSymbolicNameLenght = new Bundle[getBundles().length];
-    System.arraycopy(getBundles(), 0, getBundlesSortedByBundleSymbolicNameLenght(), 0, getBundles().length);
-    Arrays.sort(getBundlesSortedByBundleSymbolicNameLenght(), new Comparator<Bundle>() {
-      @Override
-      public int compare(Bundle b1, Bundle b2) {
-        if (b1 == null && b2 == null) {
-          return 0;
-        }
-        if (b1 == null) {
-          return -1;
-        }
-        if (b2 == null) {
-          return 1;
-        }
-        return StringUtility.length(b2.getSymbolicName()) - StringUtility.length(b1.getSymbolicName());
-      }
-    });
-    //
-    m_classCache = new HashMap<String, WeakReference<Class<?>>>();
     m_useResourceFiltering = SerializationUtility.isUseBundleOrderPrefixListAsResourceFilterEnabled();
     m_useResourceCaching = SerializationUtility.isResourceUrlCachingInBundleListClassLoaderEnabled();
-    m_resourceCache = new HashMap<String, Vector<URL>>();
-  }
-
-  public Bundle[] getBundles() {
-    return m_bundles;
-  }
-
-  public Bundle[] getBundlesSortedByBundleSymbolicNameLenght() {
-    return m_bundlesSortedByBundleSymbolicNameLenght;
-  }
-
-  public ClassLoader getParentContextClassLoader() {
-    return m_parentContextClassLoader;
-  }
-
-  public boolean isUseResourceFilteringEnabled() {
-    return m_useResourceFiltering;
-  }
-
-  public boolean isUseResourceCachingEnabled() {
-    return m_useResourceCaching;
-  }
-
-  protected Class<?> putInCache(String name, Class<?> c) {
-    m_cacheLock.writeLock().lock();
-    try {
-      m_classCache.put(name, new WeakReference<Class<?>>(c));
-    }
-    finally {
-      m_cacheLock.writeLock().unlock();
-    }
-    return c;
-  }
-
-  protected URL putInCache(String name, URL resources) {
-    Vector<URL> urlList = new Vector<URL>();
-    urlList.add(resources);
-    urlList = putInCache(name, urlList);
-    return urlList.firstElement();
-  }
-
-  protected Vector<URL> putInCache(String name, Vector<URL> resources) {
-    if (isUseResourceCachingEnabled()) {
-      m_cacheLock.writeLock().lock();
-      try {
-        m_resourceCache.put(name, resources);
-      }
-      finally {
-        m_cacheLock.writeLock().unlock();
-      }
-    }
-    return resources;
-  }
-
-  protected Vector<URL> getFromCache(String name) {
-    if (!isUseResourceCachingEnabled()) {
-      return null;
-    }
-    m_cacheLock.readLock().lock();
-    try {
-      Vector<URL> ref = m_resourceCache.get(name);
-      return ref;
-    }
-    finally {
-      m_cacheLock.readLock().unlock();
-    }
-  }
-
-  protected void clearCaches() {
-    m_cacheLock.writeLock().lock();
-    try {
-      m_classCache.clear();
-      m_resourceCache.clear();
-    }
-    finally {
-      m_cacheLock.writeLock().unlock();
-    }
+    m_bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
   }
 
   @Override
-  public Class<?> loadClass(String className) throws ClassNotFoundException {
-    if (!registerLoadingItem(className)) {
+  protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
+    final Set<String> prev = LOOP_DETECTOR.get();
+    if (prev.contains(className)) {
       throw new ClassNotFoundException(className);
     }
+
     try {
+      prev.add(className);
       return doLoadClass(className);
     }
     finally {
-      unregisterLoadingItem(className);
+      prev.remove(className);
+      if (prev.isEmpty()) {
+        LOOP_DETECTOR.remove();
+      }
     }
   }
 
-  protected Class<?> doLoadClass(String className) throws ClassNotFoundException {
-    // 1. check primitive classes
-    Class<?> c = PRIMITIVE_TYPES.get(className);
-    if (c != null) {
-      return c;
+  private Class<?> doLoadClass(String className) throws ClassNotFoundException {
+    // check the cache
+    final Class<?> fromCache = m_classCache.get(className);
+    if (fromCache == P_Unknown.class) {
+      throw new ClassNotFoundException(className);
+    }
+    if (fromCache != null) {
+      return fromCache;
     }
 
-    // 2. check if class name denotes an array
-    int arrayDim = 0;
-    while (className.startsWith("[")) {
-      className = className.substring(1);
-      arrayDim++;
+    // special handling for primitives
+    if (PRIMITIVE_TYPES.containsKey(className)) {
+      return PRIMITIVE_TYPES.get(className);
     }
-    if (className.matches("L.*;")) {
-      className = className.substring(1, className.length() - 1);
+
+    // special handling for arrays
+    final Class<?> arrayClass = tryLoadAsArray(className);
+    if (arrayClass != null) {
+      return arrayClass;
+    }
+
+    // try the loading from the m_bundles
+    final Class<?> fromBundles = tryLoadFromBundles(className);
+    if (fromBundles != null) {
+      return fromBundles;
+    }
+
+    // try parent
+    try {
+      final Class<?> fromParent = m_parentClassLoader.loadClass(className);
+      if (fromParent != null) {
+        m_classCache.put(className, fromParent);
+        return fromParent;
+      }
+    }
+    catch (ClassNotFoundException e) {
+      // ignore
+    }
+
+    m_classCache.put(className, P_Unknown.class); // remember that we do not know this class
+    throw new ClassNotFoundException(className);
+  }
+
+  private Class<?> tryLoadAsArray(String className) throws ClassNotFoundException {
+    int arrayDim = 0;
+    String memberClassName = className;
+
+    while (memberClassName.startsWith("[")) {
+      arrayDim += 1;
+      memberClassName = memberClassName.substring(1);
+    }
+    if (memberClassName.matches("L.*;")) {
+      memberClassName = memberClassName.substring(1, memberClassName.length() - 1);
     }
     if (arrayDim > 0) {
-      c = loadClass(className);
-      int[] dimensions = new int[arrayDim];
-      c = Array.newInstance(c, dimensions).getClass();
-      return c;
+      final Class<?> memberClass = loadClass(memberClassName);
+      final int[] dimensions = new int[arrayDim];
+      final Class<?> arrayClass = Array.newInstance(memberClass, dimensions).getClass();
+      m_classCache.put(className, arrayClass);
+      return arrayClass;
     }
 
-    // 3. delegate classes starting with 'java.' to parent class loader
-    if (className.startsWith("java.")) {
-      return getParentContextClassLoader().loadClass(className);
-    }
+    return null;
+  }
 
-    // 4. check if class is already in the cache
-    m_cacheLock.readLock().lock();
-    try {
-      WeakReference<Class<?>> ref = m_classCache.get(className);
-      if (ref != null) {
-        c = ref.get();
-        if (c != null) {
-          return c;
-        }
-      }
-      if (m_classCache.containsKey(className)) {
-        throw new ClassNotFoundException(className);
-      }
-    }
-    finally {
-      m_cacheLock.readLock().unlock();
-    }
+  private Class<?> tryLoadFromBundles(String className) {
+    final Set<Bundle> triedBundles = new HashSet<Bundle>();
 
-    Set<Bundle> usedBundles = new HashSet<Bundle>();
-
-    // 5. search in best matching bundles based on class and bundle symbolic name
-    for (Bundle bundle : getBundlesSortedByBundleSymbolicNameLenght()) {
-      if (usedBundles.contains(bundle)) {
-        continue;
-      }
-      if (className.startsWith(bundle.getSymbolicName() + ".")) {
-        usedBundles.add(bundle);
-        try {
-          c = bundle.loadClass(className);
-          return putInCache(className, c);
-        }
-        catch (Exception e) {
-          //nop
+    // try m_bundles with matching names
+    for (Bundle bundle : m_bundles) {
+      if (className.startsWith(bundle.getSymbolicName())) {
+        final Class<?> candidate = tryLoadFromSingleBundle(className, bundle, triedBundles);
+        if (candidate != null) {
+          return candidate;
         }
       }
     }
 
-    // 6. search in active bundles
-    for (Bundle bundle : getBundlesSortedByBundleSymbolicNameLenght()) {
-      if (usedBundles.contains(bundle)) {
-        continue;
-      }
+    // try active m_bundles
+    for (Bundle bundle : m_bundles) {
       if (bundle.getState() == Bundle.ACTIVE) {
-        usedBundles.add(bundle);
-        try {
-          c = bundle.loadClass(className);
-          return putInCache(className, c);
-        }
-        catch (Exception e) {
-          //nop
+        final Class<?> candidate = tryLoadFromSingleBundle(className, bundle, triedBundles);
+        if (candidate != null) {
+          return candidate;
         }
       }
     }
 
-    // 7. search in remaining bundles
-    for (Bundle b : getBundles()) {
-      if (usedBundles.contains(b)) {
-        continue;
-      }
-      try {
-        c = b.loadClass(className);
-        return putInCache(className, c);
-      }
-      catch (Exception e) {
-        //nop
+    // try remaining m_bundles
+    for (Bundle bundle : m_bundles) {
+      final Class<?> candidate = tryLoadFromSingleBundle(className, bundle, triedBundles);
+      if (candidate != null) {
+        return candidate;
       }
     }
 
-    // 8. try context class loader
+    return null;
+  }
+
+  private Class<?> tryLoadFromSingleBundle(String className, Bundle bundle, Set<Bundle> triedBundles) {
+    if (triedBundles.contains(bundle)) {
+      return null;
+    }
+    triedBundles.add(bundle);
+
     try {
-      // do not call super.loadClass because it checks the native cache (see eclipse equinox bug 127963)
-      c = getParentContextClassLoader().loadClass(className);
-      return putInCache(className, c);
+      // Querying the same bundle repeatedly should return the same result --> it is ok to "load" some
+      //  classes several times. We avoid locks this way, read locks in particular.
+      final Class<?> result = bundle.loadClass(className);
+      m_classCache.put(className, result);
+      return result;
     }
-    catch (Exception e) {
-      //nop
+    catch (Exception exc) {
+      // ignore
     }
-
-    // 9. class not found
-    putInCache(className, (Class<?>) null);
-    throw new ClassNotFoundException(className);
+    return null;
   }
 
   @Override
   public URL getResource(String name) {
-    Enumeration<URL> resources = getResources(name);
-    if (resources != null && resources.hasMoreElements()) {
-      return resources.nextElement();
+    final Enumeration<URL> all = getResources(name);
+    if (all != null && all.hasMoreElements()) {
+      return all.nextElement();
     }
     return null;
   }
 
   @Override
-  public InputStream getResourceAsStream(String name) {
-    try {
-      URL u = getResource(name);
-      if (u != null) {
-        return u.openStream();
-      }
-    }
-    catch (Exception e) {
-      //nop
-    }
-    return null;
-  }
-
-  @Override
-  public Enumeration<URL> getResources(String name) {
-    if (!registerLoadingItem(name)) {
+  public Enumeration<URL> getResources(String resourceName) {
+    final Set<String> prev = LOOP_DETECTOR.get();
+    if (prev.contains(resourceName)) {
       return null;
     }
+
     try {
-      // 1. check if resource is already in the cache
-      Vector<URL> ref = getFromCache(name);
-      if (ref != null) {
-        return ref.elements();
-      }
-
-      // 2. search in bundles
-      Vector<URL> urlList = searchResourcesInBundles(name);
-
-      // 3. filter resources
-      urlList = filterResources(urlList);
-
-      return putInCache(name, urlList).elements();
+      prev.add(resourceName);
+      return doGetResources(resourceName);
     }
     finally {
-      unregisterLoadingItem(name);
+      prev.remove(resourceName);
+      if (prev.isEmpty()) {
+        LOOP_DETECTOR.remove();
+      }
     }
   }
 
-  protected Vector<URL> searchResourcesInBundles(String name) {
-    Vector<URL> urlList = new Vector<URL>();
-    for (Bundle b : getBundles()) {
+  private Enumeration<URL> doGetResources(String resourceName) {
+    final List<URL> fromCache = m_resourceCache.get(resourceName);
+    if (fromCache != null) {
+      return new P_ListEnumeration(fromCache);
+    }
+
+    // collect URLs from the m_bundles
+    final List<URL> all = new ArrayList<URL>();
+    for (Bundle b : m_bundles) {
       try {
-        Enumeration resources = b.getResources(name);
-        while (resources != null && resources.hasMoreElements()) {
-          URL url = (URL) resources.nextElement();
-          urlList.add(url);
+        final Enumeration<?> en = b.getResources(resourceName);
+        while (en != null && en.hasMoreElements()) {
+          all.add((URL) en.nextElement());
         }
       }
       catch (Exception e) {
         //nop
       }
     }
-    return urlList;
+
+    // filter
+    final List<URL> filtered = filterResources(all);
+
+    if (m_useResourceCaching) {
+      m_resourceCache.put(resourceName, filtered);
+    }
+    return new P_ListEnumeration(filtered);
   }
 
-  protected Vector<URL> filterResources(Vector<URL> urlList) {
-    if (isUseResourceFilteringEnabled()) {
-      Vector<URL> newUrlList = new Vector<URL>();
-      Vector<URL> customUrlList = new Vector<URL>();
-      Enumeration<URL> resources = urlList.elements();
-      while (resources != null && resources.hasMoreElements()) {
-        URL resource = resources.nextElement();
-        newUrlList.add(resource);
-        if (isUrlFromBundlePrefixes(resource)) {
-          customUrlList.add(resource);
-        }
-      }
-      if (!customUrlList.isEmpty()) {
-        urlList = customUrlList;
-      }
-      else {
-        urlList = newUrlList;
+  private List<URL> filterResources(List<URL> all) {
+    if (!m_useResourceFiltering) {
+      return all;
+    }
+
+    final List<URL> customUrlList = new ArrayList<URL>();
+
+    for (URL url : all) {
+      if (isUrlFromBundlePrefixes(url)) {
+        customUrlList.add(url);
       }
     }
-    return urlList;
+
+    if (customUrlList.size() > 0) {
+      return customUrlList;
+    }
+
+    return all;
   }
 
-  protected boolean registerLoadingItem(String name) {
-    Set<String> loadingItems = LOOP_DETECTOR.get();
-    if (loadingItems != null && loadingItems.contains(name)) {
+  /**
+   * return true if resource {@link URL} is located in a bundle from the list of bundleOrderPrefixes
+   */
+  private boolean isUrlFromBundlePrefixes(URL resource) {
+    if (!OSGI_RESOURCE_URL_PROTOCOL.equalsIgnoreCase(resource.getProtocol()) || resource.getHost() == null) {
       return false;
     }
 
-    if (loadingItems == null) {
-      loadingItems = new HashSet<String>(3);
-      LOOP_DETECTOR.set(loadingItems);
+    Matcher m = BUNDLE_ID_URL_HOST_NAME_PATTERN.matcher(resource.getHost());
+    if (!m.matches()) {
+      return false;
     }
-    loadingItems.add(name);
-    return true;
-  }
 
-  protected void unregisterLoadingItem(String name) {
-    // invariant: register has already been invoked
-    LOOP_DETECTOR.get().remove(name);
+    long bundleId = Long.valueOf(m.group(1));
+    Bundle bundle = m_bundleContext.getBundle(bundleId);
+    if (bundle != null) {
+      for (String bundlePrefix : m_bundleOrderPrefixes) {
+        if (StringUtility.contains(bundle.getSymbolicName(), bundlePrefix)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -527,57 +427,28 @@ public class BundleListClassLoader extends ClassLoader {
     return pattern;
   }
 
-  /**
-   * return true if resource {@link URL} is located in a bundle from the list of bundleOrderPrefixes
-   */
-  protected boolean isUrlFromBundlePrefixes(URL resource) {
-    if (m_bundleOrderPrefixes == null) {
-      m_bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
+  private static class P_ListEnumeration implements Enumeration<URL> {
+    private final Iterator<URL> m_iterator;
+
+    public P_ListEnumeration(Iterable<URL> inner) {
+      m_iterator = inner.iterator();
     }
-    long bundleID = getBundleID(resource.getHost());
-    if (bundleID >= 0) {
-      Bundle bundle = getBundle(bundleID);
-      if (bundle != null) {
-        for (String bundlePrefix : m_bundleOrderPrefixes) {
-          if (StringUtility.contains(bundle.getSymbolicName(), bundlePrefix)) {
-            return true;
-          }
-        }
-      }
+
+    @Override
+    public boolean hasMoreElements() {
+      return m_iterator.hasNext();
     }
-    return false;
+
+    @Override
+    public URL nextElement() {
+      return m_iterator.next();
+    }
   }
 
   /**
-   * find the bundleId in the host string.
-   * Example: 80.2hwhefh29:3
-   *
-   * @param host
-   *          from resource {@link URL}
-   * @return bundle id
+   * Marker class used for caching unknown classes ({@link ConcurrentHashMap} does not accept <code>null</code> keys or
+   * values).
    */
-  protected long getBundleID(String host) {
-    int dotIndex = host.indexOf('.');
-    return (dotIndex >= 0 && dotIndex < host.length() - 1) ? Long.parseLong(host.substring(0, dotIndex)) : -1;
-  }
-
-  /**
-   * find the {@link Bundle} from a bundle id
-   *
-   * @param id
-   *          bundle id
-   * @return the corresponding {@link Bundle}
-   */
-  protected Bundle getBundle(long id) {
-    BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
-    Bundle result = null;
-    for (Bundle candidate : bundleContext.getBundles()) {
-      if (candidate.getBundleId() == id) {
-        if (result == null || result.getVersion().compareTo(candidate.getVersion()) < 0) {
-          result = candidate;
-        }
-      }
-    }
-    return result;
+  private static class P_Unknown {
   }
 }
