@@ -141,16 +141,17 @@ scout.Table.prototype._render = function($parent) {
   this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar.render(this.$container);
 
-
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      function() { return this.dropType; }.bind(this),
-      function(event) {
-          var row = this._rowAtY(event.originalEvent.pageY);
-          return {
-              'rowId': (row ? row.id : '')
-          };
-        }.bind(this));
+    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    function() {
+      return this.dropType;
+    }.bind(this),
+    function(event) {
+      var row = this._rowAtY(event.originalEvent.pageY);
+      return {
+        'rowId': (row ? row.id : '')
+      };
+    }.bind(this));
   this.dragAndDropHandler.install(this.$data);
 
   this._renderRows();
@@ -1986,6 +1987,7 @@ scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
 
 scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
   this.selectRows(this._rowsByIds(selectedRowIds), false);
+  this.selectionHandler.clearLastSelectedRowMarker();
 };
 
 scout.Table.prototype._syncMenus = function(menus) {

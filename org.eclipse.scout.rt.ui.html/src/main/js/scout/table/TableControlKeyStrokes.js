@@ -10,9 +10,9 @@ scout.inherits(scout.TableControlKeyStrokes, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.TableControlKeyStrokes.prototype.handle = function(event) {
-  var $newRowSelection, $prev, $next, i, rows;
+  var $newRowSelection, $prev, $next, i, rows, directionDown = false;
   var keycode = event.which;
-  var $rowsAll = this._field.$rows();
+  var $rowsAll = this._field.$filteredRows();
   //TODO nbu refactor
   var $rowsSelected = this._field.$selectedRows();
 
@@ -27,73 +27,154 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
     }
   }
 
+  var lastActionRow = this._field.selectionHandler.lastActionRow,
+    deselect = false;
+
   // up: move up
   if (keycode === scout.keys.UP) {
-    if ($rowsSelected.length > 0) {
-      $newRowSelection = this._field.$prevFilteredRows($rowsSelected.first()).first();
+    if ($rowsSelected.length > 0 || lastActionRow) {
+      lastActionRow = lastActionRow || $rowsSelected.first().data('row');
+      deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.prev('.table-row:not(.invisible)').isSelected();
+      $newRowSelection = deselect ? lastActionRow.$row : lastActionRow.$row.prev('.table-row:not(.invisible)');
+      this._field.selectionHandler.lastActionRow = lastActionRow.$row.prev('.table-row:not(.invisible)').length > 0 ? lastActionRow.$row.prev('.table-row:not(.invisible)').data('row') : lastActionRow;
     } else {
       $newRowSelection = $rowsAll.last();
+      this._field.selectionHandler.lastActionRow = $newRowSelection.data('row');
     }
   }
 
   // down: move down
   if (keycode === scout.keys.DOWN) {
-    if ($rowsSelected.length > 0) {
-      $newRowSelection = this._field.$nextFilteredRows($rowsSelected.last()).first();
+    if ($rowsSelected.length > 0 || lastActionRow) {
+      lastActionRow = lastActionRow || $rowsSelected.last().data('row');
+      deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.next('.table-row:not(.invisible)').isSelected();
+      $newRowSelection = deselect ? lastActionRow.$row : lastActionRow.$row.next('.table-row:not(.invisible)');
+      this._field.selectionHandler.lastActionRow = lastActionRow.$row.next('.table-row:not(.invisible)').length > 0 ? lastActionRow.$row.next('.table-row:not(.invisible)').data('row') : lastActionRow;
     } else {
       $newRowSelection = $rowsAll.first();
+      this._field.selectionHandler.lastActionRow = $newRowSelection.data('row');
     }
+    directionDown = true;
   }
 
   // home: top of table
   if (keycode === scout.keys.HOME) {
-    $newRowSelection = $rowsAll.first();
+    if (event.shiftKey && ($rowsSelected.length > 0 || lastActionRow)) {
+      lastActionRow = lastActionRow || $rowsSelected.first().data('row');
+      deselect = !lastActionRow.$row.isSelected();
+      $newRowSelection = lastActionRow.$row.prevAll('.table-row:not(.invisible)');
+    } else {
+      $newRowSelection = $rowsAll.first();
+    }
+    this._field.selectionHandler.lastActionRow = $rowsAll.first().data('row');
   }
 
   // end: bottom of table
   if (keycode === scout.keys.END) {
-    $newRowSelection = $rowsAll.last();
+    if (event.shiftKey && ($rowsSelected.length > 0 || lastActionRow)) {
+      lastActionRow = lastActionRow || $rowsSelected.last().data('row');
+      deselect = !lastActionRow.$row.isSelected();
+      $newRowSelection = lastActionRow.$row.nextAll('.table-row:not(.invisible)');
+      this._field.selectionHandler.lastActionRow = lastActionRow.$row.next('.table-row:not(.invisible)').length > 0 ? lastActionRow.$row.next('.table-row:not(.invisible)').data('row') : lastActionRow;
+    } else {
+      $newRowSelection = $rowsAll.last();
+    }
+    this._field.selectionHandler.lastActionRow = $rowsAll.last().data('row');
+    directionDown = true;
   }
 
   // pgup: jump up
   if (keycode === scout.keys.PAGE_UP) {
-    if ($rowsSelected.length > 0) {
-      $prev = this._field.$prevFilteredRows($rowsSelected.first());
-      if ($prev.length > 10) {
+    if (($rowsSelected.length > 0 || lastActionRow)) {
+      lastActionRow = lastActionRow || $rowsSelected.first().data('row');
+      $prev = this._field.$prevFilteredRows(lastActionRow.$row);
+      if (event.shiftKey) {
+        if ($prev.length > 10) {
+          var $potentialSelection = $prev.slice(0, 10);
+          deselect = $potentialSelection.not('.selected').length === 0;
+          if (deselect) {
+            $newRowSelection = $prev.slice(0, 9);
+            $newRowSelection = $newRowSelection.add(lastActionRow.$row);
+            this._field.selectionHandler.lastActionRow = $newRowSelection.first().prev() > 0 ? $newRowSelection.first().prev().data('row') : $newRowSelection.first().data('row');
+          } else {
+            $newRowSelection = $potentialSelection;
+            this._field.selectionHandler.lastActionRow = $potentialSelection.last().data('row');
+          }
+        } else {
+          deselect = $prev.not('.selected').length === 0;
+          if (!deselect) {
+            $newRowSelection = $prev;
+            this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
+          }
+        }
+      } else if ($prev.length > 10) {
         $newRowSelection = $prev.eq(10);
+        this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
       } else {
         $newRowSelection = $rowsAll.first();
+        this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
       }
     } else {
       $newRowSelection = $rowsAll.last();
+      this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
     }
   }
 
   // pgdn: jump down
   if (keycode === scout.keys.PAGE_DOWN) {
-    if ($rowsSelected.length > 0) {
-      $next = this._field.$nextFilteredRows($rowsSelected.last());
-      if ($next.length > 10) {
+    if ($rowsSelected.length > 0 || lastActionRow) {
+      lastActionRow = lastActionRow || $rowsSelected.last().data('row');
+      $next = this._field.$nextFilteredRows(lastActionRow.$row);
+      if (event.shiftKey) {
+        if ($next.length > 10) {
+          var $potentialSelectionDown = $next.slice(0, 10);
+          deselect = $potentialSelectionDown.not('.selected').length === 0;
+          $newRowSelection = $next.slice(0, 10);
+          if (deselect) {
+            $newRowSelection = $next.slice(0, 9);
+            $newRowSelection = $newRowSelection.add(lastActionRow.$row);
+          } else {
+            $newRowSelection = $potentialSelectionDown;
+          }
+          this._field.selectionHandler.lastActionRow = $potentialSelectionDown.last().data('row');
+        } else {
+          deselect = $next.not('.selected').length === 0;
+          if (!deselect) {
+            $newRowSelection = $next;
+            this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
+          }
+        }
+      } else if ($next.length > 10) {
         $newRowSelection = $next.eq(10);
+        this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
       } else {
         $newRowSelection = $rowsAll.last();
+        this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
       }
     } else {
       $newRowSelection = $rowsAll.first();
+      this._field.selectionHandler.lastActionRow = $newRowSelection.last().data('row');
     }
+    directionDown = true;
   }
 
   // apply selection
-  if ($newRowSelection.length > 0) {
+  if ($newRowSelection && $newRowSelection.length > 0) {
     rows = [];
-    // FIXME CGU: Handling of shift key not perfect, yet... (must remember first selected row)
     if (event.shiftKey) {
-      $newRowSelection = $rowsSelected.add($newRowSelection);
+      if (deselect) {
+        $newRowSelection = $rowsSelected.not($newRowSelection);
+      } else {
+        $newRowSelection = $rowsSelected.add($newRowSelection);
+      }
     }
     for (i = 0; $newRowSelection[i] !== undefined; i++) {
       rows.push($($newRowSelection[i]).data('row'));
     }
     var r = rows[0];
+    if (directionDown) {
+      r = rows[rows.length - 1];
+    }
     this._field.selectRows(rows, true);
     // scroll selection into view (if not visible)
     this._field.scrollTo(r);
@@ -193,8 +274,8 @@ scout.TableControlKeyStrokes.prototype.accept = function(event) {
   var elementType = document.activeElement.tagName.toLowerCase();
 
   if (document.activeElement.className !== 'control-filter' &&
-      (elementType === 'textarea' || elementType === 'input') &&
-      (!event.originalEvent || (event.originalEvent && !event.originalEvent.smartFieldEvent))) {
+    (elementType === 'textarea' || elementType === 'input') &&
+    (!event.originalEvent || (event.originalEvent && !event.originalEvent.smartFieldEvent))) {
     return false;
   }
 

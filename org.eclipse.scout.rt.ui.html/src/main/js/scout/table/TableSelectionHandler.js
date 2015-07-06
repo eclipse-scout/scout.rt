@@ -22,6 +22,10 @@ scout.TableSelectionHandler = function(table) {
   this._maxSelectedRowIndex;
 };
 
+scout.TableSelectionHandler.prototype.clearLastSelectedRowMarker = function() {
+  this.lastActionRow = undefined;
+};
+
 // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
 scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
 
