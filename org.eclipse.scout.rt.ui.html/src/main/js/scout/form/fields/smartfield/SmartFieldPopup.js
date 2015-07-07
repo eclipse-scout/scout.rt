@@ -7,7 +7,7 @@ scout.SmartFieldPopup = function(session, options) {
 scout.inherits(scout.SmartFieldPopup, scout.Popup);
 
 scout.SmartFieldPopup.prototype._render = function($parent) {
-  var htmlPopup, popupLayout, fieldBounds, initialPopupSize;
+  var popupLayout, fieldBounds, initialPopupSize;
   if (!$parent) {
     $parent = this.session.$entryPoint;
   }
@@ -16,18 +16,18 @@ scout.SmartFieldPopup.prototype._render = function($parent) {
     .on('mousedown', this._onMousedown.bind(this))
     .appendTo($parent);
 
-  htmlPopup = new scout.HtmlComponent(this.$container, this.session);
-  popupLayout = new scout.SmartFieldPopupLayout(htmlPopup);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  popupLayout = new scout.SmartFieldPopupLayout(this);
   fieldBounds = this.smartField._fieldBounds();
   initialPopupSize = new scout.Dimension(0, scout.HtmlEnvironment.formRowHeight);
-  htmlPopup.validateRoot = true;
+  this.htmlComp.validateRoot = true;
   popupLayout.adjustAutoSize = function(prefSize) {
     // must re-evaluate _fieldBounds() for each call, since smart-field is not laid out at this point.
     return this._popupSize(this.smartField._fieldBounds(), prefSize);
   }.bind(this);
-  htmlPopup.setLayout(popupLayout);
+  this.htmlComp.setLayout(popupLayout);
   popupLayout.autoSize = false;
-  htmlPopup.setSize(this._popupSize(fieldBounds, initialPopupSize));
+  this.htmlComp.setSize(this._popupSize(fieldBounds, initialPopupSize));
   popupLayout.autoSize = true;
 };
 
@@ -38,7 +38,7 @@ scout.SmartFieldPopup.prototype._popupSize = function(fieldBounds, prefSize) {
 };
 
 scout.SmartFieldPopup.prototype.resize = function() {
-  var htmlPopup = scout.HtmlComponent.get(this.$container),
+  var htmlPopup = this.htmlComp,
     popupLayout = htmlPopup.layoutManager,
     prefSize = htmlPopup.getPreferredSize(),
     size = this._popupSize(this.smartField._fieldBounds(), prefSize);

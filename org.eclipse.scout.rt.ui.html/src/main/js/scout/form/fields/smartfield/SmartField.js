@@ -76,8 +76,6 @@ scout.SmartField.prototype._renderProposalChooser = function() {
     if (this.rendered) {
       // a.) render after a click (property change), form is completely laid out
       this._popup.resize();
-      // Reposition because opening direction may have to be switched if popup gets bigger
-      this._popup.position();
     } else {
       // b.) render when HTML page is loaded, layout of form is not done yet
       //     we must acquire focus, because popup is only closed when field

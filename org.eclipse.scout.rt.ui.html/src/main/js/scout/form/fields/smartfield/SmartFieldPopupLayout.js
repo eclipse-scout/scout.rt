@@ -9,9 +9,9 @@
  *
  *  The proposal-chooser DIV is not always present.
  */
-scout.SmartFieldPopupLayout = function(htmlPopup) {
+scout.SmartFieldPopupLayout = function(popup) {
   scout.SmartFieldPopupLayout.parent.call(this);
-  this._htmlPopup = htmlPopup;
+  this._popup = popup;
   this.autoSize = true;
 };
 scout.inherits(scout.SmartFieldPopupLayout, scout.AbstractLayout);
@@ -23,15 +23,17 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
     prefSize = this.preferredLayoutSize($container);
     popupSize = this.adjustAutoSize(prefSize);
     // don't use setSize() here because this would invalidate the popup and trigger layout() again
-    scout.graphics.setSize(this._htmlPopup.$comp, popupSize);
+    scout.graphics.setSize(this._popup.htmlComp.$comp, popupSize);
   } else {
-    popupSize = this._htmlPopup.getSize();
+    popupSize = this._popup.htmlComp.getSize();
   }
 
   if (htmlProposalChooser) {
-    size = popupSize.subtract(this._htmlPopup.getInsets());
+    size = popupSize.subtract(this._popup.htmlComp.getInsets());
     htmlProposalChooser.setSize(size);
   }
+  // Reposition because opening direction may have to be switched if popup gets bigger
+  this._popup.position();
 };
 
 /**
