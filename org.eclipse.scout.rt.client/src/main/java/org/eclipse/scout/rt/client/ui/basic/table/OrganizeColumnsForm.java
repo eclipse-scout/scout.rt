@@ -55,6 +55,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -66,8 +68,6 @@ import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 
 public class OrganizeColumnsForm extends AbstractForm {
-
-  private static final int COLUMN_HEIGHT = 7;
 
   ITable m_table;
 
@@ -196,6 +196,11 @@ public class OrganizeColumnsForm extends AbstractForm {
     public class GroupBox extends AbstractGroupBox {
 
       @Override
+      protected Class<? extends IGroupBoxBodyGrid> getConfiguredBodyGrid() {
+        return HorizontalGroupBoxBodyGrid.class;
+      }
+
+      @Override
       protected int getConfiguredGridColumnCount() {
         return 5;
       }
@@ -205,7 +210,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          return COLUMN_HEIGHT;
+          return 4;
         }
 
         @Override
@@ -519,16 +524,6 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Override
-        protected int getConfiguredGridH() {
-          return COLUMN_HEIGHT;
-        }
-
-        @Override
-        protected boolean getConfiguredGridUseUiHeight() {
-          return false;
-        }
-
-        @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("ResetTableColumnsView");
         }
@@ -774,16 +769,6 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Override
-        protected int getConfiguredGridH() {
-          return COLUMN_HEIGHT;
-        }
-
-        @Override
-        protected boolean getConfiguredGridUseUiHeight() {
-          return false;
-        }
-
-        @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("ColumnSorting");
         }
@@ -860,16 +845,6 @@ public class OrganizeColumnsForm extends AbstractForm {
         @Override
         protected int getConfiguredGridW() {
           return 1;
-        }
-
-        @Override
-        protected int getConfiguredGridH() {
-          return COLUMN_HEIGHT;
-        }
-
-        @Override
-        protected boolean getConfiguredGridUseUiHeight() {
-          return false;
         }
 
         @Override
