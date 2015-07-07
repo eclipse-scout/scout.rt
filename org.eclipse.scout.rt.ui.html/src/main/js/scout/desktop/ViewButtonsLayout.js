@@ -13,8 +13,8 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     var $tab = $(this);
     var oldStyle = $tab.attr('style');
     $tab
-      .removeAttr('style')
-      .removeClass('view-button-fadeout view-button-fadein');
+//      .removeClass('view-button-fadeout view-button-fadein');
+      .removeAttr('style');
     if ($tab.isSelected()) {
       $selectedTab = $tab;
     } else {
@@ -26,9 +26,9 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
   });
   if ($selectedTab) { // when no view-buttons exist
     selectedTabWidth = containerBounds.width - fixedWidth;
-    if (this._$oldSelectedTab && this._$oldSelectedTab !== $selectedTab) {
+    if (this._$oldSelectedTab && !this._$oldSelectedTab.is($selectedTab)) {
       this._$oldSelectedTab
-      //  FIXME AWE: remove color animation after review with C.RU
+      //  FIXME AWE: remove color animation after review with C.RU (see comment out code in this class, also .css)
       //        .addClass('view-button-fadeout')
         .animate({width: '50px'}, 300);
 
