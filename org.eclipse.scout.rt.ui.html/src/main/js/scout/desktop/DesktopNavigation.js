@@ -131,7 +131,7 @@ scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
 };
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function() {
-  this.viewMenuTab._onClickTab();
+  this.viewMenuTab._onMousedownTab();
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
