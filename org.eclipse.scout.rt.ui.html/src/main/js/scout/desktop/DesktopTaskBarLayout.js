@@ -36,7 +36,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     $logo = $container.find('.taskbar-logo'),
     contWidth = scout.graphics.getSize($container).width,
     logoWidth = scout.graphics.getSize($logo, true).width,
-    numTabs = this._desktop.tabCount(),
+    numTabs = this._desktop._viewTabsController.viewTabCount(),
     largePrefTabsWidth = numTabs * this.TAB_WIDTH_LARGE,
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
     toolsWidth, tabsWidth;
@@ -177,7 +177,7 @@ scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
     });
     menu.sendDoAction = function() {
       $.log.debug('(DesktopTaskBarLayout#_onClickOverflow) tab=' + this.tab);
-      desktop._setSelectedTab(this.tab);
+      desktop._viewTabsController.selectViewTab(this.tab);
     };
     overflowMenus.push(menu);
   });

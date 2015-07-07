@@ -6,10 +6,6 @@ scout.FormController = function(parent, session, funcDialogStore, funcViewStore)
   this.session = session;
   this._funcDialogStore = funcDialogStore;
   this._funcViewStore = funcViewStore;
-  /**
-   * Key = Form ID, Value = Instance of DesktopViewTab
-   */
-   this._viewTabMap = {};
 };
 
 /**
@@ -72,7 +68,7 @@ scout.FormController.prototype._removeAndHideDialog = function(dialog) {
 };
 
 scout.FormController.prototype._showDialog = function(dialog) {
-  dialog.render(this.session.desktop.$container);
+  dialog.render(this._desktop().$container);
   dialog.htmlComp.pixelBasedSizing = true;
 
   var prefSize = dialog.htmlComp.getPreferredSize(),
@@ -116,26 +112,24 @@ scout.FormController.prototype._addAndShowView = function(view) {
 scout.FormController.prototype._removeAndHideView = function(view) {
   scout.arrays.remove(this._funcViewStore(), view);
   if (view.rendered) {
-    var viewTab = this._viewTabMap[view.id];
-    this.session.desktop._removeTab(viewTab);
+    view.remove();
   }
-  delete this._viewTabMap[view.id];
 };
 
 scout.FormController.prototype._showView = function(view) {
-  var desktop = this.session.desktop;
-  var viewTab = new scout.DesktopViewTab(view, desktop.$bench);
-
-  viewTab.events.on('tabClicked', desktop._setSelectedTab.bind(desktop));
-  if (desktop._hasTaskBar()) {
-    viewTab.render(desktop._$viewTabBar);
-  }
-  this._viewTabMap[view.id] = viewTab;
-  desktop._addTab(viewTab);
+  this._viewTabsController().createAndRenderViewTab(view, true);
   scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
 };
 
 scout.FormController.prototype._activateView = function(view) {
-  var viewTab = this._viewTabMap[view.id];
-  this.session.desktop._setSelectedTab(viewTab);
+  var viewTab = this._viewTabsController().viewTab(view);
+  this._viewTabsController().selectViewTab(viewTab);
+};
+
+scout.FormController.prototype._desktop = function() {
+  return this.session.desktop; // lazy accessor because desktop not set during instantiation.
+};
+
+scout.FormController.prototype._viewTabsController = function() {
+  return this.session.desktop._viewTabsController; // lazy accessor because desktop not set during instantiation.
 };

@@ -151,6 +151,7 @@ __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/OutlineViewButton.js");
 __include("scout/desktop/SearchOutline.js");
+__include("scout/desktop/ViewTabsController.js");
 // Basics for form fields
 __include("scout/form/Form.js");
 __include("scout/form/FormLayout.js");
