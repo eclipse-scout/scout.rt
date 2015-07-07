@@ -11,19 +11,18 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
     $groupBoxTitle = this._groupBox._$groupBoxTitle,
-    $pseudoStatus = this._groupBox.$pseudoStatus;
+    $pseudoStatus = this._groupBox.$pseudoStatus,
+    containerSize = htmlContainer.getAvailableSize()
+      .subtract(htmlContainer.getInsets());
 
   if (htmlMenuBar) {
-    // required to trigger layout() of menu-bar
-    menuBarSize = htmlMenuBar.getPreferredSize();
+    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
   } else {
     menuBarSize = new scout.Dimension(0, 0);
   }
 
-  gbBodySize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets())
-    .subtract(htmlGbBody.getMargins());
+  gbBodySize = containerSize.subtract(htmlGbBody.getMargins());
   gbBodySize.height -= this._titleHeight($container);
   gbBodySize.height -= menuBarSize.height;
 

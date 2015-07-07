@@ -5,13 +5,17 @@ scout.TreeLayout = function(tree) {
 scout.inherits(scout.TreeLayout, scout.AbstractLayout);
 
 scout.TreeLayout.prototype.layout = function($container) {
-  var menuBar = this.tree.menuBar,
+  var menuBarSize,
+    menuBar = this.tree.menuBar,
     $data = this.tree.$data,
-    height = 0;
+    height = 0,
+    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    htmlContainer = this.tree.htmlComp,
+    containerSize = htmlContainer.getAvailableSize()
+      .subtract(htmlContainer.getInsets());
 
   if (menuBar.$container.isVisible()) {
-    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
-      menuBarSize = htmlMenuBar.getPreferredSize();
+    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     height += menuBarSize.height;
   }

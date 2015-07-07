@@ -5,16 +5,20 @@ scout.TableLayout = function(table) {
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
 scout.TableLayout.prototype.layout = function($container) {
-  var menuBar = this.table.menuBar,
+  var menuBarSize,
+    menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
     $data = this.table.$data,
     lastColumn = this.table.columns[this.table.columns.length - 1],
-    height = 0;
+    height = 0,
+    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    htmlContainer = this.table.htmlComp,
+    containerSize = htmlContainer.getAvailableSize()
+      .subtract(htmlContainer.getInsets());
 
   if (menuBar.$container.isVisible()) {
-    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
-      menuBarSize = htmlMenuBar.getPreferredSize();
+    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     height += menuBarSize.height;
   }

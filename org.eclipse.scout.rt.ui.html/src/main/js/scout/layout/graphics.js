@@ -35,13 +35,23 @@ scout.graphics = {
    * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
    * because in this case the browser reserves the space the element would be using).
    */
-  prefSize: function($elem, includeMargin) {
-    var oldStyle = $elem.attr('style');
+  prefSize: function($elem, includeMargin, useCssSize) {
+    var oldStyle = $elem.attr('style'),
+      newWidth = 'auto',
+      newHeight = 'auto';
+      useCssSize = useCssSize !== undefined ? useCssSize : false;
+
+    // UseCssSize is necessary if the css rules have a fix height or width set.
+    // Otherwise setting the width/height to auto could result in a different size
+    if (useCssSize) {
+      newWidth = '';
+      newHeight = '';
+    }
 
     // modify properties which prevent reading the preferred size
     $elem.css({
-      'width': 'auto',
-      'height': 'auto',
+      'width': newWidth,
+      'height': newHeight,
       'white-space': 'no-wrap'
     });
 

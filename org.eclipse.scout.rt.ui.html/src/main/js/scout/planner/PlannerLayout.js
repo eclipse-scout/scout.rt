@@ -5,7 +5,8 @@ scout.PlannerLayout = function(planner) {
 scout.inherits(scout.PlannerLayout, scout.AbstractLayout);
 
 scout.PlannerLayout.prototype.layout = function($container) {
-  var $header = this.planner._header.$container,
+  var menuBarSize,
+    $header = this.planner._header.$container,
     $scale = this.planner.$scale,
     $grid = this.planner.$grid,
     menuBar = this.planner.menuBar,
@@ -14,11 +15,14 @@ scout.PlannerLayout.prototype.layout = function($container) {
     gridHeight = 0,
     yearContainerHeight = 0,
     gridTop = 0,
-    scaleTop = 0;
+    scaleTop = 0,
+    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    htmlContainer = this.planner.htmlComp,
+    containerSize = htmlContainer.getAvailableSize()
+      .subtract(htmlContainer.getInsets());
 
   if (menuBar.$container.isVisible()) {
-    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
-    menuBarSize = htmlMenuBar.getPreferredSize();
+    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     menuBarHeight = menuBarSize.height;
     if (menuBar.position === 'top') {

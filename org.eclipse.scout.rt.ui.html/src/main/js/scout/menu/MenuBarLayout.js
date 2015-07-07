@@ -126,23 +126,14 @@ scout.MenuBarLayout.prototype._destroyEllipsis = function() {
   }
 };
 
-/**
- * @override AbstractLayout.js
- */
-scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize,
-    oldWidth = $container.css('width'),
-    oldHeight = $container.css('height'),
-    containerMargins = scout.graphics.getMargins($container);
-
-  // reset height and width, so default CSS styles will apply before we measure pref. size
-  $container.css('height', '');
-  $container.css('width', '');
-  prefSize = scout.graphics.getSize($container)
-    .subtract(containerMargins);
-  $container.css('width', oldWidth);
-  $container.css('height', oldHeight);
-
-  return prefSize;
+scout.MenuBarLayout.size = function(htmlMenuBar, containerSize) {
+  var menuBarSize = htmlMenuBar.getPreferredSize();
+  menuBarSize.width = containerSize.width;
+  menuBarSize = menuBarSize.subtract(htmlMenuBar.getMargins());
+  return menuBarSize;
 };
 
+scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
+  // Menubar has an absolute css height set -> useCssSize = true
+  return scout.graphics.prefSize($container, false, true);
+};
