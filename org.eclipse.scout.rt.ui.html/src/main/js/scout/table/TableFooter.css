@@ -124,6 +124,10 @@
    text-decoration: underline;
   }
 
+  & .key-box {
+    bottom: 2px;
+  }
+
   &:hover span.info-button {
    color: @hover-color;
   }
