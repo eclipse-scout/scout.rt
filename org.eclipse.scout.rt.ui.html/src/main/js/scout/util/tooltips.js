@@ -23,6 +23,8 @@ scout.tooltips = {
 
 scout.TooltipSupport = function(options) {
   this._options = options;
+  this._mouseEnterHandler = this._onMouseEnter.bind(this);
+  this._mouseLeaveHandler = this._onMouseLeave.bind(this);
   this._tooltip;
   this._tooltipTimeoutId;
 };
@@ -31,8 +33,8 @@ scout.TooltipSupport.prototype.install = function($comp) {
   // prevent multiple installation of tooltip support
   if (!$comp.data('tooltipSupport')) {
     $comp
-      .on('mouseenter', this._onMouseEnter.bind(this))
-      .on('mouseleave', this._onMouseLeave.bind(this))
+      .on('mouseenter', this._mouseEnterHandler)
+      .on('mouseleave', this._mouseLeaveHandler)
       .data('tooltipSupport', this);
   }
 };
