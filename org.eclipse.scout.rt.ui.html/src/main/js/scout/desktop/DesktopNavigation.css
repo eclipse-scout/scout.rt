@@ -107,26 +107,3 @@
   border-right: solid 1px @border-color;
   border-top: solid 1px @border-color;
 }
-
-/* FIXME AWE: remove color animation after review with C.RU */
-@keyframes view-button-fadein {
-  from {background-color: @panel-background-color;}
-  to {background-color: @view-button-tab-active-background-color;}
-}
-
-@keyframes view-button-fadeout {
-  from {background-color: @view-button-tab-active-background-color;}
-  to {background-color: @panel-background-color;}
-}
-
-.view-button-fadein {
-  .animation-name(view-button-fadein);
-  .animation-duration(0.3s);
-  .animation-fill-mode(forwards);
-}
-
-.view-button-fadeout {
-  .animation-name(view-button-fadeout);
-  .animation-duration(0.3s);
-  .animation-fill-mode(forwards);
-}
