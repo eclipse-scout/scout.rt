@@ -5,6 +5,7 @@ scout.TableKeyStrokeAdapter = function(field) {
   this.keyStrokes.push(new scout.TableControlKeyStrokes(field));
   this.keyStrokes.push(new scout.TableStartCellEditKeyStroke(field));
   this.keyStrokes.push(new scout.TableSelectAllKeyStroke(field));
+  this.keyStrokes.push(new scout.TableRefreshKeyStroke(field));
  };
 scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
@@ -63,10 +64,6 @@ scout.TableStartCellEditKeyStroke.prototype._drawKeyBox = function($container, d
   }
 };
 
-
-
-/* ---- KeyStrokes ---------------------------------------------------------- */
-
 scout.TableSelectAllKeyStroke = function(table) {
   scout.TableSelectAllKeyStroke.parent.call(this);
   this._table = table;
@@ -91,6 +88,7 @@ scout.TableSelectAllKeyStroke.prototype.accept = function(event) {
  */
 scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
   this._table.selectAll();
+  event.preventDefault();
 };
 
 /**
@@ -100,11 +98,47 @@ scout.TableSelectAllKeyStroke.prototype._drawKeyBox = function($container, drawe
   if(this._table.rows.length === this._table.selectedRows.length){
     return;
   }
-  var keyBoxText, $selectedRow, pos;
+  var keyBoxText;
   if (!this.drawHint || !this.keyStroke || !this._table.footer || this._table.footer._$infoSelection>0) {
     return;
   }
     keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
     scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoSelection.find('.info-button'), this.ctrl, this.alt, this.shift);
 };
+
+
+
+
+
+
+scout.TableRefreshKeyStroke = function(table) {
+  scout.TableRefreshKeyStroke.parent.call(this);
+  this._table = table;
+  this.keyStroke = 'F5';
+  this.initKeyStrokeParts();
+};
+scout.inherits(scout.TableRefreshKeyStroke, scout.KeyStroke);
+
+/**
+ * @Override
+ */
+scout.TableRefreshKeyStroke.prototype.handle = function(event) {
+  this._table.sendReload();
+  event.preventDefault();
+};
+
+/**
+ * @Override
+ */
+scout.TableRefreshKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
+  var keyBoxText;
+  if (!this.drawHint || !this.keyStroke || !this._table.footer || this._table.footer._$infoSelection>0) {
+    return;
+  }
+    keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
+    scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoLoad.find('.info-button'), this.ctrl, this.alt, this.shift);
+};
+
+
+
 
