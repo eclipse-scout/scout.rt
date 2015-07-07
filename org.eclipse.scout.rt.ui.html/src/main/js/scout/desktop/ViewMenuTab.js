@@ -47,12 +47,12 @@ scout.ViewMenuTab.prototype._update = function() {
 
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-    .on('click', this._onClickTab.bind(this))
+    .on('click', this._onMousedownTab.bind(this))
     .data('tooltipText', function() { return this.text; }.bind(this));
   this.$title = this.$container.appendSpan('view-button-tab-title has-menu')
     .icon(this.iconId);
   this.$menuButton = this.$container.appendSpan('view-menu-button')
-    .on('click', this._onClickMenuButton.bind(this));
+    .on('click', this._onMousedownMenuButton.bind(this));
   this._renderProperties();
 };
 
@@ -103,7 +103,7 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
   return null;
 };
 
-scout.ViewMenuTab.prototype._onClickTab = function(event) {
+scout.ViewMenuTab.prototype._onMousedownTab = function(event) {
   if (this.selected) {
     if (this._inBackground) {
       this.session.desktop.bringOutlineToFront(this.outlineViewButton.outline);
@@ -115,7 +115,7 @@ scout.ViewMenuTab.prototype._onClickTab = function(event) {
   }
 };
 
-scout.ViewMenuTab.prototype._onClickMenuButton = function(event) {
+scout.ViewMenuTab.prototype._onMousedownMenuButton = function(event) {
   this._openMenu();
   event.stopPropagation();
   event.stopImmediatePropagation();

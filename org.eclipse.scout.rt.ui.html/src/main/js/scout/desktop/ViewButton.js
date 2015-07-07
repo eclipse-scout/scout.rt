@@ -4,6 +4,7 @@
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
   this.$title;
+  this._onMouseEvent = this.doAction.bind(this);
 };
 scout.inherits(scout.ViewButton, scout.Action);
 
@@ -25,12 +26,12 @@ scout.ViewButton.prototype._isTab = function() {
 
 scout.ViewButton.prototype._renderAsMenu = function($parent) {
   this.$container = $parent.appendDiv('view-button-menu')
-    .on('click', this._onClick.bind(this));
+    .on('click', this._onMouseEvent);
 };
 
 scout.ViewButton.prototype._renderAsTab = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-    .on('click', this._onClick.bind(this))
+    .on('mousedown', this._onMouseEvent)
     .data('tooltipText', function() { return this.text; }.bind(this));
 
   this.$title = this.$container.appendSpan('view-button-tab-title');
@@ -93,7 +94,6 @@ scout.ViewButton.prototype._onClick = function() {
 scout.ViewButton.prototype.last = function() {
   this.$container.addClass('last');
 };
-
 
 /**
  * @override Action.js
