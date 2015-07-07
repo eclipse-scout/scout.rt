@@ -69,7 +69,10 @@ scout.CellEditorPopup.prototype._render = function($parent) {
 scout.CellEditorPopup.prototype._remove = function() {
   scout.CellEditorPopup.parent.prototype._remove.call(this);
   this.table.events.off(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
-  this.table.$container.removeClass('focused');
+  // table may have been removed in the meantime
+  if (this.table.rendered) {
+    this.table.$container.removeClass('focused');
+  }
   this.$anchor.css('visibility', '');
 };
 
