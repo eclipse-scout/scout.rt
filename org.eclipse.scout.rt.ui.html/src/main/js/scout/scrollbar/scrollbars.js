@@ -49,6 +49,10 @@ scout.scrollbars = {
 
     function installJsScrollbars() {
       $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
+      scrollbars = scout.arrays.ensure($container.data('scrollbars'));
+      $.each(scrollbars, function(key, value) {
+        value.remove();
+      });
       scrollbars = [];
       if (options.axis === 'both') {
         options.axis = 'y';

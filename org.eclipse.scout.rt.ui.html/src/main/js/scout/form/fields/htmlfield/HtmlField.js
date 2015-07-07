@@ -44,7 +44,7 @@ scout.HtmlField.prototype.init = function(model, session) {
 };
 
 scout.HtmlField.prototype._remove = function() {
-  if (this.scrollBarsEnabled && this._$scrollables.length > 0) {
+  if (this.scrollBarsEnabled) {
     this.session.detachHelper.removeScrollable(this.$field);
   }
   scout.HtmlField.parent.prototype._remove.call(this);
@@ -53,7 +53,9 @@ scout.HtmlField.prototype._remove = function() {
 scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
   if (this.scrollBarsEnabled) {
     scout.scrollbars.install(this.$field);
-    this.session.detachHelper.pushScrollable(this.$field);
+    if (this.session.detachHelper._$scrollables && this.session.detachHelper._$scrollables.indexOf(this.$field) < 0) {
+      this.session.detachHelper.pushScrollable(this.$field);
+    }
   }
 };
 
