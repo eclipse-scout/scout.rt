@@ -1,43 +1,51 @@
 /**
- * The FileChooserController provides functionality to manage file choosers.
+ * Controller with functionality to register and render file choosers.
+ *
+* The file choosers are put into the list fileChoosers contained in 'displayParent'.
  */
-scout.FileChooserController = function(parent, session, funcFileChooserStore) {
-  this._parent = parent;
+scout.FileChooserController = function(displayParent, session) {
+  this._displayParent = displayParent;
   this.session = session;
-  this._funcFileChooserStore = funcFileChooserStore;
 };
 
 /**
- * Adds the given file chooser to the 'fileChooserStore' and DOM.
+ * Adds the given file chooser to this controller and renders it.
  */
-scout.FileChooserController.prototype.addAndShow = function(fileChooserAdapterId) {
-  var fileChooser = this.session.getOrCreateModelAdapter(fileChooserAdapterId, this._parent);
+scout.FileChooserController.prototype.registerAndRender = function(fileChooserAdapterId) {
+  var fileChooser = this.session.getOrCreateModelAdapter(fileChooserAdapterId, this._displayParent);
 
-  this._funcFileChooserStore().push(fileChooser);
-  this._showFileChooser(fileChooser);
+  this._displayParent.fileChoosers.push(fileChooser);
+  this._render(fileChooser);
 };
 
 /**
- * Removes the given file chooser from the 'fileChooserStore' and DOM. However, the file chooser's adapter is not destroyed. That only happens once the file chooser is closed.
+ * Removes the given file chooser from this controller and DOM. However, the file chooser's adapter is not destroyed. That only happens once the file chooser is closed.
  */
-scout.FileChooserController.prototype.removeAndHide = function(fileChooserAdapterId) {
-  var fileChooser = this.session.getOrCreateModelAdapter(fileChooserAdapterId, this._parent);
+scout.FileChooserController.prototype.unregisterAndRemove = function(fileChooserAdapterId) {
+  var fileChooser = this.session.getOrCreateModelAdapter(fileChooserAdapterId, this._displayParent);
 
-  scout.arrays.remove(this._funcFileChooserStore(), fileChooser);
-  this._hideFileChooser(fileChooser);
+  scout.arrays.remove(this._displayParent.fileChoosers, fileChooser);
+  this._remove(fileChooser);
 };
 
 /**
- * Adds all file choosers contained in 'fileChooserStore' into DOM.
+ * Removes all file choosers registered with this controller from DOM.
  */
-scout.FileChooserController.prototype.showAll = function() {
-  this._funcFileChooserStore().forEach(this._showFileChooser.bind(this));
+scout.FileChooserController.prototype.remove = function() {
+  this._displayParent.fileChoosers.forEach(this._remove.bind(this));
 };
 
-scout.FileChooserController.prototype._showFileChooser = function(fileChooser) {
+/**
+ * Renders all file choosers registered with this controller.
+ */
+scout.FileChooserController.prototype.render = function() {
+  this._displayParent.fileChoosers.forEach(this._render.bind(this));
+};
+
+scout.FileChooserController.prototype._render = function(fileChooser) {
   fileChooser.render(this.session.desktop.$container);
 };
 
-scout.FileChooserController.prototype._hideFileChooser = function(fileChooser) {
+scout.FileChooserController.prototype._remove = function(fileChooser) {
   fileChooser.remove();
 };

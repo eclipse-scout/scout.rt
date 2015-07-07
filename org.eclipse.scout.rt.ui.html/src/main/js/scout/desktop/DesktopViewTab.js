@@ -74,11 +74,9 @@ scout.DesktopViewTab.prototype.select = function() {
   }
   if (!this._viewAttached) {
     var $viewContainer = this._view.$container;
-    if (this._view.keyStrokeAdapter) {
-      scout.keyStrokeManager.installAdapter($viewContainer, this._view.keyStrokeAdapter);
-    }
     this._$bench.append($viewContainer);
-    this._view.session.detachHelper.afterAttach($viewContainer);
+
+    this._afterAttach();
 
     // If the parent has been resized while the content was not visible, the content has the wrong size -> update
     var htmlComp = scout.HtmlComponent.get($viewContainer);
@@ -95,12 +93,11 @@ scout.DesktopViewTab.prototype._cssSelect = function(selected) {
 };
 
 scout.DesktopViewTab.prototype.deselect = function() {
-  if (scout.keyStrokeManager.isAdapterInstalled(this._view.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this._view.keyStrokeAdapter);
-  }
   if (this._view.rendered) {
     var $viewContainer = this._view.$container;
-    this._view.session.detachHelper.beforeDetach($viewContainer);
+
+    this._beforeDetach();
+
     $viewContainer.detach();
     this._viewAttached = false;
   }
@@ -138,4 +135,42 @@ scout.DesktopViewTab.prototype.getMenuText = function() {
     text += ' (' + this._view.subTitle + ')';
   }
   return text;
+};
+
+/**
+ * Method invoked just after attaching the view's content to the DOM.
+ */
+scout.DesktopViewTab.prototype._afterAttach = function() {
+  // Delegate to DetachHelper.
+  this._view.session.detachHelper.afterAttach(this._view.$container);
+
+  // Restore keystrokes.
+  // TODO [nbu] Please verify whether this is the right place to install keystroke adapters.
+  if (this._view.keyStrokeAdapter) {
+    scout.keyStrokeManager.installAdapter(this._view.$container, this._view.keyStrokeAdapter);
+  }
+
+  // Restore dialogs and message boxes, not views.
+  this._view._formController.renderDialogs();
+  this._view._messageBoxController.render();
+  this._view._fileChooserController.render();
+};
+
+/**
+ * Method invoked just before detaching the view's content from DOM.
+ */
+scout.DesktopViewTab.prototype._beforeDetach = function() {
+  // Uninstall keystrokes.
+  // TODO [nbu] Please verify whether this is the right place to uninstall keystroke adapters.
+  if (scout.keyStrokeManager.isAdapterInstalled(this._view.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this._view.keyStrokeAdapter);
+  }
+
+  // Remove dialogs and message boxes, not views.
+  this._view._formController.removeDialogs();
+  this._view._messageBoxController.remove();
+  this._view._fileChooserController.remove();
+
+  // Delegate to DetachHelper.
+  this._view.session.detachHelper.beforeDetach(this._view.$container);
 };

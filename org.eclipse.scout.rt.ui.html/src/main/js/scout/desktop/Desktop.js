@@ -21,7 +21,7 @@ scout.Desktop = function() {
   this.selectedTool;
   this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
-  this._viewTabsController;
+  this.viewTabsController;
   this._formController;
   this._messageBoxController;
 };
@@ -30,29 +30,11 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
 scout.Desktop.prototype.init = function(model, session) {
   scout.Desktop.parent.prototype.init.call(this, model, session);
 
-  this._viewTabsController = new scout.ViewTabsController(this);
+  this.viewTabsController = new scout.ViewTabsController(this);
 
-  // Prepare FormController
-  this._formController = new scout.FormController(this, session,
-    function() { // callback to access dialogs attached to the Desktop.
-      return this.dialogs;
-    }.bind(this),
-    function() { // callback to access views attached to the Desktop.
-      return this.views;
-    }.bind(this)
-  );
-  // Prepare MessageBoxController
-  this._messageBoxController = new scout.MessageBoxController(this, session,
-    function() { // callback to access message boxes attached to the Desktop.
-      return this.messageBoxes;
-    }.bind(this)
-  );
-  // Prepare FileChooserController
-  this._fileChooserController = new scout.FileChooserController(this, session,
-    function() { // callback to access file choosers attached to the Desktop.
-      return this.fileChoosers;
-    }.bind(this)
-  );
+  this._formController = new scout.FormController(this, session);
+  this._messageBoxController = new scout.MessageBoxController(this, session);
+  this._fileChooserController = new scout.FileChooserController(this, session);
 };
 
 scout.DesktopStyle = {
@@ -93,10 +75,10 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation.onOutlineChanged(this.outline);
   this._setSplitterPosition();
 
-  // Display attached forms, message boxes and file choosers.
-  this._formController.showAll();
-  this._messageBoxController.showAll();
-  this._fileChooserController.showAll();
+  // Render attached forms, message boxes and file choosers.
+  this._formController.render();
+  this._messageBoxController.render();
+  this._fileChooserController.render();
 
   $(window).on('resize', this.onResize.bind(this));
 
@@ -205,7 +187,7 @@ scout.Desktop.prototype._hasTaskBar = function() {
 
 // FIXME AWE/CGU this is called by JQuery UI when a dialog gets resized, why?
 scout.Desktop.prototype.onResize = function(event) {
-  var selectedViewTab = this._viewTabsController.selectedViewTab();
+  var selectedViewTab = this.viewTabsController.selectedViewTab();
   if (selectedViewTab) {
     selectedViewTab.onResize();
   }
@@ -324,7 +306,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   }
 
   this._outlineContent = content;
-  this._viewTabsController.deselectViewTab();
+  this.viewTabsController.deselectViewTab();
   this._bringNavigationToFront();
 
   if (!content.rendered) {
@@ -359,21 +341,21 @@ scout.Desktop.prototype._onModelOutlineChanged = function(event) {
 
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'formShow') {
-    this._formController.addAndShow(event.form);
+    this._formController.registerAndRender(event.form);
   } else if (event.type === 'formHide') {
-    this._formController.removeAndHide(event.form);
+    this._formController.unregisterAndRemove(event.form);
   } else if (event.type === 'formActivate') {
     this._formController.activateForm(event.form);
   } else if (event.type === 'outlineChanged') {
     this._onModelOutlineChanged(event);
   } else if (event.type === 'messageBoxShow') {
-    this._messageBoxController.addAndShow(event.messageBox);
+    this._messageBoxController.registerAndRender(event.messageBox);
   } else if (event.type === 'messageBoxHide') {
-    this._messageBoxController.removeAndHide(event.messageBox);
+    this._messageBoxController.unregisterAndRemove(event.messageBox);
   } else if (event.type === 'fileChooserShow') {
-    this._fileChooserController.addAndShow(event.fileChooser);
+    this._fileChooserController.registerAndRender(event.fileChooser);
   } else if (event.type === 'fileChooserHide') {
-    this._fileChooserController.removeAndHide(event.fileChooser);
+    this._fileChooserController.unregisterAndRemove(event.fileChooser);
   } else if (event.type === 'openUri') {
     this._openUri(event);
   } else {
@@ -383,7 +365,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function(outline) {
-  this._viewTabsController.deselectViewTab();
+  this.viewTabsController.deselectViewTab();
 
   if (this.outline === outline) {
     if (this.outline.inBackground) {

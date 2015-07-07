@@ -1,74 +1,88 @@
 /**
- * The FormController provides functionality to manage forms like dialogs and views.
+ * Controller with functionality to register and render views and dialogs.
+ *
+ * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
-scout.FormController = function(parent, session, funcDialogStore, funcViewStore) {
-  this._parent = parent;
+scout.FormController = function(displayParent, session) {
+  this._displayParent = displayParent;
   this.session = session;
-  this._funcDialogStore = funcDialogStore;
-  this._funcViewStore = funcViewStore;
 };
 
 /**
- * Adds the given Form to the 'formStore' and DOM.
+ * Adds the given view or dialog to this controller and renders it.
  */
-scout.FormController.prototype.addAndShow = function(formAdapterId) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._parent);
-  this._invokeViewElseDialogFunction(form, this._addAndShowView.bind(this), this._addAndShowDialog.bind(this));
+scout.FormController.prototype.registerAndRender = function(formAdapterId) {
+  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
+
+  if (form.displayHint === 'view') {
+    this._renderView(form, true);
+  } else {
+    this._renderDialog(form, true);
+  }
 };
 
 /**
- * Removes the given Form from the 'formStore' and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
+ * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
  */
-scout.FormController.prototype.removeAndHide = function(formAdapterId) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._parent);
-  this._invokeViewElseDialogFunction(form, this._removeAndHideView.bind(this), this._removeAndHideDialog.bind(this));
+scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
+  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
+  if (form.displayHint === 'view') {
+    this._removeView(form, true);
+  } else {
+    this._removeDialog(form, true);
+  }
 };
 
 /**
- * Adds all Forms contained in 'formStore' to the DOM.
+ * Removes all dialogs registered with this controller from DOM.
  */
-scout.FormController.prototype.showAll = function() {
-  this._funcDialogStore().forEach(this._showDialog.bind(this));
-  // FIXME DWI: (von A.WE) Problem: _showView ruft Desktop#_addTab auf, dort wird dann die jeweilige view gerendert.
-  // Das darf aber nicht sein. Beim initialen Load soll nur die aktive view gerendert werden. Von allen anderen
-  // Views darf nur der Tab der View gerendert werden.
-  this._funcViewStore().forEach(this._showView.bind(this));
+scout.FormController.prototype.removeDialogs = function(messageBox) {
+  this._displayParent.dialogs.forEach(this._removeDialog.bind(this));
 };
 
 /**
- * Activates the given Form.
- * FIXME: not working for dialogs.
+ * Renders all dialogs and views registered with this controller.
+ */
+scout.FormController.prototype.render = function() {
+  this._displayParent.dialogs.forEach(this._renderDialog.bind(this));
+  this._displayParent.views.forEach(this._renderView.bind(this));
+};
+
+/**
+ * Renders all dialogs registered with this controller.
+ */
+scout.FormController.prototype.renderDialogs = function() {
+  this._displayParent.dialogs.forEach(this._renderDialog.bind(this));
+};
+
+/**
+ * Activates the given view or dialog.
  */
 scout.FormController.prototype.activateForm = function(formAdapterId) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._parent);
-  this._invokeViewElseDialogFunction(form, this._activateView.bind(this), this._activateDialog.bind(this));
-};
+  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
 
-scout.FormController.prototype._invokeViewElseDialogFunction = function(form, funcView, funcDialog) {
   if (form.displayHint === 'view') {
-    funcView(form);
+    this._activateView(form);
   } else {
-    funcDialog(form);
+    this._activateDialog(form);
   }
 };
 
-// ==== Dialog specific functionality ==== //
-
-scout.FormController.prototype._addAndShowDialog = function(dialog) {
-  this._funcDialogStore().push(dialog);
-  this._showDialog(dialog);
-};
-
-scout.FormController.prototype._removeAndHideDialog = function(dialog) {
-  scout.arrays.remove(this._funcDialogStore(), dialog);
-
-  if (dialog.rendered) {
-    dialog.remove();
+scout.FormController.prototype._renderView = function(view, register) {
+  if (register) {
+    this._displayParent.views.push(view);
   }
+
+  this.session.desktop.viewTabsController.createAndRenderViewTab(view, true);
+  scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
 };
 
-scout.FormController.prototype._showDialog = function(dialog) {
-  dialog.render(this._desktop().$container);
+scout.FormController.prototype._renderDialog = function(dialog, register) {
+  if (register) {
+    this._displayParent.dialogs.push(dialog);
+  }
+
+  dialog.render(this.session.desktop.$container);
   dialog.htmlComp.pixelBasedSizing = true;
 
   var prefSize = dialog.htmlComp.getPreferredSize(),
@@ -98,38 +112,33 @@ scout.FormController.prototype._showDialog = function(dialog) {
     .cssMarginTop(marginTop);
 };
 
-scout.FormController.prototype._activateDialog = function(dialog) {
-  // FIXME AWE: (modal dialog) - show dialogs
-};
+scout.FormController.prototype._removeView = function(view, unregister) {
+  if (unregister) {
+    scout.arrays.remove(this._displayParent.views, view);
+  }
 
-// ==== View specific functionality ==== //
-
-scout.FormController.prototype._addAndShowView = function(view) {
-  this._funcViewStore().push(view);
-  this._showView(view);
-};
-
-scout.FormController.prototype._removeAndHideView = function(view) {
-  scout.arrays.remove(this._funcViewStore(), view);
   if (view.rendered) {
     view.remove();
   }
 };
 
-scout.FormController.prototype._showView = function(view) {
-  this._viewTabsController().createAndRenderViewTab(view, true);
-  scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
+scout.FormController.prototype._removeDialog = function(dialog, unregister) {
+  if (unregister) {
+    scout.arrays.remove(this._displayParent.dialogs, dialog);
+  }
+
+  if (dialog.rendered) {
+    dialog.remove();
+  }
 };
 
 scout.FormController.prototype._activateView = function(view) {
-  var viewTab = this._viewTabsController().viewTab(view);
-  this._viewTabsController().selectViewTab(viewTab);
+  var viewTabsController = this.session.desktop.viewTabsController;
+
+  var viewTab = viewTabsController.viewTab(view);
+  viewTabsController.selectViewTab(viewTab);
 };
 
-scout.FormController.prototype._desktop = function() {
-  return this.session.desktop; // lazy accessor because desktop not set during instantiation.
-};
-
-scout.FormController.prototype._viewTabsController = function() {
-  return this.session.desktop._viewTabsController; // lazy accessor because desktop not set during instantiation.
+scout.FormController.prototype._activateDialog = function(dialog) {
+  // FIXME AWE: not implemented yet.
 };

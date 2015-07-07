@@ -15,27 +15,9 @@ scout.inherits(scout.Outline, scout.Tree);
 scout.Outline.prototype.init = function(model, session) {
   scout.Outline.parent.prototype.init.call(this, model, session);
 
-  // Prepare FormController
-  this._formController = new scout.FormController(this, session,
-    function() { // callback to access dialogs attached to this Outline.
-      return this.dialogs;
-    }.bind(this),
-    function() { // callback to access views attached to this Outline.
-      return this.views;
-    }.bind(this)
-  );
-  // Prepare MessageBoxController
-  this._messageBoxController = new scout.MessageBoxController(this, session,
-    function() { // callback to access message boxes attached to this Outline.
-      return this.messageBoxes;
-    }.bind(this)
-  );
-  // Prepare FileChooserController
-  this._fileChooserController = new scout.FileChooserController(this, session,
-    function() { // callback to access file choosers attached to this Outline.
-      return this.fileChoosers;
-    }.bind(this)
-  );
+  this._formController = new scout.FormController(this, session);
+  this._messageBoxController = new scout.MessageBoxController(this, session);
+  this._fileChooserController = new scout.FileChooserController(this, session);
 };
 
 scout.Outline.prototype._createKeyStrokeAdapter = function() {
@@ -55,9 +37,9 @@ scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
   // Display attached forms, message boxes and file choosers.
-  this._formController.showAll();
-  this._messageBoxController.showAll();
-  this._fileChooserController.showAll();
+  this._formController.render();
+  this._messageBoxController.render();
+  this._fileChooserController.render();
 
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
@@ -264,19 +246,19 @@ scout.Outline.prototype.onModelAction = function(event) {
   if (event.type === 'pageChanged') {
     this._onPageChanged(event);
   } else if (event.type === 'formShow') {
-    this._formController.addAndShow(event.form);
+    this._formController.registerAndRender(event.form);
   } else if (event.type === 'formHide') {
-    this._formController.removeAndHide(event.form);
+    this._formController.unregisterAndRemove(event.form);
   } else if (event.type === 'formActivate') {
     this._formController.activateForm(event.form);
   } else if (event.type === 'messageBoxShow') {
-    this._messageBoxController.addAndShow(event.messageBox);
+    this._messageBoxController.registerAndRender(event.messageBox);
   } else if (event.type === 'messageBoxHide') {
-    this._messageBoxController.removeAndHide(event.messageBox);
+    this._messageBoxController.unregisterAndRemove(event.messageBox);
   } else if (event.type === 'fileChooserShow') {
-    this._fileChooserController.addAndShow(event.fileChooser);
+    this._fileChooserController.registerAndRender(event.fileChooser);
   } else if (event.type === 'fileChooserHide') {
-    this._fileChooserController.removeAndHide(event.fileChooser);
+    this._fileChooserController.unregisterAndRemove(event.fileChooser);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }

@@ -1,43 +1,51 @@
 /**
- * The MessageBoxController provides functionality to manage message boxes.
+ * Controller with functionality to register and render message boxes.
+ *
+ * The message boxes are put into the list 'messageBoxes' contained in 'displayParent'.
  */
-scout.MessageBoxController = function(parent, session, funcMessageBoxStore) {
-  this._parent = parent;
+scout.MessageBoxController = function(displayParent, session) {
+  this._displayParent = displayParent;
   this.session = session;
-  this._funcMessageBoxStore = funcMessageBoxStore;
 };
 
 /**
- * Adds the given message box to the 'messageBoxStore' and DOM.
+ * Adds the given message box to this controller and renders it.
  */
-scout.MessageBoxController.prototype.addAndShow = function(messageBoxAdapterId) {
-  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this._parent);
+scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdapterId) {
+  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this._displayParent);
 
-  this._funcMessageBoxStore().push(messageBox);
-  this._showMessageBox(messageBox);
+  this._displayParent.messageBoxes.push(messageBox);
+  this._render(messageBox);
 };
 
 /**
- * Removes the given message box from the 'messageBoxStore' and DOM. However, the message-box's adapter is not destroyed. That only happens once the message-box is closed.
+ * Removes the given message box from this controller and DOM. However, the message box's adapter is not destroyed. That only happens once the message box is closed.
  */
-scout.MessageBoxController.prototype.removeAndHide = function(messageBoxAdapterId) {
-  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this._parent);
+scout.MessageBoxController.prototype.unregisterAndRemove = function(messageBoxAdapterId) {
+  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this._displayParent);
 
-  scout.arrays.remove(this._funcMessageBoxStore(), messageBox);
-  this._hideMessageBox(messageBox);
+  scout.arrays.remove(this._displayParent.messageBoxes, messageBox);
+  this._remove(messageBox);
 };
 
 /**
- * Adds all message boxes contained in 'messageBoxStore' into DOM.
+ * Removes all message boxes registered with this controller from DOM.
  */
-scout.MessageBoxController.prototype.showAll = function() {
-  this._funcMessageBoxStore().forEach(this._showMessageBox.bind(this));
+scout.MessageBoxController.prototype.remove = function() {
+  this._displayParent.messageBoxes.forEach(this._remove.bind(this));
 };
 
-scout.MessageBoxController.prototype._showMessageBox = function(messageBox) {
+/**
+ * Renders all message boxes registered with this controller.
+ */
+scout.MessageBoxController.prototype.render = function() {
+  this._displayParent.messageBoxes.forEach(this._render.bind(this));
+};
+
+scout.MessageBoxController.prototype._render = function(messageBox) {
   messageBox.render(this.session.desktop.$container);
 };
 
-scout.MessageBoxController.prototype._hideMessageBox = function(messageBox) {
+scout.MessageBoxController.prototype._remove = function(messageBox) {
   messageBox.remove();
 };
