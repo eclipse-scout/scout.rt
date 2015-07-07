@@ -29,9 +29,17 @@ scout.Device.SupportedBrowsers = {
 scout.Device.SYSTEM_IOS = 'IOS';
 
 /**
- * Called by index.html. Precalculates the value of "getUnselectableAttribute()" and
- * stores it as a static property (to prevent many function calls inside loops, e.g.
- * when generating table rows).
+ * Called by index.html. Precalculates the value of some attributes to store them
+ * in a static way (and prevent many repeating function calls within loops).
+ */
+scout.Device.prototype.initDeviceSpecificAttributes = function() {
+  this.initUnselectableAttribute();
+};
+
+
+/**
+ * Precalculates the value of "getUnselectableAttribute()" and stores it as a static
+ * property (to prevent many function calls inside loops, e.g. when generating table rows).
  */
 scout.Device.prototype.initUnselectableAttribute = function() {
   // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
