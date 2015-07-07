@@ -47,7 +47,7 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container, $fo
     }
     if (!$firstButton && ($focusableElement.hasClass('button') || $focusableElement.hasClass('menu-item'))) {
       $firstButton = $focusableElement;
-    } else if (menuParents.length === 0 && tabParents.length === 0) {
+    } else if (menuParents.length === 0 && tabParents.length === 0  && typeof $focusableElements.get(i).focus === 'function') {
       focused = true;
       return $focusableElements.get(i);
     }
