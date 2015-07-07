@@ -11,6 +11,7 @@ scout.Device = function(userAgent) {
 
   // initialize with empty string so that it can be used without calling initUnselectableAttribute()
   this.unselectableAttribute = '';
+  this.tableAdditionalDivRequired = false;
 
   this.parseUserAgent(this.userAgent);
 };
@@ -33,17 +34,9 @@ scout.Device.SYSTEM_IOS = 'IOS';
  * in a static way (and prevent many repeating function calls within loops).
  */
 scout.Device.prototype.initDeviceSpecificAttributes = function() {
-  this.initUnselectableAttribute();
-};
-
-
-/**
- * Precalculates the value of "getUnselectableAttribute()" and stores it as a static
- * property (to prevent many function calls inside loops, e.g. when generating table rows).
- */
-scout.Device.prototype.initUnselectableAttribute = function() {
   // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
   this.unselectableAttribute = this.getUnselectableAttribute();
+  this.tableAdditionalDivRequired = this.isTableAdditionalDivRequired();
 };
 
 scout.Device.prototype.isIos = function() {
@@ -152,6 +145,25 @@ scout.Device.prototype.getUnselectableAttribute = function() {
     }
     // workaround for IE 9
     return ' unselectable="on"';
+  }.bind(this));
+};
+
+/**
+ * Returns false for modern browsers, that support CSS table-cell properties restricted
+ * with a max-width and hidden overflow. Returns true if an additional div level is required.
+ */
+scout.Device.prototype.isTableAdditionalDivRequired = function() {
+  return this.supportsFeature('_tableAdditionalDivRequired',  function(property) {
+    var test = document.createElement('div');
+    test.textContent = 'Scout',
+    test.style.visibility = 'hidden';
+    test.style.display = 'table-cell';
+    test.style.maxWidth = '1px';
+    test.style.overflow = 'hidden';
+    document.body.appendChild(test);
+    var result = test.clientWidth > 1;
+    document.body.removeChild(test);
+    return result;
   }.bind(this));
 };
 

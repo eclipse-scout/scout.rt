@@ -44,7 +44,18 @@ scout.Column.prototype.buildCell = function(row) {
     content = icon + text;
   }
 
-  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + content + '</div>';
+  var cellHtml = '';
+  cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>';
+  if (scout.device.tableAdditionalDivRequired) {
+    // Table.css: @table-cell-padding-left (8 px) + @table-cell-padding-right (4 px) = 12 px
+    cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - 12 /* padding fix */ - 2 /* unknown IE9 extra space */) + 'px; ' + '">';
+  }
+  cellHtml += content;
+  if (scout.device.tableAdditionalDivRequired) {
+    cellHtml += '</div>';
+  }
+  cellHtml += '</div>';
+  return cellHtml;
 };
 
 scout.Column.prototype._icon = function(row, iconId, hasText) {

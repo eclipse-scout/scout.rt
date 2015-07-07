@@ -1599,8 +1599,14 @@ scout.Table.prototype.$sumRows = function() {
 
 scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ' )';
+  if (scout.device.tableAdditionalDivRequired) {
+    selector += ', .table-row > div:nth-of-type(' + colIndex + ' ) > .width-fix ';
+  }
   if (includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
+    if (scout.device.tableAdditionalDivRequired) {
+      selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' ) > .width-fix';
+    }
   }
   return this.$data.find(selector);
 };
