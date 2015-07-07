@@ -49,7 +49,11 @@ scout.graphics = {
     var prefSize = scout.graphics.getSize($elem, includeMargin);
 
     // reset the modified style attribute
-    $elem.attr('style', oldStyle);
+    if (!oldStyle) {
+      $elem.removeAttr('style');
+    } else {
+      $elem.attr('style', oldStyle);
+    }
     return prefSize;
   },
 
