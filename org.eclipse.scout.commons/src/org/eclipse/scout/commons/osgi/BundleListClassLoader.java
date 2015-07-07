@@ -28,11 +28,17 @@ import org.osgi.framework.BundleContext;
  */
 public class BundleListClassLoader extends ClassLoader {
 
-  @SuppressWarnings("restriction")
-  private static final String OSGI_RESOURCE_URL_PROTOCOL = org.eclipse.osgi.framework.internal.core.Constants.OSGI_RESOURCE_URL_PROTOCOL;
+  /**
+   * Constant <em>bundleresource</em> taken from
+   * org.eclipse.osgi.framework.internal.core.Constants.OSGI_RESOURCE_URL_PROTOCOL
+   */
+  private static final String OSGI_RESOURCE_URL_PROTOCOL = "bundleresource";
 
-  @SuppressWarnings("restriction")
-  private static final Pattern BUNDLE_ID_URL_HOST_NAME_PATTERN = Pattern.compile("(\\d+)" + Pattern.quote(org.eclipse.osgi.framework.internal.core.BundleResourceHandler.BID_FWKID_SEPARATOR) + ".*");
+  /**
+   * Constant <em>.fwk</em> taken from
+   * org.eclipse.osgi.framework.internal.core.BundleResourceHandler.BID_FWKID_SEPARATOR
+   */
+  private static final Pattern BUNDLE_ID_URL_HOST_NAME_PATTERN = Pattern.compile("(\\d+)" + Pattern.quote(".fwk") + ".*");
 
   /** table mapping primitive type names to corresponding class objects */
   private static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<String, Class<?>>();
