@@ -58,11 +58,6 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     super(callInitializer);
   }
 
-  @Override
-  protected boolean getConfiguredStatusVisible() {
-    return false;
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
   protected boolean getConfiguredScrollBarEnabled() {
