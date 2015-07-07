@@ -143,4 +143,3 @@ scout.DesktopNavigation.prototype.bringToFront = function() {
   this.viewMenuTab.bringToFront();
   this.outline.bringToFront();
 };
-
