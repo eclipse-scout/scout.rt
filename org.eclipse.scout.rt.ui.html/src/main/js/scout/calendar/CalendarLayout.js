@@ -14,7 +14,3 @@ scout.CalendarLayout.prototype.layout = function($container) {
   this.calendar.layoutSize();
   this.calendar.layoutYearPanel();
 };
-
-scout.CalendarLayout.prototype.preferredLayoutSize = function($comp) {
-  return scout.graphics.getSize($comp);
-};

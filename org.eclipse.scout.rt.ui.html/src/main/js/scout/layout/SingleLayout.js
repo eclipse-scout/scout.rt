@@ -8,14 +8,6 @@ scout.SingleLayout = function(htmlChild) {
 };
 scout.inherits(scout.SingleLayout, scout.AbstractLayout);
 
-scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlChild = this._htmlChild;
-  if (!htmlChild) {
-    htmlChild = this._getHtmlSingleChild($container);
-  }
-  return htmlChild.getPreferredSize();
-};
-
 scout.SingleLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container);
   var childSize = htmlContainer.getAvailableSize()
@@ -26,6 +18,14 @@ scout.SingleLayout.prototype.layout = function($container) {
     htmlChild = this._getHtmlSingleChild($container);
   }
   htmlChild.setSize(childSize);
+};
+
+scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
+  var htmlChild = this._htmlChild;
+  if (!htmlChild) {
+    htmlChild = this._getHtmlSingleChild($container);
+  }
+  return htmlChild.getPreferredSize();
 };
 
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {

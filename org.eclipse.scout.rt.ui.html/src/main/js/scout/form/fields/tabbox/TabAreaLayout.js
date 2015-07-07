@@ -123,7 +123,3 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
   });
   popup.render();
 };
-
-scout.TabAreaLayout.prototype.preferredLayoutSize = function($container) {
-  return scout.graphics.getSize($container);
-};

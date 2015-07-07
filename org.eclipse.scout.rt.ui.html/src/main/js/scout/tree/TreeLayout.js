@@ -20,7 +20,3 @@ scout.TreeLayout.prototype.layout = function($container) {
   $data.css('height', 'calc(100% - ' + height + 'px)');
   scout.scrollbars.update($data);
 };
-
-scout.TreeLayout.prototype.preferredLayoutSize = function($comp) {
-  return scout.graphics.getSize($comp);
-};

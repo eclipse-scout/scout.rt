@@ -28,9 +28,8 @@ scout.AbstractLayout.prototype.layout = function($container) {
 /**
  * Returns the preferred size of the given $container.
  *
- * Must be implemented by sub-class.
- *
  * @return scout.Dimension preferred size
  */
 scout.AbstractLayout.prototype.preferredLayoutSize = function($container) {
+  return scout.graphics.prefSize($container);
 };

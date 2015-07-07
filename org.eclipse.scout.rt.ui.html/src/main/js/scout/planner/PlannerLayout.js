@@ -127,7 +127,3 @@ scout.PlannerLayout.prototype._minWidth = function() {
 
   return numScaleItems * scaleItemMinWidth;
 };
-
-scout.PlannerLayout.prototype.preferredLayoutSize = function($comp) {
-  return scout.graphics.getSize($comp);
-};

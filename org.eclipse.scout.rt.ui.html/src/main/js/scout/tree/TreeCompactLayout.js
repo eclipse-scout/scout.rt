@@ -15,7 +15,3 @@ scout.TreeCompactLayout.prototype.layout = function($container) {
   $nodesWrapper.css('height', 'calc(100% - ' + height + 'px)');
   scout.scrollbars.update($nodesWrapper);
 };
-
-scout.TreeCompactLayout.prototype.preferredLayoutSize = function($comp) {
-  return scout.graphics.getSize($comp);
-};

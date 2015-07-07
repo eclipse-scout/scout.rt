@@ -42,7 +42,3 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
 
   this._$oldSelectedTab = $selectedTab;
 };
-
-scout.ViewButtonsLayout.prototype.preferredLayoutSize = function($container) {
-  return new scout.Dimension(0, 0);
-};

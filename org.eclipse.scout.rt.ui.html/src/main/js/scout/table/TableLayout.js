@@ -98,7 +98,3 @@ scout.TableLayout.prototype._layoutColumns = function() {
     }
   }.bind(this));
 };
-
-scout.TableLayout.prototype.preferredLayoutSize = function($comp) {
-  return scout.graphics.getSize($comp);
-};
