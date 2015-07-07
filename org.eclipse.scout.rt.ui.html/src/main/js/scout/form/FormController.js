@@ -125,9 +125,10 @@ scout.FormController.prototype._removeAndHideView = function(view) {
 scout.FormController.prototype._showView = function(view) {
   var desktop = this.session.desktop;
   var viewTab = new scout.DesktopViewTab(view, desktop.$bench);
+
   viewTab.events.on('tabClicked', desktop._setSelectedTab.bind(desktop));
   if (desktop._hasTaskBar()) {
-    viewTab.renderTab(desktop._$viewTabBar);
+    viewTab.render(desktop._$viewTabBar);
   }
   this._viewTabMap[view.id] = viewTab;
   desktop._addTab(viewTab);

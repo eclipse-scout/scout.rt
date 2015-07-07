@@ -61,10 +61,10 @@ scout.Widget.prototype._renderClassId = function($target) {
 };
 
 scout.Widget.prototype.remove = function() {
-  $.log.trace('Removing widget: ' + this);
   if (!this.rendered) {
     return;
   }
+  $.log.trace('Removing widget: ' + this);
 
   // remove children in reverse order.
   this.children.slice().reverse().forEach(function(child) {
@@ -73,6 +73,13 @@ scout.Widget.prototype.remove = function() {
   this._remove();
   this._uninstallKeyStrokeAdapter();
   this.rendered = false;
+  this._trigger('removed');
+};
+
+scout.Widget.prototype._trigger = function(event) {
+  if (this.events) {
+    this.events.trigger(event);
+  }
 };
 
 scout.Widget.prototype._remove = function() {

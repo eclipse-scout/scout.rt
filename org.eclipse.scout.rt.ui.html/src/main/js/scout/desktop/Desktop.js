@@ -260,9 +260,10 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
   this.onResize({data: newPosition});
 };
 
-scout.Desktop.prototype._addTab = function(tab) {
-  this._allViewTabs.push(tab);
-  this._setSelectedTab(tab);
+scout.Desktop.prototype._addTab = function(viewTab) {
+  this._allViewTabs.push(viewTab);
+  viewTab.events.on('removed', this._removeTab.bind(this, viewTab)); // FIXME AWE: un-register?
+  this._setSelectedTab(viewTab);
 };
 
 scout.Desktop.prototype._removeTab = function(viewTab) {
