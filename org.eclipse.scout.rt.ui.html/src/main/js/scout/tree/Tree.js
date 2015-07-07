@@ -117,6 +117,7 @@ scout.Tree.prototype._render = function($parent) {
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
       scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
       function() { return this.dropType; }.bind(this),
+      function() { return this.dropMaximumSize; }.bind(this),
       function(event) {
           var target = event.currentTarget;
           return {

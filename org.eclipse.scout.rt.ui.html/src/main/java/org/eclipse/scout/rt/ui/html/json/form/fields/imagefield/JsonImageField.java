@@ -63,6 +63,12 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
         return getModel().getDropType();
       }
     });
+    putJsonProperty(new JsonProperty<IMAGE_FIELD>(IImageField.PROP_DROP_MAXIMUM_SIZE, model) {
+      @Override
+      protected Long modelValue() {
+        return getModel().getDropMaximumSize();
+      }
+    });
   }
 
   @Override
@@ -181,5 +187,10 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
       ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);
       getModel().getUIFacade().fireDropActionFromUi(transferObject);
     }
+  }
+
+  @Override
+  public long getMaximumBinaryResourceUploadSize() {
+    return getModel().getDropMaximumSize();
   }
 }

@@ -114,6 +114,12 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
         return getModel().getDropType();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_DROP_MAXIMUM_SIZE, model) {
+      @Override
+      protected Long modelValue() {
+        return getModel().getDropMaximumSize();
+      }
+    });
   }
 
   @Override
@@ -158,5 +164,10 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
       ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);
       getModel().getUIFacade().fireDropActionFromUi(transferObject);
     }
+  }
+
+  @Override
+  public long getMaximumBinaryResourceUploadSize() {
+    return getModel().getDropMaximumSize();
   }
 }

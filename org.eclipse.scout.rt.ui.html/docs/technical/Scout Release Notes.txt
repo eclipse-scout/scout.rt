@@ -434,3 +434,14 @@ API changes AbstractStringField:
 AWE 02.07.2015
 Removed IOutlineTableForm, IOutlineTreeForm and all sub-classes.
 They're not supported by the new Html UI anymore.
+
+MOT 08.07.2015:
+Added:
+- org.eclipse.scout.rt.client.ui.IDNDSupport.setDropMaximumSize(long)
+- org.eclipse.scout.rt.client.ui.IDNDSupport.getDropMaximumSize()
+- org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser.setMaximumUploadSize(long)
+- org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser.getMaximumUploadSize()
+- org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField.setMaximumUploadSize(long)
+- org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField.getMaximumUploadSize()
+Also added getConfigured...() methods were applicable for properties above. File upload size is always limited now (otherwise server might run out of memory if too large files are sent).
+Default size is 50 MB, but every field might specify lower/higher sizes.

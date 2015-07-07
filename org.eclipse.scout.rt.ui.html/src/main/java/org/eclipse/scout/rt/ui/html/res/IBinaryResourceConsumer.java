@@ -13,4 +13,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 public interface IBinaryResourceConsumer {
 
   void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties);
+
+  /**
+   * Maximum upload size in bytes.
+   */
+  long getMaximumBinaryResourceUploadSize();
 }

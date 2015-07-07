@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserF
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
@@ -28,6 +29,17 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
 
   public JsonFileChooserField(FILE_CHOOSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
+  }
+
+  @Override
+  protected void initJsonProperties(FILE_CHOOSER_FIELD model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<FILE_CHOOSER_FIELD>(IFileChooserField.PROP_MAXIMUM_UPLOAD_SIZE, model) {
+      @Override
+      protected Long modelValue() {
+        return getModel().getMaximumUploadSize();
+      }
+    });
   }
 
   @Override
@@ -59,5 +71,10 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
     if (!CollectionUtility.isEmpty(binaryResources)) {
       getModel().setValue(CollectionUtility.firstElement(binaryResources));
     }
+  }
+
+  @Override
+  public long getMaximumBinaryResourceUploadSize() {
+    return getModel().getMaximumUploadSize();
   }
 }

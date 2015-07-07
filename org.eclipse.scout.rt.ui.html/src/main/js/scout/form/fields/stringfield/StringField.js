@@ -35,12 +35,7 @@ scout.StringField.prototype._render = function($parent) {
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
       scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
       function() { return this.dropType; }.bind(this),
-      function(event) {
-          var target = event.currentTarget;
-          return {
-              'nodeId': (target.classList.contains('tree-node') ? $(target).data('node').id : '')
-          };
-        }.bind(this));
+      function() { return this.dropMaximumSize; }.bind(this));
   this.dragAndDropHandler.install($field);
 
   this.addField($field);

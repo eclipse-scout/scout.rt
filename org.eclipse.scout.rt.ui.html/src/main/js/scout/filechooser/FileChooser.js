@@ -78,7 +78,7 @@ scout.FileChooser.prototype._doOk = function() {
     this._doCancel();
     return;
   }
-  this.session.uploadFiles(this, this._files);
+  this.session.uploadFiles(this, this._files, undefined, this.maximumUploadSize);
 };
 
 scout.FileChooser.prototype._doCancel = function() {

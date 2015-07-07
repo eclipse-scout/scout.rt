@@ -214,6 +214,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         return getModel().getDropType();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_DROP_MAXIMUM_SIZE, model) {
+      @Override
+      protected Long modelValue() {
+        return getModel().getDropMaximumSize();
+      }
+    });
   }
 
   @Override
@@ -1012,6 +1018,11 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       }
       getModel().getUIFacade().fireRowDropActionFromUI(row, transferObject);
     }
+  }
+
+  @Override
+  public long getMaximumBinaryResourceUploadSize() {
+    return getModel().getDropMaximumSize();
   }
 
   protected CheckedInfo jsonToCheckedInfo(JSONObject data) {

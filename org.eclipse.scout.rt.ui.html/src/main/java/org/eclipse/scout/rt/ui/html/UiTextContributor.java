@@ -87,7 +87,9 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.Upload",
         "ui.Browse",
         "ui.FromXToY",
-        "ui.To"
+        "ui.To",
+        "ui.FileSizeLimitTitle",
+        "ui.FileSizeLimit"
         ));
   }
 }

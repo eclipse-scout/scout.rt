@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +29,6 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -38,6 +39,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.MDC;
 
@@ -48,8 +50,7 @@ import org.slf4j.MDC;
 public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestInterceptor.class);
 
-  private static final String PROP_UI_SESSION_ID = "uiSessionId";
-  private static final String PROP_TARGET = "target";
+  private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -60,9 +61,12 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
   public boolean interceptPost(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
     //serve only /upload
     String pathInfo = httpReq.getPathInfo();
-    if (CompareUtility.notEquals(pathInfo, "/upload")) {
+    Matcher matcher = PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
+    if (!matcher.matches()) {
       return false;
     }
+    String uiSessionId = matcher.group(1);
+    String targetAdapterId = matcher.group(2);
 
     // Check if is really a file upload
     if (!ServletFileUpload.isMultipartContent(httpReq)) {
@@ -77,15 +81,24 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
         LOG.debug("started");
       }
 
+      // Resolve session
+      MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSessionId);
+      IUiSession uiSession = resolveUiSession(httpReq, uiSessionId);
+
+      // Resolve adapter
+      if (!StringUtility.hasText(targetAdapterId)) {
+        throw new IllegalArgumentException("Missing target adapter ID");
+      }
+      IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(targetAdapterId);
+      if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
+        throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
+      }
+      IBinaryResourceConsumer binaryResourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
+
       // Read uploaded data
       Map<String, String> uploadProperties = new HashMap<String, String>();
       List<BinaryResource> uploadResources = new ArrayList<>();
-      readUploadData(httpReq, uploadProperties, uploadResources);
-
-      // Resolve session
-      String uiSessionId = uploadProperties.get(PROP_UI_SESSION_ID);
-      MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSessionId);
-      IUiSession uiSession = resolveUiSession(httpReq, uiSessionId);
+      readUploadData(httpReq, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
 
       try {
         MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
@@ -98,7 +111,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
             writeResponse(httpResp, createSessionTerminatedResponse());
             return true;
           }
-          JSONObject jsonResp = uiSession.processFileUpload(httpReq, uploadProperties.get(PROP_TARGET), uploadResources, uploadProperties);
+          JSONObject jsonResp = uiSession.processFileUpload(httpReq, binaryResourceConsumer, uploadResources, uploadProperties);
           if (jsonResp == null) {
             jsonResp = createEmptyResponse();
           }
@@ -133,8 +146,9 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
     return true;
   }
 
-  protected void readUploadData(HttpServletRequest httpReq, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException, ProcessingException {
+  protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException, ProcessingException {
     ServletFileUpload upload = new ServletFileUpload();
+    upload.setSizeMax(maxSize);
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
       String name = item.getFieldName();
@@ -156,7 +170,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
 
   protected IUiSession resolveUiSession(HttpServletRequest httpReq, String uiSessionId) {
     if (!StringUtility.hasText(uiSessionId)) {
-      throw new IllegalArgumentException("Missing property '" + PROP_UI_SESSION_ID + "'");
+      throw new IllegalArgumentException("Missing UI session ID.");
     }
     HttpSession httpSession = httpReq.getSession();
     IUiSession uiSession = (IUiSession) httpSession.getAttribute(IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + uiSessionId);

@@ -70,6 +70,7 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
     JSONObject json = super.toJson();
     putProperty(json, "multiSelect", getModel().isMultiSelect());
     putProperty(json, "contentTypes", new JSONArray(getFileExtensionsAsContentTypes()));
+    putProperty(json, "maximumUploadSize", getModel().getMaximumUploadSize());
     return json;
   }
 
@@ -119,6 +120,11 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   @Override
   public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
     getModel().getUIFacade().setResultFromUI(binaryResources);
+  }
+
+  @Override
+  public long getMaximumBinaryResourceUploadSize() {
+    return getModel().getMaximumUploadSize();
   }
 
   private class P_FileChooserListener implements FileChooserListener {

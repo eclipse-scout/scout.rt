@@ -31,7 +31,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -628,7 +627,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public JSONObject processFileUpload(HttpServletRequest httpReq, final String targetAdapterId, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
+  public JSONObject processFileUpload(HttpServletRequest httpReq, final IBinaryResourceConsumer resourceConsumer, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
     try {
       m_currentHttpRequest.set(httpReq);
 
@@ -636,7 +635,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       JobUtility.runModelJobAndAwait("upload-processing", getClientSession(), false, Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
-          processFileUploadInternal(targetAdapterId, uploadResources, uploadProperties);
+          resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
         }
       }));
 
@@ -665,26 +664,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         dispose();
       }
     }
-  }
-
-  /**
-   * <b>Do not call this internal method directly!</b> It should only be called be
-   * {@link #processFileUpload(HttpServletRequest, Map, List)} which ensures that the required
-   * state is set up correctly (and will be cleaned up later) and is run as a model job.
-   */
-  protected void processFileUploadInternal(String targetAdapterId, List<BinaryResource> uploadFiles, Map<String, String> uploadProperties) {
-    // Resolve adapter
-    if (!StringUtility.hasText(targetAdapterId)) {
-      throw new IllegalArgumentException("Missing target adapter ID");
-    }
-    IJsonAdapter<?> jsonAdapter = getJsonAdapter(targetAdapterId);
-    if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
-      throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
-    }
-    IBinaryResourceConsumer resourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
-
-    // Consume
-    resourceConsumer.consumeBinaryResource(uploadFiles, uploadProperties);
   }
 
   @Override

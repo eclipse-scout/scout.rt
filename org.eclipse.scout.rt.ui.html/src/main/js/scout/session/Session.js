@@ -639,11 +639,11 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   }
 };
 
-scout.Session.prototype.uploadFiles = function(target, files, uploadProperties) {
-  // FIXME mot d'n'd check content-type?
-  // FIXME mot d'n'd check length (what is the maximum length?)
+scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize) {
+  // TODO mot content type check before upload would be nice to have (new feature)
 
   var formData = new FormData();
+  var totalSize = 0;
 
   if (uploadProperties) {
     $.each(uploadProperties, function(key, value) {
@@ -651,16 +651,31 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties) 
     });
   }
 
-  formData.append('uiSessionId', this.uiSessionId);
-  formData.append('target', target.id);
   $.each(files, function(index, value) {
+    totalSize += value.size;
     formData.append('files', value, value.name);
   }.bind(this));
+
+  if (!maxTotalSize) {
+    maxTotalSize = 5 * 1024 * 1024; // 5 MB as default maximum size
+  }
+
+  // very large files must not be sent to server otherwise the whole system might crash (for all users).
+  if (totalSize > maxTotalSize) {
+    var boxOptions = {
+        header: this._texts.get('ui.FileSizeLimitTitle'),
+        body: this._texts.get('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),
+        yesButtonText: this.optText('Ok', 'Ok')
+      };
+
+    this.showFatalMessage(boxOptions);
+    return;
+  }
 
   var uploadAjaxOptions = {
     async: true,
     type: 'POST',
-    url: 'upload',
+    url: 'upload/' + this.uiSessionId + '/' + target.id,
     cache: false,
     // Don't touch the data (do not convert it to string)
     processData: false,

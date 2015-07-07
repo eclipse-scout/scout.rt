@@ -24,7 +24,8 @@ scout.ImageField.prototype._render = function($parent) {
   // add drag and drop event listeners to field container, img field might be hidden (e.g. if no image has been set)
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
       scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      function() { return this.dropType; }.bind(this));
+      function() { return this.dropType; }.bind(this),
+      function() { return this.dropMaximumSize; }.bind(this));
   this.dragAndDropHandler.install(this.$fieldContainer);
 
   var $field = $('<img>')

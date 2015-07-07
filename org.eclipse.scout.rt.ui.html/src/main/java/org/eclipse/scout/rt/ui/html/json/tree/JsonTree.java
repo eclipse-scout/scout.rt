@@ -125,6 +125,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         return getModel().getDropType();
       }
     });
+    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_DROP_MAXIMUM_SIZE, model) {
+      @Override
+      protected Long modelValue() {
+        return getModel().getDropMaximumSize();
+      }
+    });
   }
 
   @Override
@@ -519,6 +525,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       }
       getModel().getUIFacade().fireNodeDropActionFromUI(node, transferObject);
     }
+  }
+
+  @Override
+  public long getMaximumBinaryResourceUploadSize() {
+    return getModel().getDropMaximumSize();
   }
 
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean ignoreDeletedNodes, boolean autoCreateNodeId) {

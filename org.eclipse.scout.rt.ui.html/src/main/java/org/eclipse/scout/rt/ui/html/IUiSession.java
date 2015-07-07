@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 
 @Bean
@@ -92,15 +93,15 @@ public interface IUiSession {
   /**
    * @param httpRequest
    *          the HTTP request
-   * @param targetAdapterId
-   *          the ID of the adapter that receives the uploaded files
+   * @param resourceConsumer
+   *          the target adapter that receives the uploaded files
    * @param uploadResources
    *          list of uploaded files
    * @param uploadProperties
    *          a map of all other submitted string properties (usually not needed)
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
-  JSONObject processFileUpload(HttpServletRequest httpReq, String targetAdapterId, List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
+  JSONObject processFileUpload(HttpServletRequest httpReq, IBinaryResourceConsumer resourceConsumer, List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
 
   void processCancelRequest();
 
