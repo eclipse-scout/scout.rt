@@ -257,6 +257,9 @@
   };
 
   $.fn.setVisible = function(visible) {
+    if (this.isVisible() === visible) {
+      return this;
+    }
     if (visible) {
       this.show();
     } else {

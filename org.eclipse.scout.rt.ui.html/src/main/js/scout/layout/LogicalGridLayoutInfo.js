@@ -92,14 +92,19 @@ scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap) {
 };
 
 scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
-  var compCount = this.$components.length;
-  var compSize = [];
+  var comp,
+    compCount = this.$components.length,
+    compSize = [];
   // cache component sizes and cleanup constraints
   var $comp, cons, d;
   for (var i = 0; i < compCount; i++) {
     $comp = this.$components[i];
     cons = this.gridDatas[i];
     d = this.uiSizeInPixel($comp);
+    if ($.log.isTraceEnabled()) {
+      comp = scout.HtmlComponent.optGet($comp);
+      $.log.trace('(LogicalGridLayoutInfo#initializeInfo $comp = ' + comp ? comp.debug() : ''+ ' size=' + d);
+    }
     if (cons.widthHint > 0) {
       d.width = cons.widthHint;
     }

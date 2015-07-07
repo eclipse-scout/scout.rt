@@ -47,20 +47,20 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
     htmlMenuBar,
     prefSize;
 
-  if (htmlGbBody.$comp.isVisible()) {
+  if (this._groupBox.expanded) {
     prefSize = htmlGbBody.getPreferredSize()
       .add(htmlGbBody.getMargins());
+
+    htmlMenuBar = this._htmlMenuBar();
+    if (htmlMenuBar) {
+      prefSize.height += htmlMenuBar.getPreferredSize(true).height;
+    }
   }
   else {
     prefSize = new scout.Dimension(0, 0);
   }
   prefSize = prefSize.add(htmlContainer.getInsets());
-  prefSize.height += this._titleHeight($container);
-
-  htmlMenuBar = this._htmlMenuBar();
-  if (htmlMenuBar) {
-    prefSize.height += htmlMenuBar.getSize(true).height;
-  }
+  prefSize.height += scout.graphics.prefSize(this._groupBox._$groupBoxTitle, true).height;
 
   return prefSize;
 };

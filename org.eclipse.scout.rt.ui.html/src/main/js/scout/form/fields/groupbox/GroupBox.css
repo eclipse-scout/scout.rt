@@ -18,9 +18,15 @@
   border-bottom: 3px solid @border-color;
 }
 
-.group-box > .menubar {
-  margin-left: @mandatory-indicator-width;
-  margin-right: 0;
+.group-box {
+  & > .menubar {
+    margin-left: @mandatory-indicator-width;
+    margin-right: 0;
+  }
+
+  &.collapsed > .menubar {
+    display: none;
+  }
 }
 
 .group-box-title {
