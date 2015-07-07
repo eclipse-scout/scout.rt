@@ -73,7 +73,7 @@ scout.Widget.prototype.remove = function() {
   this._remove();
   this._uninstallKeyStrokeAdapter();
   this.rendered = false;
-  this._trigger('removed');
+  this._trigger('remove');
 };
 
 scout.Widget.prototype._trigger = function(event) {

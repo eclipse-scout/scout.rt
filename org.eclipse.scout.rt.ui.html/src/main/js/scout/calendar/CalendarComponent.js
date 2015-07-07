@@ -14,9 +14,6 @@ scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
  * @override ModelAdapter.js
  */
 scout.CalendarComponent.prototype._remove = function() {
-  // list-components must be informed, that their source has been removed
-  this.events.trigger('removed');
-
   // remove $parts because they're not children of this.$container
   var tooltipSupport = this.parent._tooltipSupport;
   this._$parts.forEach(function($part) {

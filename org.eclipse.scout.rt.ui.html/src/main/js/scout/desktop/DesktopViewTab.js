@@ -17,27 +17,28 @@ scout.DesktopViewTab = function(view, $bench) {
    */
   this._$detachedDom;
 
-  this._contentPropertyChangeListener = function(event) {
+  this._propertyChangeListener = function(event) {
     if (scout.helpers.isOneOf(event.changedProperties, 'title' ,'subTitle')) {
       this._titlesUpdated();
     }
   }.bind(this);
 
-  this._removedListener = this.remove.bind(this);
+  this._removeListener = this.remove.bind(this);
 
+  this.addChild(this._view);
   this._addEventSupport();
   this._installListeners();
 };
 scout.inherits(scout.DesktopViewTab, scout.Widget);
 
 scout.DesktopViewTab.prototype._installListeners = function() {
-  this._view.on('propertyChange', this._contentPropertyChangeListener);
-  this._view.on('removed', this._removedListener);
+  this._view.on('propertyChange', this._propertyChangeListener);
+  this._view.on('remove', this._removeListener);
 };
 
 scout.DesktopViewTab.prototype._uninstallListeners = function() {
-  this._view.off('propertyChange', this._contentPropertyChangeListener);
-  this._view.off('removed', this._removedListener);
+  this._view.off('propertyChange', this._propertyChangeListener);
+  this._view.off('remove', this._removeListener);
 };
 
 /**
@@ -45,20 +46,7 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
  */
 scout.DesktopViewTab.prototype._remove = function() {
   this._uninstallListeners();
-  this._removeTab();
-  this._removeView();
-};
-
-scout.DesktopViewTab.prototype._removeTab = function() {
-  if (this.$container) {
-    this.$container.remove();
-  }
-};
-
-scout.DesktopViewTab.prototype._removeView = function() {
-  if (this._view.rendered) {
-    this._view.remove();
-  }
+  scout.DesktopViewTab.parent.prototype._remove.call(this);
 };
 
 scout.DesktopViewTab.prototype._render = function($parent) {

@@ -12,15 +12,15 @@ scout.ButtonAdapterMenu.prototype.init = function(model, session) {
   if (!this.button) {
     throw new Error('Cannot adapt to undefined button');
   }
-  this._attachToButton();
+  this._installListeners();
 };
 
-scout.ButtonAdapterMenu.prototype._attachToButton = function() {
+scout.ButtonAdapterMenu.prototype._installListeners = function() {
   this.button.on('propertyChange', this._onButtonPropertyChange.bind(this));
   this.button.on('destroy', this._onButtonDestroy.bind(this));
 };
 
-scout.ButtonAdapterMenu.prototype._detatchFromButton = function() {
+scout.ButtonAdapterMenu.prototype._uninstallListeners = function() {
   this.button.off('propertyChange');
   this.button.off('destroy');
 };
@@ -38,7 +38,7 @@ scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
 
 scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {
   this.remove();
-  this._detatchFromButton();
+  this._uninstallListeners();
 };
 
 /**

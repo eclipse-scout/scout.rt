@@ -7,13 +7,13 @@ scout.Desktop = function() {
   this.$bench;
 
   this.navigation;
-  // FIXME DWI: (von A.WE) this collection should be moved/merged to/with FormController
   this._allViewTabs = [];
   /**
    * outline-content = outline form or table
    */
   this._outlineContent;
   this._selectedViewTab;
+  this._viewTabRemoveListener;
 
   /**
    * FIXME DWI: (activeForm): selectedTool wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
@@ -52,6 +52,8 @@ scout.Desktop.prototype.init = function(model, session) {
       return this.fileChoosers;
     }.bind(this)
   );
+
+  this._viewTabRemoveListener = this._removeTab.bind(this);
 };
 
 scout.DesktopStyle = {
@@ -262,16 +264,16 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
 
 scout.Desktop.prototype._addTab = function(viewTab) {
   this._allViewTabs.push(viewTab);
-  viewTab.events.on('removed', this._removeTab.bind(this, viewTab)); // FIXME AWE: un-register?
+  viewTab.events.on('remove', this.viewTabRemoveListener);
   this._setSelectedTab(viewTab);
 };
 
 scout.Desktop.prototype._removeTab = function(viewTab) {
   scout.arrays.remove(this._allViewTabs, viewTab);
+  viewTab.events.off('remove', this.viewTabRemoveListener);
   viewTab.remove();
 
   // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
-
   // Only change 'tab selection' if the tab to be removed was the active one.
   if (this._selectedViewTab === viewTab) {
     if (this._allViewTabs.length > 0) {

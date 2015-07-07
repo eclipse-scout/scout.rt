@@ -12,7 +12,7 @@ scout.CalendarListComponent = function(partDay, source) {
   this._selectedListener = source.events.on('selected', function(event) {
     this.$container.toggleClass('comp-selected', event.selected);
   }.bind(this));
-  this._removedListener = source.events.on('removed', this.remove.bind(this));
+  this._removeListener = source.events.on('remove', this.remove.bind(this));
 };
 
 scout.CalendarListComponent.prototype.render = function($parent) {
@@ -29,6 +29,6 @@ scout.CalendarListComponent.prototype.render = function($parent) {
 
 scout.CalendarListComponent.prototype.remove = function() {
   this.source.events.removeListener(this._selectedListener);
-  this.source.events.removeListener(this._removedListener);
+  this.source.events.removeListener(this._removeListener);
   this.$container.remove();
 };
