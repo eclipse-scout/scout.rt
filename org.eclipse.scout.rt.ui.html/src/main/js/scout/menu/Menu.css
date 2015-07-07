@@ -46,7 +46,7 @@
   display: inline-block;
 
   & > .key-box {
-    bottom: 2px;
+    bottom: -3px;
   }
 
   & > .font-icon {

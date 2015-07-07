@@ -44,6 +44,14 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
     // FIXME NBU/AWE: hier brauchen wir den ViewMenuButton (keyStroke hartcodiert?)
     scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F2', this._desktopNavigation.viewMenuTab.$container, this.ctrl, this.alt, this.shift);
     drawedKeys.F2 = true;
+    var $icon = this._desktopNavigation.viewMenuTab.$container.find('.icon');
+    if($icon.length>0){
+      var wIcon = $icon.width();
+      var wKeybox = this._desktopNavigation.viewMenuTab.$container.find('.key-box').outerWidth();
+      var containerPadding = Number(this._desktopNavigation.viewMenuTab.$container.css('padding-left').replace('px', ''));
+      var leftKeyBox = wIcon/2 - wKeybox/2 + containerPadding;
+      this._desktopNavigation.viewMenuTab.$container.find('.key-box').css('left', leftKeyBox+'px');
+    }
   }
   this.keyBoxDrawed = true;
 };

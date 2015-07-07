@@ -93,3 +93,18 @@ scout.ViewButton.prototype._onClick = function() {
 scout.ViewButton.prototype.last = function() {
   this.$container.addClass('last');
 };
+
+
+/**
+ * @override Action.js
+ */
+scout.ViewButton.prototype._drawKeyBox = function($container) {
+  scout.ViewButton.parent.prototype._drawKeyBox.call(this,$container);
+  if(this.iconId){
+    var wIcon = this.$container.width();
+    var wKeybox = this.$container.find('.key-box').outerWidth();
+    var containerPadding = Number(this.$container.css('padding-left').replace('px', ''));
+    var leftKeyBox = wIcon/2 - wKeybox/2 + containerPadding;
+    this.$container.find('.key-box').css('left', leftKeyBox+'px');
+  }
+};
