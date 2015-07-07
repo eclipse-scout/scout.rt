@@ -28,12 +28,13 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     selectedTabWidth = containerBounds.width - fixedWidth;
     if (this._$oldSelectedTab && this._$oldSelectedTab !== $selectedTab) {
       this._$oldSelectedTab
-        .addClass('view-button-fadeout')
-        .animate({width: '50px'}, 400);
+      //  FIXME AWE: remove color animation after review with C.RU
+      //        .addClass('view-button-fadeout')
+        .animate({width: '50px'}, 300);
 
       $selectedTab
-        .addClass('view-button-fadein')
-        .animate({width: selectedTabWidth}, 400);
+//        .addClass('view-button-fadein')
+        .animate({width: selectedTabWidth}, 300);
     } else {
       scout.graphics.setSize($selectedTab, new scout.Dimension(selectedTabWidth, containerBounds.height));
     }

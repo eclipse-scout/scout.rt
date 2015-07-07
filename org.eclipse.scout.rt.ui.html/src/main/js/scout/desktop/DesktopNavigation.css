@@ -33,6 +33,7 @@
   white-space: nowrap;
   min-width: 50px;
   position: relative;
+  vertical-align: top;
 
   & > .key-box {
     bottom: 4px;
@@ -106,6 +107,7 @@
   border-top: solid 1px @border-color;
 }
 
+/* FIXME AWE: remove color animation after review with C.RU */
 @keyframes view-button-fadein {
   from {background-color: @panel-background-color;}
   to {background-color: @view-button-tab-active-background-color;}
@@ -118,10 +120,12 @@
 
 .view-button-fadein {
   .animation-name(view-button-fadein);
-  .animation-duration(0.4s);
+  .animation-duration(0.3s);
+  .animation-fill-mode(forwards);
 }
 
 .view-button-fadeout {
   .animation-name(view-button-fadeout);
-  .animation-duration(0.4s);
+  .animation-duration(0.3s);
+  .animation-fill-mode(forwards);
 }
