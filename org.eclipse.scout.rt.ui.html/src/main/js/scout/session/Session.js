@@ -79,20 +79,6 @@ scout.Session = function($entryPoint, options) {
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
   this._fatalMessagesOnScreen = {};
 
-  // TODO BSH Detach | Check if there is another way
-  // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
-  // re-name "detach window", since "detach" is also an often used JQuery operation on the DOM
-  if (window.opener && window.opener.scout && window.opener.scout.sessions) {
-    // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js/_onFormClosed)
-    if (window.opener.scout.sessions.length > 1) {
-      window.close();
-      throw new Error('Too many scout sessions');
-    }
-    var parentUiSession = window.opener.scout.sessions[0];
-    parentUiSession.registerChildWindow(window);
-    this.parentUiSession = parentUiSession; // TODO BSH Detach | Get from options instead?
-  }
-
   this.modelAdapterRegistry[options.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
@@ -101,6 +87,7 @@ scout.Session = function($entryPoint, options) {
   }, this);
 
   this._initCustomParams();
+  this._registerWithParentUiSession();
   scout.focusManager.installManagerForSession(this, options);
 };
 
@@ -116,6 +103,36 @@ scout.Session.prototype._initCustomParams = function() {
   var customParamMap = scoutUrl.parameterMap;
   for (var prop in customParamMap) {
     this._customParams[prop] = customParamMap[prop];
+  }
+};
+
+/**
+ * If this is a popup window, re-registers the session with the parent session. This
+ * can be the case if the user reloaded the popup window.
+ */
+// TODO BSH Detach | Check if there is another way
+scout.Session.prototype._registerWithParentUiSession = function() {
+  var openerScout;
+  try {
+    openerScout = window.opener && window.opener.scout;
+  } catch (err) {
+    // Catch security exceptions of the following type:
+    //   "DOMException: Blocked a frame with origin <url> from accessing a cross-origin frame."
+    //
+    // This should never happen, but apparently it does sometimes. To prevent the UI session
+    // from not being started, we catch catch the exception and silently ignore it.
+    return;
+  }
+
+  if (openerScout && openerScout.sessions) {
+    // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js/_onFormClosed)
+    if (openerScout.sessions.length > 1) {
+      window.close();
+      throw new Error('Too many scout sessions');
+    }
+    var parentUiSession = openerScout.sessions[0];
+    parentUiSession.registerChildWindow(window);
+    this.parentUiSession = parentUiSession; // TODO BSH Detach | Get from options instead?
   }
 };
 
