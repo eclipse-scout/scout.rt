@@ -257,9 +257,9 @@ scout.Action.prototype.initKeyStrokeParts = function() {
   for (var i = 0; i < keyStrokeParts.length; i++) {
     var part = keyStrokeParts[i];
     // see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
-    if (part === 'alternate') {
+    if (part === 'alternate' || part === 'alt') {
       this.alt = true;
-    } else if (part === 'control') {
+    } else if (part === 'control' || part ==='ctrl') {
       this.ctrl = true;
     } else if (part === 'shift') {
       this.shift = true;
