@@ -6,6 +6,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   var column = $header.data('column'),
     pos = table.columns.indexOf(column);
 
+  this.session = session;
   // label title
   $header.addClass('menu-open');
 
@@ -155,7 +156,6 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     cube = matrix.calculateCube();
 
   var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
-  scout.scrollbars.install($headerFilterContainer);
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
@@ -171,6 +171,9 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       $filter.addClass('selected');
     }
   }
+
+  this.$headerFilterContainer = $headerFilterContainer;
+  scout.scrollbars.install($headerFilterContainer, session);
 
   var containerHeight = $headerFilterContainer.get(0).offsetHeight,
     scrollHeight = $headerFilterContainer.get(0).scrollHeight;
@@ -409,6 +412,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 };
 
 scout.TableHeaderMenu.prototype.remove = function() {
+  scout.scrollbars.uninstall(this.$headerFilterContainer, this.session);
   this.$headerMenu.remove();
   this.$header.removeClass('menu-open');
   $(window).off('mousedown.tableheadermenu');

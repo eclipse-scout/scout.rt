@@ -56,10 +56,9 @@ scout.GroupBox.prototype._render = function($parent) {
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
   if (this.scrollable) {
-    scout.scrollbars.install(this.$body, {
+    scout.scrollbars.install(this.$body, this.session, {
       axis: 'y'
     });
-    this.session.detachHelper.pushScrollable(this.$body);
   }
   this._prepareFields();
   this.controls.forEach(function(control) {
@@ -90,7 +89,7 @@ scout.GroupBox.prototype._remove = function() {
     this.menuBar.remove();
   }
   if (this.scrollable) {
-    this.session.detachHelper.removeScrollable(this.$body);
+    scout.scrollbars.uninstall(this.$body);
   }
 };
 

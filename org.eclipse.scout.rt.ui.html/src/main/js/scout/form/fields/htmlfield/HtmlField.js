@@ -16,6 +16,7 @@ scout.HtmlField.prototype._render = function($parent) {
 scout.HtmlField.prototype._renderProperties = function() {
   scout.HtmlField.parent.prototype._renderProperties.call(this);
 
+  this._renderScrollBarsEnabled();
   this._renderScrollToPosition(this.scrollToPosition);
 };
 
@@ -32,8 +33,10 @@ scout.HtmlField.prototype._renderDisplayText = function() {
     .on('click', this._onAppLinkAction.bind(this))
     .attr('tabindex', '0');
 
-  // this method replaces the content, also the scroll bars get lost
-  this._renderScrollBarsEnabled(this.scrollBarsEnabled);
+  // this method replaces the content, the scroll bars get lost -> render again (only necessary if already rendered, otherwise it is done by renderProperties)
+  if (this.rendered) {
+    this._renderScrollBarsEnabled(this.scrollBarsEnabled);
+  }
 
   this.invalidateLayoutTree();
 };
@@ -44,18 +47,15 @@ scout.HtmlField.prototype.init = function(model, session) {
 };
 
 scout.HtmlField.prototype._remove = function() {
-  if (this.scrollBarsEnabled) {
-    this.session.detachHelper.removeScrollable(this.$field);
-  }
+  scout.scrollbars.uninstall(this.$field, this.session);
   scout.HtmlField.parent.prototype._remove.call(this);
 };
 
-scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
+scout.HtmlField.prototype._renderScrollBarsEnabled = function() {
   if (this.scrollBarsEnabled) {
-    scout.scrollbars.install(this.$field);
-    if (this.session.detachHelper._$scrollables && this.session.detachHelper._$scrollables.indexOf(this.$field) < 0) {
-      this.session.detachHelper.pushScrollable(this.$field);
-    }
+    scout.scrollbars.install(this.$field, this.session);
+  } else {
+    scout.scrollbars.uninstall(this.$field, this.session);
   }
 };
 

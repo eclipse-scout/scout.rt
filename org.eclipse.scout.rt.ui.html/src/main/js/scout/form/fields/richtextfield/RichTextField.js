@@ -19,7 +19,7 @@ scout.RichTextField.prototype._render = function($parent) {
   this.addFieldContainer($.makeDiv('rich-text-editor'));
   var $editorContent = this.$fieldContainer.appendDiv('rich-text-editor-content');
 
-  scout.scrollbars.install($editorContent, {
+  scout.scrollbars.install($editorContent, this.session, {
     updateScrollbarPos: false
   });
   this.session.detachHelper.pushScrollable($editorContent);

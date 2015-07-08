@@ -15,42 +15,44 @@ scout.TreeCompact.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('compact-tree');
 
   this.$filter = $('<input>').
-    attr('type', 'text').
-    placeholder(this.session.text('ui.FilterBy_')).
-    addClass('text-field').
-    appendTo(this.$container).
-    on('input', this._onInput.bind(this)).
-    keydown(this._onKeyDown.bind(this));
+  attr('type', 'text').
+  placeholder(this.session.text('ui.FilterBy_')).
+  addClass('text-field').
+  appendTo(this.$container).
+  on('input', this._onInput.bind(this)).
+  keydown(this._onKeyDown.bind(this));
 
   var layout = new scout.TreeCompactLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
 
   this.$nodesWrapper = $.makeDiv('nodes-wrapper').appendTo(this.$container);
-  scout.scrollbars.install(this.$nodesWrapper, {invertColors:true, borderless:true});
-  this.session.detachHelper.pushScrollable(this.$nodesWrapper);
+  scout.scrollbars.install(this.$nodesWrapper, this.session, {
+    invertColors: true,
+    borderless: true
+  });
   this.$nodes = $.makeDiv('nodes').appendTo(this.$nodesWrapper);
   this._renderNodes();
 };
 
 scout.TreeCompact.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this.$nodesWrapper);
+  scout.scrollbars.uninstall(this.$nodesWrapper, this.session);
 };
 
 scout.TreeCompact.prototype._renderNodes = function(filter) {
   var i, j, node, $node, childNode, $childNode;
-  for (i=0; i<this.nodes.length; i++) {
+  for (i = 0; i < this.nodes.length; i++) {
     node = this.nodes[i];
     $node = $.makeDiv('section').appendTo(this.$nodes);
     $.makeDiv('title').appendTo($node).text(node.text);
     this._domMap[node.id] = $node;
-    for (j=0; j<node.childNodes.length; j++) {
+    for (j = 0; j < node.childNodes.length; j++) {
       childNode = node.childNodes[j];
       $childNode = $.makeDiv('process').
-        data('node', childNode).
-        click(this._onNodeClick.bind(this)).
-        text(childNode.text).
-        appendTo($node);
+      data('node', childNode).
+      click(this._onNodeClick.bind(this)).
+      text(childNode.text).
+      appendTo($node);
       this._domMap[childNode.id] = $childNode;
     }
   }
@@ -58,12 +60,12 @@ scout.TreeCompact.prototype._renderNodes = function(filter) {
 
 scout.TreeCompact.prototype._updateNodes = function() {
   var i, j, node, childNode, $dom;
-  for (i=0; i<this.nodes.length; i++) {
+  for (i = 0; i < this.nodes.length; i++) {
     node = this.nodes[i];
     $dom = this._domMap[node.id];
     $dom.setVisible(node.visible);
     if (node.visible) {
-      for (j=0; j<node.childNodes.length; j++) {
+      for (j = 0; j < node.childNodes.length; j++) {
         childNode = node.childNodes[j];
         $dom = this._domMap[childNode.id];
         $.log.debug('updateNode id=' + childNode.id + ' visible=' + childNode.visible);
@@ -80,7 +82,7 @@ scout.TreeCompact.prototype._onInput = function(event) {
 
 scout.TreeCompact.prototype._applyFilter = function(filterText) {
   if (filterText) {
-    $.log.debug('filter nodes='+filterText);
+    $.log.debug('filter nodes=' + filterText);
     this._filterNodes(filterText);
   } else {
     $.log.debug('expand all nodes');
@@ -121,7 +123,7 @@ scout.TreeCompact.prototype._moveSelection = function(diff) {
     tmpSelectedNodeIndex = numNodes - 1;
   }
   if (oldSelectedNodeIndex !== tmpSelectedNodeIndex) {
-    $.log.debug('_moveSelection to node with index='+ tmpSelectedNodeIndex);
+    $.log.debug('_moveSelection to node with index=' + tmpSelectedNodeIndex);
     this._selectedNodeIndex = tmpSelectedNodeIndex;
     $($nodes[oldSelectedNodeIndex]).removeClass('selected');
     $($nodes[tmpSelectedNodeIndex]).addClass('selected');
@@ -130,11 +132,11 @@ scout.TreeCompact.prototype._moveSelection = function(diff) {
 
 scout.TreeCompact.prototype._expandAllNodes = function() {
   var i, j, node, childNode;
-  for (i=0; i<this.nodes.length; i++) {
+  for (i = 0; i < this.nodes.length; i++) {
     node = this.nodes[i];
     node.expanded = true;
     node.visible = true;
-    for (j=0; j<node.childNodes.length; j++) {
+    for (j = 0; j < node.childNodes.length; j++) {
       childNode = node.childNodes[j];
       childNode.visible = true;
     }
@@ -157,11 +159,11 @@ scout.TreeCompact.prototype._matches = function(node, regexp) {
 scout.TreeCompact.prototype._filterNodes = function(filter) {
   var i, j, node, childNode, expanded,
     regexp = new RegExp(filter, 'i');
-  for (i=0; i<this.nodes.length; i++) {
+  for (i = 0; i < this.nodes.length; i++) {
     node = this.nodes[i];
     expanded = this._matches(node, regexp);
     node.expanded = expanded;
-    for (j=0; j<node.childNodes.length; j++) {
+    for (j = 0; j < node.childNodes.length; j++) {
       childNode = node.childNodes[j];
       if (expanded) {
         // show all sub nodes

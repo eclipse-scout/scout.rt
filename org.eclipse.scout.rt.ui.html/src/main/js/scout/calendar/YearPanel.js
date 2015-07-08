@@ -20,14 +20,20 @@ scout.YearPanel.prototype._render = function($parent) {
 scout.YearPanel.prototype.renderContent = function() {
   this.removeContent();
   this._drawYear();
-  scout.scrollbars.install(this.$yearList, {axis: 'y'});
+  scout.scrollbars.install(this.$yearList, this.session, {axis: 'y'});
   this.yearRendered = true;
   this._colorYear();
 };
 
 scout.YearPanel.prototype.removeContent = function() {
+  scout.scrollbars.uninstall(this.$yearList, this.session);
   this.$yearList.empty();
   this.yearRendered = false;
+};
+
+scout.YearPanel.prototype._remove = function() {
+  this.removeContent();
+  scout.YearPanel.parent.prototype._remove.call(this);
 };
 
 scout.YearPanel.prototype._drawYear = function() {

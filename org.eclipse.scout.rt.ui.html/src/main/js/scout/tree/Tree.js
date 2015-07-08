@@ -107,10 +107,9 @@ scout.Tree.prototype._render = function($parent) {
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlMouseDown.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 
-  scout.scrollbars.install(this.$data, {
+  scout.scrollbars.install(this.$data, this.session, {
     axis: 'y'
   });
-  this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar.render(this.$container);
 
   // add drag and drop support
@@ -134,7 +133,7 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this.$data);
+  scout.scrollbars.uninstall(this.$data, this.session);
   scout.Tree.parent.prototype._remove.call(this);
 };
 

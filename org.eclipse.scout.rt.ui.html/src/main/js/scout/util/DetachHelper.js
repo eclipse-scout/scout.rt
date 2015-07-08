@@ -98,6 +98,10 @@ scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
 };
 
 scout.DetachHelper.prototype.pushScrollable = function($container) {
+  if (this._$scrollables.indexOf($container) > -1) {
+    // already pushed
+    return;
+  }
   this._$scrollables.push($container);
   $.log.debug('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
 };

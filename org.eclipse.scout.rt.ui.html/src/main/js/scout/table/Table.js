@@ -135,10 +135,9 @@ scout.Table.prototype._render = function($parent) {
     .on('mouseup', '.table-row', onMouseUp)
     .on('dblclick', '.table-row', onDoubleClick)
     .on('contextmenu', '.table-row', onContextMenu);
-  scout.scrollbars.install(this.$data, {
+  scout.scrollbars.install(this.$data, this.session, {
     axis: 'both'
   });
-  this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar.render(this.$container);
 
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
@@ -234,7 +233,7 @@ scout.Table.prototype._renderProperties = function() {
 };
 
 scout.Table.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this.$data);
+  scout.scrollbars.uninstall(this.$data, this.session);
   this.header = null;
   this.footer = null;
   scout.Table.parent.prototype._remove.call(this);

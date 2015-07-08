@@ -8,7 +8,7 @@ scout.scrollbars = {
    * must set some additional CSS styles.
    *
    */
-  install: function($container, options) {
+  install: function($container, session, options) {
     var scrollbars, scrollbar, nativeScrollbars,
       htmlContainer = scout.HtmlComponent.optGet($container);
 
@@ -29,6 +29,7 @@ scout.scrollbars = {
       htmlContainer.scrollable = true;
     }
     $container.data('scrollable', true);
+    session.detachHelper.pushScrollable($container);
     return $container;
 
     function installNativeScrollbars() {
@@ -50,8 +51,8 @@ scout.scrollbars = {
     function installJsScrollbars() {
       $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
       scrollbars = scout.arrays.ensure($container.data('scrollbars'));
-      $.each(scrollbars, function(key, value) {
-        value.remove();
+      scrollbars.forEach(function(scrollbar) {
+        scrollbar.remove();
       });
       scrollbars = [];
       if (options.axis === 'both') {
@@ -74,6 +75,26 @@ scout.scrollbars = {
         scrollbar.update();
       });
     }
+  },
+
+  /**
+   * Removes the js scrollbars for the $container, if there are any.<p>
+   * Also removes the scrollable from the detachhelper.
+   */
+  uninstall: function($container, session) {
+    if (!$container.data('scrollable')) {
+      // was not installed previously -> uninstalling not necessary
+      return;
+    }
+
+    var scrollbars = $container.data('scrollbars');
+    if (scrollbars) {
+      scrollbars.forEach(function(scrollbar) {
+        scrollbar.remove();
+      });
+    }
+    session.detachHelper.removeScrollable($container);
+    $container.removeData('scrollable');
   },
 
   /**

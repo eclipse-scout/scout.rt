@@ -109,7 +109,7 @@ scout.Planner.prototype._render = function($parent) {
   this.menuBar.render(this.$container);
 
   // scrollbars
-  scout.scrollbars.install(this.$grid);
+  scout.scrollbars.install(this.$grid, this.session);
   this.session.detachHelper.pushScrollable(this.$grid);
   this._gridScrollHandler = this._onGridScroll.bind(this);
   this.$grid.on('scroll', this._gridScrollHandler);
@@ -126,6 +126,11 @@ scout.Planner.prototype._renderProperties = function() {
   this._renderSelectedResources();
   // render with setTimeout because the planner needs to be layouted first
   setTimeout(this._renderSelectionRange.bind(this));
+};
+
+scout.Planner.prototype._remove = function() {
+  scout.scrollbars.uninstall(this.$grid, this.session);
+  scout.Planner.parent.prototype._remove.call(this);
 };
 
 /* -- basics, events -------------------------------------------- */

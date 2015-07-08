@@ -14,13 +14,6 @@ scout.ImageField.prototype._render = function($parent) {
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
   this.addFieldContainer($('<div>'));
 
-  if (this.scrollBarEnabled) {
-    scout.scrollbars.install(this.$fieldContainer, {
-      invertColors: true
-    });
-    this.session.detachHelper.pushScrollable(this.$fieldContainer);
-  }
-
   // add drag and drop event listeners to field container, img field might be hidden (e.g. if no image has been set)
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
       scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
@@ -60,13 +53,13 @@ scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
   this._renderImageUrl();
   this._renderAutoFit();
-  this._renderMenus(this.menus);
+  this._renderMenus();
+  this._renderScrollBarsEnabled();
 };
 
 scout.ImageField.prototype._remove = function() {
-  if (this.scrollBarEnabled) {
-    this.session.detachHelper.removeScrollable(this.$fieldContainer);
-  }
+  scout.scrollbars.uninstall(this.$fieldContainer, this.session);
+  scout.ImageField.parent.prototype._remove.call(this);
 };
 
 scout.ImageField.prototype._renderImageUrl = function() {
@@ -77,6 +70,16 @@ scout.ImageField.prototype._renderImageUrl = function() {
 
 scout.ImageField.prototype._renderAutoFit = function() {
   this.$field.toggleClass('autofit', this.autoFit);
+};
+
+scout.ImageField.prototype._renderScrollBarsEnabled = function() {
+  if (this.scrollBarEnabled) {
+    scout.scrollbars.install(this.$fieldContainer, this.session, {
+      invertColors: true
+    });
+  } else {
+    scout.scrollbars.uninstall(this.$fieldContainer, this.session);
+  }
 };
 
 scout.ImageField.prototype._syncMenus = function(menus) {

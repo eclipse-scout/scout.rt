@@ -1,8 +1,9 @@
 describe("scrollbars", function() {
-  var $container;
+  var $container, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
+    session = sandboxSession();
     createScrollable();
   });
 
@@ -28,7 +29,7 @@ describe("scrollbars", function() {
       var handler = function() {
         exec = true;
       };
-      var $content = scout.scrollbars.install($container);
+      var $content = scout.scrollbars.install($container, session);
       var $element = createContent($content);
 
       scout.scrollbars.onScroll($element, handler);
@@ -45,7 +46,7 @@ describe("scrollbars", function() {
       var handler = function() {
         exec = true;
       };
-      var $content = scout.scrollbars.install($container);
+      var $content = scout.scrollbars.install($container, session);
       var $element = createContent($content);
 
       scout.scrollbars.onScroll($element, handler);
