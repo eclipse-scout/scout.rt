@@ -326,8 +326,8 @@ scout.Table.prototype.selectAll = function() {
     return; // not possible
   }
   this.clearSelection(true);
-
-  this.rows.forEach(function(row) {
+  var rows = this.filteredRows();
+  rows.forEach(function(row) {
     this.addRowToSelection(row, true);
   }, this);
   this._sendRowsPending = true;
@@ -1418,8 +1418,8 @@ scout.Table.prototype._rowsToIds = function(rows) {
  * model has to be updated before calling this method.
  */
 scout.Table.prototype.renderSelection = function($row, deselect) {
-  var $previousElement = $row.prev('.table-row'),
-    $followingElement = $row.next('.table-row');
+  var $previousElement = $row.prevAll('.table-row:not(.invisible)').first(),
+    $followingElement = $row.nextAll('.table-row:not(.invisible)').first();
   $row.removeClass('select-middle select-top select-bottom select-single selected');
   if (!deselect) {
     $row.select(true);
