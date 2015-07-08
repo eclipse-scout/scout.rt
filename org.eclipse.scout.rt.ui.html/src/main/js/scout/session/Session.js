@@ -525,9 +525,9 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   // Default values for fatal message boxes
   var boxOptions = {
-    header: this.text('ui.ServerError'),
+    header: this.optText('ui.ServerError', 'Server Error') + ' (' + this.optText('ui.ErrorCodeX', 'Code ' + jsonError.code, jsonError.code) + ')',
     body: jsonError.message,
-    yesButtonText: this.text('ui.Reload'),
+    yesButtonText: this.optText('ui.Reload', 'Reload'),
     yesButtonAction: function() {
       scout.reloadPage();
     }
@@ -547,7 +547,7 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
     boxOptions.body = scout.strings.join('\n\n',
         this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
         this.optText('ui.UiInconsistentMsg', ''));
-    boxOptions.noButtonText = this.text('ui.Ignore');
+    boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
   }
   this.showFatalMessage(boxOptions, jsonError.code);
 };
