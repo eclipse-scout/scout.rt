@@ -13,7 +13,6 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
   var $newRowSelection, $prev, $next, i, rows, directionDown = false;
   var keycode = event.which;
   var $rowsAll = this._field.$filteredRows();
-  //TODO nbu refactor
   var $rowsSelected = this._field.$selectedRows();
 
   if (keycode === scout.keys.SPACE) {
@@ -36,7 +35,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
       lastActionRow = lastActionRow || $rowsSelected.first().data('row');
       deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.prev('.table-row:not(.invisible)').isSelected();
       $newRowSelection = deselect ? lastActionRow.$row : lastActionRow.$row.prev('.table-row:not(.invisible)');
-      this._field.selectionHandler.lastActionRow = lastActionRow.$row.prev('.table-row:not(.invisible)').length > 0 ? lastActionRow.$row.prev('.table-row:not(.invisible)').data('row') : lastActionRow;
+      this._field.selectionHandler.lastActionRow = this._calculateLastActionRowUp(lastActionRow, deselect);
     } else {
       $newRowSelection = $rowsAll.last();
       this._field.selectionHandler.lastActionRow = $newRowSelection.data('row');
@@ -49,7 +48,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
       lastActionRow = lastActionRow || $rowsSelected.last().data('row');
       deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.next('.table-row:not(.invisible)').isSelected();
       $newRowSelection = deselect ? lastActionRow.$row : lastActionRow.$row.next('.table-row:not(.invisible)');
-      this._field.selectionHandler.lastActionRow = lastActionRow.$row.next('.table-row:not(.invisible)').length > 0 ? lastActionRow.$row.next('.table-row:not(.invisible)').data('row') : lastActionRow;
+      this._field.selectionHandler.lastActionRow = this._calculateLastActionRowDown(lastActionRow, deselect);
     } else {
       $newRowSelection = $rowsAll.first();
       this._field.selectionHandler.lastActionRow = $newRowSelection.data('row');
@@ -184,6 +183,23 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
   // which would interfere with our custom scroll behavior.
   event.preventDefault();
 };
+
+scout.TableControlKeyStrokes.prototype._calculateLastActionRowUp = function (lastActionRow, deselect){
+  var $prev =  lastActionRow.$row.prev('.table-row:not(.invisible)');
+  if($prev.prev().isSelected()&& !deselect){
+   return this._calculateLastActionRowUp($prev.data('row'),deselect);
+  }
+  return $prev.length > 0 ? $prev.data('row') : lastActionRow;
+};
+
+scout.TableControlKeyStrokes.prototype._calculateLastActionRowDown = function (lastActionRow, deselect){
+  var $next =  lastActionRow.$row.next('.table-row:not(.invisible)');
+  if($next.next().isSelected() && !deselect){
+   return this._calculateLastActionRowDown($next.data('row'), deselect);
+  }
+  return $next.length > 0 ? $next.data('row') : lastActionRow;
+};
+
 /**
  * @Override scout.KeyStroke
  */
