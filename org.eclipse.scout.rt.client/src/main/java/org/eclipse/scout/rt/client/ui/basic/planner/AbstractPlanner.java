@@ -63,6 +63,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private IPlannerUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
   private List<Resource<RI>> m_resources;
+  private List<Resource<RI>> m_selectedResources = new ArrayList<>();
   private int m_tableChanging;
   private AbstractEventBuffer<PlannerEvent> m_eventBuffer;
   private IContributionOwner m_contributionHolder;
@@ -338,12 +339,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setContextMenu(contextMenu);
 
     // local property observer
-    addPropertyChangeListener(new PropertyChangeListener() {
+    addPlannerListener(new PlannerAdapter() {
       @Override
       @SuppressWarnings("unchecked")
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(PROP_SELECTED_RESOURCES)) {
-          List<Resource<RI>> resources = (List<Resource<RI>>) e.getNewValue();
+      public void plannerChanged(PlannerEvent e) {
+        if (e.getType() == PlannerEvent.TYPE_RESOURCES_SELECTED) {
+          List<Resource<RI>> resources = (List<Resource<RI>>) e.getResources();
           try {
             interceptResourcesSelected(resources);
           }
@@ -351,7 +352,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
             BEANS.get(ExceptionHandler.class).handle(t);
           }
         }
-        else if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
+      }
+    });
+    addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      @SuppressWarnings("unchecked")
+      public void propertyChange(PropertyChangeEvent e) {
+        if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
           try {
             //FIXME CGU add interceptor
             execDisplayModeChanged((int) e.getNewValue());
@@ -457,8 +464,31 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void replaceResources(List<Resource<RI>> resources) {
-    deleteAllResources();
-    addResources(resources);
+    setPlannerChanging(true);
+    try {
+      List<RI> selectedResourceIds = getSelectedResourceIds();
+      deleteAllResources();
+      addResources(resources);
+      restoreSelection(selectedResourceIds);
+    }
+    finally {
+      setPlannerChanging(false);
+    }
+  }
+
+  private void restoreSelection(List<RI> selectedIds) {
+    List<Resource<RI>> selectedResources = new ArrayList<>();
+    if (selectedIds.size() > 0) {
+      for (Resource<RI> resource : getResources()) {
+        if (selectedIds.remove(resource.getId())) {
+          selectedResources.add(resource);
+          if (selectedIds.size() == 0) {
+            break;
+          }
+        }
+      }
+    }
+    selectResources(selectedResources);
   }
 
   @Override
@@ -563,14 +593,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return getSelectedActivity() == cell;
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
+  public Resource<RI> getSelectedResource() {
+    return CollectionUtility.firstElement(m_selectedResources);
+  }
+
   @Override
   public List<Resource<RI>> getSelectedResources() {
-    List<Resource<RI>> a = (List<Resource<RI>>) propertySupport.getProperty(PROP_SELECTED_RESOURCES);
-    if (a == null) {
-      a = CollectionUtility.emptyArrayList();
-    }
-    return a;
+    return CollectionUtility.arrayList(m_selectedResources);
   }
 
   @Override
@@ -585,42 +615,79 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void deselectAllResources() {
-    setSelectedResources(new ArrayList<Resource<RI>>());
+    selectResources(new ArrayList<Resource<RI>>());
   }
 
   @Override
-  public boolean deselectResources(List<? extends Resource> resources) {
+  public boolean deselectResource(Resource<RI> resource) {
+    return deselectResources(CollectionUtility.arrayList(resource));
+  }
+
+  @Override
+  public boolean deselectResources(List<? extends Resource<RI>> resources) {
     List<Resource<RI>> selectedResources = getSelectedResources();
     boolean selectionChanged = selectedResources.removeAll(resources);
     if (selectionChanged) {
-      setSelectedResources(selectedResources);
+      selectResources(selectedResources);
     }
     return selectionChanged;
   }
 
   @Override
+  public void selectResource(Resource<RI> resource) {
+    selectResources(CollectionUtility.arrayList(resource));
+  }
+
+  @Override
+  public void selectResources(List<? extends Resource<RI>> resources) {
+    setPlannerChanging(true);
+    try {
+      List<Resource<RI>> newSelection = new ArrayList<Resource<RI>>();
+      newSelection.addAll(resources);
+      if (newSelection.size() > 1 && !isMultiSelectResources()) {
+        Resource<RI> first = newSelection.get(0);
+        newSelection.clear();
+        newSelection.add(first);
+      }
+      if (!CollectionUtility.equalsCollection(m_selectedResources, newSelection, false)) {
+        m_selectedResources = new ArrayList<Resource<RI>>(newSelection);
+        List<Resource<RI>> notificationCopy = CollectionUtility.arrayList(m_selectedResources);
+
+        fireResourcesSelected(notificationCopy);
+
+        //FIXME implement activity selection
+//        // check whether current selected activity cell needs to be updated
+//        if (CollectionUtility.size(internalResources) != 1) {
+//          // at most one activity cell might be selected
+//          setSelectedActivityCell(null);
+//          return;
+//        }
+//
+//        Activity<RI, AI> selectedCell = getSelectedActivity();
+//        if (selectedCell == null) {
+//          // nothing selected
+//          return;
+//        }
+//
+//        Resource<RI> resource = CollectionUtility.firstElement(resources);
+//        if (CompareUtility.notEquals(resource, selectedCell.getResourceId())) {
+//          // selected cell does not belong to selected resources
+//          setSelectedActivityCell(null);
+//        }
+      }
+    }
+    finally {
+      setPlannerChanging(false);
+    }
+  }
+
+  /**
+   * @deprecated use {@link #selectResources(List)}
+   */
+  @Deprecated
+  @Override
   public void setSelectedResources(List<? extends Resource<RI>> resources) {
-    List<Resource<RI>> internalResources = CollectionUtility.arrayList(resources);
-    propertySupport.setProperty(PROP_SELECTED_RESOURCES, internalResources);
-
-    // check whether current selected activity cell needs to be updated
-    if (CollectionUtility.size(internalResources) != 1) {
-      // at most one activity cell might be selected
-      setSelectedActivityCell(null);
-      return;
-    }
-
-    Activity<RI, AI> selectedCell = getSelectedActivity();
-    if (selectedCell == null) {
-      // nothing selected
-      return;
-    }
-
-    Resource<RI> resource = CollectionUtility.firstElement(resources);
-    if (CompareUtility.notEquals(resource, selectedCell.getResourceId())) {
-      // selected cell does not belong to selected resources
-      setSelectedActivityCell(null);
-    }
+    selectResources(resources);
   }
 
   @Override
@@ -688,6 +755,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   private void fireAllResourcesDeleted() {
     PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ALL_RESOURCES_DELETED);
+    firePlannerEventInternal(e);
+  }
+
+  private void fireResourcesSelected(List<Resource<RI>> resources) {
+    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_RESOURCES_SELECTED, resources);
     firePlannerEventInternal(e);
   }
 
@@ -903,6 +975,10 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return propertySupport.getPropertyInt(PROP_SELECTION_MODE);
   }
 
+  public boolean isMultiSelectResources() {
+    return SELECTION_MODE_MULTI_RANGE == getSelectionMode();
+  }
+
   @Override
   public void setSelectionMode(int mode) {
     propertySupport.setPropertyInt(PROP_SELECTION_MODE, mode);
@@ -1058,7 +1134,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     public void setSelectionFromUI(List<? extends Resource<RI>> resources, Range<Date> selectionRange) {
       try {
         setPlannerChanging(true);
-        setSelectedResources(resources);
+        selectResources(resources);
         setSelectionRange(selectionRange);
       }
       finally {

@@ -329,6 +329,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    */
   protected boolean isResourceOrderUnchanged(int type) {
     switch (type) {
+      case PlannerEvent.TYPE_RESOURCES_SELECTED:
       case PlannerEvent.TYPE_RESOURCES_UPDATED:
         return true;
       default:
@@ -343,6 +344,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     res.add(PlannerEvent.TYPE_RESOURCES_DELETED);
     res.add(PlannerEvent.TYPE_RESOURCES_INSERTED);
     res.add(PlannerEvent.TYPE_RESOURCES_UPDATED);
+    res.add(PlannerEvent.TYPE_RESOURCES_SELECTED);
     return res;
   }
 
@@ -358,6 +360,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
   protected boolean isIgnorePrevious(int type) {
     switch (type) {
 //      case PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED:
+      case PlannerEvent.TYPE_RESOURCES_SELECTED:
       case PlannerEvent.TYPE_ALL_RESOURCES_DELETED: {
         return true;
       }

@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
+import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
+import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 
 /**
  * The invisible root menu node of any activity map. (internal usage only)
@@ -32,6 +34,7 @@ public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPla
   @Override
   protected void initConfig() {
     super.initConfig();
+    getOwner().addPlannerListener(new P_OwnerPlannerListener());
     // set active filter
     setCurrentMenuTypes(MenuUtility.getMenuTypesForPlannerSelection(getOwner().getSelectedResources(), getOwner().getSelectedActivity()));
     calculateLocalVisibility();
@@ -56,12 +59,19 @@ public class PlannerContextMenu extends AbstractPropertyObserverContextMenu<IPla
     if (IPlanner.PROP_SELECTED_ACTIVITY.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
-    else if (IPlanner.PROP_SELECTED_RESOURCES.equals(evt.getPropertyName())) {
-      handleOwnerValueChanged();
-    }
     else if (IPlanner.PROP_SELECTION_RANGE.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
+  }
+
+  private class P_OwnerPlannerListener extends PlannerAdapter {
+    @Override
+    public void plannerChanged(PlannerEvent e) {
+      if (e.getType() == PlannerEvent.TYPE_RESOURCES_SELECTED) {
+        handleOwnerValueChanged();
+      }
+    }
+
   }
 
 }

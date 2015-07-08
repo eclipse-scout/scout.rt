@@ -25,6 +25,7 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
   public static final int TYPE_RESOURCES_INSERTED = 100;
   public static final int TYPE_RESOURCES_UPDATED = 101;
   public static final int TYPE_RESOURCES_DELETED = 102;
+  public static final int TYPE_RESOURCES_SELECTED = 103;
   public static final int TYPE_ACTIVITY_ACTION = 104;
   public static final int TYPE_ALL_RESOURCES_DELETED = 105;
 

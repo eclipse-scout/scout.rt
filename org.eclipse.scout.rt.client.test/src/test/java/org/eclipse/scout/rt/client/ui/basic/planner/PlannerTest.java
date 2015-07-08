@@ -11,6 +11,9 @@
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +66,57 @@ public class PlannerTest {
     resource.addActivity(createTestActivity(resource, 0));
     assertEquals(1, ta.getEvents().size());
     assertEquals(PlannerEvent.TYPE_RESOURCES_UPDATED, ta.getEvents().get(0).getType());
+  }
+
+  @Test
+  public void testSelectResources() throws ProcessingException {
+    P_Planner planner = createTestPlanner();
+    Resource<Integer> resource = createTestResource(0);
+    planner.addResource(resource);
+
+    assertTrue(planner.getSelectedResources().isEmpty());
+    planner.selectResource(resource);
+    assertFalse(planner.getSelectedResources().isEmpty());
+    assertEquals(resource, planner.getSelectedResource());
+  }
+
+  /**
+   * Tests that selected resources are still selected if resources are replaced
+   */
+  @Test
+  public void testRestoreSelection() throws ProcessingException {
+    P_Planner planner = createTestPlanner();
+    Resource<Integer> resource = createTestResource(1);
+    planner.addResource(resource);
+    planner.selectResource(resource);
+    assertEquals(resource, planner.getSelectedResource());
+
+    List<Resource<Integer>> newResources = new ArrayList<Resource<Integer>>();
+    newResources.add(createTestResource(0));
+    newResources.add(createTestResource(1));
+    planner.replaceResources(newResources);
+
+    assertEquals(1, planner.getSelectedResources().size());
+    assertNotEquals(resource, planner.getSelectedResource());
+    assertEquals(newResources.get(1), planner.getSelectedResource());
+  }
+
+  /**
+   * Tests that selection is cleared after replace if the previous selected resource isn't there anymore
+   */
+  @Test
+  public void testRestoreSelection_NoMatch() throws ProcessingException {
+    P_Planner planner = createTestPlanner();
+    Resource<Integer> resource = createTestResource(1);
+    planner.addResource(resource);
+    planner.selectResource(resource);
+    assertEquals(resource, planner.getSelectedResource());
+
+    List<Resource<Integer>> newResources = new ArrayList<Resource<Integer>>();
+    newResources.add(createTestResource(0));
+    planner.replaceResources(newResources);
+
+    assertTrue(planner.getSelectedResources().isEmpty());
   }
 
   /**

@@ -86,10 +86,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_SELECTION_MODE = "selectionMode";
 
   /**
-   * {@link Long}[]
-   */
-  String PROP_SELECTED_RESOURCES = "selectedResources";
-  /**
    * {@link Activity}
    */
   String PROP_SELECTED_ACTIVITY = "selectedActivity";
@@ -252,6 +248,11 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   boolean isSelectedActivityCell(Activity<RESOURCE_ID, ACTIVITY_ID> cell);
 
   /**
+   * First selected resource
+   */
+  Resource<RESOURCE_ID> getSelectedResource();
+
+  /**
    * selected resources in arbitrary order
    */
   List<? extends Resource<RESOURCE_ID>> getSelectedResources();
@@ -262,7 +263,13 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   void isSelectedResource(Resource<RESOURCE_ID> resource);
 
-  boolean deselectResources(List<? extends Resource> resources);
+  void selectResource(Resource<RESOURCE_ID> resource);
+
+  void selectResources(List<? extends Resource<RESOURCE_ID>> resources);
+
+  boolean deselectResource(Resource<RESOURCE_ID> resources);
+
+  boolean deselectResources(List<? extends Resource<RESOURCE_ID>> resources);
 
   void deselectAllResources();
 
