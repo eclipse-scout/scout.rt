@@ -124,7 +124,6 @@ scout.Planner.prototype._renderProperties = function() {
   this._renderYearPanelVisible(false);
   this._renderResources();
   this._renderSelectedResources();
-  this._renderLabel();
   // render with setTimeout because the planner needs to be layouted first
   setTimeout(this._renderSelectionRange.bind(this));
 };
@@ -294,6 +293,7 @@ scout.Planner.prototype._renderScale = function() {
 
   // append main elements
   this.$scaleTitle = this.$scale.appendDiv('planner-scale-title');
+  this._renderLabel();
   this.$timeline = this.$scale.appendDiv('timeline');
   this.$timelineLarge = this.$timeline.appendDiv('timeline-large');
   this.$timelineSmall = this.$timeline.appendDiv('timeline-small');
