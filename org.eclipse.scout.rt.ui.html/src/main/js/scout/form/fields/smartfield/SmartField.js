@@ -137,11 +137,6 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     return;
   }
 
-  if (e.which === scout.keys.TAB) {
-    this._acceptProposal();
-    return;
-  }
-
   if (this._isNavigationKey(e)) {
     if (this.proposalChooser) {
       this.proposalChooser.delegateEvent(e);
@@ -232,10 +227,6 @@ scout.SmartField.prototype._onFieldBlur = function() {
  * list of proposals). We must accept the user defined text in that case.
  */
 scout.SmartField.prototype._acceptProposal = function() {
-  if (!this.proposal && !this._popup.rendered) {
-    $.log.debug('proposal popup is not opened. do not acceptProposal');
-    return;
-  }
   var searchText = this._searchText();
   $.log.debug('SmartField#_acceptProposal searchText=' + searchText);
   this.session.send(this.id, 'acceptProposal', {

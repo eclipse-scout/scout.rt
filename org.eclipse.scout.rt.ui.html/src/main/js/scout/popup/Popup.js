@@ -108,9 +108,26 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   y = anchorBounds.y;
   if (openingDirectionY === 'up') {
     y -= height;
-  } else if (openingDirectionY === 'down'){
+  } else if (openingDirectionY === 'down') {
     y += anchorBounds.height;
   }
+
+  // FIXME AWE/CGU: for smartfield-popups we must adjust the popup-size
+  // so the popup fits into the available space. It's simple to calculate
+  // the correct size, but it's not so easy to resize the popup-container
+  // since this method here is called in the middle of a layout-operation
+  // of the SmartfieldPopupLayout. When we resize the contaienr here it
+  // will result in an endless loop. We should:
+  // 1. calc the pref. size of the popup
+  // 2. find the right position for the popup (up, down)
+  // 3. check if the popup size is small enough to be completely visible
+  //    in the current window
+  // 4. if required reduce the popup-size, so it will fit into the window
+  // 5. finally set the size and layout the popup and its children.
+  //
+  // To avoid that the popup switches between up and down position while
+  // typing, we could always find the position by using the max. popup
+  // size instead by checking against the current size.
   return {x: x, y: y};
 };
 
