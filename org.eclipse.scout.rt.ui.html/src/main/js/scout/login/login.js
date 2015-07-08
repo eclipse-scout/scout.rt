@@ -23,7 +23,8 @@ scout.login = {
     return new scout.Texts(translations[language]);
   },
 
-  init: function() {
+  init: function(opts) {
+    this.options = opts || {};
     var texts = scout.login.initTexts();
     this.$form = $('<form action="auth" method="post">')
       .submit(onLoginFormSubmit.bind(this))
@@ -71,7 +72,29 @@ scout.login = {
     }
 
     function onPostDone(data) {
-      window.location.reload();
+      // Calculate target URL
+      var url = this.options.redirectUrl;
+      if (!url) {
+        url = (window.location.href || '').trim();
+        // Remove everything after the last '/', e.g. things like 'login.html'.
+        // Do nothing string already ends with '/' or when the last '/' belongs to the protocol part.
+        var lastSlashPos = url.lastIndexOf('/');
+        if (lastSlashPos != (url.length - 1) && lastSlashPos > url.lastIndexOf('://') + 2) {
+          url = url.substring(0, lastSlashPos + 1);
+        }
+        if (url.match(/.*:\/+$/)) {
+          // If only the protocol:// remains, calculation failed. Don't use that URL.
+          url = null;
+        }
+      }
+
+      // Go to target URL
+      if (url) {
+        window.location.href = url;
+      }
+      else {
+        window.location.reload();
+      }
     }
 
     function onPostFail(jqXHR, textStatus, errorThrown) {
@@ -94,4 +117,5 @@ scout.login = {
         .removeClass('login-error');
     }
   }
+
 };
