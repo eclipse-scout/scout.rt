@@ -107,23 +107,6 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
-  /**
-   * Configures the horizontal alignment of the fields inside this group box.<br>
-   * This property typically only has an effect if fill horizontal is set to false which can be configured by
-   * {@link #getConfiguredFillHorizontal()}.
-   * <p>
-   * Subclasses can override this method. Default alignment is left.
-   *
-   * @return -1 for left, 0 for center and 1 for right alignment
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
-   */
-  @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
-  @Order(85)
-  @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return -1;
-  }
-
   // convert string to a real string
   @Override
   protected String parseValueInternal(String text) throws ProcessingException {
