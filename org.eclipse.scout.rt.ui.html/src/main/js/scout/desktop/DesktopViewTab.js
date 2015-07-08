@@ -145,7 +145,6 @@ scout.DesktopViewTab.prototype._afterAttach = function() {
   this._view.session.detachHelper.afterAttach(this._view.$container);
 
   // Restore keystrokes.
-  // TODO [nbu] Please verify whether this is the right place to install keystroke adapters.
   if (this._view.keyStrokeAdapter) {
     scout.keyStrokeManager.installAdapter(this._view.$container, this._view.keyStrokeAdapter);
   }
@@ -161,7 +160,6 @@ scout.DesktopViewTab.prototype._afterAttach = function() {
  */
 scout.DesktopViewTab.prototype._beforeDetach = function() {
   // Uninstall keystrokes.
-  // TODO [nbu] Please verify whether this is the right place to uninstall keystroke adapters.
   if (scout.keyStrokeManager.isAdapterInstalled(this._view.keyStrokeAdapter)) {
     scout.keyStrokeManager.uninstallAdapter(this._view.keyStrokeAdapter);
   }
