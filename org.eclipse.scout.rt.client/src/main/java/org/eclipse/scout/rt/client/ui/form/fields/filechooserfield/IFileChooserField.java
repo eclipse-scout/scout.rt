@@ -19,6 +19,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public interface IFileChooserField extends IValueField<BinaryResource> {
 
   String PROP_FILE_ICON_ID = "fileIconId";
+  String PROP_MAXIMUM_UPLOAD_SIZE = "maximumUploadSize";
+
+  /**
+   * default maximum upload size
+   */
+  long DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // default: 50 MB;
 
   void setShowFileExtension(boolean b);
 
@@ -40,4 +46,15 @@ public interface IFileChooserField extends IValueField<BinaryResource> {
   int getFileSize();
 
   IFileChooserFieldUIFacade getUIFacade();
+
+  /**
+   * @param maximumUploadSize
+   *          maximum size for upload in bytes.
+   */
+  void setMaximumUploadSize(long maximumUploadSize);
+
+  /**
+   * @return maximum size for upload in bytes
+   */
+  long getMaximumUploadSize();
 }

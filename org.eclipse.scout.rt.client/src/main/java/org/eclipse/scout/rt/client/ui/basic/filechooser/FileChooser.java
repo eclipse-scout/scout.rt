@@ -36,6 +36,7 @@ public class FileChooser implements IFileChooser {
   private boolean m_multiSelect;
   private List<BinaryResource> m_files;
   private final IBlockingCondition m_blockingCondition;
+  private long m_maximumUploadSize;
 
   private IDisplayParent m_displayParent;
 
@@ -56,6 +57,7 @@ public class FileChooser implements IFileChooser {
     m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_multiSelect = multiSelect;
+    m_maximumUploadSize = DEFAULT_MAXIMUM_UPLOAD_SIZE;
 
     m_displayParent = deriveDisplayParent();
   }
@@ -95,6 +97,16 @@ public class FileChooser implements IFileChooser {
   @Override
   public boolean isMultiSelect() {
     return m_multiSelect;
+  }
+
+  @Override
+  public void setMaximumUploadSize(long maximumUploadSize) {
+    m_maximumUploadSize = maximumUploadSize;
+  }
+
+  @Override
+  public long getMaximumUploadSize() {
+    return m_maximumUploadSize;
   }
 
   @Override

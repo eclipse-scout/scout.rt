@@ -231,6 +231,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
+   * Configures the maximum size for a drop request (in bytes).
+   * <p>
+   * Subclasses can override this method. Default is defined by {@link IDNDSupport#DEFAULT_DROP_MAXIMUM_SIZE}.
+   *
+   * @return maximum size in bytes.
+   */
+  @ConfigProperty(ConfigProperty.LONG)
+  @Order(190)
+  protected long getConfiguredDropMaximumSize() {
+    return DEFAULT_DROP_MAXIMUM_SIZE;
+  }
+
+  /**
    * @return true: deleted nodes are automatically erased<br>
    *         false: deleted nodes are cached for later processing (service
    *         deletion)
@@ -505,6 +518,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setDragEnabled(getConfiguredDragEnabled());
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
+    setDropMaximumSize(getConfiguredDropMaximumSize());
     setRootNodeVisible(getConfiguredRootNodeVisible());
     setRootHandlesVisible(getConfiguredRootHandlesVisible());
     setScrollToSelection(getConfiguredScrollToSelection());
@@ -907,6 +921,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
+  }
+
+  @Override
+  public void setDropMaximumSize(long dropMaximumSize) {
+    propertySupport.setPropertyLong(PROP_DROP_MAXIMUM_SIZE, dropMaximumSize);
+  }
+
+  @Override
+  public long getDropMaximumSize() {
+    return propertySupport.getPropertyInt(PROP_DROP_MAXIMUM_SIZE);
   }
 
   @Override

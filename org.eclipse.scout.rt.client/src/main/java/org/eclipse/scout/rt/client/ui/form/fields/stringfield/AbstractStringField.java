@@ -138,6 +138,19 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
+   * Configures the maximum size for a drop request (in bytes).
+   * <p>
+   * Subclasses can override this method. Default is defined by {@link IDNDSupport#DEFAULT_DROP_MAXIMUM_SIZE}.
+   *
+   * @return maximum size in bytes.
+   */
+  @ConfigProperty(ConfigProperty.LONG)
+  @Order(190)
+  protected long getConfiguredDropMaximumSize() {
+    return DEFAULT_DROP_MAXIMUM_SIZE;
+  }
+
+  /**
    * Configures the drop support of this string field.
    * <p>
    * Subclasses can override this method. Default is {@code 0} (no drop support).
@@ -231,6 +244,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
       configuredDropType = 0;
     }
     setDropType(configuredDropType);
+    setDropMaximumSize(getConfiguredDropMaximumSize());
     setSelectionTrackingEnabled(getConfiguredSelectionTrackingEnabled());
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setSpellCheckEnabled(computeSpellCheckEnabled());
@@ -453,6 +467,16 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
   }
 
+  @Override
+  public void setDropMaximumSize(long dropMaximumSize) {
+    propertySupport.setPropertyLong(PROP_DROP_MAXIMUM_SIZE, dropMaximumSize);
+  }
+
+  @Override
+  public long getDropMaximumSize() {
+    return propertySupport.getPropertyInt(PROP_DROP_MAXIMUM_SIZE);
+  }
+
   private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
 
     /*
@@ -525,7 +549,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-      implements IStringFieldExtension<OWNER_FIELD> {
+  implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);

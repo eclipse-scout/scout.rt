@@ -21,6 +21,11 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public interface IFileChooser {
 
+  /**
+   * default maximum upload size
+   */
+  long DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // default: 50 MB;
+
   IFileChooserUIFacade getUIFacade();
 
   /**
@@ -62,4 +67,15 @@ public interface IFileChooser {
    * @return list of previously uploaded files using {@link #startChooser()} (empty list if chooser was not yet started)
    */
   List<BinaryResource> getFiles();
+
+  /**
+   * @param maximumUploadSize
+   *          maximum size for upload in bytes.
+   */
+  void setMaximumUploadSize(long maximumUploadSize);
+
+  /**
+   * @return maximum size for upload in bytes
+   */
+  long getMaximumUploadSize();
 }

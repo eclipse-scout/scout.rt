@@ -65,6 +65,12 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     return AbstractIcons.FileChooserFieldFile;
   }
 
+  @ConfigProperty(ConfigProperty.LONG)
+  @Order(310)
+  protected long getConfiguredMaximumUploadSize() {
+    return DEFAULT_MAXIMUM_UPLOAD_SIZE;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
@@ -72,6 +78,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     setShowFileExtension(getConfiguredShowFileExtension());
     setFileExtensions(getConfiguredFileExtensions());
     setFileIconId(getConfiguredFileIconId());
+    setMaximumUploadSize(getConfiguredMaximumUploadSize());
   }
 
   @Override
@@ -111,8 +118,20 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
   }
 
   @Override
+  public void setMaximumUploadSize(long maximumUploadSize) {
+    propertySupport.setPropertyLong(PROP_MAXIMUM_UPLOAD_SIZE, maximumUploadSize);
+  }
+
+  @Override
+  public long getMaximumUploadSize() {
+    return propertySupport.getPropertyInt(PROP_MAXIMUM_UPLOAD_SIZE);
+  }
+
+  @Override
   public IFileChooser getFileChooser() {
-    return new FileChooser(getFileExtensions(), false);
+    FileChooser fileChooser = new FileChooser(getFileExtensions(), false);
+    fileChooser.setMaximumUploadSize(getMaximumUploadSize());
+    return fileChooser;
   }
 
   // Convenience file getter

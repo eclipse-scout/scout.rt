@@ -117,6 +117,19 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   }
 
   /**
+   * Configures the maximum size for a drop request (in bytes).
+   * <p>
+   * Subclasses can override this method. Default is defined by {@link IDNDSupport#DEFAULT_DROP_MAXIMUM_SIZE}.
+   *
+   * @return maximum size in bytes.
+   */
+  @ConfigProperty(ConfigProperty.LONG)
+  @Order(190)
+  protected long getConfiguredDropMaximumSize() {
+    return DEFAULT_DROP_MAXIMUM_SIZE;
+  }
+
+  /**
    * Configures the drop support of this image field.
    * <p>
    * Subclasses can override this method. Default is {@code 0} (no drop support).
@@ -175,6 +188,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setZoomDelta(getConfiguredZoomDelta());
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
+    setDropMaximumSize(getConfiguredDropMaximumSize());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
 
     // menus
@@ -383,6 +397,16 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
+  }
+
+  @Override
+  public void setDropMaximumSize(long dropMaximumSize) {
+    propertySupport.setPropertyLong(PROP_DROP_MAXIMUM_SIZE, dropMaximumSize);
+  }
+
+  @Override
+  public long getDropMaximumSize() {
+    return propertySupport.getPropertyInt(PROP_DROP_MAXIMUM_SIZE);
   }
 
   @Override

@@ -476,6 +476,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * Configures the maximum size for a drop request (in bytes).
+   * <p>
+   * Subclasses can override this method. Default is defined by {@link IDNDSupport#DEFAULT_DROP_MAXIMUM_SIZE}.
+   *
+   * @return maximum size in bytes.
+   */
+  @ConfigProperty(ConfigProperty.LONG)
+  @Order(190)
+  protected long getConfiguredDropMaximumSize() {
+    return DEFAULT_DROP_MAXIMUM_SIZE;
+  }
+
+  /**
    * Configures the drop support of this table.
    * <p>
    * Subclasses can override this method. Default is {@code 0} (no drop support).
@@ -887,6 +900,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setKeyboardNavigation(getConfiguredKeyboardNavigation());
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
+    setDropMaximumSize(getConfiguredDropMaximumSize());
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
     if (getTableCustomizer() == null) {
@@ -1492,6 +1506,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public int getDropType() {
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
+  }
+
+  @Override
+  public void setDropMaximumSize(long dropMaximumSize) {
+    propertySupport.setPropertyLong(PROP_DROP_MAXIMUM_SIZE, dropMaximumSize);
+  }
+
+  @Override
+  public long getDropMaximumSize() {
+    return propertySupport.getPropertyInt(PROP_DROP_MAXIMUM_SIZE);
   }
 
   @Override

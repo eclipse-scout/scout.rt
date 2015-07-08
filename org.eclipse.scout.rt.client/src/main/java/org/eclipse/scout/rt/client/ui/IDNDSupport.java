@@ -4,20 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 
 /**
  * <h3>IDNDSupport</h3>
- * 
+ *
  * @since 3.1.12 24.07.2008
  * @see TextTransferObject
  * @see JavaTransferObject
@@ -30,6 +30,7 @@ public interface IDNDSupport {
    */
   String PROP_DRAG_TYPE = "dragType";
   String PROP_DROP_TYPE = "dropType";
+  String PROP_DROP_MAXIMUM_SIZE = "dropMaximumSize";
   /*
    * drag n drop types
    */
@@ -37,6 +38,11 @@ public interface IDNDSupport {
   int TYPE_JAVA_ELEMENT_TRANSFER = 1 << 1;
   int TYPE_TEXT_TRANSFER = 1 << 2;
   int TYPE_IMAGE_TRANSFER = 1 << 3;
+
+  /**
+   * default maximum upload size
+   */
+  long DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // default: 50 MB;
 
   /**
    * @param dragType
@@ -63,5 +69,16 @@ public interface IDNDSupport {
    *         {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER}, {@link IDNDSupport#TYPE_TEXT_TRANSFER}
    */
   int getDropType();
+
+  /**
+   * @param dropMaximumSize
+   *          maximum size for drop in bytes.
+   */
+  void setDropMaximumSize(long dropMaximumSize);
+
+  /**
+   * @return maximum size for drop in bytes
+   */
+  long getDropMaximumSize();
 
 }
