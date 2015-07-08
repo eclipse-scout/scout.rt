@@ -47,9 +47,8 @@ scout.Column.prototype.buildCell = function(row) {
   var cellHtml = '';
   cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>';
   if (scout.device.tableAdditionalDivRequired) {
-    // Table.css: @table-cell-padding-left (8 px) + @table-cell-padding-right (4 px) = 12 px
-    cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - 12 /* padding fix */ - 2 /* unknown IE9 extra space */) + 'px; ' + '">';
     // same calculation in scout.Table.prototype.resizeColumn
+    cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - 2 /* unknown IE9 extra space */) + 'px; ' + '">';
   }
   cellHtml += content;
   if (scout.device.tableAdditionalDivRequired) {

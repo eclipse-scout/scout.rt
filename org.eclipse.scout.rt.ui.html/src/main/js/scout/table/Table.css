@@ -1,5 +1,5 @@
-@table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
-@table-cell-padding-right: 4px;  /* also used in scout.Column.prototype.buildCell */
+@table-cell-padding-left: 8px;
+@table-cell-padding-right: 4px;
 @table-row-padding-y: 7px;
 @table-row-padding-left: @table-cell-padding-left;
 /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline cells) */
@@ -102,6 +102,8 @@
     display: inline-block;
     .overflow-ellipsis;
     /* An additional max-width: must be added in browser. */
+    margin-left: calc(0 - @table-cell-padding-left);
+    margin-right: calc(0 - @table-cell-padding-right);
   }
 
   .disabled & {
