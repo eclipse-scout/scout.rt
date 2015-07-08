@@ -63,6 +63,11 @@ scout.PlannerLayout.prototype._updateMinWidth = function() {
     $scaleTitle = this.planner.$scaleTitle,
     $timeline = this.planner.$timeline;
 
+  if (!$timeline) {
+    // May be null if no view range is rendered
+    return;
+  }
+
   $timeline.css('min-width', minWidth);
   minWidth += $scaleTitle.outerWidth(true);
   this.planner.resources.forEach(function(resource) {
@@ -74,9 +79,17 @@ scout.PlannerLayout.prototype._updateMinWidth = function() {
  * Positions the scale lines and set to correct height
  */
 scout.PlannerLayout.prototype._layoutScaleLines = function() {
-  var height,
-    $smallScaleItems = this.planner.$timelineSmall.children('.scale-item'),
-    $largeScaleItems = this.planner.$timelineLarge.children('.scale-item');
+  var height, $smallScaleItems, $largeScaleItems,
+    $timelineSmall = this.planner.$timelineSmall,
+    $timelineLarge = this.planner.$timelineLarge;
+
+  if (!$timelineSmall) {
+    // May be null if no view range is rendered
+    return;
+  }
+
+  $smallScaleItems = $timelineSmall.children('.scale-item'),
+  $largeScaleItems = $timelineLarge.children('.scale-item');
 
   // First loop through every item and set height to 0 in order to get the correct scrollHeight
   $largeScaleItems.each(function() {
