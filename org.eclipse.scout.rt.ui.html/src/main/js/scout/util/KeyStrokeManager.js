@@ -3,11 +3,10 @@ scout.KeystrokeManager = function() {
   this._adapters = []; // FIXME BSH Keystroke | Check if we really need this
   var that = this;
 
-  //disable default help on F1 on IE;
-  if ( "onhelp" in window ) {
-    // (jQuery cannot bind "onhelp" event)
-    window.onhelp = function () {
-        return false;
+  // disable default help on F1 on IE
+  if (window.onhelp) {
+    window.onhelp = function () { // (jQuery cannot bind "onhelp" event)
+      return false;
     };
   }
 
