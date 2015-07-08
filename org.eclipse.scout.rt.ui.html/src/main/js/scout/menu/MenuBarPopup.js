@@ -117,7 +117,7 @@ scout.MenuBarPopup.prototype.alignTo = function(openingDirectionX, openingDirect
     headTop = bodySize.height;
     decoTop = headTop - 1; // -1 is body border (the purpose of deco is to hide the body border)
   } else if (openingDirectionY === 'down') {
-    bodyTop += headSize.height - 1;
+    bodyTop += headSize.height;
     decoTop = bodyTop;
   }
 

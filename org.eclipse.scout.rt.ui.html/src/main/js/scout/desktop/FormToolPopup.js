@@ -66,7 +66,7 @@ scout.FormToolPopup.prototype.alignTo = function() {
   var left = pos.left,
     top = pos.top,
     headInsets = scout.graphics.getInsets(this.$head),
-    bodyTop = headSize.height - 1;
+    bodyTop = headSize.height;
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);

@@ -1,0 +1,121 @@
+.popup {
+  position: absolute;
+
+  &.down > .popup-head {
+    padding-top: 3px;
+    border-top-width: 1px;
+    .drop-shadow();
+  }
+
+  &.up > .popup-head {
+    padding-bottom: 3px;
+    border-bottom-width: 1px;
+    .drop-shadow(@y: -6px;);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.popup-head {
+  position: absolute;
+  line-height: @menu-item-height;
+  padding: 0 13px;
+  white-space: nowrap;
+  background-color: @palette-white;
+  border: 1px solid @border-color;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  color: @active-color;
+
+  &.has-submenu::after {
+    .sub-menu-icon;
+    .transform(rotate(180deg));
+    padding-right: 10px;
+    padding-left: 0;
+    top: 5px;
+  }
+
+  & > .font-icon {
+    .menu-icon;
+    color: @active-color;
+  }
+
+  &.in-main-menubar > .font-icon {
+    font-size: 22px;
+    display: inline-block;
+  }
+}
+
+.popup-deco {
+  position: absolute;
+  height: 1px;
+  left: 1px;
+  background-color: @palette-white;
+}
+
+.popup-body {
+  position: absolute;
+  border: 1px solid @border-color;
+  background-color: @palette-white;
+
+  & > .menu-item.context-menu-item-first {
+    border-top: 1px solid transparent; //@border-color;
+  }
+  & > .menu-item.context-menu-item-last {
+    border-bottom: 1px solid transparent; //@border-color;
+  }
+
+  &.down  {
+    .drop-shadow();
+
+    .popup-head ~ & > .menu-item.context-menu-item-first {
+      border-top: 1px solid transparent;
+
+      &.selected {
+        border-color: @item-selection-border-color;
+      }
+    }
+  }
+
+  &.up {
+    .drop-shadow(@y: -6px;);
+
+    .popup-head ~ & > .menu-item.context-menu-item-last {
+      border-bottom: 1px solid transparent;
+
+      &.selected {
+        border-color: @item-selection-border-color;
+      }
+    }
+  }
+
+  & > .menu-item {
+    border-top: solid 1px @border-color;
+    display: block;
+    width: 100%;
+    padding-left: 15px;
+
+    &.selected {
+      border-top: 1px solid @item-selection-border-color;
+      border-color: @item-selection-border-color;
+    }
+
+    &.selected + .menu-item{
+      border-top-color: @item-selection-border-color;
+    }
+
+    &.selected.context-menu-item-first {
+      border-top: 1px solid @item-selection-border-color;
+    }
+
+    &.selected.context-menu-item-last {
+      border-color: @item-selection-border-color;
+    }
+
+    &:focus {
+      text-decoration: none;
+    }
+  }
+}
