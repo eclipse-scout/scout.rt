@@ -1142,6 +1142,11 @@ scout.Planner.prototype._onResourcesDeleted = function(resourceIds) {
   this._deleteResources(resources);
 };
 
+scout.Planner.prototype._onResourcesSelected = function(resourceIds) {
+  var resources = this._resourcesByIds(resourceIds);
+  this.selectResources(resources, false);
+};
+
 scout.Planner.prototype._onAllResourcesDeleted = function() {
   this._deleteAllResources();
 };
@@ -1159,6 +1164,8 @@ scout.Planner.prototype.onModelAction = function(event) {
     this._onResourcesInserted(event.resources);
   } else if (event.type === 'resourcesDeleted') {
     this._onResourcesDeleted(event.resourceIds);
+  } else if (event.type === 'resourcesSelected') {
+    this._onResourcesSelected(event.resourceIds);
   } else if (event.type === 'allResourcesDeleted') {
     this._onAllResourcesDeleted();
   } else if (event.type === 'resourceOrderChanged') {

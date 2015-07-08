@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -42,6 +43,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   public static final String EVENT_RESOURCES_INSERTED = "resourcesInserted";
   public static final String EVENT_RESOURCES_UPDATED = "resourcesUpdated";
   public static final String EVENT_RESOURCES_DELETED = "resourcesDeleted";
+  public static final String EVENT_RESOURCES_SELECTED = "resourcesSelected";
   public static final String EVENT_ALL_RESOURCES_DELETED = "allResourcesDeleted";
 
   // from UI
@@ -49,7 +51,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   private static final String EVENT_SET_VIEW_RANGE = "setViewRange";
   private static final String EVENT_SET_SELECTION = "setSelection";
   private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
-  private static final String EVENT_CELL_ACTION = "cellAction";
 
   private PlannerListener m_plannerListener;
   private final Map<String, Activity<?, ?>> m_cells;
@@ -57,6 +58,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   private final Map<String, Resource<?>> m_resources;
   private final Map<Resource<?>, String> m_resourceIds;
   private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
+  private final PlannerEventFilter m_plannerEventFilter;
 
   public JsonPlanner(PLANNER model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -65,6 +67,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     m_resources = new HashMap<>();
     m_resourceIds = new HashMap<>();
     m_eventBuffer = model.createEventBuffer();
+    m_plannerEventFilter = new PlannerEventFilter(this);
   }
 
   @Override
@@ -188,18 +191,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
 //        return getModel().getIntradayInterval();
 //      }
 //    });
-    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTED_RESOURCES, model) {
-      @Override
-      protected List<?> modelValue() {
-        return getModel().getSelectedResources();
-      }
-
-      @Override
-      @SuppressWarnings("unchecked")
-      public Object prepareValueForToJson(Object value) {
-        return resourceIdsToJson((List<Resource<?>>) value, new P_GetOrCreateResourceIdProvider());
-      }
-    });
     putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
       @Override
       protected Activity<?, ?> modelValue() {
@@ -219,7 +210,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       }
     });
 
-    // TODO BSH | Calendar String PROP_CONTEXT_MENU = "contextMenus";
   }
 
   @Override
@@ -238,6 +228,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     if (jsonContextMenu != null) {
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
+    putProperty(json, "selectedResources", resourceIdsToJson(getModel().getSelectedResources(), new P_ResourceIdProvider()));
     return json;
   }
 
@@ -257,6 +248,9 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   protected String getResourceId(Resource<?> resource) {
+    if (resource == null) {
+      return null;
+    }
     return m_resourceIds.get(resource);
   }
 
@@ -310,15 +304,25 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       case PlannerEvent.TYPE_RESOURCES_DELETED:
         handleModelResourcesDeleted(event.getResources());
         break;
+      case PlannerEvent.TYPE_RESOURCES_SELECTED:
+        handleModelResourcesSelected(event.getResources());
+        break;
       case PlannerEvent.TYPE_ALL_RESOURCES_DELETED:
         handleModelAllResourcesDeleted();
         break;
+
 //      case PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED:
 //        handleModelResourceOrderChanged(event.getResources());
 //        break;
       default:
         // NOP
     }
+  }
+
+  protected void handleModelResourcesSelected(List<? extends Resource> resources) {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, "resourceIds", resourceIdsToJson(resources, new P_ResourceIdProvider()));
+    addActionEvent(EVENT_RESOURCES_SELECTED, jsonEvent);
   }
 
   protected void handleModelResourcesInserted(List<? extends Resource> resources) {
@@ -397,9 +401,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     else if (EVENT_SET_SELECTED_ACTIVITY_CELLS.equals(event.getType())) {
       handleUiSetSelectedActivityCells(event);
     }
-    else if (EVENT_CELL_ACTION.equals(event.getType())) {
-      handleCellAction(event);
-    }
     else {
       super.handleUiEvent(event);
     }
@@ -425,7 +426,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     Range<Date> selectionRange = extractSelectionRange(event.getData());
     List<Resource<?>> resources = extractResources(event.getData());
     //FIXME CGU filter selectionRange as well
-    addPropertyEventFilterCondition(IPlanner.PROP_SELECTED_RESOURCES, resources);
+    addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
     getModel().getUIFacade().setSelectionFromUI(resources, selectionRange);
     LOG.debug("selectionRange=" + selectionRange);
   }
@@ -448,23 +449,12 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     return new JsonDate(data.optString(propertyName, null)).asJavaDate();
   }
 
-  // FIXME CGU Fix generics
   @SuppressWarnings("unchecked")
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
     Activity<?, ?> activityCell = null;
     // TODO Map data from JSON
 
     getModel().getUIFacade().setSelectedActivityCellFromUI(activityCell);
-  }
-
-  protected void handleCellAction(JsonEvent event) {
-//    Resource resource = null;
-    // TODO Map data from JSON
-
-//    Activity<?, ?> activityCell = null;
-    // TODO Map data from JSON
-
-//    getModel().getUIFacade().fireCellActionFromUI(resource, activityCell);
   }
 
   protected List<Resource<?>> extractResources(JSONObject json) {
@@ -474,7 +464,11 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   protected List<Resource<?>> jsonToResources(JSONArray resourceIds) {
     List<Resource<?>> resources = new ArrayList<>(resourceIds.length());
     for (int i = 0; i < resourceIds.length(); i++) {
-      resources.add(m_resources.get(resourceIds.get(i)));
+      Resource<?> resource = m_resources.get(resourceIds.get(i));
+      if (resource == null) {
+        throw new UiException("No resource found for id " + resourceIds.get(i));
+      }
+      resources.add(resource);
     }
     return resources;
   }
@@ -490,7 +484,11 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   protected JSONArray resourceIdsToJson(List<? extends Resource> resources, IIdProvider<Resource<?>> idProvider) {
     JSONArray jsonResourceIds = new JSONArray();
     for (Resource resource : resources) {
-      jsonResourceIds.put(idProvider.getId(resource));
+      String resourceId = idProvider.getId(resource);
+      if (resourceId == null) { // Ignore resources that are not yet sent to the UI
+        continue;
+      }
+      jsonResourceIds.put(resourceId);
     }
     return jsonResourceIds;
   }
@@ -505,6 +503,18 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
 //      super.handleModelPropertyChange(propertyName, oldValue, newValue);
 //    }
 //  }
+
+  protected PlannerEventFilterCondition addPlannerEventFilterCondition(int plannerEventType) {
+    PlannerEventFilterCondition conditon = new PlannerEventFilterCondition(plannerEventType);
+    m_plannerEventFilter.addCondition(conditon);
+    return conditon;
+  }
+
+  @Override
+  public void cleanUpEventFilters() {
+    super.cleanUpEventFilters();
+    m_plannerEventFilter.removeAllConditions();
+  }
 
   protected class P_PlannerListener extends PlannerAdapter {
 
