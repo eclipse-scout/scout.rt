@@ -2,6 +2,15 @@ scout.KeystrokeManager = function() {
   this._adaptersToDraw = [];
   this._adapters = []; // FIXME BSH Keystroke | Check if we really need this
   var that = this;
+
+  //disable default help on F1 on IE;
+  if ( "onhelp" in window ) {
+    // (jQuery cannot bind "onhelp" event)
+    window.onhelp = function () {
+        return false;
+    };
+  }
+
   //f1-help
   $(document).keydown(function(event) {
     if (event.which === scout.keys.F1) {
@@ -10,6 +19,7 @@ scout.KeystrokeManager = function() {
     }
     that._adaptersToDraw = [];
   });
+
 
   $(document).keyup(function(event) {
     if (event.which === scout.keys.F1) {
