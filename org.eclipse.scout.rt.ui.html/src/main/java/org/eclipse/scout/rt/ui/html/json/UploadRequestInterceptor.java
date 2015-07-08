@@ -84,16 +84,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
       // Resolve session
       MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSessionId);
       IUiSession uiSession = resolveUiSession(httpReq, uiSessionId);
-
-      // Resolve adapter
-      if (!StringUtility.hasText(targetAdapterId)) {
-        throw new IllegalArgumentException("Missing target adapter ID");
-      }
-      IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(targetAdapterId);
-      if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
-        throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
-      }
-      IBinaryResourceConsumer binaryResourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
+      IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
 
       // Read uploaded data
       Map<String, String> uploadProperties = new HashMap<String, String>();
@@ -144,6 +135,24 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
       writeResponse(httpResp, createUnrecoverableFailureResponse());
     }
     return true;
+  }
+
+  /**
+   * @param uiSession
+   * @param targetAdapterId
+   * @return
+   */
+  private IBinaryResourceConsumer resolveJsonAdapter(IUiSession uiSession, String targetAdapterId) {
+    // Resolve adapter
+    if (!StringUtility.hasText(targetAdapterId)) {
+      throw new IllegalArgumentException("Missing target adapter ID");
+    }
+    IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(targetAdapterId);
+    if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
+      throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
+    }
+    IBinaryResourceConsumer binaryResourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
+    return binaryResourceConsumer;
   }
 
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException, ProcessingException {
