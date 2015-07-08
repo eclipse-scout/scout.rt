@@ -1,0 +1,17 @@
+.number-field > .field {
+
+  &.has-inner-alignment {
+
+    &.halign-left {
+      text-align: left;
+    }
+
+    &.halign-center {
+      text-align: center;
+    }
+
+    &.halign-right {
+      text-align: right;
+    }
+  }
+}

@@ -76,6 +76,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelFont(this.labelFont);
   this._renderLabelForegroundColor(this.labelForegroundColor);
   this._renderLabelBackgroundColor(this.labelBackgroundColor);
+  this._renderGridData(this.gridData);
 };
 
 scout.FormField.prototype._remove = function() {
@@ -429,4 +430,44 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
   htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   this.htmlComp = htmlComp;
+};
+
+/**
+ * Updates the "inner alignment" of a field. Usually, the GridData hints only have influence on the
+ * LogicalGridLayout. However, the properties "horizontalAlignment" and "verticalAlignment" are
+ * sometimes used differently. Instead of controlling the field alignment in case fillHorizontal/
+ * fillVertical is false, the developer expects the _contents_ of the field to be aligned correspondingly
+ * inside the field. Technically, this is not correct, but is supported for legacy and convenience
+ * reasons for some of the Scout fields. Those who support the behavior may override _renderGridData()
+ * and call this method. Some CSS classes are then added to the field.
+ *
+ * opts:
+ *   useHorizontalAlignment:
+ *     When this option is true, "halign-" classes are added according to gridData.horizontalAlignment.
+ *   useVerticalAlignment:
+ *     When this option is true, "valign-" classes are added according to gridData.verticalAlignment.
+ *   $fieldContainer:
+ *     Specifies the div where the classes should be added. If omitted, this.$fieldContainer is used.
+ */
+scout.FormField.prototype.updateInnerAlignment = function(opts) {
+  opts = opts || {};
+  var useHorizontalAlignment = scout.helpers.nvl(opts.useHorizontalAlignment, true);
+  var useVerticalAlignment = scout.helpers.nvl(opts.useVerticalAlignment, true);
+  var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
+
+  if ($fieldContainer) {
+    $fieldContainer.removeClass('has-inner-alignment halign-left halign-center halign-right valign-top valign-middle valign-bottom');
+    if (useHorizontalAlignment || useVerticalAlignment) {
+      // Set horizontal and vertical alignment (from gridData)
+      $fieldContainer.addClass('has-inner-alignment');
+      if (useHorizontalAlignment) {
+        var hAlign = this.gridData.horizontalAlignment;
+        $fieldContainer.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
+      }
+      if (useVerticalAlignment) {
+        var vAlign = this.gridData.verticalAlignment;
+        $fieldContainer.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
+      }
+    }
+  }
 };

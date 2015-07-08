@@ -1,22 +1,25 @@
-.date-field > .field > input {
-  position: absolute;
-}
+.date-field > .field {
 
-.date-field > .field > input.date {
-  .text-field-with-icon(@icon-calendar);
-}
+  & > input {
+    position: absolute;
 
-.date-field > .field > input.time {
-  .text-field-with-icon(@icon-clock,~'.time');
-}
+    &.date {
+      .text-field-with-icon(@icon-calendar);
+    }
 
-/** Prediction input field is in the back of the actual input field -> make actual input field transparent */
-.date-field > .field > .predict {
-  color: @disabled-color;
-  background-color: @control-background-color;
+    &.time {
+      .text-field-with-icon(@icon-clock,~'.time');
+    }
+  }
 
-  & + input {
-    background-color: transparent;
+  /** Prediction input field is in the back of the actual input field -> make actual input field transparent */
+  & > .predict {
+    color: @disabled-color;
+    background-color: @control-background-color;
+
+    & + input {
+      background-color: transparent;
+    }
   }
 }
 

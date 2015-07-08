@@ -1,4 +1,23 @@
 .string-field  {
+
+  & > .field {
+
+    &.has-inner-alignment {
+
+      &.halign-left {
+        text-align: left;
+      }
+
+      &.halign-center {
+        text-align: center;
+      }
+
+      &.halign-right {
+        text-align: right;
+      }
+    }
+  }
+
   &.has-action {
     & > input[type=text] {
       .text-field-with-icon(@icon-arrow-right);
@@ -9,7 +28,7 @@
     }
   }
 
-  & > textarea {
+  & > textarea.field {
     width: 100%; /* must be set for IE9 */
   }
 }

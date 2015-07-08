@@ -26,3 +26,9 @@ scout.LabelField.prototype._renderDisplayText = function(displayText) {
 scout.LabelField.prototype._renderWrapText = function() {
   this.$field.toggleClass('white-space-nowrap', !this.wrapText);
 };
+
+scout.LabelField.prototype._renderGridData = function() {
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};

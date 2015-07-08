@@ -106,6 +106,17 @@ scout.ImageField.prototype._renderMenusVisible = function() {
   this._updateMenus();
 };
 
+scout.ImageField.prototype._renderGridData = function() {
+  this._updateInnerAlignment();
+};
+
+scout.ImageField.prototype._updateInnerAlignment = function() {
+  this.updateInnerAlignment({
+    useHorizontalAlignment: (!this.scrollBarEnabled),
+    useVerticalAlignment: (!this.scrollBarEnabled)
+  });
+};
+
 scout.ImageField.prototype._updateMenus = function() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };

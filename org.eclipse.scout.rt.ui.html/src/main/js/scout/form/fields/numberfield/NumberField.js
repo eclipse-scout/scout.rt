@@ -14,6 +14,12 @@ scout.NumberField.prototype._render = function($parent) {
   this.addStatus();
 };
 
+scout.NumberField.prototype._renderGridData = function() {
+  this.updateInnerAlignment({
+    useHorizontalAlignment: true
+  });
+};
+
 scout.NumberField.prototype._parse = function () {
   var input = this.$field.val();
   if (input) {

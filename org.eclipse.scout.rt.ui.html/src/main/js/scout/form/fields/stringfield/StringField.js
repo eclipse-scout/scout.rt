@@ -122,6 +122,12 @@ scout.StringField.prototype._renderWrapText = function() {
   this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
 };
 
+scout.StringField.prototype._renderGridData = function() {
+  this.updateInnerAlignment({
+    useHorizontalAlignment: (this.multilineText ? false : true)
+  });
+};
+
 scout.StringField.prototype._onIconClick = function(event) {
   this.displayTextChanged();
   scout.StringField.parent.prototype._onIconClick.call(this, event);

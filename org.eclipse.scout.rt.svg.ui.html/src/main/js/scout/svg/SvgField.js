@@ -18,8 +18,8 @@ scout.SvgField.prototype._renderProperties = function() {
 };
 
 scout.SvgField.prototype.init = function(model, session) {
-    scout.SvgField.parent.prototype.init.call(this, model, session);
-    this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
+  scout.SvgField.parent.prototype.init.call(this, model, session);
+  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
 scout.SvgField.prototype._renderSvgDocument = function() {
@@ -28,7 +28,9 @@ scout.SvgField.prototype._renderSvgDocument = function() {
     return;
   }
   this.$field.html(this.svgDocument);
-  this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this)).attr('tabindex', "0");
+  this.$field.find('.app-link')
+    .on('click', this._onAppLinkAction.bind(this))
+    .attr('tabindex', '0');
 };
 
 scout.SvgField.prototype._onAppLinkAction = function(event) {
