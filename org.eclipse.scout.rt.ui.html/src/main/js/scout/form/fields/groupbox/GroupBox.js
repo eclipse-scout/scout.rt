@@ -131,7 +131,7 @@ scout.GroupBox.prototype._prepareFields = function() {
       for (var k = 0; k < field.tabItems.length; k++) {
         var tabMnemonic = this._getMnemonic(field.tabItems[k]);
         if (tabMnemonic) {
-          this.registerRootKeyStroke(new scout.TabItemMnemonicKeyStroke(res, field.tabItems[k]));
+          this.registerRootKeyStroke(new scout.TabItemMnemonicKeyStroke(tabMnemonic, field.tabItems[k]));
         }
       }
     } else {
