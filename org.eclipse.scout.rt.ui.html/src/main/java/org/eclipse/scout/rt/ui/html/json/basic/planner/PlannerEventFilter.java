@@ -20,10 +20,10 @@ import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, PlannerEventFilterCondition> {
 
-  private JsonPlanner<? extends IPlanner> m_JsonPlanner;
+  private JsonPlanner<? extends IPlanner> m_jsonPlanner;
 
-  public PlannerEventFilter(JsonPlanner<? extends IPlanner> JsonPlanner) {
-    m_JsonPlanner = JsonPlanner;
+  public PlannerEventFilter(JsonPlanner<? extends IPlanner> jsonPlanner) {
+    m_jsonPlanner = jsonPlanner;
   }
 
   @Override
@@ -38,7 +38,7 @@ public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, Planne
             return null;
           }
 
-          PlannerEvent newEvent = new PlannerEvent((IPlanner) m_JsonPlanner.getModel(), event.getType(), resources);
+          PlannerEvent newEvent = new PlannerEvent((IPlanner) m_jsonPlanner.getModel(), event.getType(), resources);
           return newEvent;
         }
 
