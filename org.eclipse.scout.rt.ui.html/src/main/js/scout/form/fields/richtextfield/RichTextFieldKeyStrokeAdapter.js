@@ -2,8 +2,8 @@ scout.RichTextFieldKeyStrokeAdapter = function(field) {
   scout.RichTextFieldKeyStrokeAdapter.parent.call(this, field);
 
   // Prevent enter to bubble up and execute form or groupbox enter key.
-  this.keyStrokes.push(new scout.RichTextFieldEnterKeyStroke());
-  this.keyStrokes.push(new scout.RichTextFieldBackspaceKeyStroke());
+  this.registerKeyStroke(new scout.RichTextFieldEnterKeyStroke());
+  this.registerKeyStroke(new scout.RichTextFieldBackspaceKeyStroke());
 };
 
 scout.inherits(scout.RichTextFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);

@@ -1,8 +1,8 @@
 scout.MenuKeyStrokeAdapter = function(menu) {
   scout.MenuKeyStrokeAdapter.parent.call(this, menu);
 
-  this.keyStrokes.push(new scout.MenuExecKeyStroke(menu));
-  this.keyStrokes.push(new scout.MenuSpaceExecKeyStroke(menu));
+  this.registerKeyStroke(new scout.MenuExecKeyStroke(menu));
+  this.registerKeyStroke(new scout.MenuSpaceExecKeyStroke(menu));
 };
 scout.inherits(scout.MenuKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 

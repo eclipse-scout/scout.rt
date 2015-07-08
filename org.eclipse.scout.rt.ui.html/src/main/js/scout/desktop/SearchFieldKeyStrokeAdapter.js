@@ -1,11 +1,10 @@
 scout.SearchFieldKeyStrokeAdapter = function(searchOutline) {
   scout.SearchFieldKeyStrokeAdapter.parent.call(this, searchOutline);
 
-  this.keyStrokes.push(new scout.SearchFieldEnterKeyStroke());
-  this.keyStrokes.push(new scout.SearchFieldBackspaceKeyStroke());
+  this.registerKeyStroke(new scout.SearchFieldEnterKeyStroke());
+  this.registerKeyStroke(new scout.SearchFieldBackspaceKeyStroke());
 };
 scout.inherits(scout.SearchFieldKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
-
 
 scout.SearchFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
   // NOP

@@ -9,8 +9,8 @@ scout.DesktopKeyStrokeAdapter = function(desktop) {
   this._desktop = desktop;
   this._viewTabAutoKeyStroke = new scout.ViewTabAutoKeyStroke(desktop.autoTabKeyStrokesEnabled, this._tabs, desktop.autoTabKeyStrokeModifier);
 
-  this.keyStrokes.push(this._viewTabAutoKeyStroke);
-  this.keyStrokes.push(new scout.DesktopBackspaceKeyStroke());
+  this.registerKeyStroke(this._viewTabAutoKeyStroke);
+  this.registerKeyStroke(new scout.DesktopBackspaceKeyStroke());
   this.installDesktopModelKeystrokes();
 };
 

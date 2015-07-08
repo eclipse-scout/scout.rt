@@ -102,13 +102,8 @@ scout.GroupBox.prototype._prepareFields = function() {
 
   var i, field, res;
   for (i = 0; i < this.fields.length; i++) {
-    res = undefined;
     field = this.fields[i];
-    if (field.label !== scout.strings.removeAmpersand(field.label)) {
-      //Add mnemonic keyStrokevar
-      var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
-      res = mnemonic.charAt(mnemonic.length - 1);
-    }
+    res = this._getMnemonic(field);
 
     if (field instanceof scout.Button) {
       if (field.processButton) {
@@ -121,30 +116,38 @@ scout.GroupBox.prototype._prepareFields = function() {
       } else {
         this.controls.push(field);
       }
-      if (res) {
-        this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, field));
-      }
       // Register all button key strokes
-      for (var j = 0; j < field.keyStrokes.length; j++) {
-        field.keyStrokes[j].$drawKeyBoxContainer = field.$container;
-        this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
+      if (!field.processButton) {
+        if (res) {
+          this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, field));
+        }
+        for (var j = 0; j < field.keyStrokes.length; j++) {
+          field.keyStrokes[j].$drawKeyBoxContainer = field.$container;
+          this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
+        }
       }
     } else if (field instanceof scout.TabBox) {
       this.controls.push(field);
       for (var k = 0; k < field.tabItems.length; k++) {
-        if (field.tabItems[k].label !== scout.strings.removeAmpersand(field.tabItems[k].label)) {
-          //Add mnemonic keyStrokevar
-          var tabmnemonic = field.tabItems[k].label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
-          res = tabmnemonic.charAt(tabmnemonic.length - 1);
+        var tabMnemonic = this._getMnemonic(field.tabItems[k]);
+        if (tabMnemonic) {
           this.registerRootKeyStroke(new scout.TabItemMnemonicKeyStroke(res, field.tabItems[k]));
-
         }
       }
-
     } else {
       this.controls.push(field);
     }
   }
+};
+
+scout.GroupBox.prototype._getMnemonic = function(field) {
+  var res;
+  if (field.label !== scout.strings.removeAmpersand(field.label)) {
+    //Add mnemonic keyStrokevar
+    var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
+    res = mnemonic.charAt(mnemonic.length - 1);
+  }
+  return res;
 };
 
 /**
@@ -225,8 +228,7 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
       this.gridData.weightY = this._collapsedWeightY;
       delete this._collapsedWeightY;
     }
-  }
-  else {
+  } else {
     // If group box has a weight different than 0, we set it to zero and back up the old value
     if (this.gridData.weightY !== 0) {
       this._collapsedWeightY = this.gridData.weightY;
@@ -247,6 +249,7 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
 scout.GroupBox.prototype._renderMenus = function(menus) {
   // create a menu-adapter for each process button
   var menuItems = this.staticMenus.concat(menus);
+  //register keystrokes on root groupbox
   this.processButtons.forEach(function(button) {
     var menu = this.session.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
       objectType: 'ButtonAdapterMenu',
@@ -254,6 +257,20 @@ scout.GroupBox.prototype._renderMenus = function(menus) {
     }));
     menuItems.push(menu);
   }.bind(this));
+  for (var i = 0; i < menuItems.length; i++) {
+    var menuItem = menuItems[i];
+    this.registerRootKeyStroke(menuItem);
+    var res = this._getMnemonic(menuItem);
+    if (res) {
+      this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, menuItem));
+    }
+    if (menuItem.keyStrokes) {
+      for (var j = 0; j < menuItem.keyStrokes.length; j++) {
+        menuItem.keyStrokes[j].$drawKeyBoxContainer = menuItem.$container;
+        this.keyStrokeAdapter.registerKeyStroke(menuItem.keyStrokes[j]);
+      }
+    }
+  }
   this.menuBar.updateItems(menuItems);
 };
 

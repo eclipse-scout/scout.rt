@@ -1,12 +1,12 @@
 scout.TableKeyStrokeAdapter = function(field) {
   scout.TableKeyStrokeAdapter.parent.call(this, field);
 
-  this.keyStrokes.push(new scout.TableFilterControlKeyStrokes(field));
-  this.keyStrokes.push(new scout.TableControlKeyStrokes(field));
-  this.keyStrokes.push(new scout.TableStartCellEditKeyStroke(field));
-  this.keyStrokes.push(new scout.TableSelectAllKeyStroke(field));
-  this.keyStrokes.push(new scout.TableRefreshKeyStroke(field));
- };
+  this.registerKeyStroke(new scout.TableFilterControlKeyStrokes(field));
+  this.registerKeyStroke(new scout.TableControlKeyStrokes(field));
+  this.registerKeyStroke(new scout.TableStartCellEditKeyStroke(field));
+  this.registerKeyStroke(new scout.TableSelectAllKeyStroke(field));
+  this.registerKeyStroke(new scout.TableRefreshKeyStroke(field));
+};
 scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.TableKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
@@ -52,7 +52,7 @@ scout.TableStartCellEditKeyStroke.prototype._drawKeyBox = function($container, d
   if (!this.drawHint || !this.keyStroke) {
     return;
   }
-//TODO nbu refactor
+  //TODO nbu refactor
   $selectedRow = this._table.$selectedRows().first();
   if ($selectedRow.length === 0) {
     return;
@@ -72,15 +72,14 @@ scout.TableSelectAllKeyStroke = function(table) {
 };
 scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);
 
-
 /**
  * @Override
  */
 scout.TableSelectAllKeyStroke.prototype.accept = function(event) {
-  if(this._table.rows.length === this._table.selectedRows.length){
+  if (this._table.rows.length === this._table.selectedRows.length) {
     return false;
   }
-  return scout.TableSelectAllKeyStroke.parent.prototype.accept.call(this,event);
+  return scout.TableSelectAllKeyStroke.parent.prototype.accept.call(this, event);
 };
 
 /**
@@ -95,21 +94,16 @@ scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
  * @Override
  */
 scout.TableSelectAllKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
-  if(this._table.rows.length === this._table.selectedRows.length){
+  if (this._table.rows.length === this._table.selectedRows.length) {
     return;
   }
   var keyBoxText;
-  if (!this.drawHint || !this.keyStroke || !this._table.footer || this._table.footer._$infoSelection>0) {
+  if (!this.drawHint || !this.keyStroke || !this._table.footer || this._table.footer._$infoSelection > 0) {
     return;
   }
-    keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoSelection.find('.info-button'), this.ctrl, this.alt, this.shift);
+  keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
+  scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoSelection.find('.info-button'), this.ctrl, this.alt, this.shift);
 };
-
-
-
-
-
 
 scout.TableRefreshKeyStroke = function(table) {
   scout.TableRefreshKeyStroke.parent.call(this);
@@ -132,13 +126,9 @@ scout.TableRefreshKeyStroke.prototype.handle = function(event) {
  */
 scout.TableRefreshKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
   var keyBoxText;
-  if (!this.drawHint || !this.keyStroke || !this._table.footer || this._table.footer._$infoSelection>0) {
+  if (!this.drawHint || !this.keyStroke || !this._table.footer || this._table.footer._$infoSelection > 0) {
     return;
   }
-    keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoLoad.find('.info-button'), this.ctrl, this.alt, this.shift);
+  keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
+  scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoLoad.find('.info-button'), this.ctrl, this.alt, this.shift);
 };
-
-
-
-

@@ -1,9 +1,9 @@
 scout.CellEditorPopupKeyStrokeAdapter = function(popup) {
   scout.CellEditorPopupKeyStrokeAdapter.parent.call(this, popup);
 
-  this.keyStrokes.push(new scout.CellEditorCompleteEditKeyStroke(popup));
-  this.keyStrokes.push(new scout.CellEditorCancelEditKeyStroke(popup));
-  this.keyStrokes.push(new scout.CellEditorTabKeyStroke(popup));
+  this.registerKeyStroke(new scout.CellEditorCompleteEditKeyStroke(popup));
+  this.registerKeyStroke(new scout.CellEditorCancelEditKeyStroke(popup));
+  this.registerKeyStroke(new scout.CellEditorTabKeyStroke(popup));
   this.anchorKeyStrokeAdapter = true;
 };
 scout.inherits(scout.CellEditorPopupKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);

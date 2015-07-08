@@ -4,7 +4,7 @@ scout.OutlineKeyStrokeAdapter = function(field) {
   var keyStroke = new scout.TreeControlKeyStrokes(field);
   keyStroke.ctrl = true;
   keyStroke.shift = true;
-  this.keyStrokes.push(keyStroke);
+  this.registerKeyStroke(keyStroke);
 };
 scout.inherits(scout.OutlineKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 

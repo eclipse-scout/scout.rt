@@ -1,6 +1,7 @@
 scout.ButtonAdapterMenu = function() {
   scout.ButtonAdapterMenu.parent.call(this);
   this._removeAdapterProperties('childActions'); // managed by button
+  this.defaultKeyStroke;
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 
@@ -89,11 +90,9 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
     }
     if (buttonStyle === scout.Button.DisplayStyle.TOGGLE) {
       return scout.Action.ActionStyle.TOGGLE;
-    }
-    else if (buttonStyle === scout.Button.DisplayStyle.LINK) {
+    } else if (buttonStyle === scout.Button.DisplayStyle.LINK) {
       return scout.Action.ActionStyle.DEFAULT;
-    }
-    else {
+    } else {
       return scout.Action.ActionStyle.BUTTON;
     }
   }

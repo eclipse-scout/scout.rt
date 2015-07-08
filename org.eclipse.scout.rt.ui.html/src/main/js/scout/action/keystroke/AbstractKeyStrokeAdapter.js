@@ -50,13 +50,24 @@ scout.AbstractKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.registerKeyStroke = function(keyStroke) {
+
   var index = this.keyStrokes.indexOf(keyStroke);
   if (index === -1) {
     if (keyStroke === undefined) {
       throw new Error('KeyStroke is undefined');
     }
     this.keyStrokes.push(keyStroke);
+    this.addDestroyListener(keyStroke);
   }
+};
+
+scout.AbstractKeyStrokeAdapter.prototype.addDestroyListener = function(keyStroke) {
+  keyStroke.on('destroy', this._onKeyStrokeDestroy.bind(this, keyStroke));
+};
+
+scout.AbstractKeyStrokeAdapter.prototype._onKeyStrokeDestroy = function(keyStroke) {
+  this.unregisterKeyStroke(keyStroke);
+  keyStroke.off('destroy');
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStroke) {
@@ -66,7 +77,7 @@ scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStrok
   }
 };
 
-scout.AbstractKeyStrokeAdapter.prototype.uiSessionId = function(uiSessionId){
+scout.AbstractKeyStrokeAdapter.prototype.uiSessionId = function(uiSessionId) {
   if (uiSessionId) {
     this._uiSessionId = uiSessionId;
   }

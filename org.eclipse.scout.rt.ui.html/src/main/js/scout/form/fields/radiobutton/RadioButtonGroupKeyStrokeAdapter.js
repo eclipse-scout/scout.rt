@@ -1,7 +1,7 @@
 scout.RadioButtonGroupKeyStrokeAdapter = function(field) {
   scout.RadioButtonGroupKeyStrokeAdapter.parent.call(this, field);
-  this.keyStrokes.push(new scout.RadioButtonGroupLeftKeyStroke(field));
-  this.keyStrokes.push(new scout.RadioButtonGroupRightKeyStroke(field));
+  this.registerKeyStroke(new scout.RadioButtonGroupLeftKeyStroke(field));
+  this.registerKeyStroke(new scout.RadioButtonGroupRightKeyStroke(field));
 };
 scout.inherits(scout.RadioButtonGroupKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 

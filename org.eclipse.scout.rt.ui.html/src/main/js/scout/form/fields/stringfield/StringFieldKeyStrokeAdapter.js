@@ -1,7 +1,7 @@
 scout.StringFieldKeyStrokeAdapter = function(field) {
   scout.StringFieldKeyStrokeAdapter.parent.call(this, field);
-  this.keyStrokes.push(new scout.StringFieldEnterKeyStroke());
-  this.keyStrokes.push(new scout.StringFieldCtrlEnterKeyStroke(field));
+  this.registerKeyStroke(new scout.StringFieldEnterKeyStroke());
+  this.registerKeyStroke(new scout.StringFieldCtrlEnterKeyStroke(field));
 };
 scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
@@ -15,7 +15,6 @@ scout.StringFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
   }
   return false;
 };
-
 
 scout.StringFieldEnterKeyStroke = function() {
   scout.StringFieldEnterKeyStroke.parent.call(this);
@@ -48,7 +47,6 @@ scout.StringFieldEnterKeyStroke.prototype.checkAndDrawKeyBox = function($contain
     drawedKeys[this.keyStrokeName()] = true;
   }
 };
-
 
 scout.StringFieldCtrlEnterKeyStroke = function(field) {
   scout.StringFieldCtrlEnterKeyStroke.parent.call(this);

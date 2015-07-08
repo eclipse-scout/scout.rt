@@ -1,8 +1,8 @@
 scout.MenuBarKeyStrokeAdapter = function(menuBar) {
   scout.MenuBarKeyStrokeAdapter.parent.call(this, menuBar);
 
-  this.keyStrokes.push(new scout.MenuBarLeftKeyStroke(menuBar));
-  this.keyStrokes.push(new scout.MenuBarRightKeyStroke(menuBar));
+  this.registerKeyStroke(new scout.MenuBarLeftKeyStroke(menuBar));
+  this.registerKeyStroke(new scout.MenuBarRightKeyStroke(menuBar));
 };
 scout.inherits(scout.MenuBarKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 

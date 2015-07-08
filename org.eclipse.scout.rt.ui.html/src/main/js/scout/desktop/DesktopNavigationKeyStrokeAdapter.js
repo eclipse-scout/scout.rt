@@ -1,7 +1,7 @@
 scout.DesktopNavigationKeyStrokeAdapter = function(desktopNavigation) {
   scout.DesktopNavigationKeyStrokeAdapter.parent.call(this, desktopNavigation);
 
-  this.keyStrokes.push(new scout.DesktopNavigationKeyStroke(desktopNavigation));
+  this.registerKeyStroke(new scout.DesktopNavigationKeyStroke(desktopNavigation));
 };
 scout.inherits(scout.DesktopNavigationKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
