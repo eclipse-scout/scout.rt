@@ -72,6 +72,12 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     if (m_field.hasAcceptedProposal()) {
       ILookupRow<LOOKUP_KEY> acceptedProposal = m_field.getProposalChooser().getAcceptedProposal();
       LOG.debug("acceptProposalFromUI -> acceptProposal. acceptedProposal=" + acceptedProposal);
+      // This line is required for the following case:
+      // - Smartfield has a selected value and an accepted proposal row with text "Zoom"
+      // - User changes smartfield text in UI to "Z" and presses Tab
+      // - The display text on the client is still "Zoom", the accepted proposal is unchanged
+      //   that's why we must set the display text from the UI (Z), so a property change
+      //   event will be triggered to set the UI text back to "Zoom"
       m_field.setDisplayText(text);
       m_field.acceptProposal(acceptedProposal);
     }
