@@ -1,5 +1,5 @@
-scout.SmartFieldMultiline = function(lookupStrategy) {
-  scout.SmartFieldMultiline.parent.call(this, lookupStrategy);
+scout.SmartFieldMultiline = function() {
+  scout.SmartFieldMultiline.parent.call(this);
   this.options;
   this._$multilineField;
 };

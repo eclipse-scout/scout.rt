@@ -37,9 +37,6 @@ describe("scout.defaultValues", function() {
               "y": 0
             }
           },
-          "SmartField": {
-            "lookupStrategy": "remote"
-          },
           "NumberField": {
             "alignment": 1
           }

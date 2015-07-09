@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
@@ -26,7 +26,6 @@ import org.json.JSONObject;
 public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends IContentAssistField<VALUE, LOOKUP_KEY>> extends JsonValueField<CONTENT_ASSIST_FIELD> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
-  private static final String PROP_LOOKUP_STRATEGY = "lookupStrategy";
   private static final String PROP_PROPOSAL = "proposal";
 
   private boolean m_proposal;
@@ -53,12 +52,6 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
         return getModel().getProposalChooser();
       }
     });
-    putJsonProperty(new JsonProperty<IContentAssistField<VALUE, LOOKUP_KEY>>(PROP_LOOKUP_STRATEGY, model) {
-      @Override
-      protected String modelValue() {
-        return getLookupStrategy();
-      }
-    });
   }
 
   @Override
@@ -70,9 +63,6 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
       return "SmartField";
     }
   }
-
-  // FIXME AWE: (smart-field) event 'code-type neu laden' behandeln.
-  // browser-seitige felder mit cachingEnabled neu laden evtl. nur wenn der Code-Type passt
 
   /**
    * Returns whether or not it is allowed to cache all options on the browser-side.
@@ -89,6 +79,10 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   @Override
   public void handleUiEvent(JsonEvent event) {
+    // NOTE: it's important we always set the submitted 'searchText' as display text
+    // on the model field instance. Otherwise the java client will be out of sync
+    // with the browser, which will cause a variety of bugs in the UI. This happens
+    // in the UI facade impl.
     if ("openProposal".equals(event.getType())) {
       handleUiOpenProposal(event);
     }
@@ -107,12 +101,12 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiProposalTyped(JsonEvent event) {
-    String text = event.getData().optString("searchText", null);
+    String text = getSearchTextAndAddFilter(event);
     getModel().getUIFacade().proposalTypedFromUI(text);
   }
 
   protected void handleUiAcceptProposal(JsonEvent event) {
-    String text = event.getData().optString("searchText", null);
+    String text = getSearchTextAndAddFilter(event);
     getModel().getUIFacade().acceptProposalFromUI(text);
   }
 
@@ -121,10 +115,16 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiOpenProposal(JsonEvent event) {
-    String searchText = event.getData().optString("searchText", null);
+    String searchText = getSearchTextAndAddFilter(event);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
     LOG.debug("handle openProposal -> openProposalFromUI. searchText=" + searchText + " selectCurrentValue=" + selectCurrentValue);
     getModel().getUIFacade().openProposalChooserFromUI(searchText, selectCurrentValue);
+  }
+
+  private String getSearchTextAndAddFilter(JsonEvent event) {
+    String text = event.getData().optString("searchText", null);
+    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, text);
+    return text;
   }
 
   @Override
