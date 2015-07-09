@@ -35,6 +35,7 @@ scout.Menu.prototype._renderItem = function($parent) {
   }
 
   this.$container.on('mousedown', '', this._onMouseEvent.bind(this));
+  this.$container.on('contextmenu', '', this._onMouseEvent.bind(this));
   this.$container.on('click', '', this._onMouseEvent.bind(this));
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
@@ -60,7 +61,7 @@ scout.Menu.prototype._onMouseEvent = function(event) {
   var hasChildActions = (this.childActions.length > 0);
   if (event.type === 'mousedown' && hasChildActions) {
     this.doAction(event);
-  } else if (event.type === 'click' && !hasChildActions) {
+  } else if ((event.type === 'click' || event.type ==='contextmenu') && !hasChildActions) {
     this.doAction(event);
   }
 };
