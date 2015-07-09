@@ -54,7 +54,7 @@ scout.ImageField.prototype._renderProperties = function() {
   this._renderImageUrl();
   this._renderAutoFit();
   this._renderMenus();
-  this._renderScrollBarsEnabled();
+  this._renderScrollBarEnabled();
 };
 
 scout.ImageField.prototype._remove = function() {
@@ -70,9 +70,14 @@ scout.ImageField.prototype._renderImageUrl = function() {
 
 scout.ImageField.prototype._renderAutoFit = function() {
   this.$field.toggleClass('autofit', this.autoFit);
+  scout.scrollbars.update(this.$fieldContainer);
 };
 
-scout.ImageField.prototype._renderScrollBarsEnabled = function() {
+scout.ImageField.prototype._renderScrollBarEnabled = function() {
+  // Note: Inner alignment has to be updated _before_ installing the scrollbar, because the inner
+  // alignment uses absolute positioning, which confuses the scrollbar calculations.
+  this._updateInnerAlignment();
+
   if (this.scrollBarEnabled) {
     scout.scrollbars.install(this.$fieldContainer, this.session, {
       invertColors: true
@@ -111,6 +116,7 @@ scout.ImageField.prototype._renderGridData = function() {
 };
 
 scout.ImageField.prototype._updateInnerAlignment = function() {
+  // Enable inner alignment only when scrollbars are disabled
   this.updateInnerAlignment({
     useHorizontalAlignment: (!this.scrollBarEnabled),
     useVerticalAlignment: (!this.scrollBarEnabled)
