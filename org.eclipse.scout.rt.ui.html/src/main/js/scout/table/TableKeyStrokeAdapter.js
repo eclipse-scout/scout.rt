@@ -6,6 +6,7 @@ scout.TableKeyStrokeAdapter = function(field) {
   this.registerKeyStroke(new scout.TableStartCellEditKeyStroke(field));
   this.registerKeyStroke(new scout.TableSelectAllKeyStroke(field));
   this.registerKeyStroke(new scout.TableRefreshKeyStroke(field));
+  this.registerKeyStroke(new scout.ContextMenuKeyStroke(field, field.onContextMenu, field));
 };
 scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 

@@ -134,7 +134,11 @@ scout.Table.prototype._render = function($parent) {
   this.$data.on('mousedown', '.table-row', onMouseDown)
     .on('mouseup', '.table-row', onMouseUp)
     .on('dblclick', '.table-row', onDoubleClick)
-    .on('contextmenu', '.table-row', onContextMenu);
+    .on('contextmenu', '.table-row', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    });
   scout.scrollbars.install(this.$data, this.session, {
     axis: 'both'
   });
@@ -142,8 +146,12 @@ scout.Table.prototype._render = function($parent) {
 
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
     scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    function() { return this.dropType; }.bind(this),
-    function() { return this.dropMaximumSize; }.bind(this),
+    function() {
+      return this.dropType;
+    }.bind(this),
+    function() {
+      return this.dropMaximumSize;
+    }.bind(this),
     function(event) {
       var row = this._rowAtY(event.originalEvent.pageY);
       return {
@@ -204,22 +212,29 @@ scout.Table.prototype._render = function($parent) {
     that.sendRowAction($row, column.id);
   }
 
-  function onContextMenu(event) {
-    var menuItems, popup;
-    event.preventDefault();
-    if (that.selectedRows.length > 0) {
-      menuItems = that._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
-      if (menuItems.length > 0) {
-        popup = new scout.ContextMenuPopup(that.session, {
-          menuItems: menuItems,
-          location: {
-            x: event.pageX,
-            y: event.pageY
-          },
-          $anchor: that.$data
-        });
-        popup.render();
-      }
+};
+
+scout.Table.prototype.onContextMenu = function(event) {
+  var menuItems, popup;
+  event.preventDefault();
+  if (this.selectedRows.length > 0) {
+    menuItems = this._filterMenus(['Table.SingleSelection', 'Table.MultiSelection']);
+    if (!event.pageX && !event.pageY) {
+      var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
+      var offset = $rowToDisplay.offset();
+      event.pageX = offset.left + 10;
+      event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+    }
+    if (menuItems.length > 0) {
+      popup = new scout.ContextMenuPopup(this.session, {
+        menuItems: menuItems,
+        location: {
+          x: event.pageX,
+          y: event.pageY
+        },
+        $anchor: this.$data
+      });
+      popup.render(undefined, event);
     }
   }
 };
@@ -1826,7 +1841,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   if (scout.device.tableAdditionalDivRequired) {
     // sam calculation in scout.Column.prototype.buildCell;
     this.$cellsForColIndexWidthFix(colNum, true)
-      .css('max-width', (width - 2 /* unknown IE9 extra space */));
+      .css('max-width', (width - 2 /* unknown IE9 extra space */ ));
   }
   this.$rows(true)
     .css('width', this._rowWidth);

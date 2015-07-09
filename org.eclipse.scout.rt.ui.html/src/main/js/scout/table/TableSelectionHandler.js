@@ -28,7 +28,10 @@ scout.TableSelectionHandler.prototype.clearLastSelectedRowMarker = function() {
 
 // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
 scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
-
+  //detect context menu button event ie event.buttons is 4 others 0
+  if (event.which === 3 && event.button === 2 && (event.buttons === 0 || event.buttons === 4)) {
+    return false;
+  }
   var $row = $(event.currentTarget),
     row = $row.data('row'),
     oldSelectedState = $row.isSelected();
@@ -57,16 +60,20 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
     this.handleSelection(event);
   }
 
-  if (this.mouseMoveSelectionEnabled) {
+  if (this.mouseMoveSelectionEnabled && event.which !== 3) {
     this.table.$data.off('mouseover', this.mouseOverHandler);
     this.mouseOverHandler = this.onMouseOver.bind(this);
     this.table.$data.on('mouseover', '.table-row', this.mouseOverHandler);
     // This additionally window listener is necessary to track the clicks outside of a table row.
     // If the mouse is released on a table row, onMouseUp gets called by the table's mouseUp listener.
-    $(window).one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   }
 
+  $(window).one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   this.lastActionRow = row;
+  if (event.which === 3) {
+    this.table.onContextMenu(event);
+    return false;
+  }
 };
 
 scout.TableSelectionHandler.prototype.onMouseOver = function(event) {

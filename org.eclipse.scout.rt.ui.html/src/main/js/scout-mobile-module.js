@@ -60,6 +60,7 @@ __include("scout/util/tooltips.js");
 __include("scout/action/Action.js");
 __include("scout/action/keystroke/AbstractKeyStrokeAdapter.js");
 __include("scout/action/keystroke/KeyStroke.js");
+__include("scout/action/keystroke/ContextMenuKeyStroke.js");
 __include("scout/action/keystroke/MnemonicKeyStroke.js");
 __include("scout/action/keystroke/GlassPaneKeyStrokeAdapter.js");
 __include("scout/popup/Popup.js");

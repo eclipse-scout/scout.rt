@@ -4,6 +4,7 @@ scout.Popup = function(session, options) {
   this._mouseDownHandler;
   this.session = session;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  this.openEvent;
   this.anchorBounds = options.anchorBounds;
   if (options.location) {
     this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
@@ -15,10 +16,11 @@ scout.Popup = function(session, options) {
 };
 scout.inherits(scout.Popup, scout.Widget);
 
-scout.Popup.prototype.render = function($parent) {
+scout.Popup.prototype.render = function($parent, event) {
   scout.Popup.parent.prototype.render.call(this, $parent);
+  this.openEvent = event;
   if (this.installFocusContext) {
-     this.$container.installFocusContextAsync('auto', this.session.uiSessionId);
+    this.$container.installFocusContextAsync('auto', this.session.uiSessionId);
   }
   this._attachCloseHandler();
   this.position();
@@ -44,9 +46,10 @@ scout.Popup.prototype._render = function($parent) {
   this.$container = $.makeDiv('popup')
     .appendTo($parent);
 };
-
 scout.Popup.prototype.close = function(event) {
-  this.remove();
+  if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
+    this.remove();
+  }
 };
 
 /**
@@ -128,7 +131,10 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   // To avoid that the popup switches between up and down position while
   // typing, we could always find the position by using the max. popup
   // size instead by checking against the current size.
-  return {x: x, y: y};
+  return {
+    x: x,
+    y: y
+  };
 };
 
 scout.Popup.prototype.overlap = function($container, location) {
@@ -142,8 +148,11 @@ scout.Popup.prototype.overlap = function($container, location) {
     top = location.y;
 
   overlapX = left + width + this.windowPaddingX - $(window).width();
-  overlapY = top + height + this.windowPaddingY  - $(window).height();
-  return {x: overlapX, y: overlapY};
+  overlapY = top + height + this.windowPaddingY - $(window).height();
+  return {
+    x: overlapX,
+    y: overlapY
+  };
 };
 
 scout.Popup.prototype.adjustLocation = function($container, location, anchorBounds) {
@@ -161,7 +170,10 @@ scout.Popup.prototype.adjustLocation = function($container, location, anchorBoun
     // Move popup to the left until it gets fully visible
     left -= overlap.x;
   }
-  return {x: left, y: top};
+  return {
+    x: left,
+    y: top
+  };
 };
 
 scout.Popup.prototype.position = function() {
