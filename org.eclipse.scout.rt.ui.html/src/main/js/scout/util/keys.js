@@ -214,7 +214,7 @@ scout.keyStrokeBox = {
     if (ctrl) {
       keyBoxText = 'Ctrl ' + keyBoxText;
     }
-    if ($container.css('position') === 'absolute' || $container.css('position') === 'relative') {
+    if ($container.css('position') === 'absolute' || $container.css('position') === 'relative' || ($container.css('position') === 'static' && $existingKeyBoxes.length > 0)) {
       $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
     } else {
       var pos = $container.position();

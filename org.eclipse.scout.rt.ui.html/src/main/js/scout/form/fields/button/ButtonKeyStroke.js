@@ -27,19 +27,15 @@ scout.ButtonKeyStroke.prototype.accept = function(event) {
   return scout.ButtonKeyStroke.parent.prototype.accept.call(this, event);
 };
 
-scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
-  if (this._button.$container && this._button.enabled && this._button.visible) {
-    var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._button.$container, this.ctrl, this.alt, this.shift, true);
-  }
-};
-
 /**
  * @override Menu.js
  */
-scout.Button.prototype._drawKeyBox = function($container) {
-  if (this.$container) {
+scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
+  $container = this.$drawKeyBoxContainer || this._button.$container;
+  var keyBoxOffset = this.keyBoxOffset || 16,
+    keyBoxAlignRight = this.keyBoxAlignRight === undefined ? true : this.keyBoxAlignRight;
+  if ($container && this._button.enabled && this._button.visible) {
     var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(2, keyBoxText, this._field.$container, this.ctrl, this.alt, this.shift);
+    scout.keyStrokeBox.drawSingleKeyBoxItem(keyBoxOffset, keyBoxText, $container, this.ctrl, this.alt, this.shift, keyBoxAlignRight);
   }
 };
