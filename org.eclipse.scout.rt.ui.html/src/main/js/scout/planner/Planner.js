@@ -84,8 +84,16 @@ scout.Planner.prototype.init = function(model, session) {
 
 scout.Planner.prototype._initResource = function(resource) {
   scout.defaultValues.applyTo(resource, 'Resource');
-  scout.defaultValues.applyTo(resource.activities, 'Cell');
+  resource.activities.forEach(function(activity) {
+    this._initActivity(activity);
+  }, this);
   this.resourceMap[resource.id] = resource;
+};
+
+scout.Planner.prototype._initActivity = function(activity) {
+  activity.beginTime = scout.dates.parseJsonDate(activity.beginTime);
+  activity.endTime = scout.dates.parseJsonDate(activity.endTime);
+  scout.defaultValues.applyTo(activity, 'Activity');
 };
 
 scout.Planner.prototype._render = function($parent) {
@@ -527,10 +535,15 @@ scout.Planner.prototype._build$Resource = function(resource) {
   $resource.appendDiv('resource-title')
     .text(resource.resourceCell.text);
   var $cells = $resource.appendDiv('resource-cells');
-  for (i = 0; i < resource.activities.length; i++) {
-    $activity = this._build$Activity(resource.activities[i]);
+  resource.activities.forEach(function(activity) {
+    if (activity.beginTime.valueOf() > this.endScale ||
+        activity.endTime.valueOf() < this.beginScale) {
+      // don't add activities which are not in the view range
+      return;
+    }
+    $activity = this._build$Activity(activity);
     $activity.appendTo($cells);
-  }
+  }, this);
   $resource.data('resource', resource);
   resource.$resource = $resource;
   return $resource;
@@ -541,8 +554,8 @@ scout.Planner.prototype._build$Activity = function(activity) {
     $activity = $.makeDiv('planner-activity'),
     level = 100 - Math.min(activity.level * 100, 100),
     levelColor = scout.helpers.modelToCssColor(activity.levelColor),
-    begin = scout.dates.parseJsonDate(activity.beginTime).valueOf(),
-    end = scout.dates.parseJsonDate(activity.endTime).valueOf();
+    begin = activity.beginTime.valueOf(),
+    end = activity.endTime.valueOf();
 
   // Make sure activity fits into scale
   begin = Math.max(begin, this.beginScale);
@@ -845,8 +858,8 @@ scout.Planner.prototype._renderDisplayMode = function() {
 
 scout.Planner.prototype._syncViewRange = function(viewRange) {
   this.viewRange = new scout.Range(
-    scout.dates.create(viewRange.from),
-    scout.dates.create(viewRange.to)
+    scout.dates.parseJsonDate(viewRange.from),
+    scout.dates.parseJsonDate(viewRange.to)
   );
   this._yearPanel.setViewRange(this.viewRange);
   this._yearPanel.selectDate(this.viewRange.from);
@@ -865,8 +878,8 @@ scout.Planner.prototype._syncAvailableDisplayModes = function(availableDisplayMo
 
 scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
   this.selectionRange = {
-    from: scout.dates.create(selectionRange.from),
-    to: scout.dates.create(selectionRange.to)
+    from: scout.dates.parseJsonDate(selectionRange.from),
+    to: scout.dates.parseJsonDate(selectionRange.to)
   };
 };
 

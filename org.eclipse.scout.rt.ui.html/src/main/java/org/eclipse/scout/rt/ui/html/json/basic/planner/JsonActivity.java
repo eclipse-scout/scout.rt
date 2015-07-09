@@ -35,7 +35,6 @@ public class JsonActivity implements IJsonObject {
     json.put("foregroundColor", m_activity.getForegroundColor());
     json.put("level", m_activity.getLevel());
     json.put("levelColor", m_activity.getLevelColor());
-    json.put("durationMinutes", m_activity.getDurationMinutes());
     json.put("tooltipText", m_activity.getTooltipText());
     json.put("cssClass", m_activity.getCssClass());
     JsonObjectUtility.filterDefaultValues(json, "Activity");

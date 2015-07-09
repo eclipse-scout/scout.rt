@@ -87,7 +87,7 @@ scout.Calendar.prototype.init = function(model, session) {
 };
 
 scout.Calendar.prototype._syncSelectedDate = function(dateString) {
-  this.selectedDate = scout.dates.create(dateString);
+  this.selectedDate = scout.dates.parseJsonDate(dateString);
   this._yearPanel.selectDate(this.selectedDate);
 };
 
@@ -98,8 +98,8 @@ scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
   this.viewRange = new scout.Range(
-    scout.dates.create(viewRange.from),
-    scout.dates.create(viewRange.to));
+    scout.dates.parseJsonDate(viewRange.from),
+    scout.dates.parseJsonDate(viewRange.to));
 };
 
 scout.Calendar.prototype._render = function($parent) {
