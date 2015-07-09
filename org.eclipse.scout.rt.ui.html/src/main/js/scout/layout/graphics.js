@@ -41,6 +41,12 @@ scout.graphics = {
       newHeight = 'auto';
       useCssSize = useCssSize !== undefined ? useCssSize : false;
 
+    // Return 0/0 if element is not displayed (display: none).
+    // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
+    if ($elem.isDisplayNone()) {
+      return new scout.Dimension(0, 0);
+    }
+
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
     if (useCssSize) {

@@ -268,6 +268,10 @@
     return this;
   };
 
+  $.fn.isDisplayNone = function() {
+    return this.css('display') === 'none';
+  };
+
   $.fn.icon = function(iconId) {
     var icon, $icon = this.data('$icon');
     if (iconId) {
