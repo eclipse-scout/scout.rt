@@ -23,7 +23,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   }
 
   gbBodySize = containerSize.subtract(htmlGbBody.getMargins());
-  gbBodySize.height -= this._titleHeight($container);
+  gbBodySize.height -= this._titleHeight();
   gbBodySize.height -= menuBarSize.height;
 
   if ($pseudoStatus.isVisible()) {
@@ -59,13 +59,13 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
     prefSize = new scout.Dimension(0, 0);
   }
   prefSize = prefSize.add(htmlContainer.getInsets());
-  prefSize.height += scout.graphics.prefSize(this._groupBox._$groupBoxTitle, true).height;
+  prefSize.height += this._titleHeight();
 
   return prefSize;
 };
 
-scout.GroupBoxLayout.prototype._titleHeight = function($container) {
-  return scout.graphics.getVisibleSize(this._groupBox._$groupBoxTitle, true).height;
+scout.GroupBoxLayout.prototype._titleHeight = function() {
+  return scout.graphics.prefSize(this._groupBox._$groupBoxTitle, true).height;
 };
 
 /**
