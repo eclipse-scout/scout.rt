@@ -235,6 +235,8 @@ public class JsonResponse {
       json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
       if (m_error) {
+        // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the card coded string
+        // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.sendJsonSessionTimeout(HttpServletResponse)
         JSONObject jsonError = JsonObjectUtility.newOrderedJSONObject();
         jsonError.put(PROP_ERROR_CODE, m_errorCode);
         jsonError.put(PROP_ERROR_MESSAGE, m_errorMessage);

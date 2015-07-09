@@ -23,6 +23,11 @@ scout.login = {
     return new scout.Texts(translations[language]);
   },
 
+  /**
+   * opts:
+   * - redirectUrl: URL to redirect to after successful login
+   * - prepareRedirectUrl: function(s) that is called on the redirectUrl before opening it
+   */
   init: function(opts) {
     this.options = opts || {};
     var texts = scout.login.initTexts();
@@ -76,16 +81,9 @@ scout.login = {
       var url = this.options.redirectUrl;
       if (!url) {
         url = (window.location.href || '').trim();
-        // Remove everything after the last '/', e.g. things like 'login.html'.
-        // Do nothing string already ends with '/' or when the last '/' belongs to the protocol part.
-        var lastSlashPos = url.lastIndexOf('/');
-        if (lastSlashPos != (url.length - 1) && lastSlashPos > url.lastIndexOf('://') + 2) {
-          url = url.substring(0, lastSlashPos + 1);
-        }
-        if (url.match(/.*:\/+$/)) {
-          // If only the protocol:// remains, calculation failed. Don't use that URL.
-          url = null;
-        }
+        var prepareRedirectUrlFunc = this.options.prepareRedirectUrlFunc || prepareRedirectUrl;
+        // Remove login.html and everything after it from the URL
+        url = prepareRedirectUrlFunc(url);
       }
 
       // Go to target URL
@@ -109,6 +107,15 @@ scout.login = {
         this.$user.one('input.resetLoginError', resetButtonText.bind(this));
         this.$password.one('input.resetLoginError', resetButtonText.bind(this));
       }.bind(this), 300);
+    }
+
+    function prepareRedirectUrl(url) {
+      var urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart
+      var filteredBaseUrl = urlParts[1]
+        .replace(/login.html$/, '')
+        .replace(/login$/, '')
+        .replace(/logout$/, '');
+      return filteredBaseUrl + (urlParts[2] ? urlParts[2] : '') + (urlParts[3] ? urlParts[3] : '');
     }
 
     function resetButtonText() {
