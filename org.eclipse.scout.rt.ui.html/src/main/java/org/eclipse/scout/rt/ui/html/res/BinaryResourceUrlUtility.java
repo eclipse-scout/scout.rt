@@ -43,6 +43,13 @@ public class BinaryResourceUrlUtility {
    */
   public static final Pattern BINARY_RESOURCE_REGEX_PATTERN = Pattern.compile("([\"'])binaryResource:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
 
+  /**
+   * Pattern to determine if the provided url path is a dynamic resource path.
+   *
+   * @see #createDynamicAdapterResourceUrl(IJsonAdapter, String)
+   */
+  public static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/dynamic/([^/]*)/([^/]*)/(.*)$");
+
   // FIXME AWE: (font icons) extend syntax for icon-ID so a font-name can be configured
   // font:[char] --> uses default scoutIcons.ttf (CSS class .font-icon)
   // font.crm:[char] --> uses crmIcons.ttf (CSS class .crm-font-icon)
@@ -94,6 +101,7 @@ public class BinaryResourceUrlUtility {
    *         {@link ResourceRequestInterceptor#loadDynamicAdapterResource(javax.servlet.http.HttpServletRequest, String)}
    *         <p>
    *         The calling adapter must implement {@link IBinaryResourceProvider}
+   * @see #PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH
    */
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {
     if (jsonAdapter == null) {
@@ -106,7 +114,16 @@ public class BinaryResourceUrlUtility {
     if (filename == null) {
       return null;
     }
-    return "dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + IOUtility.urlEncode(filename);
+
+    String encodedFilename = IOUtility.urlEncode(filename);
+    // / was encoded by %2F, revert this encoding otherwise filename doesn't look nice in browser download
+    // Example for filesnames containing a /:
+    // - relative reference from a unzipped zip file
+    // - another path segment was explicitly added to distinguish between same filenames
+    encodedFilename = encodedFilename.replace("%2F", "/");
+
+    // do not change this dynamic resource url format without updating the recognition pattern (@see in JavaDoc)
+    return "dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + encodedFilename;
   }
 
   /**

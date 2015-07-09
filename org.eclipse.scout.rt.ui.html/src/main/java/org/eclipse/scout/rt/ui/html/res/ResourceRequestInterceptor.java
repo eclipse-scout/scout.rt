@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,6 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   private static final String UTF_8 = "UTF-8";
-  private static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/dynamic/([^/]*)/([^/]*)/(.*)$");
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -246,7 +244,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
    * The pathInfo is expected to have the following form: <code>/dynamic/[uiSessionId]/[adapterId]/[filename]</code>
    */
   protected HttpCacheObject loadDynamicAdapterResource(UiServlet servlet, HttpServletRequest req, String pathInfo) {
-    Matcher m = PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
+    Matcher m = BinaryResourceUrlUtility.PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
     if (!m.matches()) {
       return null;
     }

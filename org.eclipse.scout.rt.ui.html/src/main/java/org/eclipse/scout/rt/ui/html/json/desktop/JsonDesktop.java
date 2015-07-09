@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
@@ -53,6 +54,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   public static final String PROP_MESSAGE_BOX = "messageBox";
   public static final String PROP_FILE_CHOOSER = "fileChooser";
   public static final String PROP_ACTIVE_FORM = "activeForm";
+
+  private static final AtomicLong RESOURCE_COUNTER = new AtomicLong();
 
   private final DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
@@ -225,9 +228,15 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
    * downloaded resource or if the download is processed in the same window as the Scout application.
    */
   protected void handleModelDownloadResource(IDownloadHandler handler) {
-    String fileName = handler.getResource().getFilename();
-    m_downloads.put(fileName, handler);
-    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, fileName);
+    String filename = handler.getResource().getFilename();
+
+    // add another path segment to filename to distinguish between different resources
+    // with the same filename
+    long counter = RESOURCE_COUNTER.getAndIncrement();
+    filename = counter + "/" + filename;
+
+    m_downloads.put(filename, handler);
+    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filename);
     handleModelOpenUri(downloadUrl, TargetWindow.BLANK); // FIXME AWE: (from imo) AUTO causes in
   }
 
