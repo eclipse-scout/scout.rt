@@ -160,12 +160,15 @@ scout.Planner.prototype._navigateDate = function(direction) {
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
   } else if (this.displayMode == DISPLAY_MODE.WEEK || this.displayMode == DISPLAY_MODE.WORK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
+    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
   } else if (this.displayMode == DISPLAY_MODE.MONTH) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
+    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode == DISPLAY_MODE.CALENDAR_WEEK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
+    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode == DISPLAY_MODE.YEAR) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
@@ -529,12 +532,27 @@ scout.Planner.prototype._renderResources = function(resources) {
   }
 };
 
+scout.Planner.prototype._rerenderActivities = function(resources) {
+  resources = resources || this.resources;
+  resources.forEach(function(resource) {
+    this._removeActivititesForResource(resource);
+    this._renderActivititesForResource(resource);
+  }, this);
+};
+
 scout.Planner.prototype._build$Resource = function(resource) {
-  var i, $activity,
-    $resource = $.makeDiv('planner-resource');
+  var $resource = $.makeDiv('planner-resource');
   $resource.appendDiv('resource-title')
     .text(resource.resourceCell.text);
-  var $cells = $resource.appendDiv('resource-cells');
+  resource.$cells = $resource.appendDiv('resource-cells');
+  this._renderActivititesForResource(resource);
+  $resource.data('resource', resource);
+  resource.$resource = $resource;
+  return $resource;
+};
+
+scout.Planner.prototype._renderActivititesForResource = function(resource) {
+  var $activity;
   resource.activities.forEach(function(activity) {
     if (activity.beginTime.valueOf() > this.endScale ||
         activity.endTime.valueOf() < this.beginScale) {
@@ -542,11 +560,17 @@ scout.Planner.prototype._build$Resource = function(resource) {
       return;
     }
     $activity = this._build$Activity(activity);
-    $activity.appendTo($cells);
+    $activity.appendTo(resource.$cells);
   }, this);
-  $resource.data('resource', resource);
-  resource.$resource = $resource;
-  return $resource;
+};
+
+scout.Planner.prototype._removeActivititesForResource = function(resource) {
+  resource.activities.forEach(function(activity) {
+    if (activity.$activity) {
+      activity.$activity.remove();
+      activity.$activity = null;
+    }
+  }, this);
 };
 
 scout.Planner.prototype._build$Activity = function(activity) {
@@ -1018,6 +1042,7 @@ scout.Planner.prototype.setViewRange = function(viewRange) {
 
   if (this.rendered) {
     this._renderViewRange();
+    this._rerenderActivities();
     this.validateLayoutTree();
   }
 };

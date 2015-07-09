@@ -119,6 +119,28 @@ describe("scout.dates", function() {
 
   });
 
+  describe("shiftToNextDayOfType", function() {
+
+    it("shifts to next day of type", function() {
+      var date = scout.dates.create('2015-07-09');
+      expect(scout.dates.shiftToNextDayOfType(date, 1).toISOString()).toBe(scout.dates.create('2015-07-13 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2015-07-09');
+      expect(scout.dates.shiftToNextDayOfType(date, 6).toISOString()).toBe(scout.dates.create('2015-07-11 00:00:00.000').toISOString());
+    });
+  });
+
+  describe("shiftToPreviousDayOfType", function() {
+
+    it("shifts to previous day of type", function() {
+      var date = scout.dates.create('2015-07-09');
+      expect(scout.dates.shiftToPreviousDayOfType(date, 1).toISOString()).toBe(scout.dates.create('2015-07-06 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2015-07-09');
+      expect(scout.dates.shiftToPreviousDayOfType(date, 6).toISOString()).toBe(scout.dates.create('2015-07-04 00:00:00.000').toISOString());
+    });
+  });
+
   describe("isSameDay", function() {
     it("returns true if day, month and year matches", function() {
       var date = scout.dates.create('2014-11-21');

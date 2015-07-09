@@ -158,20 +158,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
-    //FIXME CGU remove
-//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_WORK_DAY_COUNT, model) {
-//      @Override
-//      protected Integer modelValue() {
-//        return getModel().getWorkDayCount();
-//      }
-//    });
-    //FIXME CGU not part of planner mode?
-//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_WORK_DAYS_ONLY, model) {
-//      @Override
-//      protected Boolean modelValue() {
-//        return getModel().isWorkDaysOnly();
-//      }
-//    });
     //FIXME CGU needed?
 //    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_FIRST_HOUR_OF_DAY, model) {
 //      @Override

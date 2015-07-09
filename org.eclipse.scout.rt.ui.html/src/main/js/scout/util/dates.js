@@ -27,6 +27,36 @@ scout.dates = {
     return newDate;
   },
 
+  shiftToNextDayOfType: function(date, day) {
+    var diff = day - date.getDay();
+
+    if (diff <= 0) {
+      diff += 7;
+    }
+    return scout.dates.shift(date, 0, 0, diff);
+  },
+
+  shiftToPreviousDayOfType: function(date, day) {
+    var diff = day - date.getDay();
+
+    if (diff >= 0) {
+      diff -= 7;
+    }
+    return scout.dates.shift(date, 0, 0, diff);
+  },
+
+  shiftToNextOrPrevDayOfType: function(date, day, direction) {
+    if (direction > 0) {
+      return scout.dates.shiftToNextDayOfType(date, day);
+    } else {
+      return scout.dates.shiftToPreviousDayOfType(date, day);
+    }
+  },
+
+  shiftToNextOrPrevMonday: function(date, direction) {
+    return scout.dates.shiftToNextOrPrevDayOfType(date, 1, direction);
+  },
+
   isSameDay: function(date, date2) {
     return date.getFullYear() === date2.getFullYear() &&
       date.getMonth() === date2.getMonth() &&
