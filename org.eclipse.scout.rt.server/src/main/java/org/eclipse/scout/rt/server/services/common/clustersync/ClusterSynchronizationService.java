@@ -260,7 +260,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     m_messageService.publishNotifications(messages);
     for (IClusterNotificationMessage im : messages) {
       getStatusInfoInternal().updateSentStatus(im);
-      getStatusInfoInternal(im.getClass()).updateReceiveStatus(im);
+      getStatusInfoInternal(im.getNotification().getClass()).updateReceiveStatus(im);
     }
   }
 
@@ -281,7 +281,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       }
 
       getStatusInfoInternal().updateReceiveStatus(message);
-      getStatusInfoInternal(message.getClass()).updateReceiveStatus(message);
+      getStatusInfoInternal(message.getNotification().getClass()).updateReceiveStatus(message);
 
       ServerRunContext serverRunContext = ServerRunContexts.empty();
       serverRunContext.subject(m_subject);
