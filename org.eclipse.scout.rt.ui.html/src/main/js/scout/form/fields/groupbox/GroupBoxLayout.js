@@ -61,6 +61,14 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
   prefSize = prefSize.add(htmlContainer.getInsets());
   prefSize.height += this._titleHeight();
 
+  // predefined height or width in pixel override other values
+  if (this._groupBox.gridData && this._groupBox.gridData.widthInPixel) {
+    prefSize.width = this._groupBox.gridData.widthInPixel;
+  }
+  if (this._groupBox.gridData && this._groupBox.gridData.heightInPixel) {
+    prefSize.height = this._groupBox.gridData.heightInPixel;
+  }
+
   return prefSize;
 };
 
