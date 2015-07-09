@@ -164,7 +164,7 @@
   /* 1px smaller than the taskbar because of the bottom border */
   height: @desktop-taskbar-height - 1px;
   width: 220px;
-  padding: 6px 20px 0 20px;
+  padding: 6px 10px 0 20px;
   cursor: pointer;
   background-color: @panel-background-color;
   color: @text-color;
