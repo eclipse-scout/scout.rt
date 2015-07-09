@@ -66,7 +66,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  * This class is not thought to directly subclass. Use {@link AbstractSmartField} or {@link AbstractProposalField}
@@ -813,14 +812,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return (IProposalChooser<?, LOOKUP_KEY>) propertySupport.getProperty(PROP_PROPOSAL_CHOOSER);
   }
 
-  // FIXME AWE: (post-swing) remove if/else when swing client is no more. The new web-client has no browse_all logic in its UI facade.
   protected String toSearchText(String text) {
-    if (UserAgentUtility.isWebClient()) {
-      return StringUtility.isNullOrEmpty(text) ? IContentAssistField.BROWSE_ALL_TEXT : text;
-    }
-    else {
-      return text;
-    }
+    return StringUtility.isNullOrEmpty(text) ? IContentAssistField.BROWSE_ALL_TEXT : text;
   }
 
   @Override

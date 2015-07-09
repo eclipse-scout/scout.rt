@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  *
@@ -85,7 +84,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         }
       }
     }
-    html = html.replace("#FONT_SIZE_UNIT#", UserAgentUtility.getFontSizeUnit());
+    html = html.replace("#FONT_SIZE_UNIT#", "px");
     html = html.replace("#TOP#", topPart);
     html = html.replace("#LIST#", listPart.toString());
     html = html.replace("#BOTTOM#", bottomPart);
@@ -112,7 +111,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     appendHtmlForSpacerLine(buf, spacerCssClass, 7, AbstractWizardStatusField.STEP_ANCHOR_IDENTIFIER + index);
     buf.append("<tr class=\"" + cssClass + "\">\n");
     buf.append(" <td width=\"15\"><img src=\"binaryResource:empty.png\" width=\"1\" height=\"30\"></td>\n");
-    buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:0px;padding-top:" + (UserAgentUtility.isRichClient() ? "4" : "5") + "px;\">" + index + "</td>\n");
+    buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:0px;padding-top:5px;\">" + index + "</td>\n");
     buf.append(" <td width=\"17\"></td>\n");
     buf.append(" <td style=\"padding-top:2px;\">" + StringUtility.nvl(step.getTitleHtml(), step.getTitle()) + "</td>\n");
     buf.append(" <td width=\"15\"></td>\n");

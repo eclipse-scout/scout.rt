@@ -24,14 +24,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
+// FIXME AWE: (table) check how we can solve this with Html UI
 public class CopyWidthsOfColumnsMenu extends AbstractMenu {
 
   public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";
   private final ITable m_table;
 
-  // FIXME AWE: (table) call 'copy column widths' menu from html UI
   public CopyWidthsOfColumnsMenu(ITable table) {
     m_table = table;
   }
@@ -54,7 +53,7 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
   @Override
   protected void execInitAction() throws ProcessingException {
     // This menu is only visible in development mode and not in the web client
-    setVisible(Platform.get().inDevelopmentMode() && !UserAgentUtility.isWebClient());
+    setVisible(Platform.get().inDevelopmentMode());
   }
 
   /**

@@ -37,14 +37,6 @@ public final class UserAgentUtility {
     return getCurrentUiDeviceType().isTouchDevice();
   }
 
-  public static boolean isWebClient() {
-    return getCurrentUiLayer().isWebUi();
-  }
-
-  public static boolean isRichClient() {
-    return !isWebClient();
-  }
-
   public static IUiDeviceType getCurrentUiDeviceType() {
     return getCurrentUserAgent().getUiDeviceType();
   }
@@ -62,11 +54,6 @@ public final class UserAgentUtility {
       LOG.warn("No UserAgent in calling context found; using default UserAgent");
       return UserAgent.createDefault();
     }
-  }
-
-  // FIXME BSH: (UiLayer) remove this method when wizard refactoring is done
-  public static String getFontSizeUnit() {
-    return isWebClient() ? "px" : "pt";
   }
 
 }

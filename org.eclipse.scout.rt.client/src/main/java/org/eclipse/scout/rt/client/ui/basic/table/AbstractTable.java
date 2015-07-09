@@ -77,14 +77,12 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -96,14 +94,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IContentAssistColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.AddCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ModifyCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.RemoveCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -128,7 +121,6 @@ import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  * Columns are defined as inner classes<br>
@@ -822,27 +814,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          the end.
    */
   protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
-    // FIXME AWE/CGU: (post-swing, table) temporary solution for parallel development of Swing/Html UI
-    // when Html UI development is completed, we must remove this if/else, delete all menu
-    // implementations. Only the TableOrganizeMenu should remain.
-    if (UserAgentUtility.isWebClient()) {
-      menus.addLast(new TableOrganizeMenu(this));
-    }
-    else {
-      if (getTableCustomizer() != null) {
-        menus.addLast(new AddCustomColumnMenu(this));
-        menus.addLast(new ModifyCustomColumnMenu(this));
-        menus.addLast(new RemoveCustomColumnMenu(this));
-      }
-      if (menus.size() > 0) {
-        menus.addLast(new MenuSeparator());
-      }
-      menus.addLast(new ResetColumnsMenu(this));
-      menus.addLast(new OrganizeColumnsMenu(this));
-      menus.addLast(new ColumnFilterMenu(this));
-      menus.addLast(new CopyWidthsOfColumnsMenu(this));
-      menus.addLast(new MenuSeparator());
-    }
+    menus.addLast(new TableOrganizeMenu(this));
+    menus.addLast(new CopyWidthsOfColumnsMenu(this));
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {

@@ -97,7 +97,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  * The desktop model (may) consist of
@@ -1398,12 +1397,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void downloadResource(IDownloadHandler handler) {
-    if (UserAgentUtility.isWebClient()) {
-      fireDownloadResource(handler);
-    }
-    else {
-      throw new UnsupportedOperationException("downloadResource is only supported by Html UI");
-    }
+    fireDownloadResource(handler);
   }
 
   @Override
