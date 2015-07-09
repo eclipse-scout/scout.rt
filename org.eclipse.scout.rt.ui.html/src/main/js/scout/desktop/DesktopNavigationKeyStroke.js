@@ -16,6 +16,7 @@ scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
   }
   event.preventDefault();
 };
+
 /**
  * @Override scout.KeyStroke
  */
@@ -41,7 +42,6 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
     return;
   }
   if (!drawedKeys.F2) {
-    // FIXME NBU/AWE: hier brauchen wir den ViewMenuButton (keyStroke hartcodiert?)
     scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F2', this._desktopNavigation.viewMenuTab.$container, this.ctrl, this.alt, this.shift);
     drawedKeys.F2 = true;
     var $icon = this._desktopNavigation.viewMenuTab.$container.find('.icon');
@@ -55,6 +55,7 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
   }
   this.keyBoxDrawed = true;
 };
+
 /**
  * @Override scout.KeyStroke
  */

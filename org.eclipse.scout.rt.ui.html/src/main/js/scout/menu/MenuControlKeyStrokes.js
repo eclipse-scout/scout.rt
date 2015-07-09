@@ -1,36 +1,38 @@
 scout.MenuControlKeyStrokes = function(popup, menuItemClass) {
   scout.MenuControlKeyStrokes.parent.call(this);
-  this.drawHint = true;
   this._popup = popup;
+  this._menuItemClass = menuItemClass;
+  this.drawHint = true;
   this.initKeyStrokeParts();
-  this._menuItemClass=menuItemClass;
 };
 scout.inherits(scout.MenuControlKeyStrokes, scout.KeyStroke);
+
 /**
- * @Override scout.KeyStroke
+ * @override scout.KeyStroke
  */
 scout.MenuControlKeyStrokes.prototype.handle = function(event) {
-  var $menuItems = this._popup.$body.find('.'+this._menuItemClass);
-  var $selectedMenuItem = this._popup.$body.find('.'+this._menuItemClass+'.selected');
-  var keycode = event.which;
-  var $newSelection;
+  var $newSelection,
+    keycode = event.which,
+    $menuItems = this._popup.$body.find('.' + this._menuItemClass),
+    $selectedMenuItem = this._popup.$body.find('.' + this._menuItemClass + '.selected');
+
   if ((keycode === scout.keys.SPACE || keycode === scout.keys.ENTER) && $selectedMenuItem.length > 0) {
     $selectedMenuItem.trigger('click');
   }
-  // up: move up
+  // move up
   if (keycode === scout.keys.UP) {
     if ($selectedMenuItem.length > 0) {
-      $newSelection = $selectedMenuItem.first().prev();
+      $newSelection = $selectedMenuItem.prevAll(':visible').first();
     } else {
       $newSelection = $menuItems.first();
     }
     this._changeSelection($selectedMenuItem, $newSelection);
   }
 
-  // down: move down
+  // move down
   if (keycode === scout.keys.DOWN) {
     if ($selectedMenuItem.length > 0) {
-      $newSelection = $selectedMenuItem.first().next();
+      $newSelection = $selectedMenuItem.nextAll(':visible').first();
     } else {
       $newSelection = $menuItems.first();
     }
@@ -41,32 +43,32 @@ scout.MenuControlKeyStrokes.prototype.handle = function(event) {
 
 scout.MenuControlKeyStrokes.prototype._changeSelection = function($oldItem, $newItem) {
   if ($newItem.length === 0) {
-    //do not change selection
+    // do not change selection
     return;
   } else {
-    $newItem.addClass('selected');
-    $newItem.focus();
+    $newItem.select(true).focus();
   }
-
   if ($oldItem.length > 0) {
-    $oldItem.removeClass('selected');
+    $oldItem.select(false);
   }
 };
+
 /**
- * @Override scout.KeyStroke
+ * @override scout.KeyStroke
  */
 scout.MenuControlKeyStrokes.prototype._drawKeyBox = function($container, drawedKeys) {
-
+  // NOP
 };
 
 /**
- * @Override scout.KeyStroke
+ * @override scout.KeyStroke
  */
 scout.MenuControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   this._drawKeyBox($container, drawedKeys);
 };
+
 /**
- * @Override scout.KeyStroke
+ * @override scout.KeyStroke
  */
 scout.MenuControlKeyStrokes.prototype.accept = function(event) {
   return event &&
