@@ -154,15 +154,14 @@ scout.Device.prototype.getUnselectableAttribute = function() {
  */
 scout.Device.prototype.isTableAdditionalDivRequired = function() {
   return this.supportsFeature('_tableAdditionalDivRequired',  function(property) {
-    var test = document.createElement('div');
-    test.textContent = 'Scout',
-    test.style.visibility = 'hidden';
-    test.style.display = 'table-cell';
-    test.style.maxWidth = '1px';
-    test.style.overflow = 'hidden';
-    document.body.appendChild(test);
-    var result = test.clientWidth > 1;
-    document.body.removeChild(test);
+    var test = $('body').appendDiv();
+    test.text('Scout');
+    test.css('visibility', 'hidden');
+    test.css('display', 'table-cell');
+    test.css('max-width', '1px');
+    test.css('overflow', 'hidden');
+    var result = test.width() > 1;
+    test.remove();
     return result;
   }.bind(this));
 };
