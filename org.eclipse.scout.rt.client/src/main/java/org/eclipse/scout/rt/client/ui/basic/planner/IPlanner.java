@@ -38,14 +38,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_SELECTION_RANGE = "selectionRange";
 
   /**
-   * {@link Integer}
-   */
-  String PROP_WORK_DAY_COUNT = "workDayCount";
-  /**
-   * {@link Boolean}
-   */
-  String PROP_WORK_DAYS_ONLY = "workDaysOnly";
-  /**
    * {@link Date}
    */
   String PROP_FIRST_HOUR_OF_DAY = "firstHourOfDay";
@@ -143,14 +135,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   void setViewRange(Date viewDateStart, Date viewDateEnd);
 
   void setViewRange(Range<Date> dateRange);
-
-  int getWorkDayCount();
-
-  void setWorkDayCount(int n);
-
-  boolean isWorkDaysOnly();
-
-  void setWorkDaysOnly(boolean b);
 
   /**
    * @return the first hour of a day<br>

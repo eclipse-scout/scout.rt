@@ -138,18 +138,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         DISPLAY_MODE_YEAR);
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(20)
-  protected int getConfiguredWorkDayCount() {
-    return 5;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(30)
-  protected boolean getConfiguredWorkDaysOnly() {
-    return false;
-  }
-
   /**
    * Configures the first hour of the day. A value of <code>8</code> will be considered as 8 a.m. - 9 a.m. , so that the
    * first entry can start at 8 a.m. The very first possible value is <code>0</code> which is considered as 12 a.m.
@@ -221,17 +209,23 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         to.add(Calendar.DAY_OF_WEEK, 1);
         break;
       case IPlanner.DISPLAY_MODE_WEEK:
-        from.set(Calendar.DAY_OF_WEEK, from.getFirstDayOfWeek());
+        from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.DAY_OF_WEEK, 7);
         break;
       case IPlanner.DISPLAY_MODE_WORKWEEK:
         from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.DAY_OF_WEEK, 5);
         break;
       case IPlanner.DISPLAY_MODE_MONTH:
+        from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.MONTH, 2);
         break;
       case IPlanner.DISPLAY_MODE_CALENDAR_WEEK:
+        from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        to.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         to.add(Calendar.MONTH, 9);
         break;
       case IPlanner.DISPLAY_MODE_YEAR:
@@ -306,8 +300,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setDisplayMode(getConfiguredDisplayMode());
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
-    setWorkDayCount(getConfiguredWorkDayCount());
-    setWorkDaysOnly(getConfiguredWorkDaysOnly());
     setFirstHourOfDay(getConfiguredFirstHourOfDay());
     setIntradayInterval(getConfiguredIntradayInterval());
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
@@ -854,29 +846,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public int getWorkDayCount() {
-    return propertySupport.getPropertyInt(PROP_WORK_DAY_COUNT);
-  }
-
-  @Override
-  public void setWorkDayCount(int n) {
-    if (n < 1 || n > 6) {
-      return;// ignore it
-    }
-    propertySupport.setPropertyInt(PROP_WORK_DAY_COUNT, n);
-  }
-
-  @Override
-  public boolean isWorkDaysOnly() {
-    return propertySupport.getPropertyBool(PROP_WORK_DAYS_ONLY);
-  }
-
-  @Override
-  public void setWorkDaysOnly(boolean b) {
-    propertySupport.setPropertyBool(PROP_WORK_DAYS_ONLY, b);
-  }
-
-  @Override
   public int getFirstHourOfDay() {
     return propertySupport.getPropertyInt(PROP_FIRST_HOUR_OF_DAY);
   }
@@ -1027,8 +996,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {
