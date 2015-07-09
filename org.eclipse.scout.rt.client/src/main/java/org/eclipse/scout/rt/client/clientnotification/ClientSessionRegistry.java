@@ -20,24 +20,20 @@ import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  *
@@ -46,27 +42,12 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistry.class);
 
   protected final Subject NOTIFICATION_SUBJECT = CONFIG.getPropertyValue(NotificationSubjectProperty.class);
-  private FinalValue<IClientSession> m_notificationSession = new FinalValue<>();
 
   private Object m_cacheLock = new Object();
   private final Map<String /*sessionId*/, WeakReference<IClientSession>> m_sessionIdToSession = new HashMap<>();
   private final Map<String /*userId*/, List<WeakReference<IClientSession>>> m_userToSessions = new HashMap<>();
 
   private final ISessionListener m_clientSessionStateListener = new P_ClientSessionStateListener();
-
-  @Override
-  public IClientSession getNotificationSession() {
-    if (m_notificationSession.getValue() == null) {
-      ClientRunContext ctx = ClientRunContexts.empty().subject(NOTIFICATION_SUBJECT).userAgent(UserAgent.createDefault());
-      try {
-        m_notificationSession.setValue(BEANS.get(ClientSessionProvider.class).provide(ctx));
-      }
-      catch (ProcessingException e) {
-        LOG.error("Could not create client notification session.");
-      }
-    }
-    return m_notificationSession.getValue();
-  }
 
   @Override
   public void register(IClientSession session, String sessionId) {
@@ -93,7 +74,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     session.removeListener(m_clientSessionStateListener);
     // unregister user remote
     try {
-      ClientRunContexts.empty().session(getNotificationSession(), true).subject(NOTIFICATION_SUBJECT).run(new IRunnable() {
+      RunContexts.empty().subject(NOTIFICATION_SUBJECT).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).unregisterSession(NOTIFICATION_NODE_ID);
@@ -116,9 +97,6 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
    * @throws ProcessingException
    */
   public void sessionStarted(final IClientSession session) {
-    if (m_notificationSession.getValue() == null) {
-      return;
-    }
 
     LOG.debug(String.format("client session [sessionid=%s, userId=%s] started", session.getId(), session.getUserId()));
     // lookup the userid remote because the user is not necessarily set on the client session.
@@ -152,7 +130,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     }
     // register on backend
     try {
-      ClientRunContexts.empty().session(getNotificationSession(), true).subject(NOTIFICATION_SUBJECT).run(new IRunnable() {
+      RunContexts.empty().subject(NOTIFICATION_SUBJECT).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).registerSession(NOTIFICATION_NODE_ID, session.getId(), session.getUserId());
