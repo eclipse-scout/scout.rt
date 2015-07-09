@@ -124,10 +124,14 @@ scout.scrollbars = {
     function doUpdate() {
       // Reset the scrollbars first to make sure they don't extend the scrollSize
       scrollbars.forEach(function(scrollbar) {
-        scrollbar.reset();
+        if (scrollbar.rendered) {
+          scrollbar.reset();
+        }
       });
       scrollbars.forEach(function(scrollbar) {
-        scrollbar.update();
+        if (scrollbar.rendered) {
+          scrollbar.update();
+        }
       });
     }
   },

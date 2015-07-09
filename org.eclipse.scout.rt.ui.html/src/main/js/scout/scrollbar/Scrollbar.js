@@ -17,22 +17,31 @@ scout.Scrollbar = function(options) {
   this._scrollSize;
   this._offsetSize;
   this._addEventSupport();
+
+  this._onScrollWheelHandler = this._onScrollWheel.bind(this);
+  this._onScrollHandler = this._onScroll.bind(this);
+  this._onScrollbarMousedownHandler = this._onScrollbarMousedown.bind(this);
+  this._onThumbMousedownHandler = this._onThumbMousedown.bind(this);
+  this._onThumbMousemoveHandler = this._onThumbMousemove.bind(this);
+  this._onThumbMouseupHandler = this._onThumbMouseup.bind(this);
+  this._fixScrollbarHandler = this._fixScrollbar.bind(this);
+  this._unfixScrollbarHandler = this._unfixScrollbar.bind(this);
 };
 scout.inherits(scout.Scrollbar, scout.Widget);
 
 scout.Scrollbar.prototype._render = function($parent) {
-  var begin = 0;
+  this._begin = 0;
 
   this._$parent = $parent;
-  this._$scrollbar = $parent.appendDiv('scrollbar')
+  this.$container = $parent.appendDiv('scrollbar')
     .addClass(this.axis + '-axis');
-  this._$thumb = this._$scrollbar.appendDiv('scrollbar-thumb')
+  this._$thumb = this.$container.appendDiv('scrollbar-thumb')
     .addClass(this.axis + '-axis');
   if (this.invertColors) {
     this._$thumb.addClass('inverted');
   }
   if (this.borderless) {
-    this._$scrollbar.addClass('borderless');
+    this.$container.addClass('borderless');
   }
 
   this._dim = this.axis === 'x' ? 'Width' : 'Height';
@@ -40,71 +49,96 @@ scout.Scrollbar.prototype._render = function($parent) {
   this._dirReverse = this.axis === 'x' ? 'right' : 'bottom';
   this._scrollDir = this.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
-  // event handling
-  $parent.on('DOMMouseScroll mousewheel', '', scrollWheel.bind(this))
-    .on('scroll', this.update.bind(this));
-  $parent.data('scrollbars').forEach(function(scrollbar) {
-    scrollbar.on('scrollstart', this._fixScrollbar.bind(this));
-    scrollbar.on('scrollend', this._unfixScrollbar.bind(this));
-  }, this);
-  this._$scrollbar.on('mousedown', onScrollbarMousedown.bind(this));
-  this._$thumb.on('mousedown', '', onThumbMousedown.bind(this));
+  // Install listeners
+  $parent
+    .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
+    .on('scroll', this._onScrollHandler)
+    .data('scrollbars').forEach(function(scrollbar) {
+      scrollbar.on('scrollstart', this._fixScrollbarHandler);
+      scrollbar.on('scrollend', this._unfixScrollbarHandler);
+    }.bind(this));
+  this.$container.on('mousedown', this._onScrollbarMousedownHandler);
+  this._$thumb.on('mousedown', this._onThumbMousedownHandler);
+};
 
-  function scrollWheel(event) {
-    var w, d;
-    if (event.ctrlKey) {
-      return true; // allow ctrl + mousewheel to zoom the page
-    }
-    if (this.mouseWheelNeedsShift !== event.shiftKey) {
-      // only scroll if shift modifier matches
-      return true;
-    }
-    event = event.originalEvent || window.event.originalEvent;
-    w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
-    d = this._scrollSize / this._offsetSize;
-
-    this.trigger('scrollstart');
-    this.scroll(w / d);
-    this.trigger('scrollend');
-    return false;
+scout.Scrollbar.prototype._onScrollWheel = function(event) {
+  var w, d;
+  if (event.ctrlKey) {
+    return true; // allow ctrl + mousewheel to zoom the page
   }
-
-  function onScrollbarMousedown(event) {
-    this.trigger('scrollstart');
-    scrollTo.call(this, event);
-    this.trigger('scrollend');
+  if (this.mouseWheelNeedsShift !== event.shiftKey) {
+    // only scroll if shift modifier matches
+    return true;
   }
+  event = event.originalEvent || window.event.originalEvent;
+  w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
+  d = this._scrollSize / this._offsetSize;
 
-  function onThumbMousedown(event) {
-    this.trigger('scrollstart');
-    begin = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
-    this._$thumb.addClass('scrollbar-thumb-move');
-    this._mousemoveHandler = scrollTo.bind(this);
-    $(document)
-      .on('mousemove', this._mousemoveHandler)
-      .one('mouseup', onThumbMouseup.bind(this));
-    return false;
-  }
+  this.trigger('scrollstart');
+  this.scroll(w / d);
+  this.trigger('scrollend');
+  return false;
+};
 
-  function onThumbMouseup() {
-    this._$thumb.removeClass('scrollbar-thumb-move');
-    $(document).off('mousemove', this._mousemoveHandler);
-    this.trigger('scrollend');
-    return false;
-  }
+scout.Scrollbar.prototype._onScroll = function(event) {
+  this.update();
+};
 
-  function scrollTo(event) {
-    begin = begin === 0 ? this._beginDefault : begin;
-    var end = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
-    this.scroll(end - begin);
-  }
+scout.Scrollbar.prototype._onScrollbarMousedown = function(event) {
+  this.trigger('scrollstart');
+  this._scrollTo(event);
+  this.trigger('scrollend');
+};
+
+scout.Scrollbar.prototype._onThumbMousedown = function(event) {
+  this.trigger('scrollstart');
+  this._begin = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
+  this._$thumb.addClass('scrollbar-thumb-move');
+  $(document)
+    .on('mousemove', this._onThumbMousemoveHandler)
+    .one('mouseup', this._onThumbMouseupHandler);
+  return false;
+};
+
+scout.Scrollbar.prototype._onThumbMousemove = function(event) {
+  this._scrollTo(event);
+};
+
+scout.Scrollbar.prototype._onThumbMouseup = function() {
+  this._$thumb.removeClass('scrollbar-thumb-move');
+  $(document)
+    .off('mousemove', this._onThumbMousemoveHandler);
+  this.trigger('scrollend');
+  return false;
+};
+
+scout.Scrollbar.prototype._scrollTo = function(event) {
+  var begin = this._begin === 0 ? this._beginDefault : this._begin;
+  var end = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
+  this.scroll(end - begin);
+};
+
+scout.Scrollbar.prototype._remove = function() {
+  // Uninstall listeners
+  var $parent = this._$parent;
+  $parent
+    .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
+    .off('scroll', this._onScrollHandler)
+    .data('scrollbars').forEach(function(scrollbar) {
+      scrollbar.off('scrollstart', this._fixScrollbarHandler);
+      scrollbar.off('scrollend', this._unfixScrollbarHandler);
+    }.bind(this));
+  this.$container.off('mousedown', this._onScrollbarMousedownHandler);
+  this._$thumb.off('mousedown', '', this._onThumbMousedownHandler);
+
+  scout.Scrollbar.parent.prototype._remove.call(this);
 };
 
 /**
  * do not use this internal method
  */
 scout.Scrollbar.prototype.update = function() {
-  var margin = this._$scrollbar['cssMargin' + this.axis.toUpperCase()](),
+  var margin = this.$container['cssMargin' + this.axis.toUpperCase()](),
     scrollPos = this._$parent[this._scrollDir](),
     scrollLeft = this._$parent.scrollLeft(),
     scrollTop = this._$parent.scrollTop();
@@ -127,16 +161,16 @@ scout.Scrollbar.prototype.update = function() {
 
   // show scrollbar
   if (this._offsetSize >= this._scrollSize) {
-    this._$scrollbar.css('visibility', 'hidden');
+    this.$container.css('visibility', 'hidden');
   } else {
-    this._$scrollbar.css('visibility', 'visible');
+    this.$container.css('visibility', 'visible');
   }
 
   // Position the scrollbar(s)
   if (this.updateScrollbarPos) {
     // Always update both to make sure every scrollbar (x and y) is positioned correctly
-    this._$scrollbar.cssRight(-1 * scrollLeft);
-    this._$scrollbar.cssBottom(-1 * scrollTop);
+    this.$container.cssRight(-1 * scrollLeft);
+    this.$container.cssBottom(-1 * scrollTop);
   }
 };
 
@@ -146,13 +180,13 @@ scout.Scrollbar.prototype.update = function() {
 scout.Scrollbar.prototype.reset = function() {
   this._$thumb.css(this._dim.toLowerCase(), 0);
   if (this.updateScrollbarPos) {
-    this._$scrollbar.cssRight(0);
-    this._$scrollbar.cssBottom(0);
+    this.$container.cssRight(0);
+    this.$container.cssBottom(0);
   }
 };
 
 scout.Scrollbar.prototype.scroll = function(posDiff) {
-  var scrollbarOffset = this._$scrollbar.offset(),
+  var scrollbarOffset = this.$container.offset(),
     thumbOffset = this._$thumb.offset(),
     posOld = thumbOffset[this._dir] - scrollbarOffset[this._dir],
     posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff)),
@@ -163,7 +197,7 @@ scout.Scrollbar.prototype.scroll = function(posDiff) {
   // Thumb and scrollbar would be updated by the scroll handler. To make it more fluent it is done here as well
   this._$thumb.css(this._dir, posNew);
   if (this.updateScrollbarPos) {
-    this._$scrollbar.css(this._dirReverse, -1 * scrollPos);
+    this.$container.css(this._dirReverse, -1 * scrollPos);
   }
 };
 
@@ -172,14 +206,14 @@ scout.Scrollbar.prototype.scroll = function(posDiff) {
  * This is necessary to prevent flickering in IE.
  */
 scout.Scrollbar.prototype._fixScrollbar = function() {
-  scout.scrollbars.fix(this._$scrollbar);
+  scout.scrollbars.fix(this.$container);
 };
 
 /**
  * Reverts the changes made by fixScrollbar.
  */
 scout.Scrollbar.prototype._unfixScrollbar = function() {
-  this._unfixTimeoutId = scout.scrollbars.unfix(this._$scrollbar, this._unfixTimeoutId);
+  this._unfixTimeoutId = scout.scrollbars.unfix(this.$container, this._unfixTimeoutId);
 };
 
 scout.Scrollbar.prototype.notifyBeforeScroll = function() {
