@@ -39,4 +39,9 @@ public interface IClientSessionRegistry {
    */
   List<IClientSession> getAllClientSessions();
 
+  /**
+   * @return
+   */
+  IClientSession getNotificationSession();
+
 }

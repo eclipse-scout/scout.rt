@@ -291,7 +291,9 @@ public class ServiceTunnelServlet extends HttpServlet {
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
   protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
-    return BEANS.get(ServerSessionProvider.class).<IServerSession> provide(serverRunContext, (String) serverRunContext.propertyMap().get(SESSION_ID));
+    String sessionId = (String) serverRunContext.propertyMap().get(SESSION_ID);
+    System.out.println(sessionId);
+    return BEANS.get(ServerSessionProvider.class).<IServerSession> provide(serverRunContext, sessionId);
   }
 
   // === Helper methods ===
