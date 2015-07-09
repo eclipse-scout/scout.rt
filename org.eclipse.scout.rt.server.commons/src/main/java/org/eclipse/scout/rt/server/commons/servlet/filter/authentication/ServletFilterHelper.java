@@ -148,7 +148,7 @@ public class ServletFilterHelper {
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Forwarding '{0}' to /login.html", (req).getPathInfo());
+      LOG.debug("Forwarding '{0}' to /login.html", req.getPathInfo());
     }
     req.getRequestDispatcher("/login.html").forward(req, resp);
   }

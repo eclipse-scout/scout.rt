@@ -17,6 +17,8 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 
 /**
@@ -56,11 +58,18 @@ public final class BEANS {
    * @return all instances of this type ordered by {@link Order} (never <code>null</code>)
    */
   public static <T> List<T> all(Class<T> beanClazz) {
+    return BEANS.all(beanClazz, new AlwaysFilter<T>());
+  }
+
+  /**
+   * @return all instances of this type ordered by {@link Order} (never <code>null</code>)
+   */
+  public static <T> List<T> all(Class<T> beanClazz, IFilter<T> filter) {
     List<IBean<T>> beans = Platform.get().getBeanManager().getBeans(beanClazz);
     List<T> instances = new ArrayList<T>(beans.size());
     for (IBean<T> bean : beans) {
       T instance = bean.getInstance(beanClazz);
-      if (instance != null) {
+      if (instance != null && filter.accept(instance)) {
         instances.add(instance);
       }
     }

@@ -186,7 +186,7 @@ public class BeanManagerImplementor implements IBeanManager {
       return list.get(0);
     }
 
-    if (list.size() == 0) {
+    if (list.isEmpty()) {
       return null;
     }
     else {
