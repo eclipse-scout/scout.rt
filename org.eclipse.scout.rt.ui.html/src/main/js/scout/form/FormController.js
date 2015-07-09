@@ -34,25 +34,11 @@ scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
 };
 
 /**
- * Removes all dialogs registered with this controller from DOM.
- */
-scout.FormController.prototype.removeDialogs = function(messageBox) {
-  this._displayParent.dialogs.forEach(this._removeDialog.bind(this));
-};
-
-/**
  * Renders all dialogs and views registered with this controller.
  */
 scout.FormController.prototype.render = function() {
   this._displayParent.dialogs.forEach(this._renderDialog.bind(this));
   this._displayParent.views.forEach(this._renderView.bind(this));
-};
-
-/**
- * Renders all dialogs registered with this controller.
- */
-scout.FormController.prototype.renderDialogs = function() {
-  this._displayParent.dialogs.forEach(this._renderDialog.bind(this));
 };
 
 /**
@@ -73,8 +59,16 @@ scout.FormController.prototype._renderView = function(view, register) {
     this._displayParent.views.push(view);
   }
 
-  this.session.desktop.viewTabsController.createAndRenderViewTab(view, true);
-  scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop._renderView');
+  // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
+  if (!this._displayParent.rendered) {
+    return;
+  }
+
+  var viewTabsController = this.session.desktop.viewTabsController;
+
+  // Create the view-tab.
+  var viewTab = viewTabsController.createAndRenderViewTab(view);
+  viewTabsController.selectViewTab(viewTab);
 };
 
 scout.FormController.prototype._renderDialog = function(dialog, register) {
@@ -82,34 +76,18 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     this._displayParent.dialogs.push(dialog);
   }
 
+  // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
+  if (!this._displayParent.rendered) {
+    return;
+  }
+
   dialog.render(this.session.desktop.$container);
-  dialog.htmlComp.pixelBasedSizing = true;
+  this._layoutDialog(dialog);
 
-  var prefSize = dialog.htmlComp.getPreferredSize(),
-    dialogMargins = dialog.htmlComp.getMargins(),
-    documentSize = new scout.Dimension($(document).width(), $(document).height()),
-    dialogSize = new scout.Dimension();
-
-  // class .dialog may specify a margin
-  var maxWidth = (documentSize.width - dialogMargins.left - dialogMargins.right);
-  var maxHeight = (documentSize.height - dialogMargins.top - dialogMargins.bottom);
-
-  // Ensure the dialog is not larger than viewport
-  dialogSize.width = Math.min(maxWidth, prefSize.width);
-  dialogSize.height = Math.min(maxHeight, prefSize.height);
-
-  var marginLeft = (documentSize.width - dialogSize.width) / 2;
-  var marginTop = (documentSize.height - dialogSize.height) / 2;
-
-  // optical middle
-  var opticalMiddleOffset = Math.min(marginTop / 5, 10);
-  marginTop -= opticalMiddleOffset;
-
-  dialog.htmlComp.setSize(dialogSize);
-
-  dialog.$container
-    .cssMarginLeft(marginLeft)
-    .cssMarginTop(marginTop);
+  // Only display the dialog if its 'displayParent' is visible to the user.
+  if (!this._displayParent.inFront()) {
+    dialog.detach();
+  }
 };
 
 scout.FormController.prototype._removeView = function(view, unregister) {
@@ -141,4 +119,58 @@ scout.FormController.prototype._activateView = function(view) {
 
 scout.FormController.prototype._activateDialog = function(dialog) {
   // FIXME AWE: not implemented yet.
+};
+
+/**
+ * Attaches all dialogs to their original DOM parents.
+ * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already attached.
+ */
+scout.FormController.prototype.attachDialogs = function() {
+  this._displayParent.dialogs.forEach(function(dialog) {
+    dialog.attach();
+  }, this);
+};
+
+/**
+ * Detaches all dialogs from their DOM parents. Thereby, modality glassPanes are not detached.
+ * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already detached.
+ */
+scout.FormController.prototype.detachDialogs = function() {
+  this._displayParent.dialogs.forEach(function(dialog) {
+    dialog.detach();
+  }, this);
+};
+
+scout.FormController.prototype._layoutDialog = function(dialog) {
+  dialog.htmlComp.pixelBasedSizing = true;
+
+  var prefSize = dialog.htmlComp.getPreferredSize(),
+    dialogMargins = dialog.htmlComp.getMargins(),
+    documentSize = new scout.Dimension($(document).width(), $(document).height()),
+    dialogSize = new scout.Dimension();
+
+  // class .dialog may specify a margin
+  var maxWidth = (documentSize.width - dialogMargins.left - dialogMargins.right);
+  var maxHeight = (documentSize.height - dialogMargins.top - dialogMargins.bottom);
+
+  // Ensure the dialog is not larger than viewport
+  dialogSize.width = Math.min(maxWidth, prefSize.width);
+  dialogSize.height = Math.min(maxHeight, prefSize.height);
+
+  var left = (documentSize.width - dialogSize.width) / 2;
+  var top = (documentSize.height - dialogSize.height) / 2;
+
+  // optical middle
+  var opticalMiddleOffset = Math.min(top / 5, 10);
+  top -= opticalMiddleOffset;
+
+  dialog.htmlComp.setSize(dialogSize);
+
+  dialog.$container
+    .cssLeft(left)
+    .cssTop(top);
 };

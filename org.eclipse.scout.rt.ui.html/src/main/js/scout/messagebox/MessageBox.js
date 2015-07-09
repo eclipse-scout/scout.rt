@@ -14,28 +14,32 @@ scout.MessageBox = function(model, session) {
   this.$cancelButton;
   this._$closeButton;
   this.focusListener;
-  this._$glassPane;
-  this._session = session;
+  this.session = session;
   this._addEventSupport();
+  this.$parentContainer; // DOM element which this message box is attached to.
+  this.attached = false; // Indicates whether this message box is currently visible to the user.
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
 // represents severity codes from IStatus
 scout.MessageBox.SEVERITY = {
-    OK: 1,
-    INFO: 256,
-    WARNING: 65536,
-    ERROR: 16777216
+  OK: 1,
+  INFO: 256,
+  WARNING: 65536,
+  ERROR: 16777216
 };
-
 
 scout.MessageBox.prototype._render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
   }
 
-  this._$glassPane = scout.fields.new$Glasspane(this._session.uiSessionId).appendTo($parent);
-  this.$container = this._$glassPane.appendDiv('messagebox');
+  // Add modality glassPane; must precede appending the message box to the DOM.
+  this._modalityController = new scout.ModalityController(this);
+  this._modalityController.addGlassPane();
+
+  this.$parentContainer = $parent;
+  this.$container = $parent.appendDiv('messagebox');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
@@ -82,12 +86,14 @@ scout.MessageBox.prototype._render = function($parent) {
   // Class 'shown' is used for css animation
   this.$container.addClass('shown');
 
-  this._$glassPane.installFocusContext('auto', this._session.uiSessionId);
+  this.attached = true;
 };
 
 scout.MessageBox.prototype._remove = function() {
+  this._modalityController.removeGlassPane();
+  this.attached = false;
+
   scout.MessageBox.parent.prototype._remove.call(this);
-  this._$glassPane.fadeOutAndRemove();
 };
 
 scout.MessageBox.prototype._createKeyStrokeAdapter = function() {
@@ -174,4 +180,46 @@ scout.MessageBox.prototype.close = function() {
     this._$closeButton.focus();
     this._$closeButton.click();
   }
+};
+
+/**
+ * Attaches this message box to its original DOM parent.
+ * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already attached.
+ */
+scout.MessageBox.prototype.attach = function() {
+  if (this.attached || !this.rendered) {
+    return;
+  }
+
+  this.$parentContainer.append(this.$container);
+  this.session.detachHelper.afterAttach(this.$container);
+
+  if (this.keyStrokeAdapter) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+
+  this.attached = true;
+};
+
+/**
+ * Detaches this message box from its DOM parent. Thereby, a possible modality glass-pane is not detached.
+ * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already detached.
+ */
+scout.MessageBox.prototype.detach = function() {
+  if (!this.attached || !this.rendered) {
+    return;
+  }
+
+  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+
+  this.session.detachHelper.beforeDetach(this.$container);
+  this.$container.detach();
+
+  this.attached = false;
 };

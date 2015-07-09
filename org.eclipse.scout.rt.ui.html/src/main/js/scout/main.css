@@ -237,3 +237,14 @@ button::-moz-focus-inner {
 .scout > .offline-message {
   z-index: 1;
 }
+
+/* Modality on Outline */
+.desktop-bench > .table > * {
+  z-index: 0;
+}
+
+/* Modality on Form */
+.form > *,
+.desktop-view-tab > * {
+  z-index: 0;
+}

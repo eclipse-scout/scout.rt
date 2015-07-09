@@ -43,9 +43,43 @@ scout.MessageBoxController.prototype.render = function() {
 };
 
 scout.MessageBoxController.prototype._render = function(messageBox) {
+  // Only render message box if 'displayParent' is rendered yet; if not, the message box will be rendered once 'displayParent' is rendered.
+  if (!this._displayParent.rendered) {
+    return;
+  }
+
   messageBox.render(this.session.desktop.$container);
+
+  // Only display the message box if its 'displayParent' is visible to the user.
+  if (!this._displayParent.inFront()) {
+    messageBox.ui.detach();
+  }
 };
 
 scout.MessageBoxController.prototype._remove = function(messageBox) {
   messageBox.remove();
+};
+
+/**
+ * Attaches all message boxes to their original DOM parents.
+ * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already attached.
+ */
+scout.MessageBoxController.prototype.attach = function() {
+  this._displayParent.messageBoxes.forEach(function(messageBox) {
+    messageBox.ui.attach();
+  }, this);
+};
+
+/**
+ * Detaches all message boxes from their DOM parents. Thereby, modality glassPanes are not detached.
+ * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already detached.
+ */
+scout.MessageBoxController.prototype.detach = function() {
+  this._displayParent.messageBoxes.forEach(function(messageBox) {
+    messageBox.ui.detach();
+  }, this);
 };

@@ -36,14 +36,16 @@ scout.Outline.prototype._installKeyStrokeAdapter = function() {
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
+  if (this.selectedNodeIds.length === 0) {
+    this._showDefaultDetailForm();
+  }
+};
+
+scout.Outline.prototype._postRender = function() {
   // Display attached forms, message boxes and file choosers.
   this._formController.render();
   this._messageBoxController.render();
   this._fileChooserController.render();
-
-  if (this.selectedNodeIds.length === 0) {
-    this._showDefaultDetailForm();
-  }
 };
 
 /**
@@ -80,7 +82,6 @@ scout.Outline.prototype._decorateNode = function(node) {
     node.$node.toggleAttr('data-classid', node.classId, node.classId);
   }
 };
-
 
 scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
@@ -271,13 +272,51 @@ scout.Outline.prototype.validateFocus = function() {
 scout.Outline.prototype.sendToBack = function() {
   this.inBackground = true;
   this._renderInBackground();
+
+  // Detach child dialogs, message boxes and file choosers, not views.
+  this._formController.detachDialogs();
+  this._messageBoxController.detach();
+  this._fileChooserController.detach();
 };
 
 scout.Outline.prototype.bringToFront = function() {
   this.inBackground = false;
   this._renderInBackground();
+
+  // Attach child dialogs, message boxes and file choosers.
+  this._formController.attachDialogs();
+  this._messageBoxController.attach();
+  this._fileChooserController.attach();
 };
 
 scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
+};
+
+/**
+ * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
+ *
+ * This method is necessary because this Outline may act as 'displayParent'.
+ */
+scout.Outline.prototype.modalityElements = function() {
+  var desktop = this.session.desktop;
+
+  var elements = [];
+  if (desktop.navigation) {
+    elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
+  }
+  if (desktop._outlineContent) {
+    elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
+  }
+
+  return elements;
+};
+
+/**
+ * Returns 'true' if this Outline is currently accessible to the user.
+ *
+ * This method is necessary because this Outline may act as 'displayParent'.
+ */
+scout.Outline.prototype.inFront = function() {
+  return this.rendered && !this.inBackground;
 };

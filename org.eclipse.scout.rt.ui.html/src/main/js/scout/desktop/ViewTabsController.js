@@ -11,7 +11,7 @@ scout.ViewTabsController = function(desktop) {
 /**
  * Creates and renders a view tab for the given view.
  */
-scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, selectViewTab) {
+scout.ViewTabsController.prototype.createAndRenderViewTab = function(view) {
   // Create the view tab.
   var viewTab = new scout.DesktopViewTab(view, this._desktop.$bench);
   var viewId = view.id;
@@ -29,12 +29,8 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, selec
     viewTab.render(this._desktop._$viewTabBar);
   }
 
-  // Select the 'view-tab'.
-  if (selectViewTab) {
-    this.selectViewTab(viewTab);
-  }
+  return viewTab;
 };
-
 
 /**
  * Method invoked once the given view tab is removed from DOM.

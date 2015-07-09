@@ -45,7 +45,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_SUB_TITLE = IForm.PROP_SUB_TITLE;
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
   public static final String PROP_MODAL = "modal";
-  public static final String PROP_MODALITY_HINT = "modalityHint";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
   public static final String PROP_CLOSABLE = "closable";
@@ -156,7 +155,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     JSONObject json = super.toJson();
     IForm model = getModel();
     putProperty(json, PROP_MODAL, model.isModal());
-    putProperty(json, PROP_MODALITY_HINT, modalityHintToJson(model.getModalityHint()));
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     putProperty(json, PROP_CLOSABLE, isClosable());
@@ -211,19 +209,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
         return "popupDialog";
       case IForm.DISPLAY_HINT_POPUP_WINDOW:
         return "popupWindow";
-      default:
-        return null;
-    }
-  }
-
-  protected String modalityHintToJson(int modalityHint) {
-    switch (modalityHint) {
-      case IForm.MODALITY_HINT_NONE:
-        return "none";
-      case IForm.MODALITY_HINT_PARENT:
-        return "parent";
-      case IForm.MODALITY_HINT_DESKTOP:
-        return "desktop";
       default:
         return null;
     }

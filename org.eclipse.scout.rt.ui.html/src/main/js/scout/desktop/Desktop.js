@@ -75,11 +75,6 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation.onOutlineChanged(this.outline);
   this._setSplitterPosition();
 
-  // Render attached forms, message boxes and file choosers.
-  this._formController.render();
-  this._messageBoxController.render();
-  this._fileChooserController.render();
-
   $(window).on('resize', this.onResize.bind(this));
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
@@ -92,6 +87,13 @@ scout.Desktop.prototype._render = function($parent) {
     }
   });
   scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
+};
+
+scout.Desktop.prototype._postRender = function() {
+  // Render attached forms, message boxes and file choosers.
+  this._formController.render();
+  this._messageBoxController.render();
+  this._fileChooserController.render();
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {
@@ -377,6 +379,7 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   } else {
     this.setOutline(outline);
   }
+
   this._bringNavigationToFront();
 };
 
@@ -404,4 +407,22 @@ scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
   if (this._hasNavigation()) {
     this.$bench.toggleClass('drop-shadow', showShadow);
   }
+};
+
+/**
+ * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with the Desktop as its 'displayParent'.
+ *
+ * This method is necessary because the Display may act as 'displayParent'.
+ */
+scout.Desktop.prototype.modalityElements = function() {
+  return [this.$container];
+};
+
+/**
+ * Returns 'true' if the Desktop is currently accessible to the user.
+ *
+ * This method is necessary because the Desktop may act as 'displayParent'.
+ */
+scout.Desktop.prototype.inFront = function() {
+  return true; // Desktop is always available to the user.
 };

@@ -134,12 +134,11 @@
     },
     "Form": {
       "displayHint": "dialog",
-      "modalityHint": "none",
       "maximizeEnabled": true,
       "maximized": false,
       "minimizeEnabled": true,
       "minimized": false,
-      "modal": false,
+      "modal": true,
       "dialogs": [],
       "views": [],
       "messageBoxes": [],

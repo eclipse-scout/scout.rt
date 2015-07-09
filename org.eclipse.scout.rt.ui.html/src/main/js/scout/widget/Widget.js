@@ -18,6 +18,7 @@ scout.Widget.prototype.render = function($parent) {
   this._renderInternal($parent);
   this._installKeyStrokeAdapter();
   this.rendered = true;
+  this._postRender();
 };
 
 // Currently only necessary for ModelAdapter
@@ -59,6 +60,14 @@ scout.Widget.prototype._renderClassId = function($target) {
     $target.attr('data-classid', this.classId);
   }
 };
+
+/**
+ * Method invoked once rendering completed and 'rendered' flag is set to 'true'.
+ */
+scout.Widget.prototype._postRender = function() {
+  // NOP
+};
+
 
 scout.Widget.prototype.remove = function() {
   if (!this.rendered) {

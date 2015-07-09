@@ -1,7 +1,7 @@
 /**
  * Controller with functionality to register and render file choosers.
  *
-* The file choosers are put into the list fileChoosers contained in 'displayParent'.
+ * The file choosers are put into the list fileChoosers contained in 'displayParent'.
  */
 scout.FileChooserController = function(displayParent, session) {
   this._displayParent = displayParent;
@@ -43,9 +43,43 @@ scout.FileChooserController.prototype.render = function() {
 };
 
 scout.FileChooserController.prototype._render = function(fileChooser) {
+  // Only render file chooser if 'displayParent' is rendered yet; if not, the file chooser will be rendered once 'displayParent' is rendered.
+  if (!this._displayParent.rendered) {
+    return;
+  }
+
   fileChooser.render(this.session.desktop.$container);
+
+  // Only display the file chooser if its 'displayParent' is visible to the user.
+  if (!this._displayParent.inFront()) {
+    fileChooser.detach();
+  }
 };
 
 scout.FileChooserController.prototype._remove = function(fileChooser) {
   fileChooser.remove();
+};
+
+/**
+ * Attaches all file choosers to their original DOM parents.
+ * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already attached.
+ */
+scout.FileChooserController.prototype.attach = function() {
+  this._displayParent.fileChoosers.forEach(function(fileChooser) {
+    fileChooser.attach();
+  }, this);
+};
+
+/**
+ * Detaches all file choosers from their DOM parents. Thereby, modality glassPanes are not detached.
+ * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already detached.
+ */
+scout.FileChooserController.prototype.detach = function() {
+  this._displayParent.fileChoosers.forEach(function(fileChooser) {
+    fileChooser.detach();
+  }, this);
 };

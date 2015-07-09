@@ -8,13 +8,6 @@ scout.DesktopViewTab = function(view, $bench) {
    * Container for the _Tab_ (not for the view).
    */
   this.$container;
-  this.$viewContainer;
-  this._viewAttached = false;
-
-  /**
-   * This property stores the detached DOM, when the tab is not active (=not visible).
-   */
-  this._$detachedDom;
 
   this._propertyChangeListener = function(event) {
     if (scout.helpers.isOneOf(event.changedProperties, 'title', 'subTitle')) {
@@ -58,24 +51,14 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
   this._view.htmlComp.validateLayout();
   this._view.htmlComp.validateRoot = true;
   this._view.rendered = true;
-  this._viewAttached = true;
 };
 
 scout.DesktopViewTab.prototype.select = function() {
   this._cssSelect(true);
-  if (!this._view.rendered) {
+  if (this._view.rendered) {
+    this._view.attach();
+  } else {
     this._renderView();
-  }
-  if (!this._viewAttached) {
-    var $viewContainer = this._view.$container;
-    this._$bench.append($viewContainer);
-    this._afterAttach();
-
-    // If the parent has been resized while the content was not visible, the content has the wrong size -> update
-    var htmlComp = scout.HtmlComponent.get($viewContainer);
-    var htmlParent = htmlComp.getParent();
-    htmlComp.setSize(htmlParent.getSize());
-    this._viewAttached = true;
   }
 };
 
@@ -87,10 +70,7 @@ scout.DesktopViewTab.prototype._cssSelect = function(selected) {
 
 scout.DesktopViewTab.prototype.deselect = function() {
   if (this._view.rendered) {
-    var $viewContainer = this._view.$container;
-    this._beforeDetach();
-    $viewContainer.detach();
-    this._viewAttached = false;
+    this._view.detach();
   }
   this._cssSelect(false);
 };
@@ -141,40 +121,4 @@ scout.DesktopViewTab.prototype.getMenuText = function() {
     text += ' (' + this._view.subTitle + ')';
   }
   return text;
-};
-
-/**
- * Method invoked just after attaching the view's content to the DOM.
- */
-scout.DesktopViewTab.prototype._afterAttach = function() {
-  // Delegate to DetachHelper.
-  this._view.session.detachHelper.afterAttach(this._view.$container);
-
-  // Restore keystrokes.
-  if (this._view.keyStrokeAdapter) {
-    scout.keyStrokeManager.installAdapter(this._view.$container, this._view.keyStrokeAdapter);
-  }
-
-  // Restore dialogs and message boxes, not views.
-  this._view._formController.renderDialogs();
-  this._view._messageBoxController.render();
-  this._view._fileChooserController.render();
-};
-
-/**
- * Method invoked just before detaching the view's content from DOM.
- */
-scout.DesktopViewTab.prototype._beforeDetach = function() {
-  // Uninstall keystrokes.
-  if (scout.keyStrokeManager.isAdapterInstalled(this._view.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this._view.keyStrokeAdapter);
-  }
-
-  // Remove dialogs and message boxes, not views.
-  this._view._formController.removeDialogs();
-  this._view._messageBoxController.remove();
-  this._view._fileChooserController.remove();
-
-  // Delegate to DetachHelper.
-  this._view.session.detachHelper.beforeDetach(this._view.$container);
 };

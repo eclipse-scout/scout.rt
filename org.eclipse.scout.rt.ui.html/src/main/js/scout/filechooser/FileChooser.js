@@ -1,12 +1,25 @@
 scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
   this._files = [];
+  this._modalityController;
+  this.$parentContainer; // DOM element which this file chooser is attached to.
+  this.attached = false; // Indicates whether this file chooser is currently visible to the user.
 };
 scout.inherits(scout.FileChooser, scout.ModelAdapter);
 
+scout.FileChooser.prototype.init = function(model, session) {
+  scout.FileChooser.parent.prototype.init.call(this, model, session);
+
+  this._modalityController = new scout.ModalityController(this);
+};
+
 scout.FileChooser.prototype._render = function($parent) {
-  this._$glassPane = scout.fields.new$Glasspane(this.session.uiSessionId).appendTo($parent);
-  this.$container = this._$glassPane.appendDiv('file-chooser');
+  this.$parentContainer = $parent;
+
+  // Add modality glassPane; must precede appending the file chooser to the DOM.
+  this._modalityController.addGlassPane();
+
+  this.$container = $parent.appendDiv('file-chooser');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
@@ -37,7 +50,7 @@ scout.FileChooser.prototype._render = function($parent) {
     .appendTo(this.$content);
   this.$addFileButton = $('<button>')
     .text(this.session.text('ui.Browse')) // XXX BSH
-    .on('click', this._onAddFileButtonClicked.bind(this))
+  .on('click', this._onAddFileButtonClicked.bind(this))
     .appendTo(this.$buttons);
   this.$okButton = $('<button>')
     .text(this.session.text('ui.Upload'))
@@ -54,19 +67,21 @@ scout.FileChooser.prototype._render = function($parent) {
 
   // Class 'shown' is used for css animation
   this.$container.addClass('shown');
-  // Prevent resizing when message-box is dragged off the viewport
+  // Prevent resizing when file chooser is dragged off the viewport
   this.$container.addClass('calc-helper');
   this.$container.css('min-width', this.$container.width());
   this.$container.removeClass('calc-helper');
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
 
-  this._$glassPane.installFocusContext('auto', this.session.uiSessionId);
+  this.attached = true;
 };
 
 scout.FileChooser.prototype._remove = function() {
+  this._modalityController.removeGlassPane();
+  this.attached = false;
+
   scout.FileChooser.parent.prototype._remove.call(this);
-  this._$glassPane.fadeOutAndRemove();
 };
 
 scout.FileChooser.prototype._position = function() {
@@ -113,7 +128,7 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this._files.push(file);
     }
     else {
-      this._files = [ file ];
+      this._files = [file];
       this.$files.empty();
     }
     this.$files.appendDiv('file').text(file.name);
@@ -135,7 +150,7 @@ scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
 };
 
 scout.FileChooser.prototype._onDrop = function(event) {
-  if(scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+  if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -143,3 +158,44 @@ scout.FileChooser.prototype._onDrop = function(event) {
   }
 };
 
+/**
+ * Attaches this file chooser to its original DOM parent.
+ * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already attached.
+ */
+scout.FileChooser.prototype.attach = function() {
+  if (this.attached || !this.rendered) {
+    return;
+  }
+
+  this.$parentContainer.append(this.$container);
+  this.session.detachHelper.afterAttach(this.$container);
+
+  if (this.keyStrokeAdapter) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+
+  this.attached = true;
+};
+
+/**
+ * Detaches this file chooser from its DOM parent. Thereby, a possible modality glass-pane is not detached.
+ * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *
+ * This method has no effect if already detached.
+ */
+scout.FileChooser.prototype.detach = function() {
+  if (!this.attached || !this.rendered) {
+    return;
+  }
+
+  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+
+  this.session.detachHelper.beforeDetach(this.$container);
+  this.$container.detach();
+
+  this.attached = false;
+};

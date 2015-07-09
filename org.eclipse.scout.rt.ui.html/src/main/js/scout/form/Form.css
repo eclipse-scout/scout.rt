@@ -6,7 +6,7 @@
 }
 
 .dialog {
-  position: absolute;
+  position: absolute !important; /* ignore positioning of 'ui-resizable' */
   background-color: @background-color;
   border: solid 1px @border-color;
   border-top: 5px solid @active-color;
