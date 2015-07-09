@@ -125,11 +125,4 @@ public class TrivialAuthenticator {
 
     return null;
   }
-
-  // FIXME BSH We have to find a better solution for this! See also ServletFilterHelper
-  protected void sendSessionTimeout(HttpServletResponse resp) throws IOException {
-    resp.setContentType("application/json");
-    resp.setCharacterEncoding("UTF-8");
-    resp.getWriter().print("{\"error\":{\"code\":10,\"message\":\"The session has expired, please reload the page.\"}}"); // JsonResponse.ERR_SESSION_TIMEOUT
-  }
 }
