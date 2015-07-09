@@ -3,7 +3,6 @@ scout.DesktopViewTab = function(view, $bench) {
 
   this._view = view;
   this._$bench = $bench;
-  this.events = new scout.EventSupport();
 
   /**
    * Container for the _Tab_ (not for the view).
@@ -23,7 +22,10 @@ scout.DesktopViewTab = function(view, $bench) {
     }
   }.bind(this);
 
-  this._removeListener = this.remove.bind(this);
+  // XXX AWE: problem ist, dass Widegt#remove prüft ob rendered ist
+  // im bench mode ist der DesktopViewTab nicht gerendet, _remove wird
+  // darum nicht aufgerufen und das 'remove event vom tab nie getriggert
+  this._removeListener = this._onViewRemoved.bind(this);
 
   this.addChild(this._view);
   this._addEventSupport();
@@ -39,14 +41,6 @@ scout.DesktopViewTab.prototype._installListeners = function() {
 scout.DesktopViewTab.prototype._uninstallListeners = function() {
   this._view.off('propertyChange', this._propertyChangeListener);
   this._view.off('remove', this._removeListener);
-};
-
-/**
- * @override Widget.js
- */
-scout.DesktopViewTab.prototype._remove = function() {
-  this._uninstallListeners();
-  scout.DesktopViewTab.parent.prototype._remove.call(this);
 };
 
 scout.DesktopViewTab.prototype._render = function($parent) {
@@ -75,7 +69,6 @@ scout.DesktopViewTab.prototype.select = function() {
   if (!this._viewAttached) {
     var $viewContainer = this._view.$container;
     this._$bench.append($viewContainer);
-
     this._afterAttach();
 
     // If the parent has been resized while the content was not visible, the content has the wrong size -> update
@@ -95,9 +88,7 @@ scout.DesktopViewTab.prototype._cssSelect = function(selected) {
 scout.DesktopViewTab.prototype.deselect = function() {
   if (this._view.rendered) {
     var $viewContainer = this._view.$container;
-
     this._beforeDetach();
-
     $viewContainer.detach();
     this._viewAttached = false;
   }
@@ -122,6 +113,21 @@ scout.DesktopViewTab.prototype._titlesUpdated = function() {
     } else {
       $titleElement.setVisible(false);
     }
+  }
+};
+
+/**
+ * We cannot not bind the 'remove' event of the view to the remove function
+ * of the this tab, because in bench-mode we the tab is never rendered
+ * and thus the _remove function is never called. However, we must still
+ * trigger the 'remove' event because the ViewTabsController depends on it.
+ */
+scout.DesktopViewTab.prototype._onViewRemoved = function() {
+  this._uninstallListeners();
+  if (this.rendered) {
+    this.remove();
+  } else {
+    this._trigger('remove');
   }
 };
 
