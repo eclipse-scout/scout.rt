@@ -36,6 +36,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   public void proposalTypedFromUI(String text) {
     LOG.debug("proposalTypedFromUI text=" + text);
     assert m_field.isProposalChooserRegistered();
+    m_field.setDisplayText(text);
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {
       m_field.doSearch(text, false, false);
     }
@@ -49,6 +50,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     LOG.debug("openProposalChooserFromUI");
     assert !m_field.isProposalChooserRegistered();
     try {
+      m_field.setDisplayText(text);
       String searchText = toSearchText(text);
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
       IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), selectCurrentValue);
@@ -70,6 +72,9 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   @Override
   public void acceptProposalFromUI(String text) {
     if (m_field.hasAcceptedProposal()) {
+      // With this block we deal with the case where we the proposal chooser is open
+      // and the user hits Enter or clicks with the mouse to choose a row from
+      // the proposal chooser
       ILookupRow<LOOKUP_KEY> acceptedProposal = m_field.getProposalChooser().getAcceptedProposal();
       LOG.debug("acceptProposalFromUI -> acceptProposal. acceptedProposal=" + acceptedProposal);
       // This line is required for the following case:
@@ -81,10 +86,20 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       m_field.setDisplayText(text);
       m_field.acceptProposal(acceptedProposal);
     }
+    // With this block we deal with the case where the proposal chooser has never been opened
+    // but the text has changed:
+    // 1. text has been deleted (value must be set to null, always)
+    // 2. text has changed (a new search must be executed, when a single row matches, that row
+    //    will be the new current value. When there is more than one row that matches, the error
+    //    status must be set.
+    else if (!StringUtility.hasText(text)) {
+      LOG.debug("acceptProposalFromUI, text is empty -> call parseAndSetValue('')");
+      m_field.parseAndSetValue(text);
+    }
     else {
-      String oldDisplayText = m_field.getDisplayText();
-      if (!StringUtility.equalsIgnoreCase(oldDisplayText, text)) {
-        LOG.debug("acceptProposalFromUI, no accepted proposal. parseValue text=" + text);
+      String oldText = m_field.getCurrentLookupRow() != null ? m_field.getCurrentLookupRow().getText() : m_field.getDisplayText();
+      if (!oldText.equals(text)) {
+        LOG.debug("acceptProposalFromUI, text has changed -> call parseAndSetValue('" + text + "') with new text, old text was '" + oldText + "'");
         m_field.parseAndSetValue(text);
       }
     }
