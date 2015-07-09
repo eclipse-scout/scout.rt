@@ -124,6 +124,20 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
   }
 
   /**
+   * Returns the number of elements contained in this store.
+   */
+  public int size() {
+    return values().size();
+  }
+
+  /**
+   * Returns <code>true</code> if no elements are contained in this store, or <code>false</code> otherwise.
+   */
+  public boolean isEmpty() {
+    return values().isEmpty();
+  }
+
+  /**
    * Removes all elements from this store and discards all calculated indices.
    */
   public void clear() {

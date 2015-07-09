@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -45,6 +46,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
@@ -88,6 +90,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -880,6 +883,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return;
     }
 
+    // Validate the Form's modality configuration.
+    Assertions.assertNotNull(form.getDisplayParent(), "Property 'displayParent' must not be null");
+    boolean applicationModal = (form.isModal() && form.getDisplayParent() == this);
+    boolean view = (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW);
+
+    // Ensure not to show a 'application-modal' view. Otherwise, no user interaction would be possible.
+    Assertions.assertFalse(view && applicationModal, "'desktop-modality' not supported for views");
+
+    // Ensure not to show a modal Form if the application is in 'application-modal' state. Otherwise, no user interaction would be possible.
+    if (view && form.isModal()) {
+      boolean applicationLocked = m_formStore.containsApplicationModalDialogs() || m_messageBoxStore.containsApplicationModalMessageBoxes() || m_fileChooserStore.containsApplicationModalFileChoosers();
+      Assertions.assertFalse(applicationLocked, "Modal view cannot be showed because application is in 'desktop-modal' state; otherwise, no user interaction would be possible.");
+    }
+
     // TODO [dwi] Clarify whether this logic is still required.
     // If the Form is not a View, close all open PopUp windows.
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_POPUP_WINDOW) {
@@ -892,10 +909,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-
-    // Ensure 'displayParent' to be set.
-    form.setDisplayParent(this); // TODO [dwi] Feature disabled until working with View in HTML UI.
-    Assertions.assertNotNull(form.getDisplayParent(), "Property 'displayParent' must not be null");
 
     m_formStore.add(form);
     fireFormShow(form);
@@ -930,7 +943,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     // Ensure 'displayParent' to be set.
-    messageBox.displayParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
     Assertions.assertNotNull(messageBox.displayParent(), "Property 'displayParent' must not be null");
 
     m_messageBoxStore.add(messageBox);
@@ -981,100 +993,105 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void setOutline(IOutline outline) {
-    outline = resolveOutline(outline);
-    if (m_outline == outline
-        || m_outlineChanging) {
-      return;
-    }
-    synchronized (this) {
-      try {
-        m_outlineChanging = true;
-        if (m_outline != null) {
-          IPage<?> oldActivePage = m_outline.getActivePage();
-          if (oldActivePage != null) {
-            Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
-            /*
-             *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
-             *  a page on the path to the currently selected page is getting invalidated due to changes
-             *  in an other outline.
-             */
-            if (bm != null) {
-              m_bookmarkPerOutline.put(m_outline, bm);
-            }
-          }
+    final IOutline newOutline = resolveOutline(outline);
+    ClientRunContexts.copyCurrent().outline(newOutline).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (m_outline == newOutline || m_outlineChanging) {
+          return;
         }
-        //
-        IOutline oldOutline = m_outline;
-        if (m_activeOutlineListener != null && oldOutline != null) {
-          oldOutline.removeTreeListener(m_activeOutlineListener);
-          oldOutline.removePropertyChangeListener(m_activeOutlineListener);
-          m_activeOutlineListener = null;
-        }
-        // set new outline to set facts
-        m_outline = outline;
-        // deactivate old page
-        if (oldOutline != null) {
-          oldOutline.clearContextPage();
-        }
-        //
-        if (m_outline != null) {
-          m_activeOutlineListener = new P_ActiveOutlineListener();
-          m_outline.addTreeListener(m_activeOutlineListener);
-          m_outline.addPropertyChangeListener(m_activeOutlineListener);
-        }
-        // <bsh 2010-10-15>
-        // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
-        // are only called when the new outline is null. When the new outline is _not_ null, we
-        // will override the "null" anyway (see below).
-        // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
-        if (m_outline == null) {
-          setPageDetailForm(null);
-          setPageDetailTable(null);
-          setPageSearchForm(null, true);
-        }
-        // </bsh>
-        fireOutlineChanged(oldOutline, m_outline);
-        if (m_outline != null) {
-          // reload selected page in case it is marked dirty
-          if (m_outline.getActivePage() != null) {
-            try {
-              m_outline.getActivePage().ensureChildrenLoaded();
-            }
-            catch (ProcessingException e) {
-              BEANS.get(ExceptionHandler.class).handle(e);
-            }
-          }
-          m_outline.setNodeExpanded(m_outline.getRootNode(), true);
-          setPageDetailForm(m_outline.getDetailForm());
-          setPageDetailTable(m_outline.getDetailTable());
-          setPageSearchForm(m_outline.getSearchForm(), true);
-          m_outline.makeActivePageToContextPage();
-          IPage<?> newActivePage = m_outline.getActivePage();
-          if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
-            // if there is no active page and no default detail form, select the first page
-            Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
-            if (bookmark != null && Boolean.TRUE) {
-              try {
-                activateBookmark(bookmark);
-              }
-              catch (ProcessingException e) {
-                LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
+        synchronized (AbstractDesktop.this) {
+          try {
+            m_outlineChanging = true;
+            if (m_outline != null) {
+              IPage<?> oldActivePage = m_outline.getActivePage();
+              if (oldActivePage != null) {
+                Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
+                /*
+                 *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
+                 *  a page on the path to the currently selected page is getting invalidated due to changes
+                 *  in an other outline.
+                 */
+                if (bm != null) {
+                  m_bookmarkPerOutline.put(m_outline, bm);
+                }
               }
             }
-            else {
-              activateFirstPage();
+            //
+            IOutline oldOutline = m_outline;
+            if (m_activeOutlineListener != null && oldOutline != null) {
+              oldOutline.removeTreeListener(m_activeOutlineListener);
+              oldOutline.removePropertyChangeListener(m_activeOutlineListener);
+              m_activeOutlineListener = null;
             }
-            newActivePage = m_outline.getActivePage();
+            // set new outline to set facts
+            m_outline = newOutline;
+            // deactivate old page
+            if (oldOutline != null) {
+              oldOutline.clearContextPage();
+            }
+            //
+            if (m_outline != null) {
+              m_activeOutlineListener = new P_ActiveOutlineListener();
+              m_outline.addTreeListener(m_activeOutlineListener);
+              m_outline.addPropertyChangeListener(m_activeOutlineListener);
+            }
+            // <bsh 2010-10-15>
+            // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
+            // are only called when the new outline is null. When the new outline is _not_ null, we
+            // will override the "null" anyway (see below).
+            // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
+            if (m_outline == null) {
+              setPageDetailForm(null);
+              setPageDetailTable(null);
+              setPageSearchForm(null, true);
+            }
+            // </bsh>
+            fireOutlineChanged(oldOutline, m_outline);
+            if (m_outline != null) {
+              // reload selected page in case it is marked dirty
+              if (m_outline.getActivePage() != null) {
+                try {
+                  m_outline.getActivePage().ensureChildrenLoaded();
+                }
+                catch (ProcessingException e) {
+                  BEANS.get(ExceptionHandler.class).handle(e);
+                }
+              }
+              m_outline.setNodeExpanded(m_outline.getRootNode(), true);
+              setPageDetailForm(m_outline.getDetailForm());
+              setPageDetailTable(m_outline.getDetailTable());
+              setPageSearchForm(m_outline.getSearchForm(), true);
+              m_outline.makeActivePageToContextPage();
+              IPage<?> newActivePage = m_outline.getActivePage();
+              if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
+                // if there is no active page and no default detail form, select the first page
+                Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
+                if (bookmark != null && Boolean.TRUE) {
+                  try {
+                    activateBookmark(bookmark);
+                  }
+                  catch (ProcessingException e) {
+                    LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
+                  }
+                }
+                else {
+                  activateFirstPage();
+                }
+                newActivePage = m_outline.getActivePage();
+              }
+              if (newActivePage != null) {
+                BEANS.get(INavigationHistoryService.class).addStep(0, newActivePage);
+              }
+            }
           }
-          if (newActivePage != null) {
-            BEANS.get(INavigationHistoryService.class).addStep(0, newActivePage);
+          finally {
+            m_outlineChanging = false;
           }
         }
       }
-      finally {
-        m_outlineChanging = false;
-      }
-    }
+    }, BEANS.get(RuntimeExceptionTranslator.class));
   }
 
   /**
@@ -1363,7 +1380,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     // Ensure 'displayParent' to be set.
-    fileChooser.setDisplayParent(this); // TODO [dwi] Feature disabled until implemented in HTML UI.
     Assertions.assertNotNull(fileChooser.getDisplayParent(), "Property 'displayParent' must not be null");
 
     m_fileChooserStore.add(fileChooser);

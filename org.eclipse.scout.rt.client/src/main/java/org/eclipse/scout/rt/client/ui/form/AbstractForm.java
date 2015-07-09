@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
@@ -93,6 +94,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -116,6 +118,7 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -149,8 +152,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private final EventListenerList m_listenerList = new EventListenerList();
   private IFormUIFacade m_uiFacade;
   private IWizardStep m_wizardStep;
-  private boolean m_modal;// no property, is fixed
-  private int m_modalityHint;// no property, is fixed
+  private final PreferredValue<Boolean> m_modal = new PreferredValue<Boolean>(false, false); // no property, is fixed
   private boolean m_cacheBounds; // no property is fixed
   private boolean m_askIfNeedSave;
   private boolean m_buttonsArmed;
@@ -193,6 +195,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private int m_toolbarLocation;
 
   private final PreferredValue<IDisplayParent> m_displayParent = new PreferredValue<>(null, false);
+  private ClientRunContext m_initialClientRunContext; // ClientRunContext of the calling context during initialization.
 
   public AbstractForm() throws ProcessingException {
     this(true);
@@ -212,31 +215,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     if (callInitializer) {
       callInitializer();
-    }
-  }
-
-  @Override
-  public IDisplayParent getDisplayParent() {
-    return m_displayParent.get();
-  }
-
-  @Override
-  public void setDisplayParent(IDisplayParent displayParent) {
-    Assertions.assertNotNull(displayParent, "Property 'displayParent' must not be null");
-
-    if (m_displayParent.get() == displayParent) {
-      return;
-    }
-
-    IDesktop desktop = getDesktop();
-    if (desktop == null || !desktop.isShowing(this)) {
-      m_displayParent.set(displayParent, true); // no Desktop available, or Form is not showing yet.
-    }
-    else {
-      // This Form is already showing and must be attached to the new 'displayParent'.
-      desktop.hideForm(this);
-      m_displayParent.set(displayParent, true);
-      desktop.showForm(this);
     }
   }
 
@@ -270,8 +248,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return;
     }
 
-    // Derive the 'displayParent' from the calling context, and set it as non preferred value, meaning that a potential preferred value is not overwritten.
-    m_displayParent.set(deriveDisplayParent(), false);
+    // Remember the initial ClientRunContext to not loose the Form from current calling context.
+    m_initialClientRunContext = ClientRunContexts.copyCurrent();
 
     // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().form(this).run(new IRunnable() {
@@ -305,37 +283,55 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return the localized sub-title property of the form. Use {@link TEXTS}.
    */
   @ConfigProperty(ConfigProperty.TEXT)
-  @Order(11)
+  @Order(20)
   protected String getConfiguredSubTitle() {
     return null;
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(20)
-  protected int/* seconds */getConfiguredCloseTimer() {
-    return 0;
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(40)
-  protected int/* seconds */getConfiguredCustomTimer() {
-    return 0;
-  }
-
   @ConfigProperty(ConfigProperty.TEXT)
-  @Order(90)
+  @Order(30)
   protected String getConfiguredCancelVerificationText() {
     return ScoutTexts.get("FormSaveChangesQuestion");
   }
 
+  /**
+   * Overwrite to set the display hint for this {@link IForm}. By default, {@link #DISPLAY_HINT_DIALOG} is configured.
+   * <ul>
+   * <li>{@link #DISPLAY_HINT_VIEW}</li>
+   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link #DISPLAY_HINT_POPUP_WINDOW}</li>
+   * </ul>
+   */
   @ConfigProperty(ConfigProperty.FORM_DISPLAY_HINT)
-  @Order(100)
+  @Order(40)
   protected int getConfiguredDisplayHint() {
     return DISPLAY_HINT_DIALOG;
   }
 
+  /**
+   * Overwrite to set the display parent for this {@link IForm}. By default, this method returns <code>null</code>,
+   * meaning that it is derived from the current calling context, or is {@link IDesktop} for views.
+   * <p>
+   * A display parent is the anchor to attach this {@link IForm} to, and affects its accessibility and modality scope.
+   * Possible parents are {@link IDesktop}, {@link IOutline}, or {@link IForm}:
+   * <ul>
+   * <li>Desktop: Form is always accessible; blocks the entire desktop if modal;</li>
+   * <li>Outline: Form is only accessible when the given outline is active; blocks only the outline if modal;</li>
+   * <li>Form: Form is only accessible when the given Form is active; blocks only the Form if modal;</li>
+   * </ul>
+   *
+   * @return like {@link IDesktop}, {@link IOutline} or {@link IForm}, or <code>null</code> to derive from the calling
+   *         context.
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(50)
+  protected IDisplayParent getConfiguredDisplayParent() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.FORM_VIEW_ID)
-  @Order(105)
+  @Order(60)
   protected String getConfiguredDisplayViewId() {
     return null;
   }
@@ -344,7 +340,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return if the form can be minimized.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(108)
+  @Order(70)
   protected boolean getConfiguredMinimizeEnabled() {
     return false;
   }
@@ -353,7 +349,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return if the form can be maximized.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(109)
+  @Order(80)
   protected boolean getConfiguredMaximizeEnabled() {
     return false;
   }
@@ -362,45 +358,46 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return defines if the form is initially minimized
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(110)
+  @Order(90)
   protected boolean getConfiguredMinimized() {
     return false;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(112)
+  @Order(100)
   protected boolean getConfiguredMaximized() {
     return false;
   }
 
   /**
-   * Modal defines if a form is the only form a user can interact with within the same process as long as this form is
-   * open.
+   * Overwrite to set the modality hint for this {@link IForm}. By default, this method returns <code>null</code>,
+   * meaning that modality is derived from the configured <code>display-hint</code>. For dialogs, it is
+   * <code>true</code>, for views <code>false</code>.
    *
-   * @return <code>true</code> if form is modal, <code>false</code> otherwise.
+   * @return <code>true</code> to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or
+   *         <code>false</code> otherwise, or <code>null</code> to derive modality from the <code>display-hint</code>.
+   * @see #getConfiguredDisplayHint()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(120)
-  protected boolean getConfiguredModal() {
-    return true;
+  @Order(110)
+  protected Boolean getConfiguredModal() {
+    return null;
   }
 
   /**
-   * Overwrite to set the modality hint for this {@link IForm}.
-   * <ul>
-   * <li>{@link #MODALITY_HINT_NONE}</li>
-   * <li>{@link #MODALITY_HINT_PARENT}</li>
-   * <li>{@link #MODALITY_HINT_DESKTOP}</li>
-   * </ul>
+   * Configure whether to show this {@link IForm} once started.
+   * <p>
+   * If set to <code>true</code> and this {@link IForm} is started, it is added to the {@link IDesktop} in order to be
+   * displayed. By default, this property is set to <code>true</code>.
    */
-  @ConfigProperty(ConfigProperty.INTEGER)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(120)
-  protected int getConfiguredModalityHint() {
-    return IForm.MODALITY_HINT_NONE;
+  protected boolean getConfiguredShowOnStart() {
+    return true;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(140)
+  @Order(130)
   protected boolean getConfiguredCacheBounds() {
     return false;
   }
@@ -412,7 +409,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return <code>true</code> if message box is shown for confirmation, <code>false</code> otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(150)
+  @Order(140)
   protected boolean getConfiguredAskIfNeedSave() {
     return true;
   }
@@ -421,7 +418,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return configured icon ID for this form
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
-  @Order(160)
+  @Order(150)
   protected String getConfiguredIconId() {
     return null;
   }
@@ -433,21 +430,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return {@link IForm#TOOLBAR_FORM_HEADER} | {@link IForm#TOOLBAR_VIEW_PART}
    */
   @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
-  @Order(170)
+  @Order(160)
   protected int getConfiguredToolbarLocation() {
     return TOOLBAR_FORM_HEADER;
   }
 
-  /**
-   * Configure whether to show this {@link IForm} once started.
-   * <p>
-   * If set to <code>true</code> and this {@link IForm} is started, it is added to the {@link IDesktop} in order to be
-   * displayed. By default, this property is set to <code>true</code>.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(170)
+  protected int/* seconds */getConfiguredCloseTimer() {
+    return 0;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
   @Order(180)
-  protected boolean getConfiguredShowOnStart() {
-    return true;
+  protected int/* seconds */getConfiguredCustomTimer() {
+    return 0;
   }
 
   /**
@@ -727,10 +724,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (getConfiguredCustomTimer() > 0) {
       setTimer("custom", getConfiguredCustomTimer());
     }
-    setModal(getConfiguredModal());
-    setModalityHint(getConfiguredModalityHint());
-    setDisplayHint(getConfiguredDisplayHint());
-    setDisplayViewId(getConfiguredDisplayViewId());
+
     if (getConfiguredCancelVerificationText() != null) {
       setCancelVerificationText(getConfiguredCancelVerificationText());
     }
@@ -747,6 +741,24 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     setCacheBounds(getConfiguredCacheBounds());
     setAskIfNeedSave(getConfiguredAskIfNeedSave());
     setIconId(getConfiguredIconId());
+
+    // Set 'modality' as preferred value if not null.
+    Boolean modal = getConfiguredModal();
+    if (modal != null) {
+      m_modal.set(modal, true);
+    }
+
+    // Set 'displayParent' as preferred value if not null; must precede setting of the 'displayHint'.
+    IDisplayParent displayParent = getConfiguredDisplayParent();
+    if (displayParent != null) {
+      m_displayParent.set(displayParent, true);
+    }
+    else {
+      m_displayParent.set(getDesktop(), false);
+    }
+
+    setDisplayHint(getConfiguredDisplayHint());
+    setDisplayViewId(getConfiguredDisplayViewId());
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
@@ -2772,36 +2784,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isModal() {
-    return m_modal;
+    return m_modal.get();
   }
 
   @Override
-  public void setModal(boolean b) {
-    if (b) {
-      switch (getDisplayHint()) {
-        case DISPLAY_HINT_POPUP_DIALOG:
-        case DISPLAY_HINT_DIALOG: {
-          m_modal = b;
-          break;
-        }
-        default: {
-          LOG.warn("cannot set property 'modal' to true with current display hint type");
-        }
-      }
-    }
-    else {
-      m_modal = b;
-    }
-  }
-
-  @Override
-  public int getModalityHint() {
-    return m_modalityHint;
-  }
-
-  @Override
-  public void setModalityHint(int modalityHint) {
-    m_modalityHint = modalityHint;
+  public void setModal(boolean modal) {
+    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'modal' cannot be changed because Form is already showing [form=%s]", this);
+    m_modal.set(modal, true);
   }
 
   @Override
@@ -2826,29 +2815,52 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setDisplayHint(int displayHint) {
-    // TODO [dwi] uncomment once completed
-//    Assertions.assertFalse(getDesktop().containsForm(this), "Property 'displayHint' cannot be changed because Form is already attached to Desktop [form=%s]", this);
+    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form=%s]", this);
 
     switch (displayHint) {
       case DISPLAY_HINT_DIALOG:
-      case DISPLAY_HINT_POPUP_DIALOG: {
-        m_displayHint = displayHint;
-        break;
-      }
-      case DISPLAY_HINT_POPUP_WINDOW: {
-        m_displayHint = displayHint;
-        setModal(false);
-        break;
-      }
+      case DISPLAY_HINT_POPUP_DIALOG:
+      case DISPLAY_HINT_POPUP_WINDOW:
       case DISPLAY_HINT_VIEW: {
         m_displayHint = displayHint;
-        setModal(false);
-        m_displayParent.set(getDesktop(), false); // by default, a View has the Desktop as 'displayParent'.
         break;
       }
       default: {
         throw new IllegalArgumentException("Unsupported displayHint " + displayHint);
       }
+    }
+
+    // Update modality hint if not explicitly set yet.
+    boolean dialog = (displayHint == IForm.DISPLAY_HINT_DIALOG || displayHint == IForm.DISPLAY_HINT_POPUP_DIALOG);
+    m_modal.set(dialog, false);
+    m_displayParent.set(resolveDisplayParent(), false);
+  }
+
+  @Override
+  public IDisplayParent getDisplayParent() {
+    return m_displayParent.get();
+  }
+
+  @Override
+  public void setDisplayParent(IDisplayParent displayParent) {
+    if (displayParent == null) {
+      displayParent = resolveDisplayParent();
+    }
+    displayParent = Assertions.assertNotNull(displayParent, "'displayParent' must not be null");
+
+    if (m_displayParent.get() == displayParent) {
+      return;
+    }
+
+    IDesktop desktop = getDesktop();
+    if (desktop == null || !desktop.isShowing(this)) {
+      m_displayParent.set(displayParent, true); // no Desktop available, or Form is not showing yet.
+    }
+    else {
+      // This Form is already showing and must be attached to the new 'displayParent'.
+      desktop.hideForm(this);
+      m_displayParent.set(displayParent, true);
+      desktop.showForm(this);
     }
   }
 
@@ -2967,24 +2979,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
-  /**
-   * Derives the {@link IDisplayParent} from the calling context.
-   */
-  protected IDisplayParent deriveDisplayParent() {
-    ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
+  protected IDisplayParent resolveDisplayParent() {
+    return m_initialClientRunContext.call(new Callable<IDisplayParent>() {
 
-    // Check whether a Form is currently the 'displayParent'.
-    if (currentRunContext.form() != null) {
-      return currentRunContext.form();
-    }
-
-    // Check whether an Outline is currently the 'displayParent'.
-    if (currentRunContext.outline() != null) {
-      return currentRunContext.outline();
-    }
-
-    // Use the desktop as 'displayParent'.
-    return currentRunContext.session().getDesktop();
+      @Override
+      public IDisplayParent call() throws Exception {
+        return BEANS.get(DisplayParentResolver.class).resolve(AbstractForm.this);
+      }
+    }, BEANS.get(RuntimeExceptionTranslator.class));
   }
 
   /**

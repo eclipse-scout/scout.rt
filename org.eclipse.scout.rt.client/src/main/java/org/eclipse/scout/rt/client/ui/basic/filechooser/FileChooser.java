@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.filechooser;
 
 import java.util.Collection;
-import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
@@ -19,11 +18,11 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.DisplayParentResolver;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
@@ -58,8 +57,7 @@ public class FileChooser implements IFileChooser {
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_multiSelect = multiSelect;
     m_maximumUploadSize = DEFAULT_MAXIMUM_UPLOAD_SIZE;
-
-    m_displayParent = deriveDisplayParent();
+    m_displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);
   }
 
   @Override
@@ -74,9 +72,13 @@ public class FileChooser implements IFileChooser {
 
   @Override
   public void setDisplayParent(IDisplayParent displayParent) {
-    Assertions.assertNotNull(displayParent, "Property 'displayParent' must not be null");
-    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because FileChooser is already attached to Desktop [fileChooser=%s]", this);
-    m_displayParent = displayParent;
+    Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because FileChooser is already showing [fileChooser=%s]", this);
+
+    if (displayParent == null) {
+      displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);
+    }
+
+    m_displayParent = Assertions.assertNotNull(displayParent, "'displayParent' must not be null");
   }
 
   @Override
@@ -127,12 +129,7 @@ public class FileChooser implements IFileChooser {
   }
 
   private void waitFor() throws ProcessingException {
-    try {
-      m_blockingCondition.waitFor();
-    }
-    finally {
-      fireClosed();
-    }
+    m_blockingCondition.waitFor();
   }
 
   @Override
@@ -151,32 +148,10 @@ public class FileChooser implements IFileChooser {
   }
 
   protected void fireFileChooserEvent(FileChooserEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(FileChooserListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (int i = 0; i < listeners.length; i++) {
-        ((FileChooserListener) listeners[i]).fileChooserChanged(e);
-      }
+    FileChooserListener[] listeners = m_listenerList.getListeners(FileChooserListener.class);
+    for (FileChooserListener listener : listeners) {
+      listener.fileChooserChanged(e);
     }
-  }
-
-  /**
-   * Derives the {@link IDisplayParent} from the calling context.
-   */
-  protected IDisplayParent deriveDisplayParent() {
-    ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
-
-    // Check whether a Form is currently the 'displayParent'.
-    if (currentRunContext.form() != null) {
-      return currentRunContext.form();
-    }
-
-    // Check whether an Outline is currently the 'displayParent'.
-    if (currentRunContext.outline() != null) {
-      return currentRunContext.outline();
-    }
-
-    // Use the desktop as 'displayParent'.
-    return currentRunContext.session().getDesktop();
   }
 
   private class P_UIFacade implements IFileChooserUIFacade {

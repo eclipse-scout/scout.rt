@@ -74,11 +74,6 @@ public class ColumnFilterForm extends AbstractForm {
     return ScoutTexts.get("ColumnFilter");
   }
 
-  @Override
-  protected boolean getConfiguredModal() {
-    return true;
-  }
-
   public ITableColumnFilter<?> getColumnFilter() {
     return m_columnFilter;
   }

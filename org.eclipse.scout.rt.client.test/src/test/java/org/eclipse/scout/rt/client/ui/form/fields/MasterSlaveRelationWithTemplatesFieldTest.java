@@ -88,7 +88,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Override
-    protected boolean getConfiguredModal() {
+    protected Boolean getConfiguredModal() {
       return false;
     }
 
@@ -193,7 +193,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Override
-    protected boolean getConfiguredModal() {
+    protected Boolean getConfiguredModal() {
       return false;
     }
 

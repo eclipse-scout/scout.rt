@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -36,6 +37,7 @@ public class FormStore extends IndexedStore<IForm> {
   private final P_DisplayHintIndex m_displayHintIndex = registerIndex(new P_DisplayHintIndex());
   private final P_ClassIndex m_clazzIndex = registerIndex(new P_ClassIndex());
   private final P_ExclusiveKeyViewIndex m_viewKeyIndex = registerIndex(new P_ExclusiveKeyViewIndex());
+  private final P_ApplicationModalDialogIndex m_applicationModalDialogIndex = registerIndex(new P_ApplicationModalDialogIndex());
 
   private static enum FormType {
     VIEW, DIALOG;
@@ -56,16 +58,16 @@ public class FormStore extends IndexedStore<IForm> {
   }
 
   /**
-   * Returns all <code>Forms</code> which are attached to the given {@link IDisplayParent}. The forms returned are ordered
-   * as inserted.
+   * Returns all <code>Forms</code> which are attached to the given {@link IDisplayParent}. The forms returned are
+   * ordered as inserted.
    */
   public List<IForm> getByDisplayParent(final IDisplayParent displayParent) {
     return m_displayParentIndex.get(displayParent);
   }
 
   /**
-   * Returns all <code>Views</code> which are attached to the given {@link IDisplayParent}. The forms returned are ordered
-   * as inserted.
+   * Returns all <code>Views</code> which are attached to the given {@link IDisplayParent}. The forms returned are
+   * ordered as inserted.
    */
   public List<IForm> getViewsByDisplayParent(final IDisplayParent displayParent) {
     return m_displayParentViewIndex.get(displayParent);
@@ -101,6 +103,13 @@ public class FormStore extends IndexedStore<IForm> {
    */
   public List<IForm> getViewsByKey(final Object key) {
     return m_viewKeyIndex.get(key);
+  }
+
+  /**
+   * Returns <code>true</code> if this store contains 'application-modal' dialogs, or <code>false</code> if not.
+   */
+  public boolean containsApplicationModalDialogs() {
+    return m_applicationModalDialogIndex.get(Boolean.TRUE).size() > 0;
   }
 
   // ====  Index definitions ==== //
@@ -179,6 +188,14 @@ public class FormStore extends IndexedStore<IForm> {
         BEANS.get(ExceptionHandler.class).handle(e);
         return null;
       }
+    }
+  }
+
+  private class P_ApplicationModalDialogIndex extends AbstractMultiValueIndex<Boolean, IForm> {
+
+    @Override
+    protected Boolean calculateIndexFor(final IForm form) {
+      return form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW && form.isModal() && form.getDisplayParent() == ClientSessionProvider.currentSession().getDesktop();
     }
   }
 }

@@ -64,38 +64,23 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   String PROP_PERSPECTIVE_ID = "perspectiveId";
 
   /**
-   * Standalone window
+   * Hint to render a {@link IForm} as dialog in a separate window. A dialog can be modal or non-modal.
    */
   int DISPLAY_HINT_DIALOG = 0;
   /**
-   * Popup view is a popup window that is automatically closed when mouse clicks outside of popup
+   * Hint to render a {@link IForm} as pop-up window that is closed automatically once a mouse click outside the pop-up
+   * occurs.
    */
   int DISPLAY_HINT_POPUP_WINDOW = 10;
   /**
-   * Popup dialog is a normal dialog, but placement is at the focus owner location instead of default dialog position
+   * Hint to render a {@link IForm} as dialog that is positioned at current focus location.
    */
   int DISPLAY_HINT_POPUP_DIALOG = 12;
   /**
-   * Inline view
+   * Hint to render a {@link IForm} as view. Typically, a view is not modal and has the {@link IDesktop} as its
+   * {@link IDisplayParent}.
    */
   int DISPLAY_HINT_VIEW = 20;
-
-  /**
-   * Use this modality hint to not make the {@link IForm} modal.
-   */
-  int MODALITY_HINT_NONE = 0;
-
-  /**
-   * Use this modality hint to make a {@link IForm} modal in respect to its {@link IDisplayParent}. That prevents the
-   * user
-   * from interacting with controls of the {@link IDisplayParent}.
-   */
-  int MODALITY_HINT_PARENT = 10;
-
-  /**
-   * Use this modality hint to make the {@link IForm} desktop or application modal.
-   */
-  int MODALITY_HINT_DESKTOP = 20;
 
   int TOOLBAR_FORM_HEADER = 30;
   int TOOLBAR_VIEW_PART = 31;
@@ -120,23 +105,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * By default any of the #start* methods of the form call this method
    */
   void initForm() throws ProcessingException;
-
-  /**
-   * @return the {@link IDisplayParent} to attach this {@link IForm} to; is never <code>null</code>.
-   */
-  IDisplayParent getDisplayParent();
-
-  /**
-   * Sets the model element to attach this {@link IForm} to. By default, the {@link IDisplayParent} is set automatically
-   * from the current calling context when the {@link IForm} is created. However, that parent can be overwritten
-   * manually. If the Form is already showing, it is linked with the new {@link IDisplayParent}.
-   * <p>
-   * By default, a view's parent is the {@link IDesktop} and not the parent of the calling context.
-   *
-   * @param displayParent
-   *          like {@link IDesktop}, {@link IOutline} or {@link IForm}; must not be <code>null</code>.
-   */
-  void setDisplayParent(IDisplayParent displayParent);
 
   /**
    * This method is called to get an exclusive key of the form. The key is used
@@ -537,24 +505,16 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
 
   void setMinimizeEnabled(boolean b);
 
+  /**
+   * @return <code>true</code> to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or
+   *         <code>false</code> otherwise.
+   */
   boolean isModal();
 
+  /**
+   * Sets the modality hint to make this {@link IForm} modal in respect to its {@link IDisplayParent}.
+   */
   void setModal(boolean modal);
-
-  /**
-   * @return the modality hint of this {@link IForm}.
-   */
-  int getModalityHint();
-
-  /**
-   * Set this modality hint to control modality of this {@link IForm}.
-   * <ul>
-   * <li>{@link #MODALITY_HINT_NONE}</li>
-   * <li>{@link #MODALITY_HINT_PARENT}</li>
-   * <li>{@link #MODALITY_HINT_DESKTOP}</li>
-   * </ul>
-   */
-  void setModalityHint(int modalityHint);
 
   void setCacheBounds(boolean cacheBounds);
 
@@ -568,17 +528,50 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   String computeCacheBoundsKey();
 
   /**
-   * @return one of the DISPLAY_HINT_* constants or a custom value
+   * @return the display hint to control visualization of this {@link IForm}.
+   * @see #DISPLAY_HINT_VIEW
+   * @see #DISPLAY_HINT_POPUP_DIALOG
+   * @see #DISPLAY_HINT_POPUP_DIALOG
+   * @see #DISPLAY_HINT_POPUP_WINDOW
    */
   int getDisplayHint();
 
   /**
-   * use one ofe the DISPLAY_HINT constants or a custom value
+   * Set the given hint to control visualization of this {@link IForm}.
+   * <ul>
+   * <li>{@link #DISPLAY_HINT_VIEW}</li>
+   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link #DISPLAY_HINT_POPUP_WINDOW}</li>
+   * </ul>
    */
   void setDisplayHint(int i);
 
   /**
-   * @return one of the VIEW_ID_* constants or a custom text
+   * @return the {@link IDisplayParent} to attach this {@link IForm} to; is never <code>null</code>.
+   */
+  IDisplayParent getDisplayParent();
+
+  /**
+   * Sets the display parent to attach this {@link IForm} to.
+   * <p>
+   * A display parent is the anchor to attach this {@link IForm} to, and affects its accessibility and modality scope.
+   * Possible parents are {@link IDesktop}, {@link IOutline}, or {@link IForm}:
+   * <ul>
+   * <li>Desktop: Form is always accessible; blocks the entire desktop if modal;</li>
+   * <li>Outline: Form is only accessible when the given outline is active; only blocks the outline if modal;</li>
+   * <li>Form: Form is only accessible when the given Form is active; only blocks the Form if modal;</li>
+   * </ul>
+   * This property can be changed even if the {@link IForm} is showing.
+   *
+   * @param displayParent
+   *          like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to use the
+   *          {@link IDisplayParent} resolved from the current calling context during initialization.
+   */
+  void setDisplayParent(IDisplayParent displayParent);
+
+  /**
+   * @return the display hint of this {@link IForm}.
    */
   String getDisplayViewId();
 

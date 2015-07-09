@@ -34,12 +34,19 @@ public interface IFileChooser {
   IDisplayParent getDisplayParent();
 
   /**
-   * Sets the model element to attach this {@link IFileChooser} to. By default, the {@link IDisplayParent} is set
-   * automatically from the current calling context when the {@link IFileChooser} is created. However, that parent can
-   * be overwritten manually as long as not showing.
+   * Sets the display parent to attach this {@link IFileChooser} to.
+   * <p>
+   * A display parent is the anchor to attach this {@link IFileChooser} to, and affects its accessibility and modality
+   * scope. Possible parents are {@link IDesktop}, {@link IOutline}, or {@link IForm}:
+   * <ul>
+   * <li>Desktop: {@link IFileChooser} is always accessible; blocks the entire desktop;</li>
+   * <li>Outline: {@link IFileChooser} is only accessible when the given outline is active; only blocks the outline;</li>
+   * <li>Form: {@link IFileChooser} is only accessible when the given Form is active; only blocks the Form;</li>
+   * </ul>
    *
    * @param displayParent
-   *          like {@link IDesktop}, {@link IOutline} or {@link IForm}; must not be <code>null</code>.
+   *          like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to derive the
+   *          {@link IDisplayParent} from the current calling context.
    */
   void setDisplayParent(IDisplayParent displayParent);
 

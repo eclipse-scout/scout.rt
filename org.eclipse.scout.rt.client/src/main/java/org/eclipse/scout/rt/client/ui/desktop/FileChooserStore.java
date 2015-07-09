@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.platform.Bean;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.platform.Bean;
 public class FileChooserStore extends IndexedStore<IFileChooser> {
 
   private final P_DisplayParentIndex m_displayParentIndex = registerIndex(new P_DisplayParentIndex());
+  private final P_ApplicationModalIndex m_applicationModalIndex = registerIndex(new P_ApplicationModalIndex());
 
   /**
    * Returns all <code>FileChoosers</code> which are attached to the given {@link IDisplayParent} in the order as
@@ -36,6 +38,13 @@ public class FileChooserStore extends IndexedStore<IFileChooser> {
     return m_displayParentIndex.get(displayParent);
   }
 
+  /**
+   * Returns <code>true</code> if this store contains 'application-modal' file choosers, or <code>false</code> if not.
+   */
+  public boolean containsApplicationModalFileChoosers() {
+    return m_applicationModalIndex.get(Boolean.TRUE).size() > 0;
+  }
+
   // ====  Index definitions ==== //
 
   private class P_DisplayParentIndex extends AbstractMultiValueIndex<IDisplayParent, IFileChooser> {
@@ -43,6 +52,14 @@ public class FileChooserStore extends IndexedStore<IFileChooser> {
     @Override
     protected IDisplayParent calculateIndexFor(final IFileChooser fileChooser) {
       return fileChooser.getDisplayParent();
+    }
+  }
+
+  private class P_ApplicationModalIndex extends AbstractMultiValueIndex<Boolean, IFileChooser> {
+
+    @Override
+    protected Boolean calculateIndexFor(final IFileChooser fileChooser) {
+      return fileChooser.getDisplayParent() == ClientSessionProvider.currentSession().getDesktop();
     }
   }
 }

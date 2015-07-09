@@ -60,7 +60,7 @@ public class StringFieldSetMultilineTextTest {
     }
 
     @Override
-    protected boolean getConfiguredModal() {
+    protected Boolean getConfiguredModal() {
       return false;
     }
 
