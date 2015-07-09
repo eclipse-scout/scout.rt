@@ -97,6 +97,13 @@ scout.ViewTabsController.prototype.viewTab = function(view) {
 };
 
 /**
+ * Returns the all view tabs.
+ */
+scout.ViewTabsController.prototype.viewTabs = function() {
+  return this._viewTabs;
+};
+
+/**
  * Returns the selected view tab.
  */
 scout.ViewTabsController.prototype.selectedViewTab = function() {

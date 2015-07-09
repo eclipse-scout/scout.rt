@@ -39,18 +39,18 @@ scout.ValueField.prototype._syncMenus = function(menus) {
 /**
  * @override FormField.js
  */
-scout.ValueField.prototype._onStatusClick = function(event) {
-  if (this._hasMenus()) {
+scout.ValueField.prototype._onStatusMouseDown = function(event) {
+  if (this._hasMenus() && (!this.contextPopup|| !this.contextPopup.rendered)) {
     // showing menus is more important than showing tooltips
-    var popup = new scout.ContextMenuPopup(this.session, {
+    this.contextPopup = new scout.ContextMenuPopup(this.session, {
       menuItems: this.menus,
       cloneMenuItems: false,
       $anchor: this.$status
     });
-    popup.render();
+    this.contextPopup.render(undefined, event);
   } else {
     // super call shows tooltip
-    scout.ValueField.parent.prototype._onStatusClick.call(this);
+    scout.ValueField.parent.prototype._onStatusMouseDown.call(this);
   }
 };
 

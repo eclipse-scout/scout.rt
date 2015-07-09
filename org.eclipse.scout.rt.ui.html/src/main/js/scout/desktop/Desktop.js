@@ -129,7 +129,7 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
 };
 
 scout.Desktop.prototype._setupDragAndDrop = function() {
-  var dragEnterOrOver = function (event) {
+  var dragEnterOrOver = function(event) {
     event.stopPropagation();
     event.preventDefault();
     // change cursor to forbidden (no dropping allowed)
@@ -138,7 +138,7 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
 
   this.$container.on('dragenter', dragEnterOrOver);
   this.$container.on('dragover', dragEnterOrOver);
-  this.$container.on('drop', function (event) {
+  this.$container.on('drop', function(event) {
     event.stopPropagation();
     event.preventDefault();
   });
@@ -169,8 +169,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
     var splitterPosition = parseInt(storedSplitterPosition, 10);
     this.splitter.updatePosition(splitterPosition);
     this._handleUpdateSplitterPosition(splitterPosition);
-  }
-  else {
+  } else {
     // Set initial splitter position
     this.splitter.updatePosition();
     this._handleUpdateSplitterPosition(this.splitter.positoin);
@@ -240,8 +239,12 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
 };
 
 scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
-  this.navigation.onResize({data: newPosition});
-  this.onResize({data: newPosition});
+  this.navigation.onResize({
+    data: newPosition
+  });
+  this.onResize({
+    data: newPosition
+  });
 };
 
 scout.Desktop.prototype._detachOutlineContent = function() {
@@ -387,12 +390,12 @@ scout.Desktop.prototype.navigationWidthUpdated = function(navigationWidth) {
   }
 };
 
-scout.Desktop.prototype._bringNavigationToFront = function () {
+scout.Desktop.prototype._bringNavigationToFront = function() {
   this.navigation.bringToFront();
   this._renderBenchDropShadow(false);
 };
 
-scout.Desktop.prototype._sendNavigationToBack = function () {
+scout.Desktop.prototype._sendNavigationToBack = function() {
   this.navigation.sendToBack();
   this._renderBenchDropShadow(true);
 };

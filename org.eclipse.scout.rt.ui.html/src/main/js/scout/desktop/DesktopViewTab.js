@@ -17,7 +17,7 @@ scout.DesktopViewTab = function(view, $bench) {
   this._$detachedDom;
 
   this._propertyChangeListener = function(event) {
-    if (scout.helpers.isOneOf(event.changedProperties, 'title' ,'subTitle')) {
+    if (scout.helpers.isOneOf(event.changedProperties, 'title', 'subTitle')) {
       this._titlesUpdated();
     }
   }.bind(this);
@@ -45,7 +45,7 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 
 scout.DesktopViewTab.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-view-tab')
-    .on('click', this._onClick.bind(this));
+    .on('mousedown', this._onMouseDown.bind(this));
   this._$title = this.$container.appendDiv('title').text(this._view.title);
   this._$subTitle = this.$container.appendDiv('sub-title').text(this._view.subTitle);
 };
@@ -95,7 +95,7 @@ scout.DesktopViewTab.prototype.deselect = function() {
   this._cssSelect(false);
 };
 
-scout.DesktopViewTab.prototype._onClick = function(event) {
+scout.DesktopViewTab.prototype._onMouseDown = function(event) {
   this.events.trigger('tabClicked', this);
 };
 

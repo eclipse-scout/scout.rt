@@ -128,17 +128,17 @@ scout.ImageField.prototype._hasMenus = function() {
 /**
  * @override FormField.js
  */
-scout.ImageField.prototype._onStatusClick = function(event) {
-  if (this._hasMenus()) {
+scout.ImageField.prototype._onStatusMouseDown = function(event) {
+  if (this._hasMenus()&&(!this.contextPopup|| !this.contextPopup.rendered)) {
     // showing menus is more important than showing tooltips
-    var popup = new scout.ContextMenuPopup(this.session, {
+    this.contextPopup = new scout.ContextMenuPopup(this.session, {
       menuItems: this.menus,
       cloneMenuItems: false,
       $anchor: this.$status
     });
-    popup.render();
+    this.contextPopup.render(undefined, event);
   } else {
     // super call shows tooltip
-    scout.ValueField.parent.prototype._onStatusClick.call(this);
+    scout.ValueField.parent.prototype._onStatusMouseDown.call(this);
   }
 };

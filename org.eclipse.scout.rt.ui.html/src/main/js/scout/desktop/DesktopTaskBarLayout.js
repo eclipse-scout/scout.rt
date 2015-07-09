@@ -145,7 +145,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
     this._$overflowTab = $tabs
       .appendDiv('overflow-tab-item')
-      .on('click', this._onClickOverflow.bind(this));
+      .on('mousedown', this._onMouseDownOverflow.bind(this));
     if (numOverflowTabs > 1) {
       this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
     }
@@ -165,18 +165,18 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
   }
 };
 
-scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
+scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
   var menu, tab, text, popup, overflowMenus = [],
     desktop = this._desktop;
   this._overflowTabsIndizes.forEach(function(i) {
-    tab = desktop._allTabs[i];
+    tab = desktop.viewTabsController.viewTabs()[i];
     menu = desktop.session.createUiObject({
       objectType: 'Menu',
       text: tab.getMenuText(),
       tab: tab
     });
     menu.sendDoAction = function() {
-      $.log.debug('(DesktopTaskBarLayout#_onClickOverflow) tab=' + this.tab);
+      $.log.debug('(DesktopTaskBarLayout#_onMouseDownOverflow) tab=' + this.tab);
       desktop.viewTabsController.selectViewTab(this.tab);
     };
     overflowMenus.push(menu);
@@ -190,5 +190,5 @@ scout.DesktopTabBarLayout.prototype._onClickOverflow = function(event) {
       y: event.pageY
     }
   });
-  popup.render();
+  popup.render(undefined, event);
 };

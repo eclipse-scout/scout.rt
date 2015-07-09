@@ -241,7 +241,7 @@ scout.FormField.prototype._renderGridData = function(gridData) {
   // NOP
 };
 
-scout.FormField.prototype._onStatusClick = function() {
+scout.FormField.prototype._onStatusMouseDown = function() {
   // Toggle tooltip
   if (this.tooltip && this.tooltip.rendered) {
     this._hideStatusMessage();
@@ -367,7 +367,7 @@ scout.FormField.prototype.removeField = function() {
 scout.FormField.prototype.addStatus = function() {
   this.$status = $('<span>')
     .addClass('status')
-    .click(this._onStatusClick.bind(this))
+    .on('mousedown', this._onStatusMouseDown.bind(this))
     .appendTo(this.$container);
 };
 
