@@ -94,15 +94,14 @@ public class PlatformImplementor implements IPlatform {
       initBeanScopeEvaluator();
       initBeanDecorationFactory();
 
+      changeState(State.BeanManagerValid, true);
     }
     finally {
+      //since we are using a reentrant lock, platform beans can be accessed within platform listeners
+      //lock has to be released after the State.BeanManagerValid change to make sure everything is initialized correctly, before beans can be accessed.
       m_platformLock.writeLock().unlock();
     }
-
-    changeState(State.BeanManagerValid, true);
     startCreateImmediatelyBeans();
-
-    // last event is outside lock to allow the listeners to use the bean context and the inventory
     changeState(State.PlatformStarted, true);
   }
 
