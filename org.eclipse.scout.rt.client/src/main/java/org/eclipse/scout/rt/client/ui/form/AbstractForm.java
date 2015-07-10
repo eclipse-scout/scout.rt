@@ -42,6 +42,7 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.PreferredValue;
+import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -370,18 +371,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Overwrite to set the modality hint for this {@link IForm}. By default, this method returns <code>null</code>,
-   * meaning that modality is derived from the configured <code>display-hint</code>. For dialogs, it is
-   * <code>true</code>, for views <code>false</code>.
+   * Overwrite to set the modality hint for this {@link IForm}. By default, this method returns
+   * {@link TriState#UNDEFINED}, meaning that modality is derived from the configured <code>display-hint</code>. For
+   * dialogs, it is <code>true</code>, for views <code>false</code>.
    *
-   * @return <code>true</code> to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or
-   *         <code>false</code> otherwise, or <code>null</code> to derive modality from the <code>display-hint</code>.
+   * @return {@link TriState#TRUE} to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or
+   *         {@link TriState#FALSE} otherwise, or {@link TriState#UNDEFINED} to derive modality from the
+   *         <code>display-hint</code>.
    * @see #getConfiguredDisplayHint()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(110)
-  protected Boolean getConfiguredModal() {
-    return null;
+  protected TriState getConfiguredModal() {
+    return TriState.UNDEFINED;
   }
 
   /**
@@ -743,9 +745,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     setIconId(getConfiguredIconId());
 
     // Set 'modality' as preferred value if not null.
-    Boolean modal = getConfiguredModal();
-    if (modal != null) {
-      m_modal.set(modal, true);
+    TriState modal = getConfiguredModal();
+    if (!modal.isUndefined()) {
+      m_modal.set(modal.isTrue(), true);
     }
 
     // Set 'displayParent' as preferred value if not null; must precede setting of the 'displayHint'.
@@ -2446,8 +2448,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-          header(TEXTS.get("LoadFormXmlFailedText")).
-          show();
+              header(TEXTS.get("LoadFormXmlFailedText")).
+              show();
         }
       }
     }
