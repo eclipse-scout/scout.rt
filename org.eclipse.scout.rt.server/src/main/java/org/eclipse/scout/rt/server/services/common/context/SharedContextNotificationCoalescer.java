@@ -21,10 +21,12 @@ import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedN
  */
 public class SharedContextNotificationCoalescer implements ICoalescer<SharedContextChangedNotification> {
 
+  /**
+   * Reduce to last notification
+   */
   @Override
   public List<SharedContextChangedNotification> coalesce(List<SharedContextChangedNotification> notifications) {
-    // reduce to one
-    return CollectionUtility.arrayList(CollectionUtility.firstElement(notifications));
+    return CollectionUtility.arrayList(CollectionUtility.lastElement(notifications));
   }
 
 }
