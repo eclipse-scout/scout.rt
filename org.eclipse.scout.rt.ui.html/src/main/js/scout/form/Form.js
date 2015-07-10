@@ -30,7 +30,11 @@ scout.Form.prototype.init = function(model, session) {
 
 scout.Form.prototype._render = function($parent) {
   this.$parentContainer = $parent;
+  this._renderForm($parent);
+  this.attached = true;
+};
 
+scout.Form.prototype._renderForm = function($parent) {
   // Add modality glassPane if applicable; must precede appending the Form to the DOM.
   this._modalityController.addGlassPane();
 
@@ -71,8 +75,8 @@ scout.Form.prototype._render = function($parent) {
     $.log.warn('startInstall');
   }
 
-  this.attached = true;
 };
+
 
 scout.Form.prototype._renderProperties = function() {
   this._renderInitialFocus(this.initialFocus);
