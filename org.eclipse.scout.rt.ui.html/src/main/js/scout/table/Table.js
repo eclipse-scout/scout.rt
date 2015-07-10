@@ -1620,17 +1620,17 @@ scout.Table.prototype.$sumRows = function() {
 };
 
 scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
-  var selector = '.table-row > div:nth-of-type(' + colIndex + ' )';
+  var selector = '.table-row > div:nth-of-type(' + colIndex + ')';
   if (includeSumRows) {
-    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
+    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ')';
   }
   return this.$data.find(selector);
 };
 
 scout.Table.prototype.$cellsForColIndexWidthFix = function(colIndex, includeSumRows) {
-  var selector = 'table-row > div:nth-of-type(' + colIndex + ' ) > .width-fix ';
+  var selector = '.table-row > div:nth-of-type(' + colIndex + ') > .width-fix ';
   if (includeSumRows) {
-    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' ) > .width-fix';
+    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ') > .width-fix';
   }
   return this.$data.find(selector);
 };
