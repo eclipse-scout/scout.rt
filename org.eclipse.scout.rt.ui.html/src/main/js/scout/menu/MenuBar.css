@@ -52,6 +52,10 @@
   }
 
   & > .menu-item.last {
-    margin-right: 5px;
+    margin-right: 0;
+
+    &.right-aligned {
+      margin-right: 5px;
+    }
   }
 }
