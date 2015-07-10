@@ -445,3 +445,7 @@ Added:
 - org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField.getMaximumUploadSize()
 Also added getConfigured...() methods were applicable for properties above. File upload size is always limited now (otherwise server might run out of memory if too large files are sent).
 Default size is 50 MB, but every field might specify lower/higher sizes.
+
+AWE 10.07.2015:
+Removed methods UserAgentUtility#isRichClient() and #isWebClient()
+Deleted CopyColumnsWidthsMenu, replaced with new button in OrganizeColumnsForm
