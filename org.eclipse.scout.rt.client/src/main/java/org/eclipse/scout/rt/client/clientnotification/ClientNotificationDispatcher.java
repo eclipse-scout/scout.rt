@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.clientnotification;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -64,6 +65,10 @@ public class ClientNotificationDispatcher {
    */
   public void dispatchNotifications(Collection<ClientNotificationMessage> notifications, IFilter<ClientNotificationMessage> filter) {
     IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
+    // FIXME AHO/JGU: hack added by A.WE to prevent NPE
+    if (notifications == null) {
+      notifications = Collections.emptyList();
+    }
     for (ClientNotificationMessage message : notifications) {
       if (!filter.accept(message)) {
         continue;

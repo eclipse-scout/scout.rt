@@ -19,18 +19,13 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  *
@@ -44,17 +39,19 @@ public class ClientNotificationPoller {
   @PostConstruct
   public void start() {
     // TODO aho guard to start only once
-    if (BEANS.get(IServiceTunnel.class).isActive()) {
-      P_NotificationPollJob pollJob = new P_NotificationPollJob();
-      m_pollerFuture = Jobs.schedule(pollJob, Jobs.newInput(
-          ClientRunContexts.empty().
-              session(BEANS.get(IClientSessionRegistry.class).getNotificationSession(), true).
-              subject(BEANS.get(NotificationSubjectProperty.class).getValue()).
-              userAgent(UserAgent.createDefault())));
-    }
-    else {
-      LOG.debug("Starting without notifications due to no proxy service is available");
-    }
+    // FIXME JGU/AHO... commented out by A.WE
+    return;
+//    if (BEANS.get(IServiceTunnel.class).isActive()) {
+//      P_NotificationPollJob pollJob = new P_NotificationPollJob();
+//      m_pollerFuture = Jobs.schedule(pollJob, Jobs.newInput(
+//          ClientRunContexts.empty().
+//              session(BEANS.get(IClientSessionRegistry.class).getNotificationSession(), true).
+//              subject(BEANS.get(NotificationSubjectProperty.class).getValue()).
+//              userAgent(UserAgent.createDefault())));
+//    }
+//    else {
+//      LOG.debug("Starting without notifications due to no proxy service is available");
+//    }
   }
 
   public void stop() {
