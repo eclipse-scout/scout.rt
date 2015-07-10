@@ -60,14 +60,11 @@ public class ClientNotificationDispatcher {
     dispatchNotifications(notifications, ACCEPT_ALL_FILTER);
   }
 
-  /**
-   * @param notifications
-   */
   public void dispatchNotifications(Collection<ClientNotificationMessage> notifications, IFilter<ClientNotificationMessage> filter) {
     IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
-    // FIXME AHO/JGU: hack added by A.WE to prevent NPE
     if (notifications == null) {
       notifications = Collections.emptyList();
+      LOG.error("Notifications null. Please check your configuration");
     }
     for (ClientNotificationMessage message : notifications) {
       if (!filter.accept(message)) {
