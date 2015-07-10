@@ -11,13 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -25,7 +23,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -37,9 +34,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -62,16 +59,16 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * ...
  * public class MyDateField extends AbstractDateField {
  * }
- *
+ * 
  * //Use SimpleDateFormat to get a String representation of the date.
  * Date d = formData.getMyDate().getValue();
  * DateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd - HH:mm:ss&quot;, Locale.ENGLISH);
  * String formattedDate = dateFormat.format(d);
  * System.out.println(formattedDate);
- *
+ * 
  * //Send the formData to the server using a service:
  * BEANS.get(IMyService.class).load(MyFormData formData)
- *
+ * 
  * //Use SimpleDateFormat to get a String representation of the date in the service implementation.
  * public MyFormData load(MyFormData formData) {
  *     Date d = formData.getMyDate().getValue();
@@ -94,14 +91,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 public abstract class AbstractDateField extends AbstractBasicField<Date> implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
 
-  private static enum ParseContext {
-    Date, Time
-  }
-
-  private static final ThreadLocal<ParseContext> PARSE_CONTEXT = new ThreadLocal<AbstractDateField.ParseContext>();
-
   private IDateFieldUIFacade m_uiFacade;
-  private String m_format;
   private long m_autoTimeMillis;
   private Date m_autoDate;
 
@@ -119,6 +109,18 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @ConfigProperty(ConfigProperty.STRING)
   @Order(230)
   protected String getConfiguredFormat() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(231)
+  protected String getConfiguredDateFormatPattern() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(232)
+  protected String getConfiguredTimeFormatPattern() {
     return null;
   }
 
@@ -181,6 +183,24 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   /**
+   * @deprecated This method is never called for {@link IDateField}. The UI is responsible for parsing a date.
+   */
+  @Override
+  @Deprecated
+  protected final Date execParseValue(String text) throws ProcessingException {
+    return super.execParseValue(text);
+  }
+
+  /**
+   * <b>Important:</b> Make sure that this method only uses formats that are supported by the UI. Otherwise, a formatted
+   * date cannot be parsed again.
+   */
+  @Override
+  protected String execFormatValue(Date value) {
+    return super.execFormatValue(value);
+  }
+
+  /**
    * Depending whether subclass overrides this method
    * <p>
    * Default is as follows<br>
@@ -212,7 +232,11 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
+
     setFormat(getConfiguredFormat());
+    setDateFormatPattern(getConfiguredDateFormatPattern());
+    setTimeFormatPattern(getConfiguredTimeFormatPattern());
+
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
     setAutoTimeMillis(getConfiguredAutoTimeMillis());
@@ -229,14 +253,83 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   @Override
-  public void setFormat(String s) {
-    m_format = s;
-    refreshDisplayText();
+  public void setFormat(String format) {
+    format = checkFormatPatternSupported(format);
+
+    String dateFormatPattern = null;
+    String timeFormatPattern = null;
+    if (format != null) {
+      // Try to extract date and time parts of pattern
+      int h = format.toLowerCase().indexOf('h');
+      if (h >= 0) {
+        dateFormatPattern = format.substring(0, h).trim();
+        timeFormatPattern = format.substring(h).trim();
+      }
+      else {
+        if (isHasDate()) {
+          dateFormatPattern = format;
+          timeFormatPattern = null;
+          if (isHasTime()) {
+            LOG.warn("Could not extract time part from pattern '" + format + "', using default pattern.");
+          }
+        }
+        else {
+          dateFormatPattern = null;
+          timeFormatPattern = (isHasTime() ? format : null);
+        }
+      }
+    }
+    setDateFormatPattern(dateFormatPattern);
+    setTimeFormatPattern(timeFormatPattern);
   }
 
   @Override
   public String getFormat() {
-    return m_format;
+    String s = "";
+    if (isHasDate()) {
+      s = StringUtility.join(" ", s, getDateFormatPattern());
+    }
+    if (isHasTime()) {
+      s = StringUtility.join(" ", s, getTimeFormatPattern());
+    }
+    return s;
+  }
+
+  @Override
+  public void setDateFormatPattern(String dateFormatPattern) {
+    dateFormatPattern = checkFormatPatternSupported(dateFormatPattern);
+    if (dateFormatPattern == null) {
+      dateFormatPattern = getDefaultDateFormatPatternByLocale(NlsLocale.get());
+    }
+    propertySupport.setPropertyString(PROP_DATE_FORMAT_PATTERN, dateFormatPattern);
+    // Always update display text (format may be the same, but language might have changed)
+    refreshDisplayText();
+  }
+
+  @Override
+  public String getDateFormatPattern() {
+    return propertySupport.getPropertyString(PROP_DATE_FORMAT_PATTERN);
+  }
+
+  @Override
+  public void setTimeFormatPattern(String timeFormatPattern) {
+    timeFormatPattern = checkFormatPatternSupported(timeFormatPattern);
+    if (timeFormatPattern == null) {
+      timeFormatPattern = getDefaultTimeFormatPatternByLocale(NlsLocale.get());
+    }
+    propertySupport.setPropertyString(PROP_TIME_FORMAT_PATTERN, timeFormatPattern);
+    // Always update display text (format may be the same, but language might have changed)
+    refreshDisplayText();
+  }
+
+  @Override
+  public String getTimeFormatPattern() {
+    return propertySupport.getPropertyString(PROP_TIME_FORMAT_PATTERN);
+  }
+
+  protected String checkFormatPatternSupported(String formatPattern) {
+    // FIXME BSH How to implement?
+    return formatPattern;
   }
 
   @Override
@@ -357,8 +450,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     if (rawValue != null) {
       try {
         // apply format
-        DateFormat df = getDateFormat();
-        rawValue = df.parse(df.format(rawValue));
+//        DateFormat df = getDateFormat();
+//        rawValue = df.parse(df.format(rawValue));
       }
       catch (Exception t) {
         // nop, take raw value
@@ -366,59 +459,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
     validValue = rawValue;
     return validValue;
-  }
-
-  /**
-   * convert string to a real Date
-   */
-  @Override
-  protected Date parseValueInternal(String text) throws ProcessingException {
-    if (!StringUtility.hasText(text)) {
-      return null;
-    }
-    Date d = null;
-    boolean customFormat = (getFormat() != null);
-    if (isHasDate() && isHasTime()) {
-      ParseContext pctx = PARSE_CONTEXT.get();
-      if (pctx == null) {
-        d = parseDateTimeInternal(text, customFormat ? getDateFormat() : null);
-      }
-      else if (pctx == ParseContext.Date) {
-        d = parseDateInternal(text, customFormat ? getIsolatedDateFormat() : null);
-        Date currentValue = getValue();
-        if (currentValue != null) {
-          d = DateUtility.createDateTime(d, currentValue);
-        }
-      }
-      else if (pctx == ParseContext.Time) {
-        d = parseTimeInternal(text, customFormat ? getIsolatedTimeFormat() : null);
-        Date currentValue = getValue();
-        currentValue = applyAutoDate(currentValue);
-        d = DateUtility.createDateTime(currentValue, d);
-      }
-    }
-    else if (isHasDate() && !isHasTime()) {
-      d = parseDateInternal(text, customFormat ? getDateFormat() : null);
-    }
-    else if (!isHasDate() && isHasTime()) {
-      d = parseTimeInternal(text, customFormat ? getDateFormat() : null);
-    }
-    // truncate value
-    DateFormat df = getDateFormat();
-    try {
-      //preserve the year, since it might have been truncated to previous century, ticket 87172
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(d);
-      int year = cal.get(Calendar.YEAR);
-      d = df.parse(df.format(d));
-      cal.setTime(d);
-      cal.set(Calendar.YEAR, year);
-      d = cal.getTime();
-    }
-    catch (ParseException e) {
-      throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
-    }
-    return d;
   }
 
   @Override
@@ -477,23 +517,11 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
   @Override
   public DateFormat getDateFormat() {
-    DateFormat df = null;
-    if (getFormat() != null) {
-      df = new SimpleDateFormat(getFormat(), NlsLocale.get());
+    String format = getFormat();
+    if (format != null) {
+      return new SimpleDateFormat(format, NlsLocale.get());
     }
-    else {
-      if (isHasDate() && !isHasTime()) {
-        df = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
-      }
-      else if (!isHasDate() && isHasTime()) {
-        df = BEANS.get(DateFormatProvider.class).getTimeInstance(DateFormat.SHORT, NlsLocale.get());
-      }
-      else {
-        df = BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get());
-      }
-      df.setLenient(true);
-    }
-    return df;
+    return null;
   }
 
   @Override
@@ -533,595 +561,135 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   /**
-   * parse date only
+   * <pre>
+   * en-gb    "dd/MM/yyyy"
+   * nl-be    "dd/MM/yyyy"
+   * 
+   * fr-ch    "dd.MM.yyyy"
+   * it-ch    "dd.MM.yyyy"
+   * 
+   * cs       "d.M.yyyy"
+   * fi       "d.M.yyyy"
+   * 
+   * el       "d/M/yyyy"
+   * 
+   * fa       "yyyy/MM/dd"
+   * 
+   * hu       "yyyy.MM.dd"
+   * 
+   * zh       "yyyy-MM-dd"
+   * 
+   * ca       "dd/MM/yyyy"
+   * es       "dd/MM/yyyy"
+   * fr       "dd/MM/yyyy"
+   * gl       "dd/MM/yyyy"
+   * it       "dd/MM/yyyy"
+   * nl       "dd-MM-yyyy"
+   * vi       "dd/MM/yyyy"
+   * 
+   * bs       "dd.MM.yyyy"
+   * de       "dd.MM.yyyy"
+   * et       "dd.MM.yyyy"
+   * me       "dd.MM.yyyy"
+   * mk       "dd.MM.yyyy"
+   * no       "dd.MM.yyyy"
+   * pl       "dd.MM.yyyy"
+   * rs       "dd.MM.yyyy"
+   * ru       "dd.MM.yyyy"
+   * sr       "dd.MM.yyyy"
+   * tr       "dd.MM.yyyy"
+   * uk       "dd.MM.yyyy"
+   * 
+   * default  "MM/dd/yyyy"
+   * </pre>
    */
-  private Date parseDateInternal(String text, DateFormat defaultFormat) throws ProcessingException {
-    Date retVal = null;
-    BooleanHolder includesTime = new BooleanHolder(false);
-    Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
-    if (verboseDeltaMatcher.matches()) {
-      int i = Integer.parseInt(verboseDeltaMatcher.group(2));
-      if (verboseDeltaMatcher.group(1).equals("-")) {
-        i = -i;
-      }
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(new Date());
-      cal.add(Calendar.DATE, i);
-      retVal = cal.getTime();
+  protected String getDefaultDateFormatPatternByLocale(Locale locale) {
+    if (locale == null) {
+      locale = NlsLocale.get();
     }
-    else {
-      retVal = parseDateFormatsInternal(text, defaultFormat, includesTime);
-      if (retVal == null) {
-        throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
-      }
+    String localeName = StringUtility.nvl(locale.toLanguageTag().toLowerCase(), "");
+
+    // Check longer locale names first
+    if (localeName.startsWith("en-gb") || localeName.startsWith("nl-be")) {
+      return "dd/MM/yyyy";
     }
-    // range check -2000 ... +9000
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(retVal);
-    if (cal.get(Calendar.YEAR) < -2000) {
-      cal.set(Calendar.YEAR, -2000);
+    if (localeName.startsWith("fr-ch") || localeName.startsWith("it-ch")) {
+      return "dd.MM.yyyy";
     }
-    if (cal.get(Calendar.YEAR) > 9000) {
-      cal.set(Calendar.YEAR, 9000);
+
+    // Now check short names
+    if (localeName.startsWith("cs") || localeName.startsWith("fi")) {
+      return "d.M.yyyy";
     }
-    retVal = cal.getTime();
-    //adapt time
-    retVal = applyAutoTime(retVal);
-    return retVal;
+    if (localeName.startsWith("el")) {
+      return "d/M/yyyy";
+    }
+    if (localeName.startsWith("fa")) {
+      return "yyyy/MM/dd";
+    }
+    if (localeName.startsWith("hu")) {
+      return "yyyy.MM.dd";
+    }
+    if (localeName.startsWith("zh")) {
+      return "yyyy-MM-dd";
+    }
+    if (localeName.startsWith("no")
+        || localeName.startsWith("pl")
+        || localeName.startsWith("rs")
+        || localeName.startsWith("ru")
+        || localeName.startsWith("sr")
+        || localeName.startsWith("tr")
+        || localeName.startsWith("uk")
+        || localeName.startsWith("me")
+        || localeName.startsWith("mk")
+        || localeName.startsWith("et")
+        || localeName.startsWith("de")
+        || localeName.startsWith("bs")) {
+      return "dd.MM.yyyy";
+    }
+    if (localeName.startsWith("es")
+        || localeName.startsWith("ca")
+        || localeName.startsWith("it")
+        || localeName.startsWith("fr")
+        || localeName.startsWith("gl")
+        || localeName.startsWith("vi")) {
+      return "dd/MM/yyyy";
+    }
+    if (localeName.startsWith("nl")) {
+      return "dd-MM-yyyy";
+    }
+
+    // Default format
+    return "MM/dd/yyyy";
   }
 
   /**
-   * parse date and time
+   * <pre>
+   * en       "h:mm a"
+   * 
+   * default  "hh:mm"
+   * </pre>
    */
-  private Date parseDateTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
-    Date retVal = null;
-    if (!StringUtility.hasText(text)) {
-      return null;
+  protected String getDefaultTimeFormatPatternByLocale(Locale locale) {
+    if (locale == null) {
+      locale = NlsLocale.get();
     }
-    BooleanHolder includesTime = new BooleanHolder(false);
-    Matcher verboseDeltaMatcher = Pattern.compile("([+-])([0-9]+)").matcher(text);
-    if (verboseDeltaMatcher.matches()) {
-      int i = Integer.parseInt(verboseDeltaMatcher.group(2));
-      if ("-".equals(verboseDeltaMatcher.group(1))) {
-        i = -i;
-      }
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(new Date());
-      cal.add(Calendar.DATE, i);
-      retVal = cal.getTime();
-    }
-    else {
-      retVal = parseDateTimeFormatsInternal(text, defaultFormat, includesTime);
-      if (retVal == null) {
-        throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
-      }
-    }
-    // range check -2000 ... +9000
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(retVal);
-    if (cal.get(Calendar.YEAR) < -2000) {
-      cal.set(Calendar.YEAR, -2000);
-    }
-    if (cal.get(Calendar.YEAR) > 9000) {
-      cal.set(Calendar.YEAR, 9000);
-    }
-    retVal = cal.getTime();
-    if (!includesTime.getValue()) {
-      retVal = applyAutoTime(retVal);
-    }
-    return retVal;
-  }
+    String localeName = StringUtility.nvl(locale.toLanguageTag().toLowerCase(), "");
 
-  /**
-   * parse time only
-   */
-  private Date parseTimeInternal(String text, DateFormat defaultFormat) throws ProcessingException {
-    Date retVal = null;
-    if (!StringUtility.hasText(text)) {
-      return null;
+    if (localeName.startsWith("en")) {
+      return "h:mm a";
     }
-    BooleanHolder includesTime = new BooleanHolder(false);
-    retVal = parseTimeFormatsInternal(text, defaultFormat, includesTime);
-    if (retVal == null) {
-      throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
-    }
-    // range check -2000 ... +9000
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(retVal);
-    if (cal.get(Calendar.YEAR) < -2000) {
-      cal.set(Calendar.YEAR, -2000);
-    }
-    if (cal.get(Calendar.YEAR) > 9000) {
-      cal.set(Calendar.YEAR, 9000);
-    }
-    retVal = cal.getTime();
-    // truncate value
-    DateFormat df = getDateFormat();
-    try {
-      //re-set the year, since it might have been truncated to previous century, ticket 87172
-      cal = Calendar.getInstance();
-      cal.setTime(retVal);
-      int year = cal.get(Calendar.YEAR);
-      retVal = df.parse(df.format(retVal));
-      cal.setTime(retVal);
-      cal.set(Calendar.YEAR, year);
-      retVal = cal.getTime();
-    }
-    catch (ParseException e) {
-      throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
-    }
-    return retVal;
-  }
 
-  private Date parseDateFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
-    Date d;
-    if (defaultFormat != null) {
-      d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) {
-        return d;
-      }
-    }
-    StringBuffer dateFormat = new StringBuffer();
-    if (text.matches("[0-9]{6}")) {
-      DateFormat templateFmt = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, NlsLocale.get());
-      if (templateFmt instanceof SimpleDateFormat) {
-        String pattern = ((SimpleDateFormat) templateFmt).toPattern();
-        for (char c : pattern.toCharArray()) {
-          if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-            dateFormat.append(c);
-          }
-        }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
-        //no further checks
-        return d;
-      }
-    }
-    else if (text.matches("[0-9]{8}")) {
-      DateFormat templateFmt = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
-      if (templateFmt instanceof SimpleDateFormat) {
-        String pattern = ((SimpleDateFormat) templateFmt).toPattern();
-        for (char c : pattern.toCharArray()) {
-          if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-            dateFormat.append(c);
-          }
-        }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
-        //no further checks
-        return d;
-      }
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.LONG, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    //add convenience patterns for english locales
-    if (NlsLocale.get().getLanguage().equals("en")) {
-      d = parseHelper(new SimpleDateFormat("M / d / yy", NlsLocale.get()), text, includesTime);
-      if (d != null) {
-        return d;
-      }
-      d = parseHelper(new SimpleDateFormat("MMM d,yyyy", NlsLocale.get()), text, includesTime);
-      if (d != null) {
-        return d;
-      }
-      d = parseHelper(new SimpleDateFormat("MMMM d,yyyy", NlsLocale.get()), text, includesTime);
-      if (d != null) {
-        return d;
-      }
-    }
-    return null;
-  }
-
-/*
-      d=parseHelper(df, text, includesTime);
-      if(d!=null) return d;
- */
-  private Date parseDateTimeFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
-    Date d = null;
-    if (defaultFormat != null) {
-      d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) {
-        return d;
-      }
-    }
-    StringBuffer dateFormat = new StringBuffer();
-    if (text.matches("[0-9]{6}")) {
-      DateFormat templateFmt = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, NlsLocale.get());
-      if (templateFmt instanceof SimpleDateFormat) {
-        String pattern = ((SimpleDateFormat) templateFmt).toPattern();
-        for (char c : pattern.toCharArray()) {
-          if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-            dateFormat.append(c);
-          }
-        }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
-        //no further checks
-        return d;
-      }
-    }
-    else if (text.matches("[0-9]{8}")) {
-      DateFormat templateFmt = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
-      if (templateFmt instanceof SimpleDateFormat) {
-        String pattern = ((SimpleDateFormat) templateFmt).toPattern();
-        for (char c : pattern.toCharArray()) {
-          if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-            dateFormat.append(c);
-          }
-        }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
-        //no further checks
-        return d;
-      }
-    }
-    //time
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, NlsLocale.get())).toPattern() + ":SSS", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    for (DateFormat t : new DateFormat[]{
-        BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, NlsLocale.get()),
-        BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.MEDIUM, NlsLocale.get()),
-        BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.LONG, NlsLocale.get())}) {
-      if (t instanceof SimpleDateFormat) {
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mm a", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmm a", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hmm a", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h a", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mma", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmma", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " ha", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H:mm", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HHmm", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HH", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " Hmm", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H", NlsLocale.get()), text, includesTime);
-        if (d != null) {
-          return d;
-        }
-        d = parseHelper(t, text, includesTime);
-        if (d != null) {
-          return d;
-        }
-      }
-    }
-    //date
-    //add convenience patterns for english locales
-    if (NlsLocale.get().getLanguage().equals("en")) {
-      d = parseHelper(new SimpleDateFormat("M / d / yy", NlsLocale.get()), text, includesTime);
-      if (d != null) {
-        return d;
-      }
-      d = parseHelper(new SimpleDateFormat("MMM d,yyyy", NlsLocale.get()), text, includesTime);
-      if (d != null) {
-        return d;
-      }
-      d = parseHelper(new SimpleDateFormat("MMMM d,yyyy", NlsLocale.get()), text, includesTime);
-      if (d != null) {
-        return d;
-      }
-    }
-    return null;
-  }
-
-  private Date parseTimeFormatsInternal(String text, DateFormat defaultFormat, BooleanHolder includesTime) {
-    Date d = null;
-    if (defaultFormat != null) {
-      d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) {
-        return d;
-      }
-    }
-    //
-    if (text.matches("[0-9]{3}")) {
-      text = "0" + text; // "230" -> 02:30
-    }
-    if (text.matches("[0-9]{2}")) {
-      int hours = Integer.parseInt(text);
-      if (hours >= 24) {
-        text = "00" + text; // "23" -> 23:00 but "30" -> 00:30
-      }
-    }
-    if (defaultFormat != null) {
-      d = parseHelper(defaultFormat, text, includesTime);
-      if (d != null) {
-        return d;
-      }
-    }
-    d = parseHelper(BEANS.get(DateFormatProvider.class).getTimeInstance(DateFormat.SHORT, NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("h:mm a", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("hhmm a", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("hmm a", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("h a", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("h:mma", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("hhmma", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("ha", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("H:mm", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("HHmm", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("HH", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("Hmm", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    d = parseHelper(new SimpleDateFormat("H", NlsLocale.get()), text, includesTime);
-    if (d != null) {
-      return d;
-    }
-    return null;
-  }
-
-  private Date parseHelper(DateFormat df, String text, BooleanHolder includesTime) {
-    // >>> ticket #105'126
-    if (df instanceof SimpleDateFormat) {
-      String pattern = ((SimpleDateFormat) df).toPattern();
-      df = new SimpleDateFormat(pattern.replaceAll("yyyy", "yy"), NlsLocale.get()); // Always use century interpretation
-    }
-    // <<< ticket #105'126
-
-    Date d = null;
-    if (d == null) {
-      try {
-        df.setLenient(false);
-        d = df.parse(text);
-      }
-      catch (ParseException e) {
-        //nop
-      }
-    }
-    // Allow "," instead of ".", because some keyboard layouts have a comma instead of
-    // a dot on the numeric keypad
-    if (d == null) {
-      try {
-        if (df instanceof SimpleDateFormat) {
-          String pattern = ((SimpleDateFormat) df).toPattern();
-          if (pattern.contains(".")) {
-            SimpleDateFormat df2 = new SimpleDateFormat(pattern.replace('.', ','), NlsLocale.get());
-            df2.setLenient(false);
-            d = df2.parse(text);
-          }
-        }
-      }
-      catch (ParseException e) {
-        //nop
-      }
-    }
-    //eval
-    if (d != null) {
-      if (df instanceof SimpleDateFormat) {
-        String pattern = ((SimpleDateFormat) df).toPattern();
-        if (pattern.matches(".*[hHm].*")) {
-          includesTime.setValue(true);
-        }
-      }
-      else {
-        includesTime.setValue(true);
-      }
-    }
-    return d;
+    // Default format
+    return "HH:mm";
   }
 
   private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
 
     @Override
-    public void setDateTextFromUI(String newDate) {
-      if (!isHasDate()) {
-        //nop
-        return;
-      }
-      if (newDate != null && newDate.length() == 0) {
-        newDate = null;
-      }
-      if (!isHasTime()) {
-        parseAndSetValue(newDate);
-        return;
-      }
-      if (newDate == null) {
-        parseAndSetValue(null);
-        return;
-      }
-      //date part only
+    public void setDateTimeFromUI(Date date) {
       try {
-        PARSE_CONTEXT.set(ParseContext.Date);
-        parseAndSetValue(newDate);
-        return;
-      }
-      finally {
-        PARSE_CONTEXT.set(null);
-      }
-    }
-
-    @Override
-    public void setTimeTextFromUI(String newTime) {
-      if (!isHasTime()) {
-        //nop
-        return;
-      }
-      if (newTime != null && newTime.length() == 0) {
-        newTime = null;
-      }
-      if (!isHasDate()) {
-        parseAndSetValue(newTime);
-        return;
-      }
-      //time part
-      try {
-        PARSE_CONTEXT.set(ParseContext.Time);
-        parseAndSetValue(newTime);
-        return;
-      }
-      finally {
-        PARSE_CONTEXT.set(null);
-      }
-    }
-
-    @Override
-    public void setDateFromUI(Date d) {
-      try {
-        if (d != null) {
-          // preserve time
-          Date oldDate = getValue();
-          if (oldDate != null) {
-            Calendar calOld = Calendar.getInstance();
-            calOld.setTime(oldDate);
-            Calendar calNew = Calendar.getInstance();
-            calNew.setTime(d);
-            calNew.set(Calendar.HOUR, calOld.get(Calendar.HOUR));
-            calNew.set(Calendar.HOUR_OF_DAY, calOld.get(Calendar.HOUR_OF_DAY));
-            calNew.set(Calendar.MINUTE, calOld.get(Calendar.MINUTE));
-            calNew.set(Calendar.SECOND, calOld.get(Calendar.SECOND));
-            calNew.set(Calendar.MILLISECOND, calOld.get(Calendar.MILLISECOND));
-            d = calNew.getTime();
-          }
-          else {
-            d = applyAutoTime(d);
-          }
-        }
-        setValue(d);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
-      }
-    }
-
-    @Override
-    public void setTimeFromUI(Date d) {
-      try {
-        Date oldDate = getValue();
-        if (d != null) {
-          oldDate = applyAutoDate(oldDate);
-          // preserve date
-          Calendar calOld = Calendar.getInstance();
-          calOld.setTime(oldDate);
-          Calendar calNew = Calendar.getInstance();
-          calNew.setTime(d);
-          calNew.set(Calendar.YEAR, calOld.get(Calendar.YEAR));
-          calNew.set(Calendar.MONTH, calOld.get(Calendar.MONTH));
-          calNew.set(Calendar.DATE, calOld.get(Calendar.DATE));
-          d = calNew.getTime();
-        }
-        else if (isHasDate() && oldDate != null) {
-          d = applyAutoTime(oldDate);
-        }
-        setValue(d);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
-      }
-    }
-
-    @Override
-    public void setDateTimeFromUI(Date d) {
-      try {
-        setValue(d);
+        setValue(date);
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
@@ -1148,6 +716,19 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       }
     }
 
+    @Override
+    public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
+      ParsingFailedStatus status = new ParsingFailedStatus(
+          ScoutTexts.get("InvalidValueMessageX", StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText))),
+          invalidDateText + "\n" + invalidTimeText // don't use join()!
+          );
+      addErrorStatus(status);
+    }
+
+    @Override
+    public void removeParseErrorFromUI() {
+      removeErrorStatus(ParsingFailedStatus.class);
+    }
   }
 
   protected final void interceptShiftTime(int level, int value) throws ProcessingException {

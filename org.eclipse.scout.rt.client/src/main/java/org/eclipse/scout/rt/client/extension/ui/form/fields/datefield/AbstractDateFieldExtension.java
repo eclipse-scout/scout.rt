@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractBasicFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -22,5 +23,13 @@ public abstract class AbstractDateFieldExtension<OWNER extends AbstractDateField
   @Override
   public void execShiftDate(DateFieldShiftDateChain chain, int level, int value) throws ProcessingException {
     chain.execShiftDate(level, value);
+  }
+
+  /**
+   * parsing is not longer supported on model. Client parses date and sets value;
+   */
+  @Override
+  public final Date execParseValue(ValueFieldParseValueChain<Date> chain, String text) throws ProcessingException {
+    return null;
   }
 }

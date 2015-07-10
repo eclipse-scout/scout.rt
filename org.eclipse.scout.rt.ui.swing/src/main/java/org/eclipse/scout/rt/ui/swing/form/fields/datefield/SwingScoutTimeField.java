@@ -302,7 +302,7 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().setTimeTextFromUI(text);
+//        getScoutObject().getUIFacade().setTimeTextFromUI(text);
       }
     };
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
@@ -328,7 +328,7 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
       Runnable t = new Runnable() {
         @Override
         public void run() {
-          getScoutObject().getUIFacade().setTimeFromUI(newDate);
+          getScoutObject().getUIFacade().setDateTimeFromUI(newDate);
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 0);

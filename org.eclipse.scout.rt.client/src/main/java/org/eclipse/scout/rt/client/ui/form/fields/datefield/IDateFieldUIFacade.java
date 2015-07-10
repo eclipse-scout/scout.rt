@@ -16,15 +16,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
 public interface IDateFieldUIFacade extends IBasicFieldUIFacade {
 
-  void setDateTextFromUI(String newText);
-
-  void setTimeTextFromUI(String newText);
-
   void setDateTimeFromUI(Date d);
 
-  void setDateFromUI(Date d);
+  void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText);
 
-  void setTimeFromUI(Date d);
+  void removeParseErrorFromUI();
 
   /**
    * see {@link AbstractDateField#execShiftDate(int, int)}
@@ -35,5 +31,4 @@ public interface IDateFieldUIFacade extends IBasicFieldUIFacade {
    * see {@link AbstractDateField#execShiftTime(int, int)}
    */
   void fireTimeShiftActionFromUI(int level, int value);
-
 }
