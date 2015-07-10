@@ -347,30 +347,12 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   /**
-   * Sets the status to invisible of every visible field beside the last one.
+   * Sets the status to invisible of every field.
    */
   protected void updateFieldStatusVisible() {
     List<IFormField> fields = getFields();
-    List<IFormField> visibleFields = new ArrayList<IFormField>();
     for (IFormField field : fields) {
-      if (field.isVisible()) {
-        visibleFields.add(field);
-      }
-    }
-    for (int i = 0; i < visibleFields.size(); i++) {
-      IFormField field = visibleFields.get(i);
-      if (i < visibleFields.size() - 1) {
-        field.setProperty("origStatusVisible", field.isStatusVisible());
-        field.setStatusVisible(false);
-      }
-      else {
-        // If status visible was false before, visibility changes must not override this state
-        Boolean wasStatusVisible = (Boolean) field.getProperty("origStatusVisible");
-        if (wasStatusVisible != null) {
-          field.setStatusVisible(wasStatusVisible);
-          field.setProperty("origStatusVisible", null);
-        }
-      }
+      field.setStatusVisible(false);
     }
   }
 
