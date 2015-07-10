@@ -69,7 +69,9 @@
       "borderDecoration": "auto",
       "borderVisible": true,
       "mainBox": false,
-      "scrollable": false
+      "scrollable": false,
+      "expandable": false,
+      "expanded": true
     },
     "PlannerField": {
       "splitterPosition": 168

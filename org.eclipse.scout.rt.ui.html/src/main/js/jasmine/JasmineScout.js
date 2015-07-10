@@ -28,9 +28,16 @@ function createSimpleModel(objectType, id) {
   if (id === undefined) {
     id = scout.createUniqueId();
   }
+  // parent: used because by definition, a Form belongs to a 'displayParent'.
   return {
     id: id,
-    objectType: objectType
+    objectType: objectType,
+    parent: {
+      rendered: true,
+      inFront: function() { return true; },
+      modalityElements: function() { return []; },
+      removeChild: function() {}
+    }
   };
 }
 
