@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.w3c.dom.Element;
 
 @ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
@@ -112,7 +113,13 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
     // Remove listeners, close the form if life cycle is not externally managed
-    setInnerForm(null);
+    try {
+      uninstallInnerForm();
+    }
+    catch (ProcessingException e) {
+      // May occur during form life cycle management (start, close).
+      throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
+    }
   }
 
   @Override
@@ -143,7 +150,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     }
     catch (ProcessingException e) {
       // May occur during form life cycle management (start, close).
-      throw new RuntimeException(e);
+      throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
     }
   }
 
@@ -152,19 +159,28 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     if (m_innerForm == form) {
       return;
     }
-    if (m_innerForm != null) {
-      fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      m_innerForm.removePropertyChangeListener(m_innerFormPropertyListener);
-      m_innerForm.getRootGroupBox().removeSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
-      m_innerForm.removeFormListener(m_innerFormListener);
-      m_innerForm.setWrapperFieldInternal(null);
-      if (m_manageInnerFormLifeCycle) {
-        m_innerForm.doClose();
-      }
-      m_innerForm = null;
-    }
+    uninstallInnerForm();
     m_innerForm = form;
     m_manageInnerFormLifeCycle = manageFormLifeCycle;
+    installInnerForm();
+
+    boolean changed = propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
+    calculateVisibleInternal();
+    if (m_innerForm != null) {
+      fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
+      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) {
+        m_innerForm.start();
+      }
+    }
+    if (changed) {
+      // Inform parent form (update layout etc.)
+      if (getForm() != null) {
+        getForm().structureChanged(this);
+      }
+    }
+  }
+
+  protected void installInnerForm() {
     if (m_innerForm != null) {
       if (!m_innerForm.isFormStarted()) {
         m_innerForm.setModal(false);
@@ -177,18 +193,17 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
       m_innerForm.getRootGroupBox().addSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
       m_innerForm.addFormListener(m_innerFormListener);
     }
-    boolean changed = propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
-    calculateVisibleInternal();
+  }
+
+  protected void uninstallInnerForm() throws ProcessingException {
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      if (!m_innerForm.isFormStarted() && m_manageInnerFormLifeCycle) {
-        m_innerForm.start();
-      }
-    }
-    if (changed) {
-      // Inform parent form (update layout etc.)
-      if (getForm() != null) {
-        getForm().structureChanged(this);
+      m_innerForm.removePropertyChangeListener(m_innerFormPropertyListener);
+      m_innerForm.getRootGroupBox().removeSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
+      m_innerForm.removeFormListener(m_innerFormListener);
+      m_innerForm.setWrapperFieldInternal(null);
+      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormClosed()) {
+        m_innerForm.doClose();
       }
     }
   }
@@ -225,11 +240,11 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
    * Do not make wrapped form field auto-invisible when no form is hosted. For
    * example in wizard forms this leads to (correct) but unexpected layout flow.
    * The following line might be added by developers in their own subclass to
-   * have auto-invisible behaviour.
-   */
-  /*
-   * @Override protected boolean execCalculateVisible() { return getInnerForm()
-   * != null; }
+   * have auto-invisible behavior.
+   *
+   * @Override protected boolean execCalculateVisible() {
+   *   return getInnerForm() != null;
+   * }
    */
 
   // group box is only visible when it has at least one visible item

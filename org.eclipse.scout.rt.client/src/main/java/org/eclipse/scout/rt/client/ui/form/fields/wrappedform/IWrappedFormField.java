@@ -26,6 +26,11 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
    */
   String PROP_INNER_FORM = "innerForm";
 
+  /**
+   * @return the current inner form.
+   *         <p>
+   *         <b>Please note:</b> This form may already be closed!
+   */
   T getInnerForm();
 
   /**
