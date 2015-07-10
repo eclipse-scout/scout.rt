@@ -109,6 +109,15 @@
   &.disabled ~ .icon@{className} {
     display: none;
   }
+
+  /* When field is too small, hide the icon */
+  &.compact {
+    padding-right: @text-field-padding;
+
+    & ~ .icon {
+      display: none;
+    }
+  }
 }
 
 .user-select(@mode) {

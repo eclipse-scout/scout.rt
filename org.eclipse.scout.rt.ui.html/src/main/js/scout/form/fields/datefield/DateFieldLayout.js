@@ -1,109 +1,119 @@
-/**
- * DateFieldLayout
- */
 scout.DateFieldLayout = function(dateField) {
-  scout.DateFieldLayout.parent.call(this, dateField);
-  this.dateField = dateField;
+  scout.DateFieldLayout.parent.call(this);
+  this._dateField = dateField;
+  this.invalidateOnResize = true;
+
+  // Minimum field with to normal state, for smaller widths the "compact" style is applied.
+  this.MIN_DATE_FIELD_WIDTH = 90;
+  this.MIN_TIME_FIELD_WIDTH = 60;
 };
-scout.inherits(scout.DateFieldLayout, scout.FormFieldLayout);
+scout.inherits(scout.DateFieldLayout, scout.AbstractLayout);
 
 scout.DateFieldLayout.prototype.layout = function($container) {
-  var containerSize, fieldSize, fieldBounds, fieldContainerBounds, htmlField, labelPositionLeft, labelHasFieldWidth,
-    htmlContainer = scout.HtmlComponent.get($container),
-    formField = this.formField,
-    labelWidth = this.labelWidth,
-    statusWidth = this.statusWidth,
-    left = 0,
-    right = 0,
-    top = 0;
+  var htmlContainer = scout.HtmlComponent.get($container),
+    $dateField = this._dateField.$dateField,
+    $timeField = this._dateField.$timeField,
+    $dateFieldIcon = this._dateField.$dateFieldIcon,
+    $timeFieldIcon = this._dateField.$timeFieldIcon,
+    $predictDateField = this._dateField._$predictDateField,
+    $predictTimeField = this._dateField._$predictTimeField,
+    htmlDateField = ($dateField ? scout.HtmlComponent.get($dateField) : null),
+    htmlTimeField = ($timeField ? scout.HtmlComponent.get($timeField) : null);
 
-  containerSize = htmlContainer.getAvailableSize()
+  var availableSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (this._isLabelVisible()) {
-    // currently a gui only flag, necessary for sequencebox
-    if (formField.labelUseUiWidth) {
-      if (formField.$label.hasClass('empty')) {
-        labelWidth = 0;
-      } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
-      }
-    }
-    labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
-      formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
-    if (labelPositionLeft) {
-      scout.graphics.setBounds(formField.$label, 0, 0, labelWidth, this.rowHeight);
-      left += labelWidth;
-    } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
-      top += formField.$label.outerHeight(true);
-      labelHasFieldWidth = true;
-    }
-  }
-  if (formField.$mandatory) {
-    formField.$mandatory
-      .cssTop(top)
-      .cssLeft(left)
-      .cssWidth(this.mandatoryIndicatorWidth);
-    left += formField.$mandatory.outerWidth(true);
-  }
-  if (this._isStatusVisible()) {
-    formField.$status
-      .cssTop(top)
-      .cssWidth(statusWidth)
-      .cssHeight(this.rowHeight)
-      .cssLineHeight(this.rowHeight);
-    right += statusWidth + formField.$status.cssMarginX();
-  }
+  var dateFieldSize, timeFieldSize;
+  // --- Date and time ---
+  if (htmlDateField && htmlTimeField) {
+    // Field size
+    var dateFieldMargins = htmlDateField.getMargins();
+    var timeFieldMargins = htmlTimeField.getMargins();
+    var compositeMargins = new scout.Insets(
+        Math.max(dateFieldMargins.top, timeFieldMargins.top),
+        Math.max(dateFieldMargins.right, timeFieldMargins.right),
+        Math.max(dateFieldMargins.bottom, timeFieldMargins.bottom),
+        Math.max(dateFieldMargins.left, timeFieldMargins.left)
+      );
+    var compositeSize = availableSize.subtract(compositeMargins);
+    var hgap = scout.HtmlEnvironment.smallColumnGap;
+    var totalWidth = compositeSize.width - hgap;
+    // Date field 60%, time field 40%
+    var dateFieldWidth = (totalWidth * 0.6);
+    var timeFieldWidth = (totalWidth - dateFieldWidth);
 
-  // Make sure tooltip is at correct position after layouting, if there is one
-  if (formField.tooltip && formField.tooltip.rendered) {
-    formField.tooltip.position();
-  }
+    dateFieldSize = new scout.Dimension(dateFieldWidth, compositeSize.height);
+    timeFieldSize = new scout.Dimension(timeFieldWidth, compositeSize.height);
+    htmlDateField.setSize(dateFieldSize);
+    htmlTimeField.setSize(timeFieldSize);
+    $timeField.cssRight(0);
 
-  if (formField.$fieldContainer) {
-    fieldSize = containerSize.subtract(scout.graphics.getMargins(formField.$fieldContainer));
-    fieldContainerBounds = new scout.Rectangle(left, top, fieldSize.width - left - right, fieldSize.height - top);
-    fieldBounds = new scout.Rectangle(0, top, fieldSize.width - left - right, fieldSize.height - top);
-    htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
-    var dateFieldBounds = fieldBounds;
-    var timeFieldBounds = fieldBounds;
-    if (this.dateField.$dateField && this.dateField.$timeField) {
-      dateFieldBounds = new scout.Rectangle(0, top, Math.floor((fieldSize.width - left - right) / 3 * 2) - 1, fieldSize.height - top);
-      timeFieldBounds = new scout.Rectangle(dateFieldBounds.width + 1, top, Math.floor((fieldSize.width - left - right) / 3) - 1, fieldSize.height - top);
-      scout.graphics.setBounds(this.dateField.$dateField, dateFieldBounds);
-      scout.graphics.setBounds(this.dateField.$timeField, timeFieldBounds);
+    // Icons
+    $dateFieldIcon.cssRight(timeFieldWidth + hgap);
+    $timeFieldIcon.cssRight(0);
 
-    } else if (this.dateField.$dateField) {
-      scout.graphics.setBounds(this.dateField.$dateField, dateFieldBounds);
-    } else if (this.dateField.$timeField) {
-      scout.graphics.setBounds(this.dateField.$timeField, timeFieldBounds);
+    // Compact style
+    $dateField.toggleClass('compact', dateFieldSize.width < this.MIN_DATE_FIELD_WIDTH);
+    $timeField.toggleClass('compact', timeFieldSize.width < this.MIN_TIME_FIELD_WIDTH);
+
+    // Prediction
+    if ($predictDateField) {
+      scout.graphics.setSize($predictDateField, dateFieldSize);
     }
-
-    //Icon is placed inside the datefield (as overlay)
-    if (formField.$icon && formField.$dateField) {
-      formField.$icon
-        .cssRight(fieldBounds.width - dateFieldBounds.width)
-        .cssTop(top);
-    }
-    if (formField.$timeFieldIcon && formField.$timeField) {
-      formField.$timeFieldIcon
-        .cssRight(0)
-        .cssTop(top);
-    }
-
-    if (htmlField) {
-      htmlField.setBounds(fieldContainerBounds);
-    } else {
-      scout.graphics.setBounds(formField.$fieldContainer, fieldContainerBounds);
-    }
-
-    if (labelHasFieldWidth) {
-      formField.$label.cssWidth(fieldContainerBounds.width);
-    }
-
-    if (formField._datePickerPopup && formField._datePickerPopup.rendered) {
-      formField._datePickerPopup.position();
+    if ($predictTimeField) {
+      scout.graphics.setSize($predictTimeField, timeFieldSize);
+      $predictTimeField.cssRight(0);
     }
   }
+  // --- Date only ---
+  else if (htmlDateField) {
+    // Field size
+    dateFieldSize = availableSize.subtract(htmlDateField.getMargins());
+    htmlDateField.setSize(dateFieldSize);
 
+    // Icons
+    $dateFieldIcon.cssRight(0);
+
+    // Compact style
+    $dateField.toggleClass('compact', dateFieldSize.width < this.MIN_DATE_FIELD_WIDTH);
+
+    // Prediction
+    if ($predictDateField) {
+      scout.graphics.setSize($predictDateField, dateFieldSize);
+    }
+  }
+  // --- Time only ---
+  else if (htmlTimeField) {
+    // Field size
+    timeFieldSize = availableSize.subtract(htmlTimeField.getMargins());
+    htmlTimeField.setSize(timeFieldSize);
+
+    // Icons
+    $timeFieldIcon.cssRight(0);
+
+    // Compact style
+    $timeField.toggleClass('compact', timeFieldSize.width < this.MIN_TIME_FIELD_WIDTH);
+
+    // Prediction
+    if ($predictTimeField) {
+      scout.graphics.setSize($predictTimeField, timeFieldSize);
+    }
+  }
+};
+
+scout.DateFieldLayout.prototype.preferredLayoutSize = function($container) {
+  var prefSize = scout.graphics.prefSize($container);
+  // --- Date and time ---
+  if (this._dateField.hasDate && this._dateField.hasTime) {
+    prefSize.width = this.MIN_DATE_FIELD_WIDTH + scout.HtmlEnvironment.smallColumnGap + this.MIN_TIME_FIELD_WIDTH;
+  }
+  // --- Date only ---
+  else if (this._dateField.hasDate ) {
+    prefSize.width = this.MIN_DATE_FIELD_WIDTH;
+  }
+  // --- Time only ---
+  else if (this._dateField.hasTime ) {
+    prefSize.width = this.MIN_TIME_FIELD_WIDTH;
+  }
+  return prefSize;
 };

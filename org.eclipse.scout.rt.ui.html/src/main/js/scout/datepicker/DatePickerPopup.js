@@ -2,7 +2,7 @@ scout.DatePickerPopup = function(session, options) {
   options = options || {};
   options.installFocusContext = false;
   scout.DatePickerPopup.parent.call(this, session, options);
-  this.picker = new scout.DatePicker(options.dateFormat, options.dateField);
+  this.picker = new scout.DatePicker(options.dateFormat);
   this.addChild(this.picker);
 };
 scout.inherits(scout.DatePickerPopup, scout.Popup);

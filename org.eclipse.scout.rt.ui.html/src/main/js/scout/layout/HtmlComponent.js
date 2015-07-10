@@ -3,7 +3,7 @@
  */
 scout.HtmlComponent = function($comp, session) {
   if (!session) {
-    throw new Error('session must be defined for ' + this);
+    throw new Error('session must be defined for ' + this.debug());
   }
   this.$comp = $comp;
   this._layout = new scout.NullLayout();

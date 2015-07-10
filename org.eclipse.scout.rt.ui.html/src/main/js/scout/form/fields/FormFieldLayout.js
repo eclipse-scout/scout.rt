@@ -11,6 +11,9 @@ scout.FormFieldLayout = function(formField) {
   this.mandatoryIndicatorWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
   this.statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;
+
+  // Minimum field with to normal state, for smaller widths the "compact" style is applied.
+  this.MIN_FIELD_WIDTH = 50;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
@@ -71,6 +74,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     } else {
       scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
     }
+    formField.$field.toggleClass('compact', fieldBounds.width < this.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
       formField.$label.cssWidth(fieldBounds.width);

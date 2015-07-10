@@ -253,8 +253,8 @@ describe("scout.dates", function() {
   describe("toJsonDate / parseJsonDate", function() {
 
     it("can handle missing or invalid inputs", function() {
-      expect(scout.dates.toJsonDate()).toBe(undefined);
-      expect(scout.dates.parseJsonDate()).toBe(undefined);
+      expect(scout.dates.toJsonDate()).toBe(null);
+      expect(scout.dates.parseJsonDate()).toBe(null);
       expect(function() {
         scout.dates.parseJsonDate('invalid date string');
       }).toThrow();
@@ -290,6 +290,17 @@ describe("scout.dates", function() {
       expect(jsonDate).toBe('2014-11-21 00:00:00.000');
       jsonDate = scout.dates.toJsonDate(date, false); // should be the same as above
       expect(jsonDate).toBe('2014-11-21 00:00:00.000');
+
+      // Test 3 - special cases (UTC)
+      date = scout.dates.parseJsonDate('0025-11-21 00:00:00.000Z');
+      expect(date).not.toBe(undefined);
+      expect(date).not.toBe(null);
+      expect(date.toISOString()).toBe('0025-11-21T00:00:00.000Z');
+      jsonDate = scout.dates.toJsonDate(date, true);
+      expect(jsonDate).toBe('0025-11-21 00:00:00.000Z');
+      // Date only
+      date = scout.dates.parseJsonDate('0025-11-21Z');
+      expect(date.toISOString()).toBe('0025-11-21T00:00:00.000Z');
     });
 
   });

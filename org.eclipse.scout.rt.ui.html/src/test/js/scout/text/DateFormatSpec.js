@@ -78,9 +78,16 @@ describe("DateFormat", function() {
         var dateFormat = new scout.DateFormat(locale, pattern);
 
         var result = dateFormat.analyze('21.12.2014');
-        expect(result.day).toBe('21');
-        expect(result.month).toBe('12');
-        expect(result.year).toBe('2014');
+        expect(result.matchInfo.day).toBe('21');
+        expect(result.matchInfo.month).toBe('12');
+        expect(result.matchInfo.year).toBe('2014');
+        expect(result.parsedPattern).toBe('dd.MM.yyyy');
+
+        result = dateFormat.analyze('21.8.2014');
+        expect(result.matchInfo.day).toBe('21');
+        expect(result.matchInfo.month).toBe('8');
+        expect(result.matchInfo.year).toBe('2014');
+        expect(result.parsedPattern).toBe('dd.M.yyyy');
       });
 
       it('considers pattern dd.MM.yyyy', function() {
@@ -88,9 +95,9 @@ describe("DateFormat", function() {
         var dateFormat = new scout.DateFormat(locale, pattern);
 
         var result = dateFormat.analyze('2000-08-12');
-        expect(result.day).toBe('12');
-        expect(result.month).toBe('08');
-        expect(result.year).toBe('2000');
+        expect(result.matchInfo.day).toBe('12');
+        expect(result.matchInfo.month).toBe('08');
+        expect(result.matchInfo.year).toBe('2000');
       });
 
       it('considers pattern dd.MM.yyyy', function() {
@@ -98,9 +105,9 @@ describe("DateFormat", function() {
         var dateFormat = new scout.DateFormat(locale, pattern);
 
         var result = dateFormat.analyze('08/16/1999');
-        expect(result.day).toBe('16');
-        expect(result.month).toBe('08');
-        expect(result.year).toBe('1999');
+        expect(result.matchInfo.day).toBe('16');
+        expect(result.matchInfo.month).toBe('08');
+        expect(result.matchInfo.year).toBe('1999');
       });
     });
   });

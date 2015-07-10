@@ -87,21 +87,20 @@ scout.FormField.prototype._remove = function() {
   this._hideStatusMessage();
 };
 
-scout.FormField.prototype._renderMandatory = function(mandatory) {
-  this.$container.toggleClass('mandatory', mandatory);
+scout.FormField.prototype._renderMandatory = function() {
+  this.$container.toggleClass('mandatory', this.mandatory);
 };
 
-scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
-  errorStatus = this.errorStatusUi || this.errorStatus;
-  this.$container.toggleClass('has-error', !! errorStatus);
+scout.FormField.prototype._renderErrorStatus = function() {
+  var hasError = !!(this.errorStatus);
 
+  this.$container.toggleClass('has-error', hasError);
   if (this.$field) {
-    this.$field.toggleClass('has-error', !! errorStatus);
+    this.$field.toggleClass('has-error', hasError);
   }
 
   this._updateStatusVisible();
-
-  if (errorStatus) {
+  if (hasError) {
     this._showStatusMessage({
       autoRemove: false
     });
@@ -192,7 +191,7 @@ scout.FormField.prototype._updateStatusVisible = function() {
  */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
-    hasError = this.errorStatusUi || this.errorStatus,
+    hasError = !!(this.errorStatus),
     hasTooltip = this.tooltipText;
 
   return !this.suppressStatus && (statusVisible || hasError || hasTooltip || (this._hasMenus() && this.menusVisible));
@@ -299,28 +298,28 @@ scout.FormField.prototype._syncMenus = function(menus) {
 };
 
 scout.FormField.prototype.setTooltipText = function(tooltipText) {
-  this.tooltipText = tooltipText;
+  this._setProperty('tooltipText', tooltipText);
   if (this.rendered) {
     this._renderTooltipText();
   }
 };
 
 scout.FormField.prototype.setErrorStatus = function(errorStatus) {
-  this.errorStatus = errorStatus;
+  this._setProperty('errorStatus', errorStatus);
   if (this.rendered) {
     this._renderErrorStatus();
   }
 };
 
 scout.FormField.prototype.setMenus = function(menus) {
-  this.menus = menus;
+  this._setProperty('menus', menus);
   if (this.rendered) {
     this._renderMenus();
   }
 };
 
 scout.FormField.prototype.setMenusVisible = function(menusVisible) {
-  this.menusVisible = menusVisible;
+  this._setProperty('menusVisible', menusVisible);
   if (this.rendered) {
     this._renderMenusVisible();
   }
@@ -370,10 +369,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     text = this.tooltipText,
     cssClass = '';
 
-  if (this.errorStatusUi) {
-    text = this.errorStatusUi.message;
-    cssClass = 'tooltip-error';
-  } else if (this.errorStatus) {
+  if (this.errorStatus) {
     text = this.errorStatus.message;
     cssClass = 'tooltip-error';
   }
@@ -508,8 +504,7 @@ scout.FormField.prototype.addIcon = function($parent) {
   if (!$parent) {
     $parent = this.$container;
   }
-  this.$icon = $('<span>')
-    .addClass('icon')
+  this.$icon = scout.fields.new$Icon()
     .click(this._onIconClick.bind(this))
     .appendTo($parent);
 };

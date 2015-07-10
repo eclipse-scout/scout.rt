@@ -5,20 +5,21 @@ scout.strings = {
    * @param encodeHtml defaults to true
    */
   nl2br: function(text, encodeHtml) {
-    if (!text) {
+    if (text === undefined || text === null) {
       return text;
     }
-    encodeHtml = encodeHtml !== undefined ? encodeHtml : true;
-    if (encodeHtml) {
+    text = this.asString(text);
+    if (scout.helpers.nvl(encodeHtml, true)) {
       text = scout.strings.encode(text);
     }
     return text.replace(/\n/g, '<br>').replace(/\r/g, '');
   },
 
   removeAmpersand: function(text) {
-    if (!text) {
+    if (text === undefined || text === null) {
       return text;
     }
+    text = this.asString(text);
     // Remove single & that are not surrounded by & or &&
     text = text.replace(/(^|[^&]|&&)&($|[^&]|&&)/g, '$1$2');
     // Replace remaining && by a single &
@@ -30,6 +31,7 @@ scout.strings = {
    * @returns true if the given string contains any non-space characters
    */
   hasText: function(text) {
+    text = this.asString(text);
     if (typeof text !== 'string' || text.length === 0) {
       return false;
     }
@@ -50,14 +52,12 @@ scout.strings = {
     return result;
   },
 
-  padZeroLeft: function(s, padding) {
-    if (s === undefined || s === null) {
-      return s;
+  padZeroLeft: function(string, padding) {
+    string = this.asString(string);
+    if (string === undefined || string === null || typeof padding !== 'number' || padding < 1 || (string + '').length >= padding) {
+      return string;
     }
-    if (typeof padding !== 'number' || padding < 1 || (s + '').length >= padding) {
-      return s;
-    }
-    var z = scout.strings.repeat('0', padding) + s;
+    var z = scout.strings.repeat('0', padding) + string;
     return z.slice(-padding);
   },
 
@@ -68,6 +68,8 @@ scout.strings = {
     if (startString.length === 0) {
       return true;
     }
+    fullString = this.asString(fullString);
+    startString = this.asString(startString);
     return (fullString.substr(0, startString.length) === startString);
   },
 
@@ -78,6 +80,8 @@ scout.strings = {
     if (endString.length === 0) {
       return true;
     }
+    fullString = this.asString(fullString);
+    endString = this.asString(endString);
     return (fullString.substr(-endString.length) === endString);
   },
 
@@ -85,9 +89,11 @@ scout.strings = {
    * Returns the number of occurrences of 'separator' in 'string'
    */
   count: function(string, separator) {
-    if (!string || !separator) {
+    if (string === undefined || string === null || separator === undefined || separator === null) {
       return 0;
     }
+    string = this.asString(string);
+    separator = this.asString(separator);
     return string.split(separator).length - 1;
   },
 
@@ -95,7 +101,7 @@ scout.strings = {
    * Encodes the html of the given string.
    */
   encode: function(string) {
-    if (!string) {
+    if (string === undefined || string === null) {
       return string;
     }
     var div = document.createElement('div');
@@ -111,13 +117,15 @@ scout.strings = {
    * @param varargs List of strings to join
    */
   join: function(separator) {
+    separator = this.asString(separator);
     var s = '';
     for (var i = 1; i < arguments.length; i++ ) {
-      if (arguments[i]) {
+      var arg = this.asString(arguments[i]);
+      if (arg) {
         if (s && separator) {
           s += separator;
         }
-        s += arguments[i];
+        s += arg;
       }
     }
     return s;
@@ -128,6 +136,9 @@ scout.strings = {
    * prepended and appended, respectively. Otherwise, the empty string is returned.
    */
   box: function(prefix, string, suffix) {
+    prefix = this.asString(prefix);
+    string = this.asString(string);
+    suffix = this.asString(suffix);
     var s = '';
     if (this.hasText(string)) {
       if (prefix) {
@@ -146,10 +157,40 @@ scout.strings = {
    * the remainder is unchanged. Otherwise, the empty string is returned.
    */
   lowercaseFirstLetter: function(string) {
+    if (string === undefined || string === null) {
+      return string;
+    }
+    string = this.asString(string);
     var s = '';
     if(this.hasText(string)) {
       s = string.charAt(0).toLowerCase() + string.slice(1);
     }
     return s;
+  },
+
+  /**
+   * Quotes a string for use in a regular expression, i.e. escapes all characters with special meaning.
+   */
+  quote: function(string) {
+    if (string === undefined || string === null) {
+      return string;
+    }
+    string = this.asString(string);
+    // see "escapeRegExp()" from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Using_special_characters
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& = last match
+  },
+
+  /**
+   * If the given input is not of type string, it is converted to a string (using the standard
+   * JavaScript "String()" function). Inputs 'null' and 'undefined' are returned as they are.
+   */
+  asString: function(input) {
+    if (input === undefined || input === null) {
+      return input;
+    }
+    if (typeof input === 'string' || input instanceof String) {
+      return input;
+    }
+    return String(input);
   }
 };

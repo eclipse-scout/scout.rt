@@ -355,6 +355,34 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
 };
 
 /**
+ * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
+ */
+scout.ModelAdapter.prototype._setProperty = function(propertyName, newValue) {
+  if (!propertyName) {
+    return;
+  }
+  var oldValue = this[propertyName];
+
+  // Set property
+  this[propertyName] = newValue;
+
+  // Fire propertyChange event
+  var propertyChangeEvent = {
+    newProperties: {
+      propertyName: oldValue
+    },
+    oldProperties: {
+      propertyName: newValue
+    },
+    changedProperties: []
+  };
+  if (oldValue !== newValue) {
+    propertyChangeEvent.changedProperties.push(propertyName);
+  }
+  this.trigger('propertyChange', propertyChangeEvent);
+};
+
+/**
  * Removes the existing adapter specified by oldValue. Renders the new adapters if this.$container is set.<br>
  * To prevent this behavior just implement the method _renderPropertyName or _removePropertyName (e.g _removeTable).
  */

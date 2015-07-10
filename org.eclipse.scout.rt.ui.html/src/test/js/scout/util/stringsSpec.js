@@ -10,6 +10,7 @@ describe("scout.strings", function() {
       expect(scout.strings.nl2br('Hello\nGoodbye\n')).toBe('Hello<br>Goodbye<br>');
       expect(scout.strings.nl2br('Hello\n\nGoodbye')).toBe('Hello<br><br>Goodbye');
       expect(scout.strings.nl2br('Hello\n\r\nGoodbye')).toBe('Hello<br><br>Goodbye');
+      expect(scout.strings.nl2br(123)).toBe('123');
     });
 
     it("encodes html, if the parameter is set to true (default)", function() {
@@ -34,6 +35,7 @@ describe("scout.strings", function() {
       expect(scout.strings.removeAmpersand('You&&&Me')).toBe('You&Me');
       expect(scout.strings.removeAmpersand('You&&&&Me')).toBe('You&&Me');
       expect(scout.strings.removeAmpersand('You&&&&&Me')).toBe('You&&Me');
+      expect(scout.strings.removeAmpersand(123)).toBe('123');
     });
 
   });
@@ -48,6 +50,8 @@ describe("scout.strings", function() {
       expect(scout.strings.hasText('       .      ')).toBe(true);
       expect(scout.strings.hasText('       \n      ')).toBe(false);
       expect(scout.strings.hasText('       \n      \nn')).toBe(true);
+      expect(scout.strings.hasText(123)).toBe(true);
+      expect(scout.strings.hasText(0)).toBe(true);
     });
 
   });
@@ -61,6 +65,7 @@ describe("scout.strings", function() {
       expect(scout.strings.repeat('X', 1)).toBe('X');
       expect(scout.strings.repeat('X', 7)).toBe('XXXXXXX');
       expect(scout.strings.repeat('X', -7)).toBe('');
+      expect(scout.strings.repeat(4, 4)).toBe('4444');
     });
 
   });
@@ -74,6 +79,8 @@ describe("scout.strings", function() {
       expect(scout.strings.padZeroLeft('X', 1)).toBe('X');
       expect(scout.strings.padZeroLeft('X', 7)).toBe('000000X');
       expect(scout.strings.padZeroLeft('X', -7)).toBe('X');
+      expect(scout.strings.padZeroLeft(123, 4)).toBe('0123');
+      expect(scout.strings.padZeroLeft(12345, 4)).toBe('12345');
     });
 
   });
@@ -92,6 +99,11 @@ describe("scout.strings", function() {
       expect(scout.strings.startsWith('Der Himmel ist blau!', 'Der')).toBe(true);
       expect(scout.strings.startsWith('¿Vive usted en España?', 'Vive')).toBe(false);
       expect(scout.strings.startsWith('¿Vive usted en España?', '¿Vive')).toBe(true);
+      expect(scout.strings.startsWith(456, 4)).toBe(true);
+      expect(scout.strings.startsWith(456, 5)).toBe(false);
+      expect(scout.strings.startsWith(456, '4')).toBe(true);
+      expect(scout.strings.startsWith('456', 4)).toBe(true);
+      expect(scout.strings.startsWith(true, 't')).toBe(true);
     });
 
   });
@@ -109,6 +121,10 @@ describe("scout.strings", function() {
       expect(scout.strings.endsWith(undefined, 'hello')).toBe(false);
       expect(scout.strings.endsWith('Der Himmel ist blau!', 'blau')).toBe(false);
       expect(scout.strings.endsWith('Der Himmel ist blau!', 'blau!')).toBe(true);
+      expect(scout.strings.endsWith(1234, 4)).toBe(true);
+      expect(scout.strings.endsWith(1234, 5)).toBe(false);
+      expect(scout.strings.endsWith(1234, '4')).toBe(true);
+      expect(scout.strings.endsWith('1234', 4)).toBe(true);
     });
 
   });
@@ -128,6 +144,7 @@ describe("scout.strings", function() {
       expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', 'ü')).toBe(1);
       expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', '"')).toBe(6);
       expect(scout.strings.count('the bird is the word', 'rd')).toBe(2);
+      expect(scout.strings.count(98138165, 1)).toBe(2);
     });
 
   });
@@ -138,6 +155,7 @@ describe("scout.strings", function() {
       expect(scout.strings.encode()).toBeUndefined();
       expect(scout.strings.encode('hello')).toBe('hello');
       expect(scout.strings.encode('<b>hello</b>')).toBe('&lt;b&gt;hello&lt;/b&gt;');
+      expect(scout.strings.encode(123)).toBe('123');
     });
 
   });
@@ -159,6 +177,7 @@ describe("scout.strings", function() {
       expect(scout.strings.join('  ', ' ', '', ' ')).toBe('    ');
       expect(scout.strings.join(undefined, 'one', 'two', 'three')).toBe('onetwothree');
       expect(scout.strings.join('', 'one', 'two', 'three')).toBe('onetwothree');
+      expect(scout.strings.join(2, 0, 0, 0)).toBe('02020');
     });
 
   });
@@ -177,6 +196,48 @@ describe("scout.strings", function() {
       expect(scout.strings.box('(', 'x', ')', 'y')).toBe('(x)');
       expect(scout.strings.box('', 'x', '')).toBe('x');
       expect(scout.strings.box('a', ' ', 'b')).toBe('');
+      expect(scout.strings.box(0, -3, 7)).toBe('0-37');
+    });
+
+  });
+
+  describe("lowercaseFirstLetter", function() {
+
+    it("converts first letter to lowercase", function() {
+      expect(scout.strings.lowercaseFirstLetter()).toBe(undefined);
+      expect(scout.strings.lowercaseFirstLetter(null)).toBe(null);
+      expect(scout.strings.lowercaseFirstLetter(0)).toBe('0');
+      expect(scout.strings.lowercaseFirstLetter('0')).toBe('0');
+      expect(scout.strings.lowercaseFirstLetter('hans müller')).toBe('hans müller');
+      expect(scout.strings.lowercaseFirstLetter('Hans Müller')).toBe('hans Müller');
+      expect(scout.strings.lowercaseFirstLetter('ÄÖÜ sind Umlaute')).toBe('äÖÜ sind Umlaute');
+    });
+
+  });
+
+  describe("quote", function() {
+
+    it("quotes special characters for regexp", function() {
+      expect(scout.strings.quote()).toBe(undefined);
+      expect(scout.strings.quote(null)).toBe(null);
+      expect(scout.strings.quote('bla')).toBe('bla');
+      expect(scout.strings.quote('foo. bar.')).toBe('foo\\. bar\\.');
+      expect(scout.strings.quote('ein * am Himmel')).toBe('ein \\* am Himmel');
+      expect(scout.strings.quote(123)).toBe('123');
+    });
+
+  });
+
+  describe("asString", function() {
+
+    it("converts input to string", function() {
+      expect(scout.strings.asString()).toBe(undefined);
+      expect(scout.strings.asString(null)).toBe(null);
+      expect(scout.strings.asString('bla')).toBe('bla');
+      expect(scout.strings.asString(false)).toBe('false');
+      expect(scout.strings.asString(-4747)).toBe('-4747');
+      expect(scout.strings.asString(0.123)).toBe('0.123');
+      expect(scout.strings.asString({})).toBe('[object Object]');
     });
 
   });

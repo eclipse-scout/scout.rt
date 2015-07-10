@@ -471,3 +471,21 @@ Migration:
 
 MOT 16.07.2015:
 - AbstractColumn.execPrepareEdit(ITableRow) must not return null anymore use Cell.setEditable(boolean) instead.
+
+BSH 23.07.2015:
+The UI facade of AbstractDateField was changed. To support offline, more responsive date/time validation
+on the new Html UI, formatting and parsing has to be performed on the UI layer, not on the model layer
+(otherwise, the UI would have to wait for the model on every key press). The date field UI facade was
+changed in the following way:
+Instead of sending a text to the model and validating/parsing it there, a already valid (from the parsing
+perspective) date is sent to the model. The model may then still validate it (e.g. check ranges), but
+the parsing is done entirely on the UI. As a consequence, not all date format patterns defined in
+SimpleDateFormat are supported anymore, only the most commonly used. By default, the date field
+uses locale-dependent patterns that are supported by the UI, see getDefaultDateFormatPatternByLocale()
+and getDefaultTimeFormatPatternByLocale(). Both the date and the time part of a date field have
+a separate pattern, because they are rendered in two separate fields on the UI.
+Migration:
+The method AbstractDateField.execParseValue() is no longer supported. It cannot be removed entirely,
+because it is defined on AbstractValueField, but is marked as deprecated and final to make it clear
+that it is never called. If any subclass had overridden this method, it should be deleted. The code
+cannot be migrated, because it is now performed in the UI only.

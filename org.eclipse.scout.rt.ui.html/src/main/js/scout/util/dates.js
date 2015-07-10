@@ -27,6 +27,23 @@ scout.dates = {
     return newDate;
   },
 
+  shiftTime: function(date, hours, minutes, seconds, milliseconds) {
+    var newDate = new Date(date.getTime());
+    if (hours) {
+      newDate.setHours(date.getHours() + hours);
+    }
+    if (minutes) {
+      newDate.setMinutes(date.getMinutes() + minutes);
+    }
+    if (seconds) {
+      newDate.setSeconds(date.getSeconds() + seconds);
+    }
+    if (milliseconds) {
+      newDate.setMilliseconds(date.getMilliseconds() + milliseconds);
+    }
+    return newDate;
+  },
+
   shiftToNextDayOfType: function(date, day) {
     var diff = day - date.getDay();
 
@@ -187,7 +204,7 @@ scout.dates = {
    */
   parseJsonDate: function(jsonDate) {
     if (!jsonDate) {
-      return undefined;
+      return null;
     }
 
     var year = '1970',
@@ -233,13 +250,21 @@ scout.dates = {
       }
     }
 
+    var result;
     if (utc) {
       // UTC date
-      return new Date(Date.UTC(year, (month - 1), day, hours, minutes, seconds, milliseconds));
+      result = new Date(Date.UTC(year, (month - 1), day, hours, minutes, seconds, milliseconds));
+      if (year < 100) { // fix "two-digit years between 1900 and 1999" logic
+        result.setUTCFullYear(year);
+      }
     } else {
       // local date
-      return new Date(year, (month - 1), day, hours, minutes, seconds, milliseconds);
+      result = new Date(year, (month - 1), day, hours, minutes, seconds, milliseconds);
+      if (year < 100) { // fix "two-digit years between 1900 and 1999" logic
+        result.setFullYear(year);
+      }
     }
+    return result;
   },
 
   /**
@@ -252,7 +277,7 @@ scout.dates = {
    */
   toJsonDate: function(date, utc, includeDate, includeTime) {
     if (!date) {
-      return undefined;
+      return null;
     }
     if (includeDate === undefined) {
       includeDate = true;
@@ -262,7 +287,7 @@ scout.dates = {
     }
     var datePart, timePart, utcPart;
     if (utc) {
-      datePart = date.getUTCFullYear() + '-' +
+      datePart = scout.strings.padZeroLeft(date.getUTCFullYear(), 4) + '-' +
         scout.strings.padZeroLeft((date.getUTCMonth() + 1), 2) + '-' + // (0-indexed)
       scout.strings.padZeroLeft(date.getUTCDate(), 2);
       timePart = scout.strings.padZeroLeft(date.getUTCHours(), 2) + ':' +
@@ -271,7 +296,7 @@ scout.dates = {
         scout.strings.padZeroLeft(date.getUTCMilliseconds(), 3);
       utcPart = 'Z';
     } else {
-      datePart = date.getFullYear() + '-' +
+      datePart = scout.strings.padZeroLeft(date.getFullYear(), 4) + '-' +
         scout.strings.padZeroLeft((date.getMonth() + 1), 2) + '-' + // (0-indexed)
       scout.strings.padZeroLeft(date.getDate(), 2);
       timePart = scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
@@ -364,17 +389,17 @@ scout.dates = {
    * TODO NBU Add jasmine test
    * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.
    */
+  // FIXME BSH Check if this is needed, otherwise remove
   combineDateTime: function(date, time) {
     var newDate = new Date(0);
-    newDate.setHours(0,0,0,0);
     if (date) {
-      newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDay());
+      newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
     }
     if (time) {
-      newDate.setHours(time.getHours() ? time.getHours() : 0);
-      newDate.setMinutes(time.getMinutes() ? time.getMinutes() : 0);
-      newDate.setSeconds(time.getSeconds() ? time.getSeconds() : 0);
-      newDate.setMilliseconds(time.getMilliseconds() ? time.getMilliseconds() : 0);
+      newDate.setHours(scout.helpers.nvl(time.getHours(), 0));
+      newDate.setMinutes(scout.helpers.nvl(time.getMinutes(), 0));
+      newDate.setSeconds(scout.helpers.nvl(time.getSeconds(), 0));
+      newDate.setMilliseconds(scout.helpers.nvl(time.getMilliseconds(), 0));
     }
     return newDate;
   }

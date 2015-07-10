@@ -1,7 +1,11 @@
 /**
+ * Custom JavaScript Date Format
  *
- * Provides formatting of dates using java format pattern.<br/>
- * It does not consider timezones.
+ * Support for formatting and parsing dates based on a pattern string and some locale
+ * information from the server model. A subset of the standard Java pattern strings
+ * (see SimpleDateFormat) with the most commonly used patterns is supported.
+ *
+ * This object only operates on the local time zone.
  * <p>
  * locale.dateFormatSymbols contains:
  * <ul>
@@ -15,11 +19,24 @@
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
+scout.DateFormatPatternType = {
+  YEAR: 'year',
+  MONTH: 'month',
+  WEEK_IN_YEAR: 'week_in_year',
+  DAY_IN_MONTH: 'day_in_month',
+  WEEKDAY: 'weekday',
+  HOUR_24: 'hour_24',
+  HOUR_12: 'hour_12',
+  AM_PM: 'am_pm',
+  MINUTE: 'minute',
+  SECOND: 'second',
+  MILLISECOND: 'millisecond'
+};
+
 scout.DateFormat = function(locale, pattern) {
   /*jshint sub:true*/
-  if (!pattern) {
-    pattern = locale.dateFormatPatternDefault;
-  }
+  this.locale = locale;
+  this.pattern = pattern || locale.dateFormatPatternDefault;
 
   this.symbols = locale.dateFormatSymbols;
   this.symbols.firstDayOfWeek = 1; // monday //FIXME deliver from server
@@ -27,432 +44,1132 @@ scout.DateFormat = function(locale, pattern) {
   this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.symbols.monthsToNumber;
   this.symbols.monthsShortToNumber;
-  this._createMonthsToNumberMapping;
-  this.formatFunc = [];
-  this.patternDefinitions = [];
-  this.parseFunc = [];
-  this.pattern = pattern;
-  this.timePart;
-  this.datePart;
+
+  // List of terms, e.g. split up parts of this.pattern. The length of this array is equal
+  // to the length of this._formatFunctions, this._parseFunctions and this._analyzeFunctions.
+  this._terms = [];
+
+  // List of format function to be called _in that exact order_ to convert this.pattern
+  // to a formatted date string (by sequentially replacing all terms with real values).
+  this._formatFunctions = [];
+
+  // List of parse functions to be called _in that exact order_ to convert an input
+  // string to a valid JavaScript Date object. This order matches the recognized terms
+  // in the pattern. Unrecognized terms are represented by a "constant" function that
+  // matches the string itself (e.g. separator characters or spaces).
+  this._parseFunctions = [];
+
+  // Array of arrays, same order as _parseFunctions, but term functions are a list of term functions (to support lenient parsing)
+  this._analyzeFunctions = [];
+
+  var _dateFormat = this;
 
   // Local helper (constructor) functions
-  var DateFormatPatternDefinition = function(term, func, parseFunc, isTimePattern, type) {
-    if (Array.isArray(term)) {
-      this.terms = term;
+  /**
+   * Definition of a date format pattern.
+   *
+   * A definition provides the following properties (most of which can be set with the 'options' argument):
+   *
+   * type:
+   *   The "group" where the pattern definition belongs to. E.g. "dd" and "d" belong to the same group "day".
+   *   This is used during analysis to find other definitions for the same type. Use one of the constants
+   *   defined in scout.DateFormatPatternType.
+   *
+   * terms:
+   *   An array consisting of all pattern terms that this particular definition can handle. Multiple
+   *   terms with the same meaning may be accepted (e.g. "yyy", "yy" and "y" can be all used for a
+   *   2-digit year formatting, but different parsing rules may apply).
+   *
+   * acceptedTerm:
+   *   Indicates which of the "terms" exactly was accepted for the date pattern.
+   *
+   * dateFormat:
+   *   Reference to the corresponding dateFormat object.
+   *
+   * formatFunction:
+   *   An optional function that is used to format this particular term.
+   *   @param formatContext
+   *            See documentation at _createFormatContext().
+   *   @return
+   *            The function may return a string as result. If a string is returned, it is appended
+   *            to the formatContext.formattedString automatically. If the formatFunction already did
+   *            this, it should return "undefined".
+   *
+   * parseRegExp:
+   *   A optional JavaScript RegExp object that is applied to the input string to extract this
+   *   definition's term. The expression _must_ use exactly two capturing groups:
+   *   [1] = matched part of the input
+   *   [2] = remaining input (will be parsed later by other definitions)
+   *   Example: /^(\d{4})(.*)$/
+   *
+   * applyMatchFunction:
+   *   If 'parseRegExp' is set and found a match, and this function is defined, it is called
+   *   to apply the matched part to the parseContext.
+   *   @param parseContext
+   *            See documentation at _createParseContext().
+   *   @param match
+   *            The first match from the reg exp.
+   *   @return
+   *            No return value.
+   *
+   * parseFunction:
+   *   If parsing is not possible with a regular expression, this function may be defined to execute
+   *   more complex parse logic.
+   *   @param parseContext
+   *            See documentation at _createParseContext().
+   *   @return
+   *            A string with the matched part of the input, or null if it did not match.
+   */
+  var DateFormatPatternDefinition = function(options) {
+    options = options || {};
+    this.type = options.type;
+    // List of termins meaning the same thing
+    if (Array.isArray(options.terms)) {
+      this.terms = options.terms;
     } else {
-      this.terms = [term];
+      this.terms = [options.terms];
     }
-    this.func = func;
-    this.parseFunc = parseFunc;
-    this.isTimePattern = isTimePattern;
-    this.patternIndex = -1;
-    this.patternTextAfter = ''; //is set by DateFormat
-    this.firstPatternDefinition; //is set by DateFormat
-    this.selectedPattern;
-    this.type = type;
+    this.acceptedTerm = null; // set by accept()
+    this.dateFormat = _dateFormat;
+    this.formatFunction = options.formatFunction && options.formatFunction.bind(this);
+    this.parseRegExp = options.parseRegExp;
+    this.applyMatchFunction = options.applyMatchFunction && options.applyMatchFunction.bind(this);
+    this.parseFunction = options.parseFunction && options.parseFunction.bind(this);
   };
 
-  DateFormatPatternDefinition.prototype.compile = function(pattern) {
-    for (var i = 0; i < this.terms.length; i++) {
-      var index = pattern.indexOf(this.terms[i]);
-      if (index !== -1) {
-        this.index = index;
-        this.selectedPattern = this.terms[i];
+  DateFormatPatternDefinition.prototype.createFormatFunction = function() {
+    return function(formatContext) {
+      if (this.formatFunction) {
+        var result = this.formatFunction(formatContext);
+        if (result !== undefined) { // convenience
+          formatContext.formattedString += result;
+        }
+      }
+    }.bind(this);
+  };
+
+  DateFormatPatternDefinition.prototype.createParseFunction = function() {
+    return function(parseContext) {
+      var m, i, parsedTerm, match;
+
+      var success = false;
+      if (this.parseRegExp) {
+        // RegEx handling (default)
+        m = this.parseRegExp.exec(parseContext.inputString);
+        if (m) { // match found
+          if (this.applyMatchFunction) {
+            this.applyMatchFunction(parseContext, m[1]);
+          }
+          match = m[1];
+          // update remaining string
+          parseContext.inputString = m[2];
+          success = true;
+        }
+      }
+      if (!success && this.parseFunction) {
+        // Custom function
+        match = this.parseFunction(parseContext);
+        if (match !== null) {
+          success = true;
+        }
+      }
+
+      if (success) {
+        // If patternDefinition accepts more than one term, try to choose
+        // the form that matches the length of the match.
+        parsedTerm = this.terms[0];
+        if (this.terms.length > 1) {
+          this.terms.some(function(term) {
+            if (term.length === match.length) {
+              parsedTerm = term;
+              return true; // found
+            }
+            return false; // look further
+          });
+        }
+        parseContext.parsedPattern += parsedTerm;
+      }
+      return success;
+    }.bind(this);
+  };
+
+  DateFormatPatternDefinition.prototype.accept = function(term) {
+    if (term) {
+      // Check if one of the terms matches
+      for (var i = 0; i < this.terms.length; i++) {
+        if (term === this.terms[i]) {
+          this.acceptedTerm = this.terms[i];
+          return true;
+        }
+      }
+    }
+    this.acceptedTerm = null;
+    return false;
+  };
+
+  // Build a list of all pattern definitions. This list is then used to build the list of
+  // format, parse and analyze functions according to this.pattern.
+  //
+  // !!! PLEASE NOTE !!!
+  // The order of these definitions is important! For each term in the pattern, the list
+  // is scanned from the beginning until a definition accepts the term. If the wrong
+  // definition was picked, results would be unpredictable.
+  //
+  // Following the following rules ensures that the algorithm can pick the best matching
+  // pattern format definition for each term in the pattern:
+  // - Sort definitions by time span, from large (year) to small (milliseconds).
+  // - Two definitions of the same type should be sorted by term length, from long
+  //   (e.g. MMMM) to short (e.g. M).
+  this._patternDefinitions = [
+    // --- Year ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.YEAR,
+      terms: 'yyyy',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getFullYear(), 4).slice(-4);
+      },
+      parseRegExp: /^(\d{4})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.matchInfo.year = match;
+        parseContext.dateInfo.year = Number(match);
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.YEAR,
+      terms: ['yyy', 'yy', 'y'],
+      formatFunction: function(formatContext) {
+        var year = String(formatContext.inputDate.getFullYear());
+        var length = (formatContext.exactLength ? this.acceptedTerm.length : 2);
+        if (this.acceptedTerm.length === 1) {
+          // Return max. 2 digits, no leading zero
+          return year.slice(-length);
+        }
+        // Return max. 2 digits with zero padding
+        return scout.strings.padZeroLeft(year, length).slice(-length);
+      },
+      parseRegExp: /^(\d{1,3})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        if (match.length === 3) {
+          parseContext.dateInfo.year = Number(match);
+          parseContext.matchInfo.year = match;
+          return;
+        }
+        var shortInputYear = Number(match);
+        var startDate = parseContext.startDate || new Date();
+        var shortStartYear = Number(String(startDate.getFullYear()).slice(-2));
+        var rangeMin = (shortStartYear - 50 < 0 ? shortStartYear + 50 : shortStartYear - 50);
+        var yearPrefix = String(scout.strings.padZeroLeft(startDate.getFullYear(), 4)).substr(0, 2);
+        if (shortInputYear > rangeMin) {
+          yearPrefix = Number(yearPrefix) - 1;
+        }
+        var year = Number(String(yearPrefix) + scout.strings.padZeroLeft(shortInputYear, 2));
+        parseContext.dateInfo.year = year;
+        parseContext.matchInfo.year = match;
+      }
+    }),
+    // --- Month ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MONTH,
+      terms: 'MMMM',
+      formatFunction: function(formatContext) {
+        return this.dateFormat.symbols.months[formatContext.inputDate.getMonth()];
+      },
+      parseFunction: function(parseContext) {
+        var i, symbol, re, m;
+        for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
+          symbol = this.dateFormat.symbols.months[i];
+          if (!symbol) {
+            continue; // Ignore empty symbols (otherwise, pattern would match everything)
+          }
+          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          m = re.exec(parseContext.inputString);
+          if (m) { // match found
+            parseContext.dateInfo.month = i;
+            parseContext.matchInfo.month = m[1];
+            parseContext.inputString = m[2];
+            return m[1];
+          }
+        }
+        // No match found so far. In analyze mode, check prefixes.
+        if (parseContext.analyze) {
+          for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
+            symbol = this.dateFormat.symbols.months[i];
+            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            m = re.exec(symbol);
+            if (m) { // match found
+              parseContext.dateInfo.month = i;
+              parseContext.matchInfo.month = symbol;
+              parseContext.inputString = '';
+              return m[1];
+            }
+          }
+        }
+        return null; // no match found
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MONTH,
+      terms: 'MMM',
+      formatFunction: function(formatContext) {
+        return this.dateFormat.symbols.monthsShort[formatContext.inputDate.getMonth()];
+      },
+      parseFunction: function(parseContext) {
+        var i, symbol, re, m;
+        for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
+          symbol = this.dateFormat.symbols.monthsShort[i];
+          if (!symbol) {
+            continue; // Ignore empty symbols (otherwise, pattern would match everything)
+          }
+          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          m = re.exec(parseContext.inputString);
+          if (m) { // match found
+            parseContext.dateInfo.month = i;
+            parseContext.matchInfo.month = m[1];
+            parseContext.inputString = m[2];
+            return m[1];
+          }
+        }
+        // No match found so far. In analyze mode, check prefixes.
+        if (parseContext.analyze) {
+          for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
+            symbol = this.dateFormat.symbols.monthsShort[i];
+            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            m = re.exec(symbol);
+            if (m) { // match found
+              parseContext.dateInfo.month = i;
+              parseContext.matchInfo.month = symbol;
+              parseContext.inputString = '';
+              return m[1];
+            }
+          }
+        }
+        return null; // no match found
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MONTH,
+      terms: 'MM',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        var month = Number(match);
+        parseContext.dateInfo.month = month - 1;
+        parseContext.matchInfo.month = match;
+      },
+      parseFunction: function(parseContext) {
+        // Special case! When regexp did not match, check if input is '0'. In this case (and only
+        // if we are in analyze mode), predict '01' as input.
+        if (parseContext.analyze) {
+          if (parseContext.inputString === '0') {
+            // Use current dateInfo to create a date
+            var date = this.dateFormat._dateInfoToDate(parseContext.dateInfo);
+            if (!date) {
+              return null; // parsing failed (dateInfo does not seem to contain a valid string)
+            }
+            var month = date.getMonth();
+            if (month >= 9) {
+              month = 0;
+              if (parseContext.dateInfo.year === undefined) {
+                parseContext.dateInfo.year = Number(date.getFullYear()) + 1;
+              } else {
+                parseContext.dateInfo.year = parseContext.dateInfo.year + 1;
+              }
+            }
+            parseContext.dateInfo.month = month;
+            parseContext.matchInfo.month = scout.strings.padZeroLeft(String(month + 1), 2);
+            parseContext.inputString = '';
+            return '0';
+          }
+        }
+        return null; // no match found
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MONTH,
+      terms: 'M',
+      formatFunction: function(formatContext) {
+        return String(formatContext.inputDate.getMonth() + 1);
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        var month = Number(match);
+        parseContext.dateInfo.month = month - 1;
+        parseContext.matchInfo.month = match;
+      }
+    }),
+    // --- Week in year ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.WEEK_IN_YEAR,
+      terms: 'ww',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(scout.dates.weekInYear(formatContext.inputDate), 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.matchInfo.week = match;
+        parseContext.hints.weekInYear = Number(match);
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.WEEK_IN_YEAR,
+      terms: 'w',
+      formatFunction: function(formatContext) {
+        return String(scout.dates.weekInYear(formatContext.inputDate));
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.matchInfo.week = match;
+        parseContext.hints.weekInYear = Number(match);
+      }
+    }),
+    // --- Day in month ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.DAY_IN_MONTH,
+      terms: 'dd',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getDate(), 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.day = Number(match);
+        parseContext.matchInfo.day = match;
+      },
+      parseFunction: function(parseContext) {
+        // Special case! When regexp did not match, check if input is '0'. In this case (and only
+        // if we are in analyze mode), predict '01' as input.
+        if (parseContext.analyze) {
+          if (parseContext.inputString === '0') {
+            parseContext.dateInfo.day = 1;
+            parseContext.matchInfo.day = '01';
+            parseContext.inputString = '';
+            return '0';
+          }
+        }
+        return null; // no match found
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.DAY_IN_MONTH,
+      terms: 'd',
+      formatFunction: function(formatContext) {
+        return String(formatContext.inputDate.getDate());
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.day = Number(match);
+        parseContext.matchInfo.day = match;
+      }
+    }),
+    // --- Weekday ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.WEEKDAY,
+      terms: 'EEEE',
+      formatFunction: function(formatContext) {
+        return this.dateFormat.symbols.weekdays[formatContext.inputDate.getDay()];
+      },
+      parseFunction: function(parseContext) {
+        var i, symbol, re, m;
+        for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
+          symbol = this.dateFormat.symbols.weekdays[i];
+          if (!symbol) {
+            continue; // Ignore empty symbols (otherwise, pattern would match everything)
+          }
+          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          m = re.exec(parseContext.inputString);
+          if (m) { // match found
+            parseContext.matchInfo.weekday = m[1];
+            parseContext.hints.weekday = i;
+            parseContext.inputString = m[2];
+            return m[1];
+          }
+        }
+        // No match found so far. In analyze mode, check prefixes.
+        if (parseContext.analyze) {
+          for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
+            symbol = this.dateFormat.symbols.weekdays[i];
+            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            m = re.exec(symbol);
+            if (m) { // match found
+              parseContext.matchInfo.weekday = symbol;
+              parseContext.hints.weekday = i;
+              parseContext.inputString = '';
+              return m[1];
+            }
+          }
+        }
+        return null; // no match found
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.WEEKDAY,
+      terms: ['EEE', 'EE', 'E'],
+      formatFunction: function(formatContext) {
+        return this.dateFormat.symbols.weekdaysShort[formatContext.inputDate.getDay()];
+      },
+      parseFunction: function(parseContext) {
+        var i, symbol, re, m;
+        for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
+          symbol = this.dateFormat.symbols.weekdaysShort[i];
+          if (!symbol) {
+            continue; // Ignore empty symbols (otherwise, pattern would match everything)
+          }
+          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          m = re.exec(parseContext.inputString);
+          if (m) { // match found
+            parseContext.matchInfo.weekday = m[1];
+            parseContext.hints.weekday = i;
+            parseContext.inputString = m[2];
+            return m[1];
+          }
+        }
+        // No match found so far. In analyze mode, check prefixes.
+        if (parseContext.analyze) {
+          for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
+            symbol = this.dateFormat.symbols.weekdaysShort[i];
+            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            m = re.exec(symbol);
+            if (m) { // match found
+              parseContext.matchInfo.weekday = symbol;
+              parseContext.hints.weekday = i;
+              parseContext.inputString = '';
+              return m[1];
+            }
+          }
+        }
+        return null; // no match found
+      }
+    }),
+    // --- Hour (24h) ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.HOUR_24,
+      terms: 'HH',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getHours(), 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.hours = Number(match);
+        parseContext.matchInfo.hours = match;
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.HOUR_24,
+      terms: ['H', 'h'],
+      formatFunction: function(formatContext) {
+        return String(formatContext.inputDate.getHours());
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.hours = Number(match);
+        parseContext.matchInfo.hours = match;
+      }
+    }),
+    // --- Hour (12h) ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.HOUR_12,
+      terms: 'KK',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft((formatContext.inputDate.getHours() + 11) % 12 + 1, 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.hours = Number(match);
+        parseContext.matchInfo.hours = match;
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.HOUR_12,
+      terms: 'K',
+      formatFunction: function(formatContext) {
+        return String((formatContext.inputDate) % 12 + 1);
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.hours = Number(match);
+        parseContext.matchInfo.hours = match;
+      }
+    }),
+    // --- AM/PM marker ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.AM_PM,
+      terms: 'a',
+      formatFunction: function(formatContext) {
+        if (formatContext.inputDate.getHours() < 12) {
+          return this.dateFormat.symbols.am;
+        }
+        return this.dateFormat.symbols.pm;
+      },
+      parseFunction: function(parseContext) {
+        var am = false,
+          pm = false,
+          re, m;
+
+        re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
+        m = re.exec(parseContext.inputString);
+        if (m) { // match found
+          am = true;
+          parseContext.matchInfo.ampm = m[1];
+          parseContext.inputString = m[2];
+        } else {
+          re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
+          m = re.exec(parseContext.inputString);
+          if (m) { // match found
+            pm = true;
+            parseContext.matchInfo.ampm = m[1];
+            parseContext.inputString = m[2];
+          }
+        }
+
+        if (!am && !pm) {
+          return null; // no match found
+        }
+        parseContext.hints.am = am;
+        parseContext.hints.pm = pm;
+        return m[1];
+      }
+    }),
+    // --- Minute ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MINUTE,
+      terms: 'mm',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getMinutes(), 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.minutes = Number(match);
+        parseContext.matchInfo.minutes = match;
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MINUTE,
+      terms: 'm',
+      formatFunction: function(formatContext) {
+        return String(formatContext.inputDate.getMinutes());
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.minutes = Number(match);
+        parseContext.matchInfo.minutes = match;
+      }
+    }),
+    // --- Second ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.SECOND,
+      terms: 'ss',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getSeconds(), 2);
+      },
+      parseRegExp: /^(\d{2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.seconds = Number(match);
+        parseContext.matchInfo.seconds = match;
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.SECOND,
+      terms: 's',
+      formatFunction: function(formatContext) {
+        return String(formatContext.inputDate.getSeconds());
+      },
+      parseRegExp: /^(\d{1,2})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.seconds = Number(match);
+        parseContext.matchInfo.seconds = match;
+      }
+    }),
+    // --- Millisecond ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MILLISECOND,
+      terms: 'SSS',
+      formatFunction: function(formatContext) {
+        return scout.strings.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3);
+      },
+      parseRegExp: /^(\d{3})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.milliseconds = Number(match);
+        parseContext.matchInfo.milliseconds = match;
+      }
+    }),
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.MILLISECOND,
+      terms: 'S',
+      formatFunction: function(formatContext) {
+        return String(formatContext.inputDate.getMilliseconds());
+      },
+      parseRegExp: /^(\d{1,3})(.*)$/,
+      applyMatchFunction: function(parseContext, match) {
+        parseContext.dateInfo.milliseconds = Number(match);
+        parseContext.matchInfo.milliseconds = match;
+      }
+    })
+  ];
+
+  // Build a map of pattern definitions by pattern type
+  this._patternLibrary = {};
+  for (var i = 0; i < this._patternDefinitions.length; i++) {
+    var patternDefinition = this._patternDefinitions[i];
+    var type = patternDefinition.type;
+    if (type) {
+      if (!this._patternLibrary[type]) {
+        this._patternLibrary[type] = [];
+      }
+      this._patternLibrary[type].push(patternDefinition);
+    }
+  }
+
+  this._compile();
+};
+
+scout.DateFormat.prototype._compile = function() {
+  var i, j, patternDefinitions, patternDefinition, re, m, term, termAccepted, analyseFunctions;
+
+  // Build format, parse and analyze functions for all terms in the DateFormat's pattern.
+  // A term is a continuous sequence of the same character.
+  re = /(.)\1*/g;
+  while ((m = re.exec(this.pattern))) {
+    term = m[0];
+    this._terms.push(term);
+
+    termAccepted = false;
+    for (i = 0; i < this._patternDefinitions.length; i++) {
+      patternDefinition = this._patternDefinitions[i];
+      if (patternDefinition.accept(term)) {
+        // 1. Create and install format function
+        this._formatFunctions.push(patternDefinition.createFormatFunction());
+
+        // 2. Create and install parse function
+        this._parseFunctions.push(patternDefinition.createParseFunction());
+
+        // 3. Create and install analyze functions (= all parse functions for the same type)
+        patternDefinitions = this._patternLibrary[patternDefinition.type];
+        analyseFunctions = [];
+        for (j = 0; j < patternDefinitions.length; j++) {
+          analyseFunctions.push(patternDefinitions[j].createParseFunction());
+        }
+        this._analyzeFunctions.push(analyseFunctions);
+
+        // Term was processed, continue with next term
+        termAccepted = true;
         break;
       }
     }
-  };
-  DateFormatPatternDefinition.prototype.createFormatFunc = function() {
-    var that = this;
-    return function(string, date) {
-      return string.replace(that.selectedPattern, that.func(date));
-    };
-  };
 
-  DateFormatPatternDefinition.prototype.createParseFunc = function() {
-    var that = this;
-    return function(dateString, date) {
-      if (that.firstPatternDefinition) {
-        dateString = dateString.substring(that.index, dateString.length);
-      }
-      return that.parseFunc(dateString, date, that.patternTextAfter);
-    };
-  };
-
-  DateFormatPatternDefinition.prototype.accept = function(pattern) {
-    if (!pattern) {
-      return false;
+    // In case term was not accepted by any pattern definition, assume it is a constant string
+    if (!termAccepted) {
+      // 1. Create and install constant format function
+      this._formatFunctions.push(this._createConstantStringFormatFunction(term));
+      // 2./3. Create and install parse and analyse functions
+      var constantStringParseFunction = this._createConstantStringParseFunction(term);
+      this._parseFunctions.push(constantStringParseFunction);
+      this._analyzeFunctions.push([constantStringParseFunction]);
     }
-    // Check if one of the terms matches
-    for (var i = 0; i < this.terms.length; i++) {
-      if (pattern.indexOf(this.terms[i]) !== -1) {
-        return true;
-      }
+  }
+};
+
+/**
+ * Returns a format function for constant terms (e.g. all parts of a pattern that don't
+ * have a DateFormatPatternDefinition).
+ */
+scout.DateFormat.prototype._createConstantStringFormatFunction = function(term) {
+  return function(formatContext) {
+    formatContext.formattedString += term;
+  };
+};
+
+/**
+ * Returns a parse function for constant terms (e.g. all parts of a pattern that don't
+ * have a DateFormatPatternDefinition).
+ */
+scout.DateFormat.prototype._createConstantStringParseFunction = function(term) {
+  return function(parseContext) {
+    if (scout.strings.startsWith(parseContext.inputString, term)) {
+      parseContext.inputString = parseContext.inputString.substr(term.length);
+      parseContext.parsedPattern += term;
+      return true;
+    }
+    // In analyze mode, constant terms are optional (this supports "020318" --> "02.03.2018")
+    if (parseContext.analyze) {
+      return true;
     }
     return false;
   };
-  var that = this;
-
-  // Build the pattern library in the following order:
-  // - Sort pattern groups by 'time span', from large (year) to small (milliseconds).
-  // - Inside a pattern group, sort the definitions by 'term length', from long (e.g. MMMM)
-  //   to short (e.g. M)
-  // This order ensures, that the algorithm can pick the best matching pattern function for
-  // each term in the pattern.
-  var patternLibrary = [
-    // Year
-    [
-      new DateFormatPatternDefinition('yyyy', function(date) {
-        return String(date.getFullYear());
-      }, function(dateString, date, patternTextAfter) {
-        //every time 4 chars
-        date.setFullYear(dateString.substr(0, 4));
-        return dateString.substring(4 + this.patternTextAfter.length, dateString.length);
-      }, false, 'year'),
-      new DateFormatPatternDefinition(['yy', 'y'], function(date) {
-        return String(date.getFullYear()).slice(2);
-      }, function(dateString, date, patternTextAfter) {
-        var shortYear = Number(dateString.substr(0, 2));
-        var actualYear = Number(String(new Date().getFullYear()).slice(2));
-        var rangeMin = actualYear - 50 < 0 ? actualYear + 50 : actualYear - 50;
-        var yearprefix = shortYear > rangeMin ? Number(String(new Date().getFullYear()).substr(0, 2)) - 1 : String(new Date().getFullYear()).substr(0, 2);
-
-        date.setFullYear(yearprefix + dateString.substr(0, 2));
-        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
-      }, false, 'year')
-    ],
-    // Month
-    [
-      new DateFormatPatternDefinition('MMMM', function(date) {
-        return that.symbols.months[date.getMonth()];
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setMonth(that.symbols.monthsToNumber[dateString.toUpperCase()]);
-      }, false, 'month'),
-      new DateFormatPatternDefinition('MMM', function(date) {
-        return that.symbols.monthsShort[date.getMonth()];
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setMonth(that.symbols.monthsShortToNumber[dateString.toUpperCase()]);
-      }, false, 'month'),
-      new DateFormatPatternDefinition('MM', function(date) {
-        return scout.strings.padZeroLeft(date.getMonth() + 1, 2);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setMonth(Number(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart) - 1);
-        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
-      }, false, 'month'),
-      new DateFormatPatternDefinition('M', function(date) {
-        return date.getMonth() + 1;
-      }, function(dateString, date, patternTextAfter) {
-        //Can only parse day with pattern text after
-        if(patternTextAfter){
-          var month = dateString.substring(0, dateString.indexOf(patternTextAfter));
-          date.setMonth(month-1);
-          return dateString.replace(month+patternTextAfter, '');
-        }
-        return dateString;
-      }, false, 'month')
-    ],
-    // Week in year
-    [
-      new DateFormatPatternDefinition('ww', function(date) {
-        return scout.strings.padZeroLeft(scout.dates.weekInYear(date), 2);
-      }, function(dateString, date, patternTextAfter) {
-        //not supported
-        return date;
-      }, false, 'week'),
-      new DateFormatPatternDefinition('w', function(date) {
-        return scout.dates.weekInYear(date);
-      }, function(dateString, date, patternTextAfter) {
-        //notSuported
-        return date;
-      }, false, 'week')
-    ],
-    // Day in month
-    [
-      new DateFormatPatternDefinition('dd', function(date) {
-        return scout.strings.padZeroLeft(date.getDate(), 2);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setDate(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
-        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
-      }, false, 'day'),
-      new DateFormatPatternDefinition('d', function(date) {
-        return date.getDate();
-      }, function(dateString, date, patternTextAfter) {
-        //Can only parse day with pattern text after
-        if(patternTextAfter){
-          var day = dateString.substring(0, dateString.indexOf(patternTextAfter));
-          date.setDate(day);
-          return dateString.replace(day+patternTextAfter, '');
-        }
-        return dateString;
-      }, false, 'day')
-    ],
-    // Weekday
-    [
-      new DateFormatPatternDefinition('EEEE', function(date) {
-        return that.symbols.weekdays[date.getDay()];
-      }, function(dateString, date, patternTextAfter) {
-        //not supported
-        return date;
-      }, false, 'weekday'),
-      new DateFormatPatternDefinition(['EEE', 'EE', 'E'], function(date) {
-        return that.symbols.weekdaysShort[date.getDay()];
-      }, function(dateString, date, patternTextAfter) {
-        //not supported
-        return date;
-      }, false, 'weekday')
-    ],
-    // Hour (24h)
-    [
-      new DateFormatPatternDefinition('HH', function(date) {
-        return scout.strings.padZeroLeft(date.getHours(), 2);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setHours(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
-        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
-      }, true, 'hour'),
-      new DateFormatPatternDefinition(['H', 'h'], function(date) {
-        return date.getHours();
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setHours(dateString);
-      }, true, 'hour')
-    ],
-    // Hour (12h)
-    [
-      new DateFormatPatternDefinition('KK', function(date) {
-        return scout.strings.padZeroLeft((date.getHours() + 11) % 12 + 1, 2);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setHours(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
-        return dateString.substring(1 + this.patternTextAfter.length, dateString.length);
-      }, true, 'hour'),
-      new DateFormatPatternDefinition('K', function(date) {
-        return (date.getHours() + 11) % 12 + 1;
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setHours(dateString);
-      }, true, 'hour')
-    ],
-
-    // AM/PM marker
-    [
-      new DateFormatPatternDefinition('a', function(date) {
-        return (date.getHours() < 12) ? 'am' : 'pm';
-      }, function(dateString, date, patternTextAfter) {
-        //not supported
-        return date;
-      }, true, 'ampm')
-    ],
-    // Minute
-    [
-      new DateFormatPatternDefinition('mm', function(date) {
-        return scout.strings.padZeroLeft(date.getMinutes(), 2);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setMinutes(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
-        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
-      }, true, 'minute'),
-      new DateFormatPatternDefinition('m', function(date) {
-        return date.getMinutes();
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setMinutes(dateString);
-      }, true, 'minute')
-    ],
-    // Second
-    [
-      new DateFormatPatternDefinition('ss', function(date) {
-        return scout.strings.padZeroLeft(date.getSeconds(), 2);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setSeconds(datePart.indexOf(0) === 0 ? datePart.substr(1, 1) : datePart);
-        return dateString.substring(2 + this.patternTextAfter.length, dateString.length);
-      }, true, 'second'),
-      new DateFormatPatternDefinition('s', function(date) {
-        return date.getSeconds();
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setSeconds(dateString);
-      }, true, 'second')
-    ],
-    // Millisecond
-    [
-      new DateFormatPatternDefinition('SSS', function(date) {
-        return ('000' + date.getMilliseconds()).slice(-3);
-      }, function(dateString, date, patternTextAfter) {
-        var datePart = dateString.substr(0, 2);
-        date.setMilliseconds(datePart.indexOf(0) === 0 ? datePart.indexOf(0) === 1 ? datePart.substr(2, 1) : datePart.substr(1, 1) : datePart);
-        return dateString.substring(3 + this.patternTextAfter.length, dateString.length);
-      }, true, 'milli'),
-      new DateFormatPatternDefinition('S', function(date) {
-        return date.getMilliseconds();
-      }, function(dateString, date, patternTextAfter) {
-        //TODO nbu
-        return date.setMilliseconds(dateString);
-      }, true, 'milli')
-    ]
-  ];
-
-  this.compile(patternLibrary);
-
 };
 
-scout.DateFormat.prototype.compile = function(patternLibrary) {
-  //Now for each pattern group in the library, pick the best matching definition
-  // and retrieve the formatter function from it.
-  var lastTimePattern,
-    lastDatePattern,
-    firstTimePattern,
-    firstDatePattern;
-  for (var i = 0; i < patternLibrary.length; i++) {
-    var patternGroup = patternLibrary[i];
-    for (var j = 0; j < patternGroup.length; j++) {
-      var patternDefinition = patternGroup[j];
-      if (patternDefinition.accept(this.pattern)) {
-        patternDefinition.compile(this.pattern);
-        this.formatFunc.push(patternDefinition.createFormatFunc());
-        this.patternDefinitions[patternDefinition.index] = patternDefinition;
-        if (patternDefinition.isTimePattern) {
-          lastTimePattern = lastTimePattern ? lastTimePattern.index > patternDefinition.index ? lastTimePattern : patternDefinition : patternDefinition;
-          firstTimePattern = firstTimePattern ? firstTimePattern.index > patternDefinition.index ? patternDefinition : firstTimePattern : patternDefinition;
-        } else {
-          lastDatePattern = lastDatePattern ? lastDatePattern.index > patternDefinition.index ? lastDatePattern : patternDefinition : patternDefinition;
-          firstDatePattern = firstDatePattern ? firstDatePattern.index > patternDefinition.index ? patternDefinition : firstDatePattern : patternDefinition;
-        }
-        break;
-      }
-    }
-  }
-  //create date and time part;
-  if (firstTimePattern && lastTimePattern) {
-    this.timePart = this.pattern.substring(firstTimePattern.index, lastTimePattern.index + lastTimePattern.selectedPattern.length).trim();
-  }
-  if (firstDatePattern && lastDatePattern) {
-    this.datePart = this.pattern.substring(firstDatePattern.index, lastDatePattern.index + lastDatePattern.selectedPattern.length).trim();
+/**
+ * Formats the given date according to the date pattern. If the date is missing, the
+ * empty string is returned.
+ *
+ * @param exactLength
+ *          May be set to true to force the patterns to use the exact length. For example,
+ *          the year pattern 'yyy' would normally format the year using 2 digits. If
+ *          the parameter is true, 3 are used. This is mainly useful, when an "analyzed"
+ *          date should be formatted again using the "parsedPattern".
+ */
+scout.DateFormat.prototype.format = function(date, exactLength) {
+  if (!date) {
+    return '';
   }
 
-  //update Patterndefinitions and create parseFunc in correct order.
-  var firstDefinition = true;
-  var pattern = this.pattern;
-  var lastPatternDef;
-  for (i = 0; i < this.patternDefinitions.length; i++) {
-    var patternDef = this.patternDefinitions[i];
-    if (patternDef) {
-      this.parseFunc.push(patternDef.createParseFunc());
-      if (firstDefinition) {
-        patternDef.firstPatternDefinition = firstDefinition;
-        firstDefinition = false;
-        lastPatternDef = this.patternDefinitions[i];
-        continue;
-      }
-      if (this.patternDefinitions.length === i + 1) {
-        //last element
-        var patternAfter = pattern.substring(pattern.indexOf(patternDef.selectedPattern) + patternDef.selectedPattern.length, pattern.length);
-        patternDef.patternTextAfter = patternAfter ? patternAfter : '';
-      }
-      var patternLastAfter = pattern.substring(pattern.indexOf(lastPatternDef.selectedPattern) + lastPatternDef.selectedPattern.length, pattern.indexOf(patternDef.selectedPattern));
-      lastPatternDef.patternTextAfter = patternLastAfter ? patternLastAfter : '';
-      lastPatternDef = this.patternDefinitions[i];
-    }
-  }
-};
-
-scout.DateFormat.prototype._createMonthsToNumberMapping = function(date) {
-  var monthMap = {}, monthShortMap = {};
-
-  for (var i = 0; i < 12; i++) {
-    monthMap.set(this.symbols.months[i].toUpperCase(), i);
-    monthShortMap.se(this.symbols.monthsShort[i].toUpperCase(), i);
-  }
-
-  this.symbols.monthsToNumber = monthMap;
-  this.symbols.monthsShortToNumber = monthShortMap;
-};
-
-scout.DateFormat.prototype.format = function(date) {
-  var ret = this.pattern;
+  var formatContext = this._createFormatContext(date);
+  formatContext.exactLength = scout.helpers.nvl(exactLength, false);
   // Apply all formatter functions for this DateFormat to the pattern to replace the
   // different terms with the corresponding value from the given date.
-  for (var i = 0; i < this.formatFunc.length; i++) {
-    ret = this.formatFunc[i](ret, date);
+  for (var i = 0; i < this._formatFunctions.length; i++) {
+    var formatFunction = this._formatFunctions[i];
+    formatFunction(formatContext);
   }
-  return ret;
+  return formatContext.formattedString;
 };
 
-scout.DateFormat.prototype.analyze = function(text, asNumber) {
-  var result = {};
-  result.yearPatternDefinition,
-  result.monthPatternDefinition,
-  result.dayPatternDefinition;
-  if (text) {
-    var patternDefinition, parsedElements = false,
-      firstPatternDefinition;
+/**
+ * Analyzes the given string and returns an information object with all recognized information
+ * for the current date format.
+ *
+ * The result object contains the following properties:
+ *
+ * inputString:
+ *   The original input for the analysis.
+ *
+ * dateInfo:
+ *   An object with all numeric date parts that could be parsed from the input string. Unrecognized
+ *   parts are undefined, all others are converted to numbers. Those values may be directly
+ *   used in the JavaScript Date() type (month is zero-based!).
+ *   Valid properties:
+ *   - year, month, day, hours, minutes, seconds, milliseconds
+ *
+ * matchInfo:
+ *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
+ *   While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that
+ *   the month is "one-based", as opposed to dateInfo.month!
+ *   Valid properties:
+ *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds
+ *
+ * hints:
+ *   An object that contains further recognized date parts that are not needed to define the exact time.
+ *   Valid properties:
+ *   - am [true / false]
+ *   - pm [true / false]
+ *   - weekday [number 0-6; 0=sun, 1=mon, etc.]
+ *   - weekInYear [number 1-53]
+ *
+ * parsedPattern:
+ *   The pattern that was used to parse the input. This may differ from the date format's pattern.
+ *   Example: dateFormat="dd.MM.YYYY", inputString="5.7.2015" --> parsedPattern="d.M.yyyy"
+ *
+ * predictedDate:
+ *   The date that could be predicted from the recognized inputs. If the second method argument
+ *   'startDate' is set, this date is used as basis for this predicted date. Otherwise, 'today' is used.
+ *
+ * error:
+ *   Boolean that indicates if analyzing the input was successful (e.g. if the pattern could be parsed
+ *   and a date could be predicted).
+ */
+scout.DateFormat.prototype.analyze = function(text, startDate) {
+  var analyzeInfo = this._createAnalyzeInfo(text);
+  if (!text) {
+    return analyzeInfo;
+  }
 
-    for (var i = 0; i < this.patternDefinitions.length; i++) {
-      patternDefinition = this.patternDefinitions[i];
-      if (patternDefinition) {
-        if (!firstPatternDefinition) {
-          firstPatternDefinition = patternDefinition;
-        }
-        if (patternDefinition.type === 'day') {
-          result.dayPatternDefinition = patternDefinition;
-        } else if (patternDefinition.type === 'month') {
-          result.monthPatternDefinition = patternDefinition;
-        } else if (patternDefinition.type === 'year') {
-          result.yearPatternDefinition = patternDefinition;
-        }
-        //not parsable construct. only last element should have a empty separator
-        if (i < this.patternDefinitions.length - 1 && patternDefinition.patternTextAfter === '') {
-          return {};
-        }
-        var partIndex = patternDefinition.patternTextAfter === '' ? -1 : text.indexOf(patternDefinition.patternTextAfter);
-        if (text.length > 0) {
-          var endIndex = partIndex > -1 ? partIndex : text.length;
-          var part = text.substring(0, endIndex);
-          if (patternDefinition.type === 'day') {
-            result.dayComplete = partIndex > -1;
-            result.day = part;
-          } else if (patternDefinition.type === 'month') {
-            result.monthComplete = partIndex > -1;
-            result.month = part;
-          } else if (patternDefinition.type === 'year') {
-            result.yearComplete = partIndex > -1;
-            result.year = part;
-          }
-          text = text.substring(endIndex + 1, text.length);
+  var parseContext = this._createParseContext(text);
+  parseContext.analyze = true; // Mark context as "analyze mode"
+  parseContext.startDate = startDate;
+  for (var i = 0; i < this._terms.length; i++) {
+    if (parseContext.inputString.length > 0) {
+      var parseFunctions = this._analyzeFunctions[i];
+      var parsed = false;
+      for (var j = 0; j < parseFunctions.length; j++) {
+        var parseFunction = parseFunctions[j];
+        if (parseFunction(parseContext)) {
+          parsed = true;
+          break;
         }
       }
-    }
-
-    if (asNumber) {
-      result.day = parseInt(result.day, 10);
-      result.month = parseInt(result.month, 10);
-      result.year = parseInt(result.year, 10);
+      if (!parsed) {
+        // Parsing failed
+        analyzeInfo.error = true;
+        return analyzeInfo;
+      }
+    } else {
+      // Input is fully consumed, now just add the remaining terms from the pattern
+      parseContext.parsedPattern += this._terms[i];
     }
   }
-  return result;
+
+  if (parseContext.inputString.length > 0) {
+    // There is still input, but the pattern has no more terms --> parsing failed
+    analyzeInfo.error = true;
+    return analyzeInfo;
+  }
+
+  // Try to generate a valid predicted date with the information retrieved so far
+  startDate = this._prepareStartDate(startDate);
+  if (parseContext.hints.weekday !== undefined) {
+    startDate = scout.dates.shiftToNextDayOfType(startDate, parseContext.hints.weekday);
+  }
+  var predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate);
+
+  // Update analyzeInfo
+  analyzeInfo.dateInfo = parseContext.dateInfo;
+  analyzeInfo.matchInfo = parseContext.matchInfo;
+  analyzeInfo.hints = parseContext.hints;
+  analyzeInfo.parsedPattern = parseContext.parsedPattern;
+  analyzeInfo.predictedDate = predictedDate;
+  analyzeInfo.error = (!predictedDate);
+  return analyzeInfo;
 };
 
-scout.DateFormat.prototype.parse = function(text) {
+/**
+ * Parses the given text with the current date format. If the text does not match exactly
+ * with the pattern, "null" is returned. Otherwise, the parsed date is returned.
+ *
+ * The argument 'startDate' is optional. It may set the date where parsed information should
+ * be applied to (e.g. relevant for 2-digit years).
+ */
+scout.DateFormat.prototype.parse = function(text, startDate) {
   if (!text) {
-    return undefined;
+    return null;
   }
 
-  // FIXME NBU Fix this!
-  //  var dateInfo = this.analyze(text, true);
-  //  if (isNaN(dateInfo.year) || isNaN(dateInfo.month) || isNaN(dateInfo.day)) {
-  //    return undefined;
-  //  }
-  //
-  var date = new Date(0);
-  date.setHours(0,0,0,0);
-  var ret = text;
-  for (var i = 0; i < this.parseFunc.length; i++) {
-    ret = this.parseFunc[i](ret, date);
+  var parseContext = this._createParseContext(text);
+  parseContext.startDate = startDate;
+  for (var i = 0; i < this._parseFunctions.length; i++) {
+    var parseFunction = this._parseFunctions[i];
+    if (!parseFunction(parseContext)) {
+      return null; // Parsing failed
+    }
+    if (parseContext.inputString.length === 0) {
+      break; // Everything parsed!
+    }
   }
+  if (parseContext.inputString.length > 0) {
+    // Input remaining but no more parse functions available -> parsing failed
+    return null;
+  }
+
+  // Build date from dateInfo
+  var date = this._dateInfoToDate(parseContext.dateInfo, startDate);
+  if (!date) {
+    return null; // dateInfo could not be converted to a valid date -> parsing failed
+  }
+
+  // Handle hints
+  if ((parseContext.hints.am || parseContext.hints.pm)) {
+    var hours = date.getHours();
+    if (hours === 12) {
+      hours = 0;
+    }
+    if (parseContext.hints.pm) {
+      hours += 12;
+    }
+    date.setHours(hours);
+  }
+  if (parseContext.hints.weekday !== undefined) {
+    if (date.getDay() !== parseContext.hints.weekday) {
+      return null; // Date and weekday don't match -> parsing failed
+    }
+  }
+  // TODO Handle week of year
+
+  // Return valid date
   return date;
+};
+
+scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
+  if (!dateInfo) {
+    return null;
+  }
+
+  // Default date
+  var result = this._prepareStartDate(startDate);
+
+  // Apply date info
+  if (dateInfo.year !== undefined) {
+    result.setFullYear(dateInfo.year);
+  }
+  if (dateInfo.month !== undefined) {
+    result.setMonth(dateInfo.month);
+  }
+  if (dateInfo.day !== undefined) {
+    result.setDate(dateInfo.day);
+  }
+  if (dateInfo.hours !== undefined) {
+    result.setHours(dateInfo.hours);
+  }
+  if (dateInfo.minutes !== undefined) {
+    result.setMinutes(dateInfo.minutes);
+  }
+  if (dateInfo.seconds !== undefined) {
+    result.setSeconds(dateInfo.seconds);
+  }
+  if (dateInfo.milliseconds !== undefined) {
+    result.setMilliseconds(dateInfo.milliseconds);
+  }
+
+  // Validate. A date is considered valid if the value from the dateInfo did
+  // not change (JS date automatically converts illegal values, e.g. day 32 is
+  // converted to first day of next month).
+  if (!isValid(result.getFullYear(), dateInfo.year)) {
+    return null;
+  }
+  if (!isValid(result.getMonth(), dateInfo.month)) {
+    return null;
+  }
+  if (!isValid(result.getDate(), dateInfo.day)) {
+    return null;
+  }
+  if (!isValid(result.getHours(), dateInfo.hours)) {
+    return null;
+  }
+  if (!isValid(result.getMinutes(), dateInfo.minutes)) {
+    return null;
+  }
+  if (!isValid(result.getSeconds(), dateInfo.seconds)) {
+    return null;
+  }
+  if (!isValid(result.getMilliseconds(), dateInfo.milliseconds)) {
+    return null;
+  }
+
+  return result;
+
+  // ----- Helper functions -----
+
+  function isValid(value, expectedValue) {
+    return (expectedValue === undefined || expectedValue === value);
+  }
+};
+
+/**
+ * Returns the date where parsed information should be applied to. The given
+ * startDate is used when specified, otherwise a new date is created (today).
+ */
+scout.DateFormat.prototype._prepareStartDate = function(startDate) {
+  if (startDate) {
+    // It is important that we don't alter the argument 'startDate', but create an independent copy!
+    return new Date(startDate.getTime());
+  }
+  startDate = new Date();
+  startDate.setHours(0, 0, 0, 0); // clear time
+  return startDate;
+};
+
+/**
+ * Returns the "format context", an object that is initially filled with the input date and is then
+ * passed through the various formatting functions. As the formatting progresses, the format context object
+ * is updated accordingly. At the end of the process, the object contains the result.
+ *
+ * The parse context contains the following properties:
+ *
+ * inputString:
+ *   The original input for the parsing. This string will be consumed during the parse process,
+ *   and will be empty at the end.
+ *
+ * dateInfo:
+ *   An object with all numeric date parts that could be parsed from the input string. Unrecognized
+ *   parts are undefined, all others are converted to numbers.
+ *   Valid properties:
+ *   - year, month, day, hours, minutes, seconds, milliseconds
+ *
+ * matchInfo:
+ *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
+ *   While dateInfo may contain the year 1995, the matchInfo may contain "95".
+ *   Valid properties:
+ *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds
+ *
+ * hints:
+ *   An object that contains further recognized date parts that are not needed to define the exact time.
+ *   Valid properties:
+ *   - am [true / false]
+ *   - pm [true / false]
+ *   - weekday [number 0-6; 0=sun, 1=mon, etc.]
+ *   - weekInYear [number 1-53]
+ *
+ * analyze:
+ *   A flag that indicates if the "analyze mode" is on. This is true when analyze() was called, and
+ *   false when parse() was called. It may alter the behavior of the parse functions, i.e. they will
+ *   not fail in analyze mode when the pattern does not match exactly.
+ *
+ * startDate:
+ *   A date to be used as reference for date calculations. Is used for example when mapping a 2-digit
+ *   year to a 4-digit year.
+ */
+
+scout.DateFormat.prototype._createFormatContext = function(inputDate) {
+  return {
+    inputDate: inputDate,
+    formattedString: '',
+    exactLength: false
+  };
+};
+
+/**
+ * Returns the "parse context", an object that is initially filled with the input string and is then
+ * passed through the various parsing functions. As the parsing progresses, the parse context object
+ * is updated accordingly. At the end of the process, the object contains the result.
+ *
+ * The parse context contains the following properties:
+ *
+ * inputString:
+ *   The original input for the parsing. This string will be consumed during the parse process,
+ *   and will be empty at the end.
+ *
+ * dateInfo:
+ *   An object with all numeric date parts that could be parsed from the input string. Unrecognized
+ *   parts are undefined, all others are converted to numbers. Those values may be directly
+ *   used in the JavaScript Date() type (month is zero-based!).
+ *   Valid properties:
+ *   - year, month, day, hours, minutes, seconds, milliseconds
+ *
+ * matchInfo:
+ *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
+ *   While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that
+ *   the month is "one-based", as opposed to dateInfo.month!
+ *   Valid properties:
+ *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds
+ *
+ * hints:
+ *   An object that contains further recognized date parts that are not needed to define the exact time.
+ *   Valid properties:
+ *   - am [true / false]
+ *   - pm [true / false]
+ *   - weekday [number 0-6; 0=sun, 1=mon, etc.]
+ *   - weekInYear [number 1-53]
+ *
+ * analyze:
+ *   A flag that indicates if the "analyze mode" is on. This is true when analyze() was called, and
+ *   false when parse() was called. It may alter the behavior of the parse functions, i.e. they will
+ *   not fail in analyze mode when the pattern does not match exactly.
+ *
+ * startDate:
+ *   A date to be used as reference for date calculations. Is used for example when mapping a 2-digit
+ *   year to a 4-digit year.
+ */
+scout.DateFormat.prototype._createParseContext = function(inputText) {
+  return {
+    inputString: inputText,
+    dateInfo: {},
+    matchInfo: {},
+    hints: {},
+    parsedPattern: '',
+    analyze: false,
+    startDate: null
+  };
+};
+
+/**
+ * @see analyze()
+ */
+scout.DateFormat.prototype._createAnalyzeInfo = function(inputText) {
+  return {
+    inputString: inputText,
+    dateInfo: {},
+    matchInfo: {},
+    hints: {},
+    parsedPattern: '',
+    predictedDate: null,
+    error: false
+  };
 };

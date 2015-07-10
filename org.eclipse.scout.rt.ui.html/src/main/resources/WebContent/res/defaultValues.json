@@ -18,7 +18,6 @@
       "labelPosition": 0,
       "mandatory": false,
       "statusVisible": true,
-      "errorStatus": "",
       "menus": [],
       "gridData": { // works because of special handling in DefaultValuesFilter.filterDefaultObject() and defaultValues._extendWithDefaults()
         "x": -1,

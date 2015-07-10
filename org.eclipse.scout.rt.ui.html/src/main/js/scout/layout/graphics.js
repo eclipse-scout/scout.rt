@@ -4,6 +4,7 @@
 scout.graphics = {
 
   /**
+   * @memberOf scout.graphics
    * @param text
    * @param className (optional) className to apply on measurement DIV
    * @returns {scout.Dimension}

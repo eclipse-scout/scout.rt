@@ -1,6 +1,6 @@
 scout.DatePicker = function(dateFormat) {
   scout.DatePicker.parent.call(this);
-  this._dateFormat = dateFormat;
+  this.dateFormat = dateFormat;
   this.selectedDate;
   this.viewDate;
   this.$container;
@@ -37,14 +37,10 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
 
-  this.selectedDate = selectedDate;
+  this.selectedDate = selectedDate || new Date();
 
   if (!viewDate) {
-    if (selectedDate) {
-      viewDate = selectedDate;
-    } else {
-      viewDate = new Date();
-    }
+    viewDate = this.selectedDate;
   }
   if (this.viewDate && viewDate) {
     viewDateDiff = scout.dates.compareMonths(viewDate, this.viewDate);
@@ -154,11 +150,7 @@ scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
 };
 
 scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
-  var date = this.selectedDate;
-  if (!date) {
-    date = new Date();
-  }
-  date = scout.dates.shift(date, years, months, days);
+  var date = scout.dates.shift(this.selectedDate, years, months, days);
 
   this.trigger('dateSelect', {
     date: date,
@@ -170,7 +162,7 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
 scout.DatePicker.prototype._build$DateBox = function() {
   var cl, i, now = new Date();
   var day, dayInMonth, $day;
-  var weekdays = this._dateFormat.symbols.weekdaysShortOrdered;
+  var weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
   var start = new Date(this.viewDate);
 
   var $box = $.makeDiv('date-picker-month').data('viewDate', this.viewDate);
@@ -204,7 +196,7 @@ scout.DatePicker.prototype._build$DateBox = function() {
       cl += ' date-picker-now';
     }
 
-    if (this.selectedDate && scout.dates.isSameDay(start, this.selectedDate)) {
+    if (scout.dates.isSameDay(start, this.selectedDate)) {
       cl += ' date-picker-selected';
     }
 
@@ -239,6 +231,6 @@ scout.DatePicker.prototype._updateHeader = function(viewDate) {
 };
 
 scout.DatePicker.prototype._createHeaderText = function(viewDate) {
-  var months = this._dateFormat.symbols.months;
+  var months = this.dateFormat.symbols.months;
   return months[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
 };

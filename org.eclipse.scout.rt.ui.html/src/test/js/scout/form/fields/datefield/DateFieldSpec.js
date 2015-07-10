@@ -32,7 +32,7 @@ describe("DateField", function() {
     dateField.$dateField.focus();
     jasmine.clock().tick(101);
     expect(dateField.$dateField).toBeFocused();
-    dateField.$dateField.click();
+    dateField.$dateField.mousedown();
     expect(findPicker().length).toBe(1);
 
     return dateField;
@@ -40,7 +40,7 @@ describe("DateField", function() {
 
   function createModel() {
     var model = helper.createFieldModel('scout.DateField');
-    model.hasDate=true;
+    model.hasDate = true;
     model.timeFormatPattern = 'HH:mm';
     model.dateFormatPattern = 'dd.MM.yyyy';
     return model;
@@ -48,13 +48,6 @@ describe("DateField", function() {
 
   function findPicker() {
     return $('.date-picker');
-  }
-
-  function writeText(dateField, displayText) {
-    dateField.$dateField.val(displayText);
-    dateField._onKeyDownDate({which:99});
-    jasmine.clock().tick(101);
-    dateField.validateDisplayText(dateField.$dateField.val());
   }
 
   describe("Clicking the field", function() {
@@ -65,7 +58,7 @@ describe("DateField", function() {
       dateField.render(session.$entryPoint);
       expect(findPicker().length).toBe(0);
 
-      dateField.$dateField.click();
+      dateField.$dateField.mousedown();
 
       expect(findPicker().length).toBe(1);
     });
@@ -88,29 +81,31 @@ describe("DateField", function() {
       var model = createModel();
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
-      writeText(dateField, '02');
-      dateField._$predict.val('02.11.2015');
-      dateField._onFieldBlurDate();
+      // Set current date, so result is reliable for testing
+      dateField.timestampAsDate = new Date(2015, 10, 1);
+      dateField.$dateField.val('02');
+
+      dateField._onDateFieldBlur();
 
       expect(dateField.$dateField.val()).toBe('02.11.2015');
     });
 
     it("updates the model with the selected value", function() {
       var model = createModel();
-      model.timestamp = 1412114400000;
+      model.timestamp = '2014-10-01';
       var dateField = createFieldAndFocusAndOpenPicker(model);
       var dateBefore = new Date(dateField.timestamp);
       expect(dateBefore.getFullYear()).toBe(2014);
       expect(dateBefore.getMonth()).toBe(9);
       expect(dateBefore.getDate()).toBe(1);
 
-      writeText(dateField, '11.02.2015');
+      dateField.$dateField.val('11.02.2015');
       dateBefore = new Date(dateField.timestamp);
       expect(dateBefore.getFullYear()).toBe(2014);
       expect(dateBefore.getMonth()).toBe(9);
       expect(dateBefore.getDate()).toBe(1);
 
-      dateField._onFieldBlurDate();
+      dateField._onDateFieldBlur();
       var date= new Date(dateField.timestamp);
       expect(date.getFullYear()).toBe(2015);
       expect(date.getMonth()).toBe(1);
@@ -125,7 +120,9 @@ describe("DateField", function() {
       var model = createModel();
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
-      writeText(dateField, '33');
+      dateField.$dateField.val('33');
+      dateField._onDateFieldBlur();
+
       expect(dateField.$dateField).toHaveClass('has-error');
     });
 
@@ -133,7 +130,7 @@ describe("DateField", function() {
       var model = createModel();
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
-      writeText(dateField, '33');
+      dateField.$dateField.val('33');
       expect(dateField.displayText).toBeFalsy();
 
       expect(mostRecentJsonRequest()).toBeUndefined();
@@ -161,7 +158,7 @@ describe("DateField", function() {
 
       it("updates the model with the selected value and closes picker", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -169,7 +166,7 @@ describe("DateField", function() {
         expect(dateBefore.getDate()).toBe(1);
 
 
-        writeText(dateField, '11.02.2015');
+        dateField.$dateField.val('11.02.2015');
         dateBefore=new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
         expect(dateBefore.getMonth()).toBe(9);
@@ -190,7 +187,7 @@ describe("DateField", function() {
 
       it("increases day by one", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -208,7 +205,7 @@ describe("DateField", function() {
 
       it("increases month by one if shift is used as modifier", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -226,7 +223,7 @@ describe("DateField", function() {
 
       it("increases year by one if ctrl is used as modifier", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -249,7 +246,7 @@ describe("DateField", function() {
 
       it("decreases day by one", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -267,7 +264,7 @@ describe("DateField", function() {
 
       it("decreases month by one if shift is used as modifier", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -285,7 +282,7 @@ describe("DateField", function() {
 
       it("decreases year by one if ctrl is used as modifier", function() {
         var model = createModel();
-        model.timestamp = 1412114400000;
+        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = new Date(dateField.timestamp);
         expect(dateBefore.getFullYear()).toBe(2014);
@@ -311,44 +308,48 @@ describe("DateField", function() {
       var model = createModel();
       var dateField = createField(model);
 
-      dateField._dateFormat = new scout.DateFormat(session.locale, 'dd.MM.yyyy');
-      expect(!dateField._validateDisplayText('')).toBe(true);
-      expect(!dateField._validateDisplayText(undefined)).toBe(true);
-      //expect(!dateField._validateDisplayText('0')).toBe(true); // TODO Sollte das nicht ok sein?
-      expect(!dateField._validateDisplayText('1')).toBe(true);
-      //expect(!dateField._validateDisplayText('-7')).toBe(true); // TODO Datumsarithmetik sollte erlaubt sein
-      expect(!dateField._validateDisplayText('01')).toBe(true);
-      expect(!dateField._validateDisplayText('17')).toBe(true);
-      expect(!dateField._validateDisplayText('31')).toBe(true);
-      expect(!dateField._validateDisplayText('32')).toBe(false);
-      expect(!dateField._validateDisplayText('112')).toBe(false);
-      expect(!dateField._validateDisplayText('1.')).toBe(true);
-      expect(!dateField._validateDisplayText('1.3')).toBe(true);
-      expect(!dateField._validateDisplayText('1.3.2')).toBe(true);
-      expect(!dateField._validateDisplayText('1.3.2015')).toBe(true);
-      expect(!dateField._validateDisplayText('1.3.21015')).toBe(false);
-      expect(!dateField._validateDisplayText('01.13.2015')).toBe(false);
-      expect(!dateField._validateDisplayText('01.03.2015')).toBe(true);
-      //expect(!dateField._validateDisplayText('01032015')).toBe(true); // TODO Sollte das nicht ok sein? Aber was ist mit Locale?
-      //expect(!dateField._validateDisplayText('010315')).toBe(true); // TODO Sollte das nicht ok sein? Aber was ist mit Locale?
-      expect(!dateField._validateDisplayText('dummy')).toBe(false);
-      //expect(!dateField._validateDisplayText('1...2')).toBe(false); // TODO Sollte false sein, ist aber jetzt true
-      //expect(!dateField._validateDisplayText('11a')).toBe(false); // TODO Sollte false sein, ist aber jetzt true
-      //expect(!dateField._validateDisplayText('31.02.2015')).toBe(false); // TODO Sollte false sein, ist aber jetzt true
+      dateField.isolatedDateFormat = new scout.DateFormat(session.locale, 'dd.MM.yyyy');
+      expect(!!dateField._predictDate('')).toBe(true);
+      expect(!!dateField._predictDate(undefined)).toBe(true);
+      expect(!!dateField._predictDate('0')).toBe(true);
+      expect(!!dateField._predictDate('1')).toBe(true);
+      expect(!!dateField._predictDate('-7')).toBe(true);
+      expect(!!dateField._predictDate('01')).toBe(true);
+      expect(!!dateField._predictDate('17')).toBe(true);
+      expect(!!dateField._predictDate('31')).toBe(true);
+      expect(!!dateField._predictDate('32')).toBe(false);
+      expect(!!dateField._predictDate('112')).toBe(true); // february 11
+      expect(!!dateField._predictDate('1.')).toBe(true);
+      expect(!!dateField._predictDate('1.3')).toBe(true);
+      expect(!!dateField._predictDate('1.3.2')).toBe(true);
+      expect(!!dateField._predictDate('1.3.2015')).toBe(true);
+      expect(!!dateField._predictDate('1.3.21015')).toBe(false);
+      expect(!!dateField._predictDate('01.13.2015')).toBe(false);
+      expect(!!dateField._predictDate('01.03.2015')).toBe(true);
+      expect(!!dateField._predictDate('01032015')).toBe(true);
+      expect(!!dateField._predictDate('20150301')).toBe(false); // wrong order, does not match locale
+      expect(!!dateField._predictDate('010315')).toBe(true);
+      expect(!!dateField._predictDate('dummy')).toBe(false);
+      expect(!!dateField._predictDate('1...2')).toBe(false);
+      expect(!!dateField._predictDate('11x')).toBe(false);
+      expect(!!dateField._predictDate('31.02.2015')).toBe(false);
     });
 
     it("can predict dates", function() {
       var model = createModel();
       var dateField = createField(model);
       var now = new Date();
-      var nextMonth = scout.dates.shift(now, 0, 1);
 
-      dateField._dateFormat = new scout.DateFormat(session.locale, 'dd.MM.yyyy');
-      // _predict is only called for validated values, so we don't have to check invalid values
-      // TODO Add tests when logic is defined!
-//      expect(dateField._predict('0')).toBe('01.' + ('0' + (nextMonth.getMonth() + 1)).slice(-2) + '.' + nextMonth.getFullYear());
-//      expect(dateField._predict('1')).toBe('1.' + ('0' + (nextMonth.getMonth() + 1)).slice(-2) + '.' + nextMonth.getFullYear());
-//      expect(dateField._predict('2')).toBe('2.' + ('0' + (nextMonth.getMonth() + 1)).slice(-2) + '.' + nextMonth.getFullYear());
+      function expectPrediction(input, expectedPrediction) {
+        var prediction = dateField._predictDate(input);
+        expect(prediction).not.toBeNull();
+        expect(prediction.text).toBe(expectedPrediction);
+      }
+
+      dateField.isolatedDateFormat = new scout.DateFormat(session.locale, 'dd.MM.yyyy');
+      expectPrediction('0', '01.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
+      expectPrediction('1', '1.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
+      expectPrediction('2', '2.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
     });
 
   });

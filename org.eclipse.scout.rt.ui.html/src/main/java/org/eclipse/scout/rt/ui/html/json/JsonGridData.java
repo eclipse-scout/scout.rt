@@ -44,8 +44,10 @@ public class JsonGridData implements IJsonObject {
     return json;
   }
 
-  public static Object toJson(GridData gridData) {
-    return gridData == null ? "" : new JsonGridData(gridData).toJson();
+  public static JSONObject toJson(GridData gridData) {
+    if (gridData == null) {
+      return null;
+    }
+    return new JsonGridData(gridData).toJson();
   }
-
 }

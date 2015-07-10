@@ -64,14 +64,17 @@
   };
 
   /**
-   * Convenience function that can be used as an jQuery event handler, when
-   * this event should be "swallowed". Technically, this function just calls
-   * 'stopPropagation()' on the event.
+   * Convenience function that can be used as an jQuery event handler, when this
+   * event should be "swallowed". Technically, this function calls preventDefault(),
+   * stopPropagation() and stopImmediatePropagation() on the event.
+   *
+   * Note: "return false" is equal to preventDefault() and stopPropagation(), but
+   * not stopImmediatePropagation().
    */
   $.suppressEvent = function(event) {
     if (event) {
-      event.stopPropagation();
       event.preventDefault();
+      event.stopPropagation();
       event.stopImmediatePropagation();
     }
   };
@@ -219,7 +222,7 @@
   };
 
   $.fn.select = function(selected) {
-    return this.toggleClass('selected', selected);
+    return this.toggleClass('selected', !!selected);
   };
 
   $.fn.isSelected = function() {
@@ -763,6 +766,25 @@
       this.css('cursor', cursor2);
     }.bind(this));
     return this;
+  };
+  
+  $.fn.backupSelection = function() {
+    var field = this[0];
+    if (field && field === document.activeElement) {
+      return {
+        selectionStart: field.selectionStart,
+        selectionEnd: field.selectionEnd,
+        selectionDirection: field.selectionDirection
+      };
+    }
+    return null;
+  };
+
+  $.fn.restoreSelection = function(selection) {
+    var field = this[0];
+    if (field && field === document.activeElement && selection) {
+      field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
+    }
   };
 
   // ===== helpers for projects, may not necessarily be used by scout itself =====

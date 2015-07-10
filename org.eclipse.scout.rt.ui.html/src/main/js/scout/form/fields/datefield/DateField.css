@@ -8,7 +8,7 @@
     }
 
     &.time {
-      .text-field-with-icon(@icon-clock,~'.time');
+      .text-field-with-icon(@icon-clock, ~'.time');
     }
   }
 
@@ -16,6 +16,10 @@
   & > .predict {
     color: @disabled-color;
     background-color: @control-background-color;
+
+    &.has-error {
+      background-color: @error-background-color;
+    }
 
     & + input {
       background-color: transparent;

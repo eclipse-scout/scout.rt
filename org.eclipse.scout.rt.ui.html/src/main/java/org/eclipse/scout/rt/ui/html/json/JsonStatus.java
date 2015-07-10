@@ -33,7 +33,10 @@ public class JsonStatus implements IJsonObject {
     return json;
   }
 
-  public static Object toJson(IStatus status) {
-    return status == null ? "" : new JsonStatus(status).toJson();
+  public static JSONObject toJson(IStatus status) {
+    if (status == null) {
+      return null;
+    }
+    return new JsonStatus(status).toJson();
   }
 }
