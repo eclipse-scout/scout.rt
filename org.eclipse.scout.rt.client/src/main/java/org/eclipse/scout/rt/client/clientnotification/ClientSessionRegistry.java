@@ -20,6 +20,8 @@ import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -73,7 +75,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     synchronized (m_cacheLock) {
       m_sessionIdToSession.put(sessionId, new WeakReference<IClientSession>(session));
     }
-    if (BEANS.get(IServiceTunnel.class).isActive() && BEANS.opt(IClientNotificationService.class) != null) {
+    if (BEANS.get(IServiceTunnel.class).isActive()) {
       session.addListener(m_clientSessionStateListener);
       // if the client session is already started, otherwise the listener will invoke the clientSessionStated method.
       if (session.isActive()) {
@@ -183,6 +185,16 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     List<IClientSession> result = new LinkedList<>();
     synchronized (m_cacheLock) {
       List<WeakReference<IClientSession>> userSessions = m_userToSessions.get(userId);
+      if (userSessions == null) {
+        if (isCurrentSession(userId)) {
+          return CollectionUtility.arrayList((IClientSession) IClientSession.CURRENT.get());
+        }
+        else {
+          LOG.error("No session found for user " + userId);
+          return CollectionUtility.emptyArrayList();
+        }
+      }
+
       Iterator<WeakReference<IClientSession>> refIt = userSessions.iterator();
       while (refIt.hasNext()) {
         WeakReference<IClientSession> sessionRef = refIt.next();
@@ -195,6 +207,11 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
       }
     }
     return result;
+  }
+
+  protected boolean isCurrentSession(String userId) {
+    IClientSession currentSession = (IClientSession) IClientSession.CURRENT.get();
+    return currentSession != null && CompareUtility.equals(currentSession.getUserId(), userId);
   }
 
   @Override

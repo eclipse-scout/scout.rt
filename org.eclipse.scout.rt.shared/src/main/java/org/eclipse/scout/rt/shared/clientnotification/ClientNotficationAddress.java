@@ -28,7 +28,17 @@ public class ClientNotficationAddress implements Serializable {
   private final boolean m_notifyAllSessions;
   private final boolean m_notifyAllNodes;
 
-  public ClientNotficationAddress(Set<String> sessionIds, Set<String> userIds, boolean notifyAllSessions, boolean notifyAllNodes, String excludeNodeId) {
+  /**
+   * Only one of the following expression must evaluate to true (listed in order of evaluation in
+   * ClientNotificationDispatcher):
+   * <ul>
+   * <li>notifyAllNodes</li>
+   * <li>notifyAllSessions</li>
+   * <li>!CollectionUtility.isEmpty(sessionIds)</li>
+   * <li>!CollectionUtility.isEmpty(userIds)</li>
+   * </ul>
+   */
+  protected ClientNotficationAddress(Set<String> sessionIds, Set<String> userIds, boolean notifyAllSessions, boolean notifyAllNodes, String excludeNodeId) {
     m_sessionIds = Collections.unmodifiableSet(CollectionUtility.hashSet(sessionIds));
     m_userIds = Collections.unmodifiableSet(CollectionUtility.hashSet(userIds));
     m_notifyAllSessions = notifyAllSessions;

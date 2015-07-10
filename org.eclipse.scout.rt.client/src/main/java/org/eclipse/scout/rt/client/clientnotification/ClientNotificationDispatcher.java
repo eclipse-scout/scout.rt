@@ -11,9 +11,8 @@
 package org.eclipse.scout.rt.client.clientnotification;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -56,21 +55,24 @@ public class ClientNotificationDispatcher {
 
   private final Set<IFuture<Void>> m_notificationFutures = new HashSet<>();
 
-  public void dispatchNotifications(Collection<ClientNotificationMessage> notifications) {
+  public void dispatchNotifications(List<ClientNotificationMessage> notifications) {
     dispatchNotifications(notifications, ACCEPT_ALL_FILTER);
   }
 
-  public void dispatchNotifications(Collection<ClientNotificationMessage> notifications, IFilter<ClientNotificationMessage> filter) {
+  public void dispatchNotifications(List<ClientNotificationMessage> notifications, IFilter<ClientNotificationMessage> filter) {
     IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
     if (notifications == null) {
-      notifications = Collections.emptyList();
       LOG.error("Notifications null. Please check your configuration");
+      return;
     }
+
     for (ClientNotificationMessage message : notifications) {
       if (!filter.accept(message)) {
         continue;
       }
+
       if (message.getAddress().isNotifyAllNodes()) {
+        // notify all nodes
         dispatch(message.getNotification());
       }
       else if (message.getAddress().isNotifyAllSessions()) {
@@ -79,23 +81,22 @@ public class ClientNotificationDispatcher {
           dispatch(session, message.getNotification());
         }
       }
-      else {
-        if (CollectionUtility.hasElements(message.getAddress().getSessionIds())) {
-          for (String sessionId : message.getAddress().getSessionIds()) {
-            IClientSession session = notificationService.getClientSession(sessionId);
-            if (session == null) {
-              LOG.warn(String.format("received notification for invalid session '%s'.", sessionId));
-            }
-            else {
-              dispatch(session, message.getNotification());
-            }
+      else if (CollectionUtility.hasElements(message.getAddress().getSessionIds())) {
+        // notify all specified sessions
+        for (String sessionId : message.getAddress().getSessionIds()) {
+          IClientSession session = notificationService.getClientSession(sessionId);
+          if (session == null) {
+            LOG.warn(String.format("received notification for invalid session '%s'.", sessionId));
           }
-          if (CollectionUtility.hasElements(message.getAddress().getUserIds())) {
-            for (String userId : message.getAddress().getUserIds()) {
-              for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
-                dispatch(session, message.getNotification());
-              }
-            }
+          else {
+            dispatch(session, message.getNotification());
+          }
+        }
+      }
+      else if (CollectionUtility.hasElements(message.getAddress().getUserIds())) {
+        for (String userId : message.getAddress().getUserIds()) {
+          for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
+            dispatch(session, message.getNotification());
           }
         }
       }

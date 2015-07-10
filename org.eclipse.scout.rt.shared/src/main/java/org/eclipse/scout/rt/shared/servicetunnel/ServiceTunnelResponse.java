@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
@@ -24,7 +24,7 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   // added in 3.1.17
   private volatile Long m_processingDuration;
 
-  private Set<ClientNotificationMessage> m_notifications;
+  private List<ClientNotificationMessage> m_notifications;
 
   public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
     m_data = data;
@@ -70,12 +70,12 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
    * @param notifications
    */
   @Override
-  public void setNotifications(Set<ClientNotificationMessage> notifications) {
+  public void setNotifications(List<ClientNotificationMessage> notifications) {
     m_notifications = notifications;
   }
 
   @Override
-  public Set<ClientNotificationMessage> getNotifications() {
+  public List<ClientNotificationMessage> getNotifications() {
     return m_notifications;
   }
 

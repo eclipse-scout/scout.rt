@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
@@ -28,14 +28,8 @@ public interface IServiceTunnelResponse extends Serializable {
 
   Long getProcessingDuration();
 
-  /**
-   * @return
-   */
-  Set<ClientNotificationMessage> getNotifications();
+  List<ClientNotificationMessage> getNotifications();
 
-  /**
-   * @param notifications
-   */
-  void setNotifications(Set<ClientNotificationMessage> notifications);
+  void setNotifications(List<ClientNotificationMessage> notifications);
 
 }

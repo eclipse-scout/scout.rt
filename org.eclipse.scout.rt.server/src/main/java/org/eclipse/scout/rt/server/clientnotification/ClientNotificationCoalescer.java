@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,10 +32,11 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 public class ClientNotificationCoalescer {
 
   public List<ClientNotificationMessage> coalesce(List<ClientNotificationMessage> inNotifications) {
+    LinkedHashSet<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<ClientNotificationMessage>(inNotifications);
     List<ClientNotificationMessage> result = new ArrayList<>();
     // sort by address
     Map<ClientNotficationAddress, List<Serializable>> notificationsPerAddress = new HashMap<>();
-    for (ClientNotificationMessage message : inNotifications) {
+    for (ClientNotificationMessage message : notificationsNoDuplicates) {
       List<Serializable> notifications = notificationsPerAddress.get(message.getAddress());
       if (notifications == null) {
         notifications = new ArrayList<>();

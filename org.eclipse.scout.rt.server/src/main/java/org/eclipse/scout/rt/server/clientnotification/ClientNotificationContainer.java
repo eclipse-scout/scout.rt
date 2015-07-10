@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.clientnotification;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -30,7 +30,7 @@ public class ClientNotificationContainer {
    */
   public static final ThreadLocal<ClientNotificationContainer> CURRENT = new ThreadLocal<>();
 
-  private final Set<ClientNotificationMessage> m_notifications = new HashSet<>();
+  private final List<ClientNotificationMessage> m_notifications = new ArrayList<>();
 
   public ClientNotificationContainer() {
   }
@@ -49,8 +49,8 @@ public class ClientNotificationContainer {
     m_notifications.addAll(messages);
   }
 
-  public Set<ClientNotificationMessage> getNotifications() {
-    return new HashSet<ClientNotificationMessage>(m_notifications);
+  public List<ClientNotificationMessage> getNotifications() {
+    return new ArrayList<ClientNotificationMessage>(m_notifications);
   }
 
 }
