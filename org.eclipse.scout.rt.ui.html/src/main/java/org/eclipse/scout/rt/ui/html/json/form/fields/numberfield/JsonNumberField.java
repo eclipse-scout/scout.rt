@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.numberfield;
 
+import java.text.DecimalFormat;
+
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValueField<NUMBER_FIELD> {
@@ -30,4 +33,17 @@ public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValu
   protected void handleUiTextChangedImpl(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
+
+  @Override
+  protected void initJsonProperties(NUMBER_FIELD model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<INumberField>(INumberField.PROP_DECIMAL_FORMAT, model) {
+      @Override
+      protected String modelValue() {
+        DecimalFormat format = getModel().getFormat();
+        return format != null && format instanceof DecimalFormat ? ((DecimalFormat) format).toPattern() : "";
+      }
+    });
+  }
+
 }
