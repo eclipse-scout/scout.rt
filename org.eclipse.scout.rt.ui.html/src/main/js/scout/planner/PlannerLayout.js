@@ -137,7 +137,7 @@ scout.PlannerLayout.prototype._minWidth = function() {
   } else if (this.planner.displayMode === DISPLAY_MODE.MONTH) {
     scaleItemMinWidth = 450;
   } else if (this.planner.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
-    scaleItemMinWidth = 88;
+    scaleItemMinWidth = 85;
   } else if (this.planner.displayMode === DISPLAY_MODE.YEAR) {
     scaleItemMinWidth = 550;
   }
