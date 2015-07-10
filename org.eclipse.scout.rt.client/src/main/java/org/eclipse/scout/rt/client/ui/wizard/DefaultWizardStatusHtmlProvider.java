@@ -49,7 +49,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
   @Override
   public String initHtmlTemplate() throws ProcessingException {
     try {
-      return new String(IOUtility.getContent(getClass().getResource("/org/eclipse/scout/rt/client/html/defaultWizardStatus.html").openStream()), "iso-8859-1");
+      return new String(IOUtility.getContent(org.eclipse.scout.rt.client.ResourceBase.class.getResource("html/defaultWizardStatus.html").openStream()), "iso-8859-1");
     }
     catch (Exception t) {
       throw new ProcessingException("Unexpected", t);
