@@ -20,7 +20,8 @@ scout.ModalityController.prototype.addGlassPane = function() {
     var $glassPane = scout.fields.new$Glasspane(this._session.uiSessionId);
     this._$glassPanes.push($glassPane);
 
-    $glassPane.installFocusContext('auto', this._session.uiSessionId);
+    // FIXME [dwi] Fix keystrokes on modal elements.
+    // $glassPane.installFocusContext('auto', this._session.uiSessionId);
     $glassPane.appendTo($modalityElement);
   }, this);
 };
