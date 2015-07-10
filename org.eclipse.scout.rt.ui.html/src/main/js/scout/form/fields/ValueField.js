@@ -5,75 +5,12 @@
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
   this._keyUpListener;
-  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText(this.displayText);
-  this._renderMenus(this.menus);
-};
-
-scout.ValueField.prototype.init = function(model, session) {
-  scout.ValueField.parent.prototype.init.call(this, model, session);
-  this._syncMenus(this.menus);
-};
-
-scout.ValueField.prototype._syncMenus = function(menus) {
-  if (this._hasMenus()) {
-    this.menus.forEach(function(menu) {
-      this.keyStrokeAdapter.unregisterKeyStroke(menu);
-    }, this);
-  }
-  this.menus = menus;
-  if (this._hasMenus()) {
-    this.menus.forEach(function(menu) {
-      if (menu.enabled) {
-        this.keyStrokeAdapter.registerKeyStroke(menu);
-      }
-    }, this);
-  }
-};
-
-/**
- * @override FormField.js
- */
-scout.ValueField.prototype._onStatusMouseDown = function(event) {
-  if (this._hasMenus() && (!this.contextPopup|| !this.contextPopup.rendered)) {
-    // showing menus is more important than showing tooltips
-    this.contextPopup = new scout.ContextMenuPopup(this.session, {
-      menuItems: this.menus,
-      cloneMenuItems: false,
-      $anchor: this.$status
-    });
-    this.contextPopup.render(undefined, event);
-  } else {
-    // super call shows tooltip
-    scout.ValueField.parent.prototype._onStatusMouseDown.call(this);
-  }
-};
-
-scout.ValueField.prototype._hasMenus = function() {
-  return !!(this.menus && this.menus.length > 0);
-};
-
-scout.ValueField.prototype._renderMenus = function() {
-  this._updateMenus();
-};
-
-scout.ValueField.prototype._renderMenusVisible = function() {
-  this._updateMenus();
-};
-
-scout.ValueField.prototype._updateMenus = function() {
-  this._updateStatusVisible();
-  this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
-};
-
-scout.ValueField.prototype._computeStatusVisible = function() {
-  var statusVisible = scout.ValueField.parent.prototype._computeStatusVisible.call(this);
-  return statusVisible || (this._hasMenus() && this.menusVisible);
 };
 
 scout.ValueField.prototype._renderDisplayText = function(displayText) {

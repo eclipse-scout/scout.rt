@@ -80,7 +80,6 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderBorderVisible(this.borderVisible);
   this._renderExpandable(this.expandable);
   this._renderExpanded(this.expanded);
-  this._renderMenus(this.menus);
 };
 
 scout.GroupBox.prototype._remove = function() {
@@ -245,9 +244,10 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
 };
 
-scout.GroupBox.prototype._renderMenus = function(menus) {
+scout.GroupBox.prototype._renderMenus = function() {
   // create a menu-adapter for each process button
-  var menuItems = this.staticMenus.concat(menus);
+  var menus = this.menus,
+    menuItems = this.staticMenus.concat(menus);
   //register keystrokes on root groupbox
   this.processButtons.forEach(function(button) {
     var menu = this.session.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
@@ -256,6 +256,7 @@ scout.GroupBox.prototype._renderMenus = function(menus) {
     }));
     menuItems.push(menu);
   }.bind(this));
+  //FIXME same code as in FormField.syncMenus? What with $drawKeyBoxContainer?
   for (var i = 0; i < menuItems.length; i++) {
     var menuItem = menuItems[i];
     this.registerRootKeyStroke(menuItem);

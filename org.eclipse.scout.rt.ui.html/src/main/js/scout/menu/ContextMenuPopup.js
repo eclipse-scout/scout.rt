@@ -133,7 +133,7 @@ scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
   if (!this.rendered) {
     return;
   }
-  if (event.visible !== undefined) {
+  if (event.changedProperties.indexOf('visible') != -1) {
     this._updateFirstLastClass();
   }
   // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)

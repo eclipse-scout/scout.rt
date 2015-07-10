@@ -1,5 +1,4 @@
-/* global FormSpecHelper */
-/* global MenuSpecHelper */
+/* global FormSpecHelper, MenuSpecHelper */
 describe("ValueField", function() {
   var session, helper, menuHelper;
 

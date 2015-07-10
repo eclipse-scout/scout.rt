@@ -4,8 +4,7 @@ scout.EventSupport = function() {
 
 scout.EventSupport.prototype.on = function(type, func) {
   if (!func) {
-    $.log.warn('Missing callback function');
-    return; // TODO CGU Should we throw an error?
+    throw new Error('Missing callback function');
   }
 
   var listener = {

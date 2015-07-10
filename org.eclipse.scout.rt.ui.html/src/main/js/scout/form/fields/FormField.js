@@ -19,11 +19,11 @@ scout.FormField = function() {
   this.$fieldContainer;
 
   /**
-   * The status label is used for error-status and tooltip-icon.
+   * The status label is used for error-status, tooltip-icon and menus.
    */
   this.$status;
   this.keyStrokes = [];
-  this._addAdapterProperties('keyStrokes');
+  this._addAdapterProperties(['keyStrokes', 'menus']);
   this.refFieldId;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
@@ -37,6 +37,7 @@ scout.FormField.LABEL_POSITION_TOP = 4;
 scout.FormField.prototype.init = function(model, session) {
   scout.FormField.parent.prototype.init.call(this, model, session);
   this.refFieldId = this.uniqueId('ref');
+  this._syncMenus(this.menus);
 };
 
 scout.FormField.prototype._createKeyStrokeAdapter = function() {
@@ -64,8 +65,9 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
   this._renderMandatory(this.mandatory);
   this._renderVisible(this.visible);
-  this._renderTooltipText(this.tooltipText);
-  this._renderErrorStatus(this.errorStatus);
+  this._renderTooltipText();
+  this._renderErrorStatus();
+  this._renderMenus();
   this._renderLabel(this.label);
   this._renderLabelVisible(this.labelVisible);
   this._renderStatusVisible(this.statusVisible);
@@ -91,10 +93,10 @@ scout.FormField.prototype._renderMandatory = function(mandatory) {
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   errorStatus = this.errorStatusUi || this.errorStatus;
-  this.$container.toggleClass('has-error', !!errorStatus);
+  this.$container.toggleClass('has-error', !! errorStatus);
 
   if (this.$field) {
-    this.$field.toggleClass('has-error', !!errorStatus);
+    this.$field.toggleClass('has-error', !! errorStatus);
   }
 
   this._updateStatusVisible();
@@ -108,7 +110,8 @@ scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   }
 };
 
-scout.FormField.prototype._renderTooltipText = function(tooltipText) {
+scout.FormField.prototype._renderTooltipText = function() {
+  var tooltipText = this.tooltipText;
   var hasTooltipText = scout.strings.hasText(tooltipText);
   this.$container.toggleClass('has-tooltip', hasTooltipText);
   if (this.$field) {
@@ -166,6 +169,11 @@ scout.FormField.prototype._renderStatusVisible = function(statusVisible) {
   this._renderChildVisible(this.$status, this._computeStatusVisible());
   // Pseudo status is only for layouting purpose, therefore tooltip, errorStatus etc. must not influence its visibility -> not necessary to use _computeStatusVisible
   this._renderChildVisible(this.$pseudoStatus, statusVisible);
+
+  // Make sure tooltip gets removed if there is no status anymore (tooltip points to the status)
+  if (this.$status && !this.$status.isVisible() && this.tooltip) {
+    this.tooltip.remove();
+  }
 };
 
 /**
@@ -178,12 +186,16 @@ scout.FormField.prototype._updateStatusVisible = function() {
   }
 };
 
+/**
+ * Computes whether the $status should be visible based on statusVisible, errorStatus and tooltip.
+ * -> errorStatus and tooltip override statusVisible, so $status may be visible event though statusVisible is set to false
+ */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
     hasError = this.errorStatusUi || this.errorStatus,
     hasTooltip = this.tooltipText;
 
-  return statusVisible || hasError || hasTooltip;
+  return !this.suppressStatus && (statusVisible || hasError || hasTooltip || (this._hasMenus() && this.menusVisible));
 };
 
 scout.FormField.prototype._renderChildVisible = function($child, visible) {
@@ -192,7 +204,8 @@ scout.FormField.prototype._renderChildVisible = function($child, visible) {
   }
   if ($child.isVisible() !== visible) {
     $child.setVisible(visible);
-    this.invalidateLayoutTree(); //FIXME CGU whole tree?
+    this.invalidateLayoutTree();
+    return true;
   }
 };
 
@@ -241,16 +254,89 @@ scout.FormField.prototype._renderGridData = function(gridData) {
   // NOP
 };
 
-scout.FormField.prototype._onStatusMouseDown = function() {
-  // Toggle tooltip
-  if (this.tooltip && this.tooltip.rendered) {
-    this._hideStatusMessage();
-  } else {
-    var opts = {};
-    if (this.$container.hasClass('has-error')) {
-      opts.autoRemove = false;
+scout.FormField.prototype._renderMenus = function() {
+  this._updateMenus();
+};
+
+scout.FormField.prototype._renderMenusVisible = function() {
+  this._updateMenus();
+};
+
+scout.FormField.prototype._hasMenus = function() {
+  return !!(this.menus && this.menus.length > 0);
+};
+
+scout.FormField.prototype._updateMenus = function() {
+  this._updateStatusVisible();
+  this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
+};
+
+scout.FormField.prototype._syncMenus = function(menus) {
+  if (this._hasMenus()) {
+    this.menus.forEach(function(menu) {
+      this.keyStrokeAdapter.unregisterKeyStroke(menu);
+    }, this);
+  }
+  this.menus = menus;
+  if (this._hasMenus()) {
+    this.menus.forEach(function(menu) {
+      if (menu.enabled) {
+        this.keyStrokeAdapter.registerKeyStroke(menu);
+      }
+    }, this);
+  }
+};
+
+scout.FormField.prototype.setTooltipText = function(tooltipText) {
+  this.tooltipText = tooltipText;
+  if (this.rendered) {
+    this._renderTooltipText();
+  }
+};
+
+scout.FormField.prototype.setErrorStatus = function(errorStatus) {
+  this.errorStatus = errorStatus;
+  if (this.rendered) {
+    this._renderErrorStatus();
+  }
+};
+
+scout.FormField.prototype.setMenus = function(menus) {
+  this.menus = menus;
+  if (this.rendered) {
+    this._renderMenus();
+  }
+};
+
+scout.FormField.prototype.setMenusVisible = function(menusVisible) {
+  this.menusVisible = menusVisible;
+  if (this.rendered) {
+    this._renderMenusVisible();
+  }
+};
+
+scout.FormField.prototype._onStatusMouseDown = function(event) {
+  if (this._hasMenus()) {
+    // showing menus is more important than showing tooltips
+    if (!this.contextPopup || !this.contextPopup.rendered) {
+      this.contextPopup = new scout.ContextMenuPopup(this.session, {
+        menuItems: this.menus,
+        cloneMenuItems: false,
+        $anchor: this.$status
+      });
+      this.contextPopup.render(undefined, event);
     }
-    this._showStatusMessage(opts);
+  } else {
+    // Toggle tooltip
+    if (this.tooltip && this.tooltip.rendered) {
+      this._hideStatusMessage();
+    } else {
+      var opts = {};
+      if (this.$container.hasClass('has-error')) {
+        opts.autoRemove = false;
+      }
+      this._showStatusMessage(opts);
+    }
   }
 };
 

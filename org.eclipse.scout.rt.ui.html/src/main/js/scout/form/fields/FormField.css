@@ -39,12 +39,10 @@
     visibility: hidden;
   }
 
-  /* FIXME AWE/CGU: better solve this which-icon-is-visible? logic in javascript */
   & > .status {
     position: absolute;
     right: 0;
     margin-left: 10px;
-    cursor: pointer;
 
     &::before  {
       .font-icon();
@@ -54,6 +52,7 @@
 
   &.has-tooltip > .status {
     visibility: visible;
+    cursor: pointer;
 
     &::before  {
       content: @icon-info;
@@ -67,6 +66,7 @@
 
   &.has-menus > .status {
     visibility: visible;
+    cursor: pointer;
 
     &::before {
       padding-left: 6px;
@@ -81,6 +81,7 @@
 
   &.has-error > .status {
     visibility: visible;
+    cursor: pointer;
 
     &::before  {
       content: @icon-error;

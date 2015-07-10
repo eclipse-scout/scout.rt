@@ -1,14 +1,8 @@
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
   this.$fieldContainer;
-  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.ImageField, scout.FormField);
-
-scout.ImageField.prototype.init = function(model, session) {
-  scout.ImageField.parent.prototype.init.call(this, model, session);
-  this._syncMenus(this.menus);
-};
 
 scout.ImageField.prototype._render = function($parent) {
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
@@ -30,11 +24,6 @@ scout.ImageField.prototype._render = function($parent) {
   this.addLabel();
   this.addField($field);
   this.addStatus();
-  if (this.menus) {
-    for (var j = 0; j < this.menus.length; j++) {
-      this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
-    }
-  }
 };
 
 scout.ImageField.prototype._onImageLoad = function(event) {
@@ -87,30 +76,6 @@ scout.ImageField.prototype._renderScrollBarEnabled = function() {
   }
 };
 
-scout.ImageField.prototype._syncMenus = function(menus) {
-  if (this._hasMenus()) {
-    this.menus.forEach(function(menu) {
-      this.keyStrokeAdapter.unregisterKeyStroke(menu);
-    }, this);
-  }
-  this.menus = menus;
-  if (this._hasMenus()) {
-    this.menus.forEach(function(menu) {
-      if (menu.enabled) {
-        this.keyStrokeAdapter.registerKeyStroke(menu);
-      }
-    }, this);
-  }
-};
-
-scout.ImageField.prototype._renderMenus = function() {
-  this._updateMenus();
-};
-
-scout.ImageField.prototype._renderMenusVisible = function() {
-  this._updateMenus();
-};
-
 scout.ImageField.prototype._renderGridData = function() {
   this._updateInnerAlignment();
 };
@@ -121,30 +86,4 @@ scout.ImageField.prototype._updateInnerAlignment = function() {
     useHorizontalAlignment: (!this.scrollBarEnabled),
     useVerticalAlignment: (!this.scrollBarEnabled)
   });
-};
-
-scout.ImageField.prototype._updateMenus = function() {
-  this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
-};
-
-scout.ImageField.prototype._hasMenus = function() {
-  return !!(this.menus && this.menus.length > 0);
-};
-
-/**
- * @override FormField.js
- */
-scout.ImageField.prototype._onStatusMouseDown = function(event) {
-  if (this._hasMenus()&&(!this.contextPopup|| !this.contextPopup.rendered)) {
-    // showing menus is more important than showing tooltips
-    this.contextPopup = new scout.ContextMenuPopup(this.session, {
-      menuItems: this.menus,
-      cloneMenuItems: false,
-      $anchor: this.$status
-    });
-    this.contextPopup.render(undefined, event);
-  } else {
-    // super call shows tooltip
-    scout.ValueField.parent.prototype._onStatusMouseDown.call(this);
-  }
 };

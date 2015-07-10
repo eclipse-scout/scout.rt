@@ -190,6 +190,8 @@ scout.Widget.prototype._addEventSupport = function() {
 };
 
 scout.Widget.prototype.trigger = function(type, event) {
+  event = event || {};
+  event.source = this;
   this.events.trigger(type, event);
 };
 

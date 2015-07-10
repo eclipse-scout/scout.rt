@@ -79,13 +79,17 @@ scout.arrays = {
   containsAny: function(haystack, needles) {
     haystack = this.ensure(haystack);
     needles = this.ensure(needles);
-    return needles.some(function contains(element) { return haystack.indexOf(element) >= 0; });
+    return needles.some(function contains(element) {
+      return haystack.indexOf(element) >= 0;
+    });
   },
 
   containsAll: function(haystack, needles) {
     haystack = this.ensure(haystack);
     needles = this.ensure(needles);
-    return needles.every(function contains(element) { return haystack.indexOf(element) >= 0; });
+    return needles.every(function contains(element) {
+      return haystack.indexOf(element) >= 0;
+    });
   },
 
   first: function(arr) {
