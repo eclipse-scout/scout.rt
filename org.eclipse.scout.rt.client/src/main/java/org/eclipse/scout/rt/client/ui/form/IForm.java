@@ -82,6 +82,20 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    */
   int DISPLAY_HINT_VIEW = 20;
 
+  /**
+   * Hint to auto-derive the <code>modality-state</code> based on the {@link IForm}'s <code>display-hint</code>, meaning
+   * <code>true</code> for dialogs and <code>false</code> for views.
+   */
+  int MODALITY_HINT_AUTO = 0;
+  /**
+   * Hint to render a {@link IForm} in modal state.
+   */
+  int MODALITY_HINT_MODAL = 10;
+  /**
+   * Hint to render a {@link IForm} in non-modal state.
+   */
+  int MODALITY_HINT_MODELESS = 20;
+
   int TOOLBAR_FORM_HEADER = 30;
   int TOOLBAR_VIEW_PART = 31;
 
@@ -512,7 +526,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   boolean isModal();
 
   /**
-   * Sets the modality hint to make this {@link IForm} modal in respect to its {@link IDisplayParent}.
+   * Sets the modality hint to make this {@link IForm} modal or modeless in respect to its {@link IDisplayParent}.
    */
   void setModal(boolean modal);
 

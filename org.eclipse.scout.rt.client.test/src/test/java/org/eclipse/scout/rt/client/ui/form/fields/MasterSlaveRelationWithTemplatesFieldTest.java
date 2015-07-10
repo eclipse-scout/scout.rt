@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -89,8 +88,8 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Override
-    protected TriState getConfiguredModal() {
-      return TriState.FALSE;
+    protected int getConfiguredModalityHint() {
+      return MODALITY_HINT_MODELESS;
     }
 
     @Order(10)
@@ -194,8 +193,8 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Override
-    protected TriState getConfiguredModal() {
-      return TriState.FALSE;
+    protected int getConfiguredModalityHint() {
+      return MODALITY_HINT_MODELESS;
     }
 
     @Order(10)

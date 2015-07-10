@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -61,8 +60,8 @@ public class StringFieldSetMultilineTextTest {
     }
 
     @Override
-    protected TriState getConfiguredModal() {
-      return TriState.FALSE;
+    protected int getConfiguredModalityHint() {
+      return MODALITY_HINT_MODELESS;
     }
 
     public Text1Field getText1Field() {
