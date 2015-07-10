@@ -213,10 +213,10 @@ scout.HtmlComponent.prototype.pack = function() {
 };
 
 /**
- * Checks whether $comp has been removed from the dom
+ * Checks whether $comp is in the DOM or has been removed or detached.
  */
-scout.HtmlComponent.prototype.isRemoved = function() {
-  return !scout.HtmlComponent.optGet(this.$comp);
+scout.HtmlComponent.prototype.isAttached = function() {
+  return this.$comp.isAttached();
 };
 
 scout.HtmlComponent.prototype.debug = function() {

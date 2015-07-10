@@ -35,16 +35,18 @@ scout.FormToolPopup.prototype.detach = function() {
   this._detachCloseHandler();
   this._uninstallKeyStrokeAdapter();
   this.$container.uninstallFocusContext(this.session.uiSessionId);
+
   this.$container.detach();
 };
 
 scout.FormToolPopup.prototype.attach = function() {
-  var $docBody = this.session.$entryPoint;
-  $docBody.append(this.$container);
+  this.session.$entryPoint.append(this.$container);
+  this.formToolButton.form.validateLayout(); // Form layout may have become invalid during detach (i.e. closing the popup)
+  this.alignTo();
+
   this._attachCloseHandler();
   this._installKeyStrokeAdapter();
   this.$container.installFocusContextAsync('auto', this.session.uiSessionId);
-  this.alignTo();
 };
 
 scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {
