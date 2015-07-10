@@ -16,6 +16,7 @@ scout.inherits(scout.FormToolPopup, scout.PopupWithHead);
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
   this.$container.addClass('form-tool-popup');
+  this.$body.addClass('down'); // FormToolButtons always open the popup downwards
 
   var form = this.formToolButton.form;
   form.render(this.$body);
