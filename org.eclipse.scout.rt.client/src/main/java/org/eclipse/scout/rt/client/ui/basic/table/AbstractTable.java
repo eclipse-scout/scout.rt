@@ -96,7 +96,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -815,7 +814,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
     menus.addLast(new TableOrganizeMenu(this));
-    menus.addLast(new CopyWidthsOfColumnsMenu(this));
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {

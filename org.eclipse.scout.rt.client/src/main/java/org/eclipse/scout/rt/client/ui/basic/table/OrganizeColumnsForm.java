@@ -11,7 +11,10 @@ import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
+import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -58,7 +61,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -68,6 +74,8 @@ import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 
 public class OrganizeColumnsForm extends AbstractForm {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(OrganizeColumnsForm.class);
 
   ITable m_table;
 
@@ -549,7 +557,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
             updateColumnVisibilityAndOrder();
           }
-
         }
 
         @Order(20.0)
@@ -751,7 +758,61 @@ public class OrganizeColumnsForm extends AbstractForm {
             }
             getColumnsTableField().reloadTableData();
           }
+        }
 
+        @Order(80.0)
+        public class CopyWidthsOfColumnsButton extends AbstractLinkButton {
+
+          public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";
+
+          @Override
+          protected String getConfiguredLabel() {
+            return TEXTS.get("CopyWidthsOfColumnsMenu");
+          }
+
+          @Override
+          protected boolean getConfiguredProcessButton() {
+            return false;
+          }
+
+          @Override
+          protected void execInitField() throws ProcessingException {
+            // This button is only visible in development mode
+            setVisibleGranted(Platform.get().inDevelopmentMode());
+          }
+
+          @Override
+          protected void execClickAction() throws ProcessingException {
+            try {
+              StringBuilder sb = new StringBuilder();
+
+              // Add an identifier for fast identification
+              sb.append(COLUMN_COPY_CLIPBOARD_IDENTIFIER);
+              sb.append("\n");
+
+              // only visible columns are of interest
+              for (IColumn<?> column : m_table.getColumnSet().getVisibleColumns()) {
+                sb.append(column.getClass().getName());
+                sb.append("\t");
+                sb.append(column.getWidth());
+                sb.append("\n");
+              }
+
+              // calling the service to write the buffer to the clipboard
+              IClipboardService svc = BEANS.opt(IClipboardService.class);
+              if (svc == null) {
+                LOG.info(sb.toString());
+                MessageBoxes.createOk().body("See log-file for column widths output.").show();
+              }
+              else {
+                svc.setTextContents(sb.toString());
+              }
+            }
+            catch (ProcessingException se) {
+              se.addContextMessage(getLabel());
+              BEANS.get(ExceptionHandler.class).handle(se);
+            }
+          }
         }
       }
 
