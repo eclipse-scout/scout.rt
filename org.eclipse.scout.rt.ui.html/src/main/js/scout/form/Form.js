@@ -182,6 +182,12 @@ scout.Form.prototype._renderInitialFocus = function(formFieldId) {
   var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
   if (formField) {
     formField.$field.focus();
+  }else{
+    //default focus on first field of form
+    formField = scout.focusManager.getFirstFocusableElement(this.$container);
+    if(formField){
+      formField.focus();
+    }
   }
 };
 
