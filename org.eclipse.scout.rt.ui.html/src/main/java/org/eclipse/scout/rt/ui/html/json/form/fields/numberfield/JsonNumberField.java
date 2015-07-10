@@ -41,7 +41,7 @@ public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValu
       @Override
       protected String modelValue() {
         DecimalFormat format = getModel().getFormat();
-        return format != null && format instanceof DecimalFormat ? ((DecimalFormat) format).toPattern() : "";
+        return format != null ? format.toPattern() : "";
       }
     });
   }
