@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContextStatement;
+import org.eclipse.scout.rt.testing.server.runner.statement.ClientNotificationsStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.TimeoutServerRunContextStatement;
 import org.junit.After;
@@ -72,7 +73,8 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s3 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
+    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
+    final Statement s3 = new ClientNotificationsStatement(s4, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
     final Statement s2 = super.interceptClassLevelStatement(s3, testClass);
     final Statement s1 = new ClearServerRunContextStatement(s2);
 
@@ -85,7 +87,8 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s3 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
+    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
+    final Statement s3 = new ClientNotificationsStatement(s4, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
     final Statement s2 = super.interceptMethodLevelStatement(s3, testClass, testMethod);
     final Statement s1 = new ClearServerRunContextStatement(s2);
     return s1;
