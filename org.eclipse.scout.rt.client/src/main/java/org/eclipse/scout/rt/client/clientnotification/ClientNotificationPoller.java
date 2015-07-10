@@ -64,7 +64,9 @@ public class ClientNotificationPoller {
   }
 
   protected void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
-    System.out.println(String.format("CLIENT NOTIFICATION returned with %s notifications (%s).", notifications.size(), notifications));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format("CLIENT NOTIFICATION returned with %s notifications (%s).", notifications.size(), notifications));
+    }
     // process notifications
     if (!notifications.isEmpty()) {
       BEANS.get(ClientNotificationDispatcher.class).dispatchNotifications(notifications, new IFilter<ClientNotificationMessage>() {
