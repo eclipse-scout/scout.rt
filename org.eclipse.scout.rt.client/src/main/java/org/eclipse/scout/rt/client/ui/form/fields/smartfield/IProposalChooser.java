@@ -33,12 +33,6 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
   String PROP_STATUS = "status";
   String PROP_STATUS_VISIBLE = "statusVisible";
 
-  /**
-   * Legacy event required for old Swing client.
-   * FIXME AWE: (post-swing) remove before release 6.0.0 is shipped.
-   */
-  String SWING_STRUCTURE_CHANGED = "swingStructureChanged";
-
   void setStatus(IStatus status);
 
   void setStatusVisible(boolean visible);

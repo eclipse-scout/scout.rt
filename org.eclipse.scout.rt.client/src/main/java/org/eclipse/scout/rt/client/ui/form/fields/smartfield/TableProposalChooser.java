@@ -100,7 +100,6 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
     m_model.selectNextRow();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
     List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
@@ -159,7 +158,6 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
       else {
         setStatus(null);
       }
-      fireStructureChanged();
     }
     catch (ProcessingException e) {
       LOG.warn("update proposal list", e);

@@ -160,15 +160,6 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
     m_contentAssistField.doSearch(false, false);
   }
 
-  /**
-   * @deprecated Only used for Swing client, remove when Swing client is no more,
-   *             before 6.0.0 is shipped.
-   */
-  @Deprecated
-  protected final void fireStructureChanged() {
-    propertySupport.firePropertyChange(SWING_STRUCTURE_CHANGED, null, this);
-  }
-
   public final boolean isAllowCustomText() {
     return m_allowCustomText;
   }

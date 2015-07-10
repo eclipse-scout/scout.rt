@@ -482,22 +482,6 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     //set size to initial width and default height
     m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), getScoutObject().getProposalFormHeight()));
     if (proposalTree != null || proposalTable != null) {
-      //add a listener whenever the form changes
-      proposalChooser.addPropertyChangeListener(new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          if (IProposalChooser.SWING_STRUCTURE_CHANGED.equals(evt.getPropertyName())) {
-            Runnable t = new Runnable() {
-              @Override
-              public void run() {
-                optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
-              }
-            };
-            getSwingEnvironment().invokeSwingLater(t);
-
-          }
-        }
-      });
       //enqueue a later swing job since there may be waiting swing tasks in the queue that change the table
       SwingUtilities.invokeLater(new Runnable() {
         @Override

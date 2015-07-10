@@ -34,8 +34,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -75,19 +73,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
     ITree tree = createConfiguredOrDefaultModel(ITree.class);
     tree.setIconId(m_contentAssistField.getBrowseIconId());
-    tree.addTreeListener(new TreeAdapter() {
-      @Override
-      @SuppressWarnings("deprecation")
-      public void treeChanged(TreeEvent e) {
-        switch (e.getType()) {
-          case TreeEvent.TYPE_NODE_EXPANDED:
-          case TreeEvent.TYPE_NODE_COLLAPSED: {
-            fireStructureChanged();
-            break;
-          }
-        }
-      }
-    });
     return tree;
   }
 
@@ -131,7 +116,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
     String searchText = null;
     boolean selectCurrentValue = false;
@@ -154,7 +138,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
     setStatus(null);
     setStatusVisible(false);
-    fireStructureChanged();
   }
 
   /**
@@ -167,13 +150,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    * @throws ProcessingException
    */
   @Override
-  @SuppressWarnings("deprecation")
   protected void init() throws ProcessingException {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
       // do sync
       loadRootNode();
       commitPopulateInitialTree();
-      fireStructureChanged();
     }
     else {
       //show comment that smartfield is loading
@@ -199,7 +180,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
               finally {
                 m_model.setTreeChanging(false);
               }
-              fireStructureChanged();
             }
             catch (ProcessingException pe) {
               failed = pe;
@@ -324,7 +304,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     return null;
   }
 
-  @SuppressWarnings("deprecation")
   private void updateActiveFilter() {
     try {
       m_model.setTreeChanging(true);
@@ -340,7 +319,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     finally {
       m_model.setTreeChanging(false);
     }
-    fireStructureChanged();
   }
 
   private void updateSubTree(ITree tree, final ITreeNode parentNode, List<ITreeNode> subTree) throws ProcessingException {
