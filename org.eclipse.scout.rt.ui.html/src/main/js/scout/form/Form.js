@@ -30,14 +30,16 @@ scout.Form.prototype.init = function(model, session) {
 
 scout.Form.prototype._render = function($parent) {
   this.$parentContainer = $parent;
+
+  // Add modality glassPane if applicable; must precede appending the Form to the DOM.
+  this._modalityController.addGlassPane();
+
   this._renderForm($parent);
+
   this.attached = true;
 };
 
 scout.Form.prototype._renderForm = function($parent) {
-  // Add modality glassPane if applicable; must precede appending the Form to the DOM.
-  this._modalityController.addGlassPane();
-
   this.$container = $('<div>')
     .appendTo($parent)
     .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: rename class 'form' to view so we can use the displayHint as class-name
@@ -74,9 +76,7 @@ scout.Form.prototype._renderForm = function($parent) {
     this.$container.addClass('shown');
     $.log.warn('startInstall');
   }
-
 };
-
 
 scout.Form.prototype._renderProperties = function() {
   this._renderInitialFocus(this.initialFocus);
