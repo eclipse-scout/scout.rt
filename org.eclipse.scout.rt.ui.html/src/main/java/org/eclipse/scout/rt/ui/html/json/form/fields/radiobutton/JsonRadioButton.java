@@ -45,8 +45,8 @@ public class JsonRadioButton<RADIO_BUTTON extends IRadioButton> extends JsonButt
   public void handleUiEvent(JsonEvent event) {
     if (SELECTED.equals(event.getType())) {
       addPropertyEventFilterCondition(IRadioButton.PROP_SELECTED, true);
-      getModel().getUIFacade().fireButtonClickedFromUI();
       getModel().getUIFacade().setSelectedFromUI(true);
+      getModel().getUIFacade().fireButtonClickedFromUI();
     }
     else {
       super.handleUiEvent(event);
