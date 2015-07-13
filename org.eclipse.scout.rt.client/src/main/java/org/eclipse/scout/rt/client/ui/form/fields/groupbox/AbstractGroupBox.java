@@ -212,12 +212,14 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   /**
    * Configures whether this group box should be scrollable.</br>
-   * If the property is set to true, a vertical scrollbar will appear if the content is too large to be displayed.<br>
+   * If the property is set to {@link TriState#TRUE}, a vertical scrollbar will appear if the content is too large to be
+   * displayed.<br>
    * If the property is set to {@link TriState#UNDEFINED}, it will be true if the groupbox is the mainbox in a form.
-   * Otherwise it's false.
+   * Otherwise it will be false.
    * <p>
-   * So as default, the mainbox is scrollable. If you want another groupbox to be scrollable, you have to set the
-   * groupbox to scrollable while setting the mainbox to scrollable = false.
+   * By default {@link TriState#UNDEFINED} is returned which means every mainbox is scrollable. If you want another
+   * groupbox to be scrollable, you have to set the groupbox to scrollable while setting the mainbox to scrollable =
+   * false.
    * <p>
    * Subclasses can override this method. Default is {@link TriState#UNDEFINED}.
    *
