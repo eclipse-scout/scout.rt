@@ -115,7 +115,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     attachAdapter(getModel().getRootGroupBox());
 
     attachGlobalAdapters(getDesktop().getViews(getModel()));
-    attachGlobalAdapters(getDesktop().getDialogs(getModel()));
+    attachGlobalAdapters(getDesktop().getDialogs(getModel(), false));
     attachGlobalAdapters(getDesktop().getMessageBoxes(getModel()));
     attachGlobalAdapters(getDesktop().getFileChoosers(getModel()));
   }
@@ -161,7 +161,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     putAdapterIdProperty(json, PROP_ROOT_GROUP_BOX, model.getRootGroupBox());
     setInitialFocusProperty(json);
     putAdapterIdsProperty(json, "views", getDesktop().getViews(getModel()));
-    putAdapterIdsProperty(json, "dialogs", getDesktop().getDialogs(getModel()));
+    putAdapterIdsProperty(json, "dialogs", getDesktop().getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", getDesktop().getMessageBoxes(getModel()));
     putAdapterIdsProperty(json, "fileChoosers", getDesktop().getFileChoosers(getModel()));
     return json;

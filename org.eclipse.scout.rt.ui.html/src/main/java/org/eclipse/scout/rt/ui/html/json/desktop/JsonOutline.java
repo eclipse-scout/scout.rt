@@ -76,7 +76,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject json = super.toJson();
     putAdapterIdProperty(json, "defaultDetailForm", getModel().getDefaultDetailForm());
     putAdapterIdsProperty(json, "views", getDesktop().getViews(getModel()));
-    putAdapterIdsProperty(json, "dialogs", getDesktop().getDialogs(getModel()));
+    putAdapterIdsProperty(json, "dialogs", getDesktop().getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", getDesktop().getMessageBoxes(getModel()));
     putAdapterIdsProperty(json, "fileChoosers", getDesktop().getFileChoosers(getModel()));
     return json;
@@ -106,7 +106,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     attachAdapter(getModel().getDefaultDetailForm());
 
     attachGlobalAdapters(getDesktop().getViews(getModel()));
-    attachGlobalAdapters(getDesktop().getDialogs(getModel()));
+    attachGlobalAdapters(getDesktop().getDialogs(getModel(), false));
     attachGlobalAdapters(getDesktop().getMessageBoxes(getModel()));
     attachGlobalAdapters(getDesktop().getFileChoosers(getModel()));
   }

@@ -81,7 +81,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachGlobalAdapters(getModel().getViews(getModel()));
-    attachGlobalAdapters(getModel().getDialogs(getModel()));
+    attachGlobalAdapters(getModel().getDialogs(getModel(), false));
     attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
     attachGlobalAdapters(getModel().getFileChoosers(getModel()));
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
@@ -161,7 +161,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     JSONObject json = super.toJson();
     json.put(IDesktop.PROP_DESKTOP_STYLE, getModel().getDesktopStyle());
     putAdapterIdsProperty(json, "views", getModel().getViews(getModel()));
-    putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel()));
+    putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
     putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChoosers(getModel()));
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
