@@ -64,7 +64,7 @@ public class UiServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.empty().servletRequest(req).servletResponse(resp).run(new IRunnable() {
+      ServletRunContexts.empty().withServletRequest(req).withServletResponse(resp).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           m_requestHandlerGet.handleRequest(req, resp);
@@ -80,7 +80,7 @@ public class UiServlet extends HttpServlet {
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.empty().servletRequest(req).servletResponse(resp).run(new IRunnable() {
+      ServletRunContexts.empty().withServletRequest(req).withServletResponse(resp).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           m_requestHandlerPost.handleRequest(req, resp);

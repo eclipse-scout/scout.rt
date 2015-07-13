@@ -149,7 +149,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         }
         // the model job's session has to match our session
         ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().runContext();
-        if (runContext.session() != getClientSession()) {
+        if (runContext.getSession() != getClientSession()) {
           return false;
         }
         return true;
@@ -310,10 +310,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
-      ClientRunContext ctx = ClientRunContexts.empty().locale(locale).userAgent(userAgent);
-      for (Map.Entry<String, String> e : sessionInitParams.entrySet()) {
-        ctx.propertyMap().put(e.getKey(), e.getValue());
-      }
+      final ClientRunContext ctx = ClientRunContexts.empty().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
       return BEANS.get(ClientSessionProvider.class).provide(ctx, getClientSessionId());
     }
     catch (ProcessingException e) {
@@ -768,7 +765,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           }
           LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession, true)).name("Close desktop due to HTTP session invalidation"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_clientSession, true)).name("Close desktop due to HTTP session invalidation"));
     }
   }
 
