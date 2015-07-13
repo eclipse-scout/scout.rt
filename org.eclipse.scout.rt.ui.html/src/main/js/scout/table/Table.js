@@ -24,6 +24,8 @@ scout.Table = function() {
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
   this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this.handleAppLinkAction);
+
+  this.attached = false; // Indicates whether this table is currently visible to the user.
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -221,6 +223,7 @@ scout.Table.prototype._render = function($parent) {
     that.sendRowAction($row, column.id);
   }
 
+  this.attached = true;
 };
 
 scout.Table.prototype.onContextMenu = function(event) {
@@ -260,6 +263,7 @@ scout.Table.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
   this.header = null;
   this.footer = null;
+  this.attached = false;
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -2303,6 +2307,57 @@ scout.Table.prototype.onModelAction = function(event) {
   } else {
     $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }
+};
+
+/**
+ * === Method required for objects that act as 'outlineContent' ===
+ *
+ * Method invoked when this is a 'detailTable' and the outline content is displayed;
+ *
+ *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *  This method has no effect if already attached.
+ */
+scout.Table.prototype.attach = function() {
+  if (this.attached || !this.rendered) {
+    return;
+  }
+
+  this._$parent.append(this.$container);
+
+  var htmlComp = scout.HtmlComponent.get(this.$container);
+  var htmlParent = htmlComp.getParent();
+  htmlComp.setSize(htmlParent.getSize());
+
+  this.session.detachHelper.afterAttach(this.$container);
+
+  if (this.keyStrokeAdapter) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+
+  this.attached = true;
+};
+
+/**
+ * === Method required for objects that act as 'outlineContent' ===
+ *
+ * Method invoked when this is a 'detailTable' and the outline content is not displayed anymore.
+ *
+ *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *  This method has no effect if already attached.
+ */
+scout.Table.prototype.detach = function() {
+  if (!this.attached || !this.rendered) {
+    return;
+  }
+
+  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+
+  this.session.detachHelper.beforeDetach(this.$container);
+  this.$container.detach();
+
+  this.attached = false;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

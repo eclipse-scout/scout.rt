@@ -7,7 +7,6 @@ scout.Form = function() {
   this._messageBoxController;
   this._modalityController;
 
-  this.$parentContainer; // DOM element which this Form is attached to.
   this.attached = false; // Indicates whether this Form is currently visible to the user.
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
@@ -29,7 +28,7 @@ scout.Form.prototype.init = function(model, session) {
 };
 
 scout.Form.prototype._render = function($parent) {
-  this.$parentContainer = $parent;
+  this._$parent = $parent;
 
   // Add modality glassPane if applicable; must precede appending the Form to the DOM.
   this._modalityController.addGlassPane();
@@ -186,12 +185,8 @@ scout.Form.prototype._renderInitialFocus = function(formFieldId) {
   var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
   if (formField) {
     formField.$field.focus();
-  }else{
-    //default focus on first field of form
-    formField = scout.focusManager.getFirstFocusableElement(this.$container);
-    if(formField){
-      formField.focus();
-    }
+  } else {
+    scout.focusManager.focusFirstElement(this.$container);
   }
 };
 
@@ -234,17 +229,22 @@ scout.Form.prototype.onModelAction = function(event) {
 };
 
 /**
- * Attaches this Form to its original DOM parent.
- * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ * === Method required for objects that act as 'outlineContent', views or shells attached to a 'displayParent' ===
  *
- * This method has no effect if already attached.
+ * Method invoked when:
+ *  - this is a 'detailForm' and the outline content is displayed;
+ *  - this is a 'view' and the view tab is selected;
+ *  - this is a child 'dialog' or 'view' and its 'displayParent' is attached;
+ *
+ *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *  This method has no effect if already attached.
  */
 scout.Form.prototype.attach = function() {
   if (this.attached || !this.rendered) {
     return;
   }
 
-  this.$parentContainer.append(this.$container);
+  this._$parent.append(this.$container);
 
   // If the parent was resized while this view was detached, the view has a wrong size.
   if (this.isView()) {
@@ -268,10 +268,15 @@ scout.Form.prototype.attach = function() {
 };
 
 /**
- * Detaches this Form from its DOM parent. Thereby, a possible modality glass-pane is not detached.
- * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ * === Method required for objects that act as 'outlineContent', views or shells attached to a 'displayParent' ===
  *
- * This method has no effect if already detached.
+ * Method invoked when:
+ *  - this is a 'detailForm' and the outline content is hidden;
+ *  - this is a 'view' and the view tab is deselected;
+ *  - this is a child 'dialog' or 'view' and its 'displayParent' is detached;
+ *
+ *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *  This method has no effect if already detached.
  */
 scout.Form.prototype.detach = function() {
   if (!this.attached || !this.rendered) {
@@ -294,9 +299,9 @@ scout.Form.prototype.detach = function() {
 };
 
 /**
- * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Form as its 'displayParent'.
+ * === Method required for objects that act as 'displayParent' ===
  *
- * This method is necessary because this Form may act as 'displayParent'.
+ * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Form as its 'displayParent'.
  */
 scout.Form.prototype.modalityElements = function() {
   var elements = [this.$container];
@@ -310,9 +315,9 @@ scout.Form.prototype.modalityElements = function() {
 };
 
 /**
- * Returns 'true' if this Form is currently accessible to the user.
+ * === Method required for objects that act as 'displayParent' ===
  *
- * This method is necessary because this Form may act as 'displayParent'.
+ * Returns 'true' if this Form is currently accessible to the user.
  */
 scout.Form.prototype.inFront = function() {
   return this.rendered && this.attached;

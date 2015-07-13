@@ -294,9 +294,9 @@ scout.Outline.prototype._renderInBackground = function() {
 };
 
 /**
- * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
+ * === Method required for objects that act as 'displayParent' ===
  *
- * This method is necessary because this Outline may act as 'displayParent'.
+ * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
  */
 scout.Outline.prototype.modalityElements = function() {
   var desktop = this.session.desktop;
@@ -313,9 +313,9 @@ scout.Outline.prototype.modalityElements = function() {
 };
 
 /**
- * Returns 'true' if this Outline is currently accessible to the user.
+ * === Method required for objects that act as 'displayParent' ===
  *
- * This method is necessary because this Outline may act as 'displayParent'.
+ * Returns 'true' if this Outline is currently accessible to the user.
  */
 scout.Outline.prototype.inFront = function() {
   return this.rendered && !this.inBackground;

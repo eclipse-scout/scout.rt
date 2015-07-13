@@ -249,24 +249,15 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
   });
 };
 
-scout.Desktop.prototype._detachOutlineContent = function() {
+scout.Desktop.prototype._attachOutlineContent = function() {
   if (this._outlineContent) {
-    var $outlineContent = this._outlineContent.$container;
-    this.session.detachHelper.beforeDetach($outlineContent);
-    $outlineContent.detach();
+    this._outlineContent.attach();
   }
 };
 
-scout.Desktop.prototype._attachOutlineContent = function() {
+scout.Desktop.prototype._detachOutlineContent = function() {
   if (this._outlineContent) {
-    var $outlineContent = this._outlineContent.$container;
-    this.$bench.append($outlineContent);
-    this.session.detachHelper.afterAttach($outlineContent);
-
-    // If the parent has been resized while the content was not visible, the content has the wrong size -> update
-    var htmlComp = scout.HtmlComponent.get($outlineContent);
-    var htmlParent = htmlComp.getParent();
-    htmlComp.setSize(htmlParent.getSize());
+    this._outlineContent.detach();
   }
 };
 
@@ -410,18 +401,18 @@ scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
 };
 
 /**
- * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with the Desktop as its 'displayParent'.
+ * === Method required for objects that act as 'displayParent' ===
  *
- * This method is necessary because the Display may act as 'displayParent'.
+ * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with the Desktop as its 'displayParent'.
  */
 scout.Desktop.prototype.modalityElements = function() {
   return [this.$container];
 };
 
 /**
- * Returns 'true' if the Desktop is currently accessible to the user.
+ * === Method required for objects that act as 'displayParent' ===
  *
- * This method is necessary because the Desktop may act as 'displayParent'.
+ * Returns 'true' if the Desktop is currently accessible to the user.
  */
 scout.Desktop.prototype.inFront = function() {
   return true; // Desktop is always available to the user.

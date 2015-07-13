@@ -16,7 +16,6 @@ scout.MessageBox = function(model, session) {
   this.focusListener;
   this.session = session;
   this._addEventSupport();
-  this.$parentContainer; // DOM element which this message box is attached to.
   this.attached = false; // Indicates whether this message box is currently visible to the user.
 };
 scout.inherits(scout.MessageBox, scout.Widget);
@@ -33,12 +32,12 @@ scout.MessageBox.prototype._render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
   }
+  this._$parent = $parent;
 
   // Add modality glassPane; must precede appending the message box to the DOM.
   this._modalityController = new scout.ModalityController(this);
   this._modalityController.addGlassPane();
 
-  this.$parentContainer = $parent;
   this.$container = $parent.appendDiv('messagebox');
 
   var $handle = this.$container.appendDiv('drag-handle');
@@ -183,17 +182,19 @@ scout.MessageBox.prototype.close = function() {
 };
 
 /**
- * Attaches this message box to its original DOM parent.
- * In contrast to 'render', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ * === Method required for objects attached to a 'displayParent' ===
  *
- * This method has no effect if already attached.
+ * Method invoked once the 'displayParent' is attached;
+ *
+ *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *  This method has no effect if already attached.
  */
 scout.MessageBox.prototype.attach = function() {
   if (this.attached || !this.rendered) {
     return;
   }
 
-  this.$parentContainer.append(this.$container);
+  this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
@@ -204,10 +205,12 @@ scout.MessageBox.prototype.attach = function() {
 };
 
 /**
- * Detaches this message box from its DOM parent. Thereby, a possible modality glass-pane is not detached.
- * In contrast to 'remove', this method uses 'JQuery detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ * === Method required for objects attached to a 'displayParent' ===
  *
- * This method has no effect if already detached.
+ * Method invoked once the 'displayParent' is detached;
+ *
+ *  In contrast to 'render/remove', this method uses 'JQuery attach/detach mechanism' to retain CSS properties, so that the model must not be interpreted anew.
+ *  This method has no effect if already detached.
  */
 scout.MessageBox.prototype.detach = function() {
   if (!this.attached || !this.rendered) {
