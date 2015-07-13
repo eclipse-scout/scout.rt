@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
@@ -408,7 +407,6 @@ public class UserNavigationHistory {
         ActivateNavigationHistoryMenu m = new ActivateNavigationHistoryMenu(b);
         m.initAction();
         if (b == current) {
-          m.setIconId(AbstractIcons.NavigationCurrent);
           m.setEnabled(false);
         }
         newList.add(m);

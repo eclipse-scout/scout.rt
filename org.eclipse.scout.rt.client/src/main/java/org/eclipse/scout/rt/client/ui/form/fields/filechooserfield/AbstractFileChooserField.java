@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 
 @ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
 public abstract class AbstractFileChooserField extends AbstractValueField<BinaryResource> implements IFileChooserField {
@@ -60,12 +59,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     return null;
   }
 
-  @ConfigProperty(ConfigProperty.ICON_ID)
-  @Order(300)
-  protected String getConfiguredFileIconId() {
-    return AbstractIcons.FileChooserFieldFile;
-  }
-
   @ConfigProperty(ConfigProperty.LONG)
   @Order(310)
   protected long getConfiguredMaximumUploadSize() {
@@ -78,7 +71,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     super.initConfig();
     setShowFileExtension(getConfiguredShowFileExtension());
     setFileExtensions(getConfiguredFileExtensions());
-    setFileIconId(getConfiguredFileIconId());
     setMaximumUploadSize(getConfiguredMaximumUploadSize());
   }
 

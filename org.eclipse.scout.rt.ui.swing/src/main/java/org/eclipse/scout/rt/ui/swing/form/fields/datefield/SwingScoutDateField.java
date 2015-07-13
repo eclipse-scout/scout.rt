@@ -38,12 +38,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
-import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
@@ -182,7 +180,6 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
 
     // dropdown decoration
     m_dropdownIcon = new DropDownDecorationItem(textField, getSwingEnvironment());
-    m_dropdownIcon.setIconGroup(new IconGroup(getSwingEnvironment(), AbstractIcons.DateFieldDate));
     m_dropdownIcon.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {

@@ -55,7 +55,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -115,12 +114,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Order(270)
   protected String getConfiguredBrowseIconId() {
     return null;
-  }
-
-  @ConfigProperty(ConfigProperty.ICON_ID)
-  @Order(230)
-  protected String getConfiguredIconId() {
-    return AbstractIcons.SmartFieldBrowse;
   }
 
   /**
@@ -408,7 +401,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     setBrowseIconId(getConfiguredBrowseIconId());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
-    setIconId(getConfiguredIconId());
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());

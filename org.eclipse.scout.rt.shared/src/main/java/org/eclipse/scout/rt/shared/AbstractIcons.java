@@ -29,34 +29,63 @@ public abstract class AbstractIcons implements Serializable {
   /**
    * marker icon for an empty (transparent white) icon
    */
-  public static final String Empty = "empty";
-
   public static final String ApplicationLogo = "application_logo_large";
-  public static final String Bookmark = "bookmark";
-  public static final String ComposerFieldAggregation = "composerfield_aggregation";
-  public static final String ComposerFieldAttribute = "composerfield_attribute";
-  public static final String ComposerFieldEitherOrNode = "composerfield_eitheror";
-  public static final String ComposerFieldEntity = "composerfield_entity";
-  public static final String ComposerFieldRoot = "composerfield_root";
-  public static final String DateFieldDate = "datefield_date";
-  public static final String DateFieldTime = "datefield_time";
-  public static final String FileChooserFieldFile = "filechooserfield_file";
-  public static final String Gears = "gears";
-  public static final String NavigationCurrent = "navigation_current";
-  public static final String Palette = "colorpicker_browse";
-  public static final String SmartFieldBrowse = "smartfield_browse";
-  public static final String ProposalFieldBrowse = "proposalfield_browse";
 
-  public static final String StatusError = "status_error";
-  public static final String StatusInfo = "status_info";
-  public static final String StatusWarning = "status_warning";
-  public static final String TableColumnFilterActive = "table_column_filter_active";
-  public static final String TableCustomColumn = "table_custom_column";
   public static final String TableSortAsc = "font:\u2193";
   public static final String TableSortDesc = "font:\u2191";
-  public static final String TreeNode = "tree_node";
-  public static final String TreeNodeOpen = "tree_node_open";
-  public static final String WizardBackButton = "wizard_back";
-  public static final String WizardBullet = "wizard_bullet";
-  public static final String WizardNextButton = "wizard_next";
+
+  public static final String ExclamationMark = "font:\uE001";
+  public static final String Info = "font:\uE002";
+  public static final String Calendar = "font:\uE003";
+  public static final String Clock = "font:\uE004";
+  public static final String Checked = "font:\uE005";
+  public static final String Wand = "font:\uE010";
+  public static final String Phone = "font:\uE011";
+  public static final String Target = "font:\uE020";
+  public static final String World = "font:\uE021";
+  public static final String Chart = "font:\uE022";
+  public static final String Graph = "font:\uE023";
+  public static final String Category = "font:\uE024";
+  public static final String Gear = "font:\uE031";
+  public static final String Star = "font:\uE032";
+  public static final String Share = "font:\uE033";
+  public static final String Person = "font:\uE034";
+  public static final String VerticalDots = "font:\uE040";
+  public static final String List = "font:\uE041";
+  public static final String Search = "font:\uE042";
+  public static final String Folder = "font:\uE043";
+
+  public static final String ListThick = "font:\uF00B";
+  public static final String Remove = "font:\uF00D";
+  public static final String RotateRight = "font:\uF01E";
+  public static final String Pencil = "font:\uF040";
+  public static final String ChevronLeft = "font:\uF053";
+  public static final String ChevronRight = "font:\uF054";
+  public static final String ArrowRight = "font:\uF061";
+  public static final String Plus = "font:\uF067";
+  public static final String Minus = "font:\uF068";
+  public static final String ChevronUp = "font:\uF077";
+  public static final String ChevronDown = "font:\uF078";
+  public static final String Square = "font:\uF0C8";
+  public static final String Menu = "font:\uF0C9";
+  public static final String ListNumbered = "font:\uF0CB";
+  public static final String CaretDown = "font:\uF0D7";
+  public static final String CaretUp = "font:\uF0D8";
+  public static final String CaretLeft = "font:\uF0D9";
+  public static final String CaretRight = "font:\uF0DA";
+  public static final String RotateLeft = "font:\uF0E2";
+  public static final String AngleDoubleLeft = "font:\uF100";
+  public static final String AngleDoubleRight = "font:\uF101";
+  public static final String AngleDoubleUp = "font:\uF102";
+  public static final String AngleDoubleDown = "font:\uF103";
+  public static final String AngleLeft = "font:\uF104";
+  public static final String AngleRight = "font:\uF105";
+  public static final String AngleUp = "font:\uF106";
+  public static final String AngleDown = "font:\uF107";
+  public static final String Circle = "font:\uF111";
+  public static final String File = "font:\uF15B";
+  public static final String LongArrowDown = "font:\uF175";
+  public static final String LongArrowUp = "font:\uF176";
+  public static final String LongArrowLeft = "font:\uF177";
+  public static final String LongArrowRight = "font:\uF178";
 }

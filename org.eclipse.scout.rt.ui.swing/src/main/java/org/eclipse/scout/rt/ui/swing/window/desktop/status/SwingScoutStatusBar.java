@@ -34,10 +34,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
@@ -304,23 +302,11 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
 
   public void setSwingStatus(IStatus newStatus) {
     String newText = null;
-    Icon newIcon = null;
     if (newStatus != null && !StringUtility.isNullOrEmpty(newStatus.getMessage())) {
       newText = newStatus.getMessage();
-      newIcon = getSwingEnvironment().getIcon(getIconId(newStatus));
     }
     m_swingStatusLabel.setText(newText);
-    m_swingStatusLabel.setIcon(newIcon);
     updateFieldVisibilities();
-  }
-
-  private String getIconId(IStatus status) {
-    if (status instanceof IFieldStatus) {
-      return ((IFieldStatus) status).getIconId();
-    }
-    else {
-      return ScoutFieldStatus.getIconIdFromSeverity(status.getSeverity());
-    }
   }
 
   protected void updateFieldVisibilities() {

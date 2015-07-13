@@ -34,7 +34,6 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -91,8 +90,6 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "TitledBorder.border", new BorderUIResource(new EmptyBorder(0, 0, 0, 0)));
     putIfUndefined(defaults, "TitledBorder.font", new FontUIResource("Dialog", Font.PLAIN, 12));
     putIfUndefined(defaults, "TitledBorder.titleColor", new ColorUIResource(0x000000));
-    putIfUndefined(defaults, "Tree.closedIcon", createIconUIResource(AbstractIcons.TreeNode));
-    putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(AbstractIcons.TreeNodeOpen));
     putIfUndefined(defaults, "Tree.rowHeight", 24);
     putIfUndefined(defaults, "TreeBox.rowHeight", 20);
     Icon icon = SwingIconLocator.INSTANCE.getIcon(SwingIcons.Window);

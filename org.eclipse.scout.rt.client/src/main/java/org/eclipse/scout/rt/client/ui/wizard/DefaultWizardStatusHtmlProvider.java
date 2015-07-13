@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 
 /**
  *
@@ -131,17 +130,9 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
 
   /**
    * To be overwritten in order to provide custom attachments. <br/>
-   * The default implementation provides default icons for
-   * wizard steps.
    */
   protected List<BinaryResource> collectAttachments() {
     List<BinaryResource> attachments = new LinkedList<BinaryResource>();
-
-    loadIcon(attachments, AbstractIcons.Empty + ".png");
-    loadIcon(attachments, AbstractIcons.WizardBullet + ".png");
-    loadIcon(attachments, AbstractIcons.WizardBullet + "_disabled.png");
-    loadIcon(attachments, AbstractIcons.WizardBullet + "_selected.png");
-
     return attachments;
   }
 

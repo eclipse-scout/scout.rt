@@ -19,7 +19,6 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.UIManager;
 
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
@@ -98,12 +97,12 @@ public class DropDownButtonIcon implements Icon {
     m_env = env;
     m_partArrow.setEnabled(false);
     m_partArrow.setVisible(false);
-    m_iconGroup = new IconGroup(m_env, AbstractIcons.SmartFieldBrowse);
+    m_iconGroup = new IconGroup(m_env, null);
   }
 
   public void setIconGroup(IconGroup iconGroup) {
     if (iconGroup == null) {
-      m_iconGroup = new IconGroup(m_env, AbstractIcons.SmartFieldBrowse);
+      m_iconGroup = new IconGroup(m_env, null);
     }
     else {
       m_iconGroup = iconGroup;

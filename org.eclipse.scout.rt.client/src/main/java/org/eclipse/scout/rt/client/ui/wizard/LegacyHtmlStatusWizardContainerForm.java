@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardPreviousStepButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardSuspendButton;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -231,11 +230,6 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
-      protected String getConfiguredIconId() {
-        return AbstractIcons.WizardBackButton;
-      }
-
-      @Override
       protected String getConfiguredLabel() {
         return ScoutTexts.get("WizardBackButton");
       }
@@ -258,11 +252,6 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
 
     @Order(40.0)
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
-
-      @Override
-      protected String getConfiguredIconId() {
-        return AbstractIcons.WizardNextButton;
-      }
 
       @Override
       protected String getConfiguredLabel() {

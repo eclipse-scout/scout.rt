@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
@@ -826,11 +825,6 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   @Order(10)
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class SmartField extends AbstractSmartField<Object> implements IComposerValueField {
-
-    @Override
-    protected String getConfiguredBrowseIconId() {
-      return AbstractIcons.Empty;
-    }
 
     @Override
     protected void execPrepareLookup(ILookupCall<Object> call) throws ProcessingException {

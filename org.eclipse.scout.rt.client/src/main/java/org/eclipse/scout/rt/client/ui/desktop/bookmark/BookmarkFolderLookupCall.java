@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
@@ -52,7 +51,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
               if (path.size() >= 3) {
                 parent = path.get(path.size() - 2);
               }
-              LookupRow<BookmarkFolder> row = new LookupRow<BookmarkFolder>(f, f.getTitle(), f.getIconId() != null ? f.getIconId() : AbstractIcons.TreeNode);
+              LookupRow<BookmarkFolder> row = new LookupRow<BookmarkFolder>(f, f.getTitle(), null);
               row.setParentKey(parent);
               rows.add(row);
             }

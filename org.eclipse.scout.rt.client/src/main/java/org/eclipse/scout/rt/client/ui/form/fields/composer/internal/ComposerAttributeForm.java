@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
@@ -199,11 +198,6 @@ public class ComposerAttributeForm extends AbstractForm {
         @Override
         protected String getConfiguredLabel() {
           return ScoutTexts.get("Attribute");
-        }
-
-        @Override
-        protected String getConfiguredIconId() {
-          return AbstractIcons.ComposerFieldAttribute;
         }
 
         @Override

@@ -23,8 +23,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.rt.client.IFieldStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
@@ -203,8 +201,6 @@ public class JStatusLabelEx extends JComponent {
       m_mandatoryLabel.setVisible(m_mandatoryLabelVisible);
     }
     else {
-      // icon
-      m_statusLabel.setIcon(SwingIconLocator.INSTANCE.getIcon(getIconId()));
       // tooltip
       m_statusLabel.setToolTipText(m_status.getMessage());
       // visibility
@@ -213,15 +209,6 @@ public class JStatusLabelEx extends JComponent {
       if (isStatusHidesMandatoryIconEnabled()) {
         m_mandatoryLabel.setVisible(false);
       }
-    }
-  }
-
-  private String getIconId() {
-    if (m_status instanceof IFieldStatus) {
-      return ((IFieldStatus) m_status).getIconId();
-    }
-    else {
-      return ScoutFieldStatus.getIconIdFromSeverity(m_status.getSeverity());
     }
   }
 

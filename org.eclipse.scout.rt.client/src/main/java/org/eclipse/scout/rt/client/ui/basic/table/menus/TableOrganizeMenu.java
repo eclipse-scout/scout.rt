@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
@@ -25,7 +26,7 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
 
   @Override
   protected String getConfiguredIconId() {
-    return "font:\uE031";
+    return AbstractIcons.Gear;
   }
 
   @Override

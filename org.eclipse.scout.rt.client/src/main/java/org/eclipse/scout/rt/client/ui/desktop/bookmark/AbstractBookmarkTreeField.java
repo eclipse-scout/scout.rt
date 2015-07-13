@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
@@ -541,7 +540,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         title = getConfiguredGlobalBookmarkLabel();
       }
       cell.setText(title);
-      cell.setIconId(AbstractIcons.TreeNode);
     }
 
     @Order(30)
@@ -687,7 +685,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         }
         cell.setTooltipText(bm.getText());
         if (StringUtility.isNullOrEmpty(bm.getIconId())) {
-          cell.setIconId(AbstractIcons.Bookmark);
         }
         else {
           cell.setIconId(bm.getIconId());

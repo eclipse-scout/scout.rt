@@ -118,11 +118,6 @@ public class SmartFieldTest {
         }
 
         @Override
-        protected String getConfiguredIconId() {
-          return ICON_BOOKMARK;
-        }
-
-        @Override
         protected String getConfiguredBackgroundColor() {
           return "000000";
         }
@@ -206,7 +201,7 @@ public class SmartFieldTest {
   public void setUp() throws Throwable {
     m_reg = TestingUtility.registerBeans(
         new BeanMetaData(StyleLookupService.class).
-        withApplicationScoped(true)
+            withApplicationScoped(true)
         );
     m_form = new TestForm();
     m_form.startForm();

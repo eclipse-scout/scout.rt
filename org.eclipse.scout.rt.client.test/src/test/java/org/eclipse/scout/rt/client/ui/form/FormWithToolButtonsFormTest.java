@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.FormWithToolButtonsFormTest.FormWithT
 import org.eclipse.scout.rt.client.ui.form.FormWithToolButtonsFormTest.FormWithToolButtonsForm.ToolButton02;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -90,20 +89,11 @@ public class FormWithToolButtonsFormTest {
       protected String getConfiguredText() {
         return "Toolbutton";
       }
-
-      @Override
-      protected String getConfiguredIconId() {
-        return AbstractIcons.Bookmark;
-      }
     }
 
     @Order(210)
     public class ToolButton02 extends AbstractButtonTemplate {
 
-      @Override
-      protected String getConfiguredIconId() {
-        return AbstractIcons.Gears;
-      }
     }
 
     public class ViewHandler extends AbstractFormHandler {

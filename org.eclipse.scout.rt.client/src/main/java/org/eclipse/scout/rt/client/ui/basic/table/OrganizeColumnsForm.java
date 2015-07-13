@@ -257,20 +257,10 @@ public class OrganizeColumnsForm extends AbstractForm {
                   getTable().getTitleColumn().setValue(row, columnTitle + " (" + col.getSortIndex() + ")");
                 }
 
-                // Custom Column
-                if (col instanceof ICustomColumn<?>) {
-                  row.getCellForUpdate(getTable().getCustomColumnColumn().getColumnIndex()).setIconId(AbstractIcons.TableCustomColumn);
-                }
-
                 // Sorting
                 getTable().getSortingColumn().setValue(row, col);
                 if (col.isSortActive()) {
                   row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(col.isSortAscending() ? AbstractIcons.TableSortAsc : AbstractIcons.TableSortDesc);
-                }
-
-                // Filter
-                if (col.isColumnFilterActive()) {
-                  row.getCellForUpdate(getTable().getFilterColumn().getColumnIndex()).setIconId(AbstractIcons.TableColumnFilterActive);
                 }
 
                 rowList.add(row);

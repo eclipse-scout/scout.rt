@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardProgressField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -161,11 +160,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
-      protected String getConfiguredIconId() {
-        return AbstractIcons.WizardBackButton;
-      }
-
-      @Override
       protected String getConfiguredLabel() {
         return ScoutTexts.get("WizardBackButton");
       }
@@ -183,11 +177,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
     @Order(40.0)
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
-
-      @Override
-      protected String getConfiguredIconId() {
-        return AbstractIcons.WizardNextButton;
-      }
 
       @Override
       protected String getConfiguredLabel() {

@@ -19,7 +19,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup.IconState;
@@ -43,7 +42,7 @@ public class DropDownDecorationItem extends AbstractDecorationItem {
   @Override
   protected void init() {
     super.init();
-    m_iconGroup = new IconGroup(getEnvironment(), AbstractIcons.SmartFieldBrowse);
+    m_iconGroup = new IconGroup(getEnvironment(), null);
   }
 
   @Override
@@ -90,7 +89,7 @@ public class DropDownDecorationItem extends AbstractDecorationItem {
   public void setIconGroup(IconGroup iconGroup) {
 
     if (iconGroup == null) {
-      iconGroup = new IconGroup(getEnvironment(), AbstractIcons.SmartFieldBrowse);
+      iconGroup = new IconGroup(getEnvironment(), null);
     }
     if (!CompareUtility.equals(m_iconGroup, iconGroup)) {
       m_iconGroup = iconGroup;

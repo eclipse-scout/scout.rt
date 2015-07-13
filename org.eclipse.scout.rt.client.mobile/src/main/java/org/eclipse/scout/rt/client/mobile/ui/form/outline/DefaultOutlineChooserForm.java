@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOutlineChooserForm {
@@ -121,11 +120,6 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
         @Override
         protected boolean getConfiguredAutoDiscardOnDelete() {
           return true;
-        }
-
-        @Override
-        protected String getConfiguredDefaultIconId() {
-          return AbstractIcons.TreeNode;
         }
 
         @Override

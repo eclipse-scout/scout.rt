@@ -70,7 +70,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -90,7 +89,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
@@ -1200,17 +1198,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
               }
             }
 
-            // icon
-            boolean firstCellOfCheckableTable = scoutTable.isCheckable() && column == 0;
-            Icon checkboxIcon = getCheckboxIcon(firstCellOfCheckableTable, scoutCol, scoutRow, label);
-            Icon decoIcon = getDecoIcon(column, scoutRow, cell);
-            Icon icon = getCompositeIcon(checkboxIcon, decoIcon);
-            if (cell.isEditable()) {
-              icon = new P_IconWithMarker(icon);
-            }
-            label.setIcon(icon);
-            label.setDisabledIcon(icon);
-
             // Sort Order Column
             if (scoutCol instanceof ISortOrderColumn) {
               IColumn sortCol = (IColumn) cell.getValue();
@@ -1355,26 +1342,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         checkboxIcon.setEnabled(label.isEnabled());
       }
       return checkboxIcon;
-    }
-
-    /**
-     * @param column
-     * @param scoutRow
-     * @param cell
-     * @return in case of an error the error icon otherwise the cell or row icon, if set
-     */
-    private Icon getDecoIcon(int column, ITableRow scoutRow, ICell cell) {
-      Icon decoIcon = null;
-      if (cell.getErrorStatus() != null && cell.getErrorStatus().getSeverity() == IStatus.ERROR) {
-        decoIcon = getSwingEnvironment().getIcon(AbstractIcons.StatusError);
-      }
-      else if (cell.getIconId() != null) {
-        decoIcon = getSwingEnvironment().getIcon(cell.getIconId());
-      }
-      else if (column == 0) {
-        decoIcon = getSwingEnvironment().getIcon(scoutRow.getIconId());
-      }
-      return decoIcon;
     }
 
     @Override

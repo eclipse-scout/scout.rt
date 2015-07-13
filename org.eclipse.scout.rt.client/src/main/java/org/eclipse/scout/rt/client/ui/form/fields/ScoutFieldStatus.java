@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.IFieldStatus;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 
 /**
  * Status type for form fields with additional property "iconId"
@@ -39,32 +37,9 @@ public class ScoutFieldStatus extends Status implements IFieldStatus {
     m_iconId = iconId;
   }
 
-  /**
-   * icon id are defined either in {@link AbstractIcons} or in the project
-   * specific subclass named Icons
-   */
   @Override
   public String getIconId() {
-    if (m_iconId != null) {
-      return m_iconId;
-    }
-    else {
-      return getIconIdFromSeverity(getSeverity());
-    }
-  }
-
-  // FIXME AWE: (post-swing) delete this method after Swing has been removed (probably also m_iconId,
-  // since the icon ID can be derived from the severity property).
-  public static String getIconIdFromSeverity(int severity) {
-    if (severity >= IStatus.ERROR) {
-      return AbstractIcons.StatusError;
-    }
-    else if (severity >= IStatus.WARNING) {
-      return AbstractIcons.StatusWarning;
-    }
-    else {
-      return AbstractIcons.StatusInfo;
-    }
+    return null;
   }
 
   @Override

@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.RootNode;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
@@ -864,28 +863,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     @Override
     protected void execDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
       node.decorateCell();
-      if (getDefaultIconId() != null) {
-        cell.setIconId(getDefaultIconId());
-      }
-      else {
-        if (node instanceof RootNode) {
-          cell.setIconId(AbstractIcons.ComposerFieldRoot);
-        }
-        else if (node instanceof EntityNode) {
-          cell.setIconId(AbstractIcons.ComposerFieldEntity);
-        }
-        else if (node instanceof AttributeNode) {
-          if (((AttributeNode) node).getAggregationType() != null) {
-            cell.setIconId(AbstractIcons.ComposerFieldAggregation);
-          }
-          else {
-            cell.setIconId(AbstractIcons.ComposerFieldAttribute);
-          }
-        }
-        else if (node instanceof EitherOrNode) {
-          cell.setIconId(AbstractIcons.ComposerFieldEitherOrNode);
-        }
-      }
     }
   }
 
