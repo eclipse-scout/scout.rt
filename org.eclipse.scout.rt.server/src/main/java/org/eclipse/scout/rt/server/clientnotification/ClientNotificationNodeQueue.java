@@ -118,6 +118,9 @@ public class ClientNotificationNodeQueue {
     if (message.getAddress().isNotifyAllSessions()) {
       return true;
     }
+    if (message.getAddress().isNotifyAllNodes()) {
+      return true;
+    }
     Set<String> messageSessionIds = message.getAddress().getSessionIds();
     if (CollectionUtility.hasElements(messageSessionIds)) {
       // check message session ids registered in this Notificaiton Node
