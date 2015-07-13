@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 
-public class ClientNotificationAddress implements Serializable {
+public class ClientNotficationAddress implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final Set<String> m_sessionIds = new HashSet<>();
@@ -35,39 +35,39 @@ public class ClientNotificationAddress implements Serializable {
    * <li>!CollectionUtility.isEmpty(userIds)</li>
    * </ul>
    **/
-  protected ClientNotificationAddress() {
+  protected ClientNotficationAddress() {
   }
 
-  public static ClientNotificationAddress createSessionAddress(final Set<String> sessionIds) {
-    return new ClientNotificationAddress().withSessionIds(sessionIds);
+  public static ClientNotficationAddress createSessionAddress(final Set<String> sessionIds) {
+    return new ClientNotficationAddress().withSessionIds(sessionIds);
   }
 
-  public static ClientNotificationAddress createSessionAddress(final Set<String> sessionIds, final String excludedNodeId) {
-    return new ClientNotificationAddress().withSessionIds(sessionIds).withExcludedNodeId(excludedNodeId);
+  public static ClientNotficationAddress createSessionAddress(final Set<String> sessionIds, final String excludedNodeId) {
+    return new ClientNotficationAddress().withSessionIds(sessionIds).withExcludedNodeId(excludedNodeId);
   }
 
-  public static ClientNotificationAddress createUserAddress(final Set<String> userIds) {
-    return new ClientNotificationAddress().withUserIds(userIds);
+  public static ClientNotficationAddress createUserAddress(final Set<String> userIds) {
+    return new ClientNotficationAddress().withUserIds(userIds);
   }
 
-  public static ClientNotificationAddress createUserAddress(final Set<String> userIds, final String excludedNodeId) {
-    return new ClientNotificationAddress().withUserIds(userIds).withExcludedNodeId(excludedNodeId);
+  public static ClientNotficationAddress createUserAddress(final Set<String> userIds, final String excludedNodeId) {
+    return new ClientNotficationAddress().withUserIds(userIds).withExcludedNodeId(excludedNodeId);
   }
 
-  public static ClientNotificationAddress createAllSessionsAddress() {
-    return new ClientNotificationAddress().withNotifyAllSessions(true);
+  public static ClientNotficationAddress createAllSessionsAddress() {
+    return new ClientNotficationAddress().withNotifyAllSessions(true);
   }
 
-  public static ClientNotificationAddress createAllSessionsAddress(final String excludedNodeId) {
-    return new ClientNotificationAddress().withNotifyAllSessions(true).withExcludedNodeId(excludedNodeId);
+  public static ClientNotficationAddress createAllSessionsAddress(final String excludedNodeId) {
+    return new ClientNotficationAddress().withNotifyAllSessions(true).withExcludedNodeId(excludedNodeId);
   }
 
-  public static ClientNotificationAddress createAllNodesAddress() {
-    return new ClientNotificationAddress().withNotifyAllNodes(true);
+  public static ClientNotficationAddress createAllNodesAddress() {
+    return new ClientNotficationAddress().withNotifyAllNodes(true);
   }
 
-  public static ClientNotificationAddress createAllNodesAddress(final String excludedNodeId) {
-    return new ClientNotificationAddress().withNotifyAllNodes(true).withExcludedNodeId(excludedNodeId);
+  public static ClientNotficationAddress createAllNodesAddress(final String excludedNodeId) {
+    return new ClientNotficationAddress().withNotifyAllNodes(true).withExcludedNodeId(excludedNodeId);
   }
 
   public Set<String> getSessionIds() {
@@ -128,10 +128,10 @@ public class ClientNotificationAddress implements Serializable {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof ClientNotificationAddress)) {
+    if (!(obj instanceof ClientNotficationAddress)) {
       return false;
     }
-    final ClientNotificationAddress other = (ClientNotificationAddress) obj;
+    final ClientNotficationAddress other = (ClientNotficationAddress) obj;
     if (m_notifyAllSessions) {
       return other.m_notifyAllSessions;
     }
@@ -167,27 +167,27 @@ public class ClientNotificationAddress implements Serializable {
     }
   }
 
-  protected ClientNotificationAddress withSessionIds(final Set<String> sessionIds) {
+  protected ClientNotficationAddress withSessionIds(final Set<String> sessionIds) {
     m_sessionIds.addAll(sessionIds);
     return this;
   }
 
-  protected ClientNotificationAddress withUserIds(final Set<String> userIds) {
+  protected ClientNotficationAddress withUserIds(final Set<String> userIds) {
     m_userIds.addAll(userIds);
     return this;
   }
 
-  protected ClientNotificationAddress withNotifyAllSessions(final boolean notifyAllSessions) {
+  protected ClientNotficationAddress withNotifyAllSessions(final boolean notifyAllSessions) {
     m_notifyAllSessions = notifyAllSessions;
     return this;
   }
 
-  protected ClientNotificationAddress withNotifyAllNodes(final boolean notifyAllNodes) {
+  protected ClientNotficationAddress withNotifyAllNodes(final boolean notifyAllNodes) {
     m_notifyAllNodes = notifyAllNodes;
     return this;
   }
 
-  protected ClientNotificationAddress withExcludedNodeId(final String excludedNodeId) {
+  protected ClientNotficationAddress withExcludedNodeId(final String excludedNodeId) {
     m_excludedNodeId = excludedNodeId;
     return this;
   }

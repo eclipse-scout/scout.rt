@@ -66,14 +66,14 @@ public class ClientNotificationPoller {
 
   protected void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("CLIENT NOTIFICATION returned with %s notifications (%s).", notifications.size(), notifications));
+      LOG.debug("CLIENT NOTIFICATION returned with {} notifications ({}).", notifications.size(), notifications);
     }
     // process notifications
     if (!notifications.isEmpty()) {
       BEANS.get(ClientNotificationDispatcher.class).dispatchNotifications(notifications, new IFilter<ClientNotificationMessage>() {
         @Override
         public boolean accept(ClientNotificationMessage message) {
-          return !CompareUtility.equals(message.getAddress().getExcludeNodeId(), IClientSessionRegistry.NOTIFICATION_NODE_ID);
+          return !CompareUtility.equals(message.getAddress().getExcludedNodeId(), IClientSessionRegistry.NOTIFICATION_NODE_ID);
         }
       });
     }

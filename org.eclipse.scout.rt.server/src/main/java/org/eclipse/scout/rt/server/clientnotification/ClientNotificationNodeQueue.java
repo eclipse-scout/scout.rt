@@ -170,7 +170,7 @@ public class ClientNotificationNodeQueue {
   }
 
   public boolean isRelevant(ClientNotificationAddress address) {
-    if (CompareUtility.equals(getNodeId(), address.getExcludeNodeId())) {
+    if (CompareUtility.equals(getNodeId(), address.getExcludedNodeId())) {
       return false;
     }
     return address.isNotifyAllSessions()
