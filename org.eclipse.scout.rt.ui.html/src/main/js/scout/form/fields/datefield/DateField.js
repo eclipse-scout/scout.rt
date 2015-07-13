@@ -340,12 +340,12 @@ scout.DateField.prototype._onKeyDownDate = function(event) {
     if ((!this._$predict || this._$predict.length === 0) && displayText.length > 0 && this.$dateField[0] === document.activeElement) {
       this._$predict = this._createPredictionField();
     }
+    var valid = this.validateDisplayText(displayText); // must be called before return, otherwise error status might be wrong
     if (!this._$predict) {
       // Return if $predict was already removed (e.g. by focus lost)
       return;
     }
     var datePrediction = {};
-    var valid = this.validateDisplayText(displayText);
     if (displayText && valid) {
       datePrediction = this._predict(displayText);
     }
