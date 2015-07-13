@@ -228,8 +228,7 @@ public class RunContext {
   }
 
   public Object getProperty(final Object key) {
-    m_propertyMap.get(key);
-    return this;
+    return m_propertyMap.get(key);
   }
 
   public RunContext withProperty(final Object key, final Object value) {
