@@ -194,6 +194,10 @@ scout.Action.prototype.prepareDoAction = function(event) {
   // the executed action works with a wrong value for the active field.
   // --> Same check in Button.doAction()
   var activeValueField = $(document.activeElement).data('valuefield');
+  if (activeValueField === undefined) {
+    // try parent, some times the value field is the parent of the input field (e.g. DateField.js)
+    activeValueField = $(document.activeElement).parent().data('valuefield');
+  }
   if (activeValueField) {
     activeValueField.displayTextChanged();
   }

@@ -105,6 +105,10 @@ scout.Button.prototype.doAction = function() {
   // blur event, which does not change the focus but executes all code that
   // is normally triggered when a regular blur event occurs.
   var activeValueField = $(document.activeElement).data('valuefield');
+  if (activeValueField === undefined) {
+    // try parent, some times the value field is the parent of the input field (e.g. DateField.js)
+    activeValueField = $(document.activeElement).parent().data('valuefield');
+  }
   if (activeValueField) {
     activeValueField.displayTextChanged();
   }
