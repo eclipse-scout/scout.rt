@@ -91,14 +91,14 @@ scout.DecimalFormat = function(locale, pattern) {
     var matches = r.exec(pattern);
     if (matches !== null) {
       // Ignore single quotes (for special, quoted characters - e.g. Java quotes percentage sign like '%')
-      result.prefix = matches[1].replace(new RegExp('\'([^\']+)\''), '$1');
+      result.prefix = matches[1].replace(new RegExp('\'([^\']+)\'', 'g'), '$1');
     }
     // Find suffix (anything before the first 'digit-like' character)
     r = new RegExp('^.*[' + digitLikeCharacters + '](.*?)$');
     matches = r.exec(pattern);
     if (matches !== null) {
       // Ignore single quotes (for special, quoted characters - e.g. Java quotes percentage sign like '%')
-      result.suffix = matches[1].replace(new RegExp('\'([^\']+)\''), '$1');
+      result.suffix = matches[1].replace(new RegExp('\'([^\']+)\'', 'g'), '$1');
     }
     return result;
   }
