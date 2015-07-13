@@ -62,6 +62,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
@@ -84,7 +85,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -645,7 +645,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void initConfig() throws ProcessingException {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
 
     m_timerFutureMap = new HashMap<>();
     setShowOnStart(getConfiguredShowOnStart());
@@ -900,11 +900,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
       };
     }
-    IDesktop desktop = getDesktop();
-    if (desktop == null) {
-      desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
-    }
-    desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   /**
@@ -1004,7 +1000,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     setCloseTimerArmed(true);
 
     // Notify the UI to display this form.
-    if (isShowOnStart() && getDesktop() != null) {
+    if (isShowOnStart()) {
       getDesktop().showForm(this);
     }
 
@@ -1048,12 +1044,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void waitFor() throws ProcessingException {
-    // check if the desktop is observing this process
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    if (desktop == null || !desktop.isOpened()) {
-      throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
-    }
-    // wait
     m_blockingCondition.waitFor();
   }
 
@@ -1380,18 +1370,18 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public IFormField getFocusOwner() {
-    if (getDesktop() != null) {
-      IFormField field = getDesktop().getFocusOwner();
-      if (field != null) {
-        IForm form = field.getForm();
-        while (form != null) {
-          if (form == this) {
-            return field;
-          }
-          // next
-          form = form.getOuterForm();
-        }
+    IFormField field = getDesktop().getFocusOwner();
+    if (field == null) {
+      return null;
+    }
+
+    IForm form = field.getForm();
+    while (form != null) {
+      if (form == this) {
+        return field;
       }
+      // next
+      form = form.getOuterForm();
     }
     return null;
   }
@@ -1415,10 +1405,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Convenience for ClientSessionProvider.currentSession().getDesktop()
+   * @return {@link IDesktop} from current calling context.
    */
-  public IDesktop getDesktop() {
-    return ClientSessionProvider.currentSession().getDesktop();
+  protected IDesktop getDesktop() {
+    return ClientRunContexts.copyCurrent().desktop();
   }
 
   @Override
@@ -2208,15 +2198,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
 
       // Detach Form from Desktop.
-      IDesktop desktop = getDesktop();
-      if (desktop != null) {
-        desktop.hideForm(this);
+      getDesktop().hideForm(this);
 
-        // Link all Forms which have this Form as 'displayParent' with the Desktop.
-        List<IForm> forms = desktop.getForms(this);
-        for (IForm childForm : forms) {
-          childForm.setDisplayParent(getDesktop());
-        }
+      // Link all Forms which have this Form as 'displayParent' with the Desktop.
+      List<IForm> forms = getDesktop().getForms(this);
+      for (IForm childForm : forms) {
+        childForm.setDisplayParent(getDesktop());
       }
     }
     finally {
@@ -2227,13 +2214,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isShowing() {
-    IDesktop desktop = getDesktop();
-    if (desktop != null) {
-      return desktop.isShowing(this);
-    }
-    else {
-      return false;
-    }
+    return getDesktop().isShowing(this);
   }
 
   @Override
@@ -2484,9 +2465,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void activate() {
-    if (getDesktop() != null) {
-      getDesktop().ensureVisible(this);
-    }
+    getDesktop().ensureVisible(this);
   }
 
   @Override
@@ -2819,8 +2798,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setDisplayHint(int displayHint) {
-    // FIXME DWI: throws NPE when called from initConfig()
-    // Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form=%s]", this);
+    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form=%s]", this);
 
     switch (displayHint) {
       case DISPLAY_HINT_DIALOG:
@@ -2857,15 +2835,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       return;
     }
 
-    IDesktop desktop = getDesktop();
-    if (desktop == null || !desktop.isShowing(this)) {
+    if (!getDesktop().isShowing(this)) {
       m_displayParent.set(displayParent, true); // no Desktop available, or Form is not showing yet.
     }
     else {
       // This Form is already showing and must be attached to the new 'displayParent'.
-      desktop.hideForm(this);
+      getDesktop().hideForm(this);
       m_displayParent.set(displayParent, true);
-      desktop.showForm(this);
+      getDesktop().showForm(this);
     }
   }
 

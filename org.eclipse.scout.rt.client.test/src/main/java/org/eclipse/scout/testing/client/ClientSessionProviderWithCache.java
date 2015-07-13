@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -90,7 +91,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   @Override
   protected void beforeStartSession(IClientSession clientSession) {
     // auto-cancel all message boxes
-    clientSession.getVirtualDesktop().addDesktopListener(new DesktopListener() {
+    ClientRunContexts.copyCurrent().desktop().addDesktopListener(new DesktopListener() {
       @Override
       public void desktopChanged(DesktopEvent e) {
         switch (e.getType()) {

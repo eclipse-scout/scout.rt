@@ -21,12 +21,13 @@ import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.shared.ISession;
@@ -53,6 +54,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>{@link CurrentControlTracker#CURRENT_MODEL_ELEMENT}</li>
  * <li>{@link CurrentControlTracker#CURRENT_FORM}</li>
  * <li>{@link CurrentControlTracker#CURRENT_OUTLINE}</li>
+ * <li>{@link CurrentControlTracker#CURRENT_DESKTOP}</li>
  * </ul>
  *
  * @since 5.1
@@ -66,12 +68,14 @@ public class ClientRunContext extends RunContext {
   protected Object m_modelElement;
   protected IForm m_form;
   protected IOutline m_outline;
+  protected IDesktop m_desktop;
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(next, CurrentControlTracker.CURRENT_MODEL_ELEMENT, m_modelElement);
+    final Callable<RESULT> c9 = new InitThreadLocalCallable<>(next, CurrentControlTracker.CURRENT_DESKTOP, m_desktop);
+    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, CurrentControlTracker.CURRENT_OUTLINE, m_outline);
     final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, CurrentControlTracker.CURRENT_FORM, m_form);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, CurrentControlTracker.CURRENT_OUTLINE, m_outline);
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, CurrentControlTracker.CURRENT_MODEL_ELEMENT, m_modelElement);
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
     final Callable<RESULT> c3 = new CurrentSessionLogCallable<>(c4);
@@ -182,6 +186,23 @@ public class ClientRunContext extends RunContext {
     return this;
   }
 
+  /**
+   * Returns the {@link IDesktop} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
+   * set.
+   */
+  public IDesktop desktop() {
+    return m_desktop;
+  }
+
+  /**
+   * Associates this {@link ClientRunContext} with a {@link IDesktop}. Typically, that information is set by the UI
+   * facade when dispatching a request from UI.
+   */
+  public ClientRunContext desktop(final IDesktop desktop) {
+    m_desktop = desktop;
+    return this;
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -193,6 +214,7 @@ public class ClientRunContext extends RunContext {
     builder.ref("modelElement", modelElement());
     builder.ref("form", form());
     builder.ref("outline", outline());
+    builder.ref("desktop", desktop());
     return builder.toString();
   }
 
@@ -204,30 +226,33 @@ public class ClientRunContext extends RunContext {
 
     super.copyValues(originRunContext);
     m_userAgent = originRunContext.m_userAgent;
-    m_modelElement = originRunContext.m_modelElement;
-    m_outline = originRunContext.m_outline;
-    m_form = originRunContext.m_form;
     m_session = originRunContext.m_session;
+    m_modelElement = originRunContext.m_modelElement;
+    m_form = originRunContext.m_form;
+    m_outline = originRunContext.m_outline;
+    m_desktop = originRunContext.m_desktop;
   }
 
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
     m_userAgent = UserAgent.CURRENT.get();
-    m_modelElement = CurrentControlTracker.CURRENT_MODEL_ELEMENT.get();
-    m_outline = CurrentControlTracker.CURRENT_OUTLINE.get();
-    m_form = CurrentControlTracker.CURRENT_FORM.get();
     m_session = ClientSessionProvider.currentSession();
+    m_modelElement = CurrentControlTracker.CURRENT_MODEL_ELEMENT.get();
+    m_form = CurrentControlTracker.CURRENT_FORM.get();
+    m_outline = CurrentControlTracker.CURRENT_OUTLINE.get();
+    m_desktop = resolveCurrentDesktop();
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
     m_userAgent = null;
-    m_modelElement = null;
-    m_outline = null;
-    m_form = null;
     m_session = null;
+    m_modelElement = null;
+    m_form = null;
+    m_outline = null;
+    m_desktop = null;
   }
 
   @Override
@@ -235,5 +260,23 @@ public class ClientRunContext extends RunContext {
     final ClientRunContext copy = BEANS.get(ClientRunContext.class);
     copy.copyValues(this);
     return copy;
+  }
+
+  /**
+   * Resolves the {@link IDesktop} form current calling context.
+   */
+  protected IDesktop resolveCurrentDesktop() {
+    final IDesktop desktop = CurrentControlTracker.CURRENT_DESKTOP.get();
+    if (desktop != null) {
+      return desktop;
+    }
+
+    final IClientSession session = ClientSessionProvider.currentSession();
+    if (session != null) {
+      return session.getDesktopElseVirtualDesktop();
+    }
+    else {
+      return null;
+    }
   }
 }

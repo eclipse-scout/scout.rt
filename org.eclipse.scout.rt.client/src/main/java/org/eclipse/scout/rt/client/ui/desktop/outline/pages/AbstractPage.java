@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateLazyAddChildPagesToOutlineChain;
@@ -653,11 +654,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         }
       };
     }
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    if (desktop == null) {
-      desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
-    }
-    desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
+
+    ClientRunContexts.copyCurrent().desktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   @Override
@@ -684,12 +682,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
-      //sle Ticket 92'909: AbstractPage unregisterDataChangeListener NullPointer
-      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-      if (desktop == null) {
-        desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
-      }
-      desktop.removeDataChangeListener(m_internalDataChangeListener, dataTypes);
+      ClientRunContexts.copyCurrent().desktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
     }
   }
 

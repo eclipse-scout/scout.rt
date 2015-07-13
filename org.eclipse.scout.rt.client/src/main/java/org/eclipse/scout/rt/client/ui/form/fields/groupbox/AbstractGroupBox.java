@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
@@ -243,7 +244,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     Class<? extends IGroupBoxBodyGrid> bodyGridClazz = getConfiguredBodyGrid();
     if (bodyGridClazz != null) {
       IGroupBoxBodyGrid bodyGrid;

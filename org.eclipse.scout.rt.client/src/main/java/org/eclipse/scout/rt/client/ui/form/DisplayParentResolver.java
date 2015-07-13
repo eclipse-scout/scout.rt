@@ -69,6 +69,6 @@ public class DisplayParentResolver {
     }
 
     // Use the desktop as 'displayParent'.
-    return currentRunContext.session().getDesktop();
+    return currentRunContext.desktop();
   }
 }

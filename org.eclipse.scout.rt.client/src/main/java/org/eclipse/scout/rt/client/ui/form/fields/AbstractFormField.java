@@ -38,6 +38,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
@@ -959,11 +960,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       };
     }
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    if (desktop == null) {
-      desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
-    }
-    desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    ClientRunContexts.copyCurrent().desktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   /**

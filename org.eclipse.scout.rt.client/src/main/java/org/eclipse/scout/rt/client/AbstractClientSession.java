@@ -300,14 +300,20 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void execStoreSession() throws ProcessingException {
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public IDesktop getVirtualDesktop() {
-    return m_desktop != null ? m_desktop : m_virtualDesktop;
+    return getDesktopElseVirtualDesktop();
   }
 
   @Override
   public IDesktop getDesktop() {
     return m_desktop;
+  }
+
+  @Override
+  public IDesktop getDesktopElseVirtualDesktop() {
+    return m_desktop != null ? m_desktop : m_virtualDesktop;
   }
 
   @Override

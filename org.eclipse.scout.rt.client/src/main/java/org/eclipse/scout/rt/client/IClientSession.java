@@ -58,7 +58,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   /**
    * Invoke this method to initialize the session. The session is active just after this method returns.
-   * 
+   *
    * @param sessionId
    *          TODO
    */
@@ -86,11 +86,19 @@ public interface IClientSession extends ISession, IPropertyObserver {
    *         Before a desktop is set using {@link #setDesktop(IDesktop)} this is a virtual desktop ONLY used to early
    *         register observers.<br>
    *         Once a desktop has been set, this is the same as calling {@link #getDesktop()}
+   * @deprecated use {@link #getDesktopElseVirtualDesktop()}; will be removed in version 6.1.
    */
+  @Deprecated
   IDesktop getVirtualDesktop();
 
   /**
-   * @return the desktop model assiciated with this client session
+   * @return the {@link IDesktop} associated with this {@link IClientSession}, or a virtual {@link IDesktop} with
+   *         limited functionality if not set yet.
+   */
+  IDesktop getDesktopElseVirtualDesktop();
+
+  /**
+   * @return the desktop model associated with this client session
    *         <p>
    *         Desktop is available only after {@link #start(String)} and
    */

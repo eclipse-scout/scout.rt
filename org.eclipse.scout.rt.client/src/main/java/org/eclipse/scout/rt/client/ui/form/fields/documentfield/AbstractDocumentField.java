@@ -12,6 +12,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.DocumentFieldChains.DocumentFieldComReadyStatusChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.IDocumentFieldExtension;
@@ -77,7 +78,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(createUIFacade(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     super.initConfig();
     setRulersVisible(getConfiguredRulersVisible());
     setStatusBarVisible(getConfiguredStatusBarVisible());

@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
@@ -128,7 +129,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     super.initConfig();
     m_htmlEditor = getConfiguredHtmlEditor();
     m_scrollBarEnabled = getConfiguredScrollBarEnabled();

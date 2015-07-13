@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
@@ -101,8 +102,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected void initConfig() {
     m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).install(new P_UIFacadeLegacy(), this);
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), this);
+    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).install(new P_UIFacadeLegacy(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent().withModelElement(this));
   }
 
   @Override
@@ -302,7 +303,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         }
         if (proposalChooser != null &&
             (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
-                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+            StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */

@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -50,7 +51,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
 
   private IDisplayParent m_displayParent;
 
@@ -263,7 +264,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           m_header,
           m_body,
           m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
-              m_hiddenText);
+          m_hiddenText);
     }
   }
 

@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.CurrentControlTracker;
+import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.IStringFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDragRequestChain;
@@ -216,7 +217,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), this);
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     setMaxLength(getConfiguredMaxLength());
     setInputMasked(getConfiguredInputMasked());
     super.initConfig();
@@ -549,7 +550,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-  implements IStringFieldExtension<OWNER_FIELD> {
+      implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);
