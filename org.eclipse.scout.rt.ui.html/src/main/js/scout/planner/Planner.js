@@ -554,8 +554,8 @@ scout.Planner.prototype._build$Resource = function(resource) {
 scout.Planner.prototype._renderActivititesForResource = function(resource) {
   var $activity;
   resource.activities.forEach(function(activity) {
-    if (activity.beginTime.valueOf() > this.endScale ||
-        activity.endTime.valueOf() < this.beginScale) {
+    if (activity.beginTime.valueOf() >= this.endScale ||
+        activity.endTime.valueOf() <= this.beginScale) {
       // don't add activities which are not in the view range
       return;
     }

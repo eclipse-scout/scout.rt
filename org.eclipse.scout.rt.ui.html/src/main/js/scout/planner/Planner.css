@@ -159,6 +159,7 @@
   background-color: @palette-cyan-4;
   text-align: center;
   border: 1px solid @palette-gray-4;
+  overflow: hidden;
 
   &.selected {
     outline: 2px solid @item-selection-border-color;
