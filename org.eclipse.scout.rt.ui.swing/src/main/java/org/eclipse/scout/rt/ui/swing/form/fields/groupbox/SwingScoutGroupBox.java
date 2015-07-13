@@ -70,7 +70,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     swingBox.setOpaque(false);
     swingBox.setLayout(new BorderLayoutEx(0, 0));
 
-    if (getScoutObject().isScrollable()) {
+    if (getScoutObject().isScrollable().isTrue()) {
       JScrollPane scrollPane = new ViewportTrackableJScrollPaneEx(m_swingBodyPart);
       scrollPane.setBorder(null);
 

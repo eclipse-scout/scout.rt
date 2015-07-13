@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -49,7 +50,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   private IGroupBoxUIFacade m_uiFacade;
   private boolean m_mainBoxFlag = false;
   private int m_gridColumnCountHint;
-  private boolean m_scrollable;
+  private TriState m_scrollable;
   private List<IFormField> m_controlFields;
   private List<IGroupBox> m_groupBoxes;
   private List<IButton> m_customButtons;
@@ -211,16 +212,22 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   /**
    * Configures whether this group box should be scrollable.</br>
-   * If the property is set to true, a vertical scrollbar will appear if the content is too large to be displayed.
+   * If the property is set to true, a vertical scrollbar will appear if the content is too large to be displayed.<br>
+   * If the property is set to {@link TriState#UNDEFINED}, it will be true if the groupbox is the mainbox in a form.
+   * Otherwise it's false.
    * <p>
-   * Subclasses can override this method. Default is false.
+   * So as default, the mainbox is scrollable. If you want another groupbox to be scrollable, you have to set the
+   * groupbox to scrollable while setting the mainbox to scrollable = false.
+   * <p>
+   * Subclasses can override this method. Default is {@link TriState#UNDEFINED}.
    *
-   * @return {@code true} if the group box should be scrollable, {@code false} otherwise.
+   * @return {@link TriState#TRUE} if the group box should be scrollable, {@link TriState#FALSE} if not,
+   *         {@link TriState#UNDEFINED} if default logic should be applied
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(270)
-  protected boolean getConfiguredScrollable() {
-    return false;
+  protected TriState getConfiguredScrollable() {
+    return TriState.UNDEFINED;
   }
 
   /**
@@ -501,23 +508,32 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   @Override
-  public boolean isScrollable() {
+  public TriState isScrollable() {
     return m_scrollable;
   }
 
   @Override
-  public void setScrollable(boolean scrollable) {
-    if (m_scrollable != scrollable) {
-      m_scrollable = scrollable;
-      if (m_scrollable) {
-        // force weighty to be > 0
-        GridData gd = getGridDataHints();
-        if (gd.weightY <= 0) {
-          gd.weightY = 1;
-          setGridDataHints(gd);
-        }
+  public void setScrollable(TriState scrollable) {
+    if (scrollable == null) {
+      scrollable = TriState.UNDEFINED;
+    }
+    if (scrollable.equals(m_scrollable)) {
+      return;
+    }
+    m_scrollable = scrollable;
+    if (m_scrollable.isTrue()) {
+      // force weighty to be > 0
+      GridData gd = getGridDataHints();
+      if (gd.weightY <= 0) {
+        gd.weightY = 1;
+        setGridDataHints(gd);
       }
     }
+  }
+
+  @Override
+  public void setScrollable(boolean scrollable) {
+    setScrollable(TriState.parse(scrollable));
   }
 
   // box is only visible when it has at least one visible item

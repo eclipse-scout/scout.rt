@@ -366,14 +366,14 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     //Detail forms will be displayed as inner forms on page forms.
     //Make sure these inner forms are not scrollable because the page form already is
     if (groupBox.getForm() == getDesktop().getPageDetailForm()) {
-      if (groupBox.isScrollable()) {
+      if (groupBox.isScrollable().isTrue()) {
         groupBox.setScrollable(false);
         markGridDataDirty();
       }
       return;
     }
 
-    if (!groupBox.isScrollable()) {
+    if (!groupBox.isScrollable().isTrue()) {
       groupBox.setScrollable(true);
 
       //GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.

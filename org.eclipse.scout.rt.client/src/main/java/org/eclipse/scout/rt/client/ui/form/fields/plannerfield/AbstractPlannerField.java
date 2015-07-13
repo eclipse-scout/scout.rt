@@ -60,6 +60,11 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   @Override
+  protected int getConfiguredGridH() {
+    return 6;
+  }
+
+  @Override
   protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
     loadResources();
   }

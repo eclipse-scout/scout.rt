@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -164,8 +165,13 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   void setGridColumnCountHint(int c);
 
-  boolean isScrollable();
+  TriState isScrollable();
 
+  void setScrollable(TriState scrollable);
+
+  /**
+   * Calls {@link #setScrollable(TriState)}
+   */
   void setScrollable(boolean scrollable);
 
   /**

@@ -716,6 +716,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       rootBox.setFormInternal(this);
       rootBox.setMainBox(true);
       rootBox.updateKeyStrokes();
+      if (rootBox.isScrollable().isUndefined()) {
+        rootBox.setScrollable(true);
+      }
     }
 
     // move form fields
@@ -2431,8 +2434,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-              header(TEXTS.get("LoadFormXmlFailedText")).
-              show();
+          header(TEXTS.get("LoadFormXmlFailedText")).
+          show();
         }
       }
     }
