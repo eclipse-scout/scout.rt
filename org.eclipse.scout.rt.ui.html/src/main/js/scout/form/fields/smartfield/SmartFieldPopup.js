@@ -2,7 +2,7 @@ scout.SmartFieldPopup = function(session, options) {
   options = options || {};
   options.installFocusContext = false;
   scout.SmartFieldPopup.parent.call(this, session, options);
-  this.smartField = options.smartField;
+  this._smartField = options.smartField;
 };
 scout.inherits(scout.SmartFieldPopup, scout.Popup);
 
@@ -13,17 +13,17 @@ scout.SmartFieldPopup.prototype._render = function($parent) {
   }
 
   this.$container = $.makeDiv('smart-field-popup')
-    .on('mousedown', this._onMousedown.bind(this))
+    .on('mousedown', this._onContainerMouseDown.bind(this))
     .appendTo($parent);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   popupLayout = new scout.SmartFieldPopupLayout(this);
-  fieldBounds = this.smartField._fieldBounds();
+  fieldBounds = this._smartField._fieldBounds();
   initialPopupSize = new scout.Dimension(0, scout.HtmlEnvironment.formRowHeight);
   this.htmlComp.validateRoot = true;
   popupLayout.adjustAutoSize = function(prefSize) {
     // must re-evaluate _fieldBounds() for each call, since smart-field is not laid out at this point.
-    return this._popupSize(this.smartField._fieldBounds(), prefSize);
+    return this._popupSize(this._smartField._fieldBounds(), prefSize);
   }.bind(this);
   this.htmlComp.setLayout(popupLayout);
   popupLayout.autoSize = false;
@@ -41,7 +41,7 @@ scout.SmartFieldPopup.prototype.resize = function() {
   var htmlPopup = this.htmlComp,
     popupLayout = htmlPopup.layoutManager,
     prefSize = htmlPopup.getPreferredSize(),
-    size = this._popupSize(this.smartField._fieldBounds(), prefSize);
+    size = this._popupSize(this._smartField._fieldBounds(), prefSize);
   $.log.debug('SmartFieldPopup resize size=' + size + ' prefSize=' + prefSize);
   // Invalidate is required, when the popup is already opened and the proposal chooser is rendered later
   // when the popup size is the same as before, the proposal chooser would not layout its children (like
@@ -50,8 +50,29 @@ scout.SmartFieldPopup.prototype.resize = function() {
   htmlPopup.setSize(size);
 };
 
-scout.SmartFieldPopup.prototype._onMousedown = function(event) {
-  // Make sure field blur won't be triggered (using preventDefault).
-  // Also makes sure event does not get propagated (and handled by another mouse down handler, e.g. the one from CellEditorPopup.js)
+/**
+ * @override Popup.js
+ */
+scout.SmartFieldPopup.prototype._onMouseDown = function(event) {
+  // when user clicks on SmartField input-field, cannot prevent default
+  // because text-selection would not work anymore
+  if (this.$anchor.isOrHas(event.target)) {
+    return;
+  }
+
+  // or else: clicked somewhere else on the document -> close
+  scout.SmartFieldPopup.parent.prototype._onMouseDown.call(this, event);
+};
+
+/**
+ * This event handler is called before the mousedown handler on the _document_ is triggered
+ * This allows us to prevent the default, which is important for the CellEditorPopup which
+ * should stay open when the SmartField popup is closed. It also prevents the focus blur
+ * event on the SmartField input-field.
+ */
+scout.SmartFieldPopup.prototype._onContainerMouseDown = function(event) {
+  // when user clicks on proposal popup with table or tree (prevent default,
+  // so input-field does not lose the focus, popup will be closed by the
+  // proposal chooser impl.
   return false;
 };
