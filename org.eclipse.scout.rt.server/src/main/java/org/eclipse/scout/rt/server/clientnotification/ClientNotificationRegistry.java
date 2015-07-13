@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +27,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -34,9 +34,8 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
  * The {@link ClientNotificationRegistry} is the registry for all notifications. It keeps a
- * {@link ClientNotificationNodeQueue} for
- * each notification node (usually a client node).
- * The {@link ClientNotificationService} consumes the notifications per node. The consumption of the notifications waits
+ * {@link ClientNotificationNodeQueue} for each notification node (usually a client node). The
+ * {@link ClientNotificationService} consumes the notifications per node. The consumption of the notifications waits
  * for a given timeout for notifications. If no notifications are scheduled within this timeout the lock will be
  * released and returns without any notifications. In case a notification gets scheduled during this timeout the
  * request will be released immediately.
@@ -122,7 +121,7 @@ public class ClientNotificationRegistry {
    */
   public void putForUser(String userId, Serializable notification) {
     ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId)), notification);
-    put(message);
+    publish(Collections.singleton(message));
   }
 
   /**
@@ -134,7 +133,7 @@ public class ClientNotificationRegistry {
    */
   public void putForSession(String sessionId, Serializable notification) {
     ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId)), notification);
-    put(message);
+    publish(Collections.singleton(message));
   }
 
   /**
@@ -144,7 +143,7 @@ public class ClientNotificationRegistry {
    */
   public void putForAllSessions(Serializable notification) {
     ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(), notification);
-    put(message);
+    publish(Collections.singleton(message));
   }
 
   /**
@@ -154,20 +153,16 @@ public class ClientNotificationRegistry {
    */
   public void putForAllNodes(Serializable notification) {
     ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(), notification);
-    put(message);
-  }
-
-  public void put(ClientNotificationMessage message) {
-    put(CollectionUtility.arrayList(message));
+    publish(Collections.singleton(message));
   }
 
   public void putWithoutClusterNotification(ClientNotificationMessage message) {
     putWithoutClusterNotification(CollectionUtility.arrayList(message));
   }
 
-  public void put(Collection<? extends ClientNotificationMessage> messages) {
+  public void publish(Collection<? extends ClientNotificationMessage> messages) {
     putWithoutClusterNotification(messages);
-    publish(messages);
+    publishInternal(messages);
   }
 
   public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
@@ -247,7 +242,8 @@ public class ClientNotificationRegistry {
   }
 
   public void putTransactional(ClientNotificationMessage message) {
-    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
+    // TODO jgu: please verify and enable this assertion
+//    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
     ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
     try {
       ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
@@ -259,20 +255,19 @@ public class ClientNotificationRegistry {
     }
     catch (ProcessingException e) {
       LOG.warn("Could not register transaction member. The notification will be processed immediately", e);
-      put(message);
+      publish(Collections.singleton(message));
     }
   }
 
-  private void publish(Collection<? extends ClientNotificationMessage> messages) {
+  private void publishInternal(Collection<? extends ClientNotificationMessage> messages) {
     try {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
       service.publish(new ClientNotificationClusterNotification(messages));
     }
     catch (ProcessingException e) {
-      LOG.error("Error distributing cluster notification ", e);
+      LOG.error("Failed to publish client notification", e);
     }
   }
-
 
   private String currentNodeIdElseThrow() {
     return Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No 'notification node id' found on current calling context");

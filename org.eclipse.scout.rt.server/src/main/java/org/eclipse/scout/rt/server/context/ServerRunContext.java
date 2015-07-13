@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationContainer;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -64,7 +64,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>{@link ISession#CURRENT}</li>
  * <li>{@link UserAgent#CURRENT}</li>
  * <li>{@link ClientNotificationNodeId#CURRENT}</li>
- * <li>{@link ClientNotificationContainer#CURRENT}</li>
+ * <li>{@link TransactionalClientNotificationCollector#CURRENT}</li>
  * <li>{@link ScoutTexts#CURRENT}</li>
  * <li>{@link ITransaction#CURRENT}</li>
  * <li>{@link OfflineState#CURRENT}</li>
@@ -78,7 +78,7 @@ public class ServerRunContext extends RunContext {
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected String m_notificationNodeId;
-  protected ClientNotificationContainer m_txNotificationContainer;
+  protected TransactionalClientNotificationCollector m_transactionalClientNotificationCollector;
   protected TransactionScope m_transactionScope;
   protected ITransaction m_transaction;
   protected boolean m_offline;
@@ -87,7 +87,7 @@ public class ServerRunContext extends RunContext {
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
     final Callable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, getTransaction(), m_transactionScope);
     final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ClientNotificationContainer.CURRENT, m_txNotificationContainer);
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, TransactionalClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector);
     final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ClientNotificationNodeId.CURRENT, m_notificationNodeId);
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, m_userAgent);
     final Callable<RESULT> c4 = new CurrentSessionLogCallable<>(c5);
@@ -180,8 +180,8 @@ public class ServerRunContext extends RunContext {
    * The collector for transactional client notifications issued by the current or any nested transaction, and are to be
    * included in the request's response upon successful commit (piggyback).
    */
-  public ClientNotificationContainer getTxNotificationContainer() {
-    return m_txNotificationContainer;
+  public TransactionalClientNotificationCollector getTransactionalClientNotificationCollector() {
+    return m_transactionalClientNotificationCollector;
   }
 
   /**
@@ -190,8 +190,8 @@ public class ServerRunContext extends RunContext {
    * <p>
    * A transactional notification is only sent to clients once the transaction is committed successfully.
    */
-  public ServerRunContext withTxNotificationContainer(final ClientNotificationContainer txNotificationContainer) {
-    m_txNotificationContainer = txNotificationContainer;
+  public ServerRunContext withTransactionalClientNotificationCollector(final TransactionalClientNotificationCollector collector) {
+    m_transactionalClientNotificationCollector = collector;
     return this;
   }
 
@@ -249,7 +249,7 @@ public class ServerRunContext extends RunContext {
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
     builder.attr("notificationNodeId", getNotificationNodeId());
-    builder.ref("txNotificationContainer", getTxNotificationContainer());
+    builder.ref("transactionalClientNotificationCollector", getTransactionalClientNotificationCollector());
     builder.ref("transaction", getTransaction());
     builder.attr("transactionScope", getTransactionScope());
     builder.attr("offline", isOffline());
@@ -265,7 +265,7 @@ public class ServerRunContext extends RunContext {
     super.copyValues(originRunContext);
     m_session = originRunContext.m_session;
     m_userAgent = originRunContext.m_userAgent;
-    m_txNotificationContainer = originRunContext.m_txNotificationContainer;
+    m_transactionalClientNotificationCollector = originRunContext.m_transactionalClientNotificationCollector;
     m_notificationNodeId = originRunContext.m_notificationNodeId;
     m_transactionScope = originRunContext.m_transactionScope;
     m_transaction = originRunContext.m_transaction;
@@ -276,7 +276,7 @@ public class ServerRunContext extends RunContext {
   protected void fillCurrentValues() {
     super.fillCurrentValues();
     m_userAgent = UserAgent.CURRENT.get();
-    m_txNotificationContainer = ClientNotificationContainer.CURRENT.get();
+    m_transactionalClientNotificationCollector = TransactionalClientNotificationCollector.CURRENT.get();
     m_notificationNodeId = ClientNotificationNodeId.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
@@ -288,7 +288,7 @@ public class ServerRunContext extends RunContext {
   protected void fillEmptyValues() {
     super.fillEmptyValues();
     m_userAgent = null;
-    m_txNotificationContainer = new ClientNotificationContainer();
+    m_transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
     m_notificationNodeId = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;

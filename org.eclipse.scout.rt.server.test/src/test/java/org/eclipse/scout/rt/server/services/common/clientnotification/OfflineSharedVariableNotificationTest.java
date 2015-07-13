@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationContainer;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationService;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -253,7 +253,7 @@ public class OfflineSharedVariableNotificationTest {
 
   private void runWithNotificationContainer(IRunnable runnable) throws ProcessingException {
     ServerRunContexts.copyCurrent()
-        .withTxNotificationContainer(new ClientNotificationContainer())
+        .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
         .withNotificationNodeId("test").run(runnable);
   }
 

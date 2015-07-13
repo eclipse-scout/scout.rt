@@ -13,33 +13,23 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
-import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
- * The container of all transactional notifications during a server request. Is kept on the {@link ServerRunContext}.
+ * Collector for transactional client notifications issued during processing of a service request, and which are to be
+ * included in the request's response upon successful commit (piggyback).
  *
  * @see ClientNotificationTransactionMember
  */
-public class ClientNotificationContainer {
+public class TransactionalClientNotificationCollector {
 
   /**
-   * The {@link Locale} which is currently associated with the current thread.
+   * The {@link TransactionalClientNotificationCollector} which is currently associated with the current thread.
    */
-  public static final ThreadLocal<ClientNotificationContainer> CURRENT = new ThreadLocal<>();
+  public static final ThreadLocal<TransactionalClientNotificationCollector> CURRENT = new ThreadLocal<>();
 
   private final List<ClientNotificationMessage> m_notifications = new ArrayList<>();
-
-  public ClientNotificationContainer() {
-  }
-
-  /**
-   */
-  public static ClientNotificationContainer get() {
-    return CURRENT.get();
-  }
 
   public boolean add(ClientNotificationMessage message) {
     return m_notifications.add(message);
@@ -49,8 +39,7 @@ public class ClientNotificationContainer {
     m_notifications.addAll(messages);
   }
 
-  public List<ClientNotificationMessage> getNotifications() {
-    return new ArrayList<ClientNotificationMessage>(m_notifications);
+  public List<ClientNotificationMessage> values() {
+    return new ArrayList<>(m_notifications);
   }
-
 }

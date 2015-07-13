@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationContainer;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -115,7 +115,8 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
-          ClientNotificationContainer txNotificationContainer = new ClientNotificationContainer();
+          // Collector to collect transactional client notifications issued during processing of the current request.
+          TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
           // Enable global cancellation of the service request.
           RunMonitor runMonitor = BEANS.get(RunMonitor.class);
 
@@ -123,7 +124,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           serverRunContext.withLocale(serviceRequest.getLocale());
           serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
           serverRunContext.withRunMonitor(runMonitor);
-          serverRunContext.withTxNotificationContainer(txNotificationContainer);
+          serverRunContext.withTransactionalClientNotificationCollector(transactionalClientNotificationCollector);
           serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
           serverRunContext.withProperty(SESSION_ID, serviceRequest.getSessionId());
           serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
@@ -134,9 +135,8 @@ public class ServiceTunnelServlet extends HttpServlet {
           BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
           try {
             IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-            // piggyback notifications
-            // TODO[aho] write cliet notificaitons to response.
-            serviceResponse.setNotifications(txNotificationContainer.getNotifications());
+            // Include transactional client notification in response (piggyback).
+            serviceResponse.setNotifications(transactionalClientNotificationCollector.values());
             serializeServiceResponse(serviceResponse);
           }
           finally {

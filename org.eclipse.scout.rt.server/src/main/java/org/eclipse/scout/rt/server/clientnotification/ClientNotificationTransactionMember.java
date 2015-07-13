@@ -14,16 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
- * This transaction member is used to collect all notifications during a transaction. On successful commit the
- * notifications will be added to the {@link ServerRunContext#getTxNotificationContainer()}. Further all notifications in
- * the txNotificationContainer will be added to the {@link ServiceTunnelResponse} and piggy backed to the client.
- * The reason to do so is to provide an immediate client side processing of transactional notifications.
+ * This transaction member is used to collect all transactional notifications issued during a transaction. On successful
+ * commit, the notifications will be added to the {@link ServerRunContext#getTransactionalClientNotificationCollector()
+ * )} to be included in the request's response (piggyback). That allows immediate processing of the transactional
+ * notifications on client side.
  */
 public class ClientNotificationTransactionMember extends AbstractTransactionMember {
 
@@ -37,7 +35,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
 
   @Override
   public boolean needsCommit() {
-    return m_notifications.size() > 0;
+    return !m_notifications.isEmpty();
   }
 
   public void addNotification(ClientNotificationMessage message) {
@@ -47,12 +45,15 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
   @Override
   public void commitPhase2() {
     // coalease
-    List<ClientNotificationMessage> coalescedNotifications = BEANS.get(ClientNotificationCoalescer.class).coalesce(new ArrayList<ClientNotificationMessage>(m_notifications));
-    m_notifications.clear();
-    // piggy back
-    ClientNotificationContainer.get().addAll(coalescedNotifications);
-    // notify others
-    BEANS.get(ClientNotificationRegistry.class).put(coalescedNotifications);
-  }
+    List<ClientNotificationMessage> coalescedNotifications = BEANS.get(ClientNotificationCoalescer.class).coalesce(new ArrayList<>(m_notifications));
 
+    m_notifications.clear();
+
+    // Register all transactional client notifications of the current transaction in the collector to be included in the service response (piggyback).
+    TransactionalClientNotificationCollector.CURRENT.get().addAll(coalescedNotifications);
+
+    // Notify other client nodes.
+    BEANS.get(ClientNotificationRegistry.class).publish(coalescedNotifications);
+    // FIXME jgu: other nodes are notified, but current node not if parent transaction fails
+  }
 }

@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationContainer;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationNodeId;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.shared.ISession;
@@ -171,9 +171,9 @@ public class ServerRunContextChainTest {
     InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
     assertSame(ClientNotificationNodeId.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. InitThreadLocalCallable for NotificationNodeId.CURRENT
+    // 11. InitThreadLocalCallable for TransactionalClientNotificationCollector.CURRENT
     InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
-    assertSame(ClientNotificationContainer.CURRENT, ((InitThreadLocalCallable) c11).getThreadLocal());
+    assertSame(TransactionalClientNotificationCollector.CURRENT, ((InitThreadLocalCallable) c11).getThreadLocal());
 
     // 12. InitThreadLocalCallable for ScoutTexts.CURRENT
     InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);

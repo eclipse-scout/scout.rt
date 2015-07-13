@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
-import org.eclipse.scout.rt.server.clientnotification.ClientNotificationContainer;
+import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.testing.server.runner.RunWithClientNotifications;
 import org.junit.runners.model.Statement;
@@ -23,7 +23,7 @@ public class ClientNotificationsStatement extends Statement {
 
   private final Statement m_next;
   private final String m_nodeId;
-  private final ClientNotificationContainer m_container;
+  private final TransactionalClientNotificationCollector m_collector;
 
   /**
    * Creates a statement to execute the following statements with client notification thread locals set to simulate a
@@ -37,12 +37,12 @@ public class ClientNotificationsStatement extends Statement {
   public ClientNotificationsStatement(final Statement next, final RunWithClientNotifications annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
     m_nodeId = (annotation != null ? annotation.nodeId() : null);
-    m_container = new ClientNotificationContainer();
+    m_collector = new TransactionalClientNotificationCollector();
   }
 
   @Override
   public void evaluate() throws Throwable {
-    ServerRunContexts.copyCurrent().withTxNotificationContainer(m_container).withNotificationNodeId(m_nodeId).run(new IRunnable() {
+    ServerRunContexts.copyCurrent().withTransactionalClientNotificationCollector(m_collector).withNotificationNodeId(m_nodeId).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
