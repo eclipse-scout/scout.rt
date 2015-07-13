@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotficationAddress;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class ClientNotificationNodeQueueTest {
         return m_queue.getNotifications(10, 100, TimeUnit.MILLISECONDS);
       }
     });
-    ClientNotficationAddress allNodes = ClientNotficationAddress.createAllNodesAddress();
+    ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     m_queue.put(new ClientNotificationMessage(allNodes, "test"));
     m_queue.put(new ClientNotificationMessage(allNodes, "test2"));
     List<ClientNotificationMessage> notifications = res.awaitDoneAndGet();
@@ -79,7 +79,7 @@ public class ClientNotificationNodeQueueTest {
   }
 
   private void putTestNotifications(int count) {
-    ClientNotficationAddress allNodes = ClientNotficationAddress.createAllNodesAddress();
+    ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     for (int i = 0; i < count; i++) {
       m_queue.put(new ClientNotificationMessage(allNodes, "test" + i));
     }

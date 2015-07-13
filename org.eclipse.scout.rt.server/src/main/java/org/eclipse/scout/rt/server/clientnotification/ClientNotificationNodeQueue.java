@@ -33,7 +33,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.services.common.security.LogoutService;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotficationAddress;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
@@ -169,7 +169,7 @@ public class ClientNotificationNodeQueue {
     return notifications;
   }
 
-  public boolean isRelevant(ClientNotficationAddress address) {
+  public boolean isRelevant(ClientNotificationAddress address) {
     if (CompareUtility.equals(getNodeId(), address.getExcludeNodeId())) {
       return false;
     }

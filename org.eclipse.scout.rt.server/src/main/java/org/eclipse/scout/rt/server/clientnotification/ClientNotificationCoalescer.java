@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.notification.NotificationCoalescer;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotficationAddress;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
@@ -35,7 +35,7 @@ public class ClientNotificationCoalescer {
     LinkedHashSet<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<ClientNotificationMessage>(inNotifications);
     List<ClientNotificationMessage> result = new ArrayList<>();
     // sort by address
-    Map<ClientNotficationAddress, List<Serializable>> notificationsPerAddress = new HashMap<>();
+    Map<ClientNotificationAddress, List<Serializable>> notificationsPerAddress = new HashMap<>();
     for (ClientNotificationMessage message : notificationsNoDuplicates) {
       List<Serializable> notifications = notificationsPerAddress.get(message.getAddress());
       if (notifications == null) {
@@ -44,13 +44,13 @@ public class ClientNotificationCoalescer {
       }
       notifications.add(message.getNotification());
     }
-    for (Entry<ClientNotficationAddress, List<Serializable>> e : notificationsPerAddress.entrySet()) {
+    for (Entry<ClientNotificationAddress, List<Serializable>> e : notificationsPerAddress.entrySet()) {
       result.addAll(coalesce(e.getKey(), e.getValue()));
     }
     return result;
   }
 
-  protected List<ClientNotificationMessage> coalesce(ClientNotficationAddress address, List<Serializable> notificationsIn) {
+  protected List<ClientNotificationMessage> coalesce(ClientNotificationAddress address, List<Serializable> notificationsIn) {
     if (notificationsIn.isEmpty()) {
       return new ArrayList<>();
     }

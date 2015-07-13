@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 /**
  *
  */
-public class ClientNotficationAddress implements Serializable {
+public class ClientNotificationAddress implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final Set<String> m_sessionIds;
@@ -38,7 +38,7 @@ public class ClientNotficationAddress implements Serializable {
    * <li>!CollectionUtility.isEmpty(userIds)</li>
    * </ul>
    */
-  protected ClientNotficationAddress(Set<String> sessionIds, Set<String> userIds, boolean notifyAllSessions, boolean notifyAllNodes, String excludeNodeId) {
+  protected ClientNotificationAddress(Set<String> sessionIds, Set<String> userIds, boolean notifyAllSessions, boolean notifyAllNodes, String excludeNodeId) {
     m_sessionIds = Collections.unmodifiableSet(CollectionUtility.hashSet(sessionIds));
     m_userIds = Collections.unmodifiableSet(CollectionUtility.hashSet(userIds));
     m_notifyAllSessions = notifyAllSessions;
@@ -46,36 +46,36 @@ public class ClientNotficationAddress implements Serializable {
     m_excludeNodeId = excludeNodeId;
   }
 
-  public static ClientNotficationAddress createSessionAddress(Set<String> sessionIds) {
+  public static ClientNotificationAddress createSessionAddress(Set<String> sessionIds) {
     return createSessionAddress(sessionIds, null);
   }
 
-  public static ClientNotficationAddress createSessionAddress(Set<String> sessionIds, String excludeNodeId) {
-    return new ClientNotficationAddress(sessionIds, null, false, false, excludeNodeId);
+  public static ClientNotificationAddress createSessionAddress(Set<String> sessionIds, String excludeNodeId) {
+    return new ClientNotificationAddress(sessionIds, null, false, false, excludeNodeId);
   }
 
-  public static ClientNotficationAddress createUserAddress(Set<String> userIds) {
+  public static ClientNotificationAddress createUserAddress(Set<String> userIds) {
     return createUserAddress(userIds, null);
   }
 
-  public static ClientNotficationAddress createUserAddress(Set<String> userIds, String excludeNodeId) {
-    return new ClientNotficationAddress(null, userIds, false, false, excludeNodeId);
+  public static ClientNotificationAddress createUserAddress(Set<String> userIds, String excludeNodeId) {
+    return new ClientNotificationAddress(null, userIds, false, false, excludeNodeId);
   }
 
-  public static ClientNotficationAddress createAllSessionsAddress() {
+  public static ClientNotificationAddress createAllSessionsAddress() {
     return createAllSessionsAddress(null);
   }
 
-  public static ClientNotficationAddress createAllSessionsAddress(String excludeNodeId) {
-    return new ClientNotficationAddress(null, null, true, false, excludeNodeId);
+  public static ClientNotificationAddress createAllSessionsAddress(String excludeNodeId) {
+    return new ClientNotificationAddress(null, null, true, false, excludeNodeId);
   }
 
-  public static ClientNotficationAddress createAllNodesAddress() {
+  public static ClientNotificationAddress createAllNodesAddress() {
     return createAllNodesAddress(null);
   }
 
-  public static ClientNotficationAddress createAllNodesAddress(String excludeNodeId) {
-    return new ClientNotficationAddress(null, null, false, true, excludeNodeId);
+  public static ClientNotificationAddress createAllNodesAddress(String excludeNodeId) {
+    return new ClientNotificationAddress(null, null, false, true, excludeNodeId);
   }
 
   public Set<String> getSessionIds() {
@@ -136,10 +136,10 @@ public class ClientNotficationAddress implements Serializable {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof ClientNotficationAddress)) {
+    if (!(obj instanceof ClientNotificationAddress)) {
       return false;
     }
-    ClientNotficationAddress other = (ClientNotficationAddress) obj;
+    ClientNotificationAddress other = (ClientNotificationAddress) obj;
     if (m_notifyAllSessions) {
       return other.m_notifyAllSessions;
     }

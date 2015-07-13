@@ -18,15 +18,15 @@ import java.io.Serializable;
 public class ClientNotificationMessage implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final ClientNotficationAddress m_address;
+  private final ClientNotificationAddress m_address;
   private final Serializable m_notification;
 
-  public ClientNotificationMessage(ClientNotficationAddress address, Serializable notification) {
+  public ClientNotificationMessage(ClientNotificationAddress address, Serializable notification) {
     m_address = address;
     m_notification = notification;
   }
 
-  public ClientNotficationAddress getAddress() {
+  public ClientNotificationAddress getAddress() {
     return m_address;
   }
 

@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotficationAddress;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
@@ -120,7 +120,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForUser(String userId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createUserAddress(CollectionUtility.hashSet(userId)), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId)), notification);
     put(message);
   }
 
@@ -132,7 +132,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId)), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId)), notification);
     put(message);
   }
 
@@ -142,7 +142,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForAllSessions(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createAllSessionsAddress(), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(), notification);
     put(message);
   }
 
@@ -152,7 +152,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForAllNodes(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createAllNodesAddress(), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(), notification);
     put(message);
   }
 
@@ -188,7 +188,7 @@ public class ClientNotificationRegistry {
    */
   public void putTransactionalForUser(String userId, Serializable notification) {
     // exclude the node the request comes from
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createUserAddress(CollectionUtility.hashSet(userId),
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId),
         Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
     putTransactional(message);
   }
@@ -204,7 +204,7 @@ public class ClientNotificationRegistry {
    */
   public void putTransactionalForUsers(Set<String> userIds, Serializable notification) {
     // exclude the node the request comes from
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createUserAddress(userIds,
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(userIds,
         Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
     putTransactional(message);
   }
@@ -219,7 +219,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId),
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId),
         Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
     putTransactional(message);
   }
@@ -232,7 +232,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForAllSessions(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createAllSessionsAddress(
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(
         Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
     putTransactional(message);
   }
@@ -245,7 +245,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForAllNodes(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotficationAddress.createAllNodesAddress(
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(
         Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
     putTransactional(message);
   }
