@@ -124,15 +124,6 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     });
   }
 
-  /**
-   * @param rows
-   */
-  protected void handleRowsUpdated(List<ITableRow> rows) {
-    if (CollectionUtility.containsAny(rows, m_currentSelection)) {
-      calculateEnableState(m_currentSelection);
-    }
-  }
-
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
@@ -147,7 +138,9 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
         handleOwnerValueChanged();
       }
       else if (e.getType() == TableEvent.TYPE_ROWS_UPDATED) {
-        handleRowsUpdated(e.getRows());
+        if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
+          handleOwnerValueChanged();
+        }
       }
     }
 

@@ -77,11 +77,14 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   @Override
+  public Object getOwnerValue() {
+    return m_ownerValue;
+  }
+
+  @Override
   public final void handleOwnerValueChanged(Object newValue) throws ProcessingException {
-    if (!CompareUtility.equals(m_ownerValue, newValue)) {
-      m_ownerValue = newValue;
-      interceptOwnerValueChanged(newValue);
-    }
+    m_ownerValue = newValue;
+    interceptOwnerValueChanged(newValue);
   }
 
   /**
@@ -190,7 +193,9 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
           if (action instanceof IMenu) {
             IMenu menu = (IMenu) action;
             try {
-              menu.handleOwnerValueChanged(ownerValue);
+              if (!CompareUtility.equals(menu.getOwnerValue(), ownerValue)) {
+                menu.handleOwnerValueChanged(ownerValue);
+              }
             }
             catch (ProcessingException e) {
               LOG.error("error during handle owner value changed.", e);

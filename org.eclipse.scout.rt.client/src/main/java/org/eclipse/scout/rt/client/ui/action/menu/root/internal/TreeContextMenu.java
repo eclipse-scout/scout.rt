@@ -126,15 +126,6 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     });
   }
 
-  /**
-   * @param nodes
-   */
-  protected void handleNodesUpdated(Collection<ITreeNode> nodes) {
-    if (CollectionUtility.containsAny(nodes, m_currentSelection)) {
-      calculateEnableState(m_currentSelection);
-    }
-  }
-
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
@@ -150,7 +141,9 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
         handleOwnerValueChanged();
       }
       else if (e.getType() == TreeEvent.TYPE_NODES_UPDATED) {
-        handleNodesUpdated(e.getNodes());
+        if (CollectionUtility.containsAny(e.getNodes(), m_currentSelection)) {
+          handleOwnerValueChanged();
+        }
       }
     }
   }

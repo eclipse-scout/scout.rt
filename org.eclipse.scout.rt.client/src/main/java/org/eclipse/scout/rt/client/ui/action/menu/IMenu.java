@@ -32,6 +32,8 @@ public interface IMenu extends IActionNode<IMenu> {
    */
   Set<IMenuType> getMenuTypes();
 
+  Object getOwnerValue();
+
   /**
    * @param newValue
    * @throws ProcessingException
