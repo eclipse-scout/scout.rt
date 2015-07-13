@@ -645,7 +645,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void initConfig() throws ProcessingException {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
 
     m_timerFutureMap = new HashMap<>();
     setShowOnStart(getConfiguredShowOnStart());

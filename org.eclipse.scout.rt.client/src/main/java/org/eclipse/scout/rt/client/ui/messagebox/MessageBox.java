@@ -51,7 +51,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
 
   private IDisplayParent m_displayParent;
 

@@ -102,8 +102,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected void initConfig() {
     m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).install(new P_UIFacadeLegacy(), ContextInfo.copyCurrent().withModelElement(this));
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacadeLegacy(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent().withModelElement(this));
   }
 
   @Override

@@ -219,7 +219,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());
     setSelectedDate(new Date());

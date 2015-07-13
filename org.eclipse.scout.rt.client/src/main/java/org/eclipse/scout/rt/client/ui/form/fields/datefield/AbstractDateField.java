@@ -210,7 +210,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     super.initConfig();
     setFormat(getConfiguredFormat());
     setHasDate(getConfiguredHasDate());

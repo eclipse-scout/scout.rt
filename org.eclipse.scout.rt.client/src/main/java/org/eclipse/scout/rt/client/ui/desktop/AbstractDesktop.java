@@ -172,7 +172,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
     m_fileChooserStore = BEANS.get(FileChooserStore.class);
     m_formActivationTracker = BEANS.get(FormActivationTracker.class);
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this).withDesktop(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this).withDesktop(this));
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this);
     if (callInitializer) {

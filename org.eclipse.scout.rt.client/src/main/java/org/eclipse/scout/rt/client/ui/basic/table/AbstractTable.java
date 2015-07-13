@@ -853,7 +853,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void initConfig() {
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setTitle(getConfiguredTitle());

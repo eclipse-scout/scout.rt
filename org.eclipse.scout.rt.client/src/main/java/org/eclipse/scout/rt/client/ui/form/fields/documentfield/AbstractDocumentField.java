@@ -78,7 +78,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     super.initConfig();
     setRulersVisible(getConfiguredRulersVisible());
     setStatusBarVisible(getConfiguredStatusBarVisible());

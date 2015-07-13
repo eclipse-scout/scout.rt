@@ -87,7 +87,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     m_grid = new TabBoxGrid(this);
     setMarkStrategy(getConfiguredMarkStrategy());
     super.initConfig();

@@ -49,7 +49,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     setIconId(getConfiguredIconId());
 
   }

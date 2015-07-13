@@ -72,6 +72,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testSaveNeeded() throws ProcessingException {
+    System.out.println("test");
     m_testForm.startNew();
     m_testForm.getMessageField().setValue("test");
     assertTrue(m_testForm.isSaveNeeded());

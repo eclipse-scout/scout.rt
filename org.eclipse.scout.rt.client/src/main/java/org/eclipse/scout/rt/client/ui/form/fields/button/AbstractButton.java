@@ -57,7 +57,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   public AbstractButton(boolean callInitializer) {
     super(false);
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
     m_uiFacadeSetSelectedLock = new OptimisticLock();
     if (callInitializer) {
       callInitializer();

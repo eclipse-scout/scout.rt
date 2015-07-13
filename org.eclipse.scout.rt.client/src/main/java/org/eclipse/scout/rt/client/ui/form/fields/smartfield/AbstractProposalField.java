@@ -47,8 +47,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).install(new P_UIFacadeLegacy(), ContextInfo.copyCurrent().withModelElement(this));
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).install(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacadeLegacy(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent().withModelElement(this));
   }
 
   @Override

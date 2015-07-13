@@ -28,8 +28,6 @@ import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 /**
  * This class tracks the current model element, {@link IForm}, {@link IOutline} and {@link IDesktop} of the current
  * thread's calling context.
- * <p>
- * This class is intended to be used by the model thread only.
  *
  * @since 5.1
  */
@@ -61,19 +59,18 @@ public class CurrentControlTracker {
   public static final ThreadLocal<IDesktop> CURRENT_DESKTOP = new ThreadLocal<>();
 
   /**
-   * Creates a Java Proxy for the given 'UI facade' to apply the given {@link ContextInfo} to the
-   * {@link ClientRunContext} of the thread invoking methods of the facade.
+   * Creates a Java Proxy for the given 'object' with the given context information applied when invoking the object's
+   * methods.
    *
-   * @param facade
-   *          The 'UI facade' to be proxied.
+   * @param object
+   *          The object to be proxied.
    * @param contextInfo
-   *          The context information to be applied to the {@link ClientRunContext} of the thread invoking methods of
-   *          the facade.
-   * @return proxied facade.
+   *          The context information to be applied when invoking the object's methods.
+   * @return proxied object.
    */
   @SuppressWarnings("unchecked")
-  public <FACADE> FACADE install(final FACADE facade, final ContextInfo contextInfo) {
-    return (FACADE) Proxy.newProxyInstance(facade.getClass().getClassLoader(), ReflectionUtility.getInterfaces(facade.getClass()), new InvocationHandler() {
+  public <OBJECT> OBJECT newProxy(final OBJECT object, final ContextInfo contextInfo) {
+    return (OBJECT) Proxy.newProxyInstance(object.getClass().getClassLoader(), ReflectionUtility.getInterfaces(object.getClass()), new InvocationHandler() {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -81,7 +78,7 @@ public class CurrentControlTracker {
 
           @Override
           public Object call() throws Exception {
-            return method.invoke(facade, args);
+            return method.invoke(object, args);
           }
         }, BEANS.get(ThrowableTranslator.class));
       }
