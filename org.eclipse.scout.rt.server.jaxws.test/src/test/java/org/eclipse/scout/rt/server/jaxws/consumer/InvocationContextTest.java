@@ -102,7 +102,7 @@ public class InvocationContextTest {
         currentTransaction.setValue(ITransaction.CURRENT.get());
 
         InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-        invocationContext.contextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+        invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
 
         invocationContext.whenCommit(m_commitListener);
         invocationContext.whenRollback(m_rollbackListener);
@@ -118,7 +118,7 @@ public class InvocationContextTest {
         });
 
         // run the test
-        invocationContext.port().webMethod();
+        invocationContext.getPort().webMethod();
       }
     });
 
@@ -150,7 +150,7 @@ public class InvocationContextTest {
           currentTransaction.setValue(ITransaction.CURRENT.get());
 
           InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-          invocationContext.contextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+          invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
 
           invocationContext.whenCommit(m_commitListener);
           invocationContext.whenRollback(m_rollbackListener);
@@ -167,7 +167,7 @@ public class InvocationContextTest {
 
           // run the test
           try {
-            invocationContext.port().webMethod();
+            invocationContext.getPort().webMethod();
           }
           catch (Exception e) {
             invocationException.setValue(e);
@@ -195,7 +195,7 @@ public class InvocationContextTest {
     final BooleanHolder intercepted = new BooleanHolder(false);
 
     InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-    invocationContext.contextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+    invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
     invocationContext.whenInvoke(new InvocationHandler() {
 
       @Override
@@ -205,7 +205,7 @@ public class InvocationContextTest {
       }
     });
 
-    invocationContext.port().notWebMethod(); // invoke method which is not annotated with @WebMethod
+    invocationContext.getPort().notWebMethod(); // invoke method which is not annotated with @WebMethod
     assertFalse(intercepted.getValue()); // only methods annotated with @WebMethod are intercepted
     verify(m_port).notWebMethod();
   }
@@ -215,7 +215,7 @@ public class InvocationContextTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     final InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-    invocationContext.contextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
+    invocationContext.withContextProperty(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://localhost");
 
     // Make Stub.webMethod to block until cancelled.
     doAnswer(new Answer<Void>() {
@@ -253,7 +253,7 @@ public class InvocationContextTest {
       @Override
       public void run() throws Exception {
         try {
-          invocationContext.port().webMethod(); // this method blocks until cancelled.
+          invocationContext.getPort().webMethod(); // this method blocks until cancelled.
           fail();
         }
         catch (CancellationException e) {

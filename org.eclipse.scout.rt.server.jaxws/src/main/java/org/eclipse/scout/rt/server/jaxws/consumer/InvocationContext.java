@@ -84,7 +84,7 @@ public class InvocationContext<PORT> {
   /**
    * @return associated port, is always the same instance and not <code>null</code>.
    */
-  public PORT port() {
+  public PORT getPort() {
     return m_portProxy;
   }
 
@@ -127,7 +127,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> endpointUrl(final String endpointUrl) {
+  public InvocationContext<PORT> withEndpointUrl(final String endpointUrl) {
     m_requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointUrl);
     return this;
   }
@@ -137,7 +137,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> username(final String username) {
+  public InvocationContext<PORT> withUsername(final String username) {
     m_requestContext.put(InvocationContext.PROP_USERNAME, username);
     return this;
   }
@@ -147,7 +147,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> password(final String password) {
+  public InvocationContext<PORT> withPassword(final String password) {
     m_requestContext.put(InvocationContext.PROP_PASSWORD, password);
     return this;
   }
@@ -159,7 +159,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> connectTimeout(final Integer connectTimeout) {
+  public InvocationContext<PORT> withConnectTimeout(final Integer connectTimeout) {
     m_implementorSpecifics.setSocketConnectTimeout(m_requestContext, (int) TimeUnit.SECONDS.toMillis(NumberUtility.nvl(connectTimeout, 0)));
     return this;
   }
@@ -171,7 +171,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> readTimeout(final Integer readTimeout) {
+  public InvocationContext<PORT> withReadTimeout(final Integer readTimeout) {
     m_implementorSpecifics.setSocketReadTimeout(m_requestContext, (int) TimeUnit.SECONDS.toMillis(NumberUtility.nvl(readTimeout, 0)));
     return this;
   }
@@ -181,7 +181,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> contextProperty(final String key, final Object value) {
+  public InvocationContext<PORT> withContextProperty(final String key, final Object value) {
     m_requestContext.put(key, value);
     return this;
   }
@@ -191,7 +191,7 @@ public class InvocationContext<PORT> {
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> httpRequestHeader(final String key, final String value) {
+  public InvocationContext<PORT> withHttpRequestHeader(final String key, final String value) {
     m_implementorSpecifics.setHttpRequestHeader(m_requestContext, key, value);
     return this;
   }
@@ -199,7 +199,7 @@ public class InvocationContext<PORT> {
   /**
    * Returns a HTTP response header of the previous webservice request, or <code>null</code> if not available.
    */
-  public List<String> httpResponseHeader(final String key) {
+  public List<String> getHttpResponseHeader(final String key) {
     final Map<String, Object> responseContext = ((BindingProvider) m_portProxy).getResponseContext();
     return (responseContext != null ? m_implementorSpecifics.getHttpResponseHeader(responseContext, key) : null);
   }
@@ -208,7 +208,7 @@ public class InvocationContext<PORT> {
    * Returns the HTTP status code of the previous webservice request, or <code>-1</code> if not available yet. See the
    * constants on {@link HttpServletResponse} for valid response codes.
    */
-  public int httpStatusCode() {
+  public int getHttpStatusCode() {
     final Map<String, Object> responseContext = ((BindingProvider) m_portProxy).getResponseContext();
     return (responseContext != null ? m_implementorSpecifics.getHttpStatusCode(responseContext).intValue() : -1);
   }

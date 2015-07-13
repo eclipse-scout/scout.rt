@@ -167,11 +167,11 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
     final PORT port = (m_portCache != null ? m_portCache.get() : m_portProvider.provide());
 
     final InvocationContext<PORT> portHandle = new InvocationContext<>(port, getClass().getSimpleName());
-    portHandle.endpointUrl(m_endpointUrl);
-    portHandle.connectTimeout(m_connectTimeout);
-    portHandle.readTimeout(m_readTimeout);
-    portHandle.username(m_username);
-    portHandle.password(m_password);
+    portHandle.withEndpointUrl(m_endpointUrl);
+    portHandle.withConnectTimeout(m_connectTimeout);
+    portHandle.withReadTimeout(m_readTimeout);
+    portHandle.withUsername(m_username);
+    portHandle.withPassword(m_password);
 
     return portHandle;
   }
