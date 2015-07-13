@@ -27,6 +27,6 @@ public class DisplayParentMessageBoxFilter implements IFilter<IMessageBox> {
 
   @Override
   public boolean accept(final IMessageBox messageBox) {
-    return m_displayParent == messageBox.displayParent();
+    return m_displayParent == messageBox.getDisplayParent();
   }
 }

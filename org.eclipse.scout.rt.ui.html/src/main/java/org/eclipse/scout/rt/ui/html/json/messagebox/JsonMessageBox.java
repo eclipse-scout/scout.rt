@@ -43,7 +43,7 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
     putJsonProperty(new JsonProperty<IMessageBox>("iconId", model) {
       @Override
       protected String modelValue() {
-        return getModel().iconId();
+        return getModel().getIconId();
       }
 
       @Override
@@ -54,55 +54,55 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
     putJsonProperty(new JsonProperty<IMessageBox>("severity", model) {
       @Override
       protected Integer modelValue() {
-        return getModel().severity();
+        return getModel().getSeverity();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("header", model) {
       @Override
       protected String modelValue() {
-        return getModel().header();
+        return getModel().getHeader();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("body", model) {
       @Override
       protected String modelValue() {
-        return getModel().body();
+        return getModel().getBody();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("html", model) {
       @Override
       protected String modelValue() {
-        return getModel().html() == null ? null : getModel().html().toEncodedHtml();
+        return getModel().getHtml() == null ? null : getModel().getHtml().toEncodedHtml();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("hiddenText", model) {
       @Override
       protected String modelValue() {
-        return getModel().hiddenText();
+        return getModel().getHiddenText();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("copyPasteText", model) {
       @Override
       protected String modelValue() {
-        return getModel().copyPasteText();
+        return getModel().getCopyPasteText();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("yesButtonText", model) {
       @Override
       protected String modelValue() {
-        return getModel().yesButtonText();
+        return getModel().getYesButtonText();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("noButtonText", model) {
       @Override
       protected String modelValue() {
-        return getModel().noButtonText();
+        return getModel().getNoButtonText();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("cancelButtonText", model) {
       @Override
       protected String modelValue() {
-        return getModel().cancelButtonText();
+        return getModel().getCancelButtonText();
       }
     });
   }
