@@ -449,3 +449,10 @@ Default size is 50 MB, but every field might specify lower/higher sizes.
 AWE 10.07.2015:
 Removed methods UserAgentUtility#isRichClient() and #isWebClient()
 Deleted CopyColumnsWidthsMenu, replaced with new button in OrganizeColumnsForm
+
+CGU 13.07.2015:
+Changed return value of IGroupBox.getConfiguredScrollable to TriState
+Mainbox is now scrollable by default.
+Migration:
+- You can remove getConfiguredScrollable() from your mainboxes
+- If you want another groupbox to be scrollable, you have to set the groupbox to scrollable while setting the mainbox to scrollable = false.
