@@ -90,13 +90,15 @@ scout.DecimalFormat = function(locale, pattern) {
     var r = new RegExp('^(.*?)[' + digitLikeCharacters + '].*$');
     var matches = r.exec(pattern);
     if (matches !== null) {
-      result.prefix = matches[1];
+      // Ignore single quotes (for special, quoted characters - e.g. Java quotes percentage sign like '%')
+      result.prefix = matches[1].replace(new RegExp('\'([^\']+)\''), '$1');
     }
     // Find suffix (anything before the first 'digit-like' character)
     r = new RegExp('^.*[' + digitLikeCharacters + '](.*?)$');
     matches = r.exec(pattern);
     if (matches !== null) {
-      result.suffix = matches[1];
+      // Ignore single quotes (for special, quoted characters - e.g. Java quotes percentage sign like '%')
+      result.suffix = matches[1].replace(new RegExp('\'([^\']+)\''), '$1');
     }
     return result;
   }
