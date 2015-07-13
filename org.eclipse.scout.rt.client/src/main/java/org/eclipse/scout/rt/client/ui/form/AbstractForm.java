@@ -2450,8 +2450,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes.createOk().
-          header(TEXTS.get("LoadFormXmlFailedText")).
-          show();
+              header(TEXTS.get("LoadFormXmlFailedText")).
+              show();
         }
       }
     }
@@ -2819,7 +2819,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setDisplayHint(int displayHint) {
-    Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form=%s]", this);
+    // FIXME DWI: throws NPE when called from initConfig()
+    // Assertions.assertFalse(getDesktop().isShowing(this), "Property 'displayHint' cannot be changed because Form is already showing [form=%s]", this);
 
     switch (displayHint) {
       case DISPLAY_HINT_DIALOG:
