@@ -147,9 +147,10 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
         handleOwnerValueChanged();
       }
       else if (e.getType() == TableEvent.TYPE_ROWS_UPDATED) {
-        handleRowsUpdated(e.getRows());
+        if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
+          handleOwnerValueChanged();
+        }
       }
     }
-
   }
 }

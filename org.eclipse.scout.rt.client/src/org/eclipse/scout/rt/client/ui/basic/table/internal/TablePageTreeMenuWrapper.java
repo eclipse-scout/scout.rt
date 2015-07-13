@@ -78,6 +78,11 @@ public class TablePageTreeMenuWrapper implements IMenu {
   }
 
   @Override
+  public Object getOwnerValue() {
+    return m_wrappedMenu.getOwnerValue();
+  }
+
+  @Override
   public void handleOwnerValueChanged(Object newValue) throws ProcessingException {
     // void
   }

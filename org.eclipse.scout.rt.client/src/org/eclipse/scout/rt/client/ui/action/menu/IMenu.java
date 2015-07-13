@@ -39,6 +39,8 @@ public interface IMenu extends IActionNode<IMenu> {
    */
   void aboutToShow();
 
+  Object getOwnerValue();
+
   /**
    * @param newValue
    * @throws ProcessingException
