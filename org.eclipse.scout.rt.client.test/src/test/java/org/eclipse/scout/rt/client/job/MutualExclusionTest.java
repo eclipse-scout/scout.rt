@@ -302,7 +302,7 @@ public class MutualExclusionTest {
           protocol.add("1: modelThread [b]");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -335,7 +335,7 @@ public class MutualExclusionTest {
           protocol.add("2: modelThread [b]");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
 
     // Wait until job1 completed.
     future1.awaitDoneAndGet(30, TimeUnit.SECONDS);
@@ -423,7 +423,7 @@ public class MutualExclusionTest {
         protocol.add("running-2");
         setupLatch.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false));
     ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -484,7 +484,7 @@ public class MutualExclusionTest {
         protocol.add("done-1");
         job1FinishLatch.countDown();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
 
     final IFuture<Void> future2 = ModelJobs.schedule(new IRunnable() {
 
@@ -499,7 +499,7 @@ public class MutualExclusionTest {
         latchJob2.countDownAndBlock();
         protocol.add("done-2");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
 
     final IFuture<Void> future3 = ModelJobs.schedule(new IRunnable() {
 
@@ -507,7 +507,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("done-3");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-3"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
 
     assertTrue(latchJob2.await());
     waitForPermitsAcquired(m_jobManager.getMutexSemaphores(), m_clientSession, 3); // job-1 (interrupted, but re-acquire mutex task still pending), job32 (latch), job-3 (pending)
@@ -815,7 +815,7 @@ public class MutualExclusionTest {
         }
         return null;
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-1"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-1"));
 
     IFuture<Void> future2 = jobManager.schedule(new Callable<Void>() {
 
@@ -830,7 +830,7 @@ public class MutualExclusionTest {
         return null;
       }
 
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-2"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-2"));
 
     IFuture<Void> future3 = jobManager.schedule(new Callable<Void>() {
 
@@ -841,7 +841,7 @@ public class MutualExclusionTest {
         return null;
 
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-3"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-3"));
 
     IFuture<Void> future4 = jobManager.schedule(new Callable<Void>() {
 
@@ -851,7 +851,7 @@ public class MutualExclusionTest {
         return null;
 
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-4"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("job-4"));
 
     jobsScheduledLatch.countDown(); // notify that all jobs are scheduled.
 
@@ -1253,7 +1253,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("2: running");
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).expirationTime(100, TimeUnit.MILLISECONDS));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withExpirationTime(100, TimeUnit.MILLISECONDS));
 
     // Wait until entering blocking condition
     waitForPermitsAcquired(m_jobManager.getMutexSemaphores(), m_clientSession, 0);

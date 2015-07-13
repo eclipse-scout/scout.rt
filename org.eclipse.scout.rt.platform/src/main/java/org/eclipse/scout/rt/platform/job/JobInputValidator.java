@@ -30,8 +30,8 @@ public class JobInputValidator {
   public void validate(final JobInput input) {
     Assertions.assertNotNull(input, "'JobInput' must not be null");
 
-    if (input.runContext() != null) {
-      Assertions.assertNotNull(input.runContext().getRunMonitor(), "'RunMonitor' on 'RunContext' must not be null");
+    if (input.getRunContext() != null) {
+      Assertions.assertNotNull(input.getRunContext().getRunMonitor(), "'RunMonitor' on 'RunContext' must not be null");
     }
   }
 }

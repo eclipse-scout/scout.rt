@@ -36,6 +36,6 @@ public class SwingBusyHandler extends AbstractBusyHandler {
   @Override
   protected void runBusy(IFuture<?> future) {
     IRunnable runnable = new SwingBusyJob(this);
-    Jobs.schedule(runnable, Jobs.newInput(null).name(TEXTS.get("BusyJob")));
+    Jobs.schedule(runnable, Jobs.newInput(null).withName(TEXTS.get("BusyJob")));
   }
 }

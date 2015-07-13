@@ -143,7 +143,7 @@ public class WhenDoneTest {
         protocol.add("1");
         throw pe;
       }
-    }, 1, TimeUnit.SECONDS, Jobs.newInput(null).logOnError(false)); // delayed
+    }, 1, TimeUnit.SECONDS, Jobs.newInput(null).withLogOnError(false)); // delayed
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
@@ -183,7 +183,7 @@ public class WhenDoneTest {
         protocol.add("1");
         throw error;
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
     try {
       future.awaitDoneAndGet();
       fail("exception expected");

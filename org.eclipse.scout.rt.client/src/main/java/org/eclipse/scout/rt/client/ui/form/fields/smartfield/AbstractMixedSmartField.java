@@ -250,7 +250,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
                 filterKeyLookup(call, result);
                 return cleanupResultList(result);
               }
-            }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Fetch smart-field data")));
+            }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("Fetch smart-field data")));
 
             ModelJobs.schedule(new IRunnable() {
               @Override

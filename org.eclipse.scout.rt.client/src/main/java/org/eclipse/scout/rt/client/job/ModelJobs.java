@@ -277,7 +277,7 @@ public final class ModelJobs {
    */
   public static boolean isModelThread(IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    return ModelJobs.isModelJob(currentFuture) && ((JobFutureTask) currentFuture).isMutexOwner() && (IClientSession) currentFuture.getJobInput().mutex() == clientSession;
+    return ModelJobs.isModelJob(currentFuture) && ((JobFutureTask) currentFuture).isMutexOwner() && (IClientSession) currentFuture.getJobInput().getMutex() == clientSession;
   }
 
   /**
@@ -287,10 +287,10 @@ public final class ModelJobs {
     if (future == null) {
       return false;
     }
-    if (!(future.getJobInput().runContext() instanceof ClientRunContext)) {
+    if (!(future.getJobInput().getRunContext() instanceof ClientRunContext)) {
       return false;
     }
-    if (!(future.getJobInput().mutex() instanceof IClientSession)) {
+    if (!(future.getJobInput().getMutex() instanceof IClientSession)) {
       return false; // this is a client job
     }
     return true;
@@ -320,7 +320,7 @@ public final class ModelJobs {
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for model jobs");
     Assertions.assertNotNull(clientRunContext.getSession(), "'ClientSession' must not be null for model jobs");
-    return BEANS.get(JobInput.class).threadName("scout-model-thread").runContext(clientRunContext).mutex(clientRunContext.getSession());
+    return BEANS.get(JobInput.class).withThreadName("scout-model-thread").withRunContext(clientRunContext).withMutex(clientRunContext.getSession());
   }
 
   /**

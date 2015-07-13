@@ -148,7 +148,7 @@ public final class ServerJobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      final RunContext runContext = future.getJobInput().runContext();
+      final RunContext runContext = future.getJobInput().getRunContext();
       if (runContext instanceof ServerRunContext) {
         return m_session == ((ServerRunContext) runContext).getSession();
       }

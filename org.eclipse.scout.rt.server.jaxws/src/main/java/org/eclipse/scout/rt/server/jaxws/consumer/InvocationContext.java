@@ -289,7 +289,7 @@ public class InvocationContext<PORT> {
             wsError.setValue(t);
           }
         }
-      }, Jobs.newInput(currentRunContext).name("JAX-WS request [%s]", operation));
+      }, Jobs.newInput(currentRunContext).withName("JAX-WS request [%s]", operation));
 
       try {
         future.awaitDone(); // wait until completed or interrupted.

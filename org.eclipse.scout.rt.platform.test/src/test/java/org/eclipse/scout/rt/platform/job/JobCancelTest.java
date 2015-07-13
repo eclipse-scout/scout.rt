@@ -145,7 +145,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(setupLatch.await());
 
@@ -202,7 +202,7 @@ public class JobCancelTest {
           verifyLatch.await();
         }
       }
-    }, 10L, 10L, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
+    }, 10L, 10L, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     assertTrue(setupLatch.await());
 
@@ -241,7 +241,7 @@ public class JobCancelTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     IFuture<Void> future2 = m_jobManager.schedule(new Callable<Void>() {
 
@@ -259,7 +259,7 @@ public class JobCancelTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(latch.await());
 
@@ -282,7 +282,7 @@ public class JobCancelTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     // VERIFY
     assertEquals(CollectionUtility.hashSet("running-1", "running-2", "interrupted-1", "interrupted-2", "done-1", "done-2"), protocol);
@@ -329,7 +329,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).name("job-2").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-2").withLogOnError(false));
         childFutureRef.set(childFuture);
 
         try {
@@ -347,7 +347,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1"));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1"));
 
     assertTrue(setupLatch.await());
     childFutureRef.get().cancel(true);
@@ -396,7 +396,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).name("job-2").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-2").withLogOnError(false));
 
         //does not re-use runmonitor -> no nested cancel
         m_jobManager.schedule(new Callable<Void>() {
@@ -417,7 +417,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).name("job-3").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).withName("job-3").withLogOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -435,7 +435,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1"));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1"));
 
     assertTrue(setupLatch.await());
     future1.cancel(true);
@@ -480,7 +480,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(null).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(null).withLogOnError(false));
 
     // Job-2 (common-id) => CANCEL
     m_jobManager.schedule(new Callable<Void>() {
@@ -496,7 +496,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(null).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(null).withLogOnError(false));
 
     // Job-3 (common-id) => CANCEL
     m_jobManager.schedule(new Callable<Void>() {
@@ -516,7 +516,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).name("otherName").mutex(null).logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent()).withName("otherName").withMutex(null).withLogOnError(false));
 
         // Job-3b (other name, other runMonitor => NO CANCEL)
         m_jobManager.schedule(new Callable<Void>() {
@@ -530,7 +530,7 @@ public class JobCancelTest {
             }
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).name("otherName").mutex(null).logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).withName("otherName").withMutex(null).withLogOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -541,7 +541,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(null));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(null));
 
     // Job-4 (common-id, but not-null mutex)
     m_jobManager.schedule(new Callable<Void>() {
@@ -556,7 +556,7 @@ public class JobCancelTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(new Object()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName(commonJobName).withMutex(new Object()).withLogOnError(false));
 
     assertTrue(setupLatch.await());
     m_jobManager.cancel(Jobs.newFutureFilter().andMatchNames(commonJobName).andMatchMutex(null), true);

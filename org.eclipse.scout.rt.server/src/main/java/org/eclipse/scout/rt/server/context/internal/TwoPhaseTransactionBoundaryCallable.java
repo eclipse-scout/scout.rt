@@ -221,7 +221,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
   protected String getCurrentJobName() {
     final IFuture<?> future = IFuture.CURRENT.get();
     if (future != null) {
-      return future.getJobInput().name();
+      return future.getJobInput().getName();
     }
     else {
       return "";

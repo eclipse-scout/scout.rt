@@ -317,7 +317,7 @@ public final class Jobs {
    * </pre>
    */
   public static JobInput newInput(final RunContext runContext) {
-    return BEANS.get(JobInput.class).runContext(runContext);
+    return BEANS.get(JobInput.class).withRunContext(runContext);
   }
 
   /**

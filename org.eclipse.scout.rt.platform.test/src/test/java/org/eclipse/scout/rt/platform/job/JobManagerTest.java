@@ -56,7 +56,7 @@ public class JobManagerTest {
         latch.countDownAndBlock();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     IFuture<Void> future2 = m_jobManager.schedule(new Callable<Void>() {
 
@@ -65,7 +65,7 @@ public class JobManagerTest {
         latch.countDownAndBlock();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     IFuture<Void> future3 = m_jobManager.schedule(new Callable<Void>() {
 
@@ -74,7 +74,7 @@ public class JobManagerTest {
         latch.countDownAndBlock();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(latch.await());
 
@@ -115,7 +115,7 @@ public class JobManagerTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     m_jobManager.schedule(new Callable<Void>() {
 
@@ -132,7 +132,7 @@ public class JobManagerTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     m_jobManager.schedule(new Callable<Void>() {
 
@@ -149,7 +149,7 @@ public class JobManagerTest {
         }
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(setupLatch.await());
 

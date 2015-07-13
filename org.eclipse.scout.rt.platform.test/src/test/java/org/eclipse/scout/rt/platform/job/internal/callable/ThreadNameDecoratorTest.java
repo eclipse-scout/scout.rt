@@ -134,7 +134,7 @@ public class ThreadNameDecoratorTest {
         assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
         return true;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1").withMutex(mutexObject));
 
     // Job-2 (same mutex as job-1)
     IFuture<Boolean> future2 = Jobs.schedule(new Callable<Boolean>() {
@@ -172,7 +172,7 @@ public class ThreadNameDecoratorTest {
 
         return true;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1").withMutex(mutexObject));
 
     assertTrue(future2.awaitDoneAndGet());
     assertTrue(future1.awaitDoneAndGet());

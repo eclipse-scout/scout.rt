@@ -190,7 +190,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       // Cancel already running GC job
       Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().andMatchCurrentSession().andMatchNameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")), true);
       // Schedule new GC job
-      ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name(gcJobId + ":release memory"));
+      ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName(gcJobId + ":release memory"));
 
       m_release = false;
     }

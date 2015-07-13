@@ -32,18 +32,18 @@ public class JobInputTest {
   @Test
   public void testCopy() {
     JobInput input = Jobs.newInput(RunContexts.empty());
-    input.name("name");
+    input.withName("name");
 
     JobInput copy = input.copy();
 
-    assertNotSame(input.runContext(), copy.runContext());
-    assertEquals(input.name(), copy.name());
+    assertNotSame(input.getRunContext(), copy.getRunContext());
+    assertEquals(input.getName(), copy.getName());
   }
 
   @Test
   public void testFillCurrentName() {
-    assertNull(Jobs.newInput(RunContexts.copyCurrent()).name());
-    assertEquals("ABC", Jobs.newInput(RunContexts.copyCurrent()).name("ABC").name());
+    assertNull(Jobs.newInput(RunContexts.copyCurrent()).getName());
+    assertEquals("ABC", Jobs.newInput(RunContexts.copyCurrent()).withName("ABC").getName());
   }
 
 }

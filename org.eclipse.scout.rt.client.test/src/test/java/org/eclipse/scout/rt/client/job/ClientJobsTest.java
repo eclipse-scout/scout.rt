@@ -63,19 +63,19 @@ public class ClientJobsTest {
     when(future.getJobInput()).thenReturn(new JobInput());
     assertFalse(ClientJobs.isClientJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new RunContext()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new RunContext()));
     assertFalse(ClientJobs.isClientJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()));
     assertTrue(ClientJobs.isClientJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()).mutex(null));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(null));
     assertTrue(ClientJobs.isClientJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()).mutex(new Object()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(new Object()));
     assertTrue(ClientJobs.isClientJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()).mutex(mock(IClientSession.class)));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(mock(IClientSession.class)));
     assertFalse(ClientJobs.isClientJob(future));
   }
 
@@ -146,8 +146,8 @@ public class ClientJobsTest {
   public void testNewInput() {
     ClientRunContext runContext = ClientRunContexts.empty();
 
-    assertSame(runContext, ClientJobs.newInput(runContext).runContext());
-    assertEquals("scout-client-thread", ClientJobs.newInput(runContext).threadName());
+    assertSame(runContext, ClientJobs.newInput(runContext).getRunContext());
+    assertEquals("scout-client-thread", ClientJobs.newInput(runContext).getThreadName());
   }
 
   @Test(expected = AssertionException.class)

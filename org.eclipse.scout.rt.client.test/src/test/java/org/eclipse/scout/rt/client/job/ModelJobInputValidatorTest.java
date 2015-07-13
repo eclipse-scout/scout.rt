@@ -36,7 +36,7 @@ public class ModelJobInputValidatorTest {
 
   @Test
   public void test() {
-    new ModelJobInputValidator().validate(new JobInput().mutex(m_clientSession).runContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
+    new ModelJobInputValidator().validate(new JobInput().withMutex(m_clientSession).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
     assertTrue(true);
   }
 
@@ -47,26 +47,26 @@ public class ModelJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testWrongRunContext() {
-    new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty()));
+    new ModelJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty()));
   }
 
   @Test(expected = AssertionException.class)
   public void testNullSession() {
-    new ModelJobInputValidator().validate(new JobInput().mutex(null).runContext(ClientRunContexts.empty().withSession(null, true)));
+    new ModelJobInputValidator().validate(new JobInput().withMutex(null).withRunContext(ClientRunContexts.empty().withSession(null, true)));
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongMutex() {
-    new ModelJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
+    new ModelJobInputValidator().validate(new JobInput().withMutex(new Object()).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
   }
 
   @Test(expected = AssertionException.class)
   public void testNullClientSession1() {
-    new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty()));
+    new ModelJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty()));
   }
 
   @Test(expected = AssertionException.class)
   public void testNullClientSession2() {
-    new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().withSession(null, true)));
+    new ModelJobInputValidator().validate(new JobInput().withRunContext(ClientRunContexts.empty().withSession(null, true)));
   }
 }

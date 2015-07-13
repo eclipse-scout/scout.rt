@@ -92,10 +92,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_donePremise = new DonePromise<>(this);
     m_input = input;
     m_periodic = periodic;
-    m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
+    m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
 
-    m_runWithRunContext = m_input.runContext() != null;
-    m_runMonitor = (m_runWithRunContext ? m_input.runContext().getRunMonitor() : BEANS.get(RunMonitor.class));
+    m_runWithRunContext = m_input.getRunContext() != null;
+    m_runMonitor = (m_runWithRunContext ? m_input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class));
 
     m_jobManager.registerFuture(this);
     m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
@@ -184,7 +184,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public Object getMutexObject() {
-    return m_input.mutex();
+    return m_input.getMutex();
   }
 
   @Override
@@ -281,10 +281,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return get();
     }
     catch (final CancellationException e) {
-      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.name())), throwableTranslator);
+      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.getName())), throwableTranslator);
     }
     catch (final InterruptedException e) {
-      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name())), throwableTranslator);
+      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.getName())), throwableTranslator);
     }
     catch (final Throwable t) {
       return throwElseReturnNull(t, throwableTranslator);
@@ -302,13 +302,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return get(timeout, unit);
     }
     catch (final CancellationException e) {
-      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.name())), throwableTranslator);
+      return throwElseReturnNull(new CancellationException(String.format("The job was cancelled. [job=%s]", m_input.getName())), throwableTranslator);
     }
     catch (final InterruptedException e) {
-      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name())), throwableTranslator);
+      return throwElseReturnNull(new InterruptedException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.getName())), throwableTranslator);
     }
     catch (final TimeoutException e) {
-      return throwElseReturnNull(new TimeoutException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.name())), throwableTranslator);
+      return throwElseReturnNull(new TimeoutException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.getName())), throwableTranslator);
     }
     catch (final Throwable t) {
       return throwElseReturnNull(t, throwableTranslator);

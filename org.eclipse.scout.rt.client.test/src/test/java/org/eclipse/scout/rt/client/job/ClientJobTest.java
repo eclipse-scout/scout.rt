@@ -103,9 +103,9 @@ public class ClientJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("XYZ"));
+        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("XYZ"));
       }
-    }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("ABC"));
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("ABC"));
 
     assertTrue(setupLatch.await());
 

@@ -77,7 +77,7 @@ public class PortCache<PORT> {
       public void run() throws Exception {
         discardExpiredPorts();
       }
-    }, 1, 1, TimeUnit.MINUTES, Jobs.newInput(RunContexts.empty()).name("JAX-WS port cache cleanup"));
+    }, 1, 1, TimeUnit.MINUTES, Jobs.newInput(RunContexts.empty()).withName("JAX-WS port cache cleanup"));
 
     // Ensures to have at minimum 'corePoolSize' Ports in the cache.
     if (m_corePoolSize > 0) {
@@ -87,7 +87,7 @@ public class PortCache<PORT> {
         public void run() throws Exception {
           ensureCorePool();
         }
-      }, Jobs.newInput(RunContexts.empty()).name("JAX-WS port cache initializer"));
+      }, Jobs.newInput(RunContexts.empty()).withName("JAX-WS port cache initializer"));
     }
   }
 

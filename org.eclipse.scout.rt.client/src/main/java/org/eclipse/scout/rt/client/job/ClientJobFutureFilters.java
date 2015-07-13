@@ -149,7 +149,7 @@ public final class ClientJobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      final RunContext runContext = future.getJobInput().runContext();
+      final RunContext runContext = future.getJobInput().getRunContext();
       if (runContext instanceof ClientRunContext) {
         return m_session == ((ClientRunContext) runContext).getSession();
       }

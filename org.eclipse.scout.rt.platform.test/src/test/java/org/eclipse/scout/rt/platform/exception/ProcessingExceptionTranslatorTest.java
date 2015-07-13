@@ -145,7 +145,7 @@ public class ProcessingExceptionTranslatorTest {
     // test context message with 'job' and 'no subject'
     future = mock(IFuture.class);
     IFuture.CURRENT.set(future);
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).withName("do-something"));
     pe = Subject.doAs(null, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -162,7 +162,7 @@ public class ProcessingExceptionTranslatorTest {
     subject.getPrincipals().add(new SimplePrincipal("anna"));
     subject.getPrincipals().add(new SimplePrincipal("john"));
 
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).withName("do-something"));
     pe = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -183,7 +183,7 @@ public class ProcessingExceptionTranslatorTest {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("anna"));
 
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).withName("do-something"));
     ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -208,7 +208,7 @@ public class ProcessingExceptionTranslatorTest {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("anna"));
 
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).withName("do-something"));
     ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override

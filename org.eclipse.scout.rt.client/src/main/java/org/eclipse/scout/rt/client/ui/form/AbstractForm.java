@@ -3028,7 +3028,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               BEANS.get(ExceptionHandler.class).handle(pe);
             }
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Form timer")).awaitDone();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Form timer")).awaitDone();
       }
     }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
   }
@@ -3071,7 +3071,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }).awaitDone();
       }
-    }, 0, 1, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("Close timer"));
+    }, 0, 1, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("Close timer"));
   }
 
   private abstract static class P_AbstractCollectingFieldVisitor<T> implements IFormFieldVisitor {

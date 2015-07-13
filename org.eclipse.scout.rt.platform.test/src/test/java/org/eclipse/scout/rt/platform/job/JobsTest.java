@@ -44,7 +44,7 @@ public class JobsTest {
       }
     }).awaitDoneAndGet();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule with delay
     actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
@@ -55,7 +55,7 @@ public class JobsTest {
       }
     }, 0, TimeUnit.MILLISECONDS).awaitDoneAndGet();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
@@ -68,7 +68,7 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDone();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
@@ -81,7 +81,7 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDone();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class JobsTest {
       }
     }, Jobs.newInput(null)).awaitDoneAndGet();
 
-    assertNull(actualFuture.getJobInput().runContext());
+    assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule with delay
     actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
@@ -108,7 +108,7 @@ public class JobsTest {
       }
     }, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
 
-    assertNull(actualFuture.getJobInput().runContext());
+    assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
@@ -121,7 +121,7 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDone();
 
-    assertNull(actualFuture.getJobInput().runContext());
+    assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
@@ -134,18 +134,18 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDone();
 
-    assertNull(actualFuture.getJobInput().runContext());
+    assertNull(actualFuture.getJobInput().getRunContext());
   }
 
   @Test
   public void testNewInput() {
     RunContext runContext = RunContexts.empty();
-    assertSame(runContext, Jobs.newInput(runContext).runContext());
-    assertEquals("scout-thread", Jobs.newInput(null).threadName());
+    assertSame(runContext, Jobs.newInput(runContext).getRunContext());
+    assertEquals("scout-thread", Jobs.newInput(null).getThreadName());
   }
 
   @Test
   public void testNewInputNullInput() {
-    assertNull(Jobs.newInput(null).runContext());
+    assertNull(Jobs.newInput(null).getRunContext());
   }
 }

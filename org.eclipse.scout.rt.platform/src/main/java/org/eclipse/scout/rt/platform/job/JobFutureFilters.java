@@ -250,7 +250,7 @@ public final class JobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return m_names.contains(future.getJobInput().name());
+      return m_names.contains(future.getJobInput().getName());
     }
   }
 
@@ -269,10 +269,10 @@ public final class JobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      if (future.getJobInput().name() == null) {
+      if (future.getJobInput().getName() == null) {
         return false;
       }
-      return m_regex.matcher(future.getJobInput().name()).matches();
+      return m_regex.matcher(future.getJobInput().getName()).matches();
     }
   }
 
@@ -291,7 +291,7 @@ public final class JobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return CompareUtility.equals(m_mutexObject, future.getJobInput().mutex());
+      return CompareUtility.equals(m_mutexObject, future.getJobInput().getMutex());
     }
   }
 }

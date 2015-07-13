@@ -101,7 +101,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -123,7 +123,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -145,7 +145,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -168,7 +168,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -191,7 +191,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -214,7 +214,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -273,10 +273,10 @@ public class JobScheduleTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).name("XYZ")).awaitDoneAndGet();
+        }, Jobs.newInput(RunContexts.copyCurrent()).withName("XYZ")).awaitDoneAndGet();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name("ABC")).awaitDoneAndGet();
+    }, Jobs.newInput(RunContexts.copyCurrent()).withName("ABC")).awaitDoneAndGet();
     assertTrue(actualThreadName1.getValue(), actualThreadName1.getValue().matches("scout-thread-(\\d)+ \\[Running\\] ABC"));
     assertTrue(actualThreadName2.getValue(), actualThreadName2.getValue().matches("scout-thread-(\\d)+ \\[Running\\] XYZ"));
     assertEquals("main", Thread.currentThread().getName());
@@ -353,7 +353,7 @@ public class JobScheduleTest {
         barrier.countDownAndBlock();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     m_jobManager.schedule(new Callable<Void>() {
 
@@ -362,7 +362,7 @@ public class JobScheduleTest {
         barrier.countDownAndBlock();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     m_jobManager.schedule(new Callable<Void>() {
 
@@ -371,7 +371,7 @@ public class JobScheduleTest {
         barrier.countDownAndBlock();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(barrier.await());
     barrier.unblock();
@@ -388,7 +388,7 @@ public class JobScheduleTest {
         executed.set(true);
         return null;
       }
-    }, 1, TimeUnit.SECONDS, Jobs.newInput(RunContexts.empty()).expirationTime(500, TimeUnit.MILLISECONDS));
+    }, 1, TimeUnit.SECONDS, Jobs.newInput(RunContexts.empty()).withExpirationTime(500, TimeUnit.MILLISECONDS));
 
     future.awaitDone();
     assertTrue(future.isCancelled());
@@ -406,7 +406,7 @@ public class JobScheduleTest {
         executed.set(true);
         return null;
       }
-    }, 1, TimeUnit.SECONDS, Jobs.newInput(RunContexts.empty()).expirationTime(JobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
+    }, 1, TimeUnit.SECONDS, Jobs.newInput(RunContexts.empty()).withExpirationTime(JobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
 
     future.awaitDoneAndGet();
     assertTrue(executed.get());
@@ -442,7 +442,7 @@ public class JobScheduleTest {
         Thread.sleep(2000);
         return "job-1";
       }
-    }, Jobs.newInput(RunContexts.empty()).mutex(mutex));
+    }, Jobs.newInput(RunContexts.empty()).withMutex(mutex));
 
     IFuture<String> future2 = m_jobManager.schedule(new Callable<String>() {
 
@@ -450,7 +450,7 @@ public class JobScheduleTest {
       public String call() throws Exception {
         return "job-2";
       }
-    }, 500, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()).mutex(mutex));
+    }, 500, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()).withMutex(mutex));
 
     assertEquals("job-2", future2.awaitDoneAndGet(10, TimeUnit.SECONDS));
     assertEquals("job-1", future1.awaitDoneAndGet());
@@ -469,7 +469,7 @@ public class JobScheduleTest {
         latch.countDownAndBlock();
         return "job-1";
       }
-    }, Jobs.newInput(RunContexts.empty()).mutex(mutex).logOnError(false));
+    }, Jobs.newInput(RunContexts.empty()).withMutex(mutex).withLogOnError(false));
 
     IFuture<String> future2 = m_jobManager.schedule(new Callable<String>() {
 
@@ -477,7 +477,7 @@ public class JobScheduleTest {
       public String call() throws Exception {
         return "job-2";
       }
-    }, Jobs.newInput(RunContexts.empty()).mutex(mutex));
+    }, Jobs.newInput(RunContexts.empty()).withMutex(mutex));
 
     try {
       assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));

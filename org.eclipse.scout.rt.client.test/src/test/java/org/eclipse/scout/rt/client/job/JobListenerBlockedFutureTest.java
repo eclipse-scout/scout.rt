@@ -113,7 +113,7 @@ public class JobListenerBlockedFutureTest {
               condition.setBlocking(false);
 
               // Wait until the outer future is re-acquiring the mutex.
-              m_jobManager.waitForPermitsAcquired(input.mutex(), 2); // 2=outer-job + inner-job
+              m_jobManager.waitForPermitsAcquired(input.getMutex(), 2); // 2=outer-job + inner-job
               return null;
             }
           }, 200, TimeUnit.MILLISECONDS, input));

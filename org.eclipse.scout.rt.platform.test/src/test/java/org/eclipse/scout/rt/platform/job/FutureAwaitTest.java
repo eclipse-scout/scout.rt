@@ -167,7 +167,7 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         throw computationException;
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -351,7 +351,7 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         throw computationException;
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -493,7 +493,7 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         throw computationException;
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -628,7 +628,7 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         throw computationException;
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -671,7 +671,7 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         return "result";
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
 
     // Test controller
     s_executor.submit(new Runnable() {
@@ -848,7 +848,7 @@ public class FutureAwaitTest {
         setupLatch.countDownAndBlock();
         throw computationException;
       }
-    }, Jobs.newInput(null).logOnError(false));
+    }, Jobs.newInput(null).withLogOnError(false));
 
     // Test controller
     s_executor.submit(new Runnable() {

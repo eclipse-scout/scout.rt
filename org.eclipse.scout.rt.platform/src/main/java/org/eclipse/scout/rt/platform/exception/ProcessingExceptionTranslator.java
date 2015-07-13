@@ -87,8 +87,8 @@ public class ProcessingExceptionTranslator implements IThrowableTranslator<Proce
 
     // Add the current job to the context message.
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    if (currentFuture != null && !StringUtility.isNullOrEmpty(currentFuture.getJobInput().name())) {
-      final String job = "job=" + currentFuture.getJobInput().name();
+    if (currentFuture != null && !StringUtility.isNullOrEmpty(currentFuture.getJobInput().getName())) {
+      final String job = "job=" + currentFuture.getJobInput().getName();
       if (!status.getContextMessages().contains(job)) {
         pe.addContextMessage(job);
       }

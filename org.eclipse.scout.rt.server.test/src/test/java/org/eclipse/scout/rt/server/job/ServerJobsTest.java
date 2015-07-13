@@ -58,19 +58,19 @@ public class ServerJobsTest {
     when(future.getJobInput()).thenReturn(new JobInput());
     assertFalse(ServerJobs.isServerJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new RunContext()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new RunContext()));
     assertFalse(ServerJobs.isServerJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ServerRunContext()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ServerRunContext()));
     assertTrue(ServerJobs.isServerJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ServerRunContext()).mutex(null));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ServerRunContext()).withMutex(null));
     assertTrue(ServerJobs.isServerJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ServerRunContext()).mutex(new Object()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ServerRunContext()).withMutex(new Object()));
     assertTrue(ServerJobs.isServerJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ServerRunContext()).mutex(mock(IServerSession.class)));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ServerRunContext()).withMutex(mock(IServerSession.class)));
     assertTrue(ServerJobs.isServerJob(future));
   }
 
@@ -142,8 +142,8 @@ public class ServerJobsTest {
   public void testNewInput() {
     ServerRunContext runContext = ServerRunContexts.empty();
 
-    assertSame(runContext, ServerJobs.newInput(runContext).runContext());
-    assertEquals("scout-server-thread", ServerJobs.newInput(runContext).threadName());
+    assertSame(runContext, ServerJobs.newInput(runContext).getRunContext());
+    assertEquals("scout-server-thread", ServerJobs.newInput(runContext).getThreadName());
   }
 
   @Test(expected = AssertionException.class)

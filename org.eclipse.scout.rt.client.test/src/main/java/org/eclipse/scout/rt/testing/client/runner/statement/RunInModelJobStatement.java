@@ -28,7 +28,7 @@ public class RunInModelJobStatement extends Statement {
       m_next.evaluate();
     }
     else {
-      JobInput input = ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("JUnit model job");
+      JobInput input = ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("JUnit model job");
       ModelJobs.schedule(new IRunnable() {
 
         @Override

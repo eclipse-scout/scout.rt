@@ -114,7 +114,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumer() throws ProcessingException {
     stopMessageConsumer();
-    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput(null).name("JmsMessageConsumer"));
+    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput(null).withName("JmsMessageConsumer"));
   }
 
   protected synchronized void stopMessageConsumer() throws ProcessingException {

@@ -80,7 +80,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
               public void run() throws Exception {
                 showExceptionInUI(pe);
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("visualize ProcessingException")).awaitDoneAndGet();
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withLogOnError(false).withName("visualize ProcessingException")).awaitDoneAndGet();
           }
           catch (final Exception e) {
             LOG.error("Failed to synchronize with model thread to visualize ProcessingException", e);

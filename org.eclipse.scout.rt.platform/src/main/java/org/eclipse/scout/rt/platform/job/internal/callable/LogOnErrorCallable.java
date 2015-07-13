@@ -55,7 +55,7 @@ public class LogOnErrorCallable<RESULT> implements Callable<RESULT>, IChainable<
       return m_next.call();
     }
     catch (final Throwable t) {
-      if (m_input.logOnError()) {
+      if (m_input.isLogOnError()) {
         try {
           BEANS.get(ExceptionHandler.class).handle(t);
         }

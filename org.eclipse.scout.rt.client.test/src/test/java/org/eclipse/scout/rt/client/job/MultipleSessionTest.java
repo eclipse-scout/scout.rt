@@ -75,7 +75,7 @@ public class MultipleSessionTest {
         protocol.add("job1-S1");
         latch1.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).name("job-1-S1").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).withName("job-1-S1").withLogOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -84,7 +84,7 @@ public class MultipleSessionTest {
         protocol.add("job2-S1");
         latch2.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).name("job-2-S1").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).withName("job-2-S1").withLogOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -93,7 +93,7 @@ public class MultipleSessionTest {
         protocol.add("job1-S2");
         latch1.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).name("job-1-S2").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).withName("job-1-S2").withLogOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -102,7 +102,7 @@ public class MultipleSessionTest {
         protocol.add("job2-S2");
         latch2.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).name("job-2-S2").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).withName("job-2-S2").withLogOnError(false));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
@@ -141,7 +141,7 @@ public class MultipleSessionTest {
         }
         awaitAllCancelledLatch.await();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).name("job-1-S1").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).withName("job-1-S1").withLogOnError(false));
 
     // Session 1 (job2) --> never starts running because cancelled while job1 is mutex-owner
     ModelJobs.schedule(new IRunnable() {
@@ -157,7 +157,7 @@ public class MultipleSessionTest {
           protocol.add("job2-S1-interrupted");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).name("job-2-S1").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)).withName("job-2-S1").withLogOnError(false));
 
     // Session 2 (job1)
     ModelJobs.schedule(new IRunnable() {
@@ -172,7 +172,7 @@ public class MultipleSessionTest {
           protocol.add("job1-S2-interrupted");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).name("job-1-S2").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).withName("job-1-S2").withLogOnError(false));
 
     // Session 2 (job2)
     ModelJobs.schedule(new IRunnable() {
@@ -187,7 +187,7 @@ public class MultipleSessionTest {
           protocol.add("job2-S2-interrupted");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).name("job-2-S2").logOnError(false));
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true)).withName("job-2-S2").withLogOnError(false));
 
     assertTrue(setupLatch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);

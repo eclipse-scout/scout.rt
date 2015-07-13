@@ -336,7 +336,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByKeyInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).withName("%s.getDataByKeyInBackground", getClass().getName()));
     }
   }
 
@@ -393,7 +393,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByTextInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).withName("%s.getDataByTextInBackground", getClass().getName()));
     }
   }
 
@@ -450,7 +450,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByAllInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).withName("%s.getDataByAllInBackground", getClass().getName()));
     }
   }
 
@@ -506,7 +506,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByRecInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).withName("%s.getDataByRecInBackground", getClass().getName()));
     }
   }
 

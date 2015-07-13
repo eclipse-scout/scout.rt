@@ -62,16 +62,16 @@ public class ModelJobsTest {
     when(future.getJobInput()).thenReturn(new JobInput());
     assertFalse(ModelJobs.isModelJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new RunContext()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new RunContext()));
     assertFalse(ModelJobs.isModelJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()));
     assertFalse(ModelJobs.isModelJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()).mutex(new Object()));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(new Object()));
     assertFalse(ModelJobs.isModelJob(future));
 
-    when(future.getJobInput()).thenReturn(new JobInput().runContext(new ClientRunContext()).mutex(mock(IClientSession.class)));
+    when(future.getJobInput()).thenReturn(new JobInput().withRunContext(new ClientRunContext()).withMutex(mock(IClientSession.class)));
     assertTrue(ModelJobs.isModelJob(future));
   }
 
@@ -146,9 +146,9 @@ public class ModelJobsTest {
   public void testNewInput() {
     ClientRunContext runContext = ClientRunContexts.empty().withSession(m_clientSession, true);
 
-    assertSame(runContext, ModelJobs.newInput(runContext).runContext());
-    assertEquals("scout-model-thread", ModelJobs.newInput(runContext).threadName());
-    assertSame(m_clientSession, ModelJobs.newInput(runContext).mutex());
+    assertSame(runContext, ModelJobs.newInput(runContext).getRunContext());
+    assertEquals("scout-model-thread", ModelJobs.newInput(runContext).getThreadName());
+    assertSame(m_clientSession, ModelJobs.newInput(runContext).getMutex());
   }
 
   @Test(expected = AssertionException.class)

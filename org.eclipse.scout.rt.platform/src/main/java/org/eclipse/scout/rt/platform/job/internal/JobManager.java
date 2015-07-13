@@ -194,12 +194,12 @@ public class JobManager implements IJobManager {
   @Internal
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input, final boolean periodic) {
     Assertions.assertNotNull(input, "'JobInput' must not be null");
-    if (input.runContext() != null) {
-      Assertions.assertNotNull(input.runContext().getRunMonitor(), "'RunMonitor' required if providing a 'RunContext'");
+    if (input.getRunContext() != null) {
+      Assertions.assertNotNull(input.getRunContext().getRunMonitor(), "'RunMonitor' required if providing a 'RunContext'");
     }
 
     // Ensure a job name to be set.
-    final JobInput inputCopy = input.copy().name(StringUtility.nvl(input.name(), callable.getClass().getName()));
+    final JobInput inputCopy = input.copy().withName(StringUtility.nvl(input.getName(), callable.getClass().getName()));
 
     // Create the Future to be returned to the caller.
     return interceptFuture(JobFutureTask.create(this, inputCopy, periodic, interceptCallable(callable, inputCopy)));
@@ -289,8 +289,8 @@ public class JobManager implements IJobManager {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final JobInput input) {
-    final Callable<RESULT> c3 = new RunContextCallable<RESULT>(next, input.runContext());
-    final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.threadName(), input.name());
+    final Callable<RESULT> c3 = new RunContextCallable<RESULT>(next, input.getRunContext());
+    final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getName());
     final Callable<RESULT> c1 = new LogOnErrorCallable<>(c2, input);
 
     return c1;

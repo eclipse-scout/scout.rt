@@ -52,7 +52,7 @@ public class TimeoutClientRunContextStatement extends Statement {
         }
       };
 
-      IFuture<Void> future = ModelJobs.schedule(nestedRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("nested JUnit model job"));
+      IFuture<Void> future = ModelJobs.schedule(nestedRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("nested JUnit model job"));
       try {
         if (m_timeoutMillis <= 0) {
           future.awaitDoneAndGet();

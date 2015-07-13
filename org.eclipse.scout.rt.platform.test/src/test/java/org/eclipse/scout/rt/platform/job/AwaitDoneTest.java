@@ -111,7 +111,7 @@ public class AwaitDoneTest {
         protocol.add("run-2");
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future1), 30, TimeUnit.SECONDS));
     assertTrue(m_jobManager.isDone(Jobs.newFutureFilter().andMatchFutures(future1)));
@@ -141,7 +141,7 @@ public class AwaitDoneTest {
         protocol.add("after-2");
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).withLogOnError(false));
 
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andAreNotBlocked(), 10, TimeUnit.SECONDS));
   }

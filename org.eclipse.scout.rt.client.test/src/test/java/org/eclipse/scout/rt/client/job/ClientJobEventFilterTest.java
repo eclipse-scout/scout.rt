@@ -204,14 +204,14 @@ public class ClientJobEventFilterTest {
     Object mutexObject2 = new Object();
 
     JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture);
-    m_clientJobFuture.getJobInput().mutex(mutexObject1);
+    m_clientJobFuture.getJobInput().withMutex(mutexObject1);
     assertTrue(ClientJobs.newEventFilter().accept(clientEvent));
     assertFalse(ClientJobs.newEventFilter().andMatchMutex(null).accept(clientEvent));
     assertTrue(ClientJobs.newEventFilter().andMatchMutex(mutexObject1).accept(clientEvent));
     assertFalse(ClientJobs.newEventFilter().andMatchMutex(mutexObject2).accept(clientEvent));
 
     clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture);
-    m_clientJobFuture.getJobInput().mutex(null);
+    m_clientJobFuture.getJobInput().withMutex(null);
     assertTrue(ClientJobs.newEventFilter().accept(clientEvent));
     assertTrue(ClientJobs.newEventFilter().andMatchMutex(null).accept(clientEvent));
     assertFalse(ClientJobs.newEventFilter().andMatchMutex(mutexObject1).accept(clientEvent));

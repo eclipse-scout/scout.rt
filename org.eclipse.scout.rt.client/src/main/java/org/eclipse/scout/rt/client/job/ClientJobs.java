@@ -299,10 +299,10 @@ public final class ClientJobs {
     if (future == null) {
       return false;
     }
-    if (!(future.getJobInput().runContext() instanceof ClientRunContext)) {
+    if (!(future.getJobInput().getRunContext() instanceof ClientRunContext)) {
       return false;
     }
-    if (future.getJobInput().mutex() instanceof IClientSession) {
+    if (future.getJobInput().getMutex() instanceof IClientSession) {
       return false; // this is a model job
     }
     return true;
@@ -331,7 +331,7 @@ public final class ClientJobs {
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for client jobs");
-    return BEANS.get(JobInput.class).threadName("scout-client-thread").runContext(clientRunContext);
+    return BEANS.get(JobInput.class).withThreadName("scout-client-thread").withRunContext(clientRunContext);
   }
 
   /**

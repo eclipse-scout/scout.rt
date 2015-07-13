@@ -214,7 +214,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     RunMonitor.CURRENT.get().registerCancellable(monitor);
 
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
-    final JobInput jobInput = Jobs.newInput(createCurrentRunContext().withRunMonitor(monitor)).name("Remote service request [%s]", requestSequence);
+    final JobInput jobInput = Jobs.newInput(createCurrentRunContext().withRunMonitor(monitor)).withName("Remote service request [%s]", requestSequence);
 
     IServiceTunnelResponse serviceResponse;
     try {

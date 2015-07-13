@@ -110,7 +110,7 @@ public class ScheduleWithFixedDelayTest {
           protocol.add(System.nanoTime());
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
+    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
@@ -153,7 +153,7 @@ public class ScheduleWithFixedDelayTest {
           Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
+    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
@@ -196,7 +196,7 @@ public class ScheduleWithFixedDelayTest {
           Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
         }
       }
-    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
+    }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));

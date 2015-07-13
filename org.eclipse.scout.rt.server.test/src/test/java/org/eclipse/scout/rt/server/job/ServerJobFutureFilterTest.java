@@ -135,13 +135,13 @@ public class ServerJobFutureFilterTest {
     Object mutexObject1 = new Object();
     Object mutexObject2 = new Object();
 
-    m_serverJobFuture.getJobInput().mutex(mutexObject1);
+    m_serverJobFuture.getJobInput().withMutex(mutexObject1);
     assertTrue(ServerJobs.newFutureFilter().accept(m_serverJobFuture));
     assertFalse(ServerJobs.newFutureFilter().andMatchMutex(null).accept(m_serverJobFuture));
     assertTrue(ServerJobs.newFutureFilter().andMatchMutex(mutexObject1).accept(m_serverJobFuture));
     assertFalse(ServerJobs.newFutureFilter().andMatchMutex(mutexObject2).accept(m_serverJobFuture));
 
-    m_serverJobFuture.getJobInput().mutex(null);
+    m_serverJobFuture.getJobInput().withMutex(null);
     assertTrue(ServerJobs.newFutureFilter().accept(m_serverJobFuture));
     assertTrue(ServerJobs.newFutureFilter().andMatchMutex(null).accept(m_serverJobFuture));
     assertFalse(ServerJobs.newFutureFilter().andMatchMutex(mutexObject1).accept(m_serverJobFuture));

@@ -110,7 +110,7 @@ public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelR
       final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
 
       final RunMonitor runMonitor = BEANS.get(RunMonitor.class); // do not link the RunMonitor with the current RunMonitor to not cancel this request.
-      final JobInput jobInput = Jobs.newInput(m_tunnel.createCurrentRunContext().withRunMonitor(runMonitor)).name("Cancellation request [%s]", requestSequence);
+      final JobInput jobInput = Jobs.newInput(m_tunnel.createCurrentRunContext().withRunMonitor(runMonitor)).withName("Cancellation request [%s]", requestSequence);
       final IServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet(10, TimeUnit.SECONDS);
 
       if (cancelResponse == null) {

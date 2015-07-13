@@ -299,7 +299,7 @@ public final class ServerJobs {
     if (future == null) {
       return false;
     }
-    if (!(future.getJobInput().runContext() instanceof ServerRunContext)) {
+    if (!(future.getJobInput().getRunContext() instanceof ServerRunContext)) {
       return false;
     }
     return true;
@@ -328,7 +328,7 @@ public final class ServerJobs {
    */
   public static JobInput newInput(final ServerRunContext serverRunContext) {
     Assertions.assertNotNull(serverRunContext, "'RunContext' must not be null for server jobs");
-    return BEANS.get(JobInput.class).threadName("scout-server-thread").runContext(serverRunContext);
+    return BEANS.get(JobInput.class).withThreadName("scout-server-thread").withRunContext(serverRunContext);
   }
 
   /**

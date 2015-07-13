@@ -82,9 +82,9 @@ public class ServerJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).name("XYZ"));
+        }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).withName("XYZ"));
       }
-    }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).name("ABC"));
+    }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).withName("ABC"));
 
     assertTrue(setupLatch.await());
 

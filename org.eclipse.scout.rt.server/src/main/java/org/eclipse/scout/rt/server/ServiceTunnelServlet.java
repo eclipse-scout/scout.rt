@@ -84,7 +84,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.withUserAgent(UserAgent.createDefault());
-          serverRunContext.getPropertyMap().put(SESSION_ID, UUID.randomUUID().toString());
+          serverRunContext.withProperty(SESSION_ID, UUID.randomUUID().toString());
           serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           invokeAdminService(serverRunContext);
@@ -125,7 +125,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           serverRunContext.withRunMonitor(runMonitor);
           serverRunContext.withTxNotificationContainer(txNotificationContainer);
           serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
-          serverRunContext.getPropertyMap().put(SESSION_ID, serviceRequest.getSessionId());
+          serverRunContext.withProperty(SESSION_ID, serviceRequest.getSessionId());
           serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           IServerSession session = serverRunContext.getSession();
@@ -291,7 +291,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
   protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
-    String sessionId = (String) serverRunContext.getPropertyMap().get(SESSION_ID);
+    String sessionId = (String) serverRunContext.getProperty(SESSION_ID);
     return BEANS.get(ServerSessionProvider.class).<IServerSession> provide(serverRunContext, sessionId);
   }
 

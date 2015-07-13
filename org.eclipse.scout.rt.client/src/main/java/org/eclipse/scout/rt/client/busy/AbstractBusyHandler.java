@@ -200,25 +200,25 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void addTimer(IFuture<?> future) {
     P_TimerJob runnable = new P_TimerJob(future);
-    future.getJobInput().propertyMap().put(TIMER_PROPERTY, runnable);
+    future.getJobInput().withProperty(TIMER_PROPERTY, runnable);
     Jobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS);
   }
 
   private void removeTimer(IFuture<?> future) {
-    P_TimerJob t = (P_TimerJob) future.getJobInput().propertyMap().get(TIMER_PROPERTY);
+    P_TimerJob t = (P_TimerJob) future.getJobInput().getProperty(TIMER_PROPERTY);
     if (t != null) {
-      future.getJobInput().propertyMap().put(TIMER_PROPERTY, null);
+      future.getJobInput().withProperty(TIMER_PROPERTY, null);
     }
   }
 
   private P_TimerJob getTimer(IFuture<?> future) {
-    return (P_TimerJob) future.getJobInput().propertyMap().get(TIMER_PROPERTY);
+    return (P_TimerJob) future.getJobInput().getProperty(TIMER_PROPERTY);
   }
 
   private void addBusyOperation(IFuture<?> future) {
     int oldSize, newSize;
     synchronized (getStateLock()) {
-      future.getJobInput().propertyMap().put(BUSY_OPERATION_PROPERTY, "true");
+      future.getJobInput().withProperty(BUSY_OPERATION_PROPERTY, "true");
       oldSize = m_list.size();
       m_list.add(future);
       newSize = m_list.size();
@@ -231,14 +231,14 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void removeBusyOperation(IFuture<?> future) {
     synchronized (getStateLock()) {
-      future.getJobInput().propertyMap().put(BUSY_OPERATION_PROPERTY, null);
+      future.getJobInput().withProperty(BUSY_OPERATION_PROPERTY, null);
       m_list.remove(future);
       getStateLock().notifyAll();
     }
   }
 
   private boolean isBusyOperationNoLock(IFuture<?> future) {
-    return "true".equals(future.getJobInput().propertyMap().get(BUSY_OPERATION_PROPERTY));
+    return "true".equals(future.getJobInput().getProperty(BUSY_OPERATION_PROPERTY));
   }
 
   private static boolean isJobActive(IFuture<?> future) {

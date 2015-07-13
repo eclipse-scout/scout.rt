@@ -44,7 +44,7 @@ public class JobInput {
   protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
 
-  public String name() {
+  public String getName() {
     return m_name;
   }
 
@@ -56,7 +56,7 @@ public class JobInput {
    * @param args
    *          arguments to be used in the name, e.g. <code>JobInput.name("load data [id=%s]", id)</code>
    */
-  public JobInput name(final String name, final Object... args) {
+  public JobInput withName(final String name, final Object... args) {
     m_name = (name != null ? String.format(name, args) : null);
     return this;
   }
@@ -65,7 +65,7 @@ public class JobInput {
    * Returns the mutex object, if the job is to be run in sequence among other jobs with the same mutex object, or
    * <code>null</code> to run the job at the next reasonable opportunity.
    */
-  public Object mutex() {
+  public Object getMutex() {
     return m_mutexObject;
   }
 
@@ -74,12 +74,12 @@ public class JobInput {
    * jobs are run in parallel at the same time. By default, no mutex object is set, meaning the job is not executed in
    * mutually exclusive manner.
    */
-  public JobInput mutex(final Object mutexObject) {
+  public JobInput withMutex(final Object mutexObject) {
     m_mutexObject = mutexObject;
     return this;
   }
 
-  public long expirationTimeMillis() {
+  public long getExpirationTimeMillis() {
     return m_expirationTime;
   }
 
@@ -93,12 +93,12 @@ public class JobInput {
    * @param timeUnit
    *          the time unit of the <code>time</code> argument.
    */
-  public JobInput expirationTime(final long time, final TimeUnit timeUnit) {
+  public JobInput withExpirationTime(final long time, final TimeUnit timeUnit) {
     m_expirationTime = timeUnit.toMillis(time);
     return this;
   }
 
-  public RunContext runContext() {
+  public RunContext getRunContext() {
     return m_runContext;
   }
 
@@ -109,12 +109,12 @@ public class JobInput {
    * However, if no context is provided, the job manager ensures a {@link RunMonitor} to be installed, so that executing
    * code can always query the cancellation status by <code>RunMonitor.CURRENT.get().isCancelled()</code>.
    */
-  public JobInput runContext(final RunContext runContext) {
+  public JobInput withRunContext(final RunContext runContext) {
     m_runContext = runContext;
     return this;
   }
 
-  public boolean logOnError() {
+  public boolean isLogOnError() {
     return m_logOnError;
   }
 
@@ -123,45 +123,45 @@ public class JobInput {
    * That is enabled by default, but might be disabled, if the caller handles exceptions himself by waiting for the job
    * to complete.
    */
-  public JobInput logOnError(final boolean logOnError) {
+  public JobInput withLogOnError(final boolean logOnError) {
     m_logOnError = logOnError;
     return this;
   }
 
-  public String threadName() {
+  public String getThreadName() {
     return m_threadName;
   }
 
   /**
    * Sets the thread name of the worker thread that will execute the job.
    */
-  public JobInput threadName(final String threadName) {
+  public JobInput withThreadName(final String threadName) {
     m_threadName = threadName;
     return this;
   }
 
-  public PropertyMap propertyMap() {
-    return runContext().getPropertyMap();
+  public PropertyMap getPropertyMap() {
+    return getRunContext().getPropertyMap();
   }
 
   public Object getProperty(final Object key) {
-    return runContext().getProperty(key);
+    return getRunContext().getProperty(key);
   }
 
   public JobInput withProperty(final Object key, final Object value) {
-    runContext().withProperty(key, value);
+    getRunContext().withProperty(key, value);
     return this;
   }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("name", name());
-    builder.ref("mutexObject", mutex());
-    builder.attr("expirationTime", expirationTimeMillis());
-    builder.attr("logOnError", logOnError());
-    builder.attr("threadName", threadName());
-    builder.attr("runContext", runContext());
+    builder.attr("name", getName());
+    builder.ref("mutexObject", getMutex());
+    builder.attr("expirationTime", getExpirationTimeMillis());
+    builder.attr("logOnError", isLogOnError());
+    builder.attr("threadName", getThreadName());
+    builder.attr("runContext", getRunContext());
 
     return builder.toString();
   }
@@ -171,12 +171,12 @@ public class JobInput {
    */
   public JobInput copy() {
     final JobInput copy = BEANS.get(JobInput.class);
-    copy.name(m_name);
-    copy.mutex(m_mutexObject);
-    copy.expirationTime(m_expirationTime, TimeUnit.MILLISECONDS);
-    copy.logOnError(m_logOnError);
-    copy.threadName(m_threadName);
-    copy.runContext(m_runContext != null ? m_runContext.copy() : null);
+    copy.withName(m_name);
+    copy.withMutex(m_mutexObject);
+    copy.withExpirationTime(m_expirationTime, TimeUnit.MILLISECONDS);
+    copy.withLogOnError(m_logOnError);
+    copy.withThreadName(m_threadName);
+    copy.withRunContext(m_runContext != null ? m_runContext.copy() : null);
     return copy;
   }
 }

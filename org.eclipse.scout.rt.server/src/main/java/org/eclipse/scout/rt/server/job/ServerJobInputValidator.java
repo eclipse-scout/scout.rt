@@ -30,12 +30,12 @@ public class ServerJobInputValidator {
    */
   public void validate(final JobInput input) {
     Assertions.assertNotNull(input, "For server jobs, 'JobInput' must not be null");
-    Assertions.assertNotNull(input.runContext(), "For server jobs, 'RunContext' must not be null");
-    Assertions.assertTrue(input.runContext() instanceof ServerRunContext, "For server jobs, 'RunContext' must be of the type 'ServerRunContext'");
+    Assertions.assertNotNull(input.getRunContext(), "For server jobs, 'RunContext' must not be null");
+    Assertions.assertTrue(input.getRunContext() instanceof ServerRunContext, "For server jobs, 'RunContext' must be of the type 'ServerRunContext'");
 
-    final ServerRunContext serverRunContext = (ServerRunContext) input.runContext();
+    final ServerRunContext serverRunContext = (ServerRunContext) input.getRunContext();
     Assertions.assertNotNull(serverRunContext.getSession(), "For server jobs, 'serverSession' must not be null");
 
-    Assertions.assertNotNull(input.runContext().getRunMonitor(), "For server jobs, 'RunMonitor' on 'RunContext' must not be null");
+    Assertions.assertNotNull(input.getRunContext().getRunMonitor(), "For server jobs, 'RunMonitor' on 'RunContext' must not be null");
   }
 }
