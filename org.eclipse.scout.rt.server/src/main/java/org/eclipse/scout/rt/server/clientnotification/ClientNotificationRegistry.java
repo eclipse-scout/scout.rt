@@ -71,13 +71,16 @@ public class ClientNotificationRegistry {
    *
    * @param notificationNodeId
    * @param maxAmount
-   * @param amount
+   *          maximum number of notifications to be consumed
+   * @param maxWaitTime
+   *          maximum waiting time for new notifications
    * @param unit
+   *          time unit for maxWaitTime
    * @return
    */
-  List<ClientNotificationMessage> consume(String notificationNodeId, int maxAmount, int amount, TimeUnit unit) {
+  List<ClientNotificationMessage> consume(String notificationNodeId, int maxAmount, int maxWaitTime, TimeUnit unit) {
     ClientNotificationNodeQueue queue = getQueue(notificationNodeId);
-    return queue.consume(maxAmount, amount, unit);
+    return queue.consume(maxAmount, maxWaitTime, unit);
   }
 
   private ClientNotificationNodeQueue getQueue(String notificationNodeId) {

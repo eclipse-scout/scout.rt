@@ -19,9 +19,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -30,28 +31,35 @@ import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.services.common.security.LogoutService;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotficationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
- *
+ * A queue for a client node, that keeps track of notifications for that node.
  */
 @Bean
 public class ClientNotificationNodeQueue {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogoutService.class);
 
   private final FinalValue<String> m_nodeId = new FinalValue<>();
-  private final FinalValue<Integer> m_capacity = new FinalValue<>();
 
-  private final List<ClientNotificationMessage> m_notifications = new LinkedList<ClientNotificationMessage>();
-  private final Object m_sessionCacheLock = new Object();
+  private final Integer m_capacity;
+  private final BlockingDeque<ClientNotificationMessage> m_notifications;
+
+  //TODO [aho] only keyset of m_sessionsToUser, m_userToSessions is used. Remove values?
+  private final ReentrantReadWriteLock m_sessionUserCacheLock = new ReentrantReadWriteLock();
   private final Map<String /*sessionId*/, String /*userId*/> m_sessionsToUser = new HashMap<>();
   private final Map<String /*userId*/, Set<String /*sessionId*/>> m_userToSessions = new HashMap<>();
 
-  @PostConstruct
-  protected void initConfig() {
-    // TODO aho make configurable
-    m_capacity.setValue(200);
+  public ClientNotificationNodeQueue() {
+    this(CONFIG.getPropertyValue(ClientNotificationProperties.NodeQueueCapacity.class));
+  }
+
+  public ClientNotificationNodeQueue(int capacity) {
+    m_capacity = capacity;
+    m_notifications = new LinkedBlockingDeque<>(capacity);
   }
 
   public void setNodeId(String nodeId) {
@@ -62,17 +70,18 @@ public class ClientNotificationNodeQueue {
     return m_nodeId.getValue();
   }
 
+  /**
+   * @return capacity of queue. If maximum capacity is reached, messages are dropped.
+   */
   public int getCapacity() {
-    return m_capacity.getValue();
+    return m_capacity;
   }
 
-  /**
-   * @param userId
-   */
   public void registerSession(String sessionId, String userId) {
     Assertions.assertNotNull(sessionId);
     Assertions.assertNotNull(userId);
-    synchronized (m_sessionCacheLock) {
+    m_sessionUserCacheLock.writeLock().lock();
+    try {
       m_sessionsToUser.put(sessionId, userId);
       Set<String> userSessions = m_userToSessions.get(sessionId);
       if (userSessions == null) {
@@ -81,6 +90,9 @@ public class ClientNotificationNodeQueue {
       }
       userSessions.add(sessionId);
     }
+    finally {
+      m_sessionUserCacheLock.writeLock().unlock();
+    }
   }
 
   public void put(ClientNotificationMessage notification) {
@@ -88,113 +100,104 @@ public class ClientNotificationNodeQueue {
   }
 
   public void put(Collection<? extends ClientNotificationMessage> notificationInput) {
-    List<ClientNotificationMessage> notifications = new ArrayList<ClientNotificationMessage>(notificationInput);
-    Iterator<ClientNotificationMessage> it = notifications.iterator();
-    while (it.hasNext()) {
-      if (!isRelevant(it.next())) {
-        it.remove();
-      }
-    }
-    if (notifications.isEmpty()) {
-      return;
-    }
-    synchronized (m_notifications) {
-      int newSize = m_notifications.size() + notifications.size();
-      if (newSize > getCapacity()) {
-        LOG.warn(String.format("Notification queue capacity reached. Remove oldest %s notification messages.", newSize - getCapacity()));
-        for (; newSize > getCapacity(); newSize--) {
-          m_notifications.remove(0);
-        }
-      }
-      m_notifications.addAll(notifications);
-      m_notifications.notify();
-    }
-  }
-
-  public boolean isRelevant(ClientNotificationMessage message) {
-    if (CompareUtility.equals(getNodeId(), message.getAddress().getExcludeNodeId())) {
-      return false;
-    }
-    if (message.getAddress().isNotifyAllSessions()) {
-      return true;
-    }
-    if (message.getAddress().isNotifyAllNodes()) {
-      return true;
-    }
-    Set<String> messageSessionIds = message.getAddress().getSessionIds();
-    if (CollectionUtility.hasElements(messageSessionIds)) {
-      // check message session ids registered in this Notificaiton Node
-      Set<String> sessionIds = getAllSessionIds();
-      sessionIds.retainAll(messageSessionIds);
-      if (!sessionIds.isEmpty()) {
-        return true;
-      }
-    }
-    Set<String> messageUserIds = message.getAddress().getUserIds();
-    if (CollectionUtility.hasElements(messageUserIds)) {
-      Set<String> userIds = getAllUserIds();
-      userIds.retainAll(messageUserIds);
-      if (!userIds.isEmpty()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void releaseAllWaitingThreads() {
-    synchronized (m_notifications) {
-      m_notifications.notifyAll();
-    }
-  }
-
-  public List<ClientNotificationMessage> consume(int maxAmount, long amount, TimeUnit unit) {
-    List<ClientNotificationMessage> result = new ArrayList<ClientNotificationMessage>(maxAmount);
-    getNotifications(maxAmount, amount, unit, result, true);
-    LOG.debug(String.format("consumed %s notifications.", result.size()));
-    return result;
-  }
-
-  protected void getNotifications(int maxAmount, long amount, TimeUnit unit, List<ClientNotificationMessage> collector, boolean reschedule) {
-    synchronized (m_notifications) {
-      if (m_notifications.isEmpty()) {
-        try {
-          m_notifications.wait(unit.toMillis(amount));
-        }
-        catch (InterruptedException e) {
-          LOG.warn("Consume notification thread waiting for notifications interrupted.");
-        }
-      }
-      Iterator<ClientNotificationMessage> it = m_notifications.iterator();
-      int itemCount = collector.size();
-      while (it.hasNext() && itemCount < maxAmount) {
-        collector.add(it.next());
-        it.remove();
-        itemCount++;
-      }
-      // Optimization to not go back with one notification when some are about to pop up.
-      if (reschedule && itemCount < maxAmount) {
-        getNotifications(maxAmount, 234, TimeUnit.MILLISECONDS, collector, false);
-      }
-    }
-  }
-
-  public Set<String /*sessionId*/> getAllSessionIds() {
-    final Set<String> sessionIds;
-    synchronized (m_sessionCacheLock) {
-      sessionIds = new HashSet<String>(m_sessionsToUser.keySet());
-    }
-    return sessionIds;
+    List<ClientNotificationMessage> notifications = getFilteredNotifications(notificationInput);
+    putDroppingOld(notifications);
   }
 
   /**
-   * @return
+   * Put notifications into queue and drop oldest ones, if capacity is reached.
    */
-  public Set<String> getAllUserIds() {
-    final Set<String> userIds;
-    synchronized (m_sessionCacheLock) {
-      userIds = new HashSet<String>(m_userToSessions.keySet());
+  private void putDroppingOld(Collection<? extends ClientNotificationMessage> notifications) {
+    int dropCount = 0;
+    for (ClientNotificationMessage message : notifications) {
+      boolean inserted = m_notifications.offer(message);
+      while (!inserted) {
+        ClientNotificationMessage removed = m_notifications.poll();
+        if (removed != null) {
+          dropCount++;
+        }
+        inserted = m_notifications.offer(message);
+      }
     }
-    return userIds;
+    if (dropCount > 0) {
+      LOG.warn(String.format("Notification queue capacity reached. Remove oldest %s notification messages.", dropCount));
+    }
+  }
+
+  public List<ClientNotificationMessage> consume(int maxAmount, long maxWaitTime, TimeUnit unit) {
+    List<ClientNotificationMessage> result = getNotifications(maxAmount, maxWaitTime, unit);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format("consumed %s notifications.", result.size()));
+    }
+    return result;
+  }
+
+  protected List<ClientNotificationMessage> getNotifications(int maxAmount, long maxWaitTime, TimeUnit unit) {
+    List<ClientNotificationMessage> collected = new LinkedList<>();
+    try {
+      //blocking wait to get first message
+      ClientNotificationMessage next = m_notifications.poll(maxWaitTime, unit);
+      if (next != null) {
+        collected.add(next);
+      }
+
+      //add more available notifications
+      //with short wait timeout to not go back with one notification when some are about to pop up.
+      int timeout = 234; // 0 for no reschedule
+      while (next != null && collected.size() < maxAmount) {
+        next = m_notifications.poll(timeout, TimeUnit.MILLISECONDS);
+        if (next != null) {
+          collected.add(next);
+        }
+      }
+
+    }
+    catch (InterruptedException e1) {
+      LOG.warn("Consume notification thread waiting for notifications interrupted.");
+    }
+    return collected;
+  }
+
+  private List<ClientNotificationMessage> getFilteredNotifications(Collection<? extends ClientNotificationMessage> notificationInput) {
+    List<ClientNotificationMessage> notifications = new ArrayList<ClientNotificationMessage>(notificationInput);
+    Iterator<ClientNotificationMessage> it = notifications.iterator();
+    while (it.hasNext()) {
+      if (!isRelevant(it.next().getAddress())) {
+        it.remove();
+      }
+    }
+    return notifications;
+  }
+
+  public boolean isRelevant(ClientNotficationAddress address) {
+    if (CompareUtility.equals(getNodeId(), address.getExcludeNodeId())) {
+      return false;
+    }
+    return address.isNotifyAllSessions()
+        || address.isNotifyAllNodes()
+        || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds())
+        || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
+  }
+
+  public Set<String /*sessionId*/> getAllSessionIds() {
+    m_sessionUserCacheLock.readLock().lock();
+    try {
+      return new HashSet<String>(m_sessionsToUser.keySet());
+    }
+    finally {
+      m_sessionUserCacheLock.readLock().unlock();
+    }
+  }
+
+  public Set<String> getAllUserIds() {
+    m_sessionUserCacheLock.readLock().lock();
+    try {
+      return new HashSet<String>(m_userToSessions.keySet());
+    }
+    finally {
+      m_sessionUserCacheLock.readLock().unlock();
+    }
+
   }
 
 }
