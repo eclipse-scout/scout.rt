@@ -51,7 +51,7 @@ public class MessageBoxStore extends IndexedStore<IMessageBox> {
 
     @Override
     protected IDisplayParent calculateIndexFor(final IMessageBox messageBox) {
-      return messageBox.displayParent();
+      return messageBox.getDisplayParent();
     }
   }
 
@@ -59,7 +59,7 @@ public class MessageBoxStore extends IndexedStore<IMessageBox> {
 
     @Override
     protected Boolean calculateIndexFor(final IMessageBox messageBox) {
-      return messageBox.displayParent() == ClientSessionProvider.currentSession().getDesktop();
+      return messageBox.getDisplayParent() == ClientSessionProvider.currentSession().getDesktop();
     }
   }
 }

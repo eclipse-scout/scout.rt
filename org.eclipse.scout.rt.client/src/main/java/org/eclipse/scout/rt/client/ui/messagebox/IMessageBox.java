@@ -40,7 +40,7 @@ public interface IMessageBox extends IPropertyObserver {
   /**
    * @return the {@link IDisplayParent} to attach this {@link IMessageBox} to; is never <code>null</code>.
    */
-  IDisplayParent displayParent();
+  IDisplayParent getDisplayParent();
 
   /**
    * Sets the display parent to attach this {@link IMessageBox} to.
@@ -57,7 +57,7 @@ public interface IMessageBox extends IPropertyObserver {
    *          like {@link IDesktop}, {@link IOutline}, {@link IForm}, or <code>null</code> to derive the
    *          {@link IDisplayParent} from the current calling context.
    */
-  IMessageBox displayParent(IDisplayParent displayParent);
+  IMessageBox withDisplayParent(IDisplayParent displayParent);
 
   /*
    * Model observer
@@ -71,14 +71,14 @@ public interface IMessageBox extends IPropertyObserver {
    */
   IMessageBoxUIFacade getUIFacade();
 
-  String iconId();
+  String getIconId();
 
-  IMessageBox iconId(String iconId);
+  IMessageBox withIconId(String iconId);
 
   /**
-   * @see {@link #severity(int)}
+   * @see {@link #withSeverity(int)}
    */
-  int severity();
+  int getSeverity();
 
   /**
    * Sets the severity.
@@ -87,48 +87,48 @@ public interface IMessageBox extends IPropertyObserver {
    *          One of the {@link IStatus} constants.
    * @return
    */
-  IMessageBox severity(int severity);
+  IMessageBox withSeverity(int severity);
 
   /**
-   * @see {@link #header(String)}
+   * @see {@link #withHeader(String)}
    */
-  String header();
+  String getHeader();
 
   /**
    * Sets the header.
    * <p>
    * The header is by default represented in bold font as first entry in the message box.
    */
-  IMessageBox header(String header);
+  IMessageBox withHeader(String header);
 
   /**
-   * @see {@link #body(String)}
+   * @see {@link #withBody(String)}
    */
-  String body();
+  String getBody();
 
   /**
    * Sets the body.
    * <p>
    * The body is by default represented in normal font as second entry after the header (if available).
    */
-  IMessageBox body(String body);
+  IMessageBox withBody(String body);
 
   /**
-   * @see {@link #html(IHtmlContent)}
+   * @see {@link #withHtml(IHtmlContent)}
    */
-  IHtmlContent html();
+  IHtmlContent getHtml();
 
   /**
    * Sets the html.
    * <p>
    * The html allows to use custom html and is positioned as third entry after the body (if available).
    */
-  IMessageBox html(IHtmlContent html);
+  IMessageBox withHtml(IHtmlContent html);
 
   /**
-   * @see {@link #hiddenText(String)}
+   * @see {@link #withHiddenText(String)}
    */
-  String hiddenText();
+  String getHiddenText();
 
   /**
    * Sets the hidden text.
@@ -136,42 +136,42 @@ public interface IMessageBox extends IPropertyObserver {
    * The hidden text is used for the default copy paste text, thus not visible in the UI directly.<br/>
    * Examples usages are stacktraces or more detailed information that should not be directly presented to the user.
    */
-  IMessageBox hiddenText(String hiddenText);
+  IMessageBox withHiddenText(String hiddenText);
 
   /**
-   * @see {@link #yesButtonText(String)}
+   * @see {@link #withYesButtonText(String)}
    */
-  String yesButtonText();
+  String getYesButtonText();
 
   /**
    * Sets the text for the yes / ok button.
    */
-  IMessageBox yesButtonText(String yesButtonText);
+  IMessageBox withYesButtonText(String yesButtonText);
 
   /**
-   * @see {@link #noButtonText(String)}
+   * @see {@link #withNoButtonText(String)}
    */
-  String noButtonText();
+  String getNoButtonText();
 
   /**
    * Sets the text for the no button.
    */
-  IMessageBox noButtonText(String noButtonText);
+  IMessageBox withNoButtonText(String noButtonText);
 
   /**
-   * @see {@link #cancelButtonText(String)}
+   * @see {@link #withCancelButtonText(String)}
    */
-  String cancelButtonText();
+  String getCancelButtonText();
 
   /**
    * Sets the text for the cancel button.
    */
-  IMessageBox cancelButtonText(String cancelButtonText);
+  IMessageBox withCancelButtonText(String cancelButtonText);
 
   /**
-   * @see {@link #autoCloseMillis(long)}
+   * @see {@link #withAutoCloseMillis(long)}
    */
-  long autoCloseMillis();
+  long getAutoCloseMillis();
 
   /**
    * To close the message box automatically after the specified period of time. By default, the result
@@ -181,12 +181,12 @@ public interface IMessageBox extends IPropertyObserver {
    * @param autoCloseMillis
    *          timeout [ms]
    */
-  IMessageBox autoCloseMillis(long autoCloseMillis);
+  IMessageBox withAutoCloseMillis(long autoCloseMillis);
 
   /**
-   * @see {@link #copyPasteText(String)}
+   * @see {@link #withCopyPasteText(String)}
    */
-  String copyPasteText();
+  String getCopyPasteText();
 
   /**
    * Sets the copy paste text.
@@ -196,7 +196,7 @@ public interface IMessageBox extends IPropertyObserver {
    * If not explicitly set, the default copy paste text is used, which is a combination of header, body, html (plain
    * text) and hidden text (separated by newline).
    */
-  IMessageBox copyPasteText(String copyPasteText);
+  IMessageBox withCopyPasteText(String copyPasteText);
 
   /**
    * To query whether the message box is open or closed.

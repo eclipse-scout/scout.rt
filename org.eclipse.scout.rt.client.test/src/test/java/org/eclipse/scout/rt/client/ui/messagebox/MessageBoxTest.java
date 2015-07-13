@@ -231,19 +231,19 @@ public class MessageBoxTest {
 
   @Test
   public void testYesNoMessageBox() throws Exception {
-    MessageBoxes.createYesNo().header("header").body("body").show();
+    MessageBoxes.createYesNo().withHeader("header").withBody("body").show();
     assertMessageBox("header", "body");
   }
 
   @Test
   public void testYesNoMessageBoxWithHtml() throws Exception {
-    MessageBoxes.createYesNo().header("header").body("body").html(HTML.plain("<h1>title</h1>")).show();
+    MessageBoxes.createYesNo().withHeader("header").withBody("body").withHtml(HTML.plain("<h1>title</h1>")).show();
     assertMessageBox("header", "body", "<h1>title</h1>");
   }
 
   @Test
   public void testYesNoMessageBoxWithEncodedHtml() throws Exception {
-    MessageBoxes.createYesNo().header("header").body("body").html(HTML.h1("title & sub-title")).show();
+    MessageBoxes.createYesNo().withHeader("header").withBody("body").withHtml(HTML.h1("title & sub-title")).show();
     assertMessageBox("header", "body", "<h1>title &amp; sub-title</h1>");
   }
 
@@ -256,12 +256,12 @@ public class MessageBoxTest {
     Mockito.verify(m_desktopSpy).showMessageBox(argument.capture());
 
     MessageBox messageBox = argument.getValue();
-    assertEquals("Intro text", expectedIntro, messageBox.header());
-    assertEquals("Action text", expectedAction, messageBox.body());
-    assertEquals("Html", expectedHtml, messageBox.html() == null ? null : messageBox.html().toEncodedHtml());
-    assertEquals("Yes button text", TEXTS.get("YesButton"), messageBox.yesButtonText());
-    assertEquals("No button text", TEXTS.get("NoButton"), messageBox.noButtonText());
-    assertEquals("Cancel button text", null, messageBox.cancelButtonText());
+    assertEquals("Intro text", expectedIntro, messageBox.getHeader());
+    assertEquals("Action text", expectedAction, messageBox.getBody());
+    assertEquals("Html", expectedHtml, messageBox.getHtml() == null ? null : messageBox.getHtml().toEncodedHtml());
+    assertEquals("Yes button text", TEXTS.get("YesButton"), messageBox.getYesButtonText());
+    assertEquals("No button text", TEXTS.get("NoButton"), messageBox.getNoButtonText());
+    assertEquals("Cancel button text", null, messageBox.getCancelButtonText());
   }
 
 }

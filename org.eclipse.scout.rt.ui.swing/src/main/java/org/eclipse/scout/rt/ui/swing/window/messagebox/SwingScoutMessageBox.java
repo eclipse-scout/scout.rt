@@ -96,7 +96,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       m_swingDialog = new JDialogEx((Frame) m_swingParent);
     }
     m_swingDialog.setModal(true);
-    String title = getScoutMessageBox().header(); // title doesn't exist anymore since N release
+    String title = getScoutMessageBox().getHeader(); // title doesn't exist anymore since N release
     m_swingDialog.setTitle(title);
     /**
      * WORKAROUND AWT doesn't show a dialog icon if dialog is not resizeable
@@ -107,8 +107,8 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     JPanel contentPane = (JPanel) m_swingDialog.getContentPane();
     contentPane.setLayout(new P_Layout());
     contentPane.setBackground(new Color(COLOR_LIGHT_GRAY));
-    if (getScoutMessageBox().header() != null) {
-      String s = getScoutMessageBox().header();
+    if (getScoutMessageBox().getHeader() != null) {
+      String s = getScoutMessageBox().getHeader();
       JPanel labelPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
       labelPanel.setBorder(new EmptyBorder(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING));
       labelPanel.setBackground(Color.white);
@@ -119,8 +119,8 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       labelPanel.add(label);
       contentPane.add(BorderLayout.NORTH, labelPanel);
     }
-    if (getScoutMessageBox().body() != null) {
-      String s = getScoutMessageBox().body();
+    if (getScoutMessageBox().getBody() != null) {
+      String s = getScoutMessageBox().getBody();
       JPanel labelPanel = new JPanelEx(new FlowLayoutEx(FlowLayoutEx.LEFT));
       labelPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING)));
       labelPanel.setOpaque(false);
@@ -135,22 +135,22 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     buttonPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(EMPTY_BORDER_PADDING, EMPTY_BORDER_PADDING, EMPTY_BORDER_PADDING, EMPTY_BORDER_PADDING)));
     buttonPanel.setOpaque(false);
     JButton defaultButton = null;
-    if (getScoutMessageBox().yesButtonText() != null) {
-      m_swingButtonYes = createButton(getScoutMessageBox().yesButtonText(), UIManager.getIcon("SystemButton.yesIcon"));
+    if (getScoutMessageBox().getYesButtonText() != null) {
+      m_swingButtonYes = createButton(getScoutMessageBox().getYesButtonText(), UIManager.getIcon("SystemButton.yesIcon"));
       buttonPanel.add(m_swingButtonYes);
       if (defaultButton == null) {
         defaultButton = m_swingButtonYes;
       }
     }
-    if (getScoutMessageBox().noButtonText() != null) {
-      m_swingButtonNo = createButton(getScoutMessageBox().noButtonText(), UIManager.getIcon("SystemButton.noIcon"));
+    if (getScoutMessageBox().getNoButtonText() != null) {
+      m_swingButtonNo = createButton(getScoutMessageBox().getNoButtonText(), UIManager.getIcon("SystemButton.noIcon"));
       buttonPanel.add(m_swingButtonNo);
       if (defaultButton == null) {
         defaultButton = m_swingButtonNo;
       }
     }
-    if (getScoutMessageBox().cancelButtonText() != null) {
-      m_swingButtonCancel = createButton(getScoutMessageBox().cancelButtonText(), UIManager.getIcon("SystemButton.cancelIcon"));
+    if (getScoutMessageBox().getCancelButtonText() != null) {
+      m_swingButtonCancel = createButton(getScoutMessageBox().getCancelButtonText(), UIManager.getIcon("SystemButton.cancelIcon"));
       buttonPanel.add(m_swingButtonCancel);
       if (defaultButton == null) {
         defaultButton = m_swingButtonCancel;
@@ -177,7 +177,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       addButtonKeyStroke(m_swingButtonYes, "ESCAPE");
     }
     // copy/paste button
-    if (getScoutMessageBox().hiddenText() != null) {
+    if (getScoutMessageBox().getHiddenText() != null) {
       m_swingButtonCopy = createButton(SwingUtility.getNlsText("Copy"), null);
       buttonPanel.add(m_swingButtonCopy);
       addButtonKeyStroke(m_swingButtonCopy, "control C");
@@ -254,7 +254,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
     if (b == m_swingButtonCopy) {
       // copy message to clipboard
       Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-      clip.setContents(new StringSelection(getScoutMessageBox().hiddenText()), null);
+      clip.setContents(new StringSelection(getScoutMessageBox().getHiddenText()), null);
     }
     else {
       int resultOption = -1;

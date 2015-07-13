@@ -52,25 +52,21 @@ public final class MessageBoxes {
    * Do not forget to call {@link #show()} at the end.
    */
   public static IMessageBox createOk() {
-    return MessageBoxes.create().
-        yesButtonText(ScoutTexts.get("OkButton"));
+    return MessageBoxes.create().withYesButtonText(ScoutTexts.get("OkButton"));
   }
 
   /**
    * Creates e message box with yes and not buttons.
    */
   public static IMessageBox createYesNo() {
-    return MessageBoxes.create().
-        yesButtonText(ScoutTexts.get("YesButton")).
-        noButtonText(ScoutTexts.get("NoButton"));
+    return MessageBoxes.create().withYesButtonText(ScoutTexts.get("YesButton")).withNoButtonText(ScoutTexts.get("NoButton"));
   }
 
   /**
    * Creates a message box with yes, no and cancel buttons.
    */
   public static IMessageBox createYesNoCancel() {
-    return MessageBoxes.createYesNo().
-        cancelButtonText(ScoutTexts.get("CancelButton"));
+    return MessageBoxes.createYesNo().withCancelButtonText(ScoutTexts.get("CancelButton"));
   }
 
   /**
@@ -161,7 +157,7 @@ public final class MessageBoxes {
       body = (n > 0 ? t.toString() : null);
     }
 
-    int result = createYesNo().header(header).body(body).show();
+    int result = createYesNo().withHeader(header).withBody(body).show();
     return result == IMessageBox.YES_OPTION;
   }
 }

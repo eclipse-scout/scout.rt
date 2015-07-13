@@ -225,7 +225,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
         for (IForm f : invalidForms) {
           msg.append("- ").append(getFormDisplayName(f)).append("\n");
         }
-        MessageBoxes.createOk().header(TEXTS.get("NotAllCheckedFormsCanBeSaved")).body(msg.toString()).show();
+        MessageBoxes.createOk().withHeader(TEXTS.get("NotAllCheckedFormsCanBeSaved")).withBody(msg.toString()).show();
         return false;
       }
       return true;

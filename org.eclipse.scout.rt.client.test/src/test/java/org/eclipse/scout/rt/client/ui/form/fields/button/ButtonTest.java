@@ -87,7 +87,7 @@ public class ButtonTest {
 
           @Override
           protected void execAction() throws ProcessingException {
-            MessageBoxes.createOk().header("click").body("it").show();
+            MessageBoxes.createOk().withHeader("click").withBody("it").show();
           }
         }
 
@@ -105,7 +105,7 @@ public class ButtonTest {
 
           @Override
           protected void execAction() throws ProcessingException {
-            MessageBoxes.createOk().header("click").body("it").show();
+            MessageBoxes.createOk().withHeader("click").withBody("it").show();
           }
         }
       }

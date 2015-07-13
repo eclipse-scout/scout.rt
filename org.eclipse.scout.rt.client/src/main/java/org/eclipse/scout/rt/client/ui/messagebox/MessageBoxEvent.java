@@ -58,7 +58,7 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
     }
     // messageBox
     if (getMessageBox() != null) {
-      buf.append(" " + getMessageBox().header());
+      buf.append(" " + getMessageBox().getHeader());
     }
     buf.append("]");
     return buf.toString();

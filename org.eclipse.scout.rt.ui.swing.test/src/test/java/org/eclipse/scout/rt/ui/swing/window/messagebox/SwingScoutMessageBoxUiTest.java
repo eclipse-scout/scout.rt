@@ -131,8 +131,8 @@ public class SwingScoutMessageBoxUiTest {
     @Override
     public IMessageBox getScoutMessageBox() {
       IMessageBox scoutObject = mock(IMessageBox.class);
-      when(scoutObject.header()).thenReturn(m_header);
-      when(scoutObject.body()).thenReturn(m_body);
+      when(scoutObject.getHeader()).thenReturn(m_header);
+      when(scoutObject.getBody()).thenReturn(m_body);
       return scoutObject;
     }
   }

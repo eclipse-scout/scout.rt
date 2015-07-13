@@ -79,7 +79,7 @@ public class PasswordPolicyVerifier {
             header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays));
           }
 
-          int answer = MessageBoxes.createYesNoCancel().header(header).body(ScoutTexts.get("PasswordWillExpireInfo")).show();
+          int answer = MessageBoxes.createYesNoCancel().withHeader(header).withBody(ScoutTexts.get("PasswordWillExpireInfo")).show();
           if (answer == MessageBox.YES_OPTION) {
             changeNow = true;
           }
@@ -87,7 +87,7 @@ public class PasswordPolicyVerifier {
       }
       else {
         // has expired
-        MessageBoxes.createOk().header(ScoutTexts.get("PasswordHasExpiredTitle")).body(ScoutTexts.get("PasswordHasExpiredHeader")).show();
+        MessageBoxes.createOk().withHeader(ScoutTexts.get("PasswordHasExpiredTitle")).withBody(ScoutTexts.get("PasswordHasExpiredHeader")).show();
         changeNow = true;
       }
       //

@@ -962,7 +962,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     // Ensure 'displayParent' to be set.
-    Assertions.assertNotNull(messageBox.displayParent(), "Property 'displayParent' must not be null");
+    Assertions.assertNotNull(messageBox.getDisplayParent(), "Property 'displayParent' must not be null");
 
     m_messageBoxStore.add(messageBox);
     fireMessageBoxShow(messageBox);

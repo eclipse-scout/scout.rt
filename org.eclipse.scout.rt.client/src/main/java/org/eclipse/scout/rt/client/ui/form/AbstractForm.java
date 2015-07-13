@@ -1884,9 +1884,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
         int result = MessageBoxes
         		        .createYesNoCancel()
-        		        .displayParent(this)
-        		        .header(getCancelVerificationText())
-        		        .severity(IStatus.INFO)
+        		        .withDisplayParent(this)
+        		        .withHeader(getCancelVerificationText())
+        		        .withSeverity(IStatus.INFO)
         		        .show();
 
         if (result == IMessageBox.YES_OPTION) {
@@ -2437,8 +2437,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes
             .createOk()
-            .displayParent(this)
-            .header(TEXTS.get("LoadFormXmlFailedText"))
+            .withDisplayParent(this)
+            .withHeader(TEXTS.get("LoadFormXmlFailedText"))
             .show();
         }
       }

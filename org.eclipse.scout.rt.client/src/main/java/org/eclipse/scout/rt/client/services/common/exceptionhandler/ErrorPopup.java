@@ -52,11 +52,11 @@ public class ErrorPopup {
     ensureErrorParsed(error);
 
     MessageBoxes.create().
-        header(m_text).
-        body(m_detail).
-        yesButtonText(m_acceptText).
-        hiddenText(m_copyPasteText).
-        severity(m_cause.getStatus().getSeverity()).
+        withHeader(m_text).
+        withBody(m_detail).
+        withYesButtonText(m_acceptText).
+        withHiddenText(m_copyPasteText).
+        withSeverity(m_cause.getStatus().getSeverity()).
         show();
   }
 

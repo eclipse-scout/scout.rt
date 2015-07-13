@@ -946,7 +946,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           }
         }
         if (success != null && !success) {
-          MessageBoxes.createOk().body(ScoutTexts.get("ApplyBookmarkToSearchFailedMessage")).show();
+          MessageBoxes.createOk().withBody(ScoutTexts.get("ApplyBookmarkToSearchFailedMessage")).show();
         }
       }
     }

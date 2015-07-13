@@ -90,12 +90,12 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   @Override
-  public IDisplayParent displayParent() {
+  public IDisplayParent getDisplayParent() {
     return m_displayParent;
   }
 
   @Override
-  public IMessageBox displayParent(IDisplayParent displayParent) {
+  public IMessageBox withDisplayParent(IDisplayParent displayParent) {
     Assertions.assertFalse(ClientSessionProvider.currentSession().getDesktop().isShowing(this), "Property 'displayParent' cannot be changed because message box is already showing [messageBox=%s]", this);
 
     if (displayParent == null) {
@@ -128,121 +128,121 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   @Override
-  public String header() {
+  public String getHeader() {
     return m_header;
   }
 
   @Override
-  public MessageBox header(String header) {
+  public MessageBox withHeader(String header) {
     m_header = header;
     m_copyPasteTextInternal = null;
     return this;
   }
 
   @Override
-  public String body() {
+  public String getBody() {
     return m_body;
   }
 
   @Override
-  public MessageBox body(String body) {
+  public MessageBox withBody(String body) {
     m_body = body;
     m_copyPasteTextInternal = null;
     return this;
   }
 
   @Override
-  public IHtmlContent html() {
+  public IHtmlContent getHtml() {
     return m_html;
   }
 
   @Override
-  public MessageBox html(IHtmlContent html) {
+  public MessageBox withHtml(IHtmlContent html) {
     m_html = html;
     m_copyPasteTextInternal = null;
     return this;
   }
 
   @Override
-  public String hiddenText() {
+  public String getHiddenText() {
     return m_hiddenText;
   }
 
   @Override
-  public MessageBox hiddenText(String hiddenText) {
+  public MessageBox withHiddenText(String hiddenText) {
     m_hiddenText = hiddenText;
     m_copyPasteTextInternal = null;
     return this;
   }
 
   @Override
-  public String yesButtonText() {
+  public String getYesButtonText() {
     return m_yesButtonText;
   }
 
   @Override
-  public MessageBox yesButtonText(String yesButtonText) {
+  public MessageBox withYesButtonText(String yesButtonText) {
     m_yesButtonText = yesButtonText;
     return this;
   }
 
   @Override
-  public String noButtonText() {
+  public String getNoButtonText() {
     return m_noButtonText;
   }
 
   @Override
-  public MessageBox noButtonText(String noButtonText) {
+  public MessageBox withNoButtonText(String noButtonText) {
     m_noButtonText = noButtonText;
     return this;
   }
 
   @Override
-  public String cancelButtonText() {
+  public String getCancelButtonText() {
     return m_cancelButtonText;
   }
 
   @Override
-  public MessageBox cancelButtonText(String cancelButtonText) {
+  public MessageBox withCancelButtonText(String cancelButtonText) {
     m_cancelButtonText = cancelButtonText;
     return this;
   }
 
   @Override
-  public String iconId() {
+  public String getIconId() {
     return m_iconId;
   }
 
   @Override
-  public MessageBox iconId(String iconId) {
+  public MessageBox withIconId(String iconId) {
     m_iconId = iconId;
     return this;
   }
 
   @Override
-  public int severity() {
+  public int getSeverity() {
     return m_severity;
   }
 
   @Override
-  public MessageBox severity(int severity) {
+  public MessageBox withSeverity(int severity) {
     m_severity = severity;
     return this;
   }
 
   @Override
-  public long autoCloseMillis() {
+  public long getAutoCloseMillis() {
     return m_autoCloseMillis;
   }
 
   @Override
-  public MessageBox autoCloseMillis(long autoCloseMillis) {
+  public MessageBox withAutoCloseMillis(long autoCloseMillis) {
     m_autoCloseMillis = autoCloseMillis;
     return this;
   }
 
   @Override
-  public String copyPasteText() {
+  public String getCopyPasteText() {
     if (m_copyPasteText == null) {
       updateCopyPasteTextInternal();
       return m_copyPasteTextInternal;
@@ -253,7 +253,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   }
 
   @Override
-  public MessageBox copyPasteText(String copyPasteText) {
+  public MessageBox withCopyPasteText(String copyPasteText) {
     m_copyPasteText = copyPasteText;
     return this;
   }
@@ -307,7 +307,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   /**
    * Displays the message box and waits for a response.
    * <p>
-   * If {@link #autoCloseMillis()} is set, the message box will return with {@link IMessageBox#CANCEL_OPTION} after the
+   * If {@link #getAutoCloseMillis()} is set, the message box will return with {@link IMessageBox#CANCEL_OPTION} after the
    * specific time.
    */
   @Override
@@ -318,7 +318,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   /**
    * Displays the message box and waits for a response.
    * <p>
-   * If {@link #autoCloseMillis()} is set, the message box will return with given response after the specific time.
+   * If {@link #getAutoCloseMillis()} is set, the message box will return with given response after the specific time.
    */
   @Override
   public int show(int defaultResult) {
@@ -346,8 +346,8 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
         desktop.showMessageBox(this);
         // attach auto-cancel timer
         IFuture<Void> autoCloseFuture = null;
-        if (autoCloseMillis() > 0) {
-          final long dt = autoCloseMillis();
+        if (getAutoCloseMillis() > 0) {
+          final long dt = getAutoCloseMillis();
           autoCloseFuture = ClientJobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {

@@ -802,7 +802,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               IClipboardService svc = BEANS.opt(IClipboardService.class);
               if (svc == null) {
                 LOG.info(sb.toString());
-                MessageBoxes.createOk().body("See log-file for column widths output.").show();
+                MessageBoxes.createOk().withBody("See log-file for column widths output.").show();
               }
               else {
                 svc.setTextContents(sb.toString());
