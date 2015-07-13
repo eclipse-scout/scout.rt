@@ -47,10 +47,11 @@ public class ClientNotificationPoller {
     if (BEANS.get(IServiceTunnel.class).isActive()) {
       P_NotificationPollJob pollJob = new P_NotificationPollJob();
       m_pollerFuture = Jobs.schedule(pollJob, Jobs.newInput(
-          ClientRunContexts.empty().
-          session(BEANS.get(IClientSessionRegistry.class).getNotificationSession(), true).
-          subject(BEANS.get(NotificationSubjectProperty.class).getValue()).
-          userAgent(UserAgent.createDefault())));
+          ClientRunContexts
+            .empty()
+            .withSession(BEANS.get(IClientSessionRegistry.class).getNotificationSession(), true)
+            .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
+            .withUserAgent(UserAgent.createDefault())));
     }
     else {
       LOG.debug("Starting without notifications due to no proxy service is available");

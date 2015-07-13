@@ -95,7 +95,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
     m_runWithRunContext = m_input.runContext() != null;
-    m_runMonitor = (m_runWithRunContext ? m_input.runContext().runMonitor() : BEANS.get(RunMonitor.class));
+    m_runMonitor = (m_runWithRunContext ? m_input.runContext().getRunMonitor() : BEANS.get(RunMonitor.class));
 
     m_jobManager.registerFuture(this);
     m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).

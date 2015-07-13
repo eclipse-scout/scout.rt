@@ -269,7 +269,7 @@ public class InvocationContext<PORT> {
 
       final String operation = String.format("client=%s, operation=%s.%s", m_name, method.getDeclaringClass().getSimpleName(), method.getName());
 
-      final ServerRunContext currentRunContext = ServerRunContexts.copyCurrent().transactionScope(TransactionScope.REQUIRED);
+      final ServerRunContext currentRunContext = ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRED);
       final IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
         @Override

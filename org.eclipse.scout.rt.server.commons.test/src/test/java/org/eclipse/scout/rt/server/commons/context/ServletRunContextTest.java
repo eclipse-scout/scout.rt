@@ -56,26 +56,26 @@ public class ServletRunContextTest {
   @Test
   public void testEmpty() {
     ServletRunContext runContext = ServletRunContexts.empty();
-    assertNull(runContext.servletRequest());
-    assertNull(runContext.servletResponse());
+    assertNull(runContext.getServletRequest());
+    assertNull(runContext.getServletResponse());
   }
 
   @Test
   public void testCopy() {
     ServletRunContext runContext = ServletRunContexts.empty();
-    runContext.propertyMap().put("A", "B");
-    runContext.subject(new Subject());
-    runContext.locale(Locale.CANADA_FRENCH);
-    runContext.servletRequest(m_servletRequest);
-    runContext.servletResponse(m_servletResponse);
+    runContext.getPropertyMap().put("A", "B");
+    runContext.withSubject(new Subject());
+    runContext.withLocale(Locale.CANADA_FRENCH);
+    runContext.withServletRequest(m_servletRequest);
+    runContext.withServletResponse(m_servletResponse);
 
     ServletRunContext copy = runContext.copy();
 
-    assertEquals(toSet(runContext.propertyMap().iterator()), toSet(copy.propertyMap().iterator()));
-    assertSame(runContext.subject(), copy.subject());
-    assertSame(runContext.locale(), copy.locale());
-    assertSame(m_servletRequest, copy.servletRequest());
-    assertSame(m_servletResponse, copy.servletResponse());
+    assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
+    assertSame(runContext.getSubject(), copy.getSubject());
+    assertSame(runContext.getLocale(), copy.getLocale());
+    assertSame(m_servletRequest, copy.getServletRequest());
+    assertSame(m_servletResponse, copy.getServletResponse());
   }
 
   @Test
@@ -88,7 +88,7 @@ public class ServletRunContextTest {
         return ServletRunContexts.copyCurrent();
       }
     });
-    assertSame(subject, runContext.subject());
+    assertSame(subject, runContext.getSubject());
 
     runContext = Subject.doAs(null, new PrivilegedAction<ServletRunContext>() {
 
@@ -97,34 +97,34 @@ public class ServletRunContextTest {
         return ServletRunContexts.copyCurrent();
       }
     });
-    assertNull(runContext.subject());
+    assertNull(runContext.getSubject());
   }
 
   @Test
   public void testCurrentServletRequest() {
     IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
-    assertNull(ServletRunContexts.copyCurrent().servletRequest());
+    assertNull(ServletRunContexts.copyCurrent().getServletRequest());
 
     IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(m_servletRequest);
-    assertSame(m_servletRequest, ServletRunContexts.copyCurrent().servletRequest());
+    assertSame(m_servletRequest, ServletRunContexts.copyCurrent().getServletRequest());
   }
 
   @Test
   public void testCurrentServletResponse() {
     IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
-    assertNull(ServletRunContexts.copyCurrent().servletResponse());
+    assertNull(ServletRunContexts.copyCurrent().getServletResponse());
 
     IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(m_servletResponse);
-    assertSame(m_servletResponse, ServletRunContexts.copyCurrent().servletResponse());
+    assertSame(m_servletResponse, ServletRunContexts.copyCurrent().getServletResponse());
   }
 
   @Test
   public void testCurrentLocale() {
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServletRunContexts.copyCurrent().locale());
+    assertEquals(Locale.CANADA_FRENCH, ServletRunContexts.copyCurrent().getLocale());
 
     NlsLocale.CURRENT.remove();
-    assertNull(ServletRunContexts.copyCurrent().locale());
+    assertNull(ServletRunContexts.copyCurrent().getLocale());
   }
 
   @Test
@@ -135,12 +135,12 @@ public class ServletRunContextTest {
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
     assertNotNull(ServletRunContexts.copyCurrent());
-    assertTrue(toSet(ServletRunContexts.copyCurrent().propertyMap().iterator()).isEmpty());
+    assertTrue(toSet(ServletRunContexts.copyCurrent().getPropertyMap().iterator()).isEmpty());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(propertyMap);
-    assertNotSame(propertyMap, ServletRunContexts.copyCurrent().propertyMap()); // test for copy
-    assertEquals(toSet(propertyMap.iterator()), toSet(ServletRunContexts.copyCurrent().propertyMap().iterator()));
+    assertNotSame(propertyMap, ServletRunContexts.copyCurrent().getPropertyMap()); // test for copy
+    assertEquals(toSet(propertyMap.iterator()), toSet(ServletRunContexts.copyCurrent().getPropertyMap().iterator()));
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

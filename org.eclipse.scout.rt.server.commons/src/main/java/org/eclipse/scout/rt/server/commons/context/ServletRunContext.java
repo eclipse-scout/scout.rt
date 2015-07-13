@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.commons.context;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
@@ -21,8 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
@@ -42,8 +43,8 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
  * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT}</li>
+ * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_REQUEST}</li>
+ * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_RESPONSE}</li>
  * </ul>
  *
  * @since 5.1
@@ -57,45 +58,57 @@ public class ServletRunContext extends RunContext {
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
     final Callable<RESULT> c4 = new CurrentHttpServletRequestLogCallable<>(next);
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse);
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest);
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }
 
   @Override
-  public ServletRunContext runMonitor(final RunMonitor runMonitor) {
-    super.runMonitor(runMonitor);
+  public ServletRunContext withRunMonitor(final RunMonitor runMonitor) {
+    super.withRunMonitor(runMonitor);
     return this;
   }
 
   @Override
-  public ServletRunContext subject(final Subject subject) {
-    super.subject(subject);
+  public ServletRunContext withSubject(final Subject subject) {
+    super.withSubject(subject);
     return this;
   }
 
   @Override
-  public ServletRunContext locale(final Locale locale) {
-    super.locale(locale);
+  public ServletRunContext withLocale(final Locale locale) {
+    super.withLocale(locale);
     return this;
   }
 
-  public HttpServletRequest servletRequest() {
+  @Override
+  public ServletRunContext withProperty(final Object key, final Object value) {
+    super.withProperty(key, value);
+    return this;
+  }
+
+  @Override
+  public ServletRunContext withProperties(final Map<?, ?> properties) {
+    super.withProperties(properties);
+    return this;
+  }
+
+  public HttpServletRequest getServletRequest() {
     return m_servletRequest;
   }
 
-  public ServletRunContext servletRequest(final HttpServletRequest servletRequest) {
+  public ServletRunContext withServletRequest(final HttpServletRequest servletRequest) {
     m_servletRequest = servletRequest;
     return this;
   }
 
-  public HttpServletResponse servletResponse() {
+  public HttpServletResponse getServletResponse() {
     return m_servletResponse;
   }
 
-  public ServletRunContext servletResponse(final HttpServletResponse servletResponse) {
+  public ServletRunContext withServletResponse(final HttpServletResponse servletResponse) {
     m_servletResponse = servletResponse;
     return this;
   }
@@ -103,10 +116,10 @@ public class ServletRunContext extends RunContext {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("subject", subject());
-    builder.attr("locale", locale());
-    builder.ref("servletRequest", servletRequest());
-    builder.ref("servletResponse", servletResponse());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("servletRequest", getServletRequest());
+    builder.ref("servletResponse", getServletResponse());
     return builder.toString();
   }
 
@@ -141,5 +154,4 @@ public class ServletRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
-
 }

@@ -58,38 +58,38 @@ public class ServerRunContextTest {
   @Test
   public void testEmpty() {
     ServerRunContext runContext = ServerRunContexts.empty();
-    assertNull(runContext.subject());
-    assertNull(runContext.session());
-    assertNull(runContext.userAgent());
-    assertNull(runContext.locale());
-    assertFalse(runContext.offline());
-    assertEquals(TransactionScope.REQUIRES_NEW, runContext.transactionScope());
+    assertNull(runContext.getSubject());
+    assertNull(runContext.getSession());
+    assertNull(runContext.getUserAgent());
+    assertNull(runContext.getLocale());
+    assertFalse(runContext.isOffline());
+    assertEquals(TransactionScope.REQUIRES_NEW, runContext.getTransactionScope());
   }
 
   @Test
   public void testCopy() {
     ServerRunContext runContext = ServerRunContexts.empty();
-    runContext.propertyMap().put("A", "B");
-    runContext.subject(new Subject());
-    runContext.session(mock(IServerSession.class), true);
-    runContext.userAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
-    runContext.locale(Locale.CANADA_FRENCH);
-    runContext.offline(true);
-    runContext.transactionScope(TransactionScope.MANDATORY);
+    runContext.getPropertyMap().put("A", "B");
+    runContext.withSubject(new Subject());
+    runContext.withSession(mock(IServerSession.class), true);
+    runContext.withUserAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
+    runContext.withLocale(Locale.CANADA_FRENCH);
+    runContext.withOffline(true);
+    runContext.withTransactionScope(TransactionScope.MANDATORY);
 
     ServerRunContext copy = runContext.copy();
 
-    assertEquals(toSet(runContext.propertyMap().iterator()), toSet(copy.propertyMap().iterator()));
-    assertSame(runContext.subject(), copy.subject());
-    assertSame(runContext.userAgent(), copy.userAgent());
-    assertSame(runContext.locale(), copy.locale());
-    assertSame(runContext.offline(), copy.offline());
-    assertEquals(TransactionScope.MANDATORY, runContext.transactionScope());
+    assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
+    assertSame(runContext.getSubject(), copy.getSubject());
+    assertSame(runContext.getUserAgent(), copy.getUserAgent());
+    assertSame(runContext.getLocale(), copy.getLocale());
+    assertSame(runContext.isOffline(), copy.isOffline());
+    assertEquals(TransactionScope.MANDATORY, runContext.getTransactionScope());
   }
 
   @Test
   public void testCurrentTransactionScope() {
-    assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().transactionScope());
+    assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

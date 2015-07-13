@@ -74,14 +74,14 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       // Check whether the request is already authenticated, e.g. by the container.
       final Subject currentSubject = Subject.getSubject(AccessController.getContext());
       if (currentSubject != null && !currentSubject.getPrincipals().isEmpty()) {
-        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(currentSubject).transactionScope(TransactionScope.REQUIRES_NEW));
+        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(currentSubject).withTransactionScope(TransactionScope.REQUIRES_NEW));
         return true;
       }
 
       // Authenticate the request.
       final Subject subject = authenticateRequest(messageContext);
       if (subject != null) {
-        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(subject).transactionScope(TransactionScope.REQUIRES_NEW));
+        MessageContexts.setRunContext(messageContext, m_requestRunContextProvider.provide(subject).withTransactionScope(TransactionScope.REQUIRES_NEW));
         return true;
       }
       else {
@@ -118,7 +118,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       return m_authenticationMethod.authenticate(context, m_authenticator);
     }
     else {
-      return m_authenticatorRunContextProvider.provide(AUTHENTICATOR_SUBJECT).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Subject>() {
+      return m_authenticatorRunContextProvider.provide(AUTHENTICATOR_SUBJECT).withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Subject>() {
 
         @Override
         public Subject call() throws Exception {

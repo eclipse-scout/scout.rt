@@ -123,7 +123,7 @@ public class PortProvider<SERVICE extends Service, PORT> {
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         if (PROXIED_HANDLER_METHODS.contains(method)) {
-          return serverRunContextProvider.provide(Subject.getSubject(AccessController.getContext())).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
+          return serverRunContextProvider.provide(Subject.getSubject(AccessController.getContext())).withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<Object>() {
 
             @Override
             public Object call() throws Exception {

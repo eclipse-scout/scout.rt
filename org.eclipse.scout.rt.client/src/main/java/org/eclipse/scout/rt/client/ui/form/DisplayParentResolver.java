@@ -59,16 +59,16 @@ public class DisplayParentResolver {
     final ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
 
     // Check whether a Form is currently the 'displayParent'.
-    if (currentRunContext.form() != null) {
-      return currentRunContext.form();
+    if (currentRunContext.getForm() != null) {
+      return currentRunContext.getForm();
     }
 
     // Check whether an Outline is currently the 'displayParent'.
-    if (currentRunContext.outline() != null) {
-      return currentRunContext.outline();
+    if (currentRunContext.getOutline() != null) {
+      return currentRunContext.getOutline();
     }
 
     // Use the desktop as 'displayParent'.
-    return currentRunContext.desktop();
+    return currentRunContext.getDesktop();
   }
 }

@@ -183,7 +183,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
           try {
             final Message jmsMessage = m_consumer.receive(m_receiveTimeout);
             if (jmsMessage != null) {
-              JmsRunContexts.empty().jmsMessage(jmsMessage).run(new IRunnable() {
+              JmsRunContexts.empty().withJmsMessage(jmsMessage).run(new IRunnable() {
 
                 @Override
                 public void run() throws Exception {

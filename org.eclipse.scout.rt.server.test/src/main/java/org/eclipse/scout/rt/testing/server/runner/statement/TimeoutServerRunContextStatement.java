@@ -63,7 +63,7 @@ public class TimeoutServerRunContextStatement extends Statement {
 
     // Create a copy of the calling RunContext and re-use its transaction if available.
     // TODO [abr/dwi]: Should we use the current TX if available? (REQUIRED)
-    ServerRunContext runContext = ServerRunContexts.copyCurrent().transactionScope(TransactionScope.REQUIRES_NEW);
+    ServerRunContext runContext = ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW);
 
     if (m_timeoutMillis <= 0) {
       // no timeout specified. Hence run in a nested transaction that uses the calling thread

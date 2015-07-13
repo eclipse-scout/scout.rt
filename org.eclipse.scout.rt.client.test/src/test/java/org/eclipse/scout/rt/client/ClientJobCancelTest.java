@@ -126,7 +126,7 @@ public class ClientJobCancelTest {
     final ClientRunContext runContext = ClientRunContexts.copyCurrent();
 
     final RunMonitor runMonitor = BEANS.get(RunMonitor.class);
-    runContext.runMonitor(runMonitor);
+    runContext.withRunMonitor(runMonitor);
 
     IFuture<String> pingFuture = Jobs.schedule(new Callable<String>() {
 

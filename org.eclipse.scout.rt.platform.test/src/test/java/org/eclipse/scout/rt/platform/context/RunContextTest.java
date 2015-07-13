@@ -48,26 +48,26 @@ public class RunContextTest {
   @Test
   public void testEmpty() {
     RunContext runContext = RunContexts.empty();
-    assertNull(runContext.subject());
-    assertNull(runContext.locale());
-    assertTrue(toSet(runContext.propertyMap().iterator()).isEmpty());
-    assertNotNull(runContext.runMonitor());
+    assertNull(runContext.getSubject());
+    assertNull(runContext.getLocale());
+    assertTrue(toSet(runContext.getPropertyMap().iterator()).isEmpty());
+    assertNotNull(runContext.getRunMonitor());
   }
 
   @Test
   public void testCopy() {
     RunContext runContext = RunContexts.empty();
-    runContext.propertyMap().put("A", "B");
-    runContext.subject(new Subject());
-    runContext.locale(Locale.CANADA_FRENCH);
-    runContext.runMonitor(new RunMonitor());
+    runContext.getPropertyMap().put("A", "B");
+    runContext.withSubject(new Subject());
+    runContext.withLocale(Locale.CANADA_FRENCH);
+    runContext.withRunMonitor(new RunMonitor());
 
     RunContext copy = runContext.copy();
 
-    assertEquals(toSet(runContext.propertyMap().iterator()), toSet(copy.propertyMap().iterator()));
-    assertSame(runContext.subject(), copy.subject());
-    assertSame(runContext.locale(), copy.locale());
-    assertSame(runContext.runMonitor(), copy.runMonitor());
+    assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
+    assertSame(runContext.getSubject(), copy.getSubject());
+    assertSame(runContext.getLocale(), copy.getLocale());
+    assertSame(runContext.getRunMonitor(), copy.getRunMonitor());
   }
 
   @Test
@@ -80,7 +80,7 @@ public class RunContextTest {
         return RunContexts.copyCurrent();
       }
     });
-    assertSame(subject, runContext.subject());
+    assertSame(subject, runContext.getSubject());
 
     runContext = Subject.doAs(null, new PrivilegedAction<RunContext>() {
 
@@ -89,7 +89,7 @@ public class RunContextTest {
         return RunContexts.copyCurrent();
       }
     });
-    assertNull(runContext.subject());
+    assertNull(runContext.getSubject());
   }
 
   @Test
@@ -100,24 +100,24 @@ public class RunContextTest {
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
     assertNotNull(RunContexts.copyCurrent());
-    assertTrue(toSet(RunContexts.copyCurrent().propertyMap().iterator()).isEmpty());
+    assertTrue(toSet(RunContexts.copyCurrent().getPropertyMap().iterator()).isEmpty());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(propertyMap);
-    assertNotSame(propertyMap, RunContexts.copyCurrent().propertyMap()); // test for copy
-    assertEquals(toSet(propertyMap.iterator()), toSet(RunContexts.copyCurrent().propertyMap().iterator()));
+    assertNotSame(propertyMap, RunContexts.copyCurrent().getPropertyMap()); // test for copy
+    assertEquals(toSet(propertyMap.iterator()), toSet(RunContexts.copyCurrent().getPropertyMap().iterator()));
   }
 
   @Test
   public void testCopyCurrent_Locale() {
     NlsLocale.CURRENT.remove();
-    assertNull(RunContexts.copyCurrent().locale());
+    assertNull(RunContexts.copyCurrent().getLocale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().locale());
+    assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.KOREAN, RunContexts.copyCurrent().locale(Locale.KOREAN).locale());
+    assertEquals(Locale.KOREAN, RunContexts.copyCurrent().withLocale(Locale.KOREAN).getLocale());
   }
 
   /**
@@ -133,7 +133,7 @@ public class RunContextTest {
     RunMonitor.CURRENT.remove();
 
     RunContext runContext = RunContexts.copyCurrent();
-    assertNotNull(runContext.runMonitor());
+    assertNotNull(runContext.getRunMonitor());
 
     runContext.run(new IRunnable() {
 
@@ -144,7 +144,7 @@ public class RunContextTest {
     });
 
     assertNull(RunMonitor.CURRENT.get());
-    assertNotNull(runContext.runMonitor());
+    assertNotNull(runContext.getRunMonitor());
   }
 
   /**
@@ -162,10 +162,10 @@ public class RunContextTest {
     final RunMonitor explicitRunMonitor = new RunMonitor();
     RunContext runContext = RunContexts.copyCurrent();
 
-    runContext.runMonitor(explicitRunMonitor); // explicit RunMonitor
-    assertSame(explicitRunMonitor, runContext.runMonitor());
+    runContext.withRunMonitor(explicitRunMonitor); // explicit RunMonitor
+    assertSame(explicitRunMonitor, runContext.getRunMonitor());
 
-    assertSame(explicitRunMonitor, runContext.runMonitor());
+    assertSame(explicitRunMonitor, runContext.getRunMonitor());
 
     runContext.run(new IRunnable() {
 
@@ -176,7 +176,7 @@ public class RunContextTest {
     });
 
     assertNull(RunMonitor.CURRENT.get());
-    assertSame(explicitRunMonitor, runContext.runMonitor());
+    assertSame(explicitRunMonitor, runContext.getRunMonitor());
   }
 
   /**
@@ -193,7 +193,7 @@ public class RunContextTest {
     RunMonitor.CURRENT.set(currentRunMonitor);
 
     RunContext runContext = RunContexts.copyCurrent();
-    final RunMonitor newRunMonitor = runContext.runMonitor();
+    final RunMonitor newRunMonitor = runContext.getRunMonitor();
 
     assertNotSame("RunMonitor should not be same instance a current RunMonitor", currentRunMonitor, newRunMonitor);
     assertTrue("RunMonitor should be registered within current RunMonitor", currentRunMonitor.getCancellables().contains(newRunMonitor));
@@ -208,7 +208,7 @@ public class RunContextTest {
     });
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
-    assertSame(newRunMonitor, runContext.runMonitor());
+    assertSame(newRunMonitor, runContext.getRunMonitor());
     assertTrue("RunMonitor should still be registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(newRunMonitor));
   }
 
@@ -227,10 +227,10 @@ public class RunContextTest {
 
     RunMonitor.CURRENT.set(currentRunMonitor);
     RunContext runContext = RunContexts.copyCurrent();
-    final RunMonitor defaultRunMonitor = runContext.runMonitor();
+    final RunMonitor defaultRunMonitor = runContext.getRunMonitor();
 
-    runContext.runMonitor(explicitRunMonitor); // explicit RunMonitor
-    assertSame(explicitRunMonitor, runContext.runMonitor());
+    runContext.withRunMonitor(explicitRunMonitor); // explicit RunMonitor
+    assertSame(explicitRunMonitor, runContext.getRunMonitor());
 
     assertTrue("No deregistration of default RunMonitor", currentRunMonitor.getCancellables().contains(defaultRunMonitor));
     assertFalse("Explicit RunMonitor should NOT be automatically registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(explicitRunMonitor));
@@ -246,19 +246,19 @@ public class RunContextTest {
     });
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
-    assertSame(explicitRunMonitor, runContext.runMonitor());
+    assertSame(explicitRunMonitor, runContext.getRunMonitor());
     assertTrue("No deregistration of default RunMonitor", currentRunMonitor.getCancellables().contains(defaultRunMonitor));
     assertFalse("Explicit RunMonitor should NOT be automatically registered within current RunMonitor (by default)", currentRunMonitor.getCancellables().contains(explicitRunMonitor));
   }
 
   @Test(expected = AssertionException.class)
   public void testCopyCurrentWithNullRunMonitor() {
-    RunContexts.copyCurrent().runMonitor(null);
+    RunContexts.copyCurrent().withRunMonitor(null);
   }
 
   @Test(expected = AssertionException.class)
   public void testEmptyWithNullRunMonitor() {
-    RunContexts.empty().runMonitor(null);
+    RunContexts.empty().withRunMonitor(null);
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

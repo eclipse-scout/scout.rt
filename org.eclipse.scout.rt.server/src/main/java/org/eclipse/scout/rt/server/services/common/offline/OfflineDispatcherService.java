@@ -41,13 +41,13 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       RunMonitor runMonitor = BEANS.get(RunMonitor.class);
 
       ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-      serverRunContext.offline(true);
-      serverRunContext.locale(serviceRequest.getLocale());
-      serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      serverRunContext.runMonitor(runMonitor);
-      serverRunContext.session(provideServerSession(serverRunContext.copy()), true);
+      serverRunContext.withOffline(true);
+      serverRunContext.withLocale(serviceRequest.getLocale());
+      serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+      serverRunContext.withRunMonitor(runMonitor);
+      serverRunContext.withSession(provideServerSession(serverRunContext.copy()), true);
 
-      IServerSession session = serverRunContext.session();
+      IServerSession session = serverRunContext.getSession();
       long requestId = serviceRequest.getRequestSequence();
 
       BEANS.get(RunMonitorCancelRegistry.class).register(session, requestId, runMonitor);

@@ -87,7 +87,7 @@ public class GeneralView extends DefaultView {
       p.print("There is no Session found");
     }
 
-    String sessionId = (String) BEANS.get(ServerRunContext.class).propertyMap().get(ServiceTunnelServlet.SESSION_ID);
+    String sessionId = (String) BEANS.get(ServerRunContext.class).getProperty(ServiceTunnelServlet.SESSION_ID);
 
 //    String sessionID = BEANS.get(IClientIdentificationService.class).getClientId(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get(), IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     p.br();

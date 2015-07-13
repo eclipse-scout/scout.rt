@@ -960,7 +960,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       };
     }
-    ClientRunContexts.copyCurrent().desktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    ClientRunContexts.copyCurrent().getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   /**

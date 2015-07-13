@@ -64,7 +64,7 @@ public abstract class AbstractGlobalServerCacheService extends AbstractHttpSessi
   public abstract void touch(String key, Long expiration);
 
   protected String getKeyWithId(String key, HttpServletRequest req, HttpServletResponse res) {
-    Object sessionId = BEANS.get(RunContext.class).propertyMap().get("sessionId");
+    Object sessionId = BEANS.get(RunContext.class).getProperty("sessionId");
     return sessionId + "_" + key;
   }
 

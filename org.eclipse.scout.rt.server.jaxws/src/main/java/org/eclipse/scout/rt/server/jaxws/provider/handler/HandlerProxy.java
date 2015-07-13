@@ -113,7 +113,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
         return callable.call();
       }
       else {
-        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, HANDLER_SUBJECT)).transactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<T>() {
+        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, HANDLER_SUBJECT)).withTransactionScope(TransactionScope.REQUIRES_NEW).call(new Callable<T>() {
           @Override
           public T call() throws Exception {
             return callable.call();

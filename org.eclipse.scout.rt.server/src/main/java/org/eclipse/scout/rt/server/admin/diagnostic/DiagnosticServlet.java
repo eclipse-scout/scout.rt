@@ -50,13 +50,13 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      ServletRunContexts.copyCurrent().locale(Locale.getDefault()).servletRequest(servletRequest).servletResponse(servletResponse).run(new IRunnable() {
+      ServletRunContexts.copyCurrent().withLocale(Locale.getDefault()).withServletRequest(servletRequest).withServletResponse(servletResponse).run(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-          serverRunContext.userAgent(UserAgent.createDefault());
-          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
+          serverRunContext.withUserAgent(UserAgent.createDefault());
+          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           invokeDiagnosticService(serverRunContext);
         }

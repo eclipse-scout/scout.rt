@@ -150,7 +150,7 @@ public final class ServerJobFutureFilters {
     public boolean accept(final IFuture<?> future) {
       final RunContext runContext = future.getJobInput().runContext();
       if (runContext instanceof ServerRunContext) {
-        return m_session == ((ServerRunContext) runContext).session();
+        return m_session == ((ServerRunContext) runContext).getSession();
       }
       else {
         return false;

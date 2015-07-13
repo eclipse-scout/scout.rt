@@ -195,7 +195,7 @@ public class JobManager implements IJobManager {
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input, final boolean periodic) {
     Assertions.assertNotNull(input, "'JobInput' must not be null");
     if (input.runContext() != null) {
-      Assertions.assertNotNull(input.runContext().runMonitor(), "'RunMonitor' required if providing a 'RunContext'");
+      Assertions.assertNotNull(input.runContext().getRunMonitor(), "'RunMonitor' required if providing a 'RunContext'");
     }
 
     // Ensure a job name to be set.

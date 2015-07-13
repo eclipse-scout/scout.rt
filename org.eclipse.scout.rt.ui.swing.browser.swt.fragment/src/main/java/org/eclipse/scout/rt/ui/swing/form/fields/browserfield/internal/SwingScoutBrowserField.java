@@ -288,7 +288,7 @@ public class SwingScoutBrowserField extends SwingScoutFieldComposite<IBrowserFie
       public void run() throws Exception {
         getScoutObject().getUIFacade().firePostMessageFromUI(location, null);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession(), true)));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getSwingEnvironment().getScoutSession(), true)));
   }
 
   /**

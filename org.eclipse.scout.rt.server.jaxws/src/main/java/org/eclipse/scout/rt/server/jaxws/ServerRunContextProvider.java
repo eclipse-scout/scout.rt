@@ -38,10 +38,10 @@ public class ServerRunContextProvider {
    * Provides a {@link RunContext} for the given {@link Subject}.
    */
   public ServerRunContext provide(final Subject subject) throws ProcessingException {
-    final ServerRunContext runContext = ServerRunContexts.copyCurrent().subject(subject);
+    final ServerRunContext runContext = ServerRunContexts.copyCurrent().withSubject(subject);
 
-    if (runContext.session() == null || !subject.equals(Subject.getSubject(AccessController.getContext()))) {
-      runContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(runContext.copy()), true);
+    if (runContext.getSession() == null || !subject.equals(Subject.getSubject(AccessController.getContext()))) {
+      runContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(runContext.copy()), true);
     }
     return runContext;
   }

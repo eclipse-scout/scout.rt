@@ -353,7 +353,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
         m_pendingProposalFuture.cancel(true);
       }
       P_PendingProposalRunnable job = new P_PendingProposalRunnable(text, selectCurrentValue);
-      m_pendingProposalFuture = ClientJobs.schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession(), true)));
+      m_pendingProposalFuture = ClientJobs.schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().withSession(getSwingEnvironment().getScoutSession(), true)));
     }
   }
 

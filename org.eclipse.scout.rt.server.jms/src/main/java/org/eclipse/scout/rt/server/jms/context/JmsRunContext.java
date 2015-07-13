@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.server.jms.context;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.jms.Message;
 import javax.security.auth.Subject;
@@ -20,6 +22,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
 /**
@@ -50,38 +53,58 @@ public class JmsRunContext extends RunContext {
   protected Message m_jmsMessage;
 
   @Override
-  public JmsRunContext runMonitor(RunMonitor runMonitor) {
-    super.runMonitor(runMonitor);
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(next, CURRENT_JMS_MESSAGE, m_jmsMessage);
+    final Callable<RESULT> c1 = super.interceptCallable(c2);
+
+    return c1;
+  }
+
+  @Override
+  public JmsRunContext withRunMonitor(final RunMonitor runMonitor) {
+    super.withRunMonitor(runMonitor);
     return this;
   }
 
   @Override
-  public JmsRunContext subject(final Subject subject) {
-    super.subject(subject);
+  public JmsRunContext withSubject(final Subject subject) {
+    super.withSubject(subject);
     return this;
   }
 
   @Override
-  public JmsRunContext locale(final Locale locale) {
-    super.locale(locale);
+  public JmsRunContext withLocale(final Locale locale) {
+    super.withLocale(locale);
     return this;
   }
 
-  public JmsRunContext jmsMessage(final Message jmsMessage) {
+  @Override
+  public JmsRunContext withProperty(final Object key, final Object value) {
+    super.withProperty(key, value);
+    return this;
+  }
+
+  @Override
+  public JmsRunContext withProperties(final Map<?, ?> properties) {
+    super.withProperties(properties);
+    return this;
+  }
+
+  public Message getJmsMessage() {
+    return m_jmsMessage;
+  }
+
+  public JmsRunContext withJmsMessage(final Message jmsMessage) {
     m_jmsMessage = jmsMessage;
     return this;
-  }
-
-  public Message jmsMessage() {
-    return m_jmsMessage;
   }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("subject", subject());
-    builder.attr("locale", locale());
-    builder.ref("message", jmsMessage());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("message", getJmsMessage());
     return builder.toString();
   }
 
@@ -113,5 +136,4 @@ public class JmsRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
-
 }

@@ -182,7 +182,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   protected final void callInitializer() {
     // Run the initialization on behalf of this Desktop.
-    ClientRunContexts.copyCurrent().desktop(this).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withDesktop(this).run(new IRunnable() {
       @Override
       public void run() throws Exception {
         interceptInitConfig();
@@ -1013,7 +1013,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setOutline(IOutline outline) {
     final IOutline newOutline = resolveOutline(outline);
-    ClientRunContexts.copyCurrent().outline(newOutline).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withOutline(newOutline).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {

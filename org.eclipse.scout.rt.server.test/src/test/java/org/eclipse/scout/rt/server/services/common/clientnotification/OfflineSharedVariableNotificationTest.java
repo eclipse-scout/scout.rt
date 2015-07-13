@@ -253,8 +253,8 @@ public class OfflineSharedVariableNotificationTest {
 
   private void runWithNotificationContainer(IRunnable runnable) throws ProcessingException {
     ServerRunContexts.copyCurrent()
-        .txNotificationContainer(new ClientNotificationContainer())
-        .notificationNodeId("test").run(runnable);
+        .withTxNotificationContainer(new ClientNotificationContainer())
+        .withNotificationNodeId("test").run(runnable);
   }
 
   private List<ClientNotificationMessage> getNotifications() {

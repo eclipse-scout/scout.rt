@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
  * This transaction member is used to collect all notifications during a transaction. On successful commit the
- * notifications will be added to the {@link ServerRunContext#txNotificationContainer()}. Further all notifications in
+ * notifications will be added to the {@link ServerRunContext#getTxNotificationContainer()}. Further all notifications in
  * the txNotificationContainer will be added to the {@link ServiceTunnelResponse} and piggy backed to the client.
  * The reason to do so is to provide an immediate client side processing of transactional notifications.
  */

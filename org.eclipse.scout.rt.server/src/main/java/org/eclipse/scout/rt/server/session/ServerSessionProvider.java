@@ -54,7 +54,7 @@ public class ServerSessionProvider {
         final SESSION serverSession = ServerSessionProvider.cast(BEANS.get(IServerSession.class));
 
         // 2. Load the session.
-        ServerRunContexts.copyCurrent().session(serverSession, true).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
+        ServerRunContexts.copyCurrent().withSession(serverSession, true).withTransactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {

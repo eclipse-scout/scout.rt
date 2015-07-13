@@ -51,7 +51,7 @@ public class ServerJobEventFilterTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    JobInput serverJobInput = ServerJobs.newInput(ServerRunContexts.empty().session(m_serverSession1, true));
+    JobInput serverJobInput = ServerJobs.newInput(ServerRunContexts.empty().withSession(m_serverSession1, true));
     when(m_serverJobFuture.getJobInput()).thenReturn(serverJobInput);
 
     JobInput jobInput = Jobs.newInput(RunContexts.empty());

@@ -40,7 +40,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
 
   @Override
   public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext, String sessionId) throws ProcessingException {
-    final Subject subject = Assertions.assertNotNull(runContext.subject(), "Subject must not be null");
+    final Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 

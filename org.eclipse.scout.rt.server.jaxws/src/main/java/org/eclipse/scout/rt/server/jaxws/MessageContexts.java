@@ -96,8 +96,8 @@ public final class MessageContexts {
    */
   public static Subject getSubject(final MessageContext messageContext, final Subject defaultSubject) {
     final RunContext runContext = MessageContexts.getRunContext(messageContext);
-    if (runContext != null && runContext.subject() != null) {
-      return runContext.subject();
+    if (runContext != null && runContext.getSubject() != null) {
+      return runContext.getSubject();
     }
     else {
       return defaultSubject;

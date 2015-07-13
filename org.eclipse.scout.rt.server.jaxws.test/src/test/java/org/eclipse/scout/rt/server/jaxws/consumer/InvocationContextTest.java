@@ -95,7 +95,7 @@ public class InvocationContextTest {
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
 
-    ServerRunContexts.copyCurrent().transactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() { // set transaction boundary
+    ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() { // set transaction boundary
 
       @Override
       public void run() throws Exception {
@@ -143,7 +143,7 @@ public class InvocationContextTest {
     doThrow(exception).when(m_port).webMethod();
 
     try {
-      ServerRunContexts.copyCurrent().transactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() { // set transaction boundary
+      ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() { // set transaction boundary
 
         @Override
         public void run() throws Exception {
@@ -248,7 +248,7 @@ public class InvocationContextTest {
 
     // Run the test by
     // Invoke the web service with a specific RunMonitor to test cancellation.
-    RunContexts.empty().runMonitor(runMonitor).run(new IRunnable() {
+    RunContexts.empty().withRunMonitor(runMonitor).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {

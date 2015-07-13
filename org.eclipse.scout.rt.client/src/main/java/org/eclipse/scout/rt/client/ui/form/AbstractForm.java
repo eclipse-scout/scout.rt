@@ -252,7 +252,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_initialClientRunContext = ClientRunContexts.copyCurrent();
 
     // Run the initialization on behalf of this Form.
-    ClientRunContexts.copyCurrent().form(this).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -1411,7 +1411,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return {@link IDesktop} from current calling context.
    */
   protected IDesktop getDesktop() {
-    return ClientRunContexts.copyCurrent().desktop();
+    return ClientRunContexts.copyCurrent().getDesktop();
   }
 
   @Override
@@ -1882,10 +1882,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       };
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
-        int result = MessageBoxes.createYesNoCancel().
-            header(getCancelVerificationText()).
-            severity(IStatus.INFO).
-            show();
+        int result = MessageBoxes
+        		        .createYesNoCancel()
+        		        .displayParent(this)
+        		        .header(getCancelVerificationText())
+        		        .severity(IStatus.INFO)
+        		        .show();
 
         if (result == IMessageBox.YES_OPTION) {
           doOk();
@@ -2433,9 +2435,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
-          MessageBoxes.createOk().
-          header(TEXTS.get("LoadFormXmlFailedText")).
-          show();
+          MessageBoxes
+            .createOk()
+            .displayParent(this)
+            .header(TEXTS.get("LoadFormXmlFailedText"))
+            .show();
         }
       }
     }

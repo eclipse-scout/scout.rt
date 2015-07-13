@@ -74,7 +74,7 @@ public class CurrentControlTracker {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        return ClientRunContexts.copyCurrent().desktop(contextInfo.getDesktop()).outline(contextInfo.getOutline()).form(contextInfo.getForm()).modelElement(contextInfo.getModelElement()).call(new Callable<Object>() {
+        return ClientRunContexts.copyCurrent().withDesktop(contextInfo.getDesktop()).withOutline(contextInfo.getOutline()).withForm(contextInfo.getForm()).withModelElement(contextInfo.getModelElement()).call(new Callable<Object>() {
 
           @Override
           public Object call() throws Exception {

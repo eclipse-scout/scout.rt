@@ -59,7 +59,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
 
   private IBusyHandler getHandlerInternal(IFuture<?> future) {
     if (ClientJobs.isClientJob(future) || ModelJobs.isModelJob(future)) {
-      return getHandler(((ClientRunContext) future.getJobInput().runContext()).session());
+      return getHandler(((ClientRunContext) future.getJobInput().runContext()).getSession());
     }
     else {
       return null;

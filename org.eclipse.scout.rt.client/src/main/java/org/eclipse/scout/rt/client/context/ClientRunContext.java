@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.context;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
@@ -76,34 +77,46 @@ public class ClientRunContext extends RunContext {
     final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, CurrentControlTracker.CURRENT_OUTLINE, m_outline);
     final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, CurrentControlTracker.CURRENT_FORM, m_form);
     final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, CurrentControlTracker.CURRENT_MODEL_ELEMENT, m_modelElement);
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, m_userAgent);
     final Callable<RESULT> c3 = new CurrentSessionLogCallable<>(c4);
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, session());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, m_session);
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }
 
   @Override
-  public ClientRunContext runMonitor(final RunMonitor runMonitor) {
-    super.runMonitor(runMonitor);
+  public ClientRunContext withRunMonitor(final RunMonitor runMonitor) {
+    super.withRunMonitor(runMonitor);
     return this;
   }
 
   @Override
-  public ClientRunContext subject(final Subject subject) {
-    super.subject(subject);
+  public ClientRunContext withSubject(final Subject subject) {
+    super.withSubject(subject);
     return this;
   }
 
   @Override
-  public ClientRunContext locale(final Locale locale) {
-    super.locale(locale);
+  public ClientRunContext withLocale(final Locale locale) {
+    super.withLocale(locale);
     return this;
   }
 
-  public IClientSession session() {
+  @Override
+  public ClientRunContext withProperty(final Object key, final Object value) {
+    super.withProperty(key, value);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withProperties(final Map<?, ?> properties) {
+    super.withProperties(properties);
+    return this;
+  }
+
+  public IClientSession getSession() {
     return m_session;
   }
 
@@ -113,7 +126,7 @@ public class ClientRunContext extends RunContext {
    * @param applySessionProperties
    *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}.
    */
-  public ClientRunContext session(final IClientSession session, final boolean applySessionProperties) {
+  public ClientRunContext withSession(final IClientSession session, final boolean applySessionProperties) {
     m_session = session;
 
     if (applySessionProperties) {
@@ -125,11 +138,11 @@ public class ClientRunContext extends RunContext {
     return this;
   }
 
-  public UserAgent userAgent() {
+  public UserAgent getUserAgent() {
     return m_userAgent;
   }
 
-  public ClientRunContext userAgent(final UserAgent userAgent) {
+  public ClientRunContext withUserAgent(final UserAgent userAgent) {
     m_userAgent = userAgent;
     return this;
   }
@@ -138,7 +151,7 @@ public class ClientRunContext extends RunContext {
    * Returns the model element which is associated with this {@link ClientRunContext}, or <code>null</code> if not
    * set.
    */
-  public Object modelElement() {
+  public Object getModelElement() {
     return m_modelElement;
   }
 
@@ -147,7 +160,7 @@ public class ClientRunContext extends RunContext {
    * facade when dispatching a request from UI. For instance, events that originates from a {@link IStringField} have
    * that element as current model element set.
    */
-  public ClientRunContext modelElement(final Object modelElement) {
+  public ClientRunContext withModelElement(final Object modelElement) {
     m_modelElement = modelElement;
     return this;
   }
@@ -156,7 +169,7 @@ public class ClientRunContext extends RunContext {
    * Returns the {@link IForm} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
    * set.
    */
-  public IForm form() {
+  public IForm getForm() {
     return m_form;
   }
 
@@ -164,7 +177,7 @@ public class ClientRunContext extends RunContext {
    * Associates this {@link ClientRunContext} with a {@link IForm}. Typically, that information is set by the UI facade
    * when dispatching a request from UI.
    */
-  public ClientRunContext form(final IForm form) {
+  public ClientRunContext withForm(final IForm form) {
     m_form = form;
     return this;
   }
@@ -173,7 +186,7 @@ public class ClientRunContext extends RunContext {
    * Returns the {@link IOutline} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
    * set.
    */
-  public IOutline outline() {
+  public IOutline getOutline() {
     return m_outline;
   }
 
@@ -181,7 +194,7 @@ public class ClientRunContext extends RunContext {
    * Associates this {@link ClientRunContext} with a {@link IOutline}. Typically, that information is set by the UI
    * facade when dispatching a request from UI.
    */
-  public ClientRunContext outline(final IOutline outline) {
+  public ClientRunContext withOutline(final IOutline outline) {
     m_outline = outline;
     return this;
   }
@@ -190,7 +203,7 @@ public class ClientRunContext extends RunContext {
    * Returns the {@link IDesktop} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
    * set.
    */
-  public IDesktop desktop() {
+  public IDesktop getDesktop() {
     return m_desktop;
   }
 
@@ -198,7 +211,7 @@ public class ClientRunContext extends RunContext {
    * Associates this {@link ClientRunContext} with a {@link IDesktop}. Typically, that information is set by the UI
    * facade when dispatching a request from UI.
    */
-  public ClientRunContext desktop(final IDesktop desktop) {
+  public ClientRunContext withDesktop(final IDesktop desktop) {
     m_desktop = desktop;
     return this;
   }
@@ -206,15 +219,15 @@ public class ClientRunContext extends RunContext {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", runMonitor());
-    builder.attr("subject", subject());
-    builder.attr("locale", locale());
-    builder.ref("session", session());
-    builder.attr("userAgent", userAgent());
-    builder.ref("modelElement", modelElement());
-    builder.ref("form", form());
-    builder.ref("outline", outline());
-    builder.ref("desktop", desktop());
+    builder.ref("runMonitor", getRunMonitor());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("session", getSession());
+    builder.attr("userAgent", getUserAgent());
+    builder.ref("modelElement", getModelElement());
+    builder.ref("form", getForm());
+    builder.ref("outline", getOutline());
+    builder.ref("desktop", getDesktop());
     return builder.toString();
   }
 

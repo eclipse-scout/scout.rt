@@ -209,7 +209,7 @@ public interface IJobManager {
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobEventFilters} for simplified usage:<br/>
-   * <code>Jobs.newEventFilter().notCurrentFuture().session(...);</code>
+   * <code>Jobs.newEventFilter().andMatchNotCurrentFuture().session(...);</code>
    *
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.

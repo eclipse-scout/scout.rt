@@ -141,7 +141,16 @@ public class JobInput {
   }
 
   public PropertyMap propertyMap() {
-    return runContext().propertyMap();
+    return runContext().getPropertyMap();
+  }
+
+  public Object getProperty(final Object key) {
+    return runContext().getProperty(key);
+  }
+
+  public JobInput withProperty(final Object key, final Object value) {
+    runContext().withProperty(key, value);
+    return this;
   }
 
   @Override

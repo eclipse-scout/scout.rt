@@ -489,7 +489,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
           desktop.getUIFacade().fireDesktopOpenedFromUI();
           desktop.getUIFacade().fireGuiAttached();
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session, true)));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(session, true)));
     }
     attachBusyHandler();
   }

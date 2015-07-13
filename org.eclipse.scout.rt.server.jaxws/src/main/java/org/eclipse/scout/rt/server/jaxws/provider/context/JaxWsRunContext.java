@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.jaxws.provider.context;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
@@ -24,8 +25,8 @@ import javax.xml.ws.handler.MessageContext;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
@@ -41,8 +42,8 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
  * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT_WEBSERVICE_CONTEXT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT_WEBSERVICE_CONTEXT}</li>
+ * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_REQUEST}</li>
+ * <li>{@link IHttpServletRoundtrip#CURRENT_HTTP_SERVLET_RESPONSE}</li>
  * <li>{@link JaxWsRunContext#CURRENT_WEBSERVICE_CONTEXT}</li>
  * </ul>
  *
@@ -60,30 +61,43 @@ public class JaxWsRunContext extends ServletRunContext {
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(next, JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, webServiceContext());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(next, JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext);
     final Callable<RESULT> c1 = super.interceptCallable(c2);
+
     return c1;
   }
 
   @Override
-  public JaxWsRunContext runMonitor(final RunMonitor runMonitor) {
-    super.runMonitor(runMonitor);
+  public JaxWsRunContext withRunMonitor(final RunMonitor runMonitor) {
+    super.withRunMonitor(runMonitor);
     return this;
   }
 
   @Override
-  public JaxWsRunContext subject(final Subject subject) {
-    super.subject(subject);
+  public JaxWsRunContext withSubject(final Subject subject) {
+    super.withSubject(subject);
     return this;
   }
 
   @Override
-  public JaxWsRunContext locale(final Locale locale) {
-    super.locale(locale);
+  public JaxWsRunContext withLocale(final Locale locale) {
+    super.withLocale(locale);
     return this;
   }
 
-  public WebServiceContext webServiceContext() {
+  @Override
+  public JaxWsRunContext withProperty(final Object key, final Object value) {
+    super.withProperty(key, value);
+    return this;
+  }
+
+  @Override
+  public JaxWsRunContext withProperties(final Map<?, ?> properties) {
+    super.withProperties(properties);
+    return this;
+  }
+
+  public WebServiceContext getWebServiceContext() {
     return m_webServiceContext;
   }
 
@@ -91,7 +105,7 @@ public class JaxWsRunContext extends ServletRunContext {
    * Sets the given {@link WebServiceContext}, its associated HTTP Servlet request and response, and its associated
    * Subject if present.
    */
-  public JaxWsRunContext webServiceContext(final WebServiceContext webServiceContext) {
+  public JaxWsRunContext withWebServiceContext(final WebServiceContext webServiceContext) {
     m_webServiceContext = webServiceContext;
     m_servletRequest = (HttpServletRequest) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_REQUEST);
     m_servletResponse = (HttpServletResponse) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
@@ -108,12 +122,12 @@ public class JaxWsRunContext extends ServletRunContext {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", runMonitor());
-    builder.attr("subject", subject());
-    builder.attr("locale", locale());
-    builder.ref("servletRequest", servletRequest());
-    builder.ref("servletResponse", servletResponse());
-    builder.ref("webServiceContext", webServiceContext());
+    builder.ref("runMonitor", getRunMonitor());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("servletRequest", getServletRequest());
+    builder.ref("servletResponse", getServletResponse());
+    builder.ref("webServiceContext", getWebServiceContext());
     return builder.toString();
   }
 

@@ -85,7 +85,7 @@ public class AbstractDesktopTest {
    */
   @Test
   public void testClosingDoBeforeClosingInternal() throws ProcessingException {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     boolean closing = desktop.doBeforeClosingInternal();
     assertTrue(closing);
@@ -93,7 +93,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testUnsavedForms() throws ProcessingException {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     m_testForm.startNew();
     m_testForm.getMessageField().setValue("test");
@@ -102,7 +102,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testDataChangedSimple() throws ProcessingException {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
     desktop.addDataChangeListener(new DataChangeListener() {
@@ -120,7 +120,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testDataChangedChanging() throws ProcessingException {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
     desktop.addDataChangeListener(new DataChangeListener() {
@@ -145,7 +145,7 @@ public class AbstractDesktopTest {
   @Test
   @Ignore
   public void testGetDialogs() throws ProcessingException {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
 
     //                       form
     //        _________________|___________________________

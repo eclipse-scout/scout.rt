@@ -52,7 +52,7 @@ public abstract class AbstractKeyboardNavigationSupport {
         if (m_navigationJob != null) {
           m_navigationJob.cancel(true);
         }
-        m_navigationJob = ClientJobs.schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_session, true)));
+        m_navigationJob = ClientJobs.schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_session, true)));
         m_timeoutTimestamp = System.currentTimeMillis() + m_delay;
       }
     }

@@ -417,7 +417,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(new RunMonitor())).name("job-3").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).name("job-3").logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -530,7 +530,7 @@ public class JobCancelTest {
             }
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(new RunMonitor())).name("otherName").mutex(null).logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(new RunMonitor())).name("otherName").mutex(null).logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -574,7 +574,7 @@ public class JobCancelTest {
     RunContext runContext = RunContexts.copyCurrent();
 
     // 1. Cancel the RunMonitor
-    runContext.runMonitor().cancel(false);
+    runContext.getRunMonitor().cancel(false);
 
     // 2. Schedule the job (should never)
     final AtomicBoolean executed = new AtomicBoolean(false);

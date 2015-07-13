@@ -266,7 +266,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     final JBlock methodBody = method.body();
 
     // Declare variables 'jaxwsRunContext' and 'handlerRunContext'.
-    final JVar jaxwsRunContext = methodBody.decl(JMod.FINAL, model.ref(RunContext.class), JAXWS_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsRunContexts.class).staticInvoke("empty").invoke("webServiceContext").arg(webServiceContext));
+    final JVar jaxwsRunContext = methodBody.decl(JMod.FINAL, model.ref(RunContext.class), JAXWS_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsRunContexts.class).staticInvoke("empty").invoke("withWebServiceContext").arg(webServiceContext));
     final JVar handlerRunContext = methodBody.decl(JMod.FINAL, model.ref(RunContext.class), HANDLER_RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class).staticInvoke("getRunContext").arg(webServiceContext.invoke("getMessageContext")));
 
     final JTryBlock tryBlock = methodBody._try();

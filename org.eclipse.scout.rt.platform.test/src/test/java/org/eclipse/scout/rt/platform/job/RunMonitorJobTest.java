@@ -49,7 +49,7 @@ public class RunMonitorJobTest {
         assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
         assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(explicitMonitor)));
+    }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
     assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
 
@@ -70,7 +70,7 @@ public class RunMonitorJobTest {
         assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
         assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(explicitMonitor)));
+    }, Jobs.newInput(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
     assertNull(RunMonitorEx.CURRENT.get());
 

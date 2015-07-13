@@ -146,7 +146,7 @@ public class ClientNotificationDispatcher {
       ClientRunContexts.copyCurrent().run(dispatchJob, BEANS.get(RuntimeExceptionTranslator.class));
     }
     else {
-      IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().session(session, true)));
+      IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
       synchronized (m_notificationFutures) {
         m_notificationFutures.add(future);
         future.whenDone(new P_NotificationFutureCallback(future));

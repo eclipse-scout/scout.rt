@@ -78,14 +78,14 @@ public class ServiceTunnelServlet extends HttpServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      ServletRunContexts.copyCurrent().locale(Locale.getDefault()).servletRequest(servletRequest).servletResponse(servletResponse).run(new IRunnable() {
+      ServletRunContexts.copyCurrent().withLocale(Locale.getDefault()).withServletRequest(servletRequest).withServletResponse(servletResponse).run(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-          serverRunContext.userAgent(UserAgent.createDefault());
-          serverRunContext.propertyMap().put(SESSION_ID, UUID.randomUUID().toString());
-          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
+          serverRunContext.withUserAgent(UserAgent.createDefault());
+          serverRunContext.getPropertyMap().put(SESSION_ID, UUID.randomUUID().toString());
+          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
           invokeAdminService(serverRunContext);
         }
@@ -108,7 +108,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      ServletRunContexts.copyCurrent().servletRequest(servletRequest).servletResponse(servletResponse).run(new IRunnable() {
+      ServletRunContexts.copyCurrent().withServletRequest(servletRequest).withServletResponse(servletResponse).run(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -120,15 +120,15 @@ public class ServiceTunnelServlet extends HttpServlet {
           RunMonitor runMonitor = BEANS.get(RunMonitor.class);
 
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-          serverRunContext.locale(serviceRequest.getLocale());
-          serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-          serverRunContext.runMonitor(runMonitor);
-          serverRunContext.txNotificationContainer(txNotificationContainer);
-          serverRunContext.notificationNodeId(serviceRequest.getClientNotificationNodeId());
-          serverRunContext.propertyMap().put(SESSION_ID, serviceRequest.getSessionId());
-          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
+          serverRunContext.withLocale(serviceRequest.getLocale());
+          serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+          serverRunContext.withRunMonitor(runMonitor);
+          serverRunContext.withTxNotificationContainer(txNotificationContainer);
+          serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
+          serverRunContext.getPropertyMap().put(SESSION_ID, serviceRequest.getSessionId());
+          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
 
-          IServerSession session = serverRunContext.session();
+          IServerSession session = serverRunContext.getSession();
           long requestSequence = serviceRequest.getRequestSequence();
 
           BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
@@ -291,7 +291,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
   protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
-    String sessionId = (String) serverRunContext.propertyMap().get(SESSION_ID);
+    String sessionId = (String) serverRunContext.getPropertyMap().get(SESSION_ID);
     return BEANS.get(ServerSessionProvider.class).<IServerSession> provide(serverRunContext, sessionId);
   }
 

@@ -27,10 +27,10 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
  *
  * <pre>
  *   <i>
- *   final RunContext runContext = RunContexts.copyCurrent().subject(...).locale(Locale.US);
+ *   final RunContext runContext = RunContexts.copyCurrent().withSubject(...).withLocale(Locale.US);
  *   </i>
  *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
- *
+ * 
  *     &#064;Override
  *     public void run() throws Exception {
  *       if (runContext == null) {
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
  *       }
  *       else {
  *         runContext.run(new IRunnable() {
- *
+ * 
  *           &#064;Override
  *           public void run() throws Exception {
  *             // do some work
@@ -307,10 +307,10 @@ public final class Jobs {
    * <code>
    * // to create a "snapshot" of the current calling state
    * RunContexts.copyCurrent();
-   *
+   * 
    * // to create a "snapshot" of the current calling state, but with some values changed
-   * RunContexts.copyCurrent().subject(...).locale(Locale.US)
-   *
+   * RunContexts.copyCurrent().withSubject(...).withLocale(Locale.US)
+   * 
    * // to create an empty context with no values set
    * RunContexts.empty();
    * </code>

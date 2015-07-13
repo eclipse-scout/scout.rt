@@ -284,8 +284,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       getStatusInfoInternal(message.getNotification().getClass()).updateReceiveStatus(message);
 
       ServerRunContext serverRunContext = ServerRunContexts.empty();
-      serverRunContext.subject(m_subject);
-      serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()), true);
+      serverRunContext.withSubject(m_subject);
+      serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()), true);
       serverRunContext.run(new IRunnable() {
 
         @Override

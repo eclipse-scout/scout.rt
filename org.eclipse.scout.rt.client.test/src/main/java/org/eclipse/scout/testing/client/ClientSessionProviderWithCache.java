@@ -48,7 +48,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
 
   @Override
   public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext, final String sessionId) throws ProcessingException {
-    final Subject subject = Assertions.assertNotNull(runContext.subject(), "Subject must not be null");
+    final Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 
@@ -91,7 +91,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   @Override
   protected void beforeStartSession(IClientSession clientSession) {
     // auto-cancel all message boxes
-    ClientRunContexts.copyCurrent().desktop().addDesktopListener(new DesktopListener() {
+    ClientRunContexts.copyCurrent().getDesktop().addDesktopListener(new DesktopListener() {
       @Override
       public void desktopChanged(DesktopEvent e) {
         switch (e.getType()) {

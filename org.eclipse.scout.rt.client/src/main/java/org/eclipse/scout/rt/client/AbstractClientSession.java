@@ -422,7 +422,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
             inactivateSession();
           }
         }
-      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(this, true)).name("Wait for client jobs to finish before shutdown the session"));
+      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().withSession(this, true)).name("Wait for client jobs to finish before shutdown the session"));
     }
     else {
       logRunningJobs();

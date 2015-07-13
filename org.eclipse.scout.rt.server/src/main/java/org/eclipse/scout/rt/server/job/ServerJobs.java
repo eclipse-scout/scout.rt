@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * <pre>
  *   <i>
  *   final IServerSession session = ...;
- *   final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent().session(session).locale(Locale.US);
+ *   final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent().withSession(session).withLocale(Locale.US);
  *   </i>
  *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
  * 
@@ -319,7 +319,7 @@ public final class ServerJobs {
    * ServerRunContexts.copyCurrent();
    * 
    * // to create a "snapshot" of the current calling state, but with some values changed
-   * ServerRunContexts.copyCurrent().session(...).subject(...).locale(Locale.US)
+   * ServerRunContexts.copyCurrent().withSession(...).withSubject(...).withLocale(Locale.US)
    * 
    * // to create an empty context with no values set
    * ServerRunContexts.empty();

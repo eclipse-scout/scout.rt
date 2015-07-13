@@ -73,7 +73,7 @@ public class ModelJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1, true))).awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertTrue(modelThread.get());

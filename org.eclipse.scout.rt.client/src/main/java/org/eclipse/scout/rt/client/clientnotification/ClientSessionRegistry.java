@@ -59,7 +59,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
   @Override
   public IClientSession getNotificationSession() {
     if (m_notificationSession.getValue() == null) {
-      ClientRunContext ctx = ClientRunContexts.empty().subject(NOTIFICATION_SUBJECT).userAgent(UserAgent.createDefault());
+      ClientRunContext ctx = ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault());
       try {
         m_notificationSession.setValue(BEANS.get(ClientSessionProvider.class).provide(ctx));
       }
@@ -95,7 +95,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     session.removeListener(m_clientSessionStateListener);
     // unregister user remote
     try {
-      ClientRunContexts.empty().session(getNotificationSession(), true).subject(NOTIFICATION_SUBJECT).run(new IRunnable() {
+      ClientRunContexts.empty().withSession(getNotificationSession(), true).withSubject(NOTIFICATION_SUBJECT).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).unregisterSession(NOTIFICATION_NODE_ID);
@@ -154,7 +154,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     }
     // register on backend
     try {
-      ClientRunContexts.empty().session(getNotificationSession(), true).subject(NOTIFICATION_SUBJECT).run(new IRunnable() {
+      ClientRunContexts.empty().withSession(getNotificationSession(), true).withSubject(NOTIFICATION_SUBJECT).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).registerSession(NOTIFICATION_NODE_ID, session.getId(), session.getUserId());

@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * <pre>
  *   <i>
  *   final IClientSession session = ...;
- *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().session(session).locale(Locale.US);
+ *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(session).withLocale(Locale.US);
  *   </i>
  *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
  * 
@@ -322,7 +322,7 @@ public final class ClientJobs {
    * ClientRunContexts.copyCurrent();
    * 
    * // to create a "snapshot" of the current calling state, but with some values changed
-   * ClientRunContexts.copyCurrent().session(...).subject(...).locale(Locale.US)
+   * ClientRunContexts.copyCurrent().withSession(...).withSubject(...).withLocale(Locale.US)
    * 
    * // to create an empty context with no values set
    * ClientRunContexts.empty();

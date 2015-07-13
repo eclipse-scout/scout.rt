@@ -319,8 +319,8 @@ public final class ModelJobs {
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for model jobs");
-    Assertions.assertNotNull(clientRunContext.session(), "'ClientSession' must not be null for model jobs");
-    return BEANS.get(JobInput.class).threadName("scout-model-thread").runContext(clientRunContext).mutex(clientRunContext.session());
+    Assertions.assertNotNull(clientRunContext.getSession(), "'ClientSession' must not be null for model jobs");
+    return BEANS.get(JobInput.class).threadName("scout-model-thread").runContext(clientRunContext).mutex(clientRunContext.getSession());
   }
 
   /**

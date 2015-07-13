@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.context;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
@@ -84,38 +85,50 @@ public class ServerRunContext extends RunContext {
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, transaction(), transactionScope());
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ClientNotificationContainer.CURRENT, txNotificationContainer());
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ClientNotificationNodeId.CURRENT, notificationNodeId());
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, getTransaction(), m_transactionScope);
+    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ClientNotificationContainer.CURRENT, m_txNotificationContainer);
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ClientNotificationNodeId.CURRENT, m_notificationNodeId);
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, m_userAgent);
     final Callable<RESULT> c4 = new CurrentSessionLogCallable<>(c5);
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, offline());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, m_session);
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, m_offline);
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }
 
   @Override
-  public ServerRunContext runMonitor(final RunMonitor runMonitor) {
-    super.runMonitor(runMonitor);
+  public ServerRunContext withRunMonitor(final RunMonitor runMonitor) {
+    super.withRunMonitor(runMonitor);
     return this;
   }
 
   @Override
-  public ServerRunContext subject(final Subject subject) {
-    super.subject(subject);
+  public ServerRunContext withSubject(final Subject subject) {
+    super.withSubject(subject);
     return this;
   }
 
   @Override
-  public ServerRunContext locale(final Locale locale) {
-    super.locale(locale);
+  public ServerRunContext withLocale(final Locale locale) {
+    super.withLocale(locale);
     return this;
   }
 
-  public IServerSession session() {
+  @Override
+  public ServerRunContext withProperty(final Object key, final Object value) {
+    super.withProperty(key, value);
+    return this;
+  }
+
+  @Override
+  public ServerRunContext withProperties(final Map<?, ?> properties) {
+    super.withProperties(properties);
+    return this;
+  }
+
+  public IServerSession getSession() {
     return m_session;
   }
 
@@ -125,7 +138,7 @@ public class ServerRunContext extends RunContext {
    * @param applySessionProperties
    *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}.
    */
-  public ServerRunContext session(final IServerSession session, final boolean applySessionProperties) {
+  public ServerRunContext withSession(final IServerSession session, final boolean applySessionProperties) {
     m_session = session;
 
     if (applySessionProperties) {
@@ -135,42 +148,54 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public UserAgent userAgent() {
+  public UserAgent getUserAgent() {
     return m_userAgent;
   }
 
-  public ServerRunContext userAgent(final UserAgent userAgent) {
+  public ServerRunContext withUserAgent(final UserAgent userAgent) {
     m_userAgent = userAgent;
     return this;
   }
 
-  public String notificationNodeId() {
+  /**
+   * The <code>id</code> of the 'client notification node' which triggered the ongoing service request.
+   */
+  public String getNotificationNodeId() {
     return m_notificationNodeId;
   }
 
   /**
-   * The id of the notification node. This id is on the run context to make use of transactional piggy back
-   * notifications during a remote request. The notificationNodeId on the context will be excluded from sending
-   * notifications.
-   *
-   * @param notificationNodeId
-   * @return
+   * Sets the <code>id</code> of the 'client notification node' which triggered the ongoing service request. If
+   * transactional notifications are issued by the current or any nested transaction, those will not be published to
+   * that client node, but included in the request's response instead (piggyback).
+   * <p>
+   * A transactional notification is only sent to clients once the transaction is committed successfully.
    */
-  public ServerRunContext notificationNodeId(final String notificationNodeId) {
+  public ServerRunContext withNotificationNodeId(final String notificationNodeId) {
     m_notificationNodeId = notificationNodeId;
     return this;
   }
 
-  public ServerRunContext txNotificationContainer(ClientNotificationContainer txNotificationContainer) {
+  /**
+   * The collector for transactional client notifications issued by the current or any nested transaction, and are to be
+   * included in the request's response upon successful commit (piggyback).
+   */
+  public ClientNotificationContainer getTxNotificationContainer() {
+    return m_txNotificationContainer;
+  }
+
+  /**
+   * Sets the collector for all transactional notifications which are issued by the current or any nested transaction,
+   * and are to be included in the request's response upon successful commit (piggyback).
+   * <p>
+   * A transactional notification is only sent to clients once the transaction is committed successfully.
+   */
+  public ServerRunContext withTxNotificationContainer(final ClientNotificationContainer txNotificationContainer) {
     m_txNotificationContainer = txNotificationContainer;
     return this;
   }
 
-  public ClientNotificationContainer txNotificationContainer() {
-    return m_txNotificationContainer;
-  }
-
-  public TransactionScope transactionScope() {
+  public TransactionScope getTransactionScope() {
     return m_transactionScope;
   }
 
@@ -184,12 +209,12 @@ public class ServerRunContext extends RunContext {
    * {@link TransactionRequiredException} is thrown.</li>
    * </ul>
    */
-  public ServerRunContext transactionScope(final TransactionScope transactionScope) {
+  public ServerRunContext withTransactionScope(final TransactionScope transactionScope) {
     m_transactionScope = transactionScope;
     return this;
   }
 
-  public ITransaction transaction() {
+  public ITransaction getTransaction() {
     return m_transaction;
   }
 
@@ -198,19 +223,19 @@ public class ServerRunContext extends RunContext {
    * {@link TransactionScope#REQUIRED} or {@link TransactionScope#MANDATORY}. Normally, this property should not be set
    * manually.
    */
-  public ServerRunContext transaction(final ITransaction transaction) {
+  public ServerRunContext withTransaction(final ITransaction transaction) {
     m_transaction = transaction;
     return this;
   }
 
-  public boolean offline() {
+  public boolean isOffline() {
     return m_offline;
   }
 
   /**
    * Indicates to run in offline mode.
    */
-  public ServerRunContext offline(final boolean offline) {
+  public ServerRunContext withOffline(final boolean offline) {
     m_offline = offline;
     return this;
   }
@@ -218,16 +243,16 @@ public class ServerRunContext extends RunContext {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", runMonitor());
-    builder.attr("subject", subject());
-    builder.attr("locale", locale());
-    builder.ref("session", session());
-    builder.attr("userAgent", userAgent());
-    builder.attr("notificationId", notificationNodeId());
-    builder.attr("txNotificationContainer", txNotificationContainer());
-    builder.ref("transaction", transaction());
-    builder.attr("transactionScope", transactionScope());
-    builder.attr("offline", offline());
+    builder.ref("runMonitor", getRunMonitor());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("session", getSession());
+    builder.attr("userAgent", getUserAgent());
+    builder.attr("notificationNodeId", getNotificationNodeId());
+    builder.ref("txNotificationContainer", getTxNotificationContainer());
+    builder.ref("transaction", getTransaction());
+    builder.attr("transactionScope", getTransactionScope());
+    builder.attr("offline", isOffline());
     return builder.toString();
   }
 
@@ -263,7 +288,7 @@ public class ServerRunContext extends RunContext {
   protected void fillEmptyValues() {
     super.fillEmptyValues();
     m_userAgent = null;
-    m_txNotificationContainer = null;
+    m_txNotificationContainer = new ClientNotificationContainer();
     m_notificationNodeId = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;
@@ -277,5 +302,4 @@ public class ServerRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
-
 }

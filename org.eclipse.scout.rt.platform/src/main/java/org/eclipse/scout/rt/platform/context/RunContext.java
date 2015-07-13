@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.context;
 
 import java.security.AccessController;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
@@ -160,12 +162,11 @@ public class RunContext {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
-
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, NlsLocale.CURRENT, locale());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, m_propertyMap);
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, NlsLocale.CURRENT, m_locale);
     final Callable<RESULT> c3 = new CurrentSubjectLogCallable<>(c4);
-    final Callable<RESULT> c2 = new SubjectCallable<>(c3, subject());
-    final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, RunMonitor.CURRENT, Assertions.assertNotNull(runMonitor()));
+    final Callable<RESULT> c2 = new SubjectCallable<>(c3, m_subject);
+    final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor));
 
     return c1;
   }
@@ -173,7 +174,7 @@ public class RunContext {
   /**
    * @return {@link RunMonitor} to be used, is never <code>null</code>.
    */
-  public RunMonitor runMonitor() {
+  public RunMonitor getRunMonitor() {
     return m_runMonitor;
   }
 
@@ -189,7 +190,7 @@ public class RunContext {
    *     // Register your monitor to be cancelled as well
    *     RunMonitor.CURRENT.get().registerCancellable(monitor);
    * 
-   *     RunContexts.copyCurrent().runMonitor(monitor).run(new IRunnable() {
+   *     RunContexts.copyCurrent().withRunMonitor(monitor).run(new IRunnable() {
    * 
    *       &#064;Override
    *       public void run() throws Exception {
@@ -199,39 +200,56 @@ public class RunContext {
    * </code>
    * </pre>
    */
-  public RunContext runMonitor(final RunMonitor runMonitor) {
+  public RunContext withRunMonitor(final RunMonitor runMonitor) {
     m_runMonitor = Assertions.assertNotNull(runMonitor, "RunMonitor must not be null");
     return this;
   }
 
-  public Subject subject() {
+  public Subject getSubject() {
     return m_subject;
   }
 
-  public RunContext subject(final Subject subject) {
+  public RunContext withSubject(final Subject subject) {
     m_subject = subject;
     return this;
   }
 
-  public Locale locale() {
+  public Locale getLocale() {
     return m_locale;
   }
 
-  public RunContext locale(final Locale locale) {
+  public RunContext withLocale(final Locale locale) {
     m_locale = locale;
     return this;
   }
 
-  public PropertyMap propertyMap() {
+  public PropertyMap getPropertyMap() {
     return m_propertyMap;
+  }
+
+  public Object getProperty(final Object key) {
+    m_propertyMap.get(key);
+    return this;
+  }
+
+  public RunContext withProperty(final Object key, final Object value) {
+    m_propertyMap.put(key, value);
+    return this;
+  }
+
+  public RunContext withProperties(final Map<?, ?> properties) {
+    for (final Entry<?, ?> propertyEntry : properties.entrySet()) {
+      withProperty(propertyEntry.getKey(), propertyEntry.getValue());
+    }
+    return this;
   }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", runMonitor());
-    builder.ref("subject", subject());
-    builder.attr("locale", locale());
+    builder.ref("runMonitor", getRunMonitor());
+    builder.ref("subject", getSubject());
+    builder.attr("locale", getLocale());
 
     return builder.toString();
   }

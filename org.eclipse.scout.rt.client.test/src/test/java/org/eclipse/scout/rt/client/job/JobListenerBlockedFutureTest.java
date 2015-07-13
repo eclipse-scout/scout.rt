@@ -67,7 +67,7 @@ public class JobListenerBlockedFutureTest {
       public Void call() throws Exception {
         return null;
       }
-    }, ClientJobs.newInput(ClientRunContexts.empty().session(clientSession, true)));
+    }, ClientJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true)));
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
     m_jobManager.removeListener(listener);
@@ -101,7 +101,7 @@ public class JobListenerBlockedFutureTest {
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
       IClientSession clientSession = mock(IClientSession.class);
-      final JobInput input = ModelJobs.newInput(ClientRunContexts.empty().session(clientSession, true));
+      final JobInput input = ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true));
 
       // start recording of events
       outerFuture = m_jobManager.schedule(new Callable<Void>() {
