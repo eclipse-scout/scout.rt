@@ -1,10 +1,10 @@
-describe("SmartField", function() {
+describe('SmartField', function() {
 
   var smartField = new scout.SmartField();
 
-  describe("_onKeyUp", function() {
+  describe('_onKeyUp', function() {
 
-    it("doesn't call _openProposal() when TAB has been pressed", function() {
+    it('doesn not call _openProposal() when TAB has been pressed', function() {
       smartField._openProposal = function(searchText, selectCurrentValue) {};
       var event = {
         which: scout.keys.TAB
@@ -14,7 +14,7 @@ describe("SmartField", function() {
       expect(smartField._openProposal).not.toHaveBeenCalled();
     });
 
-    it("calls _openProposal() when a character key has been pressed", function() {
+    it('calls _openProposal() when a character key has been pressed', function() {
       smartField._browseOnce = true;
       smartField._popup = {};
       smartField._openProposal = function(searchText, selectCurrentValue) {};
@@ -25,6 +25,30 @@ describe("SmartField", function() {
       spyOn(smartField, '_openProposal').and.callThrough();
       smartField._onKeyUp(event);
       expect(smartField._openProposal).toHaveBeenCalled();
+    });
+
+  });
+
+  describe('_acceptProposal', function() {
+
+    smartField.session = {
+      send: function() {
+      }
+    };
+
+    it ('must set displayText', function() {
+      smartField.$field.val('foo');
+      smartField._acceptProposal();
+      expect(smartField.displayText).toBe('foo');
+    });
+
+    it ('must call clearTimeout() for pending typedProposal events', function() {
+      smartField._sendTimeoutId = null;
+      smartField.$field.val('bar');
+      smartField._proposalTyped();
+      expect(smartField._sendTimeoutId).toBeTruthy();
+      smartField._acceptProposal();
+      expect(smartField._sendTimeoutId).toBe(null);
     });
 
   });

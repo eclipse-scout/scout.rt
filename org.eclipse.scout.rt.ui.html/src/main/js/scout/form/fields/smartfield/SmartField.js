@@ -226,7 +226,9 @@ scout.SmartField.prototype._acceptProposal = function() {
   // must clear pending "proposalTyped" events because nothing good happens
   // when proposalTyped arrives _after_ an "acceptProposal" event.
   clearTimeout(this._sendTimeoutId);
+  this._sendTimeoutId = null;
   var searchText = this._searchText();
+  this.displayText = searchText;
   $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText);
   this.session.send(this.id, 'acceptProposal', {
     searchText: searchText
