@@ -35,7 +35,7 @@ scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
  */
 scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
   //FIXME CGU what if sequencebox itself has a tooltip or errorstatus? probably field has higher prio -> override status of seq box
-  if (visibilityChanged) {
+  if (visibilityChanged && this._this._lastVisibleField) {
     // if there is a new last visible field, make sure the status is shown on the previously last one
     this._lastVisibleField.suppressStatus = false;
     this._lastVisibleField._renderErrorStatus();
@@ -43,6 +43,9 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
     this._lastVisibleField._renderMenus();
   }
   this._lastVisibleField = this._getLastVisibleField();
+  if (!this._lastVisibleField) {
+    return;
+  }
 
   // Update the sequencebox with the status relevant flags
   this.setErrorStatus(this._lastVisibleField.errorStatus);
