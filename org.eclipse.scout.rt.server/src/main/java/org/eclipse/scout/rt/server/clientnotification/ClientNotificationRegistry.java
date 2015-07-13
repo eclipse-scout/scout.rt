@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -166,7 +167,7 @@ public class ClientNotificationRegistry {
 
   public void put(Collection<? extends ClientNotificationMessage> messages) {
     putWithoutClusterNotification(messages);
-    distributeCluster(messages);
+    publish(messages);
   }
 
   public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
@@ -188,8 +189,7 @@ public class ClientNotificationRegistry {
    */
   public void putTransactionalForUser(String userId, Serializable notification) {
     // exclude the node the request comes from
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId),
-        Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId), currentNodeIdElseThrow()), notification);
     putTransactional(message);
   }
 
@@ -204,8 +204,7 @@ public class ClientNotificationRegistry {
    */
   public void putTransactionalForUsers(Set<String> userIds, Serializable notification) {
     // exclude the node the request comes from
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(userIds,
-        Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(userIds, currentNodeIdElseThrow()), notification);
     putTransactional(message);
   }
 
@@ -219,8 +218,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId),
-        Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId), currentNodeIdElseThrow()), notification);
     putTransactional(message);
   }
 
@@ -232,8 +230,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForAllSessions(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(
-        Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(currentNodeIdElseThrow()), notification);
     putTransactional(message);
   }
 
@@ -245,29 +242,28 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForAllNodes(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(
-        Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No notification node id found on the thread context.")), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(currentNodeIdElseThrow()), notification);
     putTransactional(message);
   }
 
   public void putTransactional(ClientNotificationMessage message) {
-    ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found in curren run context for processing notification %s", message);
+    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
+    ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
     try {
-      ClientNotificationTransactionMember tMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
-      if (tMember == null) {
-        tMember = new ClientNotificationTransactionMember();
-        transaction.registerMember(tMember);
+      ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
+      if (txMember == null) {
+        txMember = new ClientNotificationTransactionMember();
+        transaction.registerMember(txMember);
       }
-      tMember.addNotification(message);
+      txMember.addNotification(message);
     }
     catch (ProcessingException e) {
       LOG.warn("Could not register transaction member. The notification will be processed immediately", e);
       put(message);
-
     }
   }
 
-  private void distributeCluster(Collection<? extends ClientNotificationMessage> messages) {
+  private void publish(Collection<? extends ClientNotificationMessage> messages) {
     try {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
       service.publish(new ClientNotificationClusterNotification(messages));
@@ -277,4 +273,8 @@ public class ClientNotificationRegistry {
     }
   }
 
+
+  private String currentNodeIdElseThrow() {
+    return Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No 'notification node id' found on current calling context");
+  }
 }
