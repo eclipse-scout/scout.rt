@@ -51,7 +51,7 @@ public final class JobUtility {
   }
 
   public static boolean isPollingRequestJob(JobInput jobInput) {
-    return jobInput.propertyMap().get(POLLING_REQUEST_HINT) != null;
+    return jobInput.getProperty(POLLING_REQUEST_HINT) != null;
   }
 
   /**
@@ -86,9 +86,9 @@ public final class JobUtility {
     }
 
     // Otherwise, schedule a model job and wait for it to finish
-    JobInput jobInput = ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true)).name(jobName);
+    JobInput jobInput = ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true)).withName(jobName);
     if (pollingRequest) {
-      jobInput.propertyMap().put(POLLING_REQUEST_HINT, pollingRequest);
+      jobInput.withProperty(POLLING_REQUEST_HINT, pollingRequest);
     }
     final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput);
     boolean timeout;

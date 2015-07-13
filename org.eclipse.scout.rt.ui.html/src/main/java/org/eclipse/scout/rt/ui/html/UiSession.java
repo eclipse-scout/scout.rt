@@ -116,7 +116,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_modelJobFinishedListener = new IJobListener() {
       @Override
       public void changed(JobEvent event) {
-        LOG.trace("Model job finished: " + event.getFuture().getJobInput().name() + ". Notify waiting requests...");
+        LOG.trace("Model job finished: " + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
         notifyPollingBackgroundJobRequests();
       }
     };
@@ -148,7 +148,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           return false;
         }
         // the model job's session has to match our session
-        ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().runContext();
+        ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().getRunContext();
         if (runContext.getSession() != getClientSession()) {
           return false;
         }
@@ -765,7 +765,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           }
           LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
         }
-      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_clientSession, true)).name("Close desktop due to HTTP session invalidation"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_clientSession, true)).withName("Close desktop due to HTTP session invalidation"));
     }
   }
 
