@@ -140,6 +140,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testGetDialogs() throws ProcessingException {
+    System.out.println("0");
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
 
     //                       form
@@ -155,10 +156,15 @@ public class AbstractDesktopTest {
     //                       |
     //                    form_2_1_2_1
 
+    System.out.println("1");
     P_Form form = new P_Form("form");
+    System.out.println("2");
     form.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    System.out.println("3");
     form.setDisplayParent(desktop);
+    System.out.println("4");
     form.start();
+    System.out.println("5");
 
     P_Form form_1 = new P_Form("form_1");
     form_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
@@ -215,8 +221,11 @@ public class AbstractDesktopTest {
     form_2_1_2_1.setDisplayParent(form_2_1_2);
     form_2_1_2_1.start();
 
+    System.out.println("A");
     assertEquals(CollectionUtility.arrayList(form_1, form_2, form_3), desktop.getDialogs(form, false));
+    System.out.println("B");
     assertEquals(CollectionUtility.arrayList(form_1, form_2_1_1, form_2_1_2_1, form_2_1_2, form_2_1, form_2_2, form_2_3_1, form_2_3, form_2, form_3_1, form_3), desktop.getDialogs(form, true));
+    System.out.println("C");
   }
 
   protected void verifyDataChanged(Holder<Object[]> resultHolder) throws ProcessingException {
