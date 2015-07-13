@@ -447,7 +447,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IForm> getDialogs(IDisplayParent displayParent) {
+  public List<IForm> getDialogs(IDisplayParent displayParent, boolean includeChildDialogs) {
     throw createUnsupportedOperationException();
   }
 

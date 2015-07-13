@@ -10,21 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.AbstractDesktopTest.CheckSaveTestForm.MainBox.MessageField;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -78,26 +81,27 @@ public class AbstractDesktopTest {
    */
   @Test
   public void testClosingDoBeforeClosingInternal() throws ProcessingException {
-    AbstractDesktop d = new AbstractDesktop() {
-    };
-    boolean closing = d.doBeforeClosingInternal();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+
+    boolean closing = desktop.doBeforeClosingInternal();
     assertTrue(closing);
   }
 
   @Test
   public void testUnsavedForms() throws ProcessingException {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+
     m_testForm.startNew();
     m_testForm.getMessageField().setValue("test");
-    IDesktop d = ClientSessionProvider.currentSession().getDesktop();
-    assertTrue(d.getUnsavedForms().contains(m_testForm));
+    assertTrue(desktop.getUnsavedForms().contains(m_testForm));
   }
 
   @Test
   public void testDataChangedSimple() throws ProcessingException {
-    AbstractDesktop d = new AbstractDesktop() {
-    };
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
-    d.addDataChangeListener(new DataChangeListener() {
+    desktop.addDataChangeListener(new DataChangeListener() {
 
       @Override
       public void dataChanged(Object... dataTypes) throws ProcessingException {
@@ -105,17 +109,17 @@ public class AbstractDesktopTest {
       }
     }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
-    d.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
     verifyDataChanged(resultHolder);
   }
 
   @Test
   public void testDataChangedChanging() throws ProcessingException {
-    AbstractDesktop d = new AbstractDesktop() {
-    };
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
-    d.addDataChangeListener(new DataChangeListener() {
+    desktop.addDataChangeListener(new DataChangeListener() {
 
       @Override
       public void dataChanged(Object... dataTypes) throws ProcessingException {
@@ -123,15 +127,96 @@ public class AbstractDesktopTest {
       }
     }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
-    d.setDataChanging(true);
-    d.dataChanged(TEST_DATA_TYPE_1);
-    d.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
-    d.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
-    d.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
-    d.dataChanged(TEST_DATA_TYPE_1);
-    d.dataChanged(TEST_DATA_TYPE_2);
-    d.setDataChanging(false);
+    desktop.setDataChanging(true);
+    desktop.dataChanged(TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.dataChanged(TEST_DATA_TYPE_1);
+    desktop.dataChanged(TEST_DATA_TYPE_2);
+    desktop.setDataChanging(false);
     verifyDataChanged(resultHolder);
+  }
+
+  @Test
+  public void testGetDialogs() throws ProcessingException {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().desktop();
+
+    //                       form
+    //        _________________|___________________________
+    //       |                 |                          |
+    //     form_1            form_2                     form_3
+    //                  _______|________________          |
+    //                 |           |            |      form_3_1
+    //               form_2_1    form_2_2    form_2_3
+    //       __________|_____                   |
+    //       |               |              form_2_3_1
+    //  form_2_1_1        form_2_1_2
+    //                       |
+    //                    form_2_1_2_1
+
+    P_Form form = new P_Form("form");
+    form.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form.setDisplayParent(desktop);
+    form.start();
+
+    P_Form form_1 = new P_Form("form_1");
+    form_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_1.setDisplayParent(form);
+    form_1.start();
+
+    P_Form form_2 = new P_Form("form_2");
+    form_2.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2.setDisplayParent(form);
+    form_2.start();
+
+    P_Form form_3 = new P_Form("form_3");
+    form_3.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_3.setDisplayParent(form);
+    form_3.start();
+
+    P_Form form_2_1 = new P_Form("form_2_1");
+    form_2_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_1.setDisplayParent(form_2);
+    form_2_1.start();
+
+    P_Form form_2_2 = new P_Form("form_2_2");
+    form_2_2.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_2.setDisplayParent(form_2);
+    form_2_2.start();
+
+    P_Form form_2_3 = new P_Form("form_2_3");
+    form_2_3.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_3.setDisplayParent(form_2);
+    form_2_3.start();
+
+    P_Form form_2_3_1 = new P_Form("form_2_3_1");
+    form_2_3_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_3_1.setDisplayParent(form_2_3);
+    form_2_3_1.start();
+
+    P_Form form_3_1 = new P_Form("form_3_1");
+    form_3_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_3_1.setDisplayParent(form_3);
+    form_3_1.start();
+
+    P_Form form_2_1_1 = new P_Form("form_2_1_1");
+    form_2_1_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_1_1.setDisplayParent(form_2_1);
+    form_2_1_1.start();
+
+    P_Form form_2_1_2 = new P_Form("form_2_1_2");
+    form_2_1_2.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_1_2.setDisplayParent(form_2_1);
+    form_2_1_2.start();
+
+    P_Form form_2_1_2_1 = new P_Form("form_2_1_2_1");
+    form_2_1_2_1.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);
+    form_2_1_2_1.setDisplayParent(form_2_1_2);
+    form_2_1_2_1.start();
+
+    assertEquals(CollectionUtility.arrayList(form_1, form_2, form_3), desktop.getDialogs(form, false));
+    assertEquals(CollectionUtility.arrayList(form_1, form_2_1_1, form_2_1_2_1, form_2_1_2, form_2_1, form_2_2, form_2_3_1, form_2_3, form_2, form_3_1, form_3), desktop.getDialogs(form, true));
   }
 
   protected void verifyDataChanged(Holder<Object[]> resultHolder) throws ProcessingException {
@@ -187,6 +272,24 @@ public class AbstractDesktopTest {
     public class NewHandler extends AbstractFormHandler {
     }
 
+  }
+
+  private class P_Form extends AbstractForm {
+
+    private String m_identifier;
+
+    public P_Form(String identifier) throws ProcessingException {
+      m_identifier = identifier;
+    }
+
+    @Order(10.0)
+    public class MainBox extends AbstractGroupBox {
+    }
+
+    @Override
+    public String toString() {
+      return m_identifier;
+    }
   }
 
 }

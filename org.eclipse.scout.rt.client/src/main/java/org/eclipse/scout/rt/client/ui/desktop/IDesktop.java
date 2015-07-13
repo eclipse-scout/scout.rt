@@ -234,15 +234,26 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Returns all {@link IForm}s with dialog character and which are attached to the given {@link IDisplayParent}. The
-   * forms
-   * returned are ordered as registered.
+   * dialogs returned are ordered as registered.
+   * <p>
+   * A dialog has one of the following display hint:
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
+   * <p>
+   * Optionally, this method can be parameterized to include all child dialogs recursively. In the resulting list, child
+   * dialogs come before their parent dialog, and child dialogs of the same parent in the order as inserted.
+   *
+   * @param displayParent
+   *          'displayParent' like {@link IDesktop}, {@link IOutline} or {@link IForm}.
+   * @param includeChildDialogs
+   *          <code>true</code> to include child dialogs, or <code>false</code> to only
+   *          include direct children of the
+   *          given {@link IDisplayParent}.
    */
-  List<IForm> getDialogs(IDisplayParent displayParent);
+  List<IForm> getDialogs(IDisplayParent displayParent, boolean includeChildDialogs);
 
   /**
    * Open dialogs or views that need to be saved

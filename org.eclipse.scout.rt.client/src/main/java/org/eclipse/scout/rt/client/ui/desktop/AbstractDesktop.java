@@ -803,8 +803,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IForm> getDialogs(IDisplayParent displayParent) {
-    return m_formStore.getDialogsByDisplayParent(displayParent);
+  public List<IForm> getDialogs(final IDisplayParent displayParent, final boolean includeChildDialogs) {
+    final List<IForm> dialogs = new ArrayList<>();
+
+    for (final IForm dialog : m_formStore.getDialogsByDisplayParent(displayParent)) {
+      // Add the dialog's child dialogs first.
+      if (includeChildDialogs) {
+        dialogs.addAll(getDialogs(dialog, true));
+      }
+
+      // Add the dialog.
+      dialogs.add(dialog);
+    }
+
+    return dialogs;
   }
 
   @SuppressWarnings("deprecation")
