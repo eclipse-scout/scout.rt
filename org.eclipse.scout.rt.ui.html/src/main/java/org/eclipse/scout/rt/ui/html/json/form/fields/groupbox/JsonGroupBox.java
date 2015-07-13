@@ -78,7 +78,7 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
     putJsonProperty(new JsonProperty<IGroupBox>(PROP_SCROLLABLE, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isScrollable();
+        return getModel().isScrollable().isTrue();
       }
     });
     putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDABLE, model) {
