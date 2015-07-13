@@ -52,7 +52,7 @@ scout.ValueField.prototype.displayTextChanged = function(whileTyping) {
 
   // send only if displayText has really changed OR if updateDisplayTextOnModify is true
   // 2. check is necessary to make sure the value and not only the display text gets written to the model (IBasicFieldUIFacade.parseAndSetValueFromUI vs setDisplayTextFromUI)
-  if (displayText !== oldDisplayText || (this.updateDisplayTextOnModify && !whileTyping)) {
+  if (displayText !== oldDisplayText || ((this.updateDisplayTextOnModify || this._displayTextChangedWhileTyping) && !whileTyping)) {
     this.displayText = displayText;
     this._sendDisplayTextChanged(displayText, whileTyping);
   }

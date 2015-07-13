@@ -57,7 +57,7 @@ function sendQueuedAjaxCalls(response, time) {
   }
 
   var request = jasmine.Ajax.requests.mostRecent();
-  if (request) {
+  if (request && request.onLoad) {
     request.response(response);
   }
 }
@@ -264,6 +264,12 @@ beforeEach(function() {
 });
 
 //JQuery extensions for testing purpose
+$.fn.triggerBlur = function() {
+  var event = new jQuery.Event("blur");
+  event.originalEvent = {}; // create dummy object
+  this.trigger(event);
+};
+
 $.fn.triggerRightClick = function() {
   this.trigger({
     type: 'mousedown',
@@ -275,6 +281,15 @@ $.fn.triggerRightClick = function() {
   });
   return this;
 };
+
+$.fn.triggerKeyUp = function(key, modifier) {
+  var event = new jQuery.Event("keyup");
+  event.originalEvent = {}; // create dummy object
+  event.which = key;
+  extendEventWithModifier(event, modifier);
+  this.trigger(event);
+};
+
 
 $.fn.triggerKeyDown = function(key, modifier) {
   var event = new jQuery.Event("keydown");
