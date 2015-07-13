@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFacade {
 
@@ -35,20 +34,17 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   @Override
   public void proposalTypedFromUI(String text) {
     LOG.debug("proposalTypedFromUI text=" + text);
-    assert m_field.isProposalChooserRegistered();
+    m_field.clearProposal();
     m_field.setDisplayText(text);
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {
       m_field.doSearch(text, false, false);
-    }
-    if (StringUtility.isNullOrEmpty(text)) {
-      m_field.getProposalChooser().deselect();
     }
   }
 
   @Override
   public void openProposalChooserFromUI(String text, boolean selectCurrentValue) {
     LOG.debug("openProposalChooserFromUI");
-    assert !m_field.isProposalChooserRegistered();
+    m_field.clearProposal();
     try {
       m_field.setDisplayText(text);
       String searchText = toSearchText(text);
@@ -71,38 +67,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void acceptProposalFromUI(String text) {
-    if (m_field.hasAcceptedProposal()) {
-      // With this block we deal with the case where we the proposal chooser is open
-      // and the user hits Enter or clicks with the mouse to choose a row from
-      // the proposal chooser
-      ILookupRow<LOOKUP_KEY> acceptedProposal = m_field.getProposalChooser().getAcceptedProposal();
-      LOG.debug("acceptProposalFromUI -> acceptProposal. acceptedProposal=" + acceptedProposal);
-      // This line is required for the following case:
-      // - Smartfield has a selected value and an accepted proposal row with text "Zoom"
-      // - User changes smartfield text in UI to "Z" and presses Tab
-      // - The display text on the client is still "Zoom", the accepted proposal is unchanged
-      //   that's why we must set the display text from the UI (Z), so a property change
-      //   event will be triggered to set the UI text back to "Zoom"
-      m_field.setDisplayText(text);
-      m_field.acceptProposal(acceptedProposal);
-    }
-    // With this block we deal with the case where the proposal chooser has never been opened
-    // but the text has changed:
-    // 1. text has been deleted (value must be set to null, always)
-    // 2. text has changed (a new search must be executed, when a single row matches, that row
-    //    will be the new current value. When there is more than one row that matches, the error
-    //    status must be set.
-    else if (!StringUtility.hasText(text)) {
-      LOG.debug("acceptProposalFromUI, text is empty -> call parseAndSetValue('')");
-      m_field.parseAndSetValue(text);
-    }
-    else {
-      String oldText = m_field.getCurrentLookupRow() != null ? m_field.getCurrentLookupRow().getText() : m_field.getDisplayText();
-      if (!oldText.equals(text)) {
-        LOG.debug("acceptProposalFromUI, text has changed -> call parseAndSetValue('" + text + "') with new text, old text was '" + oldText + "'");
-        m_field.parseAndSetValue(text);
-      }
-    }
+    m_field.parseAndSetValue(text);
     m_field.unregisterProposalChooserInternal();
   }
 

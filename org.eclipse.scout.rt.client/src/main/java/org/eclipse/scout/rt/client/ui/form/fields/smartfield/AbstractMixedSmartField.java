@@ -124,20 +124,28 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   protected VALUE parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) {
-      text = null;
+    text = StringUtility.nullIfEmpty(text);
+
+    ILookupRow<LOOKUP_KEY> currentLookupRow;
+    if (isProposalChooserRegistered()) {
+      currentLookupRow = getProposalChooser().getAcceptedProposal();
     }
-    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-    ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
-    if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), toSearchText(text))) {
-      acceptedProposalRow = proposalChooser.getAcceptedProposal();
+    else {
+      currentLookupRow = getCurrentLookupRow();
+      if (currentLookupRow != null) {
+        String currentLookupRowText = StringUtility.nullIfEmpty(currentLookupRow.getText());
+        if (!StringUtility.emptyIfNull(currentLookupRowText).equals(StringUtility.emptyIfNull(text))) {
+          currentLookupRow = null;
+          setCurrentLookupRow(null);
+        }
+      }
     }
-    //
+
     boolean unregister = true;
     try {
-      if (acceptedProposalRow != null) {
-        setCurrentLookupRow(acceptedProposalRow);
-        return interceptConvertKeyToValue(acceptedProposalRow.getKey());
+      if (currentLookupRow != null) {
+        setCurrentLookupRow(currentLookupRow);
+        return interceptConvertKeyToValue(currentLookupRow.getKey());
       }
       else if (text == null) {
         setCurrentLookupRow(EMPTY_LOOKUP_ROW);
@@ -146,12 +154,13 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       else {
         doSearch(text, false, true);
         IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
+        ILookupRow<LOOKUP_KEY> singleMatchLookupRow = null;
         if (fetchResult != null && fetchResult.getLookupRows() != null && fetchResult.getLookupRows().size() == 1) {
-          acceptedProposalRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
+          singleMatchLookupRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
         }
-        if (acceptedProposalRow != null) {
-          setCurrentLookupRow(acceptedProposalRow);
-          return interceptConvertKeyToValue(acceptedProposalRow.getKey());
+        if (singleMatchLookupRow != null) {
+          setCurrentLookupRow(singleMatchLookupRow);
+          return interceptConvertKeyToValue(singleMatchLookupRow.getKey());
         }
         else {
           unregister = false; // prevent unregister in finally

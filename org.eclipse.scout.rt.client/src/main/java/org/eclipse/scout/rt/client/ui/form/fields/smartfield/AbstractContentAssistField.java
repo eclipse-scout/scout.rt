@@ -698,8 +698,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public void revertValue() {
-    setValue(getValue());
+  public void clearProposal() {
+    setCurrentLookupRow(null);
+    if (isProposalChooserRegistered()) {
+      getProposalChooser().deselect();
+    }
   }
 
   /**

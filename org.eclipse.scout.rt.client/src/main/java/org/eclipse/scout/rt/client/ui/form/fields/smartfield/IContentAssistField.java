@@ -201,12 +201,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous);
 
   /**
-   * Revert the value and the text to the value that the smartfield had before a
-   * new text (part)was entered. Do not use this method directly This method is
-   * only called from one of the choosers outside the smartfield when the
-   * chooser was terminated
+   * Sets the current lookup-row to null and also the accepted proposal from the proposal chooser (if available).
    */
-  void revertValue();
+  void clearProposal();
 
   /**
    * This method is normally used by a {@link IContentAssistFieldProposalForm#acceptProposal()}
