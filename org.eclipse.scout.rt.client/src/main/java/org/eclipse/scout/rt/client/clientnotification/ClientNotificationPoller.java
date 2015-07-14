@@ -46,12 +46,11 @@ public class ClientNotificationPoller {
     // TODO aho guard to start only once
     if (BEANS.get(IServiceTunnel.class).isActive()) {
       P_NotificationPollJob pollJob = new P_NotificationPollJob();
-      m_pollerFuture = Jobs.schedule(pollJob, Jobs.newInput(
-          ClientRunContexts
-            .empty()
-            .withSession(BEANS.get(IClientSessionRegistry.class).getNotificationSession(), true)
-            .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
-            .withUserAgent(UserAgent.createDefault())));
+      m_pollerFuture = Jobs.schedule(pollJob,
+          Jobs.newInput(ClientRunContexts.copyCurrent()
+              .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
+              .withUserAgent(UserAgent.createDefault())
+              .withSession(null, false)));
     }
     else {
       LOG.debug("Starting without notifications due to no proxy service is available");
@@ -81,9 +80,17 @@ public class ClientNotificationPoller {
 
   private class P_NotificationPollJob implements IRunnable {
     @Override
-    public void run() {
+    public void run() throws InterruptedException {
       while (!RunMonitor.CURRENT.get().isCancelled()) {
-        handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(IClientSessionRegistry.NOTIFICATION_NODE_ID));
+        try {
+          IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
+          handleMessagesReceived(svc.getNotifications(IClientSessionRegistry.NOTIFICATION_NODE_ID));
+        }
+        catch (Exception e) {
+          //server error?
+          LOG.error("Error receiving client notifications", e);
+          Thread.sleep(10000);
+        }
       }
     }
   }

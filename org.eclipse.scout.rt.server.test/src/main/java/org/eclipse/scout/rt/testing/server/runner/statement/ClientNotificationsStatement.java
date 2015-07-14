@@ -42,7 +42,10 @@ public class ClientNotificationsStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    ServerRunContexts.copyCurrent().withTransactionalClientNotificationCollector(m_collector).withNotificationNodeId(m_nodeId).run(new IRunnable() {
+    ServerRunContexts.copyCurrent()
+        .withTransactionalClientNotificationCollector(m_collector)
+        .withNotificationNodeId(m_nodeId)
+        .run(new IRunnable() {
 
       @Override
       public void run() throws Exception {

@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.lang.reflect.Method;
 import java.net.SocketException;
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -32,9 +34,11 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -44,10 +48,13 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -114,35 +121,39 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
 
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-
-          // Collector to collect transactional client notifications issued during processing of the current request.
-          TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
-          // Enable global cancellation of the service request.
-          RunMonitor runMonitor = BEANS.get(RunMonitor.class);
-
-          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-          serverRunContext.withLocale(serviceRequest.getLocale());
-          serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-          serverRunContext.withRunMonitor(runMonitor);
-          serverRunContext.withTransactionalClientNotificationCollector(transactionalClientNotificationCollector);
-          serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
-          serverRunContext.withProperty(SESSION_ID, serviceRequest.getSessionId());
-          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
-
-          IServerSession session = serverRunContext.getSession();
-          long requestSequence = serviceRequest.getRequestSequence();
-
-          BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
-          try {
-            IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-            // Include transactional client notification in response (piggyback).
-            serviceResponse.setNotifications(transactionalClientNotificationCollector.values());
-            serializeServiceResponse(serviceResponse);
+          if (isSessionLess(serviceRequest)) {
+            processWithoutSession(serviceRequest);
           }
-          finally {
-            BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
+          else {
+            // Collector to collect transactional client notifications issued during processing of the current request.
+            TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
+            // Enable global cancellation of the service request.
+            RunMonitor runMonitor = BEANS.get(RunMonitor.class);
+            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+            serverRunContext.withLocale(serviceRequest.getLocale());
+            serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+            serverRunContext.withRunMonitor(runMonitor);
+            serverRunContext.withTransactionalClientNotificationCollector(transactionalClientNotificationCollector);
+            serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
+            serverRunContext.withProperty(SESSION_ID, serviceRequest.getSessionId());
+            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
+
+            IServerSession session = serverRunContext.getSession();
+            long requestSequence = serviceRequest.getRequestSequence();
+
+            BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
+            try {
+              IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+              // Include transactional client notification in response (piggyback).
+              serviceResponse.setNotifications(transactionalClientNotificationCollector.values());
+              serializeServiceResponse(serviceResponse);
+            }
+            finally {
+              BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
+            }
           }
         }
+
       }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
@@ -154,6 +165,31 @@ public class ServiceTunnelServlet extends HttpServlet {
         servletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
     }
+  }
+
+  /**
+   * Do not create a server session for IClientNotificationService
+   */
+  protected boolean isSessionLess(ServiceTunnelRequest serviceRequest) throws Exception {
+    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
+    return IClientNotificationService.class.isAssignableFrom(serviceInterfaceClass);
+  }
+
+  /**
+   * Process request without creating a server session
+   */
+  protected void processWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, ProcessingException, Exception {
+    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
+    Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceRequest.getOperation(), serviceRequest.getParameterTypes());
+    Object service = BEANS.get(serviceInterfaceClass);
+    if (service == null) {
+      throw new SecurityException("service registry does not contain a service of type " + serviceRequest.getServiceInterfaceClassName());
+    }
+    Object data = ServiceUtility.invoke(serviceOp, service, serviceRequest.getArgs());
+    Object[] outParameters = ServiceUtility.extractHolderArguments(serviceRequest.getArgs());
+    IServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters, null);
+    serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());
+    serializeServiceResponse(serviceResponse);
   }
 
   // === SERVICE INVOCATION ===

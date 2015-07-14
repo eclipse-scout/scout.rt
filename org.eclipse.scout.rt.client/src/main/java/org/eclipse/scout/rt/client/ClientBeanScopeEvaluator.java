@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
 /**
  *
@@ -64,6 +65,10 @@ public class ClientBeanScopeEvaluator implements IBeanScopeEvaluator {
         else {
           LOG.debug("Filtered out bean " + bean.toString() + " because it expects session '" + expectedSession.getName() + "' but was '" + scopeClass.getName() + "'.", new Exception());
         }
+      }
+      else if (IClientNotificationService.class.isAssignableFrom(bean.getBeanClazz())) {
+        //TODO jgu REMOVE!!!: quickfix to allow client notifications without sessions
+        result.add(bean);
       }
       else {
         LOG.debug("Filtered out " + bean.toString() + " because no client session exists in the current context.", new Exception());
