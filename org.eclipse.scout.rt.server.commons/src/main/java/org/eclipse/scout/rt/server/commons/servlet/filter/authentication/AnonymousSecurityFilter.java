@@ -12,22 +12,44 @@ package org.eclipse.scout.rt.server.commons.servlet.filter.authentication;
 
 import java.io.IOException;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.security.SimplePrincipal;
 
 /**
- * a security filter allowing anonymous access to the application.
+ * A security filter allowing anonymous access to the application.
  */
 public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
+
   public static final String ANONYMOUS_USER_NAME = "anonymous";
 
   @Override
   protected int negotiate(HttpServletRequest req, HttpServletResponse resp, PrincipalHolder holder) throws IOException, ServletException {
     holder.setPrincipal(new SimplePrincipal(ANONYMOUS_USER_NAME));
     return STATUS_CONTINUE_WITH_PRINCIPAL;
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+    if (isLogoutRequest(req)) {
+      HttpSession session = req.getSession(false);
+      if (session != null) {
+        session.invalidate();
+      }
+      res.sendRedirect("/");
+    }
+    else {
+      super.doFilterInternal(req, res, chain);
+    }
+  }
+
+  private boolean isLogoutRequest(HttpServletRequest req) {
+    String uri = req.getRequestURI();
+    return uri != null && uri.endsWith("/logout");
   }
 
   @Override

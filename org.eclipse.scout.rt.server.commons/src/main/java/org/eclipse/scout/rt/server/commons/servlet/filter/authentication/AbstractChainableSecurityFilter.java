@@ -207,7 +207,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
    */
   protected abstract int negotiate(HttpServletRequest req, HttpServletResponse resp, PrincipalHolder holder) throws IOException, ServletException;
 
-  private void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+  protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
     chain.doFilter(req, res);
   }
 
