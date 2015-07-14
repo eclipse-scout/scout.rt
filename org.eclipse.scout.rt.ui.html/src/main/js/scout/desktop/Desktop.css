@@ -403,6 +403,7 @@
   .animation(fadeIn ease-in 1);
   .animation-duration(0.25s);
   outline: none;
+  z-index: 100;
 
   &.busy {
     /* Make glasspane transparent and disable animation */
