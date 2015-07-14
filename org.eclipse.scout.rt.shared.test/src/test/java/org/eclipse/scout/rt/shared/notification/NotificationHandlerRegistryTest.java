@@ -43,8 +43,8 @@ public class NotificationHandlerRegistryTest {
     m_globalNotificationHanlder = Mockito.mock(GlobalNotificationHandler.class);
     m_groupNotificationHanlder = Mockito.mock(GroupNotificationHandler.class);
     m_serviceReg = TestingUtility.registerBeans(
-        new BeanMetaData(GlobalNotificationHandler.class).initialInstance(m_globalNotificationHanlder).applicationScoped(true),
-        new BeanMetaData(GroupNotificationHandler.class).initialInstance(m_groupNotificationHanlder).applicationScoped(true)
+        new BeanMetaData(GlobalNotificationHandler.class).withInitialInstance(m_globalNotificationHanlder).withApplicationScoped(true),
+        new BeanMetaData(GroupNotificationHandler.class).withInitialInstance(m_groupNotificationHanlder).withApplicationScoped(true)
         );
 
     // ensure bean hander cache of notification dispatcher gets refreshed

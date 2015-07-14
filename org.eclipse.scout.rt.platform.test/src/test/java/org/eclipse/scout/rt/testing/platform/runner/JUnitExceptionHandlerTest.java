@@ -87,7 +87,7 @@ public class JUnitExceptionHandlerTest {
    */
   @Test
   public void testCustomExceptionHandler() {
-    IBean<Object> customExceptionHandler = Platform.get().getBeanManager().registerBean(new BeanMetaData(TestExceptionHandler.class).replace(true).order(-1001));
+    IBean<Object> customExceptionHandler = Platform.get().getBeanManager().registerBean(new BeanMetaData(TestExceptionHandler.class).withReplace(true).withOrder(-1001));
     try {
       BEANS.get(ExceptionHandler.class).handle(new TestException1());
     }

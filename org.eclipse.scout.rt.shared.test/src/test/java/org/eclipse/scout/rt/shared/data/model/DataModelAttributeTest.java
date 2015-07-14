@@ -67,11 +67,11 @@ public class DataModelAttributeTest {
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_services = TestingUtility.registerBeans(
         new BeanMetaData(ICodeService.class).
-        initialInstance(codeService).
-        applicationScoped(true),
+        withInitialInstance(codeService).
+        withApplicationScoped(true),
         new BeanMetaData(ICodeLookupCallFactoryService.class).
-        initialInstance(codeLookupCallFactoryService).
-        applicationScoped(true)
+        withInitialInstance(codeLookupCallFactoryService).
+        withApplicationScoped(true)
         );
   }
 

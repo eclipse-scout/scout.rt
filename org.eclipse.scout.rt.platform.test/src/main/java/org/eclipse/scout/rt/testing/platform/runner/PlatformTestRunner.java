@@ -201,7 +201,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    */
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
     final Statement s2 = new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
-    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).replace(true).order(-1000)); // exception handler to not silently swallow handled exceptions.
+    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
 
     return s1;
   }
@@ -239,7 +239,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
     final Statement s3 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
-    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(JUnitExceptionHandler.class).replace(true).order(-1000)); // exception handler to not silently swallow handled exceptions.
+    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
     final Statement s1 = new TimesStatement(s2, ReflectionUtility.getAnnotation(Times.class, testMethod, testClass));
 
     return s1;

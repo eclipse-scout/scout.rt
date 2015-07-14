@@ -121,8 +121,8 @@ public class BasicSecurityFilterTest {
     m_registeredServices.add(
         TestingUtility.registerBean(
             new BeanMetaData(clazz).
-            initialInstance(service).
-            applicationScoped(true)
+            withInitialInstance(service).
+            withApplicationScoped(true)
             )
         );
   }

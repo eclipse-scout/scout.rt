@@ -96,8 +96,8 @@ public class FileServiceTest {
     //register services
     List<IBean<?>> reg = TestingUtility.registerBeans(
         new BeanMetaData(DummyRemoteFileService.class).
-            initialInstance(new DummyRemoteFileService()).
-            applicationScoped(true));
+            withInitialInstance(new DummyRemoteFileService()).
+            withApplicationScoped(true));
 
     //start with clean setup
     File outFolder = new File(TEST_DIR_OUT);

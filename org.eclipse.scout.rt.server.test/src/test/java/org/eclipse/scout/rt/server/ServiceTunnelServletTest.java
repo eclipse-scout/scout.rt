@@ -87,17 +87,17 @@ public class ServiceTunnelServletTest {
 
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(StickySessionCacheService.class).
-        order(TEST_SERVICE_ORDER).
-        applicationScoped(true),
+        withOrder(TEST_SERVICE_ORDER).
+        withApplicationScoped(true),
         new BeanMetaData(IAccessControlService.class).
-        initialInstance(new AbstractAccessControlService() {
+        withInitialInstance(new AbstractAccessControlService() {
         }).
-        order(TEST_SERVICE_ORDER).
-        applicationScoped(true),
+        withOrder(TEST_SERVICE_ORDER).
+        withApplicationScoped(true),
         new BeanMetaData(ServerSessionProvider.class).
-        initialInstance(m_serverSessionProviderSpy).
-        order(TEST_SERVICE_ORDER).
-        applicationScoped(true)
+        withInitialInstance(m_serverSessionProviderSpy).
+        withOrder(TEST_SERVICE_ORDER).
+        withApplicationScoped(true)
         );
 
     m_testServiceTunnelServlet = new ServiceTunnelServlet();

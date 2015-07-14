@@ -56,8 +56,8 @@ public class DefaultAuthTokenTest {
   public static void beforeClass() throws ProcessingException {
     s_pair = SecurityUtility.generateKeyPair();
     s_beans.addAll(TestingUtility.registerBeans(
-        new BeanMetaData(AuthTokenPrivateKeyProperty.class).applicationScoped(true).initialInstance(new AuthTokenPrivateKeyPropertyEx()),
-        new BeanMetaData(AuthTokenPublicKeyProperty.class).applicationScoped(true).initialInstance(new AuthTokenPublicKeyPropertyEx())
+        new BeanMetaData(AuthTokenPrivateKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPrivateKeyPropertyEx()),
+        new BeanMetaData(AuthTokenPublicKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPublicKeyPropertyEx())
         ));
   }
 

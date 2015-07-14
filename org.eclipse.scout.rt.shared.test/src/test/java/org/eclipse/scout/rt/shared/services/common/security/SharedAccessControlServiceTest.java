@@ -51,8 +51,8 @@ public class SharedAccessControlServiceTest {
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(
         new BeanMetaData(IAccessControlService.class).
-        initialInstance(m_accessControlService).
-        applicationScoped(true)
+        withInitialInstance(m_accessControlService).
+        withApplicationScoped(true)
         );
   }
 

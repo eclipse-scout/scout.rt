@@ -79,7 +79,7 @@ public class ClientRunContextStatement extends Statement {
             }
           }, BEANS.get(ThrowableTranslator.class));
         }
-      }, new BeanMetaData(clientSessionClass).order(-Long.MAX_VALUE)).evaluate();
+      }, new BeanMetaData(clientSessionClass).withOrder(-Long.MAX_VALUE)).evaluate();
     }
   }
 }

@@ -62,8 +62,8 @@ public class BatchLookupTest {
     m_reg.add(
         TestingUtility.registerBean(
             new BeanMetaData(IFlowerLookupService.class).
-            initialInstance(m_lookupService).
-            applicationScoped(true)
+            withInitialInstance(m_lookupService).
+            withApplicationScoped(true)
             ));
   }
 

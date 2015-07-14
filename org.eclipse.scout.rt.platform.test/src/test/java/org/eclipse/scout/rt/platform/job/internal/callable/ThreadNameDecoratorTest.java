@@ -46,7 +46,7 @@ public class ThreadNameDecoratorTest {
   @Before
   public void before() {
     m_jobManager = new JobManager();
-    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, m_jobManager).replace(true).order(-1));
+    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, m_jobManager).withReplace(true).withOrder(-1));
   }
 
   @After

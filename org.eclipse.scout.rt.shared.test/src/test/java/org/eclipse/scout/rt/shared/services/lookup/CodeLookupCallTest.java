@@ -61,8 +61,8 @@ public class CodeLookupCallTest {
   public static void beforeClass() throws Exception {
     s_services = TestingUtility.registerBeans(
         new BeanMetaData(ICodeService.class).
-            initialInstance(new TestingCodeService(new CodeLookupCallTestCodeType())).
-            applicationScoped(true)
+            withInitialInstance(new TestingCodeService(new CodeLookupCallTestCodeType())).
+            withApplicationScoped(true)
         );
   }
 

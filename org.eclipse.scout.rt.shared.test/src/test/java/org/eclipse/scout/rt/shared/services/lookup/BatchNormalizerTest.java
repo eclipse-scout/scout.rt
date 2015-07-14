@@ -61,8 +61,8 @@ public class BatchNormalizerTest {
     m_reg.add(
         TestingUtility.registerBean(
             new BeanMetaData(IFruitLookupService.class).
-            initialInstance(m_lookupService).
-            applicationScoped(true)
+            withInitialInstance(m_lookupService).
+            withApplicationScoped(true)
             ));
   }
 

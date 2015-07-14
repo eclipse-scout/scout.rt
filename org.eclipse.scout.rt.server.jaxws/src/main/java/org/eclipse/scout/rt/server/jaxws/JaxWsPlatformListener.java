@@ -52,7 +52,7 @@ public class JaxWsPlatformListener implements IPlatformListener {
       Assertions.assertTrue(JaxWsImplementorSpecifics.class.isAssignableFrom(implementorClazz), "Implementor class must be of type '%s'.", JaxWsImplementorSpecifics.class.getName());
 
       beanManager.unregisterClass(implementorClazz); // Unregister the Bean first, so it can be registered with @Replace annotation anew.
-      beanManager.registerBean(new BeanMetaData(implementorClazz).replace(true));
+      beanManager.registerBean(new BeanMetaData(implementorClazz).withReplace(true));
 
       LOG.info("JAX-WS implementor specific class installed: {}", implementorClazz.getName());
     }

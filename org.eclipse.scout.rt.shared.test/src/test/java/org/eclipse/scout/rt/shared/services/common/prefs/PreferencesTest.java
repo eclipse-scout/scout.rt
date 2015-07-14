@@ -73,8 +73,8 @@ public class PreferencesTest {
 
     List<IBean<?>> registerServices = TestingUtility.registerBeans(
         new BeanMetaData(IUserPreferencesStorageService.class).
-            initialInstance(svc).
-            applicationScoped(true));
+            withInitialInstance(svc).
+            withApplicationScoped(true));
     try {
       prefs.flush();
     }

@@ -81,7 +81,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData initialInstance(Object initialInstance) {
+  public BeanMetaData withInitialInstance(Object initialInstance) {
     m_initialInstance = initialInstance;
     return this;
   }
@@ -91,7 +91,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData producer(IBeanInstanceProducer<?> producer) {
+  public BeanMetaData withProducer(IBeanInstanceProducer<?> producer) {
     m_producer = producer;
     return this;
   }
@@ -105,12 +105,12 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData replace(boolean set) {
-    if (set) {
-      addAnnotation(AnnotationFactory.createReplace());
+  public BeanMetaData withReplace(boolean replace) {
+    if (replace) {
+      withAnnotation(AnnotationFactory.createReplace());
     }
     else {
-      removeAnnotation(Replace.class);
+      withoutAnnotation(Replace.class);
     }
     return this;
   }
@@ -120,8 +120,8 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData order(double order) {
-    addAnnotation(AnnotationFactory.createOrder(order));
+  public BeanMetaData withOrder(double order) {
+    withAnnotation(AnnotationFactory.createOrder(order));
     return this;
   }
 
@@ -130,12 +130,12 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData applicationScoped(boolean set) {
+  public BeanMetaData withApplicationScoped(boolean set) {
     if (set) {
-      addAnnotation(AnnotationFactory.createApplicationScoped());
+      withAnnotation(AnnotationFactory.createApplicationScoped());
     }
     else {
-      removeAnnotation(ApplicationScoped.class);
+      withoutAnnotation(ApplicationScoped.class);
     }
     return this;
   }
@@ -159,7 +159,7 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData addAnnotation(Annotation annotation) {
+  public BeanMetaData withAnnotation(Annotation annotation) {
     m_beanAnnotations.put(annotation.annotationType(), annotation);
     return this;
   }
@@ -169,9 +169,8 @@ public class BeanMetaData {
    *
    * @return this supporting the fluent api
    */
-  public BeanMetaData removeAnnotation(Class<? extends Annotation> annotationType) {
+  public BeanMetaData withoutAnnotation(Class<? extends Annotation> annotationType) {
     m_beanAnnotations.remove(annotationType);
     return this;
   }
-
 }

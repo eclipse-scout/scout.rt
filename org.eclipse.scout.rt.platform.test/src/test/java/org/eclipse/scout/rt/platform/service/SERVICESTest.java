@@ -50,7 +50,7 @@ public class SERVICESTest {
 
   private IBean<?> registerService(Class<? extends ITestService> serviceClazz, double order) {
     BeanMetaData bean = new BeanMetaData(serviceClazz);
-    bean.addAnnotation(AnnotationFactory.createOrder(order));
+    bean.withAnnotation(AnnotationFactory.createOrder(order));
     return Platform.get().getBeanManager().registerBean(bean);
   }
 

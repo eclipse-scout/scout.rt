@@ -61,7 +61,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     MockitoAnnotations.initMocks(this);
 
     m_txErrors = new ArrayList<>();
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(ITransaction.class).order(-1000).producer(new IBeanInstanceProducer<ITransaction>() {
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(ITransaction.class).withOrder(-1000).withProducer(new IBeanInstanceProducer<ITransaction>() {
       @Override
       public ITransaction produce(IBean<ITransaction> bean) {
         return m_transaction;

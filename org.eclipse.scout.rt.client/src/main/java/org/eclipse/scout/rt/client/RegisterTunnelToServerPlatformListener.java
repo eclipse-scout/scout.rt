@@ -43,7 +43,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
         if (!event.getSource().getBeanManager().getBeans(c).isEmpty()) {
           continue;
         }
-        event.getSource().getBeanManager().registerBean(new BeanMetaData(c).applicationScoped(false));
+        event.getSource().getBeanManager().registerBean(new BeanMetaData(c).withApplicationScoped(false));
       }
     }
   }

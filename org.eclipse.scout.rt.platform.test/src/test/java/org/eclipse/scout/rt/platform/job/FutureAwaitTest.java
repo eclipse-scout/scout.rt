@@ -44,7 +44,7 @@ public class FutureAwaitTest {
 
   @Before
   public void before() {
-    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, new JobManager()).replace(true).order(-1));
+    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, new JobManager()).withReplace(true).withOrder(-1));
   }
 
   @After

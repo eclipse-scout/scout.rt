@@ -81,7 +81,7 @@ public class InvocationContextTest {
 
     when(m_commitListener.onCommitPhase1()).thenReturn(true);
 
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(JaxWsImplementorSpecifics.class, m_implementorSpecifics).replace(true));
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(JaxWsImplementorSpecifics.class, m_implementorSpecifics).withReplace(true));
   }
 
   @After

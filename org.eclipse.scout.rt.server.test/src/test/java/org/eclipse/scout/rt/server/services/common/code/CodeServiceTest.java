@@ -50,7 +50,7 @@ public class CodeServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).initialInstance(testService).applicationScoped(true).addAnnotation(AnnotationFactory.createOrder(-1000)));
+    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).withInitialInstance(testService).withApplicationScoped(true).withAnnotation(AnnotationFactory.createOrder(-1000)));
     try {
       ICodeService service = BEANS.get(ICodeService.class);
       assertSame(testService, service);

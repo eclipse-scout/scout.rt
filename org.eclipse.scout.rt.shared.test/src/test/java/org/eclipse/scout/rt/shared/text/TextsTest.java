@@ -43,7 +43,7 @@ public class TextsTest {
   public void before() throws InterruptedException {
     m_testTextService = TestingUtility.registerBeans(
         new BeanMetaData(TestTextProviderService.class).
-            applicationScoped(true)
+            withApplicationScoped(true)
         );
     ScoutTexts.CURRENT.set(new ScoutTexts(BEANS.all(ITextProviderService.class)));
   }

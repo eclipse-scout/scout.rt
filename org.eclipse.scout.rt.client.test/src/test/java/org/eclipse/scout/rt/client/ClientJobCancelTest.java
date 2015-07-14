@@ -63,8 +63,8 @@ public class ClientJobCancelTest {
 
     m_serviceReg = TestingUtility.registerBeans(
         new BeanMetaData(MockServerProcessingCancelService.class).
-        initialInstance(new MockServerProcessingCancelService()).
-        applicationScoped(true).order(-1)
+        withInitialInstance(new MockServerProcessingCancelService()).
+        withApplicationScoped(true).withOrder(-1)
         );
 
   }
@@ -136,7 +136,7 @@ public class ClientJobCancelTest {
 
           @Override
           public String call() throws Exception {
-            IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(PingService.class).initialInstance(new PingService()).applicationScoped(true));
+            IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(PingService.class).withInitialInstance(new PingService()).withApplicationScoped(true));
             try {
               return ServiceTunnelUtility.createProxy(IPingService.class).ping(pingRequest);
             }

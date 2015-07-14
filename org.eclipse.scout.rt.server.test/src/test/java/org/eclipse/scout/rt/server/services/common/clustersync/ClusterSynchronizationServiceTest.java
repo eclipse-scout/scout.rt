@@ -64,8 +64,8 @@ public class ClusterSynchronizationServiceTest {
     m_beans.add(
         TestingUtility.registerBean(
             new BeanMetaData(IPublishSubscribeMessageService.class).
-            initialInstance(m_messageService).
-            applicationScoped(true)
+            withInitialInstance(m_messageService).
+            withApplicationScoped(true)
             ));
 
     m_svc = new ClusterSynchronizationService();

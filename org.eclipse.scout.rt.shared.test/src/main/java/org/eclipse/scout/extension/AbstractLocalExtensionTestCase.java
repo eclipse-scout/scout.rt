@@ -35,7 +35,7 @@ public abstract class AbstractLocalExtensionTestCase {
   public void registerLocalRegistry() {
     m_localServiceRegistrations = TestingUtility.registerBeans(
         new BeanMetaData(ExtensionRegistry.class).
-            applicationScoped(true)
+            withApplicationScoped(true)
         );
   }
 

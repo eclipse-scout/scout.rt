@@ -79,7 +79,7 @@ public class ServerRunContextStatement extends Statement {
             }
           }, BEANS.get(ThrowableTranslator.class));
         }
-      }, new BeanMetaData(serverSessionClass).order(-Long.MAX_VALUE)).evaluate();
+      }, new BeanMetaData(serverSessionClass).withOrder(-Long.MAX_VALUE)).evaluate();
     }
   }
 }
