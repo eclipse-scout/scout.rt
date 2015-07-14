@@ -610,9 +610,16 @@
       var orig_event = event;
       $handle.parents()
         .on('mousemove.dragging', function(event) {
+          var top = orig_offset.top + (event.pageY - orig_event.pageY);
+          var left = orig_offset.left + (event.pageX - orig_event.pageX);
+          // do not drop outside of viewport (and leave a margin of 100 pixels)
+          left = Math.max(100 - $handle.width(), left);
+          left = Math.min($('body').width() - 100, left);
+          top = Math.max(0, top); // must not be dragged outside of top, otherwise dragging back is impossible
+          top = Math.min($(window).height() - 100, top);
           $draggable.offset({
-            top: orig_offset.top + (event.pageY - orig_event.pageY),
-            left: orig_offset.left + (event.pageX - orig_event.pageX)
+            top: top,
+            left: left
           });
         })
         .on('mouseup.dragging', function(e) {
