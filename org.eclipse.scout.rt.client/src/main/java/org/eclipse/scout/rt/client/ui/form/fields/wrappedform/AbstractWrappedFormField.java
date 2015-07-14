@@ -280,8 +280,8 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   private class P_InnerFormListener implements FormListener {
     @Override
     public void formChanged(FormEvent e) throws ProcessingException {
-      if (e.getType() == FormEvent.TYPE_CLOSED) {
-        setInnerForm(null);
+      if (e.getType() == FormEvent.TYPE_CLOSED && m_manageInnerFormLifeCycle) {
+        setInnerForm(null, true);
       }
     }
   }// end private class
