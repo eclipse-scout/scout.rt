@@ -16,11 +16,6 @@ public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   String PROP_SEARCH_RESULT = "searchResult";
 
-  static enum Status {
-    Updating,
-    Complete
-  }
-
   /**
    * @param listener
    */

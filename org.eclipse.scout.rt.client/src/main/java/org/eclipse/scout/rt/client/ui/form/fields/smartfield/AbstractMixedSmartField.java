@@ -123,62 +123,31 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   }
 
   @Override
-  protected VALUE parseValueInternal(String text) throws ProcessingException {
-    text = StringUtility.nullIfEmpty(text);
-
-    ILookupRow<LOOKUP_KEY> currentLookupRow;
-    if (isProposalChooserRegistered()) {
-      currentLookupRow = getProposalChooser().getAcceptedProposal();
-    }
-    else {
-      currentLookupRow = getCurrentLookupRow();
-      if (currentLookupRow != null) {
-        String currentLookupRowText = StringUtility.nullIfEmpty(currentLookupRow.getText());
-        if (!StringUtility.emptyIfNull(currentLookupRowText).equals(StringUtility.emptyIfNull(text))) {
-          currentLookupRow = null;
-          setCurrentLookupRow(null);
-        }
-      }
-    }
-
-    boolean unregister = true;
-    try {
-      if (currentLookupRow != null) {
-        setCurrentLookupRow(currentLookupRow);
-        return interceptConvertKeyToValue(currentLookupRow.getKey());
-      }
-      else if (text == null) {
-        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-        return null;
-      }
-      else {
-        doSearch(text, false, true);
-        IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
-        ILookupRow<LOOKUP_KEY> singleMatchLookupRow = null;
-        if (fetchResult != null && fetchResult.getLookupRows() != null && fetchResult.getLookupRows().size() == 1) {
-          singleMatchLookupRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
-        }
-        if (singleMatchLookupRow != null) {
-          setCurrentLookupRow(singleMatchLookupRow);
-          return interceptConvertKeyToValue(singleMatchLookupRow.getKey());
-        }
-        else {
-          unregister = false; // prevent unregister in finally
-          throw new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
-        }
-      }
-    }
-    finally {
-      if (unregister) {
-        unregisterProposalChooserInternal();
-      }
-    }
-  }
-
-  @Override
   public void acceptProposal(ILookupRow<LOOKUP_KEY> row) {
     setCurrentLookupRow(row);
     setValue(interceptConvertKeyToValue(row.getKey()));
+  }
+
+  @Override
+  protected VALUE returnLookupRowAsValue(ILookupRow<LOOKUP_KEY> lookupRow) {
+    return interceptConvertKeyToValue(lookupRow.getKey());
+  }
+
+  @Override
+  protected P_HandleResult handleNoCurrentLookupRowSet(String text) throws VetoException {
+    doSearch(text, false, true);
+    IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
+    ILookupRow<LOOKUP_KEY> singleMatchLookupRow = null;
+    if (fetchResult != null && fetchResult.getLookupRows() != null && fetchResult.getLookupRows().size() == 1) {
+      singleMatchLookupRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
+    }
+    if (singleMatchLookupRow != null) {
+      setCurrentLookupRow(singleMatchLookupRow);
+      return new P_HandleResult(returnLookupRowAsValue(singleMatchLookupRow));
+    }
+    else {
+      return new P_HandleResult(new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text)));
+    }
   }
 
   @Override

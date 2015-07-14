@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
@@ -84,53 +85,6 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected String parseValueInternal(String text) throws ProcessingException {
-    if (text != null && text.length() == 0) {
-      text = null;
-    }
-    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-    ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
-    if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
-      acceptedProposalRow = proposalChooser.getAcceptedProposal();
-    }
-    boolean unregister = true;
-    try {
-      // changed
-      if (acceptedProposalRow != null) {
-        setCurrentLookupRow(acceptedProposalRow);
-        return acceptedProposalRow.getText();
-      }
-      else if (text == null) {
-        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-        return null;
-      }
-      else {
-        setCurrentLookupRow(null);
-        doSearch(text, false, true);
-        proposalChooser = getProposalChooser();
-        if (proposalChooser != null) {
-          acceptedProposalRow = proposalChooser.getAcceptedProposal();
-          if (acceptedProposalRow != null) {
-            setCurrentLookupRow(acceptedProposalRow);
-            return acceptedProposalRow.getText();
-          }
-          else {
-            // no match possible; reject change, but keep proposal chooser open
-            unregister = false;
-            setCurrentLookupRow(null);
-          }
-        }
-        return text;
-      }
-    }
-    finally {
-      if (unregister) {
-        unregisterProposalChooserInternal();
-      }
-    }
-  }
-
-  @Override
   protected String formatValueInternal(String validKey) {
     if (!isCurrentLookupRowValid(validKey)) {
       setCurrentLookupRow(null);
@@ -145,6 +99,16 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       return text;
     }
     return validKey;
+  }
+
+  @Override
+  protected String returnLookupRowAsValue(ILookupRow<LOOKUP_KEY> lookupRow) {
+    return lookupRow.getText();
+  }
+
+  @Override
+  protected P_HandleResult handleNoCurrentLookupRowSet(String text) throws VetoException {
+    return new P_HandleResult(text);
   }
 
   @Override

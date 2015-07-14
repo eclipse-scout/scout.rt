@@ -907,6 +907,76 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     interceptPrepareRecLookup(call, parentKey);
   }
 
+  class P_HandleResult {
+
+    private VALUE value;
+
+    private VetoException vetoException;
+
+    protected P_HandleResult(VALUE value) {
+      this.value = value;
+    }
+
+    protected P_HandleResult(VetoException vetoException) {
+      this.vetoException = vetoException;
+    }
+  }
+
+  protected abstract VALUE returnLookupRowAsValue(ILookupRow<LOOKUP_KEY> lookupRow);
+
+  /**
+   * This method is called when a value is set, but no single match has been found for the given text.
+   * Will be implemented differently by SmartField and ProposalField.
+   */
+  protected abstract P_HandleResult handleNoCurrentLookupRowSet(String text) throws VetoException;
+
+  @Override
+  protected VALUE parseValueInternal(String text) throws ProcessingException {
+    text = StringUtility.nullIfEmpty(text);
+
+    ILookupRow<LOOKUP_KEY> currentLookupRow;
+    if (isProposalChooserRegistered()) {
+      currentLookupRow = getProposalChooser().getAcceptedProposal();
+    }
+    else {
+      currentLookupRow = getCurrentLookupRow();
+      if (currentLookupRow != null) {
+        String currentLookupRowText = StringUtility.nullIfEmpty(currentLookupRow.getText());
+        if (!StringUtility.emptyIfNull(currentLookupRowText).equals(StringUtility.emptyIfNull(text))) {
+          currentLookupRow = null;
+          setCurrentLookupRow(null);
+        }
+      }
+    }
+
+    boolean unregister = true;
+    try {
+      if (currentLookupRow != null) {
+        setCurrentLookupRow(currentLookupRow);
+        return returnLookupRowAsValue(currentLookupRow);
+      }
+      else if (text == null) {
+        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+        return null;
+      }
+      else {
+        P_HandleResult result = handleNoCurrentLookupRowSet(text);
+        if (result.value != null) {
+          return result.value;
+        }
+        else {
+          unregister = false;
+          throw result.vetoException;
+        }
+      }
+    }
+    finally {
+      if (unregister) {
+        unregisterProposalChooserInternal();
+      }
+    }
+  }
+
   protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
     interceptFilterLookupResult(call, result);
     interceptFilterKeyLookupResult(call, result);
