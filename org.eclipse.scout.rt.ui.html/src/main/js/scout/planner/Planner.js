@@ -11,7 +11,7 @@ scout.Planner = function() {
   this._tooltipSupport = new scout.TooltipSupport({
     parent: this,
     arrowPosition: 50,
-    htmlEnabled: true
+    tooltipDelay: 750
   });
 
   // main elements

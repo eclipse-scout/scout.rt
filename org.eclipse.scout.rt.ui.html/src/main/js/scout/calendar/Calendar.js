@@ -19,7 +19,8 @@ scout.Calendar = function() {
   this._showListPanel = false;
   this._tooltipSupport = new scout.TooltipSupport({
     htmlEnabled: true,
-    tooltipDelay: 750});
+    tooltipDelay: 750
+  });
 
   /**
    * The narrow view range is different from the regular view range.
@@ -384,11 +385,11 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
     changed = true;
     $('.calendar-day').each(function(index, element) {
       var $day = $(element),
-      date = $day.data('date');
+        date = $day.data('date');
       if (scout.dates.compare(date, this.selectedDate) === 0) {
         $day.select(false); // de-select old date
       } else if (scout.dates.compare(date, selectedDate) === 0) {
-        $day.select(true);  // select new date
+        $day.select(true); // select new date
       }
     }.bind(this));
     this.selectedDate = selectedDate;
@@ -611,8 +612,7 @@ scout.Calendar.prototype.layoutLabel = function() {
       cssClass = '';
       if ((date.getDay() === 6) || (date.getDay() === 0)) {
         cssClass = date.getMonth() !== currentMonth ? ' weekend-out' : ' weekend';
-      }
-      else {
+      } else {
         cssClass = date.getMonth() !== currentMonth ? ' out' : '';
       }
       if (scout.dates.isSameDay(date, new Date())) {
@@ -626,7 +626,6 @@ scout.Calendar.prototype.layoutLabel = function() {
       if (date.getDate() > 9 && date.getDate() < 20) {
         cssClass += ' center-nice';
       }
-
 
       text = this._format(date, 'dd');
       $dates.eq(w * 7 + d)
@@ -651,7 +650,7 @@ scout.Calendar.prototype.layoutAxis = function() {
     $('.calendar-week-name').each(function(index) {
       if (index > 0) {
         $e = $(this);
-        $e.text(session.text('ui.CW' , scout.dates.weekInYear($e.next().data('date'))));
+        $e.text(session.text('ui.CW', scout.dates.weekInYear($e.next().data('date'))));
       }
     });
   } else {
@@ -745,7 +744,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
       },
       $anchor: $part
     });
-    popup.render();
+  popup.render();
 };
 
 /* -- components, arrangement------------------------------------ */
