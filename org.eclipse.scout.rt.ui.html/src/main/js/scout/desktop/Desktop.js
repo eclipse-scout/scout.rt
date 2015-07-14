@@ -271,7 +271,7 @@ scout.Desktop.prototype._openUri = function(event) {
   if (!event.uri) {
     return;
   }
-  var newWindow = false;
+  var newWindow = true;
   if (scout.Desktop.TargetWindow.BLANK === event.uriTarget) {
     newWindow = true;
   } else if (scout.Desktop.TargetWindow.SELF === event.uriTarget) {
