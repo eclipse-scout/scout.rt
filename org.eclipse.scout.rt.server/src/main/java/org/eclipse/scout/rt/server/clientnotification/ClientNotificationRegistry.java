@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -162,7 +163,7 @@ public class ClientNotificationRegistry {
 
   public void publish(Collection<? extends ClientNotificationMessage> messages) {
     putWithoutClusterNotification(messages);
-    publishInternal(messages);
+    publishClusterInternal(messages);
   }
 
   public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
@@ -242,8 +243,7 @@ public class ClientNotificationRegistry {
   }
 
   public void putTransactional(ClientNotificationMessage message) {
-    // TODO jgu: please verify and enable this assertion
-//    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
+    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
     ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
     try {
       ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
@@ -259,7 +259,10 @@ public class ClientNotificationRegistry {
     }
   }
 
-  private void publishInternal(Collection<? extends ClientNotificationMessage> messages) {
+  /**
+   * Publish messages to other cluster nodes.
+   */
+  private void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
     try {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
       service.publish(new ClientNotificationClusterNotification(messages));

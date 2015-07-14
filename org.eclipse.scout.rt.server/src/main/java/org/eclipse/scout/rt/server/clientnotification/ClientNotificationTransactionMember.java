@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
@@ -54,6 +55,5 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
 
     // Notify other client nodes.
     BEANS.get(ClientNotificationRegistry.class).publish(coalescedNotifications);
-    // FIXME jgu: other nodes are notified, but current node not if parent transaction fails
   }
 }
