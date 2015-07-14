@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -55,6 +56,11 @@ public class UnsavedFormChangesForm extends AbstractForm {
   @Override
   protected boolean getConfiguredAskIfNeedSave() {
     return false;
+  }
+
+  @Override
+  protected IDisplayParent getConfiguredDisplayParent() {
+    return getDesktop();
   }
 
   public void startNew() throws ProcessingException {
