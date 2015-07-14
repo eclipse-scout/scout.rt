@@ -71,7 +71,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
     if (data.fillHorizontal && data.fillVertical) {
       // ok
     } else {
-      d = htmlComp.getPreferredSize();
+      d = this.m_info.compSize[i];
       if (!data.fillHorizontal && d.width < r.width) {
         delta = r.width - d.width;
         r.width = d.width;
