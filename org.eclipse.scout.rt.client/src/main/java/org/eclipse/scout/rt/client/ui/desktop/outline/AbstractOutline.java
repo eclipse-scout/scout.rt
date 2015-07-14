@@ -84,7 +84,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   protected void callInitializer() {
     // Run the initialization on behalf of this Outline.
-    ClientRunContexts.copyCurrent().withOutline(this).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withOutline(this).withForm(null).run(new IRunnable() {
       @Override
       public void run() throws Exception {
         AbstractOutline.super.callInitializer();

@@ -15,10 +15,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNodesChains.PageWithNodesCreateChildPagesChain;
@@ -89,8 +91,14 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
   }
 
-  protected void createChildPagesInternal(List<IPage<?>> pageList) throws ProcessingException {
-    interceptCreateChildPages(pageList);
+  protected void createChildPagesInternal(final List<IPage<?>> pageList) throws ProcessingException {
+    ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        interceptCreateChildPages(pageList);
+      }
+    });
   }
 
   @Override
@@ -238,6 +246,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     finally {
       getTable().setTableChanging(false);
     }
+
     super.loadChildren();
   }
 

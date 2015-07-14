@@ -17,8 +17,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -54,6 +56,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
@@ -535,11 +538,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       ensureDetailFormStarted();
       interceptPageActivated();
     }
-    catch (ProcessingException t) {
-      BEANS.get(ExceptionHandler.class).handle(t);
-    }
     catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -548,11 +548,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     try {
       interceptPageDeactivated();
     }
-    catch (ProcessingException p) {
-      BEANS.get(ExceptionHandler.class).handle(p);
-    }
     catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -561,7 +558,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return null;
     }
     try {
-      return getConfiguredDetailForm().newInstance();
+      return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IForm>() {
+
+        @Override
+        public IForm call() throws Exception {
+          return getConfiguredDetailForm().newInstance();
+        }
+      });
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredDetailForm().getName() + "'.", e));
@@ -648,9 +651,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = new WeakDataChangeListener() {
+
         @Override
         public void dataChanged(Object... innerDataTypes) throws ProcessingException {
-          interceptDataChanged(innerDataTypes);
+          AbstractPage.this.dataChanged(innerDataTypes);
         }
       };
     }
@@ -659,16 +663,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public void dataChanged(Object... dataTypes) {
-    try {
-      interceptDataChanged(dataTypes);
-    }
-    catch (ProcessingException p) {
-      BEANS.get(ExceptionHandler.class).handle(p);
-    }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
-    }
+  public void dataChanged(final Object... dataTypes) {
+    ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        try {
+          interceptDataChanged(dataTypes);
+        }
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
+      }
+    }, BEANS.get(RuntimeExceptionTranslator.class));
   }
 
   /**

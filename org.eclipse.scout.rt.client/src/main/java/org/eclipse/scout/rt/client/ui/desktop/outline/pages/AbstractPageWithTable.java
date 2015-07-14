@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -28,6 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
@@ -326,8 +328,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return null;
   }
 
-  protected IPage<?> createChildPageInternal(ITableRow row) throws ProcessingException {
-    return interceptCreateChildPage(row);
+  protected IPage<?> createChildPageInternal(final ITableRow row) throws ProcessingException {
+    return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IPage<?>>() {
+
+      @Override
+      public IPage<?> call() throws Exception {
+        return interceptCreateChildPage(row);
+      }
+    });
   }
 
   /**
@@ -473,13 +481,19 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @throws ProcessingException
    */
   protected ISearchForm createSearchForm() throws ProcessingException {
-    Class<? extends ISearchForm> configuredSearchForm = getConfiguredSearchForm();
+    final Class<? extends ISearchForm> configuredSearchForm = getConfiguredSearchForm();
     if (configuredSearchForm == null) {
       return null;
     }
 
     try {
-      return configuredSearchForm.newInstance();
+      return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<ISearchForm>() {
+
+        @Override
+        public ISearchForm call() throws Exception {
+          return configuredSearchForm.newInstance();
+        }
+      });
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
