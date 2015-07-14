@@ -15,9 +15,9 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Reflection Utility to change final modifiers on fields
@@ -54,7 +54,7 @@ public final class ReflectionUtility {
       return new Class<?>[]{clazz};
     }
 
-    final List<Class<?>> interfaces = new ArrayList<>();
+    final Set<Class<?>> interfaces = new HashSet<>();
     while (!Object.class.equals(clazz)) {
       interfaces.addAll(Arrays.asList(clazz.getInterfaces()));
       clazz = clazz.getSuperclass();
