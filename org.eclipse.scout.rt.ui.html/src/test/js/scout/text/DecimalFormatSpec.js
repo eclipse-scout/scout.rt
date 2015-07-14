@@ -177,6 +177,22 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(-1)).toBe('M1!!00');
     });
 
+    it("can handle percentages, format taken from application", function() {
+      var pattern = '#,##0.00\'%\'';
+      locale.decimalFormatSymbols.minusSign = 'M';
+      locale.decimalFormatSymbols.decimalSeparator = '!';
+      locale.decimalFormatSymbols.groupingSeparator = '~';
+      var decimalFormat = new scout.DecimalFormat(locale, pattern);
+
+      expect(decimalFormat.format(0)).toBe('0!00%');
+      expect(decimalFormat.format(0.000)).toBe('0!00%');
+      expect(decimalFormat.format(0.111)).toBe('0!11%');
+      expect(decimalFormat.format(1000.1234)).toBe('1~000!12%');
+      expect(decimalFormat.format(12345.6789)).toBe('12~345!68%');
+
+      expect(decimalFormat.format(-1)).toBe('M1!00%');
+    });
+
   });
 
 });
