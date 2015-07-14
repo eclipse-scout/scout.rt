@@ -55,8 +55,8 @@ public class JsonLocale implements IJsonObject {
 
   protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    json.put("months", new JSONArray(symbols.getMonths()));
-    json.put("monthsShort", new JSONArray(symbols.getShortMonths()));
+    json.put("months", new JSONArray(Arrays.copyOf(symbols.getMonths(), 12)));
+    json.put("monthsShort", new JSONArray(Arrays.copyOf(symbols.getShortMonths(), 12)));
     json.put("weekdays", new JSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
     json.put("weekdaysShort", new JSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
     json.put("am", symbols.getAmPmStrings()[Calendar.AM]);
