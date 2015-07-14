@@ -320,15 +320,15 @@ MessageBox
 - renamed intro text to header & info / actionText to body
 - using method chaining to construct message box
     Example:
-    - getHiddenText() -> hiddenText()
-    - setHiddenText(hiddenText) -> hiddenText(hiddenText) and returning instance of IMessageBox
+    - getHiddenText() -> getHiddenText()
+    - setHiddenText(hiddenText) -> withHiddenText(hiddenText) and returning instance of IMessageBox
 - Renamed startMessageBox to show
 - Removed MessageBox(String title, String introText, String okButtonText)
-    -> MessageBoxes.create().header(introText).yesButtonText(okButtonText)
+    -> MessageBoxes.create().withHeader(introText).withYesButtonText(okButtonText)
 - Removed MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText)
-    -> MessageBoxes.create().header(introText).body(actionText).yesButtonText(yesButtonText).noButtonText(noButtonText).cancelButtonText(cancelButtonText);
+    -> MessageBoxes.create().withHeader(introText).withBody(actionText).withYesButtonText(yesButtonText).withNoButtonText(noButtonText).cancelButtonText(cancelButtonText);
 - Removed MessageBox(String title, String introText, String actionText, String yesButtonText, String noButtonText, String cancelButtonText, String hiddenText, String iconId)
-    -> MessageBoxes.create().header(introText).body(actionText).yesButtonText(yesButtonText).noButtonText(noButtonText).cancelButtonText(cancelButtonText).hiddenText(hiddenText).iconId(iconId);
+    -> MessageBoxes.create().withHeader(introText).withBody(actionText).withYesButtonText(yesButtonText).withNoButtonText(noButtonText).withCancelButtonText(cancelButtonText).withHiddenText(hiddenText).withIconId(iconId);
 - Moved MessageBox.showDeleteConfirmationMessage methods to MessagesBoxes class
 - If html needs to be displayed, use the new html(IHtmlContent) method. Header / body methods do not support html.
 
@@ -345,21 +345,21 @@ If title was null, "" or TEXTS.get("ApplicationTitle") no special considerations
 Depending on how configured the Name of our application, you might used TEXTS.get("MyApplicationName") instead of TEXTS.get("ApplicationTitle).
 
   Find:    MessageBox.show(Ok|YesNo|YesNoCancel)Message\((?:null|""|TEXTS.get\("ApplicationTitle"\)), ([^,\n]+?), ([^,\n]+?)\)(;|[ ]*==|[ ]*!=)
-  Replace: MessageBoxes.create\1().header(\2).body(\3).show()\4
+  Replace: MessageBoxes.create\1().withHeader(\2).withBody(\3).show()\4
 
 If a real title is set, a manual check is required.
 The old title might not be required anymore or the old title should be the new header
 and existing header should be moved to new body (possible concat with old body).
 
   Find:    MessageBox.show(Ok|YesNo|YesNoCancel)Message\(([^,\n]+?), ([^,\n]+?), ([^,\n]+?)\)(;|[ ]*==|[ ]*!=)
-  Replace: MessageBoxes.create\1().header(\3).body(\4).show()\5 /* XXX [messagebox] verify auto-migration, title: \2 */
+  Replace: MessageBoxes.create\1().withHeader(\3).withBody(\4).show()\5 /* XXX [messagebox] verify auto-migration, title: \2 */
 
 Restore the temporary changed , by replacing §§__§§ by , again.
 After executing search & replace, take a look at the XXX [messagebox] tasks.
 
-As a last step, header(null) or body(null) can be removed, because they have no effect.
+As a last step, withHeader(null) or withBody(null) can be removed, because they have no effect.
 
-  Find:    MessageBoxes.create(.+)\(\)([^\n]*)?(\.header\(null\)|\.body\(null\))([^\n]*)?.show\(\)
+  Find:    MessageBoxes.create(.+)\(\)([^\n]*)?(\.withHeader\(null\)|\.withBody\(null\))([^\n]*)?.show\(\)
   Replace: MessageBoxes.create\1()\2\4.show()
 
 To handle calls to showDeleteConfirmationMessage, use the following replacement (no regex)
