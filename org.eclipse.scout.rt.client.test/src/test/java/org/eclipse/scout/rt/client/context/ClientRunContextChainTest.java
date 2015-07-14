@@ -164,23 +164,19 @@ public class ClientRunContextChainTest {
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
     assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. InitThreadLocalCallable for CurrentControlTracker.CURRENT_MODEL_ELEMENT
+    // 10. InitThreadLocalCallable for CurrentControlTracker.CURRENT_FORM
     InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_MODEL_ELEMENT, ((InitThreadLocalCallable) c10).getThreadLocal());
+    assertSame(CurrentControlTracker.CURRENT_FORM, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. InitThreadLocalCallable for CurrentControlTracker.CURRENT_FORM
+    // 11. InitThreadLocalCallable for CurrentControlTracker.CURRENT_OUTLINE
     InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_FORM, ((InitThreadLocalCallable) c11).getThreadLocal());
+    assertSame(CurrentControlTracker.CURRENT_OUTLINE, ((InitThreadLocalCallable) c11).getThreadLocal());
 
-    // 12. InitThreadLocalCallable for CurrentControlTracker.CURRENT_OUTLINE
+    // 12. InitThreadLocalCallable for CurrentControlTracker.CURRENT_DESKTOP
     InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_OUTLINE, ((InitThreadLocalCallable) c12).getThreadLocal());
+    assertSame(CurrentControlTracker.CURRENT_DESKTOP, ((InitThreadLocalCallable) c12).getThreadLocal());
 
-    // 13. InitThreadLocalCallable for CurrentControlTracker.CURRENT_DESKTOP
-    InitThreadLocalCallable c13 = getNextAndAssert(c12, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_DESKTOP, ((InitThreadLocalCallable) c13).getThreadLocal());
-
-    return c13;
+    return c12;
   }
 
   @SuppressWarnings("unchecked")

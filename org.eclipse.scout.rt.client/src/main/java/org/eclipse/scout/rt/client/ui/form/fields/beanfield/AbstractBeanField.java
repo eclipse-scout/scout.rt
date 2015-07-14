@@ -34,7 +34,7 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
   }
 
   @Override

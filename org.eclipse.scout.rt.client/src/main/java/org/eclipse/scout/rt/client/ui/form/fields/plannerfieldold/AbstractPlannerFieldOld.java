@@ -162,7 +162,7 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
   @Override
   @SuppressWarnings("unchecked")
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     super.initConfig();
     setMiniCalendarCount(getConfiguredMiniCalendarCount());
     setSplitterPosition(getConfiguredSplitterPosition());

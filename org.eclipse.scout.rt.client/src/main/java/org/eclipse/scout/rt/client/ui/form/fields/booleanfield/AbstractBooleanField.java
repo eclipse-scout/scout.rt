@@ -36,7 +36,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     super.initConfig();
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554

@@ -129,7 +129,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     super.initConfig();
     m_htmlEditor = getConfiguredHtmlEditor();
     m_scrollBarEnabled = getConfiguredScrollBarEnabled();

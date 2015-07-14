@@ -645,7 +645,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void initConfig() throws ProcessingException {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withForm(this));
 
     m_timerFutureMap = new HashMap<>();
     setShowOnStart(getConfiguredShowOnStart());
@@ -1883,11 +1883,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
         int result = MessageBoxes
-        		        .createYesNoCancel()
-        		        .withDisplayParent(this)
-        		        .withHeader(getCancelVerificationText())
-        		        .withSeverity(IStatus.INFO)
-        		        .show();
+            .createYesNoCancel()
+            .withDisplayParent(this)
+            .withHeader(getCancelVerificationText())
+            .withSeverity(IStatus.INFO)
+            .show();
 
         if (result == IMessageBox.YES_OPTION) {
           doOk();
@@ -2436,10 +2436,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
           MessageBoxes
-            .createOk()
-            .withDisplayParent(this)
-            .withHeader(TEXTS.get("LoadFormXmlFailedText"))
-            .show();
+              .createOk()
+              .withDisplayParent(this)
+              .withHeader(TEXTS.get("LoadFormXmlFailedText"))
+              .show();
         }
       }
     }

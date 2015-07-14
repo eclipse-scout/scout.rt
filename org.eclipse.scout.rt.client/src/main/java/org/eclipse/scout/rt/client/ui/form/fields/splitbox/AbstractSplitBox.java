@@ -85,7 +85,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     m_grid = new SplitBoxGrid(this);
     super.initConfig();
     setSplitHorizontal(getConfiguredSplitHorizontal());

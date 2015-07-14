@@ -74,7 +74,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     super.initConfig();
     setShowFileExtension(getConfiguredShowFileExtension());
     setFileExtensions(getConfiguredFileExtensions());

@@ -110,7 +110,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     super.initConfig();
     initFormat();
     setRoundingMode(getConfiguredRoundingMode());

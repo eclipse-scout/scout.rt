@@ -51,7 +51,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MessageBox.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+  private final IMessageBoxUIFacade m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
 
   private IDisplayParent m_displayParent;
 
@@ -264,7 +264,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           m_header,
           m_body,
           m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
-          m_hiddenText);
+              m_hiddenText);
     }
   }
 
@@ -307,8 +307,8 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   /**
    * Displays the message box and waits for a response.
    * <p>
-   * If {@link #getAutoCloseMillis()} is set, the message box will return with {@link IMessageBox#CANCEL_OPTION} after the
-   * specific time.
+   * If {@link #getAutoCloseMillis()} is set, the message box will return with {@link IMessageBox#CANCEL_OPTION} after
+   * the specific time.
    */
   @Override
   public int show() {

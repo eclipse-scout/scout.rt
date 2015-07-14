@@ -62,16 +62,16 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * ...
  * public class MyDateField extends AbstractDateField {
  * }
- * 
+ *
  * //Use SimpleDateFormat to get a String representation of the date.
  * Date d = formData.getMyDate().getValue();
  * DateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd - HH:mm:ss&quot;, Locale.ENGLISH);
  * String formattedDate = dateFormat.format(d);
  * System.out.println(formattedDate);
- * 
+ *
  * //Send the formData to the server using a service:
  * BEANS.get(IMyService.class).load(MyFormData formData)
- * 
+ *
  * //Use SimpleDateFormat to get a String representation of the date in the service implementation.
  * public MyFormData load(MyFormData formData) {
  *     Date d = formData.getMyDate().getValue();
@@ -210,7 +210,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
     super.initConfig();
     setFormat(getConfiguredFormat());
     setHasDate(getConfiguredHasDate());

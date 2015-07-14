@@ -505,7 +505,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_enabledGranted = true;
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent());
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setTitle(getConfiguredTitle());

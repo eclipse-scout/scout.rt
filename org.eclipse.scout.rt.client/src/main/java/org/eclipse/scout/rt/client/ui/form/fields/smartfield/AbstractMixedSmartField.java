@@ -102,8 +102,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected void initConfig() {
     m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacadeLegacy(), ContextInfo.copyCurrent().withModelElement(this));
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacadeLegacy(), ContextInfo.copyCurrent());
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent());
   }
 
   @Override
@@ -312,7 +312,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         }
         if (proposalChooser != null &&
             (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
-            StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */

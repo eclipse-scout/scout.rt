@@ -67,7 +67,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   public AbstractAction(boolean callInitializer) {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent().withModelElement(this));
+    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent());
     m_enabledGranted = true;
     m_enabledProcessingAction = true;
     m_enabledInheritAccessibility = true;

@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -52,7 +51,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>{@link ISession#CURRENT}</li>
  * <li>{@link UserAgent#CURRENT}</li>
  * <li>{@link ScoutTexts#CURRENT}</li>
- * <li>{@link CurrentControlTracker#CURRENT_MODEL_ELEMENT}</li>
  * <li>{@link CurrentControlTracker#CURRENT_FORM}</li>
  * <li>{@link CurrentControlTracker#CURRENT_OUTLINE}</li>
  * <li>{@link CurrentControlTracker#CURRENT_DESKTOP}</li>
@@ -66,17 +64,15 @@ public class ClientRunContext extends RunContext {
 
   protected IClientSession m_session;
   protected UserAgent m_userAgent;
-  protected Object m_modelElement;
   protected IForm m_form;
   protected IOutline m_outline;
   protected IDesktop m_desktop;
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c9 = new InitThreadLocalCallable<>(next, CurrentControlTracker.CURRENT_DESKTOP, m_desktop);
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, CurrentControlTracker.CURRENT_OUTLINE, m_outline);
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, CurrentControlTracker.CURRENT_FORM, m_form);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, CurrentControlTracker.CURRENT_MODEL_ELEMENT, m_modelElement);
+    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(next, CurrentControlTracker.CURRENT_DESKTOP, m_desktop);
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, CurrentControlTracker.CURRENT_OUTLINE, m_outline);
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, CurrentControlTracker.CURRENT_FORM, m_form);
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, m_userAgent);
     final Callable<RESULT> c3 = new CurrentSessionLogCallable<>(c4);
@@ -148,24 +144,6 @@ public class ClientRunContext extends RunContext {
   }
 
   /**
-   * Returns the model element which is associated with this {@link ClientRunContext}, or <code>null</code> if not
-   * set.
-   */
-  public Object getModelElement() {
-    return m_modelElement;
-  }
-
-  /**
-   * Associates this {@link ClientRunContext} with a model element. Typically, that information is set by the UI
-   * facade when dispatching a request from UI. For instance, events that originates from a {@link IStringField} have
-   * that element as current model element set.
-   */
-  public ClientRunContext withModelElement(final Object modelElement) {
-    m_modelElement = modelElement;
-    return this;
-  }
-
-  /**
    * Returns the {@link IForm} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
    * set.
    */
@@ -224,7 +202,6 @@ public class ClientRunContext extends RunContext {
     builder.attr("locale", getLocale());
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
-    builder.ref("modelElement", getModelElement());
     builder.ref("form", getForm());
     builder.ref("outline", getOutline());
     builder.ref("desktop", getDesktop());
@@ -240,7 +217,6 @@ public class ClientRunContext extends RunContext {
     super.copyValues(originRunContext);
     m_userAgent = originRunContext.m_userAgent;
     m_session = originRunContext.m_session;
-    m_modelElement = originRunContext.m_modelElement;
     m_form = originRunContext.m_form;
     m_outline = originRunContext.m_outline;
     m_desktop = originRunContext.m_desktop;
@@ -251,7 +227,6 @@ public class ClientRunContext extends RunContext {
     super.fillCurrentValues();
     m_userAgent = UserAgent.CURRENT.get();
     m_session = ClientSessionProvider.currentSession();
-    m_modelElement = CurrentControlTracker.CURRENT_MODEL_ELEMENT.get();
     m_form = CurrentControlTracker.CURRENT_FORM.get();
     m_outline = CurrentControlTracker.CURRENT_OUTLINE.get();
     m_desktop = resolveCurrentDesktop();
@@ -262,7 +237,6 @@ public class ClientRunContext extends RunContext {
     super.fillEmptyValues();
     m_userAgent = null;
     m_session = null;
-    m_modelElement = null;
     m_form = null;
     m_outline = null;
     m_desktop = null;
