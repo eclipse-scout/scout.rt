@@ -199,11 +199,12 @@ scout.scrollbars = {
   },
 
   /**
-   * Returns true if the location is visible in the current viewport of the $scrollable
+   * Returns true if the location is visible in the current viewport of the $scrollable, or if $scrollable is null
+   *
    */
   isLocationInView: function(location, $scrollable) {
     if (!$scrollable || $scrollable.length === 0) {
-      return;
+      return true;
     }
     var inViewY, inViewX,
       scrollableOffsetBounds = scout.graphics.offsetBounds($scrollable);
