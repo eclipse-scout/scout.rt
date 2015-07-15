@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -63,9 +62,7 @@ public class PageTest {
   /**
    * {@link AbstractPage#execPageActivated()} , if a Exeption is thrown
    */
-  // FIXME DWI Fix this test!
-  @Ignore
-  @Test(expected = ProcessingException.class)
+  @Test(expected = RuntimeException.class)
   public void testPageActivatedException() {
     final IPage<?> testPage = new PageRuntimeExceptionOnActivated();
     testPage.pageActivatedNotify();
@@ -83,9 +80,7 @@ public class PageTest {
   /**
    * {@link AbstractPage#execPageDeactivated()}, if a Exeption is thrown
    */
-  // FIXME DWI Fix this test!
-  @Ignore
-  @Test(expected = ProcessingException.class)
+  @Test(expected = RuntimeException.class)
   public void testPageDeactivatedException() {
     final IPage<?> testPage = new PageRuntimeExceptionOnDeactivated();
     testPage.pageDeactivatedNotify();
