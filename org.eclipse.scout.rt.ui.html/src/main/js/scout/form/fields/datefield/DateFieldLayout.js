@@ -100,6 +100,10 @@ scout.DateFieldLayout.prototype.layout = function($container) {
     if (labelHasFieldWidth) {
       formField.$label.cssWidth(fieldContainerBounds.width);
     }
+
+    if (formField._datePickerPopup && formField._datePickerPopup.rendered) {
+      formField._datePickerPopup.position();
+    }
   }
 
 };
