@@ -121,6 +121,24 @@ describe("SequenceBox", function() {
       expect(field.fields[1].$status.isVisible()).toBe(false);
     });
 
+    it("does not display the error message of the last field, only the one of the seq box", function() {
+      var model = createModel();
+      var field = createField(model);
+      field.statusVisible = false;
+      field.render(session.$entryPoint);
+
+      expect(field.fields[1].tooltip).toBeFalsy();
+      expect(field.tooltip).toBeFalsy();
+
+      var event = createPropertyChangeEvent(field.fields[1], {
+        errorStatus: {message:'foo'}
+      });
+      field.fields[1].onModelPropertyChange(event);
+
+      expect(field.fields[1].tooltip).toBeFalsy();
+      expect(field.tooltip.rendered).toBe(true);
+    });
+
     it("removes the tooltip from the seq box if last field gets invisible", function() {
       var model = createModel();
       var field = createField(model);

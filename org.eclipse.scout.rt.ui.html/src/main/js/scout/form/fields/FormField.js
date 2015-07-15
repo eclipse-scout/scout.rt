@@ -341,8 +341,8 @@ scout.FormField.prototype._onStatusMouseDown = function(event) {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
-  // FIXME CGU Correctly handle tooltip when field is a cell editor of an editable table
-  if (!this.$status) {
+  // Don't show a tooltip if there is no visible $status (tooltip points to the status)
+  if (!this.$status || !this.$status.isVisible()) {
     return;
   }
 
