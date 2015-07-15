@@ -107,7 +107,7 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
     cell = this.table.cell(this, row);
 
   if (this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey) {
-    this.table.sendPrepareCellEdit(row.id, this.id);
+    this.table.prepareCellEdit(row.id, this.id, true);
   }
 };
 

@@ -23,6 +23,9 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
+  if (this.table.openPopupOnCellEdit) {
+    field.cellEditor = true;
+  }
   field.render(this.$container);
   this.addChild(field);
 

@@ -43,6 +43,10 @@ scout.SmartField.prototype._render = function($parent) {
   this.addIcon();
   this.addStatus();
   this.addSmartFieldPopup();
+
+  if (this.cellEditor) {
+    this._onClick();
+  }
 };
 
 scout.SmartField.prototype.addSmartFieldPopup = function() {

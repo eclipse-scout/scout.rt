@@ -21,7 +21,7 @@ scout.TableKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
 scout.TableStartCellEditKeyStroke = function(table) {
   scout.TableStartCellEditKeyStroke.parent.call(this);
   this._table = table;
-  this.keyStroke = 'control-e';
+  this.keyStroke = 'control-enter';
   this.initKeyStrokeParts();
 };
 scout.inherits(scout.TableStartCellEditKeyStroke, scout.KeyStroke);
@@ -38,7 +38,7 @@ scout.TableStartCellEditKeyStroke.prototype.handle = function(event) {
   }
   pos = this._table.nextEditableCellPosForRow(0, $selectedRow.data('row'));
   if (pos) {
-    this._table.sendPrepareCellEdit(pos.row.id, pos.column.id);
+    this._table.prepareCellEdit(pos.row.id, pos.column.id, true);
 
     // Chrome focuses address bar with ctrl-e -> prevent
     event.preventDefault();

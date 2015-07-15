@@ -75,7 +75,7 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
     if (pos.row !== this._popup.row) {
       table.selectRows([pos.row]);
     }
-    table.sendPrepareCellEdit(pos.row.id, pos.column.id);
+    table.prepareCellEdit(pos.row.id, pos.column.id);
   }
 
   // Prevent default tabbing

@@ -854,6 +854,17 @@ scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
   this.session.send(this.id, 'rowClicked', data);
 };
 
+/**
+ * @param openPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
+ *    additional property 'cellEditor' on the editor-field. The field instance may use this property
+ *    to decide whether or not it should open a popup immediately after it is rendered. This is used
+ *    for Smart- and DateFields.
+ */
+scout.Table.prototype.prepareCellEdit = function(rowId, columnId, openPopupOnCellEdit) {
+  this.openPopupOnCellEdit = scout.helpers.nvl(openPopupOnCellEdit, false);
+  this.sendPrepareCellEdit(rowId, columnId);
+};
+
 scout.Table.prototype.sendPrepareCellEdit = function(rowId, columnId) {
   var data = {
     rowId: rowId,

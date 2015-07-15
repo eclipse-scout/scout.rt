@@ -76,79 +76,79 @@ describe("CellEditor", function() {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = false;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell1_0.triggerClick();
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
       $cell0_0.triggerClick();
-      expect(table.sendPrepareCellEdit).toHaveBeenCalled();
+      expect(table.prepareCellEdit).toHaveBeenCalled();
     });
 
     it("does not start cell edit if cell is not editable", function() {
       table.rows[0].cells[0].editable = false;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell0_0.triggerClick();
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
     it("does not start cell edit if row is disabled", function() {
       table.rows[0].cells[0].editable = true;
       table.rows[0].enabled = false;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell0_0.triggerClick();
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
     it("does not start cell edit if table is disabled", function() {
       table.rows[0].cells[0].editable = true;
       table.enabled = false;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell0_0.triggerClick();
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
     it("does not start cell edit if mouse down and up happened on different cells", function() {
       table.rows[0].cells[0].editable = true;
       table.rows[0].cells[1].editable = true;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell0_1.triggerMouseDown();
       $cell0_0.triggerMouseUp();
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
     it("does not start cell edit if right mouse button was pressed", function() {
       table.rows[0].cells[0].editable = true;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell0_0.triggerMouseDown({which: 3});
       $cell0_0.triggerMouseUp({which: 3});
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
     it("does not start cell edit if middle mouse button was pressed", function() {
       table.rows[0].cells[0].editable = true;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       $cell0_0.triggerMouseDown({which: 2});
       $cell0_0.triggerMouseUp({which: 2});
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
     it("does not open cell editor if a ctrl or shift is pressed, because the user probably wants to do row selection rather than cell editing", function() {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = true;
 
-      spyOn(table, 'sendPrepareCellEdit');
+      spyOn(table, 'prepareCellEdit');
       // row 0 is selected, user presses shift and clicks row 2
       table.selectRows([table.rows[0]]);
       $cell1_0.triggerClick({modifier: 'shift'});
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
 
       $cell1_0.triggerClick({modifier: 'ctrl'});
-      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
   });
