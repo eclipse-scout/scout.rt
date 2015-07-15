@@ -133,6 +133,11 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype._remove = function() {
+  // Detach nodes from jQuery objects (because those will be removed)
+  this.nodes.forEach(function(node) {
+    delete node.$node;
+    delete node.$showAllNode;
+  });
   scout.scrollbars.uninstall(this.$data, this.session);
   scout.Tree.parent.prototype._remove.call(this);
 };
@@ -877,13 +882,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
   }
 
   // Update dummy "show all" node
-  if (!hasHiddenNodes) {
-    // Delete existing $showAllNode
-    if (parentNode && parentNode.$showAllNode) {
-      parentNode.$showAllNode.remove();
-      delete parentNode.$showAllNode;
-    }
-  } else {
+  if (hasHiddenNodes) {
     // If parent is expanded and has not already a $showAllNode, create one
     if (parentNode && parentNode.expanded && !parentNode.$showAllNode) {
       var $showAllNode = this._$buildShowAllNode(parentNode);
@@ -892,6 +891,12 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     } else {
       // Node already exists, just update the text (node count might have changed)
       this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
+    }
+  } else {
+    // Delete existing $showAllNode
+    if (parentNode && parentNode.$showAllNode) {
+      parentNode.$showAllNode.remove();
+      delete parentNode.$showAllNode;
     }
   }
 
