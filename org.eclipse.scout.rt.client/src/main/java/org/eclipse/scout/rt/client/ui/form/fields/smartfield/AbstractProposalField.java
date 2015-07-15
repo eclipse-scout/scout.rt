@@ -85,20 +85,20 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected String formatValueInternal(String validKey) {
-    if (!isCurrentLookupRowValid(validKey)) {
-      setCurrentLookupRow(null);
-    }
-
-    if (getCurrentLookupRow() != null) {
-      installLookupRowContext(getCurrentLookupRow());
-      String text = getCurrentLookupRow().getText();
-      if (!isMultilineText() && text != null) {
-        text = text.replaceAll("[\\n\\r]+", " ");
+  protected String formatValueInternal(String rawValue) {
+    ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
+    if (currentLookupRow != null) {
+      installLookupRowContext(currentLookupRow);
+      String lookupRowText = currentLookupRow.getText();
+      if (!lookupRowText.equals(rawValue)) {
+        String text = currentLookupRow.getText();
+        if (!isMultilineText() && text != null) {
+          text = text.replaceAll("[\\n\\r]+", " ");
+        }
+        return text;
       }
-      return text;
     }
-    return validKey;
+    return rawValue;
   }
 
   @Override
