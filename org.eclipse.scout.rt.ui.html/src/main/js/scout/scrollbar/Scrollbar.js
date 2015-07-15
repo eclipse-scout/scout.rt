@@ -63,6 +63,9 @@ scout.Scrollbar.prototype._render = function($parent) {
 
 scout.Scrollbar.prototype._onScrollWheel = function(event) {
   var w, d;
+  if (!this.$container.isVisible()) {
+    return true; // ignore scroll wheel event if there is no scroll bar visible
+  }
   if (event.ctrlKey) {
     return true; // allow ctrl + mousewheel to zoom the page
   }
