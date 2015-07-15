@@ -195,11 +195,6 @@ public class OrganizeColumnsForm extends AbstractForm {
   @Order(10.0)
   public class MainBox extends AbstractGroupBox {
 
-    @Override
-    protected int getConfiguredWidthInPixel() {
-      return 520;
-    }
-
     @Order(10.0)
     public class GroupBox extends AbstractGroupBox {
 
