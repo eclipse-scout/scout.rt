@@ -89,7 +89,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
     @Override
     protected int getConfiguredGridColumnCount() {
-      return 1;
+      return 2;
     }
 
     @Order(10.0)
@@ -246,7 +246,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
   }
 
   private static String getFormDisplayName(IForm f) {
-    return StringUtility.nvl(f.getTitle(), f.getClass().getName());
+    return StringUtility.join(" - ", StringUtility.nvl(f.getTitle(), f.getClass().getName()), f.getSubTitle());
   }
 
   @ClassId("70052229-e6e5-43f3-bac5-cabe6e4525d3")
