@@ -14,6 +14,7 @@
   border-top-right-radius: @border-radius;
   .drop-shadow;
   margin: 10px;
+  top: 0px; /* must be specified otherwise dialogs will be positioned at end of document and increase document size */
 
   &.shown {
     .animation(fadeIn ease-in 1);
