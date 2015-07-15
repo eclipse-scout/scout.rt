@@ -12,6 +12,7 @@ scout.DateFieldLayout.prototype.layout = function($container) {
     htmlContainer = scout.HtmlComponent.get($container),
     formField = this.formField,
     labelWidth = this.labelWidth,
+    statusWidth = this.statusWidth,
     left = 0,
     right = 0,
     top = 0;
@@ -19,7 +20,7 @@ scout.DateFieldLayout.prototype.layout = function($container) {
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (formField.$label && formField.labelVisible) {
+  if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
     if (formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
@@ -45,15 +46,13 @@ scout.DateFieldLayout.prototype.layout = function($container) {
       .cssWidth(this.mandatoryIndicatorWidth);
     left += formField.$mandatory.outerWidth(true);
   }
-  if (formField.$status && formField.statusVisible) {
-    // can not check for $status.isVisible() since we want to reserve
-    // space used for status even when $status is invisible.
+  if (this._isStatusVisible()) {
     formField.$status
       .cssTop(top)
-      .cssWidth(this.statusWidth)
+      .cssWidth(statusWidth)
       .cssHeight(this.rowHeight)
       .cssLineHeight(this.rowHeight);
-    right += formField.$status.outerWidth(true);
+    right += statusWidth + formField.$status.cssMarginX();
   }
 
   // Make sure tooltip is at correct position after layouting, if there is one
