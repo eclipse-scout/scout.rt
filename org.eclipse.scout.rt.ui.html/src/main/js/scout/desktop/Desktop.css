@@ -358,39 +358,53 @@
 
 /* other elements of the desktop */
 
-.offline-message {
-  border: 1px solid @palette-blue-4;
-  background-color: @palette-gray-2;
-  padding: 6px 5px;
-  margin: 20px auto;
+.notifications {
   position: fixed;
   right: 10px;
-  top: 55px;
+  top: 0;
+  height: 100%;
+  margin-top: 60px;
 }
 
-.offline-message.reconnect-successful {
-  border: 1px solid @palette-green-4;
-  background-color: @palette-green-0;
+.notification {
+  border-left: 3px solid @active-color;
+  background-color: @palette-white;
+  margin-bottom: 20px;
+  .drop-shadow();
+
+  &.error {
+    border-left-color: @palette-red-3;
+  }
+
+  & > .notification-content {
+    border: 1px solid @border-color;
+    border-left-width: 0;
+  }
 }
 
-.reconnect {
-  display: inline-block;
-  float: right;
-}
+.offline-message {
+  padding: 10px;
 
-.reconnect-animated::before {
-  .animation(rotation 0.9s linear infinite);
-  content: '';
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 6px;
-  margin-right: 6px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0);
-  border-top-color: @palette-blue-4;
-  border-left-color: @palette-blue-4;
-  width: 14px;
-  height: 14px;
+  & > .reconnect {
+    display: inline-block;
+    float: right;
+  }
+
+  & > .reconnect-animated::before {
+    .animation(rotation 0.9s linear infinite);
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+    margin-right: 6px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-top-color: @palette-blue-4;
+    border-left-color: @palette-blue-4;
+    width: 14px;
+    height: 14px;
+    margin-top: -3px;
+  }
 }
 
 .glasspane {

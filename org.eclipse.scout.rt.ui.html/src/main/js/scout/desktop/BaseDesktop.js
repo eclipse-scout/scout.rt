@@ -3,6 +3,7 @@
 
 scout.BaseDesktop = function() {
   scout.BaseDesktop.parent.call(this);
+  this.offline = false;
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
@@ -19,67 +20,88 @@ scout.BaseDesktop.prototype._renderTitle = function(title) {
   }
 };
 
-scout.BaseDesktop.prototype._goOffline = function() {
-  var message = this.session.text('ui.ConnectionInterrupted'),
-    $reconnect;
-
-  if (this.$offline) {
+scout.BaseDesktop.prototype.addNotification = function($notification) {
+  if (!$notification) {
     return;
   }
+  if (!this.$notifications) {
+    this.$notifications = this.$container.prependDiv('notifications');
+  }
+  // Fade in notification
+  $notification.appendTo(this.$notifications).hide().fadeIn(250);
+};
 
-  this.$offline = this.$container.prependDiv('offline-message');
-  this.$offline.text(message);
-  $reconnect = this.$offline.appendDiv('reconnect');
+scout.BaseDesktop.prototype.removeNotification = function($notification) {
+  if (!$notification) {
+    return;
+  }
+  if (this.$notifications) {
+    var that = this;
+    // Fade out notification
+    $notification.fadeOutAndRemove(250, function() {
+      if (!that.$notifications.has('.notification')) {
+        that.$notifications.remove();
+        that.$notifications = null;
+      }
+    }.bind(this));
+  }
+};
+
+scout.BaseDesktop.prototype._goOffline = function() {
+  if (this.offline) {
+    return;
+  }
+  this.offline = true;
+
+  this.$offlineNotification = $.makeDiv('notification error');
+  this._$offlineMessage = this.$offlineNotification.appendDiv('notification-content offline-message');
+  this._$offlineMessage
+    .text(this.session.text('ui.ConnectionInterrupted'));
+  var $reconnect = this._$offlineMessage.appendDiv('reconnect');
   $reconnect
     .text(this.session.text('ui.Reconnecting_'))
     .hide();
   if (scout.device.supportsCssAnimation()) {
     $reconnect.addClass('reconnect-animated');
   }
+  this.addNotification(this.$offlineNotification);
 };
 
 scout.BaseDesktop.prototype._goOnline = function() {
-  if (!this.hideOfflineMessagePending) {
+  if (!this._hideOfflineMessagePending) {
     this.hideOfflineMessage();
   }
 };
 
 scout.BaseDesktop.prototype.hideOfflineMessage = function() {
-  if (!this.$offline) {
-    return;
-  }
-
-  this.$offline.remove();
-  this.hideOfflineMessagePending = false;
-  this.$offline = null;
+  this._hideOfflineMessagePending = false;
+  this.removeNotification(this.$offlineNotification);
+  this.$offlineNotification = null;
 };
 
 scout.BaseDesktop.prototype.onReconnecting = function() {
-  if (!this.$offline) {
+  if (!this.offline) {
     return;
   }
-
-  this.$offline.find('.reconnect').show();
-  this._reconnectionTimestamp = new Date();
+  this._$offlineMessage.children('.reconnect').show();
 };
 
 scout.BaseDesktop.prototype.onReconnectingSucceeded = function() {
-  var message = this.session.text('ui.ConnectionReestablished');
-  if (!this.$offline) {
+  if (!this.offline) {
     return;
   }
+  this.offline = false;
 
-  this.$offline.find('.reconnect').hide();
-  this.$offline.text(message);
-  this.$offline.addClass('reconnect-successful');
-  this.hideOfflineMessagePending = true;
+  this._$offlineMessage.children('.reconnect').hide();
+  this._$offlineMessage.text(this.session.text('ui.ConnectionReestablished'));
+  this.$offlineNotification.removeClass('error');
+  this._hideOfflineMessagePending = true;
   setTimeout(this.hideOfflineMessage.bind(this), 3000);
 };
 
 scout.BaseDesktop.prototype.onReconnectingFailed = function() {
-  if (!this.$offline) {
+  if (!this.offline) {
     return;
   }
-
-  this.$offline.find('.reconnect').hide();
+  this._$offlineMessage.children('.reconnect').hide();
 };

@@ -236,6 +236,6 @@ button::-moz-focus-inner {
 }
 /* The .offline-message div is inserted as first child of .scout, therefore we increase the z-index by 1. The */
 /* element will therefore always be drawn at the top. */
-.scout > .offline-message {
+.scout > .notifications {
   z-index: 1;
 }

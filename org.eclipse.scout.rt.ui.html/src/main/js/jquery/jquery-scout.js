@@ -661,9 +661,14 @@
    * Calls jQuery.fadeOut() and then removes the element from the DOM.
    * Default fade-out duration is 150 ms.
    */
-  $.fn.fadeOutAndRemove = function(duration) {
+  $.fn.fadeOutAndRemove = function(duration, callback) {
     duration = (duration !== undefined) ? duration : 150;
-    this.stop(true).fadeOut(duration, $.removeThis);
+    this.stop(true).fadeOut(duration, function() {
+      $(this).remove();
+      if (callback) {
+        callback.call(this);
+      }
+    });
   };
 
   var _oldhide = $.fn.hide;

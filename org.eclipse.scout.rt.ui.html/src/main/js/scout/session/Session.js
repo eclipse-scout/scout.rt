@@ -317,24 +317,35 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 };
 
 scout.Session.prototype._sendRequest = function(request) {
-  var unload = !! request.unload;
+  if (!request) {
+    return; // nothing to send
+  }
 
-  if (this.offline && !unload) {
+  if (this.offline && !request.unload) {
     // No need to queue the request when document is unloading
     // Note: Firefox is offline when page is unloaded
-    request.events.forEach(function(event) {
-      this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
-    }.bind(this));
-    if (this._queuedRequest.events) {
-      this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+
+    // Merge request with queued event
+    if (this._queuedRequest) {
+      if (this._queuedRequest.events) {
+        // 1 .Remove request events from queued events
+        request.events.forEach(function(event) {
+          this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
+        }.bind(this));
+        // 2. Add request events to end of queued events
+        this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+      }
+      else {
+        this._queuedRequest.events = request.events;
+      }
     }
     else {
-      this._queuedRequest.events = request.events;
+      this._queuedRequest = request;
     }
     return;
   }
 
-  if (unload && navigator.sendBeacon) {
+  if (request.unload && navigator.sendBeacon) {
     // The unload request must _not_ be sent asynchronously, because the browser would cancel
     // it when the page unload is completed. Because the support for synchronous AJAX request
     // will apparently be dropped eventually, we use the "sendBeacon" method to send the unload
@@ -348,13 +359,13 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
-  var busyHandling = (!unload && !this.areRequestsPending());
+  var busyHandling = (!request.unload && !this.areRequestsPending());
   if (busyHandling) {
     this.setBusy(true);
   }
   this._requestsPendingCounter++;
 
-  $.ajax(this.defaultAjaxOptions(request, !unload))
+  $.ajax(this.defaultAjaxOptions(request, !request.unload))
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
@@ -530,7 +541,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
   if (!jqXHR.status || jqXHR.status >= 12000) {
     this.goOffline();
-    if (!this._queuedRequest && request && !request.pollForBackgroundJob) {
+    if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
       this._queuedRequest = request;
     }
     return;
@@ -766,7 +777,12 @@ scout.Session.prototype.goOffline = function() {
 
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
-  this._sendRequest(this._queuedRequest);
+  if (this._queuedRequest) {
+    this._sendRequest(this._queuedRequest); // implies "_resumeBackgroundJobPolling"
+  }
+  else {
+    this._resumeBackgroundJobPolling();
+  }
   if (this.desktop) {
     this.desktop.goOnline();
   }
