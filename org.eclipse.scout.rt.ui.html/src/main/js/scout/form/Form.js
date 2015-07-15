@@ -55,6 +55,11 @@ scout.Form.prototype._renderForm = function($parent) {
         }.bind(this));
     }
     this.$container.resizable({
+      start: function(event, ui) {
+        this.$container.resizable('option', 'maxHeight', $(window).height() - event.target.offsetTop);
+        this.$container.resizable('option', 'maxWidth', $(window).width() - event.target.offsetLeft);
+      }.bind(this),
+
       resize: function(event, ui) {
         this.htmlComp.revalidateLayout();
       }.bind(this)
