@@ -40,7 +40,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
 
   /**
    * Configuration: an outline button is a toggle button.
-   * 
+   *
    * @return {@code IButton.DISPLAY_STYLE_TOGGLE}
    */
   @Override
@@ -50,7 +50,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
 
   /**
    * Configuration: an outline button is not a process button.
-   * 
+   *
    * @return {@code false}
    */
   @Override
@@ -62,7 +62,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * Configures the outline associated with this outline button.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return a type token defining an outline
    * @see IOutline
    */
@@ -78,11 +78,11 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * <ul>
    * <li>find an instance of {@code IOutline} on the desktop consistent with the configured outline of this button, this
    * becomes the associated outline instance for this button
-   * <li>icon and label for this button are taken from the outline
+   * <li>the label for this button is taken from the outline
    * <li>a property change listener is registered with the outline such that this button can react on dynamic changes of
    * its associated outline (label, icon, visible, enabled etc.)
    * </ul>
-   * 
+   *
    * @throws ProcessingException
    *           if initialization fails
    */
@@ -100,7 +100,6 @@ public abstract class AbstractOutlineButton extends AbstractButton {
       setEnabled(m_outline.isEnabled());
       setLabel(m_outline.getTitle());
       setTooltipText(m_outline.getTitle());
-      setIconId(m_outline.getIconId());
       setSelected(desktop.getOutline() == m_outline);
       // add selection listener
       desktop.addDesktopListener(
@@ -132,7 +131,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
               else if (n.equals(IOutline.PROP_TITLE)) {
                 setLabel((String) v);
               }
-              else if (n.equals(IOutline.PROP_ICON_ID)) {
+              else if (n.equals(IOutline.PROP_DEFAULT_ICON_ID)) {
                 setIconId((String) v);
               }
             }
@@ -144,7 +143,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
   /**
    * Activates the outline associated with this outline button (i.e. sets
    * the outline as the active outline on the desktop) if {@code selected} is {@code true}, does nothing otherwise.
-   * 
+   *
    * @param selected
    *          the state of the toggle button
    */

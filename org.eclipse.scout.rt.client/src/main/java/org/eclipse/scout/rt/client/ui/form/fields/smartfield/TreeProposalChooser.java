@@ -72,7 +72,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     m_matchingNodesFilter = new P_MatchingNodesFilter();
 
     ITree tree = createConfiguredOrDefaultModel(ITree.class);
-    tree.setIconId(m_contentAssistField.getBrowseIconId());
+    tree.setDefaultIconId(m_contentAssistField.getBrowseIconId());
     return tree;
   }
 
@@ -502,9 +502,9 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     @Override
     protected ITreeNode createEmptyTreeNode() throws ProcessingException {
       ITreeNode node = TreeProposalChooser.this.createTreeNode();
-      if (m_model.getIconId() != null) {
+      if (m_model.getDefaultIconId() != null) {
         Cell cell = node.getCellForUpdate();
-        cell.setIconId(m_model.getIconId());
+        cell.setIconId(m_model.getDefaultIconId());
       }
       return node;
     }

@@ -148,7 +148,7 @@ public class DefaultOutlineChooserForm extends AbstractMobileForm implements IOu
 
         @Override
         protected void execDecorateRow(ITableRow row) throws ProcessingException {
-          final String outlineIcon = getOutlineColumn().getValue(row).getIconId();
+          final String outlineIcon = getOutlineColumn().getValue(row).getDefaultIconId();
           if (outlineIcon != null) {
             row.setIconId(outlineIcon);
           }

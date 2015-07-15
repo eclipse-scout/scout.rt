@@ -25,17 +25,11 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
   }
 
   @Override
-  protected String getConfiguredIconId() {
-    return "font:\uf002"; //Icons.Search
-  }
-
-  @Override
   public void search() throws ProcessingException {
     execSearch(getSearchQuery());
   }
 
   protected void execSearch(String query) throws ProcessingException {
-
   }
 
   @Override

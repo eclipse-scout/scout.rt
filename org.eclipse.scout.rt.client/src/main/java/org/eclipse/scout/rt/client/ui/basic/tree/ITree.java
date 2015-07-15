@@ -38,7 +38,12 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   String PROP_TITLE = "title";
   String PROP_ENABLED = "enabled";
   String PROP_DRAG_ENABLED = "dragEnabled";
-  String PROP_ICON_ID = "iconId";
+  /**
+   * @deprecated use {@link #PROP_DEFAULT_ICON_ID} instead. will be removed in the O release.
+   */
+  @Deprecated
+  String PROP_ICON_ID = "defaultIconId";
+  String PROP_DEFAULT_ICON_ID = "defaultIconId";
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_MULTI_CHECK = "multiCheck";
   String PROP_CHECKABLE = "checkable";
@@ -140,9 +145,21 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
 
   void setTitle(String s);
 
+  /**
+   * @deprecated use {@link #getDefaultIconId()} instead. will be removed in the O release.
+   */
+  @Deprecated
   String getIconId();
 
+  /**
+   * @deprecated use {@link #setDefaultIconId(String)} instead. will be removed in the O release.
+   */
+  @Deprecated
   void setIconId(String iconId);
+
+  String getDefaultIconId();
+
+  void setDefaultIconId(String defaultIconId);
 
   /**
    * @return path using delimiter " - "

@@ -345,7 +345,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         m_tree.setEnabled(isEnabled());
         // default icon
         if (this.getConfiguredIconId() != null) {
-          m_tree.setIconId(this.getConfiguredIconId());
+          m_tree.setDefaultIconId(this.getConfiguredIconId());
         }
       }
       else {

@@ -864,8 +864,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     @Override
     protected void execDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
       node.decorateCell();
-      if (getIconId() != null) {
-        cell.setIconId(getIconId());
+      if (getDefaultIconId() != null) {
+        cell.setIconId(getDefaultIconId());
       }
       else {
         if (node instanceof RootNode) {

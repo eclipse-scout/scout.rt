@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeAc
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -159,9 +160,27 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return null;
   }
 
+  /**
+   * @deprecated use {@link #getConfiguredDefaultIconId()} instead, this method will be removed in the O release.
+   */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(20)
+  @Deprecated
   protected String getConfiguredIconId() {
+    return null;
+  }
+
+  /**
+   * Configured the default iconId to be used for all tree nodes without an own icon.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return the ID (name) of the icon
+   * @see IIconProviderService
+   */
+  @ConfigProperty(ConfigProperty.ICON_ID)
+  @Order(21)
+  protected String getConfiguredDefaultIconId() {
     return null;
   }
 
@@ -441,8 +460,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(50)
   protected void execDecorateCell(ITreeNode node, Cell cell) throws ProcessingException {
-    if (cell.getIconId() == null && getIconId() != null) {
-      cell.setIconId(getIconId());
+    if (cell.getIconId() == null && getDefaultIconId() != null) {
+      cell.setIconId(getDefaultIconId());
     }
     node.decorateCell();
   }
@@ -509,7 +528,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setTitle(getConfiguredTitle());
-    setIconId(getConfiguredIconId());
+    setDefaultIconId(getConfiguredDefaultIconId());
     setAutoTitle(getConfiguredAutoTitle());
     setCheckable(getConfiguredCheckable());
     setNodeHeightHint(getConfiguredNodeHeightHint());
@@ -861,17 +880,27 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public String getIconId() {
-    String iconId = propertySupport.getPropertyString(PROP_ICON_ID);
-    if (iconId != null && iconId.length() == 0) {
-      iconId = null;
-    }
-    return iconId;
+    return getDefaultIconId();
   }
 
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public void setIconId(String iconId) {
-    propertySupport.setPropertyString(PROP_ICON_ID, iconId);
+    setDefaultIconId(iconId);
+  }
+
+  @Override
+  public String getDefaultIconId() {
+    return propertySupport.getPropertyString(PROP_DEFAULT_ICON_ID);
+  }
+
+  @Override
+  public void setDefaultIconId(String defaultIconId) {
+    propertySupport.setPropertyString(PROP_DEFAULT_ICON_ID, defaultIconId);
   }
 
   @Override

@@ -58,7 +58,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
     setVisible(m_outline.isVisible());
     setEnabled(m_outline.isEnabled());
     setText(m_outline.getTitle());
-    setIconId(m_outline.getIconId());
     setSelected(m_desktop.getOutline() == m_outline);
     // add selection listener
     m_desktop.addDesktopListener(
@@ -90,7 +89,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
             else if (n.equals(IOutline.PROP_TITLE)) {
               setText((String) v);
             }
-            else if (n.equals(IOutline.PROP_ICON_ID)) {
+            else if (n.equals(IOutline.PROP_DEFAULT_ICON_ID)) {
               setIconId((String) v);
             }
           }
@@ -155,15 +154,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
   @Override
   protected final boolean getConfiguredEnabled() {
     return super.getConfiguredEnabled();
-  }
-
-  /**
-   * since execInitAction sets the value of this method to the value of the outline. The getConfigured does not have any
-   * affect.
-   */
-  @Override
-  protected final String getConfiguredIconId() {
-    return super.getConfiguredIconId();
   }
 
   /**
