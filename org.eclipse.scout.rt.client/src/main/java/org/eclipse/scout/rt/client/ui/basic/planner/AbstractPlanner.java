@@ -484,6 +484,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
+  public void deleteResource(Resource<RI> resource) {
+    deleteResources(CollectionUtility.arrayList(resource));
+  }
+
+  @Override
   public void deleteResources(List<Resource<RI>> resources) {
     setPlannerChanging(true);
     try {
@@ -996,8 +1001,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
               (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && selectionRange.getTo() != null
                   && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {

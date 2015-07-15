@@ -213,6 +213,8 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   void replaceResources(List<Resource<RESOURCE_ID>> resources);
 
+  void deleteResource(Resource<RESOURCE_ID> resource);
+
   void deleteResources(List<Resource<RESOURCE_ID>> resources);
 
   void deleteAllResources();

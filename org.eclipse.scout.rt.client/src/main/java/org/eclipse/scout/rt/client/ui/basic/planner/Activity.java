@@ -30,7 +30,7 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   /**
    * long
    */
-  public static final int ACTIVITY_ID_BIT = 2;
+  public static final int ID_BIT = 2;
 
   /**
    * Date
@@ -89,7 +89,7 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
 
   public Activity(RESOURCE_ID resource, ACTIVITY_ID activityId) {
     setValueInternal(RESOURCE_ID_BIT, resource);
-    setValueInternal(ACTIVITY_ID_BIT, activityId);
+    setValueInternal(ID_BIT, activityId);
   }
 
   /**
@@ -103,7 +103,7 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
    */
   public Activity(RESOURCE_ID resource, ACTIVITY_ID activityId, Date startTime, Date endTime, String text, String tooltipText, float level) {
     setValueInternal(RESOURCE_ID_BIT, resource);
-    setValueInternal(ACTIVITY_ID_BIT, activityId);
+    setValueInternal(ID_BIT, activityId);
     setValueInternal(BEGIN_TIME_BIT, startTime);
     setValueInternal(END_TIME_BIT, endTime);
     setValueInternal(TEXT_BIT, text);
@@ -141,7 +141,7 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
             break;
           }
           case 1: {
-            setValueInternal(ACTIVITY_ID_BIT, row[i]);
+            setValueInternal(ID_BIT, row[i]);
             break;
           }
           case 2: {
@@ -190,8 +190,8 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   }
 
   @SuppressWarnings("unchecked")
-  public ACTIVITY_ID getActivityId() {
-    return (ACTIVITY_ID) getValueInternal(ACTIVITY_ID_BIT);
+  public ACTIVITY_ID getId() {
+    return (ACTIVITY_ID) getValueInternal(ID_BIT);
   }
 
   @SuppressWarnings("unchecked")
