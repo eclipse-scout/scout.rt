@@ -263,7 +263,6 @@ public class ClientNotificationRegistry {
   }
 
   public void putTransactional(ClientNotificationMessage message) {
-    // TODO jgu: from [osc] it would be nice to have a method which decide by itself how to publish, use case @see SemaphoreBaseService#notifyWaitingUsers
     ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
     try {
       ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
