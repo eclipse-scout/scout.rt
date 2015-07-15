@@ -68,8 +68,13 @@ scout.TableControl.prototype.renderContent = function() {
     return;
   }
 
+  // do not set initial focus as form, form is not visible during animation of control container, otherwise browser might scroll document
+  if (this.form) {
+    this.form.disableRenderInitialFocus = true;
+  }
+
   if (!this.tableFooter.open) {
-    this.tableFooter.openControlContainer();
+    this.tableFooter.openControlContainer(this);
   }
 
   if (!this.contentRendered) {
@@ -80,10 +85,16 @@ scout.TableControl.prototype.renderContent = function() {
     this.contentRendered = true;
     this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-    scout.focusManager.getActiveFocusContext(this.tableFooter._table.session.uiSessionId).focusFirstFieldInContainer(this.tableFooter.$controlContent);
   }
 
 };
+
+scout.TableControl.prototype.onControlContainerOpened = function() {
+  if (this.form) {
+    this.form.renderFocus();
+  }
+};
+
 
 scout.TableControl.prototype.onControlContainerClosed = function() {
   setTimeout(function() {

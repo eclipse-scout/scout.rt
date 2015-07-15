@@ -8,6 +8,7 @@ scout.Form = function() {
   this._modalityController;
 
   this.attached = false; // Indicates whether this Form is currently visible to the user.
+  this.disableRenderInitialFocus = false; // Indicate whether this form should not render its initial focus.
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -83,7 +84,9 @@ scout.Form.prototype._renderForm = function($parent) {
 };
 
 scout.Form.prototype._renderProperties = function() {
-  this._renderInitialFocus(this.initialFocus);
+  if (!this.disableRenderInitialFocus) {
+    this.renderFocus();
+  }
 };
 
 scout.Form.prototype._postRender = function() {
@@ -188,8 +191,8 @@ scout.Form.prototype._renderIconId = function() {
   // TODO render icon
 };
 
-scout.Form.prototype._renderInitialFocus = function(formFieldId) {
-  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
+scout.Form.prototype.renderFocus = function(formField) {
+  formField = formField || this.session.getOrCreateModelAdapter(this.initialFocus);
   if (formField) {
     formField.$field.focus();
   } else {
