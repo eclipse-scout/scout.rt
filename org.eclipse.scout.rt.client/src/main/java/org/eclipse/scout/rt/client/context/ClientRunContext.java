@@ -18,7 +18,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -51,9 +50,9 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>{@link ISession#CURRENT}</li>
  * <li>{@link UserAgent#CURRENT}</li>
  * <li>{@link ScoutTexts#CURRENT}</li>
- * <li>{@link CurrentControlTracker#CURRENT_FORM}</li>
- * <li>{@link CurrentControlTracker#CURRENT_OUTLINE}</li>
- * <li>{@link CurrentControlTracker#CURRENT_DESKTOP}</li>
+ * <li>{@link IDesktop#CURRENT}</li>
+ * <li>{@link IOutline#CURRENT}</li>
+ * <li>{@link IForm#CURRENT}</li>
  * </ul>
  *
  * @since 5.1
@@ -70,9 +69,9 @@ public class ClientRunContext extends RunContext {
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(next, CurrentControlTracker.CURRENT_DESKTOP, m_desktop);
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, CurrentControlTracker.CURRENT_OUTLINE, m_outline);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, CurrentControlTracker.CURRENT_FORM, m_form);
+    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(next, IForm.CURRENT, m_form);
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, IOutline.CURRENT, m_outline);
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, IDesktop.CURRENT, m_desktop);
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, m_userAgent);
     final Callable<RESULT> c3 = new CurrentSessionLogCallable<>(c4);
@@ -202,9 +201,9 @@ public class ClientRunContext extends RunContext {
     builder.attr("locale", getLocale());
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
-    builder.ref("form", getForm());
-    builder.ref("outline", getOutline());
     builder.ref("desktop", getDesktop());
+    builder.ref("outline", getOutline());
+    builder.ref("form", getForm());
     return builder.toString();
   }
 
@@ -217,9 +216,9 @@ public class ClientRunContext extends RunContext {
     super.copyValues(originRunContext);
     m_userAgent = originRunContext.m_userAgent;
     m_session = originRunContext.m_session;
-    m_form = originRunContext.m_form;
-    m_outline = originRunContext.m_outline;
     m_desktop = originRunContext.m_desktop;
+    m_outline = originRunContext.m_outline;
+    m_form = originRunContext.m_form;
   }
 
   @Override
@@ -227,9 +226,9 @@ public class ClientRunContext extends RunContext {
     super.fillCurrentValues();
     m_userAgent = UserAgent.CURRENT.get();
     m_session = ClientSessionProvider.currentSession();
-    m_form = CurrentControlTracker.CURRENT_FORM.get();
-    m_outline = CurrentControlTracker.CURRENT_OUTLINE.get();
     m_desktop = resolveCurrentDesktop();
+    m_outline = IOutline.CURRENT.get();
+    m_form = IForm.CURRENT.get();
   }
 
   @Override
@@ -237,9 +236,9 @@ public class ClientRunContext extends RunContext {
     super.fillEmptyValues();
     m_userAgent = null;
     m_session = null;
-    m_form = null;
-    m_outline = null;
     m_desktop = null;
+    m_outline = null;
+    m_form = null;
   }
 
   @Override
@@ -253,12 +252,12 @@ public class ClientRunContext extends RunContext {
    * Resolves the {@link IDesktop} form current calling context.
    */
   protected IDesktop resolveCurrentDesktop() {
-    final IDesktop desktop = CurrentControlTracker.CURRENT_DESKTOP.get();
+    final IDesktop desktop = IDesktop.CURRENT.get();
     if (desktop != null) {
       return desktop;
     }
 
-    final IClientSession session = ClientSessionProvider.currentSession();
+    final IClientSession session = (IClientSession) ISession.CURRENT.get();
     if (session != null) {
       return session.getDesktopElseVirtualDesktop();
     }

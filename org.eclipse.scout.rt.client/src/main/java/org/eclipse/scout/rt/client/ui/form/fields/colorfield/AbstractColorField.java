@@ -18,8 +18,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
-import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.colorfield.IColorFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
@@ -49,7 +49,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     setIconId(getConfiguredIconId());
 
   }

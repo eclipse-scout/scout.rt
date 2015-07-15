@@ -25,8 +25,8 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
-import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionActionChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitActionChain;
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
@@ -67,7 +67,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   public AbstractAction(boolean callInitializer) {
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(createUIFacade(), ContextInfo.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     m_enabledGranted = true;
     m_enabledProcessingAction = true;
     m_enabledInheritAccessibility = true;

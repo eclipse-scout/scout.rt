@@ -59,6 +59,12 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * </ul>
  */
 public interface IDesktop extends IPropertyObserver, IDisplayParent {
+
+  /**
+   * The {@link IDesktop} which is currently associated with the current thread.
+   */
+  ThreadLocal<IDesktop> CURRENT = new ThreadLocal<>();
+
   /**
    * String
    */

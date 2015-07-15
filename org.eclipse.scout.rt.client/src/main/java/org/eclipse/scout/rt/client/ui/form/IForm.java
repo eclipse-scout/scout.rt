@@ -52,6 +52,11 @@ import org.w3c.dom.Element;
  */
 public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDisplayParent {
 
+  /**
+   * The {@link IForm} which is currently associated with the current thread.
+   */
+  ThreadLocal<IForm> CURRENT = new ThreadLocal<>();
+
   String PROP_TITLE = "title";
   String PROP_SUB_TITLE = "subTitle";
   String PROP_MINIMIZE_ENABLED = "minimizeEnabled";

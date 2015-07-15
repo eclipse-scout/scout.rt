@@ -27,8 +27,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
-import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
@@ -102,8 +102,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected void initConfig() {
     m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacadeLegacy(), ContextInfo.copyCurrent());
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent());
+    m_uiFacadeLegacy = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacadeLegacy(), ModelContext.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   }
 
   @Override

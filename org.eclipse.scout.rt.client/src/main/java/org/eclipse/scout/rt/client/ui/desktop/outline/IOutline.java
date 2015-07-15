@@ -30,6 +30,11 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayParent {
 
   /**
+   * The {@link IOutline} which is currently associated with the current thread.
+   */
+  ThreadLocal<IOutline> CURRENT = new ThreadLocal<>();
+
+  /**
    * {@link Boolean}
    */
   String PROP_ENABLED = "enabled";

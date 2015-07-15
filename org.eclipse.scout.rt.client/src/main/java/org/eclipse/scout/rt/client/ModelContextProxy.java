@@ -26,48 +26,31 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 
 /**
- * This class tracks the current {@link IForm} and {@link IOutline} of the current thread's calling context.
+ * This class provides functionality to proxy an object to apply the given {@link ModelContext} to the calling
+ * {@link ClientRunContext} of the thread invoking a proxied method.
  *
  * @since 5.1
  */
 @ApplicationScoped
-public class CurrentControlTracker {
+public class ModelContextProxy {
 
   /**
-   * The current {@link IForm} of the current thread's calling context, and is typically set when entering the
-   * 'UI facade' or creating model elements.
-   */
-  public static final ThreadLocal<IForm> CURRENT_FORM = new ThreadLocal<>();
-
-  /**
-   * The current {@link IOutline} of the current thread's calling context, and is typically set when entering the
-   * 'UI facade' or creating model elements.
-   */
-  public static final ThreadLocal<IOutline> CURRENT_OUTLINE = new ThreadLocal<>();
-
-  /**
-   * The {@link IDesktop} associated with this thread's calling context, and is typically set when entering the 'UI
-   * facade' or creating model elements.
-   */
-  public static final ThreadLocal<IDesktop> CURRENT_DESKTOP = new ThreadLocal<>();
-
-  /**
-   * Creates a Java Proxy for the given 'object' with the given context information applied when invoking the object's
+   * Creates a Java Proxy for the given object with the given {@link ModelContext} applied when invoking the object's
    * methods.
    *
    * @param object
    *          The object to be proxied.
-   * @param contextInfo
-   *          The context information to be applied when invoking the object's methods.
+   * @param modelContext
+   *          The {@link ModelContext} to be applied when invoking the object's methods.
    * @return proxied object.
    */
   @SuppressWarnings("unchecked")
-  public <OBJECT> OBJECT newProxy(final OBJECT object, final ContextInfo contextInfo) {
+  public <OBJECT> OBJECT newProxy(final OBJECT object, final ModelContext modelContext) {
     return (OBJECT) Proxy.newProxyInstance(object.getClass().getClassLoader(), ReflectionUtility.getInterfaces(object.getClass()), new InvocationHandler() {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        return ClientRunContexts.copyCurrent().withDesktop(contextInfo.getDesktop()).withOutline(contextInfo.getOutline()).withForm(contextInfo.getForm()).call(new Callable<Object>() {
+        return ClientRunContexts.copyCurrent().withDesktop(modelContext.getDesktop()).withOutline(modelContext.getOutline()).withForm(modelContext.getForm()).call(new Callable<Object>() {
 
           @Override
           public Object call() throws Exception {
@@ -78,25 +61,19 @@ public class CurrentControlTracker {
     });
   }
 
-  /**
-   * Information about the invoking context.
-   */
-  public static class ContextInfo {
+  public static class ModelContext {
     private IDesktop m_desktop;
     private IOutline m_outline;
     private IForm m_form;
 
-    private ContextInfo() {
+    private ModelContext() {
     }
 
     /**
-     * @return {@link ContextInfo} initialized with the current {@link IDesktop}, {@link IOutline} and {@link IForm}.
-     *         <p>
-     *         If not set explicitly, those values are set onto the {@link ClientRunContext} when entering the 'UI
-     *         facade'.
+     * @return {@link ModelContext} initialized with the current {@link IDesktop}, {@link IOutline} and {@link IForm}.
      */
-    public static ContextInfo copyCurrent() {
-      return new ContextInfo().withDesktop(CURRENT_DESKTOP.get()).withOutline(CURRENT_OUTLINE.get()).withForm(CURRENT_FORM.get());
+    public static ModelContext copyCurrent() {
+      return new ModelContext().withDesktop(IDesktop.CURRENT.get()).withOutline(IOutline.CURRENT.get()).withForm(IForm.CURRENT.get());
     }
 
     public IDesktop getDesktop() {
@@ -104,9 +81,9 @@ public class CurrentControlTracker {
     }
 
     /**
-     * Sets the {@link IDesktop} to be set onto the {@link ClientRunContext} when entering the 'UI facade'.
+     * Sets the {@link IDesktop} to be set onto the {@link ClientRunContext} when the proxy is invoked.
      */
-    public ContextInfo withDesktop(IDesktop desktop) {
+    public ModelContext withDesktop(IDesktop desktop) {
       m_desktop = desktop;
       return this;
     }
@@ -116,9 +93,9 @@ public class CurrentControlTracker {
     }
 
     /**
-     * Sets the {@link IOutline} to be set onto the {@link ClientRunContext} when entering the 'UI facade'.
+     * Sets the {@link IOutline} to be set onto the {@link ClientRunContext} when the proxy is invoked.
      */
-    public ContextInfo withOutline(IOutline outline) {
+    public ModelContext withOutline(IOutline outline) {
       m_outline = outline;
       return this;
     }
@@ -128,9 +105,9 @@ public class CurrentControlTracker {
     }
 
     /**
-     * Sets the {@link IForm} to be set onto the {@link ClientRunContext} when entering the 'UI facade'.
+     * Sets the {@link IForm} to be set onto the {@link ClientRunContext} when the proxy is invoked.
      */
-    public ContextInfo withForm(IForm form) {
+    public ModelContext withForm(IForm form) {
       m_form = form;
       return this;
     }

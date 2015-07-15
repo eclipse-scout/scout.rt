@@ -18,9 +18,11 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
@@ -164,17 +166,17 @@ public class ClientRunContextChainTest {
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
     assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. InitThreadLocalCallable for CurrentControlTracker.CURRENT_FORM
+    // 10. InitThreadLocalCallable for IDesktop.CURRENT
     InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_FORM, ((InitThreadLocalCallable) c10).getThreadLocal());
+    assertSame(IDesktop.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. InitThreadLocalCallable for CurrentControlTracker.CURRENT_OUTLINE
+    // 11. InitThreadLocalCallable for IOutline.CURRENT
     InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_OUTLINE, ((InitThreadLocalCallable) c11).getThreadLocal());
+    assertSame(IOutline.CURRENT, ((InitThreadLocalCallable) c11).getThreadLocal());
 
-    // 12. InitThreadLocalCallable for CurrentControlTracker.CURRENT_DESKTOP
+    // 12. InitThreadLocalCallable for IForm.CURRENT
     InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);
-    assertSame(CurrentControlTracker.CURRENT_DESKTOP, ((InitThreadLocalCallable) c12).getThreadLocal());
+    assertSame(IForm.CURRENT, ((InitThreadLocalCallable) c12).getThreadLocal());
 
     return c12;
   }

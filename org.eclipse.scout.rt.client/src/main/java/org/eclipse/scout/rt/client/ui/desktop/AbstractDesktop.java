@@ -45,8 +45,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
-import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
@@ -172,7 +172,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
     m_fileChooserStore = BEANS.get(FileChooserStore.class);
     m_formActivationTracker = BEANS.get(FormActivationTracker.class);
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacade(), ContextInfo.copyCurrent().withDesktop(this));
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this);
     if (callInitializer) {

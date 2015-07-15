@@ -17,8 +17,8 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.CurrentControlTracker;
-import org.eclipse.scout.rt.client.CurrentControlTracker.ContextInfo;
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -47,8 +47,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(CurrentControlTracker.class).newProxy(new P_UIFacadeLegacy(), ContextInfo.copyCurrent());
-    m_uiFacade = BEANS.get(CurrentControlTracker.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ContextInfo.copyCurrent());
+    m_uiFacadeLegacy = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacadeLegacy(), ModelContext.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   }
 
   @Override
