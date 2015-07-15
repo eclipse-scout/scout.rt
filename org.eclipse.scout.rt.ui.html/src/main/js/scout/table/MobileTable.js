@@ -11,7 +11,7 @@ scout.inherits(scout.MobileTable, scout.Table);
 /**
  * @override
  */
-scout.MobileTable.prototype.init = function(model, session) {
+scout.MobileTable.prototype._init = function(model, session) {
   // FIXME CGU: should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   model.headerVisible = false;
   scout.MobileTable.parent.prototype.init.call(this, model, session);

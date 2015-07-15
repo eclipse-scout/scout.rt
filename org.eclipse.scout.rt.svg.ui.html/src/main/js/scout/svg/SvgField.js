@@ -17,8 +17,8 @@ scout.SvgField.prototype._renderProperties = function() {
   this._renderSvgDocument();
 };
 
-scout.SvgField.prototype.init = function(model, session) {
-  scout.SvgField.parent.prototype.init.call(this, model, session);
+scout.SvgField.prototype._init = function(model, session) {
+  scout.SvgField.parent.prototype._init.call(this, model, session);
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 

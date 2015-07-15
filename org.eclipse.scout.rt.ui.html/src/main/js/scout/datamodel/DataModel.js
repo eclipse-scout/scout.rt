@@ -4,8 +4,8 @@ scout.DataModel = function() {
 };
 scout.inherits(scout.DataModel, scout.ModelAdapter);
 
-scout.DataModel.prototype.init = function(model, session) {
-  scout.DataModel.parent.prototype.init.call(this, model, session);
+scout.DataModel.prototype._init = function(model, session) {
+  scout.DataModel.parent.prototype._init.call(this, model, session);
 
   var i, entity;
   if (model.rootEntities) {

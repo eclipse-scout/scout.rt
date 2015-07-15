@@ -27,8 +27,8 @@ scout.Desktop = function() {
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
-scout.Desktop.prototype.init = function(model, session) {
-  scout.Desktop.parent.prototype.init.call(this, model, session);
+scout.Desktop.prototype._init = function(model, session) {
+  scout.Desktop.parent.prototype._init.call(this, model, session);
 
   this.viewTabsController = new scout.ViewTabsController(this);
 

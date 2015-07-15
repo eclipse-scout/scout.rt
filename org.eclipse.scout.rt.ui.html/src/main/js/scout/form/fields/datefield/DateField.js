@@ -6,8 +6,8 @@ scout.DateField = function() {
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
-scout.DateField.prototype.init = function(model, session) {
-  scout.DateField.parent.prototype.init.call(this, model, session);
+scout.DateField.prototype._init = function(model, session) {
+  scout.DateField.parent.prototype._init.call(this, model, session);
   this._internalTimeParseDateFormat = new scout.DateFormat(session.locale, 'HHmmssSSS');
 };
 

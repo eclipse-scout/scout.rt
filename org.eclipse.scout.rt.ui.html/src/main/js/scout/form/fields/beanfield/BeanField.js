@@ -19,8 +19,8 @@ scout.BeanField.prototype._renderProperties = function() {
   this._renderValue(this.value);
 };
 
-scout.BeanField.prototype.init = function(model, session) {
-  scout.BeanField.parent.prototype.init.call(this, model, session);
+scout.BeanField.prototype._init = function(model, session) {
+  scout.BeanField.parent.prototype._init.call(this, model, session);
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 

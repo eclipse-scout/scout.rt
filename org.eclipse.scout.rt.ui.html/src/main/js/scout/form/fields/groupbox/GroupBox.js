@@ -17,8 +17,8 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
-scout.GroupBox.prototype.init = function(model, session) {
-  scout.GroupBox.parent.prototype.init.call(this, model, session);
+scout.GroupBox.prototype._init = function(model, session) {
+  scout.GroupBox.parent.prototype._init.call(this, model, session);
   this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
   // FIXME BSH Improve this logic - how about a mid-sized menubar? See also: Form.js/init()
   if (this.mainBox && !(this.getForm().parent instanceof scout.WrappedFormField)) {

@@ -12,8 +12,8 @@ scout.Outline = function() {
 };
 scout.inherits(scout.Outline, scout.Tree);
 
-scout.Outline.prototype.init = function(model, session) {
-  scout.Outline.parent.prototype.init.call(this, model, session);
+scout.Outline.prototype._init = function(model, session) {
+  scout.Outline.parent.prototype._init.call(this, model, session);
 
   this._formController = new scout.FormController(this, session);
   this._messageBoxController = new scout.MessageBoxController(this, session);

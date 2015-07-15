@@ -34,8 +34,8 @@ scout.FormField.LABEL_POSITION_ON_FIELD = 2;
 scout.FormField.LABEL_POSITION_RIGHT = 3;
 scout.FormField.LABEL_POSITION_TOP = 4;
 
-scout.FormField.prototype.init = function(model, session) {
-  scout.FormField.parent.prototype.init.call(this, model, session);
+scout.FormField.prototype._init = function(model, session) {
+  scout.FormField.parent.prototype._init.call(this, model, session);
   this.refFieldId = this.uniqueId('ref');
   this._syncMenus(this.menus);
 };
@@ -272,7 +272,7 @@ scout.FormField.prototype._updateMenus = function() {
 };
 
 scout.FormField.prototype._syncMenus = function(menus) {
-  if (this._hasMenus()) {
+  if (this.initialized && this._hasMenus()) {
     this.menus.forEach(function(menu) {
       this.keyStrokeAdapter.unregisterKeyStroke(menu);
     }, this);
@@ -388,7 +388,12 @@ scout.FormField.prototype.getForm = function() {
 };
 
 scout.FormField.prototype.registerRootKeyStroke = function(keyStroke) {
-  this.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
+  var form = this.getForm();
+  if (!this.getForm().initialized) {
+    form.on('initialized', function() {
+      form.rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
+    }.bind(this));
+  }
 };
 
 scout.FormField.prototype.unregisterRootKeyStroke = function(keyStroke) {

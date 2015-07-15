@@ -41,8 +41,8 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   this.invalidateLayoutTree();
 };
 
-scout.HtmlField.prototype.init = function(model, session) {
-  scout.HtmlField.parent.prototype.init.call(this, model, session);
+scout.HtmlField.prototype._init = function(model, session) {
+  scout.HtmlField.parent.prototype._init.call(this, model, session);
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 

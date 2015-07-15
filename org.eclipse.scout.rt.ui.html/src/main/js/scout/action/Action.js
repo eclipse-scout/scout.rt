@@ -30,7 +30,6 @@ scout.Action = function() {
    * - button: menu looks like a button
    */
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
-
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -54,8 +53,8 @@ scout.Action.prototype._renderProperties = function() {
   this._renderTabbable();
 };
 
-scout.Action.prototype.init = function(model, session) {
-  scout.Action.parent.prototype.init.call(this, model, session);
+scout.Action.prototype._init = function(model, session) {
+  scout.Action.parent.prototype._init.call(this, model, session);
   this.initKeyStrokeParts();
 };
 

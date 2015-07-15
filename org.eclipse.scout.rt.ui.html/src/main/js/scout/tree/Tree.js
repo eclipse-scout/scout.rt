@@ -20,8 +20,8 @@ scout.Tree = function() {
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
-scout.Tree.prototype.init = function(model, session) {
-  scout.Tree.parent.prototype.init.call(this, model, session);
+scout.Tree.prototype._init = function(model, session) {
+  scout.Tree.parent.prototype._init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.session, menuSorter);

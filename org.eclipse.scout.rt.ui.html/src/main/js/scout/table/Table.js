@@ -38,8 +38,8 @@ scout.Table.GUI_EVENT_ROW_ORDER_CHANGED = 'rowOrderChanged';
 
 scout.Table.COLUMN_MIN_WIDTH = 30;
 
-scout.Table.prototype.init = function(model, session) {
-  scout.Table.parent.prototype.init.call(this, model, session);
+scout.Table.prototype._init = function(model, session) {
+  scout.Table.parent.prototype._init.call(this, model, session);
 
   this._initColumns();
   this.rows.forEach(function(row) {

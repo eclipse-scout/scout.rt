@@ -13,8 +13,8 @@ scout.SmartField = function() {
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
-scout.SmartField.prototype.init = function(model, session) {
-  scout.SmartField.parent.prototype.init.call(this, model, session);
+scout.SmartField.prototype._init = function(model, session) {
+  scout.SmartField.parent.prototype._init.call(this, model, session);
 };
 
 /**

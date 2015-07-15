@@ -6,8 +6,8 @@ scout.FileChooser = function() {
 };
 scout.inherits(scout.FileChooser, scout.ModelAdapter);
 
-scout.FileChooser.prototype.init = function(model, session) {
-  scout.FileChooser.parent.prototype.init.call(this, model, session);
+scout.FileChooser.prototype._init = function(model, session) {
+  scout.FileChooser.parent.prototype._init.call(this, model, session);
 
   this._modalityController = new scout.ModalityController(this);
 };

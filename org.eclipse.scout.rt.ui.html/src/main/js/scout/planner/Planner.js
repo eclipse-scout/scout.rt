@@ -54,8 +54,8 @@ scout.Planner.SelectionMode = {
   MULTI_RANGE: 3
 };
 
-scout.Planner.prototype.init = function(model, session) {
-  scout.Planner.parent.prototype.init.call(this, model, session);
+scout.Planner.prototype._init = function(model, session) {
+  scout.Planner.parent.prototype._init.call(this, model, session);
   this._yearPanel = new scout.YearPanel(session);
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
   this.addChild(this._yearPanel);

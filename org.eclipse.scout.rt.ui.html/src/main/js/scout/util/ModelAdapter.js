@@ -23,6 +23,8 @@ scout.ModelAdapter = function() {
   this.owner;
   this.ownedAdapters = [];
 
+  this.initialized = false;
+  this.destroyed = false;
   this._addEventSupport();
 };
 scout.inherits(scout.ModelAdapter, scout.Widget);
@@ -58,6 +60,13 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(target);
+  this._init(model, session);
+  this.initialized = true;
+  this.trigger('initialized');
+};
+
+scout.ModelAdapter.prototype._init = function(model, session) {
+  // NOP
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
