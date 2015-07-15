@@ -41,6 +41,8 @@ public class SmartFieldMultilineTest {
 
   private static List<IBean<?>> m_beans;
 
+  private SmartField m_smartField = new SmartField();
+
   @BeforeClass
   public static void beforeClass() throws Exception {
     m_beans = TestingUtility.registerBeans(new BeanMetaData(P_LookupCall.class));
@@ -56,9 +58,8 @@ public class SmartFieldMultilineTest {
    */
   @Test
   public void testSingleLine() throws ProcessingException {
-    SmartField smartField = new SmartField();
-    smartField.setValue(1L);
-    assertEquals("Line1 Line2", smartField.getDisplayText());
+    m_smartField.setValue(1L);
+    assertEquals("Line1 Line2", m_smartField.getDisplayText());
   }
 
   /**
@@ -66,10 +67,9 @@ public class SmartFieldMultilineTest {
    */
   @Test
   public void testMultiLine() throws ProcessingException {
-    SmartField smartField = new SmartField();
-    smartField.setMultilineText(true);
-    smartField.setValue(1L);
-    assertEquals("Line1\nLine2", smartField.getDisplayText());
+    m_smartField.setMultilineText(true);
+    m_smartField.setValue(1L);
+    assertEquals("Line1\nLine2", m_smartField.getDisplayText());
   }
 
   private static class SmartField extends AbstractSmartField<Long> {

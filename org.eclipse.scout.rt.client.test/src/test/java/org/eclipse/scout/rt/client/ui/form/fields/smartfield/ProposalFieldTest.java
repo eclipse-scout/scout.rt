@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -44,18 +45,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- *
- */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-@SuppressWarnings("deprecation")
-public class SmartFieldParseValueTest {
+public class ProposalFieldTest {
 
   private static List<IBean<?>> m_beans;
-
-  private SmartField m_smartField;
+  private ProposalField m_proposalField = new ProposalField();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -69,39 +65,40 @@ public class SmartFieldParseValueTest {
 
   @Before
   public void setUp() throws ProcessingException {
-    m_smartField = new SmartField();
-    m_smartField.registerProposalChooserInternal();
+    m_proposalField.registerProposalChooserInternal();
   }
 
   /**
-   * Tests the case where only a single proposal matches the seachText and the proposal is accepted.
-   */
-  @Test
-  public void testSingleMatch() throws ProcessingException, InterruptedException {
-    testMatch("a", 1L, "aName", 1, false);
-  }
-
-  @Test
-  public void testMultiMatch() throws ProcessingException, InterruptedException {
-    testMatch("b", 0L, null, 2, true);
-  }
-
-  /**
-   * Other than in earlier versions of the SmartField the proposal chooser
+   * When no proposal matches the searchText, the ProposalField uses that searchText as value.
    */
   @Test
   public void testNoMatch() throws ProcessingException, InterruptedException {
-    testMatch("c", 0L, null, 0, true);
+    testMatch("c", "c", 0);
   }
 
   /**
-   * This method deals with the async nature of the proposal chooser
+   * Proposal for "a" returns one match. Other than the SmartField the ProposalField does not
+   * automatically set a single proposal match as value, it only sets the searchText as value.
    */
-  void testMatch(String searchText, Long expectedValue, String expectedDisplayText, int expectedNumProposals,
-      boolean expectValidationError) throws ProcessingException, InterruptedException {
+  @Test
+  public void testSingleMatch() throws ProcessingException, InterruptedException {
+    testMatch("a", "a", 1);
+  }
+
+  /**
+   * Proposal for "b" returns two matches. When we accept the proposal for "b" the ProposalField
+   * simply sets the value (other than the SmartField which throws a VetoException in that case).
+   */
+  @Test
+  public void testMultiMatch() throws ProcessingException, InterruptedException {
+    testMatch("b", "b", 2);
+  }
+
+  @Test
+  public void testSelectFromProposalChooser() throws ProcessingException, InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
-    m_smartField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
+    m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
@@ -109,46 +106,68 @@ public class SmartFieldParseValueTest {
         }
       }
     });
-    m_smartField.getUIFacade().openProposalChooserFromUI(searchText, false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("b", false);
+    bc.waitFor();
+
+    // select a proposal from the proposal chooser table
+    assertTrue(m_proposalField.isProposalChooserRegistered());
+    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_proposalField.getProposalChooser();
+    IContentAssistFieldTable<?> resultTable = tableProposalChooser.getModel();
+    resultTable.selectFirstRow();
+    tableProposalChooser.execResultTableRowClicked(resultTable.getRow(0));
+
+    assertEquals("bName1", m_proposalField.getDisplayText());
+    assertEquals("bName1", m_proposalField.getValue());
+    assertNotNull(m_proposalField.getCurrentLookupRow());
+  }
+
+  /**
+   * This method deals with the async nature of the proposal chooser
+   */
+  void testMatch(String searchText, String expectedValue, int expectedNumProposals) throws ProcessingException, InterruptedException {
+    final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
+
+    m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
+          bc.setBlocking(false);
+        }
+      }
+    });
+    m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false);
     bc.waitFor(); // must wait until results from client-job are available...
     if (expectedNumProposals > 0) {
-      assertTrue(m_smartField.isProposalChooserRegistered());
+      assertTrue(m_proposalField.isProposalChooserRegistered());
       assertEquals(expectedNumProposals, getProposalTableRowCount());
     }
-    assertEquals(searchText, m_smartField.getDisplayText());
-    assertEquals(null, m_smartField.getValue());
+    assertEquals(expectedValue, m_proposalField.getDisplayText());
+    assertEquals(null, m_proposalField.getValue());
 
-    m_smartField.getUIFacade().acceptProposalFromUI(searchText);
-    assertFalse(m_smartField.isProposalChooserRegistered());
+    m_proposalField.getUIFacade().acceptProposalFromUI(searchText);
+    assertFalse(m_proposalField.isProposalChooserRegistered());
+    assertEquals(expectedValue, m_proposalField.getDisplayText());
+    assertEquals(expectedValue, m_proposalField.getValue());
 
-    if (expectValidationError) {
-      assertFalse(m_smartField.getErrorStatus().isOK());
-      assertEquals(searchText, m_smartField.getDisplayText());
-      assertEquals(null, m_smartField.getValue());
-      assertNull(m_smartField.getCurrentLookupRow());
-    }
-    else {
-      assertNull(m_smartField.getErrorStatus());
-      assertEquals(expectedDisplayText, m_smartField.getDisplayText());
-      assertEquals(expectedValue, m_smartField.getValue());
-      assertNotNull(m_smartField.getCurrentLookupRow());
-    }
+    // since we've never clicked on a proposal, we don't expect a lookup row is set
+    assertNull(m_proposalField.getCurrentLookupRow());
   }
 
   int getProposalTableRowCount() {
-    return ((ITable) m_smartField.getProposalChooser().getModel()).getRowCount();
+    return ((ITable) m_proposalField.getProposalChooser().getModel()).getRowCount();
   }
 
-  private static class SmartField extends AbstractSmartField<Long> {
+  private static class ProposalField extends AbstractProposalField<Long> {
     @Override
     protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
       return P_LookupCall.class;
     }
   }
 
+  @ClassId("ad1b3fc1-4b33-4c7d-9506-a6e36618f77f")
   public static class P_LookupCall extends LookupCall<Long> {
 
-    private static final long serialVersionUID = -7536271824820806283L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected ILookupService<Long> createLookupService() {
