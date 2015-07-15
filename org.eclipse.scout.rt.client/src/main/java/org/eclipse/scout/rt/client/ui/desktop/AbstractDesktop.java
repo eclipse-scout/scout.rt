@@ -1013,7 +1013,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setOutline(IOutline outline) {
     final IOutline newOutline = resolveOutline(outline);
-    ClientRunContexts.copyCurrent().withOutline(newOutline).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withOutline(newOutline).withForm(null).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
