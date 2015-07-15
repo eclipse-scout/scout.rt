@@ -44,6 +44,20 @@ scout.DatePickerPopup.prototype.isOpen = function() {
 };
 
 /**
+ * @override Popup.js
+ */
+scout.DatePickerPopup.prototype._onMouseDown = function(event) {
+  // when user clicks on DateField input-field, cannot prevent default
+  // because text-selection would not work anymore
+  if (this.$anchor.isOrHas(event.target)) {
+    return;
+  }
+
+  // or else: clicked somewhere else on the document -> close
+  scout.DatePickerPopup.parent.prototype._onMouseDown.call(this, event);
+};
+
+/**
  * This event handler is called before the mousedown handler on the _document_ is triggered
  * This allows us to prevent the default, which is important for the CellEditorPopup which
  * should stay open when the DatePicker popup is closed. It also prevents the focus blur

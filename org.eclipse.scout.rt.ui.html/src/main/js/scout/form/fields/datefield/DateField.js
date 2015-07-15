@@ -24,6 +24,10 @@ scout.DateField.prototype._renderProperties = function() {
   this._renderHasDate();
   this._renderTimestamp(this.timestamp, true, true);
   scout.DateField.parent.prototype._renderProperties.call(this);
+
+  if (this.cellEditor) {
+    setTimeout(this.openPicker.bind(this));
+  }
 };
 
 scout.DateField.prototype._renderHasTime = function() {

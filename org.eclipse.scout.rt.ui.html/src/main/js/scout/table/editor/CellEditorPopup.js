@@ -23,6 +23,10 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
+  // Sets a hint on the field to open a popup immediately after it has rendered
+  // the field should use setTimeout() to open the popup, because the editor-field
+  // itself is in the middle of rendering and thus the popup of the editor-field
+  // cannot position itself correctly
   if (this.table.openPopupOnCellEdit) {
     field.cellEditor = true;
   }
