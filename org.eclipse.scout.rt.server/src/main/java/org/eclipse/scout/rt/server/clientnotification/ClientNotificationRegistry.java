@@ -64,6 +64,9 @@ public class ClientNotificationRegistry {
    * @param notificationNodeId
    */
   void unregisterNode(String notificationNodeId) {
+    synchronized (m_notificationQueues) {
+      m_notificationQueues.remove(notificationNodeId);
+    }
   }
 
   /**
@@ -130,8 +133,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForUsers(Set<String> userIds, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(userIds), notification);
-    publish(Collections.singleton(message));
+    publish(ClientNotificationAddress.createUserAddress(userIds), notification);
   }
 
   /**
@@ -142,8 +144,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification);
-    publish(Collections.singleton(message));
+    publish(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification);
   }
 
   /**
@@ -152,8 +153,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForAllSessions(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(), notification);
-    publish(Collections.singleton(message));
+    publish(ClientNotificationAddress.createAllSessionsAddress(), notification);
   }
 
   /**
@@ -162,23 +162,37 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForAllNodes(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(), notification);
-    publish(Collections.singleton(message));
+    publish(ClientNotificationAddress.createAllNodesAddress(), notification);
   }
 
-  public void putWithoutClusterNotification(ClientNotificationMessage message) {
-    putWithoutClusterNotification(CollectionUtility.arrayList(message));
+  public void publish(ClientNotificationAddress address, Serializable notification) {
+    publish(Collections.singleton(new ClientNotificationMessage(address, notification)));
   }
 
   public void publish(Collection<? extends ClientNotificationMessage> messages) {
-    putWithoutClusterNotification(messages);
+    putWithoutClusterNotification(messages, null);
+    publishClusterInternal(messages);
+  }
+
+  public void putWithoutClusterNotification(ClientNotificationMessage message) {
+    putWithoutClusterNotification(CollectionUtility.arrayList(message), null);
+  }
+
+  public void publish(Collection<? extends ClientNotificationMessage> messages, String excludedNode) {
+    putWithoutClusterNotification(messages, excludedNode);
     publishClusterInternal(messages);
   }
 
   public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
+    putWithoutClusterNotification(messages, null);
+  }
+
+  public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedNode) {
     synchronized (m_notificationQueues) {
       for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
-        queue.put(messages);
+        if (!queue.getNodeId().equals(excludedNode)) {
+          queue.put(messages);
+        }
       }
     }
   }
@@ -193,7 +207,6 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForUser(String userId, Serializable notification) {
-    // exclude the node the request comes from
     putTransactionalForUsers(Collections.singleton(userId), notification);
   }
 
@@ -207,9 +220,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForUsers(Set<String> userIds, Serializable notification) {
-    // exclude the node the request comes from
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(userIds, currentNodeIdElseThrow()), notification);
-    putTransactional(message);
+    putTransactional(ClientNotificationAddress.createUserAddress(userIds), notification);
   }
 
   /**
@@ -222,8 +233,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId), currentNodeIdElseThrow()), notification);
-    putTransactional(message);
+    putTransactional(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification);
   }
 
   /**
@@ -234,8 +244,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForAllSessions(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllSessionsAddress(currentNodeIdElseThrow()), notification);
-    putTransactional(message);
+    putTransactional(ClientNotificationAddress.createAllSessionsAddress(), notification);
   }
 
   /**
@@ -246,19 +255,20 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForAllNodes(Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createAllNodesAddress(currentNodeIdElseThrow()), notification);
-    putTransactional(message);
+    putTransactional(ClientNotificationAddress.createAllNodesAddress(), notification);
+  }
+
+  public void putTransactional(ClientNotificationAddress address, Serializable notification) {
+    putTransactional(new ClientNotificationMessage(address, notification));
   }
 
   public void putTransactional(ClientNotificationMessage message) {
-    // TODO jgu: please verify and enable this assertion
-//    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
     // TODO jgu: from [osc] it would be nice to have a method which decide by itself how to publish, use case @see SemaphoreBaseService#notifyWaitingUsers
     ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
     try {
       ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
       if (txMember == null) {
-        txMember = new ClientNotificationTransactionMember();
+        txMember = new ClientNotificationTransactionMember(this);
         transaction.registerMember(txMember);
       }
       txMember.addNotification(message);
@@ -282,7 +292,4 @@ public class ClientNotificationRegistry {
     }
   }
 
-  private String currentNodeIdElseThrow() {
-    return Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No 'notification node id' found on current calling context");
-  }
 }

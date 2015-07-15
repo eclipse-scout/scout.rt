@@ -13,10 +13,18 @@ package org.eclipse.scout.rt.server.clientnotification;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -100,6 +108,87 @@ public class ClientNotificationRegistryTest {
     assertEquals(2, notificationsN1.size());
     assertEquals(TEST_NOTIFICATION, notificationsN1.get(0).getNotification());
     assertEquals("notification2", notificationsN1.get(1).getNotification());
+  }
+
+  /**
+   * If a response is available and the notification is processed within a transaction, it should only be on
+   * ServerRunContext.
+   */
+  @Test
+  public void testTransactionalWithPiggyBack() throws Exception {
+    try {
+      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(mock(HttpServletResponse.class));
+
+      final String currentNode = "Node1";
+      final String otherNode = "Node2";
+
+      ServerRunContexts
+      .copyCurrent()
+      .withNotificationNodeId(currentNode)
+      .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
+      .run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          ClientNotificationRegistry reg = new ClientNotificationRegistry();
+          reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
+          reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
+
+          reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
+          commit();
+          //collected for request
+          List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().values();
+          assertSingleTestNotification(notifications);
+          //no notification for current node
+          List<ClientNotificationMessage> ownRegNotifications = consumeNoWait(reg, currentNode);
+          assertTrue(ownRegNotifications.isEmpty());
+          //notifications for other nodes
+          assertSingleTestNotification(consumeNoWait(reg, otherNode));
+        }
+      });
+
+    }
+    finally {
+      IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(null);
+    }
+  }
+
+  /**
+   * If no response is available and the notification is processed within a transaction, it should only be on
+   * ServerRunContext.
+   */
+  @Test
+  public void testTransactionalNoPiggyBack() throws Exception {
+    final String currentNode = "Node1";
+    final String otherNode = "Node2";
+
+    ServerRunContexts
+        .copyCurrent()
+        .withNotificationNodeId(currentNode)
+        .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
+        .run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            ClientNotificationRegistry reg = new ClientNotificationRegistry();
+            reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
+            reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
+            reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
+            commit();
+            //no notifications for current request (piggy back)
+            List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().values();
+            assertTrue(notifications.isEmpty());
+            //notifications for current nodes
+            assertSingleTestNotification(consumeNoWait(reg, currentNode));
+            //notifications for other nodes
+            assertSingleTestNotification(consumeNoWait(reg, otherNode));
+          }
+        });
+  }
+
+  private void commit() throws ProcessingException {
+    ITransaction.CURRENT.get().commitPhase1();
+    ITransaction.CURRENT.get().commitPhase2();
   }
 
   private List<ClientNotificationMessage> consumeNoWait(ClientNotificationRegistry reg, String nodeId) {

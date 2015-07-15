@@ -14,9 +14,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -69,12 +67,7 @@ public class ClientNotificationPoller {
     }
     // process notifications
     if (!notifications.isEmpty()) {
-      BEANS.get(ClientNotificationDispatcher.class).dispatchNotifications(notifications, new IFilter<ClientNotificationMessage>() {
-        @Override
-        public boolean accept(ClientNotificationMessage message) {
-          return !CompareUtility.equals(message.getAddress().getExcludedNodeId(), IClientSessionRegistry.NOTIFICATION_NODE_ID);
-        }
-      });
+      BEANS.get(ClientNotificationDispatcher.class).dispatchNotifications(notifications);
     }
   }
 

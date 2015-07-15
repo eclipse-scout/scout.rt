@@ -26,7 +26,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -100,7 +99,7 @@ public class ClientNotificationNodeQueue {
   }
 
   public void put(Collection<? extends ClientNotificationMessage> notificationInput) {
-    List<ClientNotificationMessage> notifications = getFilteredNotifications(notificationInput);
+    List<ClientNotificationMessage> notifications = getRelevantNotifications(notificationInput);
     putDroppingOld(notifications);
   }
 
@@ -158,7 +157,7 @@ public class ClientNotificationNodeQueue {
     return collected;
   }
 
-  private List<ClientNotificationMessage> getFilteredNotifications(Collection<? extends ClientNotificationMessage> notificationInput) {
+  private List<ClientNotificationMessage> getRelevantNotifications(Collection<? extends ClientNotificationMessage> notificationInput) {
     List<ClientNotificationMessage> notifications = new ArrayList<ClientNotificationMessage>(notificationInput);
     Iterator<ClientNotificationMessage> it = notifications.iterator();
     while (it.hasNext()) {
@@ -170,9 +169,6 @@ public class ClientNotificationNodeQueue {
   }
 
   public boolean isRelevant(ClientNotificationAddress address) {
-    if (CompareUtility.equals(getNodeId(), address.getExcludedNodeId())) {
-      return false;
-    }
     return address.isNotifyAllSessions()
         || address.isNotifyAllNodes()
         || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds())

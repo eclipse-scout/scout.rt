@@ -21,7 +21,6 @@ public class ClientNotificationAddress implements Serializable {
 
   private final Set<String> m_sessionIds = new HashSet<>();
   private final Set<String> m_userIds = new HashSet<>();
-  private String m_excludedNodeId = null;
   private boolean m_notifyAllSessions = false;
   private boolean m_notifyAllNodes = false;
 
@@ -42,32 +41,16 @@ public class ClientNotificationAddress implements Serializable {
     return new ClientNotificationAddress().withSessionIds(sessionIds);
   }
 
-  public static ClientNotificationAddress createSessionAddress(final Set<String> sessionIds, final String excludedNodeId) {
-    return new ClientNotificationAddress().withSessionIds(sessionIds).withExcludedNodeId(excludedNodeId);
-  }
-
   public static ClientNotificationAddress createUserAddress(final Set<String> userIds) {
     return new ClientNotificationAddress().withUserIds(userIds);
-  }
-
-  public static ClientNotificationAddress createUserAddress(final Set<String> userIds, final String excludedNodeId) {
-    return new ClientNotificationAddress().withUserIds(userIds).withExcludedNodeId(excludedNodeId);
   }
 
   public static ClientNotificationAddress createAllSessionsAddress() {
     return new ClientNotificationAddress().withNotifyAllSessions(true);
   }
 
-  public static ClientNotificationAddress createAllSessionsAddress(final String excludedNodeId) {
-    return new ClientNotificationAddress().withNotifyAllSessions(true).withExcludedNodeId(excludedNodeId);
-  }
-
   public static ClientNotificationAddress createAllNodesAddress() {
     return new ClientNotificationAddress().withNotifyAllNodes(true);
-  }
-
-  public static ClientNotificationAddress createAllNodesAddress(final String excludedNodeId) {
-    return new ClientNotificationAddress().withNotifyAllNodes(true).withExcludedNodeId(excludedNodeId);
   }
 
   public Set<String> getSessionIds() {
@@ -86,16 +69,11 @@ public class ClientNotificationAddress implements Serializable {
     return m_notifyAllNodes;
   }
 
-  public String getExcludedNodeId() {
-    return m_excludedNodeId;
-  }
-
   @Override
   public String toString() {
     ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("sessions", getSessionIds());
     builder.attr("userIds", getUserIds());
-    builder.attr("excludedNodeId", getExcludedNodeId());
     builder.attr("notifyAllSessions", isNotifyAllSessions());
     builder.attr("notifyAllNodes", isNotifyAllNodes());
     return builder.toString();
@@ -112,7 +90,6 @@ public class ClientNotificationAddress implements Serializable {
       result = prime * result + (m_notifyAllNodes ? 1231 : 1237);
     }
     else {
-      result = prime * result + ((m_excludedNodeId == null) ? 0 : m_excludedNodeId.hashCode());
       result = prime * result + ((m_sessionIds == null) ? 0 : m_sessionIds.hashCode());
       result = prime * result + ((m_userIds == null) ? 0 : m_userIds.hashCode());
     }
@@ -139,14 +116,6 @@ public class ClientNotificationAddress implements Serializable {
       return other.m_notifyAllNodes;
     }
     else {
-      if (m_excludedNodeId == null) {
-        if (other.m_excludedNodeId != null) {
-          return false;
-        }
-      }
-      else if (!m_excludedNodeId.equals(other.m_excludedNodeId)) {
-        return false;
-      }
       if (m_sessionIds == null) {
         if (other.m_sessionIds != null) {
           return false;
@@ -187,8 +156,4 @@ public class ClientNotificationAddress implements Serializable {
     return this;
   }
 
-  protected ClientNotificationAddress withExcludedNodeId(final String excludedNodeId) {
-    m_excludedNodeId = excludedNodeId;
-    return this;
-  }
 }
