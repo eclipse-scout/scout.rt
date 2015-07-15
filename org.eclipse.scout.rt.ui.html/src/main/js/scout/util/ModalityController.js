@@ -13,7 +13,7 @@ scout.ModalityController = function(element) {
  */
 scout.ModalityController.prototype.addGlassPane = function() {
   if (!this.render || !this._displayParent) {
-    // Nothing to be done if rendering the classpane is manually disabled by setting
+    // Nothing to be done if rendering the glasspane is manually disabled by setting
     // "render" to false (see Form.js) or there is no displayParent. The later case
     // may happen while showing a popup before the desktop is available (e.g. fatal
     // message). When no desktop is present, a glasspane is not necessary.
