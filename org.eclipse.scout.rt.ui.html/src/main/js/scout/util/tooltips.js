@@ -1,14 +1,5 @@
 scout.tooltips = {
-
-  defaultOptions: {
-    arrowPosition: 25,
-    arrowPositionUnit: '%',
-    htmlEnabled: false,
-    tooltipDelay: 350
-  },
-
   install: function($comp, options) {
-    options = $.extend({}, this.defaultOptions, options);
     var support = new scout.TooltipSupport(options);
     support.install($comp);
   },
@@ -22,6 +13,10 @@ scout.tooltips = {
 };
 
 scout.TooltipSupport = function(options) {
+  var defaultOptions = {
+    tooltipDelay: 350
+  };
+  options = $.extend({}, defaultOptions, options);
   this._options = options;
   this._mouseEnterHandler = this._onMouseEnter.bind(this);
   this._mouseLeaveHandler = this._onMouseLeave.bind(this);

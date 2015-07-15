@@ -7,8 +7,8 @@ scout.Tooltip = function(options) {
   scout.Tooltip.parent.call(this);
   options = options || {};
   this.text = options.text || '';
-  this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 50;
-  this.arrowPositionUnit = options.arrowPositionUnit || 'px';
+  this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
+  this.arrowPositionUnit = options.arrowPositionUnit || '%';
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
   this.origin = options.origin;
@@ -81,7 +81,7 @@ scout.Tooltip.prototype.renderText = function(text) {
 
 scout.Tooltip.prototype.position = function() {
   var top, left, arrowHeight, overlapX, overlapY, x, y, origin,
-    tooltipWidth, tooltipHeight, arrowDivWidth, inView;
+    tooltipWidth, tooltipHeight, arrowDivWidth, arrowPosition, inView;
 
   if (this.origin) {
     origin = this.origin;
@@ -106,19 +106,20 @@ scout.Tooltip.prototype.position = function() {
   tooltipWidth = this.$container.outerWidth();
 
   // Compute actual arrow position if position is provided in percentage
+  arrowPosition = this.arrowPosition;
   if (this.arrowPositionUnit === '%') {
-    this.arrowPosition = tooltipWidth * this.arrowPosition / 100;
+    arrowPosition = tooltipWidth * this.arrowPosition / 100;
   }
 
   top = y - tooltipHeight - arrowHeight;
-  left = x - this.arrowPosition;
+  left = x - arrowPosition;
   overlapX = left + tooltipWidth + this.windowPaddingX - $(window).width();
   overlapY = top - this.windowPaddingY;
 
   // Move tooltip to the left until it gets fully visible
   if (overlapX > 0) {
     left -= overlapX;
-    this.arrowPosition = x - left;
+    arrowPosition = x - left;
   }
 
   // FIXME AWE: (tooltip) discuss with C.GU/C.RU: also support left/right position for tooltip?
@@ -133,7 +134,7 @@ scout.Tooltip.prototype.position = function() {
     this.$arrow.addClass('arrow-bottom');
   }
 
-  this.$arrow.cssLeft(this.arrowPosition);
+  this.$arrow.cssLeft(arrowPosition);
   this.$container
     .cssLeft(left)
     .cssTop(top);
