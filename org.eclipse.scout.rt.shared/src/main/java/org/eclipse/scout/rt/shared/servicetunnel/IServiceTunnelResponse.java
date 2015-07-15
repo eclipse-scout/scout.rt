@@ -32,4 +32,8 @@ public interface IServiceTunnelResponse extends Serializable {
 
   void setNotifications(List<ClientNotificationMessage> notifications);
 
+  void setUserId(String userId);
+
+  String getUserId();
+
 }

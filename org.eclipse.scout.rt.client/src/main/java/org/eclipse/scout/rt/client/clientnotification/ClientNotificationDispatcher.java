@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -36,30 +35,20 @@ import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 
 /**
- *
+ * Dispatches notifications on the client side
  */
 @ApplicationScoped
 public class ClientNotificationDispatcher {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationDispatcher.class);
 
-  private final IFilter<ClientNotificationMessage> ACCEPT_ALL_FILTER = new IFilter<ClientNotificationMessage>() {
-    @Override
-    public boolean accept(ClientNotificationMessage element) {
-      return true;
-    }
-  };
-
   private final Set<IFuture<Void>> m_notificationFutures = new HashSet<>();
 
   public void dispatchNotifications(List<ClientNotificationMessage> notifications) {
-    dispatchNotifications(notifications, ACCEPT_ALL_FILTER);
-  }
-
-  public void dispatchNotifications(List<ClientNotificationMessage> notifications, IFilter<ClientNotificationMessage> filter) {
     IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
     if (notifications == null) {
       LOG.error("Notifications null. Please check your configuration");
@@ -67,36 +56,35 @@ public class ClientNotificationDispatcher {
     }
 
     for (ClientNotificationMessage message : notifications) {
-      if (!filter.accept(message)) {
-        continue;
-      }
+      ClientNotificationAddress address = message.getAddress();
+      Serializable notification = message.getNotification();
 
-      if (message.getAddress().isNotifyAllNodes()) {
+      if (address.isNotifyAllNodes()) {
         // notify all nodes
-        dispatch(message.getNotification());
+        dispatch(notification);
       }
-      else if (message.getAddress().isNotifyAllSessions()) {
+      else if (address.isNotifyAllSessions()) {
         // notify all sessions
         for (IClientSession session : notificationService.getAllClientSessions()) {
-          dispatch(session, message.getNotification());
+          dispatch(session, notification);
         }
       }
-      else if (CollectionUtility.hasElements(message.getAddress().getSessionIds())) {
+      else if (CollectionUtility.hasElements(address.getSessionIds())) {
         // notify all specified sessions
-        for (String sessionId : message.getAddress().getSessionIds()) {
+        for (String sessionId : address.getSessionIds()) {
           IClientSession session = notificationService.getClientSession(sessionId);
           if (session == null) {
             LOG.warn(String.format("received notification for invalid session '%s'.", sessionId));
           }
           else {
-            dispatch(session, message.getNotification());
+            dispatch(session, notification);
           }
         }
       }
-      else if (CollectionUtility.hasElements(message.getAddress().getUserIds())) {
-        for (String userId : message.getAddress().getUserIds()) {
+      else if (CollectionUtility.hasElements(address.getUserIds())) {
+        for (String userId : address.getUserIds()) {
           for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
-            dispatch(session, message.getNotification());
+            dispatch(session, notification);
           }
         }
       }
@@ -129,9 +117,8 @@ public class ClientNotificationDispatcher {
   }
 
   /**
-   * to dispatch a notification within the context of a current session. If this method is called within a
-   * {@link ClientRunContext} containing the same session as the addressed session (method argument) the notification
-   * will be dispatched sync in the current {@link RunContext}.
+   * Dispatch notifications within the context of a session.<br>
+   * Dispatching is always done asynchronously to ensure that it is not handled within a model thread.
    *
    * @param session
    *          the session describes the runcontext in which the notification should be processed.
@@ -140,17 +127,10 @@ public class ClientNotificationDispatcher {
    */
   public void dispatch(IClientSession session, Serializable notification) {
     P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
-    ISession currentSession = ISession.CURRENT.get();
-    // sync dispatch if session is equal
-    if (session == currentSession) {
-      ClientRunContexts.copyCurrent().run(dispatchJob, BEANS.get(RuntimeExceptionTranslator.class));
-    }
-    else {
-      IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
-      synchronized (m_notificationFutures) {
-        m_notificationFutures.add(future);
-        future.whenDone(new P_NotificationFutureCallback(future));
-      }
+    IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
+    synchronized (m_notificationFutures) {
+      m_notificationFutures.add(future);
+      future.whenDone(new P_NotificationFutureCallback(future));
     }
   }
 

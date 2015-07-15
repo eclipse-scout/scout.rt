@@ -127,4 +127,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
   Subject getOfflineSubject();
 
   void goOffline() throws ProcessingException;
+
+  void setUserIdInternal(String userId);
 }

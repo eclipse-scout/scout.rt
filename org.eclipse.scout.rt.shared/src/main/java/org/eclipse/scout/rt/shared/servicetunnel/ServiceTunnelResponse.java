@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 public class ServiceTunnelResponse implements IServiceTunnelResponse {
@@ -25,6 +26,7 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private volatile Long m_processingDuration;
 
   private List<ClientNotificationMessage> m_notifications;
+  private String m_userId;
 
   public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
     m_data = data;
@@ -56,33 +58,41 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
     m_processingDuration = millis;
   }
 
-  @Override
-  public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("Response[data=" + m_data + ", vars=" + ((m_outVars == null) ? "" : Arrays.asList(m_outVars)) + ", exception=" + m_exception + "]");
-    return buf.toString();
-  }
-
   /**
-   * Piggyback notifications. Transactional notifications are piggybacked to the client with the corresponding
+   * Piggyback notifications. Transactional notifications can be piggybacked to the client with the corresponding
    * {@link ServiceTunnelResponse}.
    *
    * @param notifications
    */
   @Override
-  public void setNotifications(List<ClientNotificationMessage> notifications) {
+  public synchronized void setNotifications(List<ClientNotificationMessage> notifications) {
     m_notifications = notifications;
   }
 
   @Override
-  public List<ClientNotificationMessage> getNotifications() {
+  public synchronized List<ClientNotificationMessage> getNotifications() {
     return m_notifications;
   }
 
-  /*
-   * //Activate for Null-Proxy-Test only private void
-   * readObject(ObjectInputStream in) throws IOException,
-   * ClassNotFoundException{ //don't call defaultReadObject() }
-   */
+  @Override
+  public synchronized void setUserId(String userId) {
+    m_userId = userId;
+  }
+
+  @Override
+  public synchronized String getUserId() {
+    return m_userId;
+  }
+
+  @Override
+  public String toString() {
+    ToStringBuilder tsb = new ToStringBuilder(this);
+    tsb.ref("data", getData());
+    tsb.attr("vars", Arrays.asList(getOutVars()));
+    tsb.attr("exception", getException());
+    tsb.attr("userId", getUserId());
+    tsb.attr("notifications", getNotifications());
+    return tsb.toString();
+  }
 
 }

@@ -189,6 +189,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
+  public void setUserIdInternal(String newValue) {
+    getSharedVariableMap().put("userId", newValue);
+  }
+
+  @Override
   public Subject getOfflineSubject() {
     return m_offlineSubject;
   }
@@ -478,15 +483,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   public int getExitCode() {
     return m_exitCode;
   }
-
-//  @Override
-//  public IClientServiceTunnel getServiceTunnel() {
-//    return m_serviceTunnel;
-//  }
-
-//  protected void setServiceTunnel(IClientServiceTunnel tunnel) {
-//    m_serviceTunnel = tunnel;
-//  }
 
   @Override
   public IMemoryPolicy getMemoryPolicy() {

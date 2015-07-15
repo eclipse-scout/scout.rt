@@ -36,8 +36,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
  */
 public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implements IClientServiceTunnel {
 
-//  private IFuture<Void> m_pollingJob;
-//  private long m_pollInterval = -1L;
   private boolean m_analyzeNetworkLatency = true;
 
   public ClientHttpServiceTunnel() {
@@ -47,20 +45,6 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
   public ClientHttpServiceTunnel(URL url) {
     super(url);
   }
-
-//  @Override
-//  public long getClientNotificationPollInterval() {
-//    return m_pollInterval;
-//  }
-//
-//  @Override
-//  public void setClientNotificationPollInterval(long intervallMillis) {
-//    long oldInterval = m_pollInterval;
-//    m_pollInterval = intervallMillis;
-//    if (m_pollInterval != oldInterval) {
-//      updatePollingJobInternal();
-//    }
-//  }
 
   @Override
   public boolean isAnalyzeNetworkLatency() {
@@ -79,11 +63,6 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
       serviceRequest.setSessionId(session.getId());
     }
     serviceRequest.setClientNotificationNodeId(IClientSessionRegistry.NOTIFICATION_NODE_ID);
-    // TODO piggyback notifications
-//    IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
-//    if (call instanceof ServiceTunnelRequest && cns != null) {
-//     ((ServiceTunnelRequest) call).setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
-//    }
   }
 
   @Override
@@ -104,33 +83,16 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
       }
     }
 
-    // TODO [aho] piggyback notifications
+    //make sure the current user is available on the session
+    //necessary for notifications
+    IClientSession session = (IClientSession) IClientSession.CURRENT.get();
+    if (session != null && serviceResponse.getUserId() != null) {
+      session.setUserIdInternal(serviceResponse.getUserId());
+    }
+
     ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
     notificationDispatcher.dispatchNotifications(serviceResponse.getNotifications());
-//    // client notification handler
-//    IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
-//    if (cns != null) {
-//      cns.dispatchClientNotifications(response.getClientNotifications(), getSession());
-//    }
   }
-
-//  private synchronized void updatePollingJobInternal() {
-//    long p = getClientNotificationPollInterval();
-//    if (p > 0) {
-//      if (m_pollingJob != null) {
-//        // cancel the old
-//        m_pollingJob.cancel(true);
-//      }
-//      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(getSession());
-//      m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext).name("Client notification fetcher"));
-//    }
-//    else {
-//      if (m_pollingJob != null) {
-//        m_pollingJob.cancel(true);
-//        m_pollingJob = null;
-//      }
-//    }
-//  }
 
   @Override
   protected IServiceTunnelResponse tunnel(ServiceTunnelRequest serviceRequest) {

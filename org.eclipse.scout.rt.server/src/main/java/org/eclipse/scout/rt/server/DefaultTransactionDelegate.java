@@ -131,55 +131,26 @@ public class DefaultTransactionDelegate {
     if (LOG.isDebugEnabled()) {
       LOG.debug("started " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " by " + authenticatedUser + " at " + new Date());
     }
-    CallInspector callInspector = null;
-    SessionInspector sessionInspector = ProcessInspector.instance().getSessionInspector(serverSession, true);
-    if (sessionInspector != null) {
-      callInspector = sessionInspector.requestCallInspector(serviceReq);
-    }
+    CallInspector callInspector = getCallInspector(serviceReq, serverSession);
     ServiceTunnelResponse serviceRes = null;
     try {
       //do checks
       Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
-      //check access: service proxy allowed
       Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
-      checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, serviceReq.getArgs());
-      //check access: service impl exists
+      Object[] args = serviceReq.getArgs();
+
       Object service = BEANS.get(serviceInterfaceClass);
-      if (service == null) {
-        throw new SecurityException("service registry does not contain a service of type " + serviceReq.getServiceInterfaceClassName());
-      }
-      checkRemoteServiceAccessByAnnotations(serviceInterfaceClass, service.getClass(), serviceOp, serviceReq.getArgs());
-      checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, serviceReq.getArgs());
-      //all checks done
+
+      checkServiceAccess(serviceInterfaceClass, serviceOp, service, args);
       //
-      //filter input
-      if (serviceReq.getArgs() != null && serviceReq.getArgs().length > 0) {
-        Class<? extends IValidationStrategy> inputValidationStrategyClass = findInputValidationStrategyByAnnotation(service, serviceOp);
-        if (inputValidationStrategyClass == null) {
-          inputValidationStrategyClass = findInputValidationStrategyByPolicy(service, serviceOp);
-        }
-        if (inputValidationStrategyClass == null) {
-          throw new SecurityException("input validation failed (no strategy defined)");
-        }
-        validateInput(inputValidationStrategyClass.newInstance(), service, serviceOp, serviceReq.getArgs());
-      }
+      validateInput(serviceReq, serviceOp, service);
       //
-      Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
-      Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
+      Object data = ServiceUtility.invoke(serviceOp, service, args);
+      Object[] outParameters = ServiceUtility.extractHolderArguments(args);
       //
       //filter output
-      if (data != null || (outParameters != null && outParameters.length > 0)) {
-        Class<? extends IValidationStrategy> outputValidationStrategyClass = findOutputValidationStrategyByAnnotation(service, serviceOp);
-        if (outputValidationStrategyClass == null) {
-          outputValidationStrategyClass = findOutputValidationStrategyByPolicy(service, serviceOp);
-        }
-        if (outputValidationStrategyClass == null) {
-          throw new SecurityException("output validation failed");
-        }
-        validateOutput(outputValidationStrategyClass.newInstance(), service, serviceOp, data, outParameters);
-      }
+      validateOutput(serviceOp, service, data, outParameters);
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
-
       return serviceRes;
     }
     finally {
@@ -203,6 +174,54 @@ public class DefaultTransactionDelegate {
           LOG.warn(null, t);
         }
       }
+    }
+  }
+
+  private void checkServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object service, Object[] args) {
+    checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, args);
+    checkServiceAvailable(serviceInterfaceClass, service);
+    checkRemoteServiceAccessByAnnotations(serviceInterfaceClass, service.getClass(), serviceOp, args);
+    checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, args);
+  }
+
+  private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
+    CallInspector callInspector = null;
+    SessionInspector sessionInspector = ProcessInspector.instance().getSessionInspector(serverSession, true);
+    if (sessionInspector != null) {
+      callInspector = sessionInspector.requestCallInspector(serviceReq);
+    }
+    return callInspector;
+  }
+
+  private void checkServiceAvailable(Class<?> serviceInterfaceClass, Object service) {
+    if (service == null) {
+      throw new SecurityException("service registry does not contain a service of type " + serviceInterfaceClass.getName());
+    }
+  }
+
+  private void validateOutput(Method serviceOp, Object service, Object data, Object[] outParameters) throws Exception, InstantiationException, IllegalAccessException {
+    if (data != null || (outParameters != null && outParameters.length > 0)) {
+      Class<? extends IValidationStrategy> outputValidationStrategyClass = findOutputValidationStrategyByAnnotation(service, serviceOp);
+      if (outputValidationStrategyClass == null) {
+        outputValidationStrategyClass = findOutputValidationStrategyByPolicy(service, serviceOp);
+      }
+      if (outputValidationStrategyClass == null) {
+        throw new SecurityException("output validation failed");
+      }
+      validateOutput(outputValidationStrategyClass.newInstance(), service, serviceOp, data, outParameters);
+    }
+  }
+
+  private void validateInput(ServiceTunnelRequest serviceReq, Method serviceOp, Object service) throws Exception, InstantiationException, IllegalAccessException {
+    if (serviceReq.getArgs() != null && serviceReq.getArgs().length > 0) {
+      Class<? extends IValidationStrategy> inputValidationStrategyClass = findInputValidationStrategyByAnnotation(service, serviceOp);
+      if (inputValidationStrategyClass == null) {
+        inputValidationStrategyClass = findInputValidationStrategyByPolicy(service, serviceOp);
+      }
+      if (inputValidationStrategyClass == null) {
+        throw new SecurityException("input validation failed (no strategy defined)");
+      }
+      validateInput(inputValidationStrategyClass.newInstance(), service, serviceOp, serviceReq.getArgs());
     }
   }
 
@@ -246,14 +265,16 @@ public class DefaultTransactionDelegate {
         //nop
       }
       if (m != null) {
-        for (Annotation ann : m.getAnnotations()) {
+        Annotation[] methodAnnotations = m.getAnnotations();
+        for (Annotation ann : methodAnnotations) {
           if (ann.annotationType() == RemoteServiceAccessDenied.class) {
             throw new SecurityException("access denied (code 2b).");
           }
         }
       }
       //type level
-      for (Annotation ann : c.getAnnotations()) {
+      Annotation[] classAnnotations = c.getAnnotations();
+      for (Annotation ann : classAnnotations) {
         if (ann.annotationType() == RemoteServiceAccessDenied.class) {
           throw new SecurityException("access denied (code 2c).");
         }

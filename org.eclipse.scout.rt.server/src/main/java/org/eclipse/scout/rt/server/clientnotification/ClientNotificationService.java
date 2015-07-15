@@ -16,18 +16,15 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
 /**
  *
  */
 public class ClientNotificationService implements IClientNotificationService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationService.class);
   private ClientNotificationRegistry m_notificationRegistry;
 
   @PostConstruct

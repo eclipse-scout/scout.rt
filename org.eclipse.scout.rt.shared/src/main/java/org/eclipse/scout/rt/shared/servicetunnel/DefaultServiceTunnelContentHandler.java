@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.NotSerializableException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -255,6 +256,10 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       m_objectSerializer.serialize(out, msg);
       String base64Data = StringUtility.wrapText(Base64Utility.encode(bos.toByteArray()), 10000);
       writer.write(base64Data);
+    }
+    catch (NotSerializableException e) {
+      LOG.error("Error serializing data " + msg);
+      throw e;
     }
     finally {
       if (deflater != null) {

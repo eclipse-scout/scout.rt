@@ -147,7 +147,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
   public IClientSession getClientSession(String sessionid) {
     synchronized (m_cacheLock) {
       WeakReference<IClientSession> sessionRef = m_sessionIdToSession.get(sessionid);
-      if (sessionRef.get() != null) {
+      if (sessionRef != null && sessionRef.get() != null) {
         return sessionRef.get();
       }
       else {
