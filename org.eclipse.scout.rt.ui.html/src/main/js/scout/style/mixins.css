@@ -49,7 +49,7 @@
   opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
 }
 .placeholder-disabled() {
-  opacity: 0.2;
+  color: @disabled-color;
 }
 
 .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {

@@ -61,7 +61,7 @@
 @control-background-color: @palette-white;
 @control-disabled-color: @text-disabled-color;
 @control-disabled-background-color: @palette-gray-2;
-@disabled-color: @palette-gray-4;
+@disabled-color: @palette-gray-5;
 @error-color: @palette-red-3;
 @error-background-color: @palette-red-0;
 @error-border-color: @palette-red-3;
