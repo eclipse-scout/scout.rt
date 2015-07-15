@@ -120,7 +120,17 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForUser(String userId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId)), notification);
+    putForUsers(Collections.singleton(userId), notification);
+  }
+
+  /**
+   * The notification will be distributed to all sessions of the given userIds.
+   *
+   * @param userIds
+   * @param notification
+   */
+  public void putForUsers(Set<String> userIds, Serializable notification) {
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(userIds), notification);
     publish(Collections.singleton(message));
   }
 
@@ -132,7 +142,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId)), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification);
     publish(Collections.singleton(message));
   }
 
@@ -184,8 +194,7 @@ public class ClientNotificationRegistry {
    */
   public void putTransactionalForUser(String userId, Serializable notification) {
     // exclude the node the request comes from
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createUserAddress(CollectionUtility.hashSet(userId), currentNodeIdElseThrow()), notification);
-    putTransactional(message);
+    putTransactionalForUsers(Collections.singleton(userId), notification);
   }
 
   /**
@@ -213,7 +222,7 @@ public class ClientNotificationRegistry {
    * @param notification
    */
   public void putTransactionalForSession(String sessionId, Serializable notification) {
-    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(CollectionUtility.hashSet(sessionId), currentNodeIdElseThrow()), notification);
+    ClientNotificationMessage message = new ClientNotificationMessage(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId), currentNodeIdElseThrow()), notification);
     putTransactional(message);
   }
 
@@ -244,6 +253,7 @@ public class ClientNotificationRegistry {
   public void putTransactional(ClientNotificationMessage message) {
     // TODO jgu: please verify and enable this assertion
 //    Assertions.assertNotNull(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get(), "Missing HTTP servlet response to attach transactional client notification (piggyback)");
+    // TODO jgu: from [osc] it would be nice to have a method which decide by itself how to publish, use case @see SemaphoreBaseService#notifyWaitingUsers
     ITransaction transaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "No transaction found on current calling context to register transactional client notification %s", message);
     try {
       ClientNotificationTransactionMember txMember = (ClientNotificationTransactionMember) transaction.getMember(ClientNotificationTransactionMember.TRANSACTION_MEMBER_ID);
