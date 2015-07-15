@@ -21,10 +21,10 @@ scout.TagCloudField.prototype._render = function($parent) {
   this.addStatus();
 
   // hack? wait until svg is complete rendered
-  setTimeout(this._init.bind(this), 0);
+  setTimeout(this._renderPostponed.bind(this), 0);
 };
 
-scout.TagCloudField.prototype._init = function() {
+scout.TagCloudField.prototype._renderPostponed = function() {
   // init vars
   var data = this.demo,
     wCloud = this.$container.width(),
