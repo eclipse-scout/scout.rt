@@ -53,8 +53,8 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
 
   private PlannerListener m_plannerListener;
-  private final Map<String, Activity<?, ?>> m_cells;
-  private final Map<Activity<?, ?>, String> m_cellIds;
+  private final Map<String, Activity<?, ?>> m_activities;
+  private final Map<Activity<?, ?>, String> m_activityIds;
   private final Map<String, Resource<?>> m_resources;
   private final Map<Resource<?>, String> m_resourceIds;
   private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
@@ -62,8 +62,8 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
 
   public JsonPlanner(PLANNER model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
-    m_cells = new HashMap<>();
-    m_cellIds = new HashMap<>();
+    m_activities = new HashMap<>();
+    m_activityIds = new HashMap<>();
     m_resources = new HashMap<>();
     m_resourceIds = new HashMap<>();
     m_eventBuffer = model.createEventBuffer();
@@ -219,7 +219,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   protected String getCellId(Activity<?, ?> cell) {
-    return m_cellIds.get(cell);
+    return m_activityIds.get(cell);
   }
 
   protected String createCellId(Activity<?, ?> cell) {
@@ -228,8 +228,8 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       throw new IllegalStateException("Cell already has an id. " + cell);
     }
     id = getUiSession().createUniqueIdFor(null);
-    m_cells.put(id, cell);
-    m_cellIds.put(cell, id);
+    m_activities.put(id, cell);
+    m_activityIds.put(cell, id);
     return id;
   }
 
@@ -238,6 +238,27 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       return null;
     }
     return m_resourceIds.get(resource);
+  }
+
+  protected Resource getResource(String id) {
+    if (id == null) {
+      return null;
+    }
+    return m_resources.get(id);
+  }
+
+  protected String getActivityId(Activity<?, ?> activity) {
+    if (activity == null) {
+      return null;
+    }
+    return m_activityIds.get(activity);
+  }
+
+  protected Activity getActivity(String id) {
+    if (id == null) {
+      return null;
+    }
+    return m_activities.get(id);
   }
 
   protected String createResourceId(Resource<?> resource) {
@@ -251,15 +272,21 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     return id;
   }
 
-  protected void disposeResource(Resource resource) {
+  protected void disposeResource(Resource<?> resource) {
     String resourceId = getResourceId(resource);
     m_resourceIds.remove(resource);
     m_resources.remove(resourceId);
+    for (Activity<?, ?> activity : resource.getActivities()) {
+      m_activities.remove(activity);
+      m_activityIds.remove(activity.getId());
+    }
   }
 
   protected void disposeAllResources() {
     m_resourceIds.clear();
     m_resources.clear();
+    m_activityIds.clear();
+    m_activities.clear();
   }
 
   protected void handleModelEvent(PlannerEvent event) {
@@ -450,7 +477,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   protected List<Resource<?>> jsonToResources(JSONArray resourceIds) {
     List<Resource<?>> resources = new ArrayList<>(resourceIds.length());
     for (int i = 0; i < resourceIds.length(); i++) {
-      Resource<?> resource = m_resources.get(resourceIds.get(i));
+      Resource<?> resource = getResource((String) resourceIds.get(i));
       if (resource == null) {
         throw new UiException("No resource found for id " + resourceIds.get(i));
       }
