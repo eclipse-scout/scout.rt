@@ -384,8 +384,12 @@ scout.Planner.prototype._renderScale = function() {
       }
 
       $divSmall = $timelineSmall
-        .appendDiv('scale-item', loop.getDate() % 2 == 1 ? this._dateFormat(loop, 'dd') : '')
+        .appendDiv('scale-item', this._dateFormat(loop, 'dd'))
         .data('date-from', new Date(loop.valueOf()));
+
+      if (loop.getDate() % 2 == 1) {
+        $divSmall.addClass('invisible');
+      }
 
       loop = scout.dates.shift(loop, 0, 0, 1);
       $divSmall.data('date-to', new Date(loop.valueOf()))
@@ -702,7 +706,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
   }
   // If startRange or lastRange are not given, use the existing range selection
   // Happens if the user clicks a resource instead of making a range selection
-  if (!this.startRange || !this.lastRange) {
+  if (!this.startRange && !this.lastRange) {
     if (this.selectionRange.from) {
       this.startRange = {};
       this.startRange.from = this.selectionRange.from.getTime();
@@ -746,6 +750,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
     // left and width
     var from = Math.min(this.lastRange.from, this.startRange.from),
       to = Math.max(this.lastRange.to, this.startRange.to);
+
     var selectionRange = {
       from: new Date(from),
       to: new Date(to)
