@@ -789,7 +789,26 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {
-    dispose();
-    LOG.info("UI session with ID " + m_uiSessionId + " unbound from HTTP session.");
+    if (ModelJobs.isModelThread()) {
+      dispose(); // already in model job
+      LOG.info("UI session with ID " + m_uiSessionId + " unbound from HTTP session.");
+      return;
+    }
+    try {
+      m_uiSessionLock.lock();
+      ModelJobs.schedule(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          dispose();
+          LOG.info("UI session with ID " + m_uiSessionId + " unbound from HTTP session.");
+        }
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getClientSession(), true))).awaitDone();
+    }
+    catch (ProcessingException e) {
+      LOG.error("Error during dispose of UI session", e);
+    }
+    finally {
+      m_uiSessionLock.unlock();
+    }
   }
 }
