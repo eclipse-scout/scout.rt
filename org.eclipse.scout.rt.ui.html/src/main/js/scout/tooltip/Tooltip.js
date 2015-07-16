@@ -45,8 +45,10 @@ scout.Tooltip.prototype._render = function($parent) {
 
   if (this.autoRemove) {
     // Every user action will remove the tooltip
-    $(document).on('mousedown.tooltip', this._onTooltipClicked.bind(this));
-    $(document).on('keydown.tooltip', this.remove.bind(this));
+    this._mousedownHandler = this._onDocumentMousedown.bind(this);
+    this._keydownHandler = this._onDocumentKeydown.bind(this);
+    $(document).on('mousedown', this._mousedownHandler);
+    $(document).on('keydown', this._keydownHandler);
   }
 
   if (this.$anchor) {
@@ -62,7 +64,8 @@ scout.Tooltip.prototype._render = function($parent) {
 };
 
 scout.Tooltip.prototype._remove = function() {
-  $(document).off('mousedown.tooltip keydown.tooltip');
+  $(document).off('mousedown', this._mousedownHandler);
+  $(document).off('keydown', this._keydownHandler);
   if (this._scrollHandler) {
     scout.scrollbars.offScroll(this._scrollHandler);
     this._scrollHandler = null;
@@ -122,10 +125,6 @@ scout.Tooltip.prototype.position = function() {
     arrowPosition = x - left;
   }
 
-  // FIXME AWE: (tooltip) discuss with C.GU/C.RU: also support left/right position for tooltip?
-  // FIXME AWE: (tooltip) discuss with C.GU/C.RU: always use the same BG-color for tooltips?
-  //   when custom BG-color is allowed, styling is a bit complicated because of arrow-'hack'
-
   // Move tooltip to the bottom, arrow on top
   if (this.tooltipPosition === 'bottom' || overlapY < 0) {
     this.$arrow.addClass('arrow-top');
@@ -140,13 +139,17 @@ scout.Tooltip.prototype.position = function() {
     .cssTop(top);
 };
 
-scout.Tooltip.prototype._onTooltipClicked = function(event) {
+scout.Tooltip.prototype._onDocumentMousedown = function(event) {
   // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
   var $target = $(event.target);
   if ($target[0] === this.$container[0] || this.$container.children().is($target) ||
     $target[0] === this.$anchor[0] || this.$anchor.children().is($target)) {
     return;
   }
+  this.remove();
+};
+
+scout.Tooltip.prototype._onDocumentKeydown = function(event) {
   this.remove();
 };
 
