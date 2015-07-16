@@ -307,10 +307,6 @@ public class PlannerEventBufferTest {
     return new PlannerEvent(mock(IPlanner.class), PlannerEvent.TYPE_RESOURCES_UPDATED, mockResources(0, 1));
   }
 
-  private PlannerEvent mockEvent(int type) {
-    return mockEvent(type, 0);
-  }
-
   private PlannerEvent mockEvent(int type, int resourceCount) {
     List<Resource> resources = null;
     if (resourceCount > 0) {

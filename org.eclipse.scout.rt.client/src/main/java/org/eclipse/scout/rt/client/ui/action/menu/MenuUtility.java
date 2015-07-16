@@ -11,11 +11,14 @@
 package org.eclipse.scout.rt.client.ui.action.menu;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -23,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
+import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -99,13 +103,21 @@ public final class MenuUtility {
     }
   }
 
-  public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(List<? extends Resource<?>> selectedResources, org.eclipse.scout.rt.client.ui.basic.planner.Activity<?, ?> selectedActivity) {
-    if (selectedActivity == null) {
-      return CollectionUtility.hashSet(PlannerMenuType.Range);
+  public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(List<? extends Resource<?>> selectedResources, Activity<?, ?> selectedActivity, Range<Date> selectionRange) {
+    if (CollectionUtility.isEmpty(selectedResources)) {
+      return CollectionUtility.hashSet(PlannerMenuType.EmptySpace);
     }
-    else {
-      return CollectionUtility.hashSet(PlannerMenuType.Activity);
+    Set<PlannerMenuType> menuTypes = new HashSet<PlannerMenuType>();
+    if (CollectionUtility.size(selectedResources) > 0) {
+      menuTypes.add(PlannerMenuType.Resource);
     }
+    if (selectedActivity != null) {
+      menuTypes.add(PlannerMenuType.Activity);
+    }
+    else if (selectionRange.getFrom() != null || selectionRange.getTo() != null) {
+      menuTypes.add(PlannerMenuType.Range);
+    }
+    return menuTypes;
   }
 
   public static Set<CalendarMenuType> getMenuTypesForCalendarSelection(CalendarComponent selectedComponent) {
