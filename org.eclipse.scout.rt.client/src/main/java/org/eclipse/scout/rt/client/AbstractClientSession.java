@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLo
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -254,14 +255,19 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     BEANS.get(SharedContextNotificationHanlder.class).addListener(this, new INotificationListener<SharedContextChangedNotification>() {
 
       @Override
-      public void handleNotification(SharedContextChangedNotification notification) {
+      public void handleNotification(final SharedContextChangedNotification notification) {
+        ModelJobs.schedule(new IRunnable() {
 
-        try {
-          updateSharedVariableMap(notification.getSharedVariableMap());
-        }
-        catch (Exception ex) {
-          LOG.error("update of shared contex", ex);
-        }
+          @Override
+          public void run() throws Exception {
+            try {
+              updateSharedVariableMap(notification.getSharedVariableMap());
+            }
+            catch (Exception ex) {
+              LOG.error("update of shared contex", ex);
+            }
+          }
+        });
       }
     });
   }

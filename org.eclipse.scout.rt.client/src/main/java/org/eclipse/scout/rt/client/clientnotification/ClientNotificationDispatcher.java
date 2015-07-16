@@ -28,13 +28,10 @@ import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
@@ -101,18 +98,11 @@ public class ClientNotificationDispatcher {
    */
   public void dispatch(Serializable notification) {
     P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
-    ISession currentSession = ISession.CURRENT.get();
-    if (currentSession != null) {
-      // sync dispatch to ensure applied notification after return
-      RunContexts.copyCurrent().run(dispatchJob, BEANS.get(RuntimeExceptionTranslator.class));
-    }
-    else {
-      // schedule
-      IFuture<Void> future = Jobs.schedule(dispatchJob, Jobs.newInput(ClientRunContexts.empty()));
-      synchronized (m_notificationFutures) {
-        m_notificationFutures.add(future);
-        future.whenDone(new P_NotificationFutureCallback(future));
-      }
+    // schedule
+    IFuture<Void> future = Jobs.schedule(dispatchJob, Jobs.newInput(ClientRunContexts.empty()));
+    synchronized (m_notificationFutures) {
+      m_notificationFutures.add(future);
+      future.whenDone(new P_NotificationFutureCallback(future));
     }
   }
 
