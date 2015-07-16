@@ -40,7 +40,8 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
       if (session != null) {
         session.invalidate();
       }
-      res.sendRedirect("/");
+      res.sendRedirect("");
+      return;
     }
     else {
       super.doFilterInternal(req, res, chain);
@@ -48,8 +49,7 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   }
 
   private boolean isLogoutRequest(HttpServletRequest req) {
-    String uri = req.getRequestURI();
-    return uri != null && uri.endsWith("/logout");
+    return "/logout".equals(req.getPathInfo());
   }
 
   @Override
