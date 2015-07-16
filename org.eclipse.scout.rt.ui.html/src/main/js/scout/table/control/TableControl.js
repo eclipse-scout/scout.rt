@@ -91,7 +91,8 @@ scout.TableControl.prototype.renderContent = function() {
 
 scout.TableControl.prototype.onControlContainerOpened = function() {
   if (this.form) {
-    this.form.renderFocus();
+    // TODO [dwi] temporary solution; set focus to last known position
+    this.form._initialFocusControl().focus();
   }
 };
 
