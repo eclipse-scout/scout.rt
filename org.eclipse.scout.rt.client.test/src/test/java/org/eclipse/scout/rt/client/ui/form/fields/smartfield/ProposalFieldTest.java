@@ -121,6 +121,14 @@ public class ProposalFieldTest {
     assertNotNull(m_proposalField.getCurrentLookupRow());
   }
 
+  @Test
+  public void testLookupRowWithNullText() throws Exception {
+    LookupRow<Long> nullLookupRow = new LookupRow<Long>(1L, null);
+    m_proposalField.setCurrentLookupRow(nullLookupRow);
+    assertEquals("", m_proposalField.formatValueInternal(""));
+    assertEquals(null, m_proposalField.formatValueInternal(null));
+  }
+
   /**
    * This method deals with the async nature of the proposal chooser
    */
