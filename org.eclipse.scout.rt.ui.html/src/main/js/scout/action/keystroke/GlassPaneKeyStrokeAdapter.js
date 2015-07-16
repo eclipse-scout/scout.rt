@@ -1,3 +1,4 @@
+// FIXME [dwi] check other solution
 scout.GlassPaneKeyStrokeAdapter = function($glasspane, _uiSessionId) {
   scout.GlassPaneKeyStrokeAdapter.parent.call(this);
   this._uiSessionId = _uiSessionId;
