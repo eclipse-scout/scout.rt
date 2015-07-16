@@ -28,16 +28,9 @@ function createSimpleModel(objectType, id) {
   if (id === undefined) {
     id = scout.createUniqueId();
   }
-  // parent: used because by definition, a Form belongs to a 'displayParent'.
   return {
     id: id,
-    objectType: objectType,
-    parent: {
-      rendered: true,
-      inFront: function() { return true; },
-      modalityElements: function() { return []; },
-      removeChild: function() {}
-    }
+    objectType: objectType
   };
 }
 
@@ -97,7 +90,7 @@ function createAdapter(model, session, adapterDataArray) {
 
   adapterData = createAdapterData(adapterDataArray);
   session._copyAdapterData(adapterData);
-  adapter = session.getOrCreateModelAdapter(model.id);
+  adapter = session.getOrCreateModelAdapter(model.id, model.parent);
   expect(session.getModelAdapter(adapter.id)).toBe(adapter);
   return adapter;
 }

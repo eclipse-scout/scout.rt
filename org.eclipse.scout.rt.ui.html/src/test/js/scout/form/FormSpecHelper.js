@@ -16,15 +16,22 @@ FormSpecHelper.prototype.createFormWithOneField = function(session, parentId) {
 };
 
 FormSpecHelper.prototype.createFormModel = function() {
-  return createSimpleModel('Form');
+  var form = createSimpleModel('Form');
+  // By definition, a Form must have a 'displayParent'. That is why a mocked parent is set.
+  form.parent = {
+      rendered: true,
+      removeChild: function() {},
+      addChild: function() {},
+      inFront: function() { return true; }, // expected API of a 'displayParent'
+      modalityElements: function() { return []; } // expected API of a 'displayParent'
+    };
+  return form;
 };
 
 FormSpecHelper.prototype.createFieldModel = function(objectType) {
   var model = createSimpleModel(objectType || 'StringField');
-  $.extend(model, {
-    'enabled': true,
-    'visible': true
-  });
+  model.enabled = true;
+  model.visible = true;
 
   return model;
 };
@@ -52,10 +59,8 @@ FormSpecHelper.prototype.createFormXFields = function(x, session, isModal, paren
 };
 
 FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
-  var model = createSimpleModel('Form');
-  $.extend(model, {
-    'displayHint': displayHint
-  });
+  var model = this.createFormModel();
+  model.displayHint = displayHint;
   return model;
 };
 
