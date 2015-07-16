@@ -359,10 +359,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setScrollToSelection(boolean b);
 
   /**
-   * May be used when {@link #isScrollToSelection()} = false for a one-time scroll. The property scrollToVisible however
-   * remains untouched.
+   * May be used when {@link #isScrollToSelection()} = false for a one-time scroll. The property
+   * {@value #PROP_SCROLL_TO_SELECTION} however remains untouched.
    * <p>
-   * This is a one-time scroll advise to the ui
+   * This is a one-time scroll advise to the ui. Only works if the table has already been loaded and is displayed.
    */
   void scrollToSelection();
 
