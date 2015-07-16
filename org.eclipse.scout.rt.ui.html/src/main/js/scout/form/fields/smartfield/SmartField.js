@@ -127,11 +127,12 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     return;
   }
 
-  if (e.which === scout.keys.ENTER) {
+  if (e.which === scout.keys.ENTER ||
+      e.which === scout.keys.TAB) {
     if (this._popup.rendered) {
       e.stopPropagation();
     }
-    this._acceptProposal();
+    this._acceptProposal(true);
     return;
   }
 
@@ -185,10 +186,10 @@ scout.SmartField.prototype._onKeyUp = function(e) {
 
 scout.SmartField.prototype._proposalTyped = function() {
   var searchText = this._searchText();
-  if (this._oldSearchText === searchText) {
-    $.log.debug('(SmartField#_proposalTyped) value of field has not changed - do not send proposalTyped (oldSearchText=' + this._oldSearchText + ')');
+  if (searchText === this.displayText) {
     return;
   }
+  this.displayText = searchText;
 
   // debounce send
   clearTimeout(this._sendTimeoutId);
@@ -198,9 +199,6 @@ scout.SmartField.prototype._proposalTyped = function() {
       searchText: searchText
     });
   }.bind(this), this.DEBOUNCE_DELAY);
-
-  this._oldSearchText = searchText;
-  $.log.debug('(SmartField#_proposalTyped) updated oldSearchText=' + this._oldSearchText);
 };
 
 /**
@@ -226,13 +224,29 @@ scout.SmartField.prototype._onFieldBlur = function() {
  * even when the popup is not opened (this happens when the user types something which is not in the
  * list of proposals). We must accept the user defined text in that case.
  */
-scout.SmartField.prototype._acceptProposal = function() {
+scout.SmartField.prototype._acceptProposal = function(proposalSelected) {
   // must clear pending "proposalTyped" events because nothing good happens
   // when proposalTyped arrives _after_ an "acceptProposal" event.
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = null;
+
+  // Prevent that acceptProposal is sent when text has not changed at all
+  // for instance when the user tabs over the smartfield. However, we must
+  // still send cancelProposal to the server in case the proposal chooser
+  // is opened.
+  // proposalSelected is set to true, when user has opened the proposal
+  // chooser and presses TAB or ENTER to choose the selected row in the
+  // proposal table. The Java client will use the selected row as value
+  // when it receives the acceptProposal event in that case.
+  proposalSelected = scout.helpers.nvl(proposalSelected, false);
   var searchText = this._searchText();
   this.displayText = searchText;
+  if (!proposalSelected && searchText === this._oldSearchText) {
+    this._closeProposal(true);
+    return;
+  }
+  this._oldSearchText = searchText;
+
   $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText);
   this.session.send(this.id, 'acceptProposal', {
     searchText: searchText
