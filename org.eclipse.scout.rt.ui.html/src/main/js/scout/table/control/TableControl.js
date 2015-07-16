@@ -70,7 +70,7 @@ scout.TableControl.prototype.renderContent = function() {
 
   // do not set initial focus as form, form is not visible during animation of control container, otherwise browser might scroll document
   if (this.form) {
-    this.form.disableRenderInitialFocus = true;
+    this.form.renderInitialFocus = false;
   }
 
   if (!this.tableFooter.open) {

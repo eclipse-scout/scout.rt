@@ -88,7 +88,12 @@ scout.MessageBox.prototype._render = function($parent) {
   this.attached = true;
 };
 
+scout.MessageBox.prototype._postRender = function() {
+  this.$container.installFocusContext('auto', this.session.uiSessionId);
+};
+
 scout.MessageBox.prototype._remove = function() {
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
   this._modalityController.removeGlassPane();
   this.attached = false;
 
@@ -195,6 +200,7 @@ scout.MessageBox.prototype.attach = function() {
   }
 
   this._$parent.append(this.$container);
+  this.$container.installFocusContext('auto', this.session.uiSessionId);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
@@ -222,6 +228,7 @@ scout.MessageBox.prototype.detach = function() {
   }
 
   this.session.detachHelper.beforeDetach(this.$container);
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
   this.$container.detach();
 
   this.attached = false;

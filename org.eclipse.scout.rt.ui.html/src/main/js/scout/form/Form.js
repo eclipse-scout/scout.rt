@@ -8,7 +8,7 @@ scout.Form = function() {
   this._modalityController;
 
   this.attached = false; // Indicates whether this Form is currently visible to the user.
-  this.disableRenderInitialFocus = false; // Indicate whether this form should not render its initial focus.
+  this.renderInitialFocus = true; // Indicates whether this form should render its initial focus.
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -83,13 +83,12 @@ scout.Form.prototype._renderForm = function($parent) {
   }
 };
 
-scout.Form.prototype._renderProperties = function() {
-  if (!this.disableRenderInitialFocus) {
-    this.renderFocus();
-  }
-};
-
 scout.Form.prototype._postRender = function() {
+  this._installFocusContext();  // FIXME [dwi]: _installFocusContext should not automatically render initial focus.
+  if (this.renderInitialFocus) {
+    this._initialFocusControl().focus();
+  }
+
   // Render attached forms, message boxes and file choosers.
   this._formController.render();
   this._messageBoxController.render();
@@ -169,6 +168,7 @@ scout.Form.prototype.appendTo = function($parent) {
 scout.Form.prototype._remove = function() {
   // FIXME AWE: call displayTextChanged() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
+  this._uninstallFocusContext();
   this._modalityController.removeGlassPane();
   this.attached = false;
 
@@ -189,15 +189,6 @@ scout.Form.prototype._renderSubTitle = function() {
 
 scout.Form.prototype._renderIconId = function() {
   // TODO render icon
-};
-
-scout.Form.prototype.renderFocus = function(formField) {
-  formField = formField || this.session.getOrCreateModelAdapter(this.initialFocus);
-  if (formField) {
-    formField.$field.focus();
-  } else {
-    scout.focusManager.focusFirstElement(this.$container);
-  }
 };
 
 scout.Form.prototype._onFormClosed = function(event) {
@@ -263,6 +254,7 @@ scout.Form.prototype.attach = function() {
     htmlComp.setSize(htmlParent.getSize());
   }
 
+  this._installFocusContext();
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
@@ -303,9 +295,28 @@ scout.Form.prototype.detach = function() {
   this._fileChooserController.detach();
 
   this.session.detachHelper.beforeDetach(this.$container);
+  this._uninstallFocusContext();
   this.$container.detach();
 
   this.attached = false;
+};
+
+scout.Form.prototype._initialFocusControl = function() {
+  var initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
+  var $initialFocusControl = (initialFocusField ? initialFocusField.$field : null);
+  return $initialFocusControl || scout.focusManager.getFirstFocusableElement(this.$container);
+};
+
+scout.Form.prototype._installFocusContext = function() {
+  if (this.isDialog()) {
+    this.$container.installFocusContext('auto', this.session.uiSessionId);
+  }
+};
+
+scout.Form.prototype._uninstallFocusContext = function() {
+  if (this.isDialog()) {
+    this.$container.uninstallFocusContext(this.session.uiSessionId);
+  }
 };
 
 /**

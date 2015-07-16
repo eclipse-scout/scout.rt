@@ -33,37 +33,35 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 };
 
 scout.FocusManager.prototype.getFirstFocusableElement = function($container, $focusableElements) {
-  var focused = false;
   if (!$focusableElements) {
     $focusableElements = $container.find(':focusable');
   }
-  var firstDefaultButton, $firstButton;
-  for (var i = 0; i < $focusableElements.length; i++) {
-    var $focusableElement = $($focusableElements[i]);
-    var menuParents = $focusableElement.parents('div.menubar');
-    var tabParents = $focusableElement.parents('div.tab-area');
-    if (!firstDefaultButton && $($focusableElements[i]).is('.default-menu')) {
-      firstDefaultButton = $focusableElements[i];
+  var $firstDefaultButton, $firstButton, i, $candidate, $menuParents, $tabParents;
+
+  for (i = 0; i < $focusableElements.length; i++) {
+    $candidate = $($focusableElements[i]);
+
+    $menuParents = $candidate.parents('div.menubar');
+    $tabParents = $candidate.parents('div.tab-area');
+
+    if (!$firstDefaultButton && $candidate.is('.default-menu')) {
+      $firstDefaultButton = $candidate;
     }
-    if (!$firstButton && ($focusableElement.hasClass('button') || $focusableElement.hasClass('menu-item'))) {
-      $firstButton = $focusableElement;
-    } else if (menuParents.length === 0 && tabParents.length === 0  && typeof $focusableElements.get(i).focus === 'function') {
-      focused = true;
-      return $focusableElements.get(i);
+    if (!$firstButton && ($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
+      $firstButton = $candidate;
+    } else if (!$menuParents.length && !$tabParents.length && typeof $candidate.focus === 'function') {
+      return $candidate;
     }
   }
 
-  if (!focused) {
-    if (firstDefaultButton) {
-      return firstDefaultButton;
-    } else if ($firstButton) {
-      return $firstButton;
-    } else if ($focusableElements && $focusableElements.length > 0) {
-      return $focusableElements.first();
-    } else {
-      //if nothing is found to focus then focus root container
-      return $container;
-    }
+  if ($firstDefaultButton) {
+    return $firstDefaultButton;
+  } else if ($firstButton) {
+    return $firstButton;
+  } else if ($focusableElements && $focusableElements.length > 0) {
+    return $focusableElements.first();
+  } else {
+    return $container; // no focusable element found -> return container as focusable element.
   }
 };
 
@@ -114,11 +112,11 @@ scout.FocusManager.prototype.installFocusContext = function($container, uiSessio
 };
 
 scout.FocusManager.prototype.disposeActiveFocusContext = function(uiSessionId) {
-  //get last focus context and dispose it
-  var oldFocusContext = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
-  if (oldFocusContext) {
-    //dispose old
-    oldFocusContext.dispose();
+  var focusContexts = this._sessionFocusContexts[uiSessionId].focusContexts;
+  var activeFocusContext = focusContexts[focusContexts.length - 1]; // the active 'focus context' is top on stack.
+
+  if (activeFocusContext) {
+    activeFocusContext.dispose();
   }
 };
 
@@ -130,6 +128,7 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContext) {
   }
   focusContexts.push(focusContext);
 };
+
 scout.FocusManager.prototype.uninstallFocusContextForContainer = function($container, uiSessionId) {
   $.log.trace('focuscontext for container started');
   var focusContext = this._findFocusContext($container, uiSessionId);
@@ -240,23 +239,23 @@ scout.FocusContext.prototype.handleTab = function(event) {
   if (event.which === scout.keys.TAB) {
     var activeElement = document.activeElement;
     var $focusableElements = this._$container.find(':tabbable');
-    var $firstFocusableElement = $focusableElements.first();
-    var $lastFocusableElement = $focusableElements.last();
+    var firstFocusableElement = $focusableElements.first()[0];
+    var lastFocusableElement = $focusableElements.last()[0];
 
-    // Forward (TAB)
+    // Forward Tab
     if (!event.shiftKey) {
       // If the last focusable element is focused, or the focus is on the container, set the focus to the first focusable element
-      if ($firstFocusableElement[0] && (activeElement === $lastFocusableElement[0] || activeElement === this._$container[0]) && scout.focusManager.active) {
+      if (firstFocusableElement && (activeElement === lastFocusableElement || activeElement === this._$container[0]) && scout.focusManager.active) {
         $.suppressEvent(event);
-        $firstFocusableElement[0].focus();
+        firstFocusableElement.focus();
       }
     }
-    // Backward (Shift+TAB)
+    // Backward Tab (Shift+TAB)
     else {
       // If the first focusable element is focused, or the focus is on the container, set the focus to the last focusable element
-      if ($lastFocusableElement[0] && (activeElement === this._$container[0] || activeElement === $firstFocusableElement[0]) && scout.focusManager.active) {
+      if (lastFocusableElement && (activeElement === this._$container[0] || activeElement === firstFocusableElement) && scout.focusManager.active) {
         $.suppressEvent(event);
-        $lastFocusableElement[0].focus();
+        lastFocusableElement.focus();
       }
     }
   }
