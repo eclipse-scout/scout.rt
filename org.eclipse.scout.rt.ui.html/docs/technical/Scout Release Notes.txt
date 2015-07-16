@@ -468,3 +468,6 @@ Migration:
 - Rename ITree.getConfiguredIconId() to ITree.getConfiguredDefaultIconId() if you want to
   specify a default icon for all tree nodes. Otherwise, remove it entirely. The old methods
   are still provided for convenience, but will be removed in the next release.
+
+MOT 16.07.2015:
+- AbstractColumn.execPrepareEdit(ITableRow) must not return null anymore use Cell.setEditable(boolean) instead.
