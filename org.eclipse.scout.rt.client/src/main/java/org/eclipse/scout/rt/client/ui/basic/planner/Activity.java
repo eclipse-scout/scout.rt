@@ -70,7 +70,7 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   /**
    * String
    */
-  public static final int CSS_CLASS_BIT = 9;
+  public static final int CSS_CLASS_BIT = 10;
 
   /**
    * int
