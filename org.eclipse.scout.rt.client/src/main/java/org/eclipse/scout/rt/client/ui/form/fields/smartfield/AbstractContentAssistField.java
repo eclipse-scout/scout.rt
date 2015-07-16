@@ -942,7 +942,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       currentLookupRow = getCurrentLookupRow();
       if (currentLookupRow != null) {
         String currentLookupRowText = StringUtility.nullIfEmpty(currentLookupRow.getText());
-        if (!StringUtility.emptyIfNull(currentLookupRowText).equals(StringUtility.emptyIfNull(text))) {
+        if (!StringUtility.equalsIgnoreNewLines(currentLookupRowText, text)) {
           currentLookupRow = null;
           setCurrentLookupRow(null);
         }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -70,6 +71,25 @@ public class SmartFieldMultilineTest {
     m_smartField.setMultilineText(true);
     m_smartField.setValue(1L);
     assertEquals("Line1\nLine2", m_smartField.getDisplayText());
+  }
+
+  /**
+   * Tests if the text of a multiline lookup row which is the currentLookupRow
+   * matches the displayText of the field. Otherwise we'd always get a validation
+   * error for this field, even when the user has just selected a valid proposal
+   * from the proposal chooser.
+   */
+  @Test
+  public void testMultiLine_DisplayTextMatchesCurrentLookupRow() throws ProcessingException {
+    m_smartField.setMultilineText(true);
+    m_smartField.setValue(1L);
+    assertEquals("Line1\nLine2", m_smartField.getDisplayText());
+
+    m_smartField.getUIFacade().acceptProposalFromUI("Line1 Line2");
+    // if multi line texts are not handled correctly the currentLookupRow would be
+    // set to null in AbstractContentAssistField#parseValueInternal()
+    assertNotNull(m_smartField.getCurrentLookupRow());
+    assertEquals(1L, m_smartField.getCurrentLookupRow().getKey().longValue());
   }
 
   private static class SmartField extends AbstractSmartField<Long> {
