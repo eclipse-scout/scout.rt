@@ -325,14 +325,7 @@ scout.Form.prototype._uninstallFocusContext = function() {
  * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Form as its 'displayParent'.
  */
 scout.Form.prototype.modalityElements = function() {
-  var elements = [this.$container];
-  if (this.isView()) {
-    var viewTab = this.session.desktop.viewTabsController.viewTab(this);
-    if (viewTab) {
-      elements.push(viewTab.$container);
-    }
-  }
-  return elements;
+  return [this.$container];
 };
 
 /**
