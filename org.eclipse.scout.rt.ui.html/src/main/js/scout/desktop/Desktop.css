@@ -400,11 +400,6 @@
 .offline-message {
   padding: 10px;
 
-  & > .reconnect {
-    display: inline-block;
-    float: right;
-  }
-
   & > .reconnect-animated::before {
     .animation(rotation 0.9s linear infinite);
     content: '';

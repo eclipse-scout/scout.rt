@@ -55,7 +55,7 @@ scout.BaseDesktop.prototype._goOffline = function() {
 
   this.$offlineNotification = $.makeDiv('notification error');
   this._$offlineMessage = this.$offlineNotification.appendDiv('notification-content offline-message');
-  this._$offlineMessage
+  this._$offlineMessage.appendDiv('offline-message-text')
     .text(this.session.text('ui.ConnectionInterrupted'));
   var $reconnect = this._$offlineMessage.appendDiv('reconnect');
   $reconnect
@@ -83,6 +83,7 @@ scout.BaseDesktop.prototype.onReconnecting = function() {
   if (!this.offline) {
     return;
   }
+  this._$offlineMessage.children('.offline-message-text').hide();
   this._$offlineMessage.children('.reconnect').show();
 };
 
@@ -104,4 +105,5 @@ scout.BaseDesktop.prototype.onReconnectingFailed = function() {
     return;
   }
   this._$offlineMessage.children('.reconnect').hide();
+  this._$offlineMessage.children('.offline-message-text').show();
 };
