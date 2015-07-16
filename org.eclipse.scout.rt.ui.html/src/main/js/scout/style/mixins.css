@@ -18,6 +18,10 @@
   box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
 }
 
+.drop-shadow-large() {
+  .drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: 0.5);
+}
+
 .focus-border(@bordersize: 1px) {
   outline: none;
   border: @bordersize solid @focus-border-color;
@@ -34,6 +38,13 @@
   -webkit-transform: @args;
   -ms-transform: @args;
   transform: @args;
+}
+
+.transform-origin(@args) {
+  -webkit-transform-origin: @args;
+  -moz-transform-origin: @args;
+  -ms-transform-origin: @args;
+  transform-origin: @args;
 }
 
 .text-selection() {

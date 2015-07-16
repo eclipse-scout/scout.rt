@@ -2,6 +2,7 @@
  * Controller to paint a glassPane over the given element like Form, message box or file chooser.
  */
 scout.ModalityController = function(element) {
+  this._element = element;
   this._displayParent = element.parent || element.session.desktop; // the logical parent which the given element is attached to.
   this._session = element.session;
   this._$glassPanes = [];
@@ -23,7 +24,8 @@ scout.ModalityController.prototype.addGlassPane = function() {
   this._displayParent.modalityElements().forEach(function($modalityElement) {
     var $glassPane = scout.fields.new$Glasspane(this._session.uiSessionId);
     this._$glassPanes.push($glassPane);
-    $glassPane.appendTo($modalityElement);
+    $glassPane.on('mousedown', this._onMousedown.bind(this))
+      .appendTo($modalityElement);
   }, this);
 };
 
@@ -38,4 +40,15 @@ scout.ModalityController.prototype.removeGlassPane = function() {
   this._$glassPanes.forEach(function($glassPane) {
     $glassPane.fadeOutAndRemove();
   }, this);
+};
+
+scout.ModalityController.prototype._onMousedown = function(event) {
+  var $glassPane = $(event.target);
+
+  this._element.$container.addClass('modality-highlight');
+  setTimeout(function() {
+    // remove shown as well, otherwise 'shown' animation will be executed
+    this._element.$container.removeClass('modality-highlight shown');
+    // timeout must be greater than css animation duration
+  }.bind(this), 500);
 };

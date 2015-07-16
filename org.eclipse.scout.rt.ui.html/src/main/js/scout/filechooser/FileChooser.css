@@ -3,7 +3,7 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  .drop-shadow;
+  .drop-shadow-large();
   border-top: 5px solid @active-color;
   border-radius: @border-radius;
 
@@ -58,5 +58,9 @@
   &.shown {
     .animation-name(fade-slidein-top);
     .animation-duration(0.5s);
+  }
+
+  &.modality-highlight {
+    .animation-shake();
   }
 }
