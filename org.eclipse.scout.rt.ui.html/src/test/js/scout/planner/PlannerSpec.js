@@ -29,7 +29,16 @@ describe("Planner", function() {
       id: scout.createUniqueId(),
       resourceCell: {
         text: text
-      }
+      },
+      activities: [ {
+          beginTime: '2015-04-01 01:23:45.678Z',
+          endTime: '2015-04-31 01:23:45.678Z',
+          id: scout.createUniqueId()
+        }, {
+          beginTime: '2016-02-29 01:23:45.678Z',
+          endTime: '2400-02-29 01:23:45.678Z',
+          id: scout.createUniqueId()
+        } ]
     };
   }
 
@@ -58,17 +67,23 @@ describe("Planner", function() {
       expect(planner.resources.length).toBe(3);
       expect(planner.resources[0]).toBe(resource0);
       expect(Object.keys(planner.resourceMap).length).toBe(3);
+      expect(Object.keys(planner.activityMap).length).toBe(2 * 3);
       expect(planner.resourceMap[resource0.id]).toBe(resource0);
+      expect(planner.activityMap[resource0.activities[0].id]).toBe(resource0.activities[0]);
 
       planner._deleteResources([resource0]);
       expect(planner.resources.length).toBe(2);
       expect(planner.resources[0]).toBe(resource1);
       expect(Object.keys(planner.resourceMap).length).toBe(2);
+      expect(Object.keys(planner.activityMap).length).toBe(2 * 2);
       expect(planner.resourceMap[resource0.id]).toBeUndefined();
+      expect(planner.activityMap[resource0.activities[0].id]).toBeUndefined();
 
       planner._deleteResources([resource1, resource2]);
       expect(Object.keys(planner.resourceMap).length).toBe(0);
+      expect(Object.keys(planner.activityMap).length).toBe(0);
       expect(planner.resourceMap.length).toBe(0);
+      expect(planner.activityMap.length).toBe(0);
     });
 
     it("deletes resources from html document", function() {

@@ -14,7 +14,9 @@ scout.tooltips = {
 
 scout.TooltipSupport = function(options) {
   var defaultOptions = {
-    tooltipDelay: 350
+    selector: null,
+    tooltipDelay: 350,
+    tooltipText: undefined
   };
   options = $.extend({}, defaultOptions, options);
   this._options = options;
@@ -28,8 +30,8 @@ scout.TooltipSupport.prototype.install = function($comp) {
   // prevent multiple installation of tooltip support
   if (!$comp.data('tooltipSupport')) {
     $comp
-      .on('mouseenter', this._mouseEnterHandler)
-      .on('mouseleave', this._mouseLeaveHandler)
+      .on('mouseenter', this._options.selector, this._mouseEnterHandler)
+      .on('mouseleave', this._options.selector, this._mouseLeaveHandler)
       .data('tooltipSupport', this);
   }
 };
@@ -37,8 +39,8 @@ scout.TooltipSupport.prototype.install = function($comp) {
 scout.TooltipSupport.prototype.uninstall = function($comp) {
   $comp
     .removeData('tooltipSupport')
-    .off('mouseleave', this._mouseLeaveHandler)
-    .off('mouseenter', this._onMouseEnterHandler);
+    .off('mouseleave', this._options.selector, this._mouseLeaveHandler)
+    .off('mouseenter', this._options.selector, this._onMouseEnterHandler);
   this._removeTooltip();
 };
 
@@ -61,17 +63,19 @@ scout.TooltipSupport.prototype._removeTooltip = function() {
 };
 
 scout.TooltipSupport.prototype._showTooltip = function($comp) {
-  var text = this._options.text,
-    tooltipTextData = $comp.data('tooltipText');
+  var text, tooltipTextData = this._options.tooltipText || $comp.data('tooltipText');
   if ($.isFunction(tooltipTextData)) {
     text = tooltipTextData($comp);
+    if (text === undefined) {
+      return; // function may decide not to show a tooltip
+    }
   } else if (tooltipTextData) {
     text = tooltipTextData;
   }
 
   if (this._tooltip && this._tooltip.rendered) {
     // update existing tooltip
-    this.tooltip.renderText(text);
+    this._tooltip.renderText(text);
   }
   else {
     // create new tooltip

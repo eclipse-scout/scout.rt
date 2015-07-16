@@ -4,6 +4,7 @@
 scout.Planner = function() {
   scout.Planner.parent.call(this);
   this.resourceMap = [];
+  this.activityMap = [];
 
   // visual
   this._resourceTitleWidth = 20;
@@ -93,6 +94,7 @@ scout.Planner.prototype._initActivity = function(activity) {
   activity.beginTime = scout.dates.parseJsonDate(activity.beginTime);
   activity.endTime = scout.dates.parseJsonDate(activity.endTime);
   scout.defaultValues.applyTo(activity, 'Activity');
+  this.activityMap[activity.id] = activity;
 };
 
 scout.Planner.prototype._render = function($parent) {
@@ -114,6 +116,13 @@ scout.Planner.prototype._render = function($parent) {
     .on('contextmenu', '.planner-activity', this._onActivityContextMenu.bind(this));
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render(this.$container);
+
+  scout.tooltips.install(this.$grid, {
+    selector: '.planner-activity',
+    tooltipText: function($comp) {
+      return this._activityById($comp.attr('data-id')).tooltipText;
+      }.bind(this)
+  });
 
   // scrollbars
   scout.scrollbars.install(this.$grid, this.session);
@@ -555,16 +564,16 @@ scout.Planner.prototype._build$Resource = function(resource) {
 };
 
 scout.Planner.prototype._renderActivititesForResource = function(resource) {
-  var $activity;
+  var activityHtml = '';
   resource.activities.forEach(function(activity) {
     if (activity.beginTime.valueOf() >= this.endScale ||
         activity.endTime.valueOf() <= this.beginScale) {
       // don't add activities which are not in the view range
       return;
     }
-    $activity = this._build$Activity(activity);
-    $activity.appendTo(resource.$cells);
+    activityHtml += this._buildActivityHtml(activity);
   }, this);
+  resource.$cells.html(activityHtml);
 };
 
 scout.Planner.prototype._removeActivititesForResource = function(resource) {
@@ -576,10 +585,8 @@ scout.Planner.prototype._removeActivititesForResource = function(resource) {
   }, this);
 };
 
-scout.Planner.prototype._build$Activity = function(activity) {
-  var i,
-    $activity = $.makeDiv('planner-activity'),
-    level = 100 - Math.min(activity.level * 100, 100),
+scout.Planner.prototype._buildActivityHtml = function(activity) {
+  var i, level = 100 - Math.min(activity.level * 100, 100),
     levelColor = scout.helpers.modelToCssColor(activity.levelColor),
     begin = activity.beginTime.valueOf(),
     end = activity.endTime.valueOf();
@@ -588,28 +595,24 @@ scout.Planner.prototype._build$Activity = function(activity) {
   begin = Math.max(begin, this.beginScale);
   end = Math.min(end, this.endScale);
 
-  $activity.text(activity.text)
-    .data('activity', activity)
-    .css('left', 'calc(' + this.transformLeft(begin) + '% + 2px)')
-    .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px');
+  var activityCssClass = 'planner-activity' + (activity.cssClass ? (' ' + activity.cssClass) : '');
+  var activityStyle = 'left: ' + 'calc(' + this.transformLeft(begin) + '% + 2px);';
+  activityStyle += ' width: ' + 'calc(' + this.transformWidth(end - begin) + '% - 4px);';
 
-  if (activity.cssClass) {
-    $activity.addClass(activity.cssClass);
-  }
   if (levelColor) {
-    $activity.css('background-color', levelColor);
-    $activity.css('border-color', levelColor);
+    activityStyle += ' background-color: ' + levelColor + ';';
+    activityStyle += ' border-color: ' + levelColor + ';';
   }
+
   // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
-  $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
+  activityStyle += ' background-image: ' + 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% );';
 
-  if (activity.tooltipText) {
-    $activity.data('tooltipText', activity.tooltipText);
-    this._tooltipSupport.install($activity);
-  }
-
-  activity.$activity = $activity;
-  return $activity;
+  var activityHtml = '<div';
+  activityHtml += ' class="' + activityCssClass + '"';
+  activityHtml += ' style="' + activityStyle + '"';
+  activityHtml += ' data-id="' + activity.id + '"';
+  activityHtml += '>' + scout.strings.encode(activity.text || '') + '</div>';
+  return activityHtml;
 };
 
 /* -- selector -------------------------------------------------- */
@@ -995,6 +998,10 @@ scout.Planner.prototype._resourcesByIds = function(ids) {
   return ids.map(this._resourceById.bind(this));
 };
 
+scout.Planner.prototype._activityById = function(id) {
+  return this.activityMap[id];
+};
+
 scout.Planner.prototype._resourceById = function(id) {
   return this.resourceMap[id];
 };
@@ -1113,6 +1120,10 @@ scout.Planner.prototype._deleteResources = function(resources) {
     scout.arrays.remove(this.resources, resource);
     delete this.resourceMap[resource.id];
 
+    resource.activities.forEach(function(activity) {
+      delete this.activityMap[activity.id];
+    }.bind(this));
+
     // Update HTML
     if (this.rendered) {
       resource.$resource.remove();
@@ -1133,6 +1144,7 @@ scout.Planner.prototype._deleteAllResources = function() {
   // Update model
   this.resources = [];
   this.resourceMap = {};
+  this.activityMap = {};
   this.selectResources([], false);
   this.selectRange({}, false);
 };
