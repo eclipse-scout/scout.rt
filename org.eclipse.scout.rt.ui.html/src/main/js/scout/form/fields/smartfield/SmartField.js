@@ -127,12 +127,13 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     return;
   }
 
-  if (e.which === scout.keys.ENTER ||
-      e.which === scout.keys.TAB) {
+  // We must not deal with TAB key here, because
+  // this is already handled by _onFieldBlur()
+  if (e.which === scout.keys.ENTER) {
     if (this._popup.rendered) {
       e.stopPropagation();
     }
-    this._acceptProposal(true);
+    this._acceptProposal();
     return;
   }
 
@@ -218,13 +219,12 @@ scout.SmartField.prototype._onFieldBlur = function() {
 };
 
 /**
- * This method is called when the user presses the TAB or ENTER key in the UI.
- * onFieldBlur is also executed, but won't do anything, since the popup is already closed in the UI.
- * In case the smart-field is a proposal-field we must send the current searchText to the server,
- * even when the popup is not opened (this happens when the user types something which is not in the
- * list of proposals). We must accept the user defined text in that case.
+ * This method is called when the user presses the TAB or ENTER key in the UI, or when _onFieldBlur()
+ * or displayTextChanged(). In case the field is a proposal-field we must send the current searchText
+ * to the server, even when the popup is not opened (this happens when the user types something which
+ * is not in the list of proposals). We must accept the user defined text in that case.
  */
-scout.SmartField.prototype._acceptProposal = function(proposalSelected) {
+scout.SmartField.prototype._acceptProposal = function() {
   // must clear pending "proposalTyped" events because nothing good happens
   // when proposalTyped arrives _after_ an "acceptProposal" event.
   clearTimeout(this._sendTimeoutId);
@@ -234,14 +234,15 @@ scout.SmartField.prototype._acceptProposal = function(proposalSelected) {
   // for instance when the user tabs over the smartfield. However, we must
   // still send cancelProposal to the server in case the proposal chooser
   // is opened.
-  // proposalSelected is set to true, when user has opened the proposal
+
+  // proposalChooserOpen is set to true, when user has opened the proposal
   // chooser and presses TAB or ENTER to choose the selected row in the
   // proposal table. The Java client will use the selected row as value
   // when it receives the acceptProposal event in that case.
-  proposalSelected = scout.helpers.nvl(proposalSelected, false);
-  var searchText = this._searchText();
+  var proposalChooserOpen = this._popup.rendered,
+    searchText = this._searchText();
   this.displayText = searchText;
-  if (!proposalSelected && searchText === this._oldSearchText) {
+  if (!proposalChooserOpen && searchText === this._oldSearchText) {
     this._closeProposal(true);
     return;
   }
@@ -276,15 +277,8 @@ scout.SmartField.prototype._searchText = function() {
  * size and resize the popup later when proposals are available.
  */
 scout.SmartField.prototype._openProposal = function(searchText, selectCurrentValue) {
-  // A proposal-field (PF) has a slightly different behavior than a smart-field (SF):
-  // When the typed proposal doesn't match a proposal from the list, the popup
-  // is closed. The smart-field would stay open in that case. The SF also opens the
-  // popup _before_ we send a request to the server (-> more responsive UI)
   $(document).on('mousedown', this._mouseDownListener);
-  if (!this.proposal) {
-    // FIXME AWE: das hier ausbauen und Lupe-Icon durch Loading-Icon austauschen während laden
-    // this._renderPopup();
-  }
+  // FIXME AWE: Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
   if (!this._requestedProposal) {
     this._requestedProposal = true;
     this.session.send(this.id, 'openProposal', {
