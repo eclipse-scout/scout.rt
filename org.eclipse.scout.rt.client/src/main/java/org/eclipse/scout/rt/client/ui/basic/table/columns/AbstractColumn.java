@@ -606,7 +606,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *
    * @param row
    *          on which editing occurs
-   * @return a field for editing or null to install an empty cell editor.
+   * @return a field for editing.
    */
   @ConfigOperation
   @Order(61)
