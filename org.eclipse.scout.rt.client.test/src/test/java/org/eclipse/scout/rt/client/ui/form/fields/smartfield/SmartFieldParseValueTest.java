@@ -44,18 +44,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- *
- */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-@SuppressWarnings("deprecation")
 public class SmartFieldParseValueTest {
 
   private static List<IBean<?>> m_beans;
 
-  private SmartField m_smartField;
+  private AbstractSmartField m_smartField;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -148,13 +144,12 @@ public class SmartFieldParseValueTest {
 
   public static class P_LookupCall extends LookupCall<Long> {
 
-    private static final long serialVersionUID = -7536271824820806283L;
+    private static final long serialVersionUID = 1;
 
     @Override
     protected ILookupService<Long> createLookupService() {
       return new P_LookupService();
     }
-
   }
 
   public static class P_LookupService implements ILookupService<Long> {

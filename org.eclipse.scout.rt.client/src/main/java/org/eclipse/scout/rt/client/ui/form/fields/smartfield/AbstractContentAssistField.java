@@ -1432,6 +1432,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return proposalChooser != null && proposalChooser.getAcceptedProposal() != null;
   }
 
+  /**
+   * @return True if the currentLookupRow is == EMPTY_LOOKUP_ROW.
+   */
+  protected boolean isEmptyLookupRow() {
+    return getCurrentLookupRow() == EMPTY_LOOKUP_ROW;
+  }
+
   protected void unregisterProposalChooserInternal() {
     if (isProposalChooserRegistered()) {
       getProposalChooser().dispose();

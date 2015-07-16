@@ -80,7 +80,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
     if (row != null && row.isEnabled()) {
       return row;
     }
-    else if (m_allowCustomText) {
+    else if (m_allowCustomText || isBrowseAll()) {
       return null;
     }
     else {
@@ -93,6 +93,17 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   protected abstract ILookupRow<LOOKUP_KEY> execGetSingleMatch();
 
   protected abstract void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount);
+
+  /**
+   * Returns true when search text is "browse all" (*). This is required to avoid a problem where we have a lookup
+   * call that returns only a single row. If execSingleMatch() would apply in that case it wouldn't be possible
+   * to set the field to null, because the single match is always selected automatically.
+   *
+   * @return
+   */
+  protected boolean isBrowseAll() {
+    return IContentAssistField.BROWSE_ALL_TEXT.equals(getSearchText());
+  }
 
   @Override
   public String getSearchText() {

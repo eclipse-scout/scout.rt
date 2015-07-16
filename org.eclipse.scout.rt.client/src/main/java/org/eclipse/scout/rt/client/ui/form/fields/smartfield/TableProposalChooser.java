@@ -115,19 +115,20 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();
     }
-
     try {
       // populate table
       m_model.setTableChanging(true);
       m_model.setLookupRows(CollectionUtility.truncateList(rows, maxCount));
       try {
-        //restore selection
+        // restore selection
         LOOKUP_KEY keyToSelect = null;
         if (selectCurrentValue) {
           m_lastSelectedKey = m_contentAssistField.getValueAsLookupKey();
           keyToSelect = m_lastSelectedKey;
         }
-        else if (rows.size() == 1 && !isAllowCustomText()) {
+        else if (rows.size() == 1
+            && !isAllowCustomText()
+            && !isBrowseAll()) {
           // select first
           keyToSelect = CollectionUtility.firstElement(rows).getKey();
         }
