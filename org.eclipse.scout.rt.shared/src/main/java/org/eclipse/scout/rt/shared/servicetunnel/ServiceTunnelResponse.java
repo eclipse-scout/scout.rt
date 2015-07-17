@@ -28,6 +28,14 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private List<ClientNotificationMessage> m_notifications;
   private String m_userId;
 
+  public ServiceTunnelResponse(Throwable t) {
+    this(null, null, t);
+  }
+
+  public ServiceTunnelResponse(Object data, Object[] outVars) {
+    this(data, outVars, null);
+  }
+
   public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
     m_data = data;
     m_outVars = outVars;
@@ -50,11 +58,12 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   }
 
   @Override
-  public Long getProcessingDuration() {
+  public synchronized Long getProcessingDuration() {
     return m_processingDuration;
   }
 
-  public void setProcessingDuration(Long millis) {
+  @Override
+  public synchronized void setProcessingDuration(Long millis) {
     m_processingDuration = millis;
   }
 

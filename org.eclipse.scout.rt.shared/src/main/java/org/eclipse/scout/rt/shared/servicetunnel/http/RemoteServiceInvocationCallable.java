@@ -80,7 +80,7 @@ public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelR
       final int httpStatusCode = (m_urlConnection instanceof HttpURLConnection ? ((HttpURLConnection) m_urlConnection).getResponseCode() : 200);
       m_tunnel.preprocessHttpResponse(m_urlConnection, m_serviceRequest, httpStatusCode);
       if (httpStatusCode != 0 && (httpStatusCode < 200 || httpStatusCode > 299)) {
-        return new ServiceTunnelResponse(null, null, new HttpException(httpStatusCode)); // request failed
+        return new ServiceTunnelResponse(new HttpException(httpStatusCode)); // request failed
       }
 
       try (InputStream in = m_urlConnection.getInputStream()) {

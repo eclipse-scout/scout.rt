@@ -188,7 +188,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     }
     Object data = ServiceUtility.invoke(serviceOp, service, serviceRequest.getArgs());
     Object[] outParameters = ServiceUtility.extractHolderArguments(serviceRequest.getArgs());
-    IServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters, null);
+    IServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
     serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());
     serializeServiceResponse(serviceResponse);
   }
@@ -224,7 +224,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
-        return new DefaultTransactionDelegate(isDebug()).invoke(serviceTunnelRequest);
+        return BEANS.get(DefaultTransactionDelegate.class).invoke(serviceTunnelRequest);
       }
     }, BEANS.get(ExceptionTranslator.class));
   }

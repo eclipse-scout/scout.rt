@@ -52,7 +52,7 @@ public class ServiceTunnelServletCall extends Thread {
       m_res = contentHandler.readResponse(conn.getInputStream());
     }
     catch (Throwable e) {
-      m_res = new ServiceTunnelResponse(null, null, e);
+      m_res = new ServiceTunnelResponse(e);
     }
   }
 }

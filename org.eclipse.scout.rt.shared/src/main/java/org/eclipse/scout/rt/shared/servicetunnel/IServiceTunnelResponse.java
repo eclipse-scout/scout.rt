@@ -28,6 +28,8 @@ public interface IServiceTunnelResponse extends Serializable {
 
   Long getProcessingDuration();
 
+  void setProcessingDuration(Long millis);
+
   List<ClientNotificationMessage> getNotifications();
 
   void setNotifications(List<ClientNotificationMessage> notifications);

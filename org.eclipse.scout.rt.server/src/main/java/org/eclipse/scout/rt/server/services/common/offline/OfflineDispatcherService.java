@@ -53,14 +53,14 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       BEANS.get(RunMonitorCancelRegistry.class).register(session, requestId, runMonitor);
       try {
         IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-        return (serviceResponse != null ? serviceResponse : new ServiceTunnelResponse(null, null, new InterruptedException("Result from handler was null")));
+        return (serviceResponse != null ? serviceResponse : new ServiceTunnelResponse(new InterruptedException("Result from handler was null")));
       }
       finally {
         BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestId);
       }
     }
     catch (final Exception e) {
-      return new ServiceTunnelResponse(null, null, e);
+      return new ServiceTunnelResponse(e);
     }
   }
 
@@ -87,9 +87,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
         final Object result = ServiceUtility.invoke(serviceOperation, service, serviceArgs);
         final Object[] outParams = ServiceUtility.extractHolderArguments(serviceArgs);
 
-        final ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(result, outParams, null);
-
-        return serviceResponse;
+        return new ServiceTunnelResponse(result, outParams);
       }
     }, BEANS.get(ExceptionTranslator.class));
   }

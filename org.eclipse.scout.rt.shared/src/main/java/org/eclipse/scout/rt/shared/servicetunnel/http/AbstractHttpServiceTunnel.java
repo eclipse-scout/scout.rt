@@ -224,11 +224,11 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
       if (e.isInterruption() && !monitor.isCancelled()) {
         monitor.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted.
       }
-      serviceResponse = new ServiceTunnelResponse(null, null, e);
+      serviceResponse = new ServiceTunnelResponse(e);
     }
 
     if (monitor.isCancelled()) {
-      serviceResponse = new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
+      serviceResponse = new ServiceTunnelResponse(new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
     }
 
     return serviceResponse;

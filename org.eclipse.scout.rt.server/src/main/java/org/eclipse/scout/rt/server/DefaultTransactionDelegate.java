@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.service.IService;
@@ -60,21 +61,26 @@ import org.eclipse.scout.rt.shared.validate.OutputValidation;
  *   org.eclipse.scout.rt.server.validateOutput=false
  * </pre>
  */
+@ApplicationScoped
 public class DefaultTransactionDelegate {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTransactionDelegate.class);
 
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
-  private final boolean m_debug;
+  public DefaultTransactionDelegate() {
+    this(false);
+  }
 
+  /**
+   * @deprecated use DefaultTransactionDelegate, configure debug with logger configuration
+   */
+  @Deprecated
   public DefaultTransactionDelegate(boolean debug) {
-    m_debug = debug;
   }
 
   public IServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) throws Exception {
     long t0 = System.nanoTime();
-    long elapsedMillis;
 
     IServiceTunnelResponse response;
     try {
@@ -83,19 +89,14 @@ public class DefaultTransactionDelegate {
     catch (Throwable t) {
       ITransaction.CURRENT.get().addFailure(t);
       handleException(t, serviceReq);
-      response = new ServiceTunnelResponse(null, null, replaceOutboundException(t));
-    }
-    finally {
-      elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
+      response = new ServiceTunnelResponse(replaceOutboundException(t));
     }
 
-    if (m_debug) {
+    long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
+    if (LOG.isDebugEnabled()) {
       LOG.debug("TIME {}.{} {}ms", new Object[]{serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), elapsedMillis});
     }
-
-    if (response instanceof ServiceTunnelResponse) {
-      ((ServiceTunnelResponse) response).setProcessingDuration(elapsedMillis);
-    }
+    response.setProcessingDuration(elapsedMillis);
     return response;
   }
 
@@ -139,18 +140,17 @@ public class DefaultTransactionDelegate {
       Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       Object[] args = serviceReq.getArgs();
 
-      Object service = BEANS.get(serviceInterfaceClass);
-
-      checkServiceAccess(serviceInterfaceClass, serviceOp, service, args);
+      checkServiceAccess(serviceInterfaceClass, serviceOp, args);
       //
-      validateInput(serviceReq, serviceOp, service);
+      Object service = BEANS.get(serviceInterfaceClass);
+      validateInput(service, serviceOp, args);
       //
       Object data = ServiceUtility.invoke(serviceOp, service, args);
       Object[] outParameters = ServiceUtility.extractHolderArguments(args);
       //
       //filter output
-      validateOutput(serviceOp, service, data, outParameters);
-      serviceRes = new ServiceTunnelResponse(data, outParameters, null);
+      validateOutput(service, serviceOp, data, outParameters);
+      serviceRes = new ServiceTunnelResponse(data, outParameters);
       return serviceRes;
     }
     finally {
@@ -177,51 +177,23 @@ public class DefaultTransactionDelegate {
     }
   }
 
-  private void checkServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object service, Object[] args) {
-    checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, args);
+  /**
+   * Check, if the service can be accessed
+   */
+  protected void checkServiceAccess(Class<?> serviceInterfaceClass, Method serviceOp, Object[] args) {
+    Object service = BEANS.opt(serviceInterfaceClass);
     checkServiceAvailable(serviceInterfaceClass, service);
+    checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, args);
     checkRemoteServiceAccessByAnnotations(serviceInterfaceClass, service.getClass(), serviceOp, args);
     checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, args);
   }
 
-  private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
-    CallInspector callInspector = null;
-    SessionInspector sessionInspector = ProcessInspector.instance().getSessionInspector(serverSession, true);
-    if (sessionInspector != null) {
-      callInspector = sessionInspector.requestCallInspector(serviceReq);
-    }
-    return callInspector;
-  }
-
-  private void checkServiceAvailable(Class<?> serviceInterfaceClass, Object service) {
+  /**
+   * Check, if an instance is available
+   */
+  protected void checkServiceAvailable(Class<?> serviceInterfaceClass, Object service) {
     if (service == null) {
       throw new SecurityException("service registry does not contain a service of type " + serviceInterfaceClass.getName());
-    }
-  }
-
-  private void validateOutput(Method serviceOp, Object service, Object data, Object[] outParameters) throws Exception, InstantiationException, IllegalAccessException {
-    if (data != null || (outParameters != null && outParameters.length > 0)) {
-      Class<? extends IValidationStrategy> outputValidationStrategyClass = findOutputValidationStrategyByAnnotation(service, serviceOp);
-      if (outputValidationStrategyClass == null) {
-        outputValidationStrategyClass = findOutputValidationStrategyByPolicy(service, serviceOp);
-      }
-      if (outputValidationStrategyClass == null) {
-        throw new SecurityException("output validation failed");
-      }
-      validateOutput(outputValidationStrategyClass.newInstance(), service, serviceOp, data, outParameters);
-    }
-  }
-
-  private void validateInput(ServiceTunnelRequest serviceReq, Method serviceOp, Object service) throws Exception, InstantiationException, IllegalAccessException {
-    if (serviceReq.getArgs() != null && serviceReq.getArgs().length > 0) {
-      Class<? extends IValidationStrategy> inputValidationStrategyClass = findInputValidationStrategyByAnnotation(service, serviceOp);
-      if (inputValidationStrategyClass == null) {
-        inputValidationStrategyClass = findInputValidationStrategyByPolicy(service, serviceOp);
-      }
-      if (inputValidationStrategyClass == null) {
-        throw new SecurityException("input validation failed (no strategy defined)");
-      }
-      validateInput(inputValidationStrategyClass.newInstance(), service, serviceOp, serviceReq.getArgs());
     }
   }
 
@@ -306,6 +278,49 @@ public class DefaultTransactionDelegate {
       return;
     }
     throw new SecurityException("access denied (code 3a).");
+  }
+
+  private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
+    CallInspector callInspector = null;
+    SessionInspector sessionInspector = ProcessInspector.instance().getSessionInspector(serverSession, true);
+    if (sessionInspector != null) {
+      callInspector = sessionInspector.requestCallInspector(serviceReq);
+    }
+    return callInspector;
+  }
+
+  protected void validateInput(Object service, Method serviceOp, Object[] args) throws Exception, InstantiationException, IllegalAccessException {
+    if (isValidateInput() && args != null && args.length > 0) {
+      Class<? extends IValidationStrategy> validationStrategyClass = findInputValidationStrategyByAnnotation(service, serviceOp);
+      if (validationStrategyClass == null) {
+        validationStrategyClass = findInputValidationStrategyByPolicy(service, serviceOp);
+      }
+      if (validationStrategyClass == null) {
+        throw new SecurityException("input validation failed (no strategy defined)");
+      }
+      validateInput(validationStrategyClass.newInstance(), service, serviceOp, args);
+    }
+  }
+
+  protected boolean isValidateInput() {
+    return false;
+  }
+
+  protected void validateOutput(Object service, Method serviceOp, Object data, Object[] outParameters) throws Exception, InstantiationException, IllegalAccessException {
+    if (isValidateOutput() && data != null || (outParameters != null && outParameters.length > 0)) {
+      Class<? extends IValidationStrategy> validationStrategyClass = findOutputValidationStrategyByAnnotation(service, serviceOp);
+      if (validationStrategyClass == null) {
+        validationStrategyClass = findOutputValidationStrategyByPolicy(service, serviceOp);
+      }
+      if (validationStrategyClass == null) {
+        throw new SecurityException("output validation failed");
+      }
+      validateOutput(validationStrategyClass.newInstance(), service, serviceOp, data, outParameters);
+    }
+  }
+
+  protected boolean isValidateOutput() {
+    return false;
   }
 
   /**
