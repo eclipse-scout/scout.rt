@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -167,6 +168,10 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     boolean changed = propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
     calculateVisibleInternal();
     if (m_innerForm != null) {
+      Assertions.assertFalse(m_innerForm.isModal(), "Wrapped Form must not be modal");
+      Assertions.assertEqual(m_innerForm.getDisplayHint(), IForm.DISPLAY_HINT_VIEW, "Wrapped Form must be configured as view");
+      Assertions.assertFalse(m_innerForm.isShowOnStart(), "Wrapped Form must be configured with 'showOnStart=false'");
+
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
       if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) {
         m_innerForm.start();
@@ -184,6 +189,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     if (m_innerForm != null) {
       if (!m_innerForm.isFormStarted()) {
         m_innerForm.setModal(false);
+        m_innerForm.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
         m_innerForm.setShowOnStart(false);
       }
       m_innerForm.setWrapperFieldInternal(this);
