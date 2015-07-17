@@ -20,7 +20,7 @@ scout.Popup.prototype.render = function($parent, event) {
   scout.Popup.parent.prototype.render.call(this, $parent);
   this.openEvent = event;
   if (this.installFocusContext) {
-    this.$container.installFocusContextAsync('auto', this.session.uiSessionId);
+    this.$container.installFocusContextAsync(scout.FocusRule.AUTO, this.session.uiSessionId);
   }
   this._attachCloseHandler();
   this.position();

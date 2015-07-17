@@ -91,6 +91,8 @@ scout.Session = function($entryPoint, options) {
   scout.focusManager.installManagerForSession(this, options);
 };
 
+
+
 /**
  * Extracts custom parameters from URL: query string parameters and the url itself with key 'url'
  */
@@ -855,7 +857,7 @@ scout.Session.prototype._renderBusyGlasspane = function() {
     // (End workaround)
 
     if (this.desktop) {
-      this._$busyGlasspane.installFocusContext('auto', this.uiSessionId);
+      this._$busyGlasspane.installFocusContext(scout.FocusRule.AUTO, this.uiSessionId);
       this._busyIndicatorTimeoutId = setTimeout(function() {
         var busyIndicator = new scout.BusyIndicator(this);
         busyIndicator.on('buttonClick', function(event) {

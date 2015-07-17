@@ -76,7 +76,7 @@ scout.FileChooser.prototype._render = function($parent) {
 };
 
 scout.FileChooser.prototype._postRender = function() {
-  this.$container.installFocusContext('auto', this.session.uiSessionId);
+  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
 };
 
 scout.FileChooser.prototype._remove = function() {
@@ -175,7 +175,7 @@ scout.FileChooser.prototype.attach = function() {
   }
 
   this._$parent.append(this.$container);
-  this.$container.installFocusContext('auto', this.session.uiSessionId);
+  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {

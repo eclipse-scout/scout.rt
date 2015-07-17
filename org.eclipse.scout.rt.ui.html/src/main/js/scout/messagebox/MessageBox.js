@@ -88,7 +88,7 @@ scout.MessageBox.prototype._render = function($parent) {
 };
 
 scout.MessageBox.prototype._postRender = function() {
-  this.$container.installFocusContext('auto', this.session.uiSessionId);
+  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
 };
 
 scout.MessageBox.prototype._remove = function() {
@@ -199,7 +199,7 @@ scout.MessageBox.prototype.attach = function() {
   }
 
   this._$parent.append(this.$container);
-  this.$container.installFocusContext('auto', this.session.uiSessionId);
+  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {

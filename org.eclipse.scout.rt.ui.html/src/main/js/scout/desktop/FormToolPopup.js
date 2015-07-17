@@ -47,7 +47,7 @@ scout.FormToolPopup.prototype.attach = function() {
 
   this._attachCloseHandler();
   this._installKeyStrokeAdapter();
-  this.$container.installFocusContextAsync('auto', this.session.uiSessionId);
+  this.$container.installFocusContextAsync(scout.FocusRule.AUTO, this.session.uiSessionId);
 };
 
 scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {

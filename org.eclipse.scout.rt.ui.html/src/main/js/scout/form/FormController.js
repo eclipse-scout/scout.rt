@@ -27,9 +27,9 @@ scout.FormController.prototype.registerAndRender = function(formAdapterId) {
 scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
   if (form.displayHint === 'view') {
-    this._removeView(form, true);
+    this._removeView(form);
   } else {
-    this._removeDialog(form, true);
+    this._removeDialog(form);
   }
 };
 
@@ -82,6 +82,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   }
 
   dialog.render(this.session.desktop.$container);
+
   this._layoutDialog(dialog);
 
   // Only display the dialog if its 'displayParent' is visible to the user.
@@ -90,20 +91,16 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   }
 };
 
-scout.FormController.prototype._removeView = function(view, unregister) {
-  if (unregister) {
-    scout.arrays.remove(this._displayParent.views, view);
-  }
+scout.FormController.prototype._removeView = function(view) {
+  scout.arrays.remove(this._displayParent.views, view);
 
   if (view.rendered) {
     view.remove();
   }
 };
 
-scout.FormController.prototype._removeDialog = function(dialog, unregister) {
-  if (unregister) {
-    scout.arrays.remove(this._displayParent.dialogs, dialog);
-  }
+scout.FormController.prototype._removeDialog = function(dialog) {
+  scout.arrays.remove(this._displayParent.dialogs, dialog);
 
   if (dialog.rendered) {
     dialog.remove();

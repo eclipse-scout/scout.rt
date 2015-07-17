@@ -8,7 +8,7 @@ scout.Form = function() {
   this._modalityController;
 
   this.attached = false; // Indicates whether this Form is currently visible to the user.
-  this.renderInitialFocus = true; // Indicates whether this form should render its initial focus.
+  this.renderInitialFocusEnabled = true; // Indicates whether this form should render its initial focus.
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
@@ -83,9 +83,9 @@ scout.Form.prototype._renderForm = function($parent) {
 };
 
 scout.Form.prototype._postRender = function() {
-  this._installFocusContext();  // FIXME [dwi]: _installFocusContext should not automatically render initial focus.
-  if (this.renderInitialFocus) {
-    this._initialFocusControl().focus();
+  this._installFocusContext();
+  if (this.renderInitialFocusEnabled) {
+    this.renderInitialFocus();
   }
 
   // Render attached forms, message boxes and file choosers.
@@ -300,15 +300,16 @@ scout.Form.prototype.detach = function() {
   this.attached = false;
 };
 
-scout.Form.prototype._initialFocusControl = function() {
+scout.Form.prototype.renderInitialFocus = function() {
   var initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
   var $initialFocusControl = (initialFocusField ? initialFocusField.$field : null);
-  return $initialFocusControl || scout.focusManager.getFirstFocusableElement(this.$container);
+  $initialFocusControl = $initialFocusControl || scout.focusManager.getFirstFocusableElement(this.$container);
+  $initialFocusControl.focus();
 };
 
 scout.Form.prototype._installFocusContext = function() {
   if (this.isDialog()) {
-    this.$container.installFocusContext('auto', this.session.uiSessionId);
+    this.$container.installFocusContext(scout.FocusRule.NONE, this.session.uiSessionId);
   }
 };
 

@@ -33,12 +33,8 @@ scout.DetachHelper.prototype.afterAttach = function($container) {
 };
 
 scout.DetachHelper.prototype._storeFocus = function($container) {
-  var focusContext = scout.focusManager._sessionFocusContexts[this.session.uiSessionId].focusContexts[0];
-  if (!focusContext) {
-    return;
-  }
-  var $focusedElement = focusContext._$focusedElement;
-  if ($focusedElement) {
+  var $focusedElement = $container.find(':focus');
+  if ($focusedElement.length) {
     $container.data('lastFocus', $focusedElement);
     $.log.debug('Stored focused element =' + scout.graphics.debugOutput($focusedElement));
   }
