@@ -14,6 +14,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.junit.Test;
 
@@ -57,6 +59,32 @@ public class FinalValueTest {
     assertEquals(TEST_VALUE, value);
   }
 
+  @Test(expected = RuntimeException.class)
+  public void testLazySetWithException() throws Exception {
+    FinalValue<String> s = new FinalValue<>();
+    String value = s.setIfAbsent(new Callable<String>() {
+      @Override
+      public String call() throws Exception {
+        throw new Exception();
+      }
+    });
+    assertTestValue(s);
+    assertEquals(TEST_VALUE, value);
+  }
+
+  @Test(expected = MyRuntimeException.class)
+  public void testLazySetWithCustomException() {
+    FinalValue<String> s = new FinalValue<>();
+    String value = s.setIfAbsent(new Callable<String>() {
+      @Override
+      public String call() {
+        throw new MyRuntimeException();
+      }
+    });
+    assertTestValue(s);
+    assertEquals(TEST_VALUE, value);
+  }
+
   @Test
   public void testLazyDuplicateSet() throws Exception {
     FinalValue<String> s = new FinalValue<>();
@@ -69,5 +97,10 @@ public class FinalValueTest {
   private void assertTestValue(FinalValue<String> s) {
     assertTrue(s.isInitialized());
     assertEquals(TEST_VALUE, s.get());
+  }
+
+  class MyRuntimeException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
   }
 }

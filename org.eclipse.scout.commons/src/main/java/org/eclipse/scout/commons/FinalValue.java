@@ -90,6 +90,9 @@ public class FinalValue<VALUE> {
           m_value = producer.call();
           initialized = true;
         }
+        catch (RuntimeException e) {
+          throw e;
+        }
         catch (Exception e) {
           throw new RuntimeException(e);
         }
