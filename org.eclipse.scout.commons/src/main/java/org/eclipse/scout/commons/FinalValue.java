@@ -10,26 +10,98 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.util.concurrent.Callable;
+
+import org.eclipse.scout.commons.Assertions.AssertionException;
+
 /**
- *
+ * An effectively final value that can be lazily initialized.
  */
 public class FinalValue<VALUE> {
 
-  private VALUE m_value;
+  private volatile VALUE m_value;
+  private Object m_lock = new Object();
+  private volatile boolean initialized = false;
 
+  /**
+   * Create without initial value
+   */
   public FinalValue() {
   }
 
+  /**
+   * Create with initial value
+   */
   public FinalValue(VALUE value) {
-    m_value = value;
+    set(value);
   }
 
-  public void setValue(VALUE value) {
-    Assertions.assertNull(m_value, String.format("%s's can only be set once.", getClass().getSimpleName()));
-    m_value = value;
-  }
-
-  public VALUE getValue() {
+  /**
+   * @return the value or <code>null</code>, if not initialized.
+   */
+  public VALUE get() {
     return m_value;
+  }
+
+  /**
+   * Sets the value, if it is not initialized yet. Throws {@link AssertionException} otherwise.
+   *
+   * @param value
+   *          value to set
+   */
+  public void set(VALUE value) {
+    synchronized (m_lock) {
+      Assertions.assertFalse(initialized, String.format("%s's can only be set once.", getClass().getSimpleName()));
+      setIfAbsent(value);
+    }
+  }
+
+  /**
+   * Sets the value, if it is not already initialized.
+   *
+   * @return the current value.
+   */
+  public VALUE setIfAbsent(final VALUE value) {
+    return setIfAbsent(new Callable<VALUE>() {
+      @Override
+      public VALUE call() {
+        return value;
+      }
+    });
+  }
+
+  /**
+   * Compute the value with the producer, if it is not already initialized
+   *
+   * @param producer
+   *          to create a value, if not initialized
+   * @return the current value.
+   * @throws RuntimeException
+   *           if the producer throws an exception
+   */
+  public VALUE setIfAbsent(Callable<VALUE> producer) {
+    if (m_value != null) {
+      return m_value;
+    }
+
+    synchronized (m_lock) {
+      if (m_value == null) {
+        try {
+          m_value = producer.call();
+          initialized = true;
+        }
+        catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return m_value;
+    }
+  }
+
+  /**
+   * @return <code>true</code>, if it has been initialized.
+   */
+  public boolean isInitialized() {
+    return initialized;
   }
 }

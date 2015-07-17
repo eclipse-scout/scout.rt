@@ -62,11 +62,11 @@ public class ClientNotificationNodeQueue {
   }
 
   public void setNodeId(String nodeId) {
-    m_nodeId.setValue(nodeId);
+    m_nodeId.set(nodeId);
   }
 
   public String getNodeId() {
-    return m_nodeId.getValue();
+    return m_nodeId.get();
   }
 
   /**

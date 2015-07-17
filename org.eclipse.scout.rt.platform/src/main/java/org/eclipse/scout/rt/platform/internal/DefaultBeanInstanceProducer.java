@@ -12,9 +12,10 @@ package org.eclipse.scout.rt.platform.internal;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.FinalValue;
 import org.eclipse.scout.rt.platform.BeanCreationException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
@@ -22,12 +23,7 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
 
-  private final Semaphore m_instanceLock;
-  private T m_applicationScopedInstance;
-
-  public DefaultBeanInstanceProducer() {
-    m_instanceLock = new Semaphore(1, true);
-  }
+  private final FinalValue<T> m_applicationScopedInstance = new FinalValue<>();
 
   @Override
   public T produce(IBean<T> bean) {
@@ -45,18 +41,13 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     return createNewInstance(bean.getBeanClazz());
   }
 
-  private T getApplicationScopedInstance(IBean<T> bean) {
-    m_instanceLock.acquireUninterruptibly();
-    try {
-      if (m_applicationScopedInstance != null) {
-        return m_applicationScopedInstance;
+  private T getApplicationScopedInstance(final IBean<T> bean) {
+    return m_applicationScopedInstance.setIfAbsent(new Callable<T>() {
+      @Override
+      public T call() {
+        return createNewInstance(bean.getBeanClazz());
       }
-      m_applicationScopedInstance = createNewInstance(bean.getBeanClazz());
-      return m_applicationScopedInstance;
-    }
-    finally {
-      m_instanceLock.release();
-    }
+    });
   }
 
   /**
