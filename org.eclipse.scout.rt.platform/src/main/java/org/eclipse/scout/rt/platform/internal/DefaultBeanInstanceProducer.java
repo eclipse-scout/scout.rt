@@ -31,13 +31,6 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
 
   @Override
   public T produce(IBean<T> bean) {
-    if (BeanManagerImplementor.isApplicationScoped(bean)) {
-      T applicationScoped = getApplicationScopedInstance();
-      if (applicationScoped != null) {
-        return applicationScoped;
-      }
-    }
-
     Deque<String> stack = INSTANTIATION_STACK.get();
     String beanName = bean.getBeanClazz().getName();
     if (stack != null && stack.contains(beanName)) {
@@ -46,21 +39,19 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     }
 
     if (BeanManagerImplementor.isApplicationScoped(bean)) {
-      m_instanceLock.acquireUninterruptibly();
-      try {
-        m_applicationScopedInstance = createNewInstance(bean.getBeanClazz());
-        return m_applicationScopedInstance;
-      }
-      finally {
-        m_instanceLock.release();
-      }
+      return getApplicationScopedInstance(bean);
     }
+
     return createNewInstance(bean.getBeanClazz());
   }
 
-  private T getApplicationScopedInstance() {
+  private T getApplicationScopedInstance(IBean<T> bean) {
+    m_instanceLock.acquireUninterruptibly();
     try {
-      m_instanceLock.acquireUninterruptibly();
+      if (m_applicationScopedInstance != null) {
+        return m_applicationScopedInstance;
+      }
+      m_applicationScopedInstance = createNewInstance(bean.getBeanClazz());
       return m_applicationScopedInstance;
     }
     finally {
