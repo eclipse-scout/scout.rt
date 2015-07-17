@@ -57,17 +57,10 @@ public interface IClientSession extends ISession, IPropertyObserver {
   Object getStateLock();
 
   /**
-   * Invoke this method to initialize the session. The session is active just after this method returns.
-   *
-   * @param sessionId
-   *          TODO
-   */
-  void start(String sessionId) throws ProcessingException;
-
-  /**
    * send a stop signal to the session event queue<br>
    * check {@link #isActive()} to wait until the queue has in fact closed
    */
+  @Override
   void stop();
 
   void stop(int exitCode);

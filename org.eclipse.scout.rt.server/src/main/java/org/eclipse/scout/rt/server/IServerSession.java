@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -18,15 +17,4 @@ import org.eclipse.scout.rt.shared.ISession;
  */
 public interface IServerSession extends ISession {
 
-  /**
-   * Invoke this method to initialize the session. The session is active just after this method returns.
-   * @param sessionid TODO
-   */
-  void start(String sessionId) throws ProcessingException;
-
-
-  /**
-   * Invoke this method to stop the session. This is the last call on the session.
-   */
-  void stop();
 }

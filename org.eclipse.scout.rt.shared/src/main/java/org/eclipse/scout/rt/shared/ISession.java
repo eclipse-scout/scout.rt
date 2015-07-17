@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
@@ -78,5 +79,18 @@ public interface ISession {
    * Removes the given listener; has no effect if not registered.
    */
   void removeListener(ISessionListener sessionListener);
+
+  /**
+   * Invoke this method to initialize the session. The session is active just after this method returns.
+   *
+   * @param sessionId
+   *          unique id
+   */
+  void start(String sessionId) throws ProcessingException;
+
+  /**
+   * Invoke this method to stop the session. This is the last call on the session.
+   */
+  void stop();
 
 }
