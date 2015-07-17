@@ -79,7 +79,7 @@ public class ErrorPopup {
     if (m_text == null || m_text.length() == 0) {
       m_text = ScoutTexts.get("Error");
     }
-    m_detail = m_cause.getStatus().getMessage();
+    m_detail = m_cause.getStatus().getBody();
     m_acceptText = ScoutTexts.get("Ok");
     Throwable t = exception;
     while (t != null) {
@@ -159,8 +159,8 @@ public class ErrorPopup {
       }
       else if (t instanceof VetoException) {
         m_text = ((VetoException) t).getStatus().getTitle();
-        if (StringUtility.hasText(((VetoException) t).getStatus().getMessage())) {
-          m_detail = ((VetoException) t).getStatus().getMessage();
+        if (StringUtility.hasText(((VetoException) t).getStatus().getBody())) {
+          m_detail = ((VetoException) t).getStatus().getBody();
         }
         else {
           m_detail = ScoutTexts.get("VetoErrorText") + msg;
@@ -176,7 +176,7 @@ public class ErrorPopup {
     while (t != null) {
       String s = null;
       if (t instanceof ProcessingException) {
-        s = ((ProcessingException) t).getStatus().getMessage();
+        s = ((ProcessingException) t).getStatus().getBody();
       }
       else {
         s = t.getMessage();
