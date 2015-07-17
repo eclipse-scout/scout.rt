@@ -321,7 +321,7 @@ scout.Tree.prototype.collapseAll = function() {
   }.bind(this));
 };
 
-scout.Tree.prototype.setNodeExpanded = function(node, expanded) {
+scout.Tree.prototype.setNodeExpanded = function(node, expanded, forceRenderExpansion) {
   if (node.expanded !== expanded) {
     node.expanded = expanded;
 
@@ -331,7 +331,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded) {
     });
   }
 
-  if (this.rendered) {
+  if (this.rendered || forceRenderExpansion) {
     this._renderExpansion(node);
   }
 };
@@ -366,16 +366,17 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
 
     // animated opening
     if (!$node.hasClass('leaf') && !$node.hasClass('expanded')) { // can expand
-      var $newNodes = scout.Tree.collectSubtree($node, false);
-      if ($newNodes.length) {
-        $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
-        var h = $wrapper.outerHeight(); // FIXME CRU Why was this done like this? $newNodes.outerHeight() * $newNodes.length;
-        var removeContainer = function() {
-          $(this).replaceWith($(this).contents());
-        };
-
-        $wrapper.css('height', 0)
-          .animateAVCSD('height', h, removeContainer, this.updateScrollbar.bind(this), 200);
+      if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
+        var $newNodes = scout.Tree.collectSubtree($node, false);
+        if ($newNodes.length) {
+          $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
+          var h = $wrapper.outerHeight();
+          var removeContainer = function() {
+            $(this).replaceWith($(this).contents());
+          };
+          $wrapper.css('height', 0)
+            .animateAVCSD('height', h, removeContainer, this.updateScrollbar.bind(this), 200);
+        }
       }
     }
     $node.addClass('expanded');
@@ -384,15 +385,21 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
     delete node.$showAllNode;
 
     // animated closing
-    $wrapper = scout.Tree.collectSubtree($node, false).each(function() {
-      // unlink '$nodes' from 'nodes' before deleting them
-      var node = $(this).data('node');
-      if (node) { // FIXME BSH Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
-        delete node.$node;
+    if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
+      var $existingNodes = scout.Tree.collectSubtree($node, false);
+      if ($existingNodes.length) {
+        $existingNodes.each(function() {
+          // unlink '$nodes' from 'nodes' before deleting them
+          var node = $(this).data('node');
+          if (node) { // FIXME BSH Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
+            delete node.$node;
+          }
+        });
+        $wrapper = $existingNodes.wrapAll('<div class="animationWrapper">)').parent();
+        $wrapper
+          .animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
       }
-    }).wrapAll('<div class="animationWrapper">)').parent();
-
-    $wrapper.animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
+    }
   }
 };
 
@@ -477,7 +484,7 @@ scout.Tree.prototype._renderSelection = function() {
 
     // in case of breadcrumb, expand
     if (this._breadcrumbEnabled) {
-      this.setNodeExpanded($nodes[i].data('node'), true);
+      this.setNodeExpanded($nodes[i].data('node'), true, true);
     }
   }
 
@@ -521,7 +528,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       if (!$parentNode) {
         throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
-      this.setNodeExpanded(parentNodes[i], true);
+      this.setNodeExpanded(parentNodes[i], true, true);
     }
   }
 };
