@@ -12,7 +12,7 @@ scout.strings = {
     if (encodeHtml) {
       text = scout.strings.encode(text);
     }
-    return text.replace(/\n/g, '<br>');
+    return text.replace(/\n/g, '<br>').replace(/\r/g, '');
   },
 
   removeAmpersand: function(text) {
@@ -98,8 +98,9 @@ scout.strings = {
     if (!string) {
       return string;
     }
-    var $div = $('<div>');
-    return $div.text(string).html();
+    var div = document.createElement('div');
+    div.textContent = string;
+    return div.innerHTML;
   },
 
   /**

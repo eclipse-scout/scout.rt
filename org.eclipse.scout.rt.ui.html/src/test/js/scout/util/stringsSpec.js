@@ -9,7 +9,7 @@ describe("scout.strings", function() {
       expect(scout.strings.nl2br('Hello\nGoodbye')).toBe('Hello<br>Goodbye');
       expect(scout.strings.nl2br('Hello\nGoodbye\n')).toBe('Hello<br>Goodbye<br>');
       expect(scout.strings.nl2br('Hello\n\nGoodbye')).toBe('Hello<br><br>Goodbye');
-      expect(scout.strings.nl2br('Hello\n\r\nGoodbye')).toBe('Hello<br>\r<br>Goodbye');
+      expect(scout.strings.nl2br('Hello\n\r\nGoodbye')).toBe('Hello<br><br>Goodbye');
     });
 
     it("encodes html, if the parameter is set to true (default)", function() {

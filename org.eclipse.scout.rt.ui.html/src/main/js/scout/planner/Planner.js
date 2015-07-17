@@ -120,7 +120,8 @@ scout.Planner.prototype._render = function($parent) {
   scout.tooltips.install(this.$grid, {
     selector: '.planner-activity',
     tooltipText: function($comp) {
-      return this._activityById($comp.attr('data-id')).tooltipText;
+        if (this._activityById($comp.attr('data-id'))) { return this._activityById($comp.attr('data-id')).tooltipText; }
+        else { return undefined; }
       }.bind(this)
   });
 
@@ -534,14 +535,30 @@ scout.Planner.prototype._removeAllResources = function() {
 };
 
 scout.Planner.prototype._renderResources = function(resources) {
-  var i, $resource, resource;
+  var i, $resource, resource,
+    resourcesHtml = '';
 
   resources = resources || this.resources;
   for (i = 0; i < resources.length; i++) {
     resource = resources[i];
-    $resource = this._build$Resource(resource, this.$grid);
-    $resource.appendTo(this.$grid);
+    resourcesHtml += this._buildResourceHtml(resource, this.$grid);
   }
+
+  // Append resources to grid
+  $(resourcesHtml).appendTo(this.$grid);
+
+  // Match resources
+  this.$grid.children('.planner-resource').each(function (index, element) {
+   var $element = $(element);
+   resource = this._resourceById($element.attr('data-id'));
+   this._linkResource($element, resource);
+  }.bind(this));
+};
+
+scout.Planner.prototype._linkResource = function($resource, resource) {
+  $resource.data('resource', resource);
+  resource.$resource = $resource;
+  resource.$cells = $resource.children('.resource-cells');
 };
 
 scout.Planner.prototype._rerenderActivities = function(resources) {
@@ -552,28 +569,29 @@ scout.Planner.prototype._rerenderActivities = function(resources) {
   }, this);
 };
 
-scout.Planner.prototype._build$Resource = function(resource) {
-  var $resource = $.makeDiv('planner-resource');
-  $resource.appendDiv('resource-title')
-    .text(resource.resourceCell.text);
-  resource.$cells = $resource.appendDiv('resource-cells');
-  this._renderActivititesForResource(resource);
-  $resource.data('resource', resource);
-  resource.$resource = $resource;
-  return $resource;
+scout.Planner.prototype._buildResourceHtml = function(resource) {
+  var resourceHtml = '<div class="planner-resource" data-id="' + resource.id + '">';
+  resourceHtml += '<div class="resource-title">' + scout.strings.encode(resource.resourceCell.text || '') + '</div>';
+  resourceHtml += '<div class="resource-cells">' + this._buildActivitiesHtml(resource) + '</div>';
+  resourceHtml += '</div>';
+  return resourceHtml;
 };
 
 scout.Planner.prototype._renderActivititesForResource = function(resource) {
-  var activityHtml = '';
+  resource.$cells.html(this._buildActivitiesHtml(resource));
+};
+
+scout.Planner.prototype._buildActivitiesHtml = function(resource) {
+  var activitiesHtml = '';
   resource.activities.forEach(function(activity) {
     if (activity.beginTime.valueOf() >= this.endScale ||
         activity.endTime.valueOf() <= this.beginScale) {
       // don't add activities which are not in the view range
       return;
     }
-    activityHtml += this._buildActivityHtml(activity);
+    activitiesHtml += this._buildActivityHtml(activity);
   }, this);
-  resource.$cells.html(activityHtml);
+  return activitiesHtml;
 };
 
 scout.Planner.prototype._removeActivititesForResource = function(resource) {
@@ -1163,8 +1181,9 @@ scout.Planner.prototype._updateResources = function(resources) {
 
     // Replace old $resource
     if (this.rendered && oldResource.$resource) {
-      var $updatedResource = this._build$Resource(updatedResource);
+      var $updatedResource = $(this._buildResourceHtml(updatedResource));
       oldResource.$resource.replaceWith($updatedResource);
+      this._linkResource($updatedResource, updatedResource);
     }
   }.bind(this));
 };
