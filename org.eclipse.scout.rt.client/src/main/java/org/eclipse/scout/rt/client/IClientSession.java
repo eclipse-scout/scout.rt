@@ -109,8 +109,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
    */
   void setDesktop(IDesktop a) throws ProcessingException;
 
-//  IClientServiceTunnel getServiceTunnel();
-
   /**
    * see {@link IMemoryPolicy}
    */

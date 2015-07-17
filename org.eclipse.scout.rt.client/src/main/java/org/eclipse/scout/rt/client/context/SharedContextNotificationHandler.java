@@ -14,8 +14,8 @@ import org.eclipse.scout.rt.shared.notification.AbstractObservableNotificationHa
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 
 /**
- *
+ * Handler for {@link SharedContextChangedNotification}
  */
-public class SharedContextNotificationHanlder extends AbstractObservableNotificationHandler<SharedContextChangedNotification> {
+public class SharedContextNotificationHandler extends AbstractObservableNotificationHandler<SharedContextChangedNotification> {
 
 }

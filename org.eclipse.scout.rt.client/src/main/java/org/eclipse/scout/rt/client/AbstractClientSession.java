@@ -38,7 +38,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.context.SharedContextNotificationHanlder;
+import org.eclipse.scout.rt.client.context.SharedContextNotificationHandler;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
@@ -62,6 +62,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
+import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
@@ -233,7 +234,12 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * do not use this internal method directly
+   * Do not use this method directly. Create specific (typed) methods instead to access shared variables. (like
+   * {@link #getUserId()})
+   * <p>
+   * Returns the variables shared with the server. Shared variables are automatically updated on the client by client
+   * notifications when changed on the server.
+   * </p>
    */
   protected <T> T getSharedContextVariable(String name, Class<T> type) {
     Object o;
@@ -255,18 +261,25 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void initConfig() {
     m_virtualDesktop = new VirtualDesktop();
     String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
-    if ("small".equals(memPolicyValue)) {
+    setMemoryPolicy(memPolicyValue);
+
+    BEANS.get(SharedContextNotificationHandler.class).addListener(this, createSharedNotificationListener());
+  }
+
+  private void setMemoryPolicy(String policy) {
+    if ("small".equals(policy)) {
       setMemoryPolicy(new SmallMemoryPolicy());
     }
-    else if ("medium".equals(memPolicyValue)) {
+    else if ("medium".equals(policy)) {
       setMemoryPolicy(new MediumMemoryPolicy());
     }
     else {
       setMemoryPolicy(new LargeMemoryPolicy());
     }
+  }
 
-    // add client notification listener
-    BEANS.get(SharedContextNotificationHanlder.class).addListener(this, new INotificationListener<SharedContextChangedNotification>() {
+  private INotificationListener<SharedContextChangedNotification> createSharedNotificationListener() {
+    return new INotificationListener<SharedContextChangedNotification>() {
 
       @Override
       public void handleNotification(final SharedContextChangedNotification notification) {
@@ -277,26 +290,51 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
           Jobs.schedule(new IRunnable() {
             @Override
             public void run() {
-              updateSharedVariableMap(notification.getSharedVariableMap());
+              replaceSharedVariableMap(notification.getSharedVariableMap());
             }
           });
         }
         catch (Exception ex) {
           LOG.error("Update of shared variables failed", ex);
         }
-
       }
-    });
+    };
   }
 
-  private void updateSharedVariableMap(SharedVariableMap newMap) {
+  /**
+   * replace the shared variable map with a new version.
+   *
+   * @param newMap
+   */
+  private void replaceSharedVariableMap(SharedVariableMap newMap) {
     synchronized (m_sharedVarLock) {
       m_sharedVariableMap.updateInternal(newMap);
     }
     m_sharedVarsInitialized.countDown();
-
   }
 
+  /**
+   * Pings the server to get the initial shared variables. Blocks until the initial version of the shared variables is
+   * available or the timeout is reached.
+   *
+   * @param timeout
+   *          the maximum time to wait
+   * @param unit
+   *          the time unit of the {@code timeout} argument
+   * @throws ProcessingException
+   *           if interrupted (and the variables are not initialized)
+   */
+  protected void initializeSharedVariables(long timeout, TimeUnit unit) throws ProcessingException {
+    BEANS.get(IPingService.class).ping("");
+    awaitSharedVariablesInitialized(timeout, unit);
+  }
+
+  /**
+   * Wait until the shared variables are initialized by a notification from the server
+   *
+   * @throws ProcessingException
+   *           if interrupted (and the variables are not initialized)
+   */
   protected void awaitSharedVariablesInitialized(long timeout, TimeUnit unit) throws ProcessingException {
     try {
       if (LOG.isDebugEnabled()) {
