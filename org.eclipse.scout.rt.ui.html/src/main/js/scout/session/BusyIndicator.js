@@ -33,8 +33,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this.$container.removeClass('calc-helper');
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
-  // Class 'shown' is used for css animation
-  this.$container.addClass('shown');
+  this.$container.addClassForAnimation('shown');
 };
 
 scout.BusyIndicator.prototype._position = function() {

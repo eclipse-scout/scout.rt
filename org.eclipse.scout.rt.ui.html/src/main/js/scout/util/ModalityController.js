@@ -45,10 +45,9 @@ scout.ModalityController.prototype.removeGlassPane = function() {
 scout.ModalityController.prototype._onMousedown = function(event) {
   var $glassPane = $(event.target);
 
-  this._element.$container.addClass('modality-highlight');
-  setTimeout(function() {
-    // remove shown as well, otherwise 'shown' animation will be executed
-    this._element.$container.removeClass('modality-highlight shown');
-    // timeout must be greater than css animation duration
-  }.bind(this), 500);
+  this._element.$container.addClassForAnimation('modality-highlight', {
+    // remove shown as well, user may click the glasspane before the widget itself was able to remove the shown class
+    classesToRemove: 'modality-highlight shown',
+    delay: 500
+  });
 };

@@ -78,8 +78,7 @@ scout.Form.prototype._renderForm = function($parent) {
   }
 
   if (this.isDialog()) {
-    this.$container.addClass('shown');
-    $.log.warn('startInstall');
+    this.$container.addClassForAnimation('shown');
   }
 };
 
