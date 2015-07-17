@@ -43,9 +43,8 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
       res.sendRedirect("");
       return;
     }
-    else {
-      super.doFilterInternal(req, res, chain);
-    }
+
+    super.doFilterInternal(req, res, chain);
   }
 
   private boolean isLogoutRequest(HttpServletRequest req) {
@@ -55,5 +54,4 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   @Override
   public void destroy() {
   }
-
 }
