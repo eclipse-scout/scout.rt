@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -42,7 +43,6 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLo
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -85,7 +85,12 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private VirtualDesktop m_virtualDesktop;
   private Subject m_offlineSubject;
   private Subject m_subject;
+
+  /* locked by m_sharedVarLock*/
   private final SharedVariableMap m_sharedVariableMap;
+  private CountDownLatch m_sharedVarsInitialized = new CountDownLatch(1);
+  private final Object m_sharedVarLock = new Object();
+
   private IMemoryPolicy m_memoryPolicy;
   private final Map<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
@@ -98,11 +103,14 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_isStopping = false;
-    m_sharedVariableMap = new SharedVariableMap();
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
     m_scoutTexts = new ScoutTexts();
+
+    synchronized (m_sharedVarLock) {
+      m_sharedVariableMap = new SharedVariableMap();
+    }
 
     setLocale(NlsLocale.get()); // TODO [cgu] This is not every transparent. Change this please.
 
@@ -190,8 +198,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setUserIdInternal(String newValue) {
-    getSharedVariableMap().put("userId", newValue);
+  public void setUserIdInternal(String userId) {
+    synchronized (m_sharedVarLock) {
+      m_sharedVariableMap.put("userId", userId);
+    }
   }
 
   @Override
@@ -217,14 +227,19 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public Map<String, Object> getSharedVariableMap() {
-    return CollectionUtility.copyMap(m_sharedVariableMap);
+    synchronized (m_sharedVarLock) {
+      return CollectionUtility.copyMap(m_sharedVariableMap);
+    }
   }
 
   /**
    * do not use this internal method directly
    */
   protected <T> T getSharedContextVariable(String name, Class<T> type) {
-    Object o = m_sharedVariableMap.get(name);
+    Object o;
+    synchronized (m_sharedVarLock) {
+      o = m_sharedVariableMap.get(name);
+    }
     return TypeCastUtility.castValue(o, type);
   }
 
@@ -239,7 +254,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   protected void initConfig() {
     m_virtualDesktop = new VirtualDesktop();
-
     String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
     if ("small".equals(memPolicyValue)) {
       setMemoryPolicy(new SmallMemoryPolicy());
@@ -256,24 +270,46 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
       @Override
       public void handleNotification(final SharedContextChangedNotification notification) {
-        ModelJobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
+        try {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Handling Shared variable notification {}", notification);
+          }
+          Jobs.schedule(new IRunnable() {
+            @Override
+            public void run() {
               updateSharedVariableMap(notification.getSharedVariableMap());
             }
-            catch (Exception ex) {
-              LOG.error("update of shared contex", ex);
-            }
-          }
-        });
+          });
+        }
+        catch (Exception ex) {
+          LOG.error("Update of shared variables failed", ex);
+        }
+
       }
     });
   }
 
   private void updateSharedVariableMap(SharedVariableMap newMap) {
-    m_sharedVariableMap.updateInternal(newMap);
+    synchronized (m_sharedVarLock) {
+      m_sharedVariableMap.updateInternal(newMap);
+    }
+    m_sharedVarsInitialized.countDown();
+
+  }
+
+  protected void awaitSharedVariablesInitialized(long timeout, TimeUnit unit) throws ProcessingException {
+    try {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Awaiting shared variable map");
+      }
+      m_sharedVarsInitialized.await(timeout, unit);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Shared variables updated");
+      }
+    }
+    catch (InterruptedException e) {
+      throw new ProcessingException("Error waiting for initialized shared variables", e);
+    }
   }
 
   @Override
