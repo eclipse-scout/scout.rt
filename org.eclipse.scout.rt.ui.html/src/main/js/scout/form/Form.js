@@ -25,7 +25,7 @@ scout.Form.prototype._init = function(model, session) {
   this._fileChooserController = new scout.FileChooserController(this, session);
 
   this._modalityController = new scout.ModalityController(this);
-  this._modalityController.render = this.modal;
+  this._modalityController.render = this.modal && !(this.parent instanceof scout.WrappedFormField);
 };
 
 scout.Form.prototype._render = function($parent) {

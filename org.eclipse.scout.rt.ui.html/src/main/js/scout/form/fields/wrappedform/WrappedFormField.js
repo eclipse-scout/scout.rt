@@ -23,8 +23,11 @@ scout.WrappedFormField.prototype._renderProperties = function() {
  */
 scout.WrappedFormField.prototype._renderInnerForm = function() {
   if (this.innerForm) {
-    this.innerForm.displayHint = 'wrappedForm'; // TODO BSH Check this
+    this.innerForm.displayHint = 'view'; // by definition, an inner form is a view.
+    this.innerForm.modal = false; // by definition, an inner form is not modal.
+
     this.innerForm.render(this.$container);
+
     this.addField(this.innerForm.$container);
     this.innerForm.invalidateLayoutTree();
   }
