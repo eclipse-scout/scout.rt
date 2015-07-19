@@ -241,9 +241,7 @@ public class FindFieldByFormDataIdVisitorTest {
 
         @Override
         protected void execInitField() throws ProcessingException {
-          InnerForm innerForm = new InnerForm();
-          setInnerForm(innerForm);
-          innerForm.start();
+          setInnerForm(new InnerForm());
         }
       }
 
@@ -290,9 +288,7 @@ public class FindFieldByFormDataIdVisitorTest {
       public class WrappedFormField extends AbstractWrappedFormField<InnerInnerForm> {
         @Override
         protected void execInitField() throws ProcessingException {
-          InnerInnerForm innerInnerForm = new InnerInnerForm();
-          setInnerForm(innerInnerForm);
-          innerInnerForm.start();
+          setInnerForm(new InnerInnerForm());
         }
       }
 

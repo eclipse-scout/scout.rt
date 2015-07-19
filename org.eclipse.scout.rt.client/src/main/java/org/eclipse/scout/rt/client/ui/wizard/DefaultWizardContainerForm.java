@@ -103,7 +103,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
   }
 
   @Override
-  protected void setInnerWizardForm(IForm form) {
+  protected void setInnerWizardForm(IForm form) throws ProcessingException {
     getWrappedWizardForm().setInnerForm(form);
   }
 

@@ -507,7 +507,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   protected void ensureSearchFormStarted() {
     if (m_searchForm != null && !m_searchForm.isFormStarted()) {
       try {
-        m_searchForm.startSearch();
+        m_searchForm.start();
         notifyMemoryPolicyOfSearchFormStart();
         ensureSearchControlSelected();
       }

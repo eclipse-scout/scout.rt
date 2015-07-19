@@ -618,9 +618,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (m_detailForm != null) {
       try {
         decorateDetailForm();
-//        Assertions.assertFalse(m_detailForm.isModal(), "Detail Form must not be modal");
-//        Assertions.assertEqual(m_detailForm.getDisplayHint(), IForm.DISPLAY_HINT_VIEW, "Detail Form must be configured as view");
-//        Assertions.assertFalse(m_detailForm.isShowOnStart(), "Detail Form must be configured with 'showOnStart=false'");
       }
       catch (ProcessingException e) {
         throw new RuntimeException("Decoration of detail form failed", e);
@@ -641,7 +638,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
     }
 
-    form.setModal(false);
+    form.setModal(false); // TODO [dwi] do the same as WrappedFormField
     form.setShowOnStart(false);
   }
 

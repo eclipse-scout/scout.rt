@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.IFormHandler;
+import org.eclipse.scout.rt.client.ui.form.NullFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
@@ -34,24 +36,23 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
   T getInnerForm();
 
   /**
-   * Install a (new) inner form into the wrapped form field.
+   * Installs the given {@link IForm} as wrapped Form. Thereby, the Form must not be started yet. A previously installed
+   * Form will be closed if <code>manageFormLifeCycle</code> was set to <code>true</code>.
    * <p>
-   * Equal to {@link #setInnerForm(IForm, boolean)} without automatic form life cycle management.
+   * This method is equal to {@link #setInnerForm(IForm, boolean)} with automatic form life cycle management.
    */
-  void setInnerForm(T newInnerForm);
+  void setInnerForm(T newInnerForm) throws ProcessingException;
 
   /**
-   * Installs a form into the wrapped form field. Any previously wrapped form will be uninstalled.
+   * Installs the given {@link IForm} as wrapped Form. Thereby, the Form must not be started yet. A previously installed
+   * Form will be closed if <code>manageFormLifeCycle</code> was set to <code>true</code>.
    *
    * @param form
    *          The form to wrap
    * @param manageFormLifeCycle
-   *          If <code>true</code>, the wrapped form field automatically starts the inner form if is not yet open. It
-   *          also closes the form automatically when the wrapped form field is disposed, or the inner form is replaced
-   *          by another form. If <code>false</code> is passed, the caller is responsible for starting and disposing
-   *          the inner form.
-   * @throws ProcessingException
-   *           May be thrown by the form handler when starting it
+   *          If <code>true</code>, the {@link IForm} is started with the currently set {@link IFormHandler}, or with
+   *          {@link NullFormHandler} if not set, and is closed once this {@link IFormField} is disposed, or another
+   *          inner form is set. If <code>false</code>, the caller is responsible for starting and closing the Form.
    */
   void setInnerForm(T form, boolean manageFormLifeCycle) throws ProcessingException;
 

@@ -12,29 +12,37 @@ package org.eclipse.scout.rt.client.ui.form.fields.pagefield;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.PageFieldChains.PageFieldPageChangedChain;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Representation of a page as a composite of detailForm, table, searchForm for
  * usage inside a {@link IForm}
  */
 @ClassId("e2f4e714-637f-4a9b-b3be-d672900e1374")
-public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBox implements IPageField<T> {
-  private T m_page;
+public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGroupBox implements IPageField<PAGE> {
+  private PAGE m_page;
   private SimpleOutline m_outline;
 
   public AbstractPageField() {
@@ -57,16 +65,16 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
   }
 
   @Override
-  public final T getPage() {
+  public final PAGE getPage() {
     return m_page;
   }
 
   @Override
-  public void setPage(T newPage) {
+  public void setPage(PAGE newPage) throws ProcessingException {
     setPageInternal(newPage);
   }
 
-  private void setPageInternal(T page) {
+  private void setPageInternal(PAGE page) throws ProcessingException {
     if (m_page == page) {
       return;
     }
@@ -80,7 +88,9 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
       m_page = null;
     }
     // add new
+    PAGE oldPage = m_page;
     m_page = page;
+
     if (m_page != null) {
       m_outline = new SimpleOutline();
       m_outline.setRootNode(m_page);
@@ -88,21 +98,32 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
       m_outline.addPropertyChangeListener(new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent e) {
-          if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
-            getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
+          try {
+            if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
+              getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
+            }
+            else if (e.getPropertyName().equals(IOutline.PROP_DETAIL_TABLE)) {
+              getTableField().setTable(detachSearchFormTableControl(((IOutline) e.getSource()).getDetailTable()), true);
+            }
+            else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
+              getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
+            }
           }
-          else if (e.getPropertyName().equals(IOutline.PROP_DETAIL_TABLE)) {
-            getTableField().setTable(detachSearchFormTableControl(((IOutline) e.getSource()).getDetailTable()), true);
-          }
-          else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
-            getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
+          catch (ProcessingException pe) {
+            BEANS.get(ExceptionHandler.class).handle(pe);
           }
         }
       });
+
+      // Detail Form
       getDetailFormField().setInnerForm(m_outline.getDetailForm());
       getTableField().setTable(detachSearchFormTableControl(m_outline.getDetailTable()), true);
+
+      // Search Form
       getSearchFormField().setInnerForm(m_outline.getSearchForm());
     }
+
+    interceptPageChanged(oldPage, m_page);
   }
 
   /**
@@ -134,6 +155,18 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
   @Override
   public IWrappedFormField<IForm> getSearchFormField() {
     return getFieldByClass(SearchFormField.class);
+  }
+
+  /**
+   * Method invoked once the Page is changed.
+   *
+   * @param oldPage
+   *          the old {@link IPage}; might be <code>null</code>.
+   * @param newInnerForm
+   *          the new {@link IPage}; might be <code>null</code>.
+   */
+  @ConfigOperation
+  protected void execPageChanged(PAGE oldPage, PAGE newPage) {
   }
 
   @Order(10)
@@ -206,15 +239,26 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
     }
   }
 
+  protected final void interceptPageChanged(PAGE oldPage, PAGE newPage) throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    PageFieldPageChangedChain<PAGE> chain = new PageFieldPageChangedChain<>(extensions);
+    chain.execPageChanged(oldPage, newPage);
+  }
+
   protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER> implements IPageFieldExtension<T, OWNER> {
 
     public LocalPageFieldExtension(OWNER owner) {
       super(owner);
     }
+
+    @Override
+    public void execPageChanged(PageFieldPageChangedChain<T> chain, T oldPage, T newPage) throws ProcessingException {
+      getOwner().execPageChanged(oldPage, newPage);
+    }
   }
 
   @Override
-  protected IPageFieldExtension<T, ? extends AbstractPageField<T>> createLocalExtension() {
-    return new LocalPageFieldExtension<T, AbstractPageField<T>>(this);
+  protected IPageFieldExtension<PAGE, ? extends AbstractPageField<PAGE>> createLocalExtension() {
+    return new LocalPageFieldExtension<PAGE, AbstractPageField<PAGE>>(this);
   }
 }

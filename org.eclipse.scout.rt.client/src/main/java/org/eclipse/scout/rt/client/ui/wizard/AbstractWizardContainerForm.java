@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardContainerFormExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * <h3>AbstractWizardContainerForm</h3> The form to extends to provide a
@@ -124,20 +126,25 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
 
   protected abstract IForm getInnerWizardForm();
 
-  protected abstract void setInnerWizardForm(IForm form);
+  protected abstract void setInnerWizardForm(IForm form) throws ProcessingException;
 
   /**
    * may be overridden to handle property changes.
    */
   protected void handleWizardPropertyChanged(String propertyName, Object oldValue, Object newValue) {
-    if (IWizard.PROP_WIZARD_FORM.equals(propertyName)) {
-      setInnerWizardForm(getWizard().getWizardForm());
+    try {
+      if (IWizard.PROP_WIZARD_FORM.equals(propertyName)) {
+        setInnerWizardForm(getWizard().getWizardForm());
+      }
+      else if (IWizard.PROP_TITLE.equals(propertyName)) {
+        updateTitleFromWizard();
+      }
+      else if (IWizard.PROP_SUB_TITLE.equals(propertyName)) {
+        updateTitleFromWizard();
+      }
     }
-    else if (IWizard.PROP_TITLE.equals(propertyName)) {
-      updateTitleFromWizard();
-    }
-    else if (IWizard.PROP_SUB_TITLE.equals(propertyName)) {
-      updateTitleFromWizard();
+    catch (Exception e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 

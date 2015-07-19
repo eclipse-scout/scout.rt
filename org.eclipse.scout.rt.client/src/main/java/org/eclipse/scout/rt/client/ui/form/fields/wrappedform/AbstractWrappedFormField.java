@@ -12,13 +12,16 @@ package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wrappedform.IWrappedFormFieldExtension;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.wrappedform.WrappedFormFieldChains.WrappedFormFieldInnerFormChangedChain;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -31,9 +34,9 @@ import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.w3c.dom.Element;
 
 @ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
-public abstract class AbstractWrappedFormField<T extends IForm> extends AbstractFormField implements IWrappedFormField<T> {
+public abstract class AbstractWrappedFormField<FORM extends IForm> extends AbstractFormField implements IWrappedFormField<FORM> {
 
-  private T m_innerForm;
+  private FORM m_innerForm;
   private boolean m_manageInnerFormLifeCycle;
   private P_InnerFormPropertyChangeListener m_innerFormPropertyListener;
   private P_InnerFormSubtreePropertyChangeListener m_innerFormSubtreePropertyListener;
@@ -78,16 +81,6 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }
 
   @Override
-  protected void execInitField() throws ProcessingException {
-    IForm f = getInnerForm();
-    if (f != null && !f.isFormStarted()) {
-      if (f instanceof ISearchForm) {
-        ((ISearchForm) f).startSearch();
-      }
-    }
-  }
-
-  @Override
   protected boolean execIsSaveNeeded() throws ProcessingException {
     return getInnerForm() != null && getInnerForm().isSaveNeeded();
   }
@@ -101,7 +94,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     m_innerFormListener = new P_InnerFormListener();
     if (getConfiguredInnerForm() != null) {
       try {
-        setInnerForm((T) getConfiguredInnerForm().newInstance(), true);
+        setInnerForm((FORM) getConfiguredInnerForm().newInstance(), true);
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredInnerForm().getName() + "'.", e));
@@ -139,78 +132,76 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }
 
   @Override
-  public final T getInnerForm() {
+  public final FORM getInnerForm() {
     return m_innerForm;
   }
 
   @Override
-  public void setInnerForm(T form) {
-    try {
-      setInnerForm(form, false);
-    }
-    catch (ProcessingException e) {
-      // May occur during form life cycle management (start, close).
-      throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
-    }
+  public void setInnerForm(FORM form) throws ProcessingException {
+    setInnerForm(form, true);
   }
 
   @Override
-  public void setInnerForm(T form, boolean manageFormLifeCycle) throws ProcessingException {
+  public void setInnerForm(FORM form, boolean manageFormLifeCycle) throws ProcessingException {
     if (m_innerForm == form) {
       return;
     }
+
+    // TODO [dwi] Add assertion to ensure Form is not started yet; currently, that cannot be done because of AbstractPageField.
+//    if (form != null) {
+//      Assertions.assertFalse(form.isFormStarted(), "Inner Form must not be started yet [wrappedFormField=%s, innerForm=%s]", this, form);
+//    }
+
+    FORM oldInnerForm = m_innerForm;
     uninstallInnerForm();
     m_innerForm = form;
     m_manageInnerFormLifeCycle = manageFormLifeCycle;
     installInnerForm();
 
-    boolean changed = propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
+    propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
     calculateVisibleInternal();
     if (m_innerForm != null) {
-//      Assertions.assertFalse(m_innerForm.isModal(), "Wrapped Form must not be modal");
-//      Assertions.assertEqual(m_innerForm.getDisplayHint(), IForm.DISPLAY_HINT_VIEW, "Wrapped Form must be configured as view");
-//      Assertions.assertFalse(m_innerForm.isShowOnStart(), "Wrapped Form must be configured with 'showOnStart=false'");
-
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) {
+      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) { // TODO [dwi] Remove 'started check' once assertion is in place
         m_innerForm.start();
       }
     }
-    if (changed) {
-      // Inform parent form (update layout etc.)
-      if (getForm() != null) {
-        getForm().structureChanged(this);
-      }
+
+    // Inform parent form (update layout etc.)
+    if (getForm() != null) {
+      getForm().structureChanged(this);
     }
+
+    interceptInnerFormChanged(oldInnerForm, m_innerForm);
   }
 
   protected void installInnerForm() {
-    if (m_innerForm != null) {
-      if (!m_innerForm.isFormStarted()) {
-        m_innerForm.setModal(false);
-        m_innerForm.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-        m_innerForm.setShowOnStart(false);
-      }
-      m_innerForm.setWrapperFieldInternal(this);
-      m_innerForm.getRootGroupBox().setBorderVisible(false);
-      m_innerForm.getRootGroupBox().setScrollable(false);
-      m_innerForm.getRootGroupBox().updateKeyStrokes();
-      m_innerForm.addPropertyChangeListener(m_innerFormPropertyListener);
-      m_innerForm.getRootGroupBox().addSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
-      m_innerForm.addFormListener(m_innerFormListener);
+    if (m_innerForm == null) {
+      return;
     }
+
+    m_innerForm.setShowOnStart(false);
+    m_innerForm.setWrapperFieldInternal(this);
+    m_innerForm.getRootGroupBox().setBorderVisible(false);
+    m_innerForm.getRootGroupBox().setScrollable(false);
+    m_innerForm.getRootGroupBox().updateKeyStrokes();
+    m_innerForm.addPropertyChangeListener(m_innerFormPropertyListener);
+    m_innerForm.getRootGroupBox().addSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
+    m_innerForm.addFormListener(m_innerFormListener);
   }
 
   protected void uninstallInnerForm() throws ProcessingException {
-    if (m_innerForm != null) {
-      fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      m_innerForm.removePropertyChangeListener(m_innerFormPropertyListener);
-      m_innerForm.getRootGroupBox().removeSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
-      m_innerForm.removeFormListener(m_innerFormListener);
-      m_innerForm.setWrapperFieldInternal(null);
-      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormClosed()) {
-        m_innerForm.doClose();
-      }
+    if (m_innerForm == null) {
+      return;
+    }
+
+    fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
+    m_innerForm.removePropertyChangeListener(m_innerFormPropertyListener);
+    m_innerForm.getRootGroupBox().removeSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
+    m_innerForm.removeFormListener(m_innerFormListener);
+    m_innerForm.setWrapperFieldInternal(null);
+    if (m_manageInnerFormLifeCycle && !m_innerForm.isFormClosed()) {
+      m_innerForm.doClose();
     }
   }
 
@@ -259,6 +250,18 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }
 
   /**
+   * Method invoked once the inner Form is changed.
+   *
+   * @param oldInnerForm
+   *          the old inner {@link IForm}; might be <code>null</code>.
+   * @param newInnerForm
+   *          the new inner {@link IForm}; might be <code>null</code>.
+   */
+  @ConfigOperation
+  protected void execInnerFormChanged(FORM oldInnerForm, FORM newInnerForm) {
+  }
+
+  /**
    * Implementation of PropertyChangeListener Proxy on all attached fields (not
    * groups)
    */
@@ -291,15 +294,26 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     }
   }// end private class
 
-  protected static class LocalWrappedFormFieldExtension<T extends IForm, OWNER extends AbstractWrappedFormField<T>> extends LocalFormFieldExtension<OWNER> implements IWrappedFormFieldExtension<T, OWNER> {
+  protected final void interceptInnerFormChanged(FORM oldInnerForm, FORM newInnerForm) throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    WrappedFormFieldInnerFormChangedChain<FORM> chain = new WrappedFormFieldInnerFormChangedChain<>(extensions);
+    chain.execInnerFormChanged(oldInnerForm, newInnerForm);
+  }
+
+  protected static class LocalWrappedFormFieldExtension<FORM extends IForm, OWNER extends AbstractWrappedFormField<FORM>> extends LocalFormFieldExtension<OWNER> implements IWrappedFormFieldExtension<FORM, OWNER> {
 
     public LocalWrappedFormFieldExtension(OWNER owner) {
       super(owner);
     }
+
+    @Override
+    public void execInnerFormChanged(WrappedFormFieldInnerFormChangedChain<FORM> chain, FORM oldInnerForm, FORM newInnerForm) throws ProcessingException {
+      getOwner().execInnerFormChanged(oldInnerForm, newInnerForm);
+    }
   }
 
   @Override
-  protected IWrappedFormFieldExtension<T, ? extends AbstractWrappedFormField<T>> createLocalExtension() {
-    return new LocalWrappedFormFieldExtension<T, AbstractWrappedFormField<T>>(this);
+  protected IWrappedFormFieldExtension<FORM, ? extends AbstractWrappedFormField<FORM>> createLocalExtension() {
+    return new LocalWrappedFormFieldExtension<>(this);
   }
 }
