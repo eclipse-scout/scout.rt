@@ -296,9 +296,9 @@ scout.Outline.prototype._renderInBackground = function() {
 /**
  * === Method required for objects that act as 'displayParent' ===
  *
- * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
+ * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
  */
-scout.Outline.prototype.modalityElements = function() {
+scout.Outline.prototype.glassPaneTargets = function() {
   var desktop = this.session.desktop;
 
   var elements = [];

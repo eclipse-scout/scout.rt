@@ -1,7 +1,7 @@
 scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
   this._files = [];
-  this._modalityController;
+  this._glassPaneRenderer;
   this.attached = false; // Indicates whether this file chooser is currently visible to the user.
 };
 scout.inherits(scout.FileChooser, scout.ModelAdapter);
@@ -9,14 +9,14 @@ scout.inherits(scout.FileChooser, scout.ModelAdapter);
 scout.FileChooser.prototype._init = function(model, session) {
   scout.FileChooser.parent.prototype._init.call(this, model, session);
 
-  this._modalityController = new scout.ModalityController(this);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
 };
 
 scout.FileChooser.prototype._render = function($parent) {
   this._$parent = $parent;
 
-  // Add modality glassPane; must precede appending the file chooser to the DOM.
-  this._modalityController.addGlassPane();
+  // Renders modality glassPane; must precede appending the file-chooser to the DOM.
+  this._glassPaneRenderer.renderGlassPanes();
 
   this.$container = $parent.appendDiv('file-chooser');
 
@@ -81,7 +81,7 @@ scout.FileChooser.prototype._postRender = function() {
 
 scout.FileChooser.prototype._remove = function() {
   this.$container.uninstallFocusContext(this.session.uiSessionId);
-  this._modalityController.removeGlassPane();
+  this._glassPaneRenderer.removeGlassPanes();
   this.attached = false;
 
   scout.FileChooser.parent.prototype._remove.call(this);

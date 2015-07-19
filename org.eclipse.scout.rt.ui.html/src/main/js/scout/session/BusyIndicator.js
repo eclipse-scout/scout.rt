@@ -1,10 +1,17 @@
 scout.BusyIndicator = function(session, cancellable) {
   scout.BusyIndicator.parent.call(this);
-  this._session = session;
+  this.parent = session.desktop;
+  this.session = session;
   this._cancellable = (cancellable === undefined ? true : !!cancellable);
   this._addEventSupport();
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
+
+scout.BusyIndicator.prototype.renderGlassPanes = function() {
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
+  this._glassPaneRenderer.renderGlassPanes();
+  this._changeMouseCursorToWaitStyle();
+};
 
 scout.BusyIndicator.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('busyindicator');
@@ -17,7 +24,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
 
   if (this._cancellable) {
     this.$buttons = this.$container.appendDiv('busyindicator-buttons');
-    this.$cancelButton = this._createButton('cancel', this._session.text('Cancel'));
+    this.$cancelButton = this._createButton('cancel', this.session.text('Cancel'));
     this.$cancelButton.css('width', '100%');
   }
   else {
@@ -25,7 +32,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
   }
 
   // Render properties
-  this.$label.text(this._session.text('ui.PleaseWait_'));
+  this.$label.text(this.session.text('ui.PleaseWait_'));
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -34,6 +41,23 @@ scout.BusyIndicator.prototype._render = function($parent) {
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
   this.$container.addClassForAnimation('shown');
+};
+
+scout.BusyIndicator.prototype._postRender = function() {
+  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
+};
+
+scout.BusyIndicator.prototype.remove = function() {
+  this._changeMouseCursorToDefaultStyle();
+  this._glassPaneRenderer.removeGlassPanes();
+
+  scout.BusyIndicator.parent.prototype._remove.call(this);
+};
+
+scout.BusyIndicator.prototype._remove = function() {
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
+
+  scout.BusyIndicator.parent.prototype._remove.call(this);
 };
 
 scout.BusyIndicator.prototype._position = function() {
@@ -53,5 +77,34 @@ scout.BusyIndicator.prototype._onButtonClicked = function(event) {
   var $button = $(event.target);
   this.trigger('buttonClick', {
     option: $button.data('buttonOption')
+  });
+};
+
+scout.BusyIndicator.prototype._changeMouseCursorToWaitStyle = function() {
+  // Workaround Chrome:
+  // Trigger cursor change; otherwise, the cursor is not updated without moving the mouse first.
+  // See https://code.google.com/p/chromium/issues/detail?id=26723
+
+  // Change cursor to 'wait' style.
+  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    $glassPane.addClass('busy');
+    $glassPane.css('cursor', 'default'); // [Workaround Chrome]
+  });
+
+  // >>> [Workaround Chrome]
+  setTimeout(function() {
+    this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+      $glassPane.css('cursor', 'wait');
+    });
+  }.bind(this), 0);
+  // <<< [Workaround Chrome]
+};
+
+scout.BusyIndicator.prototype._changeMouseCursorToDefaultStyle = function() {
+  // Workaround Chrome:
+  // Cursor must be reset explicitly; otherwise, it would not be reset until moving the mouse.
+  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    $glassPane.css('cursor', 'default');
+    $glassPane.removeClass('busy');
   });
 };

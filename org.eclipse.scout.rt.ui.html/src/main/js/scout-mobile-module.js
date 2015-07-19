@@ -30,7 +30,7 @@ __include("scout/util/polyfills.js");
 __include("scout/util/status.js");
 __include("scout/util/strings.js");
 __include("scout/util/URL.js");
-__include("scout/util/ModalityController.js");
+__include("scout/util/GlassPaneRenderer.js");
 // Session related
 __include("scout/session/Event.js");
 __include("scout/session/Locale.js");

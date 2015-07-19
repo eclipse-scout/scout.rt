@@ -23,7 +23,7 @@ FormSpecHelper.prototype.createFormModel = function() {
       removeChild: function() {},
       addChild: function() {},
       inFront: function() { return true; }, // expected API of a 'displayParent'
-      modalityElements: function() { return []; } // expected API of a 'displayParent'
+      glassPaneTargets: function() { return []; } // expected API of a 'displayParent'
     };
   return form;
 };

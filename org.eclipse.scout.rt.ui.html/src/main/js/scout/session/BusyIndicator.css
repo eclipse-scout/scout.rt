@@ -21,6 +21,10 @@
     .animation-name(fade-in);
     .animation-duration(0.5s);
   }
+
+  &.modality-highlight {
+    .animation-shake();
+  }
 }
 
 .busyindicator-content {

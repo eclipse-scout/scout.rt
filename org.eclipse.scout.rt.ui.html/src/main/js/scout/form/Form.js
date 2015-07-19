@@ -5,7 +5,7 @@ scout.Form = function() {
   this._locked;
   this._formController;
   this._messageBoxController;
-  this._modalityController;
+  this._glassPaneRenderer;
 
   this.attached = false; // Indicates whether this Form is currently visible to the user.
   this.renderInitialFocusEnabled = true; // Indicates whether this form should render its initial focus.
@@ -24,18 +24,15 @@ scout.Form.prototype._init = function(model, session) {
   this._messageBoxController = new scout.MessageBoxController(this, session);
   this._fileChooserController = new scout.FileChooserController(this, session);
 
-  this._modalityController = new scout.ModalityController(this);
-  this._modalityController.render = this.modal && !(this.parent instanceof scout.WrappedFormField);
+  // Only render glassPanes if modal and not being a wrapped Form.
+  var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, renderGlassPanes);
 };
 
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
-
-  // Add modality glassPane if applicable; must precede appending the Form to the DOM.
-  this._modalityController.addGlassPane();
-
+  this._glassPaneRenderer.renderGlassPanes();
   this._renderForm($parent);
-
   this.attached = true;
 };
 
@@ -168,7 +165,7 @@ scout.Form.prototype._remove = function() {
   // FIXME AWE: call displayTextChanged() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._uninstallFocusContext();
-  this._modalityController.removeGlassPane();
+  this._glassPaneRenderer.removeGlassPanes();
   this.attached = false;
 
   scout.Form.parent.prototype._remove.call(this);
@@ -322,9 +319,9 @@ scout.Form.prototype._uninstallFocusContext = function() {
 /**
  * === Method required for objects that act as 'displayParent' ===
  *
- * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with this Form as its 'displayParent'.
+ * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is showed with this Form as its 'displayParent'.
  */
-scout.Form.prototype.modalityElements = function() {
+scout.Form.prototype.glassPaneTargets = function() {
   return [this.$container];
 };
 

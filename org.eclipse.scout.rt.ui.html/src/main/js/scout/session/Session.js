@@ -75,7 +75,7 @@ scout.Session = function($entryPoint, options) {
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper(this);
-  this._backgroundJobPollingEnabled = (options.backgroundJobPollingEnabled!== false);
+  this._backgroundJobPollingEnabled = (options.backgroundJobPollingEnabled !== false);
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
   this._fatalMessagesOnScreen = {};
 
@@ -90,8 +90,6 @@ scout.Session = function($entryPoint, options) {
   this._registerWithParentUiSession();
   scout.focusManager.installManagerForSession(this, options);
 };
-
-
 
 /**
  * Extracts custom parameters from URL: query string parameters and the url itself with key 'url'
@@ -216,7 +214,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   // we can access them in ModelAdapter#init()
   adapterData.owner = owner;
   adapterData.parent = parent;
-  adapter =  this.objectFactory.create(adapterData);
+  adapter = this.objectFactory.create(adapterData);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
 
   owner.addOwnedAdapter(adapter);
@@ -575,8 +573,8 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
     boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
     boxOptions.body = scout.strings.join('\n\n',
-        this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
-        this.optText('ui.UiInconsistentMsg', ''));
+      this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
+      this.optText('ui.UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
   }
   this.showFatalMessage(boxOptions, jsonError.code);
@@ -619,7 +617,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   options = options || {};
   var model = {
     iconId: options.iconId,
-    severity: options.severity !== undefined ? options.severity: scout.MessageBox.SEVERITY.ERROR,
+    severity: options.severity !== undefined ? options.severity : scout.MessageBox.SEVERITY.ERROR,
     header: options.header,
     body: options.body,
     hiddenText: options.hiddenText,
@@ -676,10 +674,10 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
   if (totalSize > maxTotalSize) {
     var boxOptions = {
-        header: this._texts.get('ui.FileSizeLimitTitle'),
-        body: this._texts.get('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),
-        yesButtonText: this.optText('Ok', 'Ok')
-      };
+      header: this._texts.get('ui.FileSizeLimitTitle'),
+      body: this._texts.get('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),
+      yesButtonText: this.optText('Ok', 'Ok')
+    };
 
     this.showFatalMessage(boxOptions);
     return;
@@ -828,78 +826,67 @@ scout.Session.prototype.areRequestsPending = function() {
 scout.Session.prototype.setBusy = function(busy) {
   if (busy) {
     if (this._busyCounter === 0) {
-      this._renderBusyGlasspane();
+      this._renderBusy();
     }
     this._busyCounter++;
   } else {
     this._busyCounter--;
     if (this._busyCounter === 0) {
-      this._removeBusyGlasspane();
+      this._removeBusy();
     }
   }
 };
 
-scout.Session.prototype._renderBusyGlasspane = function() {
-  // Don't show the busy glasspane immediately. Set a short timer instead (which may be
+scout.Session.prototype._renderBusy = function() {
+  // Don't show the busy indicator immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
   this._busyGlasspaneTimeoutId = setTimeout(function() {
-    // Create busy glasspane
-    this._$busyGlasspane = scout.fields.new$Glasspane(this.uiSessionId)
-      .addClass('busy')
-      .appendTo(this.$entryPoint);
-
-    // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
-    // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
-    this._$busyGlasspane.css('cursor', 'default');
-    setTimeout(function() {
-      this._$busyGlasspane.css('cursor', 'wait');
-    }.bind(this), 0);
-    // (End workaround)
-
-    if (this.desktop) {
-      this._$busyGlasspane.installFocusContext(scout.FocusRule.AUTO, this.uiSessionId);
-      this._busyIndicatorTimeoutId = setTimeout(function() {
-        var busyIndicator = new scout.BusyIndicator(this);
-        busyIndicator.on('buttonClick', function(event) {
-          // Set "cancelling" state (after 100ms)
-          busyIndicator.off('buttonClick');
-          setTimeout(function() {
-            if (!busyIndicator.rendered) {
-              // closed in the meantime
-              return;
-            }
-            busyIndicator.$label.addClass('cancelled');
-            busyIndicator.$buttons.remove();
-            busyIndicator.$content.addClass('no-buttons');
-          }.bind(this), 100);
-          // Request cancel on server
-          var request = {
-            uiSessionId: this.uiSessionId,
-            cancel: true
-          };
-          this._sendRequest(request);
-        }.bind(this));
-        busyIndicator.render(this._$busyGlasspane);
-      }.bind(this), 2500);
+    if (!this.desktop) {
+      return;
     }
+
+    // 1. Render busy glassPanes.
+    this._busyIndicator = new scout.BusyIndicator(this);
+    this._busyIndicator.on('buttonClick', function(event) {
+        this._onCancelProcessing(this._busyIndicator);
+      }.bind(this));
+    this._busyIndicator.renderGlassPanes();
+
+    // 2. Render busy box with a delay of 2.5 seconds.
+    this._busyIndicatorTimeoutId = setTimeout(function() {
+      this._busyIndicator.render(this.$entryPoint);
+    }.bind(this), 2500);
   }.bind(this), 500);
 };
 
-scout.Session.prototype._removeBusyGlasspane = function() {
+scout.Session.prototype._removeBusy = function() {
   // Clear any pending timers
   clearTimeout(this._busyGlasspaneTimeoutId);
   clearTimeout(this._busyIndicatorTimeoutId);
 
-  // If the timer action was executed and the glasspane is showing, we have to remove it
-  if (this._$busyGlasspane) {
-    // Workround for Chrome: Before removing the glasspane, reset the cursor. Therefore,
-    // the actual remove has to be inside setTimeout()
-    this._$busyGlasspane.css('cursor', 'default');
-    setTimeout(function() {
-      // (End workaround)
-      this._$busyGlasspane.stop().fadeOut(150, $.removeThis);
-    }.bind(this), 0);
+  if (this._busyIndicator) {
+    this._busyIndicator.remove();
+    this._busyIndicator = null;
   }
+};
+
+scout.Session.prototype._onCancelProcessing = function(busyIndicator) {
+  busyIndicator.off('buttonClick');
+
+  // Set "canceling" state (after 100ms)
+  setTimeout(function() {
+    if (busyIndicator.rendered) { // not closed yet
+      busyIndicator.$label.addClass('cancelled');
+      busyIndicator.$buttons.remove();
+      busyIndicator.$content.addClass('no-buttons');
+    }
+  }.bind(this), 100);
+
+  // Send cancel request to the server.
+  this._sendRequest({
+    uiSessionId: this.uiSessionId,
+    cancel: true
+  });
 };
 
 scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
@@ -931,7 +918,7 @@ scout.Session.prototype._processEvents = function(events) {
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }
-    eventTargets = [ adapter ];
+    eventTargets = [adapter];
     scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
     for (j = 0; j < eventTargets.length; j++) {
       if (event.type === 'property') { // Special handling for 'property' type

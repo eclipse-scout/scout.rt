@@ -55,7 +55,6 @@ describe("GroupBox", function() {
     beforeEach(function() {
       form = helper.createFormModel();
       session.desktop = new scout.Desktop();
-      session.rootAdapter.modalityElements = function() { return[]; };
       formController = new scout.FormController(form.parent, session);
       rootGroupBox = model;
       rootGroupBox.fields = [];

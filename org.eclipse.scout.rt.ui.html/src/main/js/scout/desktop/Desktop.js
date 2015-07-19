@@ -403,9 +403,9 @@ scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
 /**
  * === Method required for objects that act as 'displayParent' ===
  *
- * Returns the DOM elements to paint a 'modality glassPane' over, once a modal Form, message-box or file-chooser is showed with the Desktop as its 'displayParent'.
+ * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
  */
-scout.Desktop.prototype.modalityElements = function() {
+scout.Desktop.prototype.glassPaneTargets = function() {
   return [this.$container];
 };
 

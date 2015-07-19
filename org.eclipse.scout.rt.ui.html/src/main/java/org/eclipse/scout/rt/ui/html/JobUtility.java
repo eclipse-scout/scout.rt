@@ -113,6 +113,9 @@ public final class JobUtility {
       return future.awaitDoneAndGet();
     }
     catch (ProcessingException e) {
+      if (e.isCancellation() || e.isInterruption()) {
+        return null;
+      }
       throw new UiException("Job failed [job=%s]", e, callable.getClass().getName());
     }
   }
