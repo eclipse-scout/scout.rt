@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
@@ -58,14 +59,19 @@ public class DisplayParentResolver {
   protected IDisplayParent findClosestDisplayParent() {
     final ClientRunContext currentRunContext = ClientRunContexts.copyCurrent();
 
-    // Check whether a Form is currently the 'displayParent'.
-    if (currentRunContext.getForm() != null) {
-      return currentRunContext.getForm();
+    // Check whether a Form is currently the 'displayParent'. If being a wrapped Form, return its outer Form.
+    IForm currentForm = currentRunContext.getForm();
+    if (currentForm != null) {
+      while (currentForm.getOuterForm() != null) {
+        currentForm = currentForm.getOuterForm();
+      }
+      return currentForm;
     }
 
     // Check whether an Outline is currently the 'displayParent'.
-    if (currentRunContext.getOutline() != null) {
-      return currentRunContext.getOutline();
+    final IOutline currentOutline = currentRunContext.getOutline();
+    if (currentOutline != null) {
+      return currentOutline;
     }
 
     // Use the desktop as 'displayParent'.
