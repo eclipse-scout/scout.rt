@@ -16,11 +16,13 @@ import org.eclipse.scout.commons.Assertions.AssertionException;
 
 /**
  * An effectively final value that can be lazily initialized.
+ *
+ * @since 5.1
  */
 public class FinalValue<VALUE> {
 
   private volatile VALUE m_value;
-  private Object m_lock = new Object();
+  private final Object m_lock = new Object();
   private volatile boolean initialized = false;
 
   /**
@@ -32,7 +34,7 @@ public class FinalValue<VALUE> {
   /**
    * Create with initial value
    */
-  public FinalValue(VALUE value) {
+  public FinalValue(final VALUE value) {
     set(value);
   }
 
@@ -49,9 +51,9 @@ public class FinalValue<VALUE> {
    * @param value
    *          value to set
    */
-  public void set(VALUE value) {
+  public void set(final VALUE value) {
     synchronized (m_lock) {
-      Assertions.assertFalse(initialized, String.format("%s's can only be set once.", getClass().getSimpleName()));
+      Assertions.assertFalse(initialized, "%s can only be set once.", getClass().getSimpleName());
       setIfAbsent(value);
     }
   }
@@ -79,7 +81,7 @@ public class FinalValue<VALUE> {
    * @throws RuntimeException
    *           if the producer throws an exception
    */
-  public VALUE setIfAbsent(Callable<VALUE> producer) {
+  public VALUE setIfAbsent(final Callable<VALUE> producer) {
     if (m_value != null) {
       return m_value;
     }
@@ -90,10 +92,13 @@ public class FinalValue<VALUE> {
           m_value = producer.call();
           initialized = true;
         }
-        catch (RuntimeException e) {
+        catch (final RuntimeException e) {
           throw e;
         }
-        catch (Exception e) {
+        catch (final Error e) {
+          throw e;
+        }
+        catch (final Exception e) {
           throw new RuntimeException(e);
         }
       }
