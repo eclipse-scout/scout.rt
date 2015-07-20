@@ -7,9 +7,10 @@ scout.menus = {
 
   /**
    * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
-   * from this method. Invisible items are returned and added to the menu-bar DOM (invisible, however). They may change their visible state later.
+   * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
+   * menu-bar DOM (invisible, however). They may change their visible state later.
    */
-  filter: function(menus, types) {
+  filter: function(menus, types, onlyVisible) {
     if (!menus) {
       return;
     }
@@ -28,6 +29,10 @@ scout.menus = {
         }
       } // Don't check the menu type for a group
       else if (!scout.menus._checkType(menu, types)) {
+        return;
+      }
+
+      if (onlyVisible && !menu.visible) {
         return;
       }
       if (menu.separator) {
@@ -73,6 +78,21 @@ scout.menus = {
   isButton: function(obj) {
     // FIXME AWE: check this too, move to Menu.js#isButton
     return obj instanceof scout.Menu && obj.actionStyle === scout.Action.ActionStyle.BUTTON;
-  }
+  },
 
+  showContextMenuWithWait: function(session, func) {
+    var argumentsArray = Array.prototype.slice.call(arguments);
+    argumentsArray.shift(); // remove argument session
+    argumentsArray.shift(); // remove argument func, remainder: all other arguments
+
+    if (session.areRequestsPending() || session.areEventsQueued()) {
+      session.listen().done(onEventsProcessed);
+    } else {
+      func.apply(this, argumentsArray);
+    }
+
+    function onEventsProcessed() {
+      func.apply(this, argumentsArray);
+    }
+  }
 };

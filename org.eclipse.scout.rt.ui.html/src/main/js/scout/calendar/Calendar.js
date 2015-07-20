@@ -734,17 +734,25 @@ scout.Calendar.prototype._onDayContextMenu = function(event) {
 scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
   event.preventDefault();
   event.stopPropagation();
-  var filteredMenus = scout.menus.filter(this.menus, [allowedType]),
-    $part = $(event.currentTarget),
-    popup = new scout.ContextMenuPopup(this.session, {
-      menuItems: filteredMenus,
-      location: {
-        x: event.pageX,
-        y: event.pageY
-      },
-      $anchor: $part
-    });
-  popup.render();
+
+  var func = function func(event, allowedType) {
+    var filteredMenus = scout.menus.filter(this.menus, [allowedType], true),
+      $part = $(event.currentTarget);
+    if (filteredMenus.length === 0) {
+      return;
+    }
+    var popup = new scout.ContextMenuPopup(this.session, {
+        menuItems: filteredMenus,
+        location: {
+          x: event.pageX,
+          y: event.pageY
+        },
+        $anchor: $part
+      });
+    popup.render();
+  }.bind(this);
+
+  scout.menus.showContextMenuWithWait(this.session, func, event, allowedType);
 };
 
 /* -- components, arrangement------------------------------------ */

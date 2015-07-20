@@ -7,7 +7,8 @@ MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
   $.extend(model, {
     text: text,
     iconId: iconId,
-    menuTypes: menuTypes
+    menuTypes: menuTypes,
+    visible: true
   });
   return model;
 };

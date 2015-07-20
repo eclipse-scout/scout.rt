@@ -27,6 +27,21 @@ describe("menus", function() {
       expect(menus).toEqual([]);
     });
 
+    it("only returns visible menus, if onlyVisible param is set to true", function() {
+      var menus, menu1, menu2, menu3;
+      menu1 = helper.createMenu(helper.createModel(1));
+      menu1.menuTypes = ['SingleSelection'];
+      menu2 = helper.createMenu(helper.createModel(2));
+      menu2.menuTypes = ['SingleSelection'];
+      menu3 = helper.createMenu(helper.createModel(3));
+      menu3.menuTypes = ['SingleSelection'];
+      menu3.visible = false;
+
+      menus = scout.menus.filter([menu1, menu2, menu3], 'SingleSelection', true);
+
+      expect(menus).toEqual([menu1, menu2]);
+    });
+
     it("only returns menus with given type (even when menu is not visible)", function() {
       var menus, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));

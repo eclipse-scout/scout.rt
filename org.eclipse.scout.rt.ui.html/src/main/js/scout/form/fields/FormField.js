@@ -317,15 +317,24 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
 
 scout.FormField.prototype._onStatusMouseDown = function(event) {
   if (this._hasMenus()) {
-    // showing menus is more important than showing tooltips
-    if (!this.contextPopup || !this.contextPopup.rendered) {
-      this.contextPopup = new scout.ContextMenuPopup(this.session, {
-        menuItems: this.menus,
-        cloneMenuItems: false,
-        $anchor: this.$status
-      });
-      this.contextPopup.render(undefined, event);
-    }
+    var func = function func(event) {
+      // showing menus is more important than showing tooltips
+      if (!this.contextPopup || !this.contextPopup.rendered) {
+        if (!this.menus.some(function(menuItem) {
+          return menuItem.visible;
+        })) {
+          return; // at least one menu item must be visible
+        }
+        this.contextPopup = new scout.ContextMenuPopup(this.session, {
+          menuItems: this.menus,
+          cloneMenuItems: false,
+          $anchor: this.$status
+        });
+        this.contextPopup.render(undefined, event);
+      }
+    }.bind(this);
+
+    scout.menus.showContextMenuWithWait(this.session, func, event);
   } else {
     // Toggle tooltip
     if (this.tooltip && this.tooltip.rendered) {
@@ -339,7 +348,6 @@ scout.FormField.prototype._onStatusMouseDown = function(event) {
     }
   }
 };
-
 scout.FormField.prototype._showStatusMessage = function(options) {
   // Don't show a tooltip if there is no visible $status (tooltip points to the status)
   if (!this.$status || !this.$status.isVisible()) {

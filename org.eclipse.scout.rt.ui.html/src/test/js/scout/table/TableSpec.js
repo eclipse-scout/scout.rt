@@ -926,11 +926,40 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly('rowsSelected');
+      // first selection event for first row, second selection event for remaining rows (including first row)
+      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'rowsSelected']);
 
-      var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
-      });
+      var event = [new scout.Event(table.id, 'rowsSelected', {
+          rowIds: [model.rows[0].id]
+        }),
+        new scout.Event(table.id, 'rowsSelected', {
+          rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
+        })];
+      expect(requestData).toContainEvents(event);
+    });
+
+    it("only send one event for mousedown and immediate mouseup on the same row", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $rows = table.$data.children('.table-row');
+      var $row0 = $rows.eq(0);
+
+      expect($rows).not.toHaveClass('selected');
+
+      $row0.triggerMouseDown();
+      $row0.triggerMouseUp();
+
+      sendQueuedAjaxCalls();
+
+      var requestData = mostRecentJsonRequest();
+      // exactly only one selection event for first row
+      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
+
+      var event = [new scout.Event(table.id, 'rowsSelected', {
+          rowIds: [model.rows[0].id]
+        })];
       expect(requestData).toContainEvents(event);
     });
 

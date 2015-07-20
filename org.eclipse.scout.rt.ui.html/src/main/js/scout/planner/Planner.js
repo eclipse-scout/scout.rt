@@ -247,9 +247,13 @@ scout.Planner.prototype._onActivityContextMenu = function(event) {
 scout.Planner.prototype._showContextMenu = function(event, allowedType) {
   event.preventDefault();
   event.stopPropagation();
-  var filteredMenus = this._filterMenus([allowedType]),
-    $part = $(event.currentTarget),
-    popup = new scout.ContextMenuPopup(this.session, {
+  var func = function func(event, allowedType) {
+    var filteredMenus = this._filterMenus([allowedType]),
+    $part = $(event.currentTarget);
+    if (filteredMenus.length === 0) {
+      return; // at least one menu item must be visible
+    }
+    var popup = new scout.ContextMenuPopup(this.session, {
       menuItems: filteredMenus,
       location: {
         x: event.pageX,
@@ -257,7 +261,10 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
       },
       $anchor: $part
     });
-  popup.render();
+    popup.render();
+  }.bind(this);
+
+  scout.menus.showContextMenuWithWait(this.session, func, event, allowedType);
 };
 
 scout.Planner.prototype._onGridScroll = function() {
@@ -884,7 +891,7 @@ scout.Planner.prototype._filterMenus = function(allowedTypes) {
   if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
     scout.arrays.remove(allowedTypes, 'Planner.Range');
   }
-  return scout.menus.filter(this.menus, allowedTypes);
+  return scout.menus.filter(this.menus, allowedTypes, true);
 };
 
 scout.Planner.prototype._renderWorkDayCount = function() {};

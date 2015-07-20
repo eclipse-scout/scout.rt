@@ -58,6 +58,7 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
   if (event.which !== 3 || !oldSelectedState) {
     this.toIndex = this._allRows.indexOf(row);
     this.handleSelection(event);
+    this.table.notifyRowSelectionFinished();
   }
 
   if (this.mouseMoveSelectionEnabled && event.which !== 3) {
