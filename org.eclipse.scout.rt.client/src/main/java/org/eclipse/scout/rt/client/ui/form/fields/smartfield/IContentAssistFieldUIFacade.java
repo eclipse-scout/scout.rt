@@ -42,6 +42,6 @@ public interface IContentAssistFieldUIFacade {
    * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
    * {@link IContentAssistField}.
    */
-  void acceptProposalFromUI(String text);
+  void acceptProposalFromUI(String text, boolean chooser);
 
 }

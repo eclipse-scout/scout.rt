@@ -17,7 +17,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -27,7 +26,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -82,9 +80,9 @@ public class SmartFieldSingleResultTest {
 
     // Without the bugfix the accepted proposal would be "SingleResult"
     assertNull(m_smartField.getProposalChooser().getAcceptedProposal());
-    m_smartField.getUIFacade().acceptProposalFromUI("");
+    m_smartField.getUIFacade().acceptProposalFromUI("", false);
     // Without the bugfix the current lookup-row would be "SingleResult"
-    assertTrue(m_smartField.isEmptyLookupRow());
+    assertTrue(m_smartField.isEmptyCurrentLookupRow());
   }
 
   private static class SmartField extends AbstractSmartField<Long> {
@@ -103,12 +101,12 @@ public class SmartFieldSingleResultTest {
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByAll() throws ProcessingException {
-      return CollectionUtility.arrayList(new LookupRow<Long>(1L, "SingleResult"));
+      return LookupRows.firstRow();
     }
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByText() throws ProcessingException {
-      return CollectionUtility.arrayList(new LookupRow<Long>(1L, "SingleResult"));
+      return LookupRows.firstRow();
     }
 
   }

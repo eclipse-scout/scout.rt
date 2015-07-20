@@ -124,6 +124,11 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
     return (IContentAssistFieldDataFetchResult<LOOKUP_KEY>) propertySupport.getProperty(PROP_SEARCH_RESULT);
   }
 
+  /**
+   * Note: currently a SmartField with a tree does not show a status when no proposals
+   * have been found. That's inconsistent with SmartFields with a table. They do show
+   * a status in that case, saying 'no proposals have been found'.
+   */
   @Override
   public void setStatus(IStatus status) {
     propertySupport.setProperty(PROP_STATUS, status);

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -25,7 +24,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -85,11 +83,11 @@ public class SmartFieldMultilineTest {
     m_smartField.setValue(1L);
     assertEquals("Line1\nLine2", m_smartField.getDisplayText());
 
-    m_smartField.getUIFacade().acceptProposalFromUI("Line1 Line2");
+    m_smartField.getUIFacade().acceptProposalFromUI("Line1 Line2", false);
     // if multi line texts are not handled correctly the currentLookupRow would be
     // set to null in AbstractContentAssistField#parseValueInternal()
     assertNotNull(m_smartField.getCurrentLookupRow());
-    assertEquals(1L, m_smartField.getCurrentLookupRow().getKey().longValue());
+    assertEquals(4L, m_smartField.getCurrentLookupRow().getKey().longValue());
   }
 
   private static class SmartField extends AbstractSmartField<Long> {
@@ -115,12 +113,12 @@ public class SmartFieldMultilineTest {
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
-      return CollectionUtility.arrayList(new LookupRow<Long>(1L, "Line1\nLine2"));
+      return LookupRows.multiLineRow();
     }
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
-      return null;
+      return LookupRows.multiLineRow();
     }
 
     @Override

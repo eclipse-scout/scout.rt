@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -208,11 +207,8 @@ public class SmartFieldTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  public void testSmartfieldStyle() throws Throwable {
-
+  public void testStyle_SetValue() throws Throwable {
     StyleField f = m_form.getStyleField();
-    //model-side test
     f.setValue(10L);
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
     f.setValue(50L);
@@ -221,16 +217,24 @@ public class SmartFieldTest {
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
     f.setValue(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    //ui-side test
-    f.getUIFacadeLegacy().setTextFromUI("Red");
+  }
+
+  @Test
+  public void testStyle_UIFacade() throws Throwable {
+    StyleField f = m_form.getStyleField();
+    f.getUIFacade().acceptProposalFromUI("Red", false);
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
-    f.getUIFacadeLegacy().setTextFromUI("Empty");
+    f.getUIFacade().acceptProposalFromUI("Empty", false);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    f.getUIFacadeLegacy().setTextFromUI("Yellow");
+    f.getUIFacade().acceptProposalFromUI("Yellow", false);
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
-    f.getUIFacadeLegacy().setTextFromUI(null);
+    f.getUIFacade().acceptProposalFromUI(null, false);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    //proposal-side test
+  }
+
+  @Test
+  public void testStyle_AcceptProposal() throws Throwable {
+    StyleField f = m_form.getStyleField();
     f.acceptProposal(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
     f.acceptProposal(new LookupRow<Long>(50L, "Empty"));
@@ -239,7 +243,6 @@ public class SmartFieldTest {
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
     f.setValue(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-
   }
 
   @After
@@ -250,17 +253,15 @@ public class SmartFieldTest {
 
   @Test
   public void testSmartfieldMenus() {
-
     List<IMenu> smartfieldMenus = m_form.getStyleField().getMenus();
-    Assert.assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.size());
-    Assert.assertEquals("TestMenu1", smartfieldMenus.get(0).getText());
-    Assert.assertEquals("&TestMenu1", smartfieldMenus.get(0).getTextWithMnemonic());
-    Assert.assertEquals("alternate-2", smartfieldMenus.get(0).getKeyStroke());
+    assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.size());
+    assertEquals("TestMenu1", smartfieldMenus.get(0).getText());
+    assertEquals("&TestMenu1", smartfieldMenus.get(0).getTextWithMnemonic());
+    assertEquals("alternate-2", smartfieldMenus.get(0).getKeyStroke());
 
-    Assert.assertEquals("TestMenu2", smartfieldMenus.get(1).getText());
-    Assert.assertEquals("T&estMenu2", smartfieldMenus.get(1).getTextWithMnemonic());
-    Assert.assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
-
+    assertEquals("TestMenu2", smartfieldMenus.get(1).getText());
+    assertEquals("T&estMenu2", smartfieldMenus.get(1).getTextWithMnemonic());
+    assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
   }
 
   private static void assertFieldStyle(StyleField f, String icon, String tt, String bg, String fg, String font) {

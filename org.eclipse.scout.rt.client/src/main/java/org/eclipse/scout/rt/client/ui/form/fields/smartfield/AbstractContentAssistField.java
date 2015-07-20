@@ -73,9 +73,11 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 @ScoutSdkIgnore
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
+  // FIXME AWE: check when to use this and when to use null
   public final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
 
   private final EventListenerList m_listenerList = new EventListenerList();
+
   // chooser security
   private Class<? extends ICodeType<?, LOOKUP_KEY>> m_codeTypeClass;
   private ILookupCall<LOOKUP_KEY> m_lookupCall;
@@ -899,74 +901,69 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     interceptPrepareRecLookup(call, parentKey);
   }
 
-  class P_HandleResult {
-
-    private VALUE value;
-
-    private VetoException vetoException;
-
-    protected P_HandleResult(VALUE value) {
-      this.value = value;
-    }
-
-    protected P_HandleResult(VetoException vetoException) {
-      this.vetoException = vetoException;
-    }
-  }
-
   protected abstract VALUE returnLookupRowAsValue(ILookupRow<LOOKUP_KEY> lookupRow);
 
   /**
    * This method is called when a value is set, but no single match has been found for the given text.
    * Will be implemented differently by SmartField and ProposalField.
    */
-  protected abstract P_HandleResult handleNoCurrentLookupRowSet(String text) throws VetoException;
+  protected abstract VALUE handleMissingLookupRow(String text) throws VetoException;
 
   @Override
   protected VALUE parseValueInternal(String text) throws ProcessingException {
-    text = StringUtility.nullIfEmpty(text);
-
-    ILookupRow<LOOKUP_KEY> currentLookupRow;
-    if (isProposalChooserRegistered()) {
-      currentLookupRow = getProposalChooser().getAcceptedProposal();
+    ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
+    if (currentLookupRow == null) {
+      return handleMissingLookupRow(text);
     }
     else {
-      currentLookupRow = getCurrentLookupRow();
-      if (currentLookupRow != null) {
-        String currentLookupRowText = StringUtility.nullIfEmpty(currentLookupRow.getText());
-        if (!StringUtility.equalsIgnoreNewLines(currentLookupRowText, text)) {
-          currentLookupRow = null;
-          setCurrentLookupRow(null);
-        }
-      }
+      return returnLookupRowAsValue(getCurrentLookupRow());
     }
 
-    boolean unregister = true;
-    try {
-      if (currentLookupRow != null) {
-        setCurrentLookupRow(currentLookupRow);
-        return returnLookupRowAsValue(currentLookupRow);
-      }
-      else if (text == null) {
-        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-        return null;
-      }
-      else {
-        P_HandleResult result = handleNoCurrentLookupRowSet(text);
-        if (result.value != null) {
-          return result.value;
-        }
-        else {
-          unregister = false;
-          throw result.vetoException;
-        }
-      }
-    }
-    finally {
-      if (unregister) {
-        unregisterProposalChooserInternal();
-      }
-    }
+//
+//
+//    text = StringUtility.nullIfEmpty(text);
+//
+//    ILookupRow<LOOKUP_KEY> currentLookupRow;
+//    if (isProposalChooserRegistered()) {
+//      currentLookupRow = getProposalChooser().getAcceptedProposal();
+//    }
+//    else {
+//      currentLookupRow = getCurrentLookupRow();
+//      if (currentLookupRow != null) {
+//        String currentLookupRowText = StringUtility.nullIfEmpty(currentLookupRow.getText());
+//        if (!StringUtility.equalsIgnoreNewLines(currentLookupRowText, text)) {
+//          currentLookupRow = null;
+//          setCurrentLookupRow(null);
+//        }
+//      }
+//    }
+//
+//    boolean unregister = true;
+//    try {
+//      if (currentLookupRow != null) {
+//        setCurrentLookupRow(currentLookupRow);
+//        return returnLookupRowAsValue(currentLookupRow);
+//      }
+//      else if (text == null) {
+//        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+//        return null;
+//      }
+//      else {
+//        P_HandleResult result = handleNoCurrentLookupRowSet(text);
+//        if (result.value != null) {
+//          return result.value;
+//        }
+//        else {
+//          unregister = false;
+//          throw result.vetoException;
+//        }
+//      }
+//    }
+//    finally {
+//      if (unregister) {
+//        unregisterProposalChooserInternal();
+//      }
+//    }
   }
 
   protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
@@ -1245,7 +1242,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       acceptProposal(row);
     }
     else {
-      throw new VetoException("No accepted proposal");
+      acceptProposal(EMPTY_LOOKUP_ROW);
     }
   }
 
@@ -1425,10 +1422,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
-   * @return True if the currentLookupRow is == EMPTY_LOOKUP_ROW.
+   * @return True if currentLookupRow is null or EMPTY_LOOKUP_ROW.
    */
-  protected boolean isEmptyLookupRow() {
-    return getCurrentLookupRow() == EMPTY_LOOKUP_ROW;
+  protected boolean isEmptyCurrentLookupRow() {
+    ILookupRow<LOOKUP_KEY> lookupRow = getCurrentLookupRow();
+    return lookupRow == null || lookupRow == EMPTY_LOOKUP_ROW;
   }
 
   protected void unregisterProposalChooserInternal() {
@@ -1442,6 +1440,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   public void acceptProposal() throws ProcessingException {
     handleProposalChooserClosed();
     unregisterProposalChooserInternal();
+  }
+
+  protected void setEmptyLookupRow() {
+    setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+    setValue(null);
   }
 
 }

@@ -18,10 +18,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -33,7 +31,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -74,12 +71,12 @@ public class SmartFieldParseValueTest {
    */
   @Test
   public void testSingleMatch() throws ProcessingException, InterruptedException {
-    testMatch("a", 1L, "aName", 1, false);
+    testMatch("a", 1L, "aName", 1, false, false);
   }
 
   @Test
   public void testMultiMatch() throws ProcessingException, InterruptedException {
-    testMatch("b", 0L, null, 2, true);
+    testMatch("b", 0L, null, 2, true, true);
   }
 
   /**
@@ -87,14 +84,42 @@ public class SmartFieldParseValueTest {
    */
   @Test
   public void testNoMatch() throws ProcessingException, InterruptedException {
-    testMatch("c", 0L, null, 0, true);
+    testMatch("c", 0L, null, 0, false, true);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testSetValue() throws Exception {
+    m_smartField.setValue(1L);
+    assertFalse(m_smartField.isEmptyCurrentLookupRow());
+    assertEquals(1L, m_smartField.getValue());
+    assertEquals("aName", m_smartField.getDisplayText());
+  }
+
+  @Test
+  public void testParseAndSetValue() throws Exception {
+    m_smartField.parseAndSetValue("aName");
+    assertFalse(m_smartField.isEmptyCurrentLookupRow());
+    assertEquals(1L, m_smartField.getValue());
+    assertEquals("aName", m_smartField.getDisplayText());
+  }
+
+  @Test
+  public void testParseAndSetValue_InvalidValue() throws Exception {
+    m_smartField.parseAndSetValue("FooBar");
+    assertTrue(m_smartField.isEmptyCurrentLookupRow());
+    assertNotNull(m_smartField.getErrorStatus());
+
+    // When value becomes valid again, error status must be removed
+    m_smartField.parseAndSetValue("aName");
+    assertNull(m_smartField.getErrorStatus());
   }
 
   /**
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, Long expectedValue, String expectedDisplayText, int expectedNumProposals,
-      boolean expectValidationError) throws ProcessingException, InterruptedException {
+      boolean expectedProposalChooserOpen, boolean expectValidationError) throws ProcessingException, InterruptedException {
     final IBlockingCondition bc = Jobs.getJobManager().createBlockingCondition("loadProposals", true);
 
     m_smartField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
@@ -114,20 +139,20 @@ public class SmartFieldParseValueTest {
     assertEquals(searchText, m_smartField.getDisplayText());
     assertEquals(null, m_smartField.getValue());
 
-    m_smartField.getUIFacade().acceptProposalFromUI(searchText);
-    assertFalse(m_smartField.isProposalChooserRegistered());
+    m_smartField.getUIFacade().acceptProposalFromUI(searchText, true);
+    assertEquals(expectedProposalChooserOpen, m_smartField.isProposalChooserRegistered());
 
     if (expectValidationError) {
       assertFalse(m_smartField.getErrorStatus().isOK());
       assertEquals(searchText, m_smartField.getDisplayText());
       assertEquals(null, m_smartField.getValue());
-      assertNull(m_smartField.getCurrentLookupRow());
+      assertTrue(m_smartField.isEmptyCurrentLookupRow());
     }
     else {
       assertNull(m_smartField.getErrorStatus());
       assertEquals(expectedDisplayText, m_smartField.getDisplayText());
       assertEquals(expectedValue, m_smartField.getValue());
-      assertNotNull(m_smartField.getCurrentLookupRow());
+      assertFalse(m_smartField.isEmptyCurrentLookupRow());
     }
   }
 
@@ -156,18 +181,12 @@ public class SmartFieldParseValueTest {
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {
-      return null;
+      return LookupRows.getRowsByKey(call.getKey());
     }
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
-      if ("a*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "aName"));
-      }
-      if ("b*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "bName1"), new LookupRow<Long>(2L, "bName2"));
-      }
-      return Collections.emptyList();
+      return LookupRows.getRowsByText(call.getText());
     }
 
     @Override

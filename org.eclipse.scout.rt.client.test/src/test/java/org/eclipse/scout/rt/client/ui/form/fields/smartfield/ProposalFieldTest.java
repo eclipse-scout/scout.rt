@@ -18,10 +18,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -145,14 +143,16 @@ public class ProposalFieldTest {
     });
     m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false);
     bc.waitFor(); // must wait until results from client-job are available...
-    if (expectedNumProposals > 0) {
+
+    boolean proposalChooserOpen = expectedNumProposals > 0;
+    if (proposalChooserOpen) {
       assertTrue(m_proposalField.isProposalChooserRegistered());
       assertEquals(expectedNumProposals, getProposalTableRowCount());
     }
     assertEquals(expectedValue, m_proposalField.getDisplayText());
     assertEquals(null, m_proposalField.getValue());
 
-    m_proposalField.getUIFacade().acceptProposalFromUI(searchText);
+    m_proposalField.getUIFacade().acceptProposalFromUI(searchText, proposalChooserOpen);
     assertFalse(m_proposalField.isProposalChooserRegistered());
     assertEquals(expectedValue, m_proposalField.getDisplayText());
     assertEquals(expectedValue, m_proposalField.getValue());
@@ -193,13 +193,7 @@ public class ProposalFieldTest {
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
-      if ("a*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "aName"));
-      }
-      if ("b*".equals(call.getText())) {
-        return CollectionUtility.arrayList(new LookupRow<Long>(1L, "bName1"), new LookupRow<Long>(2L, "bName2"));
-      }
-      return Collections.emptyList();
+      return LookupRows.getRowsByText(call.getText());
     }
 
     @Override

@@ -109,8 +109,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected P_HandleResult handleNoCurrentLookupRowSet(String text) throws VetoException {
-    return new P_HandleResult(text);
+  protected String handleMissingLookupRow(String text) throws VetoException {
+    return text;
   }
 
   @Override
