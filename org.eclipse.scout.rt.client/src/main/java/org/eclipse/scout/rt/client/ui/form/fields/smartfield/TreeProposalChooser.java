@@ -489,7 +489,9 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
     @Override
     protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
-      m_contentAssistField.acceptProposal();
+      if (node.isEnabled()) {
+        m_contentAssistField.acceptProposal();
+      }
     }
 
     @Override
