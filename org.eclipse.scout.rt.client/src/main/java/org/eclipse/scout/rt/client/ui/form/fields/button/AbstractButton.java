@@ -164,6 +164,18 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
+   * Configures whether or not the space for the status is visible.
+   * <p>
+   * Default for buttons is false, because they normally don't fill the grid cell and therefore it is not necessary to
+   * align their status with the status of other fields. This makes sure the space next to the button is not wasted by
+   * an invisible status.
+   */
+  @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
+  }
+
+  /**
    * Called whenever this button is clicked. This button is disabled and cannot be clicked again
    * until this method returns.
    * <p>

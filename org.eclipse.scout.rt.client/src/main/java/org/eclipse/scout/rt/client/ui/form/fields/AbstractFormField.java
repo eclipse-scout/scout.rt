@@ -679,9 +679,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Configures whether or not the status icon is visible.
+   * Configures whether or not the space for the status is visible.
+   * <p>
+   * If set to false, the space is not visible unless there is a status message, tooltip or menu. <br>
+   * If set to true the space is always visible, even if there is no status message, no tooltip and no menu.
    *
-   * @return {@code true} if status icon should be visible, {@code false} otherwise
+   * @return {@code true} if the space for the status should always be visible, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
