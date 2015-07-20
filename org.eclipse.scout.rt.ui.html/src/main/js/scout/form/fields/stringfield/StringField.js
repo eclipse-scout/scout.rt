@@ -53,8 +53,24 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderSpellCheckEnabled(this.spellCheckEnabled);
   this._renderHasAction(this.hasAction);
   this._renderSelectionStart(this.selectionStart);
-  this._renderSelectionStart(this.selectionEnd);
+  this._renderSelectionEnd(this.selectionEnd);
+  this._renderMaxLength();
   // no render operation necessary: this._renderSelectionTrackingEnabled(...);
+};
+
+scout.StringField.prototype._renderMaxLength = function(maxLength0){
+  var maxLength = maxLength0 || this.maxLength;
+  if (this.$field[0].maxLength) {
+    this.$field[0].maxLength = maxLength;
+  } else {
+    this.$field.on("keyup change paste", function(e) {
+      var currLength = this.$field.val().length;
+
+      if (currLength > this.maxLength) {
+        this.$field.val(this.$field.val().slice(0, this.maxLength));
+      }
+    }.bind(this));
+  }
 };
 
 scout.StringField.prototype._renderSelectionStart = function(selectionStart){

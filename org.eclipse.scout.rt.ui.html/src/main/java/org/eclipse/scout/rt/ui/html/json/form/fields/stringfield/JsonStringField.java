@@ -120,6 +120,12 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
         return getModel().getDropMaximumSize();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_MAX_LENGTH, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getMaxLength();
+      }
+    });
   }
 
   @Override
