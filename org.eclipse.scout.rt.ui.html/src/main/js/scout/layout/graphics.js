@@ -417,6 +417,7 @@ scout.HtmlEnvironment = {
   formRowGap: 10,
   formColumnWidth: 360,
   formColumnGap: 40,
+  smallColumnGap: 4,
   fieldLabelWidth: 140,
   fieldMandatoryIndicatorWidth: 6,
   fieldStatusWidth: 20

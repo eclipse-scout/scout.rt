@@ -5,14 +5,15 @@ scout.SequenceBox = function() {
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
 scout.SequenceBox.prototype._render = function($parent) {
-  var field, i;
+  var field, i,
+    env = scout.HtmlEnvironment;
   this.addContainer($parent, 'sequence-box');
   this.addLabel();
   this.addField($('<div>'));
   this.addStatus();
   this._handleStatus();
   var htmlComp = new scout.HtmlComponent(this.$field, this.session);
-  htmlComp.setLayout(new scout.LogicalGridLayout(4, 0));
+  htmlComp.setLayout(new scout.LogicalGridLayout(env.smallColumnGap, 0));
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
     field.labelUseUiWidth = true;

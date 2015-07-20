@@ -144,14 +144,6 @@
     return $.makeDiv(cssClass, htmlContent, id).prependTo(this);
   };
 
-  $.fn.retriveBeforeElementCss = function(propertyName) {
-    return window.getComputedStyle(this[0], ':before').getPropertyValue(propertyName);
-  };
-
-  $.fn.retriveAfterElementCss = function(propertyName) {
-    return window.getComputedStyle(this[0], ':after').getPropertyValue(propertyName);
-  };
-
   // append - and return new div for chaining
   $.fn.appendDiv = function(cssClass, htmlContent, id) {
     return $.makeDiv(cssClass, htmlContent, id).appendTo(this);
