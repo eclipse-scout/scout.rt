@@ -131,7 +131,11 @@ scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
 };
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function() {
-  this.viewMenuTab._onMousedownTab();
+  if (this.viewMenuTab.popup === undefined || !this.viewMenuTab.popup.rendered) {
+    this.viewMenuTab._onMousedownTab();
+  } else {
+    this.viewMenuTab.popup.close();
+  }
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
