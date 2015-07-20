@@ -63,12 +63,14 @@ scout.StringField.prototype._renderMaxLength = function(maxLength0){
   if (this.$field[0].maxLength) {
     this.$field[0].maxLength = maxLength;
   } else {
-    this.$field.on("keyup change paste", function(e) {
-      var currLength = this.$field.val().length;
+    this.$field.on("keyup paste", function(e) {
+      setTimeout(function() {
+        var currLength = this.$field.val().length;
 
-      if (currLength > this.maxLength) {
-        this.$field.val(this.$field.val().slice(0, this.maxLength));
-      }
+        if (currLength > this.maxLength) {
+          this.$field.val(this.$field.val().slice(0, this.maxLength));
+        }
+      }.bind(this), 0);
     }.bind(this));
   }
 };
