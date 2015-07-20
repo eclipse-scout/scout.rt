@@ -42,6 +42,12 @@ describe("TabBox", function() {
       expect(field._$tabContentCache.length).toBe(0);
     });
 
+    it("must not create LogicalGridData for tab items", function() {
+      field.render(session.$entryPoint);
+      // See TabItem.js for the reason for this spec
+      expect(field.tabItems[0].htmlComp.layoutData).toBe(null);
+    });
+
   });
 
 });

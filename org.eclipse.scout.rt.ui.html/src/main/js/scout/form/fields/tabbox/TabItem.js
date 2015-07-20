@@ -9,6 +9,14 @@ scout.TabItem = function() {
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 
+scout.TabItem.prototype._render = function($parent) {
+  scout.TabItem.parent.prototype._render.call(this, $parent);
+  // LogicalGridData.isValidateRoot would always return true which is wrong if the data has not been validated yet.
+  // Since the tabbox does not use the logical grid layout, noone validates the griddata -> isValidateRoot is never correct.
+  // Because there is no logical grid layout, there is no use for the logical grid data.
+  this.htmlComp.layoutData = null;
+};
+
 /**
  * This method has nothing to do with the regular rendering of the GroupBox. It is an additional method
  * to render a single tab for this tab-item. Since tab and tab-item share the same model.
