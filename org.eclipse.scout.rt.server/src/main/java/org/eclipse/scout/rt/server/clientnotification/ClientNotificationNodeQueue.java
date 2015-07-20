@@ -31,7 +31,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.server.services.common.security.LogoutService;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
@@ -40,7 +39,7 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
  */
 @Bean
 public class ClientNotificationNodeQueue {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogoutService.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationNodeQueue.class);
 
   private final FinalValue<String> m_nodeId = new FinalValue<>();
 
