@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -33,7 +32,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
   private static final long serialVersionUID = 1L;
-  private static final String DIAGNOSTIC_SESSION_KEY = AdminSession.class.getName();
+  private static final String DIAGNOSTIC_SESSION_KEY = DiagnosticSession.class.getName();
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
