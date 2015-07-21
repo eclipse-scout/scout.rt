@@ -139,14 +139,14 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     IValueField<T> left = (nonEmptyIndex - 1 >= 0) ? nonEmptyFields.get(nonEmptyIndex - 1) : null;
     IStatus leftError = checkFromTo(left, v, false);
     if (leftError != null) {
-      addSequenceError(v, leftError);
+      v.addErrorStatus(leftError);
     }
     else {
       //check right neighbor greater
       IValueField<T> right = (nonEmptyIndex + 1 < nonEmptyFields.size()) ? nonEmptyFields.get(nonEmptyIndex + 1) : null;
       IStatus rightError = checkFromTo(v, right, true);
       if (rightError != null) {
-        addSequenceError(v, rightError);
+        v.addErrorStatus(rightError);
       }
       else {
         clearSequenceErrors(nonEmptyFields);
@@ -172,16 +172,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       beanTypes.add(f.getValue().getClass());
     }
     return beanTypes.size() == 1;
-  }
-
-  private <T extends Comparable<T>> void addSequenceError(IValueField<T> v, IStatus errorStatus) {
-    if (!v.isLabelSuppressed()) {
-      v.addErrorStatus(errorStatus);
-    }
-    else {
-      //first field's label is suppressed and error status updated on own label
-      addErrorStatus(errorStatus);
-    }
   }
 
   /**
@@ -310,8 +300,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     if (isInitialized()) {
       // box is only visible when it has at least one visible item
       rebuildFieldGrid();
-      // recompute field status visibility
-      updateFieldStatusVisible();
     }
   }
 
