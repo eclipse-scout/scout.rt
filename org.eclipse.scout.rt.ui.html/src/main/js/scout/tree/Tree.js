@@ -102,6 +102,7 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   this.$data = this.$container.appendDiv('tree-data')
+    .on('contextmenu', this._onContextMenu.bind(this))
     .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
@@ -153,7 +154,7 @@ scout.Tree.prototype._renderMenus = function() {
   this.menuBar.updateItems(menuItems);
 };
 
-scout.Tree.prototype._filterMenus = function(allowedTypes) {
+scout.Tree.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   allowedTypes = allowedTypes || [];
   if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodeIds.length !== 1) {
     scout.arrays.remove(allowedTypes, 'Tree.SingleSelection');
@@ -161,7 +162,7 @@ scout.Tree.prototype._filterMenus = function(allowedTypes) {
   if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodeIds.length <= 1) {
     scout.arrays.remove(allowedTypes, 'Tree.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes);
+  return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
 };
 
 scout.Tree.prototype._renderEnabled = function() {
@@ -1083,6 +1084,37 @@ scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   } else {
     $checkboxDiv.toggleClass('childrenChecked', false);
   }
+};
+
+scout.Tree.prototype._onContextMenu = function(event) {
+  if (this.$data.is(event.target)) {
+    this._showContextMenu(event, ['Tree.EmptySpace']);
+  } else {
+    this._showContextMenu(event, ['Tree.SingleSelection', 'Tree.MultiSelection']);
+  }
+};
+
+scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
+  event.preventDefault();
+  event.stopPropagation();
+  var func = function func(event, allowedTypes) {
+    var filteredMenus = this._filterMenus(allowedTypes, true),
+    $part = $(event.currentTarget);
+    if (filteredMenus.length === 0) {
+      return; // at least one menu item must be visible
+    }
+    var popup = new scout.ContextMenuPopup(this.session, {
+      menuItems: filteredMenus,
+      location: {
+        x: event.pageX,
+        y: event.pageY
+      },
+      $anchor: $part
+    });
+    popup.render();
+  }.bind(this);
+
+  scout.menus.showContextMenuWithWait(this.session, func, event, allowedTypes);
 };
 
 scout.Tree.prototype._onNodeMouseDown = function(event) {

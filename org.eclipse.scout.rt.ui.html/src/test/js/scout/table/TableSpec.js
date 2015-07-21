@@ -825,9 +825,8 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var $menu = helper.getDisplayingContextMenu(table);
-      expect($menu.find('.menu-item').length).toBe(2);
+      expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
-      expect($menu.find('.menu-item').eq(1).isVisible()).toBe(false);
     });
 
   });

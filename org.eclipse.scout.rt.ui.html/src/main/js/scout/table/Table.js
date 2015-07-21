@@ -799,7 +799,7 @@ scout.Table.prototype._find$AppLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function(allowedTypes) {
+scout.Table.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   allowedTypes = allowedTypes || [];
   if (allowedTypes.indexOf('Table.SingleSelection') > -1 && this.selectedRows.length !== 1) {
     scout.arrays.remove(allowedTypes, 'Table.SingleSelection');
@@ -807,7 +807,7 @@ scout.Table.prototype._filterMenus = function(allowedTypes) {
   if (allowedTypes.indexOf('Table.MultiSelection') > -1 && this.selectedRows.length <= 1) {
     scout.arrays.remove(allowedTypes, 'Table.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes);
+  return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
 };
 
 scout.Table.prototype._renderMenus = function() {
