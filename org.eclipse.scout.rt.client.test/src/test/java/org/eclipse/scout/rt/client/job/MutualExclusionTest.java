@@ -33,14 +33,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -95,8 +100,8 @@ public class MutualExclusionTest {
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobManager.class).
-        withInitialInstance(m_jobManager).
-        withApplicationScoped(true));
+            withInitialInstance(m_jobManager).
+            withApplicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
@@ -156,6 +161,30 @@ public class MutualExclusionTest {
   }
 
   /**
+   * TestsXXX
+   */
+  @Test(expected = AssertionException.class)
+  public void testAwaitDoneWithSameMutex() throws Throwable {
+    final Object mutex = new Object();
+    Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+
+          }
+        }, Jobs.newInput(null).withMutex(mutex)).awaitDone();
+
+      }
+    }, Jobs.newInput(null).withMutex(mutex)).awaitDoneAndGet(BEANS.get(ThrowableTranslator.class));
+
+  }
+
+  /**
    * Tests serial execution of nested model jobs.
    */
   @Test
@@ -185,12 +214,10 @@ public class MutualExclusionTest {
             });
 
             try {
-              future.awaitDoneAndGet(1, TimeUnit.SECONDS);
+              future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(RuntimeExceptionTranslator.class));
             }
-            catch (ProcessingException e) {
-              if (e.isTimeout()) {
-                protocol.add(5);
-              }
+            catch (AssertionException e) {
+              protocol.add(5);
             }
 
             protocol.add(6);
@@ -243,24 +270,24 @@ public class MutualExclusionTest {
 
           @Override
           public void run() throws Exception {
-            protocol.add(4);
+            protocol.add(3);
           }
         });
 
         try {
-          future.awaitDoneAndGet(1, TimeUnit.SECONDS);
+          future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(ExceptionTranslator.class));
         }
-        catch (ProcessingException e) {
+        catch (AssertionException e) {
           protocol.add(2);
-          if (e.isTimeout()) {
-            protocol.add(3);
-          }
+        }
+        catch (Exception e) {
+          protocol.add(4);
         }
       }
     });
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
-    assertEquals(CollectionUtility.arrayList(1, 2, 3, 4), protocol);
+    assertEquals(CollectionUtility.arrayList(1, 2, 3), protocol);
   }
 
   /**
@@ -599,9 +626,9 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-        withOrder(-1000).
-        withInitialInstance(jobManager).
-        withApplicationScoped(true)));
+            withOrder(-1000).
+            withInitialInstance(jobManager).
+            withApplicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
 
@@ -726,9 +753,9 @@ public class MutualExclusionTest {
 
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-        withOrder(-1000).
-        withInitialInstance(jobManager).
-        withApplicationScoped(true)));
+            withOrder(-1000).
+            withInitialInstance(jobManager).
+            withApplicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);

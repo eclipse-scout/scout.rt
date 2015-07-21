@@ -22,7 +22,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -277,7 +279,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public <ERROR extends Throwable> RESULT awaitDoneAndGet(final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
+    ensureNotSameMutex();
     try {
+
       return get();
     }
     catch (final CancellationException e) {
@@ -291,6 +295,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
   }
 
+  private void ensureNotSameMutex() {
+    IFuture<?> currentFuture = IFuture.CURRENT.get();
+    if (currentFuture != null) {
+      Assertions.assertFalse(CompareUtility.equals(getMutexObject(), currentFuture.getJobInput().getMutex()));
+    }
+  }
+
   @Override
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws ProcessingException {
     return awaitDoneAndGet(timeout, unit, BEANS.get(ProcessingExceptionTranslator.class));
@@ -298,6 +309,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public <ERROR extends Throwable> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
+    ensureNotSameMutex();
     try {
       return get(timeout, unit);
     }
