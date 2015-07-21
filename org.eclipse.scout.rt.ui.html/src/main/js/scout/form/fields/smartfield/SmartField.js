@@ -10,6 +10,7 @@ scout.SmartField = function() {
   this._browseOnce;
   this._addAdapterProperties(['proposalChooser']);
   this._popup;
+  this._tabPrevented = false;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -60,6 +61,16 @@ scout.SmartField.prototype.addSmartFieldPopup = function() {
 scout.SmartField.prototype._renderProperties = function() {
   scout.SmartField.parent.prototype._renderProperties.call(this);
   this._renderProposalChooser();
+};
+
+
+/**
+ * Prevent we search again.... XXX
+ * @param displayText
+ */
+scout.SmartField.prototype._syncDisplayText = function(displayText) {
+  this._oldSearchText = displayText;
+  this.displayText = displayText;
 };
 
 /**
@@ -117,6 +128,21 @@ scout.SmartField.prototype._onIconClick = function(event) {
   }
 };
 
+// FIXME AWE: hier die prüfung machen, ob das smartfield geändert wurde
+// und wir zum server müssen, um zu prüfen ob das nächste Feld getabbt werden
+// darf oder nicht.
+scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
+  var doPrevent;
+//  if (this.proposalChooser) {
+//    doPrevent = false;
+//  } else {
+    var searchText = this._readDisplayText();
+    doPrevent = this._oldSearchText !== searchText;
+//  }
+  $.log.debug('must prevent default when tab was pressed = ' + doPrevent);
+  return doPrevent;
+};
+
 // navigate in options
 scout.SmartField.prototype._onKeyDown = function(e) {
   if (e.which === scout.keys.ESCAPE) {
@@ -125,6 +151,16 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     }
     this._closeProposal();
     return;
+  }
+
+  // We must prevent default focus handling
+  if (e.which === scout.keys.TAB) {
+    if (this._isPreventDefaultTabHandling()) {
+      e.preventDefault();
+      this._tabPrevented = true;
+      this._acceptProposal();
+      return;
+    }
   }
 
   // We must not deal with TAB key here, because
@@ -148,7 +184,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
 
 scout.SmartField.prototype._onFocus = function(e) {
   this._browseOnce = true;
-  this._oldSearchText = this._searchText();
+  this._oldSearchText = this._readDisplayText();
 };
 
 scout.SmartField.prototype._onKeyUp = function(e) {
@@ -181,12 +217,12 @@ scout.SmartField.prototype._onKeyUp = function(e) {
     this._proposalTyped();
   } else if (this._browseOnce) {
     this._browseOnce = false;
-    this._openProposal(this._searchText(), false);
+    this._openProposal(this._readDisplayText(), false);
   }
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
-  var searchText = this._searchText();
+  var searchText = this._readDisplayText();
   if (searchText === this.displayText) {
     return;
   }
@@ -230,29 +266,58 @@ scout.SmartField.prototype._acceptProposal = function() {
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = null;
 
-  // Prevent that acceptProposal is sent when text has not changed at all
-  // for instance when the user tabs over the smartfield. However, we must
-  // still send cancelProposal to the server in case the proposal chooser
-  // is opened.
+  var proposalChooserOpen = !!this.proposalChooser,
+    searchText = this._readDisplayText();
 
-  // proposalChooserOpen is set to true, when user has opened the proposal
-  // chooser and presses TAB or ENTER to choose the selected row in the
-  // proposal table. The Java client will use the selected row as value
-  // when it receives the acceptProposal event in that case.
-  var proposalChooserOpen = this._popup.rendered,
-    searchText = this._searchText();
-  this.displayText = searchText;
-  if (!proposalChooserOpen && searchText === this._oldSearchText) {
-    this._closeProposal(true);
-    return;
+  $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen);
+  if (proposalChooserOpen) {
+    // Always send accept proposal, when proposal chooser is opened
+    // Because user wants to choose the selected proposal from the
+    // proposal chooser by pressing TAB or ENTER.
+    // The Java client will use the selected row as value when it
+    // receives the acceptProposal event in that case.
+    this._sendAcceptProposal(searchText, true);
+  } else {
+    // When proposal chooser is closed, only send accept proposal
+    // when search text has changed. Prevents unnecessary requests
+    // to the server when the user tabs over the smartfield.
+    if (searchText === this._oldSearchText) {
+      return;
+    }
+    this._sendAcceptProposal(searchText, false);
   }
-  this._oldSearchText = searchText;
 
-  $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText);
+  this.session.listen().done(function() {
+    $.log.debug('SmartField request done proposalChooser=' + this.proposalChooser);
+    if (this._tabPrevented) {
+      this._tabPrevented = false;
+      if (!this.proposalChooser) {
+        this._focusNextTabbable();
+      }
+    }
+  }.bind(this));
+};
+
+
+scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalChooserOpen) {
+  this.displayText = searchText;
+  this._oldSearchText = searchText;
   this.session.send(this.id, 'acceptProposal', {
-    searchText: searchText
+    searchText: searchText,
+    chooser: proposalChooserOpen
   });
-  this._closeProposal(false);
+};
+
+// FIXME AWE: check if we can find next tabbable in the current focus-context (FocusManager)
+scout.SmartField.prototype._focusNextTabbable = function() {
+  var $tabElements = $(':tabbable');
+  var nextIndex = 0;
+  var fieldIndex = $tabElements.index(this.$field);
+  if (fieldIndex + 1 < $tabElements.length) {
+    nextIndex = fieldIndex + 1;
+  }
+  $.log.debug('SmartField tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
+  $tabElements.eq(nextIndex).focus();
 };
 
 scout.SmartField.prototype._closeProposal = function(notifyServer) {
@@ -262,10 +327,6 @@ scout.SmartField.prototype._closeProposal = function(notifyServer) {
     }
     this._popup.close();
   }
-};
-
-scout.SmartField.prototype._searchText = function() {
-  return this.$field.val();
 };
 
 // FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
