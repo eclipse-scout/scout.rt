@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -80,9 +80,9 @@ public class SmartFieldSingleResultTest {
 
     // Without the bugfix the accepted proposal would be "SingleResult"
     assertNull(m_smartField.getProposalChooser().getAcceptedProposal());
-    m_smartField.getUIFacade().acceptProposalFromUI("", false);
+    m_smartField.getUIFacade().acceptProposalFromUI("", false, false);
     // Without the bugfix the current lookup-row would be "SingleResult"
-    assertTrue(m_smartField.isEmptyCurrentLookupRow());
+    assertFalse(m_smartField.isCurrentLookupRowSet());
   }
 
   private static class SmartField extends AbstractSmartField<Long> {

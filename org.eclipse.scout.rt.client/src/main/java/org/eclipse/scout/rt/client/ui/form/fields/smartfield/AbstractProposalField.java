@@ -114,6 +114,12 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
+  protected boolean handleAcceptByDisplayText(String text) {
+    setValue(text);
+    return false;
+  }
+
+  @Override
   protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() throws ProcessingException {
     return createProposalChooser(true);
   }

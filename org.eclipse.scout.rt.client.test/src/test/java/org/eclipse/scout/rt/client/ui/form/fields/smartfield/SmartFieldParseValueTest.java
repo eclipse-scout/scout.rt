@@ -74,24 +74,27 @@ public class SmartFieldParseValueTest {
     testMatch("a", 1L, "aName", 1, false, false);
   }
 
+  /**
+   * Expect the proposal chooser to be open when multiple matches have been found.
+   */
   @Test
   public void testMultiMatch() throws ProcessingException, InterruptedException {
     testMatch("b", 0L, null, 2, true, true);
   }
 
   /**
-   * Other than in earlier versions of the SmartField the proposal chooser
+   * Expect the proposal chooser to be open when no match has been found.
    */
   @Test
   public void testNoMatch() throws ProcessingException, InterruptedException {
-    testMatch("c", 0L, null, 0, false, true);
+    testMatch("c", 0L, null, 0, true, true);
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testSetValue() throws Exception {
     m_smartField.setValue(1L);
-    assertFalse(m_smartField.isEmptyCurrentLookupRow());
+    assertTrue(m_smartField.isCurrentLookupRowSet());
     assertEquals(1L, m_smartField.getValue());
     assertEquals("aName", m_smartField.getDisplayText());
   }
@@ -99,7 +102,7 @@ public class SmartFieldParseValueTest {
   @Test
   public void testParseAndSetValue() throws Exception {
     m_smartField.parseAndSetValue("aName");
-    assertFalse(m_smartField.isEmptyCurrentLookupRow());
+    assertTrue(m_smartField.isCurrentLookupRowSet());
     assertEquals(1L, m_smartField.getValue());
     assertEquals("aName", m_smartField.getDisplayText());
   }
@@ -107,7 +110,7 @@ public class SmartFieldParseValueTest {
   @Test
   public void testParseAndSetValue_InvalidValue() throws Exception {
     m_smartField.parseAndSetValue("FooBar");
-    assertTrue(m_smartField.isEmptyCurrentLookupRow());
+    assertFalse(m_smartField.isCurrentLookupRowSet());
     assertNotNull(m_smartField.getErrorStatus());
 
     // When value becomes valid again, error status must be removed
@@ -139,21 +142,27 @@ public class SmartFieldParseValueTest {
     assertEquals(searchText, m_smartField.getDisplayText());
     assertEquals(null, m_smartField.getValue());
 
-    m_smartField.getUIFacade().acceptProposalFromUI(searchText, true);
+    m_smartField.getUIFacade().acceptProposalFromUI(searchText, true, false);
     assertEquals(expectedProposalChooserOpen, m_smartField.isProposalChooserRegistered());
 
     if (expectValidationError) {
       assertFalse(m_smartField.getErrorStatus().isOK());
       assertEquals(searchText, m_smartField.getDisplayText());
       assertEquals(null, m_smartField.getValue());
-      assertTrue(m_smartField.isEmptyCurrentLookupRow());
+      assertFalse(m_smartField.isCurrentLookupRowSet());
     }
     else {
       assertNull(m_smartField.getErrorStatus());
       assertEquals(expectedDisplayText, m_smartField.getDisplayText());
       assertEquals(expectedValue, m_smartField.getValue());
-      assertFalse(m_smartField.isEmptyCurrentLookupRow());
+      assertTrue(m_smartField.isCurrentLookupRowSet());
     }
+  }
+
+  @Test
+  public void testForceClose() throws Exception {
+    // FIXME AWE: test
+
   }
 
   int getProposalTableRowCount() {

@@ -152,7 +152,7 @@ public class ProposalFieldTest {
     assertEquals(expectedValue, m_proposalField.getDisplayText());
     assertEquals(null, m_proposalField.getValue());
 
-    m_proposalField.getUIFacade().acceptProposalFromUI(searchText, proposalChooserOpen);
+    m_proposalField.getUIFacade().acceptProposalFromUI(searchText, proposalChooserOpen, false);
     assertFalse(m_proposalField.isProposalChooserRegistered());
     assertEquals(expectedValue, m_proposalField.getDisplayText());
     assertEquals(expectedValue, m_proposalField.getValue());

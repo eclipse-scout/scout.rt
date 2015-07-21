@@ -41,7 +41,14 @@ public interface IContentAssistFieldUIFacade {
    * Called when Enter key has been pressed.<br/>
    * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
    * {@link IContentAssistField}.
+   *
+   * @param text
+   * @param chooser
+   * @param forceClose
+   *          whether or not the proposal chooser must be closed - this is the case when a
+   *          user clicks on another field, but not when he tries to leave the field by
+   *          using the TAB key.
    */
-  void acceptProposalFromUI(String text, boolean chooser);
+  void acceptProposalFromUI(String text, boolean chooser, boolean forceClose);
 
 }

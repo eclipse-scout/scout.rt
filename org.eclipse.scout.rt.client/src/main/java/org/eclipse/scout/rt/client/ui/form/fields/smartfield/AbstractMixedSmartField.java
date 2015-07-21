@@ -39,10 +39,12 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
@@ -151,6 +153,37 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   }
 
   @Override
+  protected boolean handleAcceptByDisplayText(String text) {
+    try {
+      String searchText = toSearchText(text);
+      List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = callTextLookup(searchText, 2);
+      int numRows = lookupRows.size();
+      if (numRows == 0) {
+        setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text));
+        return true;
+      }
+      else if (numRows == 1) {
+        acceptProposal(lookupRows.get(0));
+      }
+      else if (numRows > 1) {
+        setValidationError(text, TEXTS.get("SmartFieldNotUnique", text));
+        return true;
+      }
+    }
+    catch (ProcessingException e) {
+      setValidationError(text, TEXTS.get("SmartFieldSearchFailed"));
+      return true;
+    }
+    return false;
+  }
+
+  private void setValidationError(String displayText, String errorMessage) {
+    setCurrentLookupRowAndValueToNull();
+    setDisplayText(displayText);
+    addErrorStatus(new ValidationFailedStatus(errorMessage));
+  }
+
+  @Override
   public void applyLazyStyles() {
     // override: ensure that (async loading) lookup context has been set
     if (m_backgroundJobFuture.get() != null && ModelJobs.isModelThread()) {
@@ -164,12 +197,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       try {
         if (getLookupCall() instanceof LocalLookupCall) {
           List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
-          if (rows != null && !rows.isEmpty()) {
-            installLookupRowContext(rows.get(0));
-          }
-          else {
-            installLookupRowContext(EMPTY_LOOKUP_ROW);
-          }
+          safeInstallLookupRowContext(rows);
         }
         else {
           // enqueue LookupRow fetcher
@@ -201,74 +229,6 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
   }
 
-  // FIXME AWE
-  // call installLookupRowContext(getCurrentLookupRow()); somewhere?
-
-//  private void foo() {
-//
-//    /*
-//     * Ticket 76232
-//     */
-//    IFuture<List<ILookupRow<LOOKUP_KEY>>> backgroundJobFuture = m_backgroundJobFuture.get();
-//    if (backgroundJobFuture != null) {
-//      backgroundJobFuture.cancel(true);
-//    }
-//
-//    // trivial case for null
-//    if (getCurrentLookupRow() == null) {
-//      if (validKey == null) {
-//        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-//      }
-//    }
-//    if (getCurrentLookupRow() != null) {
-//      installLookupRowContext(getCurrentLookupRow());
-//
-//    }
-//    else {
-//      // service lookup required
-//      // start a background thread that loads the text
-//      if (getLookupCall() != null) {
-//        try {
-//          if (getLookupCall() instanceof LocalLookupCall) {
-//            List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(validKey));
-//            if (rows != null && !rows.isEmpty()) {
-//              installLookupRowContext(rows.get(0));
-//            }
-//            else {
-//              installLookupRowContext(EMPTY_LOOKUP_ROW);
-//            }
-//          }
-//          else {
-//            // enqueue LookupRow fetcher
-//            // this will later on call installLookupRowContext()
-//            final ILookupCall<LOOKUP_KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
-//            prepareKeyLookup(call, interceptConvertValueToKey(validKey));
-//
-//            m_backgroundJobFuture.set(ClientJobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
-//              @Override
-//              public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
-//                List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
-//                filterKeyLookup(call, result);
-//                return cleanupResultList(result);
-//              }
-//            }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("Fetch smart-field data")));
-//
-//            ModelJobs.schedule(new IRunnable() {
-//              @Override
-//              public void run() throws Exception {
-//                waitForLookupRows();
-//              }
-//            });
-//          }
-//        }
-//        catch (ProcessingException e) {
-//          BEANS.get(ExceptionHandler.class).handle(e);
-//        }
-//      }
-//      return propertySupport.getPropertyString(PROP_DISPLAY_TEXT);
-//    }
-//  }
-
   @Override
   protected String formatValueInternal(VALUE validKey) {
     if (validKey == null) {
@@ -289,8 +249,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         }
       }
       catch (ProcessingException e) {
-        // FIXME AWE Auto-generated catch block
-        e.printStackTrace();
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
 
@@ -318,9 +277,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     if (getLookupCall() != null && getValue() != null) {
       try {
         List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
-        if (rows != null && !rows.isEmpty()) {
-          installLookupRowContext(rows.get(0));
-        }
+        safeInstallLookupRowContext(rows);
       }
       catch (ProcessingException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
@@ -455,6 +412,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
   }
 
+  protected void safeInstallLookupRowContext(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) {
+    ILookupRow<LOOKUP_KEY> lookupRow = null;
+    if (CollectionUtility.hasElements(lookupRows)) {
+      lookupRow = lookupRows.get(0);
+    }
+    installLookupRowContext(lookupRow);
+  }
+
   private void waitForLookupRows() {
     IFuture<List<ILookupRow<LOOKUP_KEY>>> backgroundJobFuture = m_backgroundJobFuture.get();
     if (backgroundJobFuture == null) {
@@ -464,12 +429,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     // background thread finished fetching
     try {
       List<ILookupRow<LOOKUP_KEY>> rows = backgroundJobFuture.awaitDoneAndGet();
-      if (CollectionUtility.hasElements(rows)) {
-        installLookupRowContext(rows.get(0));
-      }
-      else {
-        installLookupRowContext(EMPTY_LOOKUP_ROW);
-      }
+      safeInstallLookupRowContext(rows);
     }
     catch (ProcessingException e) {
       LOG.error("Error loading smartfield data.", e);

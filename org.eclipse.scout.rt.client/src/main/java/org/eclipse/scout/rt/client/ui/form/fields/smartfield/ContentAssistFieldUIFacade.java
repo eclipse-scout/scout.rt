@@ -10,13 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -70,7 +67,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   @Override
-  public void acceptProposalFromUI(String text, boolean chooser) {
+  public void acceptProposalFromUI(String text, boolean chooser, boolean forceClose) {
     boolean openProposalChooser = false;
     if (chooser) {
       // choose from proposal chooser
@@ -85,7 +82,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
         }
       }
       finally {
-        if (!openProposalChooser) {
+        if (!openProposalChooser || forceClose) {
           m_field.unregisterProposalChooserInternal();
         }
       }
@@ -112,44 +109,13 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   private boolean acceptByDisplayText(String text) {
+    boolean openProposalChooser = false;
     if (StringUtility.hasText(text)) {
-      if (m_field instanceof IProposalField) { // FIXME AWE: remove, use inheritance
-        ((IProposalField) m_field).setValue(text);
-      }
-      else {
-        // search
-        try {
-          String searchText = toSearchText(text);
-          List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = m_field.callTextLookup(searchText, 2);
-          int numRows = lookupRows.size();
-          if (numRows == 0) {
-//            m_field.handleNoMatchFound(text);
-            m_field.setEmptyLookupRow();
-            m_field.setDisplayText(text);
-            m_field.addErrorStatus(new ValidationFailedStatus("%Kein Ergebnis für '" + text + "'"));
-          }
-          else if (numRows == 1) {
-            m_field.acceptProposal(lookupRows.get(0));
-          }
-          else if (numRows > 1) {
-//            m_field.setEmptyLookupRow();
-//            m_field.setDisplayText(text);
-            m_field.addErrorStatus(new ValidationFailedStatus("%Mehr als ein Ergebnis für '" + text + "'"));
-            return true;
-          }
-        }
-        catch (ProcessingException e) {
-          // FIXME AWE: correct error message, i18n
-          m_field.setEmptyLookupRow();
-          m_field.addErrorStatus(new ValidationFailedStatus("%Fehler bei der Suche nach '" + text + "'"));
-        }
-      }
+      openProposalChooser = m_field.handleAcceptByDisplayText(text);
     }
     else {
-      // set to null
-      m_field.setEmptyLookupRow();
+      m_field.setCurrentLookupRowAndValueToNull();
     }
-
-    return false;
+    return openProposalChooser;
   }
 }

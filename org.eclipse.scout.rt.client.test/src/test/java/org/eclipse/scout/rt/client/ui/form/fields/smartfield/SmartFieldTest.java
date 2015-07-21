@@ -200,8 +200,7 @@ public class SmartFieldTest {
   public void setUp() throws Throwable {
     m_reg = TestingUtility.registerBeans(
         new BeanMetaData(StyleLookupService.class).
-            withApplicationScoped(true)
-        );
+            withApplicationScoped(true));
     m_form = new TestForm();
     m_form.startForm();
   }
@@ -222,13 +221,13 @@ public class SmartFieldTest {
   @Test
   public void testStyle_UIFacade() throws Throwable {
     StyleField f = m_form.getStyleField();
-    f.getUIFacade().acceptProposalFromUI("Red", false);
+    f.getUIFacade().acceptProposalFromUI("Red", false, false);
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
-    f.getUIFacade().acceptProposalFromUI("Empty", false);
+    f.getUIFacade().acceptProposalFromUI("Empty", false, false);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    f.getUIFacade().acceptProposalFromUI("Yellow", false);
+    f.getUIFacade().acceptProposalFromUI("Yellow", false, false);
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
-    f.getUIFacade().acceptProposalFromUI(null, false);
+    f.getUIFacade().acceptProposalFromUI(null, false, false);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
   }
 
