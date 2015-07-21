@@ -143,29 +143,20 @@ scout.FormController.prototype.detachDialogs = function() {
 };
 
 scout.FormController.prototype._layoutDialog = function(dialog) {
+  var left, top, opticalMiddleOffset, dialogSize,
+    $document = $(document),
+    documentSize = new scout.Dimension($document.width(), $document.height());
+
   dialog.htmlComp.pixelBasedSizing = true;
+  dialog.htmlComp.validateLayout();
 
-  var prefSize = dialog.htmlComp.getPreferredSize(),
-    dialogMargins = dialog.htmlComp.getMargins(),
-    documentSize = new scout.Dimension($(document).width(), $(document).height()),
-    dialogSize = new scout.Dimension();
-
-  // class .dialog may specify a margin
-  var maxWidth = (documentSize.width - dialogMargins.left - dialogMargins.right);
-  var maxHeight = (documentSize.height - dialogMargins.top - dialogMargins.bottom);
-
-  // Ensure the dialog is not larger than viewport
-  dialogSize.width = Math.min(maxWidth, prefSize.width);
-  dialogSize.height = Math.min(maxHeight, prefSize.height);
-
-  var left = (documentSize.width - dialogSize.width) / 2;
-  var top = (documentSize.height - dialogSize.height) / 2;
+  dialogSize = dialog.htmlComp.getSize();
+  left = (documentSize.width - dialogSize.width) / 2;
+  top = (documentSize.height - dialogSize.height) / 2;
 
   // optical middle
-  var opticalMiddleOffset = Math.min(top / 5, 10);
+  opticalMiddleOffset = Math.min(top / 5, 10);
   top -= opticalMiddleOffset;
-
-  dialog.htmlComp.setSize(dialogSize);
 
   dialog.$container
     .cssLeft(left)

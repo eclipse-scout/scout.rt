@@ -157,6 +157,7 @@ __include("scout/desktop/ViewTabsController.js");
 // Basics for form fields
 __include("scout/form/Form.js");
 __include("scout/form/FormLayout.js");
+__include("scout/form/DialogLayout.js");
 __include("scout/form/fields/fields.js");
 __include("scout/form/fields/AppLinkKeyStroke.js");
 __include("scout/form/fields/FormField.js");

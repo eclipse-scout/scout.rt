@@ -37,13 +37,16 @@ scout.Form.prototype._render = function($parent) {
 };
 
 scout.Form.prototype._renderForm = function($parent) {
+  var layout, $handle;
+
   this.$container = $('<div>')
     .appendTo($parent)
     .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: rename class 'form' to view so we can use the displayHint as class-name
   .data('model', this);
 
   if (this.isDialog()) {
-    var $handle = this.$container.appendDiv('drag-handle');
+    layout = new scout.DialogLayout(this);
+    $handle = this.$container.appendDiv('drag-handle');
     this.$container.makeDraggable($handle);
 
     if (this.closable) {
@@ -63,10 +66,12 @@ scout.Form.prototype._renderForm = function($parent) {
       }.bind(this)
     });
     this._updateDialogTitle();
+  } else {
+    layout = new scout.FormLayout(this);
   }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.FormLayout(this));
+  this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
   this.rootGroupBox.render(this.$container);
 
@@ -154,7 +159,9 @@ scout.Form.prototype.onResize = function() {
   var htmlComp = scout.HtmlComponent.get(this.$container);
   var $parent = this.$container.parent();
   var parentSize = new scout.Dimension($parent.width(), $parent.height());
+  htmlComp._layout.autoSize = false;
   htmlComp.setSize(parentSize);
+  htmlComp._layout.autoSize = true;
 };
 
 scout.Form.prototype.appendTo = function($parent) {
