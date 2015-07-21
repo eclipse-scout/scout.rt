@@ -98,10 +98,10 @@ public class SequenceBoxTest {
     assertNull(start.getErrorStatus());
     assertNull(end.getErrorStatus());
 
-    //start>end -> error (on box instead of first label, because label is merged)
+    //start>end -> error
     start.setValue(new Date(4 * ONE_MINUTE));
-    assertEquals(InvalidSequenceStatus.ERROR, box.getErrorStatus().getSeverity());
-    assertNull(start.getErrorStatus());
+    assertNull(box.getErrorStatus());
+    assertEquals(InvalidSequenceStatus.ERROR, start.getErrorStatus().getSeverity());
     assertNull(end.getErrorStatus());
 
     //start null ->no error
@@ -151,8 +151,8 @@ public class SequenceBoxTest {
     sb.getSecondField().setValue(2);
     sb.getThirdField().setValue(1);
     sb.execCheckFromTo(0);
-    assertFalse(sb.isContentValid());
-    assertEquals(getLessThanText(sb.getFirstField(), sb.getSecondField()), sb.getErrorStatus().getMessage());
+    assertFalse(sb.getFirstField().isContentValid());
+    assertEquals(getLessThanText(sb.getFirstField(), sb.getSecondField()), sb.getFirstField().getErrorStatus().getMessage());
   }
 
   @Test
@@ -163,8 +163,8 @@ public class SequenceBoxTest {
     sb.getSecondField().setValue(null);
     sb.getThirdField().setValue(1);
     sb.execCheckFromTo(0);
-    assertFalse(sb.isContentValid());
-    assertEquals(getLessThanText(sb.getFirstField(), sb.getThirdField()), sb.getErrorStatus().getMessage());
+    assertFalse(sb.getFirstField().isContentValid());
+    assertEquals(getLessThanText(sb.getFirstField(), sb.getThirdField()), sb.getFirstField().getErrorStatus().getMessage());
   }
 
   @Test
