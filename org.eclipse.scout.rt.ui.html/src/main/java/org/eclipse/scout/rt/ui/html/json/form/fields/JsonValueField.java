@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -83,6 +85,11 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
         }
+        else if (IContextMenu.PROP_CURRENT_MENU_TYPES.equals(evt.getPropertyName())) {
+          @SuppressWarnings("unchecked")
+          Set<? extends IMenuType> newValue = (Set<? extends IMenuType>) evt.getNewValue();
+          handleModelContextMenuCurrentMenuTypesChanged(newValue);
+        }
       }
     };
     getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);
@@ -102,11 +109,22 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+
     if (jsonContextMenu != null) {
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
       json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
+      json.put(PROP_CURRENT_MENU_TYPES, currentMenuTypesSetToStringArray(getModel().getContextMenu().getCurrentMenuTypes()));
     }
     return json;
+  }
+
+  public String[] currentMenuTypesSetToStringArray(Set<? extends IMenuType> menuTypes) {
+    IMenuType[] array0 = menuTypes.toArray(new IMenuType[0]);
+    String[] ret = new String[array0.length];
+    for (int i = 0; i < array0.length; i++) {
+      ret[i] = array0[i] != null ? array0[i].toString() : null;
+    }
+    return ret;
   }
 
   @Override
@@ -116,6 +134,10 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
 
   protected void handleModelContextMenuVisibleChanged(boolean visible) {
     addPropertyChangeEvent(PROP_MENUS_VISIBLE, visible);
+  }
+
+  protected void handleModelContextMenuCurrentMenuTypesChanged(Set<? extends IMenuType> currentMenuTypes) {
+    addPropertyChangeEvent(PROP_CURRENT_MENU_TYPES, currentMenuTypesSetToStringArray(currentMenuTypes));
   }
 
   @Override

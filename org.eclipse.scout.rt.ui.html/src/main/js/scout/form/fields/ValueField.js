@@ -17,6 +17,10 @@ scout.ValueField.prototype._renderDisplayText = function(displayText) {
   this.$field.val(displayText);
 };
 
+scout.ValueField.prototype._renderCurrentMenuTypes = function() {
+  // nop
+};
+
 scout.ValueField.prototype._readDisplayText = function() {
   return this.$field.val();
 };
@@ -91,4 +95,15 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
 scout.ValueField.prototype.addField = function($field) {
   scout.ValueField.parent.prototype.addField.call(this, $field);
   this.$field.data('valuefield', this);
+};
+
+scout.ValueField.prototype._onStatusMouseDown = function(event) {
+  if (this.menus && this.menus.length > 0) {
+    if (($(document.activeElement).data('valuefield') === this ||
+         $(document.activeElement).parent().data('valuefield') === this)) {
+      this.displayTextChanged();
+    }
+  }
+
+  scout.ValueField.parent.prototype._onStatusMouseDown.call(this, event);
 };

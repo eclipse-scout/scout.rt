@@ -262,8 +262,19 @@ scout.FormField.prototype._renderMenusVisible = function() {
   this._updateMenus();
 };
 
+scout.FormField.prototype._getCurrentMenus = function() {
+  var menuTypes;
+  if (this.currentMenuTypes) {
+    menuTypes = [];
+    this.currentMenuTypes.forEach(function(elem) {
+      menuTypes.push('ValueField.' + elem);
+    }, this);
+  }
+  return menuTypes ? scout.menus.filter(this.menus, menuTypes) : this.menus.filter(function(menu) { return menu.visible; } );
+};
+
 scout.FormField.prototype._hasMenus = function() {
-  return !!(this.menus && this.menus.length > 0);
+  return !!(this.menus && this._getCurrentMenus().length > 0);
 };
 
 scout.FormField.prototype._updateMenus = function() {
@@ -318,15 +329,16 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
 scout.FormField.prototype._onStatusMouseDown = function(event) {
   if (this._hasMenus()) {
     var func = function func(event) {
+      var menus = this._getCurrentMenus();
       // showing menus is more important than showing tooltips
       if (!this.contextPopup || !this.contextPopup.rendered) {
-        if (!this.menus.some(function(menuItem) {
+        if (!menus.some(function(menuItem) {
           return menuItem.visible;
         })) {
           return; // at least one menu item must be visible
         }
         this.contextPopup = new scout.ContextMenuPopup(this.session, {
-          menuItems: this.menus,
+          menuItems: menus,
           cloneMenuItems: false,
           $anchor: this.$status
         });

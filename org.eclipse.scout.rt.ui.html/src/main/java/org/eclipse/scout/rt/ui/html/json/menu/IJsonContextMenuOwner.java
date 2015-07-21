@@ -20,5 +20,7 @@ public interface IJsonContextMenuOwner {
 
   String PROP_MENUS_VISIBLE = "menusVisible";
 
+  String PROP_CURRENT_MENU_TYPES = "currentMenuTypes";
+
   void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters);
 }
