@@ -108,7 +108,8 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   protected void handleUiAcceptProposal(JsonEvent event) {
     String text = getSearchTextAndAddFilter(event);
     boolean chooser = event.getData().getBoolean("chooser");
-    getModel().getUIFacade().acceptProposalFromUI(text, chooser);
+    boolean forceClose = event.getData().getBoolean("forceClose");
+    getModel().getUIFacade().acceptProposalFromUI(text, chooser, forceClose);
   }
 
   protected void handleUiCancelProposal() {

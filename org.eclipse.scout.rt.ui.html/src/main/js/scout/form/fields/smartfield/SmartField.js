@@ -4,11 +4,15 @@ scout.SmartField = function() {
   this.BROWSE_ALL = '';
   this.DEBOUNCE_DELAY = 200;
 
+  this._addAdapterProperties(['proposalChooser']);
+
   this._$optionsDiv;
   this.options;
+  /**
+   * This property is used to prevent unnecessary requests to the server.
+   */
   this._oldSearchText;
   this._browseOnce;
-  this._addAdapterProperties(['proposalChooser']);
   this._popup;
   this._tabPrevented = false;
 };
@@ -64,10 +68,6 @@ scout.SmartField.prototype._renderProperties = function() {
 };
 
 
-/**
- * Prevent we search again.... XXX
- * @param displayText
- */
 scout.SmartField.prototype._syncDisplayText = function(displayText) {
   this._oldSearchText = displayText;
   this.displayText = displayText;
@@ -100,7 +100,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
  * This method is called after a valid option has been selected in the proposal chooser.
  */
 scout.SmartField.prototype._removeProposalChooser = function() {
-  $.log.debug('_removeProposalChooser proposalChooser=' + this.proposalChooser);
+  $.log.trace('(SmartField#_removeProposalChooser) proposalChooser=' + this.proposalChooser);
   this._closeProposal(false);
 };
 
@@ -117,28 +117,27 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 
 scout.SmartField.prototype._onClick = function(e) {
   if (!this._popup.rendered) {
-    this._openProposal(this.BROWSE_ALL, true);
+    var searchText = this.BROWSE_ALL;
+    if (this.errorStatus) {
+      searchText = this._readDisplayText();
+    }
+    this._openProposal(searchText, true);
   }
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
   scout.SmartField.parent.prototype._onIconClick.call(this, event);
   if (!this._popup.rendered) {
-    this._openProposal(this.BROWSE_ALL, true);
+    var searchText = this.BROWSE_ALL;
+    if (this.errorStatus) {
+      searchText = this._readDisplayText();
+    }
+    this._openProposal(searchText, true);
   }
 };
 
-// FIXME AWE: hier die prüfung machen, ob das smartfield geändert wurde
-// und wir zum server müssen, um zu prüfen ob das nächste Feld getabbt werden
-// darf oder nicht.
 scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
-  var doPrevent;
-//  if (this.proposalChooser) {
-//    doPrevent = false;
-//  } else {
-    var searchText = this._readDisplayText();
-    doPrevent = this._oldSearchText !== searchText;
-//  }
+  var doPrevent = !!this.proposalChooser;
   $.log.debug('must prevent default when tab was pressed = ' + doPrevent);
   return doPrevent;
 };
@@ -177,17 +176,17 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     if (this.proposalChooser) {
       this.proposalChooser.delegateEvent(e);
     } else {
-      this._openProposal(this.BROWSE_ALL, true);
+      var searchText = this.BROWSE_ALL;
+      if (this.errorStatus) {
+        searchText = this._readDisplayText();
+      }
+      this._openProposal(searchText, true);
     }
   }
 };
 
-scout.SmartField.prototype._onFocus = function(e) {
-  this._browseOnce = true;
-  this._oldSearchText = this._readDisplayText();
-};
-
 scout.SmartField.prototype._onKeyUp = function(e) {
+
   // Escape
   if (e.which === scout.keys.ESCAPE) {
     e.stopPropagation();
@@ -217,8 +216,18 @@ scout.SmartField.prototype._onKeyUp = function(e) {
     this._proposalTyped();
   } else if (this._browseOnce) {
     this._browseOnce = false;
+    var searchText = this.BROWSE_ALL; // FIXME AWE: wieso braucht es openProposal im keyUp und keyDown?
+    if (this.errorStatus) {
+      searchText = this._readDisplayText();
+    }
     this._openProposal(this._readDisplayText(), false);
   }
+};
+
+
+scout.SmartField.prototype._onFocus = function(e) {
+  this._browseOnce = true;
+  this._oldSearchText = this._readDisplayText();
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
@@ -251,7 +260,7 @@ scout.SmartField.prototype._onFieldBlur = function() {
   $.log.debug('(SmartField#_onFieldBlur)');
   this._browseOnce = false;
   this._requestedProposal = false;
-  this._acceptProposal();
+  this._acceptProposal(true);
 };
 
 /**
@@ -260,12 +269,13 @@ scout.SmartField.prototype._onFieldBlur = function() {
  * to the server, even when the popup is not opened (this happens when the user types something which
  * is not in the list of proposals). We must accept the user defined text in that case.
  */
-scout.SmartField.prototype._acceptProposal = function() {
+scout.SmartField.prototype._acceptProposal = function(forceClose) {
   // must clear pending "proposalTyped" events because nothing good happens
   // when proposalTyped arrives _after_ an "acceptProposal" event.
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = null;
 
+  forceClose = scout.helpers.nvl(forceClose, false);
   var proposalChooserOpen = !!this.proposalChooser,
     searchText = this._readDisplayText();
 
@@ -276,7 +286,7 @@ scout.SmartField.prototype._acceptProposal = function() {
     // proposal chooser by pressing TAB or ENTER.
     // The Java client will use the selected row as value when it
     // receives the acceptProposal event in that case.
-    this._sendAcceptProposal(searchText, true);
+    this._sendAcceptProposal(searchText, true, forceClose);
   } else {
     // When proposal chooser is closed, only send accept proposal
     // when search text has changed. Prevents unnecessary requests
@@ -284,7 +294,7 @@ scout.SmartField.prototype._acceptProposal = function() {
     if (searchText === this._oldSearchText) {
       return;
     }
-    this._sendAcceptProposal(searchText, false);
+    this._sendAcceptProposal(searchText, false, forceClose);
   }
 
   this.session.listen().done(function() {
@@ -299,12 +309,13 @@ scout.SmartField.prototype._acceptProposal = function() {
 };
 
 
-scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalChooserOpen) {
+scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalChooserOpen, forceClose) {
   this.displayText = searchText;
   this._oldSearchText = searchText;
   this.session.send(this.id, 'acceptProposal', {
     searchText: searchText,
-    chooser: proposalChooserOpen
+    chooser: proposalChooserOpen,
+    forceClose: forceClose
   });
 };
 
@@ -342,6 +353,7 @@ scout.SmartField.prototype._openProposal = function(searchText, selectCurrentVal
   // FIXME AWE: Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
   if (!this._requestedProposal) {
     this._requestedProposal = true;
+    $.log.debug('(SmartField#_openProposal) send openProposal. searchText=' + searchText + ' selectCurrentValue=' + selectCurrentValue);
     this.session.send(this.id, 'openProposal', {
       searchText: searchText,
       selectCurrentValue: selectCurrentValue
