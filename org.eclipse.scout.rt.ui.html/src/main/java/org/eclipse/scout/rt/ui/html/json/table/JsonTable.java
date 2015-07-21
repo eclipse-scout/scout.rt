@@ -99,6 +99,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   private TableListener m_tableListener;
   private final Map<String, ITableRow> m_tableRows;
   private final Map<ITableRow, String> m_tableRowIds;
+  private final Map<String, IColumn> m_columns;
   private final TableEventFilter m_tableEventFilter;
   private final Map<IColumn, JsonColumn> m_jsonColumns;
   private final AbstractEventBuffer<TableEvent> m_eventBuffer;
@@ -107,6 +108,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     super(model, uiSession, id, parent);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
+    m_columns = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(this);
     m_jsonColumns = new HashMap<IColumn, JsonColumn>();
     m_eventBuffer = model.createEventBuffer();
@@ -238,10 +240,13 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         offset += 1;
         continue;
       }
+      String id = getUiSession().createUniqueIdFor(null);
       JsonColumn jsonColumn = (JsonColumn) MainJsonObjectFactory.get().createJsonObject(column);
       jsonColumn.setUiSession(getUiSession());
+      jsonColumn.setId(id);
       jsonColumn.setColumnIndexOffset(offset);
       m_jsonColumns.put(column, jsonColumn);
+      m_columns.put(id, column);
     }
   }
 
@@ -251,10 +256,15 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
    */
   protected void disposeAllColumns() {
     m_jsonColumns.clear();
+    m_columns.clear();
   }
 
   protected void disposeColumn(IColumn<?> column) {
+    JsonColumn jsonColumn = m_jsonColumns.get(column);
     m_jsonColumns.remove(column);
+    if (jsonColumn != null) {
+      m_columns.remove(jsonColumn.getId());
+    }
   }
 
   protected void disposeColumns(Collection<IColumn<?>> columns) {
@@ -623,7 +633,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
         continue;
       }
-      String rowId = getRowId(row);
+      String rowId = getTableRowId(row);
       if (rowId == null) { // Ignore rows that are not yet sent to the UI
         continue;
       }
@@ -637,7 +647,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   protected ITableRow extractTableRow(JSONObject json) {
-    return getTableRowForRowId(json.getString(PROP_ROW_ID));
+    return getTableRow(json.getString(PROP_ROW_ID));
   }
 
   protected IColumn extractColumn(JSONObject json) {
@@ -645,30 +655,45 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     if (columnId == null) {
       return null;
     }
-    IColumn column = getModel().getColumnSet().getColumnById(columnId);
+    return getColumn(columnId);
+  }
+
+  protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
+    JSONArray jsonColumnIds = new JSONArray();
+    for (IColumn column : columns) {
+      jsonColumnIds.put(getColumnId(column));
+    }
+    return jsonColumnIds;
+  }
+
+  protected IColumn getColumn(String columnId) {
+    IColumn column = m_columns.get(columnId);
     if (column == null) {
       throw new UiException("No column found for id " + columnId);
     }
     return column;
   }
 
-  protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
-    JSONArray jsonColumnIds = new JSONArray();
-    for (IColumn column : columns) {
-      jsonColumnIds.put(column.getColumnId());
+  public String getColumnId(IColumn column) {
+    if (column == null) {
+      return null;
     }
-    return jsonColumnIds;
+    JsonColumn jsonColumn = m_jsonColumns.get(column);
+    if (jsonColumn == null) {
+      return null;
+    }
+    return jsonColumn.getId();
   }
 
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
-      rows.add(m_tableRows.get(rowIds.get(i)));
+      rows.add(getTableRow((String) rowIds.get(i)));
     }
     return rows;
   }
 
-  protected ITableRow getTableRowForRowId(String rowId) {
+  protected ITableRow getTableRow(String rowId) {
     ITableRow row = m_tableRows.get(rowId);
     if (row == null) {
       throw new UiException("No row found for id " + rowId);
@@ -676,7 +701,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return row;
   }
 
-  protected String getRowId(ITableRow row) {
+  protected String getTableRowId(ITableRow row) {
     if (row == null) {
       return null;
     }
@@ -704,7 +729,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         List<ITableRow> rowsToInsert = new ArrayList<>();
         List<ITableRow> rowsToDelete = new ArrayList<>();
         for (ITableRow row : getModel().getRows()) {
-          String existingRowId = getRowId(row);
+          String existingRowId = getTableRowId(row);
           if (row.isFilterAccepted()) {
             if (existingRowId == null) {
               // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
@@ -836,7 +861,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      String rowId = getRowId(row);
+      String rowId = getTableRowId(row);
       if (rowId == null) { // Ignore rows that are not yet sent to the UI (may happen when a filtered row is deleted)
         continue;
       }
@@ -873,7 +898,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         continue;
       }
       JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
-      putProperty(jsonRow, "id", getRowId(row));
+      putProperty(jsonRow, "id", getTableRowId(row));
       putProperty(jsonRow, "checked", row.isChecked());
       jsonRows.put(jsonRow);
     }
@@ -891,7 +916,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
         continue;
       }
-      jsonRowIds.put(getRowId(row));
+      jsonRowIds.put(getTableRowId(row));
     }
     if (jsonRowIds.length() == 0) {
       return;
@@ -1013,7 +1038,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       if (uploadProperties != null && uploadProperties.containsKey("rowId")) {
         String rowId = uploadProperties.get("rowId");
         if (!StringUtility.isNullOrEmpty(rowId)) {
-          row = getTableRowForRowId(rowId);
+          row = getTableRow(rowId);
         }
       }
       getModel().getUIFacade().fireRowDropActionFromUI(row, transferObject);

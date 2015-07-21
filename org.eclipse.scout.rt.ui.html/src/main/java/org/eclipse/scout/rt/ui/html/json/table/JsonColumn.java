@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
 
+  private String m_id;
   private IUiSession m_uiSession;
   private COLUMN m_column;
   private int m_indexOffset;
@@ -45,7 +46,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
   @Override
   public JSONObject toJson() {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    json.put("id", getColumn().getColumnId());
+    json.put("id", getId());
     json.put("objectType", getObjectTypeVariant());
     json.put("index", getColumn().getColumnIndex() - m_indexOffset);
     json.put("text", getColumn().getHeaderCell().getText());
@@ -99,5 +100,13 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
 
   public void setUiSession(IUiSession uiSession) {
     m_uiSession = uiSession;
+  }
+
+  public String getId() {
+    return m_id;
+  }
+
+  public void setId(String id) {
+    m_id = id;
   }
 }

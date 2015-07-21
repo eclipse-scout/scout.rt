@@ -238,12 +238,12 @@ public class JsonTableTest {
     assertEquals(table.getColumnSet().getVisibleColumn(0), column0);
     assertEquals(table.getColumnSet().getVisibleColumn(1), column1);
 
-    JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
+    JsonEvent event = createJsonColumnMovedEvent(jsonTable.getColumnId(column0), 2);
     jsonTable.handleUiEvent(event);
 
     assertEquals(table.getColumnSet().getVisibleColumn(2), column0);
 
-    event = createJsonColumnMovedEvent(column1.getColumnId(), 0);
+    event = createJsonColumnMovedEvent(jsonTable.getColumnId(column1), 0);
     jsonTable.handleUiEvent(event);
 
     assertEquals(table.getColumnSet().getVisibleColumn(0), column1);
@@ -265,7 +265,7 @@ public class JsonTableTest {
     JSONObject jsonRow = jsonTable.tableRowToJson(table.getRow(0));
     JSONArray jsonCells = (JSONArray) jsonRow.get("cells");
 
-    JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
+    JsonEvent event = createJsonColumnMovedEvent(jsonTable.getColumnId(column0), 2);
     jsonTable.handleUiEvent(event);
 
     JSONObject jsonRowAfterMoving = jsonTable.tableRowToJson(table.getRow(0));
@@ -294,7 +294,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonColumnMovedEvent(column.getColumnId(), 2);
+    JsonEvent event = createJsonColumnMovedEvent(jsonTable.getColumnId(column), 2);
     jsonTable.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
@@ -360,6 +360,45 @@ public class JsonTableTest {
     assertEquals(JsonTable.EVENT_COLUMN_STRUCTURE_CHANGED, events.get(0).getType());
     assertEquals(JsonTable.EVENT_ALL_ROWS_DELETED, events.get(1).getType());
     assertEquals(JsonTable.EVENT_ROWS_INSERTED, events.get(2).getType());
+  }
+
+  /**
+   * If column structure changes, old columns are disposed and the new ones attached
+   */
+  @Test
+  public void testColumnStructureChangedEvent_dispose() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+    IColumn column0 = table.getColumnSet().getColumn(0);
+    IColumn column1 = table.getColumnSet().getColumn(1);
+    IColumn column2 = table.getColumnSet().getColumn(2);
+    column0.setVisible(false);
+
+    JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    jsonTable.toJson();
+
+    String column0Id = jsonTable.getColumnId(column0);
+    String column1Id = jsonTable.getColumnId(column1);
+    String column2Id = jsonTable.getColumnId(column2);
+    assertNull(column0Id);
+    assertNotNull(column1Id);
+    assertNotNull(column2Id);
+
+    column0.setVisible(true);
+    column2.setVisible(false);
+
+    JsonResponse response = m_uiSession.currentJsonResponse();
+    response.fireProcessBufferedEvents();
+
+    String newColumn0Id = jsonTable.getColumnId(column0);
+    String newColumn1Id = jsonTable.getColumnId(column1);
+    String newColumn2Id = jsonTable.getColumnId(column2);
+    assertNotNull(newColumn0Id);
+    assertNotNull(newColumn1Id);
+    Assert.assertNotEquals(column1Id, newColumn1Id);
+    assertNull(newColumn2Id);
   }
 
   /**
@@ -556,9 +595,9 @@ public class JsonTableTest {
     String row0Id = jsonTable.getOrCreatedRowId(row0);
     String row1Id = jsonTable.getOrCreatedRowId(row1);
     assertNotNull(row0Id);
-    assertNotNull(jsonTable.getTableRowForRowId(row0Id));
+    assertNotNull(jsonTable.getTableRow(row0Id));
     assertNotNull(row1Id);
-    assertNotNull(jsonTable.getTableRowForRowId(row1Id));
+    assertNotNull(jsonTable.getTableRow(row1Id));
 
     table.addRowFilter(new ITableRowFilter() {
       @Override
@@ -576,9 +615,9 @@ public class JsonTableTest {
     assertNotNull(jsonTable.tableRowIdsMap().get(row1));
     assertNotNull(jsonTable.tableRowIdsMap().get(row2));
 
-    jsonTable.getTableRowForRowId(row1Id); // should still exist -> should NOT throw an exception
+    jsonTable.getTableRow(row1Id); // should still exist -> should NOT throw an exception
     try {
-      jsonTable.getTableRowForRowId(row0Id); // throws exception
+      jsonTable.getTableRow(row0Id); // throws exception
       fail("Expected an exception, but no exception was thrown");
     }
     catch (UiException e) {
@@ -602,7 +641,7 @@ public class JsonTableTest {
     ITableRow row = table.getRow(0);
     String row0Id = jsonTable.getOrCreatedRowId(row);
     assertNotNull(row0Id);
-    assertNotNull(jsonTable.getTableRowForRowId(row0Id));
+    assertNotNull(jsonTable.getTableRow(row0Id));
 
     table.addRowFilter(new ITableRowFilter() {
       @Override
