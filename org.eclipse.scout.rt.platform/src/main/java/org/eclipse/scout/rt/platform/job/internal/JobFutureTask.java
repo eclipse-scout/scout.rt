@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -279,9 +278,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public <ERROR extends Throwable> RESULT awaitDoneAndGet(final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
-    ensureNotSameMutex();
-    try {
+    assertNotSameMutex();
 
+    try {
       return get();
     }
     catch (final CancellationException e) {
@@ -295,13 +294,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
   }
 
-  private void ensureNotSameMutex() {
-    IFuture<?> currentFuture = IFuture.CURRENT.get();
-    if (currentFuture != null) {
-      Assertions.assertFalse(CompareUtility.equals(getMutexObject(), currentFuture.getJobInput().getMutex()));
-    }
-  }
-
   @Override
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws ProcessingException {
     return awaitDoneAndGet(timeout, unit, BEANS.get(ProcessingExceptionTranslator.class));
@@ -309,7 +301,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public <ERROR extends Throwable> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
-    ensureNotSameMutex();
+    assertNotSameMutex();
+
     try {
       return get(timeout, unit);
     }
@@ -350,5 +343,27 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     else {
       return null;
     }
+  }
+
+  /**
+   * Asserts that the current job (if applicable) does not share the same mutex as the job to be awaited for.
+   * Otherwise, that would end up in a deadlock.
+   */
+  private void assertNotSameMutex() {
+    final IFuture<?> currentFuture = IFuture.CURRENT.get();
+    if (currentFuture == null) {
+      return; // not running in a job.
+    }
+
+    final Object currentMutex = currentFuture.getJobInput().getMutex();
+    if (currentMutex == null) {
+      return; // current job is not running in mutual exclusive manner.
+    }
+
+    if (isDone()) {
+      return; // job already in 'done'-state.
+    }
+
+    Assertions.assertFalse(currentMutex.equals(getMutexObject()), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex=%s]", currentMutex);
   }
 }
