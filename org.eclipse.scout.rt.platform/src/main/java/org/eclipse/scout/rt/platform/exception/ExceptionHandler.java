@@ -33,8 +33,11 @@ public class ExceptionHandler {
    */
   public void handle(final Throwable t) {
     final Throwable rootCause = ExceptionHandler.getRootCause(t);
-    if (rootCause instanceof InterruptedException || rootCause instanceof CancellationException) {
+    if (rootCause instanceof InterruptedException) {
       handleInterruptedException((InterruptedException) rootCause);
+    }
+    else if (rootCause instanceof CancellationException) {
+      handleCancelledException((CancellationException) rootCause);
     }
     else if (t instanceof ProcessingException) {
       final ProcessingException pe = (ProcessingException) t;
@@ -53,11 +56,22 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle a {@code InterruptedException}.<br/>
-   * The default implementation does nothing.
+   * Method invoked to handle a {@code InterruptedException}. The default implementation does nothing.
    */
   protected void handleInterruptedException(final InterruptedException e) {
-    // NOOP: InterruptedException is swallowed.
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Interruption", e);
+    }
+  }
+
+  /**
+   * Method invoked to handle a {@code CancellationException}. The default implementation does nothing. Typically, this
+   * exception is thrown if waiting for a job to complete, but the job was cancelled.
+   */
+  protected void handleCancelledException(final CancellationException e) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Cancellation", e);
+    }
   }
 
   /**
