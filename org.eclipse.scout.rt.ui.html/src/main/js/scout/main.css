@@ -185,6 +185,13 @@ button::-moz-focus-inner {
 .application-loading {
   @application-loading-size: 50px;
 
+  /* Make it use the whole available size, to show the 'wait' mouse cursor */
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
   &::before {
     content: '';
     border-radius: @application-loading-size;

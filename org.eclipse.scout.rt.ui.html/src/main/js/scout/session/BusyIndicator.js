@@ -11,7 +11,11 @@ scout.BusyIndicator.prototype._render = function($parent) {
   // 1. Render glasspane
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
   this._glassPaneRenderer.renderGlassPanes();
-  this._changeMouseCursorToWaitStyle();
+  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    $glassPane
+      .addClass('busy')
+      .setMouseCursorWait(true);
+  });
 
   // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout)
   this.$container = $parent.appendDiv('busyindicator hidden');
@@ -59,7 +63,11 @@ scout.BusyIndicator.prototype._remove = function() {
   scout.BusyIndicator.parent.prototype._remove.call(this);
 
   // Remove glasspane
-  this._changeMouseCursorToDefaultStyle();
+  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    $glassPane
+      .removeClass('busy')
+      .setMouseCursorWait(false);
+  });
   this._glassPaneRenderer.removeGlassPanes();
 };
 
@@ -80,34 +88,5 @@ scout.BusyIndicator.prototype._onButtonClicked = function(event) {
   var $button = $(event.target);
   this.trigger('buttonClick', {
     option: $button.data('buttonOption')
-  });
-};
-
-scout.BusyIndicator.prototype._changeMouseCursorToWaitStyle = function() {
-  // Workaround Chrome:
-  // Trigger cursor change; otherwise, the cursor is not updated without moving the mouse first.
-  // See https://code.google.com/p/chromium/issues/detail?id=26723
-
-  // Change cursor to 'wait' style.
-  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
-    $glassPane.addClass('busy');
-    $glassPane.css('cursor', 'default'); // [Workaround Chrome]
-  });
-
-  // >>> [Workaround Chrome]
-  setTimeout(function() {
-    this._glassPaneRenderer.eachGlassPane(function($glassPane) {
-      $glassPane.css('cursor', 'wait');
-    });
-  }.bind(this), 0);
-  // <<< [Workaround Chrome]
-};
-
-scout.BusyIndicator.prototype._changeMouseCursorToDefaultStyle = function() {
-  // Workaround Chrome:
-  // Cursor must be reset explicitly; otherwise, it would not be reset until moving the mouse.
-  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
-    $glassPane.css('cursor', 'default');
-    $glassPane.removeClass('busy');
   });
 };
