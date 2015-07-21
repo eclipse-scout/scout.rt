@@ -26,4 +26,11 @@ public class PropertyChangeEventFilterCondition {
   public Object getValue() {
     return m_value;
   }
+
+  /**
+   * Used to update the filtered value of this condition.
+   */
+  public void updateValue(Object value) {
+    m_value = value;
+  }
 }

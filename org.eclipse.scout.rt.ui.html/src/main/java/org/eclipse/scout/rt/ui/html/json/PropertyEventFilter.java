@@ -24,16 +24,18 @@ public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent
   public PropertyChangeEvent filter(PropertyChangeEvent event) {
     for (PropertyChangeEventFilterCondition condition : getConditions()) {
       if (condition.getPropertyName().equals(event.getPropertyName())) {
-        //Ignore if null == null
+        // Ignore if null == null
         if (condition.getValue() == null) {
           if (event.getNewValue() == null) {
             return null;
           }
         }
-        //Ignore if value is the same
+        // Ignore if value is the same
         else if (condition.getValue().equals(event.getNewValue())) {
           return null;
         }
+        // When value is not ignored, we update the value to filter
+        condition.updateValue(event.getNewValue());
       }
     }
     return event;
