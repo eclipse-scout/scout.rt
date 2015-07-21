@@ -3,20 +3,12 @@
  */
 scout.GlassPaneRenderer = function(element, enabled) {
   this._element = element;
+  this._enabled = enabled;
   this._$glassPanes = [];
-
-  var parent = element.parent || element.session.desktop; // use Desktop if no parent set. However, the Desktop must not be available yet, e.g. fatal errors during startup.
-
-  // Only query glassPaneTargets for a valid parent.
-  if (enabled && parent && parent.glassPaneTargets) {
-    this._glassPaneTargets = parent.glassPaneTargets();
-  } else {
-    this._glassPaneTargets = [];
-  }
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
-  this._glassPaneTargets.forEach(function($glassPaneTarget) {
+  this.findGlassPaneTargets().forEach(function($glassPaneTarget) {
     this._$glassPanes.push($.makeDiv('glasspane')
       .on('mousedown', this._onMousedown.bind(this))
       .appendTo($glassPaneTarget));
@@ -37,6 +29,22 @@ scout.GlassPaneRenderer.prototype.eachGlassPane = function(func) {
   });
 };
 
+scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
+  if (!this._enabled) {
+    return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
+  }
+
+  var parent = this._element.parent || this._element.session.desktop; // use Desktop if no parent set.
+  if (!parent) {
+    return []; // No parent, e.g. during startup to display fatal errors.
+  }
+
+  if (!parent.glassPaneTargets) {
+    return []; // Parent is not a valid display parent.
+  }
+
+  return parent.glassPaneTargets();
+};
 
 scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
   var $glassPane = $(event.target);
