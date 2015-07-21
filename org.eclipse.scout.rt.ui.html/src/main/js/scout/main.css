@@ -201,20 +201,15 @@ button::-moz-focus-inner {
   }
 }
 
-/* Links calling back to the server, for example Table#execAppLinkAction */
+a,
 .app-link {
   color: @applink-color;
   text-decoration: underline;
   cursor: pointer;
-  outline: none;
 
-  /* If app-links is focusable (i.e. has tabIndex attribute), only draw the underline decoration when link is focused */
-  &[tabIndex] {
+  &:focus {
+    outline-color: @applink-color;
     text-decoration: none;
-
-    &:focus {
-      text-decoration: underline;
-    }
   }
 }
 

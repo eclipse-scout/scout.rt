@@ -6,7 +6,8 @@
   padding: 40px 70px;
   .drop-shadow();
 
-  & input, button {
+  & > input,
+  & > button {
     width: 100%;
     height: 45px;
     margin: 15px 0;

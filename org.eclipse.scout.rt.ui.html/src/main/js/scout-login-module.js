@@ -3,5 +3,6 @@ __include("jquery/jquery-scout.js");
 (function(scout, $, undefined) {
 __include("scout/text/Texts.js");
 __include("scout/login/login.js");
+__include("scout/login/logout.js");
 __include("scout/util/Device.js");
 }(window.scout = window.scout || {}, jQuery));

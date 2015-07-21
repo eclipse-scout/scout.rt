@@ -720,9 +720,15 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     JsonResponse jsonResponse = currentJsonResponse();
     if (jsonResponse != null) {
-      jsonResponse.addActionEvent(getUiSessionId(), "logout");
+      jsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
     }
     LOG.info("Logged out successfully from UI session with ID " + m_uiSessionId);
+  }
+
+  protected JSONObject createLogoutEventData() {
+    JSONObject obj = new JSONObject();
+    obj.put("redirectUrl", "logout.html");
+    return obj;
   }
 
   @Override
