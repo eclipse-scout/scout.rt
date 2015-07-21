@@ -400,7 +400,7 @@
 .offline-message {
   padding: 10px;
 
-  & > .reconnect-animated::before {
+  & > .reconnect-animated::after {
     .animation(rotation 0.9s linear infinite);
     content: '';
     display: inline-block;
@@ -409,8 +409,8 @@
     margin-right: 6px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0);
-    border-top-color: @palette-blue-4;
-    border-left-color: @palette-blue-4;
+    border-top-color: @palette-gray-7;
+    border-left-color: @palette-gray-7;
     width: 14px;
     height: 14px;
     margin-top: -3px;

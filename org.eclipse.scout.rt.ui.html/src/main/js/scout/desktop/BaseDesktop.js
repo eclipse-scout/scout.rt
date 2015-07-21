@@ -38,7 +38,7 @@ scout.BaseDesktop.prototype.removeNotification = function($notification) {
   if (this.$notifications) {
     var that = this;
     // Fade out notification
-    $notification.fadeOutAndRemove(250, function() {
+    $notification.fadeOutAndRemove(750, function() {
       if (!that.$notifications.has('.notification')) {
         that.$notifications.remove();
         that.$notifications = null;
