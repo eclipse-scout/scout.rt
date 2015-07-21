@@ -415,7 +415,7 @@ scout.TreeSet.prototype.last = function() {
 scout.HtmlEnvironment = {
   formRowHeight: 30,
   formRowGap: 10,
-  formColumnWidth: 360,
+  formColumnWidth: 420,
   formColumnGap: 40,
   smallColumnGap: 4,
   fieldLabelWidth: 140,
