@@ -10,7 +10,7 @@ scout.DesktopViewTab = function(view, $bench) {
   this.$container;
 
   this._propertyChangeListener = function(event) {
-    if (scout.helpers.isOneOf(event.changedProperties, 'title', 'subTitle')) {
+    if (scout.arrays.containsAny(event.changedProperties, ['title', 'subTitle'])) {
       this._titlesUpdated();
     }
   }.bind(this);
