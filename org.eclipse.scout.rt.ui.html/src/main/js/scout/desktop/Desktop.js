@@ -186,7 +186,6 @@ scout.Desktop.prototype._hasTaskBar = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
 
-// FIXME AWE/CGU this is called by JQuery UI when a dialog gets resized, why?
 scout.Desktop.prototype.onResize = function(event) {
   var selectedViewTab = this.viewTabsController.selectedViewTab();
   if (selectedViewTab) {

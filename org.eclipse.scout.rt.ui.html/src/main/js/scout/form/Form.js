@@ -62,7 +62,12 @@ scout.Form.prototype._renderForm = function($parent) {
       }.bind(this),
 
       resize: function(event, ui) {
+        var autoSizeOld = this.htmlComp._layout.autoSize;
+        this.htmlComp._layout.autoSize = false;
         this.htmlComp.revalidateLayout();
+        this.htmlComp._layout.autoSize = autoSizeOld;
+        // jquery ui resize event bubbles up to the window -> never propagate
+        return false;
       }.bind(this)
     });
     this._updateDialogTitle();
@@ -159,9 +164,7 @@ scout.Form.prototype.onResize = function() {
   var htmlComp = scout.HtmlComponent.get(this.$container);
   var $parent = this.$container.parent();
   var parentSize = new scout.Dimension($parent.width(), $parent.height());
-  htmlComp._layout.autoSize = false;
   htmlComp.setSize(parentSize);
-  htmlComp._layout.autoSize = true;
 };
 
 scout.Form.prototype.appendTo = function($parent) {
