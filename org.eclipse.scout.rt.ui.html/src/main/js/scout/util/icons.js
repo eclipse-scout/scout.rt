@@ -1,6 +1,6 @@
 scout.icons = {
 
-  OUTLINE: 'font:\uE030',
+  OUTLINE: 'font:\uE043',
   ELLIPSIS_V: 'font:\uE040',
 
   /**
