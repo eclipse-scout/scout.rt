@@ -7,7 +7,7 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  .drop-shadow(0, 0, 10px, 0);
+  .drop-shadow-large();
   border-top: 5px solid @color-busyindicator-active;
   border-radius: @border-radius;
 
