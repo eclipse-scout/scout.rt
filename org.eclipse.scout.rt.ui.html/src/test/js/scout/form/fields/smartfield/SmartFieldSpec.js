@@ -43,9 +43,25 @@ describe('SmartField', function() {
 
   });
 
+  describe('_searchText', function() {
+
+    beforeEach(function() {
+      smartField.$field.val('foo');
+    });
+
+    it('must "browse all" when field is valid', function() {
+      expect(smartField._searchText()).toBe('');
+    });
+
+    it('must return displayText when field is invalid', function() {
+      smartField.errorStatus = {};
+      expect(smartField._searchText()).toBe('foo');
+    });
+  });
+
   describe('_acceptProposal', function() {
 
-    it ('must set displayText', function() {
+    it('must set displayText', function() {
       smartField.$field.val('foo');
       smartField._acceptProposal();
       expect(smartField.displayText).toBe('foo');

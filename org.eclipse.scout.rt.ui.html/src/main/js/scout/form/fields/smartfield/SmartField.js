@@ -1,7 +1,6 @@
 scout.SmartField = function() {
   scout.SmartField.parent.call(this);
 
-  this.BROWSE_ALL = '';
   this.DEBOUNCE_DELAY = 200;
 
   this._addAdapterProperties(['proposalChooser']);
@@ -117,22 +116,26 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 
 scout.SmartField.prototype._onClick = function(e) {
   if (!this._popup.rendered) {
-    var searchText = this.BROWSE_ALL;
-    if (this.errorStatus) {
-      searchText = this._readDisplayText();
-    }
-    this._openProposal(searchText, true);
+    this._openProposal(this._searchText(), true);
   }
+};
+
+/**
+ * When the smartfield is valid, we want to perform a "browse all" search (=empty string),
+ * when the field is invalid, we want to perform a search with the current display-text.
+ */
+scout.SmartField.prototype._searchText = function() {
+  var searchText = '';
+  if (this.errorStatus) {
+    searchText = this._readDisplayText();
+  }
+  return searchText;
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
   scout.SmartField.parent.prototype._onIconClick.call(this, event);
   if (!this._popup.rendered) {
-    var searchText = this.BROWSE_ALL;
-    if (this.errorStatus) {
-      searchText = this._readDisplayText();
-    }
-    this._openProposal(searchText, true);
+    this._openProposal(this._searchText(), true);
   }
 };
 
@@ -176,11 +179,11 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     if (this.proposalChooser) {
       this.proposalChooser.delegateEvent(e);
     } else {
-      var searchText = this.BROWSE_ALL;
-      if (this.errorStatus) {
-        searchText = this._readDisplayText();
-      }
-      this._openProposal(searchText, true);
+      // Since this is the keyDown handler we cannot access the typed text here
+      // But when the user presses the down arrow, we can open the proposal
+      // chooser immediately. Also we can start a search with text that was already
+      // in the text field.
+      this._openProposal(this._searchText(), true);
     }
   }
 };
@@ -211,15 +214,14 @@ scout.SmartField.prototype._onKeyUp = function(e) {
     return;
   }
 
-  // ensure pop-up is opened for following operations
+  // The typed character is not available until the keyUp event happens
+  // That's why we must deal with that event here (and not in keyDown)
+  // We don't use _searchText() here because we always want the text the
+  // user has typed.
   if (this._popup.rendered) {
     this._proposalTyped();
   } else if (this._browseOnce) {
     this._browseOnce = false;
-    var searchText = this.BROWSE_ALL; // FIXME AWE: wieso braucht es openProposal im keyUp und keyDown?
-    if (this.errorStatus) {
-      searchText = this._readDisplayText();
-    }
     this._openProposal(this._readDisplayText(), false);
   }
 };
@@ -349,7 +351,6 @@ scout.SmartField.prototype._closeProposal = function(notifyServer) {
  * size and resize the popup later when proposals are available.
  */
 scout.SmartField.prototype._openProposal = function(searchText, selectCurrentValue) {
-  $(document).on('mousedown', this._mouseDownListener);
   // FIXME AWE: Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
   if (!this._requestedProposal) {
     this._requestedProposal = true;
