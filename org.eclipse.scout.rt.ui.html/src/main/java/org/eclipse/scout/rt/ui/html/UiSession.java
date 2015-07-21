@@ -765,8 +765,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         @Override
         public void run() {
           LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session");
-          // Dispose model (if session was not already stopped earlier by itself)
-          if (m_clientSession.isActive()) {
+          // Dispose model (if session was not already stopped earlier by itself).
+          // Session inactivation is executed delayed (see AbstractClientSession#getMaxShutdownWaitTime(), that's why desktop may already be null
+          if (m_clientSession.isActive() && m_clientSession.getDesktop() != null) {
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
           LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
