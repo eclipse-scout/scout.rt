@@ -10,17 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 
-public class JsonClientSession<CLIENT_SESSION extends IClientSession> extends AbstractJsonAdapter<CLIENT_SESSION> {
-
-  private PropertyChangeListener m_localeListener;
+public class JsonClientSession<CLIENT_SESSION extends IClientSession> extends AbstractJsonPropertyObserver<CLIENT_SESSION> {
 
   public JsonClientSession(CLIENT_SESSION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -30,26 +26,6 @@ public class JsonClientSession<CLIENT_SESSION extends IClientSession> extends Ab
   public String getObjectType() {
     // Currently there is no representation on client side
     return null;
-  }
-
-  @Override
-  protected void attachModel() {
-    super.attachModel();
-    if (m_localeListener != null) {
-      throw new IllegalStateException();
-    }
-    m_localeListener = new P_LocaleListener();
-    getModel().addPropertyChangeListener(IClientSession.PROP_LOCALE, m_localeListener);
-  }
-
-  @Override
-  protected void detachModel() {
-    super.detachModel();
-    if (m_localeListener == null) {
-      throw new IllegalStateException();
-    }
-    getModel().removePropertyChangeListener(m_localeListener);
-    m_localeListener = null;
   }
 
   @Override
@@ -65,12 +41,13 @@ public class JsonClientSession<CLIENT_SESSION extends IClientSession> extends Ab
     return json;
   }
 
-  private class P_LocaleListener implements PropertyChangeListener {
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-      getUiSession().sendLocaleChangedEvent((Locale) evt.getNewValue());
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+    if (IClientSession.PROP_LOCALE.equals(propertyName)) {
+      getUiSession().sendLocaleChangedEvent((Locale) newValue);
     }
-
+    else {
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
+    }
   }
 }
