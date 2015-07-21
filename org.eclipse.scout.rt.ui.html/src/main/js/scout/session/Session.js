@@ -840,30 +840,23 @@ scout.Session.prototype.setBusy = function(busy) {
 scout.Session.prototype._renderBusy = function() {
   // Don't show the busy indicator immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
-  this._busyGlasspaneTimeoutId = setTimeout(function() {
+  this._busyIndicatorTimeoutId = setTimeout(function() {
     if (!this.desktop) {
-      return;
+      return; // No busy indicator without desktop (e.g. during shutdown)
     }
-
-    // 1. Render busy glassPanes.
     this._busyIndicator = new scout.BusyIndicator(this);
     this._busyIndicator.on('buttonClick', function(event) {
-        this._onCancelProcessing(this._busyIndicator);
-      }.bind(this));
-    this._busyIndicator.renderGlassPanes();
-
-    // 2. Render busy box with a delay of 2.5 seconds.
-    this._busyIndicatorTimeoutId = setTimeout(function() {
-      this._busyIndicator.render(this.$entryPoint);
-    }.bind(this), 2500);
+      this._onCancelProcessing(this._busyIndicator);
+    }.bind(this));
+    this._busyIndicator.render(this.$entryPoint);
   }.bind(this), 500);
 };
 
 scout.Session.prototype._removeBusy = function() {
-  // Clear any pending timers
-  clearTimeout(this._busyGlasspaneTimeoutId);
+  // Clear pending timer
   clearTimeout(this._busyIndicatorTimeoutId);
 
+  // Remove busy indicator (if it was already created)
   if (this._busyIndicator) {
     this._busyIndicator.remove();
     this._busyIndicator = null;
@@ -873,7 +866,7 @@ scout.Session.prototype._removeBusy = function() {
 scout.Session.prototype._onCancelProcessing = function(busyIndicator) {
   busyIndicator.off('buttonClick');
 
-  // Set "canceling" state (after 100ms)
+  // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
   setTimeout(function() {
     if (busyIndicator.rendered) { // not closed yet
       busyIndicator.$label.addClass('cancelled');

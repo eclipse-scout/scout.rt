@@ -17,8 +17,12 @@
     left: 0;
   }
 
+  &.hidden {
+    visibility: hidden;
+  }
+
   &.shown {
-    .animation-name(fade-in);
+    .animation-name(fadeIn);
     .animation-duration(0.5s);
   }
 

@@ -7,14 +7,14 @@ scout.BusyIndicator = function(session, cancellable) {
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
 
-scout.BusyIndicator.prototype.renderGlassPanes = function() {
+scout.BusyIndicator.prototype._render = function($parent) {
+  // 1. Render glasspane
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
   this._glassPaneRenderer.renderGlassPanes();
   this._changeMouseCursorToWaitStyle();
-};
 
-scout.BusyIndicator.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('busyindicator');
+  // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout)
+  this.$container = $parent.appendDiv('busyindicator hidden');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
@@ -40,24 +40,27 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this.$container.removeClass('calc-helper');
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
-  this.$container.addClassForAnimation('shown');
+
+  // Show busy box with a delay of 2.5 seconds.
+  this._busyIndicatorTimeoutId = setTimeout(function() {
+    this.$container.removeClass('hidden').addClassForAnimation('shown');
+  }.bind(this), 2500);
 };
 
 scout.BusyIndicator.prototype._postRender = function() {
   this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
 };
 
-scout.BusyIndicator.prototype.remove = function() {
-  this._changeMouseCursorToDefaultStyle();
-  this._glassPaneRenderer.removeGlassPanes();
-
-  scout.BusyIndicator.parent.prototype._remove.call(this);
-};
-
 scout.BusyIndicator.prototype._remove = function() {
   this.$container.uninstallFocusContext(this.session.uiSessionId);
 
+  // Remove busy box (cancel timer in case it was not fired yet)
+  clearTimeout(this._busyIndicatorTimeoutId);
   scout.BusyIndicator.parent.prototype._remove.call(this);
+
+  // Remove glasspane
+  this._changeMouseCursorToDefaultStyle();
+  this._glassPaneRenderer.removeGlassPanes();
 };
 
 scout.BusyIndicator.prototype._position = function() {
