@@ -80,6 +80,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -667,11 +668,30 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (form == null) {
       return false;
     }
+
+    // wrapped form
     if (form.getOuterForm() != null) {
       return form.getOuterForm().isShowing();
     }
 
-    return m_formStore.contains(form);
+    // dialog or view
+    if (m_formStore.contains(form)) {
+      return true;
+    }
+
+    // active detail or search Form
+    if (form == m_pageDetailForm || form == m_pageSearchForm) {
+      return true;
+    }
+
+    // active tool-button Form
+    for (IToolButton toolButton : getToolButtons()) {
+      if (toolButton instanceof IFormToolButton && toolButton.isSelected() && ((IFormToolButton) toolButton).getForm() == form) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @Override

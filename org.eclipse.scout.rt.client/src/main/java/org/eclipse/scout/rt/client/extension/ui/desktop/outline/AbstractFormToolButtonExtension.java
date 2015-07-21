@@ -13,7 +13,7 @@ public abstract class AbstractFormToolButtonExtension<FORM extends IForm, OWNER 
   }
 
   @Override
-  public void execInitForm(FormToolButtonInitFormChain<? extends IForm> chain) throws ProcessingException {
-    chain.execInitForm();
+  public void execInitForm(FormToolButtonInitFormChain<FORM> chain, FORM form) throws ProcessingException {
+    chain.execInitForm(form);
   }
 }

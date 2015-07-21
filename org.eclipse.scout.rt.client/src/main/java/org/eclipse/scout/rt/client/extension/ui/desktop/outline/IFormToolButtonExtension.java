@@ -8,5 +8,5 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public interface IFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends IToolButtonExtension<OWNER> {
 
-  void execInitForm(FormToolButtonInitFormChain<? extends IForm> chain) throws ProcessingException;
+  void execInitForm(FormToolButtonInitFormChain<FORM> chain, FORM form) throws ProcessingException;
 }

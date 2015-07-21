@@ -65,16 +65,16 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   }
 
   /**
-   * Initializes the form associated with this button. This method is called before the
-   * form is used for the first time.
-   * <p>
-   * Subclasses can override this method. The default does nothing.
+   * Initializes the {@link IForm} associated with this button, and is invoked once the {@link IForm} is showed for the
+   * first time.
    *
+   * @param form
+   *          the {@link IForm} to be initialized.
    * @throws ProcessingException
    */
   @ConfigOperation
   @Order(120)
-  protected void execInitForm() throws ProcessingException {
+  protected void execInitForm(IForm form) throws ProcessingException {
   }
 
   @Override
@@ -101,9 +101,9 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     }
     FORM form = createForm();
     if (form != null) {
+      decorateForm(form);
+      interceptInitForm(form);
       setForm(form);
-      decorateForm();
-      interceptInitForm();
     }
   }
 
@@ -137,16 +137,16 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     getForm().start();
   }
 
-  protected void decorateForm() {
-    getForm().setShowOnStart(false);
-    getForm().setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-    getForm().setDisplayViewId(IForm.VIEW_ID_E);
+  protected void decorateForm(IForm form) {
+    form.setShowOnStart(false);
+    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW); // FIXME [dwi] set in UI instead
+    form.setDisplayViewId(IForm.VIEW_ID_E); // FIXME [dwi] set in UI instead
   }
 
-  protected final void interceptInitForm() throws ProcessingException {
+  protected final void interceptInitForm(FORM form) throws ProcessingException {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
-    FormToolButtonInitFormChain<FORM> chain = new FormToolButtonInitFormChain<FORM>(extensions);
-    chain.execInitForm();
+    FormToolButtonInitFormChain<FORM> chain = new FormToolButtonInitFormChain<>(extensions);
+    chain.execInitForm(form);
   }
 
   protected static class LocalFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends LocalToolButtonExtension<OWNER> implements IFormToolButtonExtension<FORM, OWNER> {
@@ -156,8 +156,8 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     }
 
     @Override
-    public void execInitForm(FormToolButtonInitFormChain<? extends IForm> chain) throws ProcessingException {
-      getOwner().execInitForm();
+    public void execInitForm(FormToolButtonInitFormChain<FORM> chain, FORM form) throws ProcessingException {
+      getOwner().execInitForm(form);
     }
   }
 

@@ -11,11 +11,12 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
  * @since 3.8.1
  */
-public interface IFormToolButton<FORM> extends IToolButton {
+public interface IFormToolButton<FORM extends IForm> extends IToolButton {
   String PROP_FORM = "form";
 
   FORM getForm();

@@ -14,7 +14,7 @@ public final class FormToolButtonChains {
   private FormToolButtonChains() {
   }
 
-  protected abstract static class AbstractFormToolButtonChain<FORM extends IForm> extends AbstractExtensionChain<IFormToolButtonExtension<? extends IForm, ? extends AbstractFormToolButton<? extends IForm>>> {
+  protected abstract static class AbstractFormToolButtonChain<FORM extends IForm> extends AbstractExtensionChain<IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<FORM>>> {
 
     public AbstractFormToolButtonChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
       super(extensions, IFormToolButtonExtension.class);
@@ -27,18 +27,17 @@ public final class FormToolButtonChains {
       super(extensions);
     }
 
-    public void execInitForm() throws ProcessingException {
+    public void execInitForm(final FORM form) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormToolButtonExtension<? extends IForm, ? extends AbstractFormToolButton<? extends IForm>> next) throws ProcessingException {
-          next.execInitForm(FormToolButtonInitFormChain.this);
+        protected void callMethod(IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<FORM>> next) throws Exception {
+          next.execInitForm(FormToolButtonInitFormChain.this, form);
         }
       };
-      callChain(methodInvocation);
+      callChain(methodInvocation, form);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
-
     }
   }
 }
