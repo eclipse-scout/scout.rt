@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -764,6 +763,16 @@ public class DateUtilityTest {
 
     // leap year
     assertDateEquals("2012-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2012-02-29 15:30:53.458")));
+  }
+
+  @Test
+  public void testTruncDateToIsoWeek() {
+    assertNull(DateUtility.truncDateToIsoWeek(null));
+
+    assertDateEquals("2014-12-29 00:00:00.000", DateUtility.truncDateToIsoWeek(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2014-12-29 00:00:00.000", DateUtility.truncDateToIsoWeek(dateOf("2015-01-04 00:00:00.000")));
+    assertDateEquals("2015-01-05 00:00:00.000", DateUtility.truncDateToIsoWeek(dateOf("2015-01-05 00:00:00.000")));
+    assertDateEquals("2014-12-29 00:00:00.000", DateUtility.truncDateToIsoWeek(dateOf("2014-12-29 00:00:00.000")));
   }
 
   @Test

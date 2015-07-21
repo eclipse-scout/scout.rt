@@ -234,7 +234,7 @@ public final class DateUtility {
   }
 
   /**
-   * truncate the date to month
+   * truncate the date to week (depends on locale)
    */
   public static Date truncDateToWeek(Date d) {
     if (d == null) {
@@ -243,6 +243,21 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToWeek(c, -1);
+    return c.getTime();
+  }
+
+  /**
+   * truncate the date to week (does not depend on locale, monday is always the first day in a week)
+   * 
+   * @see ISO 8601
+   */
+  public static Date truncDateToIsoWeek(Date d) {
+    if (d == null) {
+      return null;
+    }
+    Calendar c = Calendar.getInstance();
+    c.setTime(d);
+    truncCalendarToIsoWeek(c, -1);
     return c.getTime();
   }
 
@@ -315,13 +330,29 @@ public final class DateUtility {
     c.set(Calendar.MILLISECOND, 0);
   }
 
+  public static void truncCalendarToWeek(Calendar c, int adjustIncrement) {
+    truncCalendarToWeek(c, adjustIncrement, Calendar.getInstance().getFirstDayOfWeek());
+  }
+
+  /**
+   * Truncates to monday, see ISO 8601
+   *
+   * @param c
+   *          Calendar to truncate
+   * @param adjustIncrement
+   *          -1 to back in time, +1 to go forward
+   */
+  public static void truncCalendarToIsoWeek(Calendar c, int adjustIncrement) {
+    truncCalendarToWeek(c, adjustIncrement, Calendar.MONDAY);
+  }
+
   /**
    * truncate the calendar to week
    *
    * @param adjustIncrement
    *          +1 or -1
    */
-  public static void truncCalendarToWeek(Calendar c, int adjustIncrement) {
+  public static void truncCalendarToWeek(Calendar c, int adjustIncrement, int firstDayOfWeek) {
     if (c == null) {
       return;
     }
@@ -338,7 +369,7 @@ public final class DateUtility {
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
     c.set(Calendar.MILLISECOND, 0);
-    int firstDayOfWeek = Calendar.getInstance().getFirstDayOfWeek();
+
     while (c.get(Calendar.DAY_OF_WEEK) != firstDayOfWeek) {
       c.add(Calendar.DATE, adjustIncrement);
     }
