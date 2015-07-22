@@ -10,6 +10,8 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -90,12 +92,16 @@ public final class JobUtility {
     if (pollingRequest) {
       jobInput.withProperty(POLLING_REQUEST_HINT, pollingRequest);
     }
+
     final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput);
+
+    // Wait until the job is done (completed or cancelled), or enters a blocking condition.
     boolean timeout;
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFutures(future).andAreNotBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (ProcessingException e) {
+      // FIXME [dwi] use translator to not work with ProcessingException
       throw new UiException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, callable.getClass().getName(), future);
     }
 
@@ -103,7 +109,7 @@ public final class JobUtility {
       throw new UiException("Timeout elapsed while waiting for a job to complete [job=%s, timeout=%ss, future=%s]", new TimeoutException(), callable.getClass().getName(), TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT), future);
     }
 
-    // Query the future's 'done-state' to not block anew. That is if the job is waiting for a blocking condition to fall.
+    // Return immediately if the job is not done yet, e.g. because waiting for a blocking condition to fall.
     if (!future.isDone()) {
       return null;
     }
@@ -113,10 +119,8 @@ public final class JobUtility {
       return future.awaitDoneAndGet();
     }
     catch (ProcessingException e) {
-      if (e.isCancellation() || e.isInterruption()) {
-        return null;
-      }
-      throw new UiException("Job failed [job=%s]", e, callable.getClass().getName());
+      BEANS.get(ExceptionHandler.class).handle(e); // handle business exception
+      return null;
     }
   }
 }
