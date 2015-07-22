@@ -25,7 +25,7 @@ scout.DateField.prototype._renderProperties = function() {
   this._renderTimestamp(this.timestamp, true, true);
   scout.DateField.parent.prototype._renderProperties.call(this);
 
-  if (this.cellEditor) {
+  if (this.cellEditor && this.cellEditor.openPopupOnCellEdit) {
     this.openPicker();
   }
 };

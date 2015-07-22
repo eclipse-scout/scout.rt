@@ -23,13 +23,14 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
-  // Sets a hint on the field to open a popup immediately after it has rendered
-  // the field should use setTimeout() to open the popup, because the editor-field
+  // Sets a hint on the field that that field was opened as cell editor.
+  // Additionally, sets the property openPopupOnCellEdit to indicate that the a popup should be opened immediately after it has been rendered.
+  // The field should use setTimeout() to open the popup, because the editor-field
   // itself is in the middle of rendering and thus the popup of the editor-field
   // cannot position itself correctly
-  if (this.table.openPopupOnCellEdit) {
-    field.cellEditor = true;
-  }
+  field.cellEditor = {
+    openPopupOnCellEdit: this.table.openPopupOnCellEdit
+  };
   field.render(this.$container);
   this.addChild(field);
 
@@ -98,8 +99,7 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   var field = this.cell.field;
 
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
-  var $activeElement = $(document.activeElement);
-  $activeElement.blur();
+  field.displayTextChanged();
 
   this.table.sendCompleteCellEdit(field.id);
   this.remove();

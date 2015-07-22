@@ -48,7 +48,7 @@ scout.SmartField.prototype._render = function($parent) {
   this.addStatus();
   this.addSmartFieldPopup();
 
-  if (this.cellEditor) {
+  if (this.cellEditor && this.cellEditor.openPopupOnCellEdit) {
     this._onClick();
   }
 };
@@ -373,5 +373,8 @@ scout.SmartField.prototype._renderPopup = function() {
  * @override
  */
 scout.SmartField.prototype.displayTextChanged = function() {
-  this._acceptProposal();
+  if (this.cellEditor) {
+    return;
+  }
+  this._acceptProposal(true);
 };
