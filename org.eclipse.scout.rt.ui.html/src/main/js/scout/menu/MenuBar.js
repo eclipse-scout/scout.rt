@@ -31,6 +31,7 @@ scout.MenuBar = function(session, menuSorter) {
         return;
       }
       this.htmlComp.invalidateLayoutTree();
+      this.updateVisibility();
     }
   }.bind(this);
 };
@@ -232,7 +233,7 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 
 scout.MenuBar.prototype.updateVisibility = function() {
   var oldVisible = this.htmlComp.isVisible(),
-    visible = !this.hiddenByUi && this.menuItems.length > 0;
+    visible = !this.hiddenByUi && this.menuItems.some(function(m) { return m.visible; });
 
   // Update visibility, layout and key-strokes
   if (visible !== oldVisible) {

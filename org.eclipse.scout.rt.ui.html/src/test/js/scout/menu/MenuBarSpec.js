@@ -75,6 +75,50 @@ describe("MenuBar", function() {
       expect(menu2.$container.hasClass('default-menu')).toBe(true);
     });
 
+    it('renders menu bar invisible if no visible menu items are available', function() {
+      var modelMenu1 = helper.createModel('foo');
+      var modelMenu2 = helper.createModel('bar');
+      modelMenu2.keyStroke = 'enter';
+
+      var menu1 = helper.createMenu(modelMenu1),
+        menu2 = helper.createMenu(modelMenu2),
+        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menus = [menu1, menu2];
+
+      menu1.visible = false;
+      menu2.visible = false;
+
+      menuBar.render(session.$entryPoint);
+      menuBar.updateItems(menus);
+
+      expect(menuBar.menuItems.length).toBe(2);
+      expect(menuBar.menuItems[0]).toBe(menu1);
+      expect(menuBar.menuItems[1]).toBe(menu2);
+      expect(menuBar.$container.isVisible()).toBe(false);
+    });
+
+    it('renders menu bar visible if at least one visible menu item is available', function() {
+      var modelMenu1 = helper.createModel('foo');
+      var modelMenu2 = helper.createModel('bar');
+      modelMenu2.keyStroke = 'enter';
+
+      var menu1 = helper.createMenu(modelMenu1),
+        menu2 = helper.createMenu(modelMenu2),
+        menuBar = new scout.MenuBar(session, new scout.MenuItemsOrder(session, 'Table')),
+        menus = [menu1, menu2];
+
+      menu1.visible = false;
+      menu2.visible = true;
+
+      menuBar.render(session.$entryPoint);
+      menuBar.updateItems(menus);
+
+      expect(menuBar.menuItems.length).toBe(2);
+      expect(menuBar.menuItems[0]).toBe(menu1);
+      expect(menuBar.menuItems[1]).toBe(menu2);
+      expect(menuBar.$container.isVisible()).toBe(true);
+    });
+
   });
 
 });
