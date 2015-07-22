@@ -66,11 +66,12 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
   var text, tooltipTextData = this._options.tooltipText || $comp.data('tooltipText');
   if ($.isFunction(tooltipTextData)) {
     text = tooltipTextData($comp);
-    if (text === undefined) {
-      return; // function may decide not to show a tooltip
-    }
   } else if (tooltipTextData) {
     text = tooltipTextData;
+  }
+
+  if (!text) {
+    return; // treat undefined and no text as no tooltip
   }
 
   if (this._tooltip && this._tooltip.rendered) {

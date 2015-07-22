@@ -298,6 +298,14 @@ function extendEventWithModifier(event, modifier) {
   event.shiftKey = modifier === 'shift';
 }
 
+$.fn.triggerMouseEnter = function(opts) {
+  return this.triggerMouseAction('mouseenter', opts);
+};
+
+$.fn.triggerMouseLeave = function(opts) {
+  return this.triggerMouseAction('mouseleave', opts);
+};
+
 $.fn.triggerMouseDown = function(opts) {
   return this.triggerMouseAction('mousedown', opts);
 };
