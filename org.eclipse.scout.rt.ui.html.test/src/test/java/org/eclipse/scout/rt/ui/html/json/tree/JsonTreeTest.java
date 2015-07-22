@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -174,7 +175,7 @@ public class JsonTreeTest {
     object.dispose();
     m_uiSession = null;
     object = null;
-    JsonTestUtility.assertGC(ref);
+    TestUtility.assertGC(ref);
   }
 
   @Test

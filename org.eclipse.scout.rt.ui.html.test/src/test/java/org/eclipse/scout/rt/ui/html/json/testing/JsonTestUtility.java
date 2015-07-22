@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.testing;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.mockito.Mockito;
 
 public final class JsonTestUtility {
@@ -125,23 +123,6 @@ public final class JsonTestUtility {
   @SuppressWarnings("unchecked")
   public static <T> T extractProperty(JSONObject data, String propertyName) throws JSONException {
     return (T) data.getJSONObject("properties").get(propertyName);
-  }
-
-  public static void assertGC(WeakReference<?> ref) {
-    int maxRuns = 50;
-    for (int i = 0; i < maxRuns; i++) {
-      if (ref.get() == null) {
-        return;
-      }
-      System.gc();
-      try {
-        Thread.sleep(50);
-      }
-      catch (InterruptedException e) {
-        // NOP
-      }
-    }
-    Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
   public static JSONObject getAdapterData(JSONObject json, String id) throws JSONException {

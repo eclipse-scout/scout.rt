@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.DownloadHandler;
@@ -83,7 +84,7 @@ public class JsonDesktopTest {
     WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
     jsonDesktop.dispose();
     jsonDesktop = null;
-    JsonTestUtility.assertGC(ref);
+    TestUtility.assertGC(ref);
   }
 
   @Test

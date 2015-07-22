@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -572,7 +573,7 @@ public class JsonTableTest {
     object.dispose();
     m_uiSession = null;
     object = null;
-    JsonTestUtility.assertGC(ref);
+    TestUtility.assertGC(ref);
   }
 
   @Test

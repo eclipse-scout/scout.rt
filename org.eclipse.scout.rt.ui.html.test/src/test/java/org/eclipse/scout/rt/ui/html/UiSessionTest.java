@@ -13,6 +13,7 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 
+import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -41,7 +42,7 @@ public class UiSessionTest {
     session.dispose();
     assertTrue(session.isDisposed());
     session = null;
-    JsonTestUtility.assertGC(ref);
+    TestUtility.assertGC(ref);
   }
 
   @Test
@@ -77,7 +78,7 @@ public class UiSessionTest {
     assertTrue(uiSession.isDisposed());
 
     uiSession = null;
-    JsonTestUtility.assertGC(ref);
+    TestUtility.assertGC(ref);
   }
 
   /**
