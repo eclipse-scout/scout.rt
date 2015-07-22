@@ -2843,7 +2843,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     if (!getDesktop().isShowing(this)) {
-      m_displayParent.set(displayParent, true); // no Desktop available, or Form is not showing yet.
+      m_displayParent.set(displayParent, true); // If not showing yet, the 'displayParent' can be changed without detach/attach.
     }
     else {
       // This Form is already showing and must be attached to the new 'displayParent'.
