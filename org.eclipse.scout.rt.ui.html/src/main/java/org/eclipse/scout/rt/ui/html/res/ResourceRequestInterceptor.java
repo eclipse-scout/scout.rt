@@ -132,7 +132,11 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   protected String resolveIndexHtml(HttpServletRequest request) {
     BrowserInfo browserInfo = BrowserInfo.createFrom(request);
     if (browserInfo.isMobile()) {
-      return MOBILE_INDEX_HTML;
+      // Return index-mobile.html, but only if index-mobile.html exists (project may decide to always use index.html)
+      URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_HTML);
+      if (url != null) {
+        return MOBILE_INDEX_HTML;
+      }
     }
     return INDEX_HTML;
   }
