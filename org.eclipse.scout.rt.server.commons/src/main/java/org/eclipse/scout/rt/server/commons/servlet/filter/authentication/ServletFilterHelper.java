@@ -153,6 +153,32 @@ public class ServletFilterHelper {
     req.getRequestDispatcher("/login.html").forward(req, resp);
   }
 
+  /**
+   * forward the request to the logout.html
+   * <p>
+   * Detect if the request is a POST. For json send a timeout message, otherwise log a warning
+   */
+  public void forwardToLogoutForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    //check if POST request
+    if ("POST".equals(req.getMethod())) {
+      if ((req.getContentType() + "").startsWith("application/json")) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Returning session timeout error as json.");
+        }
+        sendJsonSessionTimeout(resp);
+        return;
+      }
+      else {
+        LOG.warn("The request for {0} is a POST request. Forwarding to the logout page will most likely fail because StaticResourceRequestInterceptor doesn't handle post.", req.getPathInfo());
+      }
+    }
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Forwarding '{0}' to /logout.html", req.getPathInfo());
+    }
+    req.getRequestDispatcher("/logout.html").forward(req, resp);
+  }
+
   protected void sendJsonSessionTimeout(HttpServletResponse resp) throws IOException {
     resp.setContentType("application/json");
     resp.setCharacterEncoding("UTF-8");
