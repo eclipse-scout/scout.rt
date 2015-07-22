@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
 import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -65,6 +67,7 @@ import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
+import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -98,6 +101,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private UserAgent m_userAgent;
   private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
+  private INotificationListener<SharedContextChangedNotification> m_sharedNotificationListener;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_eventListeners = new EventListenerList();
@@ -263,7 +267,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
     setMemoryPolicy(memPolicyValue);
 
-    BEANS.get(SharedContextNotificationHandler.class).addListener(this, createSharedNotificationListener());
+    m_sharedNotificationListener = createSharedNotificationListener();
+    BEANS.get(SharedContextNotificationHandler.class).addListener(this, m_sharedNotificationListener);
   }
 
   private void setMemoryPolicy(String policy) {
@@ -469,17 +474,20 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       }
       m_isStopping = true;
     }
+
     if (!m_desktop.doBeforeClosingInternal()) {
       m_isStopping = false;
       return;
     }
     m_exitCode = exitCode;
+
     try {
       interceptStoreSession();
     }
     catch (Exception t) {
       LOG.error("Failed to store the client session.", t);
     }
+
     if (m_desktop != null) {
       try {
         m_desktop.closeInternal();
@@ -488,6 +496,11 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         LOG.error("Failed to close the desktop.", t);
       }
       m_desktop = null;
+    }
+
+    if (m_sharedNotificationListener != null) {
+      BEANS.get(SharedContextNotificationHandler.class).removeListener(this, m_sharedNotificationListener);
+      m_sharedNotificationListener = null;
     }
 
     final long shutdownWaitTime = getMaxShutdownWaitTime();
@@ -699,7 +712,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Internal
   protected void fireSessionChangedEvent(final SessionEvent event) {
-    final ISessionListener[] listeners = m_eventListeners.getListeners(ISessionListener.class);
+    List<ISessionListener> listeners = new ArrayList<>();
+    listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners
+    listeners.addAll(BEANS.all(IGlobalSessionListener.class)); // global listeners
     for (final ISessionListener listener : listeners) {
       try {
         listener.sessionChanged(event);

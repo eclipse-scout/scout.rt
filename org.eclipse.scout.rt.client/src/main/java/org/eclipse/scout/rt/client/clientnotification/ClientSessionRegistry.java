@@ -34,13 +34,13 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectPro
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
-import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 
 /**
  *
  */
-public class ClientSessionRegistry implements IClientSessionRegistry {
+public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSessionListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistry.class);
 
   protected final Subject NOTIFICATION_SUBJECT = CONFIG.getPropertyValue(NotificationSubjectProperty.class);
@@ -49,15 +49,12 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
   private final Map<String /*sessionId*/, WeakReference<IClientSession>> m_sessionIdToSession = new HashMap<>();
   private final Map<String /*userId*/, List<WeakReference<IClientSession>>> m_userToSessions = new HashMap<>();
 
-  private final ISessionListener m_clientSessionStateListener = new P_ClientSessionStateListener();
-
   @Override
   public void register(IClientSession session, String sessionId) {
     synchronized (m_cacheLock) {
       m_sessionIdToSession.put(sessionId, new WeakReference<IClientSession>(session));
     }
     if (BEANS.get(IServiceTunnel.class).isActive()) {
-      session.addListener(m_clientSessionStateListener);
       // if the client session is already started, otherwise the listener will invoke the clientSessionStated method.
       if (session.isActive()) {
         sessionStarted(session);
@@ -73,7 +70,6 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
   protected void clientSessionStopping(IClientSession session) {
     String userId = session.getUserId();
     LOG.debug(String.format("client session [%s] stopping", userId));
-    session.removeListener(m_clientSessionStateListener);
     // unregister user remote
     try {
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).run(new IRunnable() {
@@ -87,8 +83,9 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
       LOG.warn(String.format("Could not unregister session[%s] for remote notifications.", session), e);
     }
     // client session household
-    synchronized (m_sessionIdToSession) {
+    synchronized (m_cacheLock) {
       m_sessionIdToSession.remove(session.getId());
+      m_userToSessions.remove(userId);
     }
   }
 
@@ -207,19 +204,16 @@ public class ClientSessionRegistry implements IClientSessionRegistry {
     return result;
   }
 
-  private class P_ClientSessionStateListener implements ISessionListener {
-
-    @Override
-    public void sessionChanged(SessionEvent event) {
-      switch (event.getType()) {
-        case SessionEvent.TYPE_STARTED:
-          sessionStarted((IClientSession) event.getSource());
-          break;
-        case SessionEvent.TYPE_STOPPED:
-          clientSessionStopping((IClientSession) event.getSource());
-        default:
-          break;
-      }
+  @Override
+  public void sessionChanged(SessionEvent event) {
+    switch (event.getType()) {
+      case SessionEvent.TYPE_STARTED:
+        sessionStarted((IClientSession) event.getSource());
+        break;
+      case SessionEvent.TYPE_STOPPED:
+        clientSessionStopping((IClientSession) event.getSource());
+      default:
+        break;
     }
   }
 

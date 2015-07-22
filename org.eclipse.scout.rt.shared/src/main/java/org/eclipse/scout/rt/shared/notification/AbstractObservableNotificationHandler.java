@@ -19,23 +19,16 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
+import org.eclipse.scout.rt.shared.session.SessionEvent;
 
 /**
  *
  */
-public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements INotificationHandler<T> {
+public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements INotificationHandler<T>, IGlobalSessionListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractObservableNotificationHandler.class);
 
-  private final EventListenerList m_globalListeners = new EventListenerList();
   private final Map<ISession, EventListenerList> m_listeners = new WeakHashMap<>();
-
-  public void addGlobalListener(INotificationListener<T> listener) {
-    m_globalListeners.add(INotificationListener.class, listener);
-  }
-
-  public void removeGlobalListeners(INotificationListener<T> listener) {
-    m_globalListeners.remove(INotificationListener.class, listener);
-  }
 
   /**
    * @param listener
@@ -73,36 +66,10 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     notifiyListeners(notification);
   }
 
+  @SuppressWarnings("unchecked")
   protected void notifiyListeners(T notification) {
     ISession session = ISession.CURRENT.get();
-    if (session == null) {
-      notifyGlobalListeners(notification);
-    }
-    else {
-      notifySessionBasedListeners(session, notification);
-    }
-  }
 
-  /**
-   * @param notification
-   */
-  @SuppressWarnings("unchecked")
-  protected void notifyGlobalListeners(T notification) {
-    for (INotificationListener<T> l : m_globalListeners.getListeners(INotificationListener.class)) {
-      try {
-        l.handleNotification(notification);
-      }
-      catch (Exception e) {
-        LOG.error(String.format("Error during notification of global listener '%s'.", l), e);
-      }
-    }
-  }
-
-  /**
-   * @param notification
-   */
-  @SuppressWarnings("unchecked")
-  protected void notifySessionBasedListeners(ISession session, T notification) {
     final INotificationListener<T>[] listeners;
     synchronized (m_listeners) {
       EventListenerList list = m_listeners.get(session);
@@ -119,6 +86,31 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
       }
       catch (Exception e) {
         LOG.error(String.format("Error during notification of listener '%s'.", l), e);
+      }
+    }
+  }
+
+  @Override
+  public void sessionChanged(SessionEvent event) {
+    if (event.getType() != SessionEvent.TYPE_STOPPED) {
+      // only interested in session stopped
+      return;
+    }
+
+    synchronized (m_listeners) {
+      EventListenerList listeners = m_listeners.get(Assertions.assertNotNull(event.getSource()));
+      if (listeners == null) {
+        return;
+      }
+
+      INotificationListener[] notificationListeners = listeners.getListeners(INotificationListener.class);
+      if (notificationListeners == null || notificationListeners.length == 0) {
+        return;
+      }
+
+      for (INotificationListener<?> notificationListener : notificationListeners) {
+        LOG.warn("Auto fallback removal of session listener due to stopped session. This must be done explicitly by the one that registered the listener: " + notificationListener);
+        listeners.remove(INotificationListener.class, notificationListener);
       }
     }
   }

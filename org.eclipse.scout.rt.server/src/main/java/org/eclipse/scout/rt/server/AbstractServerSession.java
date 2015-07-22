@@ -15,6 +15,8 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 
@@ -292,7 +295,9 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Internal
   protected void fireSessionChangedEvent(final SessionEvent event) {
-    final ISessionListener[] listeners = m_eventListeners.getListeners(ISessionListener.class);
+    List<ISessionListener> listeners = new ArrayList<>();
+    listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners
+    listeners.addAll(BEANS.all(IGlobalSessionListener.class)); // global listeners
     for (final ISessionListener listener : listeners) {
       try {
         listener.sessionChanged(event);

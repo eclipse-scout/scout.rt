@@ -14,8 +14,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.junit.Assert;
 
 /**
  * Utility Class for Unit Testing
@@ -55,6 +57,26 @@ public final class TestUtility {
   public static File createTempFileFromFilename(String fileName, Class clazz) {
     InputStream inputStream = clazz.getClassLoader().getResourceAsStream(fileName);
     return createTempFileFromResource(inputStream);
+  }
+
+  /**
+   * Invokes the GC several times and verifies that the object referenced by the weak reference was garbage collected.
+   */
+  public static void assertGC(WeakReference<?> ref) {
+    int maxRuns = 50;
+    for (int i = 0; i < maxRuns; i++) {
+      if (ref.get() == null) {
+        return;
+      }
+      System.gc();
+      try {
+        Thread.sleep(50);
+      }
+      catch (InterruptedException e) {
+        // NOP
+      }
+    }
+    Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
   private TestUtility() {
