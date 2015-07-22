@@ -311,7 +311,10 @@ scout.Form.prototype.renderInitialFocus = function() {
   var initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
   var $initialFocusControl = (initialFocusField ? initialFocusField.$field : null);
   $initialFocusControl = $initialFocusControl || scout.focusManager.getFirstFocusableElement(this.$container);
-  $initialFocusControl.focus();
+
+  if ($initialFocusControl) {
+    $initialFocusControl.focus();
+  }
 };
 
 scout.Form.prototype._installFocusContext = function() {

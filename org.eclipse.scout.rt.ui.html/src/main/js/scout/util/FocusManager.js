@@ -55,6 +55,10 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 };
 
 scout.FocusManager.prototype.getFirstFocusableElement = function($container, $focusableElements) {
+  if (!$container) {
+    return null; // FIXME [dwi] Analyze why $container is null in some situations
+  }
+
   if (!$focusableElements) {
     $focusableElements = $container.find(':focusable');
   }
