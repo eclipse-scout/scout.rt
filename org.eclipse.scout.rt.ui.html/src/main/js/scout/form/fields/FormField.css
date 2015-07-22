@@ -69,7 +69,6 @@
     cursor: pointer;
 
     &::before {
-      padding-left: 6px;
       content: @icon-ellipsis-v;
       color: @icon-light-color;
     }
