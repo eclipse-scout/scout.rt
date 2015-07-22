@@ -255,7 +255,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
   private void preventUpdateDisplaytextOnModifiyOnDateTimeField() {
     if (isUpdateDisplayTextOnModify() && isHasDate() && isHasTime()) {
-      LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field.");
+      LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field " + getClass().getName());
       setUpdateDisplayTextOnModify(false);
     }
   }
