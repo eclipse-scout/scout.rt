@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +29,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -38,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithClas
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox1;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox2;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.InvalidSequenceStatus;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTemplateUsingOtherTemplateGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -272,28 +276,246 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testSetErrorStatus() throws Exception {
+  public void testGetErrorStatus() throws Exception {
     SimpleTestFormField testField = new SimpleTestFormField();
     final MultiStatus ms = new MultiStatus();
     ms.add(new Status("error"));
     testField.setErrorStatus(ms);
+
     assertEquals(ms, testField.getErrorStatus());
-    assertFalse(ms == testField.getErrorStatus());
+    assertNotSame(ms, testField.getErrorStatus());
+    assertNotSame(testField.getErrorStatus(), testField.getErrorStatus()); // get always returns a new object
   }
 
   @Test
-  public void testAddErrorStatus() throws Exception {
+  public void testSetSameErrorStatus() throws Exception {
     SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+
+    final MultiStatus ms = new MultiStatus();
+    ms.add(new Status("error"));
+    testField.setErrorStatus(ms);
+    assertEquals(ms, testField.getErrorStatus());
+    assertNotSame(ms, testField.getErrorStatus());
+
+    final MultiStatus ms2 = new MultiStatus();
+    ms2.add(new Status("error")); // new object, but same content
+    testField.setErrorStatus(ms2);
+    assertEquals(ms2, testField.getErrorStatus());
+    assertNotSame(ms2, testField.getErrorStatus());
+
+    assertEquals(1, counter.getCount());
+  }
+
+  @Test
+  public void testSetDifferentErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+
+    final MultiStatus ms = new MultiStatus();
+    ms.add(new Status("error"));
+    testField.setErrorStatus(ms);
+    assertEquals(ms, testField.getErrorStatus());
+    assertNotSame(ms, testField.getErrorStatus());
+
+    final MultiStatus ms2 = new MultiStatus();
+    ms2.add(new Status("another message")); // another object, should trigger its own event
+    testField.setErrorStatus(ms2);
+    assertEquals(ms2, testField.getErrorStatus());
+    assertNotSame(ms2, testField.getErrorStatus());
+
+    assertEquals(2, counter.getCount());
+  }
+
+  @Test
+  public void testAddSameErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+    IMultiStatus status0 = testField.getErrorStatus();
+
     testField.addErrorStatus(new Status("error"));
     assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new Status("error")); // no event, because same status already exists
+    assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertEquals(status1, status2);
+    assertEquals(1, counter.getCount());
+  }
+
+  @Test
+  public void testAddDifferentErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+    IMultiStatus status0 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new Status("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new Status("another message"));
+    assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertNotEquals(status1, status2);
+    assertEquals(2, counter.getCount());
+  }
+
+  @Test
+  public void testAddRemoveAddErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+    IMultiStatus status0 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new Status("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
+    testField.removeErrorStatus(Status.class);
+    assertNull(testField.getErrorStatus());
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new Status("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status3 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertNotEquals(status1, status2);
+    assertNotEquals(status2, status3);
+    assertEquals(3, counter.getCount()); // adding + removing + adding
+  }
+
+  @Test
+  public void testAddMultipleRemoveOneAddErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+    IMultiStatus status0 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new InvalidSequenceStatus("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertFalse(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new ParsingFailedStatus("error", "input"));
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertTrue(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    testField.removeErrorStatus(ParsingFailedStatus.class);
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertFalse(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status3 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new ParsingFailedStatus("error", "input"));
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertTrue(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status4 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertNotEquals(status1, status2);
+    assertNotEquals(status2, status3);
+    assertNotEquals(status3, status4);
+    assertEquals(4, counter.getCount()); // add + add + remove + add
   }
 
   @Test
   public void testRemoveErrorStatus() throws Exception {
     SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+    IMultiStatus status0 = testField.getErrorStatus();
+
     testField.addErrorStatus(new Status("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(Status.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
     testField.removeErrorStatus(Status.class);
     assertNull(testField.getErrorStatus());
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertNotEquals(status1, status2);
+    assertEquals(2, counter.getCount());
+  }
+
+  @Test
+  public void testRemoveWithRemainingErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+
+    IMultiStatus status0 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new InvalidSequenceStatus("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertFalse(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new ParsingFailedStatus("error", "input"));
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertTrue(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    testField.removeErrorStatus(ParsingFailedStatus.class);
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertFalse(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status3 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertNotEquals(status1, status2);
+    assertNotEquals(status2, status3);
+    assertEquals(3, counter.getCount()); // add + add + remove
+  }
+
+  @Test
+  public void testRemoveNonExistingErrorStatus() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
+    testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
+
+    IMultiStatus status0 = testField.getErrorStatus();
+
+    testField.addErrorStatus(new InvalidSequenceStatus("error"));
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertFalse(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status1 = testField.getErrorStatus();
+
+    testField.removeErrorStatus(ParsingFailedStatus.class); // should not trigger an event
+    assertTrue(testField.getErrorStatus().containsStatus(InvalidSequenceStatus.class));
+    assertFalse(testField.getErrorStatus().containsStatus(ParsingFailedStatus.class));
+
+    IMultiStatus status2 = testField.getErrorStatus();
+
+    assertNotEquals(status0, status1);
+    assertEquals(status1, status2);
+    assertEquals(1, counter.getCount());
   }
 
   @Test
@@ -311,4 +533,17 @@ public class FormFieldTest {
     assertNull(testField.getErrorStatus());
   }
 
+  private class P_PropertyChangeEventCounter implements PropertyChangeListener {
+
+    private int m_count;
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      m_count++;
+    }
+
+    public int getCount() {
+      return m_count;
+    }
+  }
 }

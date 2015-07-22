@@ -1684,8 +1684,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void addErrorStatus(IStatus newStatus) {
     final MultiStatus status = ensureMultiStatus(getErrorStatusInternal());
-    status.add(newStatus);
-    setErrorStatus(status);
+    // Create a copy, otherwise no PropertyChange event is fired
+    final MultiStatus copy = new MultiStatus(status);
+    copy.add(newStatus);
+    setErrorStatus(copy);
   }
 
   /**
@@ -1694,10 +1696,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void removeErrorStatus(Class<? extends IStatus> statusClazz) {
     final MultiStatus ms = getErrorStatusInternal();
-    if (ms != null) {
-      ms.removeAll(statusClazz);
-      if (ms.getChildren().isEmpty()) {
+    if (ms != null && ms.containsStatus(statusClazz)) {
+      // Create a copy, otherwise no PropertyChange event is fired
+      final MultiStatus copy = new MultiStatus(ms);
+      copy.removeAll(statusClazz);
+      if (copy.getChildren().isEmpty()) {
         clearErrorStatus();
+      }
+      else {
+        setErrorStatusInternal(copy);
       }
     }
   }
