@@ -727,7 +727,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected JSONObject createLogoutEventData() {
     JSONObject obj = new JSONObject();
-    obj.put("redirectUrl", "logout.html");
+    obj.put("redirectUrl", "logout");
     return obj;
   }
 

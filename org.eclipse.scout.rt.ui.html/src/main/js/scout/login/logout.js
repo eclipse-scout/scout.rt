@@ -3,7 +3,7 @@ scout.logout = {
   initTexts: function() {
     var translations = {
       en: {
-        LogoutSuccessful: 'Goodbye!',
+        LogoutSuccessful: 'See you soon!',
         Relogin: 'Login again'
       },
       de: {
