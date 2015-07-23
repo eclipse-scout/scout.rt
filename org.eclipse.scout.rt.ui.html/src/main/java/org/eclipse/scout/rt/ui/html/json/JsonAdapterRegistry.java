@@ -10,152 +10,150 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
+import org.eclipse.scout.commons.index.AbstractSingleValueIndex;
+import org.eclipse.scout.commons.index.IndexedStore;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * This class is a per session registry of IJsonAdapter instances.
+ * This class represents a per session registry for {@link IJsonAdapter} instances.
  */
 public class JsonAdapterRegistry {
 
-  /**
-   * Maps the JsonAdapter ID to an IJsonAdapter instance (wrapped by a composite).
-   */
-  private final Map<String, P_RegistryValue> m_idAdapterMap;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonAdapterRegistry.class);
 
-  /**
-   * Maps Scout model instance to an IJsonAdapter instance (wrapped by a composite), grouped by parents
-   */
-  private final Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> m_parentAdapterMap;
+  private final IndexedStore<IJsonAdapter<?>> m_store;
+
+  private final P_IndexById m_idxById;
+  private final P_IndexByModelAndParent m_idxByModelAndParent;
+  private final P_IndexByParent m_idxByParent;
+  private final P_IndexByModel m_idxByModel;
 
   public JsonAdapterRegistry() {
-    m_idAdapterMap = new HashMap<>();
-    m_parentAdapterMap = new HashMap<>();
+    m_store = new IndexedStore<>();
+
+    m_idxById = m_store.registerIndex(new P_IndexById());
+    m_idxByModelAndParent = m_store.registerIndex(new P_IndexByModelAndParent());
+    m_idxByParent = m_store.registerIndex(new P_IndexByParent());
+    m_idxByModel = m_store.registerIndex(new P_IndexByModel());
   }
 
-  protected Map<String, P_RegistryValue> idAdapterMap() {
-    return m_idAdapterMap;
+  /**
+   * Adds the given adapter to this registry.
+   */
+  public void add(final IJsonAdapter<?> adapter) {
+    m_store.add(adapter);
   }
 
-  protected Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> parentAdapterMap() {
-    return m_parentAdapterMap;
-  }
-
-  public void addJsonAdapter(IJsonAdapter jsonAdapter, IJsonAdapter<?> parent) {
-    String id = jsonAdapter.getId();
-    Object model = jsonAdapter.getModel();
-
-    P_RegistryValue value = new P_RegistryValue(model, jsonAdapter);
-    m_idAdapterMap.put(id, value);
-    Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
-    if (modelAdapterMap == null) {
-      modelAdapterMap = new HashMap<Object, JsonAdapterRegistry.P_RegistryValue>();
-      m_parentAdapterMap.put(parent, modelAdapterMap);
+  /**
+   * Removes the adapter with the given <code>adapterId</code> from this registry.
+   */
+  public void remove(final String adapterId) {
+    final IJsonAdapter<?> adapter = getById(adapterId);
+    if (adapter != null) {
+      m_store.remove(adapter);
     }
-    modelAdapterMap.put(model, value);
   }
 
-  public void removeJsonAdapter(String id) {
-    P_RegistryValue value = m_idAdapterMap.remove(id);
-    for (Iterator<Map<Object, P_RegistryValue>> it = m_parentAdapterMap.values().iterator(); it.hasNext();) {
-      Map<Object, P_RegistryValue> modelAdapterMap = it.next();
-      modelAdapterMap.remove(value.getModel());
-      // Cleanup parentAdapterMap
-      if (modelAdapterMap.isEmpty()) {
-        it.remove();
+  /**
+   * Returns the number of adapters contained in this registry.
+   */
+  public int size() {
+    return m_store.size();
+  }
+
+  /**
+   * Returns the adapter with the given <code>adapterId</code>.
+   */
+  public IJsonAdapter<?> getById(final String adapterId) {
+    return m_idxById.get(adapterId);
+  }
+
+  /**
+   * Returns the adapter which belongs to the given model object and has the given adapter as its parent adapter.
+   */
+  @SuppressWarnings("unchecked")
+  public <MODEL, ADAPTER extends IJsonAdapter<? super MODEL>> ADAPTER getByModelAndParentAdapter(final MODEL model, final IJsonAdapter<?> parent) {
+    return (ADAPTER) m_idxByModelAndParent.get(createModelAndParentAdapterPair(model, parent));
+  }
+
+  /**
+   * Returns all adapters that have the given adapter as their parent adapter.
+   */
+  public List<IJsonAdapter<?>> getByParentAdapter(final IJsonAdapter<?> parentAdapter) {
+    return m_idxByParent.get(parentAdapter);
+  }
+
+  /**
+   * Returns all adapters for the given model object.
+   */
+  @SuppressWarnings("unchecked")
+  public <MODEL> List<IJsonAdapter<MODEL>> getByModel(final MODEL model) {
+    final List<IJsonAdapter<?>> adaptersRaw = m_idxByModel.get(model);
+
+    final List<IJsonAdapter<MODEL>> adapters = new ArrayList<>(adaptersRaw.size());
+    for (final IJsonAdapter<?> adapterRaw : adaptersRaw) {
+      adapters.add((IJsonAdapter<MODEL>) adapterRaw);
+    }
+    return adapters;
+  }
+
+  /**
+   * Clears and disposes all contained adapters.
+   */
+  public void disposeAdapters() {
+    for (final IJsonAdapter<?> adapter : m_store.values()) {
+      if (!adapter.isDisposed()) {
+        adapter.dispose();
       }
     }
-  }
 
-  public IJsonAdapter<?> getJsonAdapter(String id) {
-    P_RegistryValue entry = m_idAdapterMap.get(id);
-    return entry != null ? entry.getJsonAdapter() : null;
-  }
-
-  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
-    Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
-    if (modelAdapterMap == null) {
-      return null;
-    }
-    P_RegistryValue value = modelAdapterMap.get(model);
-    if (value == null) {
-      return null;
-    }
-    @SuppressWarnings("unchecked")
-    A result = (A) value.getJsonAdapter();
-    return result;
-  }
-
-  public List<IJsonAdapter<?>> getJsonAdapters(IJsonAdapter<?> parent) {
-    List<IJsonAdapter<?>> childAdapters = new LinkedList<IJsonAdapter<?>>();
-    Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
-    if (modelAdapterMap == null) {
-      return childAdapters;
-    }
-    for (P_RegistryValue value : modelAdapterMap.values()) {
-      childAdapters.add(value.getJsonAdapter());
-    }
-    return childAdapters;
-  }
-
-  public long getJsonAdapterCount() {
-    long size = 0;
-    for (Map<Object, P_RegistryValue> modelAdapterMap : m_parentAdapterMap.values()) {
-      size += modelAdapterMap.size();
-    }
-    return size;
-  }
-
-  public void disposeAllJsonAdapters() {
-    for (String key : CollectionUtility.arrayList(m_idAdapterMap.keySet())) {
-      P_RegistryValue value = m_idAdapterMap.get(key);
-      if (value != null) { // Check if still in registry (it might already have been removed by a parent adapter)
-        IJsonAdapter<?> jsonAdapter = value.getJsonAdapter();
-        if (!jsonAdapter.isDisposed()) {
-          jsonAdapter.dispose();
-        }
-      }
-    }
-    // "Leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
-    assertEmpty();
-  }
-
-  protected void assertEmpty() {
-    if (!isEmpty()) {
-      throw new IllegalStateException("JsonAdapterRegistry should be empty, but is not!");
+    // "Memory leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
+    if (!m_store.isEmpty()) {
+      LOG.error("Memory leak detected: JsonAdapterRegistry expected to be empty after disposing all adapters [adapterCount={}]", m_store.size());
     }
   }
 
-  public boolean isEmpty() {
-    return (m_idAdapterMap.isEmpty() && m_parentAdapterMap.isEmpty());
-  }
+  // ====  Index definitions ==== //
 
-  protected static class P_RegistryValue {
-
-    private final IJsonAdapter<?> m_jsonAdapter;
-    private final Object m_model;
-
-    protected P_RegistryValue(Object model, IJsonAdapter<?> jsonAdapter) {
-      m_model = model;
-      m_jsonAdapter = jsonAdapter;
-    }
-
-    protected IJsonAdapter<?> getJsonAdapter() {
-      return m_jsonAdapter;
-    }
-
-    protected Object getModel() {
-      return m_model;
-    }
+  private class P_IndexById extends AbstractSingleValueIndex<String, IJsonAdapter<?>> {
 
     @Override
-    public String toString() {
-      return "JsonAdapter: " + m_jsonAdapter;
+    protected String calculateIndexFor(final IJsonAdapter<?> adapter) {
+      return adapter.getId();
     }
+  }
+
+  private class P_IndexByModelAndParent extends AbstractSingleValueIndex<CompositeObject, IJsonAdapter<?>> {
+
+    @Override
+    protected CompositeObject calculateIndexFor(final IJsonAdapter<?> adapter) {
+      return createModelAndParentAdapterPair(adapter.getModel(), adapter.getParent());
+    }
+  }
+
+  private class P_IndexByParent extends AbstractMultiValueIndex<IJsonAdapter<?>, IJsonAdapter<?>> {
+
+    @Override
+    protected IJsonAdapter<?> calculateIndexFor(final IJsonAdapter<?> adapter) {
+      return adapter.getParent();
+    }
+  }
+
+  private class P_IndexByModel extends AbstractMultiValueIndex<Object, IJsonAdapter<?>> {
+
+    @Override
+    protected Object calculateIndexFor(final IJsonAdapter<?> adapter) {
+      return adapter.getModel();
+    }
+  }
+
+  private <MODEL> CompositeObject createModelAndParentAdapterPair(final MODEL model, final IJsonAdapter<?> parentAdapter) {
+    return new CompositeObject(model, parentAdapter);
   }
 }

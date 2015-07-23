@@ -128,6 +128,11 @@ public interface IUiSession {
   List<IJsonAdapter<?>> getJsonChildAdapters(IJsonAdapter<?> parent);
 
   /**
+   * Returns all JSON adapters which belong to the given model object.
+   */
+  <M> List<IJsonAdapter<M>> getJsonAdapters(M model);
+
+  /**
    * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance.
    * As a side-effect a newly created adapter is added to the current JSON response.
    */

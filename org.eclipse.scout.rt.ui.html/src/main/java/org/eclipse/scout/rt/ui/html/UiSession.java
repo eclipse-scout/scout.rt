@@ -421,7 +421,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     // Notify waiting requests - should not delay web-container shutdown
     notifyPollingBackgroundJobRequests();
-    m_jsonAdapterRegistry.disposeAllJsonAdapters();
+    m_jsonAdapterRegistry.disposeAdapters();
     m_currentJsonResponse = null;
     m_currentHttpSession = null;
   }
@@ -467,12 +467,17 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public IJsonAdapter<?> getJsonAdapter(String id) {
-    return m_jsonAdapterRegistry.getJsonAdapter(id);
+    return m_jsonAdapterRegistry.getById(id);
+  }
+
+  @Override
+  public <M> List<IJsonAdapter<M>> getJsonAdapters(M model) {
+    return m_jsonAdapterRegistry.getByModel(model);
   }
 
   @Override
   public List<IJsonAdapter<?>> getJsonChildAdapters(IJsonAdapter<?> parent) {
-    return m_jsonAdapterRegistry.getJsonAdapters(parent);
+    return m_jsonAdapterRegistry.getByParentAdapter(parent);
   }
 
   @Override
@@ -482,9 +487,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot) {
-    A jsonAdapter = m_jsonAdapterRegistry.getJsonAdapter(model, parent);
+    A jsonAdapter = m_jsonAdapterRegistry.getByModelAndParentAdapter(model, parent);
     if (jsonAdapter == null && checkRoot) {
-      jsonAdapter = m_jsonAdapterRegistry.getJsonAdapter(model, getRootJsonAdapter());
+      jsonAdapter = m_jsonAdapterRegistry.getByModelAndParentAdapter(model, getRootJsonAdapter());
     }
     return jsonAdapter;
   }
@@ -522,13 +527,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void registerJsonAdapter(IJsonAdapter<?> jsonAdapter) {
-    m_jsonAdapterRegistry.addJsonAdapter(jsonAdapter, jsonAdapter.getParent());
+    m_jsonAdapterRegistry.add(jsonAdapter);
   }
 
   @Override
   public void unregisterJsonAdapter(String id) {
     // Remove it from the registry. All subsequent calls of "getAdapter(id)" will return null.
-    m_jsonAdapterRegistry.removeJsonAdapter(id);
+    m_jsonAdapterRegistry.remove(id);
     // Remove it completely from the response (including events targeting the adapter).
     m_currentJsonResponse.removeJsonAdapter(id);
   }
@@ -559,7 +564,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   @Override
   public JSONObject processJsonRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
+      LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.size());
     }
 
     try {
@@ -600,7 +605,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         dispose();
       }
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
+        LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.size());
       }
     }
   }
