@@ -204,7 +204,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     List<? extends Resource<?>> resources = getModel().getResources();
     JSONArray jsonResources = new JSONArray();
     for (Resource<?> resource : resources) {
-      //FIXME CGU can't use NewResourceId Provider because properties come before toJson and already create an id, make sure properties come after?
+      // Can't use NewResourceId Provider because properties come before toJson and already create an id
       Object jsonResource = resourceToJson(resource, new P_GetOrCreateResourceIdProvider(), new P_GetOrCreateCellIdProvider());
       LOG.debug("Id: " + getId() + ". Resources: " + jsonResource.toString());
       jsonResources.put(jsonResource);
@@ -290,6 +290,10 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   protected void handleModelEvent(PlannerEvent event) {
+    event = m_plannerEventFilter.filter(event);
+    if (event == null) {
+      return;
+    }
     // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
     m_eventBuffer.add(event);
     registerAsBufferedEventsAdapter();
@@ -323,10 +327,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       case PlannerEvent.TYPE_ALL_RESOURCES_DELETED:
         handleModelAllResourcesDeleted();
         break;
-
-//      case PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED:
-//        handleModelResourceOrderChanged(event.getResources());
-//        break;
       default:
         // NOP
     }
@@ -438,8 +438,8 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   protected void handleUiSetSelection(JsonEvent event) {
     Range<Date> selectionRange = extractSelectionRange(event.getData());
     List<Resource<?>> resources = extractResources(event.getData());
-    //FIXME CGU filter selectionRange as well
     addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
+    addPropertyEventFilterCondition(IPlanner.PROP_SELECTION_RANGE, selectionRange);
     getModel().getUIFacade().setSelectionFromUI(resources, selectionRange);
     LOG.debug("selectionRange=" + selectionRange);
   }
@@ -505,17 +505,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     }
     return jsonResourceIds;
   }
-
-//  @Override
-//  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
-//    if (IPlanner.PROP_SELECTED_RESOURCES.equals(propertyName)) {
-//      List<? extends Resource<?>> selectedResources = getModel().getSelectedResources();
-//      JSONArray resourceIds = resourceIdsToJson(selectedResources);
-//      addPropertyChangeEvent("selectedResourceIds, newValue);
-//    }else {
-//      super.handleModelPropertyChange(propertyName, oldValue, newValue);
-//    }
-//  }
 
   protected PlannerEventFilterCondition addPlannerEventFilterCondition(int plannerEventType) {
     PlannerEventFilterCondition conditon = new PlannerEventFilterCondition(plannerEventType);
