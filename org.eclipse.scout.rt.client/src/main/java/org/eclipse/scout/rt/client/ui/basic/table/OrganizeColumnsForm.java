@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -72,6 +73,7 @@ import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
+import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
 public class OrganizeColumnsForm extends AbstractForm {
 
@@ -94,6 +96,14 @@ public class OrganizeColumnsForm extends AbstractForm {
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("OrganizeTableColumnsTitle");
+  }
+
+  @Override
+  protected void execStored() throws ProcessingException {
+    IPreferences clientPreferences = ClientUIPreferences.getClientPreferences(ClientSessionProvider.currentSession());
+    if (clientPreferences != null) {
+      clientPreferences.flush();
+    }
   }
 
   public AddCustomColumnButton getAddCustomColumnButton() {
