@@ -21,11 +21,10 @@ public class JsonStatusTest {
 
   @Test
   public void testToJson() {
-    assertEquals("", JsonStatus.toJson(null));
+    assertEquals(null, JsonStatus.toJson(null));
     Status status = new Status("foo", IStatus.INFO);
     JSONObject json = (JSONObject) JsonStatus.toJson(status);
     assertEquals("foo", json.getString("message"));
     assertEquals(IStatus.INFO, json.getInt("severity"));
   }
-
 }
