@@ -20,9 +20,9 @@ scout.Column.prototype.buildCell = function(row) {
   var text = this.table.cellText(this, row);
   if (!cell.htmlEnabled) {
     text = scout.strings.encode(text);
-  }
-  if (this.table.multilineText) {
-    text = scout.strings.nl2br(text, false);
+    if (this.table.multilineText) {
+      text = scout.strings.nl2br(text, false);
+    }
   }
   var iconId = cell.iconId;
   var icon = this._icon(row, iconId, !! text) || '';

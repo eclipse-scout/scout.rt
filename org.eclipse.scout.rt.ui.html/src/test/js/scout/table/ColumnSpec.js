@@ -138,6 +138,27 @@ describe("Column", function() {
     expect($cells0.eq(1).text()).toBe('hi');
   });
 
+  describe("MultilineText", function() {
+    it("replaces\n with br, but only if htmlEnabled is false", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.multilineText = true;
+      model.rows[0].cells[0].text = '<br>hello\nyou';
+      model.rows[0].cells[0].htmlEnabled = false;
+      model.rows[0].cells[1].text = '<br>hello\nyou';
+      model.rows[0].cells[1].htmlEnabled = true;
+
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+
+      expect($cells0.eq(0).html()).toBe('&lt;br&gt;hello<br>you');
+      // No replacement, provided html should be left untouched
+      expect($cells0.eq(1).html()).toBe('<br>hello\nyou');
+    });
+  });
+
   describe("TextWrap", function() {
     var table, model, $rows, $cells0, $cell0_0, $cell0_1;
 
