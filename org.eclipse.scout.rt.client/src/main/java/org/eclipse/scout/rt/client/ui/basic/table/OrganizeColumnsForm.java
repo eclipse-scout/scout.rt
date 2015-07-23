@@ -285,6 +285,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           finally {
             getTable().setTableChanging(false);
           }
+          validateButtons();
         }
 
         @Order(10.0)
@@ -797,7 +798,7 @@ public class OrganizeColumnsForm extends AbstractForm {
               IClipboardService svc = BEANS.opt(IClipboardService.class);
               if (svc == null) {
                 LOG.info(sb.toString());
-                MessageBoxes.createOk().withBody("See log-file for column widths output.").show();
+                MessageBoxes.createOk().withBody(TEXTS.get("SeeLogFileForColumnWidthsOutput")).show();
               }
               else {
                 svc.setTextContents(sb.toString());
