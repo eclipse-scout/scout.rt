@@ -185,7 +185,7 @@ __include("scout/form/fields/checkbox/CheckBoxKeyStrokeAdapter.js");
 __include("scout/form/fields/colorfield/ColorField.js");
 __include("scout/form/fields/datefield/DateField.js");
 __include("scout/form/fields/datefield/DateFieldKeyStrokeAdapter.js");
-__include("scout/form/fields/datefield/DateFieldLayout.js");
+__include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
 __include("scout/form/fields/filechooserfield/FileChooserField.js");
 __include("scout/form/fields/graphfield/GraphField.js");
 __include("scout/form/fields/groupbox/GroupBox.js");

@@ -32,29 +32,12 @@ scout.CellEditorPopup.prototype._render = function($parent) {
     openFieldPopupOnCellEdit: this.table.openFieldPopupOnCellEdit
   };
   field.render(this.$container);
+  field.prepareForCellEdit({
+    firstCell: firstCell,
+    cellHorizontalAlignment: scout.Table.parseHorizontalAlignment(this.cell.horizontalAlignment)
+  });
   this.addChild(field);
 
-  // remove mandatory and status indicators (popup should 'fill' the whole cell)
-  if (field.$mandatory) {
-    field.$mandatory.remove();
-    field.$mandatory = null;
-  }
-  if (field.$status) {
-    field.$status.remove();
-    field.$status = null;
-  }
-  if (field.$container) {
-    field.$container.addClass('cell-editor-form-field');
-  }
-  if (field.$fieldContainer) {
-    field.$fieldContainer.css('text-align', scout.Table.parseHorizontalAlignment(this.cell.horizontalAlignment));
-  }
-  if (field.$field) {
-    field.$field.addClass('cell-editor-field');
-    if (firstCell) {
-      field.$field.addClass('first');
-    }
-  }
   // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
   this.$anchor.css('visibility', 'hidden');
 

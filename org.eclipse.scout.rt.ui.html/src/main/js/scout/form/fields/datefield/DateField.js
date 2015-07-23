@@ -41,7 +41,7 @@ scout.DateField.prototype._render = function($parent) {
   this.addStatus(this.$field);
 
   this.htmlDateTimeComposite = new scout.HtmlComponent(this.$field, this.session);
-  this.htmlDateTimeComposite.setLayout(new scout.DateFieldLayout(this));
+  this.htmlDateTimeComposite.setLayout(new scout.DateTimeCompositeLayout(this));
 
   // Create date picker popup
   this._datePickerPopup = new scout.DatePickerPopup(this.session, {
@@ -50,6 +50,7 @@ scout.DateField.prototype._render = function($parent) {
   this.addChild(this._datePickerPopup);
   this._datePickerPopup.picker
     .on('dateSelect', this._onDatePickerDateSelected.bind(this));
+
   if (this.hasDate && this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
     this._openDatePicker();
   }
@@ -64,6 +65,25 @@ scout.DateField.prototype._renderProperties = function() {
 
   // Has to be the last call, otherwise _renderErrorStatus() would operate on the wrong state.
   scout.DateField.parent.prototype._renderProperties.call(this);
+};
+
+scout.DateField.prototype.prepareForCellEdit = function(opts) {
+  scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
+  opts = opts || {};
+
+  this.$field.removeClass('cell-editor-field first');
+  if (this.$dateField) {
+    this.$dateField.addClass('cell-editor-field');
+    if (opts.firstCell) {
+      this.$dateField.addClass('first');
+    }
+  }
+  if (this.$timeField) {
+    this.$timeField.addClass('cell-editor-field');
+    if (opts.firstCell && !this.$dateField) {
+      this.$timeField.addClass('first');
+    }
+  }
 };
 
 scout.DateField.prototype._remove = function() {
@@ -178,7 +198,7 @@ scout.DateField.prototype._renderTimestamp = function() {
  */
 scout.DateField.prototype._renderErrorStatus = function() {
   scout.DateField.parent.prototype._renderErrorStatus.call(this);
-  var hasError = !!(this.errorStatus) ;
+  var hasError = !! (this.errorStatus);
 
   if (this.$dateField) {
     this.$dateField.toggleClass('has-error', hasError);
@@ -227,12 +247,12 @@ scout.DateField.prototype._onTimeIconClick = function(event) {
 scout.DateField.prototype._onDateFieldBlur = function() {
   // Close picker and update model
   this._closeDatePicker();
-  this._acceptDatePrediction();
+  this.displayTextChanged();
 };
 
 scout.DateField.prototype._onTimeFieldBlur = function() {
   this._tempTimeDate = null;
-  this._acceptTimePrediction();
+  this.displayTextChanged();
 };
 
 scout.DateField.prototype._onDateFieldKeydown = function(event) {
@@ -246,6 +266,14 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
     pickerStartDate = null,
     shiftDate = true;
+
+  // Don't propagate tab to cell editor -> tab should focus time field
+  if (this.hasTime && this.cellEditor &&
+    event.which === scout.keys.TAB &&
+    modifierCount === 0) {
+    event.stopPropagation();
+    return;
+  }
 
   if (event.which === scout.keys.TAB ||
     event.which === scout.keys.SHIFT ||
@@ -375,6 +403,15 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
     shiftDate = true,
     date = null;
+
+  // Don't propagate shift-tab to cell editor -> shift tab should focus date field
+  if (this.hasDate && this.cellEditor &&
+    event.which === scout.keys.TAB &&
+    event.shiftKey &&
+    modifierCount === 1) {
+    event.stopPropagation();
+    return;
+  }
 
   if (event.which === scout.keys.TAB ||
     event.which === scout.keys.SHIFT ||
@@ -531,18 +568,13 @@ scout.DateField.prototype.updateDisplayText = function(date) {
  * @override ValueField.js
  */
 scout.DateField.prototype.displayTextChanged = function(whileTyping, forceSend) {
-  var newTimestampAsDate = null;
-  if (this.hasTime && this.hasDate) {
-    newTimestampAsDate = scout.dates.combineDateTime(
-      this.isolatedDateFormat.parse(this.$dateField.val()),
-      this.isolatedTimeFormat.parse(this.$timeField.val())
-    );
+  if (this.hasDate && this.hasTime) {
+    this._acceptDateTimePrediction();
   } else if (this.hasDate) {
-    newTimestampAsDate = this.isolatedDateFormat.parse(this.$dateField.val());
+    this._acceptDatePrediction();
   } else if (this.hasTime) {
-    newTimestampAsDate = this.isolatedTimeFormat.parse(this.$timeField.val());
+    this._acceptTimePrediction();
   }
-  this.updateTimestamp(newTimestampAsDate);
 };
 
 /**
@@ -626,6 +658,23 @@ scout.DateField.prototype._acceptTimePrediction = function() {
   if (timePrediction) {
     // parse success -> send new timestamp to server
     this.updateTimestamp(this._newTimestampAsDate(null, timePrediction.date));
+    this.updateDisplayText();
+  } else {
+    // parse error -> send error to server
+    this._syncToServer();
+  }
+};
+
+scout.DateField.prototype._acceptDateTimePrediction = function() {
+  var dateText = (this._$predictDateField ? this._$predictDateField.val() : this.$dateField.val());
+  var timeText = (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
+  this._removePredictionFields();
+
+  var datePrediction = this._predictDate(dateText);
+  var timePrediction = this._predictTime(timeText);
+  if (datePrediction && timePrediction) {
+    // parse success -> send new timestamp to server
+    this.updateTimestamp(this._newTimestampAsDate(datePrediction.date, timePrediction.date));
     this.updateDisplayText();
   } else {
     // parse error -> send error to server
@@ -733,13 +782,13 @@ scout.DateField.prototype._setDateValid = function(valid, dateText) {
     // Set to invalid (this is always a UI error)
     if (!this._hasUiErrorStatus()) {
       errorStatus = {
-          message: this.session.text('ui.InvalidDateFormat')
+        message: this.session.text('ui.InvalidDateFormat')
       };
     }
     errorStatus.invalidDateText = dateText;
     errorStatus.invalidDisplayText = scout.strings.join(" ",
-        dateText,
-        this.$timeField && this.$timeField.val());
+      dateText,
+      this.$timeField && this.$timeField.val());
     this.setErrorStatus(errorStatus);
   }
   this.setErrorStatus(errorStatus);
@@ -764,13 +813,13 @@ scout.DateField.prototype._setTimeValid = function(valid, timeText) {
     // Set to invalid (this is always a UI error)
     if (!this._hasUiErrorStatus()) {
       errorStatus = {
-          message: this.session.text('ui.InvalidDateFormat')
+        message: this.session.text('ui.InvalidDateFormat')
       };
     }
     errorStatus.invalidTimeText = timeText;
     errorStatus.invalidDisplayText = scout.strings.join(" ",
-        this.$dateField && this.$dateField.val(),
-        timeText);
+      this.$dateField && this.$dateField.val(),
+      timeText);
     this.setErrorStatus(errorStatus);
   }
   // The layout might have been invalidated by setErrorStatus() when showing/hiding the status icon

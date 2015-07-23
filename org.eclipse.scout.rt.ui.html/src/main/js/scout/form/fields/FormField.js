@@ -577,3 +577,29 @@ scout.FormField.prototype.updateInnerAlignment = function(opts) {
     }
   }
 };
+
+scout.FormField.prototype.prepareForCellEdit = function(opts) {
+  opts = opts || {};
+
+  //remove mandatory and status indicators (popup should 'fill' the whole cell)
+  if (this.$mandatory) {
+    this.$mandatory.remove();
+    this.$mandatory = null;
+  }
+  if (this.$status) {
+    this.$status.remove();
+    this.$status = null;
+  }
+  if (this.$container) {
+    this.$container.addClass('cell-editor-form-field');
+  }
+  if (this.$fieldContainer) {
+    this.$fieldContainer.css('text-align', opts.cellHorizontalAlignment);
+  }
+  if (this.$field) {
+    this.$field.addClass('cell-editor-field');
+    if (opts.firstCell) {
+      this.$field.addClass('first');
+    }
+  }
+};

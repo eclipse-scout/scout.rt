@@ -1,5 +1,5 @@
-scout.DateFieldLayout = function(dateField) {
-  scout.DateFieldLayout.parent.call(this);
+scout.DateTimeCompositeLayout = function(dateField) {
+  scout.DateTimeCompositeLayout.parent.call(this);
   this._dateField = dateField;
   this.invalidateOnResize = true;
 
@@ -7,9 +7,9 @@ scout.DateFieldLayout = function(dateField) {
   this.MIN_DATE_FIELD_WIDTH = 90;
   this.MIN_TIME_FIELD_WIDTH = 60;
 };
-scout.inherits(scout.DateFieldLayout, scout.AbstractLayout);
+scout.inherits(scout.DateTimeCompositeLayout, scout.AbstractLayout);
 
-scout.DateFieldLayout.prototype.layout = function($container) {
+scout.DateTimeCompositeLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     $dateField = this._dateField.$dateField,
     $timeField = this._dateField.$timeField,
@@ -36,7 +36,7 @@ scout.DateFieldLayout.prototype.layout = function($container) {
         Math.max(dateFieldMargins.left, timeFieldMargins.left)
       );
     var compositeSize = availableSize.subtract(compositeMargins);
-    var hgap = scout.HtmlEnvironment.smallColumnGap;
+    var hgap = this._hgap();
     var totalWidth = compositeSize.width - hgap;
     // Date field 60%, time field 40%
     var dateFieldWidth = (totalWidth * 0.6);
@@ -99,13 +99,25 @@ scout.DateFieldLayout.prototype.layout = function($container) {
       scout.graphics.setSize($predictTimeField, timeFieldSize);
     }
   }
+  var popup = this._dateField._datePickerPopup;
+  if (popup && popup.rendered) {
+    // Make sure the popup is correctly positioned (especially necessary for cell editor)
+    popup.position();
+  }
 };
 
-scout.DateFieldLayout.prototype.preferredLayoutSize = function($container) {
+scout.DateTimeCompositeLayout.prototype._hgap = function() {
+  if (this._dateField.cellEditor) {
+    return 0;
+  }
+  return scout.HtmlEnvironment.smallColumnGap;
+};
+
+scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize = scout.graphics.prefSize($container);
   // --- Date and time ---
   if (this._dateField.hasDate && this._dateField.hasTime) {
-    prefSize.width = this.MIN_DATE_FIELD_WIDTH + scout.HtmlEnvironment.smallColumnGap + this.MIN_TIME_FIELD_WIDTH;
+    prefSize.width = this.MIN_DATE_FIELD_WIDTH + this._hgap() + this.MIN_TIME_FIELD_WIDTH;
   }
   // --- Date only ---
   else if (this._dateField.hasDate ) {
