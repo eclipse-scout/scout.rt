@@ -48,7 +48,7 @@ scout.SmartField.prototype._render = function($parent) {
   this.addStatus();
   this.addSmartFieldPopup();
 
-  if (this.cellEditor && this.cellEditor.openPopupOnCellEdit) {
+  if (this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
     this._onClick();
   }
 };

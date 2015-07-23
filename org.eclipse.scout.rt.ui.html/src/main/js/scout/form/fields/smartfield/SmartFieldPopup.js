@@ -76,3 +76,7 @@ scout.SmartFieldPopup.prototype._onContainerMouseDown = function(event) {
   // proposal chooser impl.
   return false;
 };
+
+scout.SmartFieldPopup.prototype._onAnchorScroll = function(event) {
+  this.position();
+};

@@ -66,3 +66,7 @@ scout.DatePickerPopup.prototype._onMouseDown = function(event) {
 scout.DatePickerPopup.prototype._onContainerMouseDown = function(event) {
   return false;
 };
+
+scout.DatePickerPopup.prototype._onAnchorScroll = function(event) {
+  this.position();
+};

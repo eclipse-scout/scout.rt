@@ -187,18 +187,24 @@ describe("CellEditor", function() {
       expect(session.getModelAdapter(field.id)).toBeFalsy();
     });
 
-  });
-
-  describe("completeEdit", function() {
-
-    it("removes the popup and its field", function() {
+    it("removes the cell editor popup", function() {
       var popup = createTableAndStartCellEdit();
-      popup.completeEdit();
+      var field = popup.cell.field;
+
+      var message = {
+        events: [createEndCellEditEvent(popup.table, field.id)]
+      };
+      session._processSuccessResponse(message);
 
       expect($findPopup().length).toBe(0);
       expect($findPopup().find('.form-field').length).toBe(0);
+      expect(popup.rendered).toBe(false);
       expect(popup.cell.field.rendered).toBe(false);
     });
+
+  });
+
+  describe("completeEdit", function() {
 
     it("sends completeCellEdit", function() {
       var popup = createTableAndStartCellEdit();
@@ -211,18 +217,19 @@ describe("CellEditor", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
+    it("does not remove the popup and its field (will be done by endCellEdit)", function() {
+      var popup = createTableAndStartCellEdit();
+      popup.completeEdit();
+
+      expect($findPopup().length).toBe(1);
+      expect($findPopup().find('.form-field').length).toBe(1);
+      expect(popup.rendered).toBe(true);
+      expect(popup.cell.field.rendered).toBe(true);
+    });
+
   });
 
   describe("cancelEdit", function() {
-
-    it("removes the popup and its field", function() {
-      var popup = createTableAndStartCellEdit();
-      popup.cancelEdit();
-
-      expect($findPopup().length).toBe(0);
-      expect($findPopup().find('.form-field').length).toBe(0);
-      expect(popup.cell.field.rendered).toBe(false);
-    });
 
     it("sends cancelCellEdit", function() {
       var popup = createTableAndStartCellEdit();
@@ -233,6 +240,16 @@ describe("CellEditor", function() {
         fieldId: popup.cell.field.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("removes the popup and its field", function() {
+      var popup = createTableAndStartCellEdit();
+      popup.cancelEdit();
+
+      expect($findPopup().length).toBe(0);
+      expect($findPopup().find('.form-field').length).toBe(0);
+      expect(popup.rendered).toBe(false);
+      expect(popup.cell.field.rendered).toBe(false);
     });
   });
 

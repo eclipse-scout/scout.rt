@@ -60,6 +60,11 @@ scout.inherits(scout.CellEditorTabKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
+  if (this._popup.completeEditRequested) {
+    // Make sure events (complete, prepare) don't get sent twice since it will lead to exceptions
+    // This may happen if user presses and holds the tab key
+    return;
+  }
   var pos,
     backwards = event.shiftKey,
     table = this._popup.table,
@@ -67,14 +72,10 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
     row = this._popup.row;
 
   this._popup.completeEdit();
+  this._popup.completeEditRequested = true;
 
   pos = table.nextEditableCellPos(column, row, backwards);
   if (pos) {
-    // if next editable cell is on another row then select it
-    // -> makes it more responsive because server selects it anyway
-    if (pos.row !== this._popup.row) {
-      table.selectRows([pos.row]);
-    }
     table.prepareCellEdit(pos.row.id, pos.column.id);
   }
 

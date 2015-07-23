@@ -9,14 +9,10 @@ scout.inherits(scout.SmartFieldLayout, scout.FormFieldLayout);
 
 scout.SmartFieldLayout.prototype.layout = function($container) {
   scout.SmartFieldLayout.parent.prototype.layout.call(this, $container);
-  if (this._smartField._$popup) {
-    var htmlPopup = scout.HtmlComponent.get(this._smartField._$popup),
-      // Because SmartFieldPopupLayout has autoSize set to true, the size we pass here is not relevant
-      // the popup resizes itself when layout() is called. However: we must set the location
-      // of the popup.
-      prefSize = new scout.Dimension(0, 0),
-      fieldBounds = this._smartField._fieldBounds(),
-      popupSize = this._smartField._popup._popupSize(fieldBounds, prefSize);
-    htmlPopup.setSize(popupSize);
+  var popup = this._smartField._popup;
+  if (popup && popup.rendered) {
+    // Make sure the popup is correctly layouted and positioned
+    popup.position();
+    popup.validateLayout();
   }
 };

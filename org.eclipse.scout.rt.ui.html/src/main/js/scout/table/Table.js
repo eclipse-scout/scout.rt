@@ -859,13 +859,13 @@ scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
 };
 
 /**
- * @param openPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
+ * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
  *    additional property 'cellEditor' on the editor-field. The field instance may use this property
  *    to decide whether or not it should open a popup immediately after it is rendered. This is used
  *    for Smart- and DateFields.
  */
-scout.Table.prototype.prepareCellEdit = function(rowId, columnId, openPopupOnCellEdit) {
-  this.openPopupOnCellEdit = scout.helpers.nvl(openPopupOnCellEdit, false);
+scout.Table.prototype.prepareCellEdit = function(rowId, columnId, openFieldPopupOnCellEdit) {
+  this.openFieldPopupOnCellEdit = scout.helpers.nvl(openFieldPopupOnCellEdit, false);
   this.sendPrepareCellEdit(rowId, columnId);
 };
 
@@ -1459,6 +1459,7 @@ scout.Table.prototype._rowsToIds = function(rows) {
  * model has to be updated before calling this method.
  */
 scout.Table.prototype.renderSelection = function($row, deselect) {
+  //TODO CGU rewrite, render selection based on model and not using jquery selectors
   var $previousElement = $row.prevAll('.table-row:not(.invisible)').first(),
     $followingElement = $row.nextAll('.table-row:not(.invisible)').first();
   $row.removeClass('select-middle select-top select-bottom select-single selected');
@@ -1566,6 +1567,12 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
   if (this.rendered && !selectedEqualsRows) {
     this.selectedRows.forEach(function(row) {
       this.renderSelection(row.$row, false);
+
+      // Make sure the cell editor popup is correctly layouted because selection changes the cell bounds
+      if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
+        this.cellEditorPopup.alignTo();
+        this.cellEditorPopup.pack();
+      }
     }, this);
     this._triggerRowsSelected();
     if (this.scrollToSelection) {
@@ -2267,6 +2274,7 @@ scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
 scout.Table.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
   field.destroy();
+  this.cellEditorPopup.remove();
   this.cellEditorPopup = null;
 };
 

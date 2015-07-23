@@ -24,12 +24,12 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
   // Sets a hint on the field that that field was opened as cell editor.
-  // Additionally, sets the property openPopupOnCellEdit to indicate that the a popup should be opened immediately after it has been rendered.
+  // Additionally, sets the property openFieldPopupOnCellEdit to indicate that the a popup should be opened immediately after it has been rendered.
   // The field should use setTimeout() to open the popup, because the editor-field
   // itself is in the middle of rendering and thus the popup of the editor-field
   // cannot position itself correctly
   field.cellEditor = {
-    openPopupOnCellEdit: this.table.openPopupOnCellEdit
+    openFieldPopupOnCellEdit: this.table.openFieldPopupOnCellEdit
   };
   field.render(this.$container);
   this.addChild(field);
@@ -102,7 +102,6 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   field.displayTextChanged();
 
   this.table.sendCompleteCellEdit(field.id);
-  this.remove();
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {

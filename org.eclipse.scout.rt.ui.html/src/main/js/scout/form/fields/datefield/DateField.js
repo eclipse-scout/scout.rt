@@ -50,7 +50,7 @@ scout.DateField.prototype._render = function($parent) {
   this.addChild(this._datePickerPopup);
   this._datePickerPopup.picker
     .on('dateSelect', this._onDatePickerDateSelected.bind(this));
-  if (this.hasDate && this.cellEditor && this.cellEditor.openPopupOnCellEdit) {
+  if (this.hasDate && this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
     this._openDatePicker();
   }
 };
