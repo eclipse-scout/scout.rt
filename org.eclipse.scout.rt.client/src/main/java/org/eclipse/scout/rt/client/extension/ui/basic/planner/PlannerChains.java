@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
-import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class PlannerChains {
@@ -20,17 +19,17 @@ public final class PlannerChains {
     }
   }
 
-  public static class PlannerActivityCellSelectedChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
+  public static class PlannerActivitySelectedChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
 
-    public PlannerActivityCellSelectedChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
+    public PlannerActivitySelectedChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
       super(extensions);
     }
 
-    public void execActivityCellSelected(final Activity<RI, AI> cell) throws ProcessingException {
+    public void execActivitySelected(final Activity<RI, AI> cell) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
-          next.execActivityCellSelected(PlannerActivityCellSelectedChain.this, cell);
+          next.execActivitySelected(PlannerActivitySelectedChain.this, cell);
         }
       };
       callChain(methodInvocation, cell);
@@ -100,23 +99,4 @@ public final class PlannerChains {
     }
   }
 
-  public static class PlannerCellActionChain<RI, AI> extends AbstractPlannerChain<RI, AI> {
-
-    public PlannerCellActionChain(List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions) {
-      super(extensions);
-    }
-
-    public void execCellAction(final Resource<RI> resource, final Activity<RI, AI> activityCell) throws ProcessingException {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
-          next.execCellAction(PlannerCellActionChain.this, resource, activityCell);
-        }
-      };
-      callChain(methodInvocation, resource, activityCell);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-    }
-  }
 }

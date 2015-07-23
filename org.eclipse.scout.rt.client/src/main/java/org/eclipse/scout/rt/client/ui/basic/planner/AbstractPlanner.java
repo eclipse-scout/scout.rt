@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.Range;
@@ -34,8 +33,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.IPlannerExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivityCellSelectedChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerCellActionChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerActivitySelectedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisposePlannerChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerInitPlannerChain;
@@ -245,13 +243,9 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   protected void execResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
   }
 
-  /**
-   * @param activity
-   *          may be null
-   */
   @ConfigOperation
   @Order(60)
-  protected void execDecorateActivity(Activity<RI, AI> activity) throws ProcessingException {
+  protected void execSelectionRangeChanged(Range<Date> viewRange) throws ProcessingException {
   }
 
   /**
@@ -267,18 +261,18 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
    * @param activity
    *          may be null
    */
-//  @ConfigOperation
-//  @Order(75)
-//  protected void execCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
-//  }
-
   @ConfigOperation
   @Order(80)
-  protected void execInitPlanner() throws ProcessingException {
+  protected void execDecorateActivity(Activity<RI, AI> activity) throws ProcessingException {
   }
 
   @ConfigOperation
   @Order(90)
+  protected void execInitPlanner() throws ProcessingException {
+  }
+
+  @ConfigOperation
+  @Order(100)
   protected void execDisposePlanner() throws ProcessingException {
   }
 
@@ -352,8 +346,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
           try {
-            //FIXME CGU add interceptor
-            execDisplayModeChanged((int) e.getNewValue());
+            interceptDisplayModeChanged((int) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
@@ -361,8 +354,15 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         }
         else if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
           try {
-            //FIXME CGU add interceptor
-            execViewRangeChanged((Range) e.getNewValue());
+            interceptViewRangeChanged((Range) e.getNewValue());
+          }
+          catch (Exception t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+        }
+        else if (e.getPropertyName().equals(PROP_SELECTION_RANGE)) {
+          try {
+            interceptSelectionRangeChanged((Range) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
@@ -372,7 +372,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
           Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
           if (cell != null) {
             try {
-              interceptActivityCellSelected(cell);
+              interceptActivitySelected(cell);
             }
             catch (Exception t) {
               BEANS.get(ExceptionHandler.class).handle(t);
@@ -651,26 +651,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         List<Resource<RI>> notificationCopy = CollectionUtility.arrayList(m_selectedResources);
 
         fireResourcesSelected(notificationCopy);
-
-        //FIXME implement activity selection
-//        // check whether current selected activity cell needs to be updated
-//        if (CollectionUtility.size(internalResources) != 1) {
-//          // at most one activity cell might be selected
-//          setSelectedActivityCell(null);
-//          return;
-//        }
-//
-//        Activity<RI, AI> selectedCell = getSelectedActivity();
-//        if (selectedCell == null) {
-//          // nothing selected
-//          return;
-//        }
-//
-//        Resource<RI> resource = CollectionUtility.firstElement(resources);
-//        if (CompareUtility.notEquals(resource, selectedCell.getResourceId())) {
-//          // selected cell does not belong to selected resources
-//          setSelectedActivityCell(null);
-//        }
+        //FIXME implement activity selection (activity may only be selected if it belongs to the selected resource)
       }
     }
     finally {
@@ -973,7 +954,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setViewRange(Range<Date> viewRange) {
-    LOG.debug("Setting selection range to " + viewRange);
+    LOG.debug("Setting view range to " + viewRange);
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
   }
 
@@ -984,38 +965,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setSelectionRange(Range<Date> selectionRange) {
-    try {
-      setPlannerChanging(true);
-      //
-      LOG.debug("Seting selection range to " + selectionRange);
-      propertySupport.setProperty(PROP_SELECTION_RANGE, selectionRange);
-
-      // update selected activity cell based on selected time range.
-      // this is a work around for enforcing an owner value change event on context menus. Actually the empty selection event
-      // should be handled correctly in the GUI.
-      List<Resource<RI>> selectedResources = getSelectedResources();
-      if (selectedResources.size() == 1) {
-        Resource<RI> resource = CollectionUtility.firstElement(selectedResources);
-        List<Activity<?, ?>> activityCells = resource.getActivities();
-        for (Activity<?, ?> cell : activityCells) {
-
-          if (CompareUtility.equals(cell.getBeginTime(), selectionRange.getFrom()) &&
-              (CompareUtility.equals(cell.getEndTime(), selectionRange.getTo())
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
-                  && cell.getEndTime() != null
-                  && selectionRange.getTo() != null
-                  && cell.getEndTime().getTime() == selectionRange.getTo().getTime() + 1))) {
-//                setSelectedActivityCell(cell);
-            return;
-          }
-        }
-      }
-      setSelectedActivityCell(null);
-    }
-    finally {
-      setPlannerChanging(false);
-    }
+    LOG.debug("Seting selection range to " + selectionRange);
+    propertySupport.setProperty(PROP_SELECTION_RANGE, selectionRange);
   }
 
   @Override
@@ -1130,14 +1081,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     public void setSelectedActivityCellFromUI(Activity<RI, AI> cell) {
       setSelectedActivityCell(cell);
     }
-
-//    @Override
-//    public void fireCellActionFromUI(Resource<RI> resource, Activity<RI, AI> activityCell) {
-//      if (activityCell != null) {
-//        setSelectedActivityCell(activityCell);
-//      }
-//      fireCellAction(resource, activityCell);
-//    }
   }
 
   /**
@@ -1151,7 +1094,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
 
     @Override
-    public void execActivityCellSelected(PlannerActivityCellSelectedChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
+    public void execActivitySelected(PlannerActivitySelectedChain<RI, AI> chain, Activity<RI, AI> cell) throws ProcessingException {
       getOwner().execActivitySelected(cell);
     }
 
@@ -1170,26 +1113,29 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       getOwner().execInitPlanner();
     }
 
-    @Override
-    public void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
-      //FIXME CGU check if still needed, better replace with menus
-//      getOwner().execCellAction(resource, activityCell);
-    }
-
   }
 
+  //FIXME CGU add interceptors
   protected final void interceptResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
     execResourcesSelected(resources);
-    //FIXME CGU implement
-//    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-//    PlannerActivityCellSelectedChain<RI, AI> chain = new PlannerActivityCellSelectedChain<RI, AI>(extensions);
-//    chain.execActivityCellSelected(cell);
   }
 
-  protected final void interceptActivityCellSelected(Activity<RI, AI> cell) throws ProcessingException {
+  protected final void interceptSelectionRangeChanged(Range<Date> selectionRange) throws ProcessingException {
+    execSelectionRangeChanged(selectionRange);
+  }
+
+  protected final void interceptViewRangeChanged(Range<Date> viewRange) throws ProcessingException {
+    execViewRangeChanged(viewRange);
+  }
+
+  protected void interceptDisplayModeChanged(int displayMode) throws ProcessingException {
+    execDisplayModeChanged(displayMode);
+  }
+
+  protected final void interceptActivitySelected(Activity<RI, AI> cell) throws ProcessingException {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerActivityCellSelectedChain<RI, AI> chain = new PlannerActivityCellSelectedChain<RI, AI>(extensions);
-    chain.execActivityCellSelected(cell);
+    PlannerActivitySelectedChain<RI, AI> chain = new PlannerActivitySelectedChain<RI, AI>(extensions);
+    chain.execActivitySelected(cell);
   }
 
   protected final void interceptDisposePlanner() throws ProcessingException {
@@ -1208,12 +1154,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerInitPlannerChain<RI, AI> chain = new PlannerInitPlannerChain<RI, AI>(extensions);
     chain.execInitPlanner();
-  }
-
-  protected final void interceptCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
-    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
-    PlannerCellActionChain<RI, AI> chain = new PlannerCellActionChain<RI, AI>(extensions);
-    chain.execCellAction(resource, activityCell);
   }
 
 }
