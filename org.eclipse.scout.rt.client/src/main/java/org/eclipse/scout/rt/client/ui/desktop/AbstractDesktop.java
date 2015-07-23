@@ -903,6 +903,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  @SuppressWarnings("deprecation")
+  public void ensureVisible(IForm form) {
+    activateForm(form);
+  }
+
+  @Override
   public void activateForm(IForm form) {
     if (form == null) {
       return;

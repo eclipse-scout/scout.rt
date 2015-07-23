@@ -381,6 +381,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
+  public void ensureVisible(IForm form) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void activateForm(IForm form) {
     throw createUnsupportedOperationException();
   }

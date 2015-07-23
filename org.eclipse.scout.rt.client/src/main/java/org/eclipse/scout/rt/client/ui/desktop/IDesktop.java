@@ -173,6 +173,14 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * fires a activate form event
+   *
+   * @deprecated use {@link #activateForm(IForm)}; will be removed in version 6.1.
+   */
+  @Deprecated
+  void ensureVisible(IForm form);
+
+  /**
+   * fires a activate form event
    */
   void activateForm(IForm form);
 
