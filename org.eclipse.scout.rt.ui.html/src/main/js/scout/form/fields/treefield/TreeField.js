@@ -10,8 +10,8 @@ scout.inherits(scout.TreeField, scout.FormField);
 scout.TreeField.prototype._render = function($parent) {
   this.addContainer($parent, 'tree-field');
   this.addLabel();
+  this.addMandatoryIndicator();
   this.addStatus();
-
   if (this.tree) {
     this._renderTree();
   }

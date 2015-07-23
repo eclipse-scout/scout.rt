@@ -1,5 +1,4 @@
 .table-field > .table {
-  margin-left: @mandatory-indicator-width;
   border: 1px solid @border-color;
   border-radius: @border-radius;
   background-color: @control-background-color;

@@ -10,6 +10,7 @@ scout.inherits(scout.TableField, scout.FormField);
 scout.TableField.prototype._render = function($parent) {
   this.addContainer($parent, 'table-field');
   this.addLabel();
+  this.addMandatoryIndicator();
   this.addStatus();
   if (this.table) {
     this._renderTable();
