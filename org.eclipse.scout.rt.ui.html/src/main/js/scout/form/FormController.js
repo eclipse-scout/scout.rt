@@ -25,7 +25,11 @@ scout.FormController.prototype.registerAndRender = function(formAdapterId) {
  * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
  */
 scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
+  var form = this.session.getModelAdapter(formAdapterId);
+  if (!form) {
+    return;
+  }
+
   if (form.displayHint === 'view') {
     this._removeView(form);
   } else {

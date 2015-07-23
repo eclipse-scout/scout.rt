@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -37,9 +37,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
-import org.eclipse.scout.rt.ui.html.json.form.DisplayParentFormFilter;
-import org.eclipse.scout.rt.ui.html.json.messagebox.DisplayParentFileChooserFilter;
-import org.eclipse.scout.rt.ui.html.json.messagebox.DisplayParentMessageBoxFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
@@ -50,6 +47,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
 
   public static final String PROP_OUTLINE = "outline";
+  public static final String PROP_DISPLAY_PARENT = "displayParent";
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
   public static final String PROP_FILE_CHOOSER = "fileChooser";
@@ -60,16 +58,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private final DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
 
-  private final IFilter<IForm> m_displayParentFormFilter;
-  private final IFilter<IMessageBox> m_displayParentMessageBoxFilter;
-  private final IFilter<IFileChooser> m_displayParentFileChooserFilter;
-
   public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(desktop, uiSession, id, parent);
     m_downloads = new DownloadHandlerStorage();
-    m_displayParentFormFilter = new DisplayParentFormFilter(desktop);
-    m_displayParentMessageBoxFilter = new DisplayParentMessageBoxFilter(desktop);
-    m_displayParentFileChooserFilter = new DisplayParentFileChooserFilter(desktop);
   }
 
   @Override
@@ -262,51 +253,45 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelFormShow(IForm form) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form, m_displayParentFormFilter);
-    if (jsonAdapter != null) {
-      addActionEvent("formShow", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
-    }
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
+    addActionEventForEachDisplayParentAdapter("formShow", PROP_FORM, jsonAdapter, form.getDisplayParent());
   }
 
   protected void handleModelFormHide(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_displayParentFormFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form);
     if (jsonAdapter != null) {
-      addActionEvent("formHide", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+      addActionEventForEachDisplayParentAdapter("formHide", PROP_FORM, jsonAdapter, form.getDisplayParent());
     }
   }
 
   protected void handleModelFormActivate(IForm form) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form, m_displayParentFormFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form);
     if (jsonAdapter != null) {
-      addActionEvent("formActivate", new JSONObject().put(PROP_FORM, jsonAdapter.getId()));
+      addActionEventForEachDisplayParentAdapter("formActivate", PROP_FORM, jsonAdapter, form.getDisplayParent());
     }
   }
 
   protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox, m_displayParentMessageBoxFilter);
-    if (jsonAdapter != null) {
-      addActionEvent("messageBoxShow", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
-    }
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox);
+    addActionEventForEachDisplayParentAdapter("messageBoxShow", PROP_MESSAGE_BOX, jsonAdapter, messageBox.getDisplayParent());
   }
 
   protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(messageBox, m_displayParentMessageBoxFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(messageBox);
     if (jsonAdapter != null) {
-      addActionEvent("messageBoxHide", new JSONObject().put(PROP_MESSAGE_BOX, jsonAdapter.getId()));
+      addActionEventForEachDisplayParentAdapter("messageBoxHide", PROP_MESSAGE_BOX, jsonAdapter, messageBox.getDisplayParent());
     }
   }
 
   protected void handleModelFileChooserShow(final IFileChooser fileChooser) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser, m_displayParentFileChooserFilter);
-    if (jsonAdapter != null) {
-      addActionEvent("fileChooserShow", new JSONObject().put(PROP_FILE_CHOOSER, jsonAdapter.getId()));
-    }
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser);
+    addActionEventForEachDisplayParentAdapter("fileChooserShow", PROP_FILE_CHOOSER, jsonAdapter, fileChooser.getDisplayParent());
   }
 
   protected void handleModelFileChooserHide(final IFileChooser fileChooser) {
-    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(fileChooser, m_displayParentFileChooserFilter);
+    IJsonAdapter<?> jsonAdapter = getGlobalAdapter(fileChooser);
     if (jsonAdapter != null) {
-      addActionEvent("fileChooserHide", new JSONObject().put(PROP_FILE_CHOOSER, jsonAdapter.getId()));
+      addActionEventForEachDisplayParentAdapter("fileChooserHide", PROP_FILE_CHOOSER, jsonAdapter, fileChooser.getDisplayParent());
     }
   }
 
@@ -331,6 +316,14 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     String outlineId = event.getData().getString("outlineId");
     IJsonAdapter<?> jsonOutline = getUiSession().getJsonAdapter(outlineId);
     getModel().setOutline((IOutline) jsonOutline.getModel());
+  }
+
+  private void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent) {
+    for (IJsonAdapter<IDisplayParent> displayParentAdapter : getUiSession().getJsonAdapters(displayParent)) {
+      addActionEvent(eventName, new JSONObject()
+          .put(propModelAdapterId, modelAdapter.getId())
+          .put(PROP_DISPLAY_PARENT, displayParentAdapter.getId()));
+    }
   }
 
   protected class P_DesktopListener implements DesktopListener {

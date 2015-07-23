@@ -7,17 +7,18 @@ scout.Outline = function() {
   this._treeItemPaddingLevel = 20;
   this._tableSelectionListener;
   this.inBackground = false;
-  this._formController;
-  this._messageBoxController;
+  this.formController;
+  this.messageBoxController;
+  this.fileChooserController;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
 scout.Outline.prototype._init = function(model, session) {
   scout.Outline.parent.prototype._init.call(this, model, session);
 
-  this._formController = new scout.FormController(this, session);
-  this._messageBoxController = new scout.MessageBoxController(this, session);
-  this._fileChooserController = new scout.FileChooserController(this, session);
+  this.formController = new scout.FormController(this, session);
+  this.messageBoxController = new scout.MessageBoxController(this, session);
+  this.fileChooserController = new scout.FileChooserController(this, session);
 };
 
 scout.Outline.prototype._createKeyStrokeAdapter = function() {
@@ -43,9 +44,9 @@ scout.Outline.prototype._render = function($parent) {
 
 scout.Outline.prototype._postRender = function() {
   // Display attached forms, message boxes and file choosers.
-  this._formController.render();
-  this._messageBoxController.render();
-  this._fileChooserController.render();
+  this.formController.render();
+  this.messageBoxController.render();
+  this.fileChooserController.render();
 };
 
 /**
@@ -246,20 +247,6 @@ scout.Outline.prototype._onPageChanged = function(event) {
 scout.Outline.prototype.onModelAction = function(event) {
   if (event.type === 'pageChanged') {
     this._onPageChanged(event);
-  } else if (event.type === 'formShow') {
-    this._formController.registerAndRender(event.form);
-  } else if (event.type === 'formHide') {
-    this._formController.unregisterAndRemove(event.form);
-  } else if (event.type === 'formActivate') {
-    this._formController.activateForm(event.form);
-  } else if (event.type === 'messageBoxShow') {
-    this._messageBoxController.registerAndRender(event.messageBox);
-  } else if (event.type === 'messageBoxHide') {
-    this._messageBoxController.unregisterAndRemove(event.messageBox);
-  } else if (event.type === 'fileChooserShow') {
-    this._fileChooserController.registerAndRender(event.fileChooser);
-  } else if (event.type === 'fileChooserHide') {
-    this._fileChooserController.unregisterAndRemove(event.fileChooser);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }
@@ -274,9 +261,9 @@ scout.Outline.prototype.sendToBack = function() {
   this._renderInBackground();
 
   // Detach child dialogs, message boxes and file choosers, not views.
-  this._formController.detachDialogs();
-  this._messageBoxController.detach();
-  this._fileChooserController.detach();
+  this.formController.detachDialogs();
+  this.messageBoxController.detach();
+  this.fileChooserController.detach();
 };
 
 scout.Outline.prototype.bringToFront = function() {
@@ -284,9 +271,9 @@ scout.Outline.prototype.bringToFront = function() {
   this._renderInBackground();
 
   // Attach child dialogs, message boxes and file choosers.
-  this._formController.attachDialogs();
-  this._messageBoxController.attach();
-  this._fileChooserController.attach();
+  this.formController.attachDialogs();
+  this.messageBoxController.attach();
+  this.fileChooserController.attach();
 };
 
 scout.Outline.prototype._renderInBackground = function() {

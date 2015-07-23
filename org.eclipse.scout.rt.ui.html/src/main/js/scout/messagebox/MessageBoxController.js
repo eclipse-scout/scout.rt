@@ -22,10 +22,11 @@ scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdap
  * Removes the given message box from this controller and DOM. However, the message box's adapter is not destroyed. That only happens once the message box is closed.
  */
 scout.MessageBoxController.prototype.unregisterAndRemove = function(messageBoxAdapterId) {
-  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this._displayParent);
-
-  scout.arrays.remove(this._displayParent.messageBoxes, messageBox);
-  this._remove(messageBox);
+  var messageBox = this.session.getModelAdapter(messageBoxAdapterId);
+  if (messageBox) {
+    scout.arrays.remove(this._displayParent.messageBoxes, messageBox);
+    this._remove(messageBox);
+  }
 };
 
 /**

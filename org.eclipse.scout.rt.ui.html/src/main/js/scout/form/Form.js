@@ -3,8 +3,9 @@ scout.Form = function() {
   this.rootGroupBox;
   this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
   this._locked;
-  this._formController;
-  this._messageBoxController;
+  this.formController;
+  this.messageBoxController;
+  this.fileChooserController;
   this._glassPaneRenderer;
 
   this.attached = false; // Indicates whether this Form is currently visible to the user.
@@ -20,9 +21,9 @@ scout.Form.prototype._init = function(model, session) {
     this.rootGroupBox.menuBar.large();
   }
 
-  this._formController = new scout.FormController(this, session);
-  this._messageBoxController = new scout.MessageBoxController(this, session);
-  this._fileChooserController = new scout.FileChooserController(this, session);
+  this.formController = new scout.FormController(this, session);
+  this.messageBoxController = new scout.MessageBoxController(this, session);
+  this.fileChooserController = new scout.FileChooserController(this, session);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
@@ -96,9 +97,9 @@ scout.Form.prototype._postRender = function() {
   }
 
   // Render attached forms, message boxes and file choosers.
-  this._formController.render();
-  this._messageBoxController.render();
-  this._fileChooserController.render();
+  this.formController.render();
+  this.messageBoxController.render();
+  this.fileChooserController.render();
 };
 
 scout.Form.prototype._updateDialogTitle = function() {
@@ -216,20 +217,6 @@ scout.Form.prototype.onModelAction = function(event) {
     this._onFormClosed(event);
   } else if (event.type === 'requestFocus') {
     this._onRequestFocus(event.formField);
-  } else if (event.type === 'formShow') {
-    this._formController.registerAndRender(event.form);
-  } else if (event.type === 'formHide') {
-    this._formController.unregisterAndRemove(event.form);
-  } else if (event.type === 'formActivate') {
-    this._formController.activateForm(event.form);
-  } else if (event.type === 'messageBoxShow') {
-    this._messageBoxController.registerAndRender(event.messageBox);
-  } else if (event.type === 'messageBoxHide') {
-    this._messageBoxController.unregisterAndRemove(event.messageBox);
-  } else if (event.type === 'fileChooserShow') {
-    this._fileChooserController.registerAndRender(event.fileChooser);
-  } else if (event.type === 'fileChooserHide') {
-    this._fileChooserController.unregisterAndRemove(event.fileChooser);
   } else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
@@ -268,9 +255,9 @@ scout.Form.prototype.attach = function() {
   }
 
   // Attach child dialogs, message boxes and file choosers.
-  this._formController.attachDialogs();
-  this._messageBoxController.attach();
-  this._fileChooserController.attach();
+  this.formController.attachDialogs();
+  this.messageBoxController.attach();
+  this.fileChooserController.attach();
 
   this.attached = true;
 };
@@ -296,9 +283,9 @@ scout.Form.prototype.detach = function() {
   }
 
   // Detach child dialogs, message boxes and file choosers, not views.
-  this._formController.detachDialogs();
-  this._messageBoxController.detach();
-  this._fileChooserController.detach();
+  this.formController.detachDialogs();
+  this.messageBoxController.detach();
+  this.fileChooserController.detach();
 
   this.session.detachHelper.beforeDetach(this.$container);
   this._uninstallFocusContext();
