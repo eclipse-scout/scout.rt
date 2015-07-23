@@ -772,7 +772,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
 
   this.selectResources(resources.map(function(i) {
     return $(i).data('resource');
-  }), !rangeSelected);
+  }), !whileSelecting);
 
   if (rangeSelected) {
     // left and width
