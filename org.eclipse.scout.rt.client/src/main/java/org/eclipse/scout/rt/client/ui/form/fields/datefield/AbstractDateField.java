@@ -187,7 +187,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    */
   @Override
   @Deprecated
-  protected final Date execParseValue(String text) throws ProcessingException {
+  protected Date execParseValue(String text) throws ProcessingException {
     return super.execParseValue(text);
   }
 
@@ -720,8 +720,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
       ParsingFailedStatus status = new ParsingFailedStatus(
           ScoutTexts.get("InvalidValueMessageX", StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText))),
-          invalidDateText + "\n" + invalidTimeText // don't use join()!
-          );
+          invalidDateText + "\n" + invalidTimeText); // don't use join()!
       addErrorStatus(status);
     }
 
