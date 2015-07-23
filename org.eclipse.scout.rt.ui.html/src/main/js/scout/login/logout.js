@@ -22,7 +22,7 @@ scout.logout = {
   init: function(opts) {
     var $container,
       defaultOpts = {
-        loginUrl: '/'
+        loginUrl: './'
       },
       texts = scout.logout.initTexts(),
       options = $.extend({}, defaultOpts, opts);
