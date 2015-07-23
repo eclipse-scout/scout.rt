@@ -381,7 +381,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void ensureVisible(IForm form) {
+  public void activateForm(IForm form) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void activateOutline(IOutline outline) {
     throw createUnsupportedOperationException();
   }
 
@@ -649,6 +654,7 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setOutline(IOutline outline) {
     throw createUnsupportedOperationException();

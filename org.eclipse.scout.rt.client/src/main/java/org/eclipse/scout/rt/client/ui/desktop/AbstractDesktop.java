@@ -898,15 +898,135 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void ensureViewStackVisible() { // TODO [dwi] Clarify whether this method is still used.
     for (IForm view : m_formStore.getViews()) {
-      ensureVisible(view);
+      activateForm(view);
     }
   }
 
   @Override
-  public void ensureVisible(IForm form) { // TODO [dwi] Rename with better name
-    if (form != null && m_formStore.contains(form)) {
-      fireFormActivate(form);
+  public void activateForm(IForm form) {
+    if (form == null) {
+      return;
     }
+
+    if (!m_formStore.contains(form)) {
+      return; // only dialogs or views can be activated.
+    }
+
+    IDisplayParent displayParent = form.getDisplayParent();
+    if (displayParent instanceof IForm) {
+      activateForm((IForm) displayParent);
+    }
+    else if (displayParent instanceof IOutline) {
+      activateOutline(((IOutline) displayParent));
+    }
+    fireFormActivate(form);
+  }
+
+  @Override
+  public void activateOutline(IOutline outline) {
+    setOutlineInternal(outline);
+    fireOutlineContentActivate();
+  }
+
+  protected void setOutlineInternal(IOutline outline) {
+    final IOutline newOutline = resolveOutline(outline);
+    if (m_outline == newOutline || m_outlineChanging) {
+      return;
+    }
+
+    ClientRunContexts.copyCurrent().withOutline(newOutline).withForm(null).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        try {
+          m_outlineChanging = true;
+          if (m_outline != null) {
+            IPage<?> oldActivePage = m_outline.getActivePage();
+            if (oldActivePage != null) {
+              Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
+              /*
+               *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
+               *  a page on the path to the currently selected page is getting invalidated due to changes
+               *  in an other outline.
+               */
+              if (bm != null) {
+                m_bookmarkPerOutline.put(m_outline, bm);
+              }
+            }
+          }
+          //
+          IOutline oldOutline = m_outline;
+          if (m_activeOutlineListener != null && oldOutline != null) {
+            oldOutline.removeTreeListener(m_activeOutlineListener);
+            oldOutline.removePropertyChangeListener(m_activeOutlineListener);
+            m_activeOutlineListener = null;
+          }
+          // set new outline to set facts
+          m_outline = newOutline;
+          // deactivate old page
+          if (oldOutline != null) {
+            oldOutline.clearContextPage();
+          }
+          //
+          if (m_outline != null) {
+            m_activeOutlineListener = new P_ActiveOutlineListener();
+            m_outline.addTreeListener(m_activeOutlineListener);
+            m_outline.addPropertyChangeListener(m_activeOutlineListener);
+          }
+          // <bsh 2010-10-15>
+          // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
+          // are only called when the new outline is null. When the new outline is _not_ null, we
+          // will override the "null" anyway (see below).
+          // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
+          if (m_outline == null) {
+            setPageDetailForm(null);
+            setPageDetailTable(null);
+            setPageSearchForm(null, true);
+          }
+          // </bsh>
+          fireOutlineChanged(oldOutline, m_outline);
+          if (m_outline != null) {
+            // reload selected page in case it is marked dirty
+            if (m_outline.getActivePage() != null) {
+              try {
+                m_outline.getActivePage().ensureChildrenLoaded();
+              }
+              catch (ProcessingException e) {
+                BEANS.get(ExceptionHandler.class).handle(e);
+              }
+            }
+            m_outline.setNodeExpanded(m_outline.getRootNode(), true);
+            setPageDetailForm(m_outline.getDetailForm());
+            setPageDetailTable(m_outline.getDetailTable());
+            setPageSearchForm(m_outline.getSearchForm(), true);
+            m_outline.makeActivePageToContextPage();
+            IPage<?> newActivePage = m_outline.getActivePage();
+            if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
+              // if there is no active page and no default detail form, select the first page
+              Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
+              if (bookmark != null && Boolean.TRUE) {
+                try {
+                  activateBookmark(bookmark);
+                }
+                catch (ProcessingException e) {
+                  LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
+                }
+              }
+              else {
+                activateFirstPage();
+              }
+              newActivePage = m_outline.getActivePage();
+            }
+            if (newActivePage != null) {
+              BEANS.get(INavigationHistoryService.class).addStep(0, newActivePage);
+            }
+          }
+        }
+        finally {
+          m_outlineChanging = false;
+        }
+      }
+    }, BEANS.get(RuntimeExceptionTranslator.class));
   }
 
   @SuppressWarnings("deprecation")
@@ -1030,107 +1150,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_outlineChanging;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setOutline(IOutline outline) {
-    final IOutline newOutline = resolveOutline(outline);
-    ClientRunContexts.copyCurrent().withOutline(newOutline).withForm(null).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (m_outline == newOutline || m_outlineChanging) {
-          return;
-        }
-        synchronized (AbstractDesktop.this) {
-          try {
-            m_outlineChanging = true;
-            if (m_outline != null) {
-              IPage<?> oldActivePage = m_outline.getActivePage();
-              if (oldActivePage != null) {
-                Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
-                /*
-                 *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
-                 *  a page on the path to the currently selected page is getting invalidated due to changes
-                 *  in an other outline.
-                 */
-                if (bm != null) {
-                  m_bookmarkPerOutline.put(m_outline, bm);
-                }
-              }
-            }
-            //
-            IOutline oldOutline = m_outline;
-            if (m_activeOutlineListener != null && oldOutline != null) {
-              oldOutline.removeTreeListener(m_activeOutlineListener);
-              oldOutline.removePropertyChangeListener(m_activeOutlineListener);
-              m_activeOutlineListener = null;
-            }
-            // set new outline to set facts
-            m_outline = newOutline;
-            // deactivate old page
-            if (oldOutline != null) {
-              oldOutline.clearContextPage();
-            }
-            //
-            if (m_outline != null) {
-              m_activeOutlineListener = new P_ActiveOutlineListener();
-              m_outline.addTreeListener(m_activeOutlineListener);
-              m_outline.addPropertyChangeListener(m_activeOutlineListener);
-            }
-            // <bsh 2010-10-15>
-            // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
-            // are only called when the new outline is null. When the new outline is _not_ null, we
-            // will override the "null" anyway (see below).
-            // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
-            if (m_outline == null) {
-              setPageDetailForm(null);
-              setPageDetailTable(null);
-              setPageSearchForm(null, true);
-            }
-            // </bsh>
-            fireOutlineChanged(oldOutline, m_outline);
-            if (m_outline != null) {
-              // reload selected page in case it is marked dirty
-              if (m_outline.getActivePage() != null) {
-                try {
-                  m_outline.getActivePage().ensureChildrenLoaded();
-                }
-                catch (ProcessingException e) {
-                  BEANS.get(ExceptionHandler.class).handle(e);
-                }
-              }
-              m_outline.setNodeExpanded(m_outline.getRootNode(), true);
-              setPageDetailForm(m_outline.getDetailForm());
-              setPageDetailTable(m_outline.getDetailTable());
-              setPageSearchForm(m_outline.getSearchForm(), true);
-              m_outline.makeActivePageToContextPage();
-              IPage<?> newActivePage = m_outline.getActivePage();
-              if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
-                // if there is no active page and no default detail form, select the first page
-                Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
-                if (bookmark != null && Boolean.TRUE) {
-                  try {
-                    activateBookmark(bookmark);
-                  }
-                  catch (ProcessingException e) {
-                    LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
-                  }
-                }
-                else {
-                  activateFirstPage();
-                }
-                newActivePage = m_outline.getActivePage();
-              }
-              if (newActivePage != null) {
-                BEANS.get(INavigationHistoryService.class).addStep(0, newActivePage);
-              }
-            }
-          }
-          finally {
-            m_outlineChanging = false;
-          }
-        }
-      }
-    }, BEANS.get(RuntimeExceptionTranslator.class));
+    activateOutline(outline);
   }
 
   /**
@@ -1690,6 +1713,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     // fire
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OUTLINE_CHANGED, newOutline);
+    fireDesktopEvent(e);
+  }
+
+  private void fireOutlineContentActivate() {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OUTLINE_CONTENT_ACTIVATE);
     fireDesktopEvent(e);
   }
 

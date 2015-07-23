@@ -928,7 +928,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     for (IForm simCandidate : getDesktop().getSimilarViewForms(this)) {
       if (handler != null && simCandidate.getHandler() != null && handler.getClass().getName() == simCandidate.getHandler().getClass().getName()) {
         if (simCandidate.getHandler().isOpenExclusive() && handler.isOpenExclusive()) {
-          getDesktop().ensureVisible(simCandidate);
+          getDesktop().activateForm(simCandidate);
           return simCandidate;
         }
       }
@@ -2471,7 +2471,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void activate() {
-    getDesktop().ensureVisible(this);
+    getDesktop().activateForm(this);
   }
 
   @Override

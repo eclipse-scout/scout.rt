@@ -41,6 +41,13 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_OUTLINE_CHANGED = 200;
 
   /**
+   *Event type that indicates that the outline content needs to be activated.
+   *
+   *@see IDesktop#activateOutline(IOutline)
+   */
+  public static final int TYPE_OUTLINE_CONTENT_ACTIVATE = 210;
+
+  /**
    * @deprecated use {@link #TYPE_FORM_SHOW}; will be removed in version 6.1.
    */
   @Deprecated

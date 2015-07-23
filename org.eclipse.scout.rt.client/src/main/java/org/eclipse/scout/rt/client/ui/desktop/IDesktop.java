@@ -172,11 +172,15 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void ensureViewStackVisible();
 
   /**
-   * fires a ensure visible event
-   *
-   * @param form
+   * fires a activate form event
    */
-  void ensureVisible(IForm form);
+  void activateForm(IForm form);
+
+  /**
+   * sets the given outline on desktop
+   * and brings its content to front
+   */
+  void activateOutline(IOutline outline);
 
   /**
    * @return <code>true</code> if the given {@link IForm} is currently displayed. However, a value of <code>true</code>
@@ -368,8 +372,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   IOutline getOutline();
 
   /**
-   * set the currently active outline on the desktop
+   * set the given outline on desktop
+   *
+   * @deprecated use {@link #activateOutline(IOutline)}; will be removed in version 6.1.
    */
+  @Deprecated
   void setOutline(IOutline outline);
 
   /**
