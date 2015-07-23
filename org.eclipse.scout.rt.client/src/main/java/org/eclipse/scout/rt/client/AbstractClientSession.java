@@ -40,7 +40,6 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.context.SharedContextNotificationHandler;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
@@ -61,8 +60,6 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.notification.INotificationListener;
-import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
@@ -101,7 +98,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private UserAgent m_userAgent;
   private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
-  private INotificationListener<SharedContextChangedNotification> m_sharedNotificationListener;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_eventListeners = new EventListenerList();
@@ -203,13 +199,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setUserIdInternal(String userId) {
-    synchronized (m_sharedVarLock) {
-      m_sharedVariableMap.put("userId", userId);
-    }
-  }
-
-  @Override
   public Subject getOfflineSubject() {
     return m_offlineSubject;
   }
@@ -266,9 +255,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_virtualDesktop = new VirtualDesktop();
     String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
     setMemoryPolicy(memPolicyValue);
-
-    m_sharedNotificationListener = createSharedNotificationListener();
-    BEANS.get(SharedContextNotificationHandler.class).addListener(this, m_sharedNotificationListener);
   }
 
   private void setMemoryPolicy(String policy) {
@@ -283,35 +269,13 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
   }
 
-  private INotificationListener<SharedContextChangedNotification> createSharedNotificationListener() {
-    return new INotificationListener<SharedContextChangedNotification>() {
-
-      @Override
-      public void handleNotification(final SharedContextChangedNotification notification) {
-        try {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Handling Shared variable notification {}", notification);
-          }
-          Jobs.schedule(new IRunnable() {
-            @Override
-            public void run() {
-              replaceSharedVariableMap(notification.getSharedVariableMap());
-            }
-          });
-        }
-        catch (Exception ex) {
-          LOG.error("Update of shared variables failed", ex);
-        }
-      }
-    };
-  }
-
   /**
    * replace the shared variable map with a new version.
    *
    * @param newMap
    */
-  private void replaceSharedVariableMap(SharedVariableMap newMap) {
+  @Override
+  public void replaceSharedVariableMapInternal(SharedVariableMap newMap) {
     synchronized (m_sharedVarLock) {
       m_sharedVariableMap.updateInternal(newMap);
     }
@@ -496,11 +460,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         LOG.error("Failed to close the desktop.", t);
       }
       m_desktop = null;
-    }
-
-    if (m_sharedNotificationListener != null) {
-      BEANS.get(SharedContextNotificationHandler.class).removeListener(this, m_sharedNotificationListener);
-      m_sharedNotificationListener = null;
     }
 
     final long shutdownWaitTime = getMaxShutdownWaitTime();

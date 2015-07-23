@@ -12,19 +12,31 @@ package org.eclipse.scout.rt.client.servicetunnel.http;
 
 import java.net.URL;
 import java.security.PrivilegedAction;
+import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.client.clientnotification.IClientSessionRegistry;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IDoneCallback;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -35,6 +47,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
  * since the internal class does not belong to the public API.
  */
 public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implements IClientServiceTunnel {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientHttpServiceTunnel.class);
 
   private boolean m_analyzeNetworkLatency = true;
 
@@ -83,15 +97,40 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
       }
     }
 
-    //make sure the current user is available on the session
-    //necessary for notifications
-    IClientSession session = (IClientSession) IClientSession.CURRENT.get();
-    if (session != null && serviceResponse.getUserId() != null) {
-      session.setUserIdInternal(serviceResponse.getUserId());
+    // process piggyback client notifications.
+    try {
+      dispatchClientNotifications(serviceResponse.getNotifications());
     }
+    catch (ProcessingException e) {
+      LOG.error("Error during processing piggyback client notifictions.", e);
+    }
+  }
 
-    ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
-    notificationDispatcher.dispatchNotifications(serviceResponse.getNotifications());
+  /**
+   * dispatch notifications in a client job and ensure to wait for dispatched notifications
+   *
+   * @param notifications
+   *          the notifications to dispatch
+   * @throws ProcessingException
+   */
+  protected void dispatchClientNotifications(final List<ClientNotificationMessage> notifications) throws ProcessingException {
+    if (CollectionUtility.isEmpty(notifications)) {
+      return;
+    }
+    final IBlockingCondition cond = Jobs.getJobManager().createBlockingCondition("Suspend request processing thread during client notification handling.", true);
+    ClientJobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        ClientNotificationDispatcher notificationDispatcher = BEANS.get(ClientNotificationDispatcher.class);
+        notificationDispatcher.dispatchNotifications(notifications);
+      }
+    }).whenDone(new IDoneCallback<Void>() {
+      @Override
+      public void onDone(DoneEvent<Void> event) {
+        cond.setBlocking(false);
+      }
+    });
+    cond.waitFor();
   }
 
   @Override

@@ -26,7 +26,6 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private volatile Long m_processingDuration;
 
   private List<ClientNotificationMessage> m_notifications;
-  private String m_userId;
 
   public ServiceTunnelResponse(Throwable t) {
     this(null, null, t);
@@ -84,22 +83,11 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   }
 
   @Override
-  public synchronized void setUserId(String userId) {
-    m_userId = userId;
-  }
-
-  @Override
-  public synchronized String getUserId() {
-    return m_userId;
-  }
-
-  @Override
   public String toString() {
     ToStringBuilder tsb = new ToStringBuilder(this);
     tsb.ref("data", getData());
     tsb.attr("vars", Arrays.asList(getOutVars()));
     tsb.attr("exception", getException());
-    tsb.attr("userId", getUserId());
     tsb.attr("notifications", getNotifications());
     return tsb.toString();
   }

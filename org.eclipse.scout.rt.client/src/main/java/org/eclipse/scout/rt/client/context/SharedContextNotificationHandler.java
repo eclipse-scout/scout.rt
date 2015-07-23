@@ -10,12 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.context;
 
-import org.eclipse.scout.rt.shared.notification.AbstractObservableNotificationHandler;
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 
 /**
  * Handler for {@link SharedContextChangedNotification}
  */
-public class SharedContextNotificationHandler extends AbstractObservableNotificationHandler<SharedContextChangedNotification> {
+public class SharedContextNotificationHandler implements INotificationHandler<SharedContextChangedNotification> {
 
+  @Override
+  public void handleNotification(SharedContextChangedNotification notification) {
+    // the client session must be available for shared context variable updates otherwise it is a wrong usage of the notification.
+    IClientSession session = (IClientSession) Assertions.assertNotNull(IClientSession.CURRENT.get());
+    session.replaceSharedVariableMapInternal(notification.getSharedVariableMap());
+    System.out.println(String.format("XXX Shared var update DONE for session %s ", session.getUserId()));
+  }
 }

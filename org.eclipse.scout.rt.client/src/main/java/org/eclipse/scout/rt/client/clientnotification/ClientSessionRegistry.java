@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  *
@@ -72,7 +73,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     LOG.debug(String.format("client session [%s] stopping", userId));
     // unregister user remote
     try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).run(new IRunnable() {
+      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).unregisterSession(NOTIFICATION_NODE_ID);
@@ -96,9 +97,9 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
    * @throws ProcessingException
    */
   public void sessionStarted(final IClientSession session) {
-    LOG.debug(String.format("client session [sessionid=%s, userId=%s] started", session.getId(), session.getUserId()));
     // lookup the userid remote because the user is not necessarily set on the client session.
     BEANS.get(IPingService.class).ping("ensure shared context is loaded...");
+    LOG.debug(String.format("client session [sessionid=%s, userId=%s] registered on client session registry", session.getId(), session.getUserId()));
     // local linking
     synchronized (m_cacheLock) {
       List<WeakReference<IClientSession>> sessionRefs = m_userToSessions.get(session.getUserId());
@@ -128,7 +129,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     }
     // register on backend
     try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).run(new IRunnable() {
+      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).registerSession(NOTIFICATION_NODE_ID, session.getId(), session.getUserId());

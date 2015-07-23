@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -32,6 +31,7 @@ import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
@@ -96,14 +96,30 @@ public class ClientNotificationDispatcher {
    *
    * @param notification
    */
-  public void dispatch(Serializable notification) {
-    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
-    // schedule
-    IFuture<Void> future = Jobs.schedule(dispatchJob, Jobs.newInput(ClientRunContexts.empty()));
-    synchronized (m_notificationFutures) {
-      m_notificationFutures.add(future);
-      future.whenDone(new P_NotificationFutureCallback(future));
+  public void dispatch(final Serializable notification) {
+
+    if (IClientSession.CURRENT.get() != null) {
+      // dispatch sync for piggyback notifications
+      dispatchSync(notification);
     }
+    else {
+      // dispatch async
+      IRunnable dispatchRunnable = new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          dispatchSync(notification);
+        }
+      };
+      IFuture<Void> future = Jobs.schedule(dispatchRunnable, Jobs.newInput(ClientRunContexts.empty()));
+      synchronized (m_notificationFutures) {
+        m_notificationFutures.add(future);
+        future.whenDone(new P_NotificationFutureCallback(future));
+      }
+
+    }
+//    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
+    // schedule
   }
 
   /**
@@ -115,13 +131,39 @@ public class ClientNotificationDispatcher {
    * @param notification
    *          the notification to process.
    */
-  public void dispatch(IClientSession session, Serializable notification) {
-    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
-    IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
-    synchronized (m_notificationFutures) {
-      m_notificationFutures.add(future);
-      future.whenDone(new P_NotificationFutureCallback(future));
+  public void dispatch(IClientSession session, final Serializable notification) {
+//    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
+    ISession currentSession = ISession.CURRENT.get();
+    // sync dispatch if session is equal
+    if (session == currentSession) {
+      dispatchSync(notification);
+//      ClientRunContexts.copyCurrent().run(dispatchJob, BEANS.get(RuntimeExceptionTranslator.class));
     }
+    else {
+      IRunnable dispatchRunnable = new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          dispatchSync(notification);
+        }
+      };
+      IFuture<Void> future = ClientJobs.schedule(dispatchRunnable, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
+      synchronized (m_notificationFutures) {
+        m_notificationFutures.add(future);
+        future.whenDone(new P_NotificationFutureCallback(future));
+      }
+    }
+
+//    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
+//    IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
+//    synchronized (m_notificationFutures) {
+//      m_notificationFutures.add(future);
+//      future.whenDone(new P_NotificationFutureCallback(future));
+//    }
+  }
+
+  protected void dispatchSync(Serializable notification) {
+    NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
+    reg.notifyHandlers(notification);
   }
 
   /**
@@ -137,24 +179,24 @@ public class ClientNotificationDispatcher {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFutures(futures).andMatchNotCurrentFuture(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
 
-  /**
-   * The runnable is executed in a {@link ClientRunContext} running under a user session. All handlers with a message
-   * type assignable from the notification type will be called to process the notification.
-   */
-  private class P_DispatchRunnable implements IRunnable {
-
-    private final Serializable m_notification;
-
-    public P_DispatchRunnable(Serializable notification) {
-      m_notification = notification;
-    }
-
-    @Override
-    public void run() throws Exception {
-      NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-      reg.notifyHandlers(m_notification);
-    }
-  }
+//  /**
+//   * The runnable is executed in a {@link ClientRunContext} running under a user session. All handlers with a message
+//   * type assignable from the notification type will be called to process the notification.
+//   */
+//  private class P_DispatchRunnable implements IRunnable {
+//
+//    private final Serializable m_notification;
+//
+//    public P_DispatchRunnable(Serializable notification) {
+//      m_notification = notification;
+//    }
+//
+//    @Override
+//    public void run() throws Exception {
+//      NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
+//      reg.notifyHandlers(m_notification);
+//    }
+//  }
 
   private class P_NotificationFutureCallback implements IDoneCallback<Void> {
     private IFuture<Void> m_furture;

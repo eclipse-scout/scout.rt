@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public interface IClientSession extends ISession, IPropertyObserver {
@@ -119,5 +120,8 @@ public interface IClientSession extends ISession, IPropertyObserver {
 
   void goOffline() throws ProcessingException;
 
-  void setUserIdInternal(String userId);
+  /**
+   * @param newMap
+   */
+  void replaceSharedVariableMapInternal(SharedVariableMap newMap);
 }
