@@ -342,6 +342,7 @@ scout.Session.prototype._sendRequest = function(request) {
     else {
       this._queuedRequest = request;
     }
+    this.layoutValidator.validate();
     return;
   }
 
