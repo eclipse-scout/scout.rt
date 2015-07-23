@@ -19,8 +19,13 @@ scout.LabelField.prototype._renderProperties = function() {
 /**
  * @override
  */
-scout.LabelField.prototype._renderDisplayText = function(displayText) {
-  this.$field.html(displayText);
+scout.LabelField.prototype._renderDisplayText = function() {
+  var displayText = this.displayText || '';
+  if (this.htmlEnabled) {
+    this.$field.html(displayText);
+  } else {
+    this.$field.html(scout.strings.nl2br(displayText));
+  }
 };
 
 scout.LabelField.prototype._renderWrapText = function() {

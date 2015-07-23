@@ -9,7 +9,8 @@ scout.strings = {
       return text;
     }
     text = this.asString(text);
-    if (scout.helpers.nvl(encodeHtml, true)) {
+    encodeHtml = scout.helpers.nvl(encodeHtml, true);
+    if (encodeHtml) {
       text = scout.strings.encode(text);
     }
     return text.replace(/\n/g, '<br>').replace(/\r/g, '');
