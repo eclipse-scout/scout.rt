@@ -1802,10 +1802,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           buf.append("- " + it.next() + "\n");
         }
       }
-      String introText = ScoutTexts.get("FormIncompleteIntro");
       m_currentValidateContentDescriptor = firstProblem;
       //
-      VetoException veto = new VetoException(introText, buf.toString());
+      VetoException veto = new VetoException(buf.toString());
       throw veto;
     }
     if (!interceptValidate()) {
