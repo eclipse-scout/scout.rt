@@ -234,7 +234,7 @@ scout.Form.prototype.onModelAction = function(event) {
  *  This method has no effect if already attached.
  */
 scout.Form.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
+  if (this.attached || !this.rendered || !this.parent.inFront()) {
     return;
   }
 
@@ -254,12 +254,13 @@ scout.Form.prototype.attach = function() {
     scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   }
 
+  // form is attached even if children are not yet
+  this.attached = true;
+
   // Attach child dialogs, message boxes and file choosers.
   this.formController.attachDialogs();
   this.messageBoxController.attach();
   this.fileChooserController.attach();
-
-  this.attached = true;
 };
 
 /**

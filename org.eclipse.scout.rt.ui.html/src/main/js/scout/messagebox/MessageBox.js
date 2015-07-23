@@ -193,7 +193,7 @@ scout.MessageBox.prototype.close = function() {
  *  This method has no effect if already attached.
  */
 scout.MessageBox.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
+  if (this.attached || !this.rendered || (this.parent && !this.parent.inFront())) { // No parent nor desktop available during startup, e.g. to display fatal errors.
     return;
   }
 

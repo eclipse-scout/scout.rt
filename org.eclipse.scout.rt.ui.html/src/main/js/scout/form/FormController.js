@@ -119,7 +119,8 @@ scout.FormController.prototype._activateView = function(view) {
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {
-  // FIXME AWE: not implemented yet.
+  dialog.detach();
+  dialog.attach();
 };
 
 /**

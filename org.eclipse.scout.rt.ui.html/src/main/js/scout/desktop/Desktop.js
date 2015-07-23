@@ -335,6 +335,12 @@ scout.Desktop.prototype._onModelOutlineChanged = function(event) {
   }
 };
 
+scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
+  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
+    this.bringOutlineToFront(this.outline);
+  }
+};
+
 scout.Desktop.prototype._onModelFormShow = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
@@ -403,6 +409,8 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this._onOpenUri(event);
   } else if (event.type === 'outlineChanged') {
     this._onModelOutlineChanged(event);
+  } else if (event.type === 'outlineContentActivate') {
+    this._onModelOutlineContentActivate(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
@@ -415,12 +423,11 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   if (this.outline === outline) {
     if (this.outline.inBackground) {
       this._attachOutlineContent();
+      this._bringNavigationToFront();
     }
   } else {
     this.setOutline(outline);
   }
-
-  this._bringNavigationToFront();
 };
 
 /**

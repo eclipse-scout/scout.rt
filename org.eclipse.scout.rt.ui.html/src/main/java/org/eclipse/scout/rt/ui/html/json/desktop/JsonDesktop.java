@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
@@ -45,6 +44,7 @@ import org.json.JSONObject;
 public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyObserver<DESKTOP> implements IBinaryResourceProvider {
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
+  private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -171,6 +171,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       case DesktopEvent.TYPE_OUTLINE_CHANGED:
         handleModelOutlineChanged(event.getOutline());
         break;
+      case DesktopEvent.TYPE_OUTLINE_CONTENT_ACTIVATE:
+        handleModelOutlineContentActivate();
+        break;
       case DesktopEvent.TYPE_FORM_SHOW:
         handleModelFormShow(event.getForm());
         break;
@@ -246,10 +249,16 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     if (!hasDefaultStyle()) {
       return;
     }
-    JSONObject jsonEvent = new JSONObject();
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
-    putProperty(jsonEvent, PROP_OUTLINE, jsonAdapter.getId());
-    addActionEvent(EVENT_OUTLINE_CHANGED, jsonEvent);
+    addActionEvent(EVENT_OUTLINE_CHANGED, new JSONObject()
+        .put(PROP_OUTLINE, jsonAdapter.getId()));
+  }
+
+  protected void handleModelOutlineContentActivate() {
+    if (!hasDefaultStyle()) {
+      return;
+    }
+    addActionEvent(EVENT_OUTLINE_CONTENT_ACTIVATE);
   }
 
   protected void handleModelFormShow(IForm form) {
@@ -297,25 +306,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   protected void handleModelDesktopClosed() {
     getUiSession().logout();
-  }
-
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_OUTLINE_CHANGED.equals(event.getType())) {
-      handleUiOutlineChanged(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  protected void handleUiOutlineChanged(JsonEvent event) {
-    if (!hasDefaultStyle()) {
-      return;
-    }
-    String outlineId = event.getData().getString("outlineId");
-    IJsonAdapter<?> jsonOutline = getUiSession().getJsonAdapter(outlineId);
-    getModel().setOutline((IOutline) jsonOutline.getModel());
   }
 
   private void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent) {

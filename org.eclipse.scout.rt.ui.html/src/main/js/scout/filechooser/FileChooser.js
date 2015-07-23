@@ -170,7 +170,7 @@ scout.FileChooser.prototype._onDrop = function(event) {
  *  This method has no effect if already attached.
  */
 scout.FileChooser.prototype.attach = function() {
-  if (this.attached || !this.rendered) {
+  if (this.attached || !this.rendered || !this.parent.inFront()) {
     return;
   }
 
