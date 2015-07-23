@@ -39,11 +39,6 @@ public abstract class AbstractSearchButton extends AbstractButton {
   }
 
   @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("SearchButtonTooltip");
-  }
-
-  @Override
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ENTER;
   }

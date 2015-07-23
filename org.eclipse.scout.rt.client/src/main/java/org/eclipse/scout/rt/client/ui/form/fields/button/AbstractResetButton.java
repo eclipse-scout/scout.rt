@@ -39,11 +39,6 @@ public abstract class AbstractResetButton extends AbstractButton {
   }
 
   @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("ResetButtonTooltip");
-  }
-
-  @Override
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.CONTROL + "-" + IKeyStroke.F6;
   }

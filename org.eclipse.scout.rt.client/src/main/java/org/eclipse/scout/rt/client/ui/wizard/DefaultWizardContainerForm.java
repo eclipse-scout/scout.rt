@@ -165,11 +165,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardBackButtonTooltip");
-      }
-
-      @Override
       protected void execClickAction() throws ProcessingException {
         getWizard().doPreviousStep();
       }
@@ -181,11 +176,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       @Override
       protected String getConfiguredLabel() {
         return ScoutTexts.get("WizardNextButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardNextButtonTooltip");
       }
 
       @Override
@@ -208,11 +198,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardFinishButtonTooltip");
-      }
-
-      @Override
       protected void execClickAction() throws ProcessingException {
         getWizard().doFinish();
       }
@@ -229,11 +214,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       @Override
       protected String getConfiguredLabel() {
         return ScoutTexts.get("WizardCancelButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardCancelButtonTooltip");
       }
 
       @Override
@@ -256,11 +236,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardSuspendButtonTooltip");
-      }
-
-      @Override
       protected boolean getConfiguredVisible() {
         return false;
       }
@@ -277,11 +252,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       @Override
       protected String getConfiguredLabel() {
         return ScoutTexts.get("ResetButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("ResetButtonTooltip");
       }
 
       @Override

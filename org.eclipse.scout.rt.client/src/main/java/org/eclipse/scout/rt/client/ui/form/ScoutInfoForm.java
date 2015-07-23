@@ -166,10 +166,6 @@ public class ScoutInfoForm extends AbstractForm {
     @Order(20.0f)
     public class CloseButton extends AbstractCloseButton {
 
-      @Override
-      protected String getConfiguredTooltipText() {
-        return null;
-      }
     }
   }
 

@@ -39,11 +39,6 @@ public abstract class AbstractSaveButton extends AbstractButton {
   }
 
   @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("SaveButtonTooltip");
-  }
-
-  @Override
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ENTER;
   }

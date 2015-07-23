@@ -39,11 +39,6 @@ public abstract class AbstractCloseButton extends AbstractButton {
   }
 
   @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("CloseButtonTooltip");
-  }
-
-  @Override
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ESCAPE;
   }

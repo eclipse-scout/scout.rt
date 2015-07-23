@@ -39,11 +39,6 @@ public abstract class AbstractOkButton extends AbstractButton {
   }
 
   @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("OkButtonTooltip");
-  }
-
-  @Override
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ENTER;
   }
