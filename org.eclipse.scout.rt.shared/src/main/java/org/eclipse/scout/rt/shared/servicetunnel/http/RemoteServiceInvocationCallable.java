@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
@@ -41,7 +40,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  *
  * @see AbstractHttpServiceTunnel
  */
-public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelResponse>, ICancellable {
+public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelResponse>, ICancellable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RemoteServiceInvocationCallable.class);
 
@@ -61,7 +60,7 @@ public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelR
    * @return {@link IServiceTunnelResponse}; is never <code>null</code>.
    */
   @Override
-  public IServiceTunnelResponse call() throws Exception {
+  public ServiceTunnelResponse call() throws Exception {
     long nBytes = 0;
 
     final long tStart = LOG.isDebugEnabled() ? System.nanoTime() : 0L;
@@ -111,7 +110,7 @@ public class RemoteServiceInvocationCallable implements Callable<IServiceTunnelR
 
       final RunMonitor runMonitor = BEANS.get(RunMonitor.class); // do not link the RunMonitor with the current RunMonitor to not cancel this request.
       final JobInput jobInput = Jobs.newInput(m_tunnel.createCurrentRunContext().withRunMonitor(runMonitor)).withName("Cancellation request [%s]", requestSequence);
-      final IServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet(10, TimeUnit.SECONDS);
+      final ServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet(10, TimeUnit.SECONDS);
 
       if (cancelResponse == null) {
         return false;

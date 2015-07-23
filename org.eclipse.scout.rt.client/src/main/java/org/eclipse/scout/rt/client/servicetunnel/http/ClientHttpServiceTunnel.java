@@ -38,8 +38,8 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 
 /**
@@ -80,7 +80,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
   }
 
   @Override
-  protected void afterTunnel(long t0, IServiceTunnelResponse serviceResponse) {
+  protected void afterTunnel(long t0, ServiceTunnelResponse serviceResponse) {
     if (isAnalyzeNetworkLatency()) {
       // performance analyzer
       IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
@@ -134,7 +134,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(ServiceTunnelRequest serviceRequest) {
+  protected ServiceTunnelResponse tunnel(ServiceTunnelRequest serviceRequest) {
     if (OfflineState.isOfflineInCurrentThread()) {
       return tunnelOffline(serviceRequest);
     }
@@ -143,23 +143,23 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
     }
   }
 
-  protected IServiceTunnelResponse tunnelOnline(final ServiceTunnelRequest serviceRequest) {
+  protected ServiceTunnelResponse tunnelOnline(final ServiceTunnelRequest serviceRequest) {
     return super.tunnel(serviceRequest);
   }
 
   /**
    * Default for offline handling
    */
-  protected IServiceTunnelResponse tunnelOffline(final ServiceTunnelRequest serviceRequest) {
+  protected ServiceTunnelResponse tunnelOffline(final ServiceTunnelRequest serviceRequest) {
     IClientSession clientSession = ClientSessionProvider.currentSession();
     if (clientSession != null && clientSession.getOfflineSubject() != null) {
-      Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<IServiceTunnelResponse>() {
+      Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<ServiceTunnelResponse>() {
         @Override
-        public IServiceTunnelResponse run() {
+        public ServiceTunnelResponse run() {
           return BEANS.get(IOfflineDispatcherService.class).dispatch(serviceRequest);
         }
       });
-      return (IServiceTunnelResponse) response;
+      return (ServiceTunnelResponse) response;
     }
     else {
       return BEANS.get(IOfflineDispatcherService.class).dispatch(serviceRequest);

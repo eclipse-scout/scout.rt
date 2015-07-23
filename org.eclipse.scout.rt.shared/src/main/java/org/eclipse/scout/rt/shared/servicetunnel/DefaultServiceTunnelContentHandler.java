@@ -185,7 +185,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   @Override
-  public void writeResponse(OutputStream stream, IServiceTunnelResponse msg) throws Exception {
+  public void writeResponse(OutputStream stream, ServiceTunnelResponse msg) throws Exception {
     boolean debugEnabled = LOG.isDebugEnabled();
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
@@ -278,8 +278,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   @Override
-  public IServiceTunnelResponse readResponse(InputStream in) throws Exception {
-    return (IServiceTunnelResponse) read(in);
+  public ServiceTunnelResponse readResponse(InputStream in) throws Exception {
+    return (ServiceTunnelResponse) read(in);
   }
 
   protected Object/* msg */read(InputStream in) throws Exception {

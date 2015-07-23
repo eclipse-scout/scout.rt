@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.admin.inspector;
 
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 public class CallInspector {
   private SessionInspector m_parent;
@@ -47,7 +47,7 @@ public class CallInspector {
     return false;
   }
 
-  public void close(IServiceTunnelResponse res) {
+  public void close(ServiceTunnelResponse res) {
     update();
     m_info.setEndTime(System.currentTimeMillis());
     if (res != null) {

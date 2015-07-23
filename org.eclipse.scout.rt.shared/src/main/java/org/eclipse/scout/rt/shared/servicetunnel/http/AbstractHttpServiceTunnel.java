@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrl
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
@@ -201,7 +200,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
+  protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
     final long requestSequence = serviceRequest.getRequestSequence();
 
     // Create the Callable to be given to the job manager for execution.
@@ -216,7 +215,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
     final JobInput jobInput = Jobs.newInput(createCurrentRunContext().withRunMonitor(monitor)).withName("Remote service request [%s]", requestSequence);
 
-    IServiceTunnelResponse serviceResponse;
+    ServiceTunnelResponse serviceResponse;
     try {
       serviceResponse = Jobs.schedule(remoteInvocationCallable, jobInput).awaitDoneAndGet();
     }

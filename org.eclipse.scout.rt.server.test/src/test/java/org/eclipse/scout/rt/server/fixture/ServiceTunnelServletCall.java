@@ -16,7 +16,6 @@ import java.net.URL;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
@@ -25,7 +24,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  */
 public class ServiceTunnelServletCall extends Thread {
   private ServiceTunnelRequest m_req;
-  private IServiceTunnelResponse m_res;
+  private ServiceTunnelResponse m_res;
   private String m_serverUrl;
 
   public ServiceTunnelServletCall(ServiceTunnelRequest req, String serverUrl) {
@@ -33,7 +32,7 @@ public class ServiceTunnelServletCall extends Thread {
     m_serverUrl = serverUrl;
   }
 
-  public IServiceTunnelResponse getServiceTunnelResponse() {
+  public ServiceTunnelResponse getServiceTunnelResponse() {
     return m_res;
   }
 

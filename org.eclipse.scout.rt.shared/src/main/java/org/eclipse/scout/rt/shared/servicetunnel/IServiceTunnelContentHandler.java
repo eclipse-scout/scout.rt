@@ -27,8 +27,8 @@ public interface IServiceTunnelContentHandler {
 
   ServiceTunnelRequest readRequest(InputStream in) throws Exception;
 
-  void writeResponse(OutputStream out, IServiceTunnelResponse msg) throws Exception;
+  void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception;
 
-  IServiceTunnelResponse readResponse(InputStream in) throws Exception;
+  ServiceTunnelResponse readResponse(InputStream in) throws Exception;
 
 }

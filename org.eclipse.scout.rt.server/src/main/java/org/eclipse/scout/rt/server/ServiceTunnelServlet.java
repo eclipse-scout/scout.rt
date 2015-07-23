@@ -52,7 +52,6 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -143,7 +142,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
             BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
             try {
-              IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+              ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
               // Include transactional client notification in response (piggyback).
               serviceResponse.setNotifications(transactionalClientNotificationCollector.values());
               serializeServiceResponse(serviceResponse);
@@ -187,7 +186,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     }
     Object data = ServiceUtility.invoke(serviceOp, service, serviceRequest.getArgs());
     Object[] outParameters = ServiceUtility.extractHolderArguments(serviceRequest.getArgs());
-    IServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
+    ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
     serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());
     serializeServiceResponse(serviceResponse);
   }
@@ -218,11 +217,11 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Method invoked to delegate the HTTP request to the 'process service'.
    */
-  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) throws Exception {
-    return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
+  protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) throws Exception {
+    return serverRunContext.call(new Callable<ServiceTunnelResponse>() {
 
       @Override
-      public IServiceTunnelResponse call() throws Exception {
+      public ServiceTunnelResponse call() throws Exception {
         return BEANS.get(DefaultTransactionDelegate.class).invoke(serviceTunnelRequest);
       }
     }, BEANS.get(ExceptionTranslator.class));
@@ -240,7 +239,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Method invoked to serialize a service response to be sent back to the client.
    */
-  protected void serializeServiceResponse(IServiceTunnelResponse serviceResponse) throws Exception {
+  protected void serializeServiceResponse(ServiceTunnelResponse serviceResponse) throws Exception {
     // security: do not send back error stack trace
     if (serviceResponse.getException() != null) {
       serviceResponse.getException().setStackTrace(new StackTraceElement[0]);

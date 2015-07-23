@@ -44,7 +44,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
       ServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
       beforeTunnel(request);
-      IServiceTunnelResponse response = tunnel(request);
+      ServiceTunnelResponse response = tunnel(request);
       afterTunnel(t0, response);
 
       // error handler
@@ -106,12 +106,12 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * Invokes the service operation remotely on server.
    * <p>
    * This method returns, once the current {@link RunMonitor} gets cancelled. When being cancelled, a cancellation
-   * request is sent to the server, and the {@link IServiceTunnelResponse} returned contains an
+   * request is sent to the server, and the {@link ServiceTunnelResponse} returned contains an
    * {@link InterruptedException} to indicate cancellation.
    *
    * @return response sent by the server; is never <code>null</code>.
    */
-  protected abstract IServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest);
+  protected abstract ServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest);
 
   /**
    * Method invoked after the service request was tunneled. Overwrite this method to add additional information to the
@@ -121,6 +121,6 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    *          System time before the request has been started (may be used for performance analyzing).
    * @param serviceResponse
    */
-  protected void afterTunnel(long t0, IServiceTunnelResponse serviceResponse) {
+  protected void afterTunnel(long t0, ServiceTunnelResponse serviceResponse) {
   }
 }

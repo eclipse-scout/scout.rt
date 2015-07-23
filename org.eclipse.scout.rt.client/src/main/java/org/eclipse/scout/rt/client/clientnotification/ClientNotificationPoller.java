@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -41,7 +42,8 @@ public class ClientNotificationPoller {
 
   @PostConstruct
   public void start() {
-    // TODO aho guard to start only once
+    // ensure the poller starts only once.
+    Assertions.assertNull(m_pollerFuture);
     if (BEANS.get(IServiceTunnel.class).isActive()) {
       P_NotificationPollJob pollJob = new P_NotificationPollJob();
       m_pollerFuture = Jobs.schedule(pollJob,

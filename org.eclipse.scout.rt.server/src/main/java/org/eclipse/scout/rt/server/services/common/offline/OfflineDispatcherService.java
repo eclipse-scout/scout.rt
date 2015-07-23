@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -35,7 +34,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class OfflineDispatcherService extends AbstractService implements IOfflineDispatcherService {
 
   @Override
-  public IServiceTunnelResponse dispatch(final ServiceTunnelRequest serviceRequest) {
+  public ServiceTunnelResponse dispatch(final ServiceTunnelRequest serviceRequest) {
     try {
       // Enable global cancellation of the service request.
       RunMonitor runMonitor = BEANS.get(RunMonitor.class);
@@ -52,7 +51,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
 
       BEANS.get(RunMonitorCancelRegistry.class).register(session, requestId, runMonitor);
       try {
-        IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+        ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
         return (serviceResponse != null ? serviceResponse : new ServiceTunnelResponse(new InterruptedException("Result from handler was null")));
       }
       finally {
@@ -74,11 +73,11 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   /**
    * Method invoked to delegate the request to the 'process service'.
    */
-  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) throws Exception {
-    return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
+  protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) throws Exception {
+    return serverRunContext.call(new Callable<ServiceTunnelResponse>() {
 
       @Override
-      public IServiceTunnelResponse call() throws Exception {
+      public ServiceTunnelResponse call() throws Exception {
         final Class<?> serviceClass = SerializationUtility.getClassLoader().loadClass(serviceTunnelRequest.getServiceInterfaceClassName());
         final Object service = Assertions.assertNotNull(BEANS.get(serviceClass), "service not found in service registry: %s", serviceClass);
         final Method serviceOperation = ServiceUtility.getServiceOperation(serviceClass, serviceTunnelRequest.getOperation(), serviceTunnelRequest.getParameterTypes());

@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
-public class ServiceTunnelResponse implements IServiceTunnelResponse {
+public class ServiceTunnelResponse implements Serializable {
   private static final long serialVersionUID = 0L;
 
   private final Object m_data;
@@ -41,27 +42,22 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
     m_exception = t;
   }
 
-  @Override
   public Object getData() {
     return m_data;
   }
 
-  @Override
   public Object[] getOutVars() {
     return m_outVars;
   }
 
-  @Override
   public Throwable getException() {
     return m_exception;
   }
 
-  @Override
   public synchronized Long getProcessingDuration() {
     return m_processingDuration;
   }
 
-  @Override
   public synchronized void setProcessingDuration(Long millis) {
     m_processingDuration = millis;
   }
@@ -72,12 +68,10 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
    *
    * @param notifications
    */
-  @Override
   public synchronized void setNotifications(List<ClientNotificationMessage> notifications) {
     m_notifications = notifications;
   }
 
-  @Override
   public synchronized List<ClientNotificationMessage> getNotifications() {
     return m_notifications;
   }

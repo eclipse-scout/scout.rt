@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -79,10 +78,10 @@ public class DefaultTransactionDelegate {
   public DefaultTransactionDelegate(boolean debug) {
   }
 
-  public IServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) throws Exception {
+  public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) throws Exception {
     long t0 = System.nanoTime();
 
-    IServiceTunnelResponse response;
+    ServiceTunnelResponse response;
     try {
       response = invokeImpl(serviceReq);
     }
@@ -126,7 +125,7 @@ public class DefaultTransactionDelegate {
   /**
    * This method is executed within a {@link IServerSession} context on behalf of a server job.
    */
-  protected IServiceTunnelResponse invokeImpl(ServiceTunnelRequest serviceReq) throws Throwable {
+  protected ServiceTunnelResponse invokeImpl(ServiceTunnelRequest serviceReq) throws Throwable {
     IServerSession serverSession = ServerSessionProvider.currentSession();
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
