@@ -82,7 +82,7 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   var field = this.cell.field;
 
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
-  field.displayTextChanged();
+  field.acceptInput();
 
   this.table.sendCompleteCellEdit(field.id);
 };

@@ -189,7 +189,7 @@ scout.Action.prototype.prepareDoAction = function(event) {
 
   // This is required for key-stroke actions. When they are triggered on
   // key-down, the active field is still focused and its blur-event is not
-  // triggered, which means the displayTextChanged() is never executed so
+  // triggered, which means the acceptInput() is never executed so
   // the executed action works with a wrong value for the active field.
   // --> Same check in Button.doAction()
   var activeValueField = $(document.activeElement).data('valuefield');
@@ -198,7 +198,7 @@ scout.Action.prototype.prepareDoAction = function(event) {
     activeValueField = $(document.activeElement).parent().data('valuefield');
   }
   if (activeValueField) {
-    activeValueField.displayTextChanged();
+    activeValueField.acceptInput();
   }
   return true;
 };

@@ -247,12 +247,12 @@ scout.DateField.prototype._onTimeIconClick = function(event) {
 scout.DateField.prototype._onDateFieldBlur = function() {
   // Close picker and update model
   this._closeDatePicker();
-  this.displayTextChanged();
+  this.acceptInput();
 };
 
 scout.DateField.prototype._onTimeFieldBlur = function() {
   this._tempTimeDate = null;
-  this.displayTextChanged();
+  this.acceptInput();
 };
 
 scout.DateField.prototype._onDateFieldKeydown = function(event) {
@@ -567,7 +567,7 @@ scout.DateField.prototype.updateDisplayText = function(date) {
 /**
  * @override ValueField.js
  */
-scout.DateField.prototype.displayTextChanged = function(whileTyping, forceSend) {
+scout.DateField.prototype.acceptInput = function(whileTyping) {
   if (this.hasDate && this.hasTime) {
     this._acceptDateTimePrediction();
   } else if (this.hasDate) {

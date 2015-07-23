@@ -39,17 +39,24 @@ scout.ValueField.prototype._renderUpdateDisplayTextOnModify = function() {
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
-  this.displayTextChanged(false);
+  this.acceptInput(false);
 };
 
 // FIXME AWE: (naming) in JavaStyleGuide ergänzen:
 // - wenn als event handler registriert $field.on('click', this._onClick.bind(this));
 // - Wenn event vom server kommt, z.B. selection _onSelection(event)
-// - Wenn Wert an Server gesendet werden soll displayTextChanged();
+// - Wenn Wert an Server gesendet werden soll acceptInput();
 //   wird typischerweise auch im _onChange oder _onKeyUp aufgerufen.
 //   ruft typischerweise auch sendDisplayText(displayText) auf
 
-scout.ValueField.prototype.displayTextChanged = function(whileTyping) {
+/**
+ * Accepts the current input and writes it to the model.<p>
+ * This method is typically called in onBlur of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc).<p>
+ * The default reads the display text using this._readDisplayText and writes it to the model.
+ * If subclasses don't have a display text or want to write another state to the server, they may override this method.
+ *
+ */
+scout.ValueField.prototype.acceptInput = function(whileTyping) {
   whileTyping = !!whileTyping; // cast to boolean
   var displayText = scout.helpers.nvl(this._readDisplayText(), ''),
     oldDisplayText = scout.helpers.nvl(this.displayText, '');
@@ -63,7 +70,7 @@ scout.ValueField.prototype.displayTextChanged = function(whileTyping) {
 };
 
 scout.ValueField.prototype._onFieldKeyUp = function() {
-  this.displayTextChanged(true);
+  this.acceptInput(true);
 };
 
 scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
@@ -101,7 +108,7 @@ scout.ValueField.prototype._onStatusMouseDown = function(event) {
   if (this.menus && this.menus.length > 0) {
     if (($(document.activeElement).data('valuefield') === this ||
          $(document.activeElement).parent().data('valuefield') === this)) {
-      this.displayTextChanged();
+      this.acceptInput();
     }
   }
 

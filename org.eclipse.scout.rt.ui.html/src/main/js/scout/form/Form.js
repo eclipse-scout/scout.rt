@@ -173,7 +173,7 @@ scout.Form.prototype.appendTo = function($parent) {
 };
 
 scout.Form.prototype._remove = function() {
-  // FIXME AWE: call displayTextChanged() when form is removed
+  // FIXME AWE: call acceptInput() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._uninstallFocusContext();
   this._glassPaneRenderer.removeGlassPanes();

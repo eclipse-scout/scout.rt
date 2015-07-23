@@ -16,7 +16,7 @@ scout.CheckBoxField.prototype._createKeyStrokeAdapter = function() {
   return new scout.CheckBoxKeyStrokeAdapter(this);
 };
 
-scout.CheckBoxField.prototype.displayTextChanged = function(whileTyping, forceSend) {
+scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
   //nop;
 };
 

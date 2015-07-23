@@ -147,7 +147,7 @@ scout.StringField.prototype._renderGridData = function() {
 };
 
 scout.StringField.prototype._onIconClick = function(event) {
-  this.displayTextChanged();
+  this.acceptInput();
   scout.StringField.parent.prototype._onIconClick.call(this, event);
   this.session.send(this.id, 'callAction');
 };

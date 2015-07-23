@@ -267,7 +267,7 @@ scout.SmartField.prototype._onFieldBlur = function() {
 
 /**
  * This method is called when the user presses the TAB or ENTER key in the UI, or when _onFieldBlur()
- * or displayTextChanged(). In case the field is a proposal-field we must send the current searchText
+ * or acceptInput(). In case the field is a proposal-field we must send the current searchText
  * to the server, even when the popup is not opened (this happens when the user types something which
  * is not in the list of proposals). We must accept the user defined text in that case.
  */
@@ -372,7 +372,7 @@ scout.SmartField.prototype._renderPopup = function() {
 /**
  * @override
  */
-scout.SmartField.prototype.displayTextChanged = function() {
+scout.SmartField.prototype.acceptInput = function() {
   if (this.cellEditor) {
     return;
   }
