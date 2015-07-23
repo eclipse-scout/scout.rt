@@ -70,8 +70,8 @@ public class GzipServletFilter implements Filter {
     if (requestHasGzipEncoding(req)) {
       GzipServletRequestWrapper gzipReq = new GzipServletRequestWrapper(req);
       req = gzipReq;
-      if (LOG.isInfoEnabled()) {
-        LOG.info("GZIP request[size " + (gzipReq.getCompressedLength() * 100 / gzipReq.getUncompressedLength()) + "%, compressed: " + gzipReq.getCompressedLength() + ", uncompressed: " + gzipReq.getUncompressedLength() + "]: " + req.getPathInfo());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("GZIP request[size " + (gzipReq.getCompressedLength() * 100 / gzipReq.getUncompressedLength()) + "%, compressed: " + gzipReq.getCompressedLength() + ", uncompressed: " + gzipReq.getUncompressedLength() + "]: " + req.getPathInfo());
       }
     }
     if (requestAcceptsGzipEncoding(req) && supportsGzipEncoding(req)) {
@@ -84,8 +84,8 @@ public class GzipServletFilter implements Filter {
       GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
       boolean compressed = gzipResp.finish(minimumLengthToCompress(req));
       if (compressed) {
-        if (LOG.isInfoEnabled()) {
-          LOG.info("GZIP response[size " + (gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength()) + "%, uncompressed: " + gzipResp.getUncompressedLength() + ", compressed: " + gzipResp.getCompressedLength() + "]: " + req.getPathInfo());
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("GZIP response[size " + (gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength()) + "%, uncompressed: " + gzipResp.getUncompressedLength() + ", compressed: " + gzipResp.getCompressedLength() + "]: " + req.getPathInfo());
         }
       }
     }
