@@ -26,6 +26,12 @@ scout.ButtonAdapterMenu.prototype._uninstallListeners = function() {
   this.button.off('destroy');
 };
 
+scout.ButtonAdapterMenu.prototype._render = function($parent) {
+  scout.ButtonAdapterMenu.parent.prototype._render.call(this, $parent);
+  // Convenience: Add ID of original button to DOM for debugging purposes
+  this.$container.attr('data-buttonadapter', this.button.id);
+};
+
 scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
   // Whenever a button property changes, apply the changes to the menu
   var changedProperties = {};
