@@ -153,23 +153,6 @@ scout.Button.prototype._renderEnabled = function() {
   }
 };
 
-/**
- * @override
- */
-scout.Button.prototype._renderVisible = function(visible) {
-  scout.Button.parent.prototype._renderVisible.call(this, visible);
-  // FIXME AWE: (menu) move to menuBar#layout or MenuButtonAdapter
-  if (visible) {
-    if (this.menuBar && !this.$container.hasClass('last')) {
-      this.menuBar.updateLastItemMarker();
-    }
-  } else {
-    if (this.menuBar && this.$container.hasClass('last')) {
-      this.menuBar.updateLastItemMarker();
-    }
-  }
-};
-
 scout.Button.prototype._renderSelected = function() {
   if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.$field.toggleClass('selected', this.selected);

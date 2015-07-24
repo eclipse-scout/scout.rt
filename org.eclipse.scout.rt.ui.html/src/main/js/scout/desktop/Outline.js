@@ -102,7 +102,6 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
     table.staticMenus = menus;
     this._tableSelectionListener = table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
       button.updateEnabled();
-      table.menuBar.recalculateDefaultMenu();
     });
   }
 };

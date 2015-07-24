@@ -27,11 +27,11 @@ scout.MenuBar = function(session, menuSorter) {
     // because the layout calls rebuildItems().
     if (event.changedProperties.length > 0) {
       if (event.changedProperties.length == 1 && event.changedProperties[0] === 'enabled') {
-        // Optimization: don't update when only the enabled state has changed (this should not affect the layout).
+        // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
+        this.updateDefaultMenu();
         return;
       }
       this.htmlComp.invalidateLayoutTree();
-      this.updateVisibility();
     }
   }.bind(this);
 };
@@ -125,6 +125,12 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
     // Re-layout menubar
     this.htmlComp.invalidateLayoutTree();
   }
+  else {
+    // Don't rebuild menubar, but update "markers"
+    this.updateVisibility();
+    this.updateDefaultMenu();
+    this.updateLastItemMarker();
+  }
 };
 
 scout.MenuBar.prototype._updateItems = function(menuItems) {
@@ -148,7 +154,7 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   // of elements. Otherwise a strange layout bug occurs.
   this._renderMenuItems(this._orderedMenuItems.right, true);
   this._renderMenuItems(this._orderedMenuItems.left, false);
-  this.recalculateDefaultMenu();
+  this.updateDefaultMenu();
   var lastVisibleItem = this._lastVisibleItemRight || this._lastVisibleItemLeft;
   if (lastVisibleItem) {
     lastVisibleItem.$container.addClass('last');
@@ -168,34 +174,6 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   }
 
   this.updateVisibility();
-};
-
-/**
- * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
- */
-scout.MenuBar.prototype.recalculateDefaultMenu = function() {
-  if (this._orderedMenuItems && !this.recalculateDefaultMenuInItems(this._orderedMenuItems.right)) {
-    this.recalculateDefaultMenuInItems(this._orderedMenuItems.left);
-  }
-};
-
-scout.MenuBar.prototype.recalculateDefaultMenuInItems = function(items) {
-  var found = false;
-  items.some(function(item) {
-    if (item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
-      if (this._defaultMenu && this._defaultMenu !== item) {
-        this._defaultMenu.$container.toggleClass('default-menu', false);
-      }
-      this._defaultMenu = item;
-      if (this._defaultMenu.$container) {
-        this._defaultMenu.$container.toggleClass('default-menu', true);
-        this.setTabbableMenu(this._defaultMenu);
-      }
-      found = true;
-      return true;
-    }
-  }.bind(this));
-  return found;
 };
 
 scout.MenuBar.prototype.setTabbableMenu = function(menu) {
@@ -245,6 +223,38 @@ scout.MenuBar.prototype.updateVisibility = function() {
       this._uninstallKeyStrokeAdapter();
     }
   }
+};
+
+
+/**
+ * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
+ */
+scout.MenuBar.prototype.updateDefaultMenu = function() {
+  if (this._orderedMenuItems) {
+    var found = this._updateDefaultMenuInItems(this._orderedMenuItems.right);
+    if (!found) {
+      this._updateDefaultMenuInItems(this._orderedMenuItems.left);
+    }
+  }
+};
+
+scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
+  var found = false;
+  items.some(function(item) {
+    if (item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
+      if (this._defaultMenu && this._defaultMenu !== item) {
+        this._defaultMenu.$container.toggleClass('default-menu', false);
+      }
+      this._defaultMenu = item;
+      if (this._defaultMenu.$container) {
+        this._defaultMenu.$container.toggleClass('default-menu', true);
+        this.setTabbableMenu(this._defaultMenu);
+      }
+      found = true;
+      return true;
+    }
+  }.bind(this));
+  return found;
 };
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
