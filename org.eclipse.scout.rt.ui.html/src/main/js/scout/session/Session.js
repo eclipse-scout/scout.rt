@@ -651,7 +651,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   }
 };
 
-scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize) {
+scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize, allowedTypes) {
   // TODO mot content type check before upload would be nice to have (new feature)
 
   var formData = new FormData();
@@ -664,8 +664,10 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   }
 
   $.each(files, function(index, value) {
-    totalSize += value.size;
-    formData.append('files', value, value.name);
+    if (!allowedTypes || scout.arrays.ensure(allowedTypes).indexOf(value.type) != -1) {
+      totalSize += value.size;
+      formData.append('files', value, value.name);
+    }
   }.bind(this));
 
   if (!maxTotalSize) {

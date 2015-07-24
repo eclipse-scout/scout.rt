@@ -37,7 +37,7 @@
       var filename = element[2];
 
       result += '--' + this._boundary + this._crlf;
-      if (value instanceof window.File) {
+      if (window.File && value instanceof window.File) {
         // File
         var file = value;
         filename = filename || file.name || key;

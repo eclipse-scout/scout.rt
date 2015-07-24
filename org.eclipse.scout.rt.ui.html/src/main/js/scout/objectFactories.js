@@ -327,4 +327,9 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.ButtonAdapterMenu();
   }
+}, {
+  objectType: 'ClipboardField',
+  create: function() {
+    return new scout.ClipboardField();
+  }
 }];
