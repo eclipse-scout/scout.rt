@@ -30,12 +30,16 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerAllowCoreThreadTimeoutProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerCorePoolSizeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerDispatcherThreadCountProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerKeepAliveTimeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerMaximumPoolSizeProperty;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -59,7 +63,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * @since 5.1
  */
 @ApplicationScoped
-public class JobManager implements IJobManager {
+public class JobManager implements IJobManager, IPlatformListener {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
 
@@ -346,5 +350,12 @@ public class JobManager implements IJobManager {
   @Internal
   protected boolean isMutexOwner(final JobFutureTask<?> task) {
     return m_mutexSemaphores.isMutexOwner(task);
+  }
+
+  @Override
+  public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (event.getState() == IPlatform.State.PlatformStopping) {
+      shutdown();
+    }
   }
 }
