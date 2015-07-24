@@ -229,9 +229,13 @@ a,
 .scout > .desktop-bench,
 .scout > .splitter,
 .scout > .glasspane,
+.scout > .busyindicator,
 .scout > .dialog,
 .scout > .form,
+.scout > .messagebox,
 .scout > .tooltip,
+.scout > .popup,
+.scout > .form-tool-popup,
 .scout > .smart-field-popup,
 .scout > .date-picker-popup {
   z-index: 0;
