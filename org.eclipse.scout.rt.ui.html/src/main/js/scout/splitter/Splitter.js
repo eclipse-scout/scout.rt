@@ -35,11 +35,12 @@ scout.Splitter.prototype.updatePosition = function(newPosition) {
     }
   }
 
-  // Set the new position
+  // Set the new position (center splitter around 'newPosition')
+  var splitterSize = scout.graphics.getVisibleSize(this.$container, true);
   if (this.splitHorizontal) {
-    this.$container.cssLeft(newPosition);
+    this.$container.cssLeft(newPosition - (splitterSize.width / 2));
   } else {
-    this.$container.cssTop(newPosition);
+    this.$container.cssTop(newPosition - (splitterSize.height / 2));
   }
   this.position = newPosition;
 };

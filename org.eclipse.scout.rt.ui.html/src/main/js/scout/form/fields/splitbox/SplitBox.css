@@ -1,19 +1,10 @@
 .split-box {
 
   & > .split-area {
-    @splitter-size: 15px;
+    @x-splitter-size: 40px - @mandatory-indicator-width;
+    @y-splitter-size: 15px;
     @splitter-line-size: 3px;
     @temp-splitter-line-size: 1px;
-
-    & > .first-field {
-    }
-
-    & > .second-field {
-      /* | */
-      &.x-axis {
-        margin-left: -@mandatory-indicator-width;
-      }
-    }
 
     & > .splitter {
       position: absolute;
@@ -30,11 +21,10 @@
 
       /* | */
       &.x-axis {
-        margin-left: 0; /* Override margin from Splitter.css TODO BSH Improve this */
         height: 100%;
-        width: @splitter-size;
-        border-left: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
-        border-right: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
+        width: @x-splitter-size;
+        border-left: (ceil((@x-splitter-size - @mandatory-indicator-width - @splitter-line-size) / 2) + @mandatory-indicator-width) solid @background-color;
+        border-right: floor((@x-splitter-size - @mandatory-indicator-width - @splitter-line-size) / 2) solid @background-color;
         cursor: col-resize;
       }
 
@@ -42,9 +32,9 @@
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~"100%" - @mandatory-indicator-width);
-        height: @splitter-size;
-        border-top: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
-        border-bottom: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
+        height: @y-splitter-size;
+        border-top: ceil((@y-splitter-size - @splitter-line-size) / 2) solid @background-color;
+        border-bottom: floor((@y-splitter-size - @splitter-line-size) / 2) solid @background-color;
         cursor: row-resize;
       }
 
@@ -65,14 +55,15 @@
     /* used while dragging */
     & > .temp-splitter {
       position: absolute;
+      z-index: 2;
 
       /* | */
       &.x-axis {
         height: 100%;
         width: @temp-splitter-line-size;
         border-left: @temp-splitter-line-size dashed @focus-border-color;
-        margin-left: (@splitter-size - @temp-splitter-line-size) / 2;
-        margin-right: (@splitter-size - @temp-splitter-line-size) / 2;
+        margin-left: ceil((@x-splitter-size - @mandatory-indicator-width - @temp-splitter-line-size) / 2) + @mandatory-indicator-width;
+        margin-right: floor((@x-splitter-size - @mandatory-indicator-width - @temp-splitter-line-size) / 2);
       }
 
       /* -- */
@@ -81,8 +72,8 @@
         width: calc(~"100%" - @mandatory-indicator-width);
         height: @temp-splitter-line-size;
         border-top: @temp-splitter-line-size dashed @focus-border-color;
-        margin-top: (@splitter-size - @temp-splitter-line-size) / 2;
-        margin-bottom: (@splitter-size - @temp-splitter-line-size) / 2;
+        margin-top: ceil((@y-splitter-size - @temp-splitter-line-size) / 2);
+        margin-bottom: floor((@y-splitter-size - @temp-splitter-line-size) / 2);
       }
     }
   }

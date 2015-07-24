@@ -45,12 +45,18 @@ scout.SplitBox.prototype._render = function($parent) {
 
   // --- Helper functions ---
 
-  function resizeSplitter() {
+  function resizeSplitter(event) {
+    if (event.which !== 1) {
+      return; // only handle left mouse button
+    }
     if (this.splitterEnabled) {
+      // Update mouse position (see resizeMove() for details)
+      var mousePosition = { x: event.clientX, y: event.clientY };
+
       // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
       $(window)
         .on('mousemove.splitbox', resizeMove.bind(this))
-        .one('mouseup', resizeEnd.bind(this));
+        .on('mouseup.splitbox', resizeEnd.bind(this));
       // Ensure the correct cursor is always shown while moving
       $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
 
@@ -76,6 +82,13 @@ scout.SplitBox.prototype._render = function($parent) {
     }
 
     function resizeMove(event) {
+      if (event.clientX === mousePosition.x && event.clientY === mousePosition.y) {
+        // Chrome bug: https://code.google.com/p/chromium/issues/detail?id=161464
+        // When holding the mouse, but not moving it, a 'mousemove' event is fired every second nevertheless.
+        return;
+      }
+      mousePosition = { x: event.clientX, y: event.clientY };
+
       if (this.splitHorizontal) { // "|"
         // Calculate target splitter position (in area)
         var targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
@@ -94,7 +107,8 @@ scout.SplitBox.prototype._render = function($parent) {
         // Update temporary splitter
         $tempSplitter.cssLeft(targetSplitterPositionLeft - tempSplitterOffsetX);
         // Normalize target position
-        newSplitterPosition = targetSplitterPositionLeft / splitAreaSize.width;
+        newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
+        newSplitterPosition /= (splitAreaSize.width - splitterSize.width - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
       } else { // "--"
         // Calculate target splitter position (in area)
         var targetSplitterPositionTop = event.pageY - splitAreaPosition.top;
@@ -118,8 +132,13 @@ scout.SplitBox.prototype._render = function($parent) {
     }
 
     function resizeEnd(event) {
+      if (event.which !== 1) {
+        return; // only handle left mouse button
+      }
       // Remove listeners and reset cursor
-      $(window).off('mousemove.splitbox');
+      $(window)
+        .off('mousemove.splitbox')
+        .off('mouseup.splitbox');
       if ($tempSplitter) { // instead of check for this.splitterEnabled, if splitter is currently moving it must be finished correctly
         $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
 

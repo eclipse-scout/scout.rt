@@ -55,10 +55,6 @@
     border-left-color: transparent;
     border-right-color: transparent;
 
-    &::after {
-      background-color: red;
-    }
-
     &.select-top,
     &.select-middle {
       /* Disable bottom-border. Instead, we add the border in the ::after pseudo element, because otherwise */

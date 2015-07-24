@@ -22,7 +22,6 @@
   & > .mandatory-indicator {
     position: absolute;
     visibility: hidden;
-    margin-right: 2px;
 
     &::before {
       content: '*';

@@ -412,14 +412,18 @@ scout.TreeSet.prototype.last = function() {
 /**
  * HtmlEnvironment is used in place of org.eclipse.scout.rt.ui.swing.DefaultSwingEnvironment.
  */
-// When changing these values, you may have to update sizes.css as well (remember to consider margins)
 scout.HtmlEnvironment = {
-  formRowHeight: 30,
+  // -------------------------------
+  // IMPORTANT:
+  // Some of the following constants are also defined in sizes.css. If you change
+  // them, be sure to apply them at both places. (Remember to consider margins)
+ // -------------------------------
+  formRowHeight: 30, // @logical-grid-height
   formRowGap: 10,
   formColumnWidth: 420,
-  formColumnGap: 40,
+  formColumnGap: 32, // 40 pixel actual form gap - fieldMandatoryIndicatorWidth
   smallColumnGap: 4,
   fieldLabelWidth: 140,
-  fieldMandatoryIndicatorWidth: 6,
+  fieldMandatoryIndicatorWidth: 8, // @mandatory-indicator-width
   fieldStatusWidth: 20
 };
