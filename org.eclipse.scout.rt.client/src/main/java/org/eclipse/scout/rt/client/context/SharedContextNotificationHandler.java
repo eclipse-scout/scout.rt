@@ -25,6 +25,5 @@ public class SharedContextNotificationHandler implements INotificationHandler<Sh
     // the client session must be available for shared context variable updates otherwise it is a wrong usage of the notification.
     IClientSession session = (IClientSession) Assertions.assertNotNull(IClientSession.CURRENT.get());
     session.replaceSharedVariableMapInternal(notification.getSharedVariableMap());
-    System.out.println(String.format("XXX Shared var update DONE for session %s ", session.getUserId()));
   }
 }

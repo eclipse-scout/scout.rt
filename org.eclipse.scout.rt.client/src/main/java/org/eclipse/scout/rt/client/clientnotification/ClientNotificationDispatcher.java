@@ -116,10 +116,7 @@ public class ClientNotificationDispatcher {
         m_notificationFutures.add(future);
         future.whenDone(new P_NotificationFutureCallback(future));
       }
-
     }
-//    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
-    // schedule
   }
 
   /**
@@ -132,12 +129,10 @@ public class ClientNotificationDispatcher {
    *          the notification to process.
    */
   public void dispatch(IClientSession session, final Serializable notification) {
-//    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
     ISession currentSession = ISession.CURRENT.get();
     // sync dispatch if session is equal
     if (session == currentSession) {
       dispatchSync(notification);
-//      ClientRunContexts.copyCurrent().run(dispatchJob, BEANS.get(RuntimeExceptionTranslator.class));
     }
     else {
       IRunnable dispatchRunnable = new IRunnable() {
@@ -153,12 +148,6 @@ public class ClientNotificationDispatcher {
       }
     }
 
-//    P_DispatchRunnable dispatchJob = new P_DispatchRunnable(notification);
-//    IFuture<Void> future = ClientJobs.schedule(dispatchJob, ClientJobs.newInput(ClientRunContexts.empty().withSession(session, true)));
-//    synchronized (m_notificationFutures) {
-//      m_notificationFutures.add(future);
-//      future.whenDone(new P_NotificationFutureCallback(future));
-//    }
   }
 
   protected void dispatchSync(Serializable notification) {
@@ -178,25 +167,6 @@ public class ClientNotificationDispatcher {
     }
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().andMatchFutures(futures).andMatchNotCurrentFuture(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
-
-//  /**
-//   * The runnable is executed in a {@link ClientRunContext} running under a user session. All handlers with a message
-//   * type assignable from the notification type will be called to process the notification.
-//   */
-//  private class P_DispatchRunnable implements IRunnable {
-//
-//    private final Serializable m_notification;
-//
-//    public P_DispatchRunnable(Serializable notification) {
-//      m_notification = notification;
-//    }
-//
-//    @Override
-//    public void run() throws Exception {
-//      NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-//      reg.notifyHandlers(m_notification);
-//    }
-//  }
 
   private class P_NotificationFutureCallback implements IDoneCallback<Void> {
     private IFuture<Void> m_furture;
