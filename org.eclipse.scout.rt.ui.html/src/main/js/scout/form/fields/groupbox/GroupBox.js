@@ -225,6 +225,8 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
       this.gridData.weightY = this._collapsedWeightY;
       delete this._collapsedWeightY;
     }
+    // Update inner layout (e.g. menubar)
+    this.invalidateLayout();
   } else {
     // If group box has a weight different than 0, we set it to zero and back up the old value
     if (this.gridData.weightY !== 0) {
