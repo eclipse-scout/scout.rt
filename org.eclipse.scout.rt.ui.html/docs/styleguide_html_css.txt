@@ -83,8 +83,25 @@ https://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
 
 ### LESS
 
-- Mixins einsetzen für häufig genutze Konstrukte
-    z.B. .drop-shadow
+- Mixins einsetzen für häufig genutze Konstrukte. Dabei die Scout-Mixins in einen LESS-Namespace namens "scout" verpacken,
+  damit es keine Konflikte mit gleichnamigen CSS Klassen gibt. (Diese überschreiben das Mixin, was zu unerwartetem
+  Verhalten führen kann.)
+
+  Mixin definieren:
+    #scout {
+      .my-mixin() { ... }
+    }
+
+  Mixin verwenden:
+    .my-class {
+      #scout.my-mixin();
+    }
+
+  Hinweise:
+  - Bei der Definition immer runde Klammern angeben, auch wenn es keine Argumente gibt. Dann taucht am Ende nichts davon
+    im CSS auf.
+  - Bei der Verwendung immer das Prefix "#scout." verwenden (bzw. ein anderes, falls es mal andere gibt). Zudem immer
+    runde Klammern verwenden, auch ohne Argumente. Das ist zwar nicht nötig, aber einheitlicher.
 
 - Mixins einsetzen für Vendor-abhängige Stlyes
     Also sobald ein Vendor-Prefix verwendet werden muss, dies in ein mixin auslagern. Beispiel:

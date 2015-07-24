@@ -9,7 +9,7 @@
 
   & > .tab-item {
     position: relative;
-    .font-text-normal(@bold);
+    #scout.font-text-normal(@bold);
     color: @title-color;
     border: none;
     background-color: transparent;
@@ -35,7 +35,7 @@
     }
 
     &:focus::before {
-      .font-icon;
+      #scout.font-icon();
       content: @icon-angle-right;
       color: @active-color;
       position: absolute;
@@ -60,7 +60,7 @@
     padding: 0 20px;
 
     &::before {
-      .font-icon;
+      #scout.font-icon();
       font-size: 17px;
       color: @icon-color;
       content: @icon-ellipsis-v;

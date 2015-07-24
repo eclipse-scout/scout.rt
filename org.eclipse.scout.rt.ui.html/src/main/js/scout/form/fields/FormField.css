@@ -4,7 +4,7 @@
 
   & > label {
     position: absolute;
-    .overflow-ellipsis-nowrap;
+    #scout.overflow-ellipsis-nowrap();
     padding-top: @borderless-field-padding-y;
     padding-bottom: @borderless-field-padding-y;
     margin-left: @mandatory-indicator-width;
@@ -44,7 +44,7 @@
     margin-left: 10px;
 
     &::before  {
-      .font-icon();
+      #scout.font-icon();
       font-size: 16px;
     }
   }

@@ -5,7 +5,7 @@
   cursor: pointer;
   color: @text-color;
   font-size: 16px;
-  .overflow-ellipsis-nowrap;
+  #scout.overflow-ellipsis-nowrap();
 
   &:first-child {
     border-top-color: transparent;

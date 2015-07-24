@@ -4,7 +4,7 @@
 @resource-padding-x: 5px;
 
 .planner-icon(@icon, @size) {
-  .font-icon;
+  #scout.font-icon();
   display: inline-block;
   position: relative;
   font-size: @size;
@@ -60,7 +60,7 @@
 
   & > .timeline {
     display: inline-block;
-    width: calc(~"100%" - @planner-resource-title-width);
+    width: calc(~'100%' - @planner-resource-title-width);
 
     & > .timeline-large {
       height: 50%;
@@ -82,7 +82,7 @@
 .planner-scale-title {
    height: 100%;
    float: left;
-   .overflow-ellipsis-nowrap;
+   #scout.overflow-ellipsis-nowrap();
    padding: 0px @resource-padding-x;
    font-size: 17px;
    color: @palette-gray-6;
@@ -108,7 +108,7 @@
     width: @planner-resource-title-width;
     padding: 0px @resource-padding-x;
     float: left;
-    .overflow-ellipsis-nowrap;
+    #scout.overflow-ellipsis-nowrap();
   }
 
   &.selected > .resource-title {
@@ -118,7 +118,7 @@
   & > .resource-cells {
     position: relative;
     height: 100%;
-    width: calc(~"100%" - @planner-resource-title-width);
+    width: calc(~'100%' - @planner-resource-title-width);
     float: left;
 
     & > .selector {

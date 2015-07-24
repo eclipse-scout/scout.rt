@@ -18,7 +18,7 @@
   &::before {
     position: relative;
     left: 1px;
-    .font-icon;
+    #scout.font-icon();
     font-size: 22px;
     color: @palette-gray-5;
     content: @icon;
@@ -55,11 +55,11 @@
   }
 
   &::selection, & *::selection{
-    .text-selection();
+    #scout.text-selection();
   }
 
   &::-moz-selection, & *::-moz-selection {
-    .text-selection();
+    #scout.text-selection();
   }
 }
 
@@ -69,7 +69,7 @@
   border-radius: @border-radius;
 
   &.focused{
-    .focus-border;
+    #scout.focus-border();
   }
 
   & ol {
@@ -83,7 +83,7 @@
     list-style: none;
 
     &::before {
-      content: counter(li) ".";
+      content: counter(li) '.';
       counter-increment: li;
       position :absolute;
       left: -15px;
@@ -100,7 +100,7 @@
     list-style: none;
 
     &::before {
-      .font-icon;
+      #scout.font-icon();
       content: @icon-angle-double-right;
       position :absolute;
       left: -15px;
@@ -121,7 +121,7 @@
     border-bottom-right-radius: @border-radius;
     top: 1px;
     right: 1px;
-    height: ~"calc(100% - 2px)";
+    height: ~'calc(100% - 2px)';
   }
 
   & .rich-text-bar-group {

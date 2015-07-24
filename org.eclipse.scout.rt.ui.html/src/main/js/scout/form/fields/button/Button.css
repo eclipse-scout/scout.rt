@@ -6,7 +6,7 @@
   left: 0px;
   top: 3px;
   margin-top: -5px;
-  .font-icon;
+  #scout.font-icon();
   line-height: 18px;
   font-size: 18px;
   padding-left: 10px;
@@ -36,7 +36,7 @@
   }
 
   &:focus::before {
-    .button-focus;
+    #scout.button-focus();
   }
 
   &:not(.disabled):active {

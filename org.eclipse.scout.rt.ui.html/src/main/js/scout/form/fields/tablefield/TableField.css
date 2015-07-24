@@ -6,6 +6,6 @@
 
   &:focus,
   &.focused {
-    .focus-border;
+    #scout.focus-border();
   }
 }

@@ -23,7 +23,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    .font-icon;
+    #scout.font-icon();
     color: @chart-type-color;
     font-size: 34px;
     width: 90px;
@@ -131,7 +131,7 @@ text.venn-circle-text {
   &::before {
     position: relative;
     top: -4px;
-    .font-icon;
+    #scout.font-icon();
     color: @chart-axis-text-color;
     font-size: 24px;
     content: @icon-long-arrow-left;
@@ -146,7 +146,7 @@ text.venn-circle-text {
   position: absolute;
   top: 20px;
   height: 20px;
-  width: ~"calc(100% - 800px)";
+  width: ~'calc(100% - 800px)';
   left: 710px;
 }
 
@@ -167,7 +167,7 @@ text.venn-circle-text {
   }
 
   &::after {
-    .font-icon;
+    #scout.font-icon();
     content:  @icon-angle-right;
     position: relative;
     left: 10px;
@@ -175,7 +175,7 @@ text.venn-circle-text {
   }
 
  &:last-child::after {
-    content: "";
+    content: '';
     left: 0px;
   }
 }
@@ -194,7 +194,7 @@ text.venn-circle-text {
   position: absolute;
   top: 45px;
   height: 275px;
-  width: ~"calc(100% - 700px)";
+  width: ~'calc(100% - 700px)';
   left: 680px;
 }
 

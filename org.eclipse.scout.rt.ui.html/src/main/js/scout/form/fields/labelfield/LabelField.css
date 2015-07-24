@@ -2,8 +2,8 @@
   padding-top: @borderless-field-padding-y;
   padding-bottom: @borderless-field-padding-y;
   margin-left: @mandatory-indicator-width;
-  .user-select(text);
-  .overflow-ellipsis;
+  #scout.user-select(text);
+  #scout.overflow-ellipsis();
 
   &.has-inner-alignment {
 

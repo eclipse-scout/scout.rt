@@ -4,11 +4,11 @@
     position: absolute;
 
     &.date {
-      .text-field-with-icon(@icon-calendar);
+      #scout.text-field-with-icon(@icon-calendar);
     }
 
     &.time {
-      .text-field-with-icon(@icon-clock, ~'.time');
+      #scout.text-field-with-icon(@icon-clock, ~'.time');
     }
   }
 

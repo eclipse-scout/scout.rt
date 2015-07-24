@@ -1,218 +1,218 @@
-.vendor(@property, @value) {
-  -webkit-@{property}: @value;
-  -moz-@{property}: @value;
-  -ms-@{property}: @value;
-  -o-@{property}: @value;
-  @{property}: @value;
-}
+#scout {
 
-.glow(@color, @radius: 5px) {
-  box-shadow: 0 0 @radius @color;
-}
+  .vendor(@property, @value) {
+    -webkit-@{property}: @value;
+    -moz-@{property}: @value;
+    -ms-@{property}: @value;
+    -o-@{property}: @value;
+    @{property}: @value;
+  }
 
-.inner-glow(@color, @radius: 4px) {
-  box-shadow: inset 0 0 @radius @color;
-}
+  .glow(@color, @radius: 5px) {
+    box-shadow: 0 0 @radius @color;
+  }
 
-.drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {
-  box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
-}
+  .inner-glow(@color, @radius: 4px) {
+    box-shadow: inset 0 0 @radius @color;
+  }
 
-.drop-shadow-large() {
-  .drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: 0.5);
-}
+  .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {
+    box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
+  }
 
-.focus-border(@bordersize: 1px) {
-  outline: none;
-  border: @bordersize solid @focus-border-color;
-  .glow(@focus-glow-color);
-}
+  .drop-shadow-large() {
+    #scout.drop-shadow(@x: 4px, @y: 10px, @blur: 18px, @alpha: 0.5);
+  }
 
-.no-focus-border() {
-  outline: none;
-  border: 0;
-  box-shadow: 0 0 0 0;
-}
+  .focus-border(@bordersize: 1px) {
+    outline: none;
+    border: @bordersize solid @focus-border-color;
+    #scout.glow(@focus-glow-color);
+  }
 
-.transform(@args) {
-  -webkit-transform: @args;
-  -ms-transform: @args;
-  transform: @args;
-}
+  .no-focus-border() {
+    outline: none;
+    border: 0;
+    box-shadow: 0 0 0 0;
+  }
 
-.transform-origin(@args) {
-  -webkit-transform-origin: @args;
-  -moz-transform-origin: @args;
-  -ms-transform-origin: @args;
-  transform-origin: @args;
-}
+  .transform(@args) {
+    -webkit-transform: @args;
+    -ms-transform: @args;
+    transform: @args;
+  }
 
-.text-selection() {
-  background: @text-selection-background-color;
-  color: @text-selection-color;
-}
-.text-selection-disabled() {
-  background: @text-selection-disabled-background-color;
-  color: @text-selection-disabled-color;
-}
+  .transform-origin(@args) {
+    -webkit-transform-origin: @args;
+    -moz-transform-origin: @args;
+    -ms-transform-origin: @args;
+    transform-origin: @args;
+  }
 
-.placeholder() {
-  opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
-}
-.placeholder-disabled() {
-  color: @disabled-color;
-}
+  .text-selection() {
+    background: @text-selection-background-color;
+    color: @text-selection-color;
+  }
+  .text-selection-disabled() {
+    background: @text-selection-disabled-background-color;
+    color: @text-selection-disabled-color;
+  }
 
-.overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
-  position: absolute;
-  content: '';
-  left: @left;
-  top: @top;
-  width: calc(~"100% +" @diffW);
-  height: calc(~"100% +" @diffH);
-}
+  .placeholder() {
+    opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
+  }
+  .placeholder-disabled() {
+    color: @disabled-color;
+  }
 
-/* Expects a sibling html element with class 'icon' **/
-
-.text-field-with-icon (@icon; @className: ~'') {
-  padding-right: @text-field-padding + 15px;
-
-  & ~ .icon@{className} {
+  .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
     position: absolute;
-    margin-right: @text-field-padding;
-    cursor: text;
+    content: '';
+    left: @left;
+    top: @top;
+    width: calc(~'100% +' @diffW);
+    height: calc(~'100% +' @diffH);
   }
 
-  & ~ .icon@{className}::before {
-    .font-icon;
-    font-size: 13px;
-    content: @icon;
-  /* TODO AWE: (smartfield) wieso braucht das icon eine line-height?
-   * wird doch sowieso absolut positioniert.
-   */
-    line-height: @logical-grid-height;
-    color: @text-field-icon-color;
-  }
+  /* Expects a sibling html element with class 'icon' **/
+  .text-field-with-icon(@icon; @className: ~'') {
+    padding-right: @text-field-padding + 15px;
 
-  &:focus ~ .icon@{className}::before {
-    color: @text-field-icon-focus-color;
-  }
+    & ~ .icon@{className} {
+      position: absolute;
+      margin-right: @text-field-padding;
+      cursor: text;
+    }
 
-  &.has-error ~ .icon@{className}::before {
-    color: @text-field-icon-error-color;
-  }
+    & ~ .icon@{className}::before {
+      #scout.font-icon();
+      font-size: 13px;
+      content: @icon;
+      /* TODO AWE: (smartfield) wieso braucht das icon eine line-height? */
+      /* wird doch sowieso absolut positioniert. */
+      line-height: @logical-grid-height;
+      color: @text-field-icon-color;
+    }
 
-  &.disabled {
-    padding-right: @text-field-padding;
-  }
+    &:focus ~ .icon@{className}::before {
+      color: @text-field-icon-focus-color;
+    }
 
-  &.disabled ~ .icon@{className} {
-    display: none;
-  }
+    &.has-error ~ .icon@{className}::before {
+      color: @text-field-icon-error-color;
+    }
 
-  /* When field is too small, hide the icon */
-  &.compact {
-    padding-right: @text-field-padding;
+    &.disabled {
+      padding-right: @text-field-padding;
+    }
 
-    & ~ .icon {
+    &.disabled ~ .icon@{className} {
       display: none;
     }
+
+    /* When field is too small, hide the icon */
+    &.compact {
+      padding-right: @text-field-padding;
+
+      & ~ .icon {
+        display: none;
+      }
+    }
   }
-}
 
-.user-select(@mode) {
-  -webkit-user-select: @mode;
-  -moz-user-select: @mode;
-  -ms-user-select: @mode;
-  user-select: @mode;
-}
+  .user-select(@mode) {
+    -webkit-user-select: @mode;
+    -moz-user-select: @mode;
+    -ms-user-select: @mode;
+    user-select: @mode;
+  }
 
-/*Checkbox mixins*/
-.checkboxLabelBeforeFocus {
-  border-color: @focus-border-color;
-  outline: none;
-}
+  .checkbox-label-before-focus() {
+    border-color: @focus-border-color;
+    outline: none;
+  }
 
-.checkboxLabelBeforeChecked {
-  .font-icon;
-  content: @icon-checked;
-  color: @palette-blue-4;
-  font-size: 11px;
-  text-align: center;
-  line-height: 15px;
-}
+  .checkbox-label-before-checked() {
+    #scout.font-icon();
+    content: @icon-checked;
+    color: @palette-blue-4;
+    font-size: 11px;
+    text-align: center;
+    line-height: 15px;
+  }
 
-.checkboxLabelBeforeChildChecked {
-  .font-icon;
-  content: @icon-square;
-  color: @palette-blue-4;
-  font-size: 11px;
-  text-align: center;
-  line-height: 15px;
-  padding-left: 1px;
-}
+  .checkbox-label-before-child-checked() {
+    #scout.font-icon();
+    content: @icon-square;
+    color: @palette-blue-4;
+    font-size: 11px;
+    text-align: center;
+    line-height: 15px;
+    padding-left: 1px;
+  }
 
-.checkboxLabelBeforeBorder {
-  border: 2px solid @border-color;
-  border-radius: 3px;
-}
+  .checkbox-label-before-border() {
+    border: 2px solid @border-color;
+    border-radius: 3px;
+  }
 
-.checkboxLabelBeforeDisabledBorder {
-  border: 2px solid @border-color;
-}
+  .checkbox-label-before-disabled-border() {
+    border: 2px solid @border-color;
+  }
 
-.checkboxLabelBeforeDisabled {
-  color: @palette-gray-5;
-  background-color: @control-disabled-background-color;
-}
+  .checkbox-label-before-disabled() {
+    color: @palette-gray-5;
+    background-color: @control-disabled-background-color;
+  }
 
-.checkboxLabelDisabled {
-  cursor: default;
-}
+  .checkbox-label-disabled() {
+    cursor: default;
+  }
 
-.checkboxLabelBefore() {
-  content: "";
-  display: inline-block;
-  width: @check-box-size;
-  height: @check-box-size;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
+  .checkbox-label-before() {
+    content: '';
+    display: inline-block;
+    width: @check-box-size;
+    height: @check-box-size;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
 
-.overflow-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .overflow-ellipsis() {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.overflow-ellipsis-nowrap {
-  .overflow-ellipsis;
-  white-space: nowrap;
-}
+  .overflow-ellipsis-nowrap() {
+    #scout.overflow-ellipsis();
+    white-space: nowrap;
+  }
 
-.overflow-nowrap {
-  overflow: hidden;
-  white-space: nowrap;
-}
+  .overflow-nowrap() {
+    overflow: hidden;
+    white-space: nowrap;
+  }
 
-.white-space-nowrap {
-  white-space: nowrap;
-}
+  .white-space-nowrap() {
+    white-space: nowrap;
+  }
 
-.button-focus {
-  .overlay(-3px, -3px, 6px, 6px);
-  .focus-border;
-  border-radius: @border-radius;
-}
+  .button-focus() {
+    #scout.overlay(-3px, -3px, 6px, 6px);
+    #scout.focus-border();
+    border-radius: @border-radius;
+  }
 
-.triangle-top-left(@size, @color) {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: @size @size 0 0;
-  .triangle-top-left-color(@color);
-}
+  .triangle-top-left(@size, @color) {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: @size @size 0 0;
+    #scout.triangle-top-left-color(@color);
+  }
 
-.triangle-top-left-color(@color) {
-  border-color: @color transparent transparent transparent;
+  .triangle-top-left-color(@color) {
+    border-color: @color transparent transparent transparent;
+  }
 }

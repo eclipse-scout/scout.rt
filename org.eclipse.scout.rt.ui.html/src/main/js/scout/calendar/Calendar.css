@@ -3,7 +3,7 @@
 @calendar-title-height: 25px;
 
 .calendar-icon(@icon, @size) {
-  .font-icon;
+  #scout.font-icon();
   display: inline-block;
   position: relative;
   font-size: @size;
@@ -154,7 +154,7 @@
   line-height: 24px;
   height: 24px;
   padding-left: 4px;
-  .overflow-ellipsis;
+  #scout.overflow-ellipsis();
   min-height: 20px;
   width: calc(~'100%' - 32px);
   border-left: 4px solid;

@@ -13,7 +13,7 @@
 }
 
 .menu-context {
-  .drop-shadow;
+  #scout.drop-shadow;
   border: 1px solid @border-color;
 }
 
@@ -22,7 +22,7 @@
   position: relative;
   left: 0px;
   top: 3px;
-  .font-icon;
+  #scout.font-icon();
   line-height: 18px;
   font-size: 18px;
   padding-left: 10px;
@@ -103,7 +103,7 @@
 
   /* Draw border for icon only items */
   &:not(.menu-textandicon):focus::before {
-    .focus-border;
+    #scout.focus-border();
   }
 
   &.menu-open {
@@ -163,11 +163,11 @@
   }
 
   &:focus::before {
-    .button-focus;
+    #scout.button-focus();
   }
 
   &.default-menu:not(.disabled) {
-    .font-text-normal(@bold);
+    #scout.font-text-normal(@bold);
     background-color: @default-button-background-color;
     color: @default-button-color;
     border-width: 0;

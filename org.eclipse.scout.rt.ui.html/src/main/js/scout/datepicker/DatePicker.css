@@ -9,7 +9,7 @@
   background-color: @control-background-color;
   border: 1px solid @popup-border-color;
   border-radius: @border-radius;
-  .drop-shadow();
+  #scout.drop-shadow();
 
   /* necessary for animation */
   overflow: hidden;
@@ -112,7 +112,7 @@
   line-height: 30px;
   height: 30px;
   cursor: pointer;
-  .font-icon;
+  #scout.font-icon();
   font-size: 17px;
 
   &:hover {

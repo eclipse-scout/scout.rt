@@ -9,7 +9,7 @@
   cursor: pointer;
 
   &.y-axis {
-    height: calc(~"100%" - 2 * @scrollbar-margin);
+    height: calc(~'100%' - 2 * @scrollbar-margin);
     width: @scrollbar-size;
     margin: @scrollbar-margin @scrollbar-side-margin;
 
@@ -21,7 +21,7 @@
   }
 
   &.x-axis {
-    width: calc(~"100%" - 2 * @scrollbar-margin);
+    width: calc(~'100%' - 2 * @scrollbar-margin);
     height: @scrollbar-size;
     margin: @scrollbar-side-margin @scrollbar-margin;
   }

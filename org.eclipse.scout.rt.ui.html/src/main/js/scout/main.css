@@ -11,13 +11,13 @@
  * Download YUI 2.4.9 and call as Java program from maven.
  */
 body {
-  .font-text-normal;
+  #scout.font-text-normal();
   height: 100%;
   width: 100%;
   margin: 0px;
   overflow: hidden;
   -webkit-touch-callout: none;
-  .user-select(none);
+  #scout.user-select(none);
   -moz-user-select: -moz-none;
   cursor: default;
   color: @text-color;
@@ -25,23 +25,23 @@ body {
 
 /* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
 ::-moz-selection {
-  .text-selection();
+  #scout.text-selection();
 }
 ::selection {
-  .text-selection();
+  #scout.text-selection();
 }
 
 ::-webkit-input-placeholder {
-  .placeholder();
+  #scout.placeholder();
 }
 :-moz-placeholder { /* older versions of firefox */
-  .placeholder();
+  #scout.placeholder();
 }
 ::-moz-placeholder {
-  .placeholder();
+  #scout.placeholder();
 }
 :-ms-input-placeholder {
-  .placeholder();
+  #scout.placeholder();
 }
 
 /* Hide IE decorations for text input fields: */
@@ -61,23 +61,23 @@ body {
   color: @text-disabled-color;
 
   &::-moz-selection {
-    .text-selection-disabled();
+    #scout.text-selection-disabled();
   }
   &::selection {
-    .text-selection-disabled();
+    #scout.text-selection-disabled();
   }
 
   &::-webkit-input-placeholder {
-    .placeholder-disabled();
+    #scout.placeholder-disabled();
   }
   &:-moz-placeholder { /* older versions of firefox */
-    .placeholder-disabled();
+    #scout.placeholder-disabled();
   }
   &::-moz-placeholder {
-    .placeholder-disabled();
+    #scout.placeholder-disabled();
   }
   &:-ms-input-placeholder {
-    .placeholder-disabled();
+    #scout.placeholder-disabled();
   }
 }
 
@@ -94,7 +94,7 @@ div {
 }
 
 input, textarea, button {
-  .font-text-normal;
+  #scout.font-text-normal();
 }
 
 input, textarea {
@@ -109,7 +109,7 @@ input, textarea {
   }
 
   &:focus {
-    .focus-border;
+    #scout.focus-border();
   }
 
   &.has-error {
@@ -118,7 +118,7 @@ input, textarea {
   }
 
   &.has-error:focus {
-    .glow(@error-glow-color);
+    #scout.glow(@error-glow-color);
   }
 }
 
@@ -179,7 +179,7 @@ button::-moz-focus-inner {
 /* Used to display errors from server when desktop is not available */
 .fatal-error {
   margin: 10px;
-  .user-select(text)
+  #scout.user-select(text)
 }
 
 .application-loading {
@@ -204,7 +204,7 @@ button::-moz-focus-inner {
     left: 50%;
     margin-left: -(@application-loading-size / 2);
     margin-top: -((@application-loading-size / 2) + 20px);
-    .animation(rotation 1.0s infinite linear);
+    #scout.animation(rotation 1.0s infinite linear);
   }
 }
 
@@ -218,6 +218,10 @@ a,
     outline-color: @applink-color;
     text-decoration: none;
   }
+}
+
+.font-icon {
+  #scout.font-icon();
 }
 
 /* --- z-index --- */

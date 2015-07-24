@@ -15,8 +15,8 @@
     margin-top: 10px;
 
     & > .nodes {
-      .vendor(column-count, 2);
-      .vendor(column-gap, 24px);
+      #scout.vendor(column-count, 2);
+      #scout.vendor(column-gap, 24px);
 
       & > .section {
         margin-bottom: 16px;
@@ -25,7 +25,7 @@
           margin-bottom: 0;
         }
 
-        .vendor(column-break-inside, avoid);
+        #scout.vendor(column-break-inside, avoid);
         break-inside: avoid-column;
         page-break-inside: avoid;
 

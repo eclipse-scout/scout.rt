@@ -7,7 +7,7 @@
   background-color: @tooltip-background-color;
   border: @tooltip-border;
   color: @tooltip-color;
-  .drop-shadow();
+  #scout.drop-shadow();
   max-width: 300px;
   white-space: normal;
 }
@@ -35,8 +35,8 @@
   height: @tooltip-arrow-size;
   background-color: @tooltip-background-color;
   border: @tooltip-border;
-  .transform(rotate(45deg));
-  .drop-shadow();
+  #scout.transform(rotate(45deg));
+  #scout.drop-shadow();
 }
 
 .tooltip-arrow.arrow-bottom {

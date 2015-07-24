@@ -1,7 +1,7 @@
 .file-chooser-field {
 
   & > input[type=text] {
-    .text-field-with-icon(@icon-file);
+    #scout.text-field-with-icon(@icon-file);
 
       ~ .icon {
         cursor: pointer;

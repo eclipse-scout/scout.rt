@@ -4,13 +4,13 @@
   &.down > .popup-head {
     padding-top: 3px;
     border-top-width: 1px;
-    .drop-shadow();
+    #scout.drop-shadow();
   }
 
   &.up > .popup-head {
     padding-bottom: 3px;
     border-bottom-width: 1px;
-    .drop-shadow(@y: -6px;);
+    #scout.drop-shadow(@y: -6px;);
   }
 
   &:focus {
@@ -31,7 +31,7 @@
 
   &.has-submenu::after {
     .sub-menu-icon;
-    .transform(rotate(180deg));
+    #scout.transform(rotate(180deg));
     padding-right: 10px;
     padding-left: 0;
     top: 5px;
@@ -68,7 +68,7 @@
   }
 
   &.down  {
-    .drop-shadow();
+    #scout.drop-shadow();
 
     .popup-head ~ & > .menu-item.context-menu-item-first {
       border-top: 1px solid transparent;
@@ -80,7 +80,7 @@
   }
 
   &.up {
-    .drop-shadow(@y: -6px;);
+    #scout.drop-shadow(@y: -6px;);
 
     .popup-head ~ & > .menu-item.context-menu-item-last {
       border-bottom: 1px solid transparent;

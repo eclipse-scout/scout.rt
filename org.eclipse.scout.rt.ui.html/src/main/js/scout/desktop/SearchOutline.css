@@ -4,16 +4,16 @@
   border-radius: 5px;
   margin: 3px 13px 8px 10px;
   background-color: @palette-gray-2;
-  width: calc(~"100%" - (13px + 10x));
+  width: calc(~'100%' - (13px + 10x));
 
   &:focus {
     border-color: @navigation-background-color;
-    .glow(@palette-white);
+    #scout.glow(@palette-white);
   }
 }
 
 & .search-status {
-  .overflow-ellipsis-nowrap;
+  #scout.overflow-ellipsis-nowrap();
   padding-right: 13px;
   margin-bottom: 7px;
   text-align: right;

@@ -45,9 +45,9 @@
 .header-item {
   position: relative;
   display: inline-block;
-  .font-text-normal(@bold);
+  #scout.font-text-normal(@bold);
   padding: @table-header-padding-y 6px @table-header-padding-y @table-header-padding-left;
-  .overflow-ellipsis-nowrap;
+  #scout.overflow-ellipsis-nowrap();
   /* Vertical align is necessary for 2 things:
     1. Alignment in case of multiline headers.
     2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */

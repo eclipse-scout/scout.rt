@@ -30,12 +30,12 @@
 }
 
 .group-box-title {
-  width: calc(~"100%" - @mandatory-indicator-width);
+  width: calc(~'100%' - @mandatory-indicator-width);
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
   border-bottom: 3px solid @border-color;
   padding: @group-title-padding-y 0;
-  .overflow-ellipsis-nowrap;
+  #scout.overflow-ellipsis-nowrap();
 
   .group-box.collapsed:not(.with-line) > & {
     border-bottom-color: transparent;
@@ -58,7 +58,7 @@
     text-align: center;
 
     &::before {
-      .font-icon;
+      #scout.font-icon();
       font-size: @group-box-control-size;
       content: @icon-angle-down;
 
@@ -77,12 +77,12 @@
     .group-box.collapsed > & {
       /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
       /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
-      .transform(rotate(-89.99deg));
+      #scout.transform(rotate(-89.99deg));
     }
   }
 
   & > span {
-    .font-text-normal(@bold);
+    #scout.font-text-normal(@bold);
     color: @title-color;
   }
 

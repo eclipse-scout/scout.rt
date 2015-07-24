@@ -2,7 +2,7 @@
 @planner-header-buttons: 30px;
 
 .planner-icon(@icon, @size) {
-  .font-icon;
+  #scout.font-icon();
   display: inline-block;
   position: relative;
   font-size: @size;
@@ -95,7 +95,7 @@
       border-top: 1px solid @border-color;
       border-bottom: 1px solid @border-color;
       border-left: 1px solid @border-color;
-      .overflow-ellipsis-nowrap;
+      #scout.overflow-ellipsis-nowrap();
 
       &.first {
         border-left: 1px solid @border-color;

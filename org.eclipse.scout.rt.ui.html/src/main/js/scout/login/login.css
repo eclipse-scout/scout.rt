@@ -4,7 +4,7 @@
   max-width: 420px;
   margin: 150px auto;
   padding: 40px 70px;
-  .drop-shadow();
+  #scout.drop-shadow();
 
   & > input,
   & > button {
@@ -32,7 +32,7 @@
   }
 
   &:focus::before {
-    .button-focus;
+    #scout.button-focus();
   }
 
   &.disabled {
@@ -49,13 +49,13 @@
     /* Also change color of focus glow */
     &:focus::before {
       border-color: @palette-red-4;
-      .glow(@palette-red-4);
+      #scout.glow(@palette-red-4);
     }
   }
 }
 
 #login-button-loading {
-  .animation(rotation 0.9s linear infinite);
+  #scout.animation(rotation 0.9s linear infinite);
   display: inline-block;
   border-radius: 50%;
   border: 2px solid rgba(0, 0, 0, 0);

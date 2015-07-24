@@ -3,7 +3,7 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  .drop-shadow-large();
+  #scout.drop-shadow-large();
   border-top: 5px solid @active-color;
   border-radius: @border-radius;
 
@@ -18,7 +18,7 @@
     & > .file-chooser-title {
       margin-right: 30px; /* Leave space for 'x' closable */
       word-wrap: break-word;
-      .font-text-large;
+      #scout.font-text-large();
       color: @active-color;
     }
 
@@ -35,7 +35,7 @@
     position: absolute;
     right: 5px;
     margin: 8px;
-    .font-icon;
+    #scout.font-icon();
     font-size: 17px;
     cursor: pointer;
     color: @icon-light-color;
@@ -56,11 +56,11 @@
   }
 
   &.shown {
-    .animation-name(fade-slidein-top);
-    .animation-duration(0.5s);
+    #scout.animation-name(fade-slidein-top);
+    #scout.animation-duration(0.5s);
   }
 
   &.modality-highlight {
-    .animation-shake();
+    #scout.animation-shake();
   }
 }

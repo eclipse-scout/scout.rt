@@ -12,17 +12,17 @@
   border-top: 5px solid @active-color;
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;
-  .drop-shadow-large();
+  #scout.drop-shadow-large();
   margin: 10px;
   top: 0px; /* must be specified otherwise dialogs will be positioned at end of document and increase document size */
 
   &.shown {
-    .animation(fadeIn ease-in 1);
-    .animation-duration(0.15s);
+    #scout.animation(fadeIn ease-in 1);
+    #scout.animation-duration(0.15s);
   }
 
   &.modality-highlight {
-    .animation-shake();
+    #scout.animation-shake();
   }
 
   & > .title-box {
@@ -31,14 +31,14 @@
     margin-right: 30px; /* Leave space for 'x' closable */
 
     & > .title {
-      .overflow-ellipsis-nowrap;
-      .font-text-large;
+      #scout.overflow-ellipsis-nowrap();
+      #scout.font-text-large();
       color: @active-color;
     }
 
     & > .sub-title {
-      .overflow-ellipsis-nowrap;
-      .font-text-normal;
+      #scout.overflow-ellipsis-nowrap();
+      #scout.font-text-normal();
       color: @active-color;
     }
   }
@@ -47,7 +47,7 @@
     position: absolute;
     right: 5px;
     margin: 8px;
-    .font-icon;
+    #scout.font-icon();
     font-size: 17px;
     cursor: pointer;
     color: @icon-light-color;

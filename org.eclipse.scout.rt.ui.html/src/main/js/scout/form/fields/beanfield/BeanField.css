@@ -1,4 +1,4 @@
 .bean-field > .field {
   margin-left: @mandatory-indicator-width;
-  .user-select(text);
+  #scout.user-select(text);
 }

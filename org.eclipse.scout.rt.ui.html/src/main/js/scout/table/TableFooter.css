@@ -109,7 +109,7 @@
   color: @table-info-color;
   cursor: pointer;
   line-height: 19px;
-  .overflow-nowrap;
+  #scout.overflow-nowrap();
 
   &::before {
     content: '';

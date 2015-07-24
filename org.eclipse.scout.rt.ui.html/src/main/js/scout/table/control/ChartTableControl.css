@@ -92,7 +92,7 @@ svg.select-chart.selected {
   line-height: 30px;
   width: 100%;
   cursor: pointer;
-  .overflow-ellipsis;
+  #scout.overflow-ellipsis();
   border-top: 1px solid @border-color;
   border-left: 1px solid @border-color;
   border-right: 1px solid @border-color;
@@ -136,7 +136,7 @@ svg.select-chart.selected {
     line-height: 16px;
     right: 9px;
     top: 6px;
-    .font-icon;
+    #scout.font-icon();
   }
 
   &.axis-ver.selected::before {

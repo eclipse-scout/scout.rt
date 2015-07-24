@@ -11,7 +11,7 @@
   white-space: nowrap;
 
   &::before {
-    content: " ";
+    content: '';
     display: inline-block;
     width: 19px;
     height: 19px;
@@ -24,7 +24,7 @@
   }
 
   &.checked::after {
-    content: "";
+    content: '';
     display: inline-block;
     position: absolute;
     left: 6px;

@@ -102,11 +102,11 @@
     padding-right: @wizard-progress-content-h-padding;
 
     & > .wizard-step-title {
-      .overflow-ellipsis-nowrap;
+      #scout.overflow-ellipsis-nowrap();
       font-weight: bold;
     }
     & > .wizard-step-sub-title {
-      .overflow-ellipsis-nowrap;
+      #scout.overflow-ellipsis-nowrap();
     }
   }
   &:first-child > .wizard-step-content {

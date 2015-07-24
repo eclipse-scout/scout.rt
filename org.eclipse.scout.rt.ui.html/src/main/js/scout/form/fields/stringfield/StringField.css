@@ -20,7 +20,7 @@
 
   &.has-action {
     & > input[type=text] {
-      .text-field-with-icon(@icon-arrow-right);
+      #scout.text-field-with-icon(@icon-arrow-right);
 
       ~ .icon {
         cursor: pointer;

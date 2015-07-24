@@ -14,14 +14,14 @@
   position: relative;
   width: 100%;
   padding-top: 11px;
-  height: calc(~"100%" - @view-buttons-height);
+  height: calc(~'100%' - @view-buttons-height);
 }
 
 .view-buttons {
   width: 100%;
   height: @view-buttons-height;
   white-space: nowrap;
-  .font-text-large;
+  #scout.font-text-large();
   overflow: hidden;
 }
 
@@ -52,12 +52,12 @@
     & > .view-button-tab-title {
       display: inline-block;
        /* subtract icon-width and gap */
-      width: calc(~"100%" - 20px);
+      width: calc(~'100%' - 20px);
       margin-left: 8px;
 
       &.has-menu {
         /* subtract icon-width and gap and menu-button width and gap */
-        width: calc(~"100%" - 48px);
+        width: calc(~'100%' - 48px);
       }
     }
 
@@ -80,8 +80,8 @@
 .view-button-tab-title {
   display: none;
   vertical-align: text-bottom;
-  .font-text-large;
-  .overflow-ellipsis-nowrap;
+  #scout.font-text-large();
+  #scout.overflow-ellipsis-nowrap();
 }
 
 .view-menu-button {
@@ -89,7 +89,7 @@
   margin-left: 8px;
 
   &::before {
-    .font-icon;
+    #scout.font-icon();
     font-size: 17px;
     content: @icon-angle-down;
   }

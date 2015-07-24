@@ -86,7 +86,7 @@
   display: table-cell;
   padding: @table-row-padding-y @table-cell-padding-right @table-row-padding-y @table-cell-padding-left;
   position: relative;
-  .overflow-ellipsis;
+  #scout.overflow-ellipsis();
   vertical-align: top; /* for multiline text */
 
   .table-row-sum > & {
@@ -96,7 +96,7 @@
   & > .width-fix {
     /* Some browsers (e.g. IE9) need an additional <div> with display:inline-block below the table-cell */
     display: inline-block;
-    .overflow-ellipsis;
+    #scout.overflow-ellipsis();
     /* An additional max-width: must be added in browser. */
   }
 
@@ -114,7 +114,7 @@
     content: '';
     top: 0;
     left: 0;
-    .triangle-top-left(5px, @border-color);
+    #scout.triangle-top-left(5px, @border-color);
   }
 
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.mandatory::before {
@@ -127,7 +127,7 @@
   }
 
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable.has-error::before {
-    .triangle-top-left-color(@error-color);
+    #scout.triangle-top-left-color(@error-color);
   }
 
   .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.mandatory.has-error::before {
@@ -146,18 +146,18 @@
   }
 
   & > .check-box::before {
-    content: "";
+    content: '';
     display: inline-block;
     width: @check-box-size;
     height: @check-box-size;
-    .checkboxLabelBeforeBorder;
+    #scout.checkbox-label-before-border();
   }
   & > .check-box.checked::before {
-    .checkboxLabelBeforeChecked;
+    #scout.checkbox-label-before-checked();
   }
   & > .check-box.disabled::before,
   .table.disabled > .table-data > .table-row > & > .check-box::before {
-    .checkboxLabelBeforeDisabled;
+    #scout.checkbox-label-before-disabled();
   }
 }
 
@@ -184,7 +184,7 @@
 /* key box */
 
 .table-row > .key-box {
-  top: calc(~"50%" - 17px/2);
+  top: calc(~'50%' - 17px/2);
 }
 
 .control-group>.control>.key-box {
@@ -192,6 +192,5 @@
 }
 
 .table .key-box.char {
-  top: calc(~"50%" - 17px/2);
+  top: calc(~'50%' - 17px/2);
 }
-

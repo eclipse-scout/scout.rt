@@ -6,7 +6,7 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  .drop-shadow-large();
+  #scout.drop-shadow-large();
   border-top: 5px solid @active-color;
   border-radius: @border-radius;
 
@@ -21,12 +21,12 @@
   }
 
   &.shown {
-    .animation-name(fade-slidein-top);
-    .animation-duration(0.5s);
+    #scout.animation-name(fade-slidein-top);
+    #scout.animation-duration(0.5s);
   }
 
   &.modality-highlight {
-    .animation-shake();
+    #scout.animation-shake();
   }
 }
 
@@ -54,7 +54,7 @@
     background-color: @palette-gray-2;
     border: 1px solid @color-messagebox-border;
     cursor: pointer;
-    .overflow-ellipsis-nowrap;
+    #scout.overflow-ellipsis-nowrap();
   }
 
   & > button:active {
@@ -78,8 +78,8 @@
   }
 
   & > button:focus::before {
-    .focus-border;
-    .overlay(2px, 2px, -4px, -4px);
+    #scout.focus-border();
+    #scout.overlay(2px, 2px, -4px, -4px);
     z-index: 1;
   }
 
@@ -93,6 +93,6 @@
 
   .severity-error & > button:focus::before {
     border-color: @error-border-color;
-    .glow(@error-glow-color);
+    #scout.glow(@error-glow-color);
   }
 }

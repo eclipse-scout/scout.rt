@@ -35,7 +35,7 @@
 .tree-node {
   display: block;
   position: relative;
-  .overflow-ellipsis-nowrap;
+  #scout.overflow-ellipsis-nowrap();
   border: 1px solid transparent;
   border-left: 0px solid transparent;
   border-right: 0px solid transparent;
@@ -80,32 +80,32 @@
   }
 
   & div::before {
-    .checkboxLabelBefore();
+    #scout.checkbox-label-before();
     margin-top: -12px;
   }
 
   & div.disabled:hover::before {
-    .checkboxLabelBeforeDisabledBorder;
+    #scout.checkbox-label-before-disabled-border();
   }
 
   & div.checked::before {
-    .checkboxLabelBeforeChecked;
+    #scout.checkbox-label-before-checked();
   }
 
   & div::before {
-    .checkboxLabelBeforeBorder;
+    #scout.checkbox-label-before-border();
   }
 
   & div.childrenChecked::before {
-    .checkboxLabelBeforeChildChecked;
+    #scout.checkbox-label-before-child-checked();
   }
 
   & div.disabled::before {
-    .checkboxLabelBeforeDisabled;
+    #scout.checkbox-label-before-disabled();
   }
 
   & div.disabled {
-    .checkboxLabelDisabled;
+    #scout.checkbox-label-disabled();
   }
 }
 
@@ -128,7 +128,7 @@
   text-align: center;
 
   &::before {
-    .font-icon;
+    #scout.font-icon();
     font-size: @tree-node-control-size;
     content: @icon-angle-right;
     color: @border-color;
@@ -138,7 +138,7 @@
     }
 
     .tree-node.show-all > & {
-      .font-text-normal;
+      #scout.font-text-normal();
       content: '+';
     }
 
@@ -150,7 +150,7 @@
   .tree-node.expanded > & {
     /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
     /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
-    .transform(rotate(89.99deg));
+    #scout.transform(rotate(89.99deg));
   }
 
   &.checkable {
@@ -161,5 +161,5 @@
 /* key handling */
 
 .tree-node .key-box {
-  top: calc(~"50%" - 8px);
+  top: calc(~'50%' - 8px);
 }

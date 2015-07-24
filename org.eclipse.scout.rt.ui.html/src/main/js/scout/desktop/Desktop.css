@@ -148,7 +148,7 @@
     cursor: pointer;
 
     &::before {
-      .font-icon;
+      #scout.font-icon();
       color: @icon-color;
       content: @icon-chevron-right;
     }
@@ -207,20 +207,20 @@
   }
 
   & > .title {
-    .overflow-ellipsis-nowrap;
-    .font-text-large;
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-large();
   }
 
   & > .sub-title {
-    .overflow-ellipsis-nowrap;
-    .font-text-normal;
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-normal();
   }
 
   &.has-submenu::after {
     display: inline-block;
     position: relative;
     left: 0px;
-    .font-icon;
+    #scout.font-icon();
     line-height: 17px;
     font-size: 17px;
     padding-left: 10px;
@@ -244,7 +244,7 @@
   padding: 16px 20px 0 20px;
   cursor: pointer;
   color: @text-color;
-  .font-text-plus;
+  #scout.font-text-plus();
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
@@ -262,9 +262,7 @@
     padding-right: 4px;
   }
 
-  /* FIXME BSH Only specifing "& > .font-icon" overrides the mixin .font-icon for this "&"! &.has-submenu::after is missing the icon... */
-  /* --> Check why this happens and if it is dangerous. Maybe rename the mixin! */
-  & > .icon.font-icon {
+  & > .font-icon {
     color: @icon-color;
     font-size: 17px;
     padding-right: @taskbar-menu-textandicon-padding-right;
@@ -292,7 +290,7 @@
     display: inline-block;
     position: relative;
     left: 0px;
-    .font-icon;
+    #scout.font-icon();
     line-height: 17px;
     font-size: 17px;
     padding-left: 10px;
@@ -385,7 +383,7 @@
   border-left: 3px solid @active-color;
   background-color: @palette-white;
   margin-bottom: 20px;
-  .drop-shadow();
+  #scout.drop-shadow();
 
   &.error {
     border-left-color: @palette-red-3;
@@ -401,7 +399,7 @@
   padding: 10px;
 
   & > .reconnect-animated::after {
-    .animation(rotation 0.9s linear infinite);
+    #scout.animation(rotation 0.9s linear infinite);
     content: '';
     display: inline-block;
     vertical-align: middle;
@@ -423,21 +421,21 @@
   left: 0;
   bottom: 0;
   right: 0;
-  .animation(fadeIn ease-in 1);
-  .animation-duration(0.25s);
+  #scout.animation(fadeIn ease-in 1);
+  #scout.animation-duration(0.25s);
   outline: none;
   z-index: 100;
 
   &.busy {
     /* Make glasspane transparent and disable animation */
     background-color: transparent;
-    .animation(none);
+    #scout.animation(none);
     cursor: wait;
 
     &.dark {
       background-color: rgba(0, 0, 0, 0.1);
-      .animation(fadeIn ease-in 1);
-      .animation-duration(0.25s);
+      #scout.animation(fadeIn ease-in 1);
+      #scout.animation-duration(0.25s);
     }
   }
 }

@@ -5,6 +5,6 @@
   overflow: hidden; /* necessary due to rounded borders and background color*/
 
   &:focus {
-    .focus-border;
+    #scout.focus-border();
   }
 }

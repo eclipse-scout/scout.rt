@@ -22,7 +22,7 @@
 
   & > .tree-node,
   & > .animationWrapper > .tree-node {
-    .font-text-plus;
+    #scout.font-text-plus();
     cursor: pointer;
     border: 0;
 
@@ -33,7 +33,7 @@
     padding-bottom: 8px;
 
     &.parent {
-      .font-text-plus(@bold);
+      #scout.font-text-plus(@bold);
     }
 
     &.group {
@@ -92,7 +92,7 @@
     &.parent,
     &.children,
     &.selected {
-      .font-text-plus;
+      #scout.font-text-plus();
       display: block;
       background-color: @outline-group-background-color;
     }

@@ -22,39 +22,41 @@ Try these to switch between fonts:
 }
 
 /* Font Mixins */
+#scout {
 
-.font-text-small {
-  font-family: @defaultFont;
-  font-weight: normal;
-  font-size: 11px;
-}
+  .font-text-small() {
+    font-family: @defaultFont;
+    font-weight: normal;
+    font-size: 11px;
+  }
 
-.font-text-normal(@fontWeight:@normal) {
-  font-family: @defaultFont;
-  font-weight: @fontWeight;
-  font-size: 13px;
-}
+  .font-text-normal(@fontWeight:@normal) {
+    font-family: @defaultFont;
+    font-weight: @fontWeight;
+    font-size: 13px;
+  }
 
-.font-text-plus(@fontWeight:@normal) {
-  font-family: @defaultFont;
-  font-weight: @fontWeight;
-  font-size: 14px;
-}
+  .font-text-plus(@fontWeight:@normal) {
+    font-family: @defaultFont;
+    font-weight: @fontWeight;
+    font-size: 14px;
+  }
 
-.font-text-large {
-  font-family: @defaultFont;
-  font-weight: normal;
-  font-size: 16px;
-}
+  .font-text-large() {
+    font-family: @defaultFont;
+    font-weight: normal;
+    font-size: 16px;
+  }
 
-.font-icon {
-  font-family: scoutIcons, @defaultFont;
-  speak: none;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  .font-icon {
+    font-family: scoutIcons, @defaultFont;
+    speak: none;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-.make-bold {
-  font-weight: bold;
+  .make-bold {
+    font-weight: bold;
+  }
 }

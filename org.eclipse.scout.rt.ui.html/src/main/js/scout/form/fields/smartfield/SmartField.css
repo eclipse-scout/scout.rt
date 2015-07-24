@@ -1,14 +1,14 @@
 .proposal-field {
 
   & input {
-    .text-field-with-icon(@icon-pencil);
+    #scout.text-field-with-icon(@icon-pencil);
   }
 }
 
 .smart-field {
 
   & input {
-    .text-field-with-icon(@icon-search);
+    #scout.text-field-with-icon(@icon-search);
   }
 
   /* Multiline SmartField */
@@ -33,8 +33,8 @@
     border-bottom-left-radius: @border-radius;
     border-top: none;
     padding: 3px 10px;
-    .overflow-ellipsis-nowrap;
-    .user-select(text);
+    #scout.overflow-ellipsis-nowrap();
+    #scout.user-select(text);
 
     .disabled & {
       background-color: @control-disabled-background-color;
@@ -54,8 +54,8 @@
   overflow: hidden;
   margin-top: 5px;
   background-color: white;
-  .drop-shadow();
-  .focus-border;
+  #scout.drop-shadow();
+  #scout.focus-border();
 
   &.down {
     margin-top: 5px;
@@ -114,11 +114,11 @@
 
 .animate-dot {
   position: relative;
-  .animation-name(animateDot);
-  .animation-duration(1650ms);
-  .animation-iteration-count(infinite);
+  #scout.animation-name(animateDot);
+  #scout.animation-duration(1650ms);
+  #scout.animation-iteration-count(infinite);
 }
 
-.delay-0 { .animation-delay(0ms); }
-.delay-1 { .animation-delay(200ms); }
-.delay-2 { .animation-delay(400ms); }
+.delay-0 { #scout.animation-delay(0ms); }
+.delay-1 { #scout.animation-delay(200ms); }
+.delay-2 { #scout.animation-delay(400ms); }

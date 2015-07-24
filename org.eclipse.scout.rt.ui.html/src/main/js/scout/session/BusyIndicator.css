@@ -7,7 +7,7 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  .drop-shadow-large();
+  #scout.drop-shadow-large();
   border-top: 5px solid @color-busyindicator-active;
   border-radius: @border-radius;
 
@@ -22,12 +22,12 @@
   }
 
   &.shown {
-    .animation-name(fadeIn);
-    .animation-duration(0.5s);
+    #scout.animation-name(fadeIn);
+    #scout.animation-duration(0.5s);
   }
 
   &.modality-highlight {
-    .animation-shake();
+    #scout.animation-shake();
   }
 }
 
@@ -63,14 +63,14 @@
     border-top-color: @color-busyindicator-active;
     border-left-color: @color-busyindicator-active;
     border-right-color: @color-busyindicator-active;
-    .animation(rotation 1.1s linear infinite);
+    #scout.animation(rotation 1.1s linear infinite);
   }
 
   &.cancelled::before {
     border-top-color: transparent;
     border-left-color: @color-busyindicator-active;
     border-right-color: @color-busyindicator-active;
-    .animation(rotation-reverse 2.0s linear infinite);
+    #scout.animation(rotation-reverse 2.0s linear infinite);
   }
 }
 
@@ -82,7 +82,7 @@
     background-color: @palette-gray-2;
     border: 1px solid @color-busyindicator-border;
     cursor: pointer;
-    .overflow-ellipsis-nowrap;
+    #scout.overflow-ellipsis-nowrap();
   }
 
   & > button:active {
@@ -106,8 +106,8 @@
   }
 
   & > button:focus::before {
-    .focus-border;
-    .overlay(2px, 2px, -4px, -4px);
+    #scout.focus-border();
+    #scout.overlay(2px, 2px, -4px, -4px);
     z-index: 1;
   }
 
