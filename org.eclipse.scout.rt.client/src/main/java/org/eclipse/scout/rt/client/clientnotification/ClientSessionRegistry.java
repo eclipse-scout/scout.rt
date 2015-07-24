@@ -207,6 +207,9 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
   @Override
   public void sessionChanged(SessionEvent event) {
+    if (!BEANS.get(IServiceTunnel.class).isActive()) {
+      return;
+    }
     switch (event.getType()) {
       case SessionEvent.TYPE_STARTED:
         sessionStarted((IClientSession) event.getSource());
