@@ -195,6 +195,7 @@ scout.codesToKeys = {
 
 scout.keyStrokeBox = {
   gap: 4,
+
   drawSingleKeyBoxItem: function(offset, keyBoxText, $container, ctrl, alt, shift, alignementRight) {
     var $existingKeyBoxes = $('.key-box', $container);
 
@@ -248,6 +249,7 @@ scout.keyStrokeBox = {
     }
     return false;
   },
+
   /**
    * check if key stroke is already drawn. if its already drawn it returns true. if not add it and return false
    */

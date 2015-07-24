@@ -3,7 +3,6 @@ scout.DateFieldKeyStrokeAdapter = function(field) {
 };
 scout.inherits(scout.DateFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
-
 scout.DateFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
     //add swallowed keys to drawed keys;
     var i = 0;

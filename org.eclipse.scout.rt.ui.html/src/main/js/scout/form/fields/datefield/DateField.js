@@ -289,7 +289,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     if (this._datePickerPopup.isOpen() || this._$predictDateField) {
       // Close the picker and accept the current prediction (if available)
       this._closeDatePicker();
-      this._acceptDatePrediction();
+      this._acceptDateTimePrediction(true, false); // accept date part
       $.suppressEvent(event);
     }
     return;
@@ -428,7 +428,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     if (this._$predictTimeField) {
       // Accept the current prediction (if available)
       this._tempTimeDate = null;
-      this._acceptTimePrediction();
+      this._acceptDateTimePrediction(false, true); // accept time part
       $.suppressEvent(event);
     }
     return;
@@ -568,13 +568,7 @@ scout.DateField.prototype.updateDisplayText = function(date) {
  * @override ValueField.js
  */
 scout.DateField.prototype.acceptInput = function(whileTyping) {
-  if (this.hasDate && this.hasTime) {
-    this._acceptDateTimePrediction();
-  } else if (this.hasDate) {
-    this._acceptDatePrediction();
-  } else if (this.hasTime) {
-    this._acceptTimePrediction();
-  }
+  this._acceptDateTimePrediction(this.dateDate, this.hasTime);
 };
 
 /**
@@ -635,14 +629,32 @@ scout.DateField.prototype._closeDatePicker = function() {
   }
 };
 
-scout.DateField.prototype._acceptDatePrediction = function() {
-  var text = (this._$predictDateField ? this._$predictDateField.val() : this.$dateField.val());
+scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, acceptTime) {
+  var dateText, timeText, datePrediction, timePrediction;
+
+  var success = true;
+  if (acceptDate) {
+    dateText = (this._$predictDateField ? this._$predictDateField.val() : this.$dateField.val());
+    datePrediction = this._predictDate(dateText); // this also updates the errorStatus
+    if (!datePrediction) {
+      success = false;
+    }
+  }
+  if (acceptTime) {
+    timeText = (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
+    timePrediction = this._predictTime(timeText); // this also updates the errorStatus
+    if (!timePrediction) {
+      success = false;
+    }
+  }
   this._removePredictionFields();
 
-  var datePrediction = this._predictDate(text);
-  if (datePrediction) {
+  if (success) {
     // parse success -> send new timestamp to server
-    this.updateTimestamp(this._newTimestampAsDate(datePrediction.date, null));
+    var newTimestamp = this._newTimestampAsDate(
+        (datePrediction ? datePrediction.date : null),
+        (timePrediction ? timePrediction.date : null));
+    this.updateTimestamp(newTimestamp);
     this.updateDisplayText();
   } else {
     // parse error -> send error to server
@@ -650,38 +662,9 @@ scout.DateField.prototype._acceptDatePrediction = function() {
   }
 };
 
-scout.DateField.prototype._acceptTimePrediction = function() {
-  var text = (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
-  this._removePredictionFields();
-
-  var timePrediction = this._predictTime(text);
-  if (timePrediction) {
-    // parse success -> send new timestamp to server
-    this.updateTimestamp(this._newTimestampAsDate(null, timePrediction.date));
-    this.updateDisplayText();
-  } else {
-    // parse error -> send error to server
-    this._syncToServer();
-  }
-};
-
-scout.DateField.prototype._acceptDateTimePrediction = function() {
-  var dateText = (this._$predictDateField ? this._$predictDateField.val() : this.$dateField.val());
-  var timeText = (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
-  this._removePredictionFields();
-
-  var datePrediction = this._predictDate(dateText);
-  var timePrediction = this._predictTime(timeText);
-  if (datePrediction && timePrediction) {
-    // parse success -> send new timestamp to server
-    this.updateTimestamp(this._newTimestampAsDate(datePrediction.date, timePrediction.date));
-    this.updateDisplayText();
-  } else {
-    // parse error -> send error to server
-    this._syncToServer();
-  }
-};
-
+/**
+ * @returns null if input is invalid, otherwise an object with properties 'date' and 'text'
+ */
 scout.DateField.prototype._predictDate = function(inputText) {
   inputText = inputText || '';
 
@@ -730,6 +713,9 @@ scout.DateField.prototype._predictDate = function(inputText) {
   };
 };
 
+/**
+ * @returns null if input is invalid, otherwise an object with properties 'date' and 'text'
+ */
 scout.DateField.prototype._predictTime = function(inputText) {
   inputText = inputText || '';
 
