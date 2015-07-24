@@ -165,7 +165,6 @@ __include("scout/form/fields/FormFieldKeyStrokeAdapter.js");
 __include("scout/form/fields/FormFieldLayout.js");
 __include("scout/form/fields/CompositeField.js");
 __include("scout/form/fields/ValueField.js");
-__include("scout/form/fields/TextFieldLayout.js");
 __include("scout/form/FormController.js");
 // Basics for message boxes
 __include("scout/messagebox/MessageBox.js");
