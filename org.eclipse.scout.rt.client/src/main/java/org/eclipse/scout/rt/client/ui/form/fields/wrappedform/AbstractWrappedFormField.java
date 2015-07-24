@@ -183,7 +183,8 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     m_innerForm.setShowOnStart(false);
     m_innerForm.setWrapperFieldInternal(this);
     m_innerForm.getRootGroupBox().setBorderVisible(false);
-    m_innerForm.getRootGroupBox().setScrollable(false);
+    // TODO DWI Only override if different from preferred value
+    //m_innerForm.getRootGroupBox().setScrollable(false);
     m_innerForm.getRootGroupBox().updateKeyStrokes();
     m_innerForm.addPropertyChangeListener(m_innerFormPropertyListener);
     m_innerForm.getRootGroupBox().addSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
