@@ -568,7 +568,7 @@ scout.DateField.prototype.updateDisplayText = function(date) {
  * @override ValueField.js
  */
 scout.DateField.prototype.acceptInput = function(whileTyping) {
-  this._acceptDateTimePrediction(this.dateDate, this.hasTime);
+  this._acceptDateTimePrediction(this.hasDate, this.hasTime);
 };
 
 /**
