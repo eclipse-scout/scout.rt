@@ -222,7 +222,7 @@
   };
 
   $.fn.select = function(selected) {
-    return this.toggleClass('selected', !!selected);
+    return this.toggleClass('selected', !! selected);
   };
 
   $.fn.isSelected = function() {
@@ -281,10 +281,12 @@
           .attr('src', icon.iconUrl)
           .addClass('icon');
       }
-    } else if ($icon) {
-      $icon.remove();
+    } else {
+      removeIconElement.call(this, $icon);
     }
     return this;
+
+    // ----- Helper functions -----
 
     function getOrCreateIconElement($icon, newElement) {
       if (!$icon) {
@@ -293,6 +295,13 @@
         this.prepend($icon);
       }
       return $icon;
+    }
+
+    function removeIconElement($icon) {
+      if ($icon) {
+        $icon.remove();
+      }
+      this.removeData('$icon');
     }
   };
 
@@ -760,14 +769,14 @@
     defaultCursorStyle = defaultCursorStyle || 'default';
     var cursor1 = (wait ? defaultCursorStyle : 'wait');
     var cursor2 = (wait ? 'wait' : defaultCursorStyle);
-    
+
     this.css('cursor', cursor1);
     setTimeout(function() {
       this.css('cursor', cursor2);
     }.bind(this));
     return this;
   };
-  
+
   $.fn.backupSelection = function() {
     var field = this[0];
     if (field && field === document.activeElement) {

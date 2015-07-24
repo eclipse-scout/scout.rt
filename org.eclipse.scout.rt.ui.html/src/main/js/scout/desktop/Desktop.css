@@ -206,6 +206,12 @@
     }
   }
 
+  & > .icon {
+    float: right;
+    height: 100%;
+    margin-left: 5px;
+  }
+
   & > .title {
     #scout.overflow-ellipsis-nowrap();
     #scout.font-text-large();

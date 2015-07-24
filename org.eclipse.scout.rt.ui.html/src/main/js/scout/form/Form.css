@@ -34,6 +34,14 @@
       #scout.overflow-ellipsis-nowrap();
       #scout.font-text-large();
       color: @active-color;
+
+      & > .icon {
+        margin-right: 5px;
+
+        &.font-icon {
+          font-size: 14px;
+        }
+      }
     }
 
     & > .sub-title {

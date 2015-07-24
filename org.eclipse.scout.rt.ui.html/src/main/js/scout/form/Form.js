@@ -105,7 +105,9 @@ scout.Form.prototype._updateDialogTitle = function() {
     var $titles = getOrAppendChildDiv(this.$container, 'title-box');
     // Render title
     if (this.title) {
-      getOrAppendChildDiv($titles, 'title').text(this.title);
+      getOrAppendChildDiv($titles, 'title')
+        .text(this.title)
+        .icon(this.iconId);
     } else {
       removeChildDiv($titles, 'title');
     }
@@ -118,6 +120,7 @@ scout.Form.prototype._updateDialogTitle = function() {
   } else {
     removeChildDiv(this.$container, 'title-box');
   }
+
   // Layout could have been changed, e.g. if subtitle becomes visible
   this.invalidateLayoutTree();
 
@@ -193,7 +196,9 @@ scout.Form.prototype._renderSubTitle = function() {
 };
 
 scout.Form.prototype._renderIconId = function() {
-  // TODO render icon
+  if (this.isDialog()) {
+    this._updateDialogTitle();
+  }
 };
 
 scout.Form.prototype._onFormClosed = function(event) {

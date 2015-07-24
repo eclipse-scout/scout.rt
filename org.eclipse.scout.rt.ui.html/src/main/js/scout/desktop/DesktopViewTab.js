@@ -4,14 +4,15 @@ scout.DesktopViewTab = function(view, $bench) {
   this._view = view;
   this._$bench = $bench;
 
-  /**
-   * Container for the _Tab_ (not for the view).
-   */
+  // Container for the _Tab_ (not for the view).
   this.$container;
 
   this._propertyChangeListener = function(event) {
-    if (scout.arrays.containsAny(event.changedProperties, ['title', 'subTitle'])) {
+    if (scout.arrays.containsAny(event.changedProperties, ['title', 'subTitle', 'iconId'])) {
       this._titlesUpdated();
+    }
+    if (scout.arrays.containsAny(event.changedProperties, ['cssClass'])) {
+      this._cssClassUpdated(event.newProperties.cssClass, event.oldProperties.cssClass);
     }
   }.bind(this);
 
@@ -39,8 +40,10 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 scout.DesktopViewTab.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-view-tab')
     .on('mousedown', this._onMouseDown.bind(this));
-  this._$title = this.$container.appendDiv('title').text(this._view.title);
-  this._$subTitle = this.$container.appendDiv('sub-title').text(this._view.subTitle);
+  this._$title = this.$container.appendDiv('title');
+  this._$subTitle = this.$container.appendDiv('sub-title');
+  this._titlesUpdated();
+  this._cssClassUpdated(this._view.cssClass, null);
 };
 
 scout.DesktopViewTab.prototype._renderView = function($parent) {
@@ -84,8 +87,14 @@ scout.DesktopViewTab.prototype._titlesUpdated = function() {
     return;
   }
 
+  // Titles
   setTitle(this._$title, this._view.title);
   setTitle(this._$subTitle, this._view.subTitle);
+
+  // Icon
+  this.$container.icon(this._view.iconId);
+
+  // ----- Helper functions -----
 
   function setTitle($titleElement, title) {
     if (title) {
@@ -94,6 +103,14 @@ scout.DesktopViewTab.prototype._titlesUpdated = function() {
       $titleElement.setVisible(false);
     }
   }
+};
+
+scout.DesktopViewTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
 };
 
 /**
