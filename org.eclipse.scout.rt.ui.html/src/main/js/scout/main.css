@@ -224,6 +224,10 @@ a,
   #scout.font-icon();
 }
 
+.white-space-nowrap {
+  #scout.white-space-nowrap();
+}
+
 /* --- z-index --- */
 /* Rule: All child elements of .scout get the same z-index 0 assigned. This spawns a new stacking context for each */
 /* of these elements (iff they are "positioned"). To bring a new element to the top, add it to the end of the list. */
