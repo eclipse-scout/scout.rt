@@ -12,12 +12,14 @@ package org.eclipse.scout.commons.resource;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.zip.Adler32;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
@@ -80,6 +82,15 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
+   * Convenience constructor which assumes <code>filename = empty, lastModified = -1</code>.
+   *
+   * @see #BinaryResource(String, String, byte[], long)
+   */
+  public BinaryResource(MimeTypes contentType, byte[] content) {
+    this(null, contentType != null ? contentType.getType() : null, content, -1);
+  }
+
+  /**
    * Convenience constructor which assumes <code>lastModified = -1</code>.
    *
    * @see #BinaryResource(String, String, byte[], long)
@@ -108,6 +119,13 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
+   * Checks if the filename is not empty and has text.
+   */
+  public boolean hasFilename() {
+    return StringUtility.hasText(getFilename());
+  }
+
+  /**
    * @return the filename, as passed to the constructor. Should not be <code>null</code> (but could).
    */
   public String getFilename() {
@@ -127,6 +145,13 @@ public final class BinaryResource implements Serializable {
    */
   public byte[] getContent() {
     return m_content;
+  }
+
+  /**
+   * @return the {@link String} content (expecting character set UTF-8) for this resource
+   */
+  public String getContentAsString() {
+    return new String(m_content, Charset.forName("UTF-8"));
   }
 
   /**

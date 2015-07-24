@@ -46,7 +46,7 @@ public final class FileUtility {
   }
 
   /**
-   * Static extension to mimetype mapper
+   * Static extension to mimetype mapper (and reverse)
    */
   private static final Map<String, String> EXT_TO_MIME_TYPE_MAP;
 

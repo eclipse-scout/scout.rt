@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.clipboard;
 
+import java.util.Collection;
+
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.dnd.TransferObjectRequest;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.commons.resource.MimeTypes;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -34,15 +37,15 @@ public interface IClipboardService extends IService {
   void setContents(TransferObject transferObject) throws ProcessingException;
 
   /**
-   * Reads the requested contents of the clipboard and invokes the call back clipboard
-   * consumer. The optional requests var arg parameter conditions the parameters of the
-   * call back method {@link IClipboardConsumer#consume(TransferObject...)}.
+   * Reads the requested contents of the clipboard and returns them as {@link Collection} of {@link BinaryResource}.
+   * Empty collection is returned if user cancels this request.
+   * The optional requests var arg parameter conditions the content types of the {@link BinaryResource} which are
+   * returned, see {@link BinaryResource#getContentType()}.
    *
-   * @param clipboardConsumer
-   * @param requests
+   * @param allowedMimeTypes
    * @throws ProcessingException
    */
-  void consumeContents(IClipboardConsumer clipboardConsumer, TransferObjectRequest... requests) throws ProcessingException;
+  Collection<BinaryResource> getClipboardContents(MimeTypes... allowedMimeTypes) throws ProcessingException;
 
   /**
    * Convenience method for putting the given string into the system clipboard.See {@link #setContents(TransferObject)}
@@ -52,4 +55,5 @@ public interface IClipboardService extends IService {
    * @throws ProcessingException
    */
   void setTextContents(String textContents) throws ProcessingException;
+
 }

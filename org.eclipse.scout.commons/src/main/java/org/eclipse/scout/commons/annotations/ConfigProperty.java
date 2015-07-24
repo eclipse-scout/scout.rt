@@ -98,6 +98,10 @@ public @interface ConfigProperty {
    */
   String FILE_EXTENSIONS = "FILE_EXTENSIONS";
   /**
+   * List<String>
+   */
+  String MIME_TYPES = "MIME_TYPES";
+  /**
    * int
    */
   String FORM_DISPLAY_HINT = "FORM_DISPLAY_HINT";
