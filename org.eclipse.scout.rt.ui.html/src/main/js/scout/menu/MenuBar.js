@@ -204,7 +204,7 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
     }
   }
   // Assign the class to the found item
-  if (lastMenuItem) {
+  if (lastMenuItem && lastMenuItem.rendered) {
     lastMenuItem.$container.addClass('last');
   }
 };
