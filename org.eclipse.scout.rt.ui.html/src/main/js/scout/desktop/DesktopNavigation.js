@@ -60,8 +60,29 @@ scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
 
 scout.DesktopNavigation.prototype._onViewButtonPropertyChange = function(event) {
   if (event.changedProperties.indexOf('selected') !== -1) {
-    this.htmlViewButtons.revalidateLayout();
+    // this check here is required because there are multiple property change
+    // events while the outline changes. Sometimes we have none at all or two
+    // selected tabs at the same time. This makes it impossible to animate the
+    // view-buttons properly. With this check here we wait until all property
+    // change events have been processed. Assuming that in the end there's always
+    // on single selected view-button.
+    if (this._getNumSelectedTabs() === 1) {
+      this.htmlViewButtons.revalidateLayout();
+    }
   }
+};
+
+scout.DesktopNavigation.prototype._getNumSelectedTabs = function () {
+  var numSelected = 0;
+  if (this.viewMenuTab.selected) {
+    numSelected++;
+  }
+  this._viewButtons('TAB').forEach(function(viewTab) {
+    if (viewTab.selected) {
+      numSelected++;
+    }
+  });
+  return numSelected;
 };
 
 scout.DesktopNavigation.prototype._onNavigationMousedown = function(event) {
