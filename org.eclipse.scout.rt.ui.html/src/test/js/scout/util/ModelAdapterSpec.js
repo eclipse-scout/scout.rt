@@ -161,9 +161,9 @@ describe("ModelAdapter", function() {
 
   });
 
-  describe("destroy", function() {
+  describe('destroy', function() {
 
-    it("destroys the adapter and its children", function() {
+    it('destroys the adapter and its children', function() {
       var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
       var model = createGenericModel();
 
@@ -183,7 +183,7 @@ describe("ModelAdapter", function() {
       expect(session.getModelAdapter(model.id)).toBeFalsy();
     });
 
-    it("does not destroy children, which are globally used", function() {
+    it('does not destroy children, which are globally used', function() {
       var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
       var model = createGenericModel();
       model.owner = session.rootAdapter.id;
@@ -207,11 +207,50 @@ describe("ModelAdapter", function() {
 
   });
 
-  describe("onModelPropertyChange", function() {
+  describe('_firePropertyChange', function() {
 
-    describe("adapter", function() {
+    var propertyChangeEvent, adapter;
 
-      it("creates and registers the new adapter", function() {
+    beforeEach(function() {
+      adapter = createModelAdapter(createGenericModel(), 'childAdapter');
+    });
+
+    function firePropertyChange(oldValue, newValue) {
+      adapter.on('propertyChange', function(event) {
+        propertyChangeEvent = event;
+      });
+      adapter._firePropertyChange('selected', oldValue, newValue);
+    }
+
+    it('fires the expected event object', function() {
+      firePropertyChange(false, true);
+
+      expect(scout.objects.countProperties(propertyChangeEvent.oldProperties)).toBe(1);
+      expect(scout.objects.countProperties(propertyChangeEvent.newProperties)).toBe(1);
+      expect(propertyChangeEvent.changedProperties.length).toBe(1);
+
+      expect(propertyChangeEvent.oldProperties.selected).toBe(false);
+      expect(propertyChangeEvent.newProperties.selected).toBe(true);
+      expect(propertyChangeEvent.changedProperties[0]).toBe('selected');
+    });
+
+    // FIXME AWE: discuss with B.SH - when a property has _not_ changed, should it be
+    // fired as new/old property anyway? When no property has changed, should the propertyChange
+    // event be fired anyway?
+    it('changedProperties is only set when new and old value are not equals', function() {
+      firePropertyChange(true, true);
+      expect(scout.objects.countProperties(propertyChangeEvent.oldProperties)).toBe(1);
+      expect(scout.objects.countProperties(propertyChangeEvent.newProperties)).toBe(1);
+      expect(propertyChangeEvent.changedProperties.length).toBe(0);
+    });
+
+  });
+
+  describe('onModelPropertyChange', function() {
+
+    describe('adapter', function() {
+
+      it('creates and registers the new adapter', function() {
         var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
         var model = createGenericModel();
 
@@ -225,7 +264,7 @@ describe("ModelAdapter", function() {
         expect(session.getModelAdapter(model.id)).toBe(adapter.childAdapter);
       });
 
-      it("destroys the old adapter", function() {
+      it('destroys the old adapter', function() {
         var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
         var model1 = createGenericModel();
         var model2 = createGenericModel();
@@ -251,9 +290,9 @@ describe("ModelAdapter", function() {
 
     });
 
-    describe("adapters", function() {
+    describe('adapters', function() {
 
-      it("creates and registers adapters", function() {
+      it('creates and registers adapters', function() {
         var adapter = createModelAdapter(createGenericModel(), 'childAdapters');
         var model1 = createGenericModel();
         var model2 = createGenericModel();
@@ -270,7 +309,7 @@ describe("ModelAdapter", function() {
         expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[1]);
       });
 
-      it("destroys the old adapters", function() {
+      it('destroys the old adapters', function() {
         var adapter = createModelAdapter(createGenericModel(), 'childAdapters');
         var model1 = createGenericModel();
         var model2 = createGenericModel();
@@ -297,7 +336,7 @@ describe("ModelAdapter", function() {
         expect(session.getModelAdapter(model1.id)).toBeFalsy();
       });
 
-      it("destroys the old and creates the new adapters if the array contains both", function() {
+      it('destroys the old and creates the new adapters if the array contains both', function() {
         var adapter = createModelAdapter(createGenericModel(), 'childAdapters');
         var model1 = createGenericModel();
         var model2 = createGenericModel();

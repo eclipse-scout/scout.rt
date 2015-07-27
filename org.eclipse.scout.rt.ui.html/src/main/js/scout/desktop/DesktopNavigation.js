@@ -85,6 +85,10 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.validateFocus();
 };
 
+/**
+ * This method updates the state of the view-menu-tab and the selected state of outline-view-buttons.
+ * This method must also work in offline mode.
+ */
 scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
   this.viewMenuTab.onOutlineChanged(outline);
   this._viewButtons('TAB').forEach(function(viewTab) {
@@ -92,7 +96,6 @@ scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
       viewTab.onOutlineChanged(outline);
     }
   });
-  this.htmlViewButtons.revalidateLayout();
 };
 
 // vertical splitter

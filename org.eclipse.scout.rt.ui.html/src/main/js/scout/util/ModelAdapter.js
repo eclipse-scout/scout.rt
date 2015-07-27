@@ -277,8 +277,12 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   // step 3 notify - fire propertyChange _after_ properties have been rendered. (This is important
   // to make sure the DOM is in the right state, when the propertyChange event is consumed.)
   // Note: A new event object has to be created, because it is altered in EventSuppor.trigger().
+  this._fireBulkPropertyChange(oldProperties, event.properties);
+};
+
+scout.ModelAdapter.prototype._fireBulkPropertyChange = function(oldProperties, newProperties) {
   var propertyChangeEvent = {
-      newProperties: event.properties,
+      newProperties: newProperties,
       oldProperties: oldProperties,
       changedProperties: []
   };
@@ -286,12 +290,22 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   // calculate the list of "changedProperties". This may be relevant, when the value on the model
   // changes from A to B and back to A, which emits a property change event when in fact, the
   // property has not really changed for the UI.
-  for (var prop in event.properties) {
-    if (event.properties[prop] !== oldProperties[prop]) {
+  for (var prop in newProperties) {
+    if (newProperties[prop] !== oldProperties[prop]) {
       propertyChangeEvent.changedProperties.push(prop);
     }
   }
   this.trigger('propertyChange', propertyChangeEvent);
+};
+
+/**
+ * Fires a property change for a single property.
+ */
+scout.ModelAdapter.prototype._firePropertyChange = function(propertyName, oldValue, newValue) {
+  var oldProperty = {}, newProperty = {};
+  oldProperty[propertyName] = oldValue;
+  newProperty[propertyName] = newValue;
+  this._fireBulkPropertyChange(oldProperty, newProperty);
 };
 
 /**
