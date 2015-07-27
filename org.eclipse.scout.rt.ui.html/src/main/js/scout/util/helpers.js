@@ -80,7 +80,7 @@ scout.helpers = {
           // size or name
           if (/^\d+$/.test(token) && token !== '0') {
             fontSpec.size = token;
-          } else if (token !== 'NULL') {
+          } else if (token !== 'NULL' && token !== '0') {
             fontSpec.name = token;
           }
         }
