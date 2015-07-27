@@ -25,7 +25,7 @@ scout.Form.prototype._init = function(model, session) {
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, renderGlassPanes);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, renderGlassPanes, session.uiSessionId);
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -90,6 +90,7 @@ scout.Form.prototype._renderForm = function($parent) {
 
 scout.Form.prototype._postRender = function() {
   this._installFocusContext();
+
   if (this.renderInitialFocusEnabled) {
     this.renderInitialFocus();
   }
@@ -176,8 +177,8 @@ scout.Form.prototype.appendTo = function($parent) {
 scout.Form.prototype._remove = function() {
   // FIXME AWE: call acceptInput() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
-  this._uninstallFocusContext();
   this._glassPaneRenderer.removeGlassPanes();
+  this._uninstallFocusContext(); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
   this.attached = false;
 
   scout.Form.parent.prototype._remove.call(this);
@@ -237,7 +238,7 @@ scout.Form.prototype.onModelAction = function(event) {
  *  This method has no effect if already attached.
  */
 scout.Form.prototype.attach = function() {
-  if (this.attached || !this.rendered || !this.parent.inFront()) {
+  if (this.attached || !this.rendered) {
     return;
   }
 
@@ -250,7 +251,7 @@ scout.Form.prototype.attach = function() {
     htmlComp.setSize(htmlParent.getSize());
   }
 
-  this._installFocusContext();
+  this._installFocusContext(scout.FocusRule.NONE);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
@@ -299,18 +300,23 @@ scout.Form.prototype.detach = function() {
 };
 
 scout.Form.prototype.renderInitialFocus = function() {
-  var initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
-  var $initialFocusControl = (initialFocusField ? initialFocusField.$field : null);
-  $initialFocusControl = $initialFocusControl || scout.focusManager.getFirstFocusableElement(this.$container);
+  if (this.rendered) {
+    scout.focusManager.requestFocus(this.session.uiSessionId, this._initialFocusElement());
+  }
+};
 
-  if ($initialFocusControl) {
-    $initialFocusControl.focus();
+scout.Form.prototype._initialFocusElement = function() {
+  var initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
+  if (initialFocusField) {
+    return initialFocusField.$field[0];
+  } else {
+    return scout.focusManager.findFirstFocusableElement(this.session.uiSessionId, this.$container);
   }
 };
 
 scout.Form.prototype._installFocusContext = function() {
   if (this.isDialog()) {
-    this.$container.installFocusContext(scout.FocusRule.NONE, this.session.uiSessionId);
+    this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE);
   }
 };
 

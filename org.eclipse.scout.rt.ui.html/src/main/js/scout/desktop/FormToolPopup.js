@@ -26,6 +26,11 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.alignTo();
 };
 
+// Overwritten to request initial focus.
+scout.Popup.prototype._installFocusContext = function() {
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
+};
+
 scout.FormToolPopup.prototype._renderHead = function() {
   scout.FormToolPopup.parent.prototype._renderHead.call(this);
   this._copyCssClassToHead('taskbar-tool-item');
@@ -47,7 +52,7 @@ scout.FormToolPopup.prototype.attach = function() {
 
   this._attachCloseHandler();
   this._installKeyStrokeAdapter();
-  this.$container.installFocusContextAsync(scout.FocusRule.AUTO, this.session.uiSessionId);
+  this.$container.installFocusContextAsync(this.session.uiSessionId, scout.FocusRule.AUTO);
 };
 
 scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {

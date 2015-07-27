@@ -119,8 +119,9 @@ scout.FormController.prototype._activateView = function(view) {
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {
-  dialog.detach();
-  dialog.attach();
+  if (this._displayParent.inFront() && !dialog.attached) {
+    dialog.attach();
+  }
 };
 
 /**
@@ -166,4 +167,9 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   dialog.$container
     .cssLeft(left)
     .cssTop(top);
+
+
+  // FIXME [dw][awe] If not validated anew, focus on single-button forms is not gained.
+  //                 Maybe, this is the same problem as in BusyIndicator.js
+  scout.focusManager.validateFocus(this.session.uiSessionId);
 };

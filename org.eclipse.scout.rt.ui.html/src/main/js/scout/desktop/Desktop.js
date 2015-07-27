@@ -321,7 +321,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   }
 
   // Request focus on first element in new outlineTab.
-  scout.focusManager.validateFocus(this.session.uiSessionId, 'update');
+  scout.focusManager.validateFocus(this.session.uiSessionId);
 };
 
 scout.Desktop.prototype.setOutline = function(outline) {
@@ -414,7 +414,6 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
-  scout.focusManager.validateFocus(this.session.uiSessionId);
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function(outline) {
@@ -462,7 +461,8 @@ scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
  */
 scout.Desktop.prototype.glassPaneTargets = function() {
-  return [this.$container];
+  // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
+  return $.makeArray(this.$container.children().not('.splitter'));
 };
 
 /**

@@ -9,7 +9,7 @@ scout.inherits(scout.FileChooser, scout.ModelAdapter);
 scout.FileChooser.prototype._init = function(model, session) {
   scout.FileChooser.parent.prototype._init.call(this, model, session);
 
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, session.uiSessionId);
 };
 
 scout.FileChooser.prototype._render = function($parent) {
@@ -76,12 +76,12 @@ scout.FileChooser.prototype._render = function($parent) {
 };
 
 scout.FileChooser.prototype._postRender = function() {
-  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
 };
 
 scout.FileChooser.prototype._remove = function() {
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
   this._glassPaneRenderer.removeGlassPanes();
+  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane. 
   this.attached = false;
 
   scout.FileChooser.parent.prototype._remove.call(this);
@@ -170,12 +170,12 @@ scout.FileChooser.prototype._onDrop = function(event) {
  *  This method has no effect if already attached.
  */
 scout.FileChooser.prototype.attach = function() {
-  if (this.attached || !this.rendered || !this.parent.inFront()) {
+  if (this.attached || !this.rendered) {
     return;
   }
 
   this._$parent.append(this.$container);
-  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {

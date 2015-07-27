@@ -34,7 +34,7 @@ scout.MessageBox.prototype._render = function($parent) {
   }
   this._$parent = $parent;
 
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, this.session.uiSessionId);
   this._glassPaneRenderer.renderGlassPanes();
 
   this.$container = $parent.appendDiv('messagebox');
@@ -87,12 +87,12 @@ scout.MessageBox.prototype._render = function($parent) {
 };
 
 scout.MessageBox.prototype._postRender = function() {
-  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
 };
 
 scout.MessageBox.prototype._remove = function() {
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
   this._glassPaneRenderer.removeGlassPanes();
+  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane. 
   this.attached = false;
 
   scout.MessageBox.parent.prototype._remove.call(this);
@@ -193,12 +193,12 @@ scout.MessageBox.prototype.close = function() {
  *  This method has no effect if already attached.
  */
 scout.MessageBox.prototype.attach = function() {
-  if (this.attached || !this.rendered || (this.parent && !this.parent.inFront())) { // No parent nor desktop available during startup, e.g. to display fatal errors.
+  if (this.attached || !this.rendered) {
     return;
   }
 
   this._$parent.append(this.$container);
-  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {

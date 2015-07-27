@@ -12,28 +12,32 @@ scout.Popup = function(session, options) {
   this.$anchor = options.$anchor;
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
-  this.installFocusContext = options.installFocusContext !== undefined ? options.installFocusContext : true;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
 scout.Popup.prototype.render = function($parent, event) {
   scout.Popup.parent.prototype.render.call(this, $parent);
   this.openEvent = event;
-  if (this.installFocusContext) {
-    this.$container.installFocusContextAsync(scout.FocusRule.AUTO, this.session.uiSessionId);
-  }
   this._attachCloseHandler();
   this.position();
+};
+
+scout.Popup.prototype._postRender = function() {
+  this._installFocusContext();
+};
+
+scout.Popup.prototype._installFocusContext = function() {
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE); // a Pop-Up does not request initial focus.
 };
 
 scout.Popup.prototype.remove = function() {
   if (!this.rendered) {
     return;
   }
-  if (this.installFocusContext) {
-    this.$container.uninstallFocusContext(this.session.uiSessionId);
-  }
+
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
   scout.Popup.parent.prototype.remove.call(this);
+
   // remove all clean-up handlers
   this._detachCloseHandler();
   this.rendered = false;

@@ -1,26 +1,41 @@
 /**
  * Renders glassPanes over the 'glassPaneTargets' of an element.
  */
-scout.GlassPaneRenderer = function(element, enabled) {
+scout.GlassPaneRenderer = function(element, enabled, uiSessionId) {
   this._element = element;
   this._enabled = enabled;
+  this._uiSessionId = uiSessionId;
   this._$glassPanes = [];
+  this._$glassPaneTargets = [];
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
   this.findGlassPaneTargets().forEach(function($glassPaneTarget) {
+    // Render glasspanes onto glasspane targets.
     this._$glassPanes.push($.makeDiv('glasspane')
       .on('mousedown', this._onMousedown.bind(this))
       .appendTo($glassPaneTarget));
+    this._$glassPaneTargets.push($glassPaneTarget);
+
+    // Register 'glassPaneTarget' in focus manager.
+    scout.focusManager.registerGlassPaneTarget(this._uiSessionId, $glassPaneTarget);
+
   }, this);
 };
 
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
+  // Remove glasspanes.
   this._$glassPanes.forEach(function($glassPane) {
     $glassPane.fadeOutAndRemove();
   });
 
+  // Unregister glasspane targets from focus manager.
+  this._$glassPaneTargets.forEach(function($glassPaneTarget) {
+    scout.focusManager.unregisterGlassPaneTarget(this._uiSessionId, $glassPaneTarget);
+  }, this);
+
   this._$glassPanes = [];
+  this._$glassPaneTargets = [];
 };
 
 scout.GlassPaneRenderer.prototype.eachGlassPane = function(func) {

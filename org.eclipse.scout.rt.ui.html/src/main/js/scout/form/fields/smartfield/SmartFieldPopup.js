@@ -1,6 +1,5 @@
 scout.SmartFieldPopup = function(session, options) {
   options = options || {};
-  options.installFocusContext = false;
   scout.SmartFieldPopup.parent.call(this, session, options);
   this._smartField = options.smartField;
 };

@@ -70,7 +70,7 @@ scout.ViewTabsController.prototype.selectViewTab = function(viewTab) {
 
   // Invalidate layout and focus.
   this._desktop._layoutTaskBar();
-  scout.focusManager.validateFocus(this._desktop.session.uiSessionId, 'desktop');
+  scout.focusManager.validateFocus(this._desktop.session.uiSessionId);
 };
 
 /**

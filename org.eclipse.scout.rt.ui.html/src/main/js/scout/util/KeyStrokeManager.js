@@ -103,7 +103,9 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
         event.stopImmediatePropagation();
       }
       event.stopPropagation();
-      scout.focusManager.validateFocus(adapter.uiSessionId(), 'KeyStrokeManager');
+      // FIXME [dwi] why validate focus?? Smartfield does not work that way
+      // FIXME [dwi] without this, arrow-down on table does not work correctly!!
+//      scout.focusManager.validateFocus(adapter.uiSessionId());
     }
   }.bind(this);
 

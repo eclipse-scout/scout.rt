@@ -21,6 +21,7 @@ __include("scout/util/icons.js");
 __include("scout/util/keys.js");
 __include("scout/util/KeyStrokeManager.js");
 __include("scout/util/FocusManager.js");
+__include("scout/util/FocusContext.js");
 __include("scout/util/logging.js");
 __include("scout/util/ModelAdapter.js");
 __include("scout/util/numbers.js");

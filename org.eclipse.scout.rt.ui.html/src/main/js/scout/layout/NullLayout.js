@@ -8,7 +8,7 @@ scout.inherits(scout.NullLayout, scout.AbstractLayout);
 
 scout.NullLayout.prototype.layout = function($container) {
   $container.children().each(function() {
-    var htmlComp = scout.HtmlComponent.get($(this));
+    var htmlComp = scout.HtmlComponent.optGet($(this));
     if (htmlComp) {
       htmlComp.validateLayout();
     }

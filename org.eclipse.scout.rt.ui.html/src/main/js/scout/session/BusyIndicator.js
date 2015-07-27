@@ -9,7 +9,7 @@ scout.inherits(scout.BusyIndicator, scout.Widget);
 
 scout.BusyIndicator.prototype._render = function($parent) {
   // 1. Render glasspane
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, this.session.uiSessionId);
   this._glassPaneRenderer.renderGlassPanes();
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
     $glassPane
@@ -48,19 +48,20 @@ scout.BusyIndicator.prototype._render = function($parent) {
   // Show busy box with a delay of 2.5 seconds.
   this._busyIndicatorTimeoutId = setTimeout(function() {
     this.$container.removeClass('hidden').addClassForAnimation('shown');
+
+    // Validate first focusable element
+    // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
+    scout.focusManager.validateFocus(this.session.uiSessionId);
   }.bind(this), 2500);
 };
 
 scout.BusyIndicator.prototype._postRender = function() {
-  this.$container.installFocusContext(scout.FocusRule.AUTO, this.session.uiSessionId);
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
 };
 
 scout.BusyIndicator.prototype._remove = function() {
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
-
   // Remove busy box (cancel timer in case it was not fired yet)
   clearTimeout(this._busyIndicatorTimeoutId);
-  scout.BusyIndicator.parent.prototype._remove.call(this);
 
   // Remove glasspane
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
@@ -69,6 +70,9 @@ scout.BusyIndicator.prototype._remove = function() {
       .setMouseCursorWait(false);
   });
   this._glassPaneRenderer.removeGlassPanes();
+  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane. 
+
+  scout.BusyIndicator.parent.prototype._remove.call(this);
 };
 
 scout.BusyIndicator.prototype._position = function() {

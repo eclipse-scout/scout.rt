@@ -649,31 +649,42 @@
   };
 
   /**
-   * Installs listeners to the given element to ensure that the focus cannot leave it with the TAB key. Instead,
-   * when the last focusable child element is reached, the focus is set the first focusable element automatically.
+   * Installs a new focus context for this $container, and sets the $container's initial focus, either by the given rule, or tries to gain focus for the given element.
    *
-   * @param $firstFocusElement If the argument is a jQuery object, the current focus is set to this element. If the
-   *   argument is the string 'auto', the current focus is set to the first focusable element inside the parent
-   *   element. All other values don't change the current focus.
+   * @param initialFocusRuleOrElement: rule how to set the initial focus, or the element to gain focus.
+   *
+   *        rule: scout.FocusRule.AUTO: to focus the first child control (if applicable);
+   *              scout.FocusRule.NONE: to not focus any element;
+   *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
+   *                 e.g. not covert by a glasspane;
    */
-  $.fn.installFocusContext = function($firstFocusElement, uiSessionId) {
-    scout.focusManager.installFocusContext(this, uiSessionId, $firstFocusElement);
+  $.fn.installFocusContext = function(uiSessionId, $firstFocusElement) {
+    scout.focusManager.installFocusContext(uiSessionId, this, $firstFocusElement);
   };
 
   /**
-   * Async Installs listeners to the given element to ensure that the focus cannot leave it with the TAB key. Instead,
-   * when the last focusable child element is reached, the focus is set the first focusable element automatically.
+   * Asynchronously installs a new focus context for this $container, and sets the $container's initial focus, either by the given rule, or tries to gain focus for the given element.
    *
-   * @param $firstFocusElement If the argument is a jQuery object, the current focus is set to this element. If the
-   *   argument is the string 'auto', the current focus is set to the first focusable element inside the parent
-   *   element. All other values don't change the current focus.
+   * @param initialFocusRuleOrElement: rule how to set the initial focus, or the element to gain focus.
+   *
+   *        rule: scout.FocusRule.AUTO: to focus the first child control (if applicable);
+   *              scout.FocusRule.NONE: to not focus any element;
+   *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
+   *                 e.g. not covert by a glasspane;
    */
-  $.fn.installFocusContextAsync = function($firstFocusElement, uiSessionId) {
-    scout.focusManager.installFocusContextAsync(this, uiSessionId, $firstFocusElement);
+  $.fn.installFocusContextAsync = function(uiSessionId, $firstFocusElement) {
+    setTimeout(function() {
+      scout.focusManager.installFocusContext(uiSessionId, this, $firstFocusElement);
+    }.bind(this));
+
+
   };
 
+  /**
+   * Uninstalls the focus context for this $container, and activates the last active context.
+   */
   $.fn.uninstallFocusContext = function(uiSessionId) {
-    scout.focusManager.uninstallFocusContextForContainer(this, uiSessionId);
+    scout.focusManager.uninstallFocusContext(uiSessionId, this);
   };
 
   /**
