@@ -55,6 +55,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
 
   @Override
   protected void execInitAction() {
+    setVisibleGranted(m_outline.isVisibleGranted());
     setVisible(m_outline.isVisible());
     setEnabled(m_outline.isEnabled());
     setText(m_outline.getTitle());
