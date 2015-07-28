@@ -1,5 +1,8 @@
 scout.ContextMenuPopup = function(session, options) {
+  options = options || {};
+  options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
   scout.ContextMenuPopup.parent.call(this, session, options);
+
   this.menuItems = options.menuItems;
   this.options = $.extend({
     cloneMenuItems: true

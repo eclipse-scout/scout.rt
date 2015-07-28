@@ -153,7 +153,12 @@ scout.FocusManager.prototype.unregisterGlassPaneTarget = function(uiSessionId, g
  */
 scout.FocusManager.prototype.findFirstFocusableElement = function(uiSessionId, $container) {
   var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents;
-  var $candidates = $container.find(':focusable');
+
+  // Find all focusable child elements.
+  // Note: If the $container itself is focusable, also add it to the list of candidates.
+  //       E.g. menu-items in a context-menu are not focusable, but the popup container instead.
+  //       That allows the popup to gain focus even if having no focusable children.
+  var $candidates = $container.find(':focusable').addBack(':focusable');
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
@@ -173,10 +178,10 @@ scout.FocusManager.prototype.findFirstFocusableElement = function(uiSessionId, $
 
     $menuParents = $(candidate).parents('div.menubar');
     $tabParents = $(candidate).parents('div.tab-area');
-    if (!firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
+    if (!firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) { // TODO [nbu] menu-items are not focusable, why this check?
       firstButton = candidate;
     } else if (!$menuParents.length && !$tabParents.length && typeof candidate.focus === 'function') {
-      return candidate;
+      return candidate; // TODO [nbu] why is this necessary? is immediate return correct?
     }
   }
 
@@ -194,7 +199,7 @@ scout.FocusManager.prototype.validateFocus = function(uiSessionId) {
 };
 
 /**
- * Requests the focus for the given element. The focus
+ * Requests the focus for the given element, but only if being a valid focus location.
  */
 scout.FocusManager.prototype.requestFocus = function(uiSessionId, element) {
   var activeContext = this._activeContext(uiSessionId);

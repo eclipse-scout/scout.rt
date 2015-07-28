@@ -13,6 +13,7 @@ scout.Popup = function(session, options) {
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
   this.installFocusContext = options.installFocusContext !== undefined ? options.installFocusContext : true;
+  this.focusableContainer = options.focusableContainer !== undefined ? options.focusableContainer : false;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -48,8 +49,12 @@ scout.Popup.prototype._render = function($parent) {
   if (!$parent) {
     $parent = this.session.$entryPoint;
   }
-  this.$container = $.makeDiv('popup')
-    .appendTo($parent);
+  this.$container = $.makeDiv('popup').appendTo($parent);
+
+  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups)
+  if (this.installFocusContext && this.focusableContainer) {
+    this.$container.attr('tabindex', -1);
+  }
 };
 
 scout.Popup.prototype.close = function(event) {

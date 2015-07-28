@@ -56,7 +56,7 @@
 }
 
 .popup-body {
-  position: absolute;
+  position: relative;
   border: 1px solid @border-color;
   background-color: @palette-white;
 
