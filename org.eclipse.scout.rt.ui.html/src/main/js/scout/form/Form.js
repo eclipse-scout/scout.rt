@@ -254,7 +254,7 @@ scout.Form.prototype.attach = function() {
     htmlComp.setSize(htmlParent.getSize());
   }
 
-  this._installFocusContext(scout.FocusRule.NONE);
+  this._installFocusContext();
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {

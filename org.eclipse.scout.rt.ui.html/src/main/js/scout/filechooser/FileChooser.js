@@ -175,7 +175,7 @@ scout.FileChooser.prototype.attach = function() {
   }
 
   this._$parent.append(this.$container);
-  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {

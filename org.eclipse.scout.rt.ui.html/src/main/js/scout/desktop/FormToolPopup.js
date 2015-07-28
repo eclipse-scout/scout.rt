@@ -39,6 +39,8 @@ scout.FormToolPopup.prototype._renderHead = function() {
 scout.FormToolPopup.prototype.detach = function() {
   this._detachCloseHandler();
   this._uninstallKeyStrokeAdapter();
+
+  this.session.detachHelper.beforeDetach(this.$container);
   this.$container.uninstallFocusContext(this.session.uiSessionId);
   this.$container.detach();
 };
@@ -50,7 +52,9 @@ scout.FormToolPopup.prototype.attach = function() {
 
   this._attachCloseHandler();
   this._installKeyStrokeAdapter();
-  this.$container.installFocusContextAsync(this.session.uiSessionId, scout.FocusRule.AUTO);
+
+  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE);
+  this.session.detachHelper.afterAttach(this.$container);
 };
 
 scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {
