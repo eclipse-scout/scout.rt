@@ -13,6 +13,7 @@
     #scout.drop-shadow(@y: -6px;);
   }
 
+
   &:focus {
     outline: none;
   }
@@ -56,7 +57,7 @@
 }
 
 .popup-body {
-  position: relative;
+  position: absolute;
   border: 1px solid @border-color;
   background-color: @palette-white;
 

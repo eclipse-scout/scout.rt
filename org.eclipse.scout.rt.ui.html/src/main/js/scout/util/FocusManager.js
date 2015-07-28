@@ -155,10 +155,10 @@ scout.FocusManager.prototype.findFirstFocusableElement = function(uiSessionId, $
   var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents;
 
   // Find all focusable child elements.
-  // Note: If the $container itself is focusable, also add it to the list of candidates.
+  // Note: If the $container itself is focusable (with a tabindex), also add it to the list of candidates.
   //       E.g. menu-items in a context-menu are not focusable, but the popup container instead.
   //       That allows the popup to gain focus even if having no focusable children.
-  var $candidates = $container.find(':focusable').addBack(':focusable');
+  var $candidates = $container.find(':focusable').addBack('[tabindex]');
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
