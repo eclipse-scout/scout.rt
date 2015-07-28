@@ -89,7 +89,9 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.FromXToY",
         "ui.To",
         "ui.FileSizeLimitTitle",
-        "ui.FileSizeLimit"
+        "ui.FileSizeLimit",
+        "ui.ClipboardTimeoutTitle",
+        "ui.ClipboardTimeout"
         ));
   }
 }

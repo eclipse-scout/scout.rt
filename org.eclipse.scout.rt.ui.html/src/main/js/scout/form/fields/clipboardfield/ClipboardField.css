@@ -1,0 +1,5 @@
+.clipboard-field {
+  & > .field {
+  background-color: @tooltip-background-color;
+  }
+}

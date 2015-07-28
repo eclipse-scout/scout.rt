@@ -664,7 +664,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   }
 
   $.each(files, function(index, value) {
-    if (!allowedTypes || scout.arrays.ensure(allowedTypes).indexOf(value.type) != -1) {
+    if (!allowedTypes || scout.helpers.isOneOf(value.type, allowedTypes)) {
       totalSize += value.size;
       formData.append('files', value, value.name);
     }

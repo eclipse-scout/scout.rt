@@ -83,6 +83,10 @@ scout.Device.prototype.supportsTouch = function() {
   // Implement when needed, see https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
 };
 
+scout.Device.prototype.supportsFile = function() {
+  return (window.File ? true : false);
+};
+
 scout.Device.prototype.supportsCssAnimation = function() {
   return this.supportsCssProperty('animation');
 };

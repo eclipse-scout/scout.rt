@@ -24,9 +24,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonClipboardField<CLIPBOARD_FIELD extends IClipboardField> extends JsonValueField<CLIPBOARD_FIELD> implements IBinaryResourceConsumer {
+public class JsonClipboardField<T extends IClipboardField> extends JsonValueField<T> implements IBinaryResourceConsumer {
 
-  public JsonClipboardField(CLIPBOARD_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonClipboardField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -36,7 +36,7 @@ public class JsonClipboardField<CLIPBOARD_FIELD extends IClipboardField> extends
   }
 
   @Override
-  protected void initJsonProperties(CLIPBOARD_FIELD model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IClipboardField>(IClipboardField.PROP_ALLOWED_MIME_TYPES, model) {
       @Override
@@ -53,8 +53,8 @@ public class JsonClipboardField<CLIPBOARD_FIELD extends IClipboardField> extends
   }
 
   @Override
-  public void consumeBinaryResource(List<BinaryResource> binaryResources0, Map<String, String> uploadProperties) {
-    List<BinaryResource> binaryResources = new ArrayList<BinaryResource>(binaryResources0);
+  public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
+    binaryResources = new ArrayList<BinaryResource>(binaryResources);
     // IE9 does not support java script Blob objects (legacy support for text transfer)
     for (Entry<String, String> property : uploadProperties.entrySet()) {
       if (property.getKey().matches("textTransferObject\\d+")) {

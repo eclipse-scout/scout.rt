@@ -9,15 +9,15 @@ scout.ClipboardField.prototype._render = function($parent) {
   this.addField($('<div>'));
   this.addStatus();
 
-  this.$field.attr('contenteditable', '');
-  this.$field.css('background-color', 'lightyellow');
-
-  this.$field.focus();
+  this.$field.attr('contenteditable', '')
+    .on('paste', this._onPaste.bind(this));
+    //.on('copy', this._onPaste.bind(this));
 
   $parent.on('click', function(event) { this.$field.focus(); }.bind(this));
 
-  this.$field.on('copy', this._onPaste.bind(this));
-  this.$field.on('paste', this._onPaste.bind(this));
+  if (this.rendered) {
+    scout.focusManager.requestFocus(this.session.uiSessionId, this.$field);
+  }
 };
 
 scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
@@ -35,19 +35,17 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     throw new Error('Unable to access clipboard data.');
   }
 
-  // options to be uploaded, arguments for this.session.uploadFiles
-  var filesArgument = [];
-  var additionalOptions = {};
 
-  // counter for additional options
-  var additionalOptionsCompatibilityIndex = 0;
+  var filesArgument = [],   // options to be uploaded, arguments for this.session.uploadFiles
+    additionalOptions = {},
+    additionalOptionsCompatibilityIndex = 0;   // counter for additional options
 
   // some browsers (e.g. IE) specify text content simply as data of type 'Text', it is not listed in list of types
   var textContent;
   textContent = dataTransfer.getData('Text');
   if (textContent) {
     if (window.Blob) {
-      filesArgument.push(new Blob([textContent], {type: 'text/plain'}));
+      filesArgument.push(new Blob([textContent], {type: scout.MimeTypes.TEXT_PLAIN}));
     } else {
       // compatibility workaround
       additionalOptions['textTransferObject' + additionalOptionsCompatibilityIndex++] = textContent;
@@ -56,12 +54,12 @@ scout.ClipboardField.prototype._onPaste = function(event) {
 
   if (dataTransfer.items) {
     $.each(dataTransfer.items, function(idx, item) {
-      if (item.type === 'text/plain') {
+      if (item.type === scout.MimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
-          filesArgument.push(new Blob([str], {type: 'text/plain'}));
+          filesArgument.push(new Blob([str], {type: scout.MimeTypes.TEXT_PLAIN}));
         });
       }
-      else if (['image/png', 'image/jpg', 'image/jpeg','image/gif'].indexOf(item.type) != -1) {
+      else if (scout.helpers.isOneOf(item.type, [scout.MimeTypes.IMAGE_PNG, scout.MimeTypes.IMAGE_JPG, scout.MimeTypes.IMAGE_JPEG, scout.MimeTypes.IMAGE_GIF])) {
         filesArgument.push(item.getAsFile());
       }
     });
@@ -95,6 +93,17 @@ scout.ClipboardField.prototype._onPaste = function(event) {
       return;
     }
 
+    if (uploadFunctionTimeoutCount >= 99) {
+      var boxOptions = {
+        header: this.session._texts.get('ui.ClipboardTimeoutTitle'),
+        body: this.session._texts.get('ui.ClipboardTimeout'),
+        yesButtonText: this.session.optText('Ok', 'Ok')
+      };
+
+      this.session.showFatalMessage(boxOptions);
+      return;
+    }
+
     // upload paste event as files
     if (filesArgument.length > 0 || Object.keys(additionalOptions).length > 0) {
       this.session.uploadFiles(this, filesArgument, additionalOptions, this.maximumSize, this.allowedMimeTypes);
@@ -104,6 +113,5 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   uploadFunction.call(this);
 
   // do not trigger any other actions
-  event.preventDefault();
-  event.stopPropagation();
+  return false;
 };
