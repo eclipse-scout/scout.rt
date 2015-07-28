@@ -68,15 +68,18 @@ scout.Table.prototype._initColumns = function() {
     column = this.session.objectFactory.create(this.columns[i]);
     column.table = this;
     this.columns[i] = column;
+
+    if (column.checkable) {
+      // set checkable column if this column is the checkable one
+      this.checkableColumn = column;
+    }
   }
 
   // Add gui only checkbox column at the beginning
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
-  if (this.checkable) {
-    this._insertCheckBoxColumn();
-  }
+  this._syncCheckable(this.checkable);
   this._updateRowWidth();
 };
 
