@@ -928,6 +928,10 @@ scout.Table.prototype.sendAppLinkAction = function(columnId, ref) {
 
 scout.Table.prototype.sendReload = function() {
   this.$data.empty();
+  // scoll bar must be (re)installed after all content has been removed (because also scrollbars are removed)..
+  scout.scrollbars.install(this.$data, this.session, {
+    axis: 'both'
+  });
   this.session.send(this.id, 'reload');
 };
 
