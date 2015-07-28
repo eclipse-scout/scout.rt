@@ -39,15 +39,7 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
   // Make container focusable and install focus context
   $entryPoint.attr('tabindex', portletPartId);
 
-  var setInitialFocus = scout.helpers.nvl(options.setInitialFocus, true);
-  if (setInitialFocus) {
-    // FIXME: AWE/NBU: mit IMO diskutieren, was die anforderungen an fokus für die office integration sind
-    // a.) wir brauchen _immer_ einen focus context, weil sonst z.B. message-box handling kaputt geht
-    // b.) -vermutlich- darf in office die Html app keinen initialen fokus haben (Ivan fragen)
-    // Sobald diese frage geklärt ist, kann im DetachHelper#storeFocus der check für den focusContext entfernt
-    // werden, weil wir denken, dass wir immer einen focusContext haben sollten.
-    this.installFocusContext(session.uiSessionId, $entryPoint, scout.FocusRule.AUTO);
-  }
+  this.installFocusContext(session.uiSessionId, $entryPoint, scout.FocusRule.AUTO);
 
   // Install global 'mousedown' listener to accept or prevent focus gain.
   session.$entryPoint.on('mousedown', function(event) {
