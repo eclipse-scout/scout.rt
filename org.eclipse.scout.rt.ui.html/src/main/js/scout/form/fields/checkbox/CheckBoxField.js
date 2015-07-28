@@ -1,5 +1,7 @@
 scout.CheckBoxField = function() {
   scout.CheckBoxField.parent.call(this);
+  this.$checkBox;
+  this.$checkBoxLabel;
 };
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
@@ -8,7 +10,12 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
   this.addField($('<div>'));
-  this.$field.on('mousedown', this._onMouseDown.bind(this));
+  this.$checkBox = $.makeDiv('check-box');
+  this.$checkBox.appendTo(this.$field);
+  this.$checkBox.on('mousedown', this._onMouseDown.bind(this));
+  this.$checkBoxLabel = $.makeDiv('label');
+  this.$checkBoxLabel.appendTo(this.$field);
+  this.$checkBoxLabel.on('mousedown', this._onMouseDown.bind(this));
   this.addStatus();
 };
 
@@ -33,8 +40,8 @@ scout.CheckBoxField.prototype._toggleChecked = function() {
   if (!this.enabled) {
     return;
   }
-  this.$field.toggleClass('checked');
-  uiChecked = this.$field.hasClass('checked');
+  this.$checkBox.toggleClass('checked');
+  uiChecked = this.$checkBox.hasClass('checked');
   this.session.send(this.id, 'clicked', {
     checked: uiChecked
   });
@@ -45,11 +52,11 @@ scout.CheckBoxField.prototype._toggleChecked = function() {
 scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
   if (this.enabled) {
-    this.$field.attr('tabindex', '0');
+    this.$checkBox.attr('tabindex', '0');
   } else {
-    this.$field.removeAttr('tabindex');
+    this.$checkBox.removeAttr('tabindex');
   }
-  this.$field.setEnabled(this.enabled);
+  this.$checkBox.setEnabled(this.enabled);
 };
 
 scout.CheckBoxField.prototype._renderProperties = function() {
@@ -58,7 +65,7 @@ scout.CheckBoxField.prototype._renderProperties = function() {
 };
 
 scout.CheckBoxField.prototype._renderValue = function(value) {
-  this.$field.toggleClass('checked', value);
+  this.$checkBox.toggleClass('checked', value);
 };
 
 /**
@@ -68,7 +75,7 @@ scout.CheckBoxField.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   }
-  if (this.$field) {
-    this.$field.text(label);
+  if (this.$checkBoxLabel) {
+    this.$checkBoxLabel.text(label);
   }
 };

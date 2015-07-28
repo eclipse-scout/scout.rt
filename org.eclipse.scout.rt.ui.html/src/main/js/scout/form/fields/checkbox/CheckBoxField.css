@@ -1,46 +1,52 @@
 @check-box-size: 18px;
 
 .check-box-field > .field {
-  cursor: pointer;
   display: block;
   position: relative;
   padding: @borderless-field-padding-y 0px @borderless-field-padding-y 25px;
   margin-right: 15px;
   outline: none;
-  white-space: nowrap;
   /* FIXME NBU overflow cannot be set, checkbox looks ugly because height is too small */
 /*     #scout.overflow-ellipsis-nowrap();     */
 
-  &::before {
-    #scout.checkbox-label-before();
-    top: 5px;
+  & > .check-box,
+  & > .label {
+    cursor: pointer;
+    white-space: nowrap;
   }
 
-  &:focus::before {
-    #scout.checkbox-label-before-focus();
-  }
+  & > .check-box {
+    &::before {
+      #scout.checkbox-label-before();
+      top: 5px;
+    }
 
-  &.disabled:hover::before {
-    #scout.checkbox-label-before-disabled-border();
-  }
+    &:focus::before {
+      #scout.checkbox-label-before-focus();
+    }
 
-  &::before {
-    #scout.checkbox-label-before-focus();
-  }
+    &.disabled:hover::before {
+      #scout.checkbox-label-before-disabled-border();
+    }
 
-  &.checked::before {
-    #scout.checkbox-label-before-checked();
-  }
+    &::before {
+      #scout.checkbox-label-before-focus();
+    }
 
-  &::before {
-    #scout.checkbox-label-before-border();
-  }
+    &.checked::before {
+      #scout.checkbox-label-before-checked();
+    }
 
-  &.disabled::before {
-    #scout.checkbox-label-before-disabled();
-  }
+    &::before {
+      #scout.checkbox-label-before-border();
+    }
 
-  &.disabled {
-    #scout.checkbox-label-disabled();
+    &.disabled::before {
+      #scout.checkbox-label-before-disabled();
+    }
+
+    &.disabled {
+      #scout.checkbox-label-disabled();
+    }
   }
 }
