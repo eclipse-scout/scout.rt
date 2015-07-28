@@ -21,9 +21,9 @@ describe("CheckBoxField", function() {
       var $div = $('<div>');
       checkBox._render($div);
       checkBox._renderValue(true);
-      expect(checkBox.$field.hasClass('checked')).toBe(true);
+      expect(checkBox.$checkBox.hasClass('checked')).toBe(true);
       checkBox._renderValue(false);
-      expect(checkBox.$field.hasClass('checked')).toBe(false);
+      expect(checkBox.$checkBox.hasClass('checked')).toBe(false);
     });
 
     it("_renderValue sets enabled property", function() {
@@ -32,6 +32,11 @@ describe("CheckBoxField", function() {
       checkBox.enabled=false;
       checkBox._renderEnabled();
       expect(checkBox.$field.hasClass('disabled')).toBe(true);
+      expect(checkBox.$checkBox.hasClass('disabled')).toBe(true);
+      checkBox.enabled=true;
+      checkBox._renderEnabled();
+      expect(checkBox.$field.hasClass('disabled')).toBe(false);
+      expect(checkBox.$checkBox.hasClass('disabled')).toBe(false);
     });
 
   });
