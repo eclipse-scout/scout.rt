@@ -19,11 +19,20 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.$body.addClass('down'); // FormToolButtons always open the popup downwards
 
   var form = this.formToolButton.form;
+  form.renderInitialFocusEnabled = false;
   form.render(this.$body);
   form.htmlComp.pixelBasedSizing = true;
   form.htmlComp.pack();
 
   this.alignTo();
+};
+
+/**
+ * @override Popup.js
+ */
+scout.FormToolPopup.prototype._installFocusContext = function() {
+  var form = this.formToolButton.form;
+  this.$container.installFocusContext(this.session.uiSessionId, form._initialFocusElement());
 };
 
 scout.FormToolPopup.prototype._renderHead = function() {
@@ -36,7 +45,6 @@ scout.FormToolPopup.prototype.detach = function() {
   this._detachCloseHandler();
   this._uninstallKeyStrokeAdapter();
   this.$container.uninstallFocusContext(this.session.uiSessionId);
-
   this.$container.detach();
 };
 
@@ -60,7 +68,7 @@ scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {
 };
 
 scout.FormToolPopup.prototype.alignTo = function() {
-  // TODO nbu add hack to trigger this function after resources loaded(fonts);
+  // FIXME NBU: add hack to trigger this function after resources loaded(fonts);
   var pos = this.$formToolButton.offset(),
     headSize = scout.graphics.getSize(this.$head, true),
     bodyWidth = scout.graphics.getSize(this.$body, true).width;
