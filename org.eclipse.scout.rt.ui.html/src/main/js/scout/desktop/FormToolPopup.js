@@ -26,11 +26,6 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.alignTo();
 };
 
-// Overwritten to request initial focus.
-scout.Popup.prototype._installFocusContext = function() {
-  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
-};
-
 scout.FormToolPopup.prototype._renderHead = function() {
   scout.FormToolPopup.parent.prototype._renderHead.call(this);
   this._copyCssClassToHead('taskbar-tool-item');

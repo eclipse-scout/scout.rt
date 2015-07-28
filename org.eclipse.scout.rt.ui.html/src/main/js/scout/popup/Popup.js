@@ -12,6 +12,7 @@ scout.Popup = function(session, options) {
   this.$anchor = options.$anchor;
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
+  this.installFocusContext = options.installFocusContext !== undefined ? options.installFocusContext : true;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -23,11 +24,9 @@ scout.Popup.prototype.render = function($parent, event) {
 };
 
 scout.Popup.prototype._postRender = function() {
-  this._installFocusContext();
-};
-
-scout.Popup.prototype._installFocusContext = function() {
-  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE); // a Pop-Up does not request initial focus.
+  if (this.installFocusContext) {
+    this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
+  }
 };
 
 scout.Popup.prototype.remove = function() {
@@ -35,7 +34,9 @@ scout.Popup.prototype.remove = function() {
     return;
   }
 
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
+  if (this.installFocusContext) {
+    this.$container.uninstallFocusContext(this.session.uiSessionId);
+  }
   scout.Popup.parent.prototype.remove.call(this);
 
   // remove all clean-up handlers
@@ -50,6 +51,7 @@ scout.Popup.prototype._render = function($parent) {
   this.$container = $.makeDiv('popup')
     .appendTo($parent);
 };
+
 scout.Popup.prototype.close = function(event) {
   if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
     this.remove();
