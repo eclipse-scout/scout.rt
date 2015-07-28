@@ -933,12 +933,14 @@ scout.Table.prototype.sendAppLinkAction = function(columnId, ref) {
 };
 
 scout.Table.prototype.sendReload = function() {
-  this.$data.empty();
-  // scoll bar must be (re)installed after all content has been removed (because also scrollbars are removed)..
-  scout.scrollbars.install(this.$data, this.session, {
-    axis: 'both'
-  });
-  this.session.send(this.id, 'reload');
+  if (this.hasReloadHandler) {
+    this.$data.empty();
+    // scoll bar must be (re)installed after all content has been removed (because also scrollbars are removed)..
+    scout.scrollbars.install(this.$data, this.session, {
+      axis: 'both'
+    });
+    this.session.send(this.id, 'reload');
+  }
 };
 
 scout.Table.prototype.cell = function(column, row) {
@@ -2112,12 +2114,12 @@ scout.Table.prototype._removeTableHeader = function() {
 scout.Table.prototype._renderEmptyData = function() {
   if (this.header && this.rows.length === 0) {
     if (!this.$emptyData) {
-      this.$emptyData = $.makeDiv();
-      this.$emptyData.html('&nbsp;');
-      this.$emptyData.appendTo(this.$data);
+      this.$emptyData = $.makeDiv()
+        .html('&nbsp;')
+        .appendTo(this.$data);
     }
-    this.$emptyData.css('min-width', this.header.$container[0].scrollWidth);
-    this.$emptyData.css('max-width', this.header.$container[0].scrollWidth);
+    this.$emptyData.css('min-width', this.header.$container[0].scrollWidth)
+      .css('max-width', this.header.$container[0].scrollWidth);
   }
   this.updateScrollbars();
 };

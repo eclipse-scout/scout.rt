@@ -95,6 +95,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
   public static final String PROP_SELECTED_ROWS = "selectedRows";
+  public static final String PROP_HAS_RELOAD_HANDLER = "hasReloadHandler";
 
   private TableListener m_tableListener;
   private final Map<String, ITableRow> m_tableRows;
@@ -220,6 +221,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       @Override
       protected Long modelValue() {
         return getModel().getDropMaximumSize();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(PROP_HAS_RELOAD_HANDLER, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getReloadHandler() != null;
       }
     });
   }
