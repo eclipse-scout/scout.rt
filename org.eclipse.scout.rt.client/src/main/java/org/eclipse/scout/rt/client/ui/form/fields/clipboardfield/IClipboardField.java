@@ -14,10 +14,18 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
- * Optional marker interface for clipboard fields
+ * Clipboard field to catch arbitrary clipboard paste events.
+ * <p/>
+ * Some ui technologies might not be able to access the clipboard by themselves (e.g. web browsers), this field is
+ * supposed to act as man-in-the-middle. The user pastes the clipboard contents to this field, they are considered the
+ * new value of the field.
+ *
+ * @see ClipboardForm ClipboardForm for an example implementation.
+ * @since 5.1
  */
 public interface IClipboardField extends IValueField<Collection<BinaryResource>> {
 

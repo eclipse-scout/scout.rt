@@ -38,10 +38,10 @@ public enum MimeTypes {
     return type;
   }
 
-  public static MimeTypes convertToMimeType(String mimeType) {
-    for (MimeTypes mimeType0 : values()) {
-      if (mimeType0.getType().equals(mimeType)) {
-        return mimeType0;
+  public static MimeTypes convertToMimeType(String input) {
+    for (MimeTypes mimeType : values()) {
+      if (mimeType.getType().equals(input)) {
+        return mimeType;
       }
     }
     return null;
@@ -54,9 +54,9 @@ public enum MimeTypes {
     return Arrays.asList(new MimeTypes[]{IMAGE_GIF, IMAGE_JPG, IMAGE_JPEG, IMAGE_PNG});
   }
 
-  public static boolean isOneOf(Collection<MimeTypes> mimeTypes, String mimeType) {
-    for (MimeTypes mimeType0 : mimeTypes) {
-      if (mimeType0.getType().equals(mimeType)) {
+  public static boolean isOneOf(Collection<MimeTypes> mimeTypes, String input) {
+    for (MimeTypes mimeType : mimeTypes) {
+      if (mimeType.getType().equals(input)) {
         return true;
       }
     }

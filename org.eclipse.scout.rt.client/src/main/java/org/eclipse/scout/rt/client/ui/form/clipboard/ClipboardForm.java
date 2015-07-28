@@ -72,6 +72,11 @@ public class ClipboardForm extends AbstractForm {
     return TEXTS.get("Clipboard");
   }
 
+  public void startClipboard() throws ProcessingException {
+    setHandler(new ClipboardHandler());
+    start();
+  }
+
   public ClipboardField getClipboardField() {
     return getFieldByClass(ClipboardField.class);
   }
