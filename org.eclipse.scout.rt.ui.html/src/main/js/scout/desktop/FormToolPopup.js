@@ -1,5 +1,8 @@
 scout.FormToolPopup = function(formToolButton, session) {
-  scout.FormToolPopup.parent.call(this, session);
+  var options = {
+      initialFocus: formToolButton.form._initialFocusElement.bind(formToolButton.form)
+  };
+  scout.FormToolPopup.parent.call(this, session, options);
   this.$formToolButton = formToolButton.$container;
   this.$headBlueprint = this.$formToolButton;
   this.formToolButton = formToolButton;
@@ -25,14 +28,6 @@ scout.FormToolPopup.prototype._render = function($parent) {
   form.htmlComp.pack();
 
   this.alignTo();
-};
-
-/**
- * @override Popup.js
- */
-scout.FormToolPopup.prototype._installFocusContext = function() {
-  var form = this.formToolButton.form;
-  this.$container.installFocusContext(this.session.uiSessionId, form._initialFocusElement());
 };
 
 scout.FormToolPopup.prototype._renderHead = function() {

@@ -1,4 +1,5 @@
 scout.Popup = function(session, options) {
+  // FIXME AWE: use this.options property here, use helpers.nvl
   scout.Popup.parent.call(this);
   options = options || {};
   this._mouseDownHandler;
@@ -13,6 +14,7 @@ scout.Popup = function(session, options) {
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
   this.installFocusContext = options.installFocusContext !== undefined ? options.installFocusContext : true;
+  this.initialFocus = options.initialFocus !== undefined ? options.initialFocus : function() { return scout.FocusRule.AUTO; };
   this.focusableContainer = options.focusableContainer !== undefined ? options.focusableContainer : false;
 };
 scout.inherits(scout.Popup, scout.Widget);
@@ -26,7 +28,7 @@ scout.Popup.prototype.render = function($parent, event) {
 
 scout.Popup.prototype._postRender = function() {
   if (this.installFocusContext) {
-    this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
+    this.$container.installFocusContext(this.session.uiSessionId, this.initialFocus());
   }
 };
 
