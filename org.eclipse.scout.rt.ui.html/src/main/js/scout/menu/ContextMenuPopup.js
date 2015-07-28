@@ -14,23 +14,7 @@ scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
-  this._beforeRenderMenuItems();
   this._renderMenuItems();
-  this._afterRenderMenuItems();
-};
-
-/**
- * Override this method to do something before menu items are rendered.
- * The default impl. does nothing.
- */
-scout.ContextMenuPopup.prototype._beforeRenderMenuItems = function() {
-};
-
-/**
- * Override this method to do something before menu items are rendered.
- * The default impl. does nothing.
- */
-scout.ContextMenuPopup.prototype._afterRenderMenuItems = function() {
 };
 
 /**
