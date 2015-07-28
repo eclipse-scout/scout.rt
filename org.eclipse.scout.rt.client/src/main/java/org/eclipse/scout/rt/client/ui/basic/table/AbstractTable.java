@@ -927,7 +927,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (Class<? extends IKeyStroke> clazz : ksClasses) {
       try {
         IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
-        ksList.add(ks);
+        ks.initAction();
+        if (ks.getKeyStroke() != null) {
+          ksList.add(ks);
+        }
       }
       catch (Exception e) {
         String className = "null";
