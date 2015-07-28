@@ -299,7 +299,16 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
  * Checks if the given element is a menu or button.
  */
 scout.FocusManager.prototype._isMenuOrButton = function($element) {
-  return $element.data('menu') || $element.data('button') || $element.data('buttonOption');
+  return $element.data('menu') || $element.data('button') || $element.data('buttonOption') || isFormToolButton();
+
+  function isFormToolButton() {
+    if ($element.hasClass('taskbar-tool-item-title')) {
+      return true;
+    }
+    if ($element.parent().hasClass('taskbar-tool-item')) {
+      return true;
+    }
+  }
 };
 
 /**
