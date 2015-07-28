@@ -15,7 +15,7 @@ scout.FileChooser.prototype._init = function(model, session) {
 scout.FileChooser.prototype._render = function($parent) {
   this._$parent = $parent;
 
-  // Renders modality glassPane; must precede appending the file-chooser to the DOM.
+  // Render modality glasspanes (must precede adding the file chooser to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
 
   this.$container = $parent.appendDiv('file-chooser');
@@ -81,7 +81,7 @@ scout.FileChooser.prototype._postRender = function() {
 
 scout.FileChooser.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane. 
+  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
   this.attached = false;
 
   scout.FileChooser.parent.prototype._remove.call(this);

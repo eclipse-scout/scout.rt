@@ -34,6 +34,7 @@ scout.MessageBox.prototype._render = function($parent) {
   }
   this._$parent = $parent;
 
+  // Render modality glasspanes (must precede adding the message box to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, this.session.uiSessionId);
   this._glassPaneRenderer.renderGlassPanes();
 
@@ -92,7 +93,7 @@ scout.MessageBox.prototype._postRender = function() {
 
 scout.MessageBox.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane. 
+  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
   this.attached = false;
 
   scout.MessageBox.parent.prototype._remove.call(this);

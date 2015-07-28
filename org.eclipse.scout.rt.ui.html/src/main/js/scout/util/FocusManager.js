@@ -150,13 +150,13 @@ scout.FocusManager.prototype.findFirstFocusableElement = function(uiSessionId, $
   // Note: If the $container itself is focusable (with a tabindex), also add it to the list of candidates.
   //       E.g. menu-items in a context-menu are not focusable, but the popup container instead.
   //       That allows the popup to gain focus even if having no focusable children.
-  var $candidates = $container.find(':focusable').addBack('[tabindex]');
+  var $candidates = $container.find(':focusable').addBack('[tabindex]'); // FIXME [dwi][awe] use other css class for context menu popups
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
 
     // Check whether the candidate is accessible and not covert by a glass pane.
-    if (!this._isElementAccessible(candidate, uiSessionId)) {
+    if (this._isElementCovertByGlassPane(candidate, uiSessionId)) {
       continue;
     }
 
@@ -259,7 +259,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
   }
 
   // 2. Prevent focus gain if covert by glasspane.
-  if (!this._isElementAccessible($element, uiSessionId)) {
+  if (this._isElementCovertByGlassPane($element, uiSessionId)) {
     return false;
   }
 
@@ -316,20 +316,20 @@ scout.FocusManager.prototype._isSelectableText = function($element) {
 /**
  * Checks if the given element is accessible, meaning not covert by a glasspane.
  */
-scout.FocusManager.prototype._isElementAccessible = function(element, uiSessionId) {
+scout.FocusManager.prototype._isElementCovertByGlassPane = function(element, uiSessionId) {
   var glassPaneTargets = this._glassPaneTargetsBySession(uiSessionId);
   if (!glassPaneTargets.length) {
-    return true;
+    return false;
   }
 
   var i, $glassPaneTarget;
   for (i = 0; i < glassPaneTargets.length; i++) {
     if ($(element).closest($(glassPaneTargets[i])).length) {
-      return false;
+      return true;
     }
   }
 
-  return true;
+  return false;
 };
 
 // Singleton

@@ -8,7 +8,7 @@ scout.BusyIndicator = function(session, cancellable) {
 scout.inherits(scout.BusyIndicator, scout.Widget);
 
 scout.BusyIndicator.prototype._render = function($parent) {
-  // 1. Render glasspane
+  // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, this.session.uiSessionId);
   this._glassPaneRenderer.renderGlassPanes();
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
@@ -70,7 +70,7 @@ scout.BusyIndicator.prototype._remove = function() {
       .setMouseCursorWait(false);
   });
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane. 
+  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
 
   scout.BusyIndicator.parent.prototype._remove.call(this);
 };

@@ -30,7 +30,10 @@ scout.Form.prototype._init = function(model, session) {
 
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
+
+  // Render modality glasspanes (must precede adding the form to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
+
   this._renderForm($parent);
   this.attached = true;
 };

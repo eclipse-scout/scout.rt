@@ -103,21 +103,25 @@ scout.FocusContext.prototype._onHideEvent = function(event) {
  *
  */
 scout.FocusContext.prototype._validateAndSetFocus = function(element) {
-  var elementToFocus;
-  if (element && this._isValidFocus(element)) {
+  var elementToFocus = null;
+
+  if (element && this._isChildElement(element)) {
     elementToFocus = element;
   } else {
     elementToFocus = scout.focusManager.findFirstFocusableElement(this._uiSessionId, this._$container);
   }
 
-  // Store the element which will gain the focus to allow to restore it later on.
-  // Use case: If showing a message box from within this focus context, the message box's focus context gets installed.
-  //           Upon closing the message box, its context is uninstalled which in turn activates this context anew.
+  // Store the 'elementToFocus' even if the element is covert by a glasspane. That is for later restore once the glasspane is removed.
   this._lastFocusedElement = elementToFocus;
 
-  // Check whether focus management is active.
+  // Do not gain focus if the focus manager is not active.
   if (!scout.focusManager.active(this._uiSessionId)) {
     return;
+  }
+
+  // Check whether the element is covert by a glasspane
+  if (scout.focusManager._isElementCovertByGlassPane(element, this._uiSessionId)) {
+    elementToFocus = null;
   }
 
   // Only set the focus if different to the current focused element.
@@ -134,17 +138,8 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
 };
 
 /**
- * Checks whether the given element is a child control of this context's $container, and that it is not covert by a glasspane.
+ * Checks whether the given element is a child control of this context's $container.
  */
-scout.FocusContext.prototype._isValidFocus = function(element) {
-  // Check whether the element is a child of this context's container.
-  if (!$(element).closest(this._$container).length) {
-    return false;
-  }
-  // Check whether the element is accessible and not covert by a glasspane.
-  if (!scout.focusManager._isElementAccessible(element, this._uiSessionId)) {
-    return false;
-  }
-
-  return true;
+scout.FocusContext.prototype._isChildElement = function(element) {
+  return $(element).closest(this._$container).length;
 };
