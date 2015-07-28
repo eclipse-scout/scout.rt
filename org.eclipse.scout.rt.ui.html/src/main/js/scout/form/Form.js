@@ -254,7 +254,6 @@ scout.Form.prototype.attach = function() {
     htmlComp.setSize(htmlParent.getSize());
   }
 
-  this._installFocusContext();
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
@@ -296,7 +295,6 @@ scout.Form.prototype.detach = function() {
   this.fileChooserController.detach();
 
   this.session.detachHelper.beforeDetach(this.$container);
-  this._uninstallFocusContext();
   this.$container.detach();
 
   this.attached = false;

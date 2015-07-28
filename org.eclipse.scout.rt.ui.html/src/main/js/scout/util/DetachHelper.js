@@ -21,31 +21,14 @@ scout.DetachHelper.prototype.beforeDetach = function($container, options) {
   if (options.storeTooltips) {
     this._storeTooltips($container);
   }
-  if (options.storeFocus) {
-    this._storeFocus($container);
-  }
+
+  this._storeFocusAndFocusContext($container, options);
 };
 
 scout.DetachHelper.prototype.afterAttach = function($container) {
   this._restoreScrollPositions($container);
   this._restoreTooltips($container);
-  this._restoreFocus($container);
-};
-
-scout.DetachHelper.prototype._storeFocus = function($container) {
-  var $focusedElement = $container.find(':focus');
-  if ($focusedElement.length) {
-    $container.data('lastFocus', $focusedElement);
-    $.log.debug('Stored focused element =' + scout.graphics.debugOutput($focusedElement));
-  }
-};
-
-scout.DetachHelper.prototype._restoreFocus = function($container) {
-  var $storedFocusElement = $container.data('lastFocus');
-  if ($storedFocusElement) {
-    $storedFocusElement.focus();
-    $.log.debug('Restored focus on element ' + scout.graphics.debugOutput($storedFocusElement));
-  }
+  this._restoreFocusAndFocusContext($container);
 };
 
 scout.DetachHelper.prototype._storeScrollPositions = function($container) {
@@ -126,4 +109,38 @@ scout.DetachHelper.prototype._restoreTooltips = function($container) {
     tooltip.render(tooltip.$parent);
   });
   $container.data('tooltips', null);
+};
+
+scout.DetachHelper.prototype._storeFocusAndFocusContext = function($container, options) {
+  // Store current focus position
+  if (options.storeFocus) {
+    var $focusedElement = $container.find(':focus');
+    if ($focusedElement.length) {
+      $container.data('lastFocus', $focusedElement);
+      $.log.debug('Stored focused element =' + scout.graphics.debugOutput($focusedElement));
+    } else {
+      $container.removeData('lastFocus');
+    }
+  }
+
+  // Uninstall potential focus manager (must be after storing the focus)
+  if ($container.isFocusContextInstalled(this.session.uiSessionId)) {
+    $container.uninstallFocusContext(this.session.uiSessionId);
+    $container.data('focusContextInstalled', true);
+  } else {
+    $container.removeData('focusContextInstalled');
+  }
+};
+
+scout.DetachHelper.prototype._restoreFocusAndFocusContext = function($container) {
+  var $storedFocusElement = $container.data('lastFocus');
+  var focusContextInstalled = $container.data('focusContextInstalled');
+
+  if (focusContextInstalled) {
+    $container.installFocusContext(this.session.uiSessionId, $storedFocusElement || scout.FocusRule.AUTO);
+    $.log.debug('Restored focus manager and focus on element ' + scout.graphics.debugOutput($storedFocusElement));
+  } else if ($storedFocusElement) {
+    $storedFocusElement.focus();
+    $.log.debug('Restored focus on element ' + scout.graphics.debugOutput($storedFocusElement));
+  }
 };

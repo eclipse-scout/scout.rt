@@ -649,6 +649,13 @@
   };
 
   /**
+   * Returns true if there is a focus context installed for the given $container.
+   */
+  $.fn.isFocusContextInstalled = function(uiSessionId) {
+    return scout.focusManager.isFocusContextInstalled(uiSessionId, this);
+  };
+
+  /**
    * Installs a new focus context for this $container, and sets the $container's initial focus, either by the given rule, or tries to gain focus for the given element.
    *
    * @param initialFocusRuleOrElement: rule how to set the initial focus, or the element to gain focus.
@@ -663,25 +670,8 @@
   };
 
   /**
-   * Asynchronously installs a new focus context for this $container, and sets the $container's initial focus, either by the given rule, or tries to gain focus for the given element.
-   *
-   * @param initialFocusRuleOrElement: rule how to set the initial focus, or the element to gain focus.
-   *
-   *        rule: scout.FocusRule.AUTO: to focus the first child control (if applicable);
-   *              scout.FocusRule.NONE: to not focus any element;
-   *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
-   *                 e.g. not covert by a glasspane;
-   */
-  $.fn.installFocusContextAsync = function(uiSessionId, $firstFocusElement) {
-    setTimeout(function() {
-      scout.focusManager.installFocusContext(uiSessionId, this, $firstFocusElement);
-    }.bind(this));
-
-
-  };
-
-  /**
    * Uninstalls the focus context for this $container, and activates the last active context.
+   * This method has no effect, if there is no focus context installed for the given $container.
    */
   $.fn.uninstallFocusContext = function(uiSessionId) {
     scout.focusManager.uninstallFocusContext(uiSessionId, this);

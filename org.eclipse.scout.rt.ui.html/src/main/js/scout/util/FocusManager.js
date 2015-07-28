@@ -105,6 +105,7 @@ scout.FocusManager.prototype.installFocusContext = function(uiSessionId, $contai
 
 /**
  * Uninstalls the focus context for the given $container, and activates the last active context.
+ * This method has no effect, if there is no focus context installed for the given $container.
  */
 scout.FocusManager.prototype.uninstallFocusContext = function(uiSessionId, $container) {
   var focusContext = this._contextByContainer(uiSessionId, $container);
@@ -120,6 +121,13 @@ scout.FocusManager.prototype.uninstallFocusContext = function(uiSessionId, $cont
   if (activeFocusContext) {
     activeFocusContext._validateAndSetFocus(activeFocusContext._lastFocusedElement);
   }
+};
+
+/**
+ * Returns true if there is a focus context installed for the given $container.
+ */
+scout.FocusManager.prototype.isFocusContextInstalled = function(uiSessionId, $container) {
+  return this._contextByContainer(uiSessionId, $container) !== null;
 };
 
 /**

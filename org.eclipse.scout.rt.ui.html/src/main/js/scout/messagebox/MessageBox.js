@@ -199,7 +199,6 @@ scout.MessageBox.prototype.attach = function() {
   }
 
   this._$parent.append(this.$container);
-  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE);
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
@@ -227,7 +226,6 @@ scout.MessageBox.prototype.detach = function() {
   }
 
   this.session.detachHelper.beforeDetach(this.$container);
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
   this.$container.detach();
 
   this.attached = false;
