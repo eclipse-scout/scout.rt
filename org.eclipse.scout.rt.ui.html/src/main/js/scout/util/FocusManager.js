@@ -39,11 +39,11 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
   // Make container focusable and install focus context
   $entryPoint.attr('tabindex', portletPartId);
 
-  this.installFocusContext(session.uiSessionId, $entryPoint, scout.FocusRule.AUTO);
+  this.installFocusContext(session, $entryPoint, scout.FocusRule.AUTO);
 
   // Install global 'mousedown' listener to accept or prevent focus gain.
   session.$entryPoint.on('mousedown', function(event) {
-    if (!this._acceptFocusChangeOnMouseDown($(event.target), session.$entryPoint, session.uiSessionId)) {
+    if (!this._acceptFocusChangeOnMouseDown($(event.target), session)) {
       event.preventDefault();
     }
     return true;
@@ -83,10 +83,10 @@ scout.FocusManager.prototype.active = function(uiSessionId) {
  *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
  *                 e.g. not covert by a glasspane;
  */
-scout.FocusManager.prototype.installFocusContext = function(uiSessionId, $container, initialFocusRuleOrElement) {
+scout.FocusManager.prototype.installFocusContext = function(session, $container, initialFocusRuleOrElement) {
   var elementToFocus;
   if (!initialFocusRuleOrElement || initialFocusRuleOrElement === scout.FocusRule.AUTO) {
-    elementToFocus = this.findFirstFocusableElement(uiSessionId, $container);
+    elementToFocus = this.findFirstFocusableElement(session, $container);
   } else if (initialFocusRuleOrElement === scout.FocusRule.NONE) {
     elementToFocus = null;
   } else {
@@ -94,7 +94,7 @@ scout.FocusManager.prototype.installFocusContext = function(uiSessionId, $contai
   }
 
   // Create and register the focus context.
-  var focusContext = new scout.FocusContext($container, uiSessionId);
+  var focusContext = new scout.FocusContext($container, session);
   this._registerContextIfAbsentElseMoveTop(focusContext);
 
   // Focuses the given element, but only if accessible (not covert by glasspane), and if being a child control of the $container.
@@ -107,17 +107,17 @@ scout.FocusManager.prototype.installFocusContext = function(uiSessionId, $contai
  * Uninstalls the focus context for the given $container, and activates the last active context.
  * This method has no effect, if there is no focus context installed for the given $container.
  */
-scout.FocusManager.prototype.uninstallFocusContext = function(uiSessionId, $container) {
-  var focusContext = this._contextByContainer(uiSessionId, $container);
+scout.FocusManager.prototype.uninstallFocusContext = function(session, $container) {
+  var focusContext = this._contextByContainer(session.uiSessionId, $container);
   if (!focusContext) {
     return;
   }
 
-  scout.arrays.remove(this._contextsBySession(uiSessionId), focusContext);
+  scout.arrays.remove(this._contextsBySession(session.uiSessionId), focusContext);
   focusContext._dispose();
 
   // Activate last active focus context.
-  var activeFocusContext = this._activeContext(uiSessionId);
+  var activeFocusContext = this._activeContext(session.uiSessionId);
   if (activeFocusContext) {
     activeFocusContext._validateAndSetFocus(activeFocusContext._lastFocusedElement);
   }
@@ -126,8 +126,8 @@ scout.FocusManager.prototype.uninstallFocusContext = function(uiSessionId, $cont
 /**
  * Returns true if there is a focus context installed for the given $container.
  */
-scout.FocusManager.prototype.isFocusContextInstalled = function(uiSessionId, $container) {
-  return this._contextByContainer(uiSessionId, $container) !== null;
+scout.FocusManager.prototype.isFocusContextInstalled = function(session, $container) {
+  return this._contextByContainer(session.uiSessionId, $container) !== null;
 };
 
 /**
@@ -151,20 +151,18 @@ scout.FocusManager.prototype.unregisterGlassPaneTarget = function(uiSessionId, g
 /**
  * Finds the first focusable element of the given $container, or null if not found.
  */
-scout.FocusManager.prototype.findFirstFocusableElement = function(uiSessionId, $container) {
-  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents;
-
-  // Find all focusable child elements.
-  // Note: If the $container itself is focusable (with a tabindex), also add it to the list of candidates.
-  //       E.g. menu-items in a context-menu are not focusable, but the popup container instead.
-  //       That allows the popup to gain focus even if having no focusable children.
-  var $candidates = $container.find(':focusable').addBack('[tabindex]'); // FIXME [dwi][awe] use other css class for context menu popups
+scout.FocusManager.prototype.findFirstFocusableElement = function(session, $container) {
+  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents,
+    $candidates = $container
+      .find(':focusable')
+      .addBack('[tabindex]') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
+      .not(session.$entryPoint); // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
 
     // Check whether the candidate is accessible and not covert by a glass pane.
-    if (this._isElementCovertByGlassPane(candidate, uiSessionId)) {
+    if (this._isElementCovertByGlassPane(candidate, session.uiSessionId)) {
       continue;
     }
 
@@ -212,7 +210,7 @@ scout.FocusManager.prototype.requestFocus = function(uiSessionId, element) {
  * Registers the given focus context, or moves it on top if already registered.
  */
 scout.FocusManager.prototype._registerContextIfAbsentElseMoveTop = function(focusContext) {
-  var focusContexts = this._contextsBySession(focusContext._uiSessionId);
+  var focusContexts = this._contextsBySession(focusContext.session.uiSessionId);
 
   scout.arrays.remove(focusContexts, focusContext);
   focusContexts.push(focusContext);
@@ -258,7 +256,7 @@ scout.FocusManager.prototype._contextByContainer = function(uiSessionId, $contai
  *  - if the source contains some selectable text;
  *  - if the source is contained within a focusable DOM parent;
  */
-scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, $entryPoint, uiSessionId) {
+scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, session) {
   // 1. Prevent focus gain when glasspane is clicked.
   //    Even if the glasspane is not focusable, this check is required because the glasspane might be contained in a focusable container
   //    like table. Use case: outline modality with table-page as 'outlineContent'.
@@ -267,7 +265,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
   }
 
   // 2. Prevent focus gain if covert by glasspane.
-  if (this._isElementCovertByGlassPane($element, uiSessionId)) {
+  if (this._isElementCovertByGlassPane($element, session.uiSessionId)) {
     return false;
   }
 
@@ -288,7 +286,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
   }
 
   // 6. Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
-  if (this._containsFocusableParent($element, $entryPoint)) {
+  if (this._containsFocusableParent($element, session.$entryPoint)) {
     return true;
   }
 
@@ -315,7 +313,7 @@ scout.FocusManager.prototype._isMenuOrButton = function($element) {
  * Checks if the element contains a parent which is focusable.
  */
 scout.FocusManager.prototype._containsFocusableParent = function($element, $entryPoint) {
-  return $element.parents(":focusable").not($entryPoint).length; // exclude entry point; is only focusable to provide Portlet support;
+  return $element.parents(':focusable').not($entryPoint).length > 0; // exclude entry point; is only focusable to provide Portlet support;
 };
 
 /**

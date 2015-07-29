@@ -56,7 +56,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
 };
 
 scout.BusyIndicator.prototype._postRender = function() {
-  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
+  this.$container.installFocusContext(this.session, scout.FocusRule.AUTO);
 };
 
 scout.BusyIndicator.prototype._remove = function() {
@@ -70,7 +70,7 @@ scout.BusyIndicator.prototype._remove = function() {
       .setMouseCursorWait(false);
   });
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
+  this.$container.uninstallFocusContext(this.session); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
 
   scout.BusyIndicator.parent.prototype._remove.call(this);
 };

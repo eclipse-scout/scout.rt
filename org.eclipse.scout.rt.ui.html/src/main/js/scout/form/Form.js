@@ -311,19 +311,19 @@ scout.Form.prototype._initialFocusElement = function() {
   if (initialFocusField) {
     return initialFocusField.$field[0];
   } else {
-    return scout.focusManager.findFirstFocusableElement(this.session.uiSessionId, this.$container);
+    return scout.focusManager.findFirstFocusableElement(this.session, this.$container);
   }
 };
 
 scout.Form.prototype._installFocusContext = function() {
   if (this.isDialog()) {
-    this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.NONE);
+    this.$container.installFocusContext(this.session, scout.FocusRule.NONE);
   }
 };
 
 scout.Form.prototype._uninstallFocusContext = function() {
   if (this.isDialog()) {
-    this.$container.uninstallFocusContext(this.session.uiSessionId);
+    this.$container.uninstallFocusContext(this.session);
   }
 };
 

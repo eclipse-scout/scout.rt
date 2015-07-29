@@ -88,12 +88,12 @@ scout.MessageBox.prototype._render = function($parent) {
 };
 
 scout.MessageBox.prototype._postRender = function() {
-  this.$container.installFocusContext(this.session.uiSessionId, scout.FocusRule.AUTO);
+  this.$container.installFocusContext(this.session, scout.FocusRule.AUTO);
 };
 
 scout.MessageBox.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session.uiSessionId); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
+  this.$container.uninstallFocusContext(this.session); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
   this.attached = false;
 
   scout.MessageBox.parent.prototype._remove.call(this);

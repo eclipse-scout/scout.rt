@@ -5,9 +5,9 @@
  * - validates whether child controls can gain the focus;
  * - ensures proper focus once a focused control gets removed;
  */
-scout.FocusContext = function($container, uiSessionId) {
+scout.FocusContext = function($container, session) {
   this._$container = $container;
-  this._uiSessionId = uiSessionId;
+  this.session = session;
   this._lastFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
 
   // Notice: Any listener is installed on $container and not on $field level.
@@ -108,32 +108,29 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
   if (element && this._isChildElement(element)) {
     elementToFocus = element;
   } else {
-    elementToFocus = scout.focusManager.findFirstFocusableElement(this._uiSessionId, this._$container);
+    elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container);
   }
 
   // Store the 'elementToFocus' even if the element is covert by a glasspane. That is for later restore once the glasspane is removed.
   this._lastFocusedElement = elementToFocus;
 
   // Do not gain focus if the focus manager is not active.
-  if (!scout.focusManager.active(this._uiSessionId)) {
+  if (!scout.focusManager.active(this.session.uiSessionId)) {
     return;
   }
 
   // Check whether the element is covert by a glasspane
-  if (scout.focusManager._isElementCovertByGlassPane(element, this._uiSessionId)) {
+  if (scout.focusManager._isElementCovertByGlassPane(element, this.session.uiSessionId)) {
     elementToFocus = null;
   }
 
-  // Only set the focus if different to the current focused element.
-  if (document.activeElement === elementToFocus) {
-    return;
-  }
+  // When no element at all is focusable, we must focus the $entryPoint, because we don't want to focus the document body
+  // because when the body is focused, the browser default keystrokes (like backspace, etc.) would be triggered.
+  elementToFocus = elementToFocus || this.session.$entryPoint[0];
 
-  // Set the focus, or blur it.
-  if (elementToFocus) {
+  // Only set the focus if different to the current focused element.
+  if (document.activeElement !== elementToFocus) {
     $(elementToFocus).focus();
-  } else {
-    $(document.activeElement).blur();
   }
 };
 
@@ -141,5 +138,8 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
  * Checks whether the given element is a child control of this context's $container.
  */
 scout.FocusContext.prototype._isChildElement = function(element) {
-  return $(element).closest(this._$container).length;
+  return $(element)
+      .not(this._$container) // element must not be $container
+      .closest(this._$container)
+      .length > 0;
 };

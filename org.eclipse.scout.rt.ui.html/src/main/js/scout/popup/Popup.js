@@ -28,7 +28,7 @@ scout.Popup.prototype.render = function($parent, event) {
 
 scout.Popup.prototype._postRender = function() {
   if (this.installFocusContext) {
-    this.$container.installFocusContext(this.session.uiSessionId, this.initialFocus());
+    this.$container.installFocusContext(this.session, this.initialFocus());
   }
 };
 
@@ -38,7 +38,7 @@ scout.Popup.prototype.remove = function() {
   }
 
   if (this.installFocusContext) {
-    this.$container.uninstallFocusContext(this.session.uiSessionId);
+    this.$container.uninstallFocusContext(this.session);
   }
   scout.Popup.parent.prototype.remove.call(this);
 

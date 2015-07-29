@@ -124,8 +124,8 @@ scout.DetachHelper.prototype._storeFocusAndFocusContext = function($container, o
   }
 
   // Uninstall potential focus manager (must be after storing the focus)
-  if ($container.isFocusContextInstalled(this.session.uiSessionId)) {
-    $container.uninstallFocusContext(this.session.uiSessionId);
+  if ($container.isFocusContextInstalled(this.session)) {
+    $container.uninstallFocusContext(this.session);
     $container.data('focusContextInstalled', true);
   } else {
     $container.removeData('focusContextInstalled');
@@ -137,7 +137,7 @@ scout.DetachHelper.prototype._restoreFocusAndFocusContext = function($container)
   var focusContextInstalled = $container.data('focusContextInstalled');
 
   if (focusContextInstalled) {
-    $container.installFocusContext(this.session.uiSessionId, $storedFocusElement || scout.FocusRule.AUTO);
+    $container.installFocusContext(this.session, $storedFocusElement || scout.FocusRule.AUTO);
     $.log.debug('Restored focus manager and focus on element ' + scout.graphics.debugOutput($storedFocusElement));
   } else if ($storedFocusElement) {
     $storedFocusElement.focus();

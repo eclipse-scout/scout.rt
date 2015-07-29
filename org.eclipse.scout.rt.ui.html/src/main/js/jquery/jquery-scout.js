@@ -651,8 +651,8 @@
   /**
    * Returns true if there is a focus context installed for the given $container.
    */
-  $.fn.isFocusContextInstalled = function(uiSessionId) {
-    return scout.focusManager.isFocusContextInstalled(uiSessionId, this);
+  $.fn.isFocusContextInstalled = function(session) {
+    return scout.focusManager.isFocusContextInstalled(session, this);
   };
 
   /**
@@ -665,16 +665,16 @@
    *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
    *                 e.g. not covert by a glasspane;
    */
-  $.fn.installFocusContext = function(uiSessionId, $firstFocusElement) {
-    scout.focusManager.installFocusContext(uiSessionId, this, $firstFocusElement);
+  $.fn.installFocusContext = function(session, $firstFocusElement) {
+    scout.focusManager.installFocusContext(session, this, $firstFocusElement);
   };
 
   /**
    * Uninstalls the focus context for this $container, and activates the last active context.
    * This method has no effect, if there is no focus context installed for the given $container.
    */
-  $.fn.uninstallFocusContext = function(uiSessionId) {
-    scout.focusManager.uninstallFocusContext(uiSessionId, this);
+  $.fn.uninstallFocusContext = function(session) {
+    scout.focusManager.uninstallFocusContext(session, this);
   };
 
   /**
