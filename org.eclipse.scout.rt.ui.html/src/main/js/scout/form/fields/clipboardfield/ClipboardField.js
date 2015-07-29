@@ -13,7 +13,9 @@ scout.ClipboardField.prototype._render = function($parent) {
     .on('paste', this._onPaste.bind(this));
     //.on('copy', this._onPaste.bind(this));
 
-  $parent.on('click', function(event) { this.$field.focus(); }.bind(this));
+  $parent.on('click', function(event) {
+    scout.focusManager.requestFocus(this.session.uiSessionId, this.$field);
+    }.bind(this));
 
   if (this.rendered) {
     scout.focusManager.requestFocus(this.session.uiSessionId, this.$field);
@@ -21,7 +23,12 @@ scout.ClipboardField.prototype._render = function($parent) {
 };
 
 scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
-  this.$field.text(displayText);
+  if (scout.strings.hasText(displayText)) {
+    this.$field.text(displayText);
+    scout.scrollbars.install(this.$field, this.session);
+  } else {
+    this.$field.empty();
+  }
 };
 
 scout.ClipboardField.prototype._onPaste = function(event) {
@@ -35,10 +42,10 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     throw new Error('Unable to access clipboard data.');
   }
 
-
   var filesArgument = [],   // options to be uploaded, arguments for this.session.uploadFiles
     additionalOptions = {},
-    additionalOptionsCompatibilityIndex = 0;   // counter for additional options
+    additionalOptionsCompatibilityIndex = 0,   // counter for additional options
+    contentCount = 0;
 
   // some browsers (e.g. IE) specify text content simply as data of type 'Text', it is not listed in list of types
   var textContent;
@@ -46,9 +53,11 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   if (textContent) {
     if (window.Blob) {
       filesArgument.push(new Blob([textContent], {type: scout.MimeTypes.TEXT_PLAIN}));
+      contentCount++;
     } else {
       // compatibility workaround
       additionalOptions['textTransferObject' + additionalOptionsCompatibilityIndex++] = textContent;
+      contentCount++;
     }
   }
 
@@ -57,10 +66,12 @@ scout.ClipboardField.prototype._onPaste = function(event) {
       if (item.type === scout.MimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
           filesArgument.push(new Blob([str], {type: scout.MimeTypes.TEXT_PLAIN}));
+          contentCount++;
         });
       }
       else if (scout.helpers.isOneOf(item.type, [scout.MimeTypes.IMAGE_PNG, scout.MimeTypes.IMAGE_JPG, scout.MimeTypes.IMAGE_JPEG, scout.MimeTypes.IMAGE_GIF])) {
         filesArgument.push(item.getAsFile());
+        contentCount++;
       }
     });
   }
@@ -82,10 +93,12 @@ scout.ClipboardField.prototype._onPaste = function(event) {
       };
       // start file reader
       waitForFileReaderEvents++;
+      contentCount++;
       reader.readAsArrayBuffer(item);
     });
   }
 
+  // upload function needs to be called asynchronously to support real files
   var uploadFunctionTimeoutCount = 0;
   var uploadFunction = function() {
     if (waitForFileReaderEvents !== 0 && uploadFunctionTimeoutCount++ !== 99) {
@@ -110,8 +123,59 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     }
   }.bind(this);
 
-  uploadFunction.call(this);
+  // upload content function, if content can not be read from event
+  var uploadContentFunction = function() {
+    // store old inner html (will be replaced)
+    scout.scrollbars.uninstall(this.$field, this.session);
+    var oldHtmlContent = this.$field.html();
+    this.$field.html('');
+    var restoreOldHtmlContent = function() {
+      this.$field.html(oldHtmlContent);
+      scout.scrollbars.install(this.$field, this.session);
+    };
 
-  // do not trigger any other actions
-  return false;
+    setTimeout(function() {
+      $.each(this.$field.children(), function(idx, elem) {
+        if (elem.nodeName === 'IMG') {
+          var $elem = $(elem),
+            srcAttr = $elem.attr('src');
+
+          if (srcAttr && scout.strings.startsWith(srcAttr, 'data:')) {
+            var srcDataMatch = /data:(.*);base64/g.exec(srcAttr);
+            if (srcDataMatch) {
+              var srcArray = srcAttr.split(','),
+                encData = window.atob(srcArray[1]),
+                byteNumbers = new Array(encData.length);
+
+              if (scout.helpers.isOneOf(srcDataMatch[1], [scout.MimeTypes.IMAGE_PNG, scout.MimeTypes.IMAGE_JPG, scout.MimeTypes.IMAGE_JPEG, scout.MimeTypes.IMAGE_GIF])) {
+                for (var i = 0; i < encData.length; i++) {
+                    byteNumbers[i] = encData.charCodeAt(i);
+                }
+                var byteArray = new Uint8Array(byteNumbers);
+
+                var f = new Blob([byteArray], {type: srcDataMatch[1]});
+                f.name = '';
+                filesArgument.push(f);
+              }
+            }
+          }
+        }
+      }.bind(this));
+
+      restoreOldHtmlContent.call(this);
+      uploadFunction.call(this);
+    }.bind(this), 0);
+  };
+
+  if (contentCount > 0) {
+    uploadFunction.call(this);
+
+    // do not trigger any other actions
+    return false;
+  } else {
+    uploadContentFunction.call(this);
+
+    // trigger other actions to catch content
+    return true;
+  }
 };
