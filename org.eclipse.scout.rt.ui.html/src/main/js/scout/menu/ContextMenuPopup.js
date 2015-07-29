@@ -18,6 +18,13 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
 };
 
 /**
+ * @override PopupWithHead.js
+ */
+scout.ContextMenuPopup.prototype._modifyBody = function() {
+  this.$body.addClass('context-menu');
+};
+
+/**
  * Override this method to return menu items or actions used to render menu items.
  */
 scout.ContextMenuPopup.prototype._getMenuItems = function() {

@@ -155,7 +155,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function(session, $cont
   var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents,
     $candidates = $container
       .find(':focusable')
-      .addBack('[tabindex]') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
+      .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
       .not(session.$entryPoint); // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
 
   for (i = 0; i < $candidates.length; i++) {

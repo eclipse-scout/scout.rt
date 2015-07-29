@@ -61,6 +61,10 @@
   border: 1px solid @border-color;
   background-color: @palette-white;
 
+  &.context-menu {
+    position: relative;
+  }
+
   & > .menu-item.context-menu-item-first {
     border-top: 1px solid transparent; //@border-color;
   }

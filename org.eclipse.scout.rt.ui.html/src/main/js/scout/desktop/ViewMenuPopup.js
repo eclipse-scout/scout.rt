@@ -24,7 +24,7 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
 };
 
 /**
- * Override PopupWithHead.js
+ * @override PopupWithHead.js
  */
 scout.ViewMenuPopup.prototype._renderHead = function() {
   scout.ViewMenuPopup.parent.prototype._renderHead.call(this);
@@ -38,7 +38,7 @@ scout.ViewMenuPopup.prototype._renderHead = function() {
 };
 
 /**
- * Override PopupWithHead.js
+ * @override PopupWithHead.js
  */
 scout.ViewMenuPopup.prototype._modifyBody = function() {
   this.$body.removeClass('popup-body');
@@ -46,7 +46,7 @@ scout.ViewMenuPopup.prototype._modifyBody = function() {
 };
 
 /**
- * Override PopupWithHead.js
+ * @override PopupWithHead.js
  */
 scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
   var $blueprintTitle = this.$tab.find('.view-button-tab-title');
