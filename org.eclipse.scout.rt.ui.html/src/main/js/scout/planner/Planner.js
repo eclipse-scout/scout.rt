@@ -164,22 +164,22 @@ scout.Planner.prototype._navigateDate = function(direction) {
   var viewRange = new scout.Range(this.viewRange.from, this.viewRange.to),
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
-  if (this.displayMode == DISPLAY_MODE.DAY) {
+  if (this.displayMode === DISPLAY_MODE.DAY) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
-  } else if (this.displayMode == DISPLAY_MODE.WEEK || this.displayMode == DISPLAY_MODE.WORK) {
+  } else if (this.displayMode === DISPLAY_MODE.WEEK || this.displayMode === DISPLAY_MODE.WORK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
     viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
-  } else if (this.displayMode == DISPLAY_MODE.MONTH) {
+  } else if (this.displayMode === DISPLAY_MODE.MONTH) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
     viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
-  } else if (this.displayMode == DISPLAY_MODE.CALENDAR_WEEK) {
+  } else if (this.displayMode === DISPLAY_MODE.CALENDAR_WEEK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
     viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1*direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
-  } else if (this.displayMode == DISPLAY_MODE.YEAR) {
+  } else if (this.displayMode === DISPLAY_MODE.YEAR) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 3 * direction, 0);
   }
@@ -195,9 +195,9 @@ scout.Planner.prototype._onTodayClick = function(event) {
     day = (today.getDay() + 6) % 7,
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
-  if (this.displayMode == DISPLAY_MODE.DAY ) {
+  if (this.displayMode === DISPLAY_MODE.DAY ) {
     today = new Date(year, month, day);
-  } else if (this.displayMode == DISPLAY_MODE.YEAR) {
+  } else if (this.displayMode === DISPLAY_MODE.YEAR) {
     today = new Date(year, month, 1);
   } else {
     today = new Date(year, month, date - day);
@@ -289,16 +289,16 @@ scout.Planner.prototype._renderRange = function() {
   // find range text
   if (scout.dates.isSameDay(this.viewRange.from, toDate)) {
     text = this._dateFormat(this.viewRange.from, 'd. MMMM yyyy');
-  } else if (this.viewRange.from.getMonth() == toDate.getMonth() && this.viewRange.from.getFullYear() == toDate.getFullYear()) {
+  } else if (this.viewRange.from.getMonth() === toDate.getMonth() && this.viewRange.from.getFullYear() === toDate.getFullYear()) {
     text = this._dateFormat(this.viewRange.from, 'd.') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
   } else if (this.viewRange.from.getFullYear() === toDate.getFullYear()) {
-    if (this.displayMode == DISPLAY_MODE.YEAR) {
+    if (this.displayMode === DISPLAY_MODE.YEAR) {
       text = this._dateFormat(this.viewRange.from, 'MMMM') + toText + this._dateFormat(toDate, 'MMMM yyyy');
     } else {
       text = this._dateFormat(this.viewRange.from, 'd.  MMMM') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
     }
   } else {
-    if (this.displayMode == DISPLAY_MODE.YEAR) {
+    if (this.displayMode === DISPLAY_MODE.YEAR) {
       text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(toDate, 'MMMM yyyy');
     } else {
       text = this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
@@ -391,7 +391,7 @@ scout.Planner.prototype._renderScale = function() {
     // from start to end
     while (loop < this.viewRange.to) {
       newLargeGroup = false;
-      if ((loop.getDate() == 1) || first) {
+      if ((loop.getDate() === 1) || first) {
         if ((loop.getMonth() === 0) || first) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
         } else {
@@ -404,7 +404,7 @@ scout.Planner.prototype._renderScale = function() {
         .appendDiv('scale-item', this._dateFormat(loop, 'dd'))
         .data('date-from', new Date(loop.valueOf()));
 
-      if (loop.getDate() % 2 == 1) {
+      if (loop.getDate() % 2 === 1) {
         $divSmall.addClass('invisible');
       }
 
@@ -524,7 +524,7 @@ scout.Planner.prototype._scaleTooltipText = function($scale) {
     from = new Date($scale.data('date-from').valueOf()),
     to = new Date($scale.data('date-to').valueOf() - 1);
 
-  if (from.getMonth() == to.getMonth()) {
+  if (from.getMonth() === to.getMonth()) {
     return this._dateFormat(from, 'd.') + toText + this._dateFormat(to, 'd. MMMM yyyy');
   } else if (from.getFullYear() === to.getFullYear()) {
     return this._dateFormat(from, 'd. MMMM') + toText + this._dateFormat(to, 'd. MMMM yyyy');
@@ -648,11 +648,11 @@ scout.Planner.prototype._onCellMousedown = function(event) {
     $target = $(event.target),
     SELECTION_MODE = scout.Planner.SelectionMode;
 
-  if (this.selectionMode == SELECTION_MODE.NONE) {
+  if (this.selectionMode === SELECTION_MODE.NONE) {
     return;
   }
 
-  if (this.selectionMode == SELECTION_MODE.ACTIVITY) {
+  if (this.selectionMode === SELECTION_MODE.ACTIVITY) {
     $activity = $(document.elementFromPoint(event.pageX, event.pageY));
 
     if ($activity.hasClass('planner-activity')) {
@@ -751,7 +751,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
     $lastRow = this.lastRow.$resource;
 
   // in case of single selection
-  if (this.selectionMode == scout.Planner.SelectionMode.SINGLE_RANGE) {
+  if (this.selectionMode === scout.Planner.SelectionMode.SINGLE_RANGE) {
     this.lastRow = this.startRow;
     $lastRow = this.startRow.$resource;
   }

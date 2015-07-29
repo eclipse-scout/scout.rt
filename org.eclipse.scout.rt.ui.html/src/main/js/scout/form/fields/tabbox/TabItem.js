@@ -50,7 +50,7 @@ scout.TabItem.prototype.focusTab = function() {
 scout.TabItem.prototype.setTabActive = function(active) {
   var oldTabActive = this._tabActive;
   this._tabActive = active;
-  if (this._tabRendered && oldTabActive != active) {
+  if (this._tabRendered && oldTabActive !== active) {
     this._renderTabActive();
   }
 };

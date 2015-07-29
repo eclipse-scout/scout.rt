@@ -70,7 +70,7 @@ scout.YearPanel.prototype._drawYear = function() {
       // add div per day
       $day = $month.appendDiv('year-day', d).data('date', day);
 
-      if (day.getDay() === 0 || day.getDay() == 6) {
+      if (day.getDay() === 0 || day.getDay() === 6) {
         $day.addClass('weekend');
       }
 

@@ -26,7 +26,7 @@ scout.MenuBar = function(session, menuSorter) {
     // the MenuBarLayout. It will be updated automatically after the user request has finished,
     // because the layout calls rebuildItems().
     if (event.changedProperties.length > 0) {
-      if (event.changedProperties.length == 1 && event.changedProperties[0] === 'enabled') {
+      if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
         // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
         this.updateDefaultMenu();
         return;

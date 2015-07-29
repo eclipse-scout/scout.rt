@@ -105,7 +105,7 @@ scout.TabBox.prototype.rebuildTabs = function() {
 
 scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
   var tabIndex = this.tabItems.indexOf(tabItem);
-  if (tabIndex != this.selectedTab) {
+  if (tabIndex !== this.selectedTab) {
     $.log.debug('(TabBox#_selectTab) tabItem=' + tabItem + ' tabIndex=' + tabIndex);
     var oldSelectedTab = this.selectedTab;
     this.selectedTab = tabIndex;

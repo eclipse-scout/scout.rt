@@ -131,6 +131,12 @@ strikten Vergleich funktioniert (und nicht nur "zufaellig" wegen JS-Type-Magie).
 Performance scheint nur eine untergeordnete Rolle zu spielen:
 http://www.adequatelygood.com/Performance-of-vs-.html
 
+Falls doch einmal absichtlich == oder != verwendet werden soll, dies deutlich im
+Code so kennzeichnen, um unabsichtlich "Korrekturen" zu vermeiden. Beispiel:
+  ...
+  if (scout.sessions[i].partId == sessionIndex) { // <-- compare with '==' is intentional!
+  ...
+
 
 ### Exceptions werfen
 

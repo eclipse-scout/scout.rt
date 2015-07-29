@@ -334,7 +334,7 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
     oldDisplayMode = this.displayMode;
 
   displayMode = $(event.target).data('mode');
-  if (oldDisplayMode != displayMode) {
+  if (oldDisplayMode !== displayMode) {
     this.displayMode = displayMode;
     this._yearPanel.setDisplayMode(displayMode);
     if (this._isWork()) {
@@ -347,7 +347,7 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
     this._updateModel(true);
 
     // only render if components has other layout
-    if (oldDisplayMode == scout.Calendar.DisplayMode.MONTH || this.displayMode == scout.Calendar.DisplayMode.MONTH) {
+    if (oldDisplayMode === scout.Calendar.DisplayMode.MONTH || this.displayMode === scout.Calendar.DisplayMode.MONTH) {
       this._renderComponents();
     }
   }
@@ -396,7 +396,7 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
   }
 
   // selected component / part (may be null)
-  if (this.selectedComponent != selectedComponent) {
+  if (this.selectedComponent !== selectedComponent) {
     changed = true;
     if (this.selectedComponent) {
       this.selectedComponent.setSelected(false);
