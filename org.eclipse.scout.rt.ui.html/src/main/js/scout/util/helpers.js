@@ -70,7 +70,10 @@ scout.helpers = {
       for (var i = 0; i < tokens.length; i++) {
         var token = tokens[i].toUpperCase();
         // styles
-        if (token === 'PLAIN') {
+        if (token === 'NULL' || token === '0') {
+          // nop (undefined values)
+        }
+        else if (token === 'PLAIN') {
           // nop
         } else if (token === 'BOLD') {
           fontSpec.bold = true;
@@ -78,9 +81,9 @@ scout.helpers = {
           fontSpec.italic = true;
         } else {
           // size or name
-          if (/^\d+$/.test(token) && token !== '0') {
+          if (/^\d+$/.test(token)) {
             fontSpec.size = token;
-          } else if (token !== 'NULL' && token !== '0') {
+          } else if (token !== 'NULL') {
             fontSpec.name = token;
           }
         }
