@@ -983,30 +983,20 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   }
 
   // Default date
-  var result = this._prepareStartDate(startDate);
+  startDate = this._prepareStartDate(startDate);
 
-  // Apply date info
-  if (dateInfo.year !== undefined) {
-    result.setFullYear(dateInfo.year);
-  }
-  if (dateInfo.month !== undefined) {
-    result.setMonth(dateInfo.month);
-  }
-  if (dateInfo.day !== undefined) {
-    result.setDate(dateInfo.day);
-  }
-  if (dateInfo.hours !== undefined) {
-    result.setHours(dateInfo.hours);
-  }
-  if (dateInfo.minutes !== undefined) {
-    result.setMinutes(dateInfo.minutes);
-  }
-  if (dateInfo.seconds !== undefined) {
-    result.setSeconds(dateInfo.seconds);
-  }
-  if (dateInfo.milliseconds !== undefined) {
-    result.setMilliseconds(dateInfo.milliseconds);
-  }
+  // Apply date info (Start with "zero date", otherwise the date may become invalid
+  // due to JavaScript's automatic date correction, e.g. dateInfo = { day: 11, month: 1 }
+  // and startDate = 2015-07-29 would result in invalid date 2015-03-11, because February
+  // 2015 does not have 29 days and is "corrected" to March.)
+  var result = new Date(0);
+  result.setFullYear(scout.helpers.nvl(dateInfo.year, startDate.getFullYear()));
+  result.setMonth(scout.helpers.nvl(dateInfo.month, startDate.getMonth()));
+  result.setDate(scout.helpers.nvl(dateInfo.day, startDate.getDate()));
+  result.setHours(scout.helpers.nvl(dateInfo.hours, startDate.getHours()));
+  result.setMinutes(scout.helpers.nvl(dateInfo.minutes, startDate.getMinutes()));
+  result.setSeconds(scout.helpers.nvl(dateInfo.seconds, startDate.getSeconds()));
+  result.setMilliseconds(scout.helpers.nvl(dateInfo.milliseconds, startDate.getMilliseconds()));
 
   // Validate. A date is considered valid if the value from the dateInfo did
   // not change (JS date automatically converts illegal values, e.g. day 32 is
