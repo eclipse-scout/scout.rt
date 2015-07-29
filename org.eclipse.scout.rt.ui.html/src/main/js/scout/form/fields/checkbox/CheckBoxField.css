@@ -11,8 +11,13 @@
 
   & > .check-box,
   & > .label {
+    color: @control-color;
     cursor: pointer;
     white-space: nowrap;
+  }
+
+  &.disabled > .label {
+    color: @control-disabled-color;
   }
 
   & > .check-box {

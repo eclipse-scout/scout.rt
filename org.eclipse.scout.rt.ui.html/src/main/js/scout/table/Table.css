@@ -83,6 +83,7 @@
 }
 
 .table-cell {
+  color: @text-color;
   display: table-cell;
   padding: @table-row-padding-y @table-cell-padding-right @table-row-padding-y @table-cell-padding-left;
   position: relative;
@@ -100,7 +101,7 @@
     /* An additional max-width: must be added in browser. */
   }
 
-  .disabled & {
+  .disabled > .table-row > & {
     color: @disabled-color;
   }
 
