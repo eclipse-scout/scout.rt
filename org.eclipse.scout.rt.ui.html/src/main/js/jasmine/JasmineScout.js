@@ -15,12 +15,28 @@ function sandboxSession(options) {
   options.backgroundJobPollingEnabled = false;
   session = new scout.Session($('#sandbox'), options);
   session.locale = new LocaleSpecHelper().createLocale('de');
+  fixSandbox();
   return session;
+}
+
+/**
+ * FIXME AWE: fixes problem in Jasmine test suite: FocusManager set a tabindex on the entryPoint which is == the
+ * Sandbox DIV in the Jasmine test suite. This sandbox is not only used as "Desktop" DIV in the test suite, but
+ * also for every other test that wants to test something (like _render) on an arbitrary DIV. For unknown reasons
+ * this leads to network errors (!?) later. Which causes the maven-jasmine plug-in to abort the build (!).
+ * With this simple fix we remove the tabindex from the sandbox DIV so the ':focusable' selector of JQuery UI
+ * returns false when it comes to the sandbox DIV. See FocusManager#findFirstFocusableElement.
+ * The proper solution should clean-up Jasmine tests, so only tests that require a Desktop work with the sandbox
+ * DIV. All other Specs that require just a dummy DIV to call a render method should create their own DIV.
+ */
+function fixSandbox() {
+  $('#sandbox').removeAttr('tabindex');
 }
 
 function sandboxDesktop() {
   var $sandbox = window.sandbox();
   $sandbox.addClass('desktop');
+  fixSandbox();
   return $sandbox;
 }
 
@@ -394,15 +410,6 @@ $.fn.triggerClick = function(opts) {
   this.triggerMouseUp(opts);
   this.triggerMouseAction('click', opts);
 
-  return this;
-};
-
-var _oldFocus = $.fn.focus;
-$.fn.focus = function() {
-  var activeElement =  document.activeElement;
-  $(activeElement).trigger('focusout');
-  _oldFocus.apply(this, arguments);
-  this.trigger('focusin');
   return this;
 };
 
