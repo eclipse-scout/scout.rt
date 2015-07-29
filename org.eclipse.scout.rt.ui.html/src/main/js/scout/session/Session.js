@@ -652,10 +652,8 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 };
 
 scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize, allowedTypes) {
-  // TODO mot content type check before upload would be nice to have (new feature)
-
-  var formData = new FormData();
-  var totalSize = 0;
+  var formData = new FormData(),
+    totalSize = 0;
 
   if (uploadProperties) {
     $.each(uploadProperties, function(key, value) {
