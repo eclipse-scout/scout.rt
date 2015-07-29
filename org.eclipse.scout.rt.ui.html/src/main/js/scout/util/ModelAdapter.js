@@ -302,10 +302,27 @@ scout.ModelAdapter.prototype._fireBulkPropertyChange = function(oldProperties, n
  * Fires a property change for a single property.
  */
 scout.ModelAdapter.prototype._firePropertyChange = function(propertyName, oldValue, newValue) {
-  var oldProperty = {}, newProperty = {};
-  oldProperty[propertyName] = oldValue;
-  newProperty[propertyName] = newValue;
-  this._fireBulkPropertyChange(oldProperty, newProperty);
+  if (!propertyName) {
+    return;
+  }
+  var oldProperties = {},
+    newProperties = {};
+  oldProperties[propertyName] = oldValue;
+  newProperties[propertyName] = newValue;
+  this._fireBulkPropertyChange(oldProperties, newProperties);
+};
+
+
+/**
+ * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
+ */
+scout.ModelAdapter.prototype._setProperty = function(propertyName, newValue) {
+  if (!propertyName) {
+    return;
+  }
+  var oldValue = this[propertyName];
+  this[propertyName] = newValue;
+  this._firePropertyChange(propertyName, oldValue, newValue);
 };
 
 /**
@@ -366,34 +383,6 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
       funcTarget[renderFuncName](newValue, oldValue);
     }
   }.bind(this));
-};
-
-/**
- * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
- */
-scout.ModelAdapter.prototype._setProperty = function(propertyName, newValue) {
-  if (!propertyName) {
-    return;
-  }
-  var oldValue = this[propertyName];
-
-  // Set property
-  this[propertyName] = newValue;
-
-  // Fire propertyChange event
-  var propertyChangeEvent = {
-    newProperties: {
-      propertyName: oldValue
-    },
-    oldProperties: {
-      propertyName: newValue
-    },
-    changedProperties: []
-  };
-  if (oldValue !== newValue) {
-    propertyChangeEvent.changedProperties.push(propertyName);
-  }
-  this.trigger('propertyChange', propertyChangeEvent);
 };
 
 /**
