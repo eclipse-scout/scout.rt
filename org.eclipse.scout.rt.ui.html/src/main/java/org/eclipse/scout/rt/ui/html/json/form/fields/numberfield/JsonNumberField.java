@@ -39,8 +39,13 @@ public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValu
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<INumberField>(INumberField.PROP_DECIMAL_FORMAT, model) {
       @Override
-      protected String modelValue() {
-        DecimalFormat format = getModel().getFormat();
+      protected Object modelValue() {
+        return getModel().getFormat();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        DecimalFormat format = (DecimalFormat) value;
         return format != null ? format.toPattern() : "";
       }
     });

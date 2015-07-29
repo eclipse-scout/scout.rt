@@ -23,7 +23,7 @@ scout.NumberField.prototype._renderGridData = function() {
 };
 
 scout.NumberField.prototype._renderDecimalFormat = function() {
-  this._decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat ? this.decimalFormat : this.session.locale.decimalFormat);
+  this._decimalFormat = this.decimalFormat ? new scout.DecimalFormat(this.session.locale, this.decimalFormat) : this.session.locale.decimalFormat;
 };
 
 scout.NumberField.prototype._parse = function () {
