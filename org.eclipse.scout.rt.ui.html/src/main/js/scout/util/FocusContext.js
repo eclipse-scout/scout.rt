@@ -64,10 +64,14 @@ scout.FocusContext.prototype._onKeyDownEvent = function(event) {
  * Method invoked once a 'FocusIn' event is fired by this context's $container or one of its child controls.
  */
 scout.FocusContext.prototype._onFocusInEvent = function(event) {
-  // Make this context the active context.
-  scout.focusManager._registerContextIfAbsentElseMoveTop(this);
+  // Do not update current focus context nor validate focus if target is $entryPoint.
+  // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glasspanes.
+  if (event.target === this.session.$entryPoint[0]) {
+    return;
+  }
 
-  // Validate the 'focusIn' event.
+  // Make this context the active context (nothing done if already active) and validate the focus event.
+  scout.focusManager._registerContextIfAbsentElseMoveTop(this);
   this._validateAndSetFocus(event.target);
 
   // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
@@ -111,7 +115,7 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
     elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container);
   }
 
-  // Store the 'elementToFocus' even if the element is covert by a glasspane. That is for later restore once the glasspane is removed.
+  // Store the element to focus (even if the element to focus is currently covert by a glasspane -> that is for later restore once the glasspane is removed).
   this._lastFocusedElement = elementToFocus;
 
   // Do not gain focus if the focus manager is not active.
@@ -124,8 +128,8 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
     elementToFocus = null;
   }
 
-  // When no element at all is focusable, we must focus the $entryPoint, because we don't want to focus the document body
-  // because when the body is focused, the browser default keystrokes (like backspace, etc.) would be triggered.
+  // When no element at all is focusable, we focus the $entryPoint, because we don't want to focus the document body.
+  // Otherwise, the browser default keystrokes (like backspace, etc.) would be triggered.
   elementToFocus = elementToFocus || this.session.$entryPoint[0];
 
   // Only set the focus if different to the current focused element.
