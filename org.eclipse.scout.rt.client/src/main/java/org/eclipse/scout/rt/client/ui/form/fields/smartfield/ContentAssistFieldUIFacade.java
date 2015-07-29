@@ -102,8 +102,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
         m_field.getProposalChooser().forceProposalSelection();
       }
       catch (ProcessingException e) {
-        // FIXME AWE Auto-generated catch block
-        e.printStackTrace();
+        LOG.error("when forcing proposal selection", e);
       }
     }
   }
