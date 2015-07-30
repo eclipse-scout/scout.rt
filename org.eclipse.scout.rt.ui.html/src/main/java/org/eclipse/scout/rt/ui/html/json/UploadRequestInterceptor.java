@@ -51,6 +51,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestInterceptor.class);
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
+  private static final String UTF_8 = "UTF-8";
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -137,25 +138,9 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
     return true;
   }
 
-  /**
-   * @param uiSession
-   * @param targetAdapterId
-   * @return
-   */
-  private IBinaryResourceConsumer resolveJsonAdapter(IUiSession uiSession, String targetAdapterId) {
-    // Resolve adapter
-    if (!StringUtility.hasText(targetAdapterId)) {
-      throw new IllegalArgumentException("Missing target adapter ID");
-    }
-    IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(targetAdapterId);
-    if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
-      throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
-    }
-    return (IBinaryResourceConsumer) jsonAdapter;
-  }
-
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException, ProcessingException {
     ServletFileUpload upload = new ServletFileUpload();
+    upload.setHeaderEncoding(UTF_8);
     upload.setSizeMax(maxSize);
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
@@ -164,7 +149,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
 
       if (item.isFormField()) {
         // Handle non-file fields (interpreted as properties)
-        uploadProperties.put(name, Streams.asString(stream));
+        uploadProperties.put(name, Streams.asString(stream, UTF_8));
       }
       else {
         // Handle files
@@ -187,5 +172,22 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
     }
     uiSession.touch();
     return uiSession;
+  }
+
+  /**
+   * Returns the {@link IBinaryResourceConsumer} that is registered to the specified
+   * session under the given adapter ID. If the adapter could not be found, or the
+   * adapter is not a {@link IBinaryResourceConsumer}, a runtime exception is thrown.
+   */
+  protected IBinaryResourceConsumer resolveJsonAdapter(IUiSession uiSession, String targetAdapterId) {
+    // Resolve adapter
+    if (!StringUtility.hasText(targetAdapterId)) {
+      throw new IllegalArgumentException("Missing target adapter ID");
+    }
+    IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(targetAdapterId);
+    if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
+      throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
+    }
+    return (IBinaryResourceConsumer) jsonAdapter;
   }
 }
