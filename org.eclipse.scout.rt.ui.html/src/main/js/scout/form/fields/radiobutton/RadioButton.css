@@ -4,7 +4,6 @@
   position: relative;
   padding: @borderless-field-padding-y 0 @borderless-field-padding-y 25px;
   margin-left: @mandatory-indicator-width;
-  margin-right: 15px;
   outline: none;
   overflow: hidden;
   text-overflow: ellipsis;
