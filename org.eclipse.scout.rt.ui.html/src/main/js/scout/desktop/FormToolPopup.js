@@ -33,6 +33,7 @@ scout.FormToolPopup.prototype._render = function($parent) {
 scout.FormToolPopup.prototype._renderHead = function() {
   scout.FormToolPopup.parent.prototype._renderHead.call(this);
   this._copyCssClassToHead('taskbar-tool-item');
+  this._copyCssClassToHead('unfocusable');
   this.$head.addClass('selected');
 };
 
