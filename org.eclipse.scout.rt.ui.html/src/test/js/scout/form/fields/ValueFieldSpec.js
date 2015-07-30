@@ -7,6 +7,13 @@ describe("ValueField", function() {
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     menuHelper = new MenuSpecHelper(session);
+    jasmine.Ajax.install();
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
+    jasmine.Ajax.uninstall();
   });
 
   describe("property status visible", function() {
@@ -100,6 +107,11 @@ describe("ValueField", function() {
       formField.displayText = 'abc';
       formField.currentMenuTypes = ['NotNull'];
       formField.$status.triggerContextMenu();
+
+      // trigger acceptInput request (menu won't be shown before request is not finished)
+      jasmine.clock().tick(0);
+      sendQueuedAjaxCalls();
+      session.onAjaxAlways({success: true}, mostRecentJsonRequest());
 
       $menu = $('body').find('.popup-body');
       expect($menu.find('.menu-item').length).toBe(1);
