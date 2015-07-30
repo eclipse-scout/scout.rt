@@ -8,7 +8,8 @@ scout.MenuBar = function(session, menuSorter) {
   this.tabbable = true;
   this._internalMenuItems = []; // original list of menuItems that was passed to updateItems(), only used to check if menubar has changed
   this.menuItems = []; // list of menuItems (ordered, may contain additional UI separators, some menus may not be rendered)
-  this.tabbableItem;
+  this._orderedMenuItems = null; // Object containing "left" and "right" menus
+  this._defaultMenu = null;
 
   /**
    * This array is === menuItems when menu-bar is not over-sized.
@@ -80,6 +81,11 @@ scout.MenuBar.prototype.large = function() {
 scout.MenuBar.prototype._remove = function() {
   scout.MenuBar.parent.prototype._remove.call(this);
   this._removeMenuItems();
+  // Reset internal state (don't do it inside _removeMenuItems, because that is also called from _updateItems())
+  this._internalMenuItems = [];
+  this.menuItems = [];
+  this._orderedMenuItems = null;
+  this.visibleMenuItems = [];
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
@@ -197,14 +203,14 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
   this.$container.children('.last').removeClass('last');
   // Find last visible right aligned menu item
   var lastMenuItem;
-  for (var i = 0; i < this.menuItems.length; i++) {
-    var menuItem = this.menuItems[i];
-    if (menuItem.rightAligned && menuItem.visible) {
+  for (var i = 0; i < this.visibleMenuItems.length; i++) {
+    var menuItem = this.visibleMenuItems[i];
+    if (menuItem.rightAligned) {
       lastMenuItem = menuItem;
     }
   }
   // Assign the class to the found item
-  if (lastMenuItem && lastMenuItem.rendered) {
+  if (lastMenuItem) {
     lastMenuItem.$container.addClass('last');
   }
 };
@@ -243,13 +249,11 @@ scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
   items.some(function(item) {
     if (item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
       if (this._defaultMenu && this._defaultMenu !== item) {
-        this._defaultMenu.$container.toggleClass('default-menu', false);
+        this._defaultMenu.$container.removeClass('default-menu');
       }
       this._defaultMenu = item;
-      if (this._defaultMenu.$container) {
-        this._defaultMenu.$container.toggleClass('default-menu', true);
-        this.setTabbableMenu(this._defaultMenu);
-      }
+      this._defaultMenu.$container.addClass('default-menu');
+      this.setTabbableMenu(this._defaultMenu);
       found = true;
       return true;
     }
