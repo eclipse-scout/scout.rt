@@ -52,7 +52,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   textContent = dataTransfer.getData('Text');
   if (textContent) {
     if (window.Blob) {
-      filesArgument.push(new Blob([textContent], {type: scout.MimeTypes.TEXT_PLAIN}));
+      filesArgument.push(new Blob([textContent], {type: scout.mimeTypes.TEXT_PLAIN}));
       contentCount++;
     } else {
       // compatibility workaround
@@ -63,13 +63,13 @@ scout.ClipboardField.prototype._onPaste = function(event) {
 
   if (dataTransfer.items) {
     $.each(dataTransfer.items, function(idx, item) {
-      if (item.type === scout.MimeTypes.TEXT_PLAIN) {
+      if (item.type === scout.mimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
-          filesArgument.push(new Blob([str], {type: scout.MimeTypes.TEXT_PLAIN}));
+          filesArgument.push(new Blob([str], {type: scout.mimeTypes.TEXT_PLAIN}));
           contentCount++;
         });
       }
-      else if (scout.helpers.isOneOf(item.type, [scout.MimeTypes.IMAGE_PNG, scout.MimeTypes.IMAGE_JPG, scout.MimeTypes.IMAGE_JPEG, scout.MimeTypes.IMAGE_GIF])) {
+      else if (scout.helpers.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
         filesArgument.push(item.getAsFile());
         contentCount++;
       }
@@ -147,7 +147,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
                 encData = window.atob(srcArray[1]),
                 byteNumbers = new Array(encData.length);
 
-              if (scout.helpers.isOneOf(srcDataMatch[1], [scout.MimeTypes.IMAGE_PNG, scout.MimeTypes.IMAGE_JPG, scout.MimeTypes.IMAGE_JPEG, scout.MimeTypes.IMAGE_GIF])) {
+              if (scout.helpers.isOneOf(srcDataMatch[1], [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
                 for (var i = 0; i < encData.length; i++) {
                     byteNumbers[i] = encData.charCodeAt(i);
                 }

@@ -1,7 +1,7 @@
 /**
  * Pendant for org.eclipse.scout.commons.resource.MimeType enumeration.
  */
-scout.MimeTypes = {
+scout.mimeTypes = {
 
   TEXT_PLAIN: 'text/plain',
 
