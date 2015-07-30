@@ -50,10 +50,6 @@ scout.DateField.prototype._render = function($parent) {
   this.addChild(this._datePickerPopup);
   this._datePickerPopup.picker
     .on('dateSelect', this._onDatePickerDateSelected.bind(this));
-
-  if (this.hasDate && this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
-    this._openDatePicker();
-  }
 };
 
 scout.DateField.prototype._renderProperties = function() {
@@ -67,22 +63,9 @@ scout.DateField.prototype._renderProperties = function() {
   scout.DateField.parent.prototype._renderProperties.call(this);
 };
 
-scout.DateField.prototype.prepareForCellEdit = function(opts) {
-  scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
-  opts = opts || {};
-
-  this.$field.removeClass('cell-editor-field first');
-  if (this.$dateField) {
-    this.$dateField.addClass('cell-editor-field');
-    if (opts.firstCell) {
-      this.$dateField.addClass('first');
-    }
-  }
-  if (this.$timeField) {
-    this.$timeField.addClass('cell-editor-field');
-    if (opts.firstCell && !this.$dateField) {
-      this.$timeField.addClass('first');
-    }
+scout.DateField.prototype._postRender = function() {
+  if (this.hasDate && this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
+    this._openDatePicker();
   }
 };
 
@@ -829,4 +812,23 @@ scout.DateField.prototype._isTimeValid = function() {
 
 scout.DateField.prototype._hasUiErrorStatus = function() {
   return !!(this.errorStatus && (this.errorStatus.invalidDateText || this.errorStatus.invalidTimeText));
+};
+
+scout.DateField.prototype.prepareForCellEdit = function(opts) {
+  scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
+  opts = opts || {};
+
+  this.$field.removeClass('cell-editor-field first');
+  if (this.$dateField) {
+    this.$dateField.addClass('cell-editor-field');
+    if (opts.firstCell) {
+      this.$dateField.addClass('first');
+    }
+  }
+  if (this.$timeField) {
+    this.$timeField.addClass('cell-editor-field');
+    if (opts.firstCell && !this.$dateField) {
+      this.$timeField.addClass('first');
+    }
+  }
 };
