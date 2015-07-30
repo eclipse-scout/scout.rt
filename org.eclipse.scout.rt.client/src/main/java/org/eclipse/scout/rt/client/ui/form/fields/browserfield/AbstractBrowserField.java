@@ -81,12 +81,12 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * <p>
    * This property is only relevant when sandbox is enabled (see {@link #getConfiguredSandboxEnabled()}).
    *
-   * @return Sandbox permissions to enabled or {@code null} / {@link IBrowserField.SandboxPermissions#none()} if no
+   * @return Sandbox permissions to enabled or {@code null} / {@link IBrowserField.SandboxPermission#none()} if no
    *         permissions should be enabled.
    */
   @Order(220)
   @ConfigProperty(ConfigProperty.OBJECT)
-  protected EnumSet<SandboxPermissions> getConfiguredSandboxPermissions() {
+  protected EnumSet<SandboxPermission> getConfiguredSandboxPermissions() {
     return null;
   }
 
@@ -97,7 +97,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * <p>
    * <b>Important:</b> this callback is only invoked when the IFRAME is not restricted by the sandbox property. You must
    * either disable sandbox completely ({@link #getConfiguredSandboxEnabled()} returns false) or grant the required
-   * permissions ({@link SandboxPermissions#AllowScripts}).
+   * permissions ({@link SandboxPermission#AllowScripts}).
    * <p>
    * Example java script call:
    *
@@ -291,14 +291,14 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   @Override
-  public void setSandboxPermissions(EnumSet<SandboxPermissions> sandboxPermissions) {
-    propertySupport.setProperty(PROP_SANDBOX_PERMISSIONS, sandboxPermissions);
+  public void setSandboxPermissions(EnumSet<SandboxPermission> sandboxPermission) {
+    propertySupport.setProperty(PROP_SANDBOX_PERMISSIONS, sandboxPermission);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public EnumSet<SandboxPermissions> getSandboxPermissions() {
-    return (EnumSet<SandboxPermissions>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
+  public EnumSet<SandboxPermission> getSandboxPermissions() {
+    return (EnumSet<SandboxPermission>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
   }
 
   private class P_UIFacade implements IBrowserFieldUIFacade {

@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  */
 public interface IBrowserField extends IFormField {
 
-  public enum SandboxPermissions {
+  public enum SandboxPermission {
     AllowForms("allow-forms"),
     AllowPointerLock("allow-pointer-lock"),
     AllowPopups("allow-popups"),
@@ -34,16 +34,16 @@ public interface IBrowserField extends IFormField {
 
     private String m_attribute;
 
-    private SandboxPermissions(String attribute) {
+    private SandboxPermission(String attribute) {
       m_attribute = attribute;
     }
 
-    public static EnumSet<SandboxPermissions> none() {
-      return EnumSet.noneOf(SandboxPermissions.class);
+    public static EnumSet<SandboxPermission> none() {
+      return EnumSet.noneOf(SandboxPermission.class);
     }
 
-    public static Set<SandboxPermissions> all() {
-      return EnumSet.allOf(SandboxPermissions.class);
+    public static Set<SandboxPermission> all() {
+      return EnumSet.allOf(SandboxPermission.class);
     }
 
     /**
@@ -53,8 +53,6 @@ public interface IBrowserField extends IFormField {
       return m_attribute;
     }
   }
-
-  // TODO BSH doLocationChange()
 
   String PROP_LOCATION = "location";
   String PROP_BINARY_RESOURCE = "binaryResource";
@@ -115,8 +113,7 @@ public interface IBrowserField extends IFormField {
 
   boolean isSandboxEnabled();
 
-  void setSandboxPermissions(EnumSet<SandboxPermissions> sandboxPermissions);
+  void setSandboxPermissions(EnumSet<SandboxPermission> sandboxPermission);
 
-  EnumSet<SandboxPermissions> getSandboxPermissions();
-
+  EnumSet<SandboxPermission> getSandboxPermissions();
 }
