@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.resource.MimeTypes;
+import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.IClipboardField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -58,7 +58,7 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
     // IE9 does not support java script Blob objects (legacy support for text transfer)
     for (Entry<String, String> property : uploadProperties.entrySet()) {
       if (property.getKey().matches("textTransferObject\\d+")) {
-        binaryResources.add(new BinaryResource(MimeTypes.TEXT_PLAIN, property.getValue().getBytes()));
+        binaryResources.add(new BinaryResource(MimeType.TEXT_PLAIN, property.getValue().getBytes()));
       }
     }
     // Pass binary resources to clipboard field

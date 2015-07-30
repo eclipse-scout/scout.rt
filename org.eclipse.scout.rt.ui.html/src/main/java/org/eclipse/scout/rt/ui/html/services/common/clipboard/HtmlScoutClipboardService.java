@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.resource.MimeTypes;
+import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
@@ -28,7 +28,7 @@ public class HtmlScoutClipboardService extends AbstractService implements IClipb
   //private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlScoutClipboardService.class);
 
   @Override
-  public Collection<BinaryResource> getClipboardContents(MimeTypes... mimeTypes) throws ProcessingException {
+  public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) throws ProcessingException {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(mimeTypes);
     form.startClipboard();
