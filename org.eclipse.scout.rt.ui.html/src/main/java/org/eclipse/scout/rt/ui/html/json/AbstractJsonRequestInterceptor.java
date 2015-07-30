@@ -72,7 +72,9 @@ public abstract class AbstractJsonRequestInterceptor implements IServletRequestI
     String jsonText = jsonResp.toString();
     byte[] data = jsonText.getBytes("UTF-8");
     httpResp.setContentLength(data.length);
-    httpResp.setContentType("application/json");
+    if (httpResp.getContentType() == null) {
+      httpResp.setContentType("application/json");
+    }
     httpResp.setCharacterEncoding("UTF-8");
     httpResp.getOutputStream().write(data);
     if (LOG.isTraceEnabled()) {

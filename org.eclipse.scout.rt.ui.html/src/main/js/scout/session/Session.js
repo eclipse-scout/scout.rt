@@ -366,52 +366,16 @@ scout.Session.prototype._sendRequest = function(request) {
   }
   this._requestsPendingCounter++;
 
+  var scoutData = {
+      jsError: undefined,
+      sucess: false,
+      busyHandling: busyHandling
+  };
+
   $.ajax(this.defaultAjaxOptions(request, !request.unload))
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this))
-    .always(onAjaxAlways.bind(this));
-
-  // --- Helper methods ---
-
-  var jsError,
-    success = false;
-
-  function onAjaxDone(data) {
-    try {
-      if (data.error) {
-        this._processErrorJsonResponse(data.error);
-      } else {
-        this._processSuccessResponse(data);
-        success = true;
-      }
-    } catch (err) {
-      jsError = jsError || err;
-    }
-  }
-
-  function onAjaxFail(jqXHR, textStatus, errorThrown) {
-    try {
-      this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-    } catch (err) {
-      jsError = jsError || err;
-    }
-  }
-
-  function onAjaxAlways(data, textStatus, errorThrown) {
-    this._requestsPendingCounter--;
-    if (busyHandling) {
-      this.setBusy(false);
-    }
-    this.layoutValidator.validate();
-    if (success) {
-      this._resumeBackgroundJobPolling();
-      this._fireRequestFinished(data);
-    }
-    // Throw previously catched error
-    if (jsError) {
-      throw jsError;
-    }
-  }
+    .done(this.onAjaxDone.bind(this, scoutData))
+    .fail(this.onAjaxFail.bind(this, scoutData))
+    .always(this.onAjaxAlways.bind(this, scoutData));
 };
 
 scout.Session.prototype.defaultAjaxOptions = function(request, async) {
@@ -706,52 +670,16 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   }
   this._requestsPendingCounter++;
 
+  var scoutData = {
+      jsError: undefined,
+      sucess: false,
+      busyHandling: busyHandling
+  };
+
   $.ajax(uploadAjaxOptions)
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this))
-    .always(onAjaxAlways.bind(this));
-
-  // --- Helper methods ---
-
-  var jsError,
-    success = false;
-
-  function onAjaxDone(data) {
-    try {
-      if (data.error) {
-        this._processErrorJsonResponse(data.error);
-      } else {
-        this._processSuccessResponse(data);
-        success = true;
-      }
-    } catch (err) {
-      jsError = jsError || err;
-    }
-  }
-
-  function onAjaxFail(jqXHR, textStatus, errorThrown) {
-    try {
-      this._processErrorResponse(undefined, jqXHR, textStatus, errorThrown);
-    } catch (err) {
-      jsError = jsError || err;
-    }
-  }
-
-  function onAjaxAlways(data, textStatus, errorThrown) {
-    this._requestsPendingCounter--;
-    if (busyHandling) {
-      this.setBusy(false);
-    }
-    this.layoutValidator.validate();
-    if (success) {
-      this._resumeBackgroundJobPolling();
-      this._fireRequestFinished(data);
-    }
-    // Throw previously catched error
-    if (jsError) {
-      throw jsError;
-    }
-  }
+    .done(this.onAjaxDone.bind(this, scoutData))
+    .fail(this.onAjaxFail.bind(this, scoutData))
+    .always(this.onAjaxAlways.bind(this, scoutData));
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -1062,4 +990,43 @@ scout.Session.prototype.unregisterAdapterClone = function(clone) {
     throw new Error('Adapter found, but clone is not registered');
   }
   entry.splice(i, 1);
+};
+
+//--- Helper methods ---
+
+scout.Session.prototype.onAjaxDone = function(scoutData, data) {
+  try {
+    if (data.error) {
+      this._processErrorJsonResponse(data.error);
+    } else {
+      this._processSuccessResponse(data);
+      scoutData.success = true;
+    }
+  } catch (err) {
+    scoutData.jsError = scoutData.jsError || err;
+  }
+};
+
+scout.Session.prototype.onAjaxFail = function(scoutData, jqXHR, textStatus, errorThrown) {
+  try {
+    this._processErrorResponse(undefined, jqXHR, textStatus, errorThrown);
+  } catch (err) {
+    scoutData.jsError = scoutData.jsError || err;
+  }
+};
+
+scout.Session.prototype.onAjaxAlways = function(scoutData, data, textStatus, errorThrown) {
+  this._requestsPendingCounter--;
+  if (scoutData.busyHandling) {
+    this.setBusy(false);
+  }
+  this.layoutValidator.validate();
+  if (scoutData.success) {
+    this._resumeBackgroundJobPolling();
+    this._fireRequestFinished(data);
+  }
+  // Throw previously catched error
+  if (scoutData.jsError) {
+    throw scoutData.jsError;
+  }
 };

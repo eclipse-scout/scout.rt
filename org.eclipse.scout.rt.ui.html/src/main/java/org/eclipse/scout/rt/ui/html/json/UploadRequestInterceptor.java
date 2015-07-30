@@ -92,6 +92,10 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
       List<BinaryResource> uploadResources = new ArrayList<>();
       readUploadData(httpReq, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
 
+      if (uploadProperties.containsKey("legacyFormTextPlainAnswer")) {
+        httpResp.setContentType("text/plain");
+      }
+
       try {
         MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
         MDC.put(MDC_SCOUT_SESSION_ID, uiSession.getClientSessionId());
@@ -154,6 +158,10 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
       else {
         // Handle files
         String filename = item.getName();
+        if (StringUtility.hasText(filename)) {
+          String[] parts = StringUtility.split(filename, "[/\\\\]");
+          filename = parts[parts.length - 1];
+        }
         String contentType = item.getContentType();
         byte[] content = IOUtility.getContent(stream);
         uploadResources.add(new BinaryResource(filename, contentType, content));
