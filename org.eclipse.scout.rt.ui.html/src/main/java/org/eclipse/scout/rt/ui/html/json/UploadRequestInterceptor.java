@@ -151,8 +151,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
     if (!(jsonAdapter instanceof IBinaryResourceConsumer)) {
       throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
     }
-    IBinaryResourceConsumer binaryResourceConsumer = (IBinaryResourceConsumer) jsonAdapter;
-    return binaryResourceConsumer;
+    return (IBinaryResourceConsumer) jsonAdapter;
   }
 
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException, ProcessingException {

@@ -48,14 +48,17 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$buttons = $.makeDiv('file-chooser-buttons')
     .appendTo(this.$content);
   this.$addFileButton = $('<button>')
+    .unfocusable()
     .text(this.session.text('ui.Browse')) // XXX BSH
-  .on('click', this._onAddFileButtonClicked.bind(this))
+    .on('click', this._onAddFileButtonClicked.bind(this))
     .appendTo(this.$buttons);
   this.$okButton = $('<button>')
+    .unfocusable()
     .text(this.session.text('ui.Upload'))
     .on('click', this._onOkButtonClicked.bind(this))
     .appendTo(this.$buttons);
   this.$cancelButton = $('<button>')
+    .unfocusable()
     .text(this.session.text('Cancel'))
     .on('click', this._onCancelButtonClicked.bind(this))
     .appendTo(this.$buttons);

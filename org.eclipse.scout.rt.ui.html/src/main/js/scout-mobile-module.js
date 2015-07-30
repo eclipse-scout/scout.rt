@@ -168,6 +168,7 @@ __include("scout/form/fields/ValueField.js");
 __include("scout/form/FormController.js");
 // Basics for message boxes
 __include("scout/messagebox/MessageBox.js");
+__include("scout/messagebox/MessageBoxButtons.js");
 __include("scout/messagebox/MessageBoxControlKeyStrokes.js");
 __include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
 __include("scout/messagebox/MessageBoxModelAdapter.js");

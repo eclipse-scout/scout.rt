@@ -271,7 +271,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
 
   // 3. Prevent focus gain on button click.
   //    That is because buttons only can gain focus by keyboard (tabbing).
-  if (this._isMenuOrButton($element)) {
+  if (this._isUnfocusable($element)) {
     return false;
   }
 
@@ -293,20 +293,11 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
   return false;
 };
 
-/**
- * Checks if the given element is a menu or button.
- */
-scout.FocusManager.prototype._isMenuOrButton = function($element) {
-  return $element.data('menu') || $element.data('button') || $element.data('buttonOption') || isFormToolButton();
-
-  function isFormToolButton() {
-    if ($element.hasClass('taskbar-tool-item-title')) {
-      return true;
-    }
-    if ($element.parent().hasClass('taskbar-tool-item')) {
-      return true;
-    }
+scout.FocusManager.prototype._isUnfocusable = function($element) {
+  if ($element.hasClass('unfocusable')) {
+    return true;
   }
+  return $element.closest('.unfocusable').length > 0;
 };
 
 /**

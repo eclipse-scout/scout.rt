@@ -27,8 +27,9 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this.$label = this.$content.appendDiv('busyindicator-label');
 
   if (this._cancellable) {
+    var buttons = new scout.MessageBoxButtons(this);
     this.$buttons = this.$container.appendDiv('busyindicator-buttons');
-    this.$cancelButton = this._createButton('cancel', this.session.text('Cancel'));
+    this.$cancelButton = buttons.renderButton('cancel', this.session.text('Cancel'));
     this.$cancelButton.css('width', '100%');
   }
   else {
@@ -48,7 +49,6 @@ scout.BusyIndicator.prototype._render = function($parent) {
   // Show busy box with a delay of 2.5 seconds.
   this._busyIndicatorTimeoutId = setTimeout(function() {
     this.$container.removeClass('hidden').addClassForAnimation('shown');
-
     // Validate first focusable element
     // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
     scout.focusManager.validateFocus(this.session.uiSessionId);
@@ -79,18 +79,3 @@ scout.BusyIndicator.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.BusyIndicator.prototype._createButton = function(option, text) {
-  text = scout.strings.removeAmpersand(text);
-  return $('<button>')
-    .text(text)
-    .on('click', this._onButtonClicked.bind(this))
-    .data('buttonOption', option)
-    .appendTo(this.$buttons);
-};
-
-scout.BusyIndicator.prototype._onButtonClicked = function(event) {
-  var $button = $(event.target);
-  this.trigger('buttonClick', {
-    option: $button.data('buttonOption')
-  });
-};

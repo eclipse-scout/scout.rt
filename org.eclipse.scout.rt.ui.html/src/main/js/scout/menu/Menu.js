@@ -20,7 +20,7 @@ scout.Menu.prototype._render = function($parent) {
   } else {
     this._renderItem($parent);
   }
-  this.$container.data('menu', this);
+  this.$container.unfocusable();
 };
 
 scout.Menu.prototype._renderSeparator = function($parent) {
@@ -34,9 +34,10 @@ scout.Menu.prototype._renderItem = function($parent) {
     this.$container = $parent.appendDiv('menu-item');
   }
 
-  this.$container.on('mousedown', '', this._onMouseEvent.bind(this));
-  this.$container.on('contextmenu', '', this._onMouseEvent.bind(this));
-  this.$container.on('click', '', this._onMouseEvent.bind(this));
+  this.$container
+    .on('mousedown', '', this._onMouseEvent.bind(this))
+    .on('contextmenu', '', this._onMouseEvent.bind(this))
+    .on('click', '', this._onMouseEvent.bind(this));
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }

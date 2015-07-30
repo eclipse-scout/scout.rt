@@ -49,17 +49,18 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$html = this.$content.appendDiv('messagebox-label messagebox-html');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
+  var buttons = new scout.MessageBoxButtons(this);
   this._$closeButton = null; // button to be executed when close() is called, e.g. when ESCAPE is pressed
   if (this.yesButtonText) {
-    this.$yesButton = this._createButton('yes', this.yesButtonText);
+    this.$yesButton = buttons.renderButton('yes', this.yesButtonText);
     this._$closeButton = this.$yesButton;
   }
   if (this.noButtonText) {
-    this.$noButton = this._createButton('no', this.noButtonText);
+    this.$noButton = buttons.renderButton('no', this.noButtonText);
     this._$closeButton = this.$noButton;
   }
   if (this.cancelButtonText) {
-    this.$cancelButton = this._createButton('cancel', this.cancelButtonText);
+    this.$cancelButton = buttons.renderButton('cancel', this.cancelButtonText);
     this._$closeButton = this.$cancelButton;
   }
   this._updateButtonWidths();
@@ -74,7 +75,7 @@ scout.MessageBox.prototype._render = function($parent) {
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 
-  // TODO Somehow let the user copy the 'copyPasteText' - but how?
+  // FIXME MOT: Somehow let the user copy the 'copyPasteText' - but how?
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -107,24 +108,8 @@ scout.MessageBox.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.MessageBox.prototype._createButton = function(option, text) {
-  text = scout.strings.removeAmpersand(text);
-  return $('<button>')
-    .text(text)
-    .on('click', this._onButtonClicked.bind(this))
-    .data('buttonOption', option)
-    .appendTo(this.$buttons);
-};
-
-scout.MessageBox.prototype._onButtonClicked = function(event) {
-  var $button = $(event.target);
-  this.trigger('buttonClick', {
-    option: $button.data('buttonOption')
-  });
-};
-
 scout.MessageBox.prototype._renderIconId = function(iconId) {
-  // FIXME implement
+  // FIXME BSH implement
 };
 
 scout.MessageBox.prototype._renderSeverity = function(severity) {

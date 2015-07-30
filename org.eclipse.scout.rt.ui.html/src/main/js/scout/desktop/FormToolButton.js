@@ -9,7 +9,9 @@ scout.FormToolButton = function() {
 scout.inherits(scout.FormToolButton, scout.Action);
 
 scout.FormToolButton.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('taskbar-tool-item');
+  this.$container = $parent
+      .appendDiv('taskbar-tool-item')
+      .unfocusable();
   this.$title = this.$container.appendSpan('taskbar-tool-item-title');
 };
 

@@ -8,9 +8,9 @@ scout.MessageBoxModelAdapter = function() {
 scout.inherits(scout.MessageBoxModelAdapter, scout.ModelAdapter);
 
 scout.MessageBoxModelAdapter.prototype._createUi = function() {
-  var ui = new scout.MessageBox(this, this.session);
-  ui.on('buttonClick', this._onButtonClick.bind(this));
-  return ui;
+  var messageBoxUi = new scout.MessageBox(this, this.session);
+  messageBoxUi.on('buttonClick', this._onButtonClick.bind(this));
+  return messageBoxUi;
 };
 
 scout.MessageBoxModelAdapter.prototype._onButtonClick = function(event) {

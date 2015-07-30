@@ -818,4 +818,12 @@
       .on('click', func);
   };
 
+  /**
+   * Adds the class 'unfocusable' to current result set. The class is not used for styling purposes
+   * but has a meaning to the FocusManager.
+   */
+  $.fn.unfocusable = function() {
+    return this.addClass('unfocusable');
+  };
+
 }(jQuery));
