@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
-import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermissions;
+import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermission;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -59,20 +59,20 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     });
     putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SANDBOX_PERMISSIONS, model) {
       @Override
-      protected Set<SandboxPermissions> modelValue() {
+      protected Set<SandboxPermission> modelValue() {
         return getModel().getSandboxPermissions();
       }
 
       @Override
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        Set<SandboxPermissions> sandbox = (Set<SandboxPermissions>) value;
+        Set<SandboxPermission> sandbox = (Set<SandboxPermission>) value;
         if (sandbox == null || sandbox.isEmpty()) {
           return "";
         }
         // Build string for HTML "sandbox" attribute
         StringBuilder sb = new StringBuilder();
-        for (SandboxPermissions sandboxValue : sandbox) {
+        for (SandboxPermission sandboxValue : sandbox) {
           sb.append(sandboxValue.getAttribute() + " ");
         }
         sb.deleteCharAt(sb.length() - 1); // delete last space
