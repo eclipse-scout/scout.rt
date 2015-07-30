@@ -156,7 +156,7 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   dialog.htmlComp.pixelBasedSizing = true;
   dialog.htmlComp.validateLayout();
 
-  dialogSize = dialog.htmlComp.getSize();
+  dialogSize = dialog.htmlComp.getSize(true);
   left = (documentSize.width - dialogSize.width) / 2;
   top = (documentSize.height - dialogSize.height) / 2;
 
