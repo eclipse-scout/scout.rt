@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter
  * <li><b><code>?compress=(true|false)</code></b>: Enable/disable GZIP compression (if client supports it).
  * <li><b><code>?minify=(true|false)</code></b>: Enable/disable "minification" of JS/CSS files.
  * <li><b><code>?debug=(true|false)</code></b>: Enable/disable all of the above flags.
+ * <li><b><code>?inspector=(true|false)</code></b>: Enable/disable inspector attributes in DOM ("modelClass", "classId")
  * </ul>
  * All values are <code>true</code> by default, unless the application is run in development mode.
  */
