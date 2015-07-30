@@ -80,7 +80,9 @@ scout.Widget.prototype.remove = function() {
   // because a few widgets do not have a session (e.g. when early  startup errors
   // are displayed). We also check if a focus context is installed on the $container
   // because not every widget has a focus-context.
-  var hasFocusContext = this.session && this.$container.isFocusContextInstalled(this.session);
+  // FIXME AWE: check for this.$container is a workaround until we've found
+  // a better solution for MessageBox.UI
+  var hasFocusContext = this.session && this.$container && this.$container.isFocusContextInstalled(this.session);
   if (hasFocusContext) {
     scout.focusManager.suspendValidation(this.session.uiSessionId);
   }
