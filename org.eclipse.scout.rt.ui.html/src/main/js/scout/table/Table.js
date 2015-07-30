@@ -743,7 +743,7 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
     $anchor: $cell,
     table: this
   };
-  tooltip = new scout.TableTooltip(opts);
+  tooltip = new scout.TableTooltip(this.session, opts);
   tooltip.render();
   // link to be able to remove it when row gets deleted
   tooltip.row = row;

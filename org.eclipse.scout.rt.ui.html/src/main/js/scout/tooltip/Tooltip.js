@@ -3,9 +3,10 @@
  * <li>options.text - either a String or a function which returns a String.</li>
  * </ul>
  */
-scout.Tooltip = function(options) {
+scout.Tooltip = function(session, options) {
   scout.Tooltip.parent.call(this);
   options = options || {};
+  this.session = session;
   this.text = options.text || '';
   this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
   this.arrowPositionUnit = options.arrowPositionUnit || '%';

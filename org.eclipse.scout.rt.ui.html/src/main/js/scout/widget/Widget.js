@@ -75,14 +75,29 @@ scout.Widget.prototype.remove = function() {
   }
   $.log.trace('Removing widget: ' + this);
 
-  // remove children in reverse order.
-  this.children.slice().reverse().forEach(function(child) {
-    child.remove();
-  });
-  this._remove();
-  this._uninstallKeyStrokeAdapter();
-  this.rendered = false;
-  this._trigger('remove');
+  // Suspend focus validation until all children and widget itself have been removed
+  // Focus validation is resumed in the finally block. The session-check is required
+  // because a few widgets do not have a session (e.g. when early  startup errors
+  // are displayed). We also check if a focus context is installed on the $container
+  // because not every widget has a focus-context.
+  var hasFocusContext = this.session && this.$container.isFocusContextInstalled(this.session);
+  if (hasFocusContext) {
+    scout.focusManager.suspendValidation(this.session.uiSessionId);
+  }
+  try {
+    // remove children in reverse order.
+    this.children.slice().reverse().forEach(function(child) {
+      child.remove();
+    });
+    this._remove();
+    this._uninstallKeyStrokeAdapter();
+    this.rendered = false;
+    this._trigger('remove');
+  } finally {
+    if (hasFocusContext) {
+      scout.focusManager.resumeValidation(this.session.uiSessionId);
+    }
+  }
 };
 
 scout.Widget.prototype._trigger = function(event) {

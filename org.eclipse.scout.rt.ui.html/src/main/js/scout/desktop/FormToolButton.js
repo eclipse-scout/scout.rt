@@ -10,8 +10,8 @@ scout.inherits(scout.FormToolButton, scout.Action);
 
 scout.FormToolButton.prototype._render = function($parent) {
   this.$container = $parent
-      .appendDiv('taskbar-tool-item')
-      .unfocusable();
+    .appendDiv('taskbar-tool-item')
+    .unfocusable();
   this.$title = this.$container.appendSpan('taskbar-tool-item-title');
 };
 
@@ -31,11 +31,9 @@ scout.FormToolButton.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
   }
-
   if (this.desktop.selectedTool && this.desktop.selectedTool !== this) {
     this.desktop.selectedTool.setSelected(false);
   }
-
   scout.FormToolButton.parent.prototype.setSelected.call(this, selected);
 };
 

@@ -1,5 +1,5 @@
-scout.TableTooltip = function(options) {
-  scout.TableTooltip.parent.call(this, options);
+scout.TableTooltip = function(session, options) {
+  scout.TableTooltip.parent.call(this, session, options);
   this.table = options.table;
 };
 scout.inherits(scout.TableTooltip, scout.Tooltip);

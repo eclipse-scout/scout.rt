@@ -57,15 +57,15 @@ scout.scrollbars = {
       scrollbars = [];
       if (options.axis === 'both') {
         options.axis = 'y';
-        scrollbar = new scout.Scrollbar(options);
+        scrollbar = new scout.Scrollbar(session, options);
         scrollbars.push(scrollbar);
 
         options.axis = 'x';
         options.mouseWheelNeedsShift = true;
-        scrollbar = new scout.Scrollbar(options);
+        scrollbar = new scout.Scrollbar(session, options);
         scrollbars.push(scrollbar);
       } else {
-        scrollbar = new scout.Scrollbar(options);
+        scrollbar = new scout.Scrollbar(session, options);
         scrollbars.push(scrollbar);
       }
       $container.css('overflow', 'hidden');

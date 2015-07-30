@@ -9,7 +9,7 @@ scout.Planner = function() {
   // visual
   this._resourceTitleWidth = 20;
 
-  this._tooltipSupport = new scout.TooltipSupport({
+  this._tooltipSupport = new scout.TooltipSupport(this.session, {
     parent: this,
     arrowPosition: 50
   });
@@ -117,7 +117,7 @@ scout.Planner.prototype._render = function($parent) {
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render(this.$container);
 
-  scout.tooltips.install(this.$grid, {
+  scout.tooltips.install(this.$grid, this.session, {
     selector: '.planner-activity',
     tooltipText: function($comp) {
         if (this._activityById($comp.attr('data-id'))) { return this._activityById($comp.attr('data-id')).tooltipText; }

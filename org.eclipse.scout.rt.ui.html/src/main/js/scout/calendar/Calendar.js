@@ -17,7 +17,7 @@ scout.Calendar = function() {
   // additional modes; should be stored in model
   this._showYearPanel = false;
   this._showListPanel = false;
-  this._tooltipSupport = new scout.TooltipSupport({
+  this._tooltipSupport = new scout.TooltipSupport(this.session, {
     htmlEnabled: true,
     tooltipDelay: 750
   });

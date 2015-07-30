@@ -77,7 +77,7 @@ scout.ViewMenuTab.prototype._renderSelected = function() {
   if (this.selected) {
     scout.tooltips.uninstall(this.$container);
   } else {
-    scout.tooltips.install(this.$container, {text: this.text});
+    scout.tooltips.install(this.$container, this.session, {text: this.text});
   }
 };
 

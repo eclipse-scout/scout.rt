@@ -390,7 +390,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
       $anchor: this.$status
     };
     $.extend(opts, options);
-    this.tooltip = new scout.Tooltip(opts);
+    this.tooltip = new scout.Tooltip(this.session, opts);
     this.tooltip.render();
   }
 };

@@ -206,6 +206,9 @@ scout.graphics = {
     if (!$comp) {
       return 'undefined';
     }
+    if (!($comp instanceof jQuery)) {
+      $comp = $($comp);
+    }
     if ($comp.length === 0) {
       return '$()';
     }

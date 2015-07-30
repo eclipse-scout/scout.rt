@@ -107,6 +107,10 @@ scout.FocusContext.prototype._onHideEvent = function(event) {
  *
  */
 scout.FocusContext.prototype._validateAndSetFocus = function(element) {
+  if (scout.focusManager.validationSuspended(this.session.uiSessionId)) {
+    return;
+  }
+
   var elementToFocus = null;
 
   if (element && this._isChildElement(element)) {
@@ -135,6 +139,7 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
   // Only set the focus if different to the current focused element.
   if (document.activeElement !== elementToFocus) {
     $(elementToFocus).focus();
+    $.log.debug('Set focus to element ' + scout.graphics.debugOutput(elementToFocus));
   }
 };
 

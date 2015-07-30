@@ -127,7 +127,7 @@ scout.Action.prototype._onHoverOut = function() {
 };
 
 scout.Action.prototype._showTooltip = function() {
-  this.tooltip = new scout.Tooltip(this._configureTooltip());
+  this.tooltip = new scout.Tooltip(this.session, this._configureTooltip());
   this.tooltip.render();
 };
 

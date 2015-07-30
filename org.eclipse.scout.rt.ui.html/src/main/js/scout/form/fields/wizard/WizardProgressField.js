@@ -41,7 +41,7 @@ scout.WizardProgressField.prototype._renderWizardSteps = function() {
       $wizardStep.addClass('disabled');
     }
     if (scout.strings.hasText(wizardStep.tooltipText)) {
-      scout.tooltips.install($wizardStep, {
+      scout.tooltips.install($wizardStep, this.session, {
         text: wizardStep.tooltipText,
         position: 'bottom'
       });

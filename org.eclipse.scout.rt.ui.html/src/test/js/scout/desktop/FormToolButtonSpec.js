@@ -20,6 +20,9 @@ describe("FormToolButton", function() {
       menuBar: {
         bottom: function() {}
       }
+    },
+    _initialFocusElement: function() {
+      return null;
     }
   };
 

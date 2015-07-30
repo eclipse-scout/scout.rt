@@ -26,12 +26,18 @@ scout.FocusRule = {
 /**
  * Installs focus handling for the given session.
  */
+// FIXME AWE: make instance properties instead of using a map.
 scout.FocusManager.prototype.installManagerForSession = function(session, options) {
   this._sessionFocusContexts[session.uiSessionId] = {
     active:  scout.helpers.nvl(options.focusManagerActive, true),
     session: session,
     focusContexts: [],
-    glassPaneTargets: []
+    glassPaneTargets: [],
+    /**
+     * This flag controls whether or not the focus must be revalidated. With this flag,
+     * we can skip focus validation while we're in the middle of adding/removing widgets.
+     */
+    suspendValidation: 0
   };
 
   var $entryPoint = session.$entryPoint;
@@ -73,6 +79,27 @@ scout.FocusManager.prototype.active = function(uiSessionId) {
 };
 
 /**
+ * Returns whether or not it is allowed to perform focus validation.
+ */
+scout.FocusManager.prototype.suspendValidation = function(uiSessionId) {
+  this._sessionFocusContexts[uiSessionId].suspendValidation++;
+};
+
+scout.FocusManager.prototype.validationSuspended = function(uiSessionId) {
+  return this._sessionFocusContexts[uiSessionId].suspendValidation > 0;
+};
+
+/**
+ * Returns whether or not it is allowed to perform focus validation.
+ */
+scout.FocusManager.prototype.resumeValidation = function(uiSessionId) {
+  var suspendCount = --this._sessionFocusContexts[uiSessionId].suspendValidation;
+  if (suspendCount === 0) {
+    this.validateFocus(uiSessionId);
+  }
+};
+
+/**
  * Installs a new focus context for the given $container, and sets the $container's initial focus, either by
  * the given rule, or tries to gain focus for the given element.
  *
@@ -83,6 +110,7 @@ scout.FocusManager.prototype.active = function(uiSessionId) {
  *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
  *                 e.g. not covert by a glasspane;
  */
+// FIXME AWE: make "static" methods without prototype out of this (and the other static methods)
 scout.FocusManager.prototype.installFocusContext = function(session, $container, initialFocusRuleOrElement) {
   var elementToFocus;
   if (!initialFocusRuleOrElement || initialFocusRuleOrElement === scout.FocusRule.AUTO) {
@@ -211,7 +239,6 @@ scout.FocusManager.prototype.requestFocus = function(uiSessionId, element) {
  */
 scout.FocusManager.prototype._registerContextIfAbsentElseMoveTop = function(focusContext) {
   var focusContexts = this._contextsBySession(focusContext.session.uiSessionId);
-
   scout.arrays.remove(focusContexts, focusContext);
   focusContexts.push(focusContext);
 };

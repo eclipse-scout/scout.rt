@@ -16,7 +16,7 @@
 //        .width(20)
 //        .height(20);
 //
-//      var tooltip = new scout.Tooltip("text", $anchor);
+//      var tooltip = new scout.Tooltip(session, "text", $anchor);
 //      tooltip.render($sandbox);
 //
 //      var tooltipOffset = tooltip.$container.offset();

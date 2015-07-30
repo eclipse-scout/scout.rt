@@ -58,7 +58,7 @@ scout.ViewButton.prototype._renderSelected = function(selected) {
       scout.tooltips.uninstall(this.$container);
       this.$title.text(this.text);
     } else {
-      scout.tooltips.install(this.$container, {text: this.text});
+      scout.tooltips.install(this.$container, this.session, {text: this.text});
       this.$title.text('');
     }
   }

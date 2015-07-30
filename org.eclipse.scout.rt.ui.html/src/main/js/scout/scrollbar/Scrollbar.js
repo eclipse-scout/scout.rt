@@ -1,6 +1,6 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-scout.Scrollbar = function(options) {
+scout.Scrollbar = function(session, options) {
   scout.Scrollbar.parent.call(this);
   var defaults = {
     axis: 'y',
@@ -18,6 +18,7 @@ scout.Scrollbar = function(options) {
   this._offsetSize;
   this._addEventSupport();
 
+  this.session = session;
   this._onScrollWheelHandler = this._onScrollWheel.bind(this);
   this._onScrollHandler = this._onScroll.bind(this);
   this._onScrollbarMousedownHandler = this._onScrollbarMousedown.bind(this);
