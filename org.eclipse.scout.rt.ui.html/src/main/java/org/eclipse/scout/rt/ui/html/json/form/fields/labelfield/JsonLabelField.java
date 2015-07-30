@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.labelfield;
 
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -40,6 +41,12 @@ public class JsonLabelField<LABEL_FIELD extends ILabelField> extends JsonValueFi
       @Override
       protected Boolean modelValue() {
         return getModel().isSelectable();
+      }
+    });
+    putJsonProperty(new JsonProperty<ILabelField>(IHtmlCapable.PROP_HTML_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHtmlEnabled();
       }
     });
   }
