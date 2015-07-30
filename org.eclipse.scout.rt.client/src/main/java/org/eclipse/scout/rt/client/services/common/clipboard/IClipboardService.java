@@ -15,7 +15,7 @@ import java.util.Collection;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.commons.resource.MimeTypes;
+import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -45,7 +45,7 @@ public interface IClipboardService extends IService {
    * @param allowedMimeTypes
    * @throws ProcessingException
    */
-  Collection<BinaryResource> getClipboardContents(MimeTypes... allowedMimeTypes) throws ProcessingException;
+  Collection<BinaryResource> getClipboardContents(MimeType... allowedMimeTypes) throws ProcessingException;
 
   /**
    * Convenience method for putting the given string into the system clipboard.See {@link #setContents(TransferObject)}

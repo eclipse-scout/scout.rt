@@ -86,7 +86,7 @@ public final class BinaryResource implements Serializable {
    *
    * @see #BinaryResource(String, String, byte[], long)
    */
-  public BinaryResource(MimeTypes contentType, byte[] content) {
+  public BinaryResource(MimeType contentType, byte[] content) {
     this(null, contentType != null ? contentType.getType() : null, content, -1);
   }
 

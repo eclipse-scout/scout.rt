@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.resource.MimeTypes;
+import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.CancelButton;
@@ -31,13 +31,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-/**
- *
- */
 @FormData(sdkCommand = SdkCommand.IGNORE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
 public class ClipboardForm extends AbstractForm {
 
-  private MimeTypes[] mimeTypes;
+  private MimeType[] m_mimeTypes;
 
   public ClipboardForm() throws ProcessingException {
     this(true);
@@ -47,16 +44,16 @@ public class ClipboardForm extends AbstractForm {
     super(callInitializer);
   }
 
-  public MimeTypes[] getMimeTypes() {
-    return mimeTypes;
+  public MimeType[] getMimeTypes() {
+    return m_mimeTypes;
   }
 
-  public void setMimeTypes(MimeTypes[] mimeTypes) {
-    this.mimeTypes = mimeTypes;
+  public void setMimeTypes(MimeType[] mimeTypes) {
+    m_mimeTypes = mimeTypes;
 
     List<String> allowedMimeTypesListAsString = new ArrayList<String>();
     if (mimeTypes != null) {
-      for (MimeTypes mimeType : mimeTypes) {
+      for (MimeType mimeType : mimeTypes) {
         allowedMimeTypesListAsString.add(mimeType.getType());
       }
     }

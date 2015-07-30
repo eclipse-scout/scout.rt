@@ -16,30 +16,31 @@ import java.util.Collection;
 /**
  * Enumeration for a few well-known mime types.
  */
-public enum MimeTypes {
+public enum MimeType {
   TEXT_PLAIN("text/plain", "txt"),
   IMAGE_PNG("image/png", "png"),
   IMAGE_JPG("image/jpg", "jpg"),
   IMAGE_JPEG("image/jpeg", "jpg"),
   IMAGE_GIF("image/gif", "gif");
 
-  private final String preferedFileExtension, type;
+  private final String m_type;
+  private final String m_preferedFileExtension;
 
-  MimeTypes(String type, String preferedFileExtension) {
-    this.preferedFileExtension = preferedFileExtension;
-    this.type = type;
-  }
-
-  public String getPreferedFileExtension() {
-    return preferedFileExtension;
+  MimeType(String type, String preferedFileExtension) {
+    m_type = type;
+    m_preferedFileExtension = preferedFileExtension;
   }
 
   public String getType() {
-    return type;
+    return m_type;
   }
 
-  public static MimeTypes convertToMimeType(String input) {
-    for (MimeTypes mimeType : values()) {
+  public String getPreferedFileExtension() {
+    return m_preferedFileExtension;
+  }
+
+  public static MimeType convertToMimeType(String input) {
+    for (MimeType mimeType : values()) {
       if (mimeType.getType().equals(input)) {
         return mimeType;
       }
@@ -50,12 +51,19 @@ public enum MimeTypes {
   /**
    * Common image mime types.
    */
-  public static Collection<MimeTypes> getCommonImageTypes() {
-    return Arrays.asList(new MimeTypes[]{IMAGE_GIF, IMAGE_JPG, IMAGE_JPEG, IMAGE_PNG});
+  public static Collection<MimeType> getCommonImageTypes() {
+    return Arrays.asList(getCommonImageTypesAsArray());
   }
 
-  public static boolean isOneOf(Collection<MimeTypes> mimeTypes, String input) {
-    for (MimeTypes mimeType : mimeTypes) {
+  /**
+   * Common image mime types.
+   */
+  public static MimeType[] getCommonImageTypesAsArray() {
+    return new MimeType[]{IMAGE_GIF, IMAGE_JPG, IMAGE_JPEG, IMAGE_PNG};
+  }
+
+  public static boolean isOneOf(Collection<MimeType> mimeTypes, String input) {
+    for (MimeType mimeType : mimeTypes) {
       if (mimeType.getType().equals(input)) {
         return true;
       }

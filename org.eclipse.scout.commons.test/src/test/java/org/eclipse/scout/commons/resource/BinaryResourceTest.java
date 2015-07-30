@@ -19,7 +19,7 @@ public class BinaryResourceTest {
   @Test
   public void testConstructor() throws ProcessingException {
     String filename = "file.dat";
-    MimeTypes mimeType = MimeTypes.TEXT_PLAIN;
+    MimeType mimeType = MimeType.TEXT_PLAIN;
     String contentType = "application/binary";
     long modified = System.currentTimeMillis();
     byte[] emptyContent = new byte[0];
@@ -32,8 +32,8 @@ public class BinaryResourceTest {
     new BinaryResource(filename, content);
     new BinaryResource(filename, emptyContent);
 
-    new BinaryResource((MimeTypes) null, null);
-    new BinaryResource((MimeTypes) null, content);
+    new BinaryResource((MimeType) null, null);
+    new BinaryResource((MimeType) null, content);
     new BinaryResource(mimeType, null);
     new BinaryResource(mimeType, content);
 
