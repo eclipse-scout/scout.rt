@@ -94,7 +94,7 @@ scout.MessageBox.prototype._postRender = function() {
 
 scout.MessageBox.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
+  this.$container.uninstallFocusContext(this.session);
   this.attached = false;
 
   scout.MessageBox.parent.prototype._remove.call(this);

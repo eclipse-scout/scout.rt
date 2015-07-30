@@ -181,7 +181,7 @@ scout.Form.prototype._remove = function() {
   // FIXME AWE: call acceptInput() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._glassPaneRenderer.removeGlassPanes();
-  this._uninstallFocusContext(); // Must be called after removing the glasspanes. Otherwise, the newly activated focus context cannot gain focus because still covert by glasspane.
+  this._uninstallFocusContext();
   this.attached = false;
 
   scout.Form.parent.prototype._remove.call(this);

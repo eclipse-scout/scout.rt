@@ -693,8 +693,9 @@
 
   var _oldhide = $.fn.hide;
   $.fn.hide = function(speed, callback) {
+    var returnValue = _oldhide.apply(this, arguments);
     this.trigger('hide');
-    return _oldhide.apply(this, arguments);
+    return returnValue;
   };
 
   /**
