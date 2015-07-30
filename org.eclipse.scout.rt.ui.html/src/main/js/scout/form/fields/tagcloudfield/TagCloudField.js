@@ -25,6 +25,10 @@ scout.TagCloudField.prototype._render = function($parent) {
 };
 
 scout.TagCloudField.prototype._renderPostponed = function() {
+  if (!this.rendered) { // Check required because of setTimeout()
+    return;
+  }
+
   // init vars
   var data = this.demo,
     wCloud = this.$container.width(),
@@ -63,8 +67,8 @@ scout.TagCloudField.prototype._renderPostponed = function() {
 };
 
 scout.TagCloudField.prototype._change = function() {
-  if (this.$container === null) {
-    return false;
+  if (!this.rendered) { // Check required because of setTimeout()
+    return;
   }
 
   var that = this,
@@ -89,8 +93,8 @@ scout.TagCloudField.prototype._change = function() {
 };
 
 scout.TagCloudField.prototype._iterate = function() {
-  if (this.$container === null) {
-    return false;
+  if (!this.rendered) { // Check required because of setTimeout()
+    return;
   }
 
   var $t, x, y, w, h, driftX, driftY,
