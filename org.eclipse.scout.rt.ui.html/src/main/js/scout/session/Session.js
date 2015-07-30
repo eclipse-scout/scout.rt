@@ -766,9 +766,7 @@ scout.Session.prototype.goOffline = function() {
     if (this._unload) {
       return;
     }
-    if (this.desktop) {
-      this.desktop.goOffline();
-    }
+    this.rootAdapter.goOffline();
     if (!this.reconnector) {
       this.reconnector = new scout.Reconnector(this);
     }
@@ -784,9 +782,7 @@ scout.Session.prototype.goOnline = function() {
   else {
     this._resumeBackgroundJobPolling();
   }
-  if (this.desktop) {
-    this.desktop.goOnline();
-  }
+  this.rootAdapter.goOnline();
 };
 
 scout.Session.prototype.onReconnecting = function() {
