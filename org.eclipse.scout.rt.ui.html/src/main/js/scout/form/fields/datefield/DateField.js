@@ -657,6 +657,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     var now = new Date();
     var daysToAdd = Number(m[1] + (m[2] || '0'));
     now.setDate(now.getDate() + daysToAdd);
+    this._setDateValid(true, inputText);
     return {
       date: now,
       text: inputText
