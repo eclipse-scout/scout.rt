@@ -84,7 +84,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  private boolean hasDefaultStyle() {
+  protected boolean hasDefaultStyle() {
     return DesktopStyle.DEFAULT == getModel().getDesktopStyle();
   }
 
@@ -308,11 +308,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     getUiSession().logout();
   }
 
-  private void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent) {
+  protected void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent) {
     for (IJsonAdapter<IDisplayParent> displayParentAdapter : getUiSession().getJsonAdapters(displayParent)) {
-      addActionEvent(eventName, new JSONObject()
-          .put(propModelAdapterId, modelAdapter.getId())
-          .put(PROP_DISPLAY_PARENT, displayParentAdapter.getId()));
+      JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+      jsonEvent.put(propModelAdapterId, modelAdapter.getId());
+      jsonEvent.put(PROP_DISPLAY_PARENT, displayParentAdapter.getId());
+      addActionEvent(eventName, jsonEvent);
     }
   }
 
