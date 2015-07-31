@@ -226,7 +226,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       try {
         List<ILookupRow<T>> lookupRows = getLookupRows();
         for (ILookupRow<T> row : lookupRows) {
-          RadioButton radioButton = new RadioButton();
+          IRadioButton<T> radioButton = createEmptyRadioButtonForLookupRow();
           radioButton.setEnabled(row.isEnabled());
           radioButton.setLabel(row.getText());
           radioButton.setRadioValue(row.getKey());
@@ -241,6 +241,16 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
+  }
+
+  /**
+   * Returns a new instance of an empty radio button to be used when creating radio buttons dynamically from lookup
+   * rows. Subclasses may override this method to use custom radio buttons. Please note that all lookup row values (e.g.
+   * text, foreground color etc.) are applied to the returned instance afterwards. This method must <b>not</b> return
+   * <code>null</code>!
+   */
+  protected IRadioButton<T> createEmptyRadioButtonForLookupRow() throws ProcessingException {
+    return new RadioButton();
   }
 
   @Override
@@ -632,10 +642,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * A dynamic unconfigured radio button
    */
   private final class RadioButton extends AbstractRadioButton<T> {
-    @Override
-    protected void initConfig() {
-      super.initConfig();
-    }
   }
 
   protected final void interceptPrepareLookup(ILookupCall<T> call) {
