@@ -92,6 +92,11 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (formField.tooltip && formField.tooltip.rendered) {
     formField.tooltip.position();
   }
+
+  // Check for scrollbars, update them if neccessary
+  if (formField.$field) {
+    scout.scrollbars.update(formField.$field);
+  }
 };
 
 scout.FormFieldLayout.prototype._isLabelVisible = function() {

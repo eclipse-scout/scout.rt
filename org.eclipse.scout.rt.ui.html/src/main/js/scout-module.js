@@ -198,7 +198,6 @@ __include("scout/form/fields/groupbox/GroupBoxKeyStrokeAdapter.js");
 __include("scout/form/fields/groupbox/GroupBoxLayout.js");
 __include("scout/form/fields/groupbox/GroupBoxMenuItemsOrder.js");
 __include("scout/form/fields/htmlfield/HtmlField.js");
-__include("scout/form/fields/htmlfield/HtmlFieldLayout.js");
 __include("scout/form/fields/imagefield/ImageField.js");
 __include("scout/form/fields/imagefield/ImageFieldLayout.js");
 __include("scout/form/fields/labelfield/LabelField.js");

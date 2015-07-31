@@ -14,6 +14,10 @@ scout.WizardProgressField.prototype._render = function($parent) {
   this._$wizardSteps = $.makeDiv('wizard-steps');
   this.addField(this._$wizardSteps);
 
+  scout.scrollbars.install(this._$wizardSteps, this.session, {
+    axis: 'x'
+  });
+
   // TODO BSH Layout? Scrolling?
 };
 
@@ -68,6 +72,9 @@ scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
   this.wizardSteps.forEach(function(wizardStep, index) {
     this._updateWizardStepActiveClasses($wizardSteps.eq(index));
   }.bind(this));
+
+  // update background color for this._$wizardSteps, use same as for last step (otherwise there might be white space after last step)
+  this._$wizardSteps.css('background-color', $wizardSteps.eq(this.wizardSteps.length - 1).css('background-color'));
 };
 
 scout.WizardProgressField.prototype._updateWizardStepActiveClasses = function($wizardStep){

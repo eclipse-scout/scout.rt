@@ -40,8 +40,6 @@
   position: relative;
 
   &:last-child {
-    width: 100%; /* Stretch to right border, requires white-space: nowrap on container */
-
     & > .wizard-step-content {
       max-width: none;
     }
@@ -78,7 +76,7 @@
   }
   &.all-before-active {
   }
-  &.all-after-activeXXXXXXXX {
+  &.all-after-active {
     color: @wizard-progress-disabled-step-foreground-color;
     background-color: @wizard-progress-disabled-step-background-color;
 

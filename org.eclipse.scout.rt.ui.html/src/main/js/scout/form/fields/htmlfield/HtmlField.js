@@ -6,7 +6,7 @@ scout.inherits(scout.HtmlField, scout.ValueField);
 
 scout.HtmlField.prototype._render = function($parent) {
 
-  this.addContainer($parent, 'html-field', new scout.HtmlFieldLayout(this));
+  this.addContainer($parent, 'html-field');
   this.addLabel();
 
   this.addField($.makeDiv());
