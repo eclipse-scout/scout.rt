@@ -245,11 +245,7 @@ a,
 .scout > .popup,
 .scout > .form-tool-popup,
 .scout > .smart-field-popup,
-.scout > .date-picker-popup {
-  z-index: 0;
-}
-/* The .offline-message div is inserted as first child of .scout, therefore we increase the z-index by 1. The */
-/* element will therefore always be drawn at the top. */
+.scout > .date-picker-popup,
 .scout > .notifications {
-  z-index: 1;
+  z-index: 0;
 }

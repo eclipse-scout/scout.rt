@@ -261,31 +261,6 @@ scout.Desktop.prototype._detachOutlineContent = function() {
   }
 };
 
-scout.Desktop.TargetWindow = {
-  AUTO: 'AUTO',
-  SELF: 'SELF',
-  BLANK: 'BLANK'
-};
-
-scout.Desktop.prototype._onOpenUri = function(event) {
-  if (!event.uri) {
-    return;
-  }
-  var newWindow = true;
-  if (scout.Desktop.TargetWindow.BLANK === event.uriTarget) {
-    newWindow = true;
-  } else if (scout.Desktop.TargetWindow.SELF === event.uriTarget) {
-    newWindow = false;
-  }
-
-  $.log.debug('(Desktop#_onOpenUri) uri=' + event.uri + ' target=' + event.uriTarget + ' newWindow=' + newWindow);
-  if (newWindow) {
-    window.open(event.uri);
-  } else {
-    window.location.href = event.uri;
-  }
-};
-
 /* communication with outline */
 
 scout.Desktop.prototype.setOutlineContent = function(content) {
@@ -327,18 +302,6 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
 scout.Desktop.prototype.setOutline = function(outline) {
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
-};
-
-scout.Desktop.prototype._onModelOutlineChanged = function(event) {
-  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
-    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
-  }
-};
-
-scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
-  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
-    this.bringOutlineToFront(this.outline);
-  }
 };
 
 scout.Desktop.prototype._onModelFormShow = function(event) {
@@ -390,6 +353,39 @@ scout.Desktop.prototype._onModelFileChooserHide = function(event) {
   }
 };
 
+scout.Desktop.prototype._onModelOpenUri = function(event) {
+  $.log.debug('(Desktop#_onModelOpenUri) uri=' + event.uri + ' openUriHint=' + event.openUriHint);
+  if (!event.uri) {
+    return;
+  }
+
+  if (!event.hint && event.uri.match(/^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel):/)) {
+    event.hint = 'open-application';
+  }
+
+  if (event.hint === 'download') {
+    this._openUriInIFrame(event.uri);
+  } else if (event.hint === 'open-application') {
+      // TODO BSH Does that really work on all platforms?
+    this._openUriInIFrame(event.uri);
+  } else {
+    // 'new-window' -> Open popup
+    this._openUriAsNewWindow(event.uri);
+  }
+};
+
+scout.Desktop.prototype._onModelOutlineChanged = function(event) {
+  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
+    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+  }
+};
+
+scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
+  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
+    this.bringOutlineToFront(this.outline);
+  }
+};
+
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'formShow') {
     this._onModelFormShow(event);
@@ -406,13 +402,56 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else if (event.type === 'fileChooserHide') {
     this._onModelFileChooserHide(event);
   } else if (event.type === 'openUri') {
-    this._onOpenUri(event);
+    this._onModelOpenUri(event);
   } else if (event.type === 'outlineChanged') {
     this._onModelOutlineChanged(event);
   } else if (event.type === 'outlineContentActivate') {
     this._onModelOutlineContentActivate(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
+  }
+};
+
+scout.Desktop.prototype._openUriInIFrame = function(uri) {
+  // Create a hidden iframe and set the URI as src attribute value
+  var $iframe = $('<iframe>')
+    .addClass('download-frame')
+    .attr('tabindex', -1)
+    .appendTo(this.session.$entryPoint)
+    .attr('src', uri);
+
+  // Remove the iframe again after 10s (should be enough to get the download started)
+  setTimeout(function() {
+    $iframe.remove();
+  }, 10 * 1000);
+};
+
+scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
+  var popup = window.open(uri);
+
+  // Chrome returns undefined, FF && IE null when popup is blocked
+  // FIXME BSH IE also returns null when "protected mode" is on, even when the popup was successful! How to resolve this?
+  if (!popup) {
+    // Popup blocker detected
+    var $notification = $.makeDiv('notification');
+    var $notificationContent = $notification
+      .appendDiv('notification-content notification-closable');
+    $.makeDiv('close')
+      .on('click', function() {
+        this.removeNotification($notification);
+      }.bind(this))
+      .appendTo($notificationContent);
+    $.makeDiv('popup-blocked-title')
+      .text(this.session.text('ui.PopupBlockerDetected'))
+      .appendTo($notificationContent);
+    $('<a href="' + scout.strings.encode(uri) + '" target="_blank">')
+      .addClass('popup-blocked-link')
+      .text(this.session.text('ui.OpenManually'))
+      .on('click', function() {
+        this.removeNotification($notification);
+      }.bind(this))
+      .appendTo($notificationContent);
+    this.addNotification($notification);
   }
 };
 

@@ -91,7 +91,9 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.FileSizeLimitTitle",
         "ui.FileSizeLimit",
         "ui.ClipboardTimeoutTitle",
-        "ui.ClipboardTimeout"
+        "ui.ClipboardTimeout",
+        "ui.PopupBlockerDetected",
+        "ui.OpenManually"
         ));
   }
 }

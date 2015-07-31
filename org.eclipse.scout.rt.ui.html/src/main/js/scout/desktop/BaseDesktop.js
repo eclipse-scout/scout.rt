@@ -24,8 +24,11 @@ scout.BaseDesktop.prototype.addNotification = function($notification) {
   if (!$notification) {
     return;
   }
-  if (!this.$notifications) {
-    this.$notifications = this.$container.prependDiv('notifications');
+  if (this.$notifications) {
+    // Bring to front
+    this.$notifications.appendTo(this.$container);
+  } else {
+    this.$notifications = this.$container.appendDiv('notifications');
   }
   // Fade in notification
   $notification.appendTo(this.$notifications).hide().fadeIn(250);

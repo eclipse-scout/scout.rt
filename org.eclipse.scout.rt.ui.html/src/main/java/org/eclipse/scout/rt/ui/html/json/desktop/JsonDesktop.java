@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop.DesktopStyle;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
-import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
-import org.eclipse.scout.rt.client.ui.desktop.TargetWindow;
+import org.eclipse.scout.rt.client.ui.desktop.IOpenUriHint;
+import org.eclipse.scout.rt.client.ui.desktop.OpenUriHint;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -196,7 +196,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         handleModelFileChooserHide(event.getFileChooser());
         break;
       case DesktopEvent.TYPE_OPEN_URI:
-        handleModelOpenUri(event.getUri(), event.getTarget());
+        handleModelOpenUri(event.getUri(), event.getOpenUriHint());
         break;
       case DesktopEvent.TYPE_DOWNLOAD_RESOURCE:
         handleModelDownloadResource(event.getDownloadHandler());
@@ -209,11 +209,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  protected void handleModelOpenUri(String uri, ITargetWindow target) {
-    // Note: property 'target' is reserved by Scouts JSON protocol
+  protected void handleModelOpenUri(String uri, IOpenUriHint openUriHint) {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "uri", uri);
-    putProperty(json, "uriTarget", target.getIdentifier());
+    if (openUriHint != null) {
+      putProperty(json, "hint", openUriHint.getIdentifier());
+    }
     addActionEvent("openUri", json);
   }
 
@@ -231,7 +232,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
     m_downloads.put(filename, handler);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filename);
-    handleModelOpenUri(downloadUrl, TargetWindow.BLANK); // FIXME AWE: (from imo) AUTO causes in
+    handleModelOpenUri(downloadUrl, OpenUriHint.DOWNLOAD);
   }
 
   @Override

@@ -100,7 +100,7 @@ scout._installGlobalJavascriptErrorHandler = function() {
           return 'T6';
         }
         if (error.name === 'URIError') {
-          return 'U6';
+          return 'U7';
         }
       }
       return 'J0';

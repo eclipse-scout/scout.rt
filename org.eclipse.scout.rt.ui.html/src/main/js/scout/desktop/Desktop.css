@@ -383,9 +383,12 @@
   top: 0;
   height: 100%;
   margin-top: 60px;
+  width: 0; /* Don't block access to the elements in the background */
 }
 
 .notification {
+  width: 250px;
+  float: right;
   border-left: 3px solid @active-color;
   background-color: @palette-white;
   margin-bottom: 20px;
@@ -398,27 +401,40 @@
   & > .notification-content {
     border: 1px solid @border-color;
     border-left-width: 0;
+    padding: 10px;
+
+    & > .close {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      color: @icon-light-color;
+
+      &:hover {
+        color: @icon-color;
+        cursor: pointer;
+      }
+      &::before {
+        #scout.font-icon();
+        content: @icon-remove;
+      }
+    }
   }
 }
 
-.offline-message {
-  padding: 10px;
-
-  & > .reconnect-animated::after {
-    #scout.animation(rotation 0.9s linear infinite);
-    content: '';
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 6px;
-    margin-right: 6px;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0);
-    border-top-color: @palette-gray-7;
-    border-left-color: @palette-gray-7;
-    width: 14px;
-    height: 14px;
-    margin-top: -3px;
-  }
+.offline-message > .reconnect-animated::after {
+  #scout.animation(rotation 0.9s linear infinite);
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0);
+  border-top-color: @palette-gray-7;
+  border-left-color: @palette-gray-7;
+  width: 14px;
+  height: 14px;
+  margin-top: -3px;
 }
 
 .glasspane {
@@ -444,4 +460,25 @@
       #scout.animation-duration(0.25s);
     }
   }
+}
+
+/* "Open URI" related rules */
+
+.download-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.popup-blocked-title {
+  margin-right: 15px; /* leave space for close icon */
+}
+
+a.popup-blocked-link {
+  display: block;
+  margin-top: 10px;
+  outline: none;
 }
