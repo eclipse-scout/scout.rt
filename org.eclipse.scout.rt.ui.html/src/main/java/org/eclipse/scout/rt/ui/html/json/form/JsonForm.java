@@ -46,7 +46,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_INITIAL_FOCUS = "initialFocus";
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
-  public static final String EVENT_FORM_CLOSED = "formClosed";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
 
   private final IDesktop m_desktop;
@@ -199,10 +198,16 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
   protected void handleModelFormClosed(IForm form) {
     dispose();
-    // Important: The following event must be send _after_ the dispose() call! Otherwise,
-    // it would be deleted automatically from the JSON response. This is a special case
-    // where we explicitly want to send an event for an already disposed adapter.
-    addActionEvent(EVENT_FORM_CLOSED);
+
+    // JSON adapter is now disposed. To dispose it on the UI, too, we have to send an explicit
+    // event to the UI session. We _don't_ send an EVENT_FORM_CLOSED event for this form adapter,
+    // because:
+    // a) the event targets in the JSON response should not be disposed (in fact, when the adapter
+    //    was disposed, all existing events for that adapter were removed from the response)
+    // b) the form may not have been sent to the UI (e.g. opening and closing a form in
+    //    the same request). If we would send a FORM_CLOSED event for a form that does
+    //    not exist on the UI, an error would be thrown.
+    getUiSession().sendDisposeAdapterEvent(this);
   }
 
   protected void handleModelRequestFocus(IFormField formField) {

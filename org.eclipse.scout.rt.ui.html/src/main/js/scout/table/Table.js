@@ -2362,7 +2362,7 @@ scout.Table.prototype.onModelAction = function(event) {
   } else if (event.type === 'scrollToSelection') {
     this._onScrollToSelection();
   } else {
-    $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
+    scout.Table.parent.prototype.onModelAction.call(this, event);
   }
 };
 

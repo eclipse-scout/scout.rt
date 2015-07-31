@@ -77,7 +77,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * The full attribute name is: <b><code>{@link #CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX} + clientSessionId</code></b>
    */
   public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.clientsession."/*+m_clientSessionId*/;
+
   private static final long ROOT_ID = 1;
+  private static final String EVENT_INITIALIZED = "initialized";
+  private static final String EVENT_LOCALE_CHANGED = "localeChanged";
+  private static final String EVENT_DISPOSE_ADAPTER = "disposeAdapter";
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final P_RootAdapter m_rootJsonAdapter;
@@ -381,7 +385,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       }
     });
     putLocaleData(jsonEvent, sessionLocale);
-    m_currentJsonResponse.addActionEvent(m_uiSessionId, "initialized", jsonEvent);
+    m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
@@ -703,7 +707,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   public void sendLocaleChangedEvent(Locale locale) {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putLocaleData(jsonEvent, locale);
-    currentJsonResponse().addActionEvent(getUiSessionId(), "localeChanged", jsonEvent);
+    currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_LOCALE_CHANGED, jsonEvent);
   }
 
   /**
@@ -713,6 +717,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   protected void putLocaleData(JSONObject jsonEvent, Locale locale) {
     jsonEvent.put("locale", JsonLocale.toJson(locale));
     jsonEvent.put("textMap", getTextMap(locale));
+  }
+
+  @Override
+  public void sendDisposeAdapterEvent(IJsonAdapter<?> adapter) {
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    jsonEvent.put("adapter", adapter.getId());
+    currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_DISPOSE_ADAPTER, jsonEvent);
   }
 
   @Override

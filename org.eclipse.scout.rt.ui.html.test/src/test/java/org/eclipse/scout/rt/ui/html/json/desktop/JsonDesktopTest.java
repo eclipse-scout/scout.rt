@@ -45,7 +45,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -140,8 +139,6 @@ public class JsonDesktopTest {
   }
 
   @Test
-  @Ignore
-  //FIXME this test will fail. Json event model necessary? desktop event buffer? needs close before addActionEvent in JsonForm
   public void testFormOpenedAndClosedInSameRequest() throws ProcessingException, JSONException {
     JsonAdapterRegistryTest.testFormOpenedAndClosedInSameRequest(m_uiSession);
   }
@@ -174,6 +171,8 @@ public class JsonDesktopTest {
 
     form.doClose();
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formClosed");
+    assertEquals(0, responseEvents.size());
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "disposeAdapter");
     assertEquals(1, responseEvents.size());
 
     desktop.hideForm(form);
@@ -206,6 +205,8 @@ public class JsonDesktopTest {
     form.start();
     form.doClose();
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formClosed");
+    assertEquals(0, responseEvents.size());
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "disposeAdapter");
     assertEquals(1, responseEvents.size());
 
     desktop.hideForm(form);
@@ -302,7 +303,7 @@ public class JsonDesktopTest {
     jsonDesktop.handleModelDownloadResource(new DownloadHandler(new BinaryResource("foo.txt", null), 100));
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
     JSONObject data = events.get(0).getData();
-    assertEquals("dynamic/null/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run
     assertEquals("BLANK", data.getString("uriTarget"));
   }
 

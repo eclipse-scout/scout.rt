@@ -1402,7 +1402,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'scrollToSelection') {
     this._onScrollToSelection();
   } else {
-    $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
+    scout.Tree.parent.prototype.onModelAction.call(this, event);
   }
 };
 

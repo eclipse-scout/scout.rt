@@ -874,6 +874,10 @@ scout.Session.prototype.onModelAction = function(event) {
     this._onInitialized(event);
   } else if (event.type === 'logout') {
     this._onLogout(event);
+  } else if (event.type === 'disposeAdapter') {
+    this._onDisposeAdapter(event);
+  } else {
+    $.log.warn('Model action "' + event.type + '" is not supported by UI session');
   }
 };
 
@@ -900,6 +904,14 @@ scout.Session.prototype._onLogout = function(event) {
   setTimeout(function() {
     scout.reloadPage(event.redirectUrl, true);
   });
+};
+
+scout.Session.prototype._onDisposeAdapter = function(event) {
+  // Model adapter was disposed on server -> dispose it on the UI, too
+  var adapter = this.getModelAdapter(event.adapter);
+  if (adapter) { // adapter may be null if it was never sent to the UI, e.g. a form that was opened and closed in the same request
+    adapter.destroy();
+  }
 };
 
 scout.Session.prototype._onWindowUnload = function() {

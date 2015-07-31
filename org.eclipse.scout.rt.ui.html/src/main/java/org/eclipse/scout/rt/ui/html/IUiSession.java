@@ -157,4 +157,11 @@ public interface IUiSession {
    * Sends a "localeChanged" event to the UI. All locale-relevant data (number formats, texts map etc.) is sent along.
    */
   void sendLocaleChangedEvent(Locale locale);
+
+  /**
+   * Sends an explicit "disposeAdapter" event to the UI. Usually, JSON adapters are disposed automatically when their
+   * parent adapter is disposed. However, for some adapters this has to be done manually, because their parent is not
+   * disposed (e.g. forms).
+   */
+  void sendDisposeAdapterEvent(IJsonAdapter<?> adapter);
 }

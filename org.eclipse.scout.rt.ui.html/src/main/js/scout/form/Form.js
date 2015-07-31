@@ -205,10 +205,6 @@ scout.Form.prototype._renderIconId = function() {
   }
 };
 
-scout.Form.prototype._onFormClosed = function(event) {
-  this.destroy();
-};
-
 scout.Form.prototype._onRequestFocus = function(formFieldId) {
   var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
   if (formField) {
@@ -220,12 +216,10 @@ scout.Form.prototype._onRequestFocus = function(formFieldId) {
 };
 
 scout.Form.prototype.onModelAction = function(event) {
-  if (event.type === 'formClosed') {
-    this._onFormClosed(event);
-  } else if (event.type === 'requestFocus') {
+  if (event.type === 'requestFocus') {
     this._onRequestFocus(event.formField);
   } else {
-    $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
+    scout.Form.parent.prototype.onModelAction.call(this, event);
   }
 };
 

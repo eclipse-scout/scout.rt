@@ -23,7 +23,7 @@ scout.MessageBoxModelAdapter.prototype.onModelAction = function(event) {
   if (event.type === 'closed') {
     this._onMessageBoxClosed(event);
   } else {
-    $.log.warn('Model event not handled. Widget: MessageBox. Event: ' + event.type + '.');
+    scout.MessageBoxModelAdapter.parent.prototype.onModelAction.call(this, event);
   }
 };
 

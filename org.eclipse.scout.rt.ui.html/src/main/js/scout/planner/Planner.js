@@ -1258,6 +1258,6 @@ scout.Planner.prototype.onModelAction = function(event) {
   } else if (event.type === 'resourcesUpdated') {
     this._onResourcesUpdated(event.resources);
   } else {
-    $.log.warn('Model event not handled. Widget: scout.Planner. Event: ' + event.type + '.');
+    scout.Planner.parent.prototype.onModelAction.call(this, event);
   }
 };

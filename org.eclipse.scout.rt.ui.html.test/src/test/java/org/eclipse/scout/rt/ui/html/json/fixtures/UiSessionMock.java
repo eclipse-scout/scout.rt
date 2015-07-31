@@ -31,4 +31,9 @@ public class UiSessionMock extends UiSession {
   public IClientSession getClientSession() {
     return TestEnvironmentClientSession.get();
   }
+
+  @Override
+  public String getUiSessionId() {
+    return "UI:Session:Mock";
+  }
 }

@@ -46,9 +46,8 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 
   // copy all properties from model to this adapter or ui instance
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
-    if (propertyName === 'id') {
-      // TODO BSH Ignore more values? session? objectType?
-      return;
+    if (scout.helpers.isOneOf(propertyName, 'id', 'session', 'objectType')) {
+      return; // Ignore (already set manually above)
     }
     if (isAdapterProp && value) {
       value = this._createAdapters(propertyName, value);

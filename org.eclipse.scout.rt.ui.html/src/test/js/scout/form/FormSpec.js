@@ -40,10 +40,11 @@ describe("Form", function() {
 
     describe("formClose", function() {
 
-      function createFormClosedEvent(model) {
+      function createDisposeAdapterEvent(model) {
         return {
-          target: model.id,
-          type: 'formClosed'
+          target: session.uiSessionId,
+          type: 'disposeAdapter',
+          adapter: model.id
         };
       }
 
@@ -52,7 +53,7 @@ describe("Form", function() {
         spyOn(form, 'destroy');
 
         var message = {
-          events: [createFormClosedEvent(form)]
+          events: [createDisposeAdapterEvent(form)]
         };
         session._processSuccessResponse(message);
 
