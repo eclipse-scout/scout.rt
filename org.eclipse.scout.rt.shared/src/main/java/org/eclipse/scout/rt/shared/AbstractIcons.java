@@ -31,8 +31,8 @@ public abstract class AbstractIcons implements Serializable {
    */
   public static final String ApplicationLogo = "application_logo_large";
 
-  public static final String TableSortAsc = "font:\u2193";
-  public static final String TableSortDesc = "font:\u2191";
+  public static final String TableSortAsc = "font:\u2191";
+  public static final String TableSortDesc = "font:\u2193";
 
   public static final String ExclamationMark = "font:\uE001";
   public static final String Info = "font:\uE002";
