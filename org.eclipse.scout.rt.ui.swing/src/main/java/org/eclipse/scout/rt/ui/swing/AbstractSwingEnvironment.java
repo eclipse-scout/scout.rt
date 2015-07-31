@@ -72,7 +72,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -381,7 +380,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               break;
             }
             case DesktopEvent.TYPE_OPEN_URI: {
-              handleModelOpenUri(e.getUri(), e.getTarget());
+              handleModelOpenUri(e.getUri());
               break;
             }
             case DesktopEvent.TYPE_MESSAGE_BOX_SHOW: {
@@ -504,7 +503,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return handler;
   }
 
-  protected void handleModelOpenUri(String uri, ITargetWindow target /* ignored for swing */) {
+  protected void handleModelOpenUri(String uri) {
     try {
       openWithRuntimeExec(uri);
     }

@@ -1471,12 +1471,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void openUri(String url) {
-    openUri(url, TargetWindow.AUTO);
+    openUri(url, null);
   }
 
   @Override
-  public void openUri(String url, ITargetWindow target) {
-    fireOpenUri(url, target);
+  public void openUri(String url, IOpenUriHint openUriHint) {
+    fireOpenUri(url, openUriHint);
   }
 
   @Override
@@ -1762,8 +1762,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireOpenUri(String uri, ITargetWindow target) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, uri, target);
+  private void fireOpenUri(String uri, IOpenUriHint openUriHint) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, uri, openUriHint);
     fireDesktopEvent(e);
   }
 

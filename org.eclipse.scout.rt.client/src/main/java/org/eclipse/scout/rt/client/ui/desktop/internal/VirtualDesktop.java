@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
-import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
+import org.eclipse.scout.rt.client.ui.desktop.IOpenUriHint;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -280,7 +280,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void openUri(String url, ITargetWindow target) {
+  public void openUri(String url, IOpenUriHint openUriHint) {
     throw createUnsupportedOperationException();
   }
 

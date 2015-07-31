@@ -635,13 +635,13 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void openUri(String uri);
 
   /**
-   * Opens the given URI (http:, tel:, mailto:, etc.), the given target controls whether or
-   * not the URI is opened in a new window.
+   * Opens the given URI (http:, tel:, mailto:, etc.).
    *
-   * @param target
-   *          where the URI should be opened
+   * @param openUriHint
+   *          A hint for the UI that may influence the method used to open the URI (e.g. if a new window should be
+   *          opened or not). Optional (may be <code>null</code>).
    */
-  void openUri(String uri, ITargetWindow target);
+  void openUri(String uri, IOpenUriHint openUriHint);
 
   /**
    * Downloads the resource provided by the given download handler.

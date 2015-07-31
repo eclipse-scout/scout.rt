@@ -41,9 +41,9 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_OUTLINE_CHANGED = 200;
 
   /**
-   *Event type that indicates that the outline content needs to be activated.
+   * Event type that indicates that the outline content needs to be activated.
    *
-   *@see IDesktop#activateOutline(IOutline)
+   * @see IDesktop#activateOutline(IOutline)
    */
   public static final int TYPE_OUTLINE_CONTENT_ACTIVATE = 210;
 
@@ -154,7 +154,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
-  private ITargetWindow m_target;
+  private IOpenUriHint m_openUriHint;
   private IDownloadHandler m_downloadHandler;
 
   public DesktopEvent(IDesktop source, int type) {
@@ -187,10 +187,10 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     m_fileChooser = fc;
   }
 
-  public DesktopEvent(IDesktop source, int type, String uri, ITargetWindow target) {
+  public DesktopEvent(IDesktop source, int type, String uri, IOpenUriHint openUriHint) {
     this(source, type);
     m_uri = uri;
-    m_target = target;
+    m_openUriHint = openUriHint;
   }
 
   public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
@@ -235,8 +235,8 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     return m_uri;
   }
 
-  public ITargetWindow getTarget() {
-    return m_target;
+  public IOpenUriHint getOpenUriHint() {
+    return m_openUriHint;
   }
 
   public IDownloadHandler getDownloadHandler() {
