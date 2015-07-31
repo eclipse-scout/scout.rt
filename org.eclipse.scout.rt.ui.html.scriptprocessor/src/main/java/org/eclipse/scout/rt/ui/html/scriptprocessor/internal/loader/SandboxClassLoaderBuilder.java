@@ -11,17 +11,26 @@
 package org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 public final class SandboxClassLoaderBuilder {
+
+  private static final Logger LOG = Logger.getLogger(SandboxClassLoaderBuilder.class.getName());
 
   private static final int ANY_SIZE = 10240;
 
@@ -75,31 +84,87 @@ public final class SandboxClassLoaderBuilder {
   }
 
   protected static URL unwrapNestedJar(URL url) {
-    try {
-      // if (!"file".equals(url.getProtocol())) {
-      //create a copy of all jars, to avoid locked files
-      if (url.getPath().endsWith(".jar")) {
-        //copy to tmp location
-        String name = url.getPath();
-        int i = name.lastIndexOf('/');
-        if (i >= 0) {
-          name = name.substring(i + 1);
-        }
-        File f = File.createTempFile("jar-sandbox-", name);
-        f.deleteOnExit();
-        try (InputStream in = url.openStream(); FileOutputStream out = new FileOutputStream(f)) {
-          byte[] buf = new byte[ANY_SIZE];
-          int n;
-          while ((n = in.read(buf)) > 0) {
-            out.write(buf, 0, n);
-          }
-        }
-        url = f.toURI().toURL();
-      }
+    if (!url.getPath().endsWith(".jar")) {
       return url;
+    }
+
+    String tempDir = System.getProperty("java.io.tmpdir");
+    if (!(tempDir.endsWith("/") || tempDir.endsWith("\\"))) {
+      tempDir += System.getProperty("file.separator");
+    }
+
+    try {
+      String name = url.getPath();
+      int i = name.lastIndexOf('/');
+      if (i >= 0) {
+        name = name.substring(i + 1);
+      }
+
+      String sha1;
+      try (InputStream inputStream = url.openStream()) {
+        sha1 = getSha1(inputStream);
+      }
+
+      String filenameWithoutExtension = name.substring(0, name.lastIndexOf('.'));
+      String targetFilename = filenameWithoutExtension + "-" + sha1 + ".jar";
+      File targetFile = new File(tempDir, targetFilename);
+      if (targetFile.exists()) {
+        String targetFileSha1;
+        try (InputStream inputStream = new FileInputStream(targetFile)) {
+          targetFileSha1 = getSha1(inputStream);
+        }
+
+        if (!targetFileSha1.equals(sha1)) {
+          // sha1 hash of existing file doesn't match
+          // use newly created temporary file as fallback
+          File f = File.createTempFile("jar-sandbox-", name);
+          LOG.log(Level.SEVERE, "Target file " + targetFile.getAbsolutePath() + " already exists but has wrong sha1 hash [" + targetFileSha1 + "]. Using new temporary file instead " + f.getAbsolutePath() + " [" + sha1 + "].");
+          targetFile = f;
+          targetFile.deleteOnExit();
+          writeContent(url, targetFile);
+        }
+      }
+      else {
+        // existing file doesn't exist
+        // write content to file
+        targetFile.deleteOnExit();
+        writeContent(url, targetFile);
+      }
+
+      return targetFile.toURI().toURL();
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("SHA-1 algorithm is missing but required to verify jar for classloader", e);
     }
     catch (IOException e) {
       throw new IllegalArgumentException("JAR " + url + " could not be extracted to temp directory", e);
+    }
+  }
+
+  /**
+   * Determines the sha1 hash (hex representation) of the data provided by the input stream.
+   */
+  protected static String getSha1(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
+    MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
+    byte[] buf = new byte[ANY_SIZE];
+    int n;
+    while ((n = inputStream.read(buf)) > 0) {
+      sha1Digest.update(buf, 0, n);
+    }
+
+    return new HexBinaryAdapter().marshal(sha1Digest.digest());
+  }
+
+  /**
+   * Writes the content from the url output stream to the provided file.
+   */
+  protected static void writeContent(URL url, File f) throws IOException {
+    try (InputStream in = url.openStream(); FileOutputStream out = new FileOutputStream(f)) {
+      byte[] buf = new byte[ANY_SIZE];
+      int n;
+      while ((n = in.read(buf)) > 0) {
+        out.write(buf, 0, n);
+      }
     }
   }
 }
