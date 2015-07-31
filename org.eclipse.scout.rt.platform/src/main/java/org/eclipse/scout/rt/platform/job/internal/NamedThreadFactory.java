@@ -163,15 +163,15 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
       out.print("-");
       out.print(m_sequence);
       if (m_currentJobState != null) {
-        out.print(" [");
+        out.print(" (");
         out.print(m_currentJobState);
         if (StringUtility.hasText(m_currentJobStateInfo)) {
           out.printf(" '%s'", m_currentJobStateInfo);
         }
-        out.print("]");
+        out.print(")");
       }
       if (StringUtility.hasText(m_currentJobName)) {
-        out.printf(" %s", m_currentJobName);
+        out.printf(" \"%s\"", m_currentJobName);
       }
 
       return writer.toString();
