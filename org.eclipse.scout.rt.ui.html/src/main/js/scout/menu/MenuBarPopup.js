@@ -39,6 +39,7 @@ scout.MenuBarPopup.prototype._renderHead = function() {
 
   if (scout.Action.ActionStyle.TASK_BAR === this.menu.actionStyle) {
     this._copyCssClassToHead('taskbar-tool-item');
+    this._copyCssClassToHead('unfocusable');
     this.$head.addClass('selected');
   } else {
     this._copyCssClassToHead('button');
