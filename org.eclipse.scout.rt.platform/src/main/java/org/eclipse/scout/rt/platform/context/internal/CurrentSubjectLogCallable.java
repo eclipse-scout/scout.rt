@@ -63,8 +63,8 @@ public class CurrentSubjectLogCallable<RESULT> implements Callable<RESULT>, ICha
     return m_next;
   }
 
-  private String getPrincipal(final Subject subject) {
-    if (subject == null || !subject.getPrincipals().isEmpty()) {
+  protected String getPrincipal(final Subject subject) {
+    if (subject == null || subject.getPrincipals().isEmpty()) {
       return null;
     }
     final Principal principal = subject.getPrincipals().iterator().next();
