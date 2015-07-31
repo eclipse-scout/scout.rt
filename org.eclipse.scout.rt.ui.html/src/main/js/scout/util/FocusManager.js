@@ -32,12 +32,7 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
     active:  scout.helpers.nvl(options.focusManagerActive, true),
     session: session,
     focusContexts: [],
-    glassPaneTargets: [],
-    /**
-     * This flag controls whether or not the focus must be revalidated. With this flag,
-     * we can skip focus validation while we're in the middle of adding/removing widgets.
-     */
-    suspendValidation: 0
+    glassPaneTargets: []
   };
 
   var $entryPoint = session.$entryPoint;
@@ -76,27 +71,6 @@ scout.FocusManager.prototype.deactivate = function(uiSessionId) {
  */
 scout.FocusManager.prototype.active = function(uiSessionId) {
   return this._sessionFocusContexts[uiSessionId].active;
-};
-
-/**
- * Returns whether or not it is allowed to perform focus validation.
- */
-scout.FocusManager.prototype.suspendValidation = function(uiSessionId) {
-  this._sessionFocusContexts[uiSessionId].suspendValidation++;
-};
-
-scout.FocusManager.prototype.validationSuspended = function(uiSessionId) {
-  return this._sessionFocusContexts[uiSessionId].suspendValidation > 0;
-};
-
-/**
- * Returns whether or not it is allowed to perform focus validation.
- */
-scout.FocusManager.prototype.resumeValidation = function(uiSessionId) {
-  var suspendCount = --this._sessionFocusContexts[uiSessionId].suspendValidation;
-  if (suspendCount === 0) {
-    this.validateFocus(uiSessionId);
-  }
 };
 
 /**
@@ -155,7 +129,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function(session, $containe
  * Returns true if there is a focus context installed for the given $container.
  */
 scout.FocusManager.prototype.isFocusContextInstalled = function(session, $container) {
-  return this._contextByContainer(session.uiSessionId, $container) !== null;
+  return !!this._contextByContainer(session.uiSessionId, $container);
 };
 
 /**
@@ -179,12 +153,14 @@ scout.FocusManager.prototype.unregisterGlassPaneTarget = function(uiSessionId, g
 /**
  * Finds the first focusable element of the given $container, or null if not found.
  */
-scout.FocusManager.prototype.findFirstFocusableElement = function(session, $container) {
+scout.FocusManager.prototype.findFirstFocusableElement = function(session, $container, filter) {
   var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents,
     $candidates = $container
       .find(':focusable')
       .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
-      .not(session.$entryPoint); // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
+      .not(session.$entryPoint) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
+      .filter(filter || $.returnTrue);
+
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
@@ -321,10 +297,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element, 
 };
 
 scout.FocusManager.prototype._isUnfocusable = function($element) {
-  if ($element.hasClass('unfocusable')) {
-    return true;
-  }
-  return $element.closest('.unfocusable').length > 0;
+  return $element.hasClass('unfocusable') || $element.closest('.unfocusable').length > 0;
 };
 
 /**

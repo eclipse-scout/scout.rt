@@ -140,6 +140,10 @@
     return jQuery.ajax(options);
   };
 
+  $.returnTrue = function() {
+    return true;
+  };
+
   // === $.prototype extensions ===
 
   // prepend - and return new div for chaining
@@ -693,8 +697,8 @@
 
   var _oldhide = $.fn.hide;
   $.fn.hide = function(speed, callback) {
-    var returnValue = _oldhide.apply(this, arguments);
     this.trigger('hide');
+    var returnValue = _oldhide.apply(this, arguments);
     return returnValue;
   };
 

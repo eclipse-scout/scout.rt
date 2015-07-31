@@ -9,26 +9,30 @@ scout.FocusContext = function($container, session) {
   this._$container = $container;
   this.session = session;
   this._lastFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
+  this._focusedField = null;
 
-  // Notice: Any listener is installed on $container and not on $field level.
+  // Notice: Any listener is installed on $container and not on $field level, except 'remove' listener because does not bubble.
   this._keyDownListener = this._onKeyDownEvent.bind(this);
   this._focusInListener = this._onFocusInEvent.bind(this);
-  this._removeListener = this._onRemoveEvent.bind(this);
+  this._focusOutListener = this._onFocusOutEvent.bind(this);
   this._hideListener = this._onHideEvent.bind(this);
+  this._removeListener = this._onRemoveEvent.bind(this);
 
   this._$container
     .on('keydown', this._keyDownListener)
     .on('focusin', this._focusInListener)
-    .on('hide', this._hideListener)
-    .on('remove', this._removeListener);
+    .on('focusout', this._focusOutListener)
+    .on('hide', this._hideListener);
 };
 
 scout.FocusContext.prototype._dispose = function() {
   this._$container
     .off('keydown', this._keyDownListener)
     .off('focusin', this._focusInListener)
-    .off('hide', this._hideListener)
-    .off('remove', this._removeListener);
+    .off('focusout', this._focusOutListener)
+    .off('hide', this._hideListener);
+  $(this._focusedField).off('remove', this._removeListener);
+  this._focusedField = null;
 };
 
 /**
@@ -64,6 +68,9 @@ scout.FocusContext.prototype._onKeyDownEvent = function(event) {
  * Method invoked once a 'FocusIn' event is fired by this context's $container or one of its child controls.
  */
 scout.FocusContext.prototype._onFocusInEvent = function(event) {
+  $(event.target).on('remove', this._removeListener);
+  this._focusedField = event.target;
+
   // Do not update current focus context nor validate focus if target is $entryPoint.
   // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glasspanes.
   if (event.target === this.session.$entryPoint[0]) {
@@ -74,18 +81,28 @@ scout.FocusContext.prototype._onFocusInEvent = function(event) {
   scout.focusManager._registerContextIfAbsentElseMoveTop(this);
   this._validateAndSetFocus(event.target);
 
-  // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
-  event.stopPropagation();
+  event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
 };
+
+/**
+ * Method invoked once a 'FocusOut' event is fired by this context's $container or one of its child controls.
+ */
+scout.FocusContext.prototype._onFocusOutEvent = function(event) {
+  $(event.target).off('remove', this._removeListener);
+  this._focusedField = null;
+
+  event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
+};
+
 
 /**
  * Method invoked once a child element of this context's $container is removed.
  */
 scout.FocusContext.prototype._onRemoveEvent = function(event) {
-  if ($(event.target).isOrHas(this._lastFocusedElement)) {
-    this._validateAndSetFocus(); // Trigger validation because the focused element was removed.
-    event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
-  }
+  // This listener is installed on the focused element only.
+
+  this._validateAndSetFocus(event.target, true); // Trigger validation because the focused element was removed.
+  event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
 };
 
 /**
@@ -93,7 +110,7 @@ scout.FocusContext.prototype._onRemoveEvent = function(event) {
  */
 scout.FocusContext.prototype._onHideEvent = function(event) {
   if ($(event.target).isOrHas(this._lastFocusedElement)) {
-    this._validateAndSetFocus(); // Trigger validation because the focused element was hidden.
+    this._validateAndSetFocus(event.target, true); // Trigger validation because the focused element was hidden.
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
   }
 };
@@ -106,17 +123,18 @@ scout.FocusContext.prototype._onHideEvent = function(event) {
  * 3. If not: Removes the focus from the currently active element (blur);
  *
  */
-scout.FocusContext.prototype._validateAndSetFocus = function(element) {
-  if (scout.focusManager.validationSuspended(this.session.uiSessionId)) {
-    return;
-  }
-
+scout.FocusContext.prototype._validateAndSetFocus = function(element, blurElement) {
   var elementToFocus = null;
-
-  if (element && this._isChildElement(element)) {
-    elementToFocus = element;
+  if (blurElement) {
+    elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container, function() {
+      return this !== element;
+    });
   } else {
-    elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container);
+    if (element && this._isChildElement(element)) {
+      elementToFocus = element;
+    } else {
+      elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container);
+    }
   }
 
   // Store the element to focus (even if the element to focus is currently covert by a glasspane -> that is for later restore once the glasspane is removed).
@@ -135,7 +153,6 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element) {
   // When no element at all is focusable, we focus the $entryPoint, because we don't want to focus the document body.
   // Otherwise, the browser default keystrokes (like backspace, etc.) would be triggered.
   elementToFocus = elementToFocus || this.session.$entryPoint[0];
-
   // Only set the focus if different to the current focused element.
   if (document.activeElement !== elementToFocus) {
     $(elementToFocus).focus();

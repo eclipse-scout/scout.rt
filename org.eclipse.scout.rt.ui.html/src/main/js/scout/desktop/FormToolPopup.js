@@ -61,8 +61,8 @@ scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {
   if (this.formToolButton.$container.isOrHas(event.target)) {
     return;
   }
-  this.formToolButton.setSelected(false);
-  this.detach();
+
+  this.close();
 };
 
 scout.FormToolPopup.prototype.alignTo = function() {

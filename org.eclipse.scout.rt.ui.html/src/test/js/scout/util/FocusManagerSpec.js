@@ -89,21 +89,21 @@ describe('scout.Focusmanager', function() {
       });
 
       it('Must focus another valid field if the focused field is removed', function() {
-        var firstField = form.rootGroupBox.fields[0],
+        var $firstField = form.rootGroupBox.fields[0].$field,
           $secondField = form.rootGroupBox.fields[1].$field;
 
-        expect(firstField.$field).toBeFocused();
-        firstField.remove();
+        expect($firstField).toBeFocused();
+        $firstField.remove();
         expect($secondField).toBeFocused();
       });
 
 
       it('Must focus another valid field if the focused field is hidden', function() {
-        var firstField = form.rootGroupBox.fields[0],
-          $secondField = form.rootGroupBox.fields[1].$field;
+        var $firstField = form.rootGroupBox.fields[0].$field,
+        $secondField = form.rootGroupBox.fields[1].$field;
 
-        expect(firstField.$field).toBeFocused();
-        firstField._renderVisible(false);
+        expect($firstField).toBeFocused();
+        $firstField.setVisible(false);
         expect($secondField).toBeFocused();
       });
 

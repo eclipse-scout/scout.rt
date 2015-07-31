@@ -75,31 +75,14 @@ scout.Widget.prototype.remove = function() {
   }
   $.log.trace('Removing widget: ' + this);
 
-  // Suspend focus validation until all children and widget itself have been removed
-  // Focus validation is resumed in the finally block. The session-check is required
-  // because a few widgets do not have a session (e.g. when early  startup errors
-  // are displayed). We also check if a focus context is installed on the $container
-  // because not every widget has a focus-context.
-  // FIXME AWE: check for this.$container is a workaround until we've found
-  // a better solution for MessageBox.UI
-  var hasFocusContext = this.session && this.$container && this.$container.isFocusContextInstalled(this.session);
-  if (hasFocusContext) {
-    scout.focusManager.suspendValidation(this.session.uiSessionId);
-  }
-  try {
-    // remove children in reverse order.
-    this.children.slice().reverse().forEach(function(child) {
-      child.remove();
-    });
-    this._remove();
-    this._uninstallKeyStrokeAdapter();
-    this.rendered = false;
-    this._trigger('remove');
-  } finally {
-    if (hasFocusContext) {
-      scout.focusManager.resumeValidation(this.session.uiSessionId);
-    }
-  }
+  // remove children in reverse order.
+  this.children.slice().reverse().forEach(function(child) {
+    child.remove();
+  });
+  this._remove();
+  this._uninstallKeyStrokeAdapter();
+  this.rendered = false;
+  this._trigger('remove');
 };
 
 scout.Widget.prototype._trigger = function(event) {
