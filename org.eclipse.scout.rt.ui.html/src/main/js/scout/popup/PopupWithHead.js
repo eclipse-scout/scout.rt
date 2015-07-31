@@ -1,6 +1,5 @@
 scout.PopupWithHead = function(session, options) {
   scout.PopupWithHead.parent.call(this, session, options);
-  options = options || {};
   this.$head;
   this.$body;
   this.$deco;

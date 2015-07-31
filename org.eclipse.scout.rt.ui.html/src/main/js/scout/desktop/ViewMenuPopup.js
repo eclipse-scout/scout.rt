@@ -1,5 +1,7 @@
 scout.ViewMenuPopup = function(session, $tab, viewMenus, naviBounds, breadcrumbEnabled) {
-  scout.ViewMenuPopup.parent.call(this, session);
+  scout.ViewMenuPopup.parent.call(this, session, {
+    focusableContainer: true
+  });
   this.$tab = $tab;
   this.$headBlueprint = this.$tab;
   this.viewMenus = viewMenus;
