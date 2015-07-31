@@ -2,4 +2,8 @@
   margin-left: @mandatory-indicator-width;
   background-color: @tooltip-background-color;
   padding: @text-field-padding;
+
+  & > img {
+    display: none;
+  }
 }
