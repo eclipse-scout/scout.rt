@@ -27,11 +27,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.AscendingButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.DescendingButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnSortingBox.WithoutButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.RemoveFilterButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetAllButton;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetColumnFiltersButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetSortingButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ResetBox.ResetViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox;
@@ -50,7 +49,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetAllMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetColumnFiltersMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetSortingMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetViewMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -95,7 +93,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return TEXTS.get("OrganizeTableColumnsTitle");
+    return TEXTS.get("TableOrganize");
   }
 
   @Override
@@ -178,10 +176,6 @@ public class OrganizeColumnsForm extends AbstractForm {
     return getFieldByClass(ResetBox.class);
   }
 
-  public ResetColumnFiltersButton getResetColumnFilters() {
-    return getFieldByClass(ResetColumnFiltersButton.class);
-  }
-
   public ResetSortingButton getResetSortingButton() {
     return getFieldByClass(ResetSortingButton.class);
   }
@@ -219,11 +213,11 @@ public class OrganizeColumnsForm extends AbstractForm {
       }
 
       @Order(10.0)
-      public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
+      public class ColumnsGroupBox extends AbstractGroupBox {
 
         @Override
-        protected int getConfiguredGridH() {
-          return 4;
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Columns");
         }
 
         @Override
@@ -232,285 +226,304 @@ public class OrganizeColumnsForm extends AbstractForm {
         }
 
         @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Columns");
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected void execReloadTableData() throws ProcessingException {
-          ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
-          for (IColumn<?> col : m_table.getColumnSet().getAllColumnsInUserOrder()) {
-            if (col.isDisplayable()) {
-              if (col.isVisible() || col.isVisibleGranted()) {
-                IHeaderCell headerCell = col.getHeaderCell();
-                TableRow row = new TableRow(getTable().getColumnSet());
-
-                // Key
-                getTable().getKeyColumn().setValue(row, col);
-
-                // Visible
-                getTable().getVisibleColumn().setValue(row, col.isVisible());
-
-                // Column Title
-                String columnTitle = headerCell.getText();
-                if (StringUtility.isNullOrEmpty(columnTitle)) {
-                  columnTitle = headerCell.getTooltipText();
-                  row.setFont(FontSpec.parse("ITALIC"));
-                }
-                getTable().getTitleColumn().setValue(row, columnTitle);
-                if (Platform.get().inDevelopmentMode() && col.isSortActive()) {
-                  getTable().getTitleColumn().setValue(row, columnTitle + " (" + col.getSortIndex() + ")");
-                }
-
-                // Sorting
-                getTable().getSortingColumn().setValue(row, col);
-                if (col.isSortActive()) {
-                  row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(col.isSortAscending() ? AbstractIcons.TableSortAsc : AbstractIcons.TableSortDesc);
-                }
-
-                rowList.add(row);
-              }
-            }
-          }
-          try {
-            getTable().setTableChanging(true);
-            getTable().discardAllRows();
-            getTable().addRows(rowList);
-          }
-          finally {
-            getTable().setTableChanging(false);
-          }
-          validateButtons();
+        protected int getConfiguredGridColumnCount() {
+          return 1;
         }
 
         @Order(10.0)
-        public class Table extends AbstractTable {
+        public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
 
           @Override
-          protected int getConfiguredDragType() {
-            return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
+          protected int getConfiguredGridH() {
+            return 4;
           }
 
           @Override
-          protected int getConfiguredDropType() {
-            return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
+          protected int getConfiguredGridW() {
+            return 1;
           }
 
           @Override
-          protected TransferObject execDrag(List<ITableRow> rows) throws ProcessingException {
-            return new JavaTransferObject(rows);
+          protected int getConfiguredLabelPosition() {
+            return LABEL_POSITION_TOP;
           }
 
           @Override
-          protected void execDrop(ITableRow row, TransferObject transfer) throws ProcessingException {
-            if (row != null && transfer != null && transfer instanceof JavaTransferObject) {
-              List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
-              if (CollectionUtility.hasElements(draggedRows)) {
-                ITableRow draggedRow = CollectionUtility.firstElement(draggedRows);
-                if (draggedRow.getRowIndex() != row.getRowIndex()) {
-                  // target row other than source row
-                  try {
-                    getTable().setTableChanging(true);
-                    if (draggedRow.getRowIndex() < row.getRowIndex()) {
-                      moveDown(draggedRow, row.getRowIndex());
-                    }
-                    else {
-                      moveUp(draggedRow, row.getRowIndex());
-                    }
-                    updateColumnVisibilityAndOrder();
+          protected boolean getConfiguredLabelVisible() {
+            return false;
+          }
+
+          @Override
+          protected void execReloadTableData() throws ProcessingException {
+            ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
+            for (IColumn<?> col : m_table.getColumnSet().getAllColumnsInUserOrder()) {
+              if (col.isDisplayable()) {
+                if (col.isVisible() || col.isVisibleGranted()) {
+                  IHeaderCell headerCell = col.getHeaderCell();
+                  TableRow row = new TableRow(getTable().getColumnSet());
+
+                  // Key
+                  getTable().getKeyColumn().setValue(row, col);
+
+                  // Visible
+                  getTable().getVisibleColumn().setValue(row, col.isVisible());
+
+                  // Column Title
+                  String columnTitle = headerCell.getText();
+                  if (StringUtility.isNullOrEmpty(columnTitle)) {
+                    columnTitle = headerCell.getTooltipText();
+                    row.setFont(FontSpec.parse("ITALIC"));
                   }
-                  finally {
-                    getTable().setTableChanging(false);
+                  getTable().getTitleColumn().setValue(row, columnTitle);
+                  if (Platform.get().inDevelopmentMode() && col.isSortActive()) {
+                    getTable().getTitleColumn().setValue(row, columnTitle + " (" + col.getSortIndex() + ")");
                   }
+
+                  // Sorting
+                  getTable().getSortingColumn().setValue(row, col);
+                  if (col.isSortActive()) {
+                    row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(col.isSortAscending() ? AbstractIcons.TableSortAsc : AbstractIcons.TableSortDesc);
+                  }
+
+                  rowList.add(row);
                 }
-
               }
             }
-          }
-
-          @Override
-          protected boolean getConfiguredAutoResizeColumns() {
-            return true;
-          }
-
-          @Override
-          protected boolean getConfiguredMultiSelect() {
-            return false;
-          }
-
-          @Override
-          protected boolean getConfiguredHeaderVisible() {
-            return false;
-          }
-
-          public KeyColumn getKeyColumn() {
-            return getColumnSet().getColumnByClass(KeyColumn.class);
-          }
-
-          public SortingColumn getSortingColumn() {
-            return getColumnSet().getColumnByClass(SortingColumn.class);
-          }
-
-          public FilterColumn getFilterColumn() {
-            return getColumnSet().getColumnByClass(FilterColumn.class);
-          }
-
-          public CustomColumnColumn getCustomColumnColumn() {
-            return getColumnSet().getColumnByClass(CustomColumnColumn.class);
-          }
-
-          public TitleColumn getTitleColumn() {
-            return getColumnSet().getColumnByClass(TitleColumn.class);
-          }
-
-          public VisibleColumn getVisibleColumn() {
-            return getColumnSet().getColumnByClass(VisibleColumn.class);
-          }
-
-          @Override
-          protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
-            if (row != null && getContextColumn() == getVisibleColumn() && getKeyColumn().getValue(row) != null) {
-              Boolean oldValue = getVisibleColumn().getValue(row);
-              setColumnVisible(row, !oldValue);
+            try {
+              getTable().setTableChanging(true);
+              getTable().discardAllRows();
+              getTable().addRows(rowList);
             }
-          }
-
-          @Override
-          protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+            finally {
+              getTable().setTableChanging(false);
+            }
             validateButtons();
           }
 
           @Order(10.0)
-          public class SpaceKeyStroke extends AbstractKeyStroke {
+          public class Table extends AbstractTable {
+
             @Override
-            protected String getConfiguredKeyStroke() {
-              return "space";
+            protected int getConfiguredDragType() {
+              return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
             }
 
             @Override
-            protected void execAction() throws ProcessingException {
-              for (ITableRow row : getSelectedRows()) {
-                Boolean oldValue = BooleanUtility.nvl(getVisibleColumn().getValue(row));
-                setColumnVisible(row, !oldValue);
+            protected int getConfiguredDropType() {
+              return IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER;
+            }
+
+            @Override
+            protected TransferObject execDrag(List<ITableRow> rows) throws ProcessingException {
+              return new JavaTransferObject(rows);
+            }
+
+            @Override
+            protected void execDrop(ITableRow row, TransferObject transfer) throws ProcessingException {
+              if (row != null && transfer != null && transfer instanceof JavaTransferObject) {
+                List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
+                if (CollectionUtility.hasElements(draggedRows)) {
+                  ITableRow draggedRow = CollectionUtility.firstElement(draggedRows);
+                  if (draggedRow.getRowIndex() != row.getRowIndex()) {
+                    // target row other than source row
+                    try {
+                      getTable().setTableChanging(true);
+                      if (draggedRow.getRowIndex() < row.getRowIndex()) {
+                        moveDown(draggedRow, row.getRowIndex());
+                      }
+                      else {
+                        moveUp(draggedRow, row.getRowIndex());
+                      }
+                      updateColumnVisibilityAndOrder();
+                    }
+                    finally {
+                      getTable().setTableChanging(false);
+                    }
+                  }
+
+                }
               }
             }
-          }
-
-          @Order(20.0)
-          public class UpKeyStroke extends AbstractKeyStroke {
-            @Override
-            protected String getConfiguredKeyStroke() {
-              return "alt-up";
-            }
 
             @Override
-            protected void execAction() throws ProcessingException {
-              moveUp(getSelectedRow());
-            }
-          }
-
-          @Order(30.0)
-          public class DownKeyStroke extends AbstractKeyStroke {
-            @Override
-            protected String getConfiguredKeyStroke() {
-              return "alt-down";
-            }
-
-            @Override
-            protected void execAction() throws ProcessingException {
-              moveDown(getSelectedRow());
-            }
-          }
-
-          @Order(10.0)
-          public class KeyColumn extends AbstractColumn<IColumn<?>> {
-
-            @Override
-            protected boolean getConfiguredPrimaryKey() {
+            protected boolean getConfiguredAutoResizeColumns() {
               return true;
             }
 
             @Override
-            protected boolean getConfiguredDisplayable() {
+            protected boolean getConfiguredMultiSelect() {
               return false;
             }
+
+            @Override
+            protected boolean getConfiguredHeaderVisible() {
+              return false;
+            }
+
+            public KeyColumn getKeyColumn() {
+              return getColumnSet().getColumnByClass(KeyColumn.class);
+            }
+
+            public SortingColumn getSortingColumn() {
+              return getColumnSet().getColumnByClass(SortingColumn.class);
+            }
+
+            public FilterColumn getFilterColumn() {
+              return getColumnSet().getColumnByClass(FilterColumn.class);
+            }
+
+            public CustomColumnColumn getCustomColumnColumn() {
+              return getColumnSet().getColumnByClass(CustomColumnColumn.class);
+            }
+
+            public TitleColumn getTitleColumn() {
+              return getColumnSet().getColumnByClass(TitleColumn.class);
+            }
+
+            public VisibleColumn getVisibleColumn() {
+              return getColumnSet().getColumnByClass(VisibleColumn.class);
+            }
+
+            @Override
+            protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
+              if (row != null && getContextColumn() == getVisibleColumn() && getKeyColumn().getValue(row) != null) {
+                Boolean oldValue = getVisibleColumn().getValue(row);
+                setColumnVisible(row, !oldValue);
+              }
+            }
+
+            @Override
+            protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+              validateButtons();
+            }
+
+            @Order(10.0)
+            public class SpaceKeyStroke extends AbstractKeyStroke {
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return "space";
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                for (ITableRow row : getSelectedRows()) {
+                  Boolean oldValue = BooleanUtility.nvl(getVisibleColumn().getValue(row));
+                  setColumnVisible(row, !oldValue);
+                }
+              }
+            }
+
+            @Order(20.0)
+            public class UpKeyStroke extends AbstractKeyStroke {
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return "alt-up";
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                moveUp(getSelectedRow());
+              }
+            }
+
+            @Order(30.0)
+            public class DownKeyStroke extends AbstractKeyStroke {
+              @Override
+              protected String getConfiguredKeyStroke() {
+                return "alt-down";
+              }
+
+              @Override
+              protected void execAction() throws ProcessingException {
+                moveDown(getSelectedRow());
+              }
+            }
+
+            @Order(10.0)
+            public class KeyColumn extends AbstractColumn<IColumn<?>> {
+
+              @Override
+              protected boolean getConfiguredPrimaryKey() {
+                return true;
+              }
+
+              @Override
+              protected boolean getConfiguredDisplayable() {
+                return false;
+              }
+            }
+
+            @Order(20.0)
+            public class VisibleColumn extends AbstractBooleanColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("Visible");
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 20;
+              }
+
+            }
+
+            @Order(30.0)
+            public class TitleColumn extends AbstractStringColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("Title");
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 200;
+              }
+
+            }
+
+            @Order(40.0)
+            public class SortingColumn extends AbstractSortOrderColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("ColumnSorting");
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 20;
+              }
+
+            }
+
+            @Order(50.0)
+            public class FilterColumn extends AbstractStringColumn {
+
+              @Override
+              protected String getConfiguredHeaderText() {
+                return TEXTS.get("ResetTableColumnFilter");
+              }
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 20;
+              }
+
+            }
+
+            @Order(60.0)
+            public class CustomColumnColumn extends AbstractStringColumn {
+
+              @Override
+              protected int getConfiguredWidth() {
+                return 20;
+              }
+
+            }
+
           }
-
-          @Order(20.0)
-          public class VisibleColumn extends AbstractBooleanColumn {
-
-            @Override
-            protected String getConfiguredHeaderText() {
-              return TEXTS.get("Visible");
-            }
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 20;
-            }
-
-          }
-
-          @Order(30.0)
-          public class TitleColumn extends AbstractStringColumn {
-
-            @Override
-            protected String getConfiguredHeaderText() {
-              return TEXTS.get("Title");
-            }
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 200;
-            }
-
-          }
-
-          @Order(40.0)
-          public class SortingColumn extends AbstractSortOrderColumn {
-
-            @Override
-            protected String getConfiguredHeaderText() {
-              return TEXTS.get("ColumnSorting");
-            }
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 20;
-            }
-
-          }
-
-          @Order(50.0)
-          public class FilterColumn extends AbstractStringColumn {
-
-            @Override
-            protected String getConfiguredHeaderText() {
-              return TEXTS.get("ResetTableColumnFilter");
-            }
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 20;
-            }
-
-          }
-
-          @Order(60.0)
-          public class CustomColumnColumn extends AbstractStringColumn {
-
-            @Override
-            protected int getConfiguredWidth() {
-              return 20;
-            }
-
-          }
-
         }
       }
 
@@ -965,26 +978,6 @@ public class OrganizeColumnsForm extends AbstractForm {
           @Override
           protected void execClickAction() throws ProcessingException {
             doResetAction(ResetSortingMenu.class);
-          }
-
-        }
-
-        @Order(40.0)
-        public class ResetColumnFiltersButton extends AbstractLinkButton {
-
-          @Override
-          protected String getConfiguredLabel() {
-            return TEXTS.get("ResetTableColumnFilter");
-          }
-
-          @Override
-          protected boolean getConfiguredProcessButton() {
-            return false;
-          }
-
-          @Override
-          protected void execClickAction() throws ProcessingException {
-            doResetAction(ResetColumnFiltersMenu.class);
           }
 
         }
