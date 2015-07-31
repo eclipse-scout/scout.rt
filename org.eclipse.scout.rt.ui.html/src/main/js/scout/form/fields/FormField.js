@@ -405,7 +405,11 @@ scout.FormField.prototype.getForm = function() {
 
 scout.FormField.prototype.registerRootKeyStroke = function(keyStroke) {
   var form = this.getForm();
-  if (!this.getForm().initialized) {
+  if (form.initialized) {
+    form.rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
+  } else {
+    // FIXME AWE/CGU: is this code still required?
+    // When form is not initialized yet, do it later...
     form.on('initialized', function() {
       form.rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
     }.bind(this));

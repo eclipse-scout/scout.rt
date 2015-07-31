@@ -100,8 +100,6 @@ scout.GroupBox.prototype._prepareFields = function() {
   var i, field, res;
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
-    res = this._getMnemonic(field);
-
     if (field instanceof scout.Button) {
       if (field.processButton) {
         this.processButtons.push(field);
@@ -112,16 +110,7 @@ scout.GroupBox.prototype._prepareFields = function() {
         }
       } else {
         this.controls.push(field);
-      }
-      // Register all button key strokes
-      if (!field.processButton) {
-        if (res) {
-          this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, field));
-        }
-        for (var j = 0; j < field.keyStrokes.length; j++) {
-          field.keyStrokes[j].$drawKeyBoxContainer = field.$container;
-          this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
-        }
+        this._registerButtonKeyStrokes(field);
       }
     } else if (field instanceof scout.TabBox) {
       this.controls.push(field);
@@ -133,6 +122,21 @@ scout.GroupBox.prototype._prepareFields = function() {
       }
     } else {
       this.controls.push(field);
+    }
+  }
+};
+
+scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
+  var mnemonic = this._getMnemonic(button);
+  if (mnemonic) {
+    this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(mnemonic, button));
+  }
+  if (button.keyStrokes) {
+    var i, keyStroke;
+    for (i = 0; i < button.keyStrokes.length; i++) {
+      keyStroke = button.keyStrokes[i];
+      keyStroke.$drawKeyBoxContainer = button.$container;
+      this.keyStrokeAdapter.registerKeyStroke(keyStroke);
     }
   }
 };
@@ -249,7 +253,7 @@ scout.GroupBox.prototype._renderMenus = function() {
   // create a menu-adapter for each process button
   var menus = this.menus,
     menuItems = this.staticMenus.concat(menus);
-  //register keystrokes on root groupbox
+  // register keystrokes on root groupbox
   this.processButtons.forEach(function(button) {
     var menu = this.session.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
       objectType: 'ButtonAdapterMenu',
@@ -257,20 +261,11 @@ scout.GroupBox.prototype._renderMenus = function() {
     }));
     menuItems.push(menu);
   }.bind(this));
-  //FIXME same code as in FormField.syncMenus? What with $drawKeyBoxContainer?
+  // FIXME NBU: same code as in FormField.syncMenus? What with $drawKeyBoxContainer?
   for (var i = 0; i < menuItems.length; i++) {
     var menuItem = menuItems[i];
     this.registerRootKeyStroke(menuItem);
-    var res = this._getMnemonic(menuItem);
-    if (res) {
-      this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, menuItem));
-    }
-    if (menuItem.keyStrokes) {
-      for (var j = 0; j < menuItem.keyStrokes.length; j++) {
-        menuItem.keyStrokes[j].$drawKeyBoxContainer = menuItem.$container;
-        this.keyStrokeAdapter.registerKeyStroke(menuItem.keyStrokes[j]);
-      }
-    }
+    this._registerButtonKeyStrokes(menuItem);
   }
   this.menuBar.updateItems(menuItems);
 };
