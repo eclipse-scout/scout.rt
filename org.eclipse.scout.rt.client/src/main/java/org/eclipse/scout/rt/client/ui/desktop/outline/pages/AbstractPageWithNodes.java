@@ -307,8 +307,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     enhanceDetailFormWithPageMenus();
   }
 
-  // FIXME CGU: (menus) discuss with A.WE and J.GU - how's the support for page menus with the new Html UI?
-  // Currently when a TablePage has a menu, it doesn't show up in the UI.
   protected void enhanceDetailFormWithPageMenus() throws ProcessingException {
     IForm form = getDetailForm();
     IFormFieldContextMenu mainBoxContextMenu = form.getRootGroupBox().getContextMenu();

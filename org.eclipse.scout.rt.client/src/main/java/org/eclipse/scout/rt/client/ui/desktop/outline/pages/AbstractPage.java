@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -45,6 +46,11 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -53,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -66,6 +73,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private IForm m_detailForm;
   private boolean m_tableVisible;
   private boolean m_detailFormVisible;
+  private boolean m_pageMenusAdded;
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
   private IStatus m_pagePopulateStatus;
@@ -536,6 +544,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     try {
       ensureDetailFormCreated();
       ensureDetailFormStarted();
+      enhanceTableWithPageMenus();
       interceptPageActivated();
     }
     catch (Exception e) {
@@ -550,6 +559,42 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
+    }
+  }
+
+  protected void enhanceTableWithPageMenus() throws ProcessingException {
+    if (m_pageMenusAdded) {
+      return;
+    }
+    m_pageMenusAdded = true;
+    ITable table = getTable();
+    if (table != null) {
+      ITableContextMenu contextMenu = table.getContextMenu();
+      List<IMenu> menus = contextMenu.getChildActions();
+      for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
+        if (menu instanceof OutlineMenuWrapper && table.getMenus().contains(((OutlineMenuWrapper) menu).getWrappedMenu())) {
+          continue;
+        }
+
+        // mapping from TreeMenuType to TableMenuType
+        HashSet<IMenuType> newMenuTypes = new HashSet<IMenuType>();
+        for (IMenuType menuType : menu.getMenuTypes()) {
+          if (menuType == TreeMenuType.EmptySpace) {
+            newMenuTypes.add(TableMenuType.EmptySpace);
+          }
+          else if (menuType == TreeMenuType.SingleSelection) {
+            newMenuTypes.add(TableMenuType.SingleSelection);
+          }
+          else if (menuType == TreeMenuType.MultiSelection) {
+            newMenuTypes.add(TableMenuType.MultiSelection);
+          }
+          newMenuTypes.add(menuType);
+        }
+        menus.add(new OutlineMenuWrapper(menu, newMenuTypes));
+      }
+      if (!CollectionUtility.equalsCollection(menus, contextMenu.getChildActions())) {
+        contextMenu.setChildActions(menus);
+      }
     }
   }
 
