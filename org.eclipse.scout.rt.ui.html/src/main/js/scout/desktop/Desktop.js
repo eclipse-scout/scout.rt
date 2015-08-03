@@ -151,7 +151,7 @@ scout.Desktop.prototype._createSplitter = function($parent) {
   if (!this._hasNavigation()) {
     return;
   }
-  this.splitter = new scout.Splitter({
+  this.splitter = new scout.Splitter(this.session, {
     $anchor: this.navigation.$navigation,
     $root: this.$container,
     maxRatio: 0.5

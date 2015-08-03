@@ -15,7 +15,6 @@
  */
 scout.ModelAdapter = function() {
   scout.ModelAdapter.parent.call(this);
-  this.session;
   this._adapterProperties = [];
   this.ui;
 
@@ -30,8 +29,9 @@ scout.ModelAdapter = function() {
 scout.inherits(scout.ModelAdapter, scout.Widget);
 
 scout.ModelAdapter.prototype.init = function(model, session) {
+  scout.ModelAdapter.parent.prototype.init.call(this, session);
+
   var target;
-  this.session = session;
   this.id = model.id;
   this.objectType = model.objectType;
   // FIXME AWE/CGU: (model-adapter, registry) instead of working with this flag, we should

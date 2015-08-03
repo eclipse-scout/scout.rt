@@ -1,12 +1,12 @@
 scout.YearPanel = function(session) {
   scout.YearPanel.parent.call(this);
-
+  this.init(session);
+  
   this.$container;
   this.$yearTitle;
   this.$yearList;
   this.selectedDate;
   this.displayMode;
-  this.session = session;
   this._addEventSupport();
 };
 scout.inherits(scout.YearPanel, scout.Widget);

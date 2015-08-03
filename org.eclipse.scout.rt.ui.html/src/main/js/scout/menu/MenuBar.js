@@ -1,7 +1,7 @@
 scout.MenuBar = function(session, menuSorter) {
   scout.MenuBar.parent.call(this);
+  this.init(session);
 
-  this.session = session;
   this.menuSorter = menuSorter;
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'

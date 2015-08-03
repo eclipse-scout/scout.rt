@@ -1,8 +1,8 @@
 scout.PlannerHeader = function(session) {
   scout.PlannerHeader.parent.call(this);
+  this.init(session);
 
   this.availableDisplayModes = [];
-  this.session = session;
   this._addEventSupport();
 };
 scout.inherits(scout.PlannerHeader, scout.Widget);

@@ -1,7 +1,8 @@
 scout.BusyIndicator = function(session, cancellable) {
   scout.BusyIndicator.parent.call(this);
+  this.init(session);
+
   this.parent = session.desktop;
-  this.session = session;
   this._cancellable = (cancellable === undefined ? true : !!cancellable);
   this._addEventSupport();
 };

@@ -324,7 +324,7 @@ scout.Table.prototype._isFooterVisible = function() {
 };
 
 scout.Table.prototype._createHeader = function() {
-  return new scout.TableHeader(this, this.session);
+  return new scout.TableHeader(this);
 };
 
 scout.Table.prototype._createFooter = function() {

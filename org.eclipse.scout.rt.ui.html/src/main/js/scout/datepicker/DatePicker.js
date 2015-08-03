@@ -1,5 +1,7 @@
-scout.DatePicker = function(dateFormat) {
+scout.DatePicker = function(session, dateFormat) {
   scout.DatePicker.parent.call(this);
+  this.init(session);
+
   this.dateFormat = dateFormat;
   this.selectedDate;
   this.viewDate;

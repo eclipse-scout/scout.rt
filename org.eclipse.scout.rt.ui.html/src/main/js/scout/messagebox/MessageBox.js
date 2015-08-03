@@ -1,5 +1,7 @@
 scout.MessageBox = function(model, session) {
   scout.MessageBox.parent.call(this);
+  this.init(session);
+
   if (!(model instanceof scout.ModelAdapter)) {
     // If message box is used gui only, otherwise the model gets written by the model adapter.
     $.extend(this, model);
@@ -14,7 +16,6 @@ scout.MessageBox = function(model, session) {
   this.$cancelButton;
   this._$closeButton;
   this.focusListener;
-  this.session = session;
   this._addEventSupport();
   this.attached = false; // Indicates whether this message box is currently visible to the user.
 };

@@ -1,5 +1,7 @@
-scout.Splitter = function(options) {
+scout.Splitter = function(session, options) {
   scout.Splitter.parent.call(this);
+  this.init(session);
+
   options = options || {};
   this.splitHorizontal = scout.helpers.nvl(options.splitHorizontal, true);
   this.$anchor = options.$anchor;

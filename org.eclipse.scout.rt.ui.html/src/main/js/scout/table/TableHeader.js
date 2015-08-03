@@ -1,13 +1,14 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableHeader = function(table, session) {
+scout.TableHeader = function(table) {
   scout.TableHeader.parent.call(this);
-  this.session = session;
+  this.init(table.session);
+
   this.dragging = false;
   this.table = table;
   this.columns = table.columns;
-  this.menuBar = new scout.MenuBar(session, new scout.GroupBoxMenuItemsOrder());
+  this.menuBar = new scout.MenuBar(this.session, new scout.GroupBoxMenuItemsOrder());
   this.menuBar.tabbable = false;
   this.menuBar.bottom();
   this.addChild(this.menuBar);

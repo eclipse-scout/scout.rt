@@ -1,6 +1,7 @@
 scout.TableFooter = function(table) {
   scout.TableFooter.parent.call(this);
-  this.session = table.session;
+  this.init(table.session);
+
   this._table = table;
   this.filterKeyStrokeAdapter = new scout.FilterInputKeyStrokeAdapter(this._table);
 };

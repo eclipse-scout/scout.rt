@@ -1,10 +1,15 @@
 scout.Widget = function() {
   this.parent;
+  this.session;
   this.keyStrokeAdapter;
   this.children = [];
   this.rendered = false;
   this.destroyed = false;
   this.$container;
+};
+
+scout.Widget.prototype.init = function(session) {
+  this.session = session;
 };
 
 scout.Widget.prototype.render = function($parent) {

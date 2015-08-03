@@ -5,8 +5,9 @@
  */
 scout.Tooltip = function(session, options) {
   scout.Tooltip.parent.call(this);
+  this.init(session);
+
   options = options || {};
-  this.session = session;
   this.text = options.text || '';
   this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
   this.arrowPositionUnit = options.arrowPositionUnit || '%';

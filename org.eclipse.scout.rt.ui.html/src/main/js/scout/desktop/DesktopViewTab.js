@@ -1,5 +1,6 @@
-scout.DesktopViewTab = function(view, $bench) {
+scout.DesktopViewTab = function(view, $bench, session) {
   scout.DesktopViewTab.parent.call(this);
+  this.init(session);
 
   this._view = view;
   this._$bench = $bench;

@@ -1,9 +1,10 @@
 scout.Popup = function(session, options) {
   // FIXME AWE: use this.options property here, use helpers.nvl
   scout.Popup.parent.call(this);
+  this.init(session);
+
   options = options || {};
   this._mouseDownHandler;
-  this.session = session;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.openEvent;
   this.anchorBounds = options.anchorBounds;
