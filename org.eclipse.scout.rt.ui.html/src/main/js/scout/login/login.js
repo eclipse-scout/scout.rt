@@ -17,7 +17,10 @@ scout.login = {
     };
 
     var language = navigator.language || navigator.userLanguage;
-    if (translations[language] === undefined) {
+    if (language && !translations[language]) {
+      language = language.split(/[-_]/)[0];
+    }
+    if (!language || !translations[language]) {
       language = 'en';
     }
     return new scout.Texts(translations[language]);
