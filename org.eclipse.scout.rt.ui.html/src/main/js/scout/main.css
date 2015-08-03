@@ -128,6 +128,7 @@ input {
 
 button {
   padding: @button-padding;
+  margin: 0; /* reset user agent style, e.g. on safari */
 }
 
 textarea {
