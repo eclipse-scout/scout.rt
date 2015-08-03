@@ -1299,6 +1299,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
      * @param icon2
      * @return
      */
+    @SuppressWarnings("unused")
     private Icon getCompositeIcon(Icon icon1, Icon icon2) {
       Icon icon = null;
       if (icon1 != null && icon2 != null) {
@@ -1320,6 +1321,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
      * @param label
      * @return
      */
+    @SuppressWarnings("unused")
     private Icon getCheckboxIcon(boolean firstCellOfCheckableTable, IColumn scoutCol, ITableRow scoutRow, JLabel label) {
       boolean booleanColumn = scoutCol.getDataType() == Boolean.class && (!(scoutCol instanceof ISmartColumn) || ((ISmartColumn) scoutCol).getLookupCall() == null);
       CheckboxIcon checkboxIcon = null;
@@ -1357,6 +1359,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
   }
 
+  @SuppressWarnings("unused")
   private class P_IconWithMarker implements Icon {
 
     private static final int MARKER_SIZE = 5;

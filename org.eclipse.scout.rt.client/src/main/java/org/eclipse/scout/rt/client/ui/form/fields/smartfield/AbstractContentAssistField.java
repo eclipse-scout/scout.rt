@@ -76,7 +76,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
    */
-  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
+  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "");
 
   private final EventListenerList m_listenerList = new EventListenerList();
 
@@ -363,7 +363,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     super.setTooltipText(text);
     if (!m_installingRowContext) {
       //Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.setTooltipText(getTooltipText());
+      m_decorationRow.withTooltipText(getTooltipText());
     }
   }
 
@@ -372,7 +372,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     super.setBackgroundColor(c);
     if (!m_installingRowContext) {
       //Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.setBackgroundColor(getBackgroundColor());
+      m_decorationRow.withBackgroundColor(getBackgroundColor());
     }
   }
 
@@ -381,7 +381,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     super.setForegroundColor(c);
     if (!m_installingRowContext) {
       //Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.setForegroundColor(getForegroundColor());
+      m_decorationRow.withForegroundColor(getForegroundColor());
     }
   }
 
@@ -390,7 +390,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     super.setFont(f);
     if (!m_installingRowContext) {
       //Ticket 85'572: background color gets reseted after selecting a value
-      m_decorationRow.setFont(getFont());
+      m_decorationRow.withFont(getFont());
     }
   }
 
@@ -398,7 +398,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   protected void initConfig() {
     m_activeFilter = TriState.TRUE;
-    m_decorationRow = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
+    m_decorationRow = new LookupRow<LOOKUP_KEY>(null, "");
     super.initConfig();
     setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     setBrowseHierarchy(getConfiguredBrowseHierarchy());

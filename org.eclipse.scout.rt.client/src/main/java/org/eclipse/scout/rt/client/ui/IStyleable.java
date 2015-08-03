@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
+
 /**
  * @since 5.1
  */
@@ -19,4 +20,9 @@ public interface IStyleable {
   String getCssClass();
 
   void setCssClass(String cssClass);
+
+//  String getBackgroundColor();
+
+//  FontSpec getFont();
+
 }

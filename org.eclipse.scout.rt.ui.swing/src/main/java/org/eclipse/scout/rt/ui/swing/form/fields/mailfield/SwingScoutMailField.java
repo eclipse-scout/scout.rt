@@ -655,6 +655,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
   }// end class P_AddressComponent
 
   private class P_AttachmentPopupMenu extends AbstractMenu {
+    @SuppressWarnings("unused")
     private File m_file;
 
     public P_AttachmentPopupMenu(File file) {

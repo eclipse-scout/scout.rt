@@ -14,25 +14,15 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
+public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   private static final long serialVersionUID = 0L;
 
-  private ID_TYPE m_key;
-  private String m_text;
-  private String m_iconId;
-  private String m_tooltip;
-  private String m_backgroundColor;
-  private String m_foregroundColor;
-  private FontSpec m_font;
-  private boolean m_active = true;
-  private boolean m_enabled = true;
-  private transient ID_TYPE m_parentKey;
   private String m_extKey;
   private Number m_value;
   private long m_partitionId;
   private double m_order;
-  private AbstractTableRowData m_additionalTableRowData;
 
   public CodeRow(Object[] cells) {
     this(cells, cells.length - 1);
@@ -58,41 +48,43 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
    */
   @SuppressWarnings("unchecked")
   public CodeRow(Object[] cells, int maxColumnIndex) {
+    super(null, (String) null);
     if (cells != null) {
       for (int index = 0; index < cells.length && index <= maxColumnIndex; index++) {
         if (cells[index] != null) {
           switch (index) {
             case 0: {
-              m_key = (ID_TYPE) TypeCastUtility.castValue(cells[index], TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class));
+              ID_TYPE key = (ID_TYPE) TypeCastUtility.castValue(cells[index], TypeCastUtility.getGenericsParameterClass(this.getClass(), CodeRow.class));
+              withKey(key);
               break;
             }
             case 1: {
-              m_text = cells[index].toString();
+              withText(cells[index].toString());
               break;
             }
             case 2: {
-              m_iconId = cells[index].toString();
+              withIconId(cells[index].toString());
               break;
             }
             case 3: {
-              m_tooltip = cells[index].toString();
+              withTooltipText(cells[index].toString());
               break;
             }
             case 4: {
-              m_backgroundColor = cells[index].toString();
+              withBackgroundColor(cells[index].toString());
               break;
             }
             case 5: {
-              m_foregroundColor = cells[index].toString();
+              withForegroundColor(cells[index].toString());
               break;
             }
             case 6: {
-              m_font = FontSpec.parse(cells[index].toString());
+              withFont(FontSpec.parse(cells[index].toString()));
               break;
             }
             case 7: {
               Boolean b = TypeCastUtility.castValue(cells[index], Boolean.class);
-              m_active = b.booleanValue();
+              withActive(b.booleanValue());
               break;
             }
             case 8: {
@@ -100,7 +92,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
               if ((o instanceof Number) && ((Number) o).longValue() == 0) {
                 o = null;
               }
-              m_parentKey = o;
+              withParentKey(o);
               break;
             }
             case 9: {
@@ -116,7 +108,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
             }
             case 11: {
               Boolean b = TypeCastUtility.castValue(cells[index], Boolean.class);
-              m_enabled = b.booleanValue();
+              withEnabled(b.booleanValue());
               break;
             }
             case 12: {
@@ -157,8 +149,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   }
 
   public CodeRow(ID_TYPE key, String text) {
-    m_key = key;
-    m_text = text;
+    super(key, text);
     m_order = Double.MAX_VALUE;
   }
 
@@ -167,16 +158,15 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   }
 
   public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value, long partitionId, double order) {
-    m_key = key;
-    m_text = text;
-    m_iconId = iconId;
-    m_tooltip = tooltip;
-    m_backgroundColor = backgroundColor;
-    m_foregroundColor = foregroundColor;
-    m_font = font;
-    m_active = active;
-    m_enabled = enabled;
-    m_parentKey = parentKey;
+    super(key, text);
+    withIconId(iconId);
+    withTooltipText(tooltip);
+    withBackgroundColor(backgroundColor);
+    withForegroundColor(foregroundColor);
+    withFont(font);
+    withActive(active);
+    withEnabled(enabled);
+    withParentKey(parentKey);
     m_extKey = extKey;
     m_value = value;
     m_partitionId = partitionId;
@@ -186,103 +176,60 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   /*
    * typed member access
    */
-  @Override
-  public ID_TYPE getKey() {
-    return m_key;
-  }
 
-  public void setKey(ID_TYPE key) {
-    m_key = key;
+  @Override
+  public ICodeRow<ID_TYPE> withText(String text) {
+    return (ICodeRow<ID_TYPE>) super.withText(text);
   }
 
   @Override
-  public String getText() {
-    return m_text;
+  public ICodeRow<ID_TYPE> withIconId(String iconId) {
+    return (ICodeRow<ID_TYPE>) super.withIconId(iconId);
   }
 
   @Override
-  public void setText(String text) {
-    m_text = text;
+  public ICodeRow<ID_TYPE> withTooltipText(String tooltipText) {
+    return (ICodeRow<ID_TYPE>) super.withTooltipText(tooltipText);
   }
 
   @Override
-  public String getIconId() {
-    return m_iconId;
+  public ICodeRow<ID_TYPE> withForegroundColor(String foregroundColor) {
+    return (ICodeRow<ID_TYPE>) super.withForegroundColor(foregroundColor);
   }
 
   @Override
-  public void setIconId(String iconId) {
-    m_iconId = iconId;
+  public ICodeRow<ID_TYPE> withBackgroundColor(String backgroundColor) {
+    return (ICodeRow<ID_TYPE>) super.withBackgroundColor(backgroundColor);
   }
 
   @Override
-  public String getTooltipText() {
-    return m_tooltip;
+  public ICodeRow<ID_TYPE> withFont(FontSpec font) {
+    return (ICodeRow<ID_TYPE>) super.withFont(font);
   }
 
   @Override
-  public void setTooltipText(String tooltipText) {
-    m_tooltip = tooltipText;
+  public ICodeRow<ID_TYPE> withActive(boolean active) {
+    return (ICodeRow<ID_TYPE>) super.withActive(active);
   }
 
   @Override
-  public String getForegroundColor() {
-    return m_foregroundColor;
+  public ICodeRow<ID_TYPE> withEnabled(boolean enabled) {
+    return (ICodeRow<ID_TYPE>) super.withEnabled(enabled);
   }
 
   @Override
-  public void setForegroundColor(String foregroundColor) {
-    m_foregroundColor = foregroundColor;
+  public ICodeRow<ID_TYPE> withParentKey(ID_TYPE parentKey) {
+    return (ICodeRow<ID_TYPE>) super.withParentKey(parentKey);
   }
 
   @Override
-  public String getBackgroundColor() {
-    return m_backgroundColor;
+  public ICodeRow<ID_TYPE> withAdditionalTableRowData(AbstractTableRowData bean) {
+    return (ICodeRow<ID_TYPE>) super.withAdditionalTableRowData(bean);
   }
 
   @Override
-  public void setBackgroundColor(String backgroundColor) {
-    m_backgroundColor = backgroundColor;
-  }
-
-  @Override
-  public FontSpec getFont() {
-    return m_font;
-  }
-
-  @Override
-  public void setFont(FontSpec font) {
-    m_font = font;
-  }
-
-  @Override
-  public boolean isActive() {
-    return m_active;
-  }
-
-  @Override
-  public void setActive(boolean b) {
-    m_active = b;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return m_enabled;
-  }
-
-  @Override
-  public void setEnabled(boolean b) {
-    m_enabled = b;
-  }
-
-  @Override
-  public ID_TYPE getParentKey() {
-    return m_parentKey;
-  }
-
-  @Override
-  public void setParentKey(ID_TYPE parentKey) {
-    m_parentKey = parentKey;
+  public ICodeRow<ID_TYPE> withCssClass(String cssClass) {
+    return (ICodeRow<ID_TYPE>) super.withCssClass(cssClass);
   }
 
   @Override
@@ -291,8 +238,16 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   }
 
   @Override
-  public void setExtKey(String extKey) {
+  public ICodeRow<ID_TYPE> withExtKey(String extKey) {
     m_extKey = extKey;
+    return this;
+  }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  public void setExtKey(String extKey) {
+    withExtKey(extKey);
   }
 
   @Override
@@ -301,8 +256,16 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   }
 
   @Override
-  public void setValue(Number value) {
+  public ICodeRow<ID_TYPE> withValue(Number value) {
     m_value = value;
+    return this;
+  }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  public void setValue(Number value) {
+    withValue(value);
   }
 
   @Override
@@ -311,18 +274,16 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   }
 
   @Override
-  public void setPartitionId(long partitionId) {
+  public ICodeRow<ID_TYPE> withPartitionId(long partitionId) {
     m_partitionId = partitionId;
+    return this;
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
-  public AbstractTableRowData getAdditionalTableRowData() {
-    return m_additionalTableRowData;
-  }
-
-  @Override
-  public void setAdditionalTableRowData(AbstractTableRowData bean) {
-    m_additionalTableRowData = bean;
+  public void setPartitionId(long partitionId) {
+    withPartitionId(partitionId);
   }
 
   @Override
@@ -331,7 +292,16 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   }
 
   @Override
-  public void setOrder(double order) {
+  public ICodeRow<ID_TYPE> withOrder(double order) {
     m_order = order;
+    return this;
   }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  public void setOrder(double order) {
+    withOrder(order);
+  }
+
 }

@@ -263,7 +263,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       List<ILookupRow<IForm>> formRows = new ArrayList<ILookupRow<IForm>>();
       for (IForm f : m_unsavedForms) {
         String text = getFormDisplayName(f);
-        formRows.add(new LookupRow<IForm>(f, text, null, text));
+        formRows.add(new LookupRow<IForm>(f, text).withTooltipText(text));
       }
       return formRows;
     }

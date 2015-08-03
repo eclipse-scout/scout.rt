@@ -54,6 +54,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       }
     }
     finally {
+      @SuppressWarnings("unused")
       final List<File> finalFiles = files;
       Runnable t = new Runnable() {
         @Override

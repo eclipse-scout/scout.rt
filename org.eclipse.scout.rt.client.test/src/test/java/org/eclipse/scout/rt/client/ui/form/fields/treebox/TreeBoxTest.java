@@ -282,21 +282,21 @@ public class TreeBoxTest {
     @Override
     protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
       List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
-      list.add(new LookupRow<Long>(1L, "A", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow<Long>(2L, "B", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow<Long>(3L, "C", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow<Long>(4L, "D", null, null, null, null, null, true, /*parent*/null, true));
-      list.add(new LookupRow<Long>(5L, "A-A", null, null, null, null, null, true, /*parent*/1L, true));
-      list.add(new LookupRow<Long>(6L, "A-B", null, null, null, null, null, true, /*parent*/1L, true));
-      list.add(new LookupRow<Long>(7L, "A-C", null, null, null, null, null, true, /*parent*/1L, true));
-      list.add(new LookupRow<Long>(8L, "C-A", null, null, null, null, null, true, /*parent*/3L, true));
-      list.add(new LookupRow<Long>(9L, "C-B", null, null, null, null, null, true, /*parent*/3L, true));
-      list.add(new LookupRow<Long>(10L, "C-C", null, null, null, null, null, true, /*parent*/3L, true));
-      list.add(new LookupRow<Long>(11L, "C-B-A", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow<Long>(12L, "C-B-B", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow<Long>(13L, "C-B-C", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow<Long>(14L, "C-B-D", null, null, null, null, null, true, /*parent*/9L, true));
-      list.add(new LookupRow<Long>(null, "null key", null, null, null, null, null, true, /*parent*/9L, true));
+      list.add(new LookupRow<Long>(1L, "A"));
+      list.add(new LookupRow<Long>(2L, "B"));
+      list.add(new LookupRow<Long>(3L, "C"));
+      list.add(new LookupRow<Long>(4L, "D"));
+      list.add(new LookupRow<Long>(5L, "A-A").withParentKey(1L));
+      list.add(new LookupRow<Long>(6L, "A-B").withParentKey(1L));
+      list.add(new LookupRow<Long>(7L, "A-C").withParentKey(1L));
+      list.add(new LookupRow<Long>(8L, "C-A").withParentKey(3L));
+      list.add(new LookupRow<Long>(9L, "C-B").withParentKey(3L));
+      list.add(new LookupRow<Long>(10L, "C-C").withParentKey(3L));
+      list.add(new LookupRow<Long>(11L, "C-B-A").withParentKey(9L));
+      list.add(new LookupRow<Long>(12L, "C-B-B").withParentKey(9L));
+      list.add(new LookupRow<Long>(13L, "C-B-C").withParentKey(9L));
+      list.add(new LookupRow<Long>(14L, "C-B-D").withParentKey(9L));
+      list.add(new LookupRow<Long>(null, "null key").withParentKey(9L));
       return list;
     }
   }

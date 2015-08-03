@@ -237,11 +237,11 @@ public class DefaultSearchFilterServiceTest {
     @Override
     protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
       List<ILookupRow<Long>> data = new LinkedList<ILookupRow<Long>>();
-      data.add(new LookupRow(1L, "Element 1", null, null, null, null, null, true, null));
-      data.add(new LookupRow(2L, "Element 1a", null, null, null, null, null, true, 1L));
-      data.add(new LookupRow(3L, "Element 1b", null, null, null, null, null, true, 1L));
-      data.add(new LookupRow(4L, "Element 2", null, null, null, null, null, true, null));
-      data.add(new LookupRow(5L, "Element 2a", null, null, null, null, null, true, 4L));
+      data.add(new LookupRow(1L, "Element 1"));
+      data.add(new LookupRow(2L, "Element 1a").withParentKey(1L));
+      data.add(new LookupRow(3L, "Element 1b").withParentKey(1L));
+      data.add(new LookupRow(4L, "Element 2"));
+      data.add(new LookupRow(5L, "Element 2a").withParentKey(4L));
 
       List<ITreeNode> children = getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
       getTree().removeAllChildNodes(parentNode);

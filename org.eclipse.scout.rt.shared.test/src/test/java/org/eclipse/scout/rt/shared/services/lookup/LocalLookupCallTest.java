@@ -116,9 +116,9 @@ public class LocalLookupCallTest {
       list.add(new LookupRow<Integer>(ROW10_KEY, ROW10_TEXT));
       list.add(new LookupRow<Integer>(ROW20_KEY, ROW20_TEXT));
       list.add(new LookupRow<Integer>(ROW30_KEY, ROW30_TEXT));
-      list.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT, null, null, null, null, null, true, ROW10_KEY));
-      list.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT, null, null, null, null, null, true, ROW10_KEY));
-      list.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT, null, null, null, null, null, true, ROW30_KEY));
+      list.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT).withParentKey(ROW10_KEY));
+      list.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT).withParentKey(ROW10_KEY));
+      list.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT).withParentKey(ROW30_KEY));
       return list;
     }
   }

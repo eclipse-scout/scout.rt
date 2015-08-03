@@ -178,10 +178,30 @@ public class SmartFieldTest {
     @PostConstruct
     protected void initializeService() {
       List<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
-      rows.add(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
-      rows.add(new LookupRow<Long>(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")));
-      rows.add(new LookupRow<Long>(30L, "Green", ICON_FILE, "Green tooltip", "88ff88", "008800", FontSpec.parse("italic")));
-      rows.add(new LookupRow<Long>(40L, "Blue", ICON_FILE, "Blue tooltip", "8888ff", "000088", FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(10L, "Red")
+          .withIconId(ICON_FILE)
+          .withTooltipText("Red tooltip")
+          .withBackgroundColor("ff8888")
+          .withForegroundColor("880000")
+          .withFont(FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(20L, "Yellow")
+          .withIconId(ICON_FILE)
+          .withTooltipText("Yellow tooltip")
+          .withBackgroundColor("ffff88")
+          .withForegroundColor("888800")
+          .withFont(FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(30L, "Green")
+          .withIconId(ICON_FILE)
+          .withTooltipText("Green tooltip")
+          .withBackgroundColor("88ff88")
+          .withForegroundColor("008800")
+          .withFont(FontSpec.parse("italic")));
+      rows.add(new LookupRow<Long>(40L, "Blue")
+          .withIconId(ICON_FILE)
+          .withTooltipText("Blue tooltip")
+          .withBackgroundColor("8888ff")
+          .withForegroundColor("000088")
+          .withFont(FontSpec.parse("italic")));
       rows.add(new LookupRow<Long>(50L, "Empty"));
       setRows(rows);
     }
@@ -234,11 +254,21 @@ public class SmartFieldTest {
   @Test
   public void testStyle_AcceptProposal() throws Throwable {
     StyleField f = m_form.getStyleField();
-    f.acceptProposal(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
+    f.acceptProposal(new LookupRow<Long>(10L, "Red")
+        .withIconId(ICON_FILE)
+        .withTooltipText("Red tooltip")
+        .withBackgroundColor("ff8888")
+        .withForegroundColor("880000")
+        .withFont(FontSpec.parse("italic")));
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
     f.acceptProposal(new LookupRow<Long>(50L, "Empty"));
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    f.acceptProposal(new LookupRow<Long>(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")));
+    f.acceptProposal(new LookupRow<Long>(20L, "Yellow")
+        .withIconId(ICON_FILE)
+        .withTooltipText("Yellow tooltip")
+        .withBackgroundColor("ffff88")
+        .withForegroundColor("888800")
+        .withFont(FontSpec.parse("italic")));
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
     f.setValue(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");

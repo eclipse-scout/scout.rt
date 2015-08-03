@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
@@ -58,8 +59,8 @@ public class BooleanColumnFilter implements ITableColumnFilter<Boolean>, Seriali
   }
 
   @Override
-  public List<LookupRow<Boolean>> createHistogram() {
-    TreeMap<Boolean, LookupRow<Boolean>> hist = new TreeMap<Boolean, LookupRow<Boolean>>();
+  public List<ILookupRow<Boolean>> createHistogram() {
+    TreeMap<Boolean, ILookupRow<Boolean>> hist = new TreeMap<>();
     HashMap<Boolean, Integer> countMap = new HashMap<Boolean, Integer>();
     hist.put(true, new LookupRow<Boolean>(true, "(" + ScoutTexts.get("ColumnFilterCheckedText") + ")"));
     hist.put(false, new LookupRow<Boolean>(false, "(" + ScoutTexts.get("ColumnFilterUncheckedText") + ")"));
@@ -68,14 +69,14 @@ public class BooleanColumnFilter implements ITableColumnFilter<Boolean>, Seriali
       Integer count = countMap.get(key);
       countMap.put(key, count != null ? count + 1 : 1);
     }
-    for (Map.Entry<Boolean, LookupRow<Boolean>> e : hist.entrySet()) {
+    for (Map.Entry<Boolean, ILookupRow<Boolean>> e : hist.entrySet()) {
       Integer count = countMap.get(e.getKey());
       if (count != null && count > 1) {
-        LookupRow<Boolean> row = e.getValue();
-        row.setText(row.getText() + " (" + count + ")");
+        ILookupRow<Boolean> row = e.getValue();
+        row.withText(row.getText() + " (" + count + ")");
       }
     }
-    List<LookupRow<Boolean>> list = new ArrayList<LookupRow<Boolean>>();
+    List<ILookupRow<Boolean>> list = new ArrayList<>();
     list.addAll(hist.values());
     return list;
   }

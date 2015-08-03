@@ -206,7 +206,7 @@ public class ComposerAttributeForm extends AbstractForm {
           List<ILookupRow<IDataModelAttribute>> result = new ArrayList<ILookupRow<IDataModelAttribute>>(a.size());
           for (IDataModelAttribute attribute : a) {
             if (attribute.isVisible()) {
-              result.add(new LookupRow<IDataModelAttribute>(attribute, attribute.getText(), attribute.getIconId()));
+              result.add(new LookupRow<IDataModelAttribute>(attribute, attribute.getText()).withIconId(attribute.getIconId()));
             }
           }
           return result;

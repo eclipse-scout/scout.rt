@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
@@ -74,9 +75,9 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
   }
 
   @Override
-  public List<LookupRow<String>> createHistogram() {
-    Map<String, LookupRow<String>> hist = new TreeMap<String, LookupRow<String>>(Collator.getInstance(NlsLocale.get()));
-    Map<String, Integer> countMap = new HashMap<String, Integer>();
+  public List<ILookupRow<String>> createHistogram() {
+    Map<String, ILookupRow<String>> hist = new TreeMap<>(Collator.getInstance(NlsLocale.get()));
+    Map<String, Integer> countMap = new HashMap<>();
     for (ITableRow row : m_column.getTable().getRows()) {
       String s = m_column.getDisplayText(row);
       if (!StringUtility.hasText(s)) {
@@ -84,18 +85,18 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
       }
       if (s != null && !hist.containsKey(s)) {
         FontSpec font = (row.isFilterAccepted() ? null : FontSpec.parse("italic"));
-        hist.put(s, new LookupRow<String>(s, s, null, null, null, null, font));
+        hist.put(s, new LookupRow<String>(s, s).withFont(font));
       }
       Integer count = countMap.get(s);
       countMap.put(s, count != null ? count + 1 : 1);
     }
-    for (Map.Entry<String, LookupRow<String>> e : hist.entrySet()) {
+    for (Map.Entry<String, ILookupRow<String>> e : hist.entrySet()) {
       Integer count = countMap.get(e.getKey());
       if (count != null && count > 1) {
-        e.getValue().setText(e.getValue().getText() + " (" + count + ")");
+        e.getValue().withText(e.getValue().getText() + " (" + count + ")");
       }
     }
-    List<LookupRow<String>> list = new ArrayList<LookupRow<String>>();
+    List<ILookupRow<String>> list = new ArrayList<>();
     list.addAll(hist.values());
     //
     Integer nullCount = countMap.get(null);

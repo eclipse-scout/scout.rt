@@ -51,9 +51,7 @@ public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
               if (path.size() >= 3) {
                 parent = path.get(path.size() - 2);
               }
-              LookupRow<BookmarkFolder> row = new LookupRow<BookmarkFolder>(f, f.getTitle(), null);
-              row.setParentKey(parent);
-              rows.add(row);
+              rows.add(new LookupRow<>(f, f.getTitle()).withParentKey(parent));
             }
           }
           return true;

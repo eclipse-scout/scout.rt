@@ -319,6 +319,7 @@ public class SwingScoutModelFinderUiTest {
           return true;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
           List<ILookupRow<Long>> data = new ArrayList<ILookupRow<Long>>();

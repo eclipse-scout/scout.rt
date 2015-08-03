@@ -106,12 +106,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * <p>
    */
   protected ILookupRow<CODE_ID> execCreateLookupRowFromCode(ICode<CODE_ID> c) {
-
-    CODE_ID parentId = null;
-    if (c.getParentCode() != null) {
-      parentId = c.getParentCode().getId();
-    }
-    return new LookupRow<CODE_ID>(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
+    return createCodeLookupRow(c);
   }
 
   /**
@@ -133,11 +128,15 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Called by {@link #createCodeLookupRowList(List)}.
    */
   protected <T> ILookupRow<T> createCodeLookupRow(ICode<T> c) {
-    T parentId = null;
-    if (c.getParentCode() != null) {
-      parentId = c.getParentCode().getId();
-    }
-    return new LookupRow<T>(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
+    return new LookupRow<T>(c.getId(), c.getText())
+        .withIconId(c.getIconId())
+        .withTooltipText(c.getTooltipText())
+        .withBackgroundColor(c.getBackgroundColor())
+        .withForegroundColor(c.getForegroundColor())
+        .withFont(c.getFont())
+        .withEnabled(c.isEnabled())
+        .withParentKey(c.getParentCode() != null ? c.getParentCode().getId() : null)
+        .withActive(c.isActive());
   }
 
   @Override

@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
  * Used by {@link DefaultTableColumnFilterManager}
@@ -30,7 +30,7 @@ public interface ITableColumnFilter<T> extends ITableRowFilter {
 
   void setSelectedValues(Set<T> set);
 
-  List<LookupRow<T>> createHistogram();
+  List<ILookupRow<T>> createHistogram();
 
   boolean isEmpty();
 

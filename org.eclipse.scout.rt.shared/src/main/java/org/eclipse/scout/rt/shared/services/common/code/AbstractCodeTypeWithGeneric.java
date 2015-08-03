@@ -238,22 +238,22 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @Order(20)
   protected void execOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
     if (newCode.getBackgroundColor() == null) {
-      newCode.setBackgroundColor(oldCode.getBackgroundColor());
+      newCode.withBackgroundColor(oldCode.getBackgroundColor());
     }
     if (newCode.getFont() == null) {
-      newCode.setFont(oldCode.getFont());
+      newCode.withFont(oldCode.getFont());
     }
     if (newCode.getForegroundColor() == null) {
-      newCode.setForegroundColor(oldCode.getForegroundColor());
+      newCode.withForegroundColor(oldCode.getForegroundColor());
     }
     if (newCode.getIconId() == null) {
-      newCode.setIconId(oldCode.getIconId());
+      newCode.withIconId(oldCode.getIconId());
     }
     if (newCode.getExtKey() == null) {
-      newCode.setExtKey(oldCode.getExtKey());
+      newCode.withExtKey(oldCode.getExtKey());
     }
     if (newCode.getValue() == null) {
-      newCode.setValue(oldCode.getValue());
+      newCode.withValue(oldCode.getValue());
     }
   }
 

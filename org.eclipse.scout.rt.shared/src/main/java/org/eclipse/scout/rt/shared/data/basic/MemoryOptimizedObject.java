@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -98,5 +98,28 @@ public class MemoryOptimizedObject implements Serializable {
     else {
       return -1;
     }
+  }
+
+  /**
+   * Sets the value, if it is not equal to the default.
+   */
+  protected void setIfNotDefault(int bit, boolean value, boolean defaultValue) {
+    if (value == defaultValue) {
+      setValueInternal(bit, null);
+    }
+    else {
+      setValueInternal(bit, value);
+    }
+  }
+
+  /**
+   * @return the value, if non-null or else the given default value.
+   */
+  @SuppressWarnings("unchecked")
+  protected <T> T getOrElse(int valueBit, T defaultValue) {
+    if (getValueInternal(valueBit) == null) {
+      return defaultValue;
+    }
+    return (T) getValueInternal(valueBit);
   }
 }

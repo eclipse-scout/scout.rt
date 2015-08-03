@@ -211,16 +211,16 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
           getConfiguredText(),
           getConfiguredIconId(),
           getConfiguredTooltipText() != null ? getConfiguredTooltipText() : null,
-              (getConfiguredBackgroundColor()),
-              (getConfiguredForegroundColor()),
-              FontSpec.parse(getConfiguredFont()),
-              getConfiguredEnabled(),
-              null,
-              getConfiguredActive(),
-              getConfiguredExtKey(),
-              getConfiguredValue(),
-              0,
-              calculateViewOrder()
+          (getConfiguredBackgroundColor()),
+          (getConfiguredForegroundColor()),
+          FontSpec.parse(getConfiguredFont()),
+          getConfiguredEnabled(),
+          null,
+          getConfiguredActive(),
+          getConfiguredExtKey(),
+          getConfiguredValue(),
+          0,
+          calculateViewOrder()
           ));
     }
     m_contributionHolder = new ContributionComposite(this);
@@ -304,7 +304,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    * Never call it afterwards, this may lead to conflicting situations when {@link ICode}s are in use and references.
    */
   public void setActiveInternal(boolean b) {
-    m_row.setActive(b);
+    m_row.withActive(b);
   }
 
   @Override
@@ -318,7 +318,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    * Never call it afterwards, this may lead to conflicting situations when {@link ICode}s are in use and references.
    */
   public void setEnabledInternal(boolean b) {
-    m_row.setEnabled(b);
+    m_row.withEnabled(b);
   }
 
   @Override
@@ -377,7 +377,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
 
   @Override
   public void setOrder(double order) {
-    m_row.setOrder(order);
+    m_row.withOrder(order);
   }
 
   @Override

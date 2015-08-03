@@ -95,7 +95,15 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
       if (code.getParentCode() != null) {
         parentId = code.getParentCode().getId();
       }
-      rows.add(new LookupRow<CODE_ID_TYPE>(code.getId(), code.getText(), code.getIconId(), code.getTooltipText(), code.getBackgroundColor(), code.getForegroundColor(), code.getFont(), code.isEnabled(), parentId, code.isActive()));
+      rows.add(new LookupRow<CODE_ID_TYPE>(code.getId(), code.getText())
+          .withIconId(code.getIconId())
+          .withTooltipText(code.getTooltipText())
+          .withBackgroundColor(code.getBackgroundColor())
+          .withForegroundColor(code.getForegroundColor())
+          .withFont(code.getFont())
+          .withEnabled(code.isEnabled())
+          .withParentKey(parentId)
+          .withActive(code.isActive()));
     }
     return rows;
   }

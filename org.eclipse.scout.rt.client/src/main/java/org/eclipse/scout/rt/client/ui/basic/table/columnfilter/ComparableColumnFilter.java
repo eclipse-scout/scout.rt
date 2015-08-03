@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
@@ -76,26 +77,26 @@ public class ComparableColumnFilter<T extends Comparable<T>> implements ITableCo
   }
 
   @Override
-  public List<LookupRow<T>> createHistogram() {
-    Map<T, LookupRow<T>> hist = new TreeMap<T, LookupRow<T>>();
-    Map<T, Integer> countMap = new HashMap<T, Integer>();
+  public List<ILookupRow<T>> createHistogram() {
+    Map<T, ILookupRow<T>> hist = new TreeMap<>();
+    Map<T, Integer> countMap = new HashMap<>();
     for (ITableRow row : m_column.getTable().getRows()) {
       T key = m_column.getValue(row);
       String text = m_column.getDisplayText(row);
       if (key != null && !hist.containsKey(key)) {
         FontSpec font = (row.isFilterAccepted() ? null : FontSpec.parse("italic"));
-        hist.put(key, new LookupRow<T>(key, text, null, null, null, null, font));
+        hist.put(key, new LookupRow<T>(key, text).withFont(font));
       }
       Integer count = countMap.get(key);
       countMap.put(key, count != null ? count + 1 : 1);
     }
-    for (Map.Entry<T, LookupRow<T>> e : hist.entrySet()) {
+    for (Map.Entry<T, ILookupRow<T>> e : hist.entrySet()) {
       Integer count = countMap.get(e.getKey());
       if (count != null && count > 1) {
-        e.getValue().setText(e.getValue().getText() + " (" + count + ")");
+        e.getValue().withText(e.getValue().getText() + " (" + count + ")");
       }
     }
-    List<LookupRow<T>> list = new ArrayList<LookupRow<T>>();
+    List<ILookupRow<T>> list = new ArrayList<ILookupRow<T>>();
     list.addAll(hist.values());
     //
     Integer nullCount = countMap.get(null);
