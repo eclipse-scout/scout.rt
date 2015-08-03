@@ -119,7 +119,7 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
     this.tabItems[this.selectedTab].setTabActive(true);
 
     // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
-    if (!this.tabItems[this.selectedTab]._tabRendered) {
+    if (this.rendered && !this.tabItems[this.selectedTab]._tabRendered) {
       scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
     }
 
