@@ -308,15 +308,21 @@ scout.FocusManager.prototype._containsFocusableParent = function($element, $entr
 };
 
 /**
- * Checks if the given element represents content which is selectable to the user, e.g. to be copied into clipboard.
+ * Checks if the given element represents content which is selectable to the user,
+ * e.g. to be copied into clipboard. It also returns true for disabled text-fields,
+ * because the user must be able to select and copy text from these text-fields.
  */
 scout.FocusManager.prototype._isSelectableText = function($element) {
-  return $element
-    .clone()
-    .children()
-    .remove()
-    .end()
-    .text().trim().length && $element.css('user-select') !== 'none';
+  if ($element.is('input[disabled][type=text]')) {
+    return true;
+  } else {
+    return $element
+     .clone()
+     .children()
+     .remove()
+     .end()
+     .text().trim().length && $element.css('user-select') !== 'none';
+  }
 };
 
 /**

@@ -22,6 +22,17 @@ describe('scout.Focusmanager', function() {
     jasmine.clock().uninstall();
   });
 
+  describe('_isSelectableText', function() {
+
+    it('must return true for disabled text-fields', function() {
+      var $textField = $('<input>')
+        .attr('type', 'text')
+        .attr('disabled', 'disabled');
+      expect(scout.focusManager._isSelectableText($textField)).toBe(true);
+    });
+
+  });
+
   describe('validateFocus', function() {
 
     it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', function() {
