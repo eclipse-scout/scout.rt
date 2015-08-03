@@ -9,10 +9,11 @@ function mostRecentJsonRequest() {
 
 function sandboxSession(options) {
   var session;
-  options=options || {};
+  options = options || {};
   options.uiSessionId = options.uiSessionId || '1.1';
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
+  options.suppressErrors = true;
   session = new scout.Session($('#sandbox'), options);
   session.locale = new LocaleSpecHelper().createLocale('de');
   return session;

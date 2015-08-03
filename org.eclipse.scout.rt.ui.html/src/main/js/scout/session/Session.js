@@ -33,6 +33,11 @@ scout.BackgroundJobPollingStatus = {
  *   [backgroundJobPollingEnabled]
  *     Unless websockets is used, this property turns on (default) or off background
  *     polling using an async ajax call together with setTimeout()
+ *   [suppressErrors]
+ *     Basically added because of Jasmine-tests. When working with async tests that
+ *     use setTimeout(), sometimes the Jasmine-Maven plug-in fails and aborts the
+ *     build because there were console errors. These errors always happen in this
+ *     class. That's why we can skip suppress error handling with this flag.
  */
 scout.Session = function($entryPoint, options) {
   options = options || {};
@@ -55,6 +60,7 @@ scout.Session = function($entryPoint, options) {
   this.parentUiSession;
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  this.suppressErrors = scout.helpers.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
@@ -133,6 +139,12 @@ scout.Session.prototype._registerWithParentUiSession = function() {
     var parentUiSession = openerScout.sessions[0];
     parentUiSession.registerChildWindow(window);
     this.parentUiSession = parentUiSession; // TODO BSH Detach | Get from options instead?
+  }
+};
+
+scout.Session.prototype._throwError = function(message) {
+  if (!this.suppressErrors) {
+    throw new Error(message);
   }
 };
 
@@ -512,7 +524,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
     return;
   }
 
-  throw new Error('Error while processing request: ' + errorThrown);
+  this._throwError('Error while processing request: ' + errorThrown);
 };
 
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
