@@ -143,11 +143,11 @@ scout.Menu.prototype._registerKeyStrokeAdapter = function() {
   if (!this.keyStrokeAdapter) {
     this.keyStrokeAdapter = new scout.MenuKeyStrokeAdapter(this);
   }
-  scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
 };
 
 scout.Menu.prototype._unregisterKeyStrokeAdapter = function() {
   if (this.keyStrokeAdapter) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
   }
 };

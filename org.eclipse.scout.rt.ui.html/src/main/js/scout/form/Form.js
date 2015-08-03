@@ -251,7 +251,7 @@ scout.Form.prototype.attach = function() {
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+    scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
   }
 
   // form is attached even if children are not yet
@@ -279,8 +279,8 @@ scout.Form.prototype.detach = function() {
     return;
   }
 
-  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  if (scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
   }
 
   // Detach child dialogs, message boxes and file choosers, not views.

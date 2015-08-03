@@ -87,7 +87,7 @@ scout.Desktop.prototype._render = function($parent) {
       event.preventDefault();
     }
   });
-  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
+  scout.keyStrokeManager.installAdapter(this.session, $parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
 scout.Desktop.prototype._postRender = function() {
@@ -265,8 +265,8 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 
 scout.Desktop.prototype.setOutlineContent = function(content) {
   if (this._outlineContent && this._outlineContent !== content) {
-    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineContent.keyStrokeAdapter)) {
-      scout.keyStrokeManager.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
+    if (scout.keyStrokeManager.isAdapterInstalled(this.session, this._outlineContent.keyStrokeAdapter)) {
+      scout.keyStrokeManager.uninstallAdapter(this.session, this._outlineContent.keyStrokeAdapter);
     }
     this._outlineContent.remove();
     this._outlineContent = null;

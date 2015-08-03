@@ -188,7 +188,7 @@ scout.MessageBox.prototype.attach = function() {
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+    scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
   }
 
   this.attached = true;
@@ -207,8 +207,8 @@ scout.MessageBox.prototype.detach = function() {
     return;
   }
 
-  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  if (scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
   }
 
   this.session.detachHelper.beforeDetach(this.$container);

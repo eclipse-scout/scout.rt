@@ -2193,12 +2193,12 @@ scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
   if (adapter === this.keyStrokeAdapter) {
     return;
   }
-  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  if (scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
   }
   this.keyStrokeAdapter = adapter;
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
-  scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
+  scout.keyStrokeManager.installAdapter(this.session, target, this.keyStrokeAdapter);
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
@@ -2388,7 +2388,7 @@ scout.Table.prototype.attach = function() {
   this.session.detachHelper.afterAttach(this.$container);
 
   if (this.keyStrokeAdapter) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+    scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
   }
 
   this.attached = true;
@@ -2407,8 +2407,8 @@ scout.Table.prototype.detach = function() {
     return;
   }
 
-  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  if (scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
   }
 
   this.session.detachHelper.beforeDetach(this.$container);

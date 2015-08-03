@@ -1,67 +1,86 @@
-scout.KeystrokeManager = function() {
-  this._adaptersToDraw = [];
-  this._adapters = []; // FIXME BSH Keystroke | Check if we really need this
-  var that = this;
+/**
+ * The keystroke manager exists once per session, and ensures proper keystroke handling.
+ */
+scout.KeyStrokeManager = function(session) {
+  this._keyStrokeManagers = {};
 
-  // disable default help on F1 on IE
+  // Disable default help on IE.
   if (window.onhelp) {
-    window.onhelp = function () { // (jQuery cannot bind "onhelp" event)
-      return false;
-    };
-  }
-
-  //f1-help
-  $(document).keydown(function(event) {
-    if (event.which === scout.keys.F1) {
-      drawKeyBox();
-      event.preventDefault();
-    }
-    that._adaptersToDraw = [];
-  });
-
-
-  $(document).keyup(function(event) {
-    if (event.which === scout.keys.F1) {
-      removeKeyBox();
-      event.preventDefault();
-    }
-    that._adaptersToDraw = [];
-  });
-
-  $(window).blur(function() {
-    removeKeyBox();
-    that._adaptersToDraw = [];
-  });
-
-  function removeKeyBox() {
-    var i, adapter;
-    for (i = 0; i < that._adapters.length; i++) {
-      adapter = that._adapters[i];
-      if (adapter.removeKeyBox) {
-        adapter.removeKeyBox();
-      }
-    }
-  }
-
-  function drawKeyBox() {
-    var i, adapter, drawedKeys = {};
-    for (i = 0; i < that._adaptersToDraw.length; i++) {
-      adapter = that._adaptersToDraw[i];
-      if (adapter.drawKeyBox) {
-        adapter.drawKeyBox(drawedKeys);
-      }
-    }
+    window.onhelp = $.returnFalse; // (jQuery cannot bind 'onhelp' event)
   }
 };
 
-scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
+/**
+ * Installs keystroke handling for the given session.
+ */
+scout.KeyStrokeManager.prototype.installManagerForSession = function(session) {
+  var keyStrokeManager = {
+      session: session,
+      _adaptersToDraw:  [],
+      _adapters: [] // FIXME BSH Keystroke | Check if we really need this
+    };
+  this._keyStrokeManagers[session.uiSessionId] = keyStrokeManager;
+
+  var $entryPoint = session.$entryPoint;
+
+  // F1-help (key down)
+  $(document).keydown(function(event) {
+    if (event.which === scout.keys.F1) {
+      _drawKeyBox();
+      event.preventDefault();
+    }
+    keyStrokeManager._adaptersToDraw = [];
+  });
+
+  // F1-help (key up)
+  $(document).keyup(function(event) {
+    if (event.which === scout.keys.F1) {
+      _removeKeyBox();
+      event.preventDefault();
+    }
+    keyStrokeManager._adaptersToDraw = [];
+  });
+
+  // blur
+  $(window).blur(function() {
+    _removeKeyBox();
+    keyStrokeManager._adaptersToDraw = [];
+  });
+
+  function _removeKeyBox() {
+    keyStrokeManager._adapters
+        .filter(function(adapter) {
+          return adapter.removeKeyBox; // TODO [dwi] check whether necessary
+        })
+        .forEach(function(adapter) {
+          adapter.removeKeyBox();
+        });
+  }
+
+  function _drawKeyBox() {
+    keyStrokeManager._adaptersToDraw
+        .filter(function(adapter) {
+          return adapter.drawKeyBox; // TODO [dwi] check whether necessary
+        })
+        .forEach(function(adapter) {
+          adapter.drawKeyBox({});
+        });
+  }
+};
+
+scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, adapter) {
+  var keyStrokeManager = this._keyStrokeManagers[session.uiSessionId];
+
+  if (!keyStrokeManager) {
+    throw new Error('no keystroke manager found for session: ' + session.uiSessionId);
+  }
   if (!$element) {
-    throw new Error("missing argument '$element'");
+    throw new Error('missing argument \'$element\'');
   }
   if (!adapter) {
-    throw new Error("missing argument 'adapter'");
+    throw new Error('missing argument \'adapter\'');
   }
-  if (this.isAdapterInstalled(adapter)) {
+  if (this.isAdapterInstalled(session, adapter)) {
     return;
   }
 
@@ -70,7 +89,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
       return;
     }
     //Trace adapter if it is affected when key pressed.
-    this._adaptersToDraw.push(adapter);
+    keyStrokeManager._adaptersToDraw.push(adapter);
 
     //if bubble up should be prevented then continue and prevent bubble up also if no key strokes are registered
     if ((!adapter.keyStrokes || !adapter.accept(event)) && !adapter.preventBubbleUp(event)) {
@@ -98,7 +117,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     }
     if (!bubbleUp || adapter.preventBubbleUp(event)) {
       adapter.removeKeyBox();
-      this._adaptersToDraw = [];
+      keyStrokeManager._adaptersToDraw = [];
       if(stopImmediate){
         event.stopImmediatePropagation();
       }
@@ -109,26 +128,31 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     }
   }.bind(this);
 
-  this._adapters.push(adapter);
+  keyStrokeManager._adapters.push(adapter);
   adapter.$target = $element;
   adapter.controller = controller;
   $element.keydown(controller);
 };
 
-scout.KeystrokeManager.prototype.isAdapterInstalled = function(adapter) {
-  return this._adapters.indexOf(adapter) > -1;
+scout.KeyStrokeManager.prototype.isAdapterInstalled = function(session, adapter) {
+  return this._keyStrokeManagers[session.uiSessionId]._adapters.indexOf(adapter) > -1;
 };
 
-scout.KeystrokeManager.prototype.uninstallAdapter = function(adapter) {
+scout.KeyStrokeManager.prototype.uninstallAdapter = function(session, adapter) {
+  var keyStrokeManager = this._keyStrokeManagers[session.uiSessionId];
+  if (!keyStrokeManager) {
+    throw new Error('no keystroke manager found for session: ' + session.uiSessionId);
+  }
   if (!adapter) {
-    throw new Error("missing argument 'adapter'");
+    throw new Error('missing argument \'adapter\'');
   }
 
-  scout.arrays.remove(this._adapters, adapter);
+
+  scout.arrays.remove(keyStrokeManager._adapters, adapter);
   if (adapter.$target) {
     adapter.$target.off('keydown', undefined, adapter.controller);
   }
 };
 
 //Singleton
-scout.keyStrokeManager = new scout.KeystrokeManager();
+scout.keyStrokeManager = new scout.KeyStrokeManager();

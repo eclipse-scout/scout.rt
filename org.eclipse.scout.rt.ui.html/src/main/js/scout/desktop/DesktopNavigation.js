@@ -143,14 +143,14 @@ scout.DesktopNavigation.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.desktop.$container, this.keyStrokeAdapter);
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.session, this.desktop.$container, this.keyStrokeAdapter);
   }
 };
 
 scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
   }
 };
 
