@@ -83,7 +83,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
   protected void afterTunnel(long t0, ServiceTunnelResponse serviceResponse) {
     if (isAnalyzeNetworkLatency()) {
       // performance analyzer
-      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
+      IPerformanceAnalyzerService perf = BEANS.opt(IPerformanceAnalyzerService.class);
       if (perf != null) {
         long totalMillis = (System.nanoTime() - t0) / 1000000L;
         Long execMillis = serviceResponse.getProcessingDuration();
