@@ -277,8 +277,8 @@ public class JobScheduleTest {
         return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).withName("ABC")).awaitDoneAndGet();
-    assertTrue(actualThreadName1.getValue(), actualThreadName1.getValue().matches("scout-thread-(\\d)+ \\[Running\\] ABC"));
-    assertTrue(actualThreadName2.getValue(), actualThreadName2.getValue().matches("scout-thread-(\\d)+ \\[Running\\] XYZ"));
+    assertTrue(actualThreadName1.getValue(), actualThreadName1.getValue().matches("scout-thread-(\\d)+ \\(Running\\) \"ABC\""));
+    assertTrue(actualThreadName2.getValue(), actualThreadName2.getValue().matches("scout-thread-(\\d)+ \\(Running\\) \"XYZ\""));
     assertEquals("main", Thread.currentThread().getName());
   }
 

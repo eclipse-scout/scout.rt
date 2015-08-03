@@ -109,8 +109,8 @@ public class ClientJobTest {
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-client-thread-(\\d)+ \\(Running\\) \"ABC\""));
+    assertTrue(actualThreadName2.getValue().matches("scout-client-thread-(\\d)+ \\(Running\\) \"XYZ\""));
     assertEquals("main", Thread.currentThread().getName());
   }
 }

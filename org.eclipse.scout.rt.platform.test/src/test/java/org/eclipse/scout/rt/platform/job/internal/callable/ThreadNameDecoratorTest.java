@@ -70,8 +70,8 @@ public class ThreadNameDecoratorTest {
 
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", "123:job1").call();
-    assertEquals("scout-client-thread-5 [Running] 123:job1", threadName.getValue());
-    assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
+    assertEquals("scout-client-thread-5 (Running) \"123:job1\"", threadName.getValue());
+    assertEquals("scout-thread-5 (Idle)", Thread.currentThread().getName());
     ThreadInfo.CURRENT.remove();
   }
 
@@ -90,8 +90,8 @@ public class ThreadNameDecoratorTest {
 
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", null).call();
-    assertEquals("scout-client-thread-5 [Running]", threadName.getValue());
-    assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
+    assertEquals("scout-client-thread-5 (Running)", threadName.getValue());
+    assertEquals("scout-thread-5 (Idle)", Thread.currentThread().getName());
     ThreadInfo.CURRENT.remove();
   }
 
@@ -115,7 +115,7 @@ public class ThreadNameDecoratorTest {
 
         // verify job-status is 'RUNNING'.
         String currentThreadName = Thread.currentThread().getName();
-        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
+        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\(Running\\) \"job-1\""));
 
         // Start blocking
         BC.waitFor();
@@ -131,7 +131,7 @@ public class ThreadNameDecoratorTest {
 
         // verify job-status is 'RUNNING'.
         currentThreadName = Thread.currentThread().getName();
-        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
+        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\(Running\\) \"job-1\""));
         return true;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).withName("job-1").withMutex(mutexObject));
@@ -152,7 +152,7 @@ public class ThreadNameDecoratorTest {
 
         // verify job1 to be in blocked state.
         String threadNameJob1 = workerThreadJob1Holder.getValue().getName();
-        assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\[Blocked 'blocking-condition'\\] job-1"));
+        assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\(Blocked 'blocking-condition'\\) \"job-1\""));
 
         // Release job-1
         BC.setBlocking(false);
@@ -168,7 +168,7 @@ public class ThreadNameDecoratorTest {
 
         // verify job1 to be in resume state.
         threadNameJob1 = workerThreadJob1Holder.getValue().getName();
-        assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\[Resuming 'blocking-condition'\\] job-1"));
+        assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\(Resuming 'blocking-condition'\\) \"job-1\""));
 
         return true;
       }
