@@ -465,12 +465,13 @@
 /* "Open URI" related rules */
 
 .download-frame {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 0;
   height: 0;
-  display: none;
+  visibility: hidden;
+  /* Do _not_ use 'display: none', because that seems to interrupt the download in Safari */
 }
 
 .popup-blocked-title {
