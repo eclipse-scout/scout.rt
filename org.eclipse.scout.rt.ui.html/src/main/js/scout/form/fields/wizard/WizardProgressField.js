@@ -9,7 +9,7 @@ scout.WizardProgressField = function() {
 scout.inherits(scout.WizardProgressField, scout.FormField);
 
 scout.WizardProgressField.prototype._render = function($parent) {
-  this.addContainer($parent, 'wizard-progress-field');
+  this.addContainer($parent, 'wizard-progress-field', new scout.WizardProgressFieldLayout(this));
 
   this._$wizardSteps = $.makeDiv('wizard-steps');
   this.addField(this._$wizardSteps);
