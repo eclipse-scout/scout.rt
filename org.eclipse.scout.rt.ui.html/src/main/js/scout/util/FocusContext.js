@@ -26,13 +26,20 @@ scout.FocusContext = function($container, session) {
 };
 
 scout.FocusContext.prototype._dispose = function() {
+  // Remove all listeners.
   this._$container
     .off('keydown', this._keyDownListener)
     .off('focusin', this._focusInListener)
     .off('focusout', this._focusOutListener)
     .off('hide', this._hideListener);
   $(this._focusedField).off('remove', this._removeListener);
-  this._focusedField = null;
+
+  // Focus the $entryPoint if the focus is currently on an element managed by this context.
+  // That is to not blur the focus once elements of this context are removed.
+  if (this._focusedField) {
+    this._focus(this.session.$entryPoint[0]);
+    this._focusedField = null;
+  }
 };
 
 /**
@@ -137,26 +144,40 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element, blurElemen
     }
   }
 
-  // Store the element to focus (even if the element to focus is currently covert by a glasspane -> that is for later restore once the glasspane is removed).
+  // Store the element to be focused, and regardless of whether currently covert by a glass pane or the focus manager is not active. That is for later focus restore.
   this._lastFocusedElement = elementToFocus;
 
-  // Do not gain focus if the focus manager is not active.
+  // Focus the element.
+  this._focus(elementToFocus);
+};
+
+/**
+ * Focuses the requested element.
+ */
+scout.FocusContext.prototype._focus = function(elementToFocus) {
+  // Only focus element if focus manager is active
   if (!scout.focusManager.active(this.session.uiSessionId)) {
     return;
   }
 
   // Check whether the element is covert by a glasspane
-  if (scout.focusManager._isElementCovertByGlassPane(element, this.session.uiSessionId)) {
+  if (scout.focusManager._isElementCovertByGlassPane(elementToFocus, this.session.uiSessionId)) {
     elementToFocus = null;
   }
 
-  // When no element at all is focusable, we focus the $entryPoint, because we don't want to focus the document body.
-  // Otherwise, the browser default keystrokes (like backspace, etc.) would be triggered.
+  // Focus $entryPoint if current focus is to be blured.
+  // Otherwise, the HTML body would be focused which makes global keystrokes (like backspace) not to work anymore.
   elementToFocus = elementToFocus || this.session.$entryPoint[0];
-  // Only set the focus if different to the current focused element.
-  if (document.activeElement !== elementToFocus) {
-    $(elementToFocus).focus();
-    $.log.debug('Set focus to element ' + scout.graphics.debugOutput(elementToFocus));
+
+  // Only focus element if different to current focused element
+  if (document.activeElement === elementToFocus) {
+    return;
+  }
+
+  // Focus the requested element.
+  $(elementToFocus).focus();
+  if ($.log.isDebugEnabled()) {
+    $.log.debug('Focus set to ' + scout.graphics.debugOutput(elementToFocus));
   }
 };
 
