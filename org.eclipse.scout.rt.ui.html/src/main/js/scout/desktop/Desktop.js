@@ -501,7 +501,10 @@ scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
  */
 scout.Desktop.prototype.glassPaneTargets = function() {
   // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
-  return $.makeArray(this.$container.children().not('.splitter'));
+  return $.makeArray(this.$container
+      .children()
+      .not('.splitter') // exclude splitter to be locked
+      .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
 };
 
 /**
