@@ -94,7 +94,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.ClipboardTimeout",
         "ui.PopupBlockerDetected",
         "ui.OpenManually",
-        "ui.FileChooserHint"
+        "ui.FileChooserHint",
+        "ui.Outlines"
         ));
   }
 }

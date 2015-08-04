@@ -40,7 +40,7 @@ scout.ViewMenuTab.prototype._update = function() {
     this.text = this.outlineViewButton.text;
     this.iconId = this.outlineViewButton.getIconId();
   } else {
-    this.text = this.session.text('ui.outlines');
+    this.text = this.session.text('ui.Outlines');
     this.iconId = scout.icons.OUTLINE;
   }
 };
