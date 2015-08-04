@@ -56,6 +56,10 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._onMouseEvent = function(event) {
+  if (event.which !== 1) {
+    return; // Other button than left mouse button --> nop
+  }
+
   // If menu has childActions, a popup should be rendered on click. To create
   // the impression of a faster UI, open the popup already on 'mousedown', not
   // on 'click'. All other actions are handeld on 'click'.
