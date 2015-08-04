@@ -16,7 +16,6 @@
 scout.ModelAdapter = function() {
   scout.ModelAdapter.parent.call(this);
   this._adapterProperties = [];
-  this.ui;
 
   // Adapter structure
   this.owner;
@@ -31,7 +30,6 @@ scout.inherits(scout.ModelAdapter, scout.Widget);
 scout.ModelAdapter.prototype.init = function(model, session) {
   scout.ModelAdapter.parent.prototype.init.call(this, session);
 
-  var target;
   this.id = model.id;
   this.objectType = model.objectType;
   // FIXME AWE/CGU: (model-adapter, registry) instead of working with this flag, we should
@@ -41,10 +39,8 @@ scout.ModelAdapter.prototype.init = function(model, session) {
   if (scout.helpers.nvl(model._registered, true)) {
     this.session.registerModelAdapter(this);
   }
-  this.ui = this._createUi();
-  target = this.ui || this;
 
-  // copy all properties from model to this adapter or ui instance
+  // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
     if (scout.helpers.isOneOf(propertyName, 'id', 'session', 'objectType')) {
       return; // Ignore (already set manually above)
@@ -52,13 +48,13 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     if (isAdapterProp && value) {
       value = this._createAdapters(propertyName, value);
     }
-    target[propertyName] = value;
+    this[propertyName] = value;
   }.bind(this));
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 
   // Fill in the missing default values
-  scout.defaultValues.applyTo(target);
+  scout.defaultValues.applyTo(this);
   this._init(model, session);
   this.initialized = true;
   this.trigger('initialized');
@@ -69,9 +65,6 @@ scout.ModelAdapter.prototype._init = function(model, session) {
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
-  if (this.ui && this.ui.rendered) {
-    throw new Error('Already rendered: ' + this);
-  }
   scout.ModelAdapter.parent.prototype.render.call(this, $parent);
   if (this.session.offline) {
     this.goOffline();
@@ -79,11 +72,7 @@ scout.ModelAdapter.prototype.render = function($parent) {
 };
 
 scout.ModelAdapter.prototype._renderInternal = function($parent) {
-  if (this.ui) {
-    this.ui.render($parent);
-  } else {
-    scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
-  }
+  scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
   this._renderUniqueId();
 };
 
@@ -92,27 +81,10 @@ scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
     $target = qualifier;
     qualifier = undefined;
   }
-  $target = $target || this.$container || (this.ui && this.ui.$container);
+  $target = $target || this.$container;
   if ($target && !$target.attr('id')) { // don't overwrite
     $target.attr('id', this.uniqueId(qualifier));
   }
-};
-
-/**
- * @override Widget.js
- */
-scout.ModelAdapter.prototype._remove = function() {
-  scout.ModelAdapter.parent.prototype._remove.call(this);
-  if (this.ui) {
-    this.ui.remove();
-  }
-};
-
-/**
- * @returns the UI widget to use when rendering the model adapter
- */
-scout.ModelAdapter.prototype._createUi = function() {
-  return null;
 };
 
 /**
@@ -334,8 +306,7 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
-      oldValue = this[propertyName],
-      target = this.ui || this;
+      oldValue = this[propertyName];
     oldProperties[propertyName] = oldValue;
 
     if (isAdapterProp) {
@@ -347,10 +318,10 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
       }
     }
 
-    if (target[syncFuncName]) {
-      target[syncFuncName](value, oldValue);
+    if (this[syncFuncName]) {
+      this[syncFuncName](value, oldValue);
     } else {
-      target[propertyName] = value;
+      this[propertyName] = value;
     }
   }.bind(this));
 };
@@ -365,9 +336,8 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
     if (isAdapterProp) {
       this.onChildAdapterChange(propertyName, oldValue, newValue);
     } else {
-      var funcTarget = this.ui || this;
-      if (!funcTarget[renderFuncName]) {
-        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? this.toString() : 'UI'));
+      if (!this[renderFuncName]) {
+        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
       }
       // FIXME AWE/CGU: value and oldValue should be switched to conform with other functions.
       // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
@@ -379,7 +349,7 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
       // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
       // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
       //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
-      funcTarget[renderFuncName](newValue, oldValue);
+      this[renderFuncName](newValue, oldValue);
     }
   }.bind(this));
 };
@@ -392,12 +362,11 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
   var i,
     funcName = scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
     renderFuncName = '_render' + funcName,
-    removeFuncName = '_remove' + funcName,
-    funcTarget = this.ui || this;
+    removeFuncName = '_remove' + funcName;
 
   // Remove old adapter, if there is one
   if (oldValue) {
-    if (!funcTarget[removeFuncName]) {
+    if (!this[removeFuncName]) {
       if (Array.isArray(oldValue)) {
         for (i = 0; i < oldValue.length; i++) {
           oldValue[i].remove();
@@ -406,14 +375,14 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
         oldValue.remove();
       }
     } else {
-      funcTarget[removeFuncName](oldValue);
+      this[removeFuncName](oldValue);
     }
   }
 
   // Render new adapter, if there is one
   if (newValue) {
-    var $container = this.$container || (this.ui ? this.ui.$container : undefined);
-    if (!funcTarget[renderFuncName] && $container) {
+    var $container = this.$container;
+    if (!this[renderFuncName] && $container) {
       if (Array.isArray(newValue)) {
         for (i = 0; i < newValue.length; i++) {
           newValue[i].render($container);
@@ -422,7 +391,7 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
         newValue.render($container);
       }
     } else {
-      funcTarget[renderFuncName](newValue);
+      this[renderFuncName](newValue);
     }
   }
 };

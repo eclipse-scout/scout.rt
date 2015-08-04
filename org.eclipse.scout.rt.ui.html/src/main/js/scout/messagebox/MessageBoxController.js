@@ -53,7 +53,7 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
 
   // Only display the message box if its 'displayParent' is visible to the user.
   if (!this._displayParent.inFront()) {
-    messageBox.ui.detach();
+    messageBox.detach();
   }
 };
 
@@ -69,7 +69,7 @@ scout.MessageBoxController.prototype._remove = function(messageBox) {
  */
 scout.MessageBoxController.prototype.attach = function() {
   this._displayParent.messageBoxes.forEach(function(messageBox) {
-    messageBox.ui.attach();
+    messageBox.attach();
   }, this);
 };
 
@@ -81,6 +81,6 @@ scout.MessageBoxController.prototype.attach = function() {
  */
 scout.MessageBoxController.prototype.detach = function() {
   this._displayParent.messageBoxes.forEach(function(messageBox) {
-    messageBox.ui.detach();
+    messageBox.detach();
   }, this);
 };
