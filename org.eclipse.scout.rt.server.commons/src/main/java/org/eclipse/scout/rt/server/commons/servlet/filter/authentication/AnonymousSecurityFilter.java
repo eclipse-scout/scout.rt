@@ -41,11 +41,21 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
       return;
     }
 
+    if (isLoginRequest(req)) {
+      BEANS.get(ServletFilterHelper.class).doLogout(req);
+      BEANS.get(ServletFilterHelper.class).redirectTo(req, res, "");
+      return;
+    }
+
     super.doFilterInternal(req, res, chain);
   }
 
-  private boolean isLogoutRequest(HttpServletRequest req) {
+  protected boolean isLogoutRequest(HttpServletRequest req) {
     return "/logout".equals(req.getPathInfo());
+  }
+
+  protected boolean isLoginRequest(HttpServletRequest req) {
+    return "/login".equals(req.getPathInfo());
   }
 
   @Override

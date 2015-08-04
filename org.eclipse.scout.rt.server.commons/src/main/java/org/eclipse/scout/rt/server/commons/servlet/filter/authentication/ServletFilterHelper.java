@@ -130,36 +130,43 @@ public class ServletFilterHelper {
   /**
    * forward the request to the login.html
    * <p>
-   * Detect if the request is a POST. For json send a timeout message, otherwise log a warning
+   * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
    */
   public void forwardToLoginForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-    //check if POST request
-    if ("POST".equals(req.getMethod())) {
-      if ((req.getContentType() + "").startsWith("application/json")) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Returning session timeout error as json.");
-        }
-        sendJsonSessionTimeout(resp);
-        return;
-      }
-      else {
-        LOG.warn("The request for {0} is a POST request. Forwarding to the login page will most likely fail because StaticResourceRequestInterceptor doesn't handle post.", req.getPathInfo());
-      }
-    }
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Forwarding '{0}' to /login.html", req.getPathInfo());
-    }
-    req.getRequestDispatcher("/login.html").forward(req, resp);
+    forwardTo(req, resp, "/login.html");
   }
 
   /**
    * forward the request to the logout.html
    * <p>
-   * Detect if the request is a POST. For json send a timeout message, otherwise log a warning
+   * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
    */
   public void forwardToLogoutForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-    //check if POST request
+    forwardTo(req, resp, "/logout.html");
+  }
+
+  public void forwardTo(HttpServletRequest req, HttpServletResponse resp, String targetLocation) throws IOException, ServletException {
+    forwardOrRedirectTo(req, resp, targetLocation, false);
+  }
+
+  public void redirectTo(HttpServletRequest req, HttpServletResponse resp, String targetLocation) throws IOException, ServletException {
+    forwardOrRedirectTo(req, resp, targetLocation, true);
+  }
+
+  /**
+   * Forwards or redirects the request to the specified location, depending on the value of the argument 'redirect':
+   * <ul>
+   * <li><b>redirect=true</b>: A HTTP redirect response (302) is sent, using
+   * {@link HttpServletResponse#sendRedirect(String)}.
+   * <li><b>redirect=false</b>: The request is forwarded to a dispatcher using the new location, using
+   * {@link RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)). This has the same
+   * effect as if the user had requested the target location from the beginning.
+   * </ul>
+   * This method detects if the request is a POST. If it is a JSON request, no redirection happens, but a JSON timeout
+   * message is sent. For other types of POST requests, a warning is logged, but forwarding/redirection will happen
+   * nevertheless.
+   */
+  protected void forwardOrRedirectTo(HttpServletRequest req, HttpServletResponse resp, String targetLocation, boolean redirect) throws IOException, ServletException {
     if ("POST".equals(req.getMethod())) {
       if ((req.getContentType() + "").startsWith("application/json")) {
         if (LOG.isDebugEnabled()) {
@@ -169,14 +176,19 @@ public class ServletFilterHelper {
         return;
       }
       else {
-        LOG.warn("The request for {0} is a POST request. Forwarding to the logout page will most likely fail because StaticResourceRequestInterceptor doesn't handle post.", req.getPathInfo());
+        LOG.warn("The request for '{0}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{1}' will most likely fail. (Trying nevertheless.)", req.getPathInfo(), targetLocation);
       }
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Forwarding '{0}' to /logout.html", req.getPathInfo());
+      LOG.debug((redirect ? "Redirecting" : "Forwarding") + " '{0}' to '{1}'", req.getPathInfo(), targetLocation);
     }
-    req.getRequestDispatcher("/logout.html").forward(req, resp);
+    if (redirect) {
+      resp.sendRedirect(targetLocation);
+    }
+    else {
+      req.getRequestDispatcher(targetLocation).forward(req, resp);
+    }
   }
 
   protected void sendJsonSessionTimeout(HttpServletResponse resp) throws IOException {
