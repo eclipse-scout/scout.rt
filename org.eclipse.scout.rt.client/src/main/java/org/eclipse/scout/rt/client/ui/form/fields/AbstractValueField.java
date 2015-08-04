@@ -358,7 +358,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       VALUE oldValue = getValue();
       boolean changed = propertySupport.setPropertyNoFire(PROP_VALUE, validatedValue);
       // change text if auto-set-text enabled
-      updateDisplayText(rawValue);
+      updateDisplayText(validatedValue);
 
       if (changed) {
         propertySupport.firePropertyChange(PROP_VALUE, oldValue, validatedValue);

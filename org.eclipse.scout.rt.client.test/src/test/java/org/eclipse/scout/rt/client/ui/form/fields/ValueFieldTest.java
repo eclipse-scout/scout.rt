@@ -171,6 +171,17 @@ public class ValueFieldTest {
     assertTrue(f.getAField().isContentValid());
   }
 
+  /**
+   * Tests that the value is correct, if it is changed during validation.
+   */
+  @Test
+  public void testValidationValueChange() {
+    final IncValidationField f = new IncValidationField();
+    f.setValue(0);
+    assertEquals(Integer.valueOf(1), f.getValue());
+    assertEquals("1", f.getDisplayText());
+  }
+
   private void assertInvalid(IFormField field, String expectedMessage) {
     assertFalse(field.isContentValid());
     assertEquals(expectedMessage, field.getErrorStatus().getMessage());
@@ -277,6 +288,14 @@ public class ValueFieldTest {
     public void setValidABCombination() {
       getAField().setValue(0);
       getBField().setValue(1);
+    }
+  }
+
+  @Order(10.0)
+  public class IncValidationField extends AbstractValueField<Integer> {
+    @Override
+    protected Integer execValidateValue(Integer rawValue) throws ProcessingException {
+      return rawValue + 1;
     }
   }
 
