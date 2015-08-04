@@ -1,6 +1,4 @@
 scout.AbstractKeyStrokeAdapter = function(field) {
-  this.$target = undefined; // set by KeyStrokeManager
-  this.controller = undefined; // set by KeyStrokeManager
   this.keyStrokes = [];
   this._field = field;
   this.installModelKeystrokes();

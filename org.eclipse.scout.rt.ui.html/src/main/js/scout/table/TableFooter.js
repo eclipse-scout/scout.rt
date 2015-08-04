@@ -80,7 +80,7 @@ scout.TableFooter.prototype._installKeyStrokeAdapter = function() {
 
 scout.TableFooter.prototype._uninstallKeyStrokeAdapter = function() {
   scout.TableFooter.parent.prototype._uninstallKeyStrokeAdapter.call(this);
-  scout.keyStrokeManager.uninstallAdapter(this.session, this.filterKeyStrokeAdapter);
+  scout.keyStrokeManager.uninstallAdapter(this.filterKeyStrokeAdapter);
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
@@ -256,9 +256,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
 
 scout.TableFooter.prototype.closeControlContainer = function(control) {
   var that = this;
-  if (this.tableControlKeyStrokeAdapter) {
-    scout.keyStrokeManager.uninstallAdapter(this.session, this.tableControlKeyStrokeAdapter);
-  }
+  scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
   this.$controlContainer.stop(true).show().animate({
     height: 0
   }, {

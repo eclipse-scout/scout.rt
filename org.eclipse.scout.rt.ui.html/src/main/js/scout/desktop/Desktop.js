@@ -265,9 +265,7 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 
 scout.Desktop.prototype.setOutlineContent = function(content) {
   if (this._outlineContent && this._outlineContent !== content) {
-    if (scout.keyStrokeManager.isAdapterInstalled(this.session, this._outlineContent.keyStrokeAdapter)) {
-      scout.keyStrokeManager.uninstallAdapter(this.session, this._outlineContent.keyStrokeAdapter);
-    }
+    scout.keyStrokeManager.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
     this._outlineContent.remove();
     this._outlineContent = null;
   }

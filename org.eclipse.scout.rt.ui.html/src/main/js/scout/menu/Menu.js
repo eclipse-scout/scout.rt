@@ -144,14 +144,10 @@ scout.Menu.prototype._drawKeyBox = function($container) {
 };
 
 scout.Menu.prototype._registerKeyStrokeAdapter = function() {
-  if (!this.keyStrokeAdapter) {
-    this.keyStrokeAdapter = new scout.MenuKeyStrokeAdapter(this);
-  }
+  this.keyStrokeAdapter = this.keyStrokeAdapter || new scout.MenuKeyStrokeAdapter(this);
   scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
 };
 
 scout.Menu.prototype._unregisterKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter) {
-    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
-  }
+  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
 };

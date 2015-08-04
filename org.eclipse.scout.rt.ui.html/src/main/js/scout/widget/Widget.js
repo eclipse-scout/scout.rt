@@ -215,15 +215,11 @@ scout.Widget.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.Widget.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
-  }
+  scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
 };
 
 scout.Widget.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.session, this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.session, this.keyStrokeAdapter);
-  }
+  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.Widget.prototype.toString = function() {

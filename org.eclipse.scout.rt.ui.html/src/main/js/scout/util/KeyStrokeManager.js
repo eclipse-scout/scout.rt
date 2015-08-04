@@ -1,55 +1,47 @@
 /**
  * The keystroke manager exists once per session, and ensures proper keystroke handling.
  */
-scout.KeyStrokeManager = function(session) {
-  this._keyStrokeManagers = {};
-
+scout.KeyStrokeManager = function() {
   // Prevent the browser from displaying its help on F1.
   if (window.onhelp) {
     window.onhelp = $.returnFalse;
   }
 };
 
-
 scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
   return event.which === scout.keys.F1;
 };
 
 /**
- * Installs keystroke handling for the given session.
+ * Initializes keystroke handing for the given session.
  */
-scout.KeyStrokeManager.prototype.installManagerForSession = function(session) {
-  var keyStrokeManager = {
-      _adapters: [] // FIXME BSH Keystroke | Check if we really need this
-    };
-  this._keyStrokeManagers[session.uiSessionId] = keyStrokeManager;
-
+scout.KeyStrokeManager.prototype.init = function($entryPoint) {
   var preventHelpKeyStroke = function(event) {
     if (scout.keyStrokeManager._isHelpKeyStroke(event)) {
       event.preventDefault();
     }
   };
-  session.$entryPoint.keydown(preventHelpKeyStroke);
-  session.$entryPoint.keyup(preventHelpKeyStroke);
+  $entryPoint.keydown(preventHelpKeyStroke);
+  $entryPoint.keyup(preventHelpKeyStroke);
 };
 
+/**
+ * Installs the given keystroke adapter. This method has no effect if the adapter is null, or already installed.
+ */
 scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, adapter) {
-  var keyStrokeManager = this._keyStrokeManagers[session.uiSessionId];
-
-  if (!keyStrokeManager) {
-    throw new Error('no keystroke manager found for session: ' + session.uiSessionId);
+  if (!adapter) {
+    return; // no adapter to install
   }
+
+  if (adapter.handler) {
+    return; // adapter already installed
+  }
+
   if (!$element) {
     throw new Error('missing argument \'$element\'');
   }
-  if (!adapter) {
-    throw new Error('missing argument \'adapter\'');
-  }
-  if (this.isAdapterInstalled(session, adapter)) {
-    return;
-  }
 
-  var keyStrokeHandler = function(event) {
+  adapter.handler = function(event) {
     if (event.originalEvent && event.originalEvent.anchorReached) {
       return;
     }
@@ -99,57 +91,46 @@ scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, ad
       // FIXME [dwi] without this, arrow-down on table does not work correctly!!
 //      scout.focusManager.validateFocus(adapter.uiSessionId());
     }
-  },
-  drawKeyStrokes = function(adapter, target) {
-    // Draws available keystrokes.
-    adapter.drawKeyBox({});
 
-    // Registers 'key-up' and 'window-blur' handler to remove drawn keystrokes.
-    var keyUpHandler = function(event) {
-      removeKeyBoxAndHandlers(scout.keyStrokeManager._isHelpKeyStroke(event)); // only on 'key-up' for 'help keystroke'
-    },
-    windowBlurHandler = function(event) {
-      removeKeyBoxAndHandlers(true);
-    },
-    removeKeyBoxAndHandlers = function(doit) {
-      if (doit) {
-        $(target).off('keyup', keyUpHandler);
-        $(window).off('blur', windowBlurHandler);
-        adapter.removeKeyBox();
-      }
-    };
+    function drawKeyStrokes(adapter, target) {
+      // Draws available keystrokes.
+      adapter.drawKeyBox({});
 
-    $(target).on('keyup', keyUpHandler); // once the respective 'key-up' event occurs
-    $(window).on('blur', windowBlurHandler); // once the current browser tab/window is left
+      // Registers 'key-up' and 'window-blur' handler to remove drawn keystrokes.
+      var keyUpHandler = function(event) {
+        removeKeyBoxAndHandlers(scout.keyStrokeManager._isHelpKeyStroke(event)); // only on 'key-up' for 'help keystroke'
+      },
+      windowBlurHandler = function(event) {
+        removeKeyBoxAndHandlers(true);
+      },
+      removeKeyBoxAndHandlers = function(doit) {
+        if (doit) {
+          $(target).off('keyup', keyUpHandler);
+          $(window).off('blur', windowBlurHandler);
+          adapter.removeKeyBox();
+        }
+      };
+
+      $(target).on('keyup', keyUpHandler); // once the respective 'key-up' event occurs
+      $(window).on('blur', windowBlurHandler); // once the current browser tab/window is left
+    }
   };
 
-  $element.keydown(keyStrokeHandler);
-
-  adapter.$target = $element;
-  adapter.controller = keyStrokeHandler;
-
-  keyStrokeManager._adapters.push(adapter);
+  adapter.handler.$target = $element;
+  $element.keydown(adapter.handler);
 };
 
-
-scout.KeyStrokeManager.prototype.isAdapterInstalled = function(session, adapter) {
-  return this._keyStrokeManagers[session.uiSessionId]._adapters.indexOf(adapter) > -1;
-};
-
-scout.KeyStrokeManager.prototype.uninstallAdapter = function(session, adapter) {
-  var keyStrokeManager = this._keyStrokeManagers[session.uiSessionId];
-  if (!keyStrokeManager) {
-    throw new Error('no keystroke manager found for session: ' + session.uiSessionId);
-  }
+scout.KeyStrokeManager.prototype.uninstallAdapter = function(adapter) {
   if (!adapter) {
-    throw new Error('missing argument \'adapter\'');
+    return; // no adapter to uninstall
+  }
+  if (!adapter.handler) {
+    return; // adapter already uninstalled
   }
 
-
-  scout.arrays.remove(keyStrokeManager._adapters, adapter);
-  if (adapter.$target) {
-    adapter.$target.off('keydown', undefined, adapter.controller);
-  }
+  adapter.handler.$target.off('keydown', adapter.handler);
+  adapter.handler.$target = null;
+  adapter.handler = null;
 };
 
 // Singleton

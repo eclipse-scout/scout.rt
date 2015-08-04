@@ -153,7 +153,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.sendSelected();
 
   if (!selected) {
-    scout.keyStrokeManager.uninstallAdapter(this.session, this.tableControlKeyStrokeAdapter);
+    scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
   }
 };
 
