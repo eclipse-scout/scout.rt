@@ -1,5 +1,13 @@
+/**
+ * Options:
+ * <ul>
+ * <li><b>initialFocus</b> a Function that returns the element to be focused or a <code>scout.FocusRule</code>. Default returns <code>scout.FocusRule.AUTO</code></li>
+ * <li><b>focusableContainer</b> a Boolean whether or not the container of the Popup is focusable</li>
+ * </ul>
+ *
+ */
 scout.Popup = function(session, options) {
-  // FIXME AWE: use this.options property here, use helpers.nvl
+  // FIXME AWE: use this.options property here
   scout.Popup.parent.call(this);
   this.init(session);
 
@@ -12,11 +20,11 @@ scout.Popup = function(session, options) {
     this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
   }
   this.$anchor = options.$anchor;
-  this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
-  this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
-  this.installFocusContext = options.installFocusContext !== undefined ? options.installFocusContext : true;
-  this.initialFocus = options.initialFocus !== undefined ? options.initialFocus : function() { return scout.FocusRule.AUTO; };
-  this.focusableContainer = options.focusableContainer !== undefined ? options.focusableContainer : false;
+  this.windowPaddingX = scout.helpers.nvl(options.windowPaddingX, 10);
+  this.windowPaddingY = scout.helpers.nvl(options.windowPaddingY, 5);
+  this.installFocusContext = scout.helpers.nvl(options.installFocusContext, true);
+  this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.FocusRule.AUTO; });
+  this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -24,10 +32,13 @@ scout.Popup.prototype.render = function($parent, event) {
   scout.Popup.parent.prototype.render.call(this, $parent);
   this.openEvent = event;
   this._attachCloseHandler();
-  this.position();
 };
 
 scout.Popup.prototype._postRender = function() {
+  // position must be set _before_ focus is installed, otherwise we'd focus an element
+  // that is currently not on the screen. Which would cause the whole desktop to
+  // be shifted for a few pixels.
+  this.position();
   if (this.installFocusContext) {
     this.$container.installFocusContext(this.session, this.initialFocus());
   }

@@ -1,8 +1,7 @@
 scout.FormToolPopup = function(formToolButton, session) {
-  var options = {
+  scout.FormToolPopup.parent.call(this, session, {
       initialFocus: formToolButton.form._initialFocusElement.bind(formToolButton.form)
-  };
-  scout.FormToolPopup.parent.call(this, session, options);
+  });
   this.$formToolButton = formToolButton.$container;
   this.$headBlueprint = this.$formToolButton;
   this.formToolButton = formToolButton;
