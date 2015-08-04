@@ -73,6 +73,8 @@ scout.WizardProgressField.prototype._renderActiveWizardStepIndex = function() {
     this._updateWizardStepActiveClasses($wizardSteps.eq(index));
   }.bind(this));
 
+  this.scrollToActiveStep();
+
   // update background color for this._$wizardSteps, use same as for last step (otherwise there might be white space after last step)
   this._$wizardSteps.css('background-color', $wizardSteps.eq(this.wizardSteps.length - 1).css('background-color'));
 };
@@ -115,5 +117,14 @@ scout.WizardProgressField.prototype._onWizardStepClick = function(event) {
     this.session.send(this.id, 'doWizardStepAction', {
       stepIndex: targetStepIndex
     });
+  }
+};
+
+scout.WizardProgressField.prototype.scrollToActiveStep = function(event) {
+  if (this.activeWizardStepIndex) {
+    var $previousStep = this.wizardSteps[this.activeWizardStepIndex - 1].$wizardStep;
+    var $currentStep = this.wizardSteps[this.activeWizardStepIndex].$wizardStep;
+    var scrollPosition = this._$wizardSteps.scrollLeft() + $currentStep.position().left - (($previousStep.width() + $currentStep.width() < $currentStep.parent().width()) ? $previousStep.width() : 0);
+    scout.scrollbars.scrollLeft(this._$wizardSteps, scrollPosition);
   }
 };
