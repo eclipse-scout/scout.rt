@@ -48,12 +48,12 @@ public class ClientNotificationRegistry {
   /**
    * This method should only be accessed from {@link ClientNotificationService}
    *
-   * @param notificationNodeId
+   * @param nodeId
    * @param session
    */
-  void registerSession(String notificationNodeId, String sessionId, String userId) {
+  void registerSession(String nodeId, String sessionId, String userId) {
     synchronized (m_notificationQueues) {
-      ClientNotificationNodeQueue queue = getQueue(notificationNodeId);
+      ClientNotificationNodeQueue queue = getQueue(nodeId);
       queue.registerSession(sessionId, userId);
     }
   }
@@ -61,11 +61,11 @@ public class ClientNotificationRegistry {
   /**
    * This method should only be accessed from {@link ClientNotificationService}
    *
-   * @param notificationNodeId
+   * @param nodeId
    */
-  void unregisterNode(String notificationNodeId) {
+  void unregisterNode(String nodeId) {
     synchronized (m_notificationQueues) {
-      m_notificationQueues.remove(notificationNodeId);
+      m_notificationQueues.remove(nodeId);
     }
   }
 
@@ -86,15 +86,15 @@ public class ClientNotificationRegistry {
     return queue.consume(maxAmount, maxWaitTime, unit);
   }
 
-  private ClientNotificationNodeQueue getQueue(String notificationNodeId) {
-    Assertions.assertNotNull(notificationNodeId);
+  private ClientNotificationNodeQueue getQueue(String nodeId) {
+    Assertions.assertNotNull(nodeId);
     synchronized (m_notificationQueues) {
-      ClientNotificationNodeQueue queue = m_notificationQueues.get(notificationNodeId);
+      ClientNotificationNodeQueue queue = m_notificationQueues.get(nodeId);
       if (queue == null) {
         // create new
         queue = BEANS.get(ClientNotificationNodeQueue.class);
-        queue.setNodeId(notificationNodeId);
-        m_notificationQueues.put(notificationNodeId, queue);
+        queue.setNodeId(nodeId);
+        m_notificationQueues.put(nodeId, queue);
       }
       return queue;
     }

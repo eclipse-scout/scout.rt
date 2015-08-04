@@ -19,13 +19,6 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 @TunnelToServer
 public interface IClientNotificationService {
 
-  /**
-   * must be called in a session scope
-   *
-   * @return
-   */
-  String getUserIdOfCurrentSession();
-
   void registerSession(String notificationNodeId, String sessionId, String userId);
 
   void unregisterSession(String notificationNodeId);

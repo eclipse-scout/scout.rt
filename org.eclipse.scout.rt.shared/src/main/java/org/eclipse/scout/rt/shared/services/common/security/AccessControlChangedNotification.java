@@ -19,7 +19,7 @@ import java.security.Permissions;
 public class AccessControlChangedNotification implements IAccessControlNotification {
   private static final long serialVersionUID = 1L;
 
-  private Permissions m_permissions;
+  private final Permissions m_permissions;
 
   public AccessControlChangedNotification(Permissions permissions) {
     m_permissions = permissions;

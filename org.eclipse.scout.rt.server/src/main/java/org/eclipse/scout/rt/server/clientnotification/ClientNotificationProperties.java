@@ -37,4 +37,36 @@ public class ClientNotificationProperties {
     }
   }
 
+  /**
+   * The maximum amount of time in [ms] a consumer blocks while waiting for new notifications.
+   */
+  public static class MaxNotificationBlockingTimeOut extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    protected Integer getDefaultValue() {
+      return Integer.valueOf(10000);
+    }
+
+    @Override
+    public String getKey() {
+      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationService#blockingTimeout";
+    }
+  }
+
+  /**
+   * The maximum number of notifications that are consumed at once.
+   */
+  public static class MaxNotificationMessages extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    protected Integer getDefaultValue() {
+      return Integer.valueOf(30);
+    }
+
+    @Override
+    public String getKey() {
+      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationService#maxMessages";
+    }
+  }
+
 }

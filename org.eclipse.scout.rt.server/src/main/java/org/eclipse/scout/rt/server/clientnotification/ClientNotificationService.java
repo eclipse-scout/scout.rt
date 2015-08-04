@@ -13,48 +13,34 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
-/**
- *
- */
 public class ClientNotificationService implements IClientNotificationService {
-  private ClientNotificationRegistry m_notificationRegistry;
+  private final int m_blockingTimeout;
+  private final int m_maxNotifications;
 
-  @PostConstruct
-  protected void setup() {
-    m_notificationRegistry = BEANS.get(ClientNotificationRegistry.class);
-  }
-
-  @Override
-  public String getUserIdOfCurrentSession() {
-    return Assertions.assertNotNull(ISession.CURRENT.get()).getUserId();
+  public ClientNotificationService() {
+    m_blockingTimeout = Assertions.assertNotNull(CONFIG.getPropertyValue(ClientNotificationProperties.MaxNotificationBlockingTimeOut.class));
+    m_maxNotifications = Assertions.assertNotNull(CONFIG.getPropertyValue(ClientNotificationProperties.MaxNotificationMessages.class));
   }
 
   @Override
   public void registerSession(String notificationNodeId, String sessionId, String userId) {
-    m_notificationRegistry.registerSession(notificationNodeId, sessionId, userId);
+    BEANS.get(ClientNotificationRegistry.class).registerSession(notificationNodeId, sessionId, userId);
   }
 
   @Override
   public void unregisterSession(String notificationNodeId) {
-
-  }
-
-  public void destroy(String notificationNodeId) {
-
+    BEANS.get(ClientNotificationRegistry.class).unregisterNode(notificationNodeId);
   }
 
   @Override
   public List<ClientNotificationMessage> getNotifications(String notificationNodeId) {
-    // TODO[aho] to be configured
-    return m_notificationRegistry.consume(notificationNodeId, 30, 10, TimeUnit.SECONDS);
+    return BEANS.get(ClientNotificationRegistry.class).consume(notificationNodeId, m_maxNotifications, m_blockingTimeout, TimeUnit.MILLISECONDS);
   }
 
 }
