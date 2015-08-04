@@ -22,6 +22,11 @@
       color: @active-color;
     }
 
+    & > .file-chooser-label {
+      padding-top: @borderless-field-padding-y;
+      padding-bottom: @borderless-field-padding-y;
+    }
+
     & > .file-chooser-files {
       min-height: 100px; /* TODO BSH Remove */
     }

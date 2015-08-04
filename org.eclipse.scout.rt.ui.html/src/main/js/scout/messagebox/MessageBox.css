@@ -46,7 +46,7 @@
   font-weight: bold;
 }
 
-.messagebox-buttons {
+.messagebox-buttons, .file-chooser-buttons {
 
   & button {
     position: relative;

@@ -42,10 +42,15 @@ scout.FileChooser.prototype._render = function($parent) {
     this.$fileInputField.appendTo(this.$container);
   }
 
+
   this.$content = this.$container.appendDiv('file-chooser-content');
   this.$title = $.makeDiv('file-chooser-title')
     .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'))
     .appendTo(this.$content);
+
+  // explanation for file chooser
+  this.$content.appendDiv('file-chooser-label')
+    .text(this.session.text('ui.FileChooserHint'));
 
   if (scout.device.supportsFile()) {
     this.$files = $.makeDiv('file-chooser-files')
@@ -106,7 +111,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$container.addClassForAnimation('shown');
   // Prevent resizing when file chooser is dragged off the viewport
   this.$container.addClass('calc-helper');
-  this.$container.css('min-width', this.$container.width());
+  this.$container.css('min-width', this.$container.width() + 100);
   this.$container.removeClass('calc-helper');
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
@@ -168,6 +173,7 @@ scout.FileChooser.prototype._onFileChange = function(event) {
   if (scout.device.supportsFile()) {
     this.addFiles(this.$fileInputField[0].files);
   }
+  this.$okButton.attr('disabled', false);
 };
 
 /**
@@ -184,7 +190,6 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this.$files.empty();
     }
     this.$files.appendDiv('file').text(file.name);
-    this.$okButton.attr('disabled', false);
   }
 };
 
