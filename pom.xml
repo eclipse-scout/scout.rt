@@ -12,6 +12,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <prerequisites>
+    <maven>3.2.2</maven>
+  </prerequisites>
+
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
   <version>5.1.0-SNAPSHOT</version>
@@ -50,15 +54,14 @@
   </modules>
 
   <properties>
-    <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
-
     <scout.base.version>5.1.0</scout.base.version>
 
     <jdk.source.version>1.7</jdk.source.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
 
-    <!-- version of Tycho used by profiles eclipse-sign and eclipse-pack and the org.eclipse.scout.sdk.core.releng build -->
+    <!-- version of Tycho used by profiles eclipse-sign and eclipse-pack -->
     <tycho.version>0.23.0</tycho.version>
     <tycho-extras.version>0.23.0</tycho-extras.version>
     <cbi-plugins.version>1.1.2</cbi-plugins.version>
@@ -249,6 +252,12 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.3</version>
           <configuration>
@@ -263,7 +272,7 @@
             <dependency>
               <groupId>org.eclipse.tycho</groupId>
               <artifactId>tycho-compiler-jdt</artifactId>
-              <version>0.23.0</version>
+              <version>0.23.1</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -291,7 +300,7 @@
             <execution>
               <id>attach-sources</id>
               <goals>
-                <goal>jar</goal>
+                <goal>jar-no-fork</goal>
               </goals>
             </execution>
           </executions>
@@ -343,9 +352,22 @@
           <artifactId>maven-site-plugin</artifactId>
           <version>3.4</version>
         </plugin>
-
-        <!--This plugin's configuration is used to store Eclipse m2e settings
-          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.10</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.5.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -382,6 +404,12 @@
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -468,6 +496,10 @@
   </pluginRepositories>
 
   <distributionManagement>
+    <site>
+      <id>site.eclipse.org</id>
+      <url>https://wiki.eclipse.org/Scout/maven-site</url>
+    </site>
     <repository>
       <id>repo.eclipse.org</id>
       <name>Scout Repository - Releases</name>
@@ -528,7 +560,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
-            <version>2.1</version>
             <executions>
               <execution>
                 <id>set</id>
@@ -687,4 +718,27 @@
       </build>
     </profile>
   </profiles>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.8</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.2</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependency-updates-report</report>
+              <report>plugin-updates-report</report>
+              <report>property-updates-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
