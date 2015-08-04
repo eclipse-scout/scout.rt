@@ -19,7 +19,7 @@ __include("scout/util/EventSupport.js");
 __include("scout/util/helpers.js");
 __include("scout/util/icons.js");
 __include("scout/util/keys.js");
-__include("scout/util/KeyStrokeManager.js");
+__include("scout/util/KeyStrokeUtil.js");
 __include("scout/util/FocusManager.js");
 __include("scout/util/FocusContext.js");
 __include("scout/util/logging.js");

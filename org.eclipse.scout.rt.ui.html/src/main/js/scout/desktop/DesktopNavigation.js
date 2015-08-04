@@ -142,11 +142,11 @@ scout.DesktopNavigation.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {
-  scout.keyStrokeManager.installAdapter(this.session, this.desktop.$container, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.desktop.$container, this.keyStrokeAdapter);
 };
 
 scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
-  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function() {

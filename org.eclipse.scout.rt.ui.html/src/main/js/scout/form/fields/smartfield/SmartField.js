@@ -26,7 +26,7 @@ scout.SmartField.prototype._init = function(model, session) {
  */
 scout.SmartField.prototype._createKeyStrokeAdapter = function() {
   // FIXME AWE/NBU: (smart-field) andere key-strokes implementieren
-  // keyup(controller) in KeyStrokeManager#installAdapter ergänzen
+  // keyup(controller) in KeyStrokeUtil#installAdapter ergänzen
   // Idee: nur registrieren, wenn keystroke ein handleKeyUp hat, event object ergänzen
   // oder zusätzlichen parameter um zw. keyup / keydown zu unterscheiden?
   return new scout.SmartFieldKeyStrokeAdapter(this);

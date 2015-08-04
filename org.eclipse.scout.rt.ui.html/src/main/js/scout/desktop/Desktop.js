@@ -87,7 +87,7 @@ scout.Desktop.prototype._render = function($parent) {
       event.preventDefault();
     }
   });
-  scout.keyStrokeManager.installAdapter(this.session, $parent, new scout.DesktopKeyStrokeAdapter(this));
+  scout.KeyStrokeUtil.installAdapter(this.session, $parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
 scout.Desktop.prototype._postRender = function() {
@@ -265,7 +265,7 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 
 scout.Desktop.prototype.setOutlineContent = function(content) {
   if (this._outlineContent && this._outlineContent !== content) {
-    scout.keyStrokeManager.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
+    scout.KeyStrokeUtil.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
     this._outlineContent.remove();
     this._outlineContent = null;
   }

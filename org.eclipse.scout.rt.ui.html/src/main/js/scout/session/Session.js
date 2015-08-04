@@ -95,7 +95,7 @@ scout.Session = function($entryPoint, options) {
   this._initCustomParams();
   this._registerWithParentUiSession();
   scout.focusManager.installManagerForSession(this, options);
-  scout.keyStrokeManager.init(this.$entryPoint);
+  scout.KeyStrokeUtil.init(this.$entryPoint);
 };
 
 /**

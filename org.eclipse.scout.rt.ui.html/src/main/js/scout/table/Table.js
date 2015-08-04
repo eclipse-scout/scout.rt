@@ -2193,10 +2193,10 @@ scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
   if (adapter === this.keyStrokeAdapter) {
     return;
   }
-  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
   this.keyStrokeAdapter = adapter;
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
-  scout.keyStrokeManager.installAdapter(this.session, target, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, target, this.keyStrokeAdapter);
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
@@ -2384,7 +2384,7 @@ scout.Table.prototype.attach = function() {
   htmlComp.setSize(htmlParent.getSize());
 
   this.session.detachHelper.afterAttach(this.$container);
-  scout.keyStrokeManager.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
 
   this.attached = true;
 };
@@ -2402,7 +2402,7 @@ scout.Table.prototype.detach = function() {
     return;
   }
 
-  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 

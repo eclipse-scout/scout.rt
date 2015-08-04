@@ -1,23 +1,19 @@
 /**
- * The keystroke manager exists once per session, and ensures proper keystroke handling.
+ * Utility to install keystroke handling on DOM elements in the form of 'scout.AbstractKeyStrokeAdapter's.
  */
-scout.KeyStrokeManager = function() {
-  // Prevent the browser from displaying its help on F1.
-  if (window.onhelp) {
-    window.onhelp = $.returnFalse;
-  }
-};
-
-scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
-  return event.which === scout.keys.F1;
+scout.KeyStrokeUtil = function() {
 };
 
 /**
  * Initializes keystroke handing for the given session.
  */
-scout.KeyStrokeManager.prototype.init = function($entryPoint) {
+scout.KeyStrokeUtil.init = function($entryPoint) {
+  // Disable browser help.
+  if (window.onhelp) {
+    window.onhelp = $.returnFalse;
+  }
   var preventHelpKeyStroke = function(event) {
-    if (scout.keyStrokeManager._isHelpKeyStroke(event)) {
+    if (scout.KeyStrokeUtil._isHelpKeyStroke(event)) {
       event.preventDefault();
     }
   };
@@ -28,7 +24,7 @@ scout.KeyStrokeManager.prototype.init = function($entryPoint) {
 /**
  * Installs the given keystroke adapter. This method has no effect if the adapter is null, or already installed.
  */
-scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, adapter) {
+scout.KeyStrokeUtil.installAdapter = function(session, $element, adapter) {
   if (!adapter) {
     return; // no adapter to install
   }
@@ -60,7 +56,7 @@ scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, ad
     }
 
     // Draw keystrokes on help keystroke.
-    if (scout.keyStrokeManager._isHelpKeyStroke(event) && adapter.drawKeyBox) {
+    if (scout.KeyStrokeUtil._isHelpKeyStroke(event) && adapter.drawKeyBox) {
       drawKeyStrokes(adapter, event.target);
     }
 
@@ -98,7 +94,7 @@ scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, ad
 
       // Registers 'key-up' and 'window-blur' handler to remove drawn keystrokes.
       var keyUpHandler = function(event) {
-        removeKeyBoxAndHandlers(scout.keyStrokeManager._isHelpKeyStroke(event)); // only on 'key-up' for 'help keystroke'
+        removeKeyBoxAndHandlers(scout.KeyStrokeUtil._isHelpKeyStroke(event)); // only on 'key-up' for 'help keystroke'
       },
       windowBlurHandler = function(event) {
         removeKeyBoxAndHandlers(true);
@@ -120,7 +116,7 @@ scout.KeyStrokeManager.prototype.installAdapter = function(session, $element, ad
   $element.keydown(adapter.handler);
 };
 
-scout.KeyStrokeManager.prototype.uninstallAdapter = function(adapter) {
+scout.KeyStrokeUtil.uninstallAdapter = function(adapter) {
   if (!adapter) {
     return; // no adapter to uninstall
   }
@@ -133,5 +129,6 @@ scout.KeyStrokeManager.prototype.uninstallAdapter = function(adapter) {
   adapter.handler = null;
 };
 
-// Singleton
-scout.keyStrokeManager = new scout.KeyStrokeManager();
+scout.KeyStrokeUtil._isHelpKeyStroke = function(event) {
+  return event.which === scout.keys.F1;
+};
