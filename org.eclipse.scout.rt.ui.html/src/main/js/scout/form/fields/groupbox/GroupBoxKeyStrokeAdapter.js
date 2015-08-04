@@ -1,21 +1,20 @@
-scout.GroupBoxKeyStrokeAdapter = function(field) {
-  scout.GroupBoxKeyStrokeAdapter.parent.call(this, field);
+scout.GroupBoxKeyStrokeAdapter = function(groupBox) {
+  scout.GroupBoxKeyStrokeAdapter.parent.call(this, groupBox);
 };
-
 scout.inherits(scout.GroupBoxKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.GroupBoxKeyStrokeAdapter.prototype.registerKeyStroke = function(keyStroke) {
-  if (this._field.mainBox) {
+  if (this._srcElement.mainBox) {
     scout.GroupBoxKeyStrokeAdapter.parent.prototype.registerKeyStroke.call(this, keyStroke);
   } else {
-    this._field.registerRootKeyStroke(keyStroke);
+    this._srcElement.registerRootKeyStroke(keyStroke);
   }
 };
 
 scout.GroupBoxKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStroke) {
-  if (this._field.mainBox) {
+  if (this._srcElement.mainBox) {
     scout.GroupBoxKeyStrokeAdapter.parent.prototype.unregisterKeyStroke.call(this, keyStroke);
   } else {
-    this._field.unregisterRootKeyStroke(keyStroke);
+    this._srcElement.unregisterRootKeyStroke(keyStroke);
   }
 };

@@ -1,5 +1,6 @@
-scout.FormFieldKeyStrokeAdapter = function(field) {
-  scout.FormFieldKeyStrokeAdapter.parent.call(this, field);
+scout.FormFieldKeyStrokeAdapter = function(formField) {
+  scout.FormFieldKeyStrokeAdapter.parent.call(this, formField);
+
   this.ctrlPreventBubbleUpKeys = [scout.keys.A, scout.keys.C, scout.keys.Y, scout.keys.V, scout.keys.Z,
     scout.keys.RIGHT,
     scout.keys.BACKSPACE,
@@ -55,7 +56,7 @@ scout.FormFieldKeyStrokeAdapter = function(field) {
 scout.inherits(scout.FormFieldKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.FormFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
-  if (this._field && this._field.$field && this._field.$field.is('input:text')) {
+  if (this._srcElement && this._srcElement.$field && this._srcElement.$field.is('input:text')) {
     //add swallowed keys to drawed keys;
     var i = 0;
     for (i = 0; i < this.preventBubbleUpKeys.length; i++) {
@@ -72,7 +73,7 @@ scout.FormFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
 };
 
 scout.FormFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
-  if (this._field && this._field.$field && this._field.$field.is('input:text')) {
+  if (this._srcElement && this._srcElement.$field && this._srcElement.$field.is('input:text')) {
     if (event.altKey || (event.altKey && event.shiftKey)) {
       return false;
     }

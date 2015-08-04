@@ -1,8 +1,8 @@
-scout.ViewMenuPopupKeyStrokeAdapter = function(popup) {
-  scout.ViewMenuPopupKeyStrokeAdapter.parent.call(this, popup);
+scout.ViewMenuPopupKeyStrokeAdapter = function(viewMenuPopup) {
+  scout.ViewMenuPopupKeyStrokeAdapter.parent.call(this, viewMenuPopup);
 
-  this.registerKeyStroke(new scout.MenuControlKeyStrokes(popup, 'view-button-menu'));
-  var closeKeyStroke = new scout.PopupCloseKeyStroke(popup);
+  this.registerKeyStroke(new scout.MenuControlKeyStrokes(viewMenuPopup, 'view-button-menu'));
+  var closeKeyStroke = new scout.PopupCloseKeyStroke(viewMenuPopup);
   closeKeyStroke.keyStroke = 'F2';
   closeKeyStroke.initKeyStrokeParts();
   this.registerKeyStroke(closeKeyStroke);

@@ -75,7 +75,7 @@ scout.TableFooter.prototype._render = function($parent) {
 
 scout.TableFooter.prototype._installKeyStrokeAdapter = function() {
   scout.TableFooter.parent.prototype._installKeyStrokeAdapter.call(this);
-  scout.KeyStrokeUtil.installAdapter(this.session, this._$filterField, this.filterKeyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.filterKeyStrokeAdapter, this._$filterField);
 };
 
 scout.TableFooter.prototype._uninstallKeyStrokeAdapter = function() {

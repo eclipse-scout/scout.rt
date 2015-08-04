@@ -1,5 +1,5 @@
-scout.DateFieldKeyStrokeAdapter = function(field) {
-  scout.DateFieldKeyStrokeAdapter.parent.call(this, field);
+scout.DateFieldKeyStrokeAdapter = function(dateField) {
+  scout.DateFieldKeyStrokeAdapter.parent.call(this, dateField);
 };
 scout.inherits(scout.DateFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 

@@ -1,7 +1,7 @@
-scout.CheckBoxKeyStrokeAdapter = function(field) {
-  scout.CheckBoxKeyStrokeAdapter.parent.call(this, field);
-  this.registerKeyStroke(new scout.CheckBoxEnterKeyStroke(field));
-  this.registerKeyStroke(new scout.CheckBoxSpaceKeyStroke(field));
+scout.CheckBoxKeyStrokeAdapter = function(checkBoxField) {
+  scout.CheckBoxKeyStrokeAdapter.parent.call(this, checkBoxField);
+  this.registerKeyStroke(new scout.CheckBoxEnterKeyStroke(checkBoxField));
+  this.registerKeyStroke(new scout.CheckBoxSpaceKeyStroke(checkBoxField));
 };
 scout.inherits(scout.CheckBoxKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
@@ -18,8 +18,8 @@ scout.CheckBoxEnterKeyStroke.prototype.handle = function() {
   this._field._toggleChecked();
 };
 
-scout.CheckBoxSpaceKeyStroke = function(field) {
-  scout.CheckBoxSpaceKeyStroke.parent.call(this, field);
+scout.CheckBoxSpaceKeyStroke = function(checkbox) {
+  scout.CheckBoxSpaceKeyStroke.parent.call(this, checkbox);
   this.keyStroke = 'SPACE';
   this.drawHint = false;
   this.initKeyStrokeParts();

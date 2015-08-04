@@ -250,7 +250,7 @@ scout.FileChooser.prototype.attach = function() {
 
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
-  scout.KeyStrokeUtil.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   this.attached = true;
 };

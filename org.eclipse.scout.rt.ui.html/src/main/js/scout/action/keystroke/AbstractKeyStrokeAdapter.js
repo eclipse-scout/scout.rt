@@ -1,12 +1,11 @@
-scout.AbstractKeyStrokeAdapter = function(field) {
+scout.AbstractKeyStrokeAdapter = function(srcElement) {
+  if (!srcElement) {
+    throw new Error('\'srcElement\' must not be null');
+  }
   this.keyStrokes = [];
-  this._field = field;
+  this._srcElement = srcElement;
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
-  this._uiSessionId;
-  if (this._field && this._field.session) {
-    this._uiSessionId = this._field.session.uiSessionId;
-  }
   this.anchorKeyStrokeAdapter = false;
 };
 
@@ -16,22 +15,22 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
   }
   this.keyBoxDrawn = true;
   for (var i = 0; i < this.keyStrokes.length; i++) {
-    this.keyStrokes[i].checkAndDrawKeyBox(this._field.$container, drawedKeys);
+    this.keyStrokes[i].checkAndDrawKeyBox(this._srcElement.$container, drawedKeys);
   }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.removeKeyBox = function() {
   this.keyBoxDrawn = false;
   for (var i = 0; i < this.keyStrokes.length; i++) {
-    this.keyStrokes[i].removeKeyBox(this._field.$container);
+    this.keyStrokes[i].removeKeyBox(this._srcElement.$container);
   }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
   if (this.keyStrokes.length > 0) {
-    this.keyStrokes = this.keyStrokes.concat(this._field.keyStrokes);
-  } else if (this._field.keyStrokes) {
-    this.keyStrokes = this._field.keyStrokes.slice(0);
+    this.keyStrokes = this.keyStrokes.concat(this._srcElement.keyStrokes);
+  } else if (this._srcElement.keyStrokes) {
+    this.keyStrokes = this._srcElement.keyStrokes.slice(0);
   }
 };
 /**
@@ -73,11 +72,4 @@ scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStrok
   if (index > -1) {
     this.keyStrokes.splice(index, 1);
   }
-};
-
-scout.AbstractKeyStrokeAdapter.prototype.uiSessionId = function(uiSessionId) {
-  if (uiSessionId) {
-    this._uiSessionId = uiSessionId;
-  }
-  return this._uiSessionId;
 };

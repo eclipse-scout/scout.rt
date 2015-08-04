@@ -2196,7 +2196,7 @@ scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
   scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
   this.keyStrokeAdapter = adapter;
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
-  scout.KeyStrokeUtil.installAdapter(this.session, target, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, target);
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
@@ -2384,7 +2384,7 @@ scout.Table.prototype.attach = function() {
   htmlComp.setSize(htmlParent.getSize());
 
   this.session.detachHelper.afterAttach(this.$container);
-  scout.KeyStrokeUtil.installAdapter(this.session, this.$container, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   this.attached = true;
 };

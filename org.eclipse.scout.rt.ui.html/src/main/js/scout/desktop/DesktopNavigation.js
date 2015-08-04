@@ -142,7 +142,7 @@ scout.DesktopNavigation.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {
-  scout.KeyStrokeUtil.installAdapter(this.session, this.desktop.$container, this.keyStrokeAdapter);
+  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.desktop.$container);
 };
 
 scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {

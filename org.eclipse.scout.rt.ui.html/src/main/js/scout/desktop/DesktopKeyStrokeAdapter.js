@@ -3,15 +3,14 @@ scout.DesktopKeyStrokeAdapter = function(desktop) {
   this._navigation = desktop.navigation;
   this._viewButtonBar = desktop.navigation.menu;
   this._taskbar = desktop.taskbar;
-  this._tabs = desktop._allTabs;
+  this._viewTabs = desktop.viewTabsController.viewTabs();
   this._desktop = desktop;
-  this._viewTabAutoKeyStroke = new scout.ViewTabAutoKeyStroke(desktop.autoTabKeyStrokesEnabled, this._tabs, desktop.autoTabKeyStrokeModifier);
+  this._viewTabAutoKeyStroke = new scout.ViewTabAutoKeyStroke(desktop.autoTabKeyStrokesEnabled, this._viewTabs, desktop.autoTabKeyStrokeModifier);
 
   this.registerKeyStroke(this._viewTabAutoKeyStroke);
   this.registerKeyStroke(new scout.DesktopBackspaceKeyStroke());
   this.installDesktopModelKeystrokes();
 };
-
 scout.inherits(scout.DesktopKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.DesktopKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeyStrokes) {

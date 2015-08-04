@@ -1,7 +1,7 @@
-scout.StringFieldKeyStrokeAdapter = function(field) {
-  scout.StringFieldKeyStrokeAdapter.parent.call(this, field);
+scout.StringFieldKeyStrokeAdapter = function(stringField) {
+  scout.StringFieldKeyStrokeAdapter.parent.call(this, stringField);
   this.registerKeyStroke(new scout.StringFieldEnterKeyStroke());
-  this.registerKeyStroke(new scout.StringFieldCtrlEnterKeyStroke(field));
+  this.registerKeyStroke(new scout.StringFieldCtrlEnterKeyStroke(stringField));
 };
 scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 

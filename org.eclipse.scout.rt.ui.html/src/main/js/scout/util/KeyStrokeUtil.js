@@ -22,14 +22,21 @@ scout.KeyStrokeUtil.init = function($entryPoint) {
 };
 
 /**
+ * Installs the given keystroke adapter globally on $entryPoint.
+ */
+scout.KeyStrokeUtil.installAdapter = function(session, adapter) {
+  scout.KeyStrokeUtil.installAdapter(session, adapter, session.$entryPoint, true);
+};
+
+/**
  * Installs the given keystroke adapter. This method has no effect if the adapter is null, or already installed.
  */
-scout.KeyStrokeUtil.installAdapter = function(session, $element, adapter) {
+scout.KeyStrokeUtil.installAdapter = function(session, adapter, $element, global) {
   if (!adapter) {
     return; // no adapter to install
   }
 
-  if (adapter.handler) {
+  if (adapter._handler) {
     return; // adapter already installed
   }
 
@@ -37,7 +44,7 @@ scout.KeyStrokeUtil.installAdapter = function(session, $element, adapter) {
     throw new Error('missing argument \'$element\'');
   }
 
-  adapter.handler = function(event) {
+  adapter._handler = function(event) {
     if (event.originalEvent && event.originalEvent.anchorReached) {
       return;
     }
@@ -64,21 +71,22 @@ scout.KeyStrokeUtil.installAdapter = function(session, $element, adapter) {
     scout.KeyStrokeUtil._handleKeyStroke(adapter, event);
   };
 
-  adapter.handler.$target = $element;
-  $element.keydown(adapter.handler);
+  // Install the keystroke, either on the given $element, or on $entryPoint for global keystrokes.
+  adapter._handler.$target = (global ? session.$entryPoint : $element);
+  adapter._handler.$target.keydown(adapter._handler);
 };
 
 scout.KeyStrokeUtil.uninstallAdapter = function(adapter) {
   if (!adapter) {
     return; // no adapter to uninstall
   }
-  if (!adapter.handler) {
+  if (!adapter._handler) {
     return; // adapter already uninstalled
   }
 
-  adapter.handler.$target.off('keydown', adapter.handler);
-  adapter.handler.$target = null;
-  adapter.handler = null;
+  adapter._handler.$target.off('keydown', adapter._handler);
+  adapter._handler.$target = null;
+  adapter._handler = null;
 };
 
 scout.KeyStrokeUtil._isHelpKeyStroke = function(event) {

@@ -1,7 +1,7 @@
-scout.ButtonKeyStrokeAdapter = function(field) {
-  scout.ButtonKeyStrokeAdapter.parent.call(this, field);
-  this.registerKeyStroke(new scout.ButtonKeyStroke(field, 'ENTER'));
-  this.registerKeyStroke(new scout.ButtonKeyStroke(field, 'SPACE'));
+scout.ButtonKeyStrokeAdapter = function(button) {
+  scout.ButtonKeyStrokeAdapter.parent.call(this, button);
+  this.registerKeyStroke(new scout.ButtonKeyStroke(button, 'ENTER'));
+  this.registerKeyStroke(new scout.ButtonKeyStroke(button, 'SPACE'));
 };
 
 scout.inherits(scout.ButtonKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);

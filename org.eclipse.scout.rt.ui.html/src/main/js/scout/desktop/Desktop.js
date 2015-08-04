@@ -87,7 +87,7 @@ scout.Desktop.prototype._render = function($parent) {
       event.preventDefault();
     }
   });
-  scout.KeyStrokeUtil.installAdapter(this.session, $parent, new scout.DesktopKeyStrokeAdapter(this));
+  scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopKeyStrokeAdapter(this), $parent);
 };
 
 scout.Desktop.prototype._postRender = function() {

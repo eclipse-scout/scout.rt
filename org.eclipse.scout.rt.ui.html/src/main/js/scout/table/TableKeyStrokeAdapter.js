@@ -1,19 +1,19 @@
-scout.TableKeyStrokeAdapter = function(field) {
-  scout.TableKeyStrokeAdapter.parent.call(this, field);
+scout.TableKeyStrokeAdapter = function(table) {
+  scout.TableKeyStrokeAdapter.parent.call(this, table);
 
-  this.registerKeyStroke(new scout.TableFilterControlKeyStrokes(field));
-  this.registerKeyStroke(new scout.TableControlKeyStrokes(field));
-  this.registerKeyStroke(new scout.TableStartCellEditKeyStroke(field));
-  this.registerKeyStroke(new scout.TableSelectAllKeyStroke(field));
-  this.registerKeyStroke(new scout.TableRefreshKeyStroke(field));
-  this.registerKeyStroke(new scout.ContextMenuKeyStroke(field, field.onContextMenu, field));
+  this.registerKeyStroke(new scout.TableFilterControlKeyStrokes(table));
+  this.registerKeyStroke(new scout.TableControlKeyStrokes(table));
+  this.registerKeyStroke(new scout.TableStartCellEditKeyStroke(table));
+  this.registerKeyStroke(new scout.TableSelectAllKeyStroke(table));
+  this.registerKeyStroke(new scout.TableRefreshKeyStroke(table));
+  this.registerKeyStroke(new scout.ContextMenuKeyStroke(table, table.onContextMenu, table));
 };
 scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.TableKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
   scout.TableKeyStrokeAdapter.parent.prototype.installModelKeystrokes.call(this);
-  this.keyStrokes = this.keyStrokes.concat(this._field.tableControls);
-  this.keyStrokes = this.keyStrokes.concat(this._field.menus);
+  this.keyStrokes = this.keyStrokes.concat(this._srcElement.tableControls);
+  this.keyStrokes = this.keyStrokes.concat(this._srcElement.menus);
 };
 
 /* ---- KeyStrokes ---------------------------------------------------------- */

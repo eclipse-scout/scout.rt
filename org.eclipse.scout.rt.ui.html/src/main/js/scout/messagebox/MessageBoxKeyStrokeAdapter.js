@@ -1,7 +1,6 @@
-scout.MessageBoxKeyStrokeAdapter = function(field) {
-  scout.MessageBoxKeyStrokeAdapter.parent.call(this, field);
-  this.uiSessionId(field.session.uiSessionId);
-  this.registerKeyStroke(new scout.MessageBoxControlKeyStrokes(field));
+scout.MessageBoxKeyStrokeAdapter = function(messageBox) {
+  scout.MessageBoxKeyStrokeAdapter.parent.call(this, messageBox);
+  this.registerKeyStroke(new scout.MessageBoxControlKeyStrokes(messageBox));
   this.anchorKeyStrokeAdapter = true;
 };
 scout.inherits(scout.MessageBoxKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);

@@ -1,7 +1,7 @@
-scout.TableControlKeyStrokeAdapter = function(field) {
-  scout.TableControlKeyStrokeAdapter.parent.call(this, field);
+scout.TableControlKeyStrokeAdapter = function(tableControl) {
+  scout.TableControlKeyStrokeAdapter.parent.call(this, tableControl);
 
-  this.registerKeyStroke(new scout.TableAdditionalControlsKeyStrokes(field));
+  this.registerKeyStroke(new scout.TableAdditionalControlsKeyStrokes(tableControl));
 };
 
 scout.inherits(scout.TableControlKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);

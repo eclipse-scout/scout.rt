@@ -1,7 +1,7 @@
-scout.OutlineKeyStrokeAdapter = function(field) {
-  scout.OutlineKeyStrokeAdapter.parent.call(this, field);
+scout.OutlineKeyStrokeAdapter = function(outline) {
+  scout.OutlineKeyStrokeAdapter.parent.call(this, outline);
 
-  var keyStroke = new scout.TreeControlKeyStrokes(field);
+  var keyStroke = new scout.TreeControlKeyStrokes(outline);
   keyStroke.ctrl = true;
   keyStroke.shift = true;
   this.registerKeyStroke(keyStroke);

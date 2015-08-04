@@ -1,7 +1,7 @@
-scout.ViewTabAutoKeyStroke = function(enabled, tabs, keyStroke) {
+scout.ViewTabAutoKeyStroke = function(enabled, viewTabs, keyStroke) {
   scout.ViewTabAutoKeyStroke.parent.call(this);
   this._enabled = enabled;
-  this._tabs = tabs;
+  this._viewTabs = viewTabs;
   this.keyStroke = keyStroke;
   this.initKeyStrokeParts();
   this.keyBoxDrawed = false;
@@ -13,10 +13,10 @@ scout.inherits(scout.ViewTabAutoKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.ViewTabAutoKeyStroke.prototype.handle = function(event) {
-  if (this._tabs.length === 0 || (event.which !== 57 && event.which !== 49 && event.which - 49 > this._tabs.length)) {
+  if (this._viewTabs.length === 0 || (event.which !== 57 && event.which !== 49 && event.which - 49 > this._viewTabs.length)) {
     return;
   }
-  this._tabs[event.which - 49].$container.trigger('click');
+  this._viewTabs[event.which - 49].$container.trigger('click');
   event.preventDefault();
 };
 
@@ -50,11 +50,11 @@ scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
   if (this.keyBoxDrawed) {
     return;
   }
-  if (this._enabled && this._tabs) {
-    for (var i = 1; i < this._tabs.length + 1; i++) {
+  if (this._enabled && this._viewTabs) {
+    for (var i = 1; i < this._viewTabs.length + 1; i++) {
       var offsetLeft = 4;
       if (i <= 9) {
-        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, i, this._tabs[i - 1].$container, this.ctrl, this.alt, this.shift, true);
+        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, i, this._viewTabs[i - 1].$container, this.ctrl, this.alt, this.shift, true);
       }
     }
     this.keyBoxDrawed = true;
@@ -67,9 +67,9 @@ scout.ViewTabAutoKeyStroke.prototype.removeKeyBox = function() {
   if (!this.keyBoxDrawed) {
     return;
   }
-  for (var i = 0; i < this._tabs.length; i++) {
-    $('.key-box', this._tabs[i].$container).remove();
-    $('.key-box-additional', this._tabs[i].$container).remove();
+  for (var i = 0; i < this._viewTabs.length; i++) {
+    $('.key-box', this._viewTabs[i].$container).remove();
+    $('.key-box-additional', this._viewTabs[i].$container).remove();
   }
   this.keyBoxDrawed = false;
 };
