@@ -57,59 +57,11 @@ scout.KeyStrokeUtil.installAdapter = function(session, $element, adapter) {
 
     // Draw keystrokes on help keystroke.
     if (scout.KeyStrokeUtil._isHelpKeyStroke(event) && adapter.drawKeyBox) {
-      drawKeyStrokes(adapter, event.target);
+      scout.KeyStrokeUtil._drawKeyStrokes(adapter, event.target);
     }
 
     // Delegate control to registered keystrokes, but break once a keystroke requests immediate stop of propagation.
-    var stopBubble = adapter.preventBubbleUp(event),
-        stopImmediate = adapter.keyStrokes
-            .filter(function(keyStroke) {
-              return keyStroke.accept && keyStroke.accept(event);
-            })
-            .some(function(keyStroke) {
-              // Handle the keystroke.
-              keyStroke.handle(event);
-
-              // Store whether to bubble up.
-              stopBubble = stopBubble || !keyStroke.bubbleUp;
-
-              // Break on 'stopImmediate'.
-              return keyStroke.stopImmediate; // 'some-loop' breaks on true.
-            });
-
-    // Control event propagation.
-    if (stopImmediate) {
-      event.stopImmediatePropagation();
-    }
-    if (stopBubble) {
-      event.stopPropagation();
-      // FIXME [dwi] why validate focus?? Smartfield does not work that way
-      // FIXME [dwi] without this, arrow-down on table does not work correctly!!
-//      scout.focusManager.validateFocus(adapter.uiSessionId());
-    }
-
-    function drawKeyStrokes(adapter, target) {
-      // Draws available keystrokes.
-      adapter.drawKeyBox({});
-
-      // Registers 'key-up' and 'window-blur' handler to remove drawn keystrokes.
-      var keyUpHandler = function(event) {
-        removeKeyBoxAndHandlers(scout.KeyStrokeUtil._isHelpKeyStroke(event)); // only on 'key-up' for 'help keystroke'
-      },
-      windowBlurHandler = function(event) {
-        removeKeyBoxAndHandlers(true);
-      },
-      removeKeyBoxAndHandlers = function(doit) {
-        if (doit) {
-          $(target).off('keyup', keyUpHandler);
-          $(window).off('blur', windowBlurHandler);
-          adapter.removeKeyBox();
-        }
-      };
-
-      $(target).on('keyup', keyUpHandler); // once the respective 'key-up' event occurs
-      $(window).on('blur', windowBlurHandler); // once the current browser tab/window is left
-    }
+    scout.KeyStrokeUtil._handleKeyStroke(adapter, event);
   };
 
   adapter.handler.$target = $element;
@@ -131,4 +83,55 @@ scout.KeyStrokeUtil.uninstallAdapter = function(adapter) {
 
 scout.KeyStrokeUtil._isHelpKeyStroke = function(event) {
   return event.which === scout.keys.F1;
+};
+
+scout.KeyStrokeUtil._drawKeyStrokes = function(adapter, target) {
+  // Draws available keystrokes.
+  adapter.drawKeyBox({});
+
+  // Registers 'key-up' and 'window-blur' handler to remove drawn keystrokes.
+  var keyUpHandler = function(event) {
+    removeKeyBoxAndHandlers(scout.KeyStrokeUtil._isHelpKeyStroke(event)); // only on 'key-up' for 'help keystroke'
+  },
+  windowBlurHandler = function(event) {
+    removeKeyBoxAndHandlers(true);
+  },
+  removeKeyBoxAndHandlers = function(doit) {
+    if (doit) {
+      $(target).off('keyup', keyUpHandler);
+      $(window).off('blur', windowBlurHandler);
+      adapter.removeKeyBox();
+    }
+  };
+
+  $(target).on('keyup', keyUpHandler); // once the respective 'key-up' event occurs
+  $(window).on('blur', windowBlurHandler); // once the current browser tab/window is left
+};
+
+scout.KeyStrokeUtil._handleKeyStroke = function(adapter, event) {
+  var stopBubble = adapter.preventBubbleUp(event),
+      stopImmediate = adapter.keyStrokes
+          .filter(function(keyStroke) {
+            return keyStroke.accept && keyStroke.accept(event);
+          })
+          .some(function(keyStroke) {
+            // Handle the keystroke.
+            keyStroke.handle(event);
+
+            // Store whether to bubble up.
+            stopBubble = stopBubble || !keyStroke.bubbleUp;
+
+            // Break on 'stopImmediate'.
+            return keyStroke.stopImmediate; // 'some-loop' breaks on true.
+          });
+
+  if (stopImmediate) {
+    event.stopImmediatePropagation();
+  }
+  if (stopBubble) {
+    event.stopPropagation();
+    // FIXME [dwi] why validate focus?? Smartfield does not work that way
+    // FIXME [dwi] without this, arrow-down on table does not work correctly!!
+//    scout.focusManager.validateFocus(adapter.uiSessionId());
+  }
 };
