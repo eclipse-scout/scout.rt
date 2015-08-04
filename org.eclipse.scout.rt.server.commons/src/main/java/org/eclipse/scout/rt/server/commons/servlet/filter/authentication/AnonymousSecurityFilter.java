@@ -16,9 +16,9 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * A security filter allowing anonymous access to the application.
@@ -36,11 +36,8 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
     if (isLogoutRequest(req)) {
-      HttpSession session = req.getSession(false);
-      if (session != null) {
-        session.invalidate();
-      }
-      res.sendRedirect("");
+      BEANS.get(ServletFilterHelper.class).doLogout(req);
+      BEANS.get(ServletFilterHelper.class).forwardToLogoutForm(req, res);
       return;
     }
 

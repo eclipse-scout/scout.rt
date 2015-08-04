@@ -184,4 +184,14 @@ public class ServletFilterHelper {
     resp.setCharacterEncoding("UTF-8");
     resp.getWriter().print(JSON_SESSION_TIMEOUT_RESPONSE); // JsonResponse.ERR_SESSION_TIMEOUT
   }
+
+  /**
+   * If the request has a HTTP session attached, the session is invalidated.
+   */
+  public void doLogout(HttpServletRequest req) {
+    HttpSession session = req.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
+  }
 }
