@@ -16,7 +16,8 @@ scout.login = {
       }
     };
 
-    var language = navigator.language || navigator.userLanguage;
+    var preferredLanguage = sessionStorage.getItem('scout:preferredLanguage');
+    var language = preferredLanguage || navigator.language || navigator.userLanguage;
     if (language && !translations[language]) {
       language = language.split(/[-_]/)[0];
     }

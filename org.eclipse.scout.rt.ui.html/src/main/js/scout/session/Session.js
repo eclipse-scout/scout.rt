@@ -913,6 +913,8 @@ scout.Session.prototype._onInitialized = function(event) {
 };
 
 scout.Session.prototype._onLogout = function(event) {
+  // Store the current session language in the session storage (will be respected by login.js/logout.js if set)
+  sessionStorage.setItem('scout:preferredLanguage', this.locale.languageTag);
   // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
   setTimeout(function() {
     scout.reloadPage(event.redirectUrl, true);
