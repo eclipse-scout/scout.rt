@@ -111,7 +111,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
 };
 
 scout.LogicalGridLayout.prototype.preferredLayoutSize = function($parent) {
-  return this.getLayoutSize($parent, 1);
+  return this.getLayoutSize($parent, scout.LayoutConstants.PREF);
 };
 
 scout.LogicalGridLayout.prototype.getLayoutSize = function($parent, sizeflag) {

@@ -53,12 +53,6 @@ scout.LogicalGridData.prototype.validate = function() {
     this.weighty = this._inheritWeightY();
   }
   this.useUiWidth = data.useUiWidth;
-
-  // when having the label on top, the the row size has to be increased
-   if (this.model.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
-     this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
-   }
-
   this.useUiHeight = data.useUiHeight;
   this.horizontalAlignment = data.horizontalAlignment;
   this.verticalAlignment = data.verticalAlignment;
@@ -66,6 +60,11 @@ scout.LogicalGridData.prototype.validate = function() {
   this.fillVertical = data.fillVertical;
   this.widthHint = data.widthInPixel;
   this.heightHint = data.heightInPixel;
+
+  // when having the label on top, the the row size has to be increased
+   if (this.model.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+     this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
+   }
 };
 
 scout.LogicalGridData.prototype._inheritWeightY = function() {
