@@ -122,7 +122,8 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
 
   // Only update if list of menus changed. Don't compare this.menuItems, because that list
   // may contain additional UI separators, and may not be in the same order
-  if (!scout.arrays.equals(this._internalMenuItems, menuItems)) {
+  if (!scout.arrays.equals(this._internalMenuItems, menuItems) ||
+      menuItems.some(function(elem) { return !elem.rendered; })) {
     this._internalMenuItems = menuItems;
 
     // Rebuild items
