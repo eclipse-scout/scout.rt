@@ -1,5 +1,6 @@
 .popup {
   position: absolute;
+  top: 0px;
 
   &.down > .popup-head {
     padding-top: 3px;
