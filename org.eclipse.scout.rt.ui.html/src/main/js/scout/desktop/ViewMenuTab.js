@@ -41,7 +41,7 @@ scout.ViewMenuTab.prototype._update = function() {
     this.iconId = this.outlineViewButton.getIconId();
   } else {
     this.text = this.session.text('ui.outlines');
-    this.iconId = scout.Icons.OUTLINE;
+    this.iconId = scout.icons.OUTLINE;
   }
 };
 
