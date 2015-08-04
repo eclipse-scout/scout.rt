@@ -69,9 +69,10 @@ scout.Button.prototype._render = function($parent) {
 };
 
 scout.Button.prototype._onClick = function() {
-  if (this.enabled) {
-    this.doAction();
-  }
+  throw new Error('alles kaputt');
+  //  if (this.enabled) {
+//    this.doAction();
+//  }
 };
 
 scout.Button.prototype._createKeyStrokeAdapter = function() {

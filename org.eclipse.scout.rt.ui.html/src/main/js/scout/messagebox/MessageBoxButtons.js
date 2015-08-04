@@ -1,12 +1,9 @@
 /**
  * Button utility class for a set of buttons, where each button has an option value.
- * The parent passed to the constructor must have a $buttons property (JQuery object)
- * where the buttons will be added when renderButton is called.
  */
-scout.MessageBoxButtons = function(parent) {
-  this._parent = parent;
-  this.events = new scout.EventSupport();
-  this._clickHandler = this._onButtonClicked.bind(this);
+scout.MessageBoxButtons = function($parent, onClickHandler) {
+  this._$parent = $parent;
+  this._onClickHandler = onClickHandler;
 };
 
 scout.MessageBoxButtons.prototype.renderButton = function(option, text) {
@@ -14,14 +11,14 @@ scout.MessageBoxButtons.prototype.renderButton = function(option, text) {
   return $('<button>')
     .text(text)
     .unfocusable()
-    .on('click', this._clickHandler)
+    .on('click', this._onClick.bind(this))
     .data('buttonOption', option)
-    .appendTo(this._parent.$buttons);
+    .appendTo(this._$parent);
 };
 
-scout.MessageBoxButtons.prototype._onButtonClicked = function(event) {
+scout.MessageBoxButtons.prototype._onClick = function(event) {
   var $button = $(event.target);
-  this._parent.trigger('buttonClick', {
+  this._onClickHandler({
     option: $button.data('buttonOption')
   });
 };

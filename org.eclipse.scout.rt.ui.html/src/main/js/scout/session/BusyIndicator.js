@@ -28,8 +28,8 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this.$label = this.$content.appendDiv('busyindicator-label');
 
   if (this._cancellable) {
-    var buttons = new scout.MessageBoxButtons(this);
     this.$buttons = this.$container.appendDiv('busyindicator-buttons');
+    var buttons = new scout.MessageBoxButtons(this.$buttons, this._onClickCancel.bind(this));
     this.$cancelButton = buttons.renderButton('cancel', this.session.text('Cancel'));
     this.$cancelButton.css('width', '100%');
   }
@@ -54,6 +54,10 @@ scout.BusyIndicator.prototype._render = function($parent) {
     // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
     scout.focusManager.validateFocus(this.session.uiSessionId);
   }.bind(this), 2500);
+};
+
+scout.BusyIndicator.prototype._onClickCancel = function(event) {
+  this.events.trigger('clickCancel', event);
 };
 
 scout.BusyIndicator.prototype._postRender = function() {

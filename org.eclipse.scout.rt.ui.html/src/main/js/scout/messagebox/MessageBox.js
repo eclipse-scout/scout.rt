@@ -1,11 +1,5 @@
-scout.MessageBox = function(model, session) {
+scout.MessageBox = function() {
   scout.MessageBox.parent.call(this);
-  this.init(session);
-
-  if (!(model instanceof scout.ModelAdapter)) {
-    // If message box is used gui only, otherwise the model gets written by the model adapter.
-    $.extend(this, model);
-  }
   this.$container;
   this.$content;
   this.$header;
@@ -19,7 +13,7 @@ scout.MessageBox = function(model, session) {
   this._addEventSupport();
   this.attached = false; // Indicates whether this message box is currently visible to the user.
 };
-scout.inherits(scout.MessageBox, scout.Widget);
+scout.inherits(scout.MessageBox, scout.ModelAdapter);
 
 // represents severity codes from IStatus
 scout.MessageBox.SEVERITY = {
@@ -50,7 +44,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$html = this.$content.appendDiv('messagebox-label messagebox-html');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
-  var buttons = new scout.MessageBoxButtons(this);
+  var buttons = new scout.MessageBoxButtons(this.$buttons, this._onButtonClick.bind(this));
   this._$closeButton = null; // button to be executed when close() is called, e.g. when ESCAPE is pressed
   if (this.yesButtonText) {
     this.$yesButton = buttons.renderButton('yes', this.yesButtonText);
@@ -146,6 +140,24 @@ scout.MessageBox.prototype._renderHiddenText = function(text) {
 
 scout.MessageBox.prototype._renderCopyPasteText = function(text) {
   // nop
+};
+
+scout.MessageBox.prototype._onButtonClick = function(event) {
+  this.session.send(this.id, 'action', {
+    option: event.option
+  });
+};
+
+scout.MessageBox.prototype.onModelAction = function(event) {
+  if (event.type === 'closed') {
+    this._onMessageBoxClosed(event);
+  } else {
+    $.log.warn('Model event not handled. Widget: MessageBox. Event: ' + event.type + '.');
+  }
+};
+
+scout.MessageBox.prototype._onMessageBoxClosed = function(event) {
+  this.destroy();
 };
 
 scout.MessageBox.prototype._updateButtonWidths = function() {

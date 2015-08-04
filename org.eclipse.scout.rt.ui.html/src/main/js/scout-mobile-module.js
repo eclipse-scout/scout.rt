@@ -38,6 +38,7 @@ __include("scout/session/Event.js");
 __include("scout/session/Locale.js");
 __include("scout/session/Reconnector.js");
 __include("scout/session/Session.js");
+__include("scout/session/OfflineSession.js");
 __include("scout/session/UserAgent.js");
 // Basic layout
 __include("scout/layout/graphics.js");
@@ -171,7 +172,6 @@ __include("scout/messagebox/MessageBox.js");
 __include("scout/messagebox/MessageBoxButtons.js");
 __include("scout/messagebox/MessageBoxControlKeyStrokes.js");
 __include("scout/messagebox/MessageBoxKeyStrokeAdapter.js");
-__include("scout/messagebox/MessageBoxModelAdapter.js");
 __include("scout/messagebox/MessageBoxController.js");
 // Form fields (A-Z)
 __include("scout/form/fields/beanfield/BeanField.js");

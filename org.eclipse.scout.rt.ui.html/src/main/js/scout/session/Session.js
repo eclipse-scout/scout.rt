@@ -595,7 +595,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   options = options || {};
   var model = {
     iconId: options.iconId,
-    severity: options.severity !== undefined ? options.severity : scout.MessageBox.SEVERITY.ERROR,
+    severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
     header: options.header,
     body: options.body,
     hiddenText: options.hiddenText,
@@ -604,28 +604,24 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     cancelButtonText: options.cancelButtonText
   };
 
-  var ui = new scout.MessageBox(model, this);
-  ui.on('buttonClick', onButtonClick.bind(this));
-  ui.render(this.$entryPoint);
-
-  // ----- Helper functions -----
-
-  function onButtonClick(event) {
-    delete this._fatalMessagesOnScreen[errorCode];
-
-    // Close message box
-    ui.remove();
-
-    // Custom actions
-    var option = event.option;
-    if (option === 'yes' && options.yesButtonAction) {
-      options.yesButtonAction.apply(this);
-    } else if (option === 'no' && options.noButtonAction) {
-      options.noButtonAction.apply(this);
-    } else if (option === 'cancel' && options.cancelButtonAction) {
-      options.cancelButtonAction.apply(this);
+  var messageBox = new scout.MessageBox(),
+    offlineSession = scout.OfflineSession.createFromSession(this);
+  offlineSession.send(function(target, type, event) {
+    if ('action' === type) {
+      delete this._fatalMessagesOnScreen[errorCode];
+      messageBox.remove();
+      var option = event.option;
+      if (option === 'yes' && options.yesButtonAction) {
+        options.yesButtonAction.apply(this);
+      } else if (option === 'no' && options.noButtonAction) {
+        options.noButtonAction.apply(this);
+      } else if (option === 'cancel' && options.cancelButtonAction) {
+        options.cancelButtonAction.apply(this);
+      }
     }
-  }
+  }.bind(this));
+  messageBox.init(model, offlineSession);
+  messageBox.render(this.$entryPoint);
 };
 
 scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize, allowedTypes) {
@@ -783,9 +779,7 @@ scout.Session.prototype._renderBusy = function() {
       return; // No busy indicator without desktop (e.g. during shutdown)
     }
     this._busyIndicator = new scout.BusyIndicator(this);
-    this._busyIndicator.on('buttonClick', function(event) {
-      this._onCancelProcessing(this._busyIndicator);
-    }.bind(this));
+    this._busyIndicator.on('clickCancel', this._onCancelProcessing.bind(this));
     this._busyIndicator.render(this.$entryPoint);
   }.bind(this), 500);
 };
@@ -801,8 +795,9 @@ scout.Session.prototype._removeBusy = function() {
   }
 };
 
-scout.Session.prototype._onCancelProcessing = function(busyIndicator) {
-  busyIndicator.off('buttonClick');
+scout.Session.prototype._onCancelProcessing = function() {
+  var busyIndicator = this._busyIndicator;
+  busyIndicator.off('clickCancel');
 
   // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
   setTimeout(function() {
