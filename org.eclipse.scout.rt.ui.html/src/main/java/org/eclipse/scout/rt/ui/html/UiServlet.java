@@ -106,7 +106,7 @@ public class UiServlet extends HttpServlet {
       long start = System.nanoTime();
       try {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("started");
+          LOG.debug("request started");
         }
         List<IServletRequestInterceptor> interceptors = BEANS.all(IServletRequestInterceptor.class);
         for (IServletRequestInterceptor interceptor : interceptors) {
@@ -119,12 +119,12 @@ public class UiServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
       catch (Exception t) {
-        LOG.error("Exception while processing", t);
+        LOG.error("Exception while processing request", t);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("request completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
     }

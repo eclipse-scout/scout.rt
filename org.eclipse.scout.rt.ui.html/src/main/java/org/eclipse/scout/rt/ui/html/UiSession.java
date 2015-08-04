@@ -178,7 +178,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     Set<String> textKeys = new TreeSet<String>();
     for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
       contributor.contributeUiTextKeys(textKeys);
-      LOG.info("Gathered ui text keys from contributor " + contributor);
+      LOG.debug("Gathered ui text keys from contributor " + contributor);
     }
 
     // Resolve texts with the given locale

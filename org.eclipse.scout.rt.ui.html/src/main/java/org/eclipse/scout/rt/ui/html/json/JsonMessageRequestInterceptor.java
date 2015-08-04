@@ -104,7 +104,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
 
         // GUI requests for the same session must be processed consecutively
         if (LOG.isDebugEnabled()) {
-          LOG.debug("started");
+          LOG.debug("JSON request started");
         }
         uiSession.uiSessionLock().lock();
         try {
@@ -122,7 +122,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
           uiSession.uiSessionLock().unlock();
         }
         if (LOG.isDebugEnabled()) {
-          LOG.debug("completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("JSON request completed in " + StringUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
       finally {
