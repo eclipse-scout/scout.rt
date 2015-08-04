@@ -89,6 +89,7 @@ scout.FileChooser.prototype._render = function($parent) {
   }
   this.$okButton = $('<button>')
     .unfocusable()
+    .attr('disabled', true)
     .text(this.session.text('ui.Upload'))
     .on('click', this._onOkButtonClicked.bind(this))
     .appendTo(this.$buttons);
@@ -183,6 +184,7 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this.$files.empty();
     }
     this.$files.appendDiv('file').text(file.name);
+    this.$okButton.attr('disabled', false);
   }
 };
 
