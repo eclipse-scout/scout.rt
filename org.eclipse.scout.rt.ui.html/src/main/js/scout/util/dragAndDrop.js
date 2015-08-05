@@ -107,7 +107,7 @@ scout.dragAndDrop = {
     return false;
   },
 
-  handler: function(that, supportedScoutTypesArray, dropTypeCallback, dropMaximumSizeCallback, additionalDropPropertiesCallback){
+  handler: function(that, supportedScoutTypesArray, dropTypeCallback, dropMaximumSizeCallback, additionalDropPropertiesCallback, allowedTypesCallback){
     supportedScoutTypesArray = scout.arrays.ensure(supportedScoutTypesArray);
 
     // create handler
@@ -141,7 +141,8 @@ scout.dragAndDrop = {
           if (files.length >= 1) {
             that.session.uploadFiles(that, files,
                 handlerInternal.additionalDropProperties ? handlerInternal.additionalDropProperties(event) : undefined,
-                handlerInternal.dropSize ? handlerInternal.dropSize() : undefined);
+                handlerInternal.dropSize ? handlerInternal.dropSize() : undefined,
+                handlerInternal.allowedTypes ? handlerInternal.allowedTypes() : undefined);
           }
         }
       }
@@ -153,6 +154,7 @@ scout.dragAndDrop = {
     handlerInternal.dropType = dropTypeCallback;
     handlerInternal.dropSize = dropMaximumSizeCallback;
     handlerInternal.additionalDropProperties = additionalDropPropertiesCallback;
+    handlerInternal.allowedTypes = allowedTypesCallback;
 
     // return handler
     return handlerInternal;

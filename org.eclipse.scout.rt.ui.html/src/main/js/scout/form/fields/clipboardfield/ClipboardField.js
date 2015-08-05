@@ -9,9 +9,17 @@ scout.ClipboardField.prototype._render = function($parent) {
   this.addField($('<div>'));
   this.addStatus();
 
-  this.$field.attr('contenteditable', '')
+  // add drag and drop support
+  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
+      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      function() { return this.dropType; }.bind(this),
+      function() { return this.maximumSize; }.bind(this),
+      undefined,
+      function() { return this.allowedMimeTypes; }.bind(this));
+  this.dragAndDropHandler.install(this.$field);
+
+  this.$field.attr('contenteditable', 'true')
     .on('paste', this._onPaste.bind(this));
-    //.on('copy', this._onPaste.bind(this));
 
   $parent.on('click', function(event) {
     scout.focusManager.requestFocus(this.session.uiSessionId, this.$field);
@@ -24,8 +32,9 @@ scout.ClipboardField.prototype._render = function($parent) {
 
 scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
   if (scout.strings.hasText(displayText)) {
-    this.$field.text(displayText);
+    this.$field.html(scout.strings.nl2br(displayText, true));
     scout.scrollbars.install(this.$field, this.session);
+    this.$field.selectAllText();
   } else {
     this.$field.empty();
   }

@@ -835,4 +835,20 @@
     return this.addClass('unfocusable');
   };
 
+
+  $.fn.selectAllText = function() {
+    var range,
+      doc = document,
+      element = this[0];
+    if (doc.body.createTextRange) {
+        range = document.body.createTextRange();
+        range.moveToElementText(element);
+        range.select();
+    } else if (window.getSelection) {
+        range = document.createRange();
+        range.selectNodeContents(element);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    }
+  };
 }(jQuery));

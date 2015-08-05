@@ -1,6 +1,6 @@
 .clipboard-field > .field {
   margin-left: @mandatory-indicator-width;
-  background-color: @tooltip-background-color;
+  background-color: @item-selection-background-color;
   padding: @text-field-padding;
 
   & > img {

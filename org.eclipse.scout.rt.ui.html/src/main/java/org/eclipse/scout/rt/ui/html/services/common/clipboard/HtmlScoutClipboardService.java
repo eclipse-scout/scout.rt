@@ -41,87 +41,18 @@ public class HtmlScoutClipboardService extends AbstractService implements IClipb
 
   @Override
   public void setContents(final TransferObject transferObject) throws ProcessingException {
-    // FIXME mot Implementieren.
-    throw new ProcessingException("Not yet supported.");
+    if (transferObject instanceof TextTransferObject) {
+      setTextContents(((TextTransferObject) transferObject).getPlainText());
+    }
+    throw new ProcessingException("Not implemented");
   }
 
   @Override
   public void setTextContents(String textContents) throws ProcessingException {
-    // FIXME mot Implementieren.
-    setContents(new TextTransferObject(textContents));
+    ClipboardForm form = new ClipboardForm();
+    form.setMimeTypes(new MimeType[]{MimeType.TEXT_PLAIN});
+    form.getCancelButton().setVisible(false);
+    form.getClipboardField().setValue(Collections.singleton(new BinaryResource(MimeType.TEXT_PLAIN, textContents.getBytes())));
+    form.startClipboard();
   }
-
-//  private TransferObject[] createScoutTransferables(Transferable contents, TransferObjectRequest... requests) {
-////    ArrayList<TransferObject> result = new ArrayList<TransferObject>();
-////    if (requests != null) {
-////      for (TransferObjectRequest request : requests) {
-////        try {
-////          TransferObject scoutTransferObject = createScoutTransferable(contents, request);
-////          if (scoutTransferObject != null) {
-////            result.add(scoutTransferObject);
-////          }
-////        }
-////        catch (Exception e) {
-////          LOG.debug("Cannot create scout transform object", e);
-////        }
-////      }
-////    }
-////    if (result.isEmpty()) {
-////      result.add(HtmlUtility.createScoutTransferable(contents));
-////    }
-////    return result.toArray(new TransferObject[result.size()]);
-//  }
-//
-//  @SuppressWarnings("unchecked")
-//  private TransferObject createScoutTransferable(Transferable contents, TransferObjectRequest request) throws UnsupportedFlavorException, IOException, ProcessingException {
-//    if (request == null) {
-//      return null;
-//    }
-//    if (TextTransferObject.class.equals(request.getTransferObjectType())) {
-//      DataFlavor requestedDataFlavor = null;
-//      if (StringUtility.hasText(request.getMimeType())) {
-//        try {
-//          for (DataFlavor flavor : contents.getTransferDataFlavors()) {
-//            if (flavor.isMimeTypeEqual(request.getMimeType())) {
-//              requestedDataFlavor = flavor;
-//              break;
-//            }
-//          }
-//        }
-//        catch (Throwable t) {
-//          LOG.debug(null, t);
-//        }
-//      }
-//      if (requestedDataFlavor == null) {
-//        requestedDataFlavor = DataFlavor.stringFlavor;
-//      }
-//      Reader reader = requestedDataFlavor.getReaderForText(contents);
-//      String content = IOUtility.getContent(reader);
-//      TextTransferObject result = new TextTransferObject(content);
-//      result.setMimeType(requestedDataFlavor.getMimeType());
-//      return result;
-//    }
-//    else if (ImageTransferObject.class.equals(request.getTransferObjectType())) {
-//      ImageTransferObject result = new ImageTransferObject(contents.getTransferData(DataFlavor.imageFlavor));
-//      result.setMimeType(DataFlavor.imageFlavor.getMimeType());
-//      return result;
-//    }
-//    else if (ResourceListTransferObject.class.equals(request.getTransferObjectType())) {
-//      ArrayList<File> fileList = new ArrayList<File>();
-//      CollectionUtility.appendAllList(fileList, (List) contents.getTransferData(DataFlavor.javaFileListFlavor));
-//
-//      // create binary resource list from file list
-//      List<BinaryResource> resources = new ArrayList<BinaryResource>();
-//      for (File file : fileList) {
-//        resources.add(new BinaryResource(file.getName(), IOUtility.getContent(file)));
-//      }
-//
-//      ResourceListTransferObject result = new ResourceListTransferObject(resources);
-//      result.setMimeType(DataFlavor.javaFileListFlavor.getMimeType());
-//      return result;
-//    }
-//    else {
-//      return null;
-//    }
-//  }
 }

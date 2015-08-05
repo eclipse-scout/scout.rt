@@ -50,6 +50,12 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
         return getModel().getMaximumSize();
       }
     });
+    putJsonProperty(new JsonProperty<IClipboardField>(IClipboardField.PROP_DROP_TYPE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getDropType();
+      }
+    });
   }
 
   @Override
