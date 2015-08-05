@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.zip.Adler32;
 
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
+
+import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.StringUtility;
 
 /**
  * Since html rendering is very expensive in swing and tables render views every time they are repainted, this cache
@@ -47,10 +49,9 @@ public class HtmlViewCache {
         label.setForeground(label.isEnabled() ? UIManager.getDefaults().getColor("TextField.foreground") : UIManager.getDefaults().getColor("TextField.inactiveForeground"));
       }
 
-      Adler32 crc = new Adler32();
-      crc.update(text.getBytes());
       Color fg = label.getForeground();
-      Object key = "" + crc.getValue() + "." + label.getFont() + "." + (fg != null ? fg.getRGB() : 0);
+      // Key needs to be unique. To reduce memory usage the string is been compressed.
+      Object key = Base64Utility.encode(StringUtility.compress(text + "." + label.getFont() + "." + (fg != null ? fg.getRGB() : 0)));
       value = m_viewMap.get(key);
       if (value == null) {
         value = BasicHTML.createHTMLView(label, text);
