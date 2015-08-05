@@ -2543,7 +2543,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         try {
           setTreeChanging(true);
 
-          Set<ITreeNode> validNodes = new HashSet<ITreeNode>(nodes.length);
+          Set<ITreeNode> validNodes = new HashSet<ITreeNode>(nodes != null ? nodes.length : 0);
           for (ITreeNode n : resolveVirtualNodes(resolveNodes(nodes))) {
             if (n.isFilterAccepted()) {
               validNodes.add(n);
