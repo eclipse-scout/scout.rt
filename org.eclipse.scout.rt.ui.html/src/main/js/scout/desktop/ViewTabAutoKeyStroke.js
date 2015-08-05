@@ -1,8 +1,11 @@
-scout.ViewTabAutoKeyStroke = function(enabled, viewTabs, keyStroke) {
+scout.ViewTabAutoKeyStroke = function(desktop) {
   scout.ViewTabAutoKeyStroke.parent.call(this);
-  this._enabled = enabled;
-  this._viewTabs = viewTabs;
-  this.keyStroke = keyStroke;
+
+  this._enabled = desktop.autoTabKeyStrokesEnabled;
+  this._viewTabs = desktop.viewTabsController.viewTabs();
+
+  this.keyStroke = desktop.autoTabKeyStrokeModifier;
+  this.$container = desktop._$viewTabBar; // TODO [dwi] just temporary fix
   this.initKeyStrokeParts();
   this.keyBoxDrawed = false;
   this.drawHint = true;
@@ -10,7 +13,7 @@ scout.ViewTabAutoKeyStroke = function(enabled, viewTabs, keyStroke) {
 scout.inherits(scout.ViewTabAutoKeyStroke, scout.KeyStroke);
 
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
 scout.ViewTabAutoKeyStroke.prototype.handle = function(event) {
   if (this._viewTabs.length === 0 || (event.which !== 57 && event.which !== 49 && event.which - 49 > this._viewTabs.length)) {
@@ -21,7 +24,7 @@ scout.ViewTabAutoKeyStroke.prototype.handle = function(event) {
 };
 
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
 scout.ViewTabAutoKeyStroke.prototype.accept = function(event) {
   if (this._enabled && event && event.which >= 49 && event.which <= 57 && // 1-9
@@ -31,7 +34,7 @@ scout.ViewTabAutoKeyStroke.prototype.accept = function(event) {
   return false;
 };
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
 scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   if (scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[1], scout.keys[9])) {
@@ -44,7 +47,7 @@ scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, d
   }
 };
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
 scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
   if (this.keyBoxDrawed) {
@@ -61,9 +64,9 @@ scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
   }
 };
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
-scout.ViewTabAutoKeyStroke.prototype.removeKeyBox = function() {
+scout.ViewTabAutoKeyStroke.prototype.removeKeyBox = function($container) {
   if (!this.keyBoxDrawed) {
     return;
   }

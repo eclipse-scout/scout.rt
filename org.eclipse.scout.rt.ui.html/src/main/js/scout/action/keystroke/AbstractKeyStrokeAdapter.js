@@ -15,24 +15,31 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
   }
   this.keyBoxDrawn = true;
   for (var i = 0; i < this.keyStrokes.length; i++) {
-    this.keyStrokes[i].checkAndDrawKeyBox(this._srcElement.$container, drawedKeys);
+    var $drawingArea =  this._resolveKeyStrokeDrawingArea(this.keyStrokes[i]);
+    this.keyStrokes[i].checkAndDrawKeyBox($drawingArea, drawedKeys);
   }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.removeKeyBox = function() {
   this.keyBoxDrawn = false;
   for (var i = 0; i < this.keyStrokes.length; i++) {
-    this.keyStrokes[i].removeKeyBox(this._srcElement.$container);
+    var $drawingArea =  this._resolveKeyStrokeDrawingArea(this.keyStrokes[i]);
+    this.keyStrokes[i].removeKeyBox($drawingArea); // TODO [nbu] why do we have to provide a $containter for remove?
   }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
-  if (this.keyStrokes.length > 0) {
-    this.keyStrokes = this.keyStrokes.concat(this._srcElement.keyStrokes);
-  } else if (this._srcElement.keyStrokes) {
-    this.keyStrokes = this._srcElement.keyStrokes.slice(0);
-  }
+  scout.arrays.pushAll(this.keyStrokes, this._srcElement.keyStrokes);
 };
+
+/**
+ * Returns the $container the keystroke belongs to.
+ * In first priority, the keystroke's container is returned, or the adapters container otherwise.
+ */
+scout.AbstractKeyStrokeAdapter.prototype._resolveKeyStrokeDrawingArea = function(keyStroke) {
+  return keyStroke.$container || this._srcElement.$container;
+};
+
 /**
  * It is possible that key strokes should only be accepted if a precondition is true.
  * @param event
