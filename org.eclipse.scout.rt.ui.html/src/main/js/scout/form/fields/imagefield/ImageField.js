@@ -1,6 +1,5 @@
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
-  this.$fieldContainer;
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
