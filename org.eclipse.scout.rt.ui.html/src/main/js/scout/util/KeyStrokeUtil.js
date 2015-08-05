@@ -44,12 +44,14 @@ scout.KeyStrokeUtil.installAdapter = function(session, adapter, $target) {
   }
 
   adapter._handler = function(event) {
-    // Check whether keystroke is valid.
-    if (!adapter.keyStrokes || !adapter.accept(event)) {
+    // Check whether the keystroke is handled by this adapter.
+    if (!adapter.keyStrokes ||
+        !adapter.accept(event) ||
+        scout.focusManager._isElementCovertByGlassPane(adapter._srcElement.$container, session.uiSessionId)) {
       if (adapter.preventBubbleUp(event)) {
-        event.stopPropagation();
+        event.stopPropagation(); // prevent superior adapters to handle this event
       }
-      return;
+      return; // do not return ' false' so that the event can bubble up and handled by a superior adapter
     }
 
     // Draw keystrokes on help keystroke.
@@ -57,8 +59,8 @@ scout.KeyStrokeUtil.installAdapter = function(session, adapter, $target) {
       scout.KeyStrokeUtil._drawKeyStrokes(adapter, event.target);
     }
 
-    // Delegate control to registered keystrokes, but break once a keystroke requests immediate stop of propagation.
-    scout.KeyStrokeUtil._handleKeyStroke(adapter, event);
+    // Handle event by respective keystroke.
+    scout.KeyStrokeUtil._handleKeyStrokeEvent(adapter, event);
   };
 
   // Install the keystroke, either on the given $target, or on $entryPoint for global keystrokes.
@@ -106,7 +108,10 @@ scout.KeyStrokeUtil._drawKeyStrokes = function(adapter, target) {
   $(window).on('blur', windowBlurHandler); // once the current browser tab/window is left
 };
 
-scout.KeyStrokeUtil._handleKeyStroke = function(adapter, event) {
+/**
+ * Handles the keystroke event by the adapter's keystroke handlers, but returns immediately once a keystroke requests immediate stop of propagation.
+ */
+scout.KeyStrokeUtil._handleKeyStrokeEvent = function(adapter, event) {
   var stopBubble = adapter.preventBubbleUp(event),
       stopImmediate = adapter.keyStrokes
           .filter(function(keyStroke) {
