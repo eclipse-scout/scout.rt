@@ -28,7 +28,9 @@
     }
 
     & > .file-chooser-files {
-      min-height: 100px; /* TODO BSH Remove */
+      position: relative;
+      min-height: 100px;
+      max-height: 100px;
 
       & > .file {
 

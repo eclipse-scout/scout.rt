@@ -54,6 +54,7 @@ scout.FileChooser.prototype._render = function($parent) {
   if (scout.device.supportsFile()) {
     this.$files = $.makeDiv('file-chooser-files')
       .appendTo(this.$content);
+    scout.scrollbars.install(this.$files, this.session);
   } else {
     // legacy iframe code
     this.$legacyFormTarget = $('<iframe>')
@@ -195,6 +196,7 @@ scout.FileChooser.prototype.addFiles = function(files) {
       .addClass('menu-item')
       .text(this.session.text('Remove'))
       .one('click', this.removeFile.bind(this, file, this.$files.children().last()));
+    scout.scrollbars.update(this.$files);
   }
 };
 
@@ -207,6 +209,7 @@ scout.FileChooser.prototype.removeFile = function(file, $file) {
     $file.remove();
   }
   this.$okButton.attr('disabled', this._files.length <= 0);
+  scout.scrollbars.update(this.$files);
 };
 
 scout.FileChooser.prototype.onModelAction = function(event) {
