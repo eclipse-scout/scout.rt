@@ -44,15 +44,6 @@ scout.KeyStrokeUtil.installAdapter = function(session, adapter, $target) {
   }
 
   adapter._handler = function(event) {
-    if (event.originalEvent && event.originalEvent.anchorReached) {
-      return;
-    }
-
-    if (adapter.anchorKeyStrokeAdapter) {
-      // Append information about anchor reached to original event to provide information to all listeners upwards.
-      event.originalEvent.anchorReached = true;
-    }
-
     // Check whether keystroke is valid.
     if (!adapter.keyStrokes || !adapter.accept(event)) {
       if (adapter.preventBubbleUp(event)) {

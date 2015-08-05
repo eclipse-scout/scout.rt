@@ -6,7 +6,6 @@ scout.AbstractKeyStrokeAdapter = function(srcElement) {
   this._srcElement = srcElement;
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
-  this.anchorKeyStrokeAdapter = false;
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
