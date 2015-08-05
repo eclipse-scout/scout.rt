@@ -129,7 +129,6 @@
 
   .checkbox-label-before-focus() {
     border-color: @focus-border-color;
-    outline: none;
   }
 
   .checkbox-label-before-checked() {
