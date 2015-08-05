@@ -10,7 +10,6 @@ scout.DesktopNavigation = function(desktop) {
 
   this.activeTab;
   this.outlineTab;
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.viewMenuTab;
   this._breadcrumb = false;
 };
@@ -43,7 +42,6 @@ scout.DesktopNavigation.prototype.render = function($parent) {
 
   this.$container = this.$navigation.appendDiv('navigation-container')
     .on('mousedown', this._onNavigationMousedown.bind(this));
-  this._installKeyStrokeAdapter();
 };
 
 scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
@@ -135,18 +133,6 @@ scout.DesktopNavigation.prototype._setBreadcrumbEnabled = function(enabled) {
     this.outline.setBreadcrumbEnabled(enabled);
     this.viewMenuTab.setBreadcrumbEnabled(enabled);
   }
-};
-
-scout.DesktopNavigation.prototype._createKeyStrokeAdapter = function() {
-  return new scout.DesktopNavigationKeyStrokeAdapter(this);
-};
-
-scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {
-  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.desktop.$container);
-};
-
-scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
-  scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function() {

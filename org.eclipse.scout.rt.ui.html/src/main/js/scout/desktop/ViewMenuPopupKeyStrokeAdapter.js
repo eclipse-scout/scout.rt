@@ -1,3 +1,4 @@
+// TODO [dwi][nbu] Is this adapter really used? See DesktopViewButtonPopupKeyStroke
 scout.ViewMenuPopupKeyStrokeAdapter = function(viewMenuPopup) {
   scout.ViewMenuPopupKeyStrokeAdapter.parent.call(this, viewMenuPopup);
 

@@ -1,16 +1,16 @@
-scout.DesktopNavigationKeyStroke = function(desktopNavigation, keyStroke) {
-  scout.DesktopNavigationKeyStroke.parent.call(this);
+scout.DesktopViewButtonPopupKeyStroke = function(desktopNavigation, keyStroke) {
+  scout.DesktopViewButtonPopupKeyStroke.parent.call(this);
   this._desktopNavigation = desktopNavigation;
   this.initKeyStrokeParts();
   this.keyBoxDrawed = false;
   this.drawHint = true;
 };
-scout.inherits(scout.DesktopNavigationKeyStroke, scout.KeyStroke);
+scout.inherits(scout.DesktopViewButtonPopupKeyStroke, scout.KeyStroke);
 
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
-scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
+scout.DesktopViewButtonPopupKeyStroke.prototype.handle = function(event) {
   if (event && event.which === scout.keys.F2) {
     this._desktopNavigation.doViewMenuAction();
   }
@@ -18,9 +18,9 @@ scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
 };
 
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
-scout.DesktopNavigationKeyStroke.prototype.accept = function(event) {
+scout.DesktopViewButtonPopupKeyStroke.prototype.accept = function(event) {
   if (event && (event.which === scout.keys.F2) &&
     event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift) {
     return true;
@@ -29,15 +29,15 @@ scout.DesktopNavigationKeyStroke.prototype.accept = function(event) {
 };
 
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
-scout.DesktopNavigationKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+scout.DesktopViewButtonPopupKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   if (this.drawHint) {
     this._drawKeyBox($container, drawedKeys);
   }
 };
 
-scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
+scout.DesktopViewButtonPopupKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
   if (this.keyBoxDrawed) {
     return;
   }
@@ -45,7 +45,7 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
     scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F2', this._desktopNavigation.viewMenuTab.$container, this.ctrl, this.alt, this.shift);
     drawedKeys.F2 = true;
     var $icon = this._desktopNavigation.viewMenuTab.$container.find('.icon');
-    if($icon.length>0){
+    if($icon.length){
       var wIcon = $icon.width();
       var wKeybox = this._desktopNavigation.viewMenuTab.$container.find('.key-box').outerWidth();
       var containerPadding = Number(this._desktopNavigation.viewMenuTab.$container.css('padding-left').replace('px', ''));
@@ -57,9 +57,9 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
 };
 
 /**
- * @Override scout.KeyStroke
+ * @override Action.js
  */
-scout.DesktopNavigationKeyStroke.prototype.removeKeyBox = function() {
+scout.DesktopViewButtonPopupKeyStroke.prototype.removeKeyBox = function() {
   if (!this.keyBoxDrawed) {
     return;
   }

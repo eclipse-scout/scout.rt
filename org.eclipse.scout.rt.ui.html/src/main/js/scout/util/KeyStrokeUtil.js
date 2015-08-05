@@ -8,40 +8,39 @@ scout.KeyStrokeUtil = function() {
  * Initializes keystroke handing for the given session.
  */
 scout.KeyStrokeUtil.init = function($entryPoint) {
-  // Disable browser help.
+  // Prevent browser to interpret F1 (help).
   if (window.onhelp) {
     window.onhelp = $.returnFalse;
   }
-  var preventHelpKeyStroke = function(event) {
-    if (scout.KeyStrokeUtil._isHelpKeyStroke(event)) {
-      event.preventDefault();
-    }
+  var swallowHelpKeyStroke = function(event) {
+    return !scout.KeyStrokeUtil._isHelpKeyStroke(event);
   };
-  $entryPoint.keydown(preventHelpKeyStroke);
-  $entryPoint.keyup(preventHelpKeyStroke);
-};
+  $entryPoint.keydown(swallowHelpKeyStroke);
+  $entryPoint.keyup(swallowHelpKeyStroke);
 
-/**
- * Installs the given keystroke adapter globally on $entryPoint.
- */
-scout.KeyStrokeUtil.installAdapter = function(session, adapter) {
-  scout.KeyStrokeUtil.installAdapter(session, adapter, session.$entryPoint, true);
+  // Prevent browser to interpret backspace.
+  var swallowBackspaceStroke = function(event) {
+    return (event.which !== scout.keys.BACKSPACE);
+  };
+  $entryPoint.keydown(swallowBackspaceStroke);
+  $entryPoint.keyup(swallowBackspaceStroke);
 };
 
 /**
  * Installs the given keystroke adapter. This method has no effect if the adapter is null, or already installed.
+ *
+ * @param adapter
+ *        the adapter to be installed
+ * @param $target
+ *        indicates on which target element to listen for keystroke events, or null to listen globally on $entryPoint
  */
-scout.KeyStrokeUtil.installAdapter = function(session, adapter, $element, global) {
+scout.KeyStrokeUtil.installAdapter = function(session, adapter, $target) {
   if (!adapter) {
     return; // no adapter to install
   }
 
   if (adapter._handler) {
     return; // adapter already installed
-  }
-
-  if (!$element) {
-    throw new Error('missing argument \'$element\'');
   }
 
   adapter._handler = function(event) {
@@ -71,8 +70,8 @@ scout.KeyStrokeUtil.installAdapter = function(session, adapter, $element, global
     scout.KeyStrokeUtil._handleKeyStroke(adapter, event);
   };
 
-  // Install the keystroke, either on the given $element, or on $entryPoint for global keystrokes.
-  adapter._handler.$target = (global ? session.$entryPoint : $element);
+  // Install the keystroke, either on the given $target, or on $entryPoint for global keystrokes.
+  adapter._handler.$target = $target || session.$entryPoint;
   adapter._handler.$target.keydown(adapter._handler);
 };
 

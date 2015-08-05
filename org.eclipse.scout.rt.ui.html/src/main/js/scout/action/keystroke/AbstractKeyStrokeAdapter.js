@@ -33,8 +33,8 @@ scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
 };
 
 /**
- * Returns the $container the keystroke belongs to.
- * In first priority, the keystroke's container is returned, or the adapters container otherwise.
+ * Returns the drawing area to render the key stroke.
+ * In first priority, the keystroke's $container is returned, or the $container of the adapter's source element otherwise.
  */
 scout.AbstractKeyStrokeAdapter.prototype._resolveKeyStrokeDrawingArea = function(keyStroke) {
   return keyStroke.$container || this._srcElement.$container;
