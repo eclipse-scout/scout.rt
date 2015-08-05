@@ -91,7 +91,7 @@ scout.Desktop.prototype._render = function($parent) {
   // Keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
   scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopBenchKeyStrokeAdapter(this));
   // Keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
-  scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopViewButtonKeyStrokeAdapter(this));
+  scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopViewButtonBarKeyStrokeAdapter(this));
   // Keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
   scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopTaskBarKeyStrokeAdapter(this));
 };

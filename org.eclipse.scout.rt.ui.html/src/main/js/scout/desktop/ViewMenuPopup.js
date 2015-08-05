@@ -91,5 +91,5 @@ scout.ViewMenuPopup.prototype.alignTo = function() {
 };
 
 scout.ViewMenuPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.ViewMenuPopupKeyStrokeAdapter(this);
+  return new scout.ViewMenuKeyStrokeAdapter(this);
 };

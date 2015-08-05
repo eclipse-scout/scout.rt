@@ -1,16 +1,19 @@
-scout.DesktopViewButtonPopupKeyStroke = function(desktopNavigation, keyStroke) {
-  scout.DesktopViewButtonPopupKeyStroke.parent.call(this);
+/**
+ * Keystroke to open the 'ViewMenuPopup' on 'F2'.
+ */
+scout.ViewMenuOpenKeyStroke = function(desktopNavigation, keyStroke) {
+  scout.ViewMenuOpenKeyStroke.parent.call(this);
   this._desktopNavigation = desktopNavigation;
   this.initKeyStrokeParts();
   this.keyBoxDrawed = false;
   this.drawHint = true;
 };
-scout.inherits(scout.DesktopViewButtonPopupKeyStroke, scout.KeyStroke);
+scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
 
 /**
  * @override Action.js
  */
-scout.DesktopViewButtonPopupKeyStroke.prototype.handle = function(event) {
+scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
   if (event && event.which === scout.keys.F2) {
     this._desktopNavigation.doViewMenuAction();
   }
@@ -20,7 +23,7 @@ scout.DesktopViewButtonPopupKeyStroke.prototype.handle = function(event) {
 /**
  * @override Action.js
  */
-scout.DesktopViewButtonPopupKeyStroke.prototype.accept = function(event) {
+scout.ViewMenuOpenKeyStroke.prototype.accept = function(event) {
   if (event && (event.which === scout.keys.F2) &&
     event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift) {
     return true;
@@ -31,13 +34,13 @@ scout.DesktopViewButtonPopupKeyStroke.prototype.accept = function(event) {
 /**
  * @override Action.js
  */
-scout.DesktopViewButtonPopupKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+scout.ViewMenuOpenKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   if (this.drawHint) {
     this._drawKeyBox($container, drawedKeys);
   }
 };
 
-scout.DesktopViewButtonPopupKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
+scout.ViewMenuOpenKeyStroke.prototype._drawKeyBox = function($container, drawedKeys) {
   if (this.keyBoxDrawed) {
     return;
   }
@@ -59,7 +62,7 @@ scout.DesktopViewButtonPopupKeyStroke.prototype._drawKeyBox = function($containe
 /**
  * @override Action.js
  */
-scout.DesktopViewButtonPopupKeyStroke.prototype.removeKeyBox = function() {
+scout.ViewMenuOpenKeyStroke.prototype.removeKeyBox = function() {
   if (!this.keyBoxDrawed) {
     return;
   }
