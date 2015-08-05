@@ -29,6 +29,21 @@
 
     & > .file-chooser-files {
       min-height: 100px; /* TODO BSH Remove */
+
+      & > .file {
+
+        & > .remove {
+          line-height: normal; /* override line-height of .menu-item */
+          padding-top: @borderless-field-padding-y;
+          padding-left: @button-padding;
+          display: inline;
+          text-decoration: underline;
+
+          &:focus :not(:disabled) {
+            color: @hover-color;
+          }
+        }
+      }
     }
   }
 

@@ -9,6 +9,7 @@ public class UiTextContributor implements IUiTextContributor {
   public void contributeUiTextKeys(Set<String> textKeys) {
     textKeys.addAll(Arrays.asList(
         // From org.eclipse.scout.rt.client
+        "Remove",
         "ResetTableColumns",
         "ColumnSorting",
         "Column",

@@ -42,7 +42,6 @@ scout.FileChooser.prototype._render = function($parent) {
     this.$fileInputField.appendTo(this.$container);
   }
 
-
   this.$content = this.$container.appendDiv('file-chooser-content');
   this.$title = $.makeDiv('file-chooser-title')
     .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'))
@@ -189,8 +188,25 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this._files = [file];
       this.$files.empty();
     }
-    this.$files.appendDiv('file').text(file.name);
+    this.$files
+      .appendDiv('file')
+      .text(file.name)
+      .appendDiv('remove')
+      .addClass('menu-item')
+      .text(this.session.text('Remove'))
+      .one('click', this.removeFile.bind(this, file, this.$files.children().last()));
   }
+};
+
+scout.FileChooser.prototype.removeFile = function(file, $file) {
+  var index = this._files.indexOf(file);
+  if (index > -1) {
+    this._files.splice(index, 1);
+  }
+  if ($file) {
+    $file.remove();
+  }
+  this.$okButton.attr('disabled', this._files.length <= 0);
 };
 
 scout.FileChooser.prototype.onModelAction = function(event) {
