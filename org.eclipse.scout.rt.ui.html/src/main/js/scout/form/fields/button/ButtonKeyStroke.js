@@ -31,7 +31,7 @@ scout.ButtonKeyStroke.prototype.accept = function(event) {
  * @override Menu.js
  */
 scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
-  $container = this.$drawKeyBoxContainer || this._button.$container;
+  $container = this._button.$container;
   var keyBoxOffset = this.keyBoxOffset || 16,
     keyBoxAlignRight = this.keyBoxAlignRight === undefined ? true : this.keyBoxAlignRight;
   if ($container && this._button.enabled && this._button.visible) {

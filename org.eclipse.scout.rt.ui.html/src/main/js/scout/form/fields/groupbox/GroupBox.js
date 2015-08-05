@@ -135,7 +135,7 @@ scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
     var i, keyStroke;
     for (i = 0; i < button.keyStrokes.length; i++) {
       keyStroke = button.keyStrokes[i];
-      keyStroke.$drawKeyBoxContainer = button.$container;
+      // FIXME [dwi][nbu] ensure proper drawing container; $drawKeyBoxContainer was removed because looking for a better solution. // keyStroke.$drawKeyBoxContainer = button.$container;
       this.keyStrokeAdapter.registerKeyStroke(keyStroke);
     }
   }
@@ -263,7 +263,6 @@ scout.GroupBox.prototype._renderMenus = function() {
     }));
     menuItems.push(menu);
   }.bind(this));
-  // FIXME NBU: same code as in FormField.syncMenus? What with $drawKeyBoxContainer?
   for (var i = 0; i < menuItems.length; i++) {
     var menuItem = menuItems[i];
     this.registerRootKeyStroke(menuItem);

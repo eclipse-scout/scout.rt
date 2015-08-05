@@ -14,11 +14,6 @@ scout.Action = function() {
   this.stopImmediate = true;
 
   /**
-   * if this returns a container then this container is used to draw key-box on it otherwise the param in _drawKeyBox is used
-   */
-  this.$drawKeyBoxContainer;
-
-  /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */
   this.tabbable = false;
@@ -307,7 +302,6 @@ scout.Action.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
 };
 
 scout.Action.prototype._drawKeyBox = function($container) {
-  $container = this.$drawKeyBoxContainer || $container;
   if (!this.drawHint || !this.keyStroke || !this.visible || !this.enabled || !this.rendered) {
     return;
   }
