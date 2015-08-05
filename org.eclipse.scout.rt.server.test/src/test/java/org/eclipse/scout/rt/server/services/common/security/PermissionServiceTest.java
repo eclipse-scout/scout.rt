@@ -29,16 +29,13 @@ import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermissi
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Test for {@link IPermissionService}
  */
-//FIXME permission lookup not working anymore with nOSGi
 @RunWith(PlatformTestRunner.class)
-@Ignore
 public class PermissionServiceTest {
 
   /* ---------------------------------------------------------------------------------------------- */
@@ -48,8 +45,8 @@ public class PermissionServiceTest {
   private void testImpl(IPermissionService testService, boolean testPermission1Expected, boolean testPermission2Expected) {
     List<IBean<?>> reg = TestingUtility.registerBeans(
         new BeanMetaData(IPermissionService.class).
-        withInitialInstance(testService).
-        withApplicationScoped(true));
+            withInitialInstance(testService).
+            withApplicationScoped(true));
     try {
       IPermissionService service = BEANS.get(IPermissionService.class);
       assertSame(testService, service);

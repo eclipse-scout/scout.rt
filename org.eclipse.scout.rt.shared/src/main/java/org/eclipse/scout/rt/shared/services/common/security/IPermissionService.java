@@ -13,12 +13,13 @@ package org.eclipse.scout.rt.shared.services.common.security;
 import java.security.Permission;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * Support service for querying all Permission types available in any Plug-Ins class set.
+ * Support service for querying all Permission types available.
  */
-public interface IPermissionService extends IService {
+@ApplicationScoped
+public interface IPermissionService {
 
   /**
    * @return Returns all permissions on the classpath. The actual strategy to find these permissions is up to the
