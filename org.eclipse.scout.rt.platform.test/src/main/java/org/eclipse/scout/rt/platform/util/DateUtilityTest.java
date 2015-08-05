@@ -203,7 +203,7 @@ public class DateUtilityTest {
     final Calendar c1515 = getCalendar(15, 15);
     final Calendar c1445 = getCalendar(14, 45);
     final Calendar c1530 = getCalendar(15, 30);
-    final Calendar c1600 = getCalendar(16, 00);
+    final Calendar c1600 = getCalendar(16, 0);
     final Calendar c1700 = getCalendar(17, 0);
     assertCorrectDuration(c1500, c1500);
     assertCorrectDuration(c1500, c1515);

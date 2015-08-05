@@ -18,7 +18,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class NumberUtilityTest {
       0.1d,
       -4.1f,
       1,
-      2l,
+      2L,
       Float.NEGATIVE_INFINITY,
       Double.POSITIVE_INFINITY,
       Integer.valueOf(45)};

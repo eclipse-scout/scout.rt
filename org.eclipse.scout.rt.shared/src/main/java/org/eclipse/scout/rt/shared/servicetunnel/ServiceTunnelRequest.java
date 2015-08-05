@@ -23,12 +23,12 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 @Bean
 public class ServiceTunnelRequest implements Serializable {
   private static final long serialVersionUID = 0L;
-  private static final AtomicLong requestSequenceGenerator = new AtomicLong();
+  private static final AtomicLong REQUEST_SEQUENCE_GENERATOR = new AtomicLong();
 
   /**
    * @since 3.8
    */
-  private final long m_requestSequence = requestSequenceGenerator.incrementAndGet();
+  private final long m_requestSequence = REQUEST_SEQUENCE_GENERATOR.incrementAndGet();
   private String m_sessionId;
   private final String m_serviceInterfaceClassName;
   private final String m_operation;

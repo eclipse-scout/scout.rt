@@ -12,6 +12,6 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 public interface IClusterPropertyMessage {
 
-  public IClusterNotificationProperties getProperties();
+  IClusterNotificationProperties getProperties();
 
 }

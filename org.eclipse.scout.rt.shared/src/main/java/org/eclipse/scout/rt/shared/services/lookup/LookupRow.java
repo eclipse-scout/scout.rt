@@ -181,14 +181,12 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
       }
       if (ttIndex <= maxColumnIndex && cells[ttIndex] != null) {
         withTooltipText(cells[ttIndex].toString());
-      }
-      if (bgIndex <= maxColumnIndex && cells[bgIndex] != null) {
-        if (ttIndex <= maxColumnIndex && cells[ttIndex] != null) {
+
+        if (bgIndex <= maxColumnIndex && cells[bgIndex] != null) {
           withBackgroundColor(cells[bgIndex].toString());
         }
-      }
-      if (fgIndex <= maxColumnIndex && cells[fgIndex] != null) {
-        if (ttIndex <= maxColumnIndex && cells[ttIndex] != null) {
+
+        if (fgIndex <= maxColumnIndex && cells[fgIndex] != null) {
           withForegroundColor(cells[fgIndex].toString());
         }
       }
