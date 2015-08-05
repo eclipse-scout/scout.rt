@@ -46,7 +46,7 @@ public class PageWithTable3Test {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     PageWithTableOutline outline = new PageWithTableOutline();
     desktop.setAvailableOutlines(Collections.singletonList(outline));
-    desktop.setOutline(outline);
+    desktop.activateOutline(outline);
     PageWithTable page = (PageWithTable) desktop.getOutline().getActivePage();
     PageWithTable.Table table = page.getTable();
     table.resetDisplayableColumns();
@@ -58,10 +58,10 @@ public class PageWithTable3Test {
     assertSortState(table, CollectionUtility.arrayList(0, 1, 2, 3, 4, 5, 6, 7), CollectionUtility.arrayList(0));
     //
     //reset desktop and re-create new outline
-    desktop.setOutline((IOutline) null);
+    desktop.activateOutline((IOutline) null);
     outline = new PageWithTableOutline();
     desktop.setAvailableOutlines(Collections.singletonList(outline));
-    desktop.setOutline(outline);
+    desktop.activateOutline(outline);
     page = (PageWithTable) desktop.getOutline().getActivePage();
     table = page.getTable();
     assertSortState(table, CollectionUtility.arrayList(0, 1, 2, 3, 4, 5, 6, 7), CollectionUtility.arrayList(0));

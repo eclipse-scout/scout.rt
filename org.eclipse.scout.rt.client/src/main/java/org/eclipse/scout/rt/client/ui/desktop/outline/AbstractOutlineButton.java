@@ -153,7 +153,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
         // activate outline
-        desktop.setOutline(m_outline);
+        desktop.activateOutline(m_outline);
       }
     }
   }

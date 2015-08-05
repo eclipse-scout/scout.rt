@@ -285,7 +285,7 @@ public final class BookmarkUtility {
     if (!(outline.isVisible() && outline.isEnabled())) {
       throw new VetoException(TEXTS.get("BookmarkActivationFailedOutlineNotAvailable", outline.getTitle()));
     }
-    desktop.setOutline(outline);
+    desktop.activateOutline(outline);
     try {
       outline.setTreeChanging(true);
       //

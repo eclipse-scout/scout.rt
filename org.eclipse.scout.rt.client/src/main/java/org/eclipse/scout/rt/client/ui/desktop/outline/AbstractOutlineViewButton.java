@@ -137,8 +137,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
         }
       }
       else {
-        // activate outline
-        m_desktop.setOutline(m_outline);
+        m_desktop.activateOutline(m_outline);
       }
     }
   }
