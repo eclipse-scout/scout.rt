@@ -38,7 +38,8 @@ scout.FormToolButton.prototype.setSelected = function(selected) {
 };
 
 scout.FormToolButton.prototype._openContainer = function() {
-  if (!this.popup) {
+  // Create a new popup if it was not yet created OR the form is not rendered (i.e. if it was closed by the model)
+  if (!this.popup || !this.form.rendered) {
     this.popup = new scout.FormToolPopup(this, this.session);
     this.popup.render();
   } else {
