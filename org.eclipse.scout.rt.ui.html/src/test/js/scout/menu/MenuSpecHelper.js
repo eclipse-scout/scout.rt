@@ -15,5 +15,6 @@ MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
 
 MenuSpecHelper.prototype.createMenu = function(model) {
   model.objectType = model.objectType || 'Menu';
-  return this.session.createUiObject(model);
+  var offlineSession = scout.OfflineSession.createFromSession(this.session);
+  return offlineSession.createUiObject(model);
 };

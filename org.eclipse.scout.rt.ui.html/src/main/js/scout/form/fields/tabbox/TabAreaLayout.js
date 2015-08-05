@@ -97,19 +97,22 @@ scout.TabAreaLayout.prototype._destroyEllipsis = function() {
 };
 
 scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
-  var menu, popup,
+  var menu, popup, offlineSession,
     overflowMenus = [],
     tabBox = this._tabBox;
   this._overflowTabs.forEach(function(tabItem) {
-    menu = tabBox.session.createUiObject({
+    offlineSession = scout.OfflineSession.createFromSession(tabBox.session);
+    offlineSession.send(function(target, type) {
+      if ('doAction' === type) {
+        $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + this.tabItem);
+        tabBox._selectTab(this.tabItem);
+      }
+    });
+    menu = offlineSession.createUiObject({
       objectType: 'Menu',
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem
     });
-    menu.sendDoAction = function() {
-      $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + this.tabItem);
-      tabBox._selectTab(this.tabItem);
-    };
     overflowMenus.push(menu);
   });
 

@@ -7,12 +7,15 @@ scout.ObjectFactory = function(session) {
 
 /**
  * @param model needs to contain property objectType
+ * @param session (optional) if not set <code>this.session</code> is used as default. Basically this argument
+ *   is used to replace the real, live session with an instance of OfflineSession.
  */
-scout.ObjectFactory.prototype.create = function(model) {
-  var currentDeviceType = this.session.userAgent.deviceType,
-    factories, factory, index, deviceType;
+scout.ObjectFactory.prototype.create = function(model, session) {
+  session = scout.helpers.nvl(session, this.session);
 
-  index = this.deviceTypeLookupOrder.indexOf(currentDeviceType);
+  var factories, factory, deviceType,
+    index = this.deviceTypeLookupOrder.indexOf(currentDeviceType),
+    currentDeviceType = session.userAgent.deviceType;
 
   for (index = index; index < this.deviceTypeLookupOrder.length || factory; index++) {
     deviceType = this.deviceTypeLookupOrder[index];
@@ -27,7 +30,7 @@ scout.ObjectFactory.prototype.create = function(model) {
     throw new Error('No factory registered for objectType ' + model.objectType);
   }
   var object = factory.create(model);
-  object.init(model, this.session);
+  object.init(model, session);
   return object;
 };
 

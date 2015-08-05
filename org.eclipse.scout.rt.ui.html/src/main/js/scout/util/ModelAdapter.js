@@ -32,13 +32,7 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 
   this.id = model.id;
   this.objectType = model.objectType;
-  // FIXME AWE/CGU: (model-adapter, registry) instead of working with this flag, we should
-  // remove the registerModelAdapter from the ModelAdpater.js and move it to Session.js
-  // getOrCreateModelAdapter() - This will cause many Jasmine tests to fail, since they
-  // rely on the current behavior. See also createUiObject() where the flag is set.
-  if (scout.helpers.nvl(model._registered, true)) {
-    this.session.registerModelAdapter(this);
-  }
+  this.session.registerModelAdapter(this);
 
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {

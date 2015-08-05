@@ -53,7 +53,8 @@ scout.MenuItemsOrder.prototype._menuTypes = function(types) {
  * The createdBy property is added to the model to find and destroy items added by the UI later.
  */
 scout.MenuItemsOrder.prototype._createSeparator = function() {
-  return this.session.createUiObject({
+  var offlineSession = scout.OfflineSession.createFromSession(this.session);
+  return offlineSession.createUiObject({
     objectType: 'Menu',
     createdBy: this,
     separator: true

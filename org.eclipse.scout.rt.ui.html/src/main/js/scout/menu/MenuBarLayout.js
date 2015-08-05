@@ -109,7 +109,8 @@ scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItemsCopy) 
 };
 
 scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
-  var ellipsis = this._menuBar.session.createUiObject({
+  var offlineSession = scout.OfflineSession.createFromSession(this._menuBar.session);
+  var ellipsis = offlineSession.createUiObject({
     objectType: 'Menu',
     horizontalAlignment: 1,
     iconId: scout.icons.ELLIPSIS_V,

@@ -1,4 +1,4 @@
-describe("Session", function() {
+describe('Session', function() {
 
   beforeEach(function() {
     jasmine.Ajax.install();
@@ -15,9 +15,9 @@ describe("Session", function() {
     return sandboxSession({'userAgent':userAgent});
   }
 
-  describe("send", function() {
+  describe('send', function() {
 
-    it("sends multiple async events in one call", function() {
+    it('sends multiple async events in one call', function() {
       var session = createSession();
 
       session.send(1, 'nodeClicked');
@@ -39,7 +39,7 @@ describe("Session", function() {
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it("sends multiple async events in one call over multiple user interactions if sending was delayed", function() {
+    it('sends multiple async events in one call over multiple user interactions if sending was delayed', function() {
       var session = createSession();
 
       // send first event delayed (in 500 ms)
@@ -66,7 +66,7 @@ describe("Session", function() {
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it("does not await the full delay if a susequent send call has a smaller delay", function() {
+    it('does not await the full delay if a susequent send call has a smaller delay', function() {
       var session = createSession();
 
       // send first event delayed (in 500 ms)
@@ -93,7 +93,7 @@ describe("Session", function() {
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it("coalesces events if event provides a coalesce function", function() {
+    it('coalesces events if event provides a coalesce function', function() {
       var session = createSession();
 
       var coalesce = function(previous) {
@@ -143,9 +143,9 @@ describe("Session", function() {
 
   });
 
-  describe("init", function() {
+  describe('init', function() {
 
-    it("sends startup parameter", function() {
+    it('sends startup parameter', function() {
       var session = createSession();
 
       session.init();
@@ -163,7 +163,7 @@ describe("Session", function() {
       expect(requestData.startup).toBeUndefined();
     });
 
-    it("sends user agent on startup if not desktop", function() {
+    it('sends user agent on startup if not desktop', function() {
       var session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE));
 
       session.init();
@@ -194,7 +194,7 @@ describe("Session", function() {
   });
 
   // Tests whether delegation to scout.Texts works as expected
-  describe("texts", function() {
+  describe('texts', function() {
 
     var session;
 
@@ -209,56 +209,44 @@ describe("Session", function() {
       });
     });
 
-    it("check if correct text is returned", function() {
+    it('check if correct text is returned', function() {
       expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
     });
 
-    it("check if empty text is returned", function() {
+    it('check if empty text is returned', function() {
       expect(session.text('Empty')).toBe('');
     });
 
-    it("check if null text is returned", function() {
+    it('check if null text is returned', function() {
       expect(session.text('Null')).toBe(null);
     });
 
-    it("check if arguments are replaced in text", function() {
+    it('check if arguments are replaced in text', function() {
       expect(session.text('NumOptions', 3)).toBe('3 Optionen');
     });
 
-    it("check if multiple arguments are replaced in text", function() {
+    it('check if multiple arguments are replaced in text', function() {
       expect(session.text('Greeting', 'Computer', 'nice to meet you', 'User')).toBe('Hello Computer, my name is User, nice to meet you.');
     });
 
-    it("check if undefined texts return an error message", function() {
+    it('check if undefined texts return an error message', function() {
       expect(session.text('DoesNotExist')).toBe('[undefined text: DoesNotExist]');
     });
 
-    it("optText returns undefined if key is not found", function() {
+    it('optText returns undefined if key is not found', function() {
       expect(session.optText('DoesNotExist')).toBe(undefined);
     });
 
-    it("optText returns default value if key is not found", function() {
+    it('optText returns default value if key is not found', function() {
       expect(session.optText('DoesNotExist', '#Default', 'Any argument')).toBe('#Default');
     });
 
-    it("optText returns text if key found", function() {
+    it('optText returns text if key found', function() {
       expect(session.optText('NoOptions')).toBe('Keine Übereinstimmung');
     });
 
-    it("optText returns text if key found, with arguments", function() {
+    it('optText returns text if key found, with arguments', function() {
       expect(session.optText('NumOptions', '#Default', 7)).toBe('7 Optionen');
-    });
-
-  });
-
-  describe("createUiObject", function() {
-
-    it("sets the '_registered' and 'id' property correctly", function() {
-      var expectedSeqNo = scout._uniqueIdSeqNo + 1,
-        menu = createSession().createUiObject({objectType: 'Menu'});
-      expect(menu._registered).toBe(false);
-      expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-      expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
     });
 
   });
