@@ -174,8 +174,8 @@ scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
     // - 2. manchmal verschwindet ein (noch offener) Tab - wenn nur einer sichtbar ist
     // - 3. add selenium tests
     tab = desktop.viewTabsController.viewTabs()[i];
-    var offlineSession = scout.OfflineSession.createFromSession(this.desktop.session);
-    menu = offlineSession.createUiObject({
+    var localSession = scout.LocalSession.createFromSession(this.desktop.session);
+    menu = localSession.createUiObject({
       objectType: 'Menu',
       text: tab.getMenuText(),
       tab: tab

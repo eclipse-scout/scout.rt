@@ -254,10 +254,10 @@ scout.GroupBox.prototype._renderMenus = function() {
   var menu,
     menus = this.menus,
     menuItems = this.staticMenus.concat(menus),
-    offlineSession = scout.OfflineSession.createFromSession(this.session);
+    localSession = scout.LocalSession.createFromSession(this.session);
   // register keystrokes on root groupbox
   this.processButtons.forEach(function(button) {
-    menu = offlineSession.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
+    menu = localSession.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
       objectType: 'ButtonAdapterMenu',
       button: button
     }));

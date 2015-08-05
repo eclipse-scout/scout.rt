@@ -582,8 +582,8 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   };
 
   var messageBox = new scout.MessageBox(),
-    offlineSession = scout.OfflineSession.createFromSession(this);
-  offlineSession.send(function(target, type, event) {
+    localSession = scout.LocalSession.createFromSession(this);
+  localSession.send(function(target, type, event) {
     if ('action' === type) {
       delete this._fatalMessagesOnScreen[errorCode];
       messageBox.remove();
@@ -597,7 +597,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
       }
     }
   }.bind(this));
-  messageBox.init(model, offlineSession);
+  messageBox.init(model, localSession);
   messageBox.render(this.$entryPoint);
 };
 

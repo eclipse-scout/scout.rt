@@ -1,11 +1,11 @@
-describe('OfflineSession', function() {
+describe('LocalSession', function() {
 
   function createSession(userAgent) {
     setFixtures(sandbox());
     return sandboxSession({'userAgent':userAgent});
   }
 
-  var liveSession, offlineSession;
+  var liveSession, localSession;
 
   beforeEach(function() {
     liveSession = createSession();
@@ -14,9 +14,9 @@ describe('OfflineSession', function() {
   describe('createFromSession', function() {
 
     it('copies some properties from the real, live session', function() {
-      var offlineSession = scout.OfflineSession.createFromSession(liveSession);
+      var localSession = scout.LocalSession.createFromSession(liveSession);
       ['uiSessionId', '$entryPoint', 'objectFactory', 'userAgent'].forEach(function(propertyName) {
-        expect(offlineSession[propertyName]).toBe(liveSession[propertyName]);
+        expect(localSession[propertyName]).toBe(liveSession[propertyName]);
       });
     });
 
@@ -24,13 +24,13 @@ describe('OfflineSession', function() {
 
   describe('createUiObject', function() {
 
-    it('sets property \'id\' correctly, session must be set to OfflineSession', function() {
-      var offlineSession = scout.OfflineSession.createFromSession(liveSession);
+    it('sets property \'id\' correctly, session must be set to LocalSession', function() {
+      var localSession = scout.LocalSession.createFromSession(liveSession);
       var expectedSeqNo = scout._uniqueIdSeqNo + 1,
-        menu = offlineSession.createUiObject({objectType: 'Menu'});
+        menu = localSession.createUiObject({objectType: 'Menu'});
       expect(menu.id).toBe('ui' + expectedSeqNo.toString());
       expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
-      expect(menu.session).toBe(offlineSession);
+      expect(menu.session).toBe(localSession);
     });
 
   });

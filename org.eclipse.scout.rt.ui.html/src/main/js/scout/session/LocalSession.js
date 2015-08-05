@@ -1,11 +1,11 @@
 /**
- * The OfflineSession is used in place of the real, live Session.js in cases where
+ * The LocalSession is used in place of the real, live Session.js in cases where
  * you want to create model-adapters on the client-side only, without a model
  * living on the client-server-side. Use the <code>send(function)</code> method to
  * register a callback which is called when the model-adapter calls a server-side
  * method.
  */
-scout.OfflineSession = function($entryPoint, uiSessionId, objectFactory, userAgent) {
+scout.LocalSession = function($entryPoint, uiSessionId, objectFactory, userAgent) {
   this.$entryPoint = $entryPoint;
   this.uiSessionId = uiSessionId;
   this.objectFactory = objectFactory;
@@ -20,8 +20,8 @@ scout.OfflineSession = function($entryPoint, uiSessionId, objectFactory, userAge
  * properly. Also the objectFactory is copied, which is required when you want to use the
  * <code>createUiObject</code> method.
  */
-scout.OfflineSession.createFromSession = function(session) {
-  return new scout.OfflineSession(
+scout.LocalSession.createFromSession = function(session) {
+  return new scout.LocalSession(
       session.$entryPoint,
       session.uiSessionId,
       session.objectFactory,
@@ -31,7 +31,7 @@ scout.OfflineSession.createFromSession = function(session) {
 /**
  * Override this method to do something when send is called.
  */
-scout.OfflineSession.prototype.send = function(vararg, type, data, delay) {
+scout.LocalSession.prototype.send = function(vararg, type, data, delay) {
   if (typeof vararg === 'function') {
     this._sendHandler = vararg;
   } else {
@@ -40,16 +40,16 @@ scout.OfflineSession.prototype.send = function(vararg, type, data, delay) {
 };
 
 /**
- * OfflineSession doesn't register its adapters.
+ * LocalSession doesn't register its adapters.
  */
-scout.OfflineSession.prototype.registerModelAdapter = function(modelAdapter) {
+scout.LocalSession.prototype.registerModelAdapter = function(modelAdapter) {
   // NOP
 };
 
 /**
- * OfflineSession doesn't register its adapters.
+ * LocalSession doesn't register its adapters.
  */
-scout.OfflineSession.prototype.unregisterModelAdapter = function(modelAdapter) {
+scout.LocalSession.prototype.unregisterModelAdapter = function(modelAdapter) {
   // NOP
 };
 
@@ -61,13 +61,13 @@ scout.OfflineSession.prototype.unregisterModelAdapter = function(modelAdapter) {
  * The only model property required is 'objectType'. A unique ID is generated automatically,
  * when it is not provided by the model.
  */
-scout.OfflineSession.prototype.createUiObject = function(model) {
+scout.LocalSession.prototype.createUiObject = function(model) {
   if (!model || !model.objectType) {
     throw new Error('Missing objectType');
   }
   if (!this.objectFactory) {
-    throw new Error('No objectFactory is registered for OfflineSession. ' +
-        'Try to create on OfflineSession by calling the createFromSession(session) method');
+    throw new Error('No objectFactory is registered for LocalSession. ' +
+        'Try to create on LocalSession by calling the createFromSession(session) method');
   }
   if (model.id === undefined) {
     model.id = scout.createUniqueId();

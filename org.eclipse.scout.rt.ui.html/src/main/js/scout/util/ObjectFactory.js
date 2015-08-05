@@ -8,7 +8,7 @@ scout.ObjectFactory = function(session) {
 /**
  * @param model needs to contain property objectType
  * @param session (optional) if not set <code>this.session</code> is used as default. Basically this argument
- *   is used to replace the real, live session with an instance of OfflineSession.
+ *   is used to replace the real, live session with an instance of LocalSession.
  */
 scout.ObjectFactory.prototype.create = function(model, session) {
   session = scout.helpers.nvl(session, this.session);

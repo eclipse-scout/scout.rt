@@ -97,18 +97,18 @@ scout.TabAreaLayout.prototype._destroyEllipsis = function() {
 };
 
 scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
-  var menu, popup, offlineSession,
+  var menu, popup, localSession,
     overflowMenus = [],
     tabBox = this._tabBox;
   this._overflowTabs.forEach(function(tabItem) {
-    offlineSession = scout.OfflineSession.createFromSession(tabBox.session);
-    offlineSession.send(function(target, type) {
+    localSession = scout.LocalSession.createFromSession(tabBox.session);
+    localSession.send(function(target, type) {
       if ('doAction' === type) {
         $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + this.tabItem);
         tabBox._selectTab(this.tabItem);
       }
     });
-    menu = offlineSession.createUiObject({
+    menu = localSession.createUiObject({
       objectType: 'Menu',
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem
