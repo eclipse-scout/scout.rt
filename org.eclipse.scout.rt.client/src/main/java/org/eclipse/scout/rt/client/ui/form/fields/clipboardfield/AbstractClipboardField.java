@@ -13,10 +13,15 @@ package org.eclipse.scout.rt.client.ui.form.fields.clipboardfield;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
+import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.clipboardfield.IClipboardFieldExtension;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.TEXTS;
 
@@ -44,6 +49,10 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
 
     setAllowedMimeTypes(getConfiguredAllowedMimeTypes());
     setMaximumSize(getConfiguredMaximumSize());
+
+    // DND
+    setDropType(getConfiguredDropType());
+    setDragType(getConfiguredDragType());
   }
 
   /**
@@ -60,6 +69,36 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
   }
 
   /**
+   * Configures the drop support of this string field.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drop support).
+   *
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
+  @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
+  @Order(30)
+  protected int getConfiguredDropType() {
+    return IDNDSupport.TYPE_FILE_TRANSFER;
+  }
+
+  /**
+   * Configures the drag support of this string field.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drag support).
+   *
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
+  @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
+  @Order(40)
+  protected int getConfiguredDragType() {
+    return 0;
+  }
+
+  /**
    * Configures the allowed mime types for the clipboard paste event.
    * <p>
    * Subclasses can override this method. Default is <code>null</code> which does not restrict the allowed types.
@@ -67,9 +106,24 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
    * @return allowed mime types.
    */
   @ConfigProperty(ConfigProperty.MIME_TYPES)
-  @Order(20)
+  @Order(50)
   protected List<String> getConfiguredAllowedMimeTypes() {
     return null;
+  }
+
+  @ConfigOperation
+  @Order(60)
+  protected TransferObject execDragRequest() {
+    return null;
+  }
+
+  @ConfigOperation
+  @Order(70)
+  protected void execDropRequest(TransferObject transferObject) {
+    if (transferObject instanceof ResourceListTransferObject) {
+      ResourceListTransferObject resourceListTransferObject = (ResourceListTransferObject) transferObject;
+      setValue(resourceListTransferObject.getResources());
+    }
   }
 
   protected static class LocalClipboardFieldExtension<OWNER extends AbstractClipboardField> extends LocalValueFieldExtension<Collection<BinaryResource>, OWNER> implements IClipboardFieldExtension<OWNER> {
@@ -110,6 +164,51 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
 
   @Override
   protected String formatValueInternal(Collection<BinaryResource> value) {
-    return (value != null && !value.isEmpty()) ? TEXTS.get("ElementsInserted") : "";
+    return formatValueAsText(value);
+  }
+
+  protected String formatValueAsText(Collection<BinaryResource> value) {
+    if (value != null && !value.isEmpty()) {
+      for (BinaryResource res : value) {
+        if (MimeType.TEXT_PLAIN.getType().equals(res.getContentType())) {
+          return res.getContentAsString();
+        }
+      }
+      return TEXTS.get("ElementsInserted");
+    }
+    else {
+      return "";
+    }
+  }
+
+  // DND
+  @Override
+  public void setDragType(int dragType) {
+    propertySupport.setPropertyInt(PROP_DRAG_TYPE, dragType);
+  }
+
+  @Override
+  public int getDragType() {
+    return propertySupport.getPropertyInt(PROP_DRAG_TYPE);
+  }
+
+  @Override
+  public void setDropType(int dropType) {
+    propertySupport.setPropertyInt(PROP_DROP_TYPE, dropType);
+  }
+
+  @Override
+  public int getDropType() {
+    return propertySupport.getPropertyInt(PROP_DROP_TYPE);
+  }
+
+  @Override
+  public void setDropMaximumSize(long dropMaximumSize) {
+    setMaximumSize(dropMaximumSize);
+  }
+
+  @Override
+  public long getDropMaximumSize() {
+    return getMaximumSize();
   }
 }

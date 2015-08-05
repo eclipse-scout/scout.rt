@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
@@ -27,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
  * @see ClipboardForm ClipboardForm for an example implementation.
  * @since 5.1
  */
-public interface IClipboardField extends IValueField<Collection<BinaryResource>> {
+public interface IClipboardField extends IValueField<Collection<BinaryResource>>, IDNDSupport {
 
   String PROP_MAXIMUM_SIZE = "maximumSize";
   String PROP_ALLOWED_MIME_TYPES = "allowedMimeTypes";
