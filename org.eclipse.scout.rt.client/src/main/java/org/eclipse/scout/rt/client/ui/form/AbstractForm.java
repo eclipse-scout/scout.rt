@@ -1024,7 +1024,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
     }
     m_wizardStep = wizardStep;
-    setModal(false);
     setShowOnStart(false);
     setAskIfNeedSave(false);
     // hide top level process buttons with a system type
