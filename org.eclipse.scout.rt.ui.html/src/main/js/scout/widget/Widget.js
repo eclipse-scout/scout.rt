@@ -90,9 +90,9 @@ scout.Widget.prototype.remove = function() {
   this._trigger('remove');
 };
 
-scout.Widget.prototype._trigger = function(event) {
+scout.Widget.prototype._trigger = function(type, event) {
   if (this.events) {
-    this.events.trigger(event);
+    this.events.trigger(type, event);
   }
 };
 
