@@ -111,7 +111,9 @@ describe("ValueField", function() {
       // trigger acceptInput request (menu won't be shown before request is not finished)
       jasmine.clock().tick(0);
       sendQueuedAjaxCalls();
-      session.onAjaxAlways({success: true}, mostRecentJsonRequest());
+      // Simulate request response was processed...
+      session._requestsPendingCounter--;
+      session._fireRequestFinished(mostRecentJsonRequest());
 
       $menu = $('body').find('.popup-body');
       expect($menu.find('.menu-item').length).toBe(1);
