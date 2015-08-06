@@ -1,6 +1,8 @@
 package org.eclipse.scout.rt.platform.inventory.internal;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,16 +65,19 @@ public class JandexInventoryBuilder {
 
     //check for prepared index
     if (!(m_forceRebuildFolderIndexes && urlText.startsWith("file:"))) {
-      try (InputStream in = indexUri.toURL().openStream()) {
-        Index index = new IndexReader(in).read();
-        m_indexList.add(index);
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("found pre-built " + indexUri);
+      File indexFile = new File(indexUri);
+      if (indexFile.isFile()) {
+        try (InputStream in = new BufferedInputStream(new FileInputStream(indexFile))) {
+          Index index = new IndexReader(in).read();
+          m_indexList.add(index);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("found pre-built " + indexUri);
+          }
+          return;
         }
-        return;
-      }
-      catch (Exception ex) {
-        throw new PlatformException("error reading index: " + indexUri, ex);
+        catch (Exception ex) {
+          throw new PlatformException("error reading index: " + indexUri, ex);
+        }
       }
     }
 
