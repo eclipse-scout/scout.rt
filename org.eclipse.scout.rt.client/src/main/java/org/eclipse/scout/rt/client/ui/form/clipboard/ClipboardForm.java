@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardBox.ClipboardField;
+import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardLabel;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
@@ -60,8 +61,8 @@ public class ClipboardForm extends AbstractForm {
     getClipboardField().setAllowedMimeTypes(allowedMimeTypesListAsString);
   }
 
-  protected void setOkButtonVisibility() {
-    getOkButton().setEnabled(getClipboardField().getValue() != null && !getClipboardField().getValue().isEmpty());
+  protected void checkOkButtonEnabled() {
+    getOkButton().setEnabled(getHandler() instanceof CopyHandler || getClipboardField().getValue() != null && !getClipboardField().getValue().isEmpty());
   }
 
   @Override
@@ -69,9 +70,18 @@ public class ClipboardForm extends AbstractForm {
     return TEXTS.get("Clipboard");
   }
 
-  public void startClipboard() throws ProcessingException {
-    setHandler(new ClipboardHandler());
+  public void startCopy() throws ProcessingException {
+    setHandler(new CopyHandler());
     start();
+  }
+
+  public void startPaste() throws ProcessingException {
+    setHandler(new PasteHandler());
+    start();
+  }
+
+  public ClipboardLabel getClipboardLabel() {
+    return getFieldByClass(ClipboardLabel.class);
   }
 
   public ClipboardField getClipboardField() {
@@ -88,6 +98,11 @@ public class ClipboardForm extends AbstractForm {
 
   public class MainBox extends AbstractGroupBox {
 
+    @Override
+    protected int getConfiguredGridColumnCount() {
+      return 1;
+    }
+
     @Order(10.0)
     public class ClipboardLabel extends AbstractLabelField {
 
@@ -97,9 +112,18 @@ public class ClipboardForm extends AbstractForm {
       }
 
       @Override
+      protected int getConfiguredHeightInPixel() {
+        return 40;
+      }
+
+      @Override
+      protected boolean getConfiguredStatusVisible() {
+        return false;
+      }
+
+      @Override
       protected void execInitField() throws ProcessingException {
         super.execInitField();
-        setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
       }
 
       @Override
@@ -118,7 +142,7 @@ public class ClipboardForm extends AbstractForm {
 
       @Override
       protected int getConfiguredWidthInPixel() {
-        return 520;
+        return 705;
       }
 
       @Order(10.0)
@@ -140,8 +164,13 @@ public class ClipboardForm extends AbstractForm {
         }
 
         @Override
+        protected boolean getConfiguredStatusVisible() {
+          return false;
+        }
+
+        @Override
         protected void execChangedValue() throws ProcessingException {
-          setOkButtonVisibility();
+          checkOkButtonEnabled();
         }
       }
 
@@ -156,13 +185,28 @@ public class ClipboardForm extends AbstractForm {
     }
   }
 
-  public class ClipboardHandler extends AbstractFormHandler {
+  public class CopyHandler extends AbstractFormHandler {
 
     @Override
     protected void execLoad() throws ProcessingException {
       super.execLoad();
 
-      setOkButtonVisibility();
+      getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
+
+      getCancelButton().setVisible(false);
+      checkOkButtonEnabled();
+    }
+  }
+
+  public class PasteHandler extends AbstractFormHandler {
+
+    @Override
+    protected void execLoad() throws ProcessingException {
+      super.execLoad();
+
+      getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
+
+      checkOkButtonEnabled();
     }
   }
 }
