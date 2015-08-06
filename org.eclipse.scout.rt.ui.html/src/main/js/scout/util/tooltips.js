@@ -64,7 +64,9 @@ scout.TooltipSupport.prototype._removeTooltip = function() {
 };
 
 scout.TooltipSupport.prototype._showTooltip = function($comp) {
-  var text, tooltipTextData = this._options.tooltipText || $comp.data('tooltipText');
+  var text, tooltipTextData = this._options.tooltipText ||
+    $comp.data('tooltipText') ||
+    this._options.text;
   if ($.isFunction(tooltipTextData)) {
     text = tooltipTextData($comp);
   } else if (tooltipTextData) {
