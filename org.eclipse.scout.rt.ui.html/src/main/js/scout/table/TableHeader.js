@@ -19,7 +19,9 @@ scout.TableHeader.prototype._render = function() {
   var column, $header, alignment, $defaultCheckedColumHeader, $separator,
     that = this,
     columns = this.columns,
-    table = this.table;
+    table = this.table,
+    tooltipFunction = function(col) { if (col.data('column') && scout.strings.hasText(col.data('column').headerTooltip)) { return col.data('column').headerTooltip; }
+      else if (col.isContentTruncated() || (col.width() + col.position().left) > col.parent().width()) { return col.text(); } };
 
   this.$container = table.$data.beforeDiv('table-header');
 
@@ -36,6 +38,8 @@ scout.TableHeader.prototype._render = function() {
       .on('mousedown', '', dragHeader);
     column.$header = $header;
     column.filter = [];
+
+    scout.tooltips.install($header, this.session, { tooltipText: tooltipFunction });
 
     this._decorateHeader(column);
     alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);

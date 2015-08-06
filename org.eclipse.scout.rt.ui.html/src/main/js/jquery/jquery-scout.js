@@ -836,6 +836,9 @@
   };
 
 
+  /**
+   * Select all text within an element, e.g. within a content editable div element.
+   */
   $.fn.selectAllText = function() {
     var range,
       doc = document,
@@ -850,5 +853,23 @@
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
     }
+  };
+
+  /**
+   * Check if content is truncated, e.g. detects if an ellipsis is added to text
+   * (and is displayed instead of text itself).
+   */
+  $.fn.isContentTruncated = function() {
+    var $clone = this
+      .clone()
+      .css('display', 'inline')
+      .css('width', 'auto')
+      .css('visibility', 'hidden')
+      .appendTo('body');
+
+    var ret = $clone.width() > this.width();
+    $clone.remove();
+
+    return ret;
   };
 }(jQuery));
