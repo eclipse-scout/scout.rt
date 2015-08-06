@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.shared.notification;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.TypeCastUtility;
 
 /**
@@ -30,10 +32,10 @@ import org.eclipse.scout.commons.TypeCastUtility;
  */
 public class TypeParameterBeanRegistry<B> {
 
-  private final Map<Class<?>, List<B>> m_typeParamToBeans = new HashMap<>();
+  private final Map<Class<?>, List<B>> m_typeParamToBeans = new LinkedHashMap<>();
   protected final ReadWriteLock m_typeParamToBeansLock = new ReentrantReadWriteLock();
 
-  private final Map<Class<?>, List<B>> m_typeParamSubclassToBeans = new HashMap<>();
+  private final Map<Class<?>, List<B>> m_typeParamSubclassToBeans = new LinkedHashMap<>();
   protected final ReadWriteLock m_typeParamSubclassToBeansLock = new ReentrantReadWriteLock();
 
   /**
@@ -47,7 +49,6 @@ public class TypeParameterBeanRegistry<B> {
   public void registerBeans(Class<B> definingInterface, List<B> beans) {
     m_typeParamToBeansLock.writeLock().lock();
     try {
-
       for (B b : beans) {
         Class typeParam = TypeCastUtility.getGenericsParameterClass(b.getClass(), definingInterface);
         List<B> handlerList = m_typeParamToBeans.get(typeParam);
@@ -66,12 +67,15 @@ public class TypeParameterBeanRegistry<B> {
   /**
    * Returns all beans B&ltT&gt in this registry with the given generic parameter type &ltT&gt or a supertype of the
    * given generic parameter type.
+   * <p>
+   * The beans are returned in the original order (see {@link #registerBeans(Class, List)}).
+   * </p>
    *
    * @param typeParamClass
-   *          generic parameter type
+   *          generic parameter type, not <code>null</code>
    */
   public List<B> getBeans(Class<?> typeParamClass) {
-    List<B> beans = getCached(typeParamClass);
+    List<B> beans = getCached(Assertions.assertNotNull(typeParamClass));
     if (beans != null) {
       return new ArrayList<>(beans);
     }
@@ -80,6 +84,25 @@ public class TypeParameterBeanRegistry<B> {
       cacheTypeParamSubclass(typeParamClass, beans);
       return new ArrayList<B>(beans);
     }
+  }
+
+  /**
+   * Returns all beans B&ltT&gt in this registry with the given generic parameter type &ltT&gt or a supertype of the
+   * given generic parameter type.
+   *
+   * @param typeParamClass
+   *          generic parameter type, not <code>null</code>
+   */
+  public List<B> getBeans(List<Class<?>> typeParamClasses) {
+    if (Assertions.assertNotNull(typeParamClasses).isEmpty()) {
+      return new ArrayList<>();
+    }
+    //intersect and preserve order
+    LinkedHashSet<B> beans = new LinkedHashSet<>(getBeans(typeParamClasses.get(0)));
+    for (int i = 1; i < typeParamClasses.size(); i++) {
+      beans.retainAll(new LinkedHashSet<>(getBeans(typeParamClasses.get(i))));
+    }
+    return new ArrayList<>(beans);
   }
 
   private List<B> getCached(Class<?> clazz) {
@@ -93,19 +116,19 @@ public class TypeParameterBeanRegistry<B> {
   }
 
   protected List<B> findBeansForTypeParam(Class<?> typeParam) {
-    List<B> handlers = new LinkedList<>();
+    List<B> beans = new LinkedList<>();
     m_typeParamToBeansLock.readLock().lock();
     try {
       for (Entry<Class<?>, List<B>> e : m_typeParamToBeans.entrySet()) {
         if (e.getKey().isAssignableFrom(typeParam)) {
-          handlers.addAll(e.getValue());
+          beans.addAll(e.getValue());
         }
       }
+      return beans;
     }
     finally {
       m_typeParamToBeansLock.readLock().unlock();
     }
-    return handlers;
   }
 
   private void cacheTypeParamSubclass(Class<?> clazz, List<B> beans) {
