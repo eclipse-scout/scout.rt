@@ -949,6 +949,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (m_blockingCondition.isBlocking()) {
       throw new ProcessingException("The form " + getFormId() + " has already been started");
     }
+    // Ensure that boolean is set not only once by the constructor
+    setFormLoading(true);
     setHandler(handler);
     m_closeType = IButton.SYSTEM_TYPE_NONE;
     m_blockingCondition.setBlocking(true);
