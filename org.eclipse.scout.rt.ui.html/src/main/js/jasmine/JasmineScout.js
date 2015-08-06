@@ -16,6 +16,9 @@ function sandboxSession(options) {
   options.suppressErrors = true;
   session = new scout.Session($('#sandbox'), options);
   session.locale = new LocaleSpecHelper().createLocale('de');
+  session.desktop = new scout.Widget();
+  session.desktop._addEventSupport();
+
   return session;
 }
 
