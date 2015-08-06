@@ -174,7 +174,9 @@ scout.SplitBox.prototype._renderSplitterPosition = function() {
 };
 
 scout.SplitBox.prototype._renderSplitterEnabled = function() {
-  this._$splitter.setEnabled(this.splitterEnabled);
+  if (this._$splitter) {
+    this._$splitter.setEnabled(this.splitterEnabled);
+  }
 };
 
 scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
