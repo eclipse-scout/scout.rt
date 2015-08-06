@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -35,14 +34,6 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     m_proposal = model instanceof IProposalField;
   }
 
-  protected final boolean isProposal() {
-    return m_proposal;
-  }
-
-  protected final void setProposal(boolean proposal) {
-    m_proposal = proposal;
-  }
-
   @Override
   protected void initJsonProperties(CONTENT_ASSIST_FIELD model) {
     super.initJsonProperties(model);
@@ -62,19 +53,6 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     else {
       return "SmartField";
     }
-  }
-
-  /**
-   * Returns whether or not it is allowed to cache all options on the browser-side.
-   * When allowed, the client does not send any requests to the server while the
-   * smart-field is used until a value is selected.
-   */
-  protected boolean isCachingEnabled() {
-    return getModel().getClass().isAnnotationPresent(CachingEnabled.class);
-  }
-
-  protected String getLookupStrategy() {
-    return isCachingEnabled() ? "cached" : "remote";
   }
 
   @Override
