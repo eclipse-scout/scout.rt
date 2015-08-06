@@ -13,12 +13,11 @@ scout.Desktop = function() {
   this._outlineContent;
 
   /**
-   * FIXME DWI: (activeForm): selectedTool wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
+   * FIXME DWI: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
    * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
    * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
-  this.selectedTool;
   this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   this.viewTabsController;
@@ -101,25 +100,32 @@ scout.Desktop.prototype._postRender = function() {
   this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
+
+  // Align a potential open popup to its respective tool button.
+  this.actions
+      .filter(function(action) {
+        return action.selected && action.popup && action.popup.alignTo;
+      })
+      .some(function(action) {
+        action.popup.alignTo(); // TODO [dwi] positioning of the popup does not work properly, and must be analyzed in more detail (likely a timing problem; approx 10px too far on the left side)
+        return true;
+      });
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {
   if (!this._hasTaskBar()) {
     return;
   }
+
   // we set the menuStyle property to render a menu with a different style
   // depending on where the menu is located (taskbar VS menubar).
-  var i, action;
-  for (i = 0; i < this.actions.length; i++) {
-    action = this.actions[i];
+  this.actions.forEach(function(action) {
     action.actionStyle = scout.Action.ActionStyle.TASK_BAR;
     action.render(this._$toolBar);
-  }
-  if (action) {
-    action.$container.addClass('last');
-  }
-  if (this.selectedTool) {
-    this.selectedTool.popup.alignTo();
+  }.bind(this));
+
+  if (this.actions.length) {
+    this.actions[0].$container.addClass('last');
   }
 };
 
