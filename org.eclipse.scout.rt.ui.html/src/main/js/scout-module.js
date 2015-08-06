@@ -143,7 +143,7 @@ __include("scout/desktop/ViewMenuOpenKeyStroke.js");
 __include("scout/desktop/ViewMenuPopup.js");
 __include("scout/desktop/ViewMenuKeyStrokeAdapter.js");
 __include("scout/desktop/ViewMenuTab.js");
-__include("scout/desktop/ViewTabCompositeKeyStroke.js");
+__include("scout/desktop/ViewTabSelectKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/NullDesktopNavigation.js");
 __include("scout/desktop/FormToolButton.js");

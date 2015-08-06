@@ -14,14 +14,14 @@ scout.MenuBarPopup = function(menu, session, options) {
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
 /**
- * @override
+ * @override ContextMenuPopup.js
  */
 scout.MenuBarPopup.prototype._getMenuItems = function() {
   return this.menu.childActions || this.menu.menus;
 };
 
 /**
- * @override popup
+ * @override Popup.js
  */
 scout.MenuBarPopup.prototype.close = function(event) {
   if (!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent) {
@@ -29,6 +29,9 @@ scout.MenuBarPopup.prototype.close = function(event) {
   }
 };
 
+/**
+ * @override PopupWithHead.js
+ */
 scout.MenuBarPopup.prototype._renderHead = function() {
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
 
@@ -48,6 +51,9 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this._copyCssClassToHead('has-submenu');
 };
 
+/**
+ * @override Popup.js
+ */
 scout.MenuBarPopup.prototype._position = function($container) {
   var openingDirectionX, openingDirectionY, left, top, overlap, pos;
 

@@ -6,12 +6,6 @@ scout.FormToolPopup = function(formToolButton, session) {
   this.$headBlueprint = this.$formToolButton;
   this.formToolButton = formToolButton;
   formToolButton.form.rootGroupBox.menuBar.bottom();
-  if (formToolButton.keyStroke) {
-    var closeKeyStroke = new scout.PopupCloseKeyStroke(this);
-    closeKeyStroke.keyStroke = formToolButton.keyStroke;
-    closeKeyStroke.initKeyStrokeParts();
-    this.keyStrokeAdapter.registerKeyStroke(closeKeyStroke);
-  }
 };
 scout.inherits(scout.FormToolPopup, scout.PopupWithHead);
 

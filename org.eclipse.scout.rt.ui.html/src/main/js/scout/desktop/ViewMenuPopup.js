@@ -1,3 +1,6 @@
+/**
+ * Popup menu to switch between outlines.
+ */
 scout.ViewMenuPopup = function(session, $tab, viewMenus, naviBounds, breadcrumbEnabled) {
   scout.ViewMenuPopup.parent.call(this, session, {
     focusableContainer: true

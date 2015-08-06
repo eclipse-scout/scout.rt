@@ -116,13 +116,30 @@ scout.Button.prototype.doAction = function() {
   if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {
-    this.popup = new scout.MenuBarPopup(this, this.session);
-    this.popup.render();
+    this.togglePopup();
   } else {
     this.session.send(this.id, 'clicked');
   }
   return true;
 };
+
+scout.Button.prototype.togglePopup = function() {
+  if (this.popup) {
+    this.popup.close();
+  } else {
+    this.popup = this._openPopup();
+    this.popup.on('close', function(event) {
+      this.popup = null;
+    }.bind(this));
+  }
+};
+
+scout.Button.prototype._openPopup = function() {
+  var popup = new scout.MenuBarPopup(this, this.session);
+  popup.render();
+  return popup;
+};
+
 
 scout.Button.prototype.setSelected = function(selected) {
   this.selected = selected;

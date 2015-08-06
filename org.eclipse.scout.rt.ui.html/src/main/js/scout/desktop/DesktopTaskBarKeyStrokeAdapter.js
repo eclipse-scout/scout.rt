@@ -8,7 +8,7 @@ scout.DesktopTaskBarKeyStrokeAdapter = function(desktop) {
     '$container': desktop._$taskBar
   });
 
-  // Composite keystroke to switch between the view tabs.
-  this.registerKeyStroke(new scout.ViewTabCompositeKeyStroke(desktop));
+  // Composite keystroke to select a view-tab.
+  this.registerKeyStroke(new scout.ViewTabSelectKeyStroke(desktop));
 };
 scout.inherits(scout.DesktopTaskBarKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);

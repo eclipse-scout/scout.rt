@@ -135,12 +135,8 @@ scout.DesktopNavigation.prototype._setBreadcrumbEnabled = function(enabled) {
   }
 };
 
-scout.DesktopNavigation.prototype.doViewMenuAction = function() {
-  if (this.viewMenuTab.popup === undefined || !this.viewMenuTab.popup.rendered) {
-    this.viewMenuTab._onMousedownTab();
-  } else {
-    this.viewMenuTab.popup.close();
-  }
+scout.DesktopNavigation.prototype.doViewMenuAction = function(event) {
+  this.viewMenuTab.togglePopup(event);
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {

@@ -1,8 +1,8 @@
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
  */
-scout.ViewTabCompositeKeyStroke = function(desktop) {
-  scout.ViewTabCompositeKeyStroke.parent.call(this);
+scout.ViewTabSelectKeyStroke = function(desktop) {
+  scout.ViewTabSelectKeyStroke.parent.call(this);
 
   this._enabled = desktop.autoTabKeyStrokesEnabled;
   this._viewTabsController = desktop.viewTabsController;
@@ -15,12 +15,12 @@ scout.ViewTabCompositeKeyStroke = function(desktop) {
   this.asciiNum1= scout.keys['1'];
   this.asciiNum9 = scout.keys['9'];
 };
-scout.inherits(scout.ViewTabCompositeKeyStroke, scout.KeyStroke);
+scout.inherits(scout.ViewTabSelectKeyStroke, scout.KeyStroke);
 
 /**
  * @override Action.js
  */
-scout.ViewTabCompositeKeyStroke.prototype.handle = function(event) {
+scout.ViewTabSelectKeyStroke.prototype.handle = function(event) {
   var viewIndex = event.which - this.asciiNum1;
 
   if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
@@ -34,7 +34,7 @@ scout.ViewTabCompositeKeyStroke.prototype.handle = function(event) {
 /**
  * @override Action.js
  */
-scout.ViewTabCompositeKeyStroke.prototype.accept = function(event) {
+scout.ViewTabSelectKeyStroke.prototype.accept = function(event) {
   return this._enabled &&
       event &&
       event.which >= this.asciiNum1 &&
@@ -43,10 +43,11 @@ scout.ViewTabCompositeKeyStroke.prototype.accept = function(event) {
       event.altKey === this.alt &&
       event.shiftKey === this.shift;
 };
+
 /**
  * @override Action.js
  */
-scout.ViewTabCompositeKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+scout.ViewTabSelectKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   if (scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[1], scout.keys[9])) {
     return;
   }
@@ -59,7 +60,7 @@ scout.ViewTabCompositeKeyStroke.prototype.checkAndDrawKeyBox = function($contain
 /**
  * @override Action.js
  */
-scout.ViewTabCompositeKeyStroke.prototype._drawKeyBox = function($container) {
+scout.ViewTabSelectKeyStroke.prototype._drawKeyBox = function($container) {
   if (this.keyBoxDrawed) {
     return;
   }
@@ -76,7 +77,7 @@ scout.ViewTabCompositeKeyStroke.prototype._drawKeyBox = function($container) {
 /**
  * @override Action.js
  */
-scout.ViewTabCompositeKeyStroke.prototype.removeKeyBox = function($container) {
+scout.ViewTabSelectKeyStroke.prototype.removeKeyBox = function($container) {
   if (!this.keyBoxDrawed) {
     return;
   }
@@ -87,6 +88,6 @@ scout.ViewTabCompositeKeyStroke.prototype.removeKeyBox = function($container) {
   this.keyBoxDrawed = false;
 };
 
-scout.ViewTabCompositeKeyStroke.prototype._viewTabs = function() {
+scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
   return this._viewTabsController.viewTabs();
 };

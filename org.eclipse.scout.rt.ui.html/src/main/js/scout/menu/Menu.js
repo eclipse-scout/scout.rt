@@ -110,6 +110,17 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
   }
 };
 
+scout.Menu.prototype.togglePopup = function(event) {
+  if (this.popup) {
+    this.popup.close(event);
+  } else {
+    this.popup = this._openPopup(event);
+    this.popup.on('close', function(event) {
+      this.popup = null;
+    }.bind(this));
+  }
+};
+
 /**
  * @param event
  *          UI event that triggered the popup (e.g. 'mouse clicked'). This argument
@@ -117,23 +128,25 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
  *          from being closed again by the same event that bubbled to other elements.
  */
 scout.Menu.prototype._openPopup = function(event) {
-  this.popup = new scout.MenuBarPopup(this, this.session, {
+  var popup = new scout.MenuBarPopup(this, this.session, {
     ignoreEvent: event
   });
-  this.popup.render();
+  popup.render();
+  return popup;
 };
 
 /**
  * @override Action.js
  */
 scout.Menu.prototype.doAction = function(event) {
-  if (this.childActions.length > 0) {
+  if (this.childActions.length) {
     // Special handling if menu has childActions
-    if (!this.prepareDoAction()) {
+    if (this.prepareDoAction()) {
+      this.togglePopup(event);
+      return true;
+    } else {
       return false;
     }
-    this._openPopup(event);
-    return true;
   }
   // Default action handling
   return scout.Menu.parent.prototype.doAction.call(this, event);

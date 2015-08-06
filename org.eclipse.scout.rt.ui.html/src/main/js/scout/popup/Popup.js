@@ -12,7 +12,10 @@ scout.Popup = function(session, options) {
   this.init(session);
 
   options = options || {};
-  this._mouseDownHandler;
+  this._mouseDownHandler = this._onMouseDown.bind(this);
+  this._scrollHandler = this._onAnchorScroll.bind(this);
+  this._popupOpenHandler = this._onPopupOpen.bind(this);
+
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.openEvent;
   this.anchorBounds = options.anchorBounds;
@@ -25,6 +28,8 @@ scout.Popup = function(session, options) {
   this.installFocusContext = scout.helpers.nvl(options.installFocusContext, true);
   this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.FocusRule.AUTO; });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
+  this._addEventSupport();
+
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -73,32 +78,34 @@ scout.Popup.prototype._render = function($parent) {
 
 scout.Popup.prototype.close = function(event) {
   if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
+    this._trigger('close', event);
     this.remove();
   }
 };
 
 /**
- * click outside container, scroll down closes popup
+ * Install listeners to close the popup once clicking outside the popup,
+ * or changing the anchor's scroll position, or another popup is opened.
  */
 scout.Popup.prototype._attachCloseHandler = function() {
-  this._mouseDownHandler = this._onMouseDown.bind(this);
+  // Fire event that this popup is opening
+  this.session.desktop._trigger('popupopen', {popup: this});
+
+  // Register listeners to close the popup.
   $(document).on('mousedown', this._mouseDownHandler);
+  this.session.desktop.on('popupopen', this._popupOpenHandler);
 
   if (this.$anchor) {
-    this._scrollHandler = this._onAnchorScroll.bind(this);
     scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
   }
 };
 
 scout.Popup.prototype._detachCloseHandler = function() {
-  if (this._scrollHandler) {
+  if (this.$anchor) {
     scout.scrollbars.offScroll(this._scrollHandler);
-    this._$scrollParents = null;
   }
-  if (this._mouseDownHandler) {
+  this.session.desktop.off('popupopen', this._popupOpenHandler);
     $(document).off('mousedown', this._mouseDownHandler);
-    this._mouseDownHandler = null;
-  }
 };
 
 scout.Popup.prototype._onMouseDown = function(event) {
@@ -109,12 +116,27 @@ scout.Popup.prototype._onMouseDown = function(event) {
   }
 };
 
+/**
+ * Method invoked once a mouse down event occurs outside the popup.
+ */
 scout.Popup.prototype._onMouseDownOutside = function(event) {
   this.close(event);
 };
 
+/**
+ * Method invoked once the 'options.$anchor' is scrolled.
+ */
 scout.Popup.prototype._onAnchorScroll = function(event) {
-  this.remove();
+  this.close(event);
+};
+
+/**
+ * Method invoked once a popup is opened.
+ */
+scout.Popup.prototype._onPopupOpen = function(event) {
+  if (event.popup !== this) {
+    this.close(event);
+  }
 };
 
 scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {

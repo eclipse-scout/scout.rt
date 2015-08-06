@@ -15,7 +15,7 @@ scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
  */
 scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
   if (event && event.which === scout.keys.F2) {
-    this._desktopNavigation.doViewMenuAction();
+    this._desktopNavigation.doViewMenuAction(event);
   }
   event.preventDefault();
 };

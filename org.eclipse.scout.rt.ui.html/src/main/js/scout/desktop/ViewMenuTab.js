@@ -47,12 +47,12 @@ scout.ViewMenuTab.prototype._update = function() {
 
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-    .on('mousedown', this._onMousedownTab.bind(this))
+    .on('mousedown', this.togglePopup.bind(this))
     .data('tooltipText', function() { return this.text; }.bind(this));
   this.$title = this.$container.appendSpan('view-button-tab-title has-menu')
     .icon(this.iconId);
   this.$menuButton = this.$container.appendSpan('view-menu-button')
-    .on('mousedown', this._onMousedownMenuButton.bind(this));
+    .on('mousedown', this.togglePopup.bind(this));
   this._renderProperties();
 };
 
@@ -103,12 +103,23 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
   return null;
 };
 
-scout.ViewMenuTab.prototype._onMousedownTab = function(event) {
+/**
+ * Toggles the 'view menu popup', or brings the outline content to the front if in background.
+ */
+scout.ViewMenuTab.prototype.togglePopup = function(event) {
   if (this.selected) {
     if (this._inBackground) {
       this.session.desktop.bringOutlineToFront(this.outlineViewButton.outline);
     } else {
-      this._openMenu();
+      // Open or close the popup.
+      if (this.popup) {
+        this.popup.close(event);
+      } else {
+        this.popup = this._openPopup(event);
+        this.popup.on('close', function(event) {
+          this.popup = null;
+        }.bind(this));
+      }
       return false; // menu won't open if we didn't abort the mousedown-event
     }
   } else {
@@ -116,17 +127,12 @@ scout.ViewMenuTab.prototype._onMousedownTab = function(event) {
   }
 };
 
-scout.ViewMenuTab.prototype._onMousedownMenuButton = function(event) {
-  this._openMenu();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-};
-
-scout.ViewMenuTab.prototype._openMenu = function() {
+scout.ViewMenuTab.prototype._openPopup = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
-  this.popup = new scout.ViewMenuPopup(this.session, this.$container, this.viewMenus, naviBounds, this._breadcrumbEnabled);
-  this.popup.headText = this.text;
-  this.popup.render();
+  var popup = new scout.ViewMenuPopup(this.session, this.$container, this.viewMenus, naviBounds, this._breadcrumbEnabled);
+  popup.headText = this.text;
+  popup.render();
+  return popup;
 };
 
 scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {

@@ -16,11 +16,7 @@ scout.FormToolButton.prototype._render = function($parent) {
 };
 
 scout.FormToolButton.prototype.toggle = function() {
-  if (this.desktop.selectedTool === this) {
-    this.setSelected(false);
-  } else {
-    this.setSelected(true);
-  }
+  this.setSelected(!this.selected);
 };
 
 scout.FormToolButton.prototype._onMouseDown = function(event) {
@@ -30,9 +26,6 @@ scout.FormToolButton.prototype._onMouseDown = function(event) {
 scout.FormToolButton.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
-  }
-  if (this.desktop.selectedTool && this.desktop.selectedTool !== this) {
-    this.desktop.selectedTool.setSelected(false);
   }
   scout.FormToolButton.parent.prototype.setSelected.call(this, selected);
 };
@@ -68,14 +61,9 @@ scout.FormToolButton.prototype._renderSelected = function(selected) {
     if (this.form) {
       this._openContainer();
     }
-    this.desktop.selectedTool = this;
   } else {
     if (this.form) {
       this._closeContainer();
-    }
-    // Don't update the desktop initially -> only the selected tool is allowed to set it
-    if (this.rendered) {
-      this.desktop.selectedTool = null;
     }
   }
 };
