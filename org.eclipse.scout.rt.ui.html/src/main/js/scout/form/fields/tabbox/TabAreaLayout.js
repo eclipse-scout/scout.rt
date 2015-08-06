@@ -104,8 +104,8 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     localSession = scout.LocalSession.createFromSession(tabBox.session);
     localSession.send(function(target, type) {
       if ('doAction' === type) {
-        $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + this.tabItem);
-        tabBox._selectTab(this.tabItem);
+        $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
+        tabBox._selectTab(tabItem);
       }
     });
     menu = localSession.createUiObject({
