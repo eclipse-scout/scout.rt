@@ -31,7 +31,7 @@ public class HtmlScoutClipboardService extends AbstractService implements IClipb
   public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) throws ProcessingException {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(mimeTypes);
-    form.startClipboard();
+    form.startPaste();
     form.waitFor();
     if (form.isFormStored()) {
       return form.getClipboardField().getValue();
@@ -51,8 +51,7 @@ public class HtmlScoutClipboardService extends AbstractService implements IClipb
   public void setTextContents(String textContents) throws ProcessingException {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(new MimeType[]{MimeType.TEXT_PLAIN});
-    form.getCancelButton().setVisible(false);
     form.getClipboardField().setValue(Collections.singleton(new BinaryResource(MimeType.TEXT_PLAIN, textContents.getBytes())));
-    form.startClipboard();
+    form.startCopy();
   }
 }
