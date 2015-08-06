@@ -17,7 +17,7 @@ scout.MenuControlKeyStrokes.prototype.handle = function(event) {
     $selectedMenuItem = this._popup.$body.find('.' + this._menuItemClass + '.selected');
 
   if ((keycode === scout.keys.SPACE || keycode === scout.keys.ENTER) && $selectedMenuItem.length > 0) {
-    $selectedMenuItem.trigger('click');
+    $selectedMenuItem.trigger({ type: 'click', which: 1 }); // simulate left-mouse click
   }
   // move up
   if (keycode === scout.keys.UP) {
