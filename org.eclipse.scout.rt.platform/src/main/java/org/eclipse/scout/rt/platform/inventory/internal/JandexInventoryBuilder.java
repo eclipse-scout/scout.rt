@@ -53,12 +53,14 @@ public class JandexInventoryBuilder {
   public void scanModule(URL url) {
     String urlText = url.toExternalForm();
     URI indexUri;
+    String indexUrl = urlText.substring(0, urlText.length() - SCOUT_XML_PATH.length()) + JANDEX_INDEX_PATH;
     try {
-      indexUri = new URI(urlText.substring(0, urlText.length() - SCOUT_XML_PATH.length()) + JANDEX_INDEX_PATH);
+      indexUri = new URI(indexUrl);
     }
     catch (URISyntaxException ex) {
-      throw new PlatformException("create URI from: " + urlText + "/../../" + JANDEX_INDEX_PATH, ex);
+      throw new PlatformException("Cannot create URI from: " + indexUrl, ex);
     }
+
     //check for prepared index
     if (!(m_forceRebuildFolderIndexes && urlText.startsWith("file:"))) {
       try (InputStream in = indexUri.toURL().openStream()) {
@@ -70,11 +72,10 @@ public class JandexInventoryBuilder {
         return;
       }
       catch (Exception ex) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("reading " + indexUri, ex);
-        }
+        throw new PlatformException("error reading index: " + indexUri, ex);
       }
     }
+
     //scan location
     if (m_forceRebuildFolderIndexes) {
       LOG.info("forcing rebuild of index " + indexUri + "; scanning location...");
@@ -100,10 +101,10 @@ public class JandexInventoryBuilder {
         return;
       }
       //unknown protocol
-      throw new Exception("unknown protocol");
+      throw new Exception("unknown protocol: " + urlText);
     }
     catch (Exception ex) {
-      LOG.error("Cannot scan location '" + urlText + "' with jandex", ex);
+      throw new PlatformException("Cannot scan location '" + urlText + "' with jandex", ex);
     }
   }
 
