@@ -13,6 +13,7 @@ scout.FileChooserField.prototype._render = function($parent) {
       .on('dragenter', this._onDragEnterOrOver.bind(this))
       .on('dragover', this._onDragEnterOrOver.bind(this))
       .on('drop', this._onDrop.bind(this))
+      .on('keydown', this._onKeydown.bind(this))
       );
 
   this.addIcon();
@@ -43,10 +44,23 @@ scout.FileChooserField.prototype._onDrop = function(event) {
   }
 };
 
+scout.FileChooserField.prototype._onKeydown = function(event) {
+  if (event.which === scout.keys.DOWN) {
+    this.openFileChooser();
+    return false;
+  }
+  return true;
+};
+
 scout.FileChooserField.prototype._onClick = function(event) {
 };
 
 scout.FileChooserField.prototype._onIconClick = function(event) {
   scout.FileChooserField.parent.prototype._onIconClick.call(this, event);
+  this.openFileChooser();
+};
+
+scout.FileChooserField.prototype.openFileChooser = function() {
   this.session.send(this.id, 'chooseFile');
 };
+
