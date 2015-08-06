@@ -73,21 +73,35 @@ scout.FormFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
 };
 
 scout.FormFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
-  if (this._srcElement && this._srcElement.$field && this._srcElement.$field.is('input:text')) {
-    if (event.altKey || (event.altKey && event.shiftKey)) {
-      return false;
-    }
-    if (event.ctrlKey && event.shiftKey && this.ctrlShiftPreventBubbleUpKeys.indexOf(event.which) > -1) {
-      return true;
-    }
-    if (event.ctrlKey && this.ctrlPreventBubbleUpKeys.indexOf(event.which) > -1) {
-      //copy, paste, mark all, etc.
-      return true;
-    }
-    if (this.preventBubbleUpKeys.indexOf(event.which) > -1 || (event.which >= scout.keys.A && event.which <= scout.keys.Z) || (event.which >= scout.keys[0] && event.which <= scout.keys[9])) {
-      //all alphabetical chars, numbers, etc. which are captured by input.
-      return true;
-    }
+  if (this._srcElement.$field && this._srcElement.$field.is('input:text')) {
+    return this._isInputKeyStroke(event) ||
+      this._isCtrlPrevent(event) ||
+      this._isCtrlShiftPrevent(event);
+  } else {
     return false;
   }
+};
+
+scout.FormFieldKeyStrokeAdapter.prototype._isNumberKeyStroke = function(event) {
+  return event.which >= scout.keys[0] && event.which <= scout.keys[9];
+};
+
+scout.FormFieldKeyStrokeAdapter.prototype._isLetterKeyStroke = function(event) {
+  return event.which >= scout.keys.A && event.which <= scout.keys.Z;
+};
+
+scout.FormFieldKeyStrokeAdapter.prototype._isInputKeyStroke = function(event) {
+  if (event.ctrlKey || event.altKey) {
+    return false; // no printable character if Ctrl or Alt modifier is pressed.
+  } else {
+    return this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event) || this.preventBubbleUpKeys.indexOf(event.which) > -1 ;
+  }
+};
+
+scout.FormFieldKeyStrokeAdapter.prototype._isCtrlPrevent = function(event) {
+  return event.ctrlKey && this.ctrlPreventBubbleUpKeys.indexOf(event.which) > -1;
+};
+
+scout.FormFieldKeyStrokeAdapter.prototype._isCtrlShiftPrevent = function(event) {
+  return event.ctrlKey && event.shiftKey && this.ctrlShiftPreventBubbleUpKeys.indexOf(event.which) > -1;
 };

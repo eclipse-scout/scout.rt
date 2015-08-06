@@ -18,19 +18,7 @@ scout.DateFieldKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
 };
 
 scout.DateFieldKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
-    if (event.altKey || (event.altKey && event.shiftKey)) {
-      return false;
-    }
-    if (event.ctrlKey && event.shiftKey && this.ctrlShiftPreventBubbleUpKeys.indexOf(event.which) > -1) {
-      return true;
-    }
-    if (event.ctrlKey && this.ctrlPreventBubbleUpKeys.indexOf(event.which) > -1) {
-      //copy, paste, mark all, etc.
-      return true;
-    }
-    if (this.preventBubbleUpKeys.indexOf(event.which) > -1 || (event.which >= scout.keys.A && event.which <= scout.keys.Z) || (event.which >= scout.keys[0] && event.which <= scout.keys[9])) {
-      //all alphabetical chars, numbers, etc. which are captured by input.
-      return true;
-    }
-    return false;
+  return this._isInputKeyStroke(event) ||
+    this._isCtrlPrevent(event) ||
+    this._isCtrlShiftPrevent(event);
 };
