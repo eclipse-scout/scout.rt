@@ -234,6 +234,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
           radioButton.setBackgroundColor(row.getBackgroundColor());
           radioButton.setForegroundColor(row.getForegroundColor());
           radioButton.setFont(row.getFont());
+          radioButton.setEnabled(row.isActive());
           fields.addLast(radioButton);
         }
       }
@@ -314,7 +315,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * @return
    * @throws ProcessingException
    */
-  private List<ILookupRow<T>> getLookupRows() throws ProcessingException {
+  protected List<ILookupRow<T>> getLookupRows() throws ProcessingException {
     List<ILookupRow<T>> data;
     ILookupCall<T> call = getLookupCall();
     // Get the data
@@ -333,7 +334,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     return data;
   }
 
-  private void prepareLookupCall(ILookupCall<T> call) {
+  protected void prepareLookupCall(ILookupCall<T> call) {
     prepareLookupCallInternal(call);
     interceptPrepareLookup(call);
   }
@@ -346,7 +347,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  private void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+  protected void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
     interceptFilterLookupResult(call, result);
 
     // filter invalid rows
