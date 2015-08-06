@@ -104,7 +104,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
         uiSession.uiSessionLock().lock();
         try {
           if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-            writeResponse(httpResp, createSessionTerminatedResponse());
+            writeResponse(httpResp, createSessionTimeoutResponse());
             return true;
           }
           JSONObject jsonResp = uiSession.processFileUpload(httpReq, binaryResourceConsumer, uploadResources, uploadProperties);

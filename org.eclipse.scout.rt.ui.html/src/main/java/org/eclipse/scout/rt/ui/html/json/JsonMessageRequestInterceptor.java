@@ -109,7 +109,12 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         uiSession.uiSessionLock().lock();
         try {
           if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-            writeResponse(httpResp, createSessionTerminatedResponse());
+            if (jsonReq.isPollForBackgroundJobsRequest()) { // TODO BSH isManualLogout?
+              writeResponse(httpResp, createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
+            }
+            else {
+              writeResponse(httpResp, createSessionTimeoutResponse());
+            }
             return true;
           }
           JSONObject jsonResp = uiSession.processJsonRequest(httpReq, jsonReq);

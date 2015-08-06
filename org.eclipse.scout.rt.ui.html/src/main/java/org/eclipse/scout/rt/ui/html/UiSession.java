@@ -416,7 +416,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_disposed = true;
     if (isProcessingJsonRequest()) {
       // If there is a request in progress just mark the session as being disposed.
-      // The actual disposing happens before returning to the client, see processRequest.
+      // The actual disposing happens before returning to the client, see processJsonRequest().
       m_disposing = true;
       return;
     }
@@ -736,15 +736,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     JsonResponse jsonResponse = currentJsonResponse();
     if (jsonResponse != null) {
-      jsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
+      jsonResponse.addActionEvent(getUiSessionId(), getLogoutRedirectUrl(), createLogoutEventData());
     }
     LOG.info("Logged out successfully from UI session with ID " + m_uiSessionId);
   }
 
   protected JSONObject createLogoutEventData() {
     JSONObject obj = new JSONObject();
-    obj.put("redirectUrl", "logout");
+    obj.put("redirectUrl", getLogoutRedirectUrl());
     return obj;
+  }
+
+  @Override
+  public String getLogoutRedirectUrl() {
+    return "logout";
   }
 
   @Override

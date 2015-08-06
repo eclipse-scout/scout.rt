@@ -1,12 +1,6 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.BackgroundJobPollingStatus = {
-  STOPPED: 0,
-  RUNNING: 1,
-  FAILURE: 2
-};
-
 /**
  * $entryPoint and uiSessionId are required to create a new session.
  *
@@ -81,9 +75,9 @@ scout.Session = function($entryPoint, options) {
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper(this);
-  this._backgroundJobPollingEnabled = (options.backgroundJobPollingEnabled !== false);
-  this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
+  this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.helpers.nvl(options.backgroundJobPollingEnabled, true));
   this._fatalMessagesOnScreen = {};
+  this._loggedOut = false;
 
   this.modelAdapterRegistry[options.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
@@ -350,22 +344,9 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
+  var ajaxOptions = this.defaultAjaxOptions(request, !request.unload);
   var busyHandling = (!request.unload && !this.areRequestsPending());
-  if (busyHandling) {
-    this.setBusy(true);
-  }
-  this._requestsPendingCounter++;
-
-  var scoutData = {
-      jsError: undefined,
-      sucess: false,
-      busyHandling: busyHandling
-  };
-
-  $.ajax(this.defaultAjaxOptions(request, !request.unload))
-    .done(this.onAjaxDone.bind(this, scoutData))
-    .fail(this.onAjaxFail.bind(this, scoutData))
-    .always(this.onAjaxAlways.bind(this, scoutData));
+  this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
 };
 
 scout.Session.prototype.defaultAjaxOptions = function(request, async) {
@@ -378,25 +359,78 @@ scout.Session.prototype.defaultAjaxOptions = function(request, async) {
     contentType: 'application/json; charset=UTF-8',
     cache: false,
     url: this.url,
-    data: JSON.stringify(request),
-    context: request
+    data: JSON.stringify(request)
   };
+};
+
+scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling) {
+  if (busyHandling) {
+    this.setBusy(true);
+  }
+  this._requestsPendingCounter++;
+
+  var jsError = null,
+    success = false;
+
+  $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
+
+  // ----- Helper methods -----
+
+  function onAjaxDone(data) {
+    try {
+      if (data.error) {
+        this._processErrorJsonResponse(data.error);
+      } else {
+        this._processSuccessResponse(data);
+        success = true;
+      }
+    } catch (err) {
+      jsError = jsError || err;
+    }
+  }
+
+  function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    try {
+      this._processErrorResponse(jqXHR, textStatus, errorThrown);
+    } catch (err) {
+      jsError = jsError || err;
+    }
+  }
+
+  function onAjaxAlways(data, textStatus, errorThrown) {
+    this._requestsPendingCounter--;
+    if (busyHandling) {
+      this.setBusy(false);
+    }
+    this.layoutValidator.validate();
+    if (success) {
+      this._resumeBackgroundJobPolling();
+      this._fireRequestFinished(data);
+    }
+    // Throw previously catched error
+    if (jsError) {
+      throw jsError;
+    }
+  }
 };
 
 /**
  * Enable / disable background job polling.
  */
 scout.Session.prototype.enableBackgroundJobPolling = function(enabled) {
-  this._backgroundJobPollingEnabled = enabled;
+  this._backgroundJobPollingSupport.enabled(enabled);
 };
 
 /**
- * (Re-)starts background job polling when not started yet or when an error occured while polling.
+ * (Re-)starts background job polling when not started yet or when an error occurred while polling.
  * In the latter case, polling is resumed when a user-initiated request has been successful.
  */
 scout.Session.prototype._resumeBackgroundJobPolling = function() {
-  if (this._backgroundJobPollingEnabled && this._backgroundJobPollingStatus !== scout.BackgroundJobPollingStatus.RUNNING) {
-    $.log.info('Resume background jobs polling request, status was=' + this._backgroundJobPollingStatus);
+  if (this._backgroundJobPollingSupport.enabled() && this._backgroundJobPollingSupport.status() !== scout.BackgroundJobPollingStatus.RUNNING) {
+    $.log.info('Resume background jobs polling request, status was=' + this._backgroundJobPollingSupport.status());
     this._pollForBackgroundJobs();
   }
 };
@@ -413,7 +447,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     pollForBackgroundJobs: true
   };
 
-  this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.RUNNING;
+  this._backgroundJobPollingSupport.setRunning();
 
   var ajaxOptions = this.defaultAjaxOptions(request);
   // Add dummy parameter as marker (for debugging purposes)
@@ -431,10 +465,15 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       // when the next user-initiated request succeeds, we re-enable polling
       // otherwise the polling would ping the server to death in case of an error
       $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
-      this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.FAILURE;
+      this._backgroundJobPollingSupport.setFailed();
       this._processErrorJsonResponse(data.error);
     } else if (data.sessionTerminated) {
       $.log.warn('Session terminated, stopped polling for background jobs');
+      // If were are not yet logged out, redirect to the logout URL (the session that initiated the
+      // session invalidation will receive a dedicated logout event, redirect is handled there).
+      if (!this._loggedOut && data.redirectUrl) {
+        scout.reloadPage(data.redirectUrl, true);
+      }
     } else {
       this._processSuccessResponse(data);
       this.layoutValidator.validate();
@@ -443,8 +482,8 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
   }
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
-    this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.FAILURE;
-    this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+    this._backgroundJobPollingSupport.setFailed();
+    this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
 };
 
@@ -489,7 +528,7 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
 /**
  * @param textStatus 'timeout', 'abort', 'error' or 'parseerror' (see http://api.jquery.com/jquery.ajax/)
  */
-scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
+scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown, request) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
   // Status code = 0 -> no connection
@@ -651,21 +690,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   }
 
   var busyHandling = !this.areRequestsPending();
-  if (busyHandling) {
-    this.setBusy(true);
-  }
-  this._requestsPendingCounter++;
-
-  var scoutData = {
-      jsError: undefined,
-      sucess: false,
-      busyHandling: busyHandling
-  };
-
-  $.ajax(uploadAjaxOptions)
-    .done(this.onAjaxDone.bind(this, scoutData))
-    .fail(this.onAjaxFail.bind(this, scoutData))
-    .always(this.onAjaxAlways.bind(this, scoutData));
+  this._performUserAjaxRequest(uploadAjaxOptions, busyHandling);
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -885,6 +910,7 @@ scout.Session.prototype._onInitialized = function(event) {
 };
 
 scout.Session.prototype._onLogout = function(event) {
+  this._loggedOut = true;
   // Store the current session language in the session storage (will be respected by login.js/logout.js if set)
   sessionStorage.setItem('scout:preferredLanguage', this.locale.languageTag);
   // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
@@ -989,43 +1015,4 @@ scout.Session.prototype.unregisterAdapterClone = function(clone) {
     throw new Error('Adapter found, but clone is not registered');
   }
   entry.splice(i, 1);
-};
-
-//--- Helper methods ---
-
-scout.Session.prototype.onAjaxDone = function(scoutData, data) {
-  try {
-    if (data.error) {
-      this._processErrorJsonResponse(data.error);
-    } else {
-      this._processSuccessResponse(data);
-      scoutData.success = true;
-    }
-  } catch (err) {
-    scoutData.jsError = scoutData.jsError || err;
-  }
-};
-
-scout.Session.prototype.onAjaxFail = function(scoutData, jqXHR, textStatus, errorThrown) {
-  try {
-    this._processErrorResponse(undefined, jqXHR, textStatus, errorThrown);
-  } catch (err) {
-    scoutData.jsError = scoutData.jsError || err;
-  }
-};
-
-scout.Session.prototype.onAjaxAlways = function(scoutData, data, textStatus, errorThrown) {
-  this._requestsPendingCounter--;
-  if (scoutData.busyHandling) {
-    this.setBusy(false);
-  }
-  this.layoutValidator.validate();
-  if (scoutData.success) {
-    this._resumeBackgroundJobPolling();
-    this._fireRequestFinished(data);
-  }
-  // Throw previously catched error
-  if (scoutData.jsError) {
-    throw scoutData.jsError;
-  }
 };

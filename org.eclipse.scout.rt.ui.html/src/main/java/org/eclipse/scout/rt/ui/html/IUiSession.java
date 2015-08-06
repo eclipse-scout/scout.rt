@@ -146,6 +146,11 @@ public interface IUiSession {
 
   void unregisterJsonAdapter(String id);
 
+  /**
+   * @return the URL where to redirect the UI on logout
+   */
+  String getLogoutRedirectUrl();
+
   boolean isInspectorHint();
 
   /**

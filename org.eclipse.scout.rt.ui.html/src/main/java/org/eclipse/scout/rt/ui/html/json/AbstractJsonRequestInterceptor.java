@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -59,8 +60,20 @@ public abstract class AbstractJsonRequestInterceptor implements IServletRequestI
   }
 
   protected JSONObject createSessionTerminatedResponse() {
+    return createSessionTerminatedResponse(null);
+  }
+
+  /**
+   * @param redirectUrl
+   *          optional, URL where to redirect the UI. If <code>null</code>, session is informed about
+   *          session termination, but no redirection happens.
+   */
+  protected JSONObject createSessionTerminatedResponse(String redirectUrl) {
     JSONObject json = new JSONObject();
     json.put("sessionTerminated", Boolean.TRUE);
+    if (StringUtility.hasText(redirectUrl)) {
+      json.put("redirectUrl", redirectUrl);
+    }
     return json;
   }
 
