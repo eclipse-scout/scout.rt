@@ -250,7 +250,7 @@ scout.FileChooser.prototype.attach = function() {
 
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
-  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
+  scout.keyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   this.attached = true;
 };
@@ -268,7 +268,7 @@ scout.FileChooser.prototype.detach = function() {
     return;
   }
 
-  scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
+  scout.keyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 

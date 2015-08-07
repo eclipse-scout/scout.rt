@@ -249,7 +249,7 @@ scout.Form.prototype.attach = function() {
   }
 
   this.session.detachHelper.afterAttach(this.$container);
-  scout.KeyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
+  scout.keyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   // form is attached even if children are not yet
   this.attached = true;
@@ -281,7 +281,7 @@ scout.Form.prototype.detach = function() {
   this.messageBoxController.detach();
   this.fileChooserController.detach();
 
-  scout.KeyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
+  scout.keyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 

@@ -90,11 +90,11 @@ scout.Desktop.prototype._render = function($parent) {
   });
 
   // Keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
-  scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopBenchKeyStrokeAdapter(this));
+  scout.keyStrokeUtil.installAdapter(this.session, new scout.DesktopBenchKeyStrokeAdapter(this));
   // Keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
-  scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopViewButtonBarKeyStrokeAdapter(this));
+  scout.keyStrokeUtil.installAdapter(this.session, new scout.DesktopViewButtonBarKeyStrokeAdapter(this));
   // Keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
-  scout.KeyStrokeUtil.installAdapter(this.session, new scout.DesktopTaskBarKeyStrokeAdapter(this));
+  scout.keyStrokeUtil.installAdapter(this.session, new scout.DesktopTaskBarKeyStrokeAdapter(this));
 };
 
 scout.Desktop.prototype._postRender = function() {
@@ -279,7 +279,7 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 
 scout.Desktop.prototype.setOutlineContent = function(content) {
   if (this._outlineContent && this._outlineContent !== content) {
-    scout.KeyStrokeUtil.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
+    scout.keyStrokeUtil.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
     this._outlineContent.remove();
     this._outlineContent = null;
   }
