@@ -140,14 +140,6 @@
     return jQuery.ajax(options);
   };
 
-  $.returnTrue = function() {
-    return true;
-  };
-
-  $.returnFalse = function() {
-    return false;
-  };
-
   // === $.prototype extensions ===
 
   // prepend - and return new div for chaining

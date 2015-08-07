@@ -34,6 +34,7 @@ __include("scout/util/status.js");
 __include("scout/util/strings.js");
 __include("scout/util/URL.js");
 __include("scout/util/GlassPaneRenderer.js");
+__include("scout/util/Filters.js");
 // Session related
 __include("scout/session/BackgroundJobPollingSupport.js");
 __include("scout/session/BusyIndicator.js");

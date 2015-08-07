@@ -10,7 +10,7 @@ scout.KeyStrokeUtil = function() {
 scout.KeyStrokeUtil.init = function($entryPoint) {
   // Prevent browser to interpret F1 (help).
   if (window.onhelp) {
-    window.onhelp = $.returnFalse;
+    window.onhelp = scout.Filters.returnFalse;
   }
   var swallowHelpKeyStroke = function(event) {
     return !scout.KeyStrokeUtil._isHelpKeyStroke(event);
@@ -133,8 +133,5 @@ scout.KeyStrokeUtil._handleKeyStrokeEvent = function(adapter, event) {
   }
   if (stopBubble) {
     event.stopPropagation();
-    // FIXME [dwi] why validate focus?? Smartfield does not work that way
-    // FIXME [dwi] without this, arrow-down on table does not work correctly!!
-//    scout.focusManager.validateFocus(adapter.uiSessionId());
   }
 };

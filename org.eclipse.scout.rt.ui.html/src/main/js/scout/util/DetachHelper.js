@@ -112,35 +112,36 @@ scout.DetachHelper.prototype._restoreTooltips = function($container) {
 };
 
 scout.DetachHelper.prototype._storeFocusAndFocusContext = function($container, options) {
-  // Store current focus position
+  var focusedElement = $container.find(':focus')[0];
+
   if (options.storeFocus) {
-    var $focusedElement = $container.find(':focus');
-    if ($focusedElement.length) {
-      $container.data('lastFocus', $focusedElement);
-      $.log.debug('Stored focused element =' + scout.graphics.debugOutput($focusedElement));
+    if (focusedElement) {
+      $container.data('focus', focusedElement);
     } else {
-      $container.removeData('lastFocus');
+      $container.removeData('focus');
     }
   }
 
-  // Uninstall potential focus manager (must be after storing the focus)
   if ($container.isFocusContextInstalled(this.session)) {
     $container.uninstallFocusContext(this.session);
-    $container.data('focusContextInstalled', true);
+    $container.data('focusContext', true);
   } else {
-    $container.removeData('focusContextInstalled');
+    if (focusedElement) {
+      // Currently, the focus is on an element which is about to be detached. Hence, it must be set onto another control, which will not removed. Otherwise, the HTML body would be focused, because the currently focused element is removed from the DOM.
+      // JQuery implementation detail: the detach operation does not trigger a 'remove' event.
+      scout.focusManager.validateFocus(this.session.uiSessionId, scout.Filters.outsideFilter($container)); // exclude the container or any of its child elements to gain focus.
+    }
+    $container.removeData('focusContext');
   }
 };
 
 scout.DetachHelper.prototype._restoreFocusAndFocusContext = function($container) {
-  var $storedFocusElement = $container.data('lastFocus');
-  var focusContextInstalled = $container.data('focusContextInstalled');
+  var focusedElement = $container.data('focus');
+  var focusContext = $container.data('focusContext');
 
-  if (focusContextInstalled) {
-    $container.installFocusContext(this.session, $storedFocusElement || scout.FocusRule.AUTO);
-    $.log.debug('Restored focus manager and focus on element ' + scout.graphics.debugOutput($storedFocusElement));
-  } else if ($storedFocusElement) {
-    $storedFocusElement.focus();
-    $.log.debug('Restored focus on element ' + scout.graphics.debugOutput($storedFocusElement));
+  if (focusContext) {
+    $container.installFocusContext(this.session, focusedElement || scout.FocusRule.AUTO);
+  } else if (focusedElement) {
+    scout.focusManager.requestFocus(this.session.uiSessionId, focusedElement);
   }
 };

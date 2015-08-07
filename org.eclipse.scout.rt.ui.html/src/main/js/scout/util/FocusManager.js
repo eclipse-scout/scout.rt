@@ -115,13 +115,17 @@ scout.FocusManager.prototype.uninstallFocusContext = function(session, $containe
     return;
   }
 
+  // Filter to exclude the current focus context's container and any of its child elements to gain focus.
+  var filter = scout.Filters.outsideFilter(focusContext._$container);
+
+  // Remove and dispose the current focus context.
   scout.arrays.remove(this._contextsBySession(session.uiSessionId), focusContext);
   focusContext._dispose();
 
   // Activate last active focus context.
   var activeFocusContext = this._activeContext(session.uiSessionId);
   if (activeFocusContext) {
-    activeFocusContext._validateAndSetFocus(activeFocusContext._lastFocusedElement);
+    activeFocusContext._validateAndSetFocus(activeFocusContext._lastFocusedElement, filter);
   }
 };
 
@@ -159,7 +163,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function(session, $cont
       .find(':focusable')
       .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
       .not(session.$entryPoint) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
-      .filter(filter || $.returnTrue);
+      .filter(filter || scout.Filters.returnTrue);
 
 
   for (i = 0; i < $candidates.length; i++) {
@@ -193,10 +197,10 @@ scout.FocusManager.prototype.findFirstFocusableElement = function(session, $cont
 /**
  * Ensures proper focus on the currently active focus context.
  */
-scout.FocusManager.prototype.validateFocus = function(uiSessionId) {
+scout.FocusManager.prototype.validateFocus = function(uiSessionId, filter) {
   var activeContext = this._activeContext(uiSessionId);
   if (activeContext) {
-    activeContext._validateAndSetFocus(activeContext._lastFocusedElement);
+    activeContext._validateAndSetFocus(activeContext._lastFocusedElement, filter);
   }
 };
 

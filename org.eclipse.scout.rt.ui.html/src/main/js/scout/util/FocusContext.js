@@ -26,20 +26,12 @@ scout.FocusContext = function($container, session) {
 };
 
 scout.FocusContext.prototype._dispose = function() {
-  // Remove all listeners.
   this._$container
     .off('keydown', this._keyDownListener)
     .off('focusin', this._focusInListener)
     .off('focusout', this._focusOutListener)
     .off('hide', this._hideListener);
   $(this._focusedField).off('remove', this._removeListener);
-
-  // Focus the $entryPoint if the focus is currently on an element managed by this context.
-  // That is to not blur the focus once elements of this context are removed.
-  if (this._focusedField) {
-    this._focus(this.session.$entryPoint[0]);
-    this._focusedField = null;
-  }
 };
 
 /**
@@ -108,7 +100,8 @@ scout.FocusContext.prototype._onFocusOutEvent = function(event) {
 scout.FocusContext.prototype._onRemoveEvent = function(event) {
   // This listener is installed on the focused element only.
 
-  this._validateAndSetFocus(event.target, true); // Trigger validation because the focused element was removed.
+  this._validateAndSetFocus(null, scout.Filters.notSameFilter(event.target));
+
   event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
 };
 
@@ -117,31 +110,33 @@ scout.FocusContext.prototype._onRemoveEvent = function(event) {
  */
 scout.FocusContext.prototype._onHideEvent = function(event) {
   if ($(event.target).isOrHas(this._lastFocusedElement)) {
-    this._validateAndSetFocus(event.target, true); // Trigger validation because the focused element was hidden.
+    this._validateAndSetFocus(null, scout.Filters.notSameFilter(event.target));
+
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
   }
 };
 
 /**
- * Tries to set the focus according to the following policy:
+ * Focuses the given element if being a child of this context's container and matches the given filter (if provided).
  *
- * 1. Focuses the given element if being a child control of this context's $container, and is not covert by a glasspane;
- * 2. If not: Focuses the first valid child control of this context's $container;
- * 3. If not: Removes the focus from the currently active element (blur);
- *
+ * @param element
+ *        the element to gain focus, or null to focus the context's first focusable element matching the given filter.
+ * @param filter
+ *        filter to control which element to gain focus, or null to accept all focusable candidates.
  */
-scout.FocusContext.prototype._validateAndSetFocus = function(element, blurElement) {
+scout.FocusContext.prototype._validateAndSetFocus = function(element, filter) {
+  // Ensure the element to be a child element, or set it to null otherwise.
+  if (element && !$.contains(this._$container[0], element)) {
+    element = null;
+  }
+
   var elementToFocus = null;
-  if (blurElement) {
-    elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container, function() {
-      return this !== element;
-    });
+  if (!element) {
+    elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container, filter);
+  } else if (!filter || filter.call(element)) {
+    elementToFocus = element;
   } else {
-    if (element && this._isChildElement(element)) {
-      elementToFocus = element;
-    } else {
-      elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container);
-    }
+    elementToFocus = scout.focusManager.findFirstFocusableElement(this.session, this._$container, filter);
   }
 
   // Store the element to be focused, and regardless of whether currently covert by a glass pane or the focus manager is not active. That is for later focus restore.
@@ -179,14 +174,4 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   if ($.log.isDebugEnabled()) {
     $.log.debug('Focus set to ' + scout.graphics.debugOutput(elementToFocus));
   }
-};
-
-/**
- * Checks whether the given element is a child control of this context's $container.
- */
-scout.FocusContext.prototype._isChildElement = function(element) {
-  return $(element)
-      .not(this._$container) // element must not be $container
-      .closest(this._$container)
-      .length > 0;
 };
