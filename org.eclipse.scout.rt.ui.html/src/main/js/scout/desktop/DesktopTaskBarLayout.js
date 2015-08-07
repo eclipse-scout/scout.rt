@@ -33,13 +33,17 @@ scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
 scout.DesktopTabBarLayout.prototype.layout = function($container) {
   var $tabs = $container.find('.desktop-view-tabs'),
     $tools = $container.find('.taskbar-tools'),
-    $logo = $container.find('.taskbar-logo'),
     contWidth = scout.graphics.getSize($container).width,
-    logoWidth = scout.graphics.getSize($logo, true).width,
     numTabs = this._desktop.viewTabsController.viewTabCount(),
     largePrefTabsWidth = numTabs * this.TAB_WIDTH_LARGE,
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
+    logoWidth = 0,
     toolsWidth, tabsWidth;
+
+  if (this._desktop.session.uiOptions.useTaskbarLogo) {
+    var $logo = $container.find('.taskbar-logo');
+    logoWidth = scout.graphics.getSize($logo, true).width;
+  }
 
   // reset tabs and tool-items
   if (this._$overflowTab) {

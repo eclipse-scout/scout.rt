@@ -27,9 +27,9 @@ scout.FocusRule = {
  * Installs focus handling for the given session.
  */
 // FIXME AWE: make instance properties instead of using a map.
-scout.FocusManager.prototype.installManagerForSession = function(session, options) {
+scout.FocusManager.prototype.installManagerForSession = function(session, focusManagerActive) {
   this._sessionFocusContexts[session.uiSessionId] = {
-    active:  scout.helpers.nvl(options.focusManagerActive, true),
+    active:  scout.helpers.nvl(focusManagerActive, true),
     session: session,
     focusContexts: [],
     glassPaneTargets: []

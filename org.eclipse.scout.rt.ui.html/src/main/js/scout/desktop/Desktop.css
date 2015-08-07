@@ -240,6 +240,7 @@
   position: absolute;
   vertical-align:top;
   float: right;
+  white-space: nowrap;
 }
 
 .taskbar-tool-item {
@@ -367,10 +368,10 @@
   float: right;
   margin-top: 8px;
   margin-left: 20px;
-  margin-right: 13px;
-  width: 40px;
+  margin-right: 20px;
+  width: 33px;
   height: 33px;
-  background: url('logo.png');
+  background: url('taskbar-logo.png');
   background-size: contain;
   background-repeat: no-repeat;
 }

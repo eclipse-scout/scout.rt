@@ -2,19 +2,17 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 /**
- * $entryPoint and uiSessionId are required to create a new session.
- *
- * The argument partId is optional (default is '0'). It is only necessary when
- * multiple sessions are managed in the same VM (portlet support). Each session's
- * partId must be unique!
+ * $entryPoint and uiSessionId (in the options object) are required to create a new session.
  *
  * The 'options' argument holds all optional values that may be used during
  * initialization (it is the same object passed to the scout.init() function).
  * The following 'options' properties are read by this constructor function:
  *   [uiSessionId]
- *     Never null!
+ *     Mandatory UI session id, must be unique.
  *   [portletPartId]
- *     Default 0
+ *     Optional, default is 0. Necessary when multiple UI sessions are managed
+ *     by the same window (portlet support). Each session's partId must be unique.
+ *     (Usually, the partId is also part of the uiSessionId.)
  *   [clientSessionId]
  *     Identifies the 'client instance' on the UI server. If the property is not set
  *     (which is the default case), the clientSessionId is taken from the browser's
@@ -32,10 +30,14 @@
  *     use setTimeout(), sometimes the Jasmine-Maven plug-in fails and aborts the
  *     build because there were console errors. These errors always happen in this
  *     class. That's why we can skip suppress error handling with this flag.
+ *   [uiOptions]
+ *     Optional objects object that influences various parts of the core Scout Html UI.
+ *     Currently supported UI options:
+ *     o "useTaskbarLogo": Default false. If true, the desktop will add a small logo
+ *          to the taskbar. It is styled with the CSS class ".taskbar-logo".
  */
 scout.Session = function($entryPoint, options) {
   options = options || {};
-  options.portletPartId = options.portletPartId || '0';
 
   // Prepare clientSessionId
   var clientSessionId = options.clientSessionId;
@@ -50,7 +52,7 @@ scout.Session = function($entryPoint, options) {
   // Set members
   this.$entryPoint = $entryPoint;
   this.uiSessionId = options.uiSessionId;
-  this.partId = options.portletPartId;
+  this.partId = scout.helpers.nvl(options.portletPartId, 0);
   this.parentUiSession;
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
@@ -68,18 +70,19 @@ scout.Session = function($entryPoint, options) {
   this.url = 'json';
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
-  this._initObjectFactory(options);
+  this._initObjectFactory(options.objectFactories);
   this._texts = new scout.Texts();
   this._customParams;
   this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
-  this._busyCounter = 0; //  >0 = busy
+  this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper(this);
   this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.helpers.nvl(options.backgroundJobPollingEnabled, true));
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
+  this.uiOptions = options.uiOptions || {};
 
-  this.modelAdapterRegistry[options.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+  this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     id: '1',
@@ -88,7 +91,7 @@ scout.Session = function($entryPoint, options) {
 
   this._initCustomParams();
   this._registerWithParentUiSession();
-  scout.focusManager.installManagerForSession(this, options);
+  scout.focusManager.installManagerForSession(this, options.focusManagerActive);
   scout.KeyStrokeUtil.init(this.$entryPoint);
 };
 
@@ -143,15 +146,15 @@ scout.Session.prototype._throwError = function(message) {
   }
 };
 
-scout.Session.prototype._initObjectFactory = function(options) {
-  if (!options.objectFactories) {
+scout.Session.prototype._initObjectFactory = function(objectFactories) {
+  if (!objectFactories) {
     if (this.userAgent.deviceType === scout.UserAgent.DEVICE_TYPE_MOBILE) {
-      options.objectFactories = scout.mobileObjectFactories;
+      objectFactories = scout.mobileObjectFactories;
     } else {
-      options.objectFactories = scout.defaultObjectFactories;
+      objectFactories = scout.defaultObjectFactories;
     }
   }
-  this.objectFactory.register(options.objectFactories);
+  this.objectFactory.register(objectFactories);
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {

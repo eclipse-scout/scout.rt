@@ -136,9 +136,9 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
   this._$taskBar = $parent.appendDiv('desktop-taskbar');
   var htmlTabbar = new scout.HtmlComponent(this._$taskBar, this.session);
   htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
-  this._$taskBar.appendDiv('taskbar-logo')
-    .delay(1000)
-    .animateAVCSD('width', 40, null, null, 1000);
+  if (this.session.uiOptions.useTaskbarLogo) {
+    this._$taskBarLogo = this._$taskBar.appendDiv('taskbar-logo');
+  }
   this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
   this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
 };
