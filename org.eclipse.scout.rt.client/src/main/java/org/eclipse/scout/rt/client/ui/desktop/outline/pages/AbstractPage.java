@@ -579,14 +579,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         // mapping from TreeMenuType to TableMenuType
         HashSet<IMenuType> newMenuTypes = new HashSet<IMenuType>();
         for (IMenuType menuType : menu.getMenuTypes()) {
-          if (menuType == TreeMenuType.EmptySpace) {
-            newMenuTypes.add(TableMenuType.EmptySpace);
-          }
-          else if (menuType == TreeMenuType.SingleSelection) {
-            newMenuTypes.add(TableMenuType.SingleSelection);
-          }
-          else if (menuType == TreeMenuType.MultiSelection) {
-            newMenuTypes.add(TableMenuType.MultiSelection);
+          if (menuType == TreeMenuType.SingleSelection) {
+            newMenuTypes.add(TableMenuType.EmptySpace); // map tree context menu single selection to empty space for this page
           }
           newMenuTypes.add(menuType);
         }
