@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class ClientNotificationCoalescer {
       return CollectionUtility.arrayList(new ClientNotificationMessage(address, singleMessage.getNotification(), singleMessage.isDistributeOverCluster()));
     }
     else {
-      Map<Serializable, Boolean> notificationsIn = new HashMap<Serializable, Boolean>();
+      Map<Serializable, Boolean> notificationsIn = new LinkedHashMap<Serializable, Boolean>();
       for (ClientNotificationMessage singleMessage : messagesIn) {
         notificationsIn.put(singleMessage.getNotification(), singleMessage.isDistributeOverCluster());
       }
