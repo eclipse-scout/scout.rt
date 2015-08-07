@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.clientnotification;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -81,12 +84,29 @@ public class ClientNotificationPoller {
           IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
           handleMessagesReceived(svc.getNotifications(IClientSessionRegistry.NOTIFICATION_NODE_ID));
         }
+        catch (UndeclaredThrowableException e) {
+          if (e.getCause() instanceof ProcessingException) {
+            ProcessingException ex = (ProcessingException) e.getCause();
+            if (ex.isInterruption() || ex.isCancellation()) {
+              LOG.debug("Client notification polling has been interrupted.", e);
+            }
+            else {
+              handleNotificationException(ex);
+            }
+          }
+          else {
+            handleNotificationException(e);
+          }
+        }
         catch (Exception e) {
-          //server error?
-          LOG.error("Error receiving client notifications", e);
-          Thread.sleep(10000);
+          handleNotificationException(e);
         }
       }
+    }
+
+    private void handleNotificationException(Exception e) throws InterruptedException {
+      LOG.error("Error receiving client notifications", e);
+      Thread.sleep(TimeUnit.SECONDS.toMillis(10));
     }
   }
 }
