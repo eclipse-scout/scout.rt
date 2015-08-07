@@ -8,19 +8,13 @@ scout.localObjects = {
    * The only model property required is 'objectType'. A unique ID is generated automatically,
    * when it is not provided by the model.
    */
-  createObject: function(session, vararg) {
-    var model;
-    if (typeof vararg === 'string') {
-      model = {
-        objectType: vararg
-      };
-    } else if (typeof vararg === 'object') {
-      model = vararg;
+  createObject: function(session, model) {
+    if (typeof model === 'object') {
       if (!model.objectType) {
         throw new Error('missing property objectType');
       }
     } else {
-      throw new Error('varag must be a model object or a string with an objectType');
+      throw new Error('model must be an object');
     }
     if (model.id === undefined) {
       model.id = scout.createUniqueId();

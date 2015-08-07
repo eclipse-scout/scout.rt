@@ -613,6 +613,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 
   options = options || {};
   var model = {
+    objectType: 'MessageBox',
     iconId: options.iconId,
     severity: scout.helpers.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
     header: options.header,
@@ -623,7 +624,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     cancelButtonText: options.cancelButtonText
   };
 
-  var messageBox = scout.localObjects.createObject(this, 'MessageBox');
+  var messageBox = scout.localObjects.createObject(this, model);
   messageBox.remoteHandler = function(target, type, event) {
     if ('action' === type) {
       delete this._fatalMessagesOnScreen[errorCode];
