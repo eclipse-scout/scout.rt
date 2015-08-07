@@ -623,9 +623,8 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     cancelButtonText: options.cancelButtonText
   };
 
-  var messageBox = new scout.MessageBox(),
-    localSession = scout.LocalSession.createFromSession(this);
-  localSession.send(function(target, type, event) {
+  var messageBox = scout.LocalObject.createObject(this, 'MessageBox');
+  messageBox.remoteHandler = function(target, type, event) {
     if ('action' === type) {
       delete this._fatalMessagesOnScreen[errorCode];
       messageBox.remove();
@@ -638,8 +637,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
         options.cancelButtonAction.apply(this);
       }
     }
-  }.bind(this));
-  messageBox.init(model, localSession);
+  }.bind(this);
   messageBox.render(this.$entryPoint);
 };
 

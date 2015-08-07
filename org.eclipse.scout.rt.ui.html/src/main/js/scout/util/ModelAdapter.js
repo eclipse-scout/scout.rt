@@ -22,17 +22,28 @@ scout.ModelAdapter = function() {
   this.ownedAdapters = [];
 
   this.initialized = false;
+  this._register = true;
   this.destroyed = false;
   this._addEventSupport();
 };
 scout.inherits(scout.ModelAdapter, scout.Widget);
 
-scout.ModelAdapter.prototype.init = function(model, session) {
+/**
+ * @param model
+ * @param session
+ * @param register (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
+ *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
+ */
+scout.ModelAdapter.prototype.init = function(model, session, register) {
   scout.ModelAdapter.parent.prototype.init.call(this, session);
 
   this.id = model.id;
   this.objectType = model.objectType;
-  this.session.registerModelAdapter(this);
+  this.remoteHandler = session.send;
+  this._register = scout.helpers.nvl(register, true);
+  if (this._register) {
+    this.session.registerModelAdapter(this);
+  }
 
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
@@ -114,7 +125,9 @@ scout.ModelAdapter.prototype.destroy = function() {
   });
 
   this.remove();
-  this.session.unregisterModelAdapter(this);
+  if (this._register) {
+    this.session.unregisterModelAdapter(this);
+  }
 
   // Disconnect from owner
   if (this.owner) {

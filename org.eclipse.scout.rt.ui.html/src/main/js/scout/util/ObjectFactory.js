@@ -7,15 +7,13 @@ scout.ObjectFactory = function(session) {
 
 /**
  * @param model needs to contain property objectType
- * @param session (optional) if not set <code>this.session</code> is used as default. Basically this argument
- *   is used to replace the real, live session with an instance of LocalSession.
+ * @param register (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
+ *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
-scout.ObjectFactory.prototype.create = function(model, session) {
-  session = scout.helpers.nvl(session, this.session);
-
+scout.ObjectFactory.prototype.create = function(model, register) {
   var factories, factory, deviceType,
     index = this.deviceTypeLookupOrder.indexOf(currentDeviceType),
-    currentDeviceType = session.userAgent.deviceType;
+    currentDeviceType = this.session.userAgent.deviceType;
 
   for (index = index; index < this.deviceTypeLookupOrder.length || factory; index++) {
     deviceType = this.deviceTypeLookupOrder[index];
@@ -30,7 +28,7 @@ scout.ObjectFactory.prototype.create = function(model, session) {
     throw new Error('No factory registered for objectType ' + model.objectType);
   }
   var object = factory.create(model);
-  object.init(model, session);
+  object.init(model, this.session, register);
   return object;
 };
 

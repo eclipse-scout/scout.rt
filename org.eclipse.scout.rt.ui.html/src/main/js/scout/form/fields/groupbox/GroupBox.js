@@ -250,24 +250,26 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
 };
 
 scout.GroupBox.prototype._renderMenus = function() {
-  // create a menu-adapter for each process button
   var menu,
     menus = this.menus,
-    menuItems = this.staticMenus.concat(menus),
-    localSession = scout.LocalSession.createFromSession(this.session);
-  // register keystrokes on root groupbox
+    menuItems = this.staticMenus.concat(menus);
+
+  // create a menu-adapter for each process button
   this.processButtons.forEach(function(button) {
-    menu = localSession.createUiObject(scout.ButtonAdapterMenu.adaptButtonProperties(button, {
-      objectType: 'ButtonAdapterMenu',
-      button: button
+    menu = scout.LocalObject.createObject(this.session,
+      scout.ButtonAdapterMenu.adaptButtonProperties(button, {
+        objectType: 'ButtonAdapterMenu',
+        button: button
     }));
     menuItems.push(menu);
-  }.bind(this));
-  for (var i = 0; i < menuItems.length; i++) {
-    var menuItem = menuItems[i];
+  }, this);
+
+  // register keystrokes on root group-box
+  menuItems.forEach(function(menuItem) {
     this.registerRootKeyStroke(menuItem);
     this._registerButtonKeyStrokes(menuItem);
-  }
+  }, this);
+
   this.menuBar.updateItems(menuItems);
 };
 

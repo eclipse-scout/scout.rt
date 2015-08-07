@@ -200,7 +200,7 @@ scout.Action.prototype.prepareDoAction = function(event) {
 
 scout.Action.prototype.sendDoAction = function() {
   this.beforeSendDoAction();
-  this.session.send(this.id, 'doAction');
+  this.remoteHandler(this.id, 'doAction');
   this.afterSendDoAction();
 };
 

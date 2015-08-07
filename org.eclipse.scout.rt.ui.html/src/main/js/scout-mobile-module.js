@@ -42,7 +42,7 @@ __include("scout/session/Event.js");
 __include("scout/session/Locale.js");
 __include("scout/session/Reconnector.js");
 __include("scout/session/Session.js");
-__include("scout/session/LocalSession.js");
+__include("scout/session/LocalObject.js");
 __include("scout/session/UserAgent.js");
 // Basic layout
 __include("scout/layout/graphics.js");

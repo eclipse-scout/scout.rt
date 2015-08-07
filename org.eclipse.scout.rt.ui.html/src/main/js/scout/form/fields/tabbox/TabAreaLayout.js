@@ -101,18 +101,17 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     overflowMenus = [],
     tabBox = this._tabBox;
   this._overflowTabs.forEach(function(tabItem) {
-    localSession = scout.LocalSession.createFromSession(tabBox.session);
-    localSession.send(function(target, type) {
-      if ('doAction' === type) {
-        $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
-        tabBox._selectTab(tabItem);
-      }
-    });
-    menu = localSession.createUiObject({
+    menu = scout.LocalObject.createObject(tabBox.session, {
       objectType: 'Menu',
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem
     });
+    menu.remoteHandler = function(target, type) {
+      if ('doAction' === type) {
+        $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
+        tabBox._selectTab(tabItem);
+      }
+    };
     overflowMenus.push(menu);
   });
 
