@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.internal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.BeanUtility;
@@ -44,16 +45,16 @@ public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
-  private volatile State m_state; // may be read at any time by any thread
+  private AtomicReference<State> m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanContext;
 
   public PlatformImplementor() {
-    m_state = State.PlatformStopped;
+    m_state = new AtomicReference<>(State.PlatformStopped);
   }
 
   @Override
   public State getState() {
-    return m_state;
+    return m_state.get();
   }
 
   @Override
@@ -69,7 +70,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public void start() throws PlatformException {
+  public void start() {
     start(null);
   }
 
@@ -81,8 +82,8 @@ public class PlatformImplementor implements IPlatform {
         stateLatch.release();
       }
 
-      if (m_state != State.PlatformStopped) {
-        throw new PlatformException("Platform is not stopped [m_state=" + m_state + "]");
+      if (m_state.get() != State.PlatformStopped) {
+        throw new PlatformException("Platform is not stopped [m_state=" + m_state.get() + "]");
       }
 
       m_beanContext = createBeanManager();
@@ -200,23 +201,11 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public void stop() throws PlatformException {
-    stop(null);
-  }
+  public void stop() {
+    changeState(State.PlatformStopping, true);
 
-  @Override
-  public void stop(PlatformStateLatch stateLatch) {
     m_platformLock.writeLock().lock();
     try {
-      if (stateLatch != null) {
-        stateLatch.release();
-      }
-
-      if (m_state != State.PlatformStarted) {
-        throw new PlatformException("Platform is not started [m_state=" + m_state + "]");
-      }
-
-      changeState(State.PlatformStopping, false);
       if (Platform.get() == this) {
         Platform.set(null);
       }
@@ -232,38 +221,38 @@ public class PlatformImplementor implements IPlatform {
     m_beanContext = null;
   }
 
-  protected void changeState(State newState, boolean verify) {
-    if (verify) {
-      verifyStateChange(m_state, newState);
+  protected void changeState(State newState, boolean throwOnIllegalStateChange) {
+    if (newState == null) {
+      throw new IllegalArgumentException("new state cannot be null.");
     }
-    if (m_state == newState) {
+    if (m_state.get() == newState) {
       return;
     }
-    m_state = newState;
+
+    State expectedCurrentState = getPreviousState(newState);
+    if (expectedCurrentState == null) {
+      throw new IllegalStateException("Unknown state transition: '" + newState + "' has no preceeding state defined.");
+    }
+    if (!m_state.compareAndSet(expectedCurrentState, newState) && throwOnIllegalStateChange) {
+      throw new PlatformException("Invalid state change. Current state (" + m_state.get() + ") cannot be changed to " + newState + ". A state change to " + newState + " is only allowed in state " + expectedCurrentState);
+    }
     fireStateEvent(newState);
   }
 
-  protected void verifyStateChange(State oldState, State newState) {
-    if (oldState == newState) {
-      return;
+  protected static State getPreviousState(State reference) {
+    switch (reference) {
+      case BeanManagerPrepared:
+        return State.PlatformStopped;
+      case BeanManagerValid:
+        return State.BeanManagerPrepared;
+      case PlatformStarted:
+        return State.BeanManagerValid;
+      case PlatformStopping:
+        return State.PlatformStarted;
+      case PlatformStopped:
+        return State.PlatformStopping;
     }
-    if (oldState == State.PlatformStopped && newState == State.BeanManagerPrepared) {
-      return;
-    }
-    else if (oldState == State.BeanManagerPrepared && newState == State.BeanManagerValid) {
-      return;
-    }
-    else if (oldState == State.BeanManagerValid && newState == State.PlatformStarted) {
-      return;
-    }
-
-    else if (oldState == State.PlatformStarted && newState == State.PlatformStopping) {
-      return;
-    }
-    else if (oldState == State.PlatformStopping && newState == State.PlatformStopped) {
-      return;
-    }
-    throw new PlatformException("Invalid state change from " + oldState + " to " + newState);
+    return null;
   }
 
   protected void fireStateEvent(State newState) {

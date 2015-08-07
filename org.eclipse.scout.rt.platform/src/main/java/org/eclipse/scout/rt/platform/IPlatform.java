@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-
 /**
  * All instances of IPlatformListener receive event notifications from the platform
  */
@@ -56,7 +54,7 @@ public interface IPlatform {
 
   IBeanManager getBeanManager();
 
-  void start() throws PlatformException;
+  void start();
 
   /**
    * @param stateLatch
@@ -66,19 +64,9 @@ public interface IPlatform {
    *          <p>
    *          If no such synchronization is required, use {@link #start()}.
    */
-  void start(PlatformStateLatch stateLatch) throws PlatformException;
+  void start(PlatformStateLatch stateLatch);
 
-  void stop() throws PlatformException;
-
-  /**
-   * @param stateLatch
-   *          an optional object that can be used to wait for the internal platform lock to be acquired. Consumers of
-   *          this method may call {@link PlatformStateLatch#await()} to be blocked until the {@link IPlatform}
-   *          implementor has acquired it's internal lock.
-   *          <p>
-   *          If no such synchronization is required, use {@link #stop()}.
-   */
-  void stop(PlatformStateLatch stateLatch) throws PlatformException;
+  void stop();
 
   boolean inDevelopmentMode();
 }
