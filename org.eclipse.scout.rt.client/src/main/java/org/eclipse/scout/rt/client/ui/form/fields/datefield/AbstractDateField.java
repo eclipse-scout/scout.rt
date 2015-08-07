@@ -346,7 +346,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
   }
 
-  private void preventUpdateDisplaytextOnModifiyOnDateTimeField() {
+  protected void preventUpdateDisplaytextOnModifiyOnDateTimeField() {
     if (isUpdateDisplayTextOnModify() && isHasDate() && isHasTime()) {
       LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field " + getClass().getName());
       setUpdateDisplayTextOnModify(false);
@@ -442,25 +442,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     return displayValue;
   }
 
-  // validate value for ranges, mandatory, ...
-  @Override
-  protected Date validateValueInternal(Date rawValue) throws ProcessingException {
-    Date validValue = null;
-    rawValue = super.validateValueInternal(rawValue);
-    if (rawValue != null) {
-      try {
-        // apply format
-//        DateFormat df = getDateFormat();
-//        rawValue = df.parse(df.format(rawValue));
-      }
-      catch (Exception t) {
-        // nop, take raw value
-      }
-    }
-    validValue = rawValue;
-    return validValue;
-  }
-
   @Override
   public Double getTimeValue() {
     return DateUtility.convertDateToDoubleTime(getValue());
@@ -475,7 +456,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    * @since Build 200
    * @rn imo, 06.04.2006, only adjust date not date/time
    */
-  private Date applyAutoTime(Date d) {
+  protected Date applyAutoTime(Date d) {
     if (d == null) {
       return d;
     }
@@ -503,7 +484,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     return d;
   }
 
-  private Date applyAutoDate(Date d) {
+  protected Date applyAutoDate(Date d) {
     if (d != null) {
       return d;
     }
