@@ -16,6 +16,8 @@ import java.security.Permissions;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Order;
@@ -65,8 +67,15 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   public void handleNotification(IAccessControlNotification notification) {
     if (notification.getClass() == AccessControlChangedNotification.class) {
       ServiceState state = getServiceState();
-      synchronized (state.m_cacheLock) {
-        state.m_permissions = ((AccessControlChangedNotification) notification).getPermissions();
+      // use tryLock because the ensureCacheLoaded() calls the backend which triggers a notification import (that's why this method may be invoked)
+      // in this case don't lock because it is already held by ensureCacheLoaded() and the notifications can be ignored because the ensureCacheLoaded() writes them.
+      if (state.m_lock.tryLock()) {
+        try {
+          state.m_permissions = ((AccessControlChangedNotification) notification).getPermissions();
+        }
+        finally {
+          state.m_lock.unlock();
+        }
       }
     }
     else if (notification.getClass() == ResetAccessControlChangedNotification.class) {
@@ -154,13 +163,17 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   private void ensureCacheLoaded(ServiceState state) {
-    synchronized (state.m_cacheLock) {
+    state.m_lock.lock();
+    try {
       if (state.m_permissions == null) {
         // clear cache
         state.m_checkPermissionCache = new TTLCache<String, Boolean>(BasicHierarchyPermission.getCacheTimeoutMillis());
         // load permissions from backend
         state.m_permissions = getRemoteService().getPermissions();
       }
+    }
+    finally {
+      state.m_lock.unlock();
     }
   }
 
@@ -177,8 +190,12 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   @Override
   public void clearCache() {
     ServiceState state = getServiceState();
-    synchronized (state.m_cacheLock) {
+    state.m_lock.lock();
+    try {
       state.m_permissions = null;
+    }
+    finally {
+      state.m_lock.unlock();
     }
   }
 
@@ -192,7 +209,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   private static class ServiceState {
-    final Object m_cacheLock = new Object();
+    final Lock m_lock = new ReentrantLock();
     // permissions cache
     Permissions m_permissions;
     // query cache
