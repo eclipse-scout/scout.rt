@@ -1,5 +1,7 @@
 scout.ClipboardField = function() {
   scout.ClipboardField.parent.call(this);
+
+  this._fileUploadWaitRetryCountTimeout = 99;
 };
 scout.inherits(scout.ClipboardField, scout.ValueField);
 
@@ -110,16 +112,16 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   // upload function needs to be called asynchronously to support real files
   var uploadFunctionTimeoutCount = 0;
   var uploadFunction = function() {
-    if (waitForFileReaderEvents !== 0 && uploadFunctionTimeoutCount++ !== 99) {
+    if (waitForFileReaderEvents !== 0 && uploadFunctionTimeoutCount++ !== this._fileUploadWaitRetryCountTimeout) {
       setTimeout(uploadFunction, 150);
       return;
     }
 
-    if (uploadFunctionTimeoutCount >= 99) {
+    if (uploadFunctionTimeoutCount >= this._fileUploadWaitRetryCountTimeout) {
       var boxOptions = {
-        header: this.session._texts.get('ui.ClipboardTimeoutTitle'),
-        body: this.session._texts.get('ui.ClipboardTimeout'),
-        yesButtonText: this.session.optText('Ok', 'Ok')
+        header: this.session.text('ui.ClipboardTimeoutTitle'),
+        body: this.session.text('ui.ClipboardTimeout'),
+        yesButtonText: this.session.text('Ok')
       };
 
       this.session.showFatalMessage(boxOptions);
@@ -141,7 +143,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     var restoreOldHtmlContent = function() {
       this.$field.html(oldHtmlContent);
       scout.scrollbars.install(this.$field, this.session);
-    };
+    }.bind(this);
 
     setTimeout(function() {
       $.each(this.$field.children(), function(idx, elem) {
@@ -171,18 +173,18 @@ scout.ClipboardField.prototype._onPaste = function(event) {
         }
       }.bind(this));
 
-      restoreOldHtmlContent.call(this);
-      uploadFunction.call(this);
+      restoreOldHtmlContent();
+      uploadFunction();
     }.bind(this), 0);
-  };
+  }.bind(this);
 
   if (contentCount > 0) {
-    uploadFunction.call(this);
+    uploadFunction();
 
     // do not trigger any other actions
     return false;
   } else {
-    uploadContentFunction.call(this);
+    uploadContentFunction();
 
     // trigger other actions to catch content
     return true;
