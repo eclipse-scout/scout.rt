@@ -20,7 +20,6 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
@@ -104,9 +103,9 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
    *           {@link #addCustomHeaders(URLConnection, String)}
    */
   protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
-    // fast check of dummy URL's
-    if (getServerUrl().getProtocol().startsWith("file")) {
-      throw new IOException("File connection is not supporting HTTP: " + getServerUrl());
+    // fast check of wrong URL's for this tunnel
+    if (!"http".equalsIgnoreCase(getServerUrl().getProtocol()) && !"https".equalsIgnoreCase(getServerUrl().getProtocol())) {
+      throw new IOException("URL '" + getServerUrl().toString() + "' is not supported by this tunnel ('" + getClass().getName() + "').");
     }
 
     // configure POST with text/xml
@@ -148,8 +147,14 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     if (!DefaultAuthToken.isActive()) {
       return null;
     }
-    String userId = CollectionUtility.firstElement(Assertions.assertNotNull(Subject.getSubject(AccessController.getContext())).getPrincipals()).getName();
-//    String userId = CollectionUtility.firstElement(getSession().getSubject().getPrincipals()).getName();
+
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null || subject.getPrincipals().isEmpty()) {
+      // can happen e.g. when the container is shutting down
+      return null;
+    }
+
+    String userId = CollectionUtility.firstElement(subject.getPrincipals()).getName();
     DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
     token.init(userId);
     return token.toString();
