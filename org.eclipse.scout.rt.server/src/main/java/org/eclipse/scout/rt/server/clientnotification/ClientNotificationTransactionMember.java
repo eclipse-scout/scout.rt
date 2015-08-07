@@ -70,7 +70,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
   private void publish(List<ClientNotificationMessage> coalescedNotifications) {
     if (isPiggyBackPossible()) {
       preparePiggyBack(coalescedNotifications);
-      m_notificationRegistry.publish(coalescedNotifications, getCurrentNodeId());
+      m_notificationRegistry.publish(coalescedNotifications, getCurrentUiNodeId());
     }
     else {
       m_notificationRegistry.publish(coalescedNotifications);
@@ -93,7 +93,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
     return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get() != null && ClientNotificationNodeId.get() != null;
   }
 
-  private String getCurrentNodeId() {
+  private String getCurrentUiNodeId() {
     return Assertions.assertNotNull(ClientNotificationNodeId.CURRENT.get(), "No 'notification node id' found on current calling context");
   }
 

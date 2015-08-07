@@ -20,14 +20,20 @@ public class ClientNotificationMessage implements Serializable {
 
   private final ClientNotificationAddress m_address;
   private final Serializable m_notification;
+  private final boolean m_distributeOverCluster;
 
-  public ClientNotificationMessage(ClientNotificationAddress address, Serializable notification) {
+  public ClientNotificationMessage(ClientNotificationAddress address, Serializable notification, boolean distributeOverCluster) {
     m_address = address;
     m_notification = notification;
+    m_distributeOverCluster = distributeOverCluster;
   }
 
   public ClientNotificationAddress getAddress() {
     return m_address;
+  }
+
+  public boolean isDistributeOverCluster() {
+    return m_distributeOverCluster;
   }
 
   public Serializable getNotification() {

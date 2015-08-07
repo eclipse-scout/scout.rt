@@ -62,8 +62,8 @@ public class ClientNotificationNodeQueueTest {
       }
     });
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
-    m_queue.put(new ClientNotificationMessage(allNodes, "test"));
-    m_queue.put(new ClientNotificationMessage(allNodes, "test2"));
+    m_queue.put(new ClientNotificationMessage(allNodes, "test", true));
+    m_queue.put(new ClientNotificationMessage(allNodes, "test2", true));
     List<ClientNotificationMessage> notifications = res.awaitDoneAndGet();
     assertEquals(2, notifications.size());
     assertEquals("test", notifications.get(0).getNotification());
@@ -81,7 +81,7 @@ public class ClientNotificationNodeQueueTest {
   private void putTestNotifications(int count) {
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     for (int i = 0; i < count; i++) {
-      m_queue.put(new ClientNotificationMessage(allNodes, "test" + i));
+      m_queue.put(new ClientNotificationMessage(allNodes, "test" + i, true));
     }
   }
 

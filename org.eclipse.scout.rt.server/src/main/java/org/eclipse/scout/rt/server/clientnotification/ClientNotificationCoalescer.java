@@ -35,36 +35,42 @@ public class ClientNotificationCoalescer {
     LinkedHashSet<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<ClientNotificationMessage>(inNotifications);
     List<ClientNotificationMessage> result = new ArrayList<>();
     // sort by address
-    Map<ClientNotificationAddress, List<Serializable>> notificationsPerAddress = new HashMap<>();
+    Map<ClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = new HashMap<>();
     for (ClientNotificationMessage message : notificationsNoDuplicates) {
-      List<Serializable> notifications = notificationsPerAddress.get(message.getAddress());
-      if (notifications == null) {
-        notifications = new ArrayList<>();
-        notificationsPerAddress.put(message.getAddress(), notifications);
+      List<ClientNotificationMessage> messages = messagesPerAddress.get(message.getAddress());
+      if (messages == null) {
+        messages = new ArrayList<ClientNotificationMessage>();
+        messagesPerAddress.put(message.getAddress(), messages);
       }
-      notifications.add(message.getNotification());
+      messages.add(message);
     }
-    for (Entry<ClientNotificationAddress, List<Serializable>> e : notificationsPerAddress.entrySet()) {
+    for (Entry<ClientNotificationAddress, List<ClientNotificationMessage>> e : messagesPerAddress.entrySet()) {
       result.addAll(coalesce(e.getKey(), e.getValue()));
     }
     return result;
   }
 
-  protected List<ClientNotificationMessage> coalesce(ClientNotificationAddress address, List<Serializable> notificationsIn) {
-    if (notificationsIn.isEmpty()) {
+  protected List<ClientNotificationMessage> coalesce(ClientNotificationAddress address, List<ClientNotificationMessage> messagesIn) {
+    if (messagesIn.isEmpty()) {
       return new ArrayList<>();
     }
-    else if (notificationsIn.size() == 1) {
+    else if (messagesIn.size() == 1) {
       // no coalesce needed
-      return CollectionUtility.arrayList(new ClientNotificationMessage(address, CollectionUtility.firstElement(notificationsIn)));
+      ClientNotificationMessage singleMessage = CollectionUtility.firstElement(messagesIn);
+      return CollectionUtility.arrayList(new ClientNotificationMessage(address, singleMessage.getNotification(), singleMessage.isDistributeOverCluster()));
     }
     else {
-      List<? extends Serializable> outNotifications = BEANS.get(NotificationCoalescer.class).coalesce(notificationsIn);
-      List<ClientNotificationMessage> result = new ArrayList<>();
+      Map<Serializable, Boolean> notificationsIn = new HashMap<Serializable, Boolean>();
+      for (ClientNotificationMessage singleMessage : messagesIn) {
+        notificationsIn.put(singleMessage.getNotification(), singleMessage.isDistributeOverCluster());
+      }
+      List<? extends Serializable> outNotifications = BEANS.get(NotificationCoalescer.class).coalesce(new ArrayList<Serializable>(notificationsIn.keySet()));
+      List<ClientNotificationMessage> result = new ArrayList<ClientNotificationMessage>();
       for (Serializable n : outNotifications) {
-        result.add(new ClientNotificationMessage(address, n));
+        result.add(new ClientNotificationMessage(address, n, notificationsIn.get(n)));
       }
       return result;
     }
   }
+
 }

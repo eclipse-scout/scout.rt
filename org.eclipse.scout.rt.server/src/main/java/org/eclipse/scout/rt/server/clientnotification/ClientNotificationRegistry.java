@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -116,14 +116,24 @@ public class ClientNotificationRegistry {
   }
 
   // put methods
+  public void putForUser(String userId, Serializable notification) {
+    putForUser(userId, notification, true);
+  }
+
   /**
    * The notification will be distributed to all sessions of the given userId.
    *
    * @param userId
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putForUser(String userId, Serializable notification) {
-    putForUsers(Collections.singleton(userId), notification);
+  public void putForUser(String userId, Serializable notification, boolean distributeOverCluster) {
+    putForUsers(Collections.singleton(userId), notification, distributeOverCluster);
+  }
+
+  public void putForUsers(Set<String> userIds, Serializable notification) {
+    putForUsers(userIds, notification, true);
   }
 
   /**
@@ -131,9 +141,15 @@ public class ClientNotificationRegistry {
    *
    * @param userIds
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putForUsers(Set<String> userIds, Serializable notification) {
-    publish(ClientNotificationAddress.createUserAddress(userIds), notification);
+  public void putForUsers(Set<String> userIds, Serializable notification, boolean distributeOverCluster) {
+    publish(ClientNotificationAddress.createUserAddress(userIds), notification, distributeOverCluster);
+  }
+
+  public void putForSession(String sessionId, Serializable notification) {
+    putForSession(sessionId, notification, true);
   }
 
   /**
@@ -142,31 +158,49 @@ public class ClientNotificationRegistry {
    * @param sessionId
    *          the addressed session
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putForSession(String sessionId, Serializable notification) {
-    publish(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification);
+  public void putForSession(String sessionId, Serializable notification, boolean distributeOverCluster) {
+    publish(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification, distributeOverCluster);
+  }
+
+  public void putForAllSessions(Serializable notification) {
+    putForAllSessions(notification, true);
   }
 
   /**
    * This notification will be distributed to all sessions.
    *
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putForAllSessions(Serializable notification) {
-    publish(ClientNotificationAddress.createAllSessionsAddress(), notification);
+  public void putForAllSessions(Serializable notification, boolean distributeOverCluster) {
+    publish(ClientNotificationAddress.createAllSessionsAddress(), notification, distributeOverCluster);
+  }
+
+  public void putForAllNodes(Serializable notification) {
+    putForAllNodes(notification, true);
   }
 
   /**
    * This notification will be distributed to client nodes.
    *
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putForAllNodes(Serializable notification) {
-    publish(ClientNotificationAddress.createAllNodesAddress(), notification);
+  public void putForAllNodes(Serializable notification, boolean distributeOverCluster) {
+    publish(ClientNotificationAddress.createAllNodesAddress(), notification, distributeOverCluster);
   }
 
   public void publish(ClientNotificationAddress address, Serializable notification) {
-    publish(Collections.singleton(new ClientNotificationMessage(address, notification)));
+    publish(address, notification, true);
+  }
+
+  public void publish(ClientNotificationAddress address, Serializable notification, boolean distributeOverCluster) {
+    publish(Collections.singleton(new ClientNotificationMessage(address, notification, distributeOverCluster)));
   }
 
   public void publish(Collection<? extends ClientNotificationMessage> messages) {
@@ -174,27 +208,23 @@ public class ClientNotificationRegistry {
     publishClusterInternal(messages);
   }
 
-  public void putWithoutClusterNotification(ClientNotificationMessage message) {
-    putWithoutClusterNotification(CollectionUtility.arrayList(message), null);
-  }
-
-  public void publish(Collection<? extends ClientNotificationMessage> messages, String excludedNode) {
-    putWithoutClusterNotification(messages, excludedNode);
+  public void publish(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
+    putWithoutClusterNotification(messages, excludedUiNodeId);
     publishClusterInternal(messages);
   }
 
-  public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
-    putWithoutClusterNotification(messages, null);
-  }
-
-  public void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedNode) {
+  private void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
     synchronized (m_notificationQueues) {
       for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
-        if (!queue.getNodeId().equals(excludedNode)) {
+        if (!queue.getNodeId().equals(excludedUiNodeId)) {
           queue.put(messages);
         }
       }
     }
+  }
+
+  public void putTransactionalForUser(String userId, Serializable notification) {
+    putTransactionalForUser(userId, notification, true);
   }
 
   /**
@@ -205,9 +235,15 @@ public class ClientNotificationRegistry {
    * @param userId
    *          the addressed user
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putTransactionalForUser(String userId, Serializable notification) {
-    putTransactionalForUsers(Collections.singleton(userId), notification);
+  public void putTransactionalForUser(String userId, Serializable notification, boolean distributeOverCluster) {
+    putTransactionalForUsers(Collections.singleton(userId), notification, distributeOverCluster);
+  }
+
+  public void putTransactionalForUsers(Set<String> userIds, Serializable notification) {
+    putTransactionalForUsers(userIds, notification, true);
   }
 
   /**
@@ -218,9 +254,15 @@ public class ClientNotificationRegistry {
    * @param userIds
    *          the addressed user
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putTransactionalForUsers(Set<String> userIds, Serializable notification) {
-    putTransactional(ClientNotificationAddress.createUserAddress(userIds), notification);
+  public void putTransactionalForUsers(Set<String> userIds, Serializable notification, boolean distributeOverCluster) {
+    putTransactional(ClientNotificationAddress.createUserAddress(userIds), notification, distributeOverCluster);
+  }
+
+  public void putTransactionalForSession(String sessionId, Serializable notification) {
+    putTransactionalForSession(sessionId, notification, true);
   }
 
   /**
@@ -231,9 +273,15 @@ public class ClientNotificationRegistry {
    * @param sessionId
    *          the addressed session
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putTransactionalForSession(String sessionId, Serializable notification) {
-    putTransactional(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification);
+  public void putTransactionalForSession(String sessionId, Serializable notification, boolean distributeOverCluster) {
+    putTransactional(ClientNotificationAddress.createSessionAddress(Collections.singleton(sessionId)), notification, distributeOverCluster);
+  }
+
+  public void putTransactionalForAllSessions(Serializable notification) {
+    putTransactionalForAllSessions(notification, true);
   }
 
   /**
@@ -242,9 +290,15 @@ public class ClientNotificationRegistry {
    * This notification will be distributed to all sessions.
    *
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putTransactionalForAllSessions(Serializable notification) {
-    putTransactional(ClientNotificationAddress.createAllSessionsAddress(), notification);
+  public void putTransactionalForAllSessions(Serializable notification, boolean distributeOverCluster) {
+    putTransactional(ClientNotificationAddress.createAllSessionsAddress(), notification, distributeOverCluster);
+  }
+
+  public void putTransactionalForAllNodes(Serializable notification) {
+    putTransactionalForAllNodes(notification, true);
   }
 
   /**
@@ -253,13 +307,19 @@ public class ClientNotificationRegistry {
    * This notification will be distributed to all client nodes.
    *
    * @param notification
+   * @param distributeOverCluster
+   *          flag to distribute notification over whole cluster
    */
-  public void putTransactionalForAllNodes(Serializable notification) {
-    putTransactional(ClientNotificationAddress.createAllNodesAddress(), notification);
+  public void putTransactionalForAllNodes(Serializable notification, boolean distributeOverCluster) {
+    putTransactional(ClientNotificationAddress.createAllNodesAddress(), notification, distributeOverCluster);
   }
 
   public void putTransactional(ClientNotificationAddress address, Serializable notification) {
-    putTransactional(new ClientNotificationMessage(address, notification));
+    putTransactional(address, notification, true);
+  }
+
+  public void putTransactional(ClientNotificationAddress address, Serializable notification, boolean distributeOverCluster) {
+    putTransactional(new ClientNotificationMessage(address, notification, distributeOverCluster));
   }
 
   public void putTransactional(ClientNotificationMessage message) {
@@ -280,8 +340,16 @@ public class ClientNotificationRegistry {
 
   /**
    * Publish messages to other cluster nodes.
+   * Message not foreseen for cluster distributions are filtered.
    */
   private void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
+    Iterator<? extends ClientNotificationMessage> iterator = messages.iterator();
+    while (iterator.hasNext()) {
+      ClientNotificationMessage message = iterator.next();
+      if (!message.isDistributeOverCluster()) {
+        iterator.remove();
+      }
+    }
     try {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
       service.publish(new ClientNotificationClusterNotification(messages));
