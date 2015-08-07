@@ -12,7 +12,7 @@ scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
   // set focus
   var $input = $('.control-filter', this._field.$container);
   //TODO nbu check if keyStroke should be registered when no filter control is available.
-  if ($input) {
+  if ($input && $input.length) {
     var length = $input.val().length;
 
     $input.focus();
