@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -343,16 +343,15 @@ public class ClientNotificationRegistry {
    * Message not foreseen for cluster distributions are filtered.
    */
   private void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
-    Iterator<? extends ClientNotificationMessage> iterator = messages.iterator();
-    while (iterator.hasNext()) {
-      ClientNotificationMessage message = iterator.next();
-      if (!message.isDistributeOverCluster()) {
-        iterator.remove();
+    Collection<ClientNotificationMessage> filteredMessages = new LinkedList<ClientNotificationMessage>();
+    for (ClientNotificationMessage message : messages) {
+      if (message.isDistributeOverCluster()) {
+        filteredMessages.add(message);
       }
     }
     try {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
-      service.publish(new ClientNotificationClusterNotification(messages));
+      service.publish(new ClientNotificationClusterNotification(filteredMessages));
     }
     catch (ProcessingException e) {
       LOG.error("Failed to publish client notification", e);
