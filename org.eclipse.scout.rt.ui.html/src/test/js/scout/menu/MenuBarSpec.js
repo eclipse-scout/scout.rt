@@ -67,6 +67,13 @@ describe("MenuBar", function() {
       menuBar.render(session.$entryPoint);
       menuBar.updateItems(menus);
 
+      // <fix for layout issues>
+      // Menu item DIVs are too wide, because in Jasmine tests there are no CSS rules. Therefore, all
+      // items are overflown and removed by the menubar layout. To fix this for this test, we manually
+      // override the layout and force the drawing of the menu items without looking at the width.
+      menuBar.rebuildItemsInternal();
+      // </fix>
+
       expect(menuBar.menuItems.length).toBe(2);
       expect(menuBar.menuItems[0]).toBe(menu1);
       expect(menuBar.menuItems[1]).toBe(menu2);
