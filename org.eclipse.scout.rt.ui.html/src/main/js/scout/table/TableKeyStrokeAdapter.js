@@ -6,6 +6,7 @@ scout.TableKeyStrokeAdapter = function(table) {
   this.registerKeyStroke(new scout.TableStartCellEditKeyStroke(table));
   this.registerKeyStroke(new scout.TableSelectAllKeyStroke(table));
   this.registerKeyStroke(new scout.TableRefreshKeyStroke(table));
+  this.registerKeyStroke(new scout.TableCopyKeyStroke(table));
   this.registerKeyStroke(new scout.ContextMenuKeyStroke(table, table.onContextMenu, table));
 };
 scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
@@ -132,4 +133,20 @@ scout.TableRefreshKeyStroke.prototype._drawKeyBox = function($container, drawedK
   }
   keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
   scout.keyStrokeBox.drawSingleKeyBoxItem(0, keyBoxText, this._table.footer._$infoLoad.find('.info-button'), this.ctrl, this.alt, this.shift);
+};
+
+scout.TableCopyKeyStroke = function(table) {
+  scout.TableCopyKeyStroke.parent.call(this);
+  this._table = table;
+  this.keyStroke = 'control-c';
+  this.initKeyStrokeParts();
+};
+scout.inherits(scout.TableCopyKeyStroke, scout.KeyStroke);
+
+/**
+ * @Override
+ */
+scout.TableCopyKeyStroke.prototype.handle = function(event) {
+  this._table.sendExportToClipboard();
+  event.preventDefault();
 };

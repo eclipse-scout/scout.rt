@@ -943,6 +943,10 @@ scout.Table.prototype.sendReload = function() {
   }
 };
 
+scout.Table.prototype.sendExportToClipboard = function() {
+  this.session.send(this.id, 'exportToClipboard');
+};
+
 scout.Table.prototype.cell = function(column, row) {
   var cell;
   // Row Icon column and cell icon column don't not have cells -> generate one

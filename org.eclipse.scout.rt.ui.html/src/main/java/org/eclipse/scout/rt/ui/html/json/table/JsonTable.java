@@ -19,10 +19,13 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
+import org.eclipse.scout.commons.dnd.TextTransferObject;
+import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -40,6 +43,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -87,6 +93,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String EVENT_CANCEL_CELL_EDIT = "cancelCellEdit";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
   public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
+  public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -393,6 +400,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     else if (EVENT_CANCEL_CELL_EDIT.equals(event.getType())) {
       handleUiCancelCellEdit(event);
     }
+    else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
+      handleExportToClipboard(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -574,6 +584,22 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
     //FIXME CGU feld merken, revert bei toJson für page reload
     jsonField.dispose();
+  }
+
+  protected void handleExportToClipboard(JsonEvent event) {
+    if (!ACCESS.check(new CopyToClipboardPermission())) {
+      return;
+    }
+
+    TransferObject scoutTransferable = getModel().getUIFacade().fireRowsCopyRequestFromUI();
+    if (scoutTransferable != null && scoutTransferable instanceof TextTransferObject) {
+      try {
+        BEANS.get(IClipboardService.class).setContents(scoutTransferable);
+      }
+      catch (ProcessingException e) {
+        throw new UiException("Unable to copy to clipboard.", e);
+      }
+    }
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

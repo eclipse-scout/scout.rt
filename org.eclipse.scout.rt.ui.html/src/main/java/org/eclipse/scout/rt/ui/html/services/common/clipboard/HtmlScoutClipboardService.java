@@ -43,6 +43,7 @@ public class HtmlScoutClipboardService extends AbstractService implements IClipb
   public void setContents(final TransferObject transferObject) throws ProcessingException {
     if (transferObject instanceof TextTransferObject) {
       setTextContents(((TextTransferObject) transferObject).getPlainText());
+      return;
     }
     throw new ProcessingException("Not implemented");
   }
