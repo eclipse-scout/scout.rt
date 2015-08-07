@@ -55,7 +55,9 @@ scout.Desktop.prototype._render = function($parent) {
     hasTaskBar = this._hasTaskBar();
 
   this.$container = $parent;
-  this.$container.toggleClass('has-navigation', hasNavigation);
+  this.$container
+    .addClass('desktop')
+    .toggleClass('has-navigation', hasNavigation);
   this._renderUniqueId($parent);
   this._renderModelClass($parent);
 

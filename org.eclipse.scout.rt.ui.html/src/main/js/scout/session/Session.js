@@ -780,7 +780,7 @@ scout.Session.prototype._renderBusy = function() {
   // Don't show the busy indicator immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
   this._busyIndicatorTimeoutId = setTimeout(function() {
-    if (!this.desktop) {
+    if (!this.desktop || !this.desktop.rendered) {
       return; // No busy indicator without desktop (e.g. during shutdown)
     }
     this._busyIndicator = new scout.BusyIndicator(this);
@@ -823,7 +823,7 @@ scout.Session.prototype._onCancelProcessing = function() {
 scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
   if (applicationLoading) {
     this._applicationLoadingTimeoutId = setTimeout(function() {
-      if (!this.desktop) {
+      if (!this.desktop || !this.desktop.rendered) {
         this.$entryPoint.appendDiv('application-loading').setMouseCursorWait(true).hide().fadeIn();
       }
     }.bind(this), 500);
@@ -905,11 +905,24 @@ scout.Session.prototype._onInitialized = function(event) {
   this._texts = new scout.Texts(event.textMap);
   var clientSessionData = this._getAdapterData(event.clientSession);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
-  this.desktop.render(this.$entryPoint);
-  this._setApplicationLoading(false);
 
   var d = scout.device;
   $.log.info('Session initialized. Detected user-agent: system=' + d.system + ' device=' + d.device + ' browser=' + d.browser);
+
+  // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
+  if (scout.fonts.loadingComplete) {
+    this._renderDesktop();
+  }
+  else {
+    scout.fonts.preloader().then(function() {
+      this._renderDesktop();
+    }.bind(this));
+  }
+};
+
+scout.Session.prototype._renderDesktop = function() {
+  this.desktop.render(this.$entryPoint);
+  this._setApplicationLoading(false);
 };
 
 scout.Session.prototype._onLogout = function(event) {
