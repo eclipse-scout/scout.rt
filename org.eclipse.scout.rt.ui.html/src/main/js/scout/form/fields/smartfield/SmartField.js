@@ -1,18 +1,20 @@
+// FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
+// --> Keine Daten vorhanden
+
+// FIXME AWE: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
 scout.SmartField = function() {
   scout.SmartField.parent.call(this);
 
   this.DEBOUNCE_DELAY = 200;
 
   this._addAdapterProperties(['proposalChooser']);
-
-  this._$optionsDiv;
   this.options;
   /**
    * This property is used to prevent unnecessary requests to the server.
    */
   this._oldSearchText;
-  this._browseOnce;
   this._popup;
+  this._requestedProposal = false;
   this._tabPrevented = false;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
@@ -76,7 +78,7 @@ scout.SmartField.prototype._syncDisplayText = function(displayText) {
  * When popup is not rendered at this point, we render the popup.
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
-  $.log.debug('_renderProposalChooser proposalChooser=' + this.proposalChooser);
+  $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser);
   if (this.proposalChooser) {
     this._requestedProposal = false;
     this._renderPopup();
@@ -116,32 +118,20 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 
 scout.SmartField.prototype._onClick = function(e) {
   if (!this._popup.rendered) {
-    this._openProposal(this._searchText(), true);
+    this._openProposal(true);
   }
-};
-
-/**
- * When the smartfield is valid, we want to perform a "browse all" search (=empty string),
- * when the field is invalid, we want to perform a search with the current display-text.
- */
-scout.SmartField.prototype._searchText = function() {
-  var searchText = '';
-  if (this.errorStatus) {
-    searchText = this._readDisplayText();
-  }
-  return searchText;
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
   scout.SmartField.parent.prototype._onIconClick.call(this, event);
   if (!this._popup.rendered) {
-    this._openProposal(this._searchText(), true);
+    this._openProposal(true);
   }
 };
 
 scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
   var doPrevent = !!this.proposalChooser;
-  $.log.debug('must prevent default when tab was pressed = ' + doPrevent);
+  $.log.trace('(SmartField#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
   return doPrevent;
 };
 
@@ -183,7 +173,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
       // But when the user presses the down arrow, we can open the proposal
       // chooser immediately. Also we can start a search with text that was already
       // in the text field.
-      this._openProposal(this._searchText(), true);
+      this._openProposal(true);
     }
   }
 };
@@ -220,20 +210,19 @@ scout.SmartField.prototype._onKeyUp = function(e) {
   // user has typed.
   if (this._popup.rendered) {
     this._proposalTyped();
-  } else if (this._browseOnce) {
-    this._browseOnce = false;
-    this._openProposal(this._readDisplayText(), false);
+  } else {
+    this._openProposal(false);
   }
 };
 
 
 scout.SmartField.prototype._onFocus = function(e) {
-  this._browseOnce = true;
   this._oldSearchText = this._readDisplayText();
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
   var searchText = this._readDisplayText();
+  $.log.trace('(SmartField#_proposalTyped) searchText=' + searchText + ' displayText=' + this.displayText);
   if (searchText === this.displayText) {
     return;
   }
@@ -260,7 +249,6 @@ scout.SmartField.prototype._fieldBounds = function() {
 scout.SmartField.prototype._onFieldBlur = function() {
   // omit super call
   $.log.debug('(SmartField#_onFieldBlur)');
-  this._browseOnce = false;
   this._requestedProposal = false;
   this._acceptProposal(true);
 };
@@ -321,7 +309,7 @@ scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalCh
   });
 };
 
-// FIXME AWE: check if we can find next tabbable in the current focus-context (FocusManager)
+// FIXME AWE/DWI: check if we can find next tabbable in the current focus-context (FocusManager)
 scout.SmartField.prototype._focusNextTabbable = function() {
   var $tabElements = $(':tabbable');
   var nextIndex = 0;
@@ -342,17 +330,26 @@ scout.SmartField.prototype._closeProposal = function(notifyServer) {
   }
 };
 
-// FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
-// --> Keine Daten vorhanden
-
 /**
  * This method opens a popup before we contact the server to load proposals. This means
  * at this point we cannot know what size the popup should have. We have to set a fixed
  * size and resize the popup later when proposals are available.
+ *
+ * When the smartfield is valid, we want to perform a "browse all" search (=empty string),
+ * when the field is invalid, we want to perform a search with the current display-text.
+ *
+ * Other as in _proposalTyped we always open the proposal, even when the display text
+ * has not changed.
  */
-scout.SmartField.prototype._openProposal = function(searchText, selectCurrentValue) {
-  // FIXME AWE: Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
-  if (!this._requestedProposal) {
+scout.SmartField.prototype._openProposal = function(browseAll) {
+  var displayText = this._readDisplayText(),
+    searchText = (browseAll && !this.errorStatus) ? '' : this._readDisplayText(),
+    selectCurrentValue = browseAll;
+  this.displayText = displayText;
+
+  if (this._requestedProposal) {
+    $.log.trace('(SmartField#_openProposal) already requested proposal -> do nothing');
+  } else {
     this._requestedProposal = true;
     $.log.debug('(SmartField#_openProposal) send openProposal. searchText=' + searchText + ' selectCurrentValue=' + selectCurrentValue);
     this.session.send(this.id, 'openProposal', {

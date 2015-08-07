@@ -43,19 +43,34 @@ describe('SmartField', function() {
 
   });
 
-  describe('_searchText', function() {
+  describe('_openProposal', function() {
+
+    var events = [null];
 
     beforeEach(function() {
       smartField.$field.val('foo');
+      smartField.session.send = function(target, type, event) {
+        events[0] = event;
+      };
     });
 
-    it('must "browse all" when field is valid', function() {
-      expect(smartField._searchText()).toBe('');
+    it('must "browse all" when field is valid and browseAll parameter is true', function() {
+      smartField._openProposal(true);
+      expect(events[0].searchText).toBe('');
+      expect(events[0].selectCurrentValue).toBe(true);
+    });
+
+    it('must search by display-text when field is valid and browseAll parameter is false', function() {
+      smartField._openProposal(false);
+      expect(events[0].searchText).toBe('foo');
+      expect(events[0].selectCurrentValue).toBe(false);
     });
 
     it('must return displayText when field is invalid', function() {
       smartField.errorStatus = {};
-      expect(smartField._searchText()).toBe('foo');
+      smartField._openProposal(true);
+      expect(events[0].searchText).toBe('foo');
+      expect(events[0].selectCurrentValue).toBe(true);
     });
   });
 
