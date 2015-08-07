@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -37,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -299,7 +299,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   public void setDateFormatPattern(String dateFormatPattern) {
     dateFormatPattern = checkFormatPatternSupported(dateFormatPattern);
     if (dateFormatPattern == null) {
-      dateFormatPattern = getDefaultDateFormatPatternByLocale(NlsLocale.get());
+      dateFormatPattern = BEANS.get(DateFormatProvider.class).getDateFormatPattern(DateFormatProvider.PATTERN_STYLE_ISOLATED_DATE, NlsLocale.get());
     }
     propertySupport.setPropertyString(PROP_DATE_FORMAT_PATTERN, dateFormatPattern);
     // Always update display text (format may be the same, but language might have changed)
@@ -315,7 +315,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   public void setTimeFormatPattern(String timeFormatPattern) {
     timeFormatPattern = checkFormatPatternSupported(timeFormatPattern);
     if (timeFormatPattern == null) {
-      timeFormatPattern = getDefaultTimeFormatPatternByLocale(NlsLocale.get());
+      timeFormatPattern = BEANS.get(DateFormatProvider.class).getDateFormatPattern(DateFormatProvider.PATTERN_STYLE_ISOLATED_TIME, NlsLocale.get());
     }
     propertySupport.setPropertyString(PROP_TIME_FORMAT_PATTERN, timeFormatPattern);
     // Always update display text (format may be the same, but language might have changed)
@@ -558,130 +558,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       }
     }
     return null;
-  }
-
-  /**
-   * <pre>
-   * en-gb    "dd/MM/yyyy"
-   * nl-be    "dd/MM/yyyy"
-   * 
-   * fr-ch    "dd.MM.yyyy"
-   * it-ch    "dd.MM.yyyy"
-   * 
-   * cs       "d.M.yyyy"
-   * fi       "d.M.yyyy"
-   * 
-   * el       "d/M/yyyy"
-   * 
-   * fa       "yyyy/MM/dd"
-   * 
-   * hu       "yyyy.MM.dd"
-   * 
-   * zh       "yyyy-MM-dd"
-   * 
-   * ca       "dd/MM/yyyy"
-   * es       "dd/MM/yyyy"
-   * fr       "dd/MM/yyyy"
-   * gl       "dd/MM/yyyy"
-   * it       "dd/MM/yyyy"
-   * nl       "dd-MM-yyyy"
-   * vi       "dd/MM/yyyy"
-   * 
-   * bs       "dd.MM.yyyy"
-   * de       "dd.MM.yyyy"
-   * et       "dd.MM.yyyy"
-   * me       "dd.MM.yyyy"
-   * mk       "dd.MM.yyyy"
-   * no       "dd.MM.yyyy"
-   * pl       "dd.MM.yyyy"
-   * rs       "dd.MM.yyyy"
-   * ru       "dd.MM.yyyy"
-   * sr       "dd.MM.yyyy"
-   * tr       "dd.MM.yyyy"
-   * uk       "dd.MM.yyyy"
-   * 
-   * default  "MM/dd/yyyy"
-   * </pre>
-   */
-  protected String getDefaultDateFormatPatternByLocale(Locale locale) {
-    if (locale == null) {
-      locale = NlsLocale.get();
-    }
-    String localeName = StringUtility.nvl(locale.toLanguageTag().toLowerCase(), "");
-
-    // Check longer locale names first
-    if (localeName.startsWith("en-gb") || localeName.startsWith("nl-be")) {
-      return "dd/MM/yyyy";
-    }
-    if (localeName.startsWith("fr-ch") || localeName.startsWith("it-ch")) {
-      return "dd.MM.yyyy";
-    }
-
-    // Now check short names
-    if (localeName.startsWith("cs") || localeName.startsWith("fi")) {
-      return "d.M.yyyy";
-    }
-    if (localeName.startsWith("el")) {
-      return "d/M/yyyy";
-    }
-    if (localeName.startsWith("fa")) {
-      return "yyyy/MM/dd";
-    }
-    if (localeName.startsWith("hu")) {
-      return "yyyy.MM.dd";
-    }
-    if (localeName.startsWith("zh")) {
-      return "yyyy-MM-dd";
-    }
-    if (localeName.startsWith("no")
-        || localeName.startsWith("pl")
-        || localeName.startsWith("rs")
-        || localeName.startsWith("ru")
-        || localeName.startsWith("sr")
-        || localeName.startsWith("tr")
-        || localeName.startsWith("uk")
-        || localeName.startsWith("me")
-        || localeName.startsWith("mk")
-        || localeName.startsWith("et")
-        || localeName.startsWith("de")
-        || localeName.startsWith("bs")) {
-      return "dd.MM.yyyy";
-    }
-    if (localeName.startsWith("es")
-        || localeName.startsWith("ca")
-        || localeName.startsWith("it")
-        || localeName.startsWith("fr")
-        || localeName.startsWith("gl")
-        || localeName.startsWith("vi")) {
-      return "dd/MM/yyyy";
-    }
-    if (localeName.startsWith("nl")) {
-      return "dd-MM-yyyy";
-    }
-
-    // Default format
-    return "MM/dd/yyyy";
-  }
-
-  /**
-   * <pre>
-   * en       "h:mm a"
-   * 
-   * default  "hh:mm"
-   * </pre>
-   */
-  protected String getDefaultTimeFormatPatternByLocale(Locale locale) {
-    if (locale == null) {
-      locale = NlsLocale.get();
-    }
-    String localeName = StringUtility.nvl(locale.toLanguageTag().toLowerCase(), "");
-
-    if (localeName.startsWith("en")) {
-      return "h:mm a";
-    }
-
-    // Default format
-    return "HH:mm";
   }
 
   private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
