@@ -36,7 +36,7 @@ scout.BeanField.prototype._renderValue = function() {
 };
 
 scout.BeanField.prototype._sendAppLinkAction = function(ref) {
-  this.session.send(this.id, 'appLinkAction', {
+  this.remoteHandler(this.id, 'appLinkAction', {
     ref: ref
   });
 };

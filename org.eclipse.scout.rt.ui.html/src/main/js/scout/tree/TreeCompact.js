@@ -198,7 +198,7 @@ scout.TreeCompact.prototype._selectNode = function(node) {
     this._applyFilter('');
   }.bind(this), 100);
 
-  this.session.send(this.id, 'nodeAction', {
+  this.remoteHandler(this.id, 'nodeAction', {
     nodeId: node.id
   });
 };

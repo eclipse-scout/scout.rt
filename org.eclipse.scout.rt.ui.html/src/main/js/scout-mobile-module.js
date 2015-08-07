@@ -23,6 +23,7 @@ __include("scout/util/keys.js");
 __include("scout/util/KeyStrokeUtil.js");
 __include("scout/util/FocusManager.js");
 __include("scout/util/FocusContext.js");
+__include("scout/util/localObjects.js");
 __include("scout/util/logging.js");
 __include("scout/util/mimeTypes.js");
 __include("scout/util/ModelAdapter.js");
@@ -42,7 +43,6 @@ __include("scout/session/Event.js");
 __include("scout/session/Locale.js");
 __include("scout/session/Reconnector.js");
 __include("scout/session/Session.js");
-__include("scout/session/LocalObject.js");
 __include("scout/session/UserAgent.js");
 // Basic layout
 __include("scout/layout/graphics.js");

@@ -42,7 +42,7 @@ scout.CheckBoxField.prototype._toggleChecked = function() {
   }
   this.$checkBox.toggleClass('checked');
   uiChecked = this.$checkBox.hasClass('checked');
-  this.session.send(this.id, 'clicked', {
+  this.remoteHandler(this.id, 'clicked', {
     checked: uiChecked
   });
 };

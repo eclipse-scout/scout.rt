@@ -19,10 +19,6 @@ scout.SmartField = function() {
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
-scout.SmartField.prototype._init = function(model, session) {
-  scout.SmartField.parent.prototype._init.call(this, model, session);
-};
-
 /**
  * @override
  */
@@ -232,7 +228,7 @@ scout.SmartField.prototype._proposalTyped = function() {
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
     $.log.debug('(SmartField#_proposalTyped) send searchText=' + searchText);
-    this.session.send(this.id, 'proposalTyped', {
+    this.remoteHandler(this.id, 'proposalTyped', {
       searchText: searchText
     });
   }.bind(this), this.DEBOUNCE_DELAY);
@@ -302,7 +298,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
 scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalChooserOpen, forceClose) {
   this.displayText = searchText;
   this._oldSearchText = searchText;
-  this.session.send(this.id, 'acceptProposal', {
+  this.remoteHandler(this.id, 'acceptProposal', {
     searchText: searchText,
     chooser: proposalChooserOpen,
     forceClose: forceClose
@@ -324,7 +320,7 @@ scout.SmartField.prototype._focusNextTabbable = function() {
 scout.SmartField.prototype._closeProposal = function(notifyServer) {
   if (this._popup.rendered) {
     if (scout.helpers.nvl(notifyServer, true)) {
-      this.session.send(this.id, 'cancelProposal');
+      this.remoteHandler(this.id, 'cancelProposal');
     }
     this._popup.close();
   }
@@ -352,7 +348,7 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
   } else {
     this._requestedProposal = true;
     $.log.debug('(SmartField#_openProposal) send openProposal. searchText=' + searchText + ' selectCurrentValue=' + selectCurrentValue);
-    this.session.send(this.id, 'openProposal', {
+    this.remoteHandler(this.id, 'openProposal', {
       searchText: searchText,
       selectCurrentValue: selectCurrentValue
     });

@@ -82,7 +82,7 @@ scout.HtmlField.prototype._onAppLinkAction = function(event) {
 };
 
 scout.HtmlField.prototype._sendAppLinkAction = function(ref) {
-  this.session.send(this.id, 'appLinkAction', {
+  this.remoteHandler(this.id, 'appLinkAction', {
     ref: ref
   });
 };

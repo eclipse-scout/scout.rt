@@ -187,7 +187,7 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
   var positionChanged = (this.splitterPosition !== newSplitterPosition);
   this.splitterPosition = newSplitterPosition;
   if (positionChanged) {
-    this.session.send(this.id, 'setSplitterPosition', {
+    this.remoteHandler(this.id, 'setSplitterPosition', {
       splitterPosition: newSplitterPosition
     });
   }

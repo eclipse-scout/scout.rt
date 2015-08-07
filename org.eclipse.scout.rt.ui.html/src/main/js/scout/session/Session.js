@@ -623,7 +623,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     cancelButtonText: options.cancelButtonText
   };
 
-  var messageBox = scout.LocalObject.createObject(this, 'MessageBox');
+  var messageBox = scout.localObjects.createObject(this, 'MessageBox');
   messageBox.remoteHandler = function(target, type, event) {
     if ('action' === type) {
       delete this._fatalMessagesOnScreen[errorCode];

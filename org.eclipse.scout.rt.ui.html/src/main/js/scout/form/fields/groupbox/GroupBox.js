@@ -256,7 +256,7 @@ scout.GroupBox.prototype._renderMenus = function() {
 
   // create a menu-adapter for each process button
   this.processButtons.forEach(function(button) {
-    menu = scout.LocalObject.createObject(this.session,
+    menu = scout.localObjects.createObject(this.session,
       scout.ButtonAdapterMenu.adaptButtonProperties(button, {
         objectType: 'ButtonAdapterMenu',
         button: button
@@ -289,7 +289,7 @@ scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {
 scout.GroupBox.prototype.setGroupBoxExpanded = function(expanded) {
   if (this.expanded !== expanded) {
     this.expanded = expanded;
-    this.session.send(this.id, 'expanded', {
+    this.remoteHandler(this.id, 'expanded', {
       expanded: expanded
     });
   }

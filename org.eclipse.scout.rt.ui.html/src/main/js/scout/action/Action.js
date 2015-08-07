@@ -229,7 +229,7 @@ scout.Action.prototype.setSelected = function(selected) {
 };
 
 scout.Action.prototype.sendSelected = function() {
-  this.session.send(this.id, 'selected', {
+  this.remoteHandler(this.id, 'selected', {
     selected: this.selected
   });
 };

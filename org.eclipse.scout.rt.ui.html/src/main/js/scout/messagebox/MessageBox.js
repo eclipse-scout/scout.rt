@@ -143,7 +143,7 @@ scout.MessageBox.prototype._renderCopyPasteText = function(text) {
 };
 
 scout.MessageBox.prototype._onButtonClick = function(event) {
-  this.session.send(this.id, 'action', {
+  this.remoteHandler(this.id, 'action', {
     option: event.option
   });
 };

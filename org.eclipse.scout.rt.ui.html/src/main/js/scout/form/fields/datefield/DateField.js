@@ -583,13 +583,13 @@ scout.DateField.prototype.updateTimestamp = function(timestampAsDate) {
 
 scout.DateField.prototype._syncToServer = function() {
   if (this._hasUiErrorStatus()) {
-    this.session.send(this.id, 'parsingError', {
+    this.remoteHandler(this.id, 'parsingError', {
       invalidDisplayText: this.errorStatus.invalidDisplayText,
       invalidDateText: this.errorStatus.invalidDateText,
       invalidTimeText: this.errorStatus.invalidTimeText
     });
   } else {
-    this.session.send(this.id, 'timestampChanged', {
+    this.remoteHandler(this.id, 'timestampChanged', {
       timestamp: this.timestamp
     });
   }

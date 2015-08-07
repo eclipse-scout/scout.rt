@@ -93,7 +93,7 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
     }
   }
 
-  this.session.send(this.id, 'displayTextChanged', {
+  this.remoteHandler(this.id, 'displayTextChanged', {
     displayText: displayText,
     whileTyping: whileTyping
   });

@@ -149,7 +149,7 @@ scout.StringField.prototype._renderGridData = function() {
 scout.StringField.prototype._onIconClick = function(event) {
   this.acceptInput();
   scout.StringField.parent.prototype._onIconClick.call(this, event);
-  this.session.send(this.id, 'callAction');
+  this.remoteHandler(this.id, 'callAction');
 };
 
 scout.StringField.prototype._onSelect = function(event) {

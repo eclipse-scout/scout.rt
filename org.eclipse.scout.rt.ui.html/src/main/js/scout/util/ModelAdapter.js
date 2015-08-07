@@ -39,7 +39,7 @@ scout.ModelAdapter.prototype.init = function(model, session, register) {
 
   this.id = model.id;
   this.objectType = model.objectType;
-  this.remoteHandler = session.send;
+  this.remoteHandler = session.send.bind(session);
   this._register = scout.helpers.nvl(register, true);
   if (this._register) {
     this.session.registerModelAdapter(this);

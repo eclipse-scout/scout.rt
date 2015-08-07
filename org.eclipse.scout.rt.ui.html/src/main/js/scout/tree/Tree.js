@@ -299,7 +299,7 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
       node = this.nodesMap[nodeId];
 
     if (!expanded) {
-      this.session.send(this.id, 'nodeAction', {
+      this.remoteHandler(this.id, 'nodeAction', {
         nodeId: nodeId
       });
       this.setNodeExpanded(node, true);
@@ -326,7 +326,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, forceRenderExpan
   if (node.expanded !== expanded) {
     node.expanded = expanded;
 
-    this.session.send(this.id, 'nodeExpanded', {
+    this.remoteHandler(this.id, 'nodeExpanded', {
       nodeId: node.id,
       expanded: expanded
     });
@@ -436,7 +436,7 @@ scout.Tree.prototype._updateSelectedNodeIds = function(selectedNodeIds, notifySe
     this.selectedNodeIds = selectedNodeIds;
 
     if (scout.helpers.nvl(notifyServer, true)) {
-      this.session.send(this.id, 'nodesSelected', {
+      this.remoteHandler(this.id, 'nodesSelected', {
         nodeIds: selectedNodeIds
       });
     }
@@ -1061,7 +1061,7 @@ scout.Tree.prototype.sendNodesChecked = function(nodes) {
     });
   }
 
-  this.session.send(this.id, 'nodesChecked', data);
+  this.remoteHandler(this.id, 'nodesChecked', data);
 };
 
 scout.Tree.prototype._renderTreeItemControl = function($node) {
@@ -1138,7 +1138,7 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
     this.checkNode(node, !node.checked);
   }
 
-  this.session.send(this.id, 'nodeClicked', {
+  this.remoteHandler(this.id, 'nodeClicked', {
     nodeId: node.id
   });
 };
@@ -1164,7 +1164,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     return;
   }
 
-  this.session.send(this.id, 'nodeAction', {
+  this.remoteHandler(this.id, 'nodeAction', {
     nodeId: node.id
   });
 

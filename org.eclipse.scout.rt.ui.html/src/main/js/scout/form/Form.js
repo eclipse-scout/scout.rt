@@ -54,7 +54,7 @@ scout.Form.prototype._renderForm = function($parent) {
     if (this.closable) {
       this.$container.appendDiv('closable')
         .on('click', function() {
-          this.session.send(this.id, 'formClosing');
+          this.remoteHandler(this.id, 'formClosing');
         }.bind(this));
     }
     this.$container.resizable({

@@ -101,7 +101,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     overflowMenus = [],
     tabBox = this._tabBox;
   this._overflowTabs.forEach(function(tabItem) {
-    menu = scout.LocalObject.createObject(tabBox.session, {
+    menu = scout.localObjects.createObject(tabBox.session, {
       objectType: 'Menu',
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem

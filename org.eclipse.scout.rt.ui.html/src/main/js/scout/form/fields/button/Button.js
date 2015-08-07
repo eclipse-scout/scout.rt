@@ -118,7 +118,7 @@ scout.Button.prototype.doAction = function() {
   } else if (this.menus.length > 0) {
     this.togglePopup();
   } else {
-    this.session.send(this.id, 'clicked');
+    this.remoteHandler(this.id, 'clicked');
   }
   return true;
 };
@@ -146,7 +146,7 @@ scout.Button.prototype.setSelected = function(selected) {
   if (this.rendered) {
     this._renderSelected(this.selected);
   }
-  this.session.send(this.id, 'selected', {
+  this.remoteHandler(this.id, 'selected', {
     selected: selected
   });
 };

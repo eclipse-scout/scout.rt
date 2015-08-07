@@ -48,7 +48,7 @@ scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
 };
 
 scout.SearchOutline.prototype._sendSearch  = function() {
-  this.session.send(this.id, 'search', {
+  this.remoteHandler(this.id, 'search', {
     query: this.searchQuery
   });
 };

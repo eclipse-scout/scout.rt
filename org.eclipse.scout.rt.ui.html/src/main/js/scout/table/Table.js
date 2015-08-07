@@ -527,12 +527,12 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
     sortAscending: column.sortAscending
   };
   if (sorted) {
-    this.session.send(this.id, 'rowsSorted', data);
+    this.remoteHandler(this.id, 'rowsSorted', data);
     this._renderRowOrderChanges();
     this._triggerRowOrderChanged();
   } else {
     // Delegate sorting to server when it is not possible on client side
-    this.session.send(this.id, 'sortRows', data);
+    this.remoteHandler(this.id, 'sortRows', data);
   }
 };
 
@@ -861,7 +861,7 @@ scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
   if (columnId !== undefined) {
     data.columnId = columnId;
   }
-  this.session.send(this.id, 'rowClicked', data);
+  this.remoteHandler(this.id, 'rowClicked', data);
 };
 
 /**
@@ -880,21 +880,21 @@ scout.Table.prototype.sendPrepareCellEdit = function(rowId, columnId) {
     rowId: rowId,
     columnId: columnId
   };
-  this.session.send(this.id, 'prepareCellEdit', data);
+  this.remoteHandler(this.id, 'prepareCellEdit', data);
 };
 
 scout.Table.prototype.sendCompleteCellEdit = function(fieldId) {
   var data = {
     fieldId: fieldId
   };
-  this.session.send(this.id, 'completeCellEdit', data);
+  this.remoteHandler(this.id, 'completeCellEdit', data);
 };
 
 scout.Table.prototype.sendCancelCellEdit = function(fieldId) {
   var data = {
     fieldId: fieldId
   };
-  this.session.send(this.id, 'cancelCellEdit', data);
+  this.remoteHandler(this.id, 'cancelCellEdit', data);
 };
 
 scout.Table.prototype.sendRowsChecked = function(rows) {
@@ -909,24 +909,24 @@ scout.Table.prototype.sendRowsChecked = function(rows) {
     });
   }
 
-  this.session.send(this.id, 'rowsChecked', data);
+  this.remoteHandler(this.id, 'rowsChecked', data);
 };
 
 scout.Table.prototype.sendRowsSelected = function(rowIds) {
-  this.session.send(this.id, 'rowsSelected', {
+  this.remoteHandler(this.id, 'rowsSelected', {
     rowIds: rowIds
   });
 };
 
 scout.Table.prototype.sendRowAction = function($row, columnId) {
-  this.session.send(this.id, 'rowAction', {
+  this.remoteHandler(this.id, 'rowAction', {
     rowId: $row.data('row').id,
     columnId: columnId
   });
 };
 
 scout.Table.prototype.sendAppLinkAction = function(columnId, ref) {
-  this.session.send(this.id, 'appLinkAction', {
+  this.remoteHandler(this.id, 'appLinkAction', {
     columnId: columnId,
     ref: ref
   });
@@ -939,12 +939,12 @@ scout.Table.prototype.sendReload = function() {
     scout.scrollbars.install(this.$data, this.session, {
       axis: 'both'
     });
-    this.session.send(this.id, 'reload');
+    this.remoteHandler(this.id, 'reload');
   }
 };
 
 scout.Table.prototype.sendExportToClipboard = function() {
-  this.session.send(this.id, 'exportToClipboard');
+  this.remoteHandler(this.id, 'exportToClipboard');
 };
 
 scout.Table.prototype.cell = function(column, row) {
@@ -1948,7 +1948,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
     columnId: column.id,
     index: index
   };
-  this.session.send(this.id, 'columnMoved', data);
+  this.remoteHandler(this.id, 'columnMoved', data);
 
   if (this.header) {
     this.header.onColumnMoved(column, oldPos, newPos, dragged);

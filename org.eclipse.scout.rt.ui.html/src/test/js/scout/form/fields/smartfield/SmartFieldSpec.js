@@ -6,8 +6,6 @@ describe('SmartField', function() {
     smartField = new scout.SmartField();
     smartField.$field = $('<input>');
     smartField.session = {
-      send: function() {
-      },
       listen: function() {
         return {
           done: function(func) {
@@ -15,6 +13,7 @@ describe('SmartField', function() {
         };
       }
     };
+    smartField.remoteHandler = function() {};
   });
 
   describe('_onKeyUp', function() {
@@ -49,7 +48,7 @@ describe('SmartField', function() {
 
     beforeEach(function() {
       smartField.$field.val('foo');
-      smartField.session.send = function(target, type, event) {
+      smartField.remoteHandler = function(target, type, event) {
         events[0] = event;
       };
     });
@@ -94,17 +93,17 @@ describe('SmartField', function() {
     it ('dont send _acceptProposal when searchText has not changed', function() {
       smartField._oldSearchText = 'foo';
       smartField.$field.val('foo');
-      spyOn(smartField.session, 'send');
+      spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
-      expect(smartField.session.send).not.toHaveBeenCalled();
+      expect(smartField.remoteHandler).not.toHaveBeenCalled();
     });
 
     it ('send _acceptProposal when searchText has changed', function() {
       smartField._oldSearchText = 'foo';
       smartField.$field.val('bar');
-      spyOn(smartField.session, 'send');
+      spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
-      expect(smartField.session.send).toHaveBeenCalled();
+      expect(smartField.remoteHandler).toHaveBeenCalled();
     });
 
   });

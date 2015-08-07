@@ -1,4 +1,4 @@
-scout.LocalObject = {
+scout.localObjects = {
 
   /**
    * Creates a new object instance based on the given model by using the object-factory.

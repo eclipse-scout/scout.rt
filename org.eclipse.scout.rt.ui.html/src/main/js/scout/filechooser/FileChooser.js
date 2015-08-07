@@ -149,7 +149,7 @@ scout.FileChooser.prototype._doOk = function() {
 };
 
 scout.FileChooser.prototype._doCancel = function() {
-  this.session.send(this.id, 'cancel');
+  this.remoteHandler(this.id, 'cancel');
 };
 
 scout.FileChooser.prototype._doAddFile = function() {
