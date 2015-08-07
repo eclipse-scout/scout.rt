@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="scout-luna.target" sequenceNumber="1438761079">
+<target name="scout-luna.target" sequenceNumber="1438936086">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
@@ -63,8 +63,8 @@
       <unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
       <unit id="org.apache.xml.resolver" version="1.2.0.v201005080400"/>
       <unit id="org.apache.xml.serializer" version="2.7.1.v201005080400"/>
-      <unit id="org.junit" version="4.11.0.v201303080030"/>
-      <unit id="org.junit.source" version="4.11.0.v201303080030"/>
+      <unit id="org.junit" version="4.12.0.v201504281640"/>
+      <unit id="org.junit.source" version="4.12.0.v201504281640"/>
       <unit id="org.hamcrest.core" version="1.3.0.v201303031735"/>
       <unit id="org.hamcrest.core.source" version="1.3.0.v201303031735"/>
       <unit id="org.easymock" version="2.4.0.v20090202-0900"/>
