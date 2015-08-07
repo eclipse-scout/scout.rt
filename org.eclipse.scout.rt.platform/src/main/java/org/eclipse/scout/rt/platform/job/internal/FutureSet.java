@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -84,16 +83,19 @@ public class FutureSet implements IJobListener {
    * Clears this Set and cancels all removed Futures.
    */
   public void clear() {
+    final Set<IFuture<?>> runningFutures;
+
     m_writeLock.lock();
     try {
-      final Iterator<IFuture<?>> iterator = futures().iterator();
-      while (iterator.hasNext()) {
-        iterator.next().cancel(true);
-        iterator.remove();
-      }
+      runningFutures = new HashSet<>(m_futures);
+      m_futures.clear();
     }
     finally {
       m_writeLock.unlock();
+    }
+
+    for (IFuture<?> runningFuture : runningFutures) {
+      runningFuture.cancel(true);
     }
   }
 
