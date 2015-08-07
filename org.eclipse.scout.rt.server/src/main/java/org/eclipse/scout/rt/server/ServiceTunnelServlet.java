@@ -157,7 +157,8 @@ public class ServiceTunnelServlet extends HttpServlet {
     }
     catch (Exception e) {
       if (isConnectionError(e)) {
-        // NOOP: Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+        LOG.debug("Connection Error: ", e);
       }
       else {
         LOG.error(String.format("Client=%s@%s/%s", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost()), e);
