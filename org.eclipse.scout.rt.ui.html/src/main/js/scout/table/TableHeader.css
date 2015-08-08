@@ -13,8 +13,8 @@
   position: absolute;
   right: 0;
   top: 0;
-  padding-right: 8px;
-  padding-left: 10px;
+  padding-right: 0px;
+  padding-left: 6px;
   background-color: @panel-background-color;
   width: auto;
   border: none;
@@ -26,6 +26,7 @@
     height: auto;
     line-height: normal;
     padding-top: 4px;
+    margin-right: 5px;
   }
 
   & > .menu-item > .font-icon {

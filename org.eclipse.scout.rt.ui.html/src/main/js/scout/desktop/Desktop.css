@@ -64,10 +64,11 @@
 
       & > .menubar > .menu-item {
         padding-top: 10px;
+        margin-right: 7px;
       }
 
       & > .menubar {
-        padding-right: 7px;
+        padding-right: 0px;
       }
     }
 
