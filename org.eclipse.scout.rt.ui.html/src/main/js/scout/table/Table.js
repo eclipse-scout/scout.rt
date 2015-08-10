@@ -1125,8 +1125,8 @@ scout.Table.prototype._group = function(update) {
 
     // test if group is finished
     skip = (r === rows.length - 1);
-    skip = skip || (groupColumn.type !== 'date' && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
-    skip = skip || (groupColumn.type === 'date' && !this.grouped && scout.dates.parseJsonDate(this.cellValue(groupColumn, row)).getFullYear() !== scout.dates.parseJsonDate(this.cellValue(groupColumn, nextRow)).getFullYear());
+    skip = skip || (groupColumn && groupColumn.type !== 'date' && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
+    skip = skip || (groupColumn && groupColumn.type === 'date' && !this.grouped && scout.dates.parseJsonDate(this.cellValue(groupColumn, row)).getFullYear() !== scout.dates.parseJsonDate(this.cellValue(groupColumn, nextRow)).getFullYear());
 
     // if group is finished: add group row
     if (sum.length > 0 && skip) {

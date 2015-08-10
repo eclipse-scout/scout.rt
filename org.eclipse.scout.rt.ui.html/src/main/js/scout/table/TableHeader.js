@@ -73,6 +73,7 @@ scout.TableHeader.prototype._render = function() {
     if (that.dragging) {
       that.dragging = false;
     } else if (event.shiftKey || event.ctrlKey) {
+      table.removeGrouping();
       table.sort($header.data('column'), $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))) {
       that._tableHeaderMenu.remove();

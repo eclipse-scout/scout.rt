@@ -261,6 +261,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function sort(direction, multiSort, remove) {
+    table.removeGrouping();
     table.sort(column, direction, multiSort, remove);
 
     sortSelect();
