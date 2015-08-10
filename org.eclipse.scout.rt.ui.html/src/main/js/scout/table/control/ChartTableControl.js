@@ -63,7 +63,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   for (var c1 = 0; c1 < columns.length; c1++) {
     var column1 = columns[c1];
 
-    if (column1.type === 'key') {
+    if (column1.type === 'key' || column1.type === 'number') {
       continue;
     }
 
