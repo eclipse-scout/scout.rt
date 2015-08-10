@@ -14,11 +14,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$contentContainer = $parent.appendDiv();
 
   // group functions for dates
-  var dateDesc = [
-      this.session.text('ui.showEveryDate'),
-      this.session.text('ui.groupedByWeekday'),
-      this.session.text('ui.groupedByMonth'),
-      this.session.text('ui.groupedByYear')
+  var dateGroup = [
+      [scout.ChartTableControlMatrix.DateGroup.YEAR, this.session.text('ui.groupedByYear')],
+      [scout.ChartTableControlMatrix.DateGroup.MONTH, this.session.text('ui.groupedByMonth')],
+      [scout.ChartTableControlMatrix.DateGroup.WEEKDAY, this.session.text('ui.groupedByWeekday')]
     ],
     countDesc = this.session.text('ui.Count'),
     removeChart = null,
@@ -72,8 +71,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       .data('column', column1);
 
     if (column1.type === 'date') {
-      $div.appendDiv('select-axis-group', dateDesc[0]);
-      $div.data('group', 0);
+      $div.data('group', 0)
+        .appendDiv('select-axis-group', dateGroup[0][1]);
     }
 
     $xAxisSelect.append($div);
@@ -229,9 +228,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       $axis.animateAVCSD('height', 42);
 
       if ($axis.hasClass('selected')) {
-        var newGroup = (group + 1) % dateDesc.length;
+        var newGroup = (group + 1) % dateGroup.length;
         $axis.data('group', newGroup)
-          .children('.select-axis-group').text(dateDesc[newGroup]);
+          .children('.select-axis-group').text(dateGroup[newGroup][1]);
       }
     }
 
@@ -275,14 +274,17 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var matrix = new scout.ChartTableControlMatrix(that.table, that.session),
       dataAxis = matrix.addData(data, dataCount ? -1 : (dataSum ? 1 : 2));
 
-    xAxis = matrix.addAxis(axis, axisGroup);
+    var group = (axisGroup >= 0) ? dateGroup[axisGroup][0] : axisGroup;
+    xAxis = matrix.addAxis(axis, group);
 
     // in case of scatter
     if ($chart.hasClassSVG('chart-scatter')) {
       var axis2 = $('.selected', $yAxisSelect).data('column'),
         axis2Group = $('.selected', $yAxisSelect).data('group');
 
-      yAxis = matrix.addAxis(axis2, axis2Group);
+      var group2 = (axis2Group >= 0) ? dateGroup[axis2Group][0] : axis2Group;
+      $.l(axis2Group, group2)
+      yAxis = matrix.addAxis(axis2, group2);
     }
 
     // return if empty

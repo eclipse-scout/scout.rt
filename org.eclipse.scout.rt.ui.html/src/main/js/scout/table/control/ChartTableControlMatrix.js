@@ -11,6 +11,20 @@ scout.ChartTableControlMatrix = function(table, session) {
   this._table = table;
 };
 
+scout.ChartTableControlMatrix.DateGroup = {
+    NONE: 0,
+    YEAR: 1,
+    MONTH: 2,
+    WEEKDAY: 3
+  };
+
+scout.ChartTableControlMatrix.NumberGroup = {
+    COUNT: -1,
+    SUM: 1,
+    AVG: 2
+  };
+
+
 /**
  * add data axis
  */
@@ -104,7 +118,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
 
   // norm and format depends of datatype and group functionality
   if (axis.type === 'date') {
-    if (axisGroup === 0) {
+    if (axisGroup === scout.ChartTableControlMatrix.DateGroup.NONE) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -120,24 +134,23 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
           return locale.dateFormat.format(new Date(n));
         }
       };
-    } else if (axisGroup === 1) {
+    } else if (axisGroup === scout.ChartTableControlMatrix.DateGroup.YEAR) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
         } else {
           var date = scout.dates.parseJsonDate(f);
-          var b = (date.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
-          return b;
+          return date.getFullYear();
         }
       };
       keyAxis.format = function(n) {
         if (n === null) {
-          return null;
+          return emptyCell;
         } else {
-          return locale.dateFormatSymbols.weekdaysOrdered[n];
+          return String(n);
         }
       };
-    } else if (axisGroup === 2) {
+    } else if (axisGroup === scout.ChartTableControlMatrix.DateGroup.MONTH) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -153,20 +166,21 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
           return locale.dateFormatSymbols.months[n];
         }
       };
-    } else if (axisGroup === 3) {
+    } else if (axisGroup === scout.ChartTableControlMatrix.DateGroup.WEEKDAY) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
         } else {
           var date = scout.dates.parseJsonDate(f);
-          return date.getFullYear();
+          var b = (date.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+          return b;
         }
       };
       keyAxis.format = function(n) {
         if (n === null) {
-          return emptyCell;
+          return null;
         } else {
-          return String(n);
+          return locale.dateFormatSymbols.weekdaysOrdered[n];
         }
       };
     }

@@ -150,7 +150,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $headerFilter.appendDiv('header-text')
     .data('label', session.text('ui.FilterBy'));
 
-  var group = (column.type === 'date') ? 3 : -1,
+  var group = (column.type === 'date') ? scout.ChartTableControlMatrix.DateGroup.YEAR : -1,
     matrix = new scout.ChartTableControlMatrix(table, session),
     xAxis = matrix.addAxis(column, group),
     cube = matrix.calculateCube();
