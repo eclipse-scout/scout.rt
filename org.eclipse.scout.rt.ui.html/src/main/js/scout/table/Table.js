@@ -1087,7 +1087,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 };
 
 scout.Table.prototype._group = function(update) {
-  var column, alignment, rows, sum, row, value, nextRow, useRow,
+  var column, alignment, rows, sum, row, value, nextRow, useRow, skip,
     that = this,
     groupColumn = this._groupColumn();
 
@@ -1122,7 +1122,14 @@ scout.Table.prototype._group = function(update) {
 
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
-    if ((r === rows.length - 1) || (!this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
+
+    // test if group is finished
+    skip = (r === rows.length - 1);
+    skip = skip || (groupColumn.type !== 'date' && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
+    skip = skip || (groupColumn.type === 'date' && !this.grouped && scout.dates.parseJsonDate(this.cellValue(groupColumn, row)).getFullYear() !== scout.dates.parseJsonDate(this.cellValue(groupColumn, nextRow)).getFullYear());
+
+    // if group is finished: add group row
+    if (sum.length > 0 && skip) {
       this._appendSumRow(sum, groupColumn, row, this.grouped, update);
       sum = [];
     }
@@ -1158,8 +1165,13 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
       $cell = $.makeDiv('table-cell', sumValue)
         .css('text-align', alignment);
     } else if (!all && column === groupColumn) {
-      $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
+      if (column.type === 'date') {
+        $cell = $.makeDiv('table-cell', scout.dates.parseJsonDate(this.cellValue(groupColumn, row)).getFullYear())
+          .css('text-align', alignment);
+      } else {
+        $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
         .css('text-align', alignment);
+      }
     } else {
       $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
     }
