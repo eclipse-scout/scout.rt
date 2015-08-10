@@ -155,14 +155,15 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     xAxis = matrix.addAxis(column, group),
     cube = matrix.calculateCube();
 
-  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
+  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container'),
+    $filter;
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
       mark = xAxis.format(key),
       value = cube.getValue([key]).length;
 
-    var $filter = $headerFilterContainer.appendDiv('header-filter', mark)
+    $filter = $headerFilterContainer.appendDiv('header-filter', mark)
       .attr('data-xAxis', key)
       .click(filterClick)
       .attr('data-value', value);
@@ -171,6 +172,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       $filter.addClass('selected');
     }
   }
+  // mark last element
+  $filter.addClass('last');
 
   this.$headerFilterContainer = $headerFilterContainer;
   scout.scrollbars.install($headerFilterContainer, session);

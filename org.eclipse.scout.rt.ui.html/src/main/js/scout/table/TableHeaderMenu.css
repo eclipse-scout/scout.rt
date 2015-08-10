@@ -224,7 +224,7 @@
   #scout.overflow-ellipsis-nowrap();
   border-top: 1px solid @table-header-cmd-border-color;
 
-  &:last-child {
+  &.last {
     border-bottom: 1px solid @table-header-cmd-border-color;
   }
 
