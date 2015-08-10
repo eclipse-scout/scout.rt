@@ -215,11 +215,11 @@ scout.Widget.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.Widget.prototype._installKeyStrokeAdapter = function() {
-  scout.keyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
+  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 };
 
 scout.Widget.prototype._uninstallKeyStrokeAdapter = function() {
-  scout.keyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
+  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.Widget.prototype.toString = function() {

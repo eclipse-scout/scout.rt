@@ -26,7 +26,7 @@ scout.Outline.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.Outline.prototype._installKeyStrokeAdapter = function() {
-  scout.keyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container.closest('.scout'));
+  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container.closest('.scout'));
 };
 
 /**

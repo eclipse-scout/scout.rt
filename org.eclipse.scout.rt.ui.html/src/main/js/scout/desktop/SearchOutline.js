@@ -24,8 +24,8 @@ scout.SearchOutline.prototype._render = function($parent) {
     this.searchFieldKeyStrokeAdapter = new scout.SearchFieldKeyStrokeAdapter(this);
   }
   // reinstall
-  scout.keyStrokeUtil.uninstallAdapter(this.searchFieldKeyStrokeAdapter);
-  scout.keyStrokeUtil.installAdapter(this.session, this.searchFieldKeyStrokeAdapter, this.$queryField);
+  scout.keyStrokeUtils.uninstallAdapter(this.searchFieldKeyStrokeAdapter);
+  scout.keyStrokeUtils.installAdapter(this.session, this.searchFieldKeyStrokeAdapter, this.$queryField);
 };
 
 scout.SearchOutline.prototype._remove = function() {

@@ -158,9 +158,9 @@ scout.Menu.prototype._drawKeyBox = function($container) {
 
 scout.Menu.prototype._registerKeyStrokeAdapter = function() {
   this.keyStrokeAdapter = this.keyStrokeAdapter || new scout.MenuKeyStrokeAdapter(this);
-  scout.keyStrokeUtil.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
+  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 };
 
 scout.Menu.prototype._unregisterKeyStrokeAdapter = function() {
-  scout.keyStrokeUtil.uninstallAdapter(this.keyStrokeAdapter);
+  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
 };

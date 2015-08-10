@@ -84,7 +84,7 @@ scout.TableControl.prototype.renderContent = function() {
     this._renderContent(this.tableFooter.$controlContent);
     this.contentRendered = true;
     this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
-    scout.keyStrokeUtil.installAdapter(this.session, this.tableControlKeyStrokeAdapter, this.tableFooter.$controlContent);
+    scout.keyStrokeUtils.installAdapter(this.session, this.tableControlKeyStrokeAdapter, this.tableFooter.$controlContent);
   }
 
 };
@@ -153,7 +153,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.sendSelected();
 
   if (!selected) {
-    scout.keyStrokeUtil.uninstallAdapter(this.tableControlKeyStrokeAdapter);
+    scout.keyStrokeUtils.uninstallAdapter(this.tableControlKeyStrokeAdapter);
   }
 };
 
