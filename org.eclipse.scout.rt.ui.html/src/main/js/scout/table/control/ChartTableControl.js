@@ -130,7 +130,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   // draw first chart
   var $chartMain = this.$contentContainer.appendSVG('svg', '', 'chart-main')
-    .attrSVG('viewBox', '0 0 1000 320')
+    .attrSVG('viewBox', '0 0 1000 400')
     .attr('preserveAspectRatio', 'xMinYMin');
   drawChart();
 
@@ -283,7 +283,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         axis2Group = $('.selected', $yAxisSelect).data('group');
 
       var group2 = (axis2Group >= 0) ? dateGroup[axis2Group][0] : axis2Group;
-      $.l(axis2Group, group2)
       yAxis = matrix.addAxis(axis2, group2);
     }
 
@@ -319,7 +318,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   function drawBar(xAxis, dataAxis, cube) {
     // dimension functions
-    var width = Math.min(800 / (xAxis.max - xAxis.min), 60),
+    var maxWidth = 0,
+      width = Math.min(800 / (xAxis.max - xAxis.min), 70),
       x = function(i) {
         i = i === null ? xAxis.max : i;
         return 100 + (i - xAxis.min) * width;
@@ -344,7 +344,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         mark = xAxis.format(key),
         value = cube.getValue([key])[0];
 
-      drawAxisText(x(key) + width / 2 - 1.5, y(0) + 14, 'x', mark);
+      var $text = drawAxisText(x(key) + width / 2 - 1.5, y(0) + 14, 'x', mark),
+        w = $text[0].getBBox().width;
+
+      maxWidth = (w > maxWidth) ? w : maxWidth;
 
       $chartMain.appendSVG('rect', '', 'main-chart')
         .attr('x', x(key)).attr('y', y(0))
@@ -353,7 +356,23 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         .animateSVG('height', 280 - y(value), 600)
         .animateSVG('y', y(value), 600)
         .attr('data-xAxis', key)
+        .data('data-text', $text)
+        .mouseenter(chartMouseenter)
+        .mouseleave(chartMouseleave)
         .click(chartClick);
+    }
+
+    // in case of to many elements, hide or rotate label
+    if (maxWidth > width * 3) {
+      $('.main-axis-x', $chartMain).attr('fill-opacity', 0);
+    } else if (maxWidth > width * 1.2) {
+      $('.main-axis-x', $chartMain).each(function () {
+        $(this)
+          .css('text-anchor', 'end')
+          .attr('y', parseFloat($(this).attr('y')) - 4)
+          .attr('x', parseFloat($(this).attr('x')) + 4)
+          .attr('transform', 'rotate(-25 ' + $(this).attr('x') + ', ' + $(this).attr('y') + ')');
+      });
     }
 
     // function for later remove
@@ -399,6 +418,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         .delay(200)
         .animateSVG('width', x(value) - 100)
         .attr('data-xAxis', key)
+        .mouseenter(chartMouseenter)
+        .mouseleave(chartMouseleave)
         .click(chartClick);
 
     }
@@ -516,6 +537,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
           duration: 600
         })
         .attr('data-xAxis', key)
+        .mouseenter(chartMouseenter)
+        .mouseleave(chartMouseleave)
         .click(chartClick);
 
       // axis around the circle
@@ -626,6 +649,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
             .animateSVG('r', r, 600)
             .attr('data-xAxis', key1)
             .attr('data-yAxis', key2)
+            .mouseenter(chartMouseenter)
+            .mouseleave(chartMouseleave)
             .click(chartClick);
         }
       }
@@ -647,11 +672,14 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawAxisText(x, y, c, t) {
-    $chartMain.appendSVG('text', '', 'main-axis-' + c)
+    var $text = $chartMain.appendSVG('text', '', 'main-axis-' + c)
       .attr('x', x).attr('y', y)
       .text(t)
-      .attr('opacity', 0)
-      .delay(200).animateSVG('opacity', 1, 600);
+      .attr('opacity', 0);
+
+    $text.delay(200).animateSVG('opacity', 1, 600);
+
+    return $text;
   }
 
   function pathSegment(mx, my, r, start, end) {
@@ -667,6 +695,22 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     return pathString;
   }
+
+  function chartMouseenter(event) {
+    var $element = $(this),
+      $text = $element.data('data-text');
+
+    $element.data('data-store-opacity', $text.attr('fill-opacity'));
+    $text.attr('fill-opacity', '1');
+  }
+
+  function chartMouseleave(event) {
+    var $element = $(this),
+      $text = $element.data('data-text');
+
+    $text.attr('fill-opacity', $element.data('data-store-opacity'));
+  }
+
 
   function chartClick(event) {
     var $clicked = $(this);

@@ -180,7 +180,7 @@ svg.select-chart.selected {
 
 .chart-main {
   width: 1000px;
-  height: 320px;
+  height: 400px;
 
   & :focus {
       outline: none;
