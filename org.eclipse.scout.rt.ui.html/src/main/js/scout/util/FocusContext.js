@@ -97,7 +97,7 @@ scout.FocusContext.prototype._onFocusOutEvent = function(event) {
 scout.FocusContext.prototype._onRemoveEvent = function(event) {
   // This listener is installed on the focused element only.
 
-  this._validateAndSetFocus(null, scout.Filters.notSameFilter(event.target));
+  this._validateAndSetFocus(null, scout.filters.notSameFilter(event.target));
 
   event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
 };
@@ -107,7 +107,7 @@ scout.FocusContext.prototype._onRemoveEvent = function(event) {
  */
 scout.FocusContext.prototype._onHideEvent = function(event) {
   if ($(event.target).isOrHas(this._lastFocusedElement)) {
-    this._validateAndSetFocus(null, scout.Filters.notSameFilter(event.target));
+    this._validateAndSetFocus(null, scout.filters.notSameFilter(event.target));
 
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
   }

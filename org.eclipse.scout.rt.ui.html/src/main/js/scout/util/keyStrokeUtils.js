@@ -12,7 +12,7 @@ scout.keyStrokeUtils.disableBrowserKeyStrokes = function($entryPoint) {
   $entryPoint.keydown(swallowHelpKeyStroke);
   $entryPoint.keyup(swallowHelpKeyStroke);
   if (window.onhelp) {
-    window.onhelp = scout.Filters.returnFalse;
+    window.onhelp = scout.filters.returnFalse;
   }
 
   // Prevent browser to interpret backspace.

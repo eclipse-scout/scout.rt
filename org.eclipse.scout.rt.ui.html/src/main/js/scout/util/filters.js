@@ -1,20 +1,20 @@
 /**
  * Filters to be used in streaming API (Array.prototype.filter()).
  */
-scout.Filters = function() {
+scout.filters = function() {
 };
 
 /**
  * Returns a function that always evaluates to 'true'.
  */
-scout.Filters.returnTrue = function() {
+scout.filters.returnTrue = function() {
   return true;
 };
 
 /**
  * Returns a function that always evaluates to 'false'.
  */
-scout.Filters.returnFalse = function() {
+scout.filters.returnFalse = function() {
   return false;
 };
 
@@ -23,7 +23,7 @@ scout.Filters.returnFalse = function() {
  *
  * @param DOM or jQuery container.
  */
-scout.Filters.outsideFilter = function (container) {
+scout.filters.outsideFilter = function (container) {
   container = container instanceof jQuery ? container[0] : container;
   return function() {
     return this !== container && !$.contains(container, this);
@@ -35,7 +35,7 @@ scout.Filters.outsideFilter = function (container) {
  *
  * @param DOM or jQuery element.
  */
-scout.Filters.notSameFilter = function(element) {
+scout.filters.notSameFilter = function(element) {
   element = element instanceof jQuery ? element[0] : element;
   return function() {
     return this !== element;

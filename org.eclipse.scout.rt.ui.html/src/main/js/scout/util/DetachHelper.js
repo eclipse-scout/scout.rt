@@ -129,7 +129,7 @@ scout.DetachHelper.prototype._storeFocusAndFocusContext = function($container, o
     if (focusedElement) {
       // Currently, the focus is on an element which is about to be detached. Hence, it must be set onto another control, which will not removed. Otherwise, the HTML body would be focused, because the currently focused element is removed from the DOM.
       // JQuery implementation detail: the detach operation does not trigger a 'remove' event.
-      this.session.focusManager.validateFocus(scout.Filters.outsideFilter($container)); // exclude the container or any of its child elements to gain focus.
+      this.session.focusManager.validateFocus(scout.filters.outsideFilter($container)); // exclude the container or any of its child elements to gain focus.
     }
     $container.removeData('focusContext');
   }

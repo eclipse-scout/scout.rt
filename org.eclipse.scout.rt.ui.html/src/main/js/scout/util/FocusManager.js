@@ -82,7 +82,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function($container) {
   }
 
   // Filter to exclude the current focus context's container and any of its child elements to gain focus.
-  var filter = scout.Filters.outsideFilter(focusContext.$container);
+  var filter = scout.filters.outsideFilter(focusContext.$container);
 
   // Remove and dispose the current focus context.
   scout.arrays.remove(this._focusContexts, focusContext);
@@ -171,7 +171,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
       .find(':focusable')
       .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
       .not(this.$entryPoint) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
-      .filter(filter || scout.Filters.returnTrue);
+      .filter(filter || scout.filters.returnTrue);
 
 
   for (i = 0; i < $candidates.length; i++) {
