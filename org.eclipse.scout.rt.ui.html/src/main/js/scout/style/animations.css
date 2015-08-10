@@ -186,6 +186,26 @@
   @-webkit-keyframes pulsate { .keyframes-pulsate(); }
   @keyframes pulsate { .keyframes-pulsate(); }
 
+  /*** Attention ***/
+
+  .keyframes-attention () {
+    0% {
+      #scout.transform(scale3d(1, 1, 1));
+    }
+    10% {
+      #scout.transform(scale3d(1.1, 1.1, 1.1));
+    }
+    20% {
+      #scout.transform(scale3d(1, 1, 1));
+    }
+    100% {
+      #scout.transform(scale3d(1, 1, 1));
+    }
+  }
+
+  @-webkit-keyframes attention { .keyframes-attention(); }
+  @keyframes attention { .keyframes-attention(); }
+
   /*** Rotate-X ***/
 
   .keyframes-rotate-x () {

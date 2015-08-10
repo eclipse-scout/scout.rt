@@ -35,6 +35,7 @@ scout.Table.GUI_EVENT_ROWS_UPDATED = 'rowsUpdated';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 scout.Table.GUI_EVENT_ROW_ORDER_CHANGED = 'rowOrderChanged';
+scout.Table.GUI_EVENT_STATUS_CHANGED = 'statusChanged';
 
 scout.Table.COLUMN_MIN_WIDTH = 30;
 
@@ -294,8 +295,12 @@ scout.Table.prototype._syncTableControls = function(controls) {
   }
 };
 
-scout.Table.prototype._renderTableStatusVisible = function(dummy) {
+scout.Table.prototype._renderTableStatusVisible = function() {
   this._renderTableFooter();
+};
+
+scout.Table.prototype._renderTableStatus = function() {
+  this.trigger(scout.Table.GUI_EVENT_STATUS_CHANGED);
 };
 
 /**

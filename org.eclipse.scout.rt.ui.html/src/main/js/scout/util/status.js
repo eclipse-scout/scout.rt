@@ -1,5 +1,12 @@
 scout.status = {
 
+  Severity: {
+    OK: 0x01,
+    INFO: 0x100,
+    WARNING: 0x10000,
+    ERROR: 0x1000000
+  },
+
   animateStatusMessage: function($status, message) {
     if (scout.strings.endsWith(message, '...')) {
       var $elipsis = $('<span>').addClass('elipsis');

@@ -98,10 +98,14 @@
 }
 
 .table-info-load,
+.table-info-status,
 .table-info-filter,
 .table-info-selection {
   float: left;
-  padding: @table-control-padding / 2 @table-control-padding 0px @table-control-padding;
+  padding-top: @table-control-padding / 2;
+  padding-bottom: 0;
+  padding-left: @table-control-padding;
+  padding-right: @table-control-padding - 1px; /* because left padding includes the ::before border */
   position: relative;
   display: none;
   width: 0px;
@@ -115,20 +119,52 @@
     content: '';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
-    left: 0px;
+    left: 0;
     height: @table-footer-height - @table-control-padding - 4px;
     border-right: 1px solid @border-color;
   }
 
-  & span.info-button {
-   text-decoration: underline;
+  & > .info-button {
+    text-decoration: underline;
+
+    & > .key-box {
+      bottom: 2px;
+    }
   }
 
-  & .key-box {
-    bottom: 2px;
+  &:hover > .info-button {
+    color: @hover-color;
+  }
+}
+
+.table-info-status {
+  padding-top: 0;
+  line-height: @table-footer-height;
+
+  & > .font-icon {
+    display: inline-block;
+
+    &::before {
+      content: @icon-info;
+      #scout.font-icon();
+      font-size: 22px;
+    }
   }
 
-  &:hover span.info-button {
-   color: @hover-color;
+  &:hover > .font-icon {
+    color: @hover-color;
+  }
+
+  &.has-error > .font-icon {
+    color: @error-color;
+    #scout.animation(attention 5s linear infinite);
+
+    &::before {
+      content: @icon-error;
+    }
+  }
+
+  &.has-error:hover > .font-icon {
+    color: @palette-red-4;
   }
 }

@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -54,6 +55,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
@@ -210,6 +212,17 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       @Override
       protected Boolean modelValue() {
         return getModel().isTableStatusVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TABLE_STATUS, model) {
+      @Override
+      protected IStatus modelValue() {
+        return getModel().getTableStatus();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return JsonStatus.toJson((IStatus) value);
       }
     });
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getUiSession()) {

@@ -11,7 +11,7 @@ scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
 scout.TableFooter.CONTAINER_SIZE = 345;
 
 scout.TableFooter.prototype._render = function($parent) {
-  var filter, that = this;
+  var filter;
   $parent = $parent || this._table.$container;
 
   this.$container = $parent.appendDiv('table-footer');
@@ -20,18 +20,34 @@ scout.TableFooter.prototype._render = function($parent) {
   this.$controlContent = this.$controlContainer.appendDiv('control-content');
   this.$controlGroup = this.$container.appendDiv('control-group');
 
-  // info section
+  // --- info section ---
   this._$controlInfo = this.$container
     .appendDiv('control-info');
+
+  // load info ("X rows loaded, click to reload")
   this._$infoLoad = this._$controlInfo
     .appendDiv('table-info-load')
     .on('click', '', this._onClickInfoLoad.bind(this));
+
+  // filter info ("X rows filtered by Y, click to remove filter")
   this._$infoFilter = this._$controlInfo
     .appendDiv('table-info-filter')
     .on('click', '', this._onClickInfoFilter.bind(this));
+
+  // selection info ("X rows selected, click to select all/none")
   this._$infoSelection = this._$controlInfo
     .appendDiv('table-info-selection')
     .on('click', '', this._onClickInfoSelection.bind(this));
+
+  // table status
+  this._$infoTableStatus = this._$controlInfo
+    .appendDiv('table-info-status')
+    .on('mousedown', this._onStatusMousedown.bind(this));
+  $('<span>')
+    .addClass('font-icon icon')
+    .appendTo(this._$infoTableStatus);
+
+  // --- text filter ---
 
   this._$filterField = scout.fields.new$TextField()
     .addClass('control-filter')
@@ -43,33 +59,46 @@ scout.TableFooter.prototype._render = function($parent) {
     this._$filterField.val(filter.text);
   }
 
+  // ------
+
   this._updateTableControls();
   this._updateInfoLoad();
   this._updateInfoLoadVisibility();
+  this._updateInfoTableStatus();
+  this._updateInfoTableStatusVisibility();
   this._updateInfoFilter();
   this._updateInfoFilterVisibility();
   this._updateInfoSelection();
   this._updateInfoSelectionVisibility();
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
-    that._updateInfoLoad();
-    that._updateInfoLoadVisibility();
-  });
+    this._updateInfoLoad();
+    this._updateInfoLoadVisibility();
+  }.bind(this));
+
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
-    that._updateInfoFilter();
-    that._updateInfoFilterVisibility();
-  });
+    this._updateInfoFilter();
+    this._updateInfoFilterVisibility();
+  }.bind(this));
+
   this._table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    that._setInfoVisible(that._$infoFilter, false);
-  });
+    this._setInfoVisible(this._$infoFilter, false);
+  }.bind(this));
+
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
     var numRows = 0;
     if (event.rows) {
       numRows = event.rows.length;
     }
-    that._updateInfoSelection(numRows, event.allSelected);
-    that._updateInfoSelectionVisibility();
-  });
+    this._updateInfoSelection(numRows, event.allSelected);
+    this._updateInfoSelectionVisibility();
+  }.bind(this));
+
+  this._table.events.on(scout.Table.GUI_EVENT_STATUS_CHANGED, function(event) {
+    this._updateInfoTableStatus();
+    this._updateInfoTableStatusVisibility();
+  }.bind(this));
+
   this._installKeyStrokeAdapter();
 };
 
@@ -112,6 +141,7 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
 scout.TableFooter.prototype.update = function() {
   this._updateTableControls();
   this._updateInfoLoadVisibility();
+  this._updateInfoTableStatusVisibility();
   this._updateInfoSelectionVisibility();
   this._updateInfoFilterVisibility();
 };
@@ -130,52 +160,50 @@ scout.TableFooter.prototype._updateTableControls = function() {
 };
 
 scout.TableFooter.prototype._updateInfoLoad = function() {
+  var $info = this._$infoLoad;
   var numRows = this._table.rows.length;
-  var info = this.session.text('ui.NumRowsLoaded', this._computeCountInfo(numRows));
-  info += '<br><span class="info-button">' + this.session.text('ui.ReloadData') + '</span>';
-  if (this._$infoLoad.html() === info) {
-    return;
-  }
-  this._$infoLoad.html(info);
+
+  $info.empty();
+  $info.text(this.session.text('ui.NumRowsLoaded', this._computeCountInfo(numRows)));
+  $('<br>').appendTo($info);
+  $('<span>').addClass('info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
 };
 
 scout.TableFooter.prototype._updateInfoFilter = function() {
-  var filteredBy = this._table.filteredBy();
-  if (filteredBy.length > 0) {
-    filteredBy = filteredBy.join(', ');
-  }
+  var $info = this._$infoFilter;
   var numRowsFiltered = this._table.filteredRowCount;
-  var info = this.session.text('ui.NumRowsFiltered', this._computeCountInfo(numRowsFiltered));
+  var filteredBy = this._table.filteredBy().join(', '); // filteredBy() returns an array
+
+  $info.empty();
   if (filteredBy) {
-    info = this.session.text('ui.NumRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy);
+    $info.text(this.session.text('ui.NumRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy));
+  } else {
+    $info.text(this.session.text('ui.NumRowsFiltered', this._computeCountInfo(numRowsFiltered)));
   }
-  info += '<br><span class="info-button">' + this.session.text('ui.RemoveFilter') + '</span>';
-  if (this._$infoFilter.html() === info) {
-    return;
-  }
-  // FIXME BSH Table | Code injection! Don't use html() here, build content using jQuery objects instead. Fix this in the other methods as well.
-  this._$infoFilter.html(info);
+  $('<br>').appendTo($info);
+  $('<span>').addClass('info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
 };
 
 scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all) {
+  var $info = this._$infoSelection;
   var numRows = this._table.rows.length;
-  var selectAllText, info;
 
-  if (numSelectedRows === undefined) {
-    numSelectedRows = this._table.selectedRows.length;
-  }
-  if (all === undefined) {
-    all = numRows === numSelectedRows;
-  }
+  numSelectedRows = scout.helpers.nvl(numSelectedRows, this._table.selectedRows.length);
+  all = scout.helpers.nvl(all, (numRows === numSelectedRows));
 
-  selectAllText = this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll');
-  info = this.session.text('ui.NumRowsSelected', this._computeCountInfo(numSelectedRows));
-  info += '<br><span class="info-button">' + selectAllText + '</span>';
-  if (this._$infoSelection.html() === info) {
-    return;
-  }
+  $info.empty();
+  $info.text(this.session.text('ui.NumRowsSelected', this._computeCountInfo(numSelectedRows)));
+  $('<br>').appendTo($info);
+  $('<span>').addClass('info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
+};
 
-  this._$infoSelection.html(info);
+scout.TableFooter.prototype._updateInfoTableStatus = function() {
+  var $info = this._$infoTableStatus;
+  var tableStatus = this._table.tableStatus;
+  if (tableStatus) {
+    var hasError = (tableStatus.severity > scout.status.Severity.WARNING);
+    $info.toggleClass('has-error', hasError);
+  }
 };
 
 scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
@@ -193,12 +221,31 @@ scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
   this._setInfoVisible(this._$infoSelection, tableStatusVisible);
 };
 
-scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
+scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
+  var visible = (this._table.tableStatus);
   if (visible) {
-    $info.css('display', 'inline-block').widthToContent();
+    this._setInfoVisible(this._$infoTableStatus, true, function() {
+      this._showTableStatusTooltip();
+    }.bind(this));
+  }
+  else {
+    this._hideTableStatusTooltip();
+    this._setInfoVisible(this._$infoTableStatus, false);
+  }
+};
+
+scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete) {
+  if (!complete) {
+    complete = function() {
+      this._updateTableStatusTooltipPosition();
+    }.bind(this);
+  }
+  if (visible) {
+    $info.css('display', 'inline-block').widthToContent(undefined, complete); // undefined = default duration
   } else {
     $info.animateAVCSD('width', 0, function() {
       $(this).hide();
+      complete();
     });
   }
 };
@@ -217,7 +264,7 @@ scout.TableFooter.prototype._onClickInfoSelection = function() {
 };
 
 scout.TableFooter.prototype._computeCountInfo = function(n) {
-  if (n === 0) {
+  if (scout.helpers.nvl(n, 0) === 0) {
     return this.session.text('ui.TableRowCount0');
   } else if (n === 1) {
     return this.session.text('ui.TableRowCount1');
@@ -234,8 +281,7 @@ scout.TableFooter.prototype._revalidateTableLayout = function() {
 
 scout.TableFooter.prototype.openControlContainer = function(control) {
   var insets = scout.graphics.getInsets(this.$controlContainer),
-    contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom,
-    that = this;
+    contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom;
 
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
@@ -245,8 +291,8 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   this.$controlContainer.stop(true).show().delay(1).animate({
     height: scout.TableFooter.CONTAINER_SIZE
   }, {
-    duration: that.rendered ? 500 : 0,
-    progress: that._revalidateTableLayout.bind(that),
+    duration: this.rendered ? 500 : 0,
+    progress: this._revalidateTableLayout.bind(this),
     complete: function() {
       control.onControlContainerOpened();
     }
@@ -255,13 +301,12 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
 };
 
 scout.TableFooter.prototype.closeControlContainer = function(control) {
-  var that = this;
   scout.keyStrokeUtils.uninstallAdapter(this.tableControlKeyStrokeAdapter);
   this.$controlContainer.stop(true).show().animate({
     height: 0
   }, {
     duration: 500,
-    progress: that._revalidateTableLayout.bind(that)
+    progress: this._revalidateTableLayout.bind(this)
   });
 
   this.$controlContainer.promise().done(function() {
@@ -274,28 +319,26 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
 };
 
 scout.TableFooter.prototype._addResize = function($parent) {
-  var that = this;
-
   this._$controlResize = $parent.appendDiv('control-resize')
-    .on('mousedown', '', resize);
+    .on('mousedown', '', resize.bind(this));
 
   function resize(event) {
     $(window)
-      .on('mousemove.tablefooter', resizeMove)
-      .one('mouseup', resizeEnd);
+      .on('mousemove.tablefooter', resizeMove.bind(this))
+      .one('mouseup', resizeEnd.bind(this));
     $('body').addClass('row-resize');
 
     function resizeMove(event) {
-      var newHeight = that._table.$container.height() - event.pageY;
-      that.$controlContainer.height(newHeight);
-      that.$controlContent.outerHeight(newHeight);
-      that._revalidateTableLayout();
-      that.onResize();
+      var newHeight = this._table.$container.height() - event.pageY;
+      this.$controlContainer.height(newHeight);
+      this.$controlContent.outerHeight(newHeight);
+      this._revalidateTableLayout();
+      this.onResize();
     }
 
     function resizeEnd() {
-      if (that.$controlContainer.height() < 100) {
-        that.selectedControl.setSelected(false);
+      if (this.$controlContainer.height() < 100) {
+        this.selectedControl.setSelected(false);
       }
 
       $(window).off('mousemove.tablefooter');
@@ -310,4 +353,62 @@ scout.TableFooter.prototype.onResize = function() {
   this._table.tableControls.forEach(function(control) {
     control.onResize();
   });
+};
+
+scout.TableFooter.prototype._onStatusMousedown = function(event) {
+  // Toggle tooltip
+  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    this._hideTableStatusTooltip();
+  } else {
+    this._showTableStatusTooltip();
+  }
+};
+
+scout.TableFooter.prototype._hideTableStatusTooltip = function() {
+  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    this._tableStatusTooltip.remove();
+    this._tableStatusTooltip = null;
+  }
+};
+
+scout.TableFooter.prototype._showTableStatusTooltip = function(options) {
+  options = options || {};
+
+  var tableStatus = this._table.tableStatus;
+  var text = (tableStatus ? tableStatus.message : null);
+  if (!scout.strings.hasText(text)) {
+    return; // Refuse to show empty tooltip
+  }
+
+  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    // update existing tooltip
+    this._tableStatusTooltip.renderText(text);
+  } else {
+    var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
+    var isError = (tableStatus.severity > scout.status.Severity.WARNING);
+
+    // create new tooltip
+    var opts = {
+      text: text,
+      cssClass: (isError ? 'tooltip-error' : ''),
+      autoRemove: !isError,
+      $anchor: this._$infoTableStatus
+    };
+    $.extend(opts, options);
+    this._tableStatusTooltip = new scout.Tooltip(this.session, opts);
+    this._tableStatusTooltip.render();
+
+    // Auto-hide unimportant messages
+    if (!isWarning) {
+      setTimeout(function() {
+        this._hideTableStatusTooltip();
+      }.bind(this), 5000);
+    }
+  }
+};
+
+scout.TableFooter.prototype._updateTableStatusTooltipPosition = function() {
+  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    this._tableStatusTooltip.position();
+  }
 };

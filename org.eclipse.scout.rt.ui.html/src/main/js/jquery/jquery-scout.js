@@ -417,12 +417,13 @@
   };
 
   // over engineered animate
-  $.fn.widthToContent = function(duration) {
-    duration = (duration !== undefined) ? duration : 300;
+  $.fn.widthToContent = function(duration, complete) {
+    duration = scout.helpers.nvl(duration, 300);
 
     var oldW = this.outerWidth(),
       newW = this.css('width', 'auto').outerWidth(),
       finalWidth = this.data('finalWidth');
+
     if (newW !== oldW) {
       this.css('width', oldW);
     }
@@ -431,6 +432,9 @@
       this.data('finalWidth', newW);
       this.stop().animateAVCSD('width', newW, function() {
         $(this).data('finalWidth', null);
+        if (complete) {
+          complete(); // call-back
+        }
       }, null, duration);
     }
 
