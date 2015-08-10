@@ -1,19 +1,17 @@
 @check-box-size: 18px;
 
 .check-box-field > .field {
-  display: block;
-  position: relative;
   padding: @borderless-field-padding-y 0px @borderless-field-padding-y 25px;
-  margin-right: 15px;
   outline: none;
-  /* FIXME NBU overflow cannot be set, checkbox looks ugly because height is too small */
-/*     #scout.overflow-ellipsis-nowrap();     */
 
   & > .check-box,
   & > .label {
     color: @control-color;
     cursor: pointer;
-    white-space: nowrap;
+  }
+
+  & > .label {
+    #scout.overflow-ellipsis-nowrap();
   }
 
   &.disabled > .label {
@@ -31,7 +29,6 @@
     }
 
     /* ::before */
-
 
     &::before {
       #scout.checkbox-label-before();

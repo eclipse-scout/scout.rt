@@ -20,9 +20,13 @@ scout.TableHeader.prototype._render = function() {
     that = this,
     columns = this.columns,
     table = this.table,
-    tooltipFunction = function(col) { if (col.data('column') && scout.strings.hasText(col.data('column').headerTooltip)) { return col.data('column').headerTooltip; }
-      else if (col.isContentTruncated() || (col.width() + col.position().left) > col.parent().width()) { return col.text(); } };
-
+    tooltipFunction = function(col) {
+      if (col.data('column') && scout.strings.hasText(col.data('column').headerTooltip)) {
+        return col.data('column').headerTooltip;
+      } else if (col.isContentTruncated() || (col.width() + col.position().left) > col.parent().width()) {
+        return col.text();
+      }
+    };
   this.$container = table.$data.beforeDiv('table-header');
 
   this._dataScrollHandler = this._onDataScroll.bind(this);
@@ -39,7 +43,9 @@ scout.TableHeader.prototype._render = function() {
     column.$header = $header;
     column.filter = [];
 
-    scout.tooltips.install($header, this.session, { tooltipText: tooltipFunction });
+    scout.tooltips.install($header, this.session, {
+      tooltipText: tooltipFunction
+    });
 
     this._decorateHeader(column);
     alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);

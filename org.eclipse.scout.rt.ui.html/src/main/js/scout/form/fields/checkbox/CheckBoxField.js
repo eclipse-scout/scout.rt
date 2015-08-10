@@ -10,12 +10,23 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
   this.addField($('<div>'));
-  this.$checkBox = $.makeDiv('check-box');
-  this.$checkBox.appendTo(this.$field);
-  this.$checkBox.on('mousedown', this._onMouseDown.bind(this));
-  this.$checkBoxLabel = $.makeDiv('label');
-  this.$checkBoxLabel.appendTo(this.$field);
-  this.$checkBoxLabel.on('mousedown', this._onMouseDown.bind(this));
+
+  this.$checkBox = $.makeDiv('check-box')
+    .appendTo(this.$field)
+    .on('mousedown', this._onMouseDown.bind(this));
+
+  this.$checkBoxLabel = $.makeDiv('label')
+    .appendTo(this.$field)
+    .on('mousedown', this._onMouseDown.bind(this));
+
+  scout.tooltips.install(this.$checkBoxLabel, this.session, {
+    tooltipText: function($label) {
+      if ($label.isContentTruncated()) {
+        return $label.text();
+      }
+    }
+  });
+
   this.addStatus();
 };
 
@@ -36,16 +47,16 @@ scout.CheckBoxField.prototype._onMouseDown = function() {
 };
 
 scout.CheckBoxField.prototype._toggleChecked = function() {
-  var uiChecked;
   if (!this.enabled) {
     return;
   }
   this.$checkBox.toggleClass('checked');
-  uiChecked = this.$checkBox.hasClass('checked');
+  var uiChecked = this.$checkBox.hasClass('checked');
   this.remoteHandler(this.id, 'clicked', {
     checked: uiChecked
   });
 };
+
 /**
  * @override
  */
@@ -72,10 +83,7 @@ scout.CheckBoxField.prototype._renderValue = function(value) {
  * @override
  */
 scout.CheckBoxField.prototype._renderLabel = function(label) {
-  if (!label) {
-    label = '';
-  }
   if (this.$checkBoxLabel) {
-    this.$checkBoxLabel.text(label);
+    this.$checkBoxLabel.text(label || '');
   }
 };
