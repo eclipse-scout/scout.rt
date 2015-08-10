@@ -122,14 +122,14 @@ scout.DetachHelper.prototype._storeFocusAndFocusContext = function($container, o
     }
   }
 
-  if ($container.isFocusContextInstalled(this.session)) {
-    $container.uninstallFocusContext(this.session);
+  if (this.session.focusManager.isFocusContextInstalled($container)) {
+    this.session.focusManager.uninstallFocusContext($container);
     $container.data('focusContext', true);
   } else {
     if (focusedElement) {
       // Currently, the focus is on an element which is about to be detached. Hence, it must be set onto another control, which will not removed. Otherwise, the HTML body would be focused, because the currently focused element is removed from the DOM.
       // JQuery implementation detail: the detach operation does not trigger a 'remove' event.
-      scout.focusManager.validateFocus(this.session.uiSessionId, scout.Filters.outsideFilter($container)); // exclude the container or any of its child elements to gain focus.
+      this.session.focusManager.validateFocus(scout.Filters.outsideFilter($container)); // exclude the container or any of its child elements to gain focus.
     }
     $container.removeData('focusContext');
   }
@@ -140,8 +140,8 @@ scout.DetachHelper.prototype._restoreFocusAndFocusContext = function($container)
   var focusContext = $container.data('focusContext');
 
   if (focusContext) {
-    $container.installFocusContext(this.session, focusedElement || scout.FocusRule.AUTO);
+    this.session.focusManager.installFocusContext($container, focusedElement || scout.focusRule.AUTO);
   } else if (focusedElement) {
-    scout.focusManager.requestFocus(this.session.uiSessionId, focusedElement);
+    this.session.focusManager.requestFocus(focusedElement);
   }
 };

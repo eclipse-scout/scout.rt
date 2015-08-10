@@ -300,7 +300,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
     content.render(this.$bench);
 
     // Request focus on first element in new outlineTab.
-    scout.focusManager.validateFocus(this.session.uiSessionId);
+    this.session.focusManager.validateFocus();
 
     // FIXME CGU: maybe include in render?
     content.htmlComp.validateLayout();
@@ -308,7 +308,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   }
 
   // Request focus on first element in new outlineTab.
-  scout.focusManager.validateFocus(this.session.uiSessionId);
+  this.session.focusManager.validateFocus(); // TODO [nbu][dwi] why double validate?
 };
 
 scout.Desktop.prototype.setOutline = function(outline) {

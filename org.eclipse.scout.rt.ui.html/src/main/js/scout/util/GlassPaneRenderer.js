@@ -1,10 +1,10 @@
 /**
  * Renders glassPanes over the 'glassPaneTargets' of an element.
  */
-scout.GlassPaneRenderer = function(element, enabled, uiSessionId) {
+scout.GlassPaneRenderer = function(session, element, enabled) {
   this._element = element;
   this._enabled = enabled;
-  this._uiSessionId = uiSessionId;
+  this.session = session;
   this._$glassPanes = [];
   this._$glassPaneTargets = [];
 };
@@ -18,7 +18,7 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
     this._$glassPaneTargets.push($glassPaneTarget);
 
     // Register 'glassPaneTarget' in focus manager.
-    scout.focusManager.registerGlassPaneTarget(this._uiSessionId, $glassPaneTarget);
+    this.session.focusManager.registerGlassPaneTarget($glassPaneTarget);
 
   }, this);
 };
@@ -31,7 +31,7 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
 
   // Unregister glasspane targets from focus manager.
   this._$glassPaneTargets.forEach(function($glassPaneTarget) {
-    scout.focusManager.unregisterGlassPaneTarget(this._uiSessionId, $glassPaneTarget);
+    this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }, this);
 
   this._$glassPanes = [];
@@ -49,7 +49,7 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
     return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
   }
 
-  var parent = this._element.parent || this._element.session.desktop; // use Desktop if no parent set.
+  var parent = this._element.parent || this.session.desktop; // use Desktop if no parent set.
   if (!parent) {
     return []; // No parent, e.g. during startup to display fatal errors.
   }

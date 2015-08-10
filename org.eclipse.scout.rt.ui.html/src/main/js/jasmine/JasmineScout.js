@@ -18,6 +18,7 @@ function sandboxSession(options) {
   session.locale = new LocaleSpecHelper().createLocale('de');
   session.desktop = new scout.Widget();
   session.desktop._addEventSupport();
+  session.focusManager = new scout.FocusManager(session);
 
   return session;
 }

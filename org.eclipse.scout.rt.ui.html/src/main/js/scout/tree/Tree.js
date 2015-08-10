@@ -1340,7 +1340,7 @@ scout.Tree.prototype.selectedNodes = function() {
 };
 
 scout.Tree.prototype._onRequestFocus = function() {
-  this.$container.focus();
+  this.session.focusManager.requestFocus(this.$container);
 };
 
 scout.Tree.prototype._onScrollToSelection = function() {

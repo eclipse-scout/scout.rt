@@ -2327,7 +2327,7 @@ scout.Table.prototype._onEndCellEdit = function(fieldId) {
 };
 
 scout.Table.prototype._onRequestFocus = function() {
-  this.$container.focus();
+  this.session.focusManager.requestFocus(this.$container);
 };
 
 scout.Table.prototype._onScrollToSelection = function() {

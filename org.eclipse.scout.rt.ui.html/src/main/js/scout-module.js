@@ -23,6 +23,8 @@ __include("scout/util/keys.js");
 __include("scout/util/keyStrokeUtils.js");
 __include("scout/util/FocusManager.js");
 __include("scout/util/FocusContext.js");
+__include("scout/util/focusUtils.js");
+__include("scout/util/focusRule.js");
 __include("scout/util/localObjects.js");
 __include("scout/util/logging.js");
 __include("scout/util/mimeTypes.js");

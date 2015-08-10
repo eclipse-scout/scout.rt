@@ -1,7 +1,7 @@
 /* global FormSpecHelper, FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.Focusmanager', function() {
-  var session, formHelper, focusHelper, form, focusContextsForSession;
+  var session, formHelper, focusHelper, form;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -11,24 +11,22 @@ describe('scout.Focusmanager', function() {
     session = sandboxSession();
     session.init();
     jasmine.clock().install();
-    focusContextsForSession = scout.focusManager._sessionFocusContexts[session.uiSessionId].focusContexts;
     uninstallUnloadHandlers(session);
   });
 
   afterEach(function() {
     session = null;
-    focusContextsForSession = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('_isSelectableText', function() {
+  describe('isSelectableText', function() {
 
     it('must return true for disabled text-fields', function() {
       var $textField = $('<input>')
         .attr('type', 'text')
         .attr('disabled', 'disabled');
-      expect(scout.focusManager._isSelectableText($textField)).toBe(true);
+      expect(scout.focusUtils.isSelectableText($textField)).toBe(true);
     });
 
   });
@@ -36,7 +34,7 @@ describe('scout.Focusmanager', function() {
   describe('validateFocus', function() {
 
     it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', function() {
-      scout.focusManager.validateFocus(session.uiSessionId);
+      session.focusManager.validateFocus();
       var sandbox = $('#sandbox')[0];
       expect(document.activeElement).toBe(sandbox);
     });
@@ -72,25 +70,23 @@ describe('scout.Focusmanager', function() {
         $secondField.focus();
         expect($secondField).toBeFocused();
 
-        var activeContext = scout.focusManager._activeContext(session.uiSessionId);
-        expect(activeContext._lastFocusedElement).toBe($secondField[0]);
+        expect(session.focusManager._findActiveContext()._lastFocusedElement).toBe($secondField[0]);
       });
 
       it('A new FocusContext must be created when a form is opened as dialog', function() {
         var $secondField = form.rootGroupBox.fields[1].$field;
         $secondField.focus(); // must be remembered by focus-context
 
-        var sandboxContext = scout.focusManager._activeContext(session.uiSessionId);
-        expect(sandboxContext._$container).toBe(session.$entryPoint);
+        var sandboxContext = session.focusManager._findActiveContext();
+        expect(sandboxContext.$container).toBe(session.$entryPoint);
 
         var dialog = formHelper.createFormXFields(2, session, true);
         dialog.render(session.$entryPoint);
 
-        var allContexts = scout.focusManager._contextsBySession(session.uiSessionId);
-        expect(allContexts.length).toBe(2);
+        expect(session.focusManager._focusContexts.length).toBe(2);
 
-        var dialogContext = scout.focusManager._activeContext(session.uiSessionId);
-        expect(dialogContext._$container).toBe(dialog.$container);
+        var dialogContext = session.focusManager._findActiveContext();
+        expect(dialogContext.$container).toBe(dialog.$container);
 
         // focus-context must install handlers on form $container
         expect(focusHelper.handlersRegistered(dialog.$container)).toBe(true);

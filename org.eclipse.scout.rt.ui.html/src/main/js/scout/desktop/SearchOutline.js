@@ -66,9 +66,12 @@ scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
 
 /**
  * Focus and select content AFTER the search outline was rendered (and therefore the query field filled).
+ *
  * @override Outline.js
  */
 scout.SearchOutline.prototype.validateFocus = function() {
-  this.$queryField.focus();
-  this.$queryField[0].select();
+  var elementToFocus = this.$queryField[0];
+  if (this.session.focusManager.requestFocus(elementToFocus)) {
+    elementToFocus.select();
+  }
 };

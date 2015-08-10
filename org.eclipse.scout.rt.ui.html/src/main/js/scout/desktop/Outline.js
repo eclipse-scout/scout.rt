@@ -250,7 +250,7 @@ scout.Outline.prototype.onModelAction = function(event) {
 };
 
 scout.Outline.prototype.validateFocus = function() {
-  scout.focusManager.validateFocus(this.session.uiSessionId);
+  this.session.focusManager.validateFocus();
 };
 
 scout.Outline.prototype.sendToBack = function() {

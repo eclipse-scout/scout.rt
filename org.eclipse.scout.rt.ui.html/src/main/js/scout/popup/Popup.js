@@ -1,10 +1,7 @@
 /**
- * Options:
- * <ul>
- * <li><b>initialFocus</b> a Function that returns the element to be focused or a <code>scout.FocusRule</code>. Default returns <code>scout.FocusRule.AUTO</code></li>
- * <li><b>focusableContainer</b> a Boolean whether or not the container of the Popup is focusable</li>
- * </ul>
- *
+ * @param options:
+ *          initialFocus: a function that returns the element to be focused or a <code>scout.focusRule</code>. Default returns <code>scout.focusRule.AUTO</code>
+ *          focusableContainer: a boolean whether or not the container of the Popup is focusable
  */
 scout.Popup = function(session, options) {
   // FIXME AWE: use this.options property here
@@ -26,7 +23,7 @@ scout.Popup = function(session, options) {
   this.windowPaddingX = scout.helpers.nvl(options.windowPaddingX, 10);
   this.windowPaddingY = scout.helpers.nvl(options.windowPaddingY, 5);
   this.installFocusContext = scout.helpers.nvl(options.installFocusContext, true);
-  this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.FocusRule.AUTO; });
+  this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.focusRule.AUTO; });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
   this._addEventSupport();
 
@@ -45,7 +42,7 @@ scout.Popup.prototype._postRender = function() {
   // be shifted for a few pixels.
   this.position();
   if (this.installFocusContext) {
-    this.$container.installFocusContext(this.session, this.initialFocus());
+    this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
   }
 };
 
@@ -55,7 +52,7 @@ scout.Popup.prototype.remove = function() {
   }
 
   if (this.installFocusContext) {
-    this.$container.uninstallFocusContext(this.session);
+    this.session.focusManager.uninstallFocusContext(this.$container);
   }
   scout.Popup.parent.prototype.remove.call(this);
 

@@ -9,7 +9,7 @@ scout.inherits(scout.FileChooser, scout.ModelAdapter);
 scout.FileChooser.prototype._init = function(model, session) {
   scout.FileChooser.parent.prototype._init.call(this, model, session);
 
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, session.uiSessionId);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(session, this, true);
 };
 
 scout.FileChooser.prototype._render = function($parent) {
@@ -120,12 +120,12 @@ scout.FileChooser.prototype._render = function($parent) {
 };
 
 scout.FileChooser.prototype._postRender = function() {
-  this.$container.installFocusContext(this.session, scout.FocusRule.AUTO);
+  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 
 scout.FileChooser.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session);
+  this.session.focusManager.uninstallFocusContext(this.$container);
   this.attached = false;
 
   scout.FileChooser.parent.prototype._remove.call(this);

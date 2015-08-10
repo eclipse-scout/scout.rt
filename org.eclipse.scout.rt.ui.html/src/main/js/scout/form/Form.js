@@ -25,7 +25,7 @@ scout.Form.prototype._init = function(model, session) {
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, renderGlassPanes, session.uiSessionId);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(session, this, renderGlassPanes);
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -290,7 +290,7 @@ scout.Form.prototype.detach = function() {
 
 scout.Form.prototype.renderInitialFocus = function() {
   if (this.rendered) {
-    scout.focusManager.requestFocus(this.session.uiSessionId, this._initialFocusElement());
+    this.session.focusManager.requestFocus(this._initialFocusElement());
   }
 };
 
@@ -299,19 +299,19 @@ scout.Form.prototype._initialFocusElement = function() {
   if (initialFocusField) {
     return initialFocusField.$field[0];
   } else {
-    return scout.focusManager.findFirstFocusableElement(this.session, this.$container);
+    return this.session.focusManager.findFirstFocusableElement(this.$container);
   }
 };
 
 scout.Form.prototype._installFocusContext = function() {
   if (this.isDialog()) {
-    this.$container.installFocusContext(this.session, scout.FocusRule.NONE);
+    this.session.focusManager.installFocusContext(this.$container, scout.focusRule.NONE);
   }
 };
 
 scout.Form.prototype._uninstallFocusContext = function() {
   if (this.isDialog()) {
-    this.$container.uninstallFocusContext(this.session);
+    this.session.focusManager.uninstallFocusContext(this.$container);
   }
 };
 

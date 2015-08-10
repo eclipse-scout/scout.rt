@@ -10,7 +10,7 @@ scout.inherits(scout.BusyIndicator, scout.Widget);
 
 scout.BusyIndicator.prototype._render = function($parent) {
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, true, this.session.uiSessionId);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
   this._glassPaneRenderer.renderGlassPanes();
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
     $glassPane
@@ -52,7 +52,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
     this.$container.removeClass('hidden').addClassForAnimation('shown');
     // Validate first focusable element
     // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
-    scout.focusManager.validateFocus(this.session.uiSessionId);
+    this.session.focusManager.validateFocus();
   }.bind(this), 2500);
 };
 
@@ -61,7 +61,7 @@ scout.BusyIndicator.prototype._onClickCancel = function(event) {
 };
 
 scout.BusyIndicator.prototype._postRender = function() {
-  this.$container.installFocusContext(this.session, scout.FocusRule.AUTO);
+  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 
 scout.BusyIndicator.prototype._remove = function() {
@@ -75,7 +75,7 @@ scout.BusyIndicator.prototype._remove = function() {
       .setMouseCursorWait(false);
   });
   this._glassPaneRenderer.removeGlassPanes();
-  this.$container.uninstallFocusContext(this.session);
+  this.session.focusManager.uninstallFocusContext(this.$container);
 
   scout.BusyIndicator.parent.prototype._remove.call(this);
 };

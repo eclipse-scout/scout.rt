@@ -649,35 +649,6 @@
   };
 
   /**
-   * Returns true if there is a focus context installed for the given $container.
-   */
-  $.fn.isFocusContextInstalled = function(session) {
-    return scout.focusManager.isFocusContextInstalled(session, this);
-  };
-
-  /**
-   * Installs a new focus context for this $container, and sets the $container's initial focus, either by the given rule, or tries to gain focus for the given element.
-   *
-   * @param initialFocusRuleOrElement: rule how to set the initial focus, or the element to gain focus.
-   *
-   *        rule: scout.FocusRule.AUTO: to focus the first child control (if applicable);
-   *              scout.FocusRule.NONE: to not focus any element;
-   *        element: tries to focus the given element, but only if being a child control of the $container, and if being accessible,
-   *                 e.g. not covert by a glasspane;
-   */
-  $.fn.installFocusContext = function(session, $firstFocusElement) {
-    scout.focusManager.installFocusContext(session, this, $firstFocusElement);
-  };
-
-  /**
-   * Uninstalls the focus context for this $container, and activates the last active context.
-   * This method has no effect, if there is no focus context installed for the given $container.
-   */
-  $.fn.uninstallFocusContext = function(session) {
-    scout.focusManager.uninstallFocusContext(session, this);
-  };
-
-  /**
    * Calls jQuery.fadeOut() and then removes the element from the DOM.
    * Default fade-out duration is 150 ms.
    */

@@ -24,11 +24,11 @@ scout.ClipboardField.prototype._render = function($parent) {
     .on('paste', this._onPaste.bind(this));
 
   $parent.on('click', function(event) {
-    scout.focusManager.requestFocus(this.session.uiSessionId, this.$field);
+    this.session.focusManager.requestFocus(this.$field);
     }.bind(this));
 
   if (this.rendered) {
-    scout.focusManager.requestFocus(this.session.uiSessionId, this.$field);
+    this.session.focusManager.requestFocus(this.$field);
   }
 };
 

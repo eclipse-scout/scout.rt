@@ -51,7 +51,7 @@ scout.keyStrokeUtils.installAdapter = function(session, adapter, $target) {
     // Check whether the keystroke is handled by this adapter.
     if (!adapter.keyStrokes ||
         !adapter.accept(event) ||
-        scout.focusManager._isElementCovertByGlassPane(adapter._srcElement.$container, session.uiSessionId)) {
+        session.focusManager.isElementCovertByGlassPane(adapter._srcElement.$container)) {
       if (adapter.preventBubbleUp(event)) {
         event.stopPropagation(); // prevent superior adapters to handle this event
       }
