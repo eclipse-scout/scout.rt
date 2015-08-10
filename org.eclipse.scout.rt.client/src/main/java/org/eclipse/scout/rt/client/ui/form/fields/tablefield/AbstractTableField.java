@@ -577,8 +577,13 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public void setTableStatus(String status) {
-    setTableSelectionStatus(status != null ? new Status(status, IStatus.INFO) : null);
+  public void setTableStatus(String statusText) {
+    Status status = statusText != null ? new Status(statusText, IStatus.INFO) : null;
+    setTableSelectionStatus(status);
+    T table = getTable();
+    if (table != null) {
+      table.setTableStatus(status);
+    }
   }
 
   @Override

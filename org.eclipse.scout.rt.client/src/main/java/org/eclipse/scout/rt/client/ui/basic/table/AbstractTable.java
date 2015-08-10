@@ -47,6 +47,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -4221,6 +4222,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setTableStatusVisible(boolean visible) {
     propertySupport.setPropertyBool(PROP_TABLE_STATUS_VISIBLE, visible);
+  }
+
+  @Override
+  public IStatus getTableStatus() {
+    return (IStatus) propertySupport.getProperty(PROP_TABLE_STATUS);
+  }
+
+  @Override
+  public void setTableStatus(IStatus status) {
+    propertySupport.setProperty(PROP_TABLE_STATUS, status);
   }
 
   /*

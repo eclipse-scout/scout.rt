@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -150,6 +151,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.1.0
    */
   String PROP_TABLE_STATUS_VISIBLE = "tableStatusVisible";
+
+  /**
+   * {@link IStatus}
+   *
+   * @since 5.1.0
+   */
+  String PROP_TABLE_STATUS = "tableStatus";
 
   void initTable() throws ProcessingException;
 
@@ -1029,6 +1037,22 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.1.0
    */
   void setTableStatusVisible(boolean visible);
+
+  /**
+   * @return the data fetching>/loading status, warnings and other general messages related with data currently loaded
+   *         into this table
+   * @since 5.1.0
+   */
+  IStatus getTableStatus();
+
+  /**
+   * set the data loading status on the table
+   * <p>
+   * this is normally displayed in a status bar on the bottom of the table gui
+   *
+   * @since 5.1.0
+   */
+  void setTableStatus(IStatus status);
 
   /**
    * @since 5.1.0

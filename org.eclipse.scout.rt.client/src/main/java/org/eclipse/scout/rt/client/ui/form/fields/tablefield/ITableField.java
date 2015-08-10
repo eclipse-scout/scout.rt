@@ -58,7 +58,7 @@ public interface ITableField<T extends ITable> extends IFormField {
   /**
    * Convenience for {@link #setTableSelectionStatus(IStatus)} with a string. Creates a status with {@link IStatus#INFO}
    */
-  void setTableStatus(String s);
+  void setTableStatus(String statusText);
 
   /**
    * @return the status of the table data row count and selection

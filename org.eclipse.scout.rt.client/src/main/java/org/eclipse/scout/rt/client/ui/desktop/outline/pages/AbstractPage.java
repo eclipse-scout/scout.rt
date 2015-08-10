@@ -453,6 +453,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public void setPagePopulateStatus(IStatus status) {
     m_pagePopulateStatus = status;
+    T table = getTable();
+    if (table != null) {
+      getTable().setTableStatus(status);
+    }
   }
 
   @Override
