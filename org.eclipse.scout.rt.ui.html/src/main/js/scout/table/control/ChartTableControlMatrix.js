@@ -338,3 +338,7 @@ scout.ChartTableControlMatrix.prototype.columnCount = function() {
   }
   return colCount;
 };
+
+scout.ChartTableControlMatrix.prototype.isEmpty = function() {
+  return this._rows.length === 0;
+};

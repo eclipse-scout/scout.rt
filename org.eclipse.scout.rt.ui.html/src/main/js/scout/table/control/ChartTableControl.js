@@ -285,6 +285,12 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       yAxis = matrix.addAxis(axis2, axis2Group);
     }
 
+    // return if empty
+    if (matrix.isEmpty()) {
+      return false;
+    }
+
+
     // calculate matrix
     var cube = matrix.calculateCube();
 
