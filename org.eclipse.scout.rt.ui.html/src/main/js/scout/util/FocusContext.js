@@ -5,7 +5,7 @@ scout.FocusContext = function($container, focusManager) {
   this.$container = $container;
   this.focusManager = focusManager;
 
-  this._lastFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
+  this._lastValidFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
   this._focusedField = null;
 
   // Notice: Any listener is installed on $container and not on $field level, except 'remove' listener because does not bubble.
@@ -106,7 +106,7 @@ scout.FocusContext.prototype._onRemoveEvent = function(event) {
  * Method invoked once a child element of this context's $container is hidden.
  */
 scout.FocusContext.prototype._onHideEvent = function(event) {
-  if ($(event.target).isOrHas(this._lastFocusedElement)) {
+  if ($(event.target).isOrHas(this._lastValidFocusedElement)) {
     this._validateAndSetFocus(null, scout.filters.notSameFilter(event.target));
 
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
@@ -137,7 +137,7 @@ scout.FocusContext.prototype._validateAndSetFocus = function(element, filter) {
   }
 
   // Store the element to be focused, and regardless of whether currently covert by a glass pane or the focus manager is not active. That is for later focus restore.
-  this._lastFocusedElement = elementToFocus;
+  this._lastValidFocusedElement = elementToFocus;
 
   // Focus the element.
   this._focus(elementToFocus);

@@ -45,8 +45,13 @@ scout.SmartField.prototype._render = function($parent) {
   this.addIcon();
   this.addStatus();
   this.addSmartFieldPopup();
+};
 
-  if (this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
+/**
+ * Method invoked if being rendered within a cell-editor (mode='scout.FormField.MODE_CELLEDITOR'), and once the editor finished its rendering.
+ */
+scout.SmartField.prototype.onCellEditorRendered = function(options) {
+  if (options.openFieldPopup) {
     this._onClick();
   }
 };
@@ -75,22 +80,14 @@ scout.SmartField.prototype._syncDisplayText = function(displayText) {
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
   $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser);
-  if (this.proposalChooser) {
-    this._requestedProposal = false;
-    this._renderPopup();
-    this.proposalChooser.render(this._popup.$container);
-    if (this.rendered) {
-      // a.) render after a click (property change), form is completely laid out
-      this._popup.resize();
-    } else {
-      // b.) render when HTML page is loaded, layout of form is not done yet
-      //     we must acquire focus, because popup is only closed when field
-      //     loses focus.
-      if (document.activeElement !== this.$field) {
-        this.$field.focus();
-      }
-    }
+  if (!this.proposalChooser) {
+    return;
   }
+
+  this._requestedProposal = false;
+  this._renderPopup();
+  this.proposalChooser.render(this._popup.$container);
+  this._popup.resize();
 };
 
 /**
@@ -363,11 +360,10 @@ scout.SmartField.prototype._renderPopup = function() {
 };
 
 /**
- * @override
+ * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function() {
-  if (this.cellEditor) {
-    return;
+  if (this.mode !== scout.FormField.MODE_CELLEDITOR) {
+    this._acceptProposal(true);
   }
-  this._acceptProposal(true);
 };

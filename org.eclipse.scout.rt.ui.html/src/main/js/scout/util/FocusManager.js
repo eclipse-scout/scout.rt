@@ -91,7 +91,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function($container) {
   // Activate last active focus context.
   var activeFocusContext = this._findActiveContext();
   if (activeFocusContext) {
-    activeFocusContext._validateAndSetFocus(activeFocusContext._lastFocusedElement, filter);
+    activeFocusContext._validateAndSetFocus(activeFocusContext._lastValidFocusedElement, filter);
   }
 };
 
@@ -142,7 +142,7 @@ scout.FocusManager.prototype.unregisterGlassPaneTarget = function(glassPaneTarge
 scout.FocusManager.prototype.validateFocus = function(filter) {
   var activeContext = this._findActiveContext();
   if (activeContext) {
-    activeContext._validateAndSetFocus(activeContext._lastFocusedElement, filter);
+    activeContext._validateAndSetFocus(activeContext._lastValidFocusedElement, filter);
   }
 };
 
@@ -151,12 +151,12 @@ scout.FocusManager.prototype.validateFocus = function(filter) {
  *
  * @return true if focus was gained, or false otherwise.
  */
-scout.FocusManager.prototype.requestFocus = function(element) {
+scout.FocusManager.prototype.requestFocus = function(element, filter) {
   element = element instanceof jQuery ? element[0] : element;
 
   var activeContext = this._findActiveContext();
   if (activeContext) {
-    activeContext._validateAndSetFocus(element);
+    activeContext._validateAndSetFocus(element, filter);
   }
 
   return (document.activeElement === element);

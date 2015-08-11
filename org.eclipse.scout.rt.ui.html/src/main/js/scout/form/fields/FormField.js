@@ -25,6 +25,7 @@ scout.FormField = function() {
   this.keyStrokes = [];
   this._addAdapterProperties(['keyStrokes', 'menus']);
   this.refFieldId;
+  this.mode = scout.FormField.MODE_DEFAULT;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -33,6 +34,15 @@ scout.FormField.LABEL_POSITION_LEFT = 1;
 scout.FormField.LABEL_POSITION_ON_FIELD = 2;
 scout.FormField.LABEL_POSITION_RIGHT = 3;
 scout.FormField.LABEL_POSITION_TOP = 4;
+
+/**
+ * Indicates the field to be used in default mode, e.g. in a Form.
+ */
+scout.FormField.MODE_DEFAULT = 'default';
+/**
+ * Indicates the field to be used within a cell editor.
+ */
+scout.FormField.MODE_CELLEDITOR = 'celleditor';
 
 scout.FormField.prototype._init = function(model, session) {
   scout.FormField.parent.prototype._init.call(this, model, session);

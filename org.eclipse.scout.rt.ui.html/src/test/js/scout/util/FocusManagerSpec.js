@@ -70,7 +70,7 @@ describe('scout.Focusmanager', function() {
         $secondField.focus();
         expect($secondField).toBeFocused();
 
-        expect(session.focusManager._findActiveContext()._lastFocusedElement).toBe($secondField[0]);
+        expect(session.focusManager._findActiveContext()._lastValidFocusedElement).toBe($secondField[0]);
       });
 
       it('A new FocusContext must be created when a form is opened as dialog', function() {
@@ -92,7 +92,7 @@ describe('scout.Focusmanager', function() {
         expect(focusHelper.handlersRegistered(dialog.$container)).toBe(true);
 
         // must remember last focused field of first focus-context
-        expect(sandboxContext._lastFocusedElement).toBe($secondField[0]);
+        expect(sandboxContext._lastValidFocusedElement).toBe($secondField[0]);
       });
 
       it('Must focus another valid field if the focused field is removed', function() {

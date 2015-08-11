@@ -43,10 +43,12 @@ scout.FormToolPopup.prototype.attach = function() {
   this.formToolButton.form.validateLayout(); // Form layout may have become invalid during detach (i.e. closing the popup)
   this.alignTo();
 
+  this._triggerPopupOpenEvent();
   this._attachCloseHandler();
   this._installKeyStrokeAdapter();
 
   this.session.detachHelper.afterAttach(this.$container);
+
 };
 
 scout.FormToolPopup.prototype._onMouseDownOutside = function(event) {

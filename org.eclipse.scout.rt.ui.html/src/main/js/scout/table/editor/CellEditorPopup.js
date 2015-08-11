@@ -1,5 +1,6 @@
 scout.CellEditorPopup = function(column, row, cell, session) {
   scout.CellEditorPopup.parent.call(this, session);
+
   this.table = column.table;
   this.column = column;
   this.row = row;
@@ -11,10 +12,18 @@ scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.CellEditorPopupKeyStrokeAdapter(this);
 };
 
+/**
+ * Method invoked once a popup is opened.
+ */
+scout.CellEditorPopup.prototype._onPopupOpen = function(event) {
+  // nop
+  // FIXME [dwi] do nothing depending on the popup hierarchy.
+};
+
 scout.CellEditorPopup.prototype._render = function($parent) {
   scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
-  var field = this.cell.field,
-    firstCell = this.table.columns.indexOf(this.column) === 0;
+
+  var firstCell = this.table.columns.indexOf(this.column) === 0;
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
   if (firstCell) {
@@ -23,14 +32,8 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
-  // Sets a hint on the field that that field was opened as cell editor.
-  // Additionally, sets the property openFieldPopupOnCellEdit to indicate that the a popup should be opened immediately after it has been rendered.
-  // The field should use setTimeout() to open the popup, because the editor-field
-  // itself is in the middle of rendering and thus the popup of the editor-field
-  // cannot position itself correctly
-  field.cellEditor = {
-    openFieldPopupOnCellEdit: this.table.openFieldPopupOnCellEdit
-  };
+  var field = this.cell.field;
+  field.mode = scout.FormField.MODE_CELLEDITOR; // hint that this field is used within a cell-editor
   field.render(this.$container);
   field.prepareForCellEdit({
     firstCell: firstCell,
@@ -57,8 +60,21 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.table.$container.addClass('focused');
 };
 
+scout.CellEditorPopup.prototype._postRender = function() {
+  scout.CellEditorPopup.parent.prototype._postRender.call(this); // installs the focus context for this popup
+
+  // If applicable, invoke the field's function 'onCellEditorRendered' to signal the cell-editor to be rendered.
+  var field = this.cell.field;
+  if (field.onCellEditorRendered) {
+    field.onCellEditorRendered({
+        openFieldPopup: this.table.openFieldPopupOnCellEdit
+    });
+  }
+};
+
 scout.CellEditorPopup.prototype._remove = function() {
-  scout.CellEditorPopup.parent.prototype._remove.call(this);
+  scout.CellEditorPopup.parent.prototype._remove.call(this); // uninstalls the focus context for this popup
+
   this.table.events.off(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
   // table may have been removed in the meantime
   if (this.table.rendered) {

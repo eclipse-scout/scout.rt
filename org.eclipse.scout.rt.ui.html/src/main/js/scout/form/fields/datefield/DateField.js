@@ -63,8 +63,11 @@ scout.DateField.prototype._renderProperties = function() {
   scout.DateField.parent.prototype._renderProperties.call(this);
 };
 
-scout.DateField.prototype._postRender = function() {
-  if (this.hasDate && this.cellEditor && this.cellEditor.openFieldPopupOnCellEdit) {
+/**
+ * Method invoked if being rendered within a cell-editor (mode='scout.FormField.MODE_CELLEDITOR'), and once the editor finished its rendering.
+ */
+scout.DateField.prototype.onCellEditorRendered = function(options) {
+  if (options.openFieldPopup && this.hasDate) {
     this._openDatePicker();
   }
 };
@@ -251,7 +254,8 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     shiftDate = true;
 
   // Don't propagate tab to cell editor -> tab should focus time field
-  if (this.hasTime && this.cellEditor &&
+  if (this.hasTime && 
+    this.mode === scout.FormField.MODE_CELLEDITOR &&
     event.which === scout.keys.TAB &&
     modifierCount === 0) {
     event.stopPropagation();
@@ -388,7 +392,8 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     date = null;
 
   // Don't propagate shift-tab to cell editor -> shift tab should focus date field
-  if (this.hasDate && this.cellEditor &&
+  if (this.hasDate && 
+    this.mode === scout.FormField.MODE_CELLEDITOR &&
     event.which === scout.keys.TAB &&
     event.shiftKey &&
     modifierCount === 1) {

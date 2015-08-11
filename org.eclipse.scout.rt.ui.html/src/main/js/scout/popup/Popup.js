@@ -9,9 +9,9 @@ scout.Popup = function(session, options) {
   this.init(session);
 
   options = options || {};
-  this._mouseDownHandler = this._onMouseDown.bind(this);
-  this._scrollHandler = this._onAnchorScroll.bind(this);
-  this._popupOpenHandler = this._onPopupOpen.bind(this);
+  this._mouseDownHandler;
+  this._scrollHandler;
+  this._popupOpenHandler;
 
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.openEvent;
@@ -22,17 +22,19 @@ scout.Popup = function(session, options) {
   this.$anchor = options.$anchor;
   this.windowPaddingX = scout.helpers.nvl(options.windowPaddingX, 10);
   this.windowPaddingY = scout.helpers.nvl(options.windowPaddingY, 5);
-  this.installFocusContext = scout.helpers.nvl(options.installFocusContext, true);
+  this.withFocusContext = scout.helpers.nvl(options.installFocusContext, true);
   this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.focusRule.AUTO; });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
   this._addEventSupport();
-
 };
 scout.inherits(scout.Popup, scout.Widget);
 
 scout.Popup.prototype.render = function($parent, event) {
   scout.Popup.parent.prototype.render.call(this, $parent);
+
   this.openEvent = event;
+
+  this._triggerPopupOpenEvent();
   this._attachCloseHandler();
 };
 
@@ -41,7 +43,8 @@ scout.Popup.prototype._postRender = function() {
   // that is currently not on the screen. Which would cause the whole desktop to
   // be shifted for a few pixels.
   this.position();
-  if (this.installFocusContext) {
+
+  if (this.withFocusContext) {
     this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
   }
 };
@@ -51,7 +54,7 @@ scout.Popup.prototype.remove = function() {
     return;
   }
 
-  if (this.installFocusContext) {
+  if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
   scout.Popup.parent.prototype.remove.call(this);
@@ -67,8 +70,8 @@ scout.Popup.prototype._render = function($parent) {
   }
   this.$container = $.makeDiv('popup').appendTo($parent);
 
-  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups)
-  if (this.installFocusContext && this.focusableContainer) {
+  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
+  if (this.withFocusContext && this.focusableContainer) {
     this.$container.attr('tabindex', -1);
   }
 };
@@ -85,24 +88,39 @@ scout.Popup.prototype.close = function(event) {
  * or changing the anchor's scroll position, or another popup is opened.
  */
 scout.Popup.prototype._attachCloseHandler = function() {
-  // Fire event that this popup is opening
-  this.session.desktop._trigger('popupopen', {popup: this});
-
-  // Register listeners to close the popup.
+  // Install mouse close handler
+  this._mouseDownHandler = this._onMouseDown.bind(this);
   $(document).on('mousedown', this._mouseDownHandler);
+
+  // Install popup open close handler
+  this._popupOpenHandler = this._onPopupOpen.bind(this);
   this.session.desktop.on('popupopen', this._popupOpenHandler);
 
+  // Install scroll close handler
   if (this.$anchor) {
+    this._scrollHandler = this._onAnchorScroll.bind(this);
     scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
   }
 };
 
 scout.Popup.prototype._detachCloseHandler = function() {
-  if (this.$anchor) {
+  // Uninstall scroll close handler
+  if (this._scrollHandler) {
     scout.scrollbars.offScroll(this._scrollHandler);
+    this._scrollHandler = null;
   }
-  this.session.desktop.off('popupopen', this._popupOpenHandler);
+
+  // Uninstall popup open close handler
+  if (this._popupOpenHandler) {
+    this.session.desktop.off('popupopen', this._popupOpenHandler);
+    this._popupOpenHandler = null;
+  }
+
+  // Uninstall mouse close handler
+  if (this._mouseDownHandler) {
     $(document).off('mousedown', this._mouseDownHandler);
+    this._mouseDownHandler = null;
+  }
 };
 
 scout.Popup.prototype._onMouseDown = function(event) {
@@ -112,6 +130,7 @@ scout.Popup.prototype._onMouseDown = function(event) {
     this._onMouseDownOutside(event);
   }
 };
+
 
 /**
  * Method invoked once a mouse down event occurs outside the popup.
@@ -132,7 +151,8 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
  */
 scout.Popup.prototype._onPopupOpen = function(event) {
   if (event.popup !== this) {
-    this.close(event);
+//    this.close(event);
+    // FIXME [dwi] do nothing depending on the popup hierarchy.
   }
 };
 
@@ -241,4 +261,11 @@ scout.Popup.prototype.setLocation = function(location) {
 
 scout.Popup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupKeyStrokeAdapter(this);
+};
+
+/**
+ * Fire event that this popup is about to open.
+ */
+scout.Popup.prototype._triggerPopupOpenEvent= function() {
+  this.session.desktop._trigger('popupopen', {popup: this});
 };
