@@ -38,6 +38,11 @@ public interface IMultiStatus extends IStatus {
   List<IStatus> getChildren();
 
   /**
+   * Remove all children with the given class
+   */
+  void removeAll(Class<? extends IStatus> clazz);
+
+  /**
    * @param clazz
    *          not <code>null<code>
    * @return <code>true</code>, if any of the direct or indirect children is of the given type, <code>false</code>

@@ -121,6 +121,7 @@ public class MultiStatus extends Status implements IMultiStatus {
   /**
    * Remove all children with the given class
    */
+  @Override
   public void removeAll(Class<? extends IStatus> clazz) {
     for (IStatus child : getChildren()) {
       if (Assertions.assertNotNull(clazz).isAssignableFrom(child.getClass())) {
