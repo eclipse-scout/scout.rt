@@ -1,5 +1,8 @@
 .control-content-chart {
   padding: @table-control-content-padding;
+}
+
+.chart-container{
   white-space: nowrap;
 }
 
@@ -179,8 +182,8 @@ svg.select-chart.selected {
 /* chart - main */
 
 .chart-main {
-  width: 1000px;
-  height: 400px;
+  width: 3000px;
+  height: 1000px;
 
   & :focus {
       outline: none;

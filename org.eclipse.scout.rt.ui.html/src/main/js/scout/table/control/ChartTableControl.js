@@ -11,7 +11,13 @@ scout.inherits(scout.ChartTableControl, scout.TableControl);
 scout.ChartTableControl.FILTER_KEY = 'CHART';
 
 scout.ChartTableControl.prototype._renderContent = function($parent) {
-  this.$contentContainer = $parent.appendDiv();
+  this.$contentContainer = $parent.appendDiv('chart-container');
+
+  // scrollbars
+  //scout.scrollbars.install(this.$contentContainer, this.session);
+  //this.session.detachHelper.pushScrollable(this.$contentContainer);
+  //this._gridScrollHandler = this._onGridScroll.bind(this);
+  //this.$grid.on('scroll', this._gridScrollHandler);
 
   // group functions for dates
   var dateGroup = [
@@ -129,9 +135,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('.select-data').first().addClass('selected');
 
   // draw first chart
-  var $chartMain = this.$contentContainer.appendSVG('svg', '', 'chart-main')
-    .attrSVG('viewBox', '0 0 1000 400')
-    .attr('preserveAspectRatio', 'xMinYMin');
+  var $chartMain = this.$contentContainer.appendSVG('svg', '', 'chart-main');
   drawChart();
 
   function addSelectBar($container) {
@@ -319,7 +323,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawBar(xAxis, dataAxis, cube) {
     // dimension functions
     var maxWidth = 0,
-      width = Math.min(800 / xAxis.length, 70),
+      width = Math.max(10, Math.min(800 / xAxis.length, 70)),
       x = function(i) {
         i = i === null ? xAxis.length : i;
         return 100 + i * width;
@@ -351,7 +355,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
       $chartMain.appendSVG('rect', '', 'main-chart')
         .attr('x', x(a)).attr('y', y(0))
-        .attr('width', Math.max(2, width - 3)).attr('height', 0)
+        .attr('width', width - 3).attr('height', 0)
         .delay(200)
         .animateSVG('height', 280 - y(value), 600)
         .animateSVG('y', y(value), 600)
@@ -386,9 +390,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawStacked(xAxis, dataAxis, cube) {
     // dimension functions
     var maxHeight = 0,
-      height = Math.min(240 / xAxis.length, 30),
+      maxWidth = Math.max(280, that.$contentContainer.width() - 680),
+      height = Math.max(8, Math.min(240 / xAxis.length, 30)),
       x = function(i) {
-        return 100 + i / dataAxis.max * 800;
+        return 100 + i / dataAxis.max * maxWidth;
       },
       y = function(i) {
         i = i === null ? xAxis.length : i;
@@ -418,7 +423,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
       $chartMain.appendSVG('rect', '', 'main-chart')
         .attr('x', x(0)).attr('y', y(a))
-        .attr('width', 0).attr('height', Math.max(2, height - 3))
+        .attr('width', 0).attr('height', height - 3)
         .delay(200)
         .animateSVG('width', x(value) - 100)
         .attr('data-xAxis', key)
@@ -447,9 +452,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     }
 
     // dimension functions
-    var x = function(i) {
+    var maxWidth = Math.max(280, that.$contentContainer.width() - 680),
+      x = function(i) {
       i = i === null ? xAxis.max : i;
-      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * 800;
+      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
     },
       y = function(i) {
         return 280 - i / (dataAxis.max - 0) * 240;
@@ -624,8 +630,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
           .attr('fill-opacity', 0)
           .attrXLINK('href', '#ArcAxisWide');
         $label2
-          .attr('fill-opacity', 0)
-
+          .attr('fill-opacity', 0);
       }
 
       startAngle = endAngle;
@@ -646,9 +651,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   function drawScatter(xAxis, yAxis, dataAxis, cube) {
     // dimension functions
-    var x = function(i) {
+    var maxWidth = Math.max(280, that.$contentContainer.width() - 840),
+    x = function(i) {
       i = i === null ? xAxis.max : i;
-      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * 700;
+      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
     },
       y = function(i) {
         i = i === null ? yAxis.max : i;
