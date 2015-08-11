@@ -104,14 +104,7 @@ scout.Button.prototype.doAction = function() {
   // stroke action is executed, all listeners will receive an artificial
   // blur event, which does not change the focus but executes all code that
   // is normally triggered when a regular blur event occurs.
-  var activeValueField = $(document.activeElement).data('valuefield');
-  if (activeValueField === undefined) {
-    // try parent, some times the value field is the parent of the input field (e.g. DateField.js)
-    activeValueField = $(document.activeElement).parent().data('valuefield');
-  }
-  if (activeValueField) {
-    activeValueField.acceptInput();
-  }
+  scout.valueFieldUtils.acceptInputOnActiveField();
 
   if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.setSelected(!this.selected);

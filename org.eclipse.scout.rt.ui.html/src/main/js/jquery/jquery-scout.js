@@ -836,3 +836,13 @@
     return ret;
   };
 }(jQuery));
+
+/**
+ * Process each mouseDown event before and accept input on value field before do anything else.
+ */
+jQuery.event.fixHooks.mousedown = {
+    filter: function(event, origEvent){
+      scout.valueFieldUtils.acceptInputOnActiveField();
+      return event;
+    }
+};
