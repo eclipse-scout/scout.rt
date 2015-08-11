@@ -1455,14 +1455,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Decorate all cells
+   * Decorate all cells.
    */
   @Internal
   protected void decorateCells() {
     if (getTable() != null) {
-      for (ITableRow row : getTable().getRows()) {
-        decorateCell(row);
-      }
+      decorateCells(getTable().getRows());
+    }
+  }
+
+  @Internal
+  @Override
+  public void decorateCells(List<ITableRow> rows) {
+    for (ITableRow row : rows) {
+      decorateCell(row);
     }
   }
 

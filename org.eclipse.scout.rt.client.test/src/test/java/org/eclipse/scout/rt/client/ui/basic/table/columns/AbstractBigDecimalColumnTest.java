@@ -44,7 +44,7 @@ public class AbstractBigDecimalColumnTest extends AbstractBigDecimalColumn {
       setFormat(df);
 
       char decimalSeparator = df.getDecimalFormatSymbols().getDecimalSeparator();
-      decorateCellInternal(cell, row);
+      updateDisplayText(row, cell);
       assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
       DecimalFormat df1235 = (DecimalFormat) DecimalFormat.getInstance(locale);
       df1235.applyPattern("#");

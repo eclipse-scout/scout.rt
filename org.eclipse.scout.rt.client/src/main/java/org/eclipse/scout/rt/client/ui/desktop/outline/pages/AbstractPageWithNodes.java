@@ -325,11 +325,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   private class P_Table extends AbstractTable {
 
     @Override
-    protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
-      super.execRowsSelected(rows);
-    }
-
-    @Override
     protected boolean getConfiguredSortEnabled() {
       return false;
     }

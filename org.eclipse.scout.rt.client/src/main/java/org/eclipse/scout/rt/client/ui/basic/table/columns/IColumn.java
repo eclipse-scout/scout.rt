@@ -389,6 +389,8 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   void decorateCell(ITableRow row);
 
+  void decorateCells(List<ITableRow> row);
+
   void decorateHeaderCell();
 
   /**

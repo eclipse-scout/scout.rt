@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public interface ICell {
@@ -62,7 +62,7 @@ public interface ICell {
   /**
    * the error status of the cell or <code>null</code> in case of no error.
    */
-  IStatus getErrorStatus();
+  IMultiStatus getErrorStatus();
 
   /**
    * @return true if the content is valid, no error status is set on field and mandatory

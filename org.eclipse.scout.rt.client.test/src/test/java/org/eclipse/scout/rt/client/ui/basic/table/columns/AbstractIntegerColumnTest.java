@@ -40,7 +40,7 @@ public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
       df.applyPattern(getFormat().toPattern());
       setFormat(df);
 
-      decorateCellInternal(cell, row);
+      updateDisplayText(row, cell);
       assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
     }
   }

@@ -67,7 +67,7 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
     DecimalFormat df = BEANS.get(NumberFormatProvider.class).getNumberInstance(Locale.CANADA_FRENCH);
     setFormat(df);
 
-    decorateCellInternal(cell, row);
+    updateDisplayText(row, cell);
     assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
   }
 
