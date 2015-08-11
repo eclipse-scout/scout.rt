@@ -34,7 +34,7 @@ public class OutlineChooserBreadCrumb extends BreadCrumb {
     for (IOutline outline : desktop.getAvailableOutlines()) {
       outline.selectNode(null);
     }
-    desktop.setOutline((IOutline) null);
+    desktop.activateOutline((IOutline) null);
   }
 
 }

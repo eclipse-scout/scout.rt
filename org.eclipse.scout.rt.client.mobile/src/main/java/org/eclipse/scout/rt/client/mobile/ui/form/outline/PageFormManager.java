@@ -325,7 +325,7 @@ public class PageFormManager {
       //Make sure outline is correctly set
       IOutline outline = page.getOutline();
       if (getDesktop().getOutline() != page.getOutline()) {
-        getDesktop().setOutline(page.getOutline());
+        getDesktop().activateOutline(page.getOutline());
       }
 
       //Select node

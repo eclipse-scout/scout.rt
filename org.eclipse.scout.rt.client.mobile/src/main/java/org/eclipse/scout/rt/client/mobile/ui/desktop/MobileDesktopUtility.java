@@ -28,7 +28,7 @@ public class MobileDesktopUtility {
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
 
     if (desktop.getOutline() != outline) {
-      desktop.setOutline(outline);
+      desktop.activateOutline(outline);
     }
 
     if (!outline.isRootNodeVisible()) {
