@@ -37,7 +37,9 @@ public class TableImportTest {
     row.setDefault(TEST_VALUE);
     m_table.importFromTableBeanData(tableBean);
     String value = m_table.getDefaultColumn().getValue(0);
+    String text = m_table.getDefaultColumn().getValue(0);
     assertEquals(TEST_VALUE, value);
+    assertEquals(TEST_VALUE, text);
     assertEquals(1, m_table.getDefaultColumn().getParseCount());
     assertEquals(1, m_table.getDefaultColumn().getValidateCount());
     assertEquals(1, m_table.getDefaultColumn().getDecorateCount());

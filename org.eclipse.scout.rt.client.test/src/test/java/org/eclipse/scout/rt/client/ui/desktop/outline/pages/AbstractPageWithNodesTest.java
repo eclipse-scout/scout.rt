@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,16 +38,23 @@ import org.junit.runner.RunWith;
 public class AbstractPageWithNodesTest {
 
   @Test
+  public void testInitNodePage() throws Exception {
+    ParentItemNodePage pItem = new ParentItemNodePage();
+    pItem.initPage();
+    assertEquals("Parent page", pItem.getCell().getText());
+  }
+
+  @Test
   public void testPageNodeText() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
     ITreeNode parentPageNode = desktop.getOutline().getSelectedNode();
-    Assert.assertEquals("Parent page", parentPageNode.getCell().getText());
+    assertEquals("Parent page", parentPageNode.getCell().getText());
   }
 
   @Test
-  public void testRenameChildPages() throws Exception {
+  public void testSetupOutlinePage() throws Exception {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
@@ -60,31 +67,38 @@ public class AbstractPageWithNodesTest {
 
     IPage<?> page = outline.getActivePage();
     assertNotNull(page);
+  }
+
+  @Test
+  public void testRenameChildPages() throws Exception {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithTableOutline()));
+    desktop.setOutline(PageWithTableOutline.class);
 
     AbstractPageWithNodes parentPage = (AbstractPageWithNodes) desktop.getOutline().getActivePage();
     ITreeNode parentPageNode = desktop.getOutline().getSelectedNode();
     ITreeNode childPageNode = parentPageNode.getChildNode(0);
 
-    Assert.assertEquals("Parent page", parentPageNode.getCell().getText());
-    Assert.assertEquals("Child page", childPageNode.getCell().getText());
-    Assert.assertEquals("Child page", parentPage.getTable().getRow(0).getCell(0).getText()); //this is the childPages name in the table
+    assertEquals("Parent page", parentPageNode.getCell().getText());
+    assertEquals("Child page", childPageNode.getCell().getText());
+    assertEquals("Child page", parentPage.getTable().getRow(0).getCell(0).getText()); //this is the childPages name in the table
 
     //update the child node's cell text
     childPageNode.getCellForUpdate().setText("my new long text");
-    Assert.assertEquals("my new long text", childPageNode.getCell().getText());
-    Assert.assertEquals("my new long text", parentPage.getTable().getRow(0).getCell(0).getText()); //text must also be changed in the parent's table
+    assertEquals("my new long text", childPageNode.getCell().getText());
+    assertEquals("my new long text", parentPage.getTable().getRow(0).getCell(0).getText()); //text must also be changed in the parent's table
 
     //rename again
     childPageNode.getCellForUpdate().setText("Child page");
-    Assert.assertEquals("Parent page", parentPageNode.getCell().getText());
-    Assert.assertEquals("Child page", childPageNode.getCell().getText());
-    Assert.assertEquals("Child page", parentPage.getTable().getRow(0).getCell(0).getText());
+    assertEquals("Parent page", parentPageNode.getCell().getText());
+    assertEquals("Child page", childPageNode.getCell().getText());
+    assertEquals("Child page", parentPage.getTable().getRow(0).getCell(0).getText());
 
     //rename on table, must be reflected to the tree
     parentPage.getTable().getRow(0).getCellForUpdate(0).setText("my new long text");
-    Assert.assertEquals("my new long text", parentPage.getTable().getRow(0).getCell(0).getText());
-    Assert.assertEquals("Parent page", parentPageNode.getCell().getText());
-    Assert.assertEquals("my new long text", childPageNode.getCell().getText());
+    assertEquals("my new long text", parentPage.getTable().getRow(0).getCell(0).getText());
+    assertEquals("Parent page", parentPageNode.getCell().getText());
+    assertEquals("my new long text", childPageNode.getCell().getText());
   }
 
   public static class PageWithTableOutline extends AbstractOutline {
