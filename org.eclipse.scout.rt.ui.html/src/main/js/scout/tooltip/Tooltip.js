@@ -42,7 +42,6 @@ scout.Tooltip.prototype._render = function($parent) {
   this.$arrow = $.makeDiv('tooltip-arrow').appendTo(this.$container);
   this.$content = $.makeDiv('tooltip-content').appendTo(this.$container);
   this.renderText(this.text);
-  this.position();
   this.$container.show();
 
   if (this.autoRemove) {
@@ -82,6 +81,7 @@ scout.Tooltip.prototype.renderText = function(text) {
     // use nl2br to allow tooltips with line breaks
     this.$content.html(scout.strings.nl2br(scout.strings.removeAmpersand(text)));
   }
+  this.position();
 };
 
 scout.Tooltip.prototype.position = function() {
