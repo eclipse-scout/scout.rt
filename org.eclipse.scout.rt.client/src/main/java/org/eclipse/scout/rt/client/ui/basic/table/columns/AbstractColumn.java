@@ -95,7 +95,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_initialAlwaysIncludeSortAtBegin;
   private boolean m_initialAlwaysIncludeSortAtEnd;
 
-  private IValueField<VALUE> m_defaultEditor;
   private final ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> m_objectExtensions;
 
   public AbstractColumn() {
@@ -1428,10 +1427,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * @return a default editor for this column (the same for all rows).
    */
   protected final IValueField<VALUE> getDefaultEditor() {
-    if (m_defaultEditor == null) {
-      m_defaultEditor = createDefaultEditor();
-    }
-    return m_defaultEditor;
+    return createDefaultEditor();
   }
 
   /**
