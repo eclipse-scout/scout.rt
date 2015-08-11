@@ -254,7 +254,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     shiftDate = true;
 
   // Don't propagate tab to cell editor -> tab should focus time field
-  if (this.hasTime && 
+  if (this.hasTime &&
     this.mode === scout.FormField.MODE_CELLEDITOR &&
     event.which === scout.keys.TAB &&
     modifierCount === 0) {
@@ -354,6 +354,10 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
   // to check and handle the new (altered) displayText. We don't use the keyUp event because it feels slow.
   var oldDisplayText = this.$dateField.val();
   setTimeout(function(event) {
+    if (!this.rendered) {
+      return;
+    }
+
     var displayText = this.$dateField.val();
 
     // If key did not alter the displayText (e.g. when an F key was pressed) or the focus has changed to another
@@ -392,7 +396,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     date = null;
 
   // Don't propagate shift-tab to cell editor -> shift tab should focus date field
-  if (this.hasDate && 
+  if (this.hasDate &&
     this.mode === scout.FormField.MODE_CELLEDITOR &&
     event.which === scout.keys.TAB &&
     event.shiftKey &&
@@ -472,6 +476,10 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
   // to check and handle the new (altered) displayText. We don't use the keyUp event because it feels slow.
   var oldDisplayText = this.$timeField.val();
   setTimeout(function(event) {
+    if (!this.rendered) {
+      return;
+    }
+
     var displayText = this.$timeField.val();
 
     // If key did not alter the displayText (e.g. when an F key was pressed) or the focus has changed to another

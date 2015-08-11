@@ -12,14 +12,6 @@ scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.CellEditorPopupKeyStrokeAdapter(this);
 };
 
-/**
- * Method invoked once a popup is opened.
- */
-scout.CellEditorPopup.prototype._onPopupOpen = function(event) {
-  // nop
-  // FIXME [dwi] do nothing depending on the popup hierarchy.
-};
-
 scout.CellEditorPopup.prototype._render = function($parent) {
   scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
 

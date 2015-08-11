@@ -1,6 +1,7 @@
 scout.DatePickerPopup = function(session, options) {
   options = options || {};
   options.installFocusContext = false;
+  options.triggerPopupOpenEvent = false; // Do not close other popups once this popup opens. Otherwise, the datepicker could not be used within other popups, like CellEditorPopup.js.
   scout.DatePickerPopup.parent.call(this, session, options);
 
   this.picker = new scout.DatePicker(session, options.dateFormat);

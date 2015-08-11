@@ -1,6 +1,7 @@
 scout.SmartFieldPopup = function(session, options) {
   options = options || {};
   options.installFocusContext = false;
+  options.triggerPopupOpenEvent = false; // Do not close other popups once this popup opens. Otherwise, the smartfield could not be used within other popups, like CellEditorPopup.js.
   scout.SmartFieldPopup.parent.call(this, session, options);
 
   this._smartField = options.smartField;

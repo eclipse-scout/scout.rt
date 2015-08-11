@@ -25,17 +25,23 @@ scout.Popup = function(session, options) {
   this.withFocusContext = scout.helpers.nvl(options.installFocusContext, true);
   this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.focusRule.AUTO; });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
+  this.triggerPopupOpenEvent = scout.helpers.nvl(options.triggerPopupOpenEvent, true);
   this._addEventSupport();
 };
 scout.inherits(scout.Popup, scout.Widget);
 
 scout.Popup.prototype.render = function($parent, event) {
-  scout.Popup.parent.prototype.render.call(this, $parent);
-
   this.openEvent = event;
+  scout.Popup.parent.prototype.render.call(this, $parent);
+};
 
-  this._triggerPopupOpenEvent();
-  this._attachCloseHandler();
+scout.Popup.prototype._render = function($parent) {
+  this.$container = $.makeDiv('popup').appendTo($parent || this.session.$entryPoint);
+
+  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
+  if (this.withFocusContext && this.focusableContainer) {
+    this.$container.attr('tabindex', -1);
+  }
 };
 
 scout.Popup.prototype._postRender = function() {
@@ -47,33 +53,20 @@ scout.Popup.prototype._postRender = function() {
   if (this.withFocusContext) {
     this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
   }
+
+  this._triggerPopupOpenEvent();
+  this._attachCloseHandler();
 };
 
-scout.Popup.prototype.remove = function() {
-  if (!this.rendered) {
-    return;
-  }
-
+scout.Popup.prototype._remove = function() {
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
-  scout.Popup.parent.prototype.remove.call(this);
 
   // remove all clean-up handlers
   this._detachCloseHandler();
-  this.rendered = false;
-};
 
-scout.Popup.prototype._render = function($parent) {
-  if (!$parent) {
-    $parent = this.session.$entryPoint;
-  }
-  this.$container = $.makeDiv('popup').appendTo($parent);
-
-  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
-  if (this.withFocusContext && this.focusableContainer) {
-    this.$container.attr('tabindex', -1);
-  }
+  scout.Popup.parent.prototype._remove.call(this);
 };
 
 scout.Popup.prototype.close = function(event) {
@@ -151,8 +144,7 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
  */
 scout.Popup.prototype._onPopupOpen = function(event) {
   if (event.popup !== this) {
-//    this.close(event);
-    // FIXME [dwi] do nothing depending on the popup hierarchy.
+    this.close(event);
   }
 };
 
@@ -267,5 +259,7 @@ scout.Popup.prototype._createKeyStrokeAdapter = function() {
  * Fire event that this popup is about to open.
  */
 scout.Popup.prototype._triggerPopupOpenEvent= function() {
-  this.session.desktop._trigger('popupopen', {popup: this});
+  if (this.triggerPopupOpenEvent) {
+    this.session.desktop._trigger('popupopen', {popup: this});
+  }
 };
