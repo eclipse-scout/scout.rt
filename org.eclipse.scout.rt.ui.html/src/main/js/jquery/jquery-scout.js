@@ -5,6 +5,20 @@
 /*global console: false */
 (function($) {
 
+  // === $ patches ===
+
+  /**
+   * Process each mouseDown event before and accept input on value field before do anything else.
+   */
+  var _originalMouseHooksFilter = $.event.mouseHooks.filter;
+  $.event.mouseHooks.filter = function(event, origEvent){
+    event = _originalMouseHooksFilter(event, origEvent);
+    if (event.type === 'mousedown') {
+      scout.valueFieldUtils.acceptInputOnActiveField();
+    }
+    return event;
+  };
+
   // === $ extensions ===
 
   // chris' shortcut
@@ -802,7 +816,6 @@
     return this.addClass('unfocusable');
   };
 
-
   /**
    * Select all text within an element, e.g. within a content editable div element.
    */
@@ -840,13 +853,3 @@
     return ret;
   };
 }(jQuery));
-
-/**
- * Process each mouseDown event before and accept input on value field before do anything else.
- */
-jQuery.event.fixHooks.mousedown = {
-    filter: function(event, origEvent){
-      scout.valueFieldUtils.acceptInputOnActiveField();
-      return event;
-    }
-};
