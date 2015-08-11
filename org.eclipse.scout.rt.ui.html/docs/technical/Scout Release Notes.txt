@@ -489,3 +489,6 @@ The method AbstractDateField.execParseValue() is no longer supported. It cannot 
 because it is defined on AbstractValueField, but is marked as deprecated and final to make it clear
 that it is never called. If any subclass had overridden this method, it should be deleted. The code
 cannot be migrated, because it is now performed in the UI only.
+
+JGU 03.08.2015
+- changed ILookupRow to fluent API: use with... instead of set...
