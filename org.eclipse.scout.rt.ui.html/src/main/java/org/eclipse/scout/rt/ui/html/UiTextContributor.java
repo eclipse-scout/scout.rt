@@ -41,6 +41,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.groupedByWeekday",
         "ui.groupedByMonth",
         "ui.groupedByYear",
+        "ui.otherValues",
         "ui.Count",
         "ui.ConnectionInterrupted",
         "ui.ConnectionReestablished",

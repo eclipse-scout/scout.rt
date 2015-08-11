@@ -232,6 +232,7 @@ text.main-axis {
   fill: @palette-white;
   text-anchor: middle;
   dominant-baseline: middle;
+  pointer-events: none;
 }
 
 text.main-axis-y {

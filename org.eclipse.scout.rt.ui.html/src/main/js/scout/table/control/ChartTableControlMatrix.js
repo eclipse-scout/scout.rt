@@ -113,7 +113,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
 
   // default sorts function
   keyAxis.reorder = function() {
-    keyAxis.sort();
+    keyAxis.sort(function(a, b){ return (a === null ? 1 : a - b); });
   };
 
   // norm and format depends of datatype and group functionality
@@ -178,7 +178,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
       };
       keyAxis.format = function(n) {
         if (n === null) {
-          return null;
+          return emptyCell;
         } else {
           return locale.dateFormatSymbols.weekdaysOrdered[n];
         }
@@ -219,7 +219,6 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         return keyAxis.normTable[n];
       }
     };
-    var self = keyAxis;
     keyAxis.reorder = function() {
       keyAxis.sort(function(a, b){ return (a === null ? 1 : keyAxis.format(a) > keyAxis.format(b)); });
     };

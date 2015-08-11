@@ -319,10 +319,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawBar(xAxis, dataAxis, cube) {
     // dimension functions
     var maxWidth = 0,
-      width = Math.min(800 / (xAxis.max - xAxis.min), 70),
+      width = Math.min(800 / xAxis.length, 70),
       x = function(i) {
-        i = i === null ? xAxis.max : i;
-        return 100 + (i - xAxis.min) * width;
+        i = i === null ? xAxis.length : i;
+        return 100 + i * width;
       },
       y = function(i) {
         return 280 - i / (dataAxis.max - 0) * 240;
@@ -334,8 +334,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       var label = labels[l],
         text = dataAxis.format(label);
 
-      drawAxisLine(x(xAxis.min) - 10, y(label), x(xAxis.max + 1) + 7, y(label));
-      drawAxisText(x(xAxis.min) - 20, y(label), 'y', text);
+      drawAxisLine(x(0) - 10, y(label), x(xAxis.length ) + 7, y(label));
+      drawAxisText(x(0) - 20, y(label), 'y', text);
     }
 
     // draw x-axis and values
@@ -344,13 +344,13 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         mark = xAxis.format(key),
         value = cube.getValue([key])[0];
 
-      var $text = drawAxisText(x(key) + width / 2 - 1.5, y(0) + 14, 'x', mark),
+      var $text = drawAxisText(x(a) + width / 2 - 1.5, y(0) + 14, 'x', mark),
         w = $text[0].getBBox().width;
 
       maxWidth = (w > maxWidth) ? w : maxWidth;
 
       $chartMain.appendSVG('rect', '', 'main-chart')
-        .attr('x', x(key)).attr('y', y(0))
+        .attr('x', x(a)).attr('y', y(0))
         .attr('width', Math.max(2, width - 3)).attr('height', 0)
         .delay(200)
         .animateSVG('height', 280 - y(value), 600)
@@ -385,13 +385,14 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   function drawStacked(xAxis, dataAxis, cube) {
     // dimension functions
-    var height = Math.min(240 / (xAxis.max - xAxis.min), 30),
+    var maxHeight = 0,
+      height = Math.min(240 / xAxis.length, 30),
       x = function(i) {
         return 100 + i / dataAxis.max * 800;
       },
       y = function(i) {
-        i = i === null ? xAxis.max : i;
-        return 50 + (i - xAxis.min) * height;
+        i = i === null ? xAxis.length : i;
+        return 50 + i * height;
       };
 
     // draw data-axis
@@ -400,8 +401,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       var label = labels[l],
         text = dataAxis.format(label);
 
-      drawAxisLine(x(label), y(xAxis.min) - 10, x(label), y(xAxis.max + 1) + 7);
-      drawAxisText(x(label), y(xAxis.min) - 20, 'x', text);
+      drawAxisLine(x(label), y(0) - 10, x(label), y(xAxis.length) + 7);
+      drawAxisText(x(label), y(0) - 20, 'x', text);
     }
 
     // draw x-axis and values
@@ -410,18 +411,26 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         mark = xAxis.format(key),
         value = cube.getValue([key])[0];
 
-      drawAxisText(x(0) - 15, y(key) + height / 2, 'y', mark);
+      var $text = drawAxisText(x(0) - 8, y(a) + height / 2, 'y', mark),
+        h = $text[0].getBBox().height;
+
+      maxHeight = (h > maxHeight) ? h : maxHeight;
 
       $chartMain.appendSVG('rect', '', 'main-chart')
-        .attr('x', x(0)).attr('y', y(key))
+        .attr('x', x(0)).attr('y', y(a))
         .attr('width', 0).attr('height', Math.max(2, height - 3))
         .delay(200)
         .animateSVG('width', x(value) - 100)
         .attr('data-xAxis', key)
+        .data('data-text', $text)
         .mouseenter(chartMouseenter)
         .mouseleave(chartMouseleave)
         .click(chartClick);
+    }
 
+    // in case of to many elements, hide label
+    if (maxHeight > height) {
+      $('.main-axis-y', $chartMain).attr('fill-opacity', 0);
     }
 
     // function for later remove
@@ -432,6 +441,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawLine(xAxis, dataAxis, cube) {
+    // chart only possible with 2 values
+    if (xAxis.length <= 1) {
+      return false;
+    }
+
     // dimension functions
     var x = function(i) {
       i = i === null ? xAxis.max : i;
@@ -471,15 +485,15 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     }
 
     // draw values
-    for (var a = 0; a < xAxis.length; a++) {
+    for (var a = xAxis.min + 1; a <= xAxis.max; a++) {
       if (a === 0) {
         continue;
       }
 
-      var key1 = xAxis[a - 1],
-        key2 = xAxis[a],
-        value1 = cube.getValue([key1])[0],
-        value2 = cube.getValue([key2])[0];
+      var key1 = a - 1,
+        key2 = a,
+        value1 = xAxis.indexOf(key1) == -1 ? 0 : cube.getValue([key1])[0],
+        value2 = xAxis.indexOf(key2) == -1 ? 0 : cube.getValue([key2])[0];
 
       $chartMain.appendSVG('line', '', 'main-chart')
         .attr('x1', x(key1)).attr('y1', y(0))
@@ -501,7 +515,12 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     // circle for surrounding text, hehe: svg ;)
     $chartMain.appendSVG('path', 'ArcAxis', 'main-axis')
       .attr('fill', 'none')
-      .attr('d', 'M 450 160 m 0, -110 a 110,110 0 1, 1 0,220 a 110,110 0 1, 1 0,-220');
+      .attr('d', 'M 210 160 m 0, -110 a 110,110 0 1, 1 0,220 a 110,110 0 1, 1 0,-220');
+
+    $chartMain.appendSVG('path', 'ArcAxisWide', 'main-axis')
+      .attr('fill', 'none')
+      .attr('d', 'M 210 160 m 0, -122 a 122,122 0 1, 1 0,244 a 122,122 0 1, 1 0,-244');
+
 
     var startAngle = 0,
       endAngle;
@@ -509,26 +528,61 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var tweenIn = function(now, fx) {
       var start = this.getAttribute('data-start'),
         end = this.getAttribute('data-end');
-      this.setAttribute('d', pathSegment(450, 160, 105, start * fx.pos, end * fx.pos));
+      this.setAttribute('d', pathSegment(210, 160, 105, start * fx.pos, end * fx.pos));
     };
 
     var tweenOut = function(now, fx) {
       var start = this.getAttribute('data-start'),
         end = this.getAttribute('data-end');
-      this.setAttribute('d', pathSegment(450, 160, 105, start * (1 - fx.pos), end * (1 - fx.pos)));
+      this.setAttribute('d', pathSegment(210, 160, 105, start * (1 - fx.pos), end * (1 - fx.pos)));
     };
 
+    // find data
+    var segments = [];
     for (var a = 0; a < xAxis.length; a++) {
-      var key = xAxis[a],
-        mark = xAxis.format(key),
-        value = cube.getValue([key])[0];
+      var k = xAxis[a],
+        m = xAxis.format(k),
+        v = cube.getValue([k])[0];
+
+      segments.push([k, m, v]);
+    }
+
+    // order segments
+    segments.sort(function(a, b){ return (b[2] - a[2]); });
+
+    // collect small segmenets
+    var TRESHOLD = 5;
+    if (segments.length > TRESHOLD) {
+      for (var s = segments.length - 1; s >= TRESHOLD; s--) {
+        if (typeof segments[TRESHOLD - 1][0] === 'number') {
+          segments[TRESHOLD - 1][0] = [segments[TRESHOLD - 1][0], segments[s][0]];
+        } else {
+          segments[TRESHOLD - 1][0].push(segments[s][0]);
+        }
+
+        segments[TRESHOLD - 1][2] += segments[s][2];
+        segments.pop();
+      }
+      segments[TRESHOLD - 1][1] =  that.session.text('ui.otherValues');
+    }
+
+    for (var t = 0; t < segments.length; t++) {
+      var key = JSON.stringify(segments[t][0]),
+        mark = segments[t][1],
+        value = segments[t][2];
 
       endAngle = startAngle + value / dataAxis.total;
 
+
+      // -0.001, else: only 1 arc is not drawn, svg...
+      if (endAngle === 1) {
+        endAngle = endAngle - 0.001;
+      }
+
       // arc segement
-      $chartMain.appendSVG('path', '', 'main-chart')
+      var $arc = $chartMain.appendSVG('path', '', 'main-chart')
         .attr('data-start', startAngle)
-        .attr('data-end', endAngle)
+        .attr('data-end', endAngle - 0.001)
         .delay(200)
         .animate({
           tabIndex: 0
@@ -537,12 +591,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
           duration: 600
         })
         .attr('data-xAxis', key)
-        .mouseenter(chartMouseenter)
-        .mouseleave(chartMouseleave)
         .click(chartClick);
 
-      // axis around the circle
-      $chartMain.appendSVG('text', '', 'main-axis-x')
+      // labels
+      var $label1 = $chartMain.appendSVG('text', '', 'main-axis-x')
         .appendSVG('textPath')
         .attrSVG('startOffset', (startAngle + endAngle) / 2 * 100 + '%')
         .attrXLINK('href', '#ArcAxis')
@@ -553,13 +605,28 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       // data inside the arc
       var midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI;
 
-      $chartMain.appendSVG('text', '', 'main-axis')
-        .attr('x', 450 + 70 * Math.sin(midPoint))
+      var $label2 = $chartMain.appendSVG('text', '', 'main-axis')
+        .attr('x', 210 + 70 * Math.sin(midPoint))
         .attr('y', 160 - 70 * Math.cos(midPoint))
         .attr('fill', '#fff')
         .text(Math.round(value / dataAxis.total * 100) + '%')
         .attr('opacity', 0)
         .delay(600).animateSVG('opacity', 1, 300);
+
+      // handling of small arcs
+      $arc
+        .data('data-text', $label1)
+        .mouseenter(chartMouseenter)
+        .mouseleave(chartMouseleave);
+
+      if (endAngle - startAngle < 0.05) {
+        $label1
+          .attr('fill-opacity', 0)
+          .attrXLINK('href', '#ArcAxisWide');
+        $label2
+          .attr('fill-opacity', 0)
+
+      }
 
       startAngle = endAngle;
     }
@@ -649,8 +716,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
             .animateSVG('r', r, 600)
             .attr('data-xAxis', key1)
             .attr('data-yAxis', key2)
-            .mouseenter(chartMouseenter)
-            .mouseleave(chartMouseleave)
             .click(chartClick);
         }
       }
@@ -732,17 +797,32 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       oneDim = !$('.selected', $chartSelect).hasClassSVG('chart-scatter'),
       filterFunc;
 
-    //  find all filter
+    // find all filter
+    // different data may be stored: undefined, arrays (of keys )and single numbers (keys)
+    var readData = function (object, attribute)  {
+      var a = object.attr(attribute);
+      if (typeof a === undefined ) {
+        return [null];
+      } else {
+        var n = parseFloat(a);
+        if (isNaN(n)) {
+          return JSON.parse(a);
+        } else {
+          return [n];
+        }
+      }
+    };
+
     that.$contentContainer.find('.main-chart.selected').each(function() {
-      var dX = parseFloat($(this).attr('data-xAxis'));
-      dX = isNaN(dX) ? null : dX;
+      var dX, dY;
 
       if (oneDim) {
-        filters.push(dX);
+        dX = readData($(this), 'data-xAxis');
+        filters = filters.concat(dX);
       } else {
-        var dY = parseFloat($(this).attr('data-yAxis'));
-        dY = isNaN(dY) ? null : dY;
-        filters.push(JSON.stringify([dX, dY]));
+        dX = readData($(this), 'data-xAxis');
+        dY = readData($(this), 'data-yAxis');
+        filters.push(JSON.stringify([dX[0], dY[0]]));
       }
     });
 
