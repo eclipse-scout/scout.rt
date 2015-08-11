@@ -224,9 +224,18 @@ scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
 scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
   var visible = (this._table.tableStatus);
   if (visible) {
-    this._setInfoVisible(this._$infoTableStatus, true, function() {
-      this._showTableStatusTooltip();
-    }.bind(this));
+    // If footer is already rendered, automatically show the popup after the
+    // "info visible" animation has finished. For example, the property rendered
+    // is 'false' if the page is reloaded or the user changes the outlines. In
+    // those cases, we don't want the tooltip to show automatically, because
+    // that would disturb the user.
+    var complete = null;
+    if (this.rendered) {
+      complete = function() {
+        this._showTableStatusTooltip();
+      }.bind(this);
+    }
+    this._setInfoVisible(this._$infoTableStatus, true, complete);
   }
   else {
     this._hideTableStatusTooltip();
