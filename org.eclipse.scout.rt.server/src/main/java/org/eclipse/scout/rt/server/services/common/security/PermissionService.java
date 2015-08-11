@@ -18,12 +18,18 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 
+/**
+ * Default permission service: Uses jandex class inventory to find classes.
+ * <p>
+ * By default all direct subclasses of {@link Permission} and {@link BasicPermission} that are scanned and cached. Make
+ * sure your permission classes are available in the {@link ClassInventory}.
+ * </p>
+ */
 public class PermissionService implements IPermissionService {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionService.class);
@@ -61,7 +67,8 @@ public class PermissionService implements IPermissionService {
   }
 
   /**
-   * @return permission classes from class inventory.
+   * @return Permission classes from class inventory. By default all direct subclasses of {@link Permission} and
+   *         {@link BasicPermission} that are available in the {@link ClassInventory} are returned.
    */
   protected Set<IClassInfo> getPermissionsFromInventory() {
     IClassInventory inv = ClassInventory.get();
@@ -72,33 +79,30 @@ public class PermissionService implements IPermissionService {
   }
 
   /**
-   * Checks whether the given class name is a potential permission class. Class names that do not meet the
-   * requirements of this method are not considered further.
+   * Checks whether the given class is a Permission class that should be visible to this service. The default
+   * implementation checks if the class meets the following conditions:
+   * <ul>
+   * <li>class is instanciable (public, not abstract, not interface, not inner member type)
+   * <li>the name is accepted by {@link #acceptClassName(String)}
+   * </ul>
+   *
+   * @param permInfo
+   *          the class to be checked
+   * @return Returns <code>true</code> if the class used by this service. <code>false</code> otherwise.
+   */
+  protected boolean acceptClass(IClassInfo permInfo) {
+    return permInfo.isInstanciable() && acceptClassName(permInfo.name());
+  }
+
+  /**
+   * Checks whether the given class name is a potential permission class and used by this service.
    *
    * @param className
    *          the class name to be checked
-   * @return Returns <code>true</code> if the given class name meets the requirements to be considered as a permission
-   *         class. <code>false</code> otherwise.
+   * @return Returns <code>true</code> by default.
    */
   protected boolean acceptClassName(String className) {
     return true;
   }
 
-  /**
-   * Checks whether the given class is a Permission class that should be visible to this service. The default
-   * implementation checks if the class meets the following conditions:
-   * <ul>
-   * <li>subclass of {@link Permission}
-   * <li><code>public</code>
-   * <li>not an <code>interface</code>
-   * <li>not <code>abstract</code>
-   * </ul>
-   *
-   * @param permInfo
-   *          the class to be checked
-   * @return Returns <code>true</code> if the class is a permission class. <code>false</code> otherwise.
-   */
-  protected boolean acceptClass(IClassInfo permInfo) {
-    return permInfo.isInstanciable() && !permInfo.hasAnnotation(IgnoreBean.class) && acceptClassName(permInfo.name());
-  }
 }
