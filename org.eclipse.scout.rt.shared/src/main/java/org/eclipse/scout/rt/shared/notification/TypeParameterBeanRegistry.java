@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.notification;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -84,25 +83,6 @@ public class TypeParameterBeanRegistry<B> {
       cacheTypeParamSubclass(typeParamClass, beans);
       return new ArrayList<B>(beans);
     }
-  }
-
-  /**
-   * Returns all beans B&ltT&gt in this registry with the given generic parameter type &ltT&gt or a supertype of the
-   * given generic parameter type.
-   *
-   * @param typeParamClass
-   *          generic parameter type, not <code>null</code>
-   */
-  public List<B> getBeans(List<Class<?>> typeParamClasses) {
-    if (Assertions.assertNotNull(typeParamClasses).isEmpty()) {
-      return new ArrayList<>();
-    }
-    //intersect and preserve order
-    LinkedHashSet<B> beans = new LinkedHashSet<>(getBeans(typeParamClasses.get(0)));
-    for (int i = 1; i < typeParamClasses.size(); i++) {
-      beans.retainAll(new LinkedHashSet<>(getBeans(typeParamClasses.get(i))));
-    }
-    return new ArrayList<>(beans);
   }
 
   private List<B> getCached(Class<?> clazz) {

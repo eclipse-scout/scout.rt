@@ -23,6 +23,9 @@ import org.eclipse.scout.rt.shared.notification.TypeParameterBeanRegistry;
 
 /**
  * The {@link NotificationCoalescer} is used to coalesce notifications.
+ * <p>
+ * All beans implementing ICoalescer&ltT&gt
+ * </p>
  */
 @ApplicationScoped
 @CreateImmediately
@@ -36,21 +39,47 @@ public class NotificationCoalescer {
 
   @SuppressWarnings("unchecked")
   public List<? extends Serializable> coalesce(List<? extends Serializable> notificationsIn) {
-    final List<ICoalescer> coalescers = m_registry.getBeans(getClasses(notificationsIn));
-
-    List<? extends Serializable> notifications = new ArrayList<>(notificationsIn);
-    for (ICoalescer notificationCoalescer : coalescers) {
-      notifications = notificationCoalescer.coalesce(notifications);
+    if (notificationsIn.size() < 2) {
+      return notificationsIn;
     }
-
-    return notifications;
+    else {
+      int i = 0;
+      List<? extends Serializable> res = notificationsIn;
+      while (i < res.size()) {
+        final List<ICoalescer> coalescers = m_registry.getBeans(res.get(i).getClass());
+        if (coalescers.size() > 0) {
+          ICoalescer c = coalescers.get(0);
+          int j = getCoalesceCount(c, res.subList(i, res.size()));
+          res = coalesce(i, i + j, c, res);
+        }
+        i++;
+      }
+      return res;
+    }
   }
 
-  private List<Class<?>> getClasses(List<? extends Serializable> objects) {
-    List<Class<?>> classList = new ArrayList<>();
-    for (Serializable n : objects) {
-      classList.add(n.getClass());
-    }
-    return classList;
+  private <T extends Serializable> List<? extends Serializable> coalesce(int from, int to, ICoalescer<T> c, List<T> notifications) {
+    List<T> res = new ArrayList<>();
+    res.addAll(notifications.subList(0, from));
+    res.addAll(c.coalesce(notifications.subList(from, to)));
+    res.addAll(notifications.subList(to, notifications.size()));
+    return res;
   }
+
+  private int getCoalesceCount(ICoalescer<?> c, List<? extends Serializable> notifications) {
+    int i = 0;
+    while (i < notifications.size() && isApplicable(c, notifications, i)) {
+      i++;
+    }
+    return i;
+  }
+
+  /**
+   * @return <code>true</code>, if the {@link ICoalescer} is applicable to the message.
+   */
+  private boolean isApplicable(ICoalescer<?> c, List<? extends Serializable> notifications, int i) {
+    Serializable n = notifications.get(i);
+    return m_registry.getBeans(n.getClass()).contains(c);
+  }
+
 }

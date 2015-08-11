@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.CollectionUtility;
  * Cluster notification for access control changes for a set of users.
  */
 public class AccessControlClusterNotification implements Serializable {
+
   private static final long serialVersionUID = 128460814967537176L;
 
   private final Set<String> m_userIds;
@@ -39,6 +40,37 @@ public class AccessControlClusterNotification implements Serializable {
   @Override
   public String toString() {
     return "AccessControlClusterNotification [m_userIds=" + m_userIds + "]";
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_userIds == null) ? 0 : m_userIds.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    AccessControlClusterNotification other = (AccessControlClusterNotification) obj;
+    if (m_userIds == null) {
+      if (other.m_userIds != null) {
+        return false;
+      }
+    }
+    else if (!m_userIds.equals(other.m_userIds)) {
+      return false;
+    }
+    return true;
   }
 
 }

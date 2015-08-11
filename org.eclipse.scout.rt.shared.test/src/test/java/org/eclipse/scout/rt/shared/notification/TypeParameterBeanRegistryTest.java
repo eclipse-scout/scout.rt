@@ -19,7 +19,7 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- *
+ * Tests for {@link TypeParameterBeanRegistry}
  */
 public class TypeParameterBeanRegistryTest {
 
@@ -66,48 +66,6 @@ public class TypeParameterBeanRegistryTest {
     reg.getBeans(CharSequence.class);
     //get cached result
     final List<ITestHandler> res = reg.getBeans(CharSequence.class);
-    assertEquals(1, res.size());
-    assertEquals(l.get(3), res.get(0));
-  }
-
-  @Test
-  public void testMultipleEmpty() throws Exception {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
-    final List<ITestHandler> res = reg.getBeans(new ArrayList<Class<?>>());
-    assertEquals(0, res.size());
-  }
-
-  @Test
-  public void testMultipleOneElement() throws Exception {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
-    final List<ITestHandler> l = new ArrayList<>();
-    l.add(new String1Handler());
-    l.add(new LongHandler());
-    l.add(new String2Handler());
-    l.add(new CharSequenceHandler());
-    reg.registerBeans(ITestHandler.class, l);
-    List<Class<?>> classes = new ArrayList<>();
-    classes.add(CharSequence.class);
-
-    final List<ITestHandler> res = reg.getBeans(classes);
-    assertEquals(1, res.size());
-    assertEquals(l.get(3), res.get(0));
-  }
-
-  @Test
-  public void testMultiple() throws Exception {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
-    final List<ITestHandler> l = new ArrayList<>();
-    l.add(new String1Handler());
-    l.add(new LongHandler());
-    l.add(new String2Handler());
-    l.add(new CharSequenceHandler());
-    reg.registerBeans(ITestHandler.class, l);
-    List<Class<?>> classes = new ArrayList<>();
-    classes.add(CharSequence.class);
-    classes.add(String.class);
-
-    final List<ITestHandler> res = reg.getBeans(classes);
     assertEquals(1, res.size());
     assertEquals(l.get(3), res.get(0));
   }
