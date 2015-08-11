@@ -325,7 +325,7 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   }
 };
 
-scout.FormField.prototype._onStatusMouseDown = function(event) {
+scout.FormField.prototype._onStatusMousedown = function(event) {
   if (this._hasMenus()) {
     var func = function func(event) {
       var menus = this._getCurrentMenus();
@@ -359,6 +359,7 @@ scout.FormField.prototype._onStatusMouseDown = function(event) {
     }
   }
 };
+
 scout.FormField.prototype._showStatusMessage = function(options) {
   // Don't show a tooltip if there is no visible $status (tooltip points to the status)
   if (!this.$status || !this.$status.isVisible()) {
@@ -395,6 +396,13 @@ scout.FormField.prototype._showStatusMessage = function(options) {
   }
 };
 
+scout.FormField.prototype._hideStatusMessage = function() {
+  if (this.tooltip) {
+    this.tooltip.remove();
+    this.tooltip = null;
+  }
+};
+
 scout.FormField.prototype.getForm = function() {
   var parent = this.parent;
   while (parent && !(parent instanceof scout.Form)) {
@@ -418,13 +426,6 @@ scout.FormField.prototype.registerRootKeyStroke = function(keyStroke) {
 
 scout.FormField.prototype.unregisterRootKeyStroke = function(keyStroke) {
   this.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(keyStroke);
-};
-
-scout.FormField.prototype._hideStatusMessage = function() {
-  if (this.tooltip) {
-    this.tooltip.remove();
-    this.tooltip = undefined;
-  }
 };
 
 scout.FormField.prototype._goOffline = function() {
@@ -478,7 +479,7 @@ scout.FormField.prototype.removeField = function() {
 scout.FormField.prototype.addStatus = function() {
   this.$status = $('<span>')
     .addClass('status')
-    .on('mousedown', this._onStatusMouseDown.bind(this))
+    .on('mousedown', this._onStatusMousedown.bind(this))
     .appendTo(this.$container);
 };
 

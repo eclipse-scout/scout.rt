@@ -104,7 +104,7 @@ scout.ValueField.prototype.addField = function($field) {
   this.$field.data('valuefield', this);
 };
 
-scout.ValueField.prototype._onStatusMouseDown = function(event) {
+scout.ValueField.prototype._onStatusMousedown = function(event) {
   if (this.menus && this.menus.length > 0) {
     if (($(document.activeElement).data('valuefield') === this ||
          $(document.activeElement).parent().data('valuefield') === this)) {
@@ -112,5 +112,5 @@ scout.ValueField.prototype._onStatusMouseDown = function(event) {
     }
   }
 
-  scout.ValueField.parent.prototype._onStatusMouseDown.call(this, event);
+  scout.ValueField.parent.prototype._onStatusMousedown.call(this, event);
 };
