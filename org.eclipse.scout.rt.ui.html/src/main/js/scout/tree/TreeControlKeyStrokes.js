@@ -1,6 +1,7 @@
 scout.TreeControlKeyStrokes = function(field) {
   scout.TreeControlKeyStrokes.parent.call(this);
   this.drawHint = true;
+  this.invokeAcceptInputOnActiveValueField = false;
   this._field = field;
   this.initKeyStrokeParts();
 };

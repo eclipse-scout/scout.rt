@@ -134,6 +134,11 @@ scout.keyStrokeUtils._handleKeyStrokeEvent = function(adapter, event) {
             return keyStroke.accept && keyStroke.accept(event);
           })
           .some(function(keyStroke) {
+            // Before handling the keystroke, accept the input of a potential active value field.
+            if (keyStroke.invokeAcceptInputOnActiveValueField) {
+              scout.ValueField.invokeValueFieldAcceptInput();
+            }
+
             // Handle the keystroke.
             keyStroke.handle(event);
 

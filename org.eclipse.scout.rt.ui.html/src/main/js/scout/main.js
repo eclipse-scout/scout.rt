@@ -16,6 +16,7 @@ scout.createUniqueId = function() {
 
 scout.init = function(options) {
   this._installGlobalJavascriptErrorHandler();
+  this._installGlobalMouseDownInterceptor();
   var tabId = scout.dates.timestamp();
   options = options || {};
   $('.scout').each(function() {
@@ -106,6 +107,15 @@ scout._installGlobalJavascriptErrorHandler = function() {
       return 'J0';
     }
   };
+};
+
+/**
+ * Installs a global 'mousedown' interceptor to invoke 'aboutToBlurByMouseDown' on value field before anything else gets executed.
+ */
+scout._installGlobalMouseDownInterceptor = function() {
+  document.addEventListener('mousedown', function(e) {
+    scout.ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
+  }, true); // true=the event handler is executed in the capturing phase
 };
 
 /**

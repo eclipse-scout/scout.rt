@@ -568,6 +568,19 @@ scout.DateField.prototype.acceptInput = function(whileTyping) {
 };
 
 /**
+ * @override ValueField.js
+ */
+scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
+  var eventOnDateField = this.$dateField ? this.$dateField.isOrHas(target) : false;
+  var eventOnTimeField = this.$timeField ? this.$timeField.isOrHas(target) : false;
+  var eventOnPopup = this._datePickerPopup.rendered && this._datePickerPopup.$container.isOrHas(target);
+
+  if (!eventOnDateField && !eventOnTimeField && !eventOnPopup) {
+    this.acceptInput(); // event outside this field.
+  }
+};
+
+/**
  * Returns null if both arguments are not set. Otherwise, this.timestampAsDate or the current date
  * is used as basis and the given arguments are applied to that date. The result is returned.
  */

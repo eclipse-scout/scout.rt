@@ -367,3 +367,15 @@ scout.SmartField.prototype.acceptInput = function() {
     this._acceptProposal(true);
   }
 };
+
+/**
+ * @override ValueField.js
+ */
+scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
+  var eventOnField = this.$field.isOrHas(target);
+  var eventOnPopup = this._popup.rendered && this._popup.$container.isOrHas(target);
+
+  if (!eventOnField && !eventOnPopup) {
+    this.acceptInput(); // event outside this field.
+  }
+};

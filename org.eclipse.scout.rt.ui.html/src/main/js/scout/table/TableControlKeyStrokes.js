@@ -2,6 +2,7 @@
 scout.TableControlKeyStrokes = function(field) {
   scout.TableControlKeyStrokes.parent.call(this);
   this.drawHint = true;
+  this.invokeAcceptInputOnActiveValueField = false;
   this._field = field;
   this.initKeyStrokeParts();
 };

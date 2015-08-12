@@ -14,6 +14,11 @@ scout.Action = function() {
   this.stopImmediate = true;
 
   /**
+   * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
+   */
+  this.invokeAcceptInputOnActiveValueField = true;
+
+  /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */
   this.tabbable = false;

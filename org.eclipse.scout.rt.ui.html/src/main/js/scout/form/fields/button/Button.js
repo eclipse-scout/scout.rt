@@ -93,19 +93,6 @@ scout.Button.prototype.doAction = function() {
     return false;
   }
 
-  // This is required for key-stroke actions. When they are triggered on
-  // key-down, the active field is still focused and its blur-event is not
-  // triggered, which means the acceptInput() is never executed so
-  // the executed action works with a wrong value for the active field.
-  // --> Same check in Action.prepareDoAction()
-  //
-  // Note: we could probably improve this with a listener concept. Each
-  // value field would register itself as a listener on the form. When a key-
-  // stroke action is executed, all listeners will receive an artificial
-  // blur event, which does not change the focus but executes all code that
-  // is normally triggered when a regular blur event occurs.
-  scout.valueFieldUtils.acceptInputOnActiveField();
-
   if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {

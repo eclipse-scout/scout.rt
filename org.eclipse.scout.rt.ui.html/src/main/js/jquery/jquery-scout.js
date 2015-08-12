@@ -5,20 +5,6 @@
 /*global console: false */
 (function($) {
 
-  // === $ patches ===
-
-  /**
-   * Process each mouseDown event before and accept input on value field before do anything else.
-   */
-  var _originalMouseHooksFilter = $.event.mouseHooks.filter;
-  $.event.mouseHooks.filter = function(event, origEvent){
-    event = _originalMouseHooksFilter(event, origEvent);
-    if (event.type === 'mousedown') {
-      scout.valueFieldUtils.acceptInputOnActiveField();
-    }
-    return event;
-  };
-
   // === $ extensions ===
 
   // chris' shortcut

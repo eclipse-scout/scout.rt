@@ -69,6 +69,23 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
   }
 };
 
+/**
+ * Method invoked upon a mousedown click with this field as the currently focused control, and is invoked just before the mousedown click will be interpreted.
+ * However, the mousedown target must not be this control, but any other control instead.
+ *
+ * The default implementation checks, whether the click occurred outside this control, and if so invokes 'ValueField.acceptInput'.
+ *
+ * @param target
+ *        the DOM target where the mouse down event occurred.
+ */
+scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
+  var eventOnField = this.$field.isOrHas(target);
+
+  if (!eventOnField) {
+    this.acceptInput(); // event outside this value field.
+  }
+};
+
 scout.ValueField.prototype._onFieldKeyUp = function() {
   this.acceptInput(true);
 };
@@ -113,4 +130,37 @@ scout.ValueField.prototype._onStatusMousedown = function(event) {
   }
 
   scout.ValueField.parent.prototype._onStatusMousedown.call(this, event);
+};
+
+// ==== static helper methods ==== //
+
+/**
+ * Invokes 'ValueField.aboutToBlurByMouseDown' on the currently active value field.
+ * This method has no effect if another element is the focus owner.
+ */
+scout.ValueField.invokeValueFieldAboutToBlurByMouseDown = function(target) {
+  var activeValueField = this._getActiveValueField();
+  if (activeValueField) {
+    activeValueField.aboutToBlurByMouseDown(target);
+  }
+};
+
+/**
+ * Invokes 'ValueField.acceptInput' on the currently active value field.
+ * This method has no effect if another element is the focus owner.
+ */
+scout.ValueField.invokeValueFieldAcceptInput = function() {
+  var activeValueField = this._getActiveValueField();
+  if (activeValueField) {
+    activeValueField.acceptInput();
+  }
+};
+
+/**
+ * Returns the currently active value field, or null if another element is active.
+ * Also, if no value field currently owns the focus, its parent is checked to be a value field and is returned accordingly.
+ * That is used in DateField.js with multiple input elements.
+ */
+scout.ValueField._getActiveValueField = function() {
+  return $(document.activeElement).data('valuefield') || $(document.activeElement).parent().data('valuefield');
 };
