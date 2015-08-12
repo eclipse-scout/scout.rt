@@ -36,14 +36,16 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
     if (isLogoutRequest(req)) {
-      BEANS.get(ServletFilterHelper.class).doLogout(req);
-      BEANS.get(ServletFilterHelper.class).forwardToLogoutForm(req, res);
+      ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
+      helper.doLogout(req);
+      helper.forwardToLogoutForm(req, res);
       return;
     }
 
     if (isLoginRequest(req)) {
-      BEANS.get(ServletFilterHelper.class).doLogout(req);
-      BEANS.get(ServletFilterHelper.class).redirectTo(req, res, "");
+      ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
+      helper.doLogout(req);
+      helper.redirectTo(req, res, "");
       return;
     }
 
@@ -51,11 +53,11 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   }
 
   protected boolean isLogoutRequest(HttpServletRequest req) {
-    return "/logout".equals(req.getPathInfo());
+    return "/logout".equals(getPath(req));
   }
 
   protected boolean isLoginRequest(HttpServletRequest req) {
-    return "/login".equals(req.getPathInfo());
+    return "/login".equals(getPath(req));
   }
 
   @Override
