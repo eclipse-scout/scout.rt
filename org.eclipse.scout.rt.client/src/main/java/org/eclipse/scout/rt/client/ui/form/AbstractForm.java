@@ -57,6 +57,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.html.HTML;
+import org.eclipse.scout.commons.html.IHtmlContent;
+import org.eclipse.scout.commons.html.IHtmlListElement;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -1789,23 +1792,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       if (LOG.isInfoEnabled()) {
         LOG.info("there are fields with errors");
       }
-      StringBuilder buf = new StringBuilder();
-      if (mandatoryTexts.size() > 0) {
-        buf.append(ScoutTexts.get("FormEmptyMandatoryFieldsMessage") + "\n\n");
-        for (Iterator it = mandatoryTexts.iterator(); it.hasNext();) {
-          buf.append("- " + it.next() + "\n");
-        }
-        buf.append("\n");
-      }
-      if (invalidTexts.size() > 0) {
-        buf.append(ScoutTexts.get("FormInvalidFieldsMessage") + "\n\n");
-        for (Iterator it = invalidTexts.iterator(); it.hasNext();) {
-          buf.append("- " + it.next() + "\n");
-        }
-      }
       m_currentValidateContentDescriptor = firstProblem;
-      //
-      VetoException veto = new VetoException(buf.toString());
+
+      VetoException veto = new VetoException(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
       throw veto;
     }
     if (!interceptValidate()) {
@@ -1818,6 +1807,31 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       veto.consume();
       throw veto;
     }
+  }
+
+  protected IHtmlContent createValidationMessageBoxHtml(final List<String> invalidTexts, final List<String> mandatoryTexts) {
+    List<CharSequence> content = new ArrayList<>();
+
+    if (mandatoryTexts.size() > 0) {
+      content.add(HTML.bold(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
+
+      List<IHtmlListElement> mandatoryTextElements = new ArrayList<>();
+      for (String e : mandatoryTexts) {
+        mandatoryTextElements.add(HTML.li(e));
+      }
+      content.add(HTML.ul(mandatoryTextElements));
+      content.add(HTML.br());
+    }
+    if (invalidTexts.size() > 0) {
+      content.add(HTML.bold(ScoutTexts.get("FormInvalidFieldsMessage")));
+
+      List<IHtmlListElement> invalidTextElements = new ArrayList<>();
+      for (String e : invalidTexts) {
+        invalidTextElements.add(HTML.li(e));
+      }
+      content.add(HTML.ul(invalidTextElements));
+    }
+    return HTML.fragment(content);
   }
 
   /**

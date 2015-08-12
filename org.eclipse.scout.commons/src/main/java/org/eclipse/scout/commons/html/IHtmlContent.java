@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html;
 
-
 /**
  * Marker Interface for any Html Content that may contain bind variables.
  */
 public interface IHtmlContent extends IHtmlBind {
 
   String toEncodedHtml();
+
+  String toPlainText();
 
   HtmlBinds getBinds();
 

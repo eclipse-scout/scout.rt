@@ -317,6 +317,17 @@ public final class HTML {
    * </p>
    */
   public static IHtmlElement ul(IHtmlListElement... li) {
+    return ul(Arrays.asList(li));
+  }
+
+  /**
+   * Create an unordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.ul(HTML.li("text"),...).toEncodedHtml(); <br>
+   * </p>
+   */
+  public static IHtmlElement ul(List<IHtmlListElement> li) {
     return new HtmlNodeBuilder("ul", li);
   }
 

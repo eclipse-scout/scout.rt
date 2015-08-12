@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -41,6 +42,7 @@ public class ErrorPopup {
   protected String m_title;
   protected String m_text;
   protected String m_detail;
+  protected IHtmlContent m_htmlDetail;
   protected String m_acceptText;
   protected String m_copyPasteText;
   protected ProcessingException m_cause;
@@ -54,6 +56,7 @@ public class ErrorPopup {
     MessageBoxes.create().
         withHeader(m_text).
         withBody(m_detail).
+        withHtml(m_htmlDetail).
         withYesButtonText(m_acceptText).
         withHiddenText(m_copyPasteText).
         withSeverity(m_cause.getStatus().getSeverity()).
@@ -94,9 +97,7 @@ public class ErrorPopup {
             break;
           }
           default: {
-            m_title = ScoutTexts.get("NetErrorTitle");
-            m_text = ScoutTexts.get("NetErrorText") + msg;
-            m_detail = ScoutTexts.get("NetErrorInfo");
+            createNetErrorMessage(msg);
           }
         }
         return;
@@ -112,9 +113,7 @@ public class ErrorPopup {
         return;
       }
       else if (t instanceof MalformedURLException) {
-        m_title = ScoutTexts.get("NetErrorTitle");
-        m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_detail = ScoutTexts.get("NetErrorInfo");
+        createNetErrorMessage(msg);
         return;
       }
       else if (t instanceof InterruptedException) {
@@ -123,9 +122,7 @@ public class ErrorPopup {
         return;
       }
       else if (t instanceof UnknownHostException) {
-        m_title = ScoutTexts.get("NetErrorTitle");
-        m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_detail = ScoutTexts.get("NetErrorInfo");
+        createNetErrorMessage(msg);
         return;
       }
       else if (t instanceof FileNotFoundException) {
@@ -134,15 +131,11 @@ public class ErrorPopup {
         return;
       }
       else if (t instanceof NoRouteToHostException) {
-        m_title = ScoutTexts.get("NetErrorTitle");
-        m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_detail = ScoutTexts.get("NetErrorInfo");
+        createNetErrorMessage(msg);
         return;
       }
       else if (t instanceof SocketException) {
-        m_title = ScoutTexts.get("NetErrorTitle");
-        m_text = ScoutTexts.get("NetErrorText") + msg;
-        m_detail = ScoutTexts.get("NetErrorInfo");
+        createNetErrorMessage(msg);
         return;
       }
       else if (t instanceof UserInterruptedException) {
@@ -158,13 +151,7 @@ public class ErrorPopup {
         return;
       }
       else if (t instanceof VetoException) {
-        m_text = ((VetoException) t).getStatus().getTitle();
-        if (StringUtility.hasText(((VetoException) t).getStatus().getBody())) {
-          m_detail = ((VetoException) t).getStatus().getBody();
-        }
-        else {
-          m_detail = ScoutTexts.get("VetoErrorText") + msg;
-        }
+        createVetoExceptionMessage((VetoException) t, msg);
         return;
       }
       t = t.getCause();
@@ -196,6 +183,28 @@ public class ErrorPopup {
     m_detail = StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", buf.toString()), 120);
     // copy-paste
     m_copyPasteText = createCopyPasteText(m_text, m_detail, m_cause);
+  }
+
+  protected void createNetErrorMessage(String msg) {
+    m_title = ScoutTexts.get("NetErrorTitle");
+    m_text = ScoutTexts.get("NetErrorText") + msg;
+    m_detail = ScoutTexts.get("NetErrorInfo");
+  }
+
+  protected void createVetoExceptionMessage(VetoException exception, String msg) {
+    m_text = exception.getStatus().getTitle();
+    if (exception.getHtmlBody() != null) {
+      m_htmlDetail = exception.getHtmlBody();
+      m_detail = "";
+    }
+    else if (StringUtility.hasText(exception.getStatus().getBody())) {
+      m_detail = exception.getStatus().getBody();
+    }
+
+    if (!StringUtility.hasText(m_detail)
+        && m_htmlDetail == null) {
+      m_detail = ScoutTexts.get("VetoErrorText") + msg;
+    }
   }
 
   private String createCopyPasteText(String text, String detail, Throwable cause) {

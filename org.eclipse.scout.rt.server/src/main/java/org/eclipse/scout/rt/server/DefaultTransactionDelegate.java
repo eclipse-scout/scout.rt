@@ -106,14 +106,14 @@ public class DefaultTransactionDelegate {
   /**
    * security: do not send back original error and stack trace with details
    * <p>
-   * default returns an empty exception or in case of a {@link VetoException} only its title, message, error code and
-   * severity
+   * default returns an empty exception or in case of a {@link VetoException} only its title, message, htmlMessage,
+   * error code and severity
    */
   protected Throwable replaceOutboundException(Throwable t) {
     Throwable p;
     if (t instanceof VetoException) {
       VetoException ve = (VetoException) t;
-      p = new VetoException(ve.getStatus().getTitle(), ve.getStatus().getBody(), ve.getStatus().getCode(), ve.getStatus().getSeverity());
+      p = new VetoException(ve.getStatus().getTitle(), ve.getStatus().getBody(), ve.getHtmlBody(), null, ve.getStatus().getCode(), ve.getStatus().getSeverity());
     }
     else {
       p = new ProcessingException(ScoutTexts.get("RequestProblem"));

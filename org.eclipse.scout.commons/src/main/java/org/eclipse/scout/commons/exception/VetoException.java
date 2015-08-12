@@ -12,6 +12,8 @@ package org.eclipse.scout.commons.exception;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.commons.html.IHtmlContent;
+
 /**
  * This class is a special subclass of {@link ProcessingException} to mark a
  * vetoed exception that is specialized from a general {@link ProcessingException}.
@@ -23,6 +25,11 @@ public class VetoException extends ProcessingException implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
+   * Html message, localized to the current locale.
+   */
+  private IHtmlContent m_messageHtmlBody;
+
+  /**
    * Empty constructor is used to support auto-webservice publishing with java
    * bean support
    */
@@ -32,6 +39,11 @@ public class VetoException extends ProcessingException implements Serializable {
 
   public VetoException(String message) {
     this(null, message);
+  }
+
+  public VetoException(IHtmlContent htmlMessage) {
+    this(htmlMessage.toPlainText());
+    m_messageHtmlBody = htmlMessage;
   }
 
   public VetoException(String message, Throwable cause) {
@@ -67,10 +79,23 @@ public class VetoException extends ProcessingException implements Serializable {
   }
 
   public VetoException(String title, String message, Throwable cause, int errorCode, int severity) {
+    this(title, message, null, cause, errorCode, severity);
+  }
+
+  public VetoException(String title, String message, IHtmlContent htmlMessage, Throwable cause, int errorCode, int severity) {
     this(new ProcessingStatus(title, message, cause, errorCode, severity));
+    m_messageHtmlBody = htmlMessage;
   }
 
   public VetoException(IProcessingStatus status) {
     super(status);
+  }
+
+  public IHtmlContent getHtmlBody() {
+    return m_messageHtmlBody;
+  }
+
+  public void setHtmlBody(IHtmlContent messageHtmlBody) {
+    m_messageHtmlBody = messageHtmlBody;
   }
 }

@@ -19,14 +19,18 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -123,6 +127,31 @@ public class AbstractFormTest {
 
   }
 
+  /**
+   * Tests the html veto exception error message creation
+   */
+  @Test
+  public void testVetoExceptionHtmlMessage() throws ProcessingException {
+    TestFormWithMandatoryField form = new TestFormWithMandatoryField();
+    String htmlErrorMessage = "";
+
+    String expectedErrorMessage = HTML.fragment(
+        HTML.bold(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")),
+        HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(": "))),
+        HTML.br()
+        ).toEncodedHtml();
+
+    try {
+      form.validateForm();
+    }
+    catch (VetoException ve) {
+      htmlErrorMessage = ve.getHtmlBody().toEncodedHtml();
+    }
+
+    assertEquals(expectedErrorMessage, htmlErrorMessage);
+
+  }
+
   // Test classes
 
   @ClassId(FORM_TEST_CLASS_ID)
@@ -153,6 +182,33 @@ public class AbstractFormTest {
       @Override
       protected String getConfiguredLabel() {
         return "Main Box";
+      }
+
+    }
+  }
+
+  class TestFormWithMandatoryField extends TestForm {
+
+    public TestFormWithMandatoryField() throws ProcessingException {
+      super();
+    }
+
+    public StringField getStringField() {
+      return getFieldByClass(StringField.class);
+    }
+
+    @Order(10.0)
+    @InjectFieldTo(TestForm.MainBox.class)
+    public class StringField extends AbstractStringField {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return "String Field";
+      }
+
+      @Override
+      protected boolean getConfiguredMandatory() {
+        return true;
       }
     }
   }

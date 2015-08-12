@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.html.HtmlBinds;
 import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -106,6 +108,16 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
       }
     }
     return res;
+  }
+
+  @Override
+  public String toPlainText() {
+    IHtmlContent value = this;
+
+    if (!StringUtility.contains(this.toString(), "body")) {
+      value = HTML.body(this);
+    }
+    return HTMLUtility.getPlainText(value.toEncodedHtml());
   }
 
   /**
