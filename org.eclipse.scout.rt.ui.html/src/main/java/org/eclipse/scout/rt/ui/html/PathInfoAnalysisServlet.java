@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * Used to test path info and redirect capabilities of j2ee container
  * <p>
  * Result output per URL is as follows
- * 
+ *
  * <pre>
  * http://localhost:8080/imo
  * 
@@ -41,14 +41,14 @@ import javax.servlet.http.HttpServletResponse;
  * res/logo.jpg:  OK
  * 
  * 
- * http://localhost:8080/imo/index.html
+ * http://localhost:8080/imo/index.jsp
  * 
- * RequestURI: '/imo/index.html'
- * RequestURL: 'http://localhost:8080/imo/index.html'
+ * RequestURI: '/imo/index.jsp'
+ * RequestURL: 'http://localhost:8080/imo/index.jsp'
  * ServletContext.ContextPath: '/imo'
- * PathInfo: '/index.html'
+ * PathInfo: '/index.jsp'
  * res/logo.jpg:  OK
- * 
+ *
  * </pre>
  */
 public class PathInfoAnalysisServlet extends HttpServlet {

@@ -1,6 +1,8 @@
 // FIXME AWE: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
 // --> Keine Daten vorhanden
 
+// FIXME AWE: Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
+
 // FIXME AWE: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField
 scout.SmartField = function() {
   scout.SmartField.parent.call(this);
