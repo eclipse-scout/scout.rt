@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -106,6 +107,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link ITableColumnFilterManager}
    */
   String PROP_COLUMN_FILTER_MANAGER = "columnFilterManger";
+
+  /**
+   * {@link UserTableFilterManager}
+   */
+  String PROP_USER_FILTER_MANAGER = "userFilterManager";
   /**
    * {@link List<IKeyStroke>}
    */
@@ -798,6 +804,10 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ITableColumnFilterManager getColumnFilterManager();
 
   void setColumnFilterManager(ITableColumnFilterManager m);
+
+  UserTableFilterManager getUserFilterManager();
+
+  void setUserFilterManager(UserTableFilterManager manager);
 
   ITableCustomizer getTableCustomizer();
 

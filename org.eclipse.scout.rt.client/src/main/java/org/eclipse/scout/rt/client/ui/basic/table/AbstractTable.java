@@ -99,6 +99,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableFilterManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -1200,6 +1202,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (getColumnFilterManager() == null) {
       setColumnFilterManager(createColumnFilterManager());
     }
+    if (getUserFilterManager() == null) {
+      setUserFilterManager(createUserFilterManager());
+    }
   }
 
   @Override
@@ -1920,6 +1925,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   protected ITableColumnFilterManager createColumnFilterManager() {
     return new DefaultTableColumnFilterManager(this);
+  }
+
+  /**
+   * factory to manage user filters
+   * <p>
+   * default creates a {@link UserTableFilterManager}
+   */
+  protected UserTableFilterManager createUserFilterManager() {
+    return new UserTableFilterManager();
   }
 
   /**
@@ -3284,6 +3298,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public UserTableFilterManager getUserFilterManager() {
+    return (UserTableFilterManager) propertySupport.getProperty(PROP_USER_FILTER_MANAGER);
+  }
+
+  @Override
+  public void setUserFilterManager(UserTableFilterManager m) {
+    propertySupport.setProperty(PROP_USER_FILTER_MANAGER, m);
+  }
+
+  @Override
   public ITableColumnFilterManager getColumnFilterManager() {
     return (ITableColumnFilterManager) propertySupport.getProperty(PROP_COLUMN_FILTER_MANAGER);
   }
@@ -4505,6 +4529,36 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         //
         getColumnSet().removeSortColumn(column);
         sort();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireFilterAddedFromUI(IUserTableFilter filter) {
+      try {
+        pushUIProcessor();
+        //
+        getUserFilterManager().addFilter(filter);
+      }
+      catch (ProcessingException e) {
+        BEANS.get(ExceptionHandler.class).handle(e);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireFilterRemovedFromUI(IUserTableFilter filter) {
+      try {
+        pushUIProcessor();
+        //
+        getUserFilterManager().removeFilter(filter);
+      }
+      catch (ProcessingException e) {
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();

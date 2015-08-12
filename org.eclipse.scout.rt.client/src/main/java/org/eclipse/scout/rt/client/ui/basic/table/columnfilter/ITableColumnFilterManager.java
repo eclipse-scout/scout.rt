@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -85,4 +86,8 @@ public interface ITableColumnFilterManager {
    * @since 3.8.0
    */
   void removeListener(TableColumnFilterListener listener);
+
+  void addFilter(ITableRowFilter filter) throws ProcessingException;
+
+  void removeFilter(ITableRowFilter filter) throws ProcessingException;
 }

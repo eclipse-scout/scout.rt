@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
@@ -99,4 +100,7 @@ public interface ITableUIFacade {
 
   void fireSortColumnRemovedFromUI(IColumn<?> column);
 
+  void fireFilterAddedFromUI(IUserTableFilter filter);
+
+  void fireFilterRemovedFromUI(IUserTableFilter filter);
 }

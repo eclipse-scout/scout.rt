@@ -272,4 +272,20 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
     }
   }
 
+  @Override
+  public void addFilter(ITableRowFilter filter) throws ProcessingException {
+    ITableColumnFilter<?> filter2 = (ITableColumnFilter<?>) filter;
+    m_filterMap.put(filter2.getColumn(), filter2);
+    fireFilterAdded(filter2.getColumn());
+    LOG.info("Filter added " + filter);
+  }
+
+  @Override
+  public void removeFilter(ITableRowFilter filter) throws ProcessingException {
+    ITableColumnFilter<?> filter2 = (ITableColumnFilter<?>) filter;
+    m_filterMap.remove(filter2.getColumn());
+    fireFilterRemoved(filter2.getColumn());
+    LOG.info("Filter removed " + filter);
+  }
+
 }
