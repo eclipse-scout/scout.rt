@@ -5,8 +5,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -87,8 +89,10 @@ public final class JobUtility {
       }
     }
 
+    ClientRunContext runContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
+
     // Otherwise, schedule a model job and wait for it to finish
-    JobInput jobInput = ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true)).withName(jobName);
+    JobInput jobInput = ModelJobs.newInput(runContext).withName(jobName);
     if (pollingRequest) {
       jobInput.withProperty(POLLING_REQUEST_HINT, pollingRequest);
     }
@@ -118,8 +122,15 @@ public final class JobUtility {
     try {
       return future.awaitDoneAndGet();
     }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e); // handle business exception
+    catch (final ProcessingException e) {
+      ModelJobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
+
+      }, ModelJobs.newInput(runContext));
       return null;
     }
   }
