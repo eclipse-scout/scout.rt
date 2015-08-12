@@ -22,8 +22,12 @@ import java.util.Set;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public class JettyServer {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JettyServer.class);
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
   public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.server.services.common.clustersync.ClusterSynchronizationService.createNodeId()
@@ -36,8 +40,8 @@ public class JettyServer {
     // read folder
     File webappFolder = null;
     String webappParam = System.getProperty(WEB_APP_FOLDER_KEY);
-    if (webappParam == null || webappParam.length() < 1) {
-      webappFolder = new File(Paths.get(".").toAbsolutePath().normalize().toFile(), "/src/main/webapp/");
+    if (webappParam == null || webappParam.isEmpty()) {
+      webappFolder = new File(Paths.get(".").toAbsolutePath().normalize().toFile(), "/target/classes");
     }
     else {
       webappFolder = new File(webappParam);
@@ -51,9 +55,7 @@ public class JettyServer {
         port = Integer.parseInt(portConfig);
       }
       catch (Exception e) {
-        System.err.println("Error while parsing value '" + portConfig + "' for property " + SERVER_PORT_KEY + ":");
-        e.printStackTrace();
-        System.err.println("Using default port " + port + " instead.");
+        LOG.error("Error while parsing value '" + portConfig + "' for property. Using default port " + port + " instead." + SERVER_PORT_KEY, e);
       }
     }
 
@@ -64,16 +66,19 @@ public class JettyServer {
   }
 
   protected WebAppContext createWebApp(File webappDir) throws Exception {
+    String resourceBase = webappDir.getAbsolutePath();
     WebAppContext webAppContext = new P_WebAppContext();
     webAppContext.setThrowUnavailableOnStartupException(true);
     webAppContext.setContextPath("/");
-    webAppContext.setResourceBase(webappDir.getAbsolutePath());
+    webAppContext.setResourceBase(resourceBase);
     webAppContext.setParentLoaderPriority(true);
+    LOG.info("Starting Jetty with resourceBase=" + resourceBase);
 
     webAppContext.setConfigurationClasses(new String[]{
         "org.eclipse.jetty.webapp.WebInfConfiguration",
         "org.eclipse.jetty.webapp.WebXmlConfiguration",
         "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+        "org.eclipse.jetty.annotations.AnnotationConfiguration",
         "org.eclipse.jetty.plus.webapp.PlusConfiguration",
         "org.eclipse.jetty.plus.webapp.EnvConfiguration",
     });
@@ -133,7 +138,7 @@ public class JettyServer {
           while (urls.hasMoreElements()) {
             File resource = new File(urls.nextElement().getPath());
             if (!resource.exists()) {
-              System.err.println("resource not found: " + resource);
+              LOG.error("resource not found: " + resource);
               continue;
             }
 
@@ -149,8 +154,7 @@ public class JettyServer {
           }
         }
         catch (IOException e) {
-          System.err.println("Failed to resolve resources of JARs inside the web application's /WEB-INF/lib directory");
-          e.printStackTrace();
+          LOG.error("Failed to resolve resources of JARs inside the web application's /WEB-INF/lib directory", e);
         }
 
         // Look for the resource in the web application's resources (higher precedence).
