@@ -130,50 +130,29 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       .click(colorRemove);
   }
 
-  // create buttons in command for new columns
-  // TODO cru: improve organize table
-  /*
-  var $commandColumn = $menuHeader.appendDiv('header-group');
-  $commandColumn.appendDiv('header-text')
-    .data('label', session.text('Column'));
-
-  $commandColumn.appendDiv('header-command column-add')
-    .data('label', session.text('ui.add'))
-    .click(columnAdd);
-  $commandColumn.appendDiv('header-command column-remove')
-    .data('label', session.text('ui.remove'))
-    .click(columnRemove);
-   */
-
   // filter
   var $headerFilter = $menuHeader.appendDiv('header-group-filter');
   $headerFilter.appendDiv('header-text')
     .data('label', session.text('ui.FilterBy'));
 
-  var group = (column.type === 'date') ? scout.ChartTableControlMatrix.DateGroup.YEAR : -1,
-    matrix = new scout.ChartTableControlMatrix(table, session),
-    xAxis = matrix.addAxis(column, group),
-    cube = matrix.calculateCube();
-
-  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container'),
-    $filter;
-
-  for (var a = 0; a < xAxis.length; a++) {
-    var key = xAxis[a],
-      mark = xAxis.format(key),
-      value = cube.getValue([key]).length;
-
-    $filter = $headerFilterContainer.appendDiv('header-filter', mark)
-      .attr('data-xAxis', key)
-      .click(filterClick)
-      .attr('data-value', value);
-
-    if (column.filter.indexOf(key) > -1) {
-      $filter.addClass('selected');
-    }
+  var filter = table.getFilter(column.id);
+  if (!filter) {
+    filter = new scout.TableColumnFilter(table, column);
   }
-  // mark last element
-  $filter.addClass('last');
+  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
+
+  filter.availableValues.forEach(function(availableValue, index, arr) {
+    var $filterItem = $headerFilterContainer.appendDiv('header-filter', availableValue)
+      .on('click', onFilterClick);
+
+    if (filter.selectedValues.indexOf(availableValue) > -1) {
+      $filterItem.addClass('selected');
+    }
+    if (index === arr.length - 1) {
+      // mark last element
+      $filterItem.addClass('last');
+    }
+  });
 
   this.$headerFilterContainer = $headerFilterContainer;
   scout.scrollbars.install($headerFilterContainer, session);
@@ -372,42 +351,20 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     table.colorData(column, 'remove');
   }
 
-  function columnAdd() {}
-
-  function columnChange() {}
-
-  function columnRemove() {}
-
-  function filterClick(event) {
+  function onFilterClick(event) {
     var $clicked = $(this);
+    $clicked.select(!$clicked.isSelected());
 
-    // change state
-    if ($clicked.hasClass('selected')) {
-      $clicked.removeClass('selected');
-    } else {
-      $clicked.addClass('selected');
-    }
-
-    //  prepare filter
-    column.filter = [];
-
-    //  find filter
+    // find selected values
+    filter.selectedValues = [];
     $('.selected', $headerFilter).each(function() {
-      var dX = parseFloat($(this).attr('data-xAxis'));
-      dX = isNaN(dX) ? null : dX;
-      column.filter.push(dX);
+      filter.selectedValues.push($(this).text());
     });
 
-    // filter function
-    if (column.filter.length) {
-      column.filterFunc = function($row) {
-        var row = $row.data('row'),
-          textX = table.cellValue(xAxis.column, row),
-          nX = xAxis.norm(textX);
-        return (column.filter.indexOf(nX) > -1);
-      };
+    if (filter.selectedValues.length > 0) {
+      table.registerFilter(column.id, filter);
     } else {
-      column.filterFunc = null;
+      table.unregisterFilter(column.id);
     }
 
     // callback to table

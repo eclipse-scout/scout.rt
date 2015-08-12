@@ -53,6 +53,7 @@ scout.Table.prototype._init = function(model, session) {
   this.addChild(this.menuBar);
 
   this._syncSelectedRows(this.selectedRows);
+  this._syncFilters(this.filters);
   this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
@@ -343,7 +344,7 @@ scout.Table.prototype.clearSelection = function(dontFire) {
       row.$row.toggleClass('select-middle select-top select-bottom select-single', false);
     }
   });
-  this.selectedRows.length = 0;
+  this.selectedRows = [];
   if (!dontFire) {
     this._sendRowsPending = true;
     this.notifyRowSelectionFinished();
@@ -660,6 +661,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
       lastRowOfBlockSelected = $row.isSelected();
+      that._applyFiltersForRow($row);
     });
 
     // append block of rows
@@ -1727,20 +1729,9 @@ scout.Table.prototype.filter = function() {
   var rowsToHide = [];
   var rowsToShow = [];
   $allRows.each(function() {
-    var $row = $(this),
-      show = true;
+    var $row = $(this), show;
 
-    for (i = 0; i < that.columns.length; i++) {
-      if (that.columns[i].filterFunc) {
-        show = show && that.columns[i].filterFunc($row);
-      }
-    }
-
-    for (var key in that._filterMap) {
-      var filter = that._filterMap[key];
-      show = show && filter.accept($row);
-    }
-
+    show = that._rowAcceptedByFilters($row);
     if (show) {
       if ($row.hasClass('invisible')) {
         rowsToShow.push($row);
@@ -1787,17 +1778,30 @@ scout.Table.prototype.filter = function() {
   });
 };
 
+scout.Table.prototype._rowAcceptedByFilters = function($row) {
+  for (var key in this._filterMap) {
+    var filter = this._filterMap[key];
+    if (!filter.accept($row)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+scout.Table.prototype._applyFiltersForRow = function($row) {
+  if (!this._rowAcceptedByFilters($row)) {
+    this.hideRow($row);
+  } else {
+    this.showRow($row);
+  }
+};
+
 /**
  *
  * @returns array of filter names which are currently active
  */
 scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
-  for (var i = 0; i < this.columns.length; i++) {
-    if (this.columns[i].filterFunc) {
-      filteredBy.push(this.columns[i].text || '');
-    }
-  }
   for (var key in this._filterMap) {
     var filter = this._filterMap[key];
     filteredBy.push(filter.label);
@@ -1806,20 +1810,19 @@ scout.Table.prototype.filteredBy = function() {
 };
 
 scout.Table.prototype.resetFilter = function() {
-  this.clearSelection();
-
   // reset rows
-  var that = this;
-  var $rows = this.$rows();
-  $rows.each(function() {
-    that.showRow($(this), ($rows.length <= that.animationRowLimit));
-  });
-  this._group();
+  if (this.rendered) {
+    var that = this;
+    var $rows = this.$rows();
+    $rows.each(function() {
+      that.showRow($(this), ($rows.length <= that.animationRowLimit));
+    });
+    this._group();
+  }
 
-  // set back all filter functions
-  for (var i = 0; i < this.columns.length; i++) {
-    this.columns[i].filter = [];
-    this.columns[i].filterFunc = null;
+  // remove filters
+  for (var key in this._filterMap) {
+    this.unregisterFilter(key);
   }
   this._filterMap = {};
   this.filteredRowCount = undefined;
@@ -1834,6 +1837,14 @@ scout.Table.prototype.registerFilter = function(key, filter) {
     throw new Error('key has to be defined');
   }
   this._filterMap[key] = filter;
+
+  if (filter.column) {
+    var data = {
+      columnId: filter.column.id,
+      selectedValues: filter.selectedValues
+    };
+    this.remoteHandler(this.id, 'addFilter', data);
+  }
 };
 
 scout.Table.prototype.getFilter = function(key, filter) {
@@ -1843,11 +1854,20 @@ scout.Table.prototype.getFilter = function(key, filter) {
   return this._filterMap[key];
 };
 
+//TODO CGU rename to remove, add
 scout.Table.prototype.unregisterFilter = function(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
+  var filter = this._filterMap[key];
   delete this._filterMap[key];
+
+  if (filter.column) {
+    var data = {
+      columnId: filter.column.id
+    };
+    this.remoteHandler(this.id, 'removeFilter', data);
+  }
 };
 
 scout.Table.prototype.showRow = function($row, useAnimation) {
@@ -2094,6 +2114,20 @@ scout.Table.prototype._syncMenus = function(menus) {
     if (this.menus[i].enabled) {
       this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
     }
+  }
+};
+
+scout.Table.prototype._syncFilters = function(filters) {
+  if (!filters) {
+    this.resetFilter();
+  } else {
+    filters.forEach(function(filterData) {
+      var column = this.columnById(filterData.column),
+        filter = new scout.TableColumnFilter(this, column);
+
+      filter.selectedValues = filterData.selectedValues;
+      this._filterMap[column.id] = filter;
+    }, this);
   }
 };
 

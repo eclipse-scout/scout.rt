@@ -321,7 +321,7 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     key.reorder();
   }
 
-  // acces function used by chart
+  // access function used by chart
   cube.getValue = function(keys) {
     keys = JSON.stringify(keys);
 

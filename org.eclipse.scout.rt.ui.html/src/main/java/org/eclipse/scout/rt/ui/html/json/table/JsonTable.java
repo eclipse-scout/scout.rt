@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
@@ -38,7 +40,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.StringColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
@@ -96,6 +100,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
   public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
   public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
+  public static final String EVENT_ADD_FILTER = "addFilter";
+  public static final String EVENT_REMOVE_FILTER = "removeFilter";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -104,6 +110,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
   public static final String PROP_SELECTED_ROWS = "selectedRows";
+  public static final String PROP_FILTERS = "filters";
   public static final String PROP_HAS_RELOAD_HANDLER = "hasReloadHandler";
 
   private TableListener m_tableListener;
@@ -366,6 +373,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     putProperty(json, PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
+    if (getModel().getColumnFilterManager() != null) {
+      putProperty(json, PROP_FILTERS, filtersToJson(getModel().getColumnFilterManager().getFilters()));
+    }
     return json;
   }
 
@@ -414,7 +424,13 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       handleUiCancelCellEdit(event);
     }
     else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
-      handleExportToClipboard(event);
+      handleUiExportToClipboard(event);
+    }
+    else if (EVENT_ADD_FILTER.equals(event.getType())) {
+      handleUiAddFilter(event);
+    }
+    else if (EVENT_REMOVE_FILTER.equals(event.getType())) {
+      handleUiRemoveFilter(event);
     }
     else {
       super.handleUiEvent(event);
@@ -599,7 +615,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     jsonField.dispose();
   }
 
-  protected void handleExportToClipboard(JsonEvent event) {
+  protected void handleUiExportToClipboard(JsonEvent event) {
     if (!ACCESS.check(new CopyToClipboardPermission())) {
       return;
     }
@@ -613,6 +629,28 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         throw new UiException("Unable to copy to clipboard.", e);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiAddFilter(JsonEvent event) {
+    JSONObject data = event.getData();
+    IColumn column = extractColumn(data);
+    JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
+    Set<String> selectedValues = new HashSet<String>();
+    for (int i = 0; i < jsonSelectedValues.length(); i++) {
+      selectedValues.add(jsonSelectedValues.getString(i));
+    }
+    StringColumnFilter filter = new StringColumnFilter(column);
+    filter.setSelectedValues(selectedValues);
+    //FIXME CGU filter removed?
+    getModel().getUIFacade().fireFilterAddedFromUI(filter);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiRemoveFilter(JsonEvent event) {
+    IColumn column = extractColumn(event.getData());
+    ITableColumnFilter filter = getModel().getColumnFilterManager().getFilter(column);
+    getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {
@@ -752,6 +790,15 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       return null;
     }
     return m_tableRowIds.get(row);
+  }
+
+  protected JSONArray filtersToJson(Collection<ITableColumnFilter> filters) {
+    JSONArray jsonFilters = new JSONArray();
+    for (ITableColumnFilter<?> filter : filters) {
+      JSONObject jsonFilter = new JsonTableColumnFilter(filter, this).toJson();
+      jsonFilters.put(jsonFilter);
+    }
+    return jsonFilters;
   }
 
   protected void handleModelTableEvent(TableEvent event) {

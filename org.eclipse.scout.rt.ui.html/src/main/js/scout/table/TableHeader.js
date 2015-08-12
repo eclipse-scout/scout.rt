@@ -41,7 +41,6 @@ scout.TableHeader.prototype._render = function() {
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
     column.$header = $header;
-    column.filter = [];
 
     scout.tooltips.install($header, this.session, {
       tooltipText: tooltipFunction
