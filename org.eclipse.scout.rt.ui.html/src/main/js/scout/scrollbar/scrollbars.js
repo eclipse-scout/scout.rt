@@ -167,6 +167,27 @@ scout.scrollbars = {
     }
   },
 
+  /**
+   * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
+   *
+   */
+  scrollHorizontalTo: function($scrollable, $element) {
+    var scrollTo,
+      scrollableW = $scrollable.width(),
+      elementBounds = scout.graphics.bounds($element, true, true),
+      elementLeft = elementBounds.x,
+      elementW = elementBounds.width,
+      scrollbars;
+
+    if (elementLeft < 0) {
+      scout.scrollbars.scrollLeft($scrollable, $scrollable.scrollLeft() + elementLeft);
+    } else if (elementLeft + elementW > scrollableW) {
+      // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
+      scrollTo = Math.ceil($scrollable.scrollLeft() + elementLeft + elementW - scrollableW);
+      scout.scrollbars.scrollLeft($scrollable, scrollTo);
+    }
+  },
+
   scrollTop: function($scrollable, scrollTop) {
     var scrollbar = scout.scrollbars.scrollbar($scrollable, 'y');
     if (scrollbar) {
@@ -200,6 +221,7 @@ scout.scrollbars = {
 
   /**
    * Returns true if the location is visible in the current viewport of the $scrollable, or if $scrollable is null
+   * @param location object with x and y properties
    *
    */
   isLocationInView: function(location, $scrollable) {

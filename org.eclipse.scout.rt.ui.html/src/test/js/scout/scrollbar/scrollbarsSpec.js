@@ -1,14 +1,13 @@
 describe("scrollbars", function() {
-  var $container, session;
+  var session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    createScrollable();
   });
 
   function createScrollable() {
-    $container = $('<div>')
+    return $('<div>')
       .css('height', '50px')
       .css('width', '200px')
       .css('position', 'absolute')
@@ -29,6 +28,7 @@ describe("scrollbars", function() {
       var handler = function() {
         exec = true;
       };
+      var $container = createScrollable();
       var $content = scout.scrollbars.install($container, session);
       var $element = createContent($content);
 
@@ -46,6 +46,7 @@ describe("scrollbars", function() {
       var handler = function() {
         exec = true;
       };
+      var $container = createScrollable();
       var $content = scout.scrollbars.install($container, session);
       var $element = createContent($content);
 
@@ -57,6 +58,61 @@ describe("scrollbars", function() {
       scout.scrollbars.offScroll(handler);
       $container.scroll();
       expect(exec).toBe(false);
+    });
+
+  });
+
+  describe("isLocationInView", function() {
+    var $scrollable, scrollableBounds, $element;
+
+    beforeEach(function() {
+      $scrollable = createScrollable();
+      scrollableBounds = scout.graphics.offsetBounds($scrollable);
+      $element = $('<div>')
+        .css('height', '10px')
+        .css('width', '10px')
+        .css('position', 'absolute')
+        .appendTo($('#sandbox'));
+    });
+
+    it("returns true if the given location is inside the given $scrollable", function() {
+      $element
+        .cssLeft(scrollableBounds.x)
+        .cssTop(scrollableBounds.y);
+      var bounds = scout.graphics.offsetBounds($element);
+      expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(true);
+    });
+
+    it("returns false if x of the given location is outside of the given $scrollable (smaller)", function() {
+      $element
+        .cssLeft(scrollableBounds.x - 1)
+        .cssTop(scrollableBounds.y);
+      var bounds = scout.graphics.offsetBounds($element);
+      expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
+    });
+
+    it("returns false if y of the given location is outside of the given $scrollable (smaller)", function() {
+      $element
+        .cssLeft(scrollableBounds.x)
+        .cssTop(scrollableBounds.y - 1);
+      var bounds = scout.graphics.offsetBounds($element);
+      expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
+    });
+
+    it("returns false if x of the given location is outside of the given $scrollable (greater)", function() {
+      $element
+        .cssLeft(scrollableBounds.x)
+        .cssTop(scrollableBounds.x + scrollableBounds.width);
+      var bounds = scout.graphics.offsetBounds($element);
+      expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
+    });
+
+    it("returns false if y of the given location is outside of the given $scrollable (greater)", function() {
+      $element
+        .cssLeft(scrollableBounds.x)
+        .cssTop(scrollableBounds.y + scrollableBounds.height);
+      var bounds = scout.graphics.offsetBounds($element);
+      expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
   });

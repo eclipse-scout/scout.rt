@@ -23,7 +23,9 @@ scout.Popup = function(session, options) {
   this.windowPaddingX = scout.helpers.nvl(options.windowPaddingX, 10);
   this.windowPaddingY = scout.helpers.nvl(options.windowPaddingY, 5);
   this.withFocusContext = scout.helpers.nvl(options.installFocusContext, true);
-  this.initialFocus = scout.helpers.nvl(options.initialFocus, function() { return scout.focusRule.AUTO; });
+  this.initialFocus = scout.helpers.nvl(options.initialFocus, function() {
+    return scout.focusRule.AUTO;
+  });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
   this.triggerPopupOpenEvent = scout.helpers.nvl(options.triggerPopupOpenEvent, true);
   this._addEventSupport();
@@ -111,7 +113,7 @@ scout.Popup.prototype._detachCloseHandler = function() {
 
   // Uninstall mouse close handler
   if (this._mouseDownHandler) {
-    $(document).off('mousedown', this._mouseDownHandler);
+  $(document).off('mousedown', this._mouseDownHandler);
     this._mouseDownHandler = null;
   }
 };
@@ -249,6 +251,11 @@ scout.Popup.prototype.setLocation = function(location) {
   this.$container
     .css('left', location.x)
     .css('top', location.y);
+  this._triggerLocationChanged();
+};
+
+scout.Popup.prototype._triggerLocationChanged = function() {
+  this.trigger('locationChanged');
 };
 
 scout.Popup.prototype._createKeyStrokeAdapter = function() {
@@ -262,4 +269,8 @@ scout.Popup.prototype._triggerPopupOpenEvent= function() {
   if (this.triggerPopupOpenEvent) {
     this.session.desktop._trigger('popupopen', {popup: this});
   }
+};
+
+scout.Popup.prototype.belongsTo = function($anchor) {
+  return this.$anchor[0] === $anchor[0];
 };

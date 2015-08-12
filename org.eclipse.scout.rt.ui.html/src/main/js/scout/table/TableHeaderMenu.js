@@ -2,26 +2,34 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 // FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
-scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  var column = $header.data('column'),
+scout.TableHeaderMenu = function(session, options) {
+  scout.TableHeaderMenu.parent.call(this, session, options);
+  this.session = session;
+  this.tableHeader = options.tableHeader;
+  this.table = this.tableHeader.table;
+  this.$headerItem = this.$anchor;
+  this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
+  this.on('locationChanged', this._onLocationChanged.bind(this));
+};
+scout.inherits(scout.TableHeaderMenu, scout.Popup);
+
+scout.TableHeaderMenu.prototype._render = function() {
+  var table = this.table,
+    session = this.session,
+    $parent = this.session.$entryPoint,
+    $headerItem = this.$anchor,
+    column = $headerItem.data('column'),
     pos = table.columns.indexOf(column);
 
-  this.session = session;
-  // label title
-  $header.addClass('menu-open');
+  this.$parent = $parent;
+  $headerItem.select(true);
+
+  this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
 
   // create container
-  var $menuHeader = table.$container.appendDiv('table-header-menu')
-    .css('left', x).css('top', y + $header.outerHeight());
-
-  $menuHeader.appendDiv('table-header-menu-whiter').width($header[0].offsetWidth - 2);
-
-  this.$headerMenu = $menuHeader;
-  this.$header = $header;
-
-  // every user action will close menu
-  $(window).on('mousedown.tableheadermenu', onMouseDown);
-  $(window).on('keydown.tableheadermenu', removeMenu);
+  var $menuHeader = $parent.appendDiv('table-header-menu');
+  this.$container = $menuHeader;
+  this.$whiter = $menuHeader.appendDiv('table-header-menu-whiter');
 
   // create buttons in command for order
   if (table.header.columns.length > 1) {
@@ -177,31 +185,17 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .on('mouseleave', '.header-command', leaveCommand);
 
   // copy flags to menu
-  if ($header.hasClass('sort-asc')) {
+  if ($headerItem.hasClass('sort-asc')) {
     $menuHeader.addClass('sort-asc');
   }
-  if ($header.hasClass('sort-desc')) {
+  if ($headerItem.hasClass('sort-desc')) {
     $menuHeader.addClass('sort-desc');
   }
-  if ($header.hasClass('filter')) {
+  if ($headerItem.hasClass('filter')) {
     $menuHeader.addClass('filter');
   }
 
   var that = this;
-
-  function onMouseDown(event) {
-    if ($header.is($(event.target))) {
-      return;
-    }
-
-    removeMenu(event);
-  }
-
-  function removeMenu(event) {
-    if ($menuHeader.has($(event.target)).length === 0) {
-      that.remove();
-    }
-  }
 
   // event handling
   function enterCommand() {
@@ -253,18 +247,18 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     $('.header-command', $commandSort).removeClass('selected');
 
     if (sortCount === 1) {
-      if ($header.hasClass('sort-asc')) {
+      if ($headerItem.hasClass('sort-asc')) {
         $sortAsc.addClass('selected');
         addIcon = null;
-      } else if ($header.hasClass('sort-desc')) {
+      } else if ($headerItem.hasClass('sort-desc')) {
         $sortDesc.addClass('selected');
         addIcon = null;
       }
     } else if (sortCount > 1) {
-      if ($header.hasClass('sort-asc')) {
+      if ($headerItem.hasClass('sort-asc')) {
         $sortAscAdd.addClass('selected');
         addIcon = column.sortIndex + 1;
-      } else if ($header.hasClass('sort-desc')) {
+      } else if ($headerItem.hasClass('sort-desc')) {
         $sortDescAdd.addClass('selected');
         addIcon = column.sortIndex + 1;
       }
@@ -372,18 +366,73 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 };
 
-scout.TableHeaderMenu.prototype.remove = function() {
+scout.TableHeaderMenu.prototype._remove = function() {
+  scout.TableHeaderMenu.parent.prototype._remove.call(this);
   scout.scrollbars.uninstall(this.$headerFilterContainer, this.session);
-  this.$headerMenu.remove();
-  this.$header.removeClass('menu-open');
-  $(window).off('mousedown.tableheadermenu');
-  $(window).off('keydown.tableheadermenu');
+  this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
+  this.$headerItem.select(false);
 };
 
-scout.TableHeaderMenu.prototype.isOpenFor = function($header) {
-  return this.$header.is($header) && this.$header.hasClass('menu-open');
+scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
+  return this.rendered && this.belongsTo($headerItem);
 };
 
-scout.TableHeaderMenu.prototype.isOpen = function() {
-  return this.$header.hasClass('menu-open');
+scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
+  // close popup only if source of event is not $headerItem or one of it's children.
+  if (this.$headerItem.isOrHas(event.target)) {
+    return;
+  }
+
+  this.close();
+};
+
+scout.TableHeaderMenu.prototype._computeWhitherWidth = function() {
+  var $tableHeaderContainer = this.tableHeader.$container,
+    headerItemWidth = this.$headerItem.outerWidth() - this.$headerItem.cssBorderWidthX(),
+    containerWidth = this.$container.outerWidth() - this.$container.cssBorderWidthX(),
+    tableHeaderWidth = $tableHeaderContainer.outerWidth() - this.tableHeader.menuBar.$container.outerWidth();
+
+  // if container is wider than header item -> use header item width, otherwise use container width
+  var whitherWidth = Math.min(headerItemWidth, containerWidth);
+  // if container is positioned at the right side, header item may not be fully visible (under the menubar or partly invisible due to scrolling)
+  whitherWidth = Math.min(whitherWidth, tableHeaderWidth - this.$headerItem.position().left);
+  var clipLeft = $tableHeaderContainer.offset().left - this.$headerItem.offset().left - this.tableHeader.table.$container.cssBorderLeftWidth();
+  if (clipLeft > 0) {
+    whitherWidth -= clipLeft;
+  }
+  return whitherWidth;
+};
+
+scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
+  var inView, containerBounds,
+    isLocationInView = scout.scrollbars.isLocationInView,
+    headerItemBounds = scout.graphics.offsetBounds(this.$headerItem),
+    $tableHeaderContainer = this.tableHeader.$container;
+
+  this.$container.setVisible(true);
+  containerBounds = scout.graphics.offsetBounds(this.$container),
+
+  // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
+  // check left side of the header item (necessary if header item is moved outside on the left side of the table)
+  inView = isLocationInView(new scout.Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
+  if (!inView) {
+    // if left side of the header is not in view, check if right side of the header and the menu, both must be visible)
+    // check right side of the header item (necessary if header item is moved outside on the right side of the table)
+    inView = isLocationInView(new scout.Point(headerItemBounds.x + headerItemBounds.width, headerItemBounds.y + headerItemBounds.height), $tableHeaderContainer);
+    // check right side of the menu (necessary if header item is larger than menu, and if header item is moved outside on the left side of the table)
+    inView = inView && isLocationInView(new scout.Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
+  }
+  this.$container.setVisible(inView);
+
+  // make sure whither is correctly positioned and sized
+  // (bounds must be computed after setVisible, if it was hidden before bounds are not correct)
+  containerBounds = scout.graphics.offsetBounds(this.$container);
+  this.$whiter
+    // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
+    .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
+    .width(this._computeWhitherWidth());
+};
+
+scout.TableHeaderMenu.prototype._onAnchorScroll = function(event) {
+  this.position();
 };

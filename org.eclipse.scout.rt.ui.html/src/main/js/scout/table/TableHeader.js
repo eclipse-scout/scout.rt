@@ -75,8 +75,9 @@ scout.TableHeader.prototype._render = function() {
     if ($header.data('column').disallowHeaderMenu) {
       return;
     }
-    if (that.dragging) {
+    if (that.dragging || that.columnMoved) {
       that.dragging = false;
+      that.columnMoved = false;
     } else if (event.shiftKey || event.ctrlKey) {
       table.removeGrouping();
       table.sort($header.data('column'), $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
@@ -86,7 +87,11 @@ scout.TableHeader.prototype._render = function() {
     } else {
       var x = $header.position().left + that.$container.position().left + parseFloat(that.$container.css('margin-left')),
         y = $header.position().top + that.$container.position().top;
-      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, that.session);
+      that._tableHeaderMenu = new scout.TableHeaderMenu(that.session, {
+        tableHeader: that,
+        $anchor: $header
+      });
+      that._tableHeaderMenu.render();
     }
 
     return false;
@@ -131,6 +136,8 @@ scout.TableHeader.prototype._render = function() {
       $otherHeaders = $header.siblings('.header-item');
 
     that.dragging = false;
+    // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
+    that.columnMoved = false;
 
     // start drag & drop events
     $(window)
@@ -167,7 +174,7 @@ scout.TableHeader.prototype._render = function() {
         }
       });
 
-      if (that._tableHeaderMenu && that._tableHeaderMenu.isOpen()) {
+      if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
         that._tableHeaderMenu.remove();
         that._tableHeaderMenu = null;
       }
@@ -210,6 +217,7 @@ scout.TableHeader.prototype._render = function() {
       if (newPos > -1 && oldPos !== newPos) {
         table.moveColumn($header.data('column'), oldPos, newPos, true);
         that.dragging = false;
+        that.columnMoved = true;
       } else {
         $header.animateAVCSD('left', '', function() {
           that.dragging = false;
@@ -318,23 +326,36 @@ scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dra
     }.bind(this));
   }
 
-  // move menu
-  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
-    var left = $header.position().left;
-    var marginLeft = this.$container.cssMarginLeft();
-    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + marginLeft);
-  }
-
   // move to old position and then animate
   if (dragged) {
     $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
       .animateAVCSD('left', 0);
   } else {
-    $headers.each(function() {
-      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
-        .animateAVCSD('left', 0);
-    });
+    this._arrangeHeaderItems($headers);
   }
+};
+
+scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
+  var that = this;
+  $headers.each(function() {
+    // move to old position and then animate
+    $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
+    .animate({left: 0}, {
+      progress: function(animation, progress, remainingMs) {
+        var $headerItem = $(this);
+        if (!$headerItem.isSelected()) {
+          return;
+        }
+        // make sure selected header item is visible
+        scout.scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
+
+        // move menu
+        if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
+          that._tableHeaderMenu.position();
+        }
+      }
+    });
+  });
 };
 
 scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
@@ -356,18 +377,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
     this.$container.append($headerResize);
   }
 
-  // move menu
-  //Menu may only be open at this time if the user opened the menu right before the columnOrderChanged event arrives from the server
-  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
-    var left = this._tableHeaderMenu.$header.position().left;
-    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + 20);
-  }
-
-  // move to old position and then animate
-  $headers.each(function() {
-    $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
-      .animateAVCSD('left', 0);
-  });
+  this._arrangeHeaderItems($headers);
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {

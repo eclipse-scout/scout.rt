@@ -85,11 +85,11 @@
   }
 
   &.header-move::after,
-  &.menu-open::after {
+  &.selected::after {
     display: none;
   }
 
-  &.menu-open {
+  &.selected {
     border-left: 1px solid @border-color;
     border-right: 1px solid @border-color;
     background-color: @control-background-color;

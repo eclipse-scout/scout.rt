@@ -12,11 +12,6 @@
   vertical-align: -3px;
 }
 
-.menu-context {
-  #scout.drop-shadow;
-  border: 1px solid @border-color;
-}
-
 .sub-menu-icon {
   display: inline-block;
   position: relative;

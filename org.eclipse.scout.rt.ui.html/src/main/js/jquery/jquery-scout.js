@@ -173,11 +173,11 @@
 
   $.pxToNumber = function(pixel) {
     if (!pixel) {
-      // parseInt would return NaN if pixel is '' or undefined
+      // parseFloat would return NaN if pixel is '' or undefined
       return 0;
     }
-    // parseInt ignores 'px' and just extracts the number
-    return parseInt(pixel, 10);
+    // parseFloat ignores 'px' and just extracts the number
+    return parseFloat(pixel, 10);
   };
 
   // attr and class handling for svg
