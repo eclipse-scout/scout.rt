@@ -814,7 +814,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           pe = new ProcessingException(t.getMessage(), t);
         }
         if (pe.isInterruption()) {
-          setPagePopulateStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.WARNING));
+          setPagePopulateStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
         }
         else {
           String message = null;
@@ -824,7 +824,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           if (StringUtility.isNullOrEmpty(message)) {
             message = ScoutTexts.get("ErrorWhileLoadingData");
           }
-          setPagePopulateStatus(new Status(message, IStatus.WARNING));
+          setPagePopulateStatus(new Status(message, IStatus.ERROR));
         }
         throw pe;
       }

@@ -717,10 +717,10 @@ public final class BookmarkUtility {
       if (resetViewAndWarnOnFail) {
         // set appropriate warning
         if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
-          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.WARNING));
+          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.ERROR));
         }
         else {
-          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.WARNING));
+          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
         }
       }
       childPage = null;
@@ -748,7 +748,7 @@ public final class BookmarkUtility {
       }
       // set appropriate warning if child page is not available or filtered out
       if (childPage == null && resetViewAndWarnOnFail) {
-        nodePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.WARNING));
+        nodePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
       }
     }
     return childPage;
