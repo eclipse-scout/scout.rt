@@ -16,10 +16,7 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -28,9 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-@RunWith(ClientTestRunner.class)
-@RunWithSubject("default")
-@RunWithClientSession(TestEnvironmentClientSession.class)
+@RunWith(PlatformTestRunner.class)
 public class UiSessionTest {
 
   @Test

@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -339,12 +340,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
     // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
-    return JobUtility.runModelJobAndAwait("startUp jsonClientSession", clientSession, false, new Callable<JsonClientSession<?>>() {
+    return JobUtility.runInModelJobAndAwait(new Callable<JsonClientSession<?>>() {
       @Override
       public JsonClientSession<?> call() throws Exception {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
-    });
+    }, JobUtility.newModelJobInput("startUp jsonClientSession", clientSession, false), RuntimeExceptionTranslator.class);
   }
 
   protected void handleDetach(JsonStartupRequest jsonStartupRequest, HttpSession httpSession) {
@@ -359,7 +360,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected void fireDesktopOpened() {
-    JobUtility.runModelJobAndAwait("start up desktop", m_clientSession, false, Callables.callable(new IRunnable() {
+    JobUtility.runInModelJobAndAwait(Callables.callable(new IRunnable() {
       @Override
       public void run() throws Exception {
         IClientSession clientSession = ClientSessionProvider.currentSession();
@@ -372,18 +373,18 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           desktop.getUIFacade().fireGuiAttached();
         }
       }
-    }));
+    }), JobUtility.newModelJobInput("start up desktop", m_clientSession, false), RuntimeExceptionTranslator.class);
   }
 
   protected void sendInitializationEvent(String clientSessionAdapterId) {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     jsonEvent.put("clientSession", clientSessionAdapterId);
-    Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_clientSession, false, new Callable<Locale>() {
+    Locale sessionLocale = JobUtility.runInModelJobAndAwait(new Callable<Locale>() {
       @Override
       public Locale call() throws Exception {
         return m_clientSession.getLocale();
       }
-    });
+    }, JobUtility.newModelJobInput("fetch locale from model", m_clientSession, false), RuntimeExceptionTranslator.class);
     putLocaleData(jsonEvent, sessionLocale);
     m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
   }
@@ -576,12 +577,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentJsonRequest = jsonRequest;
 
       // Process events in model job
-      JobUtility.runModelJobAndAwait("event-processing", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest(), Callables.callable(new IRunnable() {
+      JobUtility.runInModelJobAndAwaitAndHandleException(Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
           processJsonRequestInternal();
         }
-      }));
+      }), JobUtility.newModelJobInput("event-processing", getClientSession(),  m_currentJsonRequest.isPollForBackgroundJobsRequest()));
 
       // Wait for any other model jobs that might have been scheduled during event processing. If there are any
       // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
@@ -589,7 +590,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
       // Convert the collected response to JSON. It is important that this is done in a
       // model job, because during toJson(), the model might be accessed.
-      JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest(), new Callable<JSONObject>() {
+      JSONObject result = JobUtility.runInModelJobAndAwait(new Callable<JSONObject>() {
         @Override
         public JSONObject call() throws Exception {
           JSONObject json = responseToJsonInternal();
@@ -599,7 +600,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           m_currentJsonResponse = createJsonResponse();
           return json;
         }
-      });
+      }, JobUtility.newModelJobInput("response-to-json", getClientSession(),  m_currentJsonRequest.isPollForBackgroundJobsRequest()), RuntimeExceptionTranslator.class);
       return result;
     }
     finally {
@@ -638,12 +639,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentHttpRequest.set(httpReq);
 
       // Process file upload in model job
-      JobUtility.runModelJobAndAwait("upload-processing", getClientSession(), false, Callables.callable(new IRunnable() {
+      JobUtility.runInModelJobAndAwaitAndHandleException(Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
           resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
         }
-      }));
+      }), JobUtility.newModelJobInput("upload-processing", getClientSession(), false));
 
       // Wait for any other model jobs that might have been scheduled during event processing. If there are any
       // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
@@ -651,17 +652,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
       // Convert the collected response to JSON. It is important that this is done in a
       // model job, because during toJson(), the model might be accessed.
-      JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), false, new Callable<JSONObject>() {
+      JSONObject result = JobUtility.runInModelJobAndAwait(new Callable<JSONObject>() {
         @Override
         public JSONObject call() throws Exception {
           JSONObject json = responseToJsonInternal();
           // Create new jsonResponse instance after JSON object has been created
           // This must happen synchronized (as it always is, in a model-job) to avoid concurrency issues
-          // FIXME AWE: (json-layer) ausprobieren, ob die currentResponse auch im Fall von einer Exception zurück gesetzt werden muss.
           m_currentJsonResponse = createJsonResponse();
           return json;
         }
-      });
+      }, JobUtility.newModelJobInput("upload-response-to-json", getClientSession(), false), RuntimeExceptionTranslator.class);
       return result;
     }
     finally {

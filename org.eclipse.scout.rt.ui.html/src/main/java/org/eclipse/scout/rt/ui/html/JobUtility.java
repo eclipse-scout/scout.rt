@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -55,47 +57,29 @@ public final class JobUtility {
   }
 
   public static boolean isPollingRequestJob(JobInput jobInput) {
-    return jobInput.getProperty(POLLING_REQUEST_HINT) != null;
+    Object pollingRequestHint = jobInput.getProperty(POLLING_REQUEST_HINT);
+    if (pollingRequestHint instanceof Boolean) {
+      return ((Boolean) pollingRequestHint).booleanValue();
+    }
+    else {
+      return false;
+    }
   }
 
   /**
-   * Runs the given job as the model thread, and blocks until the job completed or enters a blocking condition.
-   * If the calling thread is already the model thread, the job is executed directly (without scheduling a new job).
+   * Runs the given job as the model thread, and blocks until the job completed or enters a blocking condition. Does NOT
+   * catch any exception.
    *
-   * @param jobName
-   *          name to use for the model job (expect if the current thread is already the model job)
-   * @param clientSession
-   *          client session to run the job on behalf
-   * @param pollingRequest
-   *          whether the model job is started for a "polling request". Set this argument to <code>false</code> when
-   *          handling a user context. A flag is put in the job input property map and may be retrieved again using the
-   *          method {@link #isPollingRequestJob(JobInput)}. This flag is useful when listening for certain job manager
-   *          events (see {@link UiSession#UiSession()}.
    * @param callable
    *          {@link Callable} to be executed
-   * @throws UiException
-   *           in case the current thread was interrupted, or the waiting timeout elapsed, or the Future returned with a
-   *           processing exception.
+   * @param jobInput
+   *          input for the model job
+   * @param throwableTranslatorClass
+   *          exception translator class to be used
    * @return the job's result.
    */
-  public static <RESULT> RESULT runModelJobAndAwait(final String jobName, final IClientSession clientSession, final boolean pollingRequest, final Callable<RESULT> callable) {
-    // If we are already in the model thread, execute the job directly (without scheduling a new job)
-    if (ModelJobs.isModelThread(clientSession)) {
-      try {
-        return callable.call();
-      }
-      catch (Exception e) {
-        throw new UiException("Job failed [job=%s]", e, callable.getClass().getName());
-      }
-    }
-
-    ClientRunContext runContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
-
-    // Otherwise, schedule a model job and wait for it to finish
-    JobInput jobInput = ModelJobs.newInput(runContext).withName(jobName);
-    if (pollingRequest) {
-      jobInput.withProperty(POLLING_REQUEST_HINT, pollingRequest);
-    }
+  public static <RESULT, ERROR extends Throwable> RESULT runInModelJobAndAwait(final Callable<RESULT> callable, final JobInput jobInput, final Class<? extends IThrowableTranslator<ERROR>> throwableTranslatorClass) throws ERROR {
+    Assertions.assertTrue(!ModelJobs.isModelThread());
 
     final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput);
 
@@ -119,19 +103,48 @@ public final class JobUtility {
     }
 
     // Return the future's result or processing exception.
+    return future.awaitDoneAndGet(BEANS.get(throwableTranslatorClass));
+  }
+
+  /**
+   * Calls {@link #runInModelJobAndAwait(Callable, JobInput, Class)} but uses the {@link ExceptionHandler} to handle the
+   * exceptions.
+   * <p>
+   * Important: This method may only be used if a model messagebox may be displayed because the exception handler uses
+   * waitFor to wait for a button click and therefore blocks the thread. If the messagebox cannot be displayed (e.g. on
+   * session startup) nobody will release the waitFor lock.
+   */
+  public static <RESULT> RESULT runInModelJobAndAwaitAndHandleException(final Callable<RESULT> callable, final JobInput jobInput) {
     try {
-      return future.awaitDoneAndGet();
+      return runInModelJobAndAwait(callable, jobInput, ExceptionTranslator.class);
     }
-    catch (final ProcessingException e) {
+    catch (final Exception e) {
       ModelJobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
-
-      }, ModelJobs.newInput(runContext));
+      }, jobInput.withName("Handling exception"));
       return null;
     }
+  }
+
+  /**
+   * @param jobName
+   *          name to use for the model job (expect if the current thread is already the model job)
+   * @param clientSession
+   *          client session to run the job on behalf
+   * @param pollingRequest
+   *          whether the model job is started for a "polling request". Set this argument to <code>false</code> when
+   *          handling a user context. A flag is put in the job input property map and may be retrieved again using the
+   *          method {@link #isPollingRequestJob(JobInput)}. This flag is useful when listening for certain job manager
+   *          events (see {@link UiSession#UiSession()}.
+   */
+  public static JobInput newModelJobInput(final String jobName, final IClientSession clientSession, final boolean pollingRequest) {
+    ClientRunContext runContext = ClientRunContexts.copyCurrent()
+        .withSession(clientSession, true)
+        .withProperty(POLLING_REQUEST_HINT, pollingRequest);
+    return ModelJobs.newInput(runContext).withName(jobName);
   }
 }
