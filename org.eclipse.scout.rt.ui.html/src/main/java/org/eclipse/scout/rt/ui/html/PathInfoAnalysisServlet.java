@@ -87,7 +87,7 @@ public class PathInfoAnalysisServlet extends HttpServlet {
     resp.getOutputStream().println("RequestURL: '" + req.getRequestURL() + "'<br/>");
     resp.getOutputStream().println("ServletContext.ContextPath: '" + getServletContext().getContextPath() + "'<br/>");
     resp.getOutputStream().println("PathInfo: '" + pathInfo + "'<br/>");
-    resp.getOutputStream().println("res/logo.jpg: <img src=\"res/logo.jpg\">");
+    resp.getOutputStream().println("ui/res/logo.jpg: <img src=\"ui/res/logo.jpg\">");
     resp.getOutputStream().println("</body>");
     resp.getOutputStream().println("</html>");
   }

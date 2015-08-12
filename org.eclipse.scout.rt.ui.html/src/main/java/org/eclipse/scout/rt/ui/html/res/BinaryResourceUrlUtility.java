@@ -74,7 +74,7 @@ public class BinaryResourceUrlUtility {
     }
     IconSpec iconSpec = IconLocator.instance().getIconSpec(iconId);
     if (iconSpec != null) {
-      return "icon/" + iconSpec.getName(); // includes file extension
+      return "ui/icon/" + iconSpec.getName(); // includes file extension
     }
     LOG.warn("iconId '" + iconId + "' could not be resolved");
     return null; // may happen, when no icon is available for the requested iconName
@@ -123,7 +123,7 @@ public class BinaryResourceUrlUtility {
     encodedFilename = encodedFilename.replace("%2F", "/");
 
     // do not change this dynamic resource url format without updating the recognition pattern (@see in JavaDoc)
-    return "dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + encodedFilename;
+    return "ui/dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + encodedFilename;
   }
 
   /**
