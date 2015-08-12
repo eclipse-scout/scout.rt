@@ -14,10 +14,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$contentContainer = $parent.appendDiv('chart-container');
 
   // scrollbars
-  //scout.scrollbars.install(this.$contentContainer, this.session);
-  //this.session.detachHelper.pushScrollable(this.$contentContainer);
-  //this._gridScrollHandler = this._onGridScroll.bind(this);
-  //this.$grid.on('scroll', this._gridScrollHandler);
+  scout.scrollbars.install(this.$contentContainer, this.session, {axis: 'x'});
 
   // group functions for dates
   var dateGroup = [
@@ -94,7 +91,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   var matrix = new scout.ChartTableControlMatrix(this.table, this.session),
     columnCount = matrix.columnCount(),
     comp = function(a, b) {
-      return Math.abs(a[1] - 9) - Math.abs(b[1] - 9);
+      return Math.abs(a[1] - 8) - Math.abs(b[1] - 8);
     };
 
   columnCount.sort(comp);
@@ -260,11 +257,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var $chart = $('.selected', $chartSelect);
 
     // remove axis and chart
-    $chartMain.children('.main-axis, .main-axis-x, .main-axis-y')
-      .animateSVG('opacity', 0, 200, $.removeThis);
     if (removeChart) {
       removeChart();
     }
+    $chartMain.children('.main-axis, .main-axis-x, .main-axis-y')
+      .animateSVG('opacity', 0, 250, $.removeThis);
 
     // find xAxis and dataAxis
     var axis = $('.selected', $xAxisSelect).data('column'),
@@ -317,7 +314,20 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       $('.select-axis', $yAxisSelect).addClass('axis-up');
       drawScatter(xAxis, yAxis, dataAxis, cube);
     }
+
+    // update
+    $chartMain.children().promise().done(updateWidth);
+
     return false;
+  }
+
+  function updateWidth () {
+    // adapt size of svg
+    var box = $chartMain[0].getBBox();
+    $chartMain.css('width', box.x + box.width);
+
+    // update scrollbar
+    scout.scrollbars.update(that.$contentContainer);
   }
 
   function drawBar(xAxis, dataAxis, cube) {
@@ -383,7 +393,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     removeChart = function() {
       $chartMain.children('.main-chart')
         .animateSVG('height', 0, 200)
-        .animateSVG('y', y(0), 200, $.removeThis);
+        .animateSVG('y', y(0), 200, $.removeThis );
     };
   }
 
@@ -859,7 +869,16 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 };
 
+scout.ChartTableControl.prototype.onResize = function() {
+  // update scrollbar
+  if (this.$contentContainer && this.$contentContainer.length) {
+    scout.scrollbars.update(this.$contentContainer);
+  }
+};
+
+
 scout.ChartTableControl.prototype._removeContent = function() {
+  scout.scrollbars.uninstall(this.$contentContainer, this.session);
   this.$contentContainer.remove();
   this.table.events.removeListener(this._filterResetListener);
 };

@@ -220,7 +220,9 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
       }
     };
     keyAxis.reorder = function() {
-      keyAxis.sort(function(a, b){ return (a === null ? 1 : keyAxis.format(a) > keyAxis.format(b)); });
+      keyAxis.sort(function(a, b){
+          return a === null ? 1 : (keyAxis.format(a) < keyAxis.format(b) ? -1 : 1);
+        });
     };
   }
 
