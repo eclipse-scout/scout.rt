@@ -385,7 +385,11 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
     $node.addClass('expanded');
   } else {
     $node.removeClass('expanded');
-    delete node.$showAllNode;
+
+    if (node.$showAllNode) {
+      node.$showAllNode.remove();
+      delete node.$showAllNode;
+    }
 
     // animated closing
     if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
@@ -896,8 +900,8 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     // If parent is expanded and has not already a $showAllNode, create one
     if (parentNode && parentNode.expanded && !parentNode.$showAllNode) {
       var $showAllNode = this._$buildShowAllNode(parentNode);
-      $showAllNode.insertAfter($predecessor);
-      $predecessor = $showAllNode;
+      parentNode.$node.append($showAllNode);
+      //$predecessor = $showAllNode;
     } else {
       // Node already exists, just update the text (node count might have changed)
       this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
@@ -945,8 +949,6 @@ scout.Tree.prototype._$buildShowAllNode = function(parentNode) {
     .css('padding-left', this._computeTreeItemPaddingLeft(currentLevel));
 
   this._decorateShowAllNode($node, parentNode);
-  // TreeItemControl
-  var $control = $node.prependDiv('tree-node-control');
 
   // Link to parent node
   $node.data('parentNode', parentNode);
@@ -994,7 +996,8 @@ scout.Tree.prototype._decorateNode = function(node) {
 
 scout.Tree.prototype._decorateShowAllNode = function($showAllNode, parentNode) {
   $showAllNode
-    .text(this.session.text('ui.ShowAllNodes', parentNode.childNodes.length));
+    //.text(this.session.text('ui.ShowAllNodes', parentNode.childNodes.length));
+    .text('+' + parentNode.childNodes.length);
 };
 
 scout.Tree.prototype._renderNodeChecked = function(node) {
@@ -1180,12 +1183,6 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   }
 
   var $node = $(event.currentTarget).parent();
-
-  // Handle "show all" dummy node
-  if ($node.hasClass('show-all')) {
-    this._showAllNodes($node);
-    return false;
-  }
 
   var node = $node.data('node'),
     expanded = !$node.hasClass('expanded');
