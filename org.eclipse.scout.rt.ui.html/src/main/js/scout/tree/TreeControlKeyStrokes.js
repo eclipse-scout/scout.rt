@@ -57,6 +57,10 @@ scout.TreeControlKeyStrokes.prototype.handle = function(event) {
     } else if (currentNode.childNodes.length > 0) {
       newNodeSelection = currentNode.childNodes[0];
     }
+  } else if (currentNode && keycode === scout.keys.HOME) {
+    this._field.collapseAll();
+    $targetNode = this._field.$nodes().first();
+    newNodeSelection = $targetNode.data('node');
   }
 
   if (newNodeSelection) {
@@ -95,6 +99,10 @@ scout.TreeControlKeyStrokes.prototype._drawKeyBox = function($container, drawedK
   } else if (currentNode && !currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
     scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '+', $currentNode, this.ctrl, this.alt, this.shift, true);
   }
+  if ($downNode.length && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.HOME)) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(offset, 'Home', this._field.$data, this.ctrl, this.alt, this.shift, false);
+  }
+
 };
 
 /**
@@ -109,6 +117,6 @@ scout.TreeControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container, 
  */
 scout.TreeControlKeyStrokes.prototype.accept = function(event) {
   return event &&
-    $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.ADD, scout.keys.SUBTRACT, scout.keys.SPACE]) >= 0 &&
+    $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.ADD, scout.keys.SUBTRACT, scout.keys.SPACE, scout.keys.HOME]) >= 0 &&
     event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift;
 };

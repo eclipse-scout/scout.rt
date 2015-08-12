@@ -320,6 +320,8 @@ scout.Tree.prototype.collapseAll = function() {
   this._visitNodes(this.nodes, function(node) {
     this.setNodeExpanded(node, false);
   }.bind(this));
+
+
 };
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, forceRenderExpansion) {

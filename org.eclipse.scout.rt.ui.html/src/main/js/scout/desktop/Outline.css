@@ -20,6 +20,11 @@
     margin-right: 6px;
   }
 
+  & > .key-box {
+    top: 7px !important;
+  }
+
+
   & > .tree-node,
   & > .animationWrapper > .tree-node {
     #scout.font-text-plus();
@@ -154,3 +159,4 @@
     display: none;
   }
 }
+

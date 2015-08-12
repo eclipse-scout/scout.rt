@@ -161,5 +161,10 @@
 /* key handling */
 
 .tree-node .key-box {
-  top: calc(~'50%' - 8px);
+  top: calc(~'50%' - 9px);
+}
+
+.tree > .tree-data > .key-box {
+  top: 6px;
+  left: 4px !important;
 }
