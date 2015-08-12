@@ -43,7 +43,7 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$infoTableStatus = this._$controlInfo
     .appendDiv('table-info-status')
     .on('mousedown', this._onStatusMousedown.bind(this));
-  $('<span>')
+  this._$infoTableStatusIcon = $('<span>')
     .addClass('font-icon icon')
     .appendTo(this._$infoTableStatus);
 
@@ -100,6 +100,11 @@ scout.TableFooter.prototype._render = function($parent) {
   }.bind(this));
 
   this._installKeyStrokeAdapter();
+};
+
+scout.TableFooter.prototype._remove = function() {
+  scout.TableFooter.parent.prototype._remove.call(this);
+  this._hideTableStatusTooltip();
 };
 
 scout.TableFooter.prototype._installKeyStrokeAdapter = function() {
@@ -201,8 +206,12 @@ scout.TableFooter.prototype._updateInfoTableStatus = function() {
   var $info = this._$infoTableStatus;
   var tableStatus = this._table.tableStatus;
   if (tableStatus) {
-    var hasError = (tableStatus.severity > scout.status.Severity.WARNING);
-    $info.toggleClass('has-error', hasError);
+    var isInfo = (tableStatus.severity > scout.status.Severity.OK);
+    var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
+    var isError = (tableStatus.severity > scout.status.Severity.WARNING);
+    $info.toggleClass('has-error', isError);
+    $info.toggleClass('has-warning', isWarning && !isError);
+    $info.toggleClass('has-info', isInfo && !isWarning && !isError);
   }
 };
 
@@ -217,20 +226,19 @@ scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
 };
 
 scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
-  var tableStatusVisible = (this._table.tableStatusVisible && this._table.multiSelect);
-  this._setInfoVisible(this._$infoSelection, tableStatusVisible);
+  var visible = (this._table.tableStatusVisible && this._table.multiSelect);
+  this._setInfoVisible(this._$infoSelection, visible);
 };
 
 scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
-  var visible = (this._table.tableStatus);
+  var visible = (this._table.tableStatusVisible && this._table.tableStatus);
   if (visible) {
-    // If footer is already rendered, automatically show the popup after the
-    // "info visible" animation has finished. For example, the property rendered
-    // is 'false' if the page is reloaded or the user changes the outlines. In
-    // those cases, we don't want the tooltip to show automatically, because
-    // that would disturb the user.
+    // If the uiState of the tableStatus was not yet manually changed, or the user
+    // explicitly activated it (relevant when changing pages), show the tooltip
+    // when the "info visible" animation has finished. Otherwise, we don't show
+    // the tooltip to not disturb the user.
     var complete = null;
-    if (this.rendered) {
+    if (!this._table.tableStatus.uiState || this._table.tableStatus.uiState === 'user-shown') {
       complete = function() {
         this._showTableStatusTooltip();
       }.bind(this);
@@ -367,21 +375,28 @@ scout.TableFooter.prototype.onResize = function() {
 scout.TableFooter.prototype._onStatusMousedown = function(event) {
   // Toggle tooltip
   if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    this._table.tableStatus.uiState = 'user-hidden';
     this._hideTableStatusTooltip();
   } else {
+    this._table.tableStatus.uiState = 'user-shown';
     this._showTableStatusTooltip();
   }
+  $.suppressEvent(event);
 };
 
 scout.TableFooter.prototype._hideTableStatusTooltip = function() {
+  clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
   if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
     this._tableStatusTooltip.remove();
     this._tableStatusTooltip = null;
   }
 };
 
-scout.TableFooter.prototype._showTableStatusTooltip = function(options) {
-  options = options || {};
+scout.TableFooter.prototype._showTableStatusTooltip = function() {
+  // Remove existing tooltip (might have the wrong css class)
+  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+    this._tableStatusTooltip.remove();
+  }
 
   var tableStatus = this._table.tableStatus;
   var text = (tableStatus ? tableStatus.message : null);
@@ -389,30 +404,28 @@ scout.TableFooter.prototype._showTableStatusTooltip = function(options) {
     return; // Refuse to show empty tooltip
   }
 
-  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
-    // update existing tooltip
-    this._tableStatusTooltip.renderText(text);
-  } else {
-    var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
-    var isError = (tableStatus.severity > scout.status.Severity.WARNING);
+  var isInfo = (tableStatus.severity > scout.status.Severity.OK);
+  var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
+  var isError = (tableStatus.severity > scout.status.Severity.WARNING);
 
-    // create new tooltip
-    var opts = {
-      text: text,
-      cssClass: (isError ? 'tooltip-error' : ''),
-      autoRemove: !isError,
-      $anchor: this._$infoTableStatus
-    };
-    $.extend(opts, options);
-    this._tableStatusTooltip = new scout.Tooltip(this.session, opts);
-    this._tableStatusTooltip.render();
+  // Create new tooltip
+  var opts = {
+    text: text,
+    cssClass: (isError ? 'tooltip-error' : (isWarning ? 'tooltip-warning' : (isInfo ? 'tooltip-info' : ''))),
+    autoRemove: (!isError),
+    $anchor: this._$infoTableStatusIcon
+  };
+  this._tableStatusTooltip = new scout.Tooltip(this.session, opts);
+  this._tableStatusTooltip.render();
 
-    // Auto-hide unimportant messages
-    if (!isWarning) {
-      setTimeout(function() {
-        this._hideTableStatusTooltip();
-      }.bind(this), 5000);
-    }
+  // Auto-hide unimportant messages
+  clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
+  if (!isError && !this._table.tableStatus.uiState) {
+    // Remember auto-hidden, in case the user changes outline before timeout elapses
+    this._table.tableStatus.uiState = 'auto-hidden';
+    this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {
+      this._hideTableStatusTooltip();
+    }.bind(this), 5000);
   }
 };
 

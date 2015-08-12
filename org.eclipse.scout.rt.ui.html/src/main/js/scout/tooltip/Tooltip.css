@@ -62,3 +62,31 @@
     background-color: @error-background-color;
   }
 }
+
+.tooltip-warning {
+  background-color: @palette-blue-0;
+  border-color: @palette-blue-3;
+
+  & .tooltip-arrow {
+    background-color: @palette-blue-0;
+    border-color: @palette-blue-3;
+  }
+
+  & .tooltip-content {
+    background-color: @palette-blue-0;
+  }
+}
+
+.tooltip-info {
+  background-color: @palette-gray-2;
+  border-color: @palette-gray-4;
+
+  & .tooltip-arrow {
+    background-color: @palette-gray-2;
+    border-color: @palette-gray-4;
+  }
+
+  & .tooltip-content {
+    background-color: @palette-gray-2;
+  }
+}

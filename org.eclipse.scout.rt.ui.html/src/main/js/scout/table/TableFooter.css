@@ -45,7 +45,6 @@
     position: absolute;
     top: 0px;
     left: 0px;
-    // right: 4px;
 
     &::after {
       height: 0px;
@@ -141,8 +140,14 @@
   padding-top: 0;
   line-height: @table-footer-height;
 
+  /* normal */
+
   & > .font-icon {
     display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+    padding-top: 8px; /* controls distance to tooltip */
+    padding-bottom: 11px; /* larger than padding-top, to move icon to optical middle */
 
     &::before {
       content: @icon-info;
@@ -155,16 +160,32 @@
     color: @hover-color;
   }
 
+  /* error */
+
   &.has-error > .font-icon {
     color: @error-color;
-    #scout.animation(attention 5s linear infinite);
 
     &::before {
+      #scout.animation(attention 5s linear infinite);
       content: @icon-error;
     }
   }
 
   &.has-error:hover > .font-icon {
     color: @palette-red-4;
+  }
+
+  /* warning */
+
+  &.has-warning > .font-icon {
+    color: @palette-blue-35;
+
+    &::before {
+      content: @icon-error;
+    }
+  }
+
+  &.has-warning:hover > .font-icon {
+    color: @palette-blue-4;
   }
 }
