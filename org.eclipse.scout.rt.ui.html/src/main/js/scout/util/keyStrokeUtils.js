@@ -11,7 +11,7 @@ scout.keyStrokeUtils.disableBrowserKeyStrokes = function($entryPoint) {
   // Prevent browser to interpret F1 (help).
   $entryPoint.keydown(swallowHelpKeyStroke);
   $entryPoint.keyup(swallowHelpKeyStroke);
-  if (window.onhelp) {
+  if ('onhelp' in window) {
     window.onhelp = scout.filters.returnFalse;
   }
 
