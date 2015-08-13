@@ -33,36 +33,40 @@ scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
   this.$commands.empty();
 
   this.$commands.appendDiv('planner-today').on('click', this._onTodayClick.bind(this));
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.DAY) > -1) {
-    this.$commands.appendDiv('planner-mode-day planner-mode', this.session.text('ui.CalendarDay'))
-      .attr('data-mode', DISPLAY_MODE.DAY)
-      .on('click', this._onDisplayModeClick.bind(this));
+
+  if (this.availableDisplayModes.length > 1) {
+    if (this.availableDisplayModes.indexOf(DISPLAY_MODE.DAY) > -1) {
+      this.$commands.appendDiv('planner-mode-day planner-mode', this.session.text('ui.CalendarDay'))
+        .attr('data-mode', DISPLAY_MODE.DAY)
+        .on('click', this._onDisplayModeClick.bind(this));
+    }
+    if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WORK) > -1) {
+      this.$commands.appendDiv('planner-mode-work planner-mode', this.session.text('ui.CalendarWork'))
+        .attr('data-mode', DISPLAY_MODE.WORK)
+        .on('click', this._onDisplayModeClick.bind(this));
+    }
+    if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WEEK) > -1) {
+      this.$commands.appendDiv('planner-mode-week planner-mode', this.session.text('ui.CalendarWeek'))
+        .attr('data-mode', DISPLAY_MODE.WEEK)
+        .on('click', this._onDisplayModeClick.bind(this));
+    }
+    if (this.availableDisplayModes.indexOf(DISPLAY_MODE.MONTH) > -1) {
+      this.$commands.appendDiv('planner-mode-month planner-mode', this.session.text('ui.CalendarMonth'))
+        .attr('data-mode', DISPLAY_MODE.MONTH)
+        .on('click', this._onDisplayModeClick.bind(this));
+    }
+    if (this.availableDisplayModes.indexOf(DISPLAY_MODE.CALENDAR_WEEK) > -1) {
+      this.$commands.appendDiv('planner-mode-cw planner-mode', this.session.text('ui.CalendarCalendarWeek'))
+        .attr('data-mode', DISPLAY_MODE.CALENDAR_WEEK)
+        .on('click', this._onDisplayModeClick.bind(this));
+    }
+    if (this.availableDisplayModes.indexOf(DISPLAY_MODE.YEAR) > -1) {
+      this.$commands.appendDiv('planner-mode-year planner-mode', this.session.text('ui.CalendarYear'))
+        .attr('data-mode', DISPLAY_MODE.YEAR)
+        .on('click', this._onDisplayModeClick.bind(this));
+    }
   }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WORK) > -1) {
-    this.$commands.appendDiv('planner-mode-work planner-mode', this.session.text('ui.CalendarWork'))
-      .attr('data-mode', DISPLAY_MODE.WORK)
-      .on('click', this._onDisplayModeClick.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.WEEK) > -1) {
-    this.$commands.appendDiv('planner-mode-week planner-mode', this.session.text('ui.CalendarWeek'))
-      .attr('data-mode', DISPLAY_MODE.WEEK)
-      .on('click', this._onDisplayModeClick.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.MONTH) > -1) {
-    this.$commands.appendDiv('planner-mode-month planner-mode', this.session.text('ui.CalendarMonth'))
-      .attr('data-mode', DISPLAY_MODE.MONTH)
-      .on('click', this._onDisplayModeClick.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.CALENDAR_WEEK) > -1) {
-    this.$commands.appendDiv('planner-mode-cw planner-mode', this.session.text('ui.CalendarCalendarWeek'))
-      .attr('data-mode', DISPLAY_MODE.CALENDAR_WEEK)
-      .on('click', this._onDisplayModeClick.bind(this));
-  }
-  if (this.availableDisplayModes.indexOf(DISPLAY_MODE.YEAR) > -1) {
-    this.$commands.appendDiv('planner-mode-year planner-mode', this.session.text('ui.CalendarYear'))
-      .attr('data-mode', DISPLAY_MODE.YEAR)
-      .on('click', this._onDisplayModeClick.bind(this));
-  }
+
   this.$commands.children('.planner-mode').last().addClass('last'); // draw right border
   this.$commands.appendDiv('planner-toggle-year').on('click', this._onYearClick.bind(this));
 };
