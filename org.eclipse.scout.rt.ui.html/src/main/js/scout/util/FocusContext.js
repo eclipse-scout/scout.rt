@@ -9,11 +9,11 @@ scout.FocusContext = function($container, focusManager) {
   this._focusedField = null;
 
   // Notice: Any listener is installed on $container and not on $field level, except 'remove' listener because does not bubble.
-  this._keyDownListener = this._onKeyDownEvent.bind(this);
-  this._focusInListener = this._onFocusInEvent.bind(this);
-  this._focusOutListener = this._onFocusOutEvent.bind(this);
-  this._hideListener = this._onHideEvent.bind(this);
-  this._removeListener = this._onRemoveEvent.bind(this);
+  this._keyDownListener = this._onKeyDown.bind(this);
+  this._focusInListener = this._onFocusIn.bind(this);
+  this._focusOutListener = this._onFocusOut.bind(this);
+  this._hideListener = this._onHide.bind(this);
+  this._removeListener = this._onRemove.bind(this);
 
   this.$container
     .on('keydown', this._keyDownListener)
@@ -34,7 +34,7 @@ scout.FocusContext.prototype._dispose = function() {
 /**
  * Method invoked once a 'keydown' event is fired to control proper tab cycle.
  */
-scout.FocusContext.prototype._onKeyDownEvent = function(event) {
+scout.FocusContext.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
     var activeElement = document.activeElement,
         $focusableElements = this.$container.find(':tabbable'),
@@ -63,7 +63,7 @@ scout.FocusContext.prototype._onKeyDownEvent = function(event) {
 /**
  * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
  */
-scout.FocusContext.prototype._onFocusInEvent = function(event) {
+scout.FocusContext.prototype._onFocusIn = function(event) {
   $(event.target).on('remove', this._removeListener);
   this._focusedField = event.target;
 
@@ -83,7 +83,7 @@ scout.FocusContext.prototype._onFocusInEvent = function(event) {
 /**
  * Method invoked once a 'focusout' event is fired by this context's $container or one of its child controls.
  */
-scout.FocusContext.prototype._onFocusOutEvent = function(event) {
+scout.FocusContext.prototype._onFocusOut = function(event) {
   $(event.target).off('remove', this._removeListener);
   this._focusedField = null;
 
@@ -94,7 +94,7 @@ scout.FocusContext.prototype._onFocusOutEvent = function(event) {
 /**
  * Method invoked once a child element of this context's $container is removed.
  */
-scout.FocusContext.prototype._onRemoveEvent = function(event) {
+scout.FocusContext.prototype._onRemove = function(event) {
   // This listener is installed on the focused element only.
 
   this._validateAndSetFocus(null, scout.filters.notSameFilter(event.target));
@@ -105,7 +105,7 @@ scout.FocusContext.prototype._onRemoveEvent = function(event) {
 /**
  * Method invoked once a child element of this context's $container is hidden.
  */
-scout.FocusContext.prototype._onHideEvent = function(event) {
+scout.FocusContext.prototype._onHide = function(event) {
   if ($(event.target).isOrHas(this._lastValidFocusedElement)) {
     this._validateAndSetFocus(null, scout.filters.notSameFilter(event.target));
 
