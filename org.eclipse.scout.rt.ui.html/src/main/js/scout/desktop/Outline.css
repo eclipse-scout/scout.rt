@@ -38,7 +38,8 @@
     padding-bottom: 8px;
 
     &.parent {
-      #scout.font-text-plus(@bold);
+      /*nicer?, let's try*/
+      /*#scout.font-text-plus(@bold);*/
     }
 
     &.group {
