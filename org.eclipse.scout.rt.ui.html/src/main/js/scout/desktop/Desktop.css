@@ -130,15 +130,26 @@
   top: 0px;
   right: 0px;
   height: @desktop-taskbar-height;
-  border-bottom: 1px solid @border-color;
   overflow: hidden;
+
+  /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
+  /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
+  &::before {
+    content: '';
+    background-color: @border-color;
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    top: @desktop-taskbar-height - 1px;
+    left: 0;
+  }
 }
 
 /* taskbar: view-tabs */
 
 .desktop-view-tabs {
   position: absolute;
-  vertical-align:top;
+  vertical-align: top;
 
   & > .overflow-tab-item {
     border-right: 1px solid @border-color;
