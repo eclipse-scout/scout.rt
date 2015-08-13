@@ -37,19 +37,5 @@
       <artifactId>jetty-plus</artifactId>
       <version>9.2.10.v20150310</version>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>apache-jsp</artifactId>
-      <version>9.2.12.M0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>apache-jstl</artifactId>
-      <version>9.2.12.M0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.commons</artifactId>
-    </dependency>
   </dependencies>
 </project>

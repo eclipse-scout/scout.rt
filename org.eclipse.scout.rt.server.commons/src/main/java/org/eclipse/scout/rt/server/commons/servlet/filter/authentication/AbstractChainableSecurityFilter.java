@@ -53,7 +53,6 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  *        TODO imo remove in 6.0
  */
 public abstract class AbstractChainableSecurityFilter implements Filter {
-
   public static final String PROP_SUBJECT = Subject.class.getName();
 
   public static final int STATUS_CONTINUE_CHAIN = 1;
@@ -218,13 +217,6 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
 
   public boolean isFailover() {
     return m_failover;
-  }
-
-  /**
-   * @return servletPath + pathInfo
-   */
-  public String getPath(HttpServletRequest req) {
-    return StringUtility.emptyIfNull(req.getServletPath()) + StringUtility.emptyIfNull(req.getPathInfo());
   }
 
 }
