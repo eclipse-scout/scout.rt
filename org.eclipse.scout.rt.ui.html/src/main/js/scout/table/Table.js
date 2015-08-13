@@ -1191,7 +1191,7 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
   if (!update) {
     $sumRow
       .hide()
-      .slideDown();
+      .slideDown(300, this.updateScrollbars.bind(this));
   }
 };
 
