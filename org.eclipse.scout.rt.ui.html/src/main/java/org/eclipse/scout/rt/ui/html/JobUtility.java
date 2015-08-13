@@ -13,6 +13,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
@@ -56,30 +57,29 @@ public final class JobUtility {
     }
   }
 
-  public static boolean isPollingRequestJob(JobInput jobInput) {
-    Object pollingRequestHint = jobInput.getProperty(POLLING_REQUEST_HINT);
-    if (pollingRequestHint instanceof Boolean) {
-      return ((Boolean) pollingRequestHint).booleanValue();
-    }
-    else {
-      return false;
-    }
+  /**
+   * Returns whether the given {@link RunContext} represents a polling request.
+   */
+  public static boolean isPollingRequest(RunContext runContext) {
+    Object pollingRequestHint = runContext.getProperty(POLLING_REQUEST_HINT);
+    return pollingRequestHint instanceof Boolean && ((Boolean) pollingRequestHint).booleanValue();
   }
 
   /**
-   * Runs the given job as the model thread, and blocks until the job completed or enters a blocking condition. Does NOT
-   * catch any exception.
+   * Runs the given job as model job, and blocks until the job completed (done or cancelled), or enters a blocking
+   * condition. Any exception thrown is translated by the given {@link IThrowableTranslator} and propagated to the
+   * caller.
    *
    * @param callable
-   *          {@link Callable} to be executed
+   *          {@link Callable} to be run.
    * @param jobInput
-   *          input for the model job
+   *          input to run the model job.
    * @param throwableTranslatorClass
-   *          exception translator class to be used
+   *          translator to be used to translate any thrown exception.
    * @return the job's result.
    */
-  public static <RESULT, ERROR extends Throwable> RESULT runInModelJobAndAwait(final Callable<RESULT> callable, final JobInput jobInput, final Class<? extends IThrowableTranslator<ERROR>> throwableTranslatorClass) throws ERROR {
-    Assertions.assertTrue(!ModelJobs.isModelThread());
+  public static <RESULT, ERROR extends Throwable> RESULT runAsModelJob(final Callable<RESULT> callable, final JobInput jobInput, final Class<? extends IThrowableTranslator<ERROR>> throwableTranslatorClass) throws ERROR {
+    Assertions.assertTrue(!ModelJobs.isModelThread(), "must not be invoked in model thread");
 
     final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput);
 
@@ -107,16 +107,16 @@ public final class JobUtility {
   }
 
   /**
-   * Calls {@link #runInModelJobAndAwait(Callable, JobInput, Class)} but uses the {@link ExceptionHandler} to handle the
-   * exceptions.
+   * Calls {@link #runAsModelJob(Callable, JobInput, Class)} but uses an {@link ExceptionHandler} to handle any thrown
+   * exception.
    * <p>
    * Important: This method may only be used if a model messagebox may be displayed because the exception handler uses
    * waitFor to wait for a button click and therefore blocks the thread. If the messagebox cannot be displayed (e.g. on
    * session startup) nobody will release the waitFor lock.
    */
-  public static <RESULT> RESULT runInModelJobAndAwaitAndHandleException(final Callable<RESULT> callable, final JobInput jobInput) {
+  public static <RESULT> RESULT runAsModelJobAndHandleException(final Callable<RESULT> callable, final JobInput jobInput) {
     try {
-      return runInModelJobAndAwait(callable, jobInput, ExceptionTranslator.class);
+      return runAsModelJob(callable, jobInput, ExceptionTranslator.class);
     }
     catch (final Exception e) {
       ModelJobs.schedule(new IRunnable() {
@@ -131,6 +131,8 @@ public final class JobUtility {
   }
 
   /**
+   * Creates the {@link JobInput} to be used to run model jobs.
+   *
    * @param jobName
    *          name to use for the model job (expect if the current thread is already the model job)
    * @param clientSession
