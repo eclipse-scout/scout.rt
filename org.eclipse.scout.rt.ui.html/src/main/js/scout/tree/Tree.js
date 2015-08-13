@@ -1291,6 +1291,10 @@ scout.Tree.prototype._updateItemPath = function() {
   while ($node.length > 0) {
     var k = parseFloat($node.attr('data-level'));
     if (k < level) {
+     if ($node.data('node').nodeType == 'table') {
+       break;
+     }
+
       $node.addClass('parent');
       $ultimate = $node;
       level = k;
@@ -1301,9 +1305,12 @@ scout.Tree.prototype._updateItemPath = function() {
     $node = $node.prev();
   }
 
+  $.l($ultimate);
+
   // find group with same ultimate parent
   $ultimate = $ultimate || $selectedNodes;
   $node = $ultimate;
+  level = $ultimate.attr('data-level');
   while ($node.length > 0) {
     $node.addClass('group');
     if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
@@ -1316,7 +1323,7 @@ scout.Tree.prototype._updateItemPath = function() {
     }
 
     var m = parseFloat($node.attr('data-level'));
-    if (m === 0 && $node[0] !== $ultimate[0]) {
+    if (m <= level) {
       break;
     }
   }
