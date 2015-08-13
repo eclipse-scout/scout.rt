@@ -131,6 +131,7 @@
   right: 0px;
   height: @desktop-taskbar-height;
   border-bottom: 1px solid @border-color;
+  overflow: hidden;
 }
 
 /* taskbar: view-tabs */
