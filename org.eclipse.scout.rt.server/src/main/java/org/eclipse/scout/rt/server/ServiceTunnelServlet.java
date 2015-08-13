@@ -91,7 +91,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.withUserAgent(UserAgent.createDefault());
           serverRunContext.withProperty(SESSION_ID, UUID.randomUUID().toString());
-          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
+          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
           invokeAdminService(serverRunContext);
         }
@@ -135,7 +135,7 @@ public class ServiceTunnelServlet extends HttpServlet {
             serverRunContext.withTransactionalClientNotificationCollector(transactionalClientNotificationCollector);
             serverRunContext.withNotificationNodeId(serviceRequest.getClientNotificationNodeId());
             serverRunContext.withProperty(SESSION_ID, serviceRequest.getSessionId());
-            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()), true);
+            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
             IServerSession session = serverRunContext.getSession();
             long requestSequence = serviceRequest.getRequestSequence();

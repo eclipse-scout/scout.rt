@@ -12,11 +12,8 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.Map;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 
 /**
@@ -56,18 +53,6 @@ public interface ISession {
   Object getData(String key);
 
   void setData(String key, Object value);
-
-  /**
-   * Consumers can query for the {@link Subject} of a {@link IClientSession}
-   * <p>
-   * The {@link IServiceTunnel} used by {@link IClientSession#getServiceTunnel()} checks for the Subject under which the
-   * session is running and creates a WSSE security element.
-   * <p>
-   * The subject is set when this object is created from {@link Subject#getSubject(java.security.AccessControlContext)}
-   */
-  Subject getSubject();
-
-  void setSubject(Subject subject);
 
   /**
    * Registers the given listener to be notified about session state changes. Typically, a listener is installed in

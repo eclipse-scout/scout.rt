@@ -27,7 +27,7 @@ public class ServerJobInputValidatorTest {
 
   @Test
   public void test1() {
-    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(mock(IServerSession.class), true)));
+    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(mock(IServerSession.class))));
     assertTrue(true);
   }
 
@@ -48,6 +48,6 @@ public class ServerJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testNullServerSession2() {
-    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(null, true)));
+    new ServerJobInputValidator().validate(new JobInput().withRunContext(ServerRunContexts.empty().withSession(null)));
   }
 }

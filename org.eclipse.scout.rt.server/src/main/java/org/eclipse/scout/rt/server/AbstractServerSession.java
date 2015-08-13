@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -66,7 +64,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private transient Object m_attributesLock;
   private final SharedVariableMap m_sharedVariableMap;
   private transient ScoutTexts m_scoutTexts;
-  private Subject m_subject;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
@@ -234,16 +231,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   @ConfigOperation
   @Order(10)
   protected void execLoadSession() throws ProcessingException {
-  }
-
-  @Override
-  public Subject getSubject() {
-    return m_subject;
-  }
-
-  @Override
-  public void setSubject(Subject subject) {
-    m_subject = subject;
   }
 
   @Override

@@ -51,7 +51,7 @@ public class SchedulerTest {
 
     m_runContext = ServerRunContexts.empty();
     m_runContext.withSubject(subject);
-    m_runContext.withSession(BEANS.get(ServerSessionProvider.class).provide(m_runContext.copy()), true);
+    m_runContext.withSession(BEANS.get(ServerSessionProvider.class).provide(m_runContext.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
 

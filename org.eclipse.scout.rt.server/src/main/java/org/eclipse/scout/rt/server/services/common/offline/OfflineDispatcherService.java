@@ -44,7 +44,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       serverRunContext.withLocale(serviceRequest.getLocale());
       serverRunContext.withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
       serverRunContext.withRunMonitor(runMonitor);
-      serverRunContext.withSession(provideServerSession(serverRunContext.copy()), true);
+      serverRunContext.withSession(provideServerSession(serverRunContext.copy()));
 
       IServerSession session = serverRunContext.getSession();
       long requestId = serviceRequest.getRequestSequence();

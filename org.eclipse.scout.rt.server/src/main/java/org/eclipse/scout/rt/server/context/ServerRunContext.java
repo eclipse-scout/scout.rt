@@ -134,17 +134,9 @@ public class ServerRunContext extends RunContext {
 
   /**
    * Sets the session.
-   *
-   * @param applySessionProperties
-   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}.
    */
-  public ServerRunContext withSession(final IServerSession session, final boolean applySessionProperties) {
+  public ServerRunContext withSession(final IServerSession session) {
     m_session = session;
-
-    if (applySessionProperties) {
-      m_subject = (session != null ? session.getSubject() : null);
-    }
-
     return this;
   }
 

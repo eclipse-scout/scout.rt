@@ -71,7 +71,7 @@ public class ServerRunContextTest {
     ServerRunContext runContext = ServerRunContexts.empty();
     runContext.getPropertyMap().put("A", "B");
     runContext.withSubject(new Subject());
-    runContext.withSession(mock(IServerSession.class), true);
+    runContext.withSession(mock(IServerSession.class));
     runContext.withUserAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
     runContext.withLocale(Locale.CANADA_FRENCH);
     runContext.withOffline(true);
