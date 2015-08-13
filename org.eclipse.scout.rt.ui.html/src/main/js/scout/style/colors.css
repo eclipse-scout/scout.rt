@@ -117,6 +117,7 @@
 @table-header-cmd-active-background-color: @active-inverted-background-color;
 @table-header-cmd-active-border-color: @active-inverted-background-color;
 @table-info-color: @palette-gray-5;
+@table-info-active-color: @palette-gray-6;
 @text-field-icon-color: @palette-gray-5;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;

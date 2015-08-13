@@ -21,6 +21,8 @@ scout.Tooltip = function(session, options) {
   this.scrollType = options.scrollType || 'remove';
   this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
   this.$content;
+
+  this._addEventSupport();
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 

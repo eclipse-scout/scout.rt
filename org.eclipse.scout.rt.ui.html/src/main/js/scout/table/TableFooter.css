@@ -139,6 +139,11 @@
 .table-info-status {
   padding-top: 0;
   line-height: @table-footer-height;
+  color: @table-info-color;
+
+  &:hover {
+    color: @table-info-active-color;
+  }
 
   /* normal */
 
@@ -156,36 +161,32 @@
     }
   }
 
-  &:hover > .font-icon {
-    color: @hover-color;
-  }
-
   /* error */
 
-  &.has-error > .font-icon {
-    color: @error-color;
-
-    &::before {
-      #scout.animation(attention 5s linear infinite);
-      content: @icon-error;
-    }
+  &.has-error > .font-icon::before {
+    #scout.animation(attention 5s linear infinite);
+    content: @icon-error;
   }
 
-  &.has-error:hover > .font-icon {
+  &.has-error.tooltip-active {
+    color: @error-color;
+  }
+
+  &.has-error.tooltip-active:hover {
     color: @palette-red-4;
   }
 
   /* warning */
 
-  &.has-warning > .font-icon {
-    color: @palette-blue-35;
-
-    &::before {
-      content: @icon-error;
-    }
+  &.has-warning > .font-icon::before {
+    content: @icon-error;
   }
 
-  &.has-warning:hover > .font-icon {
+  &.has-warning.tooltip-active {
+    color: @palette-blue-35;
+  }
+
+  &.has-warning.tooltip-active:hover {
     color: @palette-blue-4;
   }
 }

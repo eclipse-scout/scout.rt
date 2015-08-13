@@ -239,6 +239,7 @@ scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
     // the tooltip to not disturb the user.
     var complete = null;
     if (!this._table.tableStatus.uiState || this._table.tableStatus.uiState === 'user-shown') {
+      this._$infoTableStatus.addClass('tooltip-active'); // color icon before animation starts
       complete = function() {
         this._showTableStatusTooltip();
       }.bind(this);
@@ -417,6 +418,12 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
   };
   this._tableStatusTooltip = new scout.Tooltip(this.session, opts);
   this._tableStatusTooltip.render();
+
+  // Adjust icon style
+  this._$infoTableStatus.addClass('tooltip-active');
+  this._tableStatusTooltip.on('remove', function() {
+    this._$infoTableStatus.removeClass('tooltip-active');
+  }.bind(this));
 
   // Auto-hide unimportant messages
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);

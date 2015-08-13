@@ -79,11 +79,11 @@
 
 .tooltip-info {
   background-color: @palette-gray-2;
-  border-color: @palette-gray-4;
+  border-color: @palette-gray-5;
 
   & .tooltip-arrow {
     background-color: @palette-gray-2;
-    border-color: @palette-gray-4;
+    border-color: @palette-gray-5;
   }
 
   & .tooltip-content {
