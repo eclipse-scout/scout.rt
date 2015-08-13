@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -22,15 +23,13 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
- * Utility methods to work with the Job API.
+ * Utility methods to work with the Job API from UI.
  */
-public final class JobUtility {
-  private static final long AWAIT_TIMEOUT = TimeUnit.HOURS.toMillis(1);
-  private static final String POLLING_REQUEST_HINT = "pollingRequest";
+@ApplicationScoped
+public class UiJobs {
 
-  private JobUtility() {
-    // static access only
-  }
+  protected static final long AWAIT_TIMEOUT = TimeUnit.HOURS.toMillis(1);
+  protected static final String POLLING_REQUEST_HINT = "pollingRequest";
 
   /**
    * Blocks until all model jobs for the given session are done. Blocked jobs (e.g. waitFor) are ignored.
@@ -40,7 +39,7 @@ public final class JobUtility {
    *           in case the current thread was interrupted, or the waiting timeout elapsed, or the current thread
    *           is the model thread.
    */
-  public static void awaitAllModelJobs(final IClientSession clientSession) {
+  public void awaitAllModelJobs(final IClientSession clientSession) {
     Assertions.assertNotNull(clientSession, "Argument 'clientSession' must not be null");
     Assertions.assertFalse(ModelJobs.isModelThread(clientSession), "This method may not be called from the model thread");
 
@@ -60,7 +59,7 @@ public final class JobUtility {
   /**
    * Returns whether the given {@link RunContext} represents a polling request.
    */
-  public static boolean isPollingRequest(RunContext runContext) {
+  public boolean isPollingRequest(RunContext runContext) {
     Object pollingRequestHint = runContext.getProperty(POLLING_REQUEST_HINT);
     return pollingRequestHint instanceof Boolean && ((Boolean) pollingRequestHint).booleanValue();
   }
@@ -78,7 +77,7 @@ public final class JobUtility {
    *          translator to be used to translate any thrown exception.
    * @return the job's result.
    */
-  public static <RESULT, ERROR extends Throwable> RESULT runAsModelJob(final Callable<RESULT> callable, final JobInput jobInput, final Class<? extends IThrowableTranslator<ERROR>> throwableTranslatorClass) throws ERROR {
+  public <RESULT, ERROR extends Throwable> RESULT runAsModelJob(final Callable<RESULT> callable, final JobInput jobInput, final Class<? extends IThrowableTranslator<ERROR>> throwableTranslatorClass) throws ERROR {
     Assertions.assertTrue(!ModelJobs.isModelThread(), "must not be invoked in model thread");
 
     final IFuture<RESULT> future = ModelJobs.schedule(callable, jobInput);
@@ -114,7 +113,7 @@ public final class JobUtility {
    * waitFor to wait for a button click and therefore blocks the thread. If the messagebox cannot be displayed (e.g. on
    * session startup) nobody will release the waitFor lock.
    */
-  public static <RESULT> RESULT runAsModelJobAndHandleException(final Callable<RESULT> callable, final JobInput jobInput) {
+  public <RESULT> RESULT runAsModelJobAndHandleException(final Callable<RESULT> callable, final JobInput jobInput) {
     try {
       return runAsModelJob(callable, jobInput, ExceptionTranslator.class);
     }
@@ -143,7 +142,7 @@ public final class JobUtility {
    *          method {@link #isPollingRequestJob(JobInput)}. This flag is useful when listening for certain job manager
    *          events (see {@link UiSession#UiSession()}.
    */
-  public static JobInput newModelJobInput(final String jobName, final IClientSession clientSession, final boolean pollingRequest) {
+  public JobInput newModelJobInput(final String jobName, final IClientSession clientSession, final boolean pollingRequest) {
     ClientRunContext runContext = ClientRunContexts.copyCurrent()
         .withSession(clientSession, true)
         .withProperty(POLLING_REQUEST_HINT, pollingRequest);

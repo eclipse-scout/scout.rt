@@ -131,7 +131,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         if (!ModelJobFilter.INSTANCE.accept(event.getFuture())) {
           return false; // only model jobs are of interest
         }
-        if (JobUtility.isPollingRequest(event.getFuture().getJobInput().getRunContext())) {
+        if (BEANS.get(UiJobs.class).isPollingRequest(event.getFuture().getJobInput().getRunContext())) {
           return false; // only non-polling requests are of interest
         }
 
@@ -338,13 +338,15 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
+    final UiJobs uiJobs = BEANS.get(UiJobs.class);
+
     // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
-    return JobUtility.runAsModelJob(new Callable<JsonClientSession<?>>() {
+    return uiJobs.runAsModelJob(new Callable<JsonClientSession<?>>() {
       @Override
       public JsonClientSession<?> call() throws Exception {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
-    }, JobUtility.newModelJobInput("startUp jsonClientSession", clientSession, false), RuntimeExceptionTranslator.class);
+    }, uiJobs.newModelJobInput("startUp jsonClientSession", clientSession, false), RuntimeExceptionTranslator.class);
   }
 
   protected void handleDetach(JsonStartupRequest jsonStartupRequest, HttpSession httpSession) {
@@ -359,7 +361,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected void fireDesktopOpened() {
-    JobUtility.runAsModelJob(Callables.callable(new IRunnable() {
+    final UiJobs uiJobs = BEANS.get(UiJobs.class);
+
+    uiJobs.runAsModelJob(Callables.callable(new IRunnable() {
       @Override
       public void run() throws Exception {
         IClientSession clientSession = ClientSessionProvider.currentSession();
@@ -372,18 +376,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           desktop.getUIFacade().fireGuiAttached();
         }
       }
-    }), JobUtility.newModelJobInput("start up desktop", m_clientSession, false), RuntimeExceptionTranslator.class);
+    }), uiJobs.newModelJobInput("start up desktop", m_clientSession, false), RuntimeExceptionTranslator.class);
   }
 
   protected void sendInitializationEvent(String clientSessionAdapterId) {
+    final UiJobs uiJobs = BEANS.get(UiJobs.class);
+
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     jsonEvent.put("clientSession", clientSessionAdapterId);
-    Locale sessionLocale = JobUtility.runAsModelJob(new Callable<Locale>() {
+    Locale sessionLocale = uiJobs.runAsModelJob(new Callable<Locale>() {
       @Override
       public Locale call() throws Exception {
         return m_clientSession.getLocale();
       }
-    }, JobUtility.newModelJobInput("fetch locale from model", m_clientSession, false), RuntimeExceptionTranslator.class);
+    }, uiJobs.newModelJobInput("fetch locale from model", m_clientSession, false), RuntimeExceptionTranslator.class);
     putLocaleData(jsonEvent, sessionLocale);
     m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
   }
@@ -567,6 +573,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public JSONObject processJsonRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
+    final UiJobs uiJobs = BEANS.get(UiJobs.class);
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.size());
     }
@@ -576,20 +584,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentJsonRequest = jsonRequest;
 
       // Process events in model job
-      JobUtility.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {
+      uiJobs.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
           processJsonRequestInternal();
         }
-      }), JobUtility.newModelJobInput("event-processing", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()));
+      }), uiJobs.newModelJobInput("event-processing", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()));
 
       // Wait for any other model jobs that might have been scheduled during event processing. If there are any
       // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
-      JobUtility.awaitAllModelJobs(getClientSession());
+      uiJobs.awaitAllModelJobs(getClientSession());
 
       // Convert the collected response to JSON. It is important that this is done in a
       // model job, because during toJson(), the model might be accessed.
-      JSONObject result = JobUtility.runAsModelJob(new Callable<JSONObject>() {
+      JSONObject result = uiJobs.runAsModelJob(new Callable<JSONObject>() {
         @Override
         public JSONObject call() throws Exception {
           JSONObject json = responseToJsonInternal();
@@ -599,7 +607,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           m_currentJsonResponse = createJsonResponse();
           return json;
         }
-      }, JobUtility.newModelJobInput("response-to-json", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()), RuntimeExceptionTranslator.class);
+      }, uiJobs.newModelJobInput("response-to-json", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()), RuntimeExceptionTranslator.class);
       return result;
     }
     finally {
@@ -634,24 +642,26 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public JSONObject processFileUpload(HttpServletRequest httpReq, final IBinaryResourceConsumer resourceConsumer, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
+    final UiJobs uiJobs = BEANS.get(UiJobs.class);
+
     try {
       m_currentHttpRequest.set(httpReq);
 
       // Process file upload in model job
-      JobUtility.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {
+      uiJobs.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {
         @Override
         public void run() throws Exception {
           resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
         }
-      }), JobUtility.newModelJobInput("upload-processing", getClientSession(), false));
+      }), uiJobs.newModelJobInput("upload-processing", getClientSession(), false));
 
       // Wait for any other model jobs that might have been scheduled during event processing. If there are any
       // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
-      JobUtility.awaitAllModelJobs(getClientSession());
+      uiJobs.awaitAllModelJobs(getClientSession());
 
       // Convert the collected response to JSON. It is important that this is done in a
       // model job, because during toJson(), the model might be accessed.
-      JSONObject result = JobUtility.runAsModelJob(new Callable<JSONObject>() {
+      JSONObject result = uiJobs.runAsModelJob(new Callable<JSONObject>() {
         @Override
         public JSONObject call() throws Exception {
           JSONObject json = responseToJsonInternal();
@@ -660,7 +670,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           m_currentJsonResponse = createJsonResponse();
           return json;
         }
-      }, JobUtility.newModelJobInput("upload-response-to-json", getClientSession(), false), RuntimeExceptionTranslator.class);
+      }, uiJobs.newModelJobInput("upload-response-to-json", getClientSession(), false), RuntimeExceptionTranslator.class);
       return result;
     }
     finally {

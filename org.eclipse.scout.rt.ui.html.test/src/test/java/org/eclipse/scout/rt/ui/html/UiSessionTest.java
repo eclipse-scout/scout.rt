@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import org.eclipse.scout.commons.utility.TestUtility;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -68,7 +69,7 @@ public class UiSessionTest {
     JsonTestUtility.endRequest(uiSession);
     uiSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
-    JobUtility.awaitAllModelJobs(clientSession);
+    BEANS.get(UiJobs.class).awaitAllModelJobs(clientSession);
     assertFalse(clientSession.isActive());
     assertTrue(uiSession.isDisposed());
 
