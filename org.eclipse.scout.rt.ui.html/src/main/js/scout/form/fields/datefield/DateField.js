@@ -233,12 +233,12 @@ scout.DateField.prototype._onTimeIconClick = function(event) {
 scout.DateField.prototype._onDateFieldBlur = function() {
   // Close picker and update model
   this._closeDatePicker();
-  this.acceptInput();
+  this._acceptDateTimePrediction(true, false);
 };
 
 scout.DateField.prototype._onTimeFieldBlur = function() {
   this._tempTimeDate = null;
-  this.acceptInput();
+  this._acceptDateTimePrediction(false, true);
 };
 
 scout.DateField.prototype._onDateFieldKeydown = function(event) {
@@ -661,8 +661,8 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
   if (success) {
     // parse success -> send new timestamp to server
     var newTimestamp = this._newTimestampAsDate(
-        (datePrediction ? datePrediction.date : null),
-        (timePrediction ? timePrediction.date : null));
+        (acceptDate && datePrediction.date ? datePrediction.date : null),
+        (acceptTime && timePrediction.date ? timePrediction.date : null));
     this.updateTimestamp(newTimestamp);
     this.updateDisplayText();
   } else {
