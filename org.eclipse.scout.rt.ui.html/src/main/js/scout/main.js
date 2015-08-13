@@ -113,7 +113,7 @@ scout._installGlobalJavascriptErrorHandler = function() {
  * Installs a global 'mousedown' interceptor to invoke 'aboutToBlurByMouseDown' on value field before anything else gets executed.
  */
 scout._installGlobalMouseDownInterceptor = function() {
-  document.addEventListener('mousedown', function(e) {
+  document.addEventListener('mousedown', function(event) {
     scout.ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
 };
