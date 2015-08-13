@@ -171,24 +171,25 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
 scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
   var menu, tab, text, popup, overflowMenus = [],
-    desktop = this._desktop;
+    desktop = this._desktop,
+    that = this;
   this._overflowTabsIndizes.forEach(function(i) {
     // FIXME AWE: fix bugs in overflow-menu:
     // - 1. menu schliesst nicht
     // - 2. manchmal verschwindet ein (noch offener) Tab - wenn nur einer sichtbar ist
     // - 3. add selenium tests
     tab = desktop.viewTabsController.viewTabs()[i];
-    menu = scout.localObjects.createObject(this.desktop.session, {
+    menu = scout.localObjects.createObject(desktop.session, {
       objectType: 'Menu',
       text: tab.getMenuText(),
       tab: tab
     });
     menu.remoteHandler = function(target, type) {
       if ('doAction' === type) {
-        $.log.debug('(DesktopTaskBarLayout#_onMouseDownOverflow) tab=' + this.tab);
-        desktop.viewTabsController.selectViewTab(this.tab);
+        $.log.debug('(DesktopTaskBarLayout#_onMouseDownOverflow) tab=' + this);
+        desktop.viewTabsController.selectViewTab(this);
       }
-    }.bind(this);
+    }.bind(tab);
     overflowMenus.push(menu);
   });
 
