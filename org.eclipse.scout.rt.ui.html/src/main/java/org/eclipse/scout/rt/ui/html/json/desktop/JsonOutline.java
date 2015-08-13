@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -96,6 +98,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     IPage page = (IPage) node;
     JSONObject json = super.treeNodeToJson(node);
     putDetailFormAndTable(json, page);
+    putNodeType(json, node);
     if (page.getParentPage() != null) {
       putProperty(json, "lazyAddToTree", page.getParentPage().isLazyAddChildPagesToOutline());
     }
@@ -104,6 +107,22 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       putProperty(json, "classId", page.classId());
     }
     return json;
+  }
+
+  private void putNodeType(JSONObject json, ITreeNode node) {
+    String nodeType = null;
+    if (node instanceof IPageWithNodes) {
+      nodeType = "nodes";
+    }
+    else if (node instanceof IPageWithTable) {
+      nodeType = "table";
+    }
+    else if (node instanceof IVirtualTreeNode) {
+      nodeType = "virtual";
+    }
+    if (nodeType != null) {
+      putProperty(json, "nodeType", nodeType);
+    }
   }
 
   protected void putDetailFormAndTable(JSONObject json, IPage page) {
@@ -176,6 +195,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
     super.putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, virtualNode);
+    putNodeType(jsonNode, node);
     if (getUiSession().isInspectorHint()) {
       IPage page = (IPage) node;
       putProperty(jsonNode, "modelClass", page.getClass().getName());
