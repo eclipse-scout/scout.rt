@@ -1,20 +1,20 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserFilter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
-public class JsonTableColumnFilter implements IJsonObject {
+public class JsonUserFilter implements IJsonObject {
   private final JsonTable m_jsonTable;
-  private final ITableColumnFilter<?> m_filter;
+  private final UserFilter m_filter;
 
-  public JsonTableColumnFilter(ITableColumnFilter<?> filter, JsonTable table) {
+  public JsonUserFilter(UserFilter filter, JsonTable table) {
     m_filter = filter;
     m_jsonTable = table;
   }
 
-  public ITableColumnFilter<?> getFilter() {
+  public UserFilter getFilter() {
     return m_filter;
   }
 

@@ -661,7 +661,6 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
       lastRowOfBlockSelected = $row.isSelected();
-      that._applyFiltersForRow($row);
     });
 
     // append block of rows
@@ -708,6 +707,8 @@ scout.Table.prototype._installRows = function($rows) {
     var editorField,
       $row = $(this),
       row = $row.data('row');
+
+    that._applyFiltersForRow($row);
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -1290,63 +1291,6 @@ scout.Table.prototype.colorData = function(column, mode) {
   }
 };
 
-scout.Table.prototype._onRowsSelected = function(rowIds) {
-  this._syncSelectedRows(rowIds);
-};
-
-scout.Table.prototype._onRowsChecked = function(rows) {
-  for (var i = 0; i < rows.length; i++) {
-    var row = this.rowsMap[rows[i].id];
-    row.checked = rows[i].checked;
-    if (this.rendered) {
-      this._renderRowChecked(row);
-    }
-  }
-};
-
-scout.Table.prototype._onRowsUpdated = function(rows) {
-  var $updatedRows = $();
-
-  // Update model
-  for (var i = 0; i < rows.length; i++) {
-    var updatedRow = rows[i];
-
-    var oldRow = this.rowsMap[updatedRow.id];
-    if (!oldRow) {
-      throw new Error('Update event received for non existing row. RowId: ' + updatedRow.id);
-    }
-
-    // Replace old row
-    this._initRow(updatedRow);
-    var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
-    scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
-
-    // Replace old $row
-    if (this.rendered && oldRow.$row) {
-      var rowSelected = this.selectedRows.indexOf(updatedRow) > -1;
-
-      var previousRowSelected = false,
-        followingRowSelected = false;
-      if (rowIndex > 0) {
-        previousRowSelected = this.selectedRows.indexOf(this.rows[rowIndex - 1]) > -1;
-      }
-      if (rowIndex + 1 < this.rows.length) {
-        followingRowSelected = this.selectedRows.indexOf(this.rows[rowIndex + 1]) > -1;
-      }
-
-      var $updatedRow = $(this._buildRowDiv(updatedRow, rowSelected, previousRowSelected, followingRowSelected));
-      scout.Table.linkRowToDiv(updatedRow, $updatedRow);
-      // replace div in DOM
-      oldRow.$row.replaceWith($updatedRow);
-      $updatedRows = $updatedRows.add($updatedRow);
-    }
-  }
-
-  if ($updatedRows.length > 0) {
-    this._installRows($updatedRows);
-  }
-};
-
 scout.Table.prototype._renderRowChecked = function(row) {
   if (!this.checkableColumn) {
     throw new Error('checkableColumn not set');
@@ -1429,6 +1373,49 @@ scout.Table.prototype._deleteRows = function(rows) {
 
   if (invalidate) {
     this.invalidateLayoutTree();
+  }
+};
+
+scout.Table.prototype._updateRows = function(rows) {
+  var $updatedRows = $();
+
+  // Update model
+  for (var i = 0; i < rows.length; i++) {
+    var updatedRow = rows[i];
+
+    var oldRow = this.rowsMap[updatedRow.id];
+    if (!oldRow) {
+      throw new Error('Update event received for non existing row. RowId: ' + updatedRow.id);
+    }
+
+    // Replace old row
+    this._initRow(updatedRow);
+    var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
+    scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
+
+    // Replace old $row
+    if (this.rendered && oldRow.$row) {
+      var rowSelected = this.selectedRows.indexOf(updatedRow) > -1;
+
+      var previousRowSelected = false,
+        followingRowSelected = false;
+      if (rowIndex > 0) {
+        previousRowSelected = this.selectedRows.indexOf(this.rows[rowIndex - 1]) > -1;
+      }
+      if (rowIndex + 1 < this.rows.length) {
+        followingRowSelected = this.selectedRows.indexOf(this.rows[rowIndex + 1]) > -1;
+      }
+
+      var $updatedRow = $(this._buildRowDiv(updatedRow, rowSelected, previousRowSelected, followingRowSelected));
+      scout.Table.linkRowToDiv(updatedRow, $updatedRow);
+      // replace div in DOM
+      oldRow.$row.replaceWith($updatedRow);
+      $updatedRows = $updatedRows.add($updatedRow);
+    }
+  }
+
+  if ($updatedRows.length > 0) {
+    this._installRows($updatedRows);
   }
 };
 
@@ -1712,61 +1699,44 @@ scout.Table.prototype.columnById = function(columnId) {
 };
 
 scout.Table.prototype.filter = function() {
-  var that = this,
+  var i, useAnimation,
+    that = this,
     rowCount = 0,
     $allRows = this.$rows(),
-    i;
+    rowsToHide = [],
+    rowsToShow = [];
 
   this.$sumRows().hide();
 
-  // Remember current selection
-  var oldSelectedRows = {};
-  for (i = 0; i < this.selectedRows.length; i++) {
-    oldSelectedRows[this.selectedRows[i].id] = true;
-  }
-
   // Filter rows
-  var rowsToHide = [];
-  var rowsToShow = [];
   $allRows.each(function() {
-    var $row = $(this), show;
+    var show,
+      $row = $(this);
 
     show = that._rowAcceptedByFilters($row);
     if (show) {
       if ($row.hasClass('invisible')) {
-        rowsToShow.push($row);
+        rowsToShow.push($row.data('row'));
       }
       rowCount++;
     } else {
       if (!$row.hasClass('invisible')) {
-        rowsToHide.push($row);
+        rowsToHide.push($row.data('row'));
       }
     }
   });
 
   // Show / hide rows that changed their state during filtering
-  var useAnimation = ((rowsToShow.length + rowsToHide.length) <= that.animationRowLimit);
-  $(rowsToHide).each(function() {
-    var $row = $(this);
-    that.hideRow($row, useAnimation);
-    // Remove hidden rows from the map of previously selected rows
-    var row = $row.data('row');
-    if (oldSelectedRows[row.id]) {
-      oldSelectedRows[row.id] = false;
-    }
+  useAnimation = ((rowsToShow.length + rowsToHide.length) <= that.animationRowLimit);
+  rowsToHide.forEach(function(row) {
+    that.hideRow(row.$row, useAnimation);
   });
-  $(rowsToShow).each(function() {
-    that.showRow($(this), useAnimation);
+  rowsToShow.forEach(function(row) {
+    that.showRow(row.$row, useAnimation);
   });
 
-  // Restore selection
-  var newSelectedRows = [];
-  for (var rowId in oldSelectedRows) {
-    if (oldSelectedRows[rowId]) {
-      newSelectedRows.push(this.rowById(rowId));
-    }
-  }
-  this.selectRows(newSelectedRows); // this will update the server model if necessary
+  // Non visible rows must be deselected
+  this.deselectRows(rowsToHide);
 
   // Used by table footer
   this.filteredRowCount = rowCount;
@@ -2265,6 +2235,24 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
 
 scout.Table.prototype._onAllRowsDeleted = function() {
   this._deleteAllRows();
+};
+
+scout.Table.prototype._onRowsUpdated = function(rows) {
+  this._updateRows(rows);
+};
+
+scout.Table.prototype._onRowsSelected = function(rowIds) {
+  this._syncSelectedRows(rowIds);
+};
+
+scout.Table.prototype._onRowsChecked = function(rows) {
+  for (var i = 0; i < rows.length; i++) {
+    var row = this.rowsMap[rows[i].id];
+    row.checked = rows[i].checked;
+    if (this.rendered) {
+      this._renderRowChecked(row);
+    }
+  }
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {

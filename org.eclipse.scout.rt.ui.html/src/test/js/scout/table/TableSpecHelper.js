@@ -105,10 +105,18 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
   return columns;
 };
 
-TableSpecHelper.prototype.createModelCells = function(count) {
+/**
+ * creates cells with value similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given
+ */
+TableSpecHelper.prototype.createModelCells = function(count, rowId) {
   var cells = [];
+  if (rowId === undefined) {
+    rowId = '';
+  } else {
+    rowId = rowId + '_';
+  }
   for (var i = 0; i < count; i++) {
-    cells[i] = this.createModelCell(i + '', 'cell' + i);
+    cells[i] = this.createModelCell(i + '', 'cell' + rowId + i);
   }
   return cells;
 };
@@ -120,7 +128,7 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 
   var rows = [];
   for (var i = 0; i < rowCount; i++) {
-    rows[i] = this.createModelRow(null, this.createModelCells(colCount));
+    rows[i] = this.createModelRow(null, this.createModelCells(colCount, i));
   }
   return rows;
 };

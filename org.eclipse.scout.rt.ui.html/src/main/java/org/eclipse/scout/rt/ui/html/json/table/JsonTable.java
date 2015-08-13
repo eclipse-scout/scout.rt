@@ -40,12 +40,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.StringColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -373,8 +372,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
     putProperty(json, PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
-    if (getModel().getColumnFilterManager() != null) {
-      putProperty(json, PROP_FILTERS, filtersToJson(getModel().getColumnFilterManager().getFilters()));
+    if (getModel().getUserFilterManager() != null) {
+      putProperty(json, PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
     }
     return json;
   }
@@ -636,20 +635,19 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     JSONObject data = event.getData();
     IColumn column = extractColumn(data);
     JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
-    Set<String> selectedValues = new HashSet<String>();
+    Set<Object> selectedValues = new HashSet<Object>();
     for (int i = 0; i < jsonSelectedValues.length(); i++) {
-      selectedValues.add(jsonSelectedValues.getString(i));
+      selectedValues.add(jsonSelectedValues.get(i));
     }
-    StringColumnFilter filter = new StringColumnFilter(column);
+    UserFilter filter = new UserFilter(column);
     filter.setSelectedValues(selectedValues);
     //FIXME CGU filter removed?
     getModel().getUIFacade().fireFilterAddedFromUI(filter);
   }
 
-  @SuppressWarnings("unchecked")
   protected void handleUiRemoveFilter(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    ITableColumnFilter filter = getModel().getColumnFilterManager().getFilter(column);
+    UserFilter filter = getModel().getUserFilterManager().getFilter(column);
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
@@ -792,10 +790,10 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return m_tableRowIds.get(row);
   }
 
-  protected JSONArray filtersToJson(Collection<ITableColumnFilter> filters) {
+  protected JSONArray filtersToJson(Collection<UserFilter> filters) {
     JSONArray jsonFilters = new JSONArray();
-    for (ITableColumnFilter<?> filter : filters) {
-      JSONObject jsonFilter = new JsonTableColumnFilter(filter, this).toJson();
+    for (UserFilter filter : filters) {
+      JSONObject jsonFilter = new JsonUserFilter(filter, this).toJson();
       jsonFilters.put(jsonFilter);
     }
     return jsonFilters;
