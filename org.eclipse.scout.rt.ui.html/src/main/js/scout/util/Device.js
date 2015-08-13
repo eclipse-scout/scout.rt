@@ -30,7 +30,7 @@ scout.Device.SupportedBrowsers = {
 scout.Device.SYSTEM_IOS = 'IOS';
 
 /**
- * Called by index.html. Precalculates the value of some attributes to store them
+ * Called by index.jsp. Precalculates the value of some attributes to store them
  * in a static way (and prevent many repeating function calls within loops).
  */
 scout.Device.prototype.initDeviceSpecificAttributes = function() {

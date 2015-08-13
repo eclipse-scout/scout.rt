@@ -51,8 +51,8 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestInterceptor.class);
 
-  public static final String INDEX_HTML = "/index.html";
-  public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
+  public static final String INDEX_JSP = "/index.jsp";
+  public static final String MOBILE_INDEX_JSP = "/index-mobile.jsp";
 
   private static final String UTF_8 = "UTF-8";
 
@@ -124,21 +124,21 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       return null;
     }
     if ("/".equals(pathInfo)) {
-      pathInfo = resolveIndexHtml(req);
+      pathInfo = resolveIndexJsp(req);
     }
     return pathInfo;
   }
 
-  protected String resolveIndexHtml(HttpServletRequest request) {
+  protected String resolveIndexJsp(HttpServletRequest request) {
     BrowserInfo browserInfo = BrowserInfo.createFrom(request);
     if (browserInfo.isMobile()) {
-      // Return index-mobile.html, but only if index-mobile.html exists (project may decide to always use index.html)
-      URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_HTML);
+      // Return index-mobile.jsp, but only if index-mobile.jsp exists (project may decide to always use index.jsp)
+      URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_JSP);
       if (url != null) {
-        return MOBILE_INDEX_HTML;
+        return MOBILE_INDEX_JSP;
       }
     }
-    return INDEX_HTML;
+    return INDEX_JSP;
   }
 
   /**

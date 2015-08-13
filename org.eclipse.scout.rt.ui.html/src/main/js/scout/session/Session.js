@@ -67,7 +67,7 @@ scout.Session = function($entryPoint, options) {
   this._startup;
   this._unload;
   this.desktop;
-  this.url = 'json';
+  this.url = 'ui/json';
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
   this._initObjectFactory(options.objectFactories);
