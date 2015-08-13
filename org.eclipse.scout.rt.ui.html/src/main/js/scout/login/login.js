@@ -1,5 +1,6 @@
 scout.login = {
 
+  // FIXME AWE: pass i18n texts from JSP
   initTexts: function() {
     var translations = {
       en: {
