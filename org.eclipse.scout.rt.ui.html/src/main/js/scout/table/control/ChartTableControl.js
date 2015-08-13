@@ -300,6 +300,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     // calculate matrix
     var cube = matrix.calculateCube();
 
+    // set max width
+    $chartMain.css('width', '');
+
+
     // based on chart type: set class and draw chart
     if ($chart.hasClassSVG('chart-bar')) {
       $('.select-axis', $xAxisSelect).removeClass('axis-ver axis-around').addClass('axis-hor');
