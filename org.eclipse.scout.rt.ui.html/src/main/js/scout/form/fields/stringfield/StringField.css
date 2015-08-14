@@ -1,6 +1,7 @@
 .string-field  {
 
   & > .field {
+    width: 100%; /* must be set for IE9 */
 
     &.has-inner-alignment {
 
@@ -19,6 +20,7 @@
   }
 
   &.has-action {
+
     & > input[type=text] {
       #scout.text-field-with-icon(@icon-arrow-right);
 
@@ -26,9 +28,5 @@
         cursor: pointer;
       }
     }
-  }
-
-  & > textarea.field {
-    width: 100%; /* must be set for IE9 */
   }
 }

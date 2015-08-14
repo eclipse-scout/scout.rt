@@ -137,6 +137,8 @@ textarea {
   margin: 0 auto;
   padding: 5px @text-field-padding;
   resize: none;
+  /* Override default overflow value 'scroll' in IE */
+  overflow: auto;
 }
 
 /* cursor handling */
