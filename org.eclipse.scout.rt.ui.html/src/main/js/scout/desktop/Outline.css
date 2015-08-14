@@ -37,11 +37,6 @@
     padding-top: 8px;
     padding-bottom: 8px;
 
-    &.parent {
-      /*nicer?, let's try*/
-      /*#scout.font-text-plus(@bold);*/
-    }
-
     &.group {
       background-color: @outline-group-background-color;
     }

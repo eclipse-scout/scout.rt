@@ -1285,19 +1285,21 @@ scout.Tree.prototype._updateItemPath = function() {
   var $ultimate;
   if ($selectedNodes.parent().hasClass('animationWrapper')) {
     //If node expansion animation is in progress, the nodes are wrapped by a div
-    $selectedNodes = $selectedNodes.parent();
+    $node = $selectedNodes.parent().prev();
+  } else {
+    $node = $selectedNodes.prev();
   }
-  $node = $selectedNodes.prev();
+
   while ($node.length > 0) {
     var k = parseFloat($node.attr('data-level'));
     if (k < level) {
-     if ($node.data('node').nodeType == 'table') {
+     if ($node.data('node').nodeType == 'table' && !this._breadcrumbEnabled) {
        break;
      }
 
       $node.addClass('parent');
-      $ultimate = $node;
       level = k;
+      $ultimate = $node;
     }
     if ($node.parent().hasClass('animationWrapper')) {
       $node = $node.parent();
@@ -1305,12 +1307,10 @@ scout.Tree.prototype._updateItemPath = function() {
     $node = $node.prev();
   }
 
-  $.l($ultimate);
-
   // find group with same ultimate parent
   $ultimate = $ultimate || $selectedNodes;
   $node = $ultimate;
-  level = $ultimate.attr('data-level');
+  level = $node.attr('data-level');
   while ($node.length > 0) {
     $node.addClass('group');
     if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
