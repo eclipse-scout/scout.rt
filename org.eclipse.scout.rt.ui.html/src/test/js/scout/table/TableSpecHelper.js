@@ -165,6 +165,13 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
   return table;
 };
 
+TableSpecHelper.prototype.createAndRegisterFilter = function (table, column, selectedValues) {
+  var filter = new scout.TableColumnFilter(table, column);
+  filter.selectedValues = selectedValues;
+  table.registerFilter(column.id, filter);
+  return filter;
+};
+
 /**
  * Applies display style on rows and cells so that cells are positioned correctly in a row.<br>
  * Necessary because the stylesheet is not applied when running the specs.
@@ -212,18 +219,21 @@ TableSpecHelper.prototype.assertSelection = function(table, rows) {
  * @param texts array with same length as rows.
  */
 TableSpecHelper.prototype.assertTextsInCells = function(rows, colIndex, texts) {
+  expect(rows.length).toBe(texts.length);
   for (var i=0; i < rows.length; i++) {
     expect(rows[i].cells[colIndex].text).toBe(texts[i]);
   }
 };
 
 TableSpecHelper.prototype.assertValuesInCells = function(rows, colIndex, values) {
+  expect(rows.length).toBe(values.length);
   for (var i=0; i < rows.length; i++) {
     expect(rows[i].cells[colIndex].value).toBe(values[i]);
   }
 };
 
 TableSpecHelper.prototype.assertDatesInCells = function(rows, colIndex, dates) {
+  expect(rows.length).toBe(dates.length);
   for (var i=0; i < rows.length; i++) {
     expect(rows[i].cells[colIndex].value.getTime()).toBe(dates[i].getTime());
   }

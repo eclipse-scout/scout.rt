@@ -1,14 +1,18 @@
 scout.TableColumnFilter = function(table, column) {
-  var matrix = new scout.ChartTableControlMatrix(table, table.session),
-    group = (column.type === 'date') ? scout.ChartTableControlMatrix.DateGroup.YEAR : -1;
-
   this.table = table;
   this.column = column;
   this.label = column.text || '';
-  this.availableValues = [];
   this.selectedValues = [];
-  this.xAxis = matrix.addAxis(column, group);
-  matrix.calculateCube();
+
+  this.calculateCube();
+};
+
+scout.TableColumnFilter.prototype.calculateCube = function() {
+  var group = (this.column.type === 'date') ? scout.ChartTableControlMatrix.DateGroup.YEAR : -1;
+  this.matrix = new scout.ChartTableControlMatrix(this.table, this.table.session),
+  this.xAxis = this.matrix.addAxis(this.column, group);
+  this.matrix.calculateCube();
+  this.availableValues = [];
   this.xAxis.forEach(function(key) {
     this.availableValues.push(this.xAxis.format(key));
   }, this);

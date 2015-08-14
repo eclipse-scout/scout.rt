@@ -146,6 +146,8 @@ scout.TableHeaderMenu.prototype._render = function() {
   var filter = table.getFilter(column.id);
   if (!filter) {
     filter = new scout.TableColumnFilter(table, column);
+  } else {
+    filter.calculateCube();
   }
   var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
 

@@ -559,7 +559,7 @@ describe("Table", function() {
           return;
         }
 
-        var model = helper.createModelSingleColumnByTexts(1, ['Österreich', 'Italien', 'Zypern']);
+        var model = helper.createModelSingleColumnByTexts(['Österreich', 'Italien', 'Zypern']);
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);

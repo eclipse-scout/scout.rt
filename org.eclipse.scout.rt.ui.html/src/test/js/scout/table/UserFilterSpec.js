@@ -1,5 +1,5 @@
 /* global TableSpecHelper*/
-describe("Table", function() {
+describe("UserFilter", function() {
   var session;
   var helper;
 
@@ -17,11 +17,8 @@ describe("Table", function() {
     jasmine.clock().uninstall();
   });
 
-  function createAndRegisterFilter(table, column0, selectedValues) {
-    var filter = new scout.TableColumnFilter(table, column0);
-    filter.selectedValues = selectedValues;
-    table.registerFilter(column0, filter);
-    return filter;
+  function createAndRegisterFilter(table, column, selectedValues) {
+    return helper.createAndRegisterFilter(table, column, selectedValues);
   }
 
   describe("row filtering", function() {
@@ -51,7 +48,7 @@ describe("Table", function() {
       expect(filteredRows.length).toBe(1);
       expect(filteredRows[0]).toBe(table.rows[1]);
 
-      table.unregisterFilter(filter);
+      table.unregisterFilter(filter.column.id);
       table.filter();
 
       filteredRows = table.filteredRows();
