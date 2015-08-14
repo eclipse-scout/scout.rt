@@ -176,7 +176,7 @@ scout.TableFooter.prototype._updateInfoLoad = function() {
 
 scout.TableFooter.prototype._updateInfoFilter = function() {
   var $info = this._$infoFilter;
-  var numRowsFiltered = this._table.filteredRowCount;
+  var numRowsFiltered = this._table.filteredRows().length;
   var filteredBy = this._table.filteredBy().join(', '); // filteredBy() returns an array
 
   $info.empty();

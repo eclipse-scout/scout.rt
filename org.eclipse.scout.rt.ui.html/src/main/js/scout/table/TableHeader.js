@@ -92,6 +92,7 @@ scout.TableHeader.prototype._render = function() {
         $anchor: $header
       });
       that._tableHeaderMenu.render();
+      that.addChild(that._tableHeaderMenu);
     }
 
     return false;

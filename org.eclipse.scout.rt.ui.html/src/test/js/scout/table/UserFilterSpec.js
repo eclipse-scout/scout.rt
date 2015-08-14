@@ -17,7 +17,6 @@ describe("Table", function() {
     jasmine.clock().uninstall();
   });
 
-
   function createAndRegisterFilter(table, column0, selectedValues) {
     var filter = new scout.TableColumnFilter(table, column0);
     filter.selectedValues = selectedValues;
@@ -136,6 +135,114 @@ describe("Table", function() {
       expect(table.selectedRows[0]).toBe(table.rows[1]);
     });
 
+    it("gets removed for non visible rows after filtering if a row has been updated", function() {
+      var model = helper.createModelFixture(2, 3),
+        table = helper.createTable(model),
+        column0 = table.columns[0],
+        row1 = table.rows[1];
+
+      var filter = createAndRegisterFilter(table, column0, ['cell1_0', 'cell2_0']);
+      table.render(session.$entryPoint);
+      table.selectAll();
+      expect(table.selectedRows.length).toBe(2);
+      expect(table.selectedRows[0]).toBe(table.rows[1]);
+      expect(table.selectedRows[1]).toBe(table.rows[2]);
+
+      // updateRows applies filter which should consider selection removal
+      var rows = helper.createModelRows(2, 1);
+      rows[0].id = row1.id;
+      rows[0].cells[0].value = 'updatedCell';
+      table._updateRows(rows);
+
+      expect(table.selectedRows.length).toBe(1);
+      expect(table.selectedRows[0]).toBe(table.rows[2]);
+    });
+
   });
 
+  describe("events", function() {
+
+    describe("rowsFiltered", function() {
+      var listener = {
+        _onRowsFiltered: function() {}
+      };
+
+      it("gets fired if rows are filtered", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0];
+
+        table.render(session.$entryPoint);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        var filter = createAndRegisterFilter(table, column0, ['cell1_0']);
+        table.filter();
+
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets fired if rows are filtered", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0];
+
+        table.render(session.$entryPoint);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        var filter = createAndRegisterFilter(table, column0, ['cell1_0']);
+        table.filter();
+
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets fired if rows are filtered during updateRows", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0],
+          row1 = table.rows[1];
+
+        var filter = createAndRegisterFilter(table, column0, ['cell1_0']);
+        table.render(session.$entryPoint);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        // updateRows applies filter which fire the event
+        var rows = helper.createModelRows(2, 1);
+        rows[0].id = row1.id;
+        rows[0].cells[0].value = 'updatedCell';
+        table._updateRows(rows);
+
+        expect(table.filteredRows().length).toBe(0);
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("does not get fired if rows are updated but row filter state has not changed", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0],
+          row1 = table.rows[1];
+
+        var filter = createAndRegisterFilter(table, column0, ['cell1_0']);
+        table.render(session.$entryPoint);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        // update cell 1 of row -> row still accepted by filter
+        var rows = helper.createModelRows(2, 1);
+        rows[0].id = row1.id;
+        rows[0].cells[0].value = row1.cells[0].value;
+        rows[0].cells[1].value = 'updatedCell1';
+        table._updateRows(rows);
+
+        expect(table.filteredRows().length).toBe(1);
+        expect(listener._onRowsFiltered).not.toHaveBeenCalled();
+      });
+    });
+  });
 });

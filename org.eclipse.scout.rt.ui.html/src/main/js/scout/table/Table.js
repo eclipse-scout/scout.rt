@@ -15,7 +15,7 @@ scout.Table = function() {
   this._rowWidth = 0;
   this.staticMenus = [];
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
-  this.events = new scout.EventSupport();
+  this._addEventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
   this.tooltips = [];
@@ -621,10 +621,10 @@ scout.Table.prototype._updateRowWidth = function() {
  * @param new rows to append at the end of this.$data. If undefined this.rows is used.
  */
 scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlockSelected) {
-  // this function has to be fast
   var $rows, numRowsLoaded,
     rowString = '',
     that = this;
+
   lastRowOfBlockSelected = lastRowOfBlockSelected ? lastRowOfBlockSelected : false;
   startRowIndex = startRowIndex !== undefined ? startRowIndex : 0;
   rows = rows || this.rows;
@@ -667,7 +667,6 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     $rows.appendTo(this.$data);
     this._installRows($rows);
     this._triggerRowsDrawn($rows);
-
     this._triggerRowsSelected();
 
     if (this.scrollToSelection) {
@@ -701,14 +700,22 @@ scout.Table.prototype._removeRows = function($rows) {
  * are expected to be linked with the corresponding 'rows' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRows = function($rows) {
-  var that = this;
+  var filterChanged,
+    newInvisibleRows = [],
+    that = this;
 
   $rows.each(function(entry, index, $rows) {
     var editorField,
       $row = $(this),
       row = $row.data('row');
 
-    that._applyFiltersForRow($row);
+    // Apply row filter and memorize the new invisible rows
+    if (that._applyFiltersForRow($row)) {
+      if (!$row.isVisible()) {
+        newInvisibleRows.push(row);
+      }
+      filterChanged = true;
+    }
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -725,6 +732,9 @@ scout.Table.prototype._installRows = function($rows) {
 
   // update grouping if data was grouped
   this._group();
+  if (filterChanged) {
+    this._rowsFiltered(newInvisibleRows);
+  }
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
@@ -1395,10 +1405,10 @@ scout.Table.prototype._updateRows = function(rows) {
 
     // Replace old $row
     if (this.rendered && oldRow.$row) {
-      var rowSelected = this.selectedRows.indexOf(updatedRow) > -1;
-
-      var previousRowSelected = false,
+      var rowSelected = this.selectedRows.indexOf(updatedRow) > -1,
+        previousRowSelected = false,
         followingRowSelected = false;
+
       if (rowIndex > 0) {
         previousRowSelected = this.selectedRows.indexOf(this.rows[rowIndex - 1]) > -1;
       }
@@ -1624,7 +1634,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
   var filteredRows = [];
   for (var i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
-    if (row.$row && row.$row.isVisible()) {
+    if (!row.invisibleDueToFilter) {
       filteredRows.push(row);
     }
   }
@@ -1702,26 +1712,25 @@ scout.Table.prototype.filter = function() {
   var i, useAnimation,
     that = this,
     rowCount = 0,
-    $allRows = this.$rows(),
     rowsToHide = [],
     rowsToShow = [];
 
   this.$sumRows().hide();
 
   // Filter rows
-  $allRows.each(function() {
+  this.rows.forEach(function(row) {
     var show,
-      $row = $(this);
+      $row = row.$row;
 
     show = that._rowAcceptedByFilters($row);
     if (show) {
-      if ($row.hasClass('invisible')) {
-        rowsToShow.push($row.data('row'));
+    if ($row.hasClass('invisible')) {
+        rowsToShow.push(row);
       }
       rowCount++;
     } else {
       if (!$row.hasClass('invisible')) {
-        rowsToHide.push($row.data('row'));
+        rowsToHide.push(row);
       }
     }
   });
@@ -1735,17 +1744,19 @@ scout.Table.prototype.filter = function() {
     that.showRow(row.$row, useAnimation);
   });
 
-  // Non visible rows must be deselected
-  this.deselectRows(rowsToHide);
-
-  // Used by table footer
-  this.filteredRowCount = rowCount;
-
-  this._triggerRowsFiltered(rowCount, this.filteredBy());
+  this._rowsFiltered(rowsToHide);
 
   $(':animated', that.$data).promise().done(function() {
     that._group();
   });
+};
+
+scout.Table.prototype._rowsFiltered = function(invisibleRows) {
+  // non visible rows must be deselected
+  this.deselectRows(invisibleRows);
+
+  // notify
+  this._triggerRowsFiltered();
 };
 
 scout.Table.prototype._rowAcceptedByFilters = function($row) {
@@ -1758,12 +1769,22 @@ scout.Table.prototype._rowAcceptedByFilters = function($row) {
   return true;
 };
 
+/**
+ * @returns {Boolean} true if row state has changed, false if not
+ */
 scout.Table.prototype._applyFiltersForRow = function($row) {
   if (!this._rowAcceptedByFilters($row)) {
-    this.hideRow($row);
+    if (!$row.hasClass('invisible')) {
+      this.hideRow($row);
+      return true;
+    }
   } else {
-    this.showRow($row);
+    if ($row.hasClass('invisible')) {
+      this.showRow($row);
+      return true;
+    }
   }
+  return false;
 };
 
 /**
@@ -1795,7 +1816,6 @@ scout.Table.prototype.resetFilter = function() {
     this.unregisterFilter(key);
   }
   this._filterMap = {};
-  this.filteredRowCount = undefined;
   this._triggerFilterResetted();
 };
 
@@ -1841,11 +1861,13 @@ scout.Table.prototype.unregisterFilter = function(key) {
 };
 
 scout.Table.prototype.showRow = function($row, useAnimation) {
-  var that = this;
+  var that = this,
+    row = $row.data('row');
   if (!$row.hasClass('invisible')) {
     return;
   }
 
+  row.invisibleDueToFilter = false;
   if (useAnimation) {
     $row.stop().slideDown({
       duration: 250,
@@ -1862,11 +1884,14 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
 };
 
 scout.Table.prototype.hideRow = function($row, useAnimation) {
-  var that = this;
+  var that = this,
+    row = $row.data('row');
   if ($row.hasClass('invisible')) {
     return;
   }
 
+  // flag is necessary to get correct filter count even when animation is still in progress
+  row.invisibleDueToFilter = true;
   if (useAnimation) {
     $row.stop().slideUp({
       duration: 250,
@@ -2019,18 +2044,12 @@ scout.Table.prototype._triggerRowsSelected = function() {
   this.events.trigger(type, event);
 };
 
-scout.Table.prototype._triggerRowsFiltered = function(numRows, filterName) {
-  var type = scout.Table.GUI_EVENT_ROWS_FILTERED;
-  var event = {
-    numRows: numRows,
-    filterName: filterName
-  };
-  this.events.trigger(type, event);
+scout.Table.prototype._triggerRowsFiltered = function() {
+  this.events.trigger(scout.Table.GUI_EVENT_ROWS_FILTERED);
 };
 
 scout.Table.prototype._triggerFilterResetted = function() {
-  var type = scout.Table.GUI_EVENT_FILTER_RESETTED;
-  this.events.trigger(type);
+  this.events.trigger(scout.Table.GUI_EVENT_FILTER_RESETTED);
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
