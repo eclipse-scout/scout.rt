@@ -37,11 +37,6 @@
     padding-top: 8px;
     padding-bottom: 8px;
 
-    &.parent {
-      /*nicer?, let's try*/
-      /*#scout.font-text-plus(@bold);*/
-    }
-
     &.group {
       background-color: @outline-group-background-color;
     }
@@ -91,8 +86,7 @@
     /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
     padding: 12px 2px 12px 2px !important;
 
-    &.parent,
-    &.children,
+    &.group,
     &.selected {
       #scout.font-text-plus();
       display: block;
@@ -114,8 +108,7 @@
       cursor: default;
     }
 
-    &.parent::before,
-    &.parent::after,
+    &.group::after,
     &.selected::before {
       position: absolute;
       left: 50%;
@@ -127,13 +120,13 @@
       z-index: 1;
     }
 
-    &.parent::before {
+    &.group::before {
       border-color: @outline-selection-background-color transparent transparent transparent;
       border-width: 8px 13px 0 13px;
       bottom: -9px;
     }
 
-    &.parent::after {
+    &.group::after {
       border-color: @outline-group-background-color transparent transparent transparent;
       border-width: 8px 13px 0 13px;
       bottom: -8px;
@@ -145,8 +138,7 @@
       bottom: -8px;
     }
 
-    &.parent.leaf::before,
-    &.parent.leaf::after,
+    &.group.leaf::after,
     &.selected.leaf::before {
       display: none;
     }

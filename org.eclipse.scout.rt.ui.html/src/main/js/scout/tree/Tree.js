@@ -1249,45 +1249,23 @@ scout.Tree.prototype._showAllNodes = function($showAllNode) {
 };
 
 scout.Tree.prototype._updateItemPath = function() {
-  var $selectedNodes, $node, level;
+  var $selectedNodes, $node, level, $ultimate;
 
   // first remove and select selected
-  this.$data.find('.tree-node').removeClass('parent children group');
+  this.$data.find('.tree-node').removeClass('group');
 
-  // if no selection: mark all top elements as children
-  if (this.selectedNodeIds.length === 0) {
-    this.$data.children().addClass('children');
-    return;
-  }
-
-  // find direct children
+  // init data
   $selectedNodes = this.$selectedNodes();
-  $node = $selectedNodes.next();
   level = parseFloat($selectedNodes.attr('data-level'));
-  while ($node.length > 0) {
-    if ($node.hasClass('animationWrapper')) {
-      $node = $node.children().first();
-    }
-    var l = parseFloat($node.attr('data-level'));
-    if (l === level + 1) {
-      $node.addClass('children');
-    } else if (l === level) {
-      break;
-    }
-    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
-      // If there is no next node but we are inside an animationWrapper, step out the wrapper
-      $node = $node.parent();
-    }
-    $node = $node.next();
-  }
 
-  // find parents
-  var $ultimate;
   if ($selectedNodes.parent().hasClass('animationWrapper')) {
     //If node expansion animation is in progress, the nodes are wrapped by a div
-    $selectedNodes = $selectedNodes.parent();
+    $node = $selectedNodes.parent().prev();
+  } else {
+    $node = $selectedNodes.prev();
   }
-  $node = $selectedNodes.prev();
+
+  // find best parents
   while ($node.length > 0) {
     var k = parseFloat($node.attr('data-level'));
     if (k < level) {
@@ -1295,7 +1273,7 @@ scout.Tree.prototype._updateItemPath = function() {
        break;
      }
 
-      $node.addClass('parent');
+      $node.addClass('group');
       $ultimate = $node;
       level = k;
     }
@@ -1305,12 +1283,16 @@ scout.Tree.prototype._updateItemPath = function() {
     $node = $node.prev();
   }
 
-  $.l($ultimate);
-
   // find group with same ultimate parent
   $ultimate = $ultimate || $selectedNodes;
   $node = $ultimate;
-  level = $ultimate.attr('data-level');
+  level = $node.attr('data-level');
+
+  if ($node.parent().hasClass('animationWrapper')) {
+    //If node expansion animation is in progress, the nodes are wrapped by a div
+    $node = $selectedNodes.parent();
+  }
+
   while ($node.length > 0) {
     $node.addClass('group');
     if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
