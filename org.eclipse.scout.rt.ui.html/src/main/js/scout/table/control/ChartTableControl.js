@@ -368,8 +368,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         mark = xAxis.format(key),
         value = cube.getValue([key])[0];
 
+      // bbox is expensive, test only if there is a chance so draw label
       var $text = drawAxisText(x(a) + width / 2 - 1.5, y(0) + 14, 'x', mark),
-        w = $text[0].getBBox().width;
+        w = xAxis.length > 50 ? width * 10 : $text[0].getBBox().width;
 
       maxWidth = (w > maxWidth) ? w : maxWidth;
 
@@ -436,8 +437,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
         mark = xAxis.format(key),
         value = cube.getValue([key])[0];
 
+      // bbox is expensive, test only if there is a chance so draw label
       var $text = drawAxisText(x(0) - 8, y(a) + height / 2, 'y', mark),
-        h = $text[0].getBBox().height;
+        h = xAxis.length > 50 ? height * 10 : $text[0].getBBox().height;
 
       maxHeight = (h > maxHeight) ? h : maxHeight;
 
