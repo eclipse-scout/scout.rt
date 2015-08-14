@@ -576,7 +576,11 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
   var eventOnPopup = this._datePickerPopup.rendered && this._datePickerPopup.$container.isOrHas(target);
 
   if (!eventOnDateField && !eventOnTimeField && !eventOnPopup) {
-    this.acceptInput(); // event outside this field.
+    // event outside this field.
+    var dateFieldActive = $(document.activeElement).is(this.$dateField);
+    var timeFieldActive = $(document.activeElement).is(this.$timeField);
+    // Accept only the currently focused part (the other one cannot have a pending change)
+    this._acceptDateTimePrediction(dateFieldActive, timeFieldActive);
   }
 };
 
