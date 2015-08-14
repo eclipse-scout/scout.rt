@@ -66,7 +66,7 @@ public interface ICodeService extends IService {
   List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException;
 
   /**
-   * @return all codetype classes from bundles with classPrefix
+   * @return all codetype classes with classPrefix
    */
   Collection<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix);
 

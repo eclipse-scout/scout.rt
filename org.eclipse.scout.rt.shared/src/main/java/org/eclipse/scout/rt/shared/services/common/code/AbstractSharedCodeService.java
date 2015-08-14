@@ -11,10 +11,8 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -22,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.service.AbstractService;
@@ -38,13 +37,9 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
   private static final Long DEFAULT_PARTITION_ID = 0L;
 
   private final CodeTypeStore m_codeTypeStore;
-  private final Object m_codeTypeClassDescriptorMapLock;
-  private final Map<String, Set<Class<? extends ICodeType<?, ?>>>> m_codeTypeClassDescriptorMap;
 
   protected AbstractSharedCodeService() {
     m_codeTypeStore = new CodeTypeStore();
-    m_codeTypeClassDescriptorMapLock = new Object();
-    m_codeTypeClassDescriptorMap = new HashMap<>();
   }
 
   @Override
@@ -150,37 +145,21 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
 
   @Override
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
-    if (classPrefix == null) {
-      return CollectionUtility.hashSet();
-    }
-    synchronized (m_codeTypeClassDescriptorMapLock) {
-      Set<Class<? extends ICodeType<?, ?>>> a = m_codeTypeClassDescriptorMap.get(classPrefix);
-      if (a != null) {
-        return CollectionUtility.hashSet(a);
-      }
-
-      Set<IClassInfo> allKnownCodeTypes = ClassInventory.get().getAllKnownSubClasses(ICodeType.class);
-      Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
-      for (IClassInfo codeTypeInfo : allKnownCodeTypes) {
-        if (!codeTypeInfo.isInstanciable()) {
-          continue;
+    Set<IClassInfo> allKnownCodeTypes = ClassInventory.get().getAllKnownSubClasses(ICodeType.class);
+    Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
+    for (IClassInfo codeTypeInfo : allKnownCodeTypes) {
+      if (acceptClass(codeTypeInfo)) {
+        try {
+          @SuppressWarnings("unchecked")
+          Class<? extends ICodeType<?, ?>> codeTypeClass = (Class<? extends ICodeType<?, ?>>) codeTypeInfo.resolveClass();
+          discoveredCodeTypes.add(codeTypeClass);
         }
-        if (acceptClassName(codeTypeInfo.name())) {
-          try {
-            if (acceptClass(codeTypeInfo)) {
-              @SuppressWarnings("unchecked")
-              Class<? extends ICodeType<?, ?>> codeTypeClass = (Class<? extends ICodeType<?, ?>>) codeTypeInfo.resolveClass();
-              discoveredCodeTypes.add(codeTypeClass);
-            }
-          }
-          catch (Exception e) {
-            LOG.error("load code type", e);
-          }
+        catch (Exception e) {
+          LOG.error("Error loading code type class", e);
         }
       }
-      m_codeTypeClassDescriptorMap.put(classPrefix, CollectionUtility.hashSet(discoveredCodeTypes));
-      return CollectionUtility.hashSet(discoveredCodeTypes);
     }
+    return CollectionUtility.hashSet(discoveredCodeTypes);
   }
 
   @Override
@@ -205,22 +184,6 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
   }
 
   /**
-   * Checks whether the given class name is a potential code type class. Class names that do not meet the
-   * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
-   * The default implementation checks whether the class name contains <code>"CodeType"</code>.
-   *
-   * @param bundle
-   *          The class's hosting bundle
-   * @param className
-   *          the class name to be checked
-   * @return Returns <code>true</code> if the given class name meets the requirements to be considered as a code type
-   *         class. <code>false</code> otherwise.
-   */
-  protected boolean acceptClassName(String className) {
-    return (className.indexOf("CodeType") >= 0);
-  }
-
-  /**
    * Checks whether the given class is a CodeType class that should be visible to this service.
    *
    * @param c
@@ -228,7 +191,14 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
    * @return Returns <code>true</code> if the class is an accepted code type class. <code>false</code> otherwise.
    */
   protected boolean acceptClass(IClassInfo c) {
-    return c.isInstanciable();
+    return c.isInstanciable() && !c.hasAnnotation(IgnoreBean.class) && acceptClassName(c.name());
+  }
+
+  /**
+   * Checks whether the given class name is a potential code type class. By default, all code types are accepted.
+   */
+  protected boolean acceptClassName(String className) {
+    return true;
   }
 
   /**

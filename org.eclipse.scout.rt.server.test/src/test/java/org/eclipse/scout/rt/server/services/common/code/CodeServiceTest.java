@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.services.common.code;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
@@ -19,12 +18,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.server.TestServerSession;
+import org.eclipse.scout.rt.server.services.common.code.fixture.IgnoredCodeType;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType1;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType2;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -45,77 +44,52 @@ import org.junit.runner.RunWith;
 @RunWithSubject("john")
 public class CodeServiceTest {
 
-  /* ---------------------------------------------------------------------------------------------- */
-  /* Tests for Bug 398323 - CodeService / PermissionService: More fine-grained lookup strategies for finding classes */
-  /* ---------------------------------------------------------------------------------------------- */
+  /**
+   * Tests that a code type class is found by {@link ICodeService#getAllCodeTypeClasses(String)}
+   */
+  @Test
+  public void testCodeTypeClasses() {
+    ICodeService service = BEANS.get(ICodeService.class);
+    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
+    assertTrue(allCodeTypes.contains(TestCodeType1.class));
+  }
 
-  private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).withInitialInstance(testService).withApplicationScoped(true).withAnnotation(AnnotationFactory.createOrder(-1000)));
+  /**
+   * Tests that a Codetype with Annotation {@link IgnoreBean} is not found
+   */
+  @Test
+  public void testCodeTypeClass_IgnoredNotFound() {
+    ICodeService service = BEANS.get(ICodeService.class);
+    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
+    assertFalse(allCodeTypes.contains(IgnoredCodeType.class));
+  }
+
+  /**
+   * Tests that a Codetype that is not instanciable is not found
+   */
+  @Test
+  public void testCodeTypeClass_AbstractNotFound() {
+    ICodeService service = BEANS.get(ICodeService.class);
+    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
+    assertFalse(allCodeTypes.contains(AbstractCodeType.class));
+  }
+
+  @Test
+  public void testCodeTypeClass_IgnoredName() throws ProcessingException {
+    CodeService_IgnoreClassName1_Mock testService = new CodeService_IgnoreClassName1_Mock();
+    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).withInitialInstance(testService).withApplicationScoped(true));
     try {
       ICodeService service = BEANS.get(ICodeService.class);
-      assertSame(testService, service);
-      //
-      Collection<Class<? extends ICodeType<?, ?>>> result = service.getAllCodeTypeClasses("");
-      boolean testCodeType1Found = false;
-      boolean testCodeType2Found = false;
-      for (Class<? extends ICodeType<?, ?>> b : result) {
-        if (CompareUtility.equals(b.getName(), TestCodeType1.class.getName())) {
-          testCodeType1Found = true;
-        }
-        if (CompareUtility.equals(b.getName(), TestCodeType2.class.getName())) {
-          testCodeType2Found = true;
-        }
-      }
-      //
-      if (testCodeType1Expected) {
-        assertTrue("TestCodeType1 class not found (expected: found)", testCodeType1Found);
-      }
-      else {
-        assertFalse("TestCodeType1 class found (expected: not found)", testCodeType1Found);
-      }
-      if (testCodeType2Expected) {
-        assertTrue("TestCodeType2 class not found (expected: found)", testCodeType2Found);
-      }
-      else {
-        assertFalse("TestCodeType2 class found (expected: not found)", testCodeType2Found);
-      }
+      Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
+      assertFalse(allCodeTypes.contains(TestCodeType1.class));
+      assertTrue(allCodeTypes.contains(TestCodeType2.class));
     }
     finally {
       TestingUtility.unregisterBeans(reg);
     }
   }
 
-  @Test
-  public void testDefault() throws ProcessingException {
-    testImpl(new CodeService_Default_Mock(), true, true);
-  }
-
-  @Test
-  public void testIgnoreClassName() throws ProcessingException {
-    testImpl(new CodeService_IgnoreClassName1_Mock(), false, true);
-  }
-
-  @Test
-  public void testIgnoreClass() throws ProcessingException {
-    testImpl(new CodeService_IgnoreClass2_Mock(), true, false);
-  }
-
-  abstract static class AbstractCodeServiceMock extends CodeService {
-
-    public AbstractCodeServiceMock() throws ProcessingException {
-      super();
-    }
-
-  }
-
-  static class CodeService_Default_Mock extends AbstractCodeServiceMock {
-
-    public CodeService_Default_Mock() throws ProcessingException {
-      super();
-    }
-  }
-
-  static class CodeService_IgnoreClassName1_Mock extends AbstractCodeServiceMock {
+  static class CodeService_IgnoreClassName1_Mock extends CodeService {
 
     public CodeService_IgnoreClassName1_Mock() throws ProcessingException {
       super();
@@ -124,18 +98,6 @@ public class CodeServiceTest {
     @Override
     protected boolean acceptClassName(String name) {
       return super.acceptClassName(name) && CompareUtility.notEquals(name, TestCodeType1.class.getName());
-    }
-  }
-
-  static class CodeService_IgnoreClass2_Mock extends AbstractCodeServiceMock {
-
-    public CodeService_IgnoreClass2_Mock() throws ProcessingException {
-      super();
-    }
-
-    @Override
-    protected boolean acceptClass(IClassInfo ci) {
-      return super.acceptClass(ci) && (!ci.name().equals(TestCodeType2.class.getName()));
     }
   }
 
