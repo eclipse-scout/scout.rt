@@ -1,44 +1,31 @@
 scout.logout = {
 
-  initTexts: function() {
-    var translations = {
-      en: {
-        LogoutSuccessful: 'Good bye!',
-        Relogin: 'Login again'
-      },
-      de: {
-        LogoutSuccessful: 'Auf Wiedersehen!',
-        Relogin: 'Erneut anmelden'
-      }
-    };
-
-    var preferredLanguage = sessionStorage.getItem('scout:preferredLanguage');
-    var language = preferredLanguage || navigator.language || navigator.userLanguage;
-    if (language && !translations[language]) {
-      language = language.split(/[-_]/)[0];
-    }
-    if (!language || !translations[language]) {
-      language = 'en';
-    }
-    return new scout.Texts(translations[language]);
-  },
+  // FIXME AWE: pretty graphics for unsupported / logout?
 
   init: function(opts) {
     var $container,
       defaultOpts = {
-        loginUrl: './'
+        loginUrl: './',
+        texts: {
+          'ui.logoutSuccessful': 'Good bye!',
+          'ui.loginAgain': 'Login again'
+        }
       },
-      texts = scout.logout.initTexts(),
-      options = $.extend({}, defaultOpts, opts);
-
-    $container = $('<div id="logout-box">')
-      .appendTo($('body'));
-    $('<div id="logout-text">')
-      .text(texts.get('LogoutSuccessful'))
-      .appendTo($container);
-    $('<a id="relogin" href="' + options.loginUrl + '">')
-      .text(texts.get('Relogin'))
-      .appendTo($container);
+      options = $.extend({}, defaultOpts, opts),
+      texts = new scout.Texts(options.texts),
+      $box = $('<div>')
+        .addClass('box-with-logo')
+        .text(texts.get('ui.logoutSuccessful'))
+        .appendTo($('body')),
+      $buttonBar = $('<div>')
+        .addClass('button')
+        .appendTo($box);
+      $('<button>')
+        .text(texts.get('ui.loginAgain'))
+        .click(function() {
+          window.location = options.loginUrl;
+        })
+        .appendTo($buttonBar);
   }
 
 };

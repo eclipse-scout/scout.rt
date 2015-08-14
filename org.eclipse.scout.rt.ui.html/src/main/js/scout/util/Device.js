@@ -8,12 +8,14 @@ scout.Device = function(userAgent) {
   this.features = {};
   this.device;
   this.browser = scout.Device.SupportedBrowsers.UNKNOWN;
+  this.browserVersion = 0;
 
   // initialize with empty string so that it can be used without calling initUnselectableAttribute()
   this.unselectableAttribute = '';
   this.tableAdditionalDivRequired = false;
 
-  this.parseUserAgent(this.userAgent);
+  this.parseUserAgent(userAgent);
+  this.parseBrowserVersion(userAgent);
 };
 
 // FIXME AWE: user info from server-side BrowserInfo class
@@ -175,6 +177,23 @@ scout.Device.prototype.supportsIframeSecurityAttribute = function() {
     var test = document.createElement('iframe');
     return ('security' in test);
   }.bind(this));
+};
+
+/**
+ * Currently the browserVersion is only set for IE. Because the only version-check we do,
+ * is whether or not we use an old IE version.
+ */
+scout.Device.prototype.parseBrowserVersion = function(userAgent) {
+  var versionRegex;
+  if (this.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER) {
+    versionRegex = /MSIE ([0-9\.])/;
+  }
+  if (versionRegex) {
+    var matches = versionRegex.exec(userAgent);
+    if (Array.isArray(matches) && matches.length === 2) {
+      this.browserVersion = parseFloat(matches[1]);
+    }
+  }
 };
 
 // ------------ Singleton ----------------

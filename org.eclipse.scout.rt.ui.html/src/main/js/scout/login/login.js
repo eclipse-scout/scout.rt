@@ -1,55 +1,49 @@
 scout.login = {
 
-  // FIXME AWE: pass i18n texts from JSP
-  initTexts: function() {
-    var translations = {
-      en: {
-        Login: 'Login',
-        LoginError: 'Login failed',
-        User: 'User',
-        Password: 'Password'
-      },
-      de: {
-        Login: 'Anmelden',
-        LoginError: 'Anmeldung fehlgeschlagen',
-        User: 'Benutzer',
-        Password: 'Passwort'
-      }
-    };
-
-    var preferredLanguage = sessionStorage.getItem('scout:preferredLanguage');
-    var language = preferredLanguage || navigator.language || navigator.userLanguage;
-    if (language && !translations[language]) {
-      language = language.split(/[-_]/)[0];
-    }
-    if (!language || !translations[language]) {
-      language = 'en';
-    }
-    return new scout.Texts(translations[language]);
-  },
-
   /**
    * opts:
    * - redirectUrl: URL to redirect to after successful login
    * - prepareRedirectUrl: function(s) that is called on the redirectUrl before opening it
    */
   init: function(opts) {
-    this.options = opts || {};
-    var texts = scout.login.initTexts();
-    this.$form = $('<form action="auth" method="post">')
+    var $buttonDiv, texts, defaultOpts = {
+      texts: {
+        'ui.login': 'Login',
+        'ui.loginFailed': 'Login failed',
+        'ui.user': 'User',
+        'ui.password': 'Password'
+      }
+    };
+    this.options = $.extend({}, defaultOpts, opts);
+    texts = new scout.Texts(this.options.texts);
+    this.$form = $('<form>')
+      .attr('action', 'auth')
+      .attr('method', 'post')
       .submit(onLoginFormSubmit.bind(this))
       .appendTo($('body'));
-    this.$container = $('<div id="login-box">')
+    this.$container = $('<div>')
+      .attr('id', 'login-box')
+      .addClass('box-with-logo')
       .appendTo(this.$form);
-    this.$user = $('<input id="login-user" type="text" autocapitalize="off" autocorrect="off">')
-      .placeholder(texts.get('User'))
+    this.$user = $('<input>')
+      .attr('type', 'text')
+      .attr('autocapitalize', 'off')
+      .attr('autocorrect', 'off')
+      .placeholder(texts.get('ui.user'))
       .appendTo(this.$container);
-    this.$password = $('<input id="login-password" type="password">')
-      .placeholder(texts.get('Password'))
+    this.$password = $('<input>')
+      .attr('type', 'password')
+      .placeholder(texts.get('ui.password'))
       .appendTo(this.$container);
-    this.$button = $('<button id="login-button" type="submit">')
-      .text(texts.get('Login'))
+    $buttonDiv = $('<div>')
+      .attr('id', 'login-button')
+      .addClass('button')
       .appendTo(this.$container);
+    this.$button =  $('<button>')
+      .addClass('default')
+      .attr('type', 'submit')
+      .text(texts.get('ui.login'))
+      .appendTo($buttonDiv);
 
     this.$user.focus();
 
@@ -73,7 +67,7 @@ scout.login = {
       if (scout.device.supportsCssAnimation()) {
         this.$button
           .html('')
-          .append($('<div id="login-button-loading">'));
+          .append($('<div>').attr('id', 'login-button-loading'));
       }
 
       $.post(url, data)
@@ -106,7 +100,7 @@ scout.login = {
         this.$button
           .setEnabled(true)
           .html('')
-          .text(texts.get('LoginError'))
+          .text(texts.get('ui.loginFailed'))
           .addClass('login-error');
         this.$user.focus();
         this.$user.one('input.resetLoginError', resetButtonText.bind(this));
@@ -125,7 +119,7 @@ scout.login = {
 
     function resetButtonText() {
       this.$button
-        .text(texts.get('Login'))
+        .text(texts.get('ui.login'))
         .removeClass('login-error');
     }
   }

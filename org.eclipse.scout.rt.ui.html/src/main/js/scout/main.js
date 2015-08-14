@@ -38,6 +38,23 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.parent = parentCtor;
 };
 
+scout.checkBrowserCompability = function(options, dataPartId) {
+  var device = scout.device;
+  if (device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && device.browserVersion < 9) {
+    var $entryPoint = $('.scout[data-partId="' + dataPartId + '"'),
+      $box = $entryPoint.appendDiv('box-with-logo'),
+      session = this;
+    $box.load('unsupported-browser.jsp', function() {
+      $box.find('button').click(function() {
+        $box.remove();
+        session.init(options);
+      });
+    });
+    return false;
+  }
+  return true;
+};
+
 scout._installGlobalJavascriptErrorHandler = function() {
   window.onerror = function(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {

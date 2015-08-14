@@ -192,6 +192,9 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     return null;
   }
 
+  // FIXME AWE: make this work with JSP (try a filter which works after JSP has done its magic)
+  // check also if resolveIndexJsp must be removed
+
   /**
    * html
    */
