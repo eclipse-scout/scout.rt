@@ -355,11 +355,11 @@
   }
 
   & .weekend::before {
-    color: @palette-blue-5;
+    color: @palette-blue-4;
   }
 
   & .weekend-out::before {
-    color: @palette-blue-3 ;
+    color: @palette-blue-2 ;
   }
 
   & .now::before {

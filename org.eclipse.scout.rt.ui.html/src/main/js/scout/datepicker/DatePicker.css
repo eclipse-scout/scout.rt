@@ -43,7 +43,6 @@
   line-height: 25px;
   float: left;
   text-align: center;
-  cursor: pointer;
   border-radius: 50%;
   border: 1px solid transparent;
 
@@ -52,8 +51,13 @@
   }
 
   &:hover {
-    color: @hover-color;
-    font-weight: bold;
+    border-color: @item-selection-border-color;
+    background-color:  @palette-blue-0;
+
+    &.date-picker-now {
+      border-color:  @highlight-color;
+      background-color:  @palette-orange-0;
+    }
   }
 
   &.date-picker-out {
@@ -69,13 +73,18 @@
   }
 
   &.date-picker-now {
-    background-color: @palette-orange-0;
-    border: 1px solid @palette-orange-3;
+    color: @highlight-color;
+    font-weight: bold;
   }
 
   &.date-picker-selected {
-    background-color: @palette-blue-0;
-    border: 1px solid @palette-blue-3 ;
+    background-color:  @item-selection-border-color;
+    color: @palette-white;
+
+    &.date-picker-now {
+    background-color:  @highlight-color;
+    color: @palette-white;
+    }
   }
 }
 
