@@ -6,7 +6,8 @@ describe("NavigateDownButton", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     outline = {
-      session: session
+      session: session,
+      lazyAddChildNodesToTree: function() {}
     };
     menu = new scout.NavigateDownButton(outline, node);
   });
