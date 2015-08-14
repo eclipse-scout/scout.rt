@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
-public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends AbstractColumn<VALUE> implements IContentAssistColumn<VALUE, LOOKUP_TYPE> {
+public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends AbstractColumn<VALUE>implements IContentAssistColumn<VALUE, LOOKUP_TYPE> {
 
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
@@ -223,11 +223,6 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
   }
 
   @SuppressWarnings("unchecked")
-  public Class<LOOKUP_TYPE> getType() {
-    return TypeCastUtility.getGenericsParameterClass(getClass(), AbstractContentAssistColumn.class);
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
   protected VALUE parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
     VALUE validValue = null;
@@ -389,7 +384,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     chain.execPrepareLookup(call, row);
   }
 
-  protected static class LocalContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends LocalColumnExtension<VALUE, OWNER> implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
+  protected static class LocalContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends LocalColumnExtension<VALUE, OWNER>implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
 
     public LocalContentAssistColumnExtension(OWNER owner) {
       super(owner);

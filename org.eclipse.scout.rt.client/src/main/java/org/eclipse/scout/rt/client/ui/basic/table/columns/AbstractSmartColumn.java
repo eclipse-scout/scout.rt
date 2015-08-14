@@ -15,7 +15,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ISmartColumnExtension;
 
 @ClassId("c333e52d-4678-41b3-8307-01d473864d2e")
-public abstract class AbstractSmartColumn<VALUE> extends AbstractMixedSmartColumn<VALUE, VALUE> implements ISmartColumn<VALUE> {
+public abstract class AbstractSmartColumn<VALUE> extends AbstractMixedSmartColumn<VALUE, VALUE>implements ISmartColumn<VALUE> {
 
   public AbstractSmartColumn() {
     super();
@@ -23,15 +23,15 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractMixedSmartColum
 
   @Override
   protected final VALUE execConvertKeyToValue(VALUE key) {
-    return TypeCastUtility.castValue(key, getType());
+    return TypeCastUtility.castValue(key, getDataType());
   }
 
   @Override
   protected final VALUE execConvertValueToKey(VALUE value) {
-    return TypeCastUtility.castValue(value, getType());
+    return TypeCastUtility.castValue(value, getDataType());
   }
 
-  protected static class LocalSmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends LocalMixedSmartColumnExtension<VALUE, VALUE, OWNER> implements ISmartColumnExtension<VALUE, OWNER> {
+  protected static class LocalSmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends LocalMixedSmartColumnExtension<VALUE, VALUE, OWNER>implements ISmartColumnExtension<VALUE, OWNER> {
 
     public LocalSmartColumnExtension(OWNER owner) {
       super(owner);
