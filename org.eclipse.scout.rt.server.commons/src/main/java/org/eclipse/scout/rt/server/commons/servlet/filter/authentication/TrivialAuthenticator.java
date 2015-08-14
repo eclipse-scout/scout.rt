@@ -70,7 +70,7 @@ public class TrivialAuthenticator {
     }
 
     //excluded path
-    if (m_excludePathFilter.accepts(StringUtility.join("/", req.getServletPath(), req.getPathInfo()))) {
+    if (m_excludePathFilter.accepts(StringUtility.emptyIfNull(req.getServletPath()) + StringUtility.emptyIfNull(req.getPathInfo()))) {
       chain.doFilter(req, resp);
       return true;
     }
