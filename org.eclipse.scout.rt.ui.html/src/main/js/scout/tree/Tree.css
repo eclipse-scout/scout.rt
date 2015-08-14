@@ -60,20 +60,6 @@
   &:nth-of-type(1).selected {
     border-top-color: @item-selection-nonfocus-background-color;
   }
-
-  & > .show-all {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-  }
-
-  & > .show-all:hover {
-    color: @active-color;
-  }
-
-  &.expanded > .show-all {
-    display: hidden;
-  }
 }
 
 .tree-node-checkbox {
@@ -149,6 +135,11 @@
 
     .tree-node.leaf > & {
       content: '';
+    }
+
+    .tree-node.show-all > & {
+      #scout.font-text-normal();
+      content: '+';
     }
 
     .tree-node-control:hover::before {

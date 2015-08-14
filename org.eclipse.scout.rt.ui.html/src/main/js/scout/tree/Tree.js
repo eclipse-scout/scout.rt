@@ -17,6 +17,11 @@ scout.Tree = function() {
   this.menus = [];
   this.menuBar;
   this.checkedNodes=[];
+
+  // Flag (0 = false, > 0 = true) to indicate whether child nodes should be added to the tree lazily if
+  // they request it.  Default is false, which has the consequences that most UI actions show all nodes.
+  // However, certain actions may set this flag (temporarily) to true.
+  this._lazyAddChildNodesToTree = 0;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -126,7 +131,15 @@ scout.Tree.prototype._render = function($parent) {
         }.bind(this));
   this.dragAndDropHandler.install(this.$data);
 
-  this._addNodes(this.nodes);
+  // When nodes are rendered initially, lazy nodes should not be added to the tree.
+  this.lazyAddChildNodesToTree(true);
+  try {
+    this._addNodes(this.nodes);
+  }
+  finally {
+    this.lazyAddChildNodesToTree(false);
+  }
+
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
   }
@@ -137,7 +150,6 @@ scout.Tree.prototype._remove = function() {
   // Detach nodes from jQuery objects (because those will be removed)
   this.nodes.forEach(function(node) {
     delete node.$node;
-    delete node.$showAllNode;
   });
   scout.scrollbars.uninstall(this.$data, this.session);
   scout.Tree.parent.prototype._remove.call(this);
@@ -385,11 +397,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
     $node.addClass('expanded');
   } else {
     $node.removeClass('expanded');
-
-    if (node.$showAllNode) {
-      node.$showAllNode.remove();
-      delete node.$showAllNode;
-    }
+    $node.removeClass('show-all');
 
     // animated closing
     if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
@@ -734,7 +742,16 @@ scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded, recursive) {
   function expandNodeInternal(node) {
     node.expanded = expanded;
     if (this.rendered) {
-      this._renderExpansion(node);
+      // When the model chooses to expand a node, respect the child node's "lazyAddToTree" property.
+      // This has the effect that a double click on a table row does not expand all child nodes of
+      // the table page's node.
+      this.lazyAddChildNodesToTree(true);
+      try {
+        this._renderExpansion(node);
+      }
+      finally {
+        this.lazyAddChildNodesToTree(false);
+      }
     }
   }
 };
@@ -825,10 +842,6 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
       node.$node.remove();
       delete node.$node;
     }
-    if (node.$showAllNode) {
-      node.$showAllNode.remove();
-      delete node.$showAllNode;
-    }
   }
 
   //If every child node was deleted mark node as collapsed (independent of the model state)
@@ -845,14 +858,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
     var childNodesOfParent = parentNode.childNodes;
     if (!childNodesOfParent || childNodesOfParent.length === 0) {
       $parentNode.removeClass('expanded');
-      if (parentNode.$showAllNode) {
-        parentNode.$showAllNode.remove();
-        delete parentNode.$showAllNode;
-      }
-    } else {
-      if (parentNode.$showAllNode) {
-        this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
-      }
+      $parentNode.removeClass('show-all');
     }
   }
 
@@ -865,7 +871,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
   }
 
   $predecessor = !$predecessor ? $parent : $predecessor;
-  var parentNode = ($parent ? $parent.data('node') : undefined);
+  var parentNode = ($parent ? $parent.data('node') : null);
   var hasHiddenNodes = false;
 
   for (var i = 0; i < nodes.length; i++) {
@@ -873,10 +879,11 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
 
     var $node = this._$buildNode(node, $parent);
 
-    // If node wants to be lazy added to the tree, hide the DOM element, except the
-    // node is expanded, in which case we never hide it (this provides a cheap
+    // If node wants to be lazy added to the tree, and the tree has the flag _lazyAddChildNodesToTree
+    // set (may change dynamically, depending on the current state), hide the DOM element, except
+    // the node is expanded, in which case we never hide it. (The last check provides a cheap
     // way to retain most of the state when the page is reloaded).
-    if (parentNode && node.lazyAddToTree && !node.expanded) {
+    if (parentNode && this._lazyAddChildNodesToTree && node.lazyAddToTree && !node.expanded) {
       $node.addClass('hidden');
       hasHiddenNodes = true;
     }
@@ -895,23 +902,9 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     }
   }
 
-  // Update dummy "show all" node
-  if (hasHiddenNodes) {
-    // If parent is expanded and has not already a $showAllNode, create one
-    if (parentNode && parentNode.expanded && !parentNode.$showAllNode) {
-      var $showAllNode = this._$buildShowAllNode(parentNode);
-      parentNode.$node.append($showAllNode);
-      //$predecessor = $showAllNode;
-    } else {
-      // Node already exists, just update the text (node count might have changed)
-      this._decorateShowAllNode(parentNode.$showAllNode, parentNode);
-    }
-  } else {
-    // Delete existing $showAllNode
-    if (parentNode && parentNode.$showAllNode) {
-      parentNode.$showAllNode.remove();
-      delete parentNode.$showAllNode;
-    }
+  // Set the 'show-all' state on the parent node when not all child nodes are visible.
+  if (parentNode) {
+    parentNode.$node.toggleClass('show-all', hasHiddenNodes && parentNode.expanded);
   }
 
   this.updateScrollbar();
@@ -936,23 +929,6 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
   if (this.checkable) {
     this._renderTreeItemCheckbox(node);
   }
-
-  return $node;
-};
-
-scout.Tree.prototype._$buildShowAllNode = function(parentNode) {
-  var $parent = parentNode.$node;
-  var currentLevel = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
-
-  var $node = $.makeDiv('tree-node show-all')
-    .attr('data-level', currentLevel)
-    .css('padding-left', this._computeTreeItemPaddingLeft(currentLevel));
-
-  this._decorateShowAllNode($node, parentNode);
-
-  // Link to parent node
-  $node.data('parentNode', parentNode);
-  parentNode.$showAllNode = $node;
 
   return $node;
 };
@@ -992,12 +968,20 @@ scout.Tree.prototype._decorateNode = function(node) {
   // TODO BSH More attributes...
   // iconId
   // tooltipText
-};
 
-scout.Tree.prototype._decorateShowAllNode = function($showAllNode, parentNode) {
-  $showAllNode
-    //.text(this.session.text('ui.ShowAllNodes', parentNode.childNodes.length));
-    .text('+' + parentNode.childNodes.length);
+  // If parent node is marked as 'show-all', check if any hidden child nodes remain.
+  if (node.parentNode && node.parentNode.$node.hasClass('show-all')) {
+    var hasHiddenNodes = node.parentNode.childNodes.some(function(childNode) {
+      if (!childNode.$node || childNode.$node.hasClass('hidden')) {
+        return true;
+      }
+      return false;
+    });
+    if (!hasHiddenNodes) {
+      // Remove 'show-all' from parent
+      node.parentNode.$node.removeClass('show-all');
+    }
+  }
 };
 
 scout.Tree.prototype._renderNodeChecked = function(node) {
@@ -1129,14 +1113,8 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   }
 
   var $node = $(event.currentTarget);
-
-  // Handle "show all" dummy node
-  if ($node.hasClass('show-all')) {
-    this._showAllNodes($node);
-    return false;
-  }
-
   var node = $node.data('node');
+
   this.setNodesSelected(node);
 
   if (this.checkable && this._isCheckboxClicked(event)) {
@@ -1155,15 +1133,8 @@ scout.Tree.prototype._isCheckboxClicked = function(event) {
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
   var $node = $(event.currentTarget);
-
-  // Handle "show all" dummy node
-  if ($node.hasClass('show-all')) {
-    this._showAllNodes($node);
-    return false;
-  }
-
-  var node = $node.data('node'),
-    expanded = !$node.hasClass('expanded');
+  var node = $node.data('node');
+  var expanded = !$node.hasClass('expanded');
 
   if (this._breadcrumbEnabled) {
     return;
@@ -1183,9 +1154,21 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   }
 
   var $node = $(event.currentTarget).parent();
+  var node = $node.data('node');
+  var expanded = !$node.hasClass('expanded');
 
-  var node = $node.data('node'),
-    expanded = !$node.hasClass('expanded');
+  // Click on "show all" control shows all nodes
+  if ($node.hasClass('show-all')) {
+    if (event.which === 3) {
+      // Right mouse button --> collapse (because the normal collapse icon is not visible)
+      expanded = false;
+    }
+    else {
+      // Show all nodes
+      this._showAllNodes(node);
+      return false;
+    }
+  }
 
   // FIXME cru/cgu: talk about click on not selected nodes
   this.setNodesSelected(node);
@@ -1195,17 +1178,13 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   return false;
 };
 
-scout.Tree.prototype._showAllNodes = function($showAllNode) {
-  var parentNode = $showAllNode.data('parentNode'),
-    first = true,
-    updateFunc = function() {
-      this.updateScrollbar();
-      this.revealSelection();
-    }.bind(this);
+scout.Tree.prototype._showAllNodes = function(parentNode) {
+  parentNode.$node.removeClass('show-all');
 
-  // Remove "show all" dummy node
-  delete parentNode.$showAllNode;
-  $showAllNode.remove();
+  var updateFunc = function() {
+    this.updateScrollbar();
+    this.revealSelection();
+  }.bind(this);
 
   // Show all nodes for this parent
   for (var i = 0; i < parentNode.childNodes.length; i++) {
@@ -1216,31 +1195,28 @@ scout.Tree.prototype._showAllNodes = function($showAllNode) {
       continue;
     }
 
+    childNode.$node.removeClass('hidden');
+
     // only animate small trees
     if (parentNode.childNodes.length < 100) {
       var h = childNode.$node.outerHeight(),
-        p = childNode.$node.css('padding-top'),
-        func = first ? updateFunc : null;
-
-      // only first animated element should handle scrollbar and visibility of selection
-      first = false;
+        p = childNode.$node.css('padding-top');
 
       // make height 0
       childNode.$node
         .outerHeight(0)
         .css('padding-top', '0')
-        .css('padding-bottom', '0')
-        .removeClass('hidden');
+        .css('padding-bottom', '0');
 
       // animate to original height
       childNode.$node
         .animateAVCSD('padding-top', p, null, null, 200)
         .animateAVCSD('padding-bottom', p, null, null, 200)
-        .animateAVCSD('height', h, null, func, 200);
-
-    } else {
-      childNode.$node.removeClass('hidden');
+        .animateAVCSD('height', h, null, updateFunc, 200);
     }
+
+    // only first animated element should handle scrollbar and visibility of selection
+    updateFunc = null;
   }
 
   // without animation
@@ -1382,6 +1358,10 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
     propertiesChanged = true;
   }
   return propertiesChanged;
+};
+
+scout.Tree.prototype.lazyAddChildNodesToTree = function(lazyAddChildNodesToTree) {
+  this._lazyAddChildNodesToTree += (lazyAddChildNodesToTree ? 1 : -1);
 };
 
 scout.Tree.prototype.onModelAction = function(event) {

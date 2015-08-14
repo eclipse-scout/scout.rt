@@ -47,10 +47,6 @@
       border: 0;
     }
 
-    & > .show-all:hover {
-      color: @highlight-color;
-    }
-
      & > .tree-node-control {
       /* adjust control position */
       margin-left: -@outline-node-control-size - 5px;
