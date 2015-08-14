@@ -4,6 +4,7 @@
   width: 100%;
 
   &:focus {
+
     & .tree-node.selected {
       background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;
@@ -13,7 +14,6 @@
     .tree-node:nth-of-type(1).selected {
       border-top-color: @item-selection-nonfocus-background-color;
     }
-
   }
 
   & .menubar {
@@ -140,6 +140,8 @@
     .tree-node.show-all > & {
       #scout.font-text-normal();
       content: '+';
+      /* Move to left because '+' sign is not as wide as 'arrow-down' */
+      margin-left: -2px;
     }
 
     .tree-node-control:hover::before {
