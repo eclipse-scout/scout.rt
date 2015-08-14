@@ -7,6 +7,10 @@
   position: relative;
   height: 100%;
   width: 100%;
+
+  & > .scrollbar.y-axis {
+  margin-right: 13px;}
+
 }
 
 /* chart - type select */
@@ -185,9 +189,6 @@ svg.select-chart.selected {
 /* chart - main */
 
 .chart-main {
-  width: 3000px;
-  height: 1500px;
-
   & :focus {
       outline: none;
     }

@@ -14,7 +14,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$contentContainer = $parent.appendDiv('chart-container');
 
   // scrollbars
-  scout.scrollbars.install(this.$contentContainer, this.session, {axis: 'x'});
+  scout.scrollbars.install(this.$contentContainer, this.session);
 
   // group functions for dates
   var dateGroup = [
@@ -301,7 +301,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var cube = matrix.calculateCube();
 
     // set max width
-    $chartMain.css('width', '');
+    $chartMain.css('width', '3000px');
+    $chartMain.css('height', '1500px');
 
 
     // based on chart type: set class and draw chart
@@ -324,15 +325,16 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     }
 
     // update
-    $chartMain.children().promise().done(updateWidth);
+    $chartMain.children().promise().done(updateSize);
 
     return false;
   }
 
-  function updateWidth () {
+  function updateSize () {
     // adapt size of svg
     var box = $chartMain[0].getBBox();
     $chartMain.css('width', box.x + box.width);
+    $chartMain.css('height', box.y + box.height);
 
     // update scrollbar
     scout.scrollbars.update(that.$contentContainer);
@@ -341,7 +343,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawBar(xAxis, dataAxis, cube) {
     // dimension functions
     var maxWidth = 0,
-      width = Math.max(10, Math.min(800 / xAxis.length, 70)),
+      width = Math.max(12, Math.min(800 / xAxis.length, 70)),
       x = function(i) {
         i = i === null ? xAxis.length : i;
         return 100 + i * width;
@@ -385,7 +387,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     }
 
     // in case of to many elements, hide or rotate label
-    if (maxWidth > width * 3) {
+    if (maxWidth > (width - 3) * 3) {
       $('.main-axis-x', $chartMain).attr('fill-opacity', 0);
     } else if (maxWidth > width * 1.2) {
       $('.main-axis-x', $chartMain).each(function () {
@@ -408,8 +410,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   function drawStacked(xAxis, dataAxis, cube) {
     // dimension functions
     var maxHeight = 0,
-      maxWidth = Math.max(280, that.$contentContainer.width() - 680),
-      height = Math.max(8, Math.min(240 / xAxis.length, 30)),
+      maxWidth = Math.max(280, that.$contentContainer.width() - 700),
+      height = Math.max(10, Math.min(240 / xAxis.length, 30)),
       x = function(i) {
         return 100 + i / dataAxis.max * maxWidth;
       },
@@ -470,7 +472,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     }
 
     // dimension functions
-    var maxWidth = Math.max(280, that.$contentContainer.width() - 680),
+    var maxWidth = Math.max(280, that.$contentContainer.width() - 700),
       x = function(i) {
       i = i === null ? xAxis.max : i;
       return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
@@ -669,7 +671,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   function drawScatter(xAxis, yAxis, dataAxis, cube) {
     // dimension functions
-    var maxWidth = Math.max(280, that.$contentContainer.width() - 840),
+    var maxWidth = Math.max(280, that.$contentContainer.width() - 860),
     x = function(i) {
       i = i === null ? xAxis.max : i;
       return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
