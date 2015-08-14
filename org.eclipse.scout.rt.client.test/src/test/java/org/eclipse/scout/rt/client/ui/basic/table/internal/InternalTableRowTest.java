@@ -13,7 +13,11 @@ package org.eclipse.scout.rt.client.ui.basic.table.internal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Set;
+
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -57,6 +61,43 @@ public class InternalTableRowTest {
     assertEquals("test", ir.getCell(0).getCssClass());
   }
 
+  @Test
+  public void testCellChange() throws ProcessingException {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    ir.setRowChanging(true);
+    ir.cellChanged(ir.getCell(0), ICell.TEXT_BIT);
+    assertEquals(1, ir.getUpdatedColumnIndexes().size());
+    assertEquals(Integer.valueOf(0), ir.getUpdatedColumnIndexes().iterator().next());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testValueChange() throws ProcessingException {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    ir.setRowChanging(true);
+    ir.cellChanged(ir.getCell(0), ICell.VALUE_BIT);
+    Set<Integer> changedColumnIdx = ir.getUpdatedColumnIndexes(ICell.VALUE_BIT);
+    assertEquals(1, changedColumnIdx.size());
+    assertEquals(Integer.valueOf(0), changedColumnIdx.iterator().next());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testValueChange_NoChange() throws ProcessingException {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    ir.setRowChanging(true);
+    ir.cellChanged(ir.getCell(0), ICell.VALUE_BIT);
+    Set<Integer> changedColumnIdx = ir.getUpdatedColumnIndexes(ICell.TEXT_BIT);
+    assertEquals(0, changedColumnIdx.size());
+    ir.setRowChanging(false);
+  }
+
   /**
    * A table with a test column where only the first row is editable.
    */
@@ -65,7 +106,6 @@ public class InternalTableRowTest {
     @Order(10.0)
     public class TestColumn extends AbstractStringColumn {
     }
-
   }
 
 }

@@ -200,8 +200,8 @@ public class TableUtilityTest {
     assertEquals(BigDecimal.valueOf(111.223D), row1[5]);
     assertEquals(3333, row1[6]);
     assertEquals(4444L, row1[7]);
-    assertNull(row1[8]); // no display text
-    assertNull(row1[9]); // no display text
+    assertEquals("", row1[8]); // no display text
+    assertEquals("", row1[9]); // no display text
     assertEquals("Foo", row1[10]);
     assertEquals("Hello", row1[11]);
   }
@@ -217,8 +217,8 @@ public class TableUtilityTest {
     assertEquals(BigDecimal.valueOf(777.66D), row2[5]);
     assertEquals(6666, row2[6]);
     assertEquals(5555L, row2[7]);
-    assertNull(row2[8]); // no display text
-    assertNull(row2[9]); // no display text
+    assertEquals("", row2[8]); // no display text
+    assertEquals("", row2[9]); // no display text
     assertEquals("Bar", row2[10]);
     assertEquals("World", row2[11]);
   }

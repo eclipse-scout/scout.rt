@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -40,7 +41,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   private int m_rowChanging = 0;
   private boolean m_rowPropertiesChanged;
   private boolean m_filterAccepted = true;
-  private final Set<ICell> m_updatedCells = new HashSet<>();
+  private final Map<ICell, Set<Integer>> m_updatedCells = new HashMap<>();
 
   private InternalTableRow() {
     super(null);
@@ -60,16 +61,8 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     }
     // reset status
     setStatus(row.getStatus());
-    observeCells();
     // set table at end to avoid events before the row is even attached
     m_table = table;
-  }
-
-  private void observeCells() {
-    for (int i = 0; i < m_cells.size(); i++) {
-      Cell cell = m_cells.get(i);
-      cell.setObserver(this);
-    }
   }
 
   @Override
@@ -250,24 +243,6 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   @Override
   public void setRowPropertiesChanged(boolean b) {
     m_rowPropertiesChanged = b;
-  }
-
-  @Override
-  public Set<Integer> getUpdatedColumnIndexes() {
-    // Prepare index
-    Map<ICell, Integer> indexesByCell = new HashMap<>();
-    for (int i = 0; i < m_cells.size(); i++) {
-      indexesByCell.put(m_cells.get(i), i);
-    }
-    // Build result set
-    Set<Integer> result = new HashSet<>();
-    for (ICell cell : m_updatedCells) {
-      Integer index = indexesByCell.get(cell);
-      if (index != null) {
-        result.add(index);
-      }
-    }
-    return result;
   }
 
   @Override
@@ -458,21 +433,81 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     try {
       setRowChanging(true);
       //
-      if (changedBit == ICell.VALUE_BIT) {
-        if (isStatusNonchanged()) {
-          setStatusUpdated();
-        }
-        else {
-          // keep inserted, deleted
-        }
+      if (isStatusNonchanged() && isRowUpdate(changedBit)) {
+        setStatusUpdated();
       }
       m_rowPropertiesChanged = true;
       // Remember changed column
-      m_updatedCells.add(cell);
+      setCellChanged(cell, changedBit);
     }
     finally {
       setRowChanging(false);
     }
+  }
+
+  private boolean isRowUpdate(int changedBit) {
+    return changedBit == ICell.VALUE_BIT;
+  }
+
+  private void setCellChanged(ICell cell, int changeBit) {
+    Set<Integer> updatedBits = m_updatedCells.get(cell);
+    if (updatedBits == null) {
+      updatedBits = new HashSet<Integer>();
+    }
+    updatedBits.add(changeBit);
+    m_updatedCells.put(cell, updatedBits);
+  }
+
+  private List<ICell> getChangedCells(int changedBit) {
+    ArrayList<ICell> cells = new ArrayList<ICell>();
+    for (Entry<ICell, Set<Integer>> e : m_updatedCells.entrySet()) {
+      Set<Integer> value = e.getValue();
+      if (value != null && value.contains(changedBit)) {
+        cells.add(e.getKey());
+      }
+    }
+    return cells;
+  }
+
+  private List<ICell> getChangedCells() {
+    ArrayList<ICell> cells = new ArrayList<ICell>();
+    for (Entry<ICell, Set<Integer>> e : m_updatedCells.entrySet()) {
+      Set<Integer> changedBits = e.getValue();
+      if (changedBits != null) {
+        cells.add(e.getKey());
+      }
+    }
+    return cells;
+  }
+
+  @Override
+  public Set<Integer> getUpdatedColumnIndexes() {
+    return getColumnIndexes(getChangedCells());
+  }
+
+  @Override
+  public Set<Integer> getUpdatedColumnIndexes(int changedBit) {
+    return getColumnIndexes(getChangedCells(changedBit));
+  }
+
+  private Set<Integer> getColumnIndexes(List<ICell> cells) {
+    Map<ICell, Integer> indexesByCell = createCellIndexMap();
+    Set<Integer> result = new HashSet<>();
+    for (ICell cell : cells) {
+      Integer index = indexesByCell.get(cell);
+      if (index != null) {
+        result.add(index);
+      }
+    }
+    return result;
+  }
+
+  private Map<ICell, Integer> createCellIndexMap() {
+    Map<ICell, Integer> indexesByCell = new HashMap<>();
+    for (int i = 0; i < m_cells.size(); i++) {
+      indexesByCell.put(m_cells.get(i), i);
+    }
+    return indexesByCell;
   }
 
   @Override

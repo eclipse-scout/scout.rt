@@ -27,6 +27,7 @@ public interface ICell {
   int CSS_CLASS_BIT = 11;
   int HTML_ENABLED_BIT = 12; //default false, value Boolean
   int MANDATORY_BIT = 13; //default false, value Boolean
+  int ERROR_STATUS_BIT = 14;
 
   Object getValue();
 

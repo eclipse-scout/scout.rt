@@ -23,9 +23,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.lookup.DefaultLookupCallProvisioningService;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -62,15 +64,16 @@ public class AbstractMixedSmartColumnTest {
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_regs = TestingUtility.registerBeans(
         new BeanMetaData(ICodeService.class).
-        withInitialInstance(codeService).
-        withApplicationScoped(true),
+            withInitialInstance(codeService).
+            withApplicationScoped(true),
         new BeanMetaData(ICodeLookupCallFactoryService.class).
-        withInitialInstance(codeLookupCallFactoryService).
-        withApplicationScoped(true),
+            withInitialInstance(codeLookupCallFactoryService).
+            withApplicationScoped(true),
         new BeanMetaData(ILookupCallProvisioningService.class).
-        withInitialInstance(new DefaultLookupCallProvisioningService()).
-        withApplicationScoped(true)
+            withInitialInstance(new DefaultLookupCallProvisioningService()).
+            withApplicationScoped(true)
         );
+
   }
 
   @AfterClass
@@ -172,6 +175,19 @@ public class AbstractMixedSmartColumnTest {
     Long lookupKey = field.getValueAsLookupKey();
     assertEquals(Long.valueOf(0L), lookupKey);
     assertEquals(column.lastValue, "test");
+  }
+
+  @Test
+  public void testCompleteEdit_ParsingError() throws Exception {
+    P_Table table = new P_Table();
+    table.addRowsByArray(new Long[]{3L});
+
+    IValueField<?> field = (IValueField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
+    field.parseAndSetValue("invalid Text");
+    table.getEditableSmartColumn().completeEdit(table.getRow(0), field);
+    ICell c = table.getCell(0, 0);
+    assertEquals("invalid Text", c.getText());
+    assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
   }
 
   class TestMixedSmartColumn extends AbstractMixedSmartColumn<String, Long> {

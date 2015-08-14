@@ -43,6 +43,7 @@ public class TableImportTest {
     assertEquals(1, m_table.getDefaultColumn().getParseCount());
     assertEquals(1, m_table.getDefaultColumn().getValidateCount());
     assertEquals(1, m_table.getDefaultColumn().getDecorateCount());
+    assertEquals(ITableRow.STATUS_NON_CHANGED, m_table.getRow(0).getStatus());
   }
 
   @Test

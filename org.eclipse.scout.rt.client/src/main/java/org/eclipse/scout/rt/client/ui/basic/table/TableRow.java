@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -404,5 +405,11 @@ public class TableRow implements ITableRow {
   @Override
   public String toString() {
     return getClass().getSimpleName() + m_cells;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<Integer> getUpdatedColumnIndexes(int changedBit) {
+    return Collections.EMPTY_SET;
   }
 }

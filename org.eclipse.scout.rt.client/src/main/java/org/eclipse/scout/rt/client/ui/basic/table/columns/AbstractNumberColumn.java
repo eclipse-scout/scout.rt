@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
@@ -137,7 +136,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     DecimalFormat newFormat = (DecimalFormat) format.clone();
     newFormat.setParseBigDecimal(true);
     propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, newFormat);
-    decorateCells();
+    updateDisplayTexts();
   }
 
   @Override
@@ -261,12 +260,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     f.setFormat(getFormat());
     f.setMinValue(getMinValue());
     f.setMaxValue(getMaxValue());
-  }
-
-  @Override
-  protected void decorateCellInternal(Cell cell, ITableRow row) {
-    super.decorateCellInternal(cell, row);
-    updateDisplayText(row, cell);
   }
 
   @Override

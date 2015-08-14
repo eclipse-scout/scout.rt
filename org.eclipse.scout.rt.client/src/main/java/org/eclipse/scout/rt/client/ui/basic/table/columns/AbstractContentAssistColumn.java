@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -23,13 +24,19 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExten
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IContentAssistColumnExtension;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
 public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends AbstractColumn<VALUE> implements IContentAssistColumn<VALUE, LOOKUP_TYPE> {
 
@@ -133,18 +140,16 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
    * @param key
    * @return
    */
-  @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(410)
   protected LOOKUP_TYPE execConvertValueToKey(VALUE value) {
-    return (LOOKUP_TYPE) value;
+    return TypeCastUtility.castValue(value, getLookupType());
   }
 
-  @Override
-  public ILookupCall<LOOKUP_TYPE> prepareLookupCall(ITableRow row) {
+  protected ILookupCall<LOOKUP_TYPE> prepareLookupCall(ITableRow row, VALUE value) {
     if (getLookupCall() != null) {
       ILookupCall<LOOKUP_TYPE> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new TableProvisioningContext(getTable(), row, this));
-      call.setKey(interceptConvertValueToKey(getValueInternal(row)));
+      call.setKey(interceptConvertValueToKey(value));
       call.setText(null);
       call.setAll(null);
       call.setRec(null);
@@ -154,6 +159,11 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     else {
       return null;
     }
+  }
+
+  @Override
+  public ILookupCall<LOOKUP_TYPE> prepareLookupCall(ITableRow row) {
+    return prepareLookupCall(row, getValueInternal(row));
   }
 
   @Override
@@ -208,6 +218,16 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
   }
 
   @SuppressWarnings("unchecked")
+  public Class<LOOKUP_TYPE> getLookupType() {
+    return TypeCastUtility.getGenericsParameterClass(getClass(), AbstractContentAssistColumn.class, 1);
+  }
+
+  @SuppressWarnings("unchecked")
+  public Class<LOOKUP_TYPE> getType() {
+    return TypeCastUtility.getGenericsParameterClass(getClass(), AbstractContentAssistColumn.class);
+  }
+
+  @SuppressWarnings("unchecked")
   @Override
   protected VALUE parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
     VALUE validValue = null;
@@ -226,6 +246,124 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       }
     }
     return validValue;
+  }
+
+  @Override
+  public void updateDisplayTexts(List<ITableRow> rows) {
+    try {
+      if (rows.size() > 0) {
+        BatchLookupCall batchCall = new BatchLookupCall();
+        ArrayList<ITableRow> batchRowList = new ArrayList<ITableRow>();
+
+        BatchLookupResultCache lookupResultCache = new BatchLookupResultCache();
+        for (ITableRow row : rows) {
+          ILookupCall<?> call = prepareLookupCall(row);
+          if (call != null && call.getKey() != null) {
+            //split: local vs remote
+            if (call instanceof LocalLookupCall) {
+              applyLookupResult(row, lookupResultCache.getDataByKey(call));
+            }
+            else {
+              batchRowList.add(row);
+              batchCall.addLookupCall(call);
+            }
+          }
+          else {
+            applyLookupResult(row, new ArrayList<ILookupRow<?>>(0));
+          }
+        }
+
+        //
+        if (!batchCall.isEmpty()) {
+          ITableRow[] tableRows = batchRowList.toArray(new ITableRow[batchRowList.size()]);
+          IBatchLookupService service = BEANS.get(IBatchLookupService.class);
+          List<List<ILookupRow<?>>> resultArray = service.getBatchDataByKey(batchCall);
+          for (int i = 0; i < tableRows.length; i++) {
+            applyLookupResult(tableRows[i], resultArray.get(i));
+          }
+        }
+      }
+
+    }
+    catch (ProcessingException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
+    }
+  }
+
+  @Override
+  public void updateDisplayText(ITableRow row, VALUE value) {
+    ILookupCall<?> call = prepareLookupCall(row, value);
+    if (call != null && call.getKey() != null) {
+      try {
+        List<? extends ILookupRow<?>> result = call.getDataByKey();
+        applyLookupResult(row, result);
+      }
+      catch (ProcessingException pe) {
+        BEANS.get(ExceptionHandler.class).handle(pe);
+      }
+    }
+  }
+
+  @Override
+  public void updateDisplayText(ITableRow row, Cell cell) {
+    ILookupCall<?> call = prepareLookupCall(row);
+    if (call != null && call.getKey() != null) {
+      try {
+        List<? extends ILookupRow<?>> result = call.getDataByKey();
+        applyLookupResult(row, result);
+      }
+      catch (ProcessingException pe) {
+        BEANS.get(ExceptionHandler.class).handle(pe);
+      }
+    }
+  }
+
+  private void applyLookupResult(ITableRow tableRow, List<? extends ILookupRow<?>> result) {
+    // disable row changed trigger on row
+    try {
+      tableRow.setRowChanging(true);
+      //
+      Cell cell = tableRow.getCellForUpdate(this);
+      if (result.size() == 1) {
+        cell.setText(result.get(0).getText());
+        cell.setTooltipText(result.get(0).getTooltipText());
+      }
+      else if (result.size() > 1) {
+        StringBuilder buf = new StringBuilder();
+        StringBuilder bufTooltip = new StringBuilder();
+
+        String separator = getResultRowSeparator();
+
+        for (int i = 0; i < result.size(); i++) {
+          if (i > 0) {
+            buf.append(separator);
+            bufTooltip.append(separator);
+          }
+          ILookupRow<?> row = result.get(i);
+          buf.append(row.getText());
+          bufTooltip.append(row.getTooltipText());
+        }
+        cell.setText(buf.toString());
+        cell.setTooltipText(bufTooltip.toString());
+      }
+      else {
+        cell.setText("");
+        cell.setTooltipText("");
+      }
+    }
+    finally {
+      tableRow.setRowPropertiesChanged(false);
+      tableRow.setRowChanging(false);
+    }
+  }
+
+  private String getResultRowSeparator() {
+    if (getTable().isMultilineText()) {
+      return "\n";
+    }
+    else {
+      return ", ";
+    }
   }
 
   protected void mapEditorFieldProperties(IContentAssistField<VALUE, LOOKUP_TYPE> f) {

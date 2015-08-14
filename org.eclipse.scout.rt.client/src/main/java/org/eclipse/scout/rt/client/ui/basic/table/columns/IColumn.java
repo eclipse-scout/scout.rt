@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.IStyleable;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -390,6 +391,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void decorateCell(ITableRow row);
 
   void decorateCells(List<ITableRow> row);
+
+  void updateDisplayTexts(List<ITableRow> row);
+
+  void updateDisplayText(ITableRow row, Cell cell);
 
   void decorateHeaderCell();
 

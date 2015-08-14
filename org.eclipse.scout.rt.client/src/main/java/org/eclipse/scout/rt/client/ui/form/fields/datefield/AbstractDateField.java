@@ -575,10 +575,12 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
     @Override
     public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
+      String invalidText = StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText));
       ParsingFailedStatus status = new ParsingFailedStatus(
-          ScoutTexts.get("InvalidValueMessageX", StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText))),
+          ScoutTexts.get("InvalidValueMessageX", invalidText),
           invalidDateText + "\n" + invalidTimeText); // don't use join()!
       addErrorStatus(status);
+      setDisplayText(invalidText);
     }
 
     @Override

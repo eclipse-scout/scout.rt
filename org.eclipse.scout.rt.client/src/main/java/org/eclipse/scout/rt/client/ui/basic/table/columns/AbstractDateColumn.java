@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDateColumnExtension;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -116,7 +115,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   @Override
   public void setFormat(String s) {
     m_format = s;
-    decorateCells();
+    updateDisplayTexts();
   }
 
   @Override
@@ -216,12 +215,6 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     f.setHasDate(isHasDate());
     f.setHasTime(isHasTime());
     f.setAutoTimeMillis(getAutoTimeMillis());
-  }
-
-  @Override
-  protected void decorateCellInternal(Cell cell, ITableRow row) {
-    super.decorateCellInternal(cell, row);
-    updateDisplayText(row, cell);
   }
 
   @Override

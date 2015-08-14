@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IStringColumnExtension;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -234,12 +233,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setMultilineText(multi);
     f.setWrapText(isTextWrap());
     f.setWrapText(true); // avoid to have an horizontal scroll bar
-  }
-
-  @Override
-  protected void decorateCellInternal(Cell cell, ITableRow row) {
-    super.decorateCellInternal(cell, row);
-    updateDisplayText(row, cell);
   }
 
   @Override

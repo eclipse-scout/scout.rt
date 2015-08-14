@@ -357,6 +357,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       }
 
       @Override
+      public void updateDisplayText(ITableRow row, Cell cell) {
+      }
+
+      @Override
       protected void decorateCellInternal(Cell cell, ITableRow row) {
         // if we encounter a cell change, update the tree as well
         IPage<?> page = (IPage) getTreeNodeFor(row);

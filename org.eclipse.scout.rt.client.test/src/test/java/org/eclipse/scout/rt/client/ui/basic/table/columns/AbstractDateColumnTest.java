@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -24,12 +25,16 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumnTest.TestTable.TestDateColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractDateColumn}
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractDateColumnTest {
 
   private static final String TEST_FORMAT1 = "YYYY-MM-dd";
@@ -44,6 +49,27 @@ public class AbstractDateColumnTest {
     IDateField field = (IDateField) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
     assertEquals("mandatory property to be progagated to field", column.isHasTime(), field.isHasTime());
+  }
+
+  @Test
+  public void testCompleteEdit_ParsingError() throws ProcessingException {
+    TestTable table = new TestTable();
+    Date date = new Date();
+    table.addRowsByArray(new Date[]{date});
+    ITableRow row = table.getRow(0);
+
+    setParseErrorInUI(row, table.getTestDateColumn());
+
+    ICell c = table.getCell(0, 0);
+    assertEquals("invalid", c.getText());
+    assertEquals(date, c.getValue());
+    assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
+  }
+
+  private void setParseErrorInUI(ITableRow row, AbstractDateColumn column) throws ProcessingException {
+    AbstractDateField field = (AbstractDateField) column.prepareEdit(row);
+    field.getUIFacade().setParseErrorFromUI("invalid", "invalid", null);
+    column.completeEdit(row, field);
   }
 
   @Test
@@ -131,6 +157,11 @@ public class AbstractDateColumnTest {
 
     @Order(70.0)
     public class TestDateColumn extends AbstractDateColumn {
+
+      @Override
+      protected boolean getConfiguredEditable() {
+        return true;
+      }
 
       @Override
       protected String getConfiguredFormat() {

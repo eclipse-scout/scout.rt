@@ -24,10 +24,10 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -38,8 +38,13 @@ import org.junit.runner.RunWith;
  */
 @RunWith(PlatformTestRunner.class)
 public class AbstractColumnTest extends AbstractColumn<Object> {
+  private static final String INVALID = "invalid";
+  private static final String VALID = "valid";
   private static final String INVALID_MESSAGE = "invalid value";
 
+  /**
+   * Tests that column properties are mapped correctly to editor field. {@link #mapEditorFieldProperties(IFormField)}
+   */
   @Test
   public void testMapEditorFieldProperties() {
     String bColor = "469406";
@@ -59,24 +64,29 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     assertTrue("expected mandatory property to be progagated to field", field.isMandatory());
   }
 
+  /**
+   * Test that value, text and error status are correct after adding a valid row to a table with
+   * {@link AbstractTable#addRowByArray(Object)}
+   */
   @Test
   public void testValidColumn() throws ProcessingException {
     TestTable table = new TestTable();
-    table.addRowsByArray(new String[]{"valid"});
+    table.addRowsByArray(new String[]{VALID});
     ICell c0 = table.getCell(0, 0);
     assertTrue(table.getValidateTestColumn().isContentValid(table.getRow(0)));
     assertNoErrorStatus(c0);
-    assertEquals("valid", c0.getValue());
-    assertEquals("valid", c0.getText());
+    assertEquals(VALID, c0.getValue());
+    assertEquals(VALID, c0.getText());
   }
 
   /**
-   * Invalid column values should have an error status
+   * Test that value, text and error status are correct after adding an invalid row to a table with
+   * {@link AbstractTable#addRowByArray(Object)}
    */
   @Test
-  public void testValidateColumn() throws ProcessingException {
+  public void testInvalidColumn() throws ProcessingException {
     TestTable table = new TestTable();
-    table.addRowsByArray(new String[]{"invalid", "a"});
+    table.addRowsByArray(new String[]{INVALID, "a"});
     ICell c0 = table.getCell(0, 0);
     ICell c1 = table.getCell(1, 0);
 
@@ -84,23 +94,44 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     assertNoErrorStatus(c1);
     assertErrorStatus(c0);
     //invalid value is set on the table anyways
-    assertEquals("invalid", c0.getValue());
-    assertEquals("invalid", c0.getText());
+    assertEquals(INVALID, c0.getValue());
+    assertEquals(INVALID, c0.getText());
 
     assertEquals("a", c1.getValue());
     assertEquals("a", c1.getText());
   }
 
+  /**
+   * Test that setting a valid value in an initially invalid table resets the error.
+   */
   @Test
   public void testResetValidationError() throws ProcessingException {
     TestTable table = new TestTable();
-    table.addRowsByArray(new String[]{"invalid"});
-    table.getValidateTestColumn().setValue(0, "valid");
+    table.addRowsByArray(new String[]{INVALID});
+    table.getValidateTestColumn().setValue(0, VALID);
     ICell c0 = table.getCell(0, 0);
     assertTrue(table.getValidateTestColumn().isContentValid(table.getRow(0)));
     assertNoErrorStatus(c0);
-    assertEquals("valid", c0.getValue());
-    assertEquals("valid", c0.getText());
+    assertEquals(VALID, c0.getValue());
+    assertEquals(VALID, c0.getText());
+  }
+
+  /**
+   * Test that setting a valid value using the cell editor in an initially invalid table resets the error.
+   */
+  @Test
+  public void testResetValidationError_UsingField() throws ProcessingException {
+    TestTable table = new TestTable();
+    table.addRowsByArray(new String[]{"aaa"});
+    ITableRow testRow = table.getRow(0);
+
+    TestTable.ValidateTestColumn testColumn = table.getValidateTestColumn();
+    ColumnTestUtility.editCellValue(testRow, testColumn, INVALID);
+
+    ICell c0 = table.getCell(0, 0);
+    assertFalse(testColumn.isContentValid(testRow));
+    assertEquals("aaa", c0.getValue());
+    assertEquals(INVALID, c0.getText());
   }
 
   /**
@@ -110,7 +141,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   public void testInvalidColumnVisible() throws ProcessingException {
     TestTable testTable = new TestTable();
     testTable.getValidateTestColumn().setVisible(false);
-    testTable.addRowsByArray(new String[]{"invalid"});
+    testTable.addRowsByArray(new String[]{INVALID});
     ICell c0 = testTable.getCell(0, 0);
     assertErrorStatus(c0);
     assertTrue(testTable.getValidateTestColumn().isVisible());
@@ -123,7 +154,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   @Test
   public void testValidateVetoColumn() throws ProcessingException {
     TestVetoTable table = new TestVetoTable();
-    table.addRowsByArray(new String[]{"invalid", "a"});
+    table.addRowsByArray(new String[]{INVALID, "a"});
     ICell c0 = table.getCell(0, 0);
     ICell c1 = table.getCell(1, 0);
 
@@ -144,24 +175,43 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     assertFalse(c0.isContentValid());
   }
 
+  @Test
+  public void testValidColumn_EditField() throws Exception {
+    TestVetoTable table = new TestVetoTable();
+    table.addRowsByArray(new String[]{VALID, "a"});
+    TestVetoTable.ValidateTestColumn testColumn = table.getValidateTestColumn();
+    testColumn.setMandatory(true);
+    IValueField field = (IValueField) testColumn.prepareEdit(table.getRow(0));
+    assertEquals(VALID, field.getValue());
+  }
+
+  @Test
+  public void testValidColumn_EditField1() throws Exception {
+    TestVetoTable table = new TestVetoTable();
+    TestVetoTable.ValidateTestColumn testColumn = table.getValidateTestColumn();
+    testColumn.setMandatory(true);
+    table.addRowsByArray(new String[]{null, "a"});
+
+    ColumnTestUtility.editCellValue(table.getRow(0), table.getValidateTestColumn(), VALID);
+    assertEquals(VALID, testColumn.getValue(0));
+  }
+
   /**
    * Tests that the error status is correct on the table when a field cell is edited and throwing a
    * {@link VetoException}
    */
   @Test
-  public void testValidateVetoColumn_CompleteEdit() throws Exception {
+  public void testValidateVetoColumn_EditField() throws Exception {
     TestVetoTable table = new TestVetoTable();
-    table.addRowsByArray(new String[]{"valid", "a"});
-    IStringField sf = new AbstractStringField() {
-    };
-    sf.setValue("invalid");
-    table.getValidateTestColumn().completeEdit(table.getRow(0), sf);
+    table.addRowsByArray(new String[]{VALID, "a"});
+    ColumnTestUtility.editCellValue(table.getRow(0), table.getValidateTestColumn(), INVALID);
     ICell c0 = table.getCell(0, 0);
     assertErrorStatus(c0);
+    assertEquals(INVALID, c0.getText());
   }
 
   @Test
-  public void testCompleteEdit_ParsingError() throws Exception {
+  public void testCompleteEdit_ParsingError() throws ProcessingException {
     ParsingTestTable table = new ParsingTestTable();
     table.addRowsByArray(new Integer[]{0});
     IIntegerField field = new AbstractIntegerField() {
@@ -169,6 +219,8 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     field.parseAndSetValue("invalid number");
     table.getIntTestColumn().completeEdit(table.getRow(0), field);
     ICell c = table.getCell(0, 0);
+    assertEquals("invalid number", c.getText());
+    assertEquals(0, c.getValue());
     assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
   }
 
@@ -182,7 +234,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testInitialDecoration() throws Exception {
+  public void testInitialDecoration() throws ProcessingException {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"decorate"});
     ICell c0 = table.getCell(0, 0);
@@ -191,7 +243,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testDecoration_SetValue() throws Exception {
+  public void testDecoration_SetValue() throws ProcessingException {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"b"});
     table.getValidateTestColumn().setValue(0, "decorate");
@@ -231,7 +283,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
       @Override
       protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
         Cell cell = row.getCellForUpdate(this);
-        if ("invalid".equals(rawValue)) {
+        if (INVALID.equals(rawValue)) {
           cell.addErrorStatus(INVALID_MESSAGE);
         }
         else {
@@ -272,7 +324,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
 
       @Override
       protected String execValidateValue(ITableRow row, String rawValue) throws ProcessingException {
-        if ("invalid".equals(rawValue)) {
+        if (INVALID.equals(rawValue)) {
           throw new VetoException(INVALID_MESSAGE);
         }
         return rawValue;

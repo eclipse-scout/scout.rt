@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
@@ -601,7 +602,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Subclasses can override this method. The default returns an appropriate field based on the column data type.
    * <p>
    * The mapping from the cell value to the field value is achieved using
-   * {@link #cellValueToEditField(Object, IFormField)}
+   * {@link #cellToEditField(Object, String, IMultiStatus, IFormField))}
    *
    * @param row
    *          on which editing occurs
@@ -613,11 +614,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     IFormField f = prepareEditInternal(row);
     if (f != null) {
       f.setLabelVisible(false);
-      GridData gd = f.getGridDataHints();
-      // apply horizontal alignment of column to respective editor field
-      gd.horizontalAlignment = getHorizontalAlignment();
-      f.setGridDataHints(gd);
-      cellValueToEditField(getValue(row), f);
+      cellValueToEditor(row, f);
       f.markSaved();
     }
     return f;
@@ -640,34 +637,85 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @ConfigOperation
   @Order(62)
   protected void execCompleteEdit(ITableRow row, IFormField editingField) throws ProcessingException {
-    if (editingField instanceof IValueField) {
-      @SuppressWarnings("unchecked")
-      IValueField<VALUE> valueField = (IValueField<VALUE>) editingField;
-      Cell cell = row.getCellForUpdate(this);
+    editorValueToCell(row, editingField);
+  }
 
+  /**
+   * Map the values of a cell to the editing form field. The default implementation assumes a value field.
+   *
+   * @throws ProcessingException
+   *           if the field is not a value field
+   */
+  protected void editorValueToCell(ITableRow row, IFormField editorField) throws ProcessingException {
+    if (!(editorField instanceof IValueField<?>)) {
+      throw new ProcessingException("Expected a value field.");
+    }
+    else {
+      @SuppressWarnings("unchecked")
+      IValueField<VALUE> valueField = (IValueField<VALUE>) editorField;
+      LOG.debug(String.format("complete edit: [value=%s, text=%s, status=%s]", valueField.getValue(), valueField.getDisplayText(), valueField.getErrorStatus()));
+
+      Cell cell = row.getCellForUpdate(this);
       if (!contentEquals(cell, valueField)) {
-        //map data from field to column
-        cell.setText(valueField.getDisplayText());
-        //only remove errors set by scout
-        cell.removeErrorStatus(ValidationFailedStatus.class);
-        cell.removeErrorStatus(ParsingFailedStatus.class);
-        if (editingField.getErrorStatus() != null) {
+        //parsing error, set text
+        if (valueField.getErrorStatus() != null && valueField.getErrorStatus().containsStatus(ParsingFailedStatus.class)) {
+          LOG.debug("parsing failure");
+          cell.removeErrorStatus(ParsingFailedStatus.class);
+          cell.setText(valueField.getDisplayText());
           cell.addErrorStatuses(valueField.getErrorStatus().getChildren());
         }
-        cell.setValue(editFieldToCellValue(valueField));
-        persistRowChange(row);
+        else {
+          //set value to table
+          LOG.debug("setvalue");
+          cell.removeErrorStatus(ValidationFailedStatus.class);
+          cell.removeErrorStatus(ParsingFailedStatus.class);
+          parseValueAndSet(row, valueField.getValue(), true);
+        }
       }
+
+      LOG.debug(String.format("cell updated: [value=%s, text=%s, status=%s]", cell.getValue(), cell.getText(), cell.getErrorStatus()));
     }
   }
 
   /**
-   * Used in {@link #execPrepareEdit(ITableRow)}
+   * Map the values of a cell to the editing form field. The default implementation assumes a value field.
+   *
+   * @param row
+   *          the row that is currently edited
+   * @param editorField
+   *          the field to edit the value
+   * @throws ProcessingException
+   *           if the field is not a value field
    */
   @SuppressWarnings("unchecked")
-  protected void cellValueToEditField(VALUE cellValue, IFormField editField) throws ProcessingException {
-    if (editField instanceof IValueField<?>) {
-      ((IValueField) editField).setValue(cellValue);
+  protected void cellValueToEditor(ITableRow row, IFormField editorField) throws ProcessingException {
+    final ICell cell = row.getCell(this);
+    IMultiStatus status = cell.getErrorStatus();
+
+    if (status == null || status.isOK()) {
+      cellValueToEditField((VALUE) cell.getValue(), editorField);
     }
+    else {
+      cellTextToEditField(cell.getText(), editorField);
+    }
+  }
+
+  protected void cellValueToEditField(VALUE cellValue, IFormField editorField) throws ProcessingException {
+    if (!(editorField instanceof IValueField<?>)) {
+      throw new ProcessingException("Expected a value field.");
+    }
+    @SuppressWarnings("unchecked")
+    IValueField<VALUE> field = (IValueField<VALUE>) editorField;
+    field.setValue(cellValue);
+  }
+
+  protected void cellTextToEditField(String cellText, IFormField editorField) throws ProcessingException {
+    if (!(editorField instanceof IValueField<?>)) {
+      throw new ProcessingException("Expected a value field.");
+    }
+    @SuppressWarnings("unchecked")
+    IValueField<VALUE> field = (IValueField<VALUE>) editorField;
+    field.parseAndSetValue(cellText);
   }
 
   /**
@@ -675,10 +723,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    */
   @SuppressWarnings("unchecked")
   protected VALUE editFieldToCellValue(IFormField editField) throws ProcessingException {
-    if (editField instanceof IValueField<?>) {
-      return (VALUE) ((IValueField) editField).getValue();
+    if (!(editField instanceof IValueField<?>)) {
+      throw new ProcessingException("Expected a value field.");
     }
-    return null;
+    return (VALUE) ((IValueField) editField).getValue();
   }
 
   private boolean contentEquals(Cell cell, IValueField<VALUE> field) throws ProcessingException {
@@ -1014,38 +1062,35 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setValue(getTable().getRow(rowIndex), rawValue);
   }
 
-  @SuppressWarnings("unchecked")
-  protected void updateDisplayText(ITableRow row, Cell cell) {
-    cell.setText(formatValueInternal(row, (VALUE) cell.getValue()));
-  }
-
-  protected String formatValueInternal(ITableRow row, VALUE value) {
-    return value != null ? value.toString() : "";
-  }
-
   @Override
   public void setValue(ITableRow r, VALUE value) {
+    setValue(r, value, false);
+  }
+
+  protected void setValue(ITableRow r, VALUE value, boolean updateValidDisplayText) {
     try {
       Cell cell = r.getCellForUpdate(this);
       cell.removeErrorStatus(ValidationFailedStatus.class);
       VALUE newValue = validateValue(r, value);
 
       // set newValue into the cell only if there's no error.
-      if (cell.isContentValid()) {
+      if (!cell.hasError()) {
         r.setCellValue(getColumnIndex(), newValue);
       }
 
       ensureVisibileIfInvalid(r);
+      if (updateValidDisplayText) {
+        updateDisplayText(r, newValue);
+      }
     }
     catch (ProcessingException e) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Error setting column value ", e);
       }
       Cell cell = r.getCellForUpdate(this);
-      //add
+      //add error
       cell.addErrorStatus(new ValidationFailedStatus<VALUE>(e, value));
-      //update cell displayText
-      cell.setText(value == null ? null : value.toString());
+      updateDisplayText(r, value);
     }
   }
 
@@ -1341,8 +1386,21 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         for (ITableRow row : rows) {
           setValue(row, getValue(row));
         }
+        updateDisplayTexts();
         decorateCells();
       }
+    }
+  }
+
+  /**
+   * Parses values in table row and sets it to the table row
+   */
+  public final void parseValueAndSet(ITableRow row, Object rawValue, boolean updateDisplayText) {
+    try {
+      setValue(row, interceptParseValue(row, rawValue), updateDisplayText);
+    }
+    catch (ProcessingException e) {
+      row.getCellForUpdate(this).addErrorStatus(new ParsingFailedStatus(e, StringUtility.emptyIfNull(rawValue)));
     }
   }
 
@@ -1352,8 +1410,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public final void parseValueAndSet(ITableRow row, Object rawValue) {
     try {
-      VALUE parsedValue = interceptParseValue(row, rawValue);
-      setValue(row, parsedValue);
+      setValue(row, interceptParseValue(row, rawValue));
     }
     catch (ProcessingException e) {
       row.getCellForUpdate(this).addErrorStatus(new ParsingFailedStatus(e, StringUtility.emptyIfNull(rawValue)));
@@ -1417,10 +1474,21 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   protected void mapEditorFieldProperties(IFormField f) {
+    Assertions.assertNotNull(f);
     f.setBackgroundColor(getBackgroundColor());
     f.setForegroundColor(getForegroundColor());
     f.setFont(getFont());
     f.setMandatory(isMandatory());
+    mapGridDataToField(f);
+  }
+
+  /**
+   * apply horizontal alignment of column to respective editor field
+   */
+  protected void mapGridDataToField(IFormField f) {
+    GridData gd = f.getGridDataHints();
+    gd.horizontalAlignment = getHorizontalAlignment();
+    f.setGridDataHints(gd);
   }
 
   /**
@@ -1491,6 +1559,41 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * do not use or override this internal method
    */
   protected void decorateCellInternal(Cell cell, ITableRow row) {
+  }
+
+  /**
+   * Update all display texts
+   */
+  protected void updateDisplayTexts() {
+    if (getTable() != null) {
+      updateDisplayTexts(getTable().getRows());
+    }
+  }
+
+  @Override
+  public void updateDisplayTexts(List<ITableRow> rows) {
+    for (ITableRow row : Assertions.assertNotNull(rows)) {
+      updateDisplayText(row, row.getCellForUpdate(this));
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void updateDisplayText(ITableRow row, Cell cell) {
+    updateDisplayText(row, cell, (VALUE) cell.getValue());
+  }
+
+  public void updateDisplayText(ITableRow row, VALUE value) {
+    Cell cell = row.getCellForUpdate(this);
+    updateDisplayText(row, cell, value);
+  }
+
+  private void updateDisplayText(ITableRow row, Cell cell, VALUE value) {
+    cell.setText(formatValueInternal(row, value));
+  }
+
+  protected String formatValueInternal(ITableRow row, VALUE value) {
+    return StringUtility.nullIfEmpty(value);
   }
 
   @Override
@@ -1735,19 +1838,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[" + getHeaderCell().getText() + " width=" + getWidth() + (isPrimaryKey() ? " primaryKey" : "") + (isSummary() ? " summary" : "") + " viewIndexHint=" + getVisibleColumnIndexHint() + "]";
-  }
-
-  /**
-   * Called when a value has been changed in an editable cell.
-   * Can be used to persist data directly after a value has been modified in a cell editor.
-   * CAUTION: This method is called even when an invalid value has been entered in the cell editor.
-   * In this case the last valid value is retrieved while {@link #getValue(ITableRow)} is called.
-   *
-   * @param row
-   *          The row changed in the table.
-   * @throws ProcessingException
-   */
-  protected void persistRowChange(ITableRow row) throws ProcessingException {
   }
 
   /**

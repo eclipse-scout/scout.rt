@@ -54,7 +54,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   private String m_text;
   private ICellSpecialization m_cellSpecialization = DEFAULT_CELL_STYLE;
 
-  private MultiStatus m_errorStatus = null;
+  private IMultiStatus m_errorStatus = null;
 
   public Cell() {
   }
@@ -94,7 +94,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
       setText(c.getText());
       setValue(c.getValue());
       setMandatory(c.isMandatory());
-      setErrorStatus(c.getErrorStatus());
+      setErrorStatusInternal(c.getErrorStatus());
       setHtmlEnabled(c.isHtmlEnabled());
       //do not reset observer
     }
@@ -122,9 +122,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     }
     else {
       m_value = value;
-      if (getObserver() != null) {
-        getObserver().cellChanged(this, VALUE_BIT);
-      }
+      notifyObserver(VALUE_BIT);
       return true;
     }
   }
@@ -137,9 +135,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   public void setText(String s) {
     if (CompareUtility.notEquals(m_text, s)) {
       m_text = s;
-      if (getObserver() != null) {
-        getObserver().cellChanged(this, TEXT_BIT);
-      }
+      notifyObserver(TEXT_BIT);
     }
   }
 
@@ -325,9 +321,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
         m_cellSpecialization = cellSpecialization.reconcile(sharedStyle);
       }
     }
-    if (getObserver() != null) {
-      getObserver().cellChanged(this, bitPos);
-    }
+    notifyObserver(bitPos);
   }
 
   @Override
@@ -368,6 +362,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     final MultiStatus status = ensureMultiStatus(getErrorStatusInternal());
     status.add(newStatus);
     setErrorStatusInternal(status);
+    notifyObserver(ERROR_STATUS_BIT);
   }
 
   /**
@@ -377,18 +372,20 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     final MultiStatus status = ensureMultiStatus(getErrorStatusInternal());
     status.addAll(newStatus);
     setErrorStatusInternal(status);
+    notifyObserver(ERROR_STATUS_BIT);
   }
 
   /**
    * Remove IStatus of a specific type
    */
   public void removeErrorStatus(Class<? extends IStatus> statusClazz) {
-    final MultiStatus ms = getErrorStatusInternal();
+    final IMultiStatus ms = getErrorStatusInternal();
     if (ms != null) {
       ms.removeAll(statusClazz);
       if (ms.getChildren().isEmpty()) {
         clearErrorStatus();
       }
+      notifyObserver(ERROR_STATUS_BIT);
     }
   }
 
@@ -403,18 +400,24 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return ms;
   }
 
-  private MultiStatus getErrorStatusInternal() {
+  private IMultiStatus getErrorStatusInternal() {
     return m_errorStatus;
   }
 
-  public void setErrorStatusInternal(MultiStatus status) {
+  public void setErrorStatusInternal(IMultiStatus status) {
     m_errorStatus = status;
+  }
+
+  private void notifyObserver(int changedBit) {
+    if (getObserver() != null) {
+      getObserver().cellChanged(this, changedBit);
+    }
   }
 
   /**
    * @return true, if it contains an error status with severity >= IStatus.ERROR
    */
-  protected boolean hasError() {
+  public boolean hasError() {
     IStatus errorStatus = getErrorStatus();
     return errorStatus != null && (errorStatus.getSeverity() >= IStatus.ERROR);
   }

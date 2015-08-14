@@ -176,6 +176,12 @@ public interface ITableRow {
    */
   void setUpdatedColumnIndexes(Set<Integer> updatedColumnIndexes);
 
+  /**
+   * @return set of column indexes that have changed the value of the given changeBit. (only valid during "rowChanging",
+   *         by default only on InternalTableRow). Return value is never <code>null</code>.
+   */
+  Set<Integer> getUpdatedColumnIndexes(int changedBit);
+
   boolean isRowChanging();
 
   /**

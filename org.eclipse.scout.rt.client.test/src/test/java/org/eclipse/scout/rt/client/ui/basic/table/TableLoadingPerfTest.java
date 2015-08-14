@@ -26,7 +26,7 @@ import org.junit.Test;
  * Should run successfully on slow infrastructure.
  */
 public class TableLoadingPerfTest {
-  int TEST_RUN_COUNT = 100;
+  int TEST_RUN_COUNT = 10;
 
   /**
    * Tests that adding rows to a table is fast.<b>

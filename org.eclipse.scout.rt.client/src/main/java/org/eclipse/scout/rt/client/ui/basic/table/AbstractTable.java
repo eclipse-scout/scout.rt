@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -93,7 +94,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IContentAssistColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
@@ -116,12 +116,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
-import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
 /**
  * Columns are defined as inner classes<br>
@@ -156,8 +150,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private AbstractEventBuffer<TableEvent> m_eventBuffer;
   private int m_eventBufferLoopDetection;
 
-  private final HashSet<P_CellLookup> m_cellLookupBuffer = new HashSet<P_CellLookup>();
   private HashSet<ITableRow> m_rowDecorationBuffer = new HashSet<ITableRow>();
+  private Map<Integer, Set<ITableRow>> m_rowValueChangeBuffer = new HashMap<>();
+
   // key stroke buffer for select-as-you-type
   private final KeyStrokeBuffer m_keyStrokeBuffer;
   private final EventListenerList m_listenerList = new EventListenerList();
@@ -2219,6 +2214,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
        * do NOT use ITableRow#setRowChanging, this might cause a stack overflow
        */
       ensureInvalidColumnsVisible(row);
+      Set<Integer> changedColumnValues = row.getUpdatedColumnIndexes(ICell.VALUE_BIT);
+      if (!changedColumnValues.isEmpty()) {
+        enqueueValueChangeTasks(row, changedColumnValues);
+      }
       enqueueDecorationTasks(row);
     }
   }
@@ -2828,9 +2827,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException {
+    return addRows(newRows, markAsInserted, insertIndexes, false);
+  }
+
+  private List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes, boolean startObserving) throws ProcessingException {
     if (newRows == null) {
       return CollectionUtility.emptyArrayList();
     }
+    List<InternalTableRow> newIRows = null;
     try {
       setTableChanging(true);
       //
@@ -2839,7 +2843,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (markAsInserted) {
         updateStatus(newRows, ITableRow.STATUS_INSERTED);
       }
-      List<ITableRow> newIRows = createInternalRows(newRows);
+      newIRows = createInternalRows(newRows);
 
       // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
@@ -2857,34 +2861,53 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
       else if (insertIndexes != null) {
-        ITableRow[] sortArray = new ITableRow[m_rows.size()];
-        // add new rows that have a given sortIndex
-        for (int i = 0; i < insertIndexes.length; i++) {
-          sortArray[insertIndexes[i]] = newIRows.get(i);
-        }
-        int sortArrayIndex = 0;
-        // add existing rows
-        for (int i = 0; i < oldRowCount; i++) {
-          // find next empty slot
-          while (sortArray[sortArrayIndex] != null) {
-            sortArrayIndex++;
-          }
-          sortArray[sortArrayIndex] = m_rows.get(i);
-        }
-        // add new rows that have no given sortIndex
-        for (int i = insertIndexes.length; i < newIRows.size(); i++) {
-          // find next empty slot
-          while (sortArray[sortArrayIndex] != null) {
-            sortArrayIndex++;
-          }
-          sortArray[sortArrayIndex] = newIRows.get(i);
-        }
+        ITableRow[] sortArray = createSortArray(newIRows, insertIndexes, oldRowCount);
         sortInternal(Arrays.asList(sortArray));
       }
-      return newIRows;
     }
     finally {
       setTableChanging(false);
+    }
+
+    addCellObserver(newIRows);
+    return new ArrayList<ITableRow>(newIRows);
+  }
+
+  private ITableRow[] createSortArray(List<InternalTableRow> newIRows, int[] insertIndexes, int oldRowCount) {
+    ITableRow[] sortArray = new ITableRow[m_rows.size()];
+    // add new rows that have a given sortIndex
+    for (int i = 0; i < insertIndexes.length; i++) {
+      sortArray[insertIndexes[i]] = newIRows.get(i);
+    }
+    int sortArrayIndex = 0;
+    // add existing rows
+    for (int i = 0; i < oldRowCount; i++) {
+      // find next empty slot
+      while (sortArray[sortArrayIndex] != null) {
+        sortArrayIndex++;
+      }
+      sortArray[sortArrayIndex] = m_rows.get(i);
+    }
+    // add new rows that have no given sortIndex
+    for (int i = insertIndexes.length; i < newIRows.size(); i++) {
+      // find next empty slot
+      while (sortArray[sortArrayIndex] != null) {
+        sortArrayIndex++;
+      }
+      sortArray[sortArrayIndex] = newIRows.get(i);
+    }
+    return sortArray;
+  }
+
+  /**
+   * Add InternalTableRow as an observer to the cell in order to update the row status on changes
+   */
+  private void addCellObserver(List<InternalTableRow> rows) {
+    for (InternalTableRow row : rows) {
+      for (int i = 0; i < row.getCellCount(); i++) {
+        Cell cell = row.getCellForUpdate(i);
+        cell.setObserver(row);
+      }
     }
   }
 
@@ -2906,8 +2929,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  private List<ITableRow> createInternalRows(List<? extends ITableRow> newRows) throws ProcessingException {
-    List<ITableRow> newIRows = new ArrayList<>(newRows.size());
+  private List<InternalTableRow> createInternalRows(List<? extends ITableRow> newRows) throws ProcessingException {
+    List<InternalTableRow> newIRows = new ArrayList<>(newRows.size());
     for (ITableRow newRow : newRows) {
       newIRows.add(new InternalTableRow(this, newRow));
     }
@@ -2922,6 +2945,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       newIRow.setTableInternal(this);
       m_rows.add(newIRow);
     }
+
+    Set<Integer> indexes = new HashSet<Integer>();
+    for (int idx : getColumnSet().getAllColumnIndexes()) {
+      indexes.add(idx);
+    }
+
+    enqueueValueChangeTasks(newIRow, indexes);
     enqueueDecorationTasks(newIRow);
     return newIRow;
   }
@@ -3515,68 +3545,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   private void processDecorationBuffer() {
     /*
-     * 1. process lookup service calls
+     * update row decorations
      */
-    try {
-      BatchLookupCall batchCall = null;
-      ArrayList<ITableRow> tableRowList = null;
-      ArrayList<Integer> columnIndexList = null;
-      if (m_cellLookupBuffer.size() > 0) {
-        batchCall = new BatchLookupCall();
-        tableRowList = new ArrayList<ITableRow>();
-        columnIndexList = new ArrayList<Integer>();
-        BatchLookupResultCache lookupResultCache = new BatchLookupResultCache();
-        for (P_CellLookup lookup : m_cellLookupBuffer) {
-          ITableRow row = lookup.getRow();
-          if (row.getTable() == AbstractTable.this) {
-            IContentAssistColumn<?, ?> col = lookup.getColumn();
-            ILookupCall<?> call = col.prepareLookupCall(row);
-            if (call != null && call.getKey() != null) {
-              //split: local vs remote
-              if (call instanceof LocalLookupCall) {
-                List<ILookupRow<?>> result = lookupResultCache.getDataByKey(call);
-                applyLookupResult((InternalTableRow) row, col.getColumnIndex(), result);
-              }
-              else {
-                tableRowList.add(row);
-                columnIndexList.add(Integer.valueOf(col.getColumnIndex()));
-                batchCall.addLookupCall(call);
-              }
-            }
-            else {
-              applyLookupResult((InternalTableRow) row, col.getColumnIndex(), new ArrayList<ILookupRow<?>>(0));
-            }
-          }
-        }
-      }
-      m_cellLookupBuffer.clear();
-      //
-      if (batchCall != null && tableRowList != null && columnIndexList != null && !batchCall.isEmpty()) {
-        ITableRow[] tableRows = tableRowList.toArray(new ITableRow[tableRowList.size()]);
-        List<List<ILookupRow<?>>> resultArray;
-        IBatchLookupService service = BEANS.get(IBatchLookupService.class);
-        resultArray = service.getBatchDataByKey(batchCall);
-        for (int i = 0; i < tableRows.length; i++) {
-          applyLookupResult((InternalTableRow) tableRows[i], ((Number) columnIndexList.get(i)).intValue(), resultArray.get(i));
-        }
-      }
-    }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    finally {
-      m_cellLookupBuffer.clear();
-    }
-    /*
-     * 2. update row decorations
-     */
-    HashSet<ITableRow> set = m_rowDecorationBuffer;
+    Map<Integer, Set<ITableRow>> changes = m_rowValueChangeBuffer;
+    m_rowValueChangeBuffer = new HashMap<>();
+    applyRowValueChanges(changes);
+
+    Set<ITableRow> set = m_rowDecorationBuffer;
     m_rowDecorationBuffer = new HashSet<ITableRow>();
-    for (ITableRow row : set) {
-      if (row.getTable() == AbstractTable.this) {
-        applyRowDecorationsImpl(row);
-      }
-    }
+    applyRowDecorations(set);
     /*
      * check row filters
      */
@@ -3595,6 +3572,55 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       if (filterChanged) {
         fireRowFilterChanged();
+      }
+    }
+  }
+
+  private void applyRowValueChanges(Map<Integer, Set<ITableRow>> changes) {
+    try {
+      for (ITableRow tableRow : getRows()) {
+        tableRow.setRowChanging(true);
+      }
+
+      Set<Entry<Integer, Set<ITableRow>>> entrySet = changes.entrySet();
+
+      for (Entry<Integer, Set<ITableRow>> e : entrySet) {
+        IColumn<?> col = getColumnSet().getColumn(e.getKey());
+        col.updateDisplayTexts(CollectionUtility.arrayList(e.getValue()));
+      }
+    }
+    finally {
+      for (ITableRow tableRow : getRows()) {
+        tableRow.setRowPropertiesChanged(false);
+        tableRow.setRowChanging(false);
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void applyRowDecorations(Set<ITableRow> rows) {
+    try {
+      for (ITableRow tableRow : rows) {
+        tableRow.setRowChanging(true);
+        this.decorateRow(tableRow);
+      }
+
+      for (IColumn col : getColumns()) {
+        col.decorateCells(CollectionUtility.arrayList(rows));
+
+        // cell decorator on table
+        for (ITableRow row : rows) {
+          this.decorateCell(row, col);
+        }
+      }
+    }
+    catch (Exception ex) {
+      LOG.error("Error occured while applying row decoration", ex);
+    }
+    finally {
+      for (ITableRow tableRow : rows) {
+        tableRow.setRowPropertiesChanged(false);
+        tableRow.setRowChanging(false);
       }
     }
   }
@@ -3636,89 +3662,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    */
   private void enqueueDecorationTasks(ITableRow row) {
     if (row != null) {
-      for (int i = 0; i < row.getCellCount(); i++) {
-        IColumn<?> column = getColumnSet().getColumn(i);
-        // lookups
-        if (column instanceof IContentAssistColumn) {
-          IContentAssistColumn<?, ?> assistColumn = (IContentAssistColumn<?, ?>) column;
-          if (assistColumn.getLookupCall() != null) {
-            m_cellLookupBuffer.add(new P_CellLookup(row, assistColumn));
-          }
-        }
-      }
       m_rowDecorationBuffer.add(row);
     }
   }
 
-  /*
-   * does not use setTableChanging()
-   */
-  private void applyRowDecorationsImpl(ITableRow tableRow) {
-    // disable row changed trigger on row
-    try {
-      tableRow.setRowChanging(true);
-      //
-      // row decorator on table
-      this.decorateRow(tableRow);
-      // row decorator on columns
-      ColumnSet cset = getColumnSet();
-      for (int c = 0; c < tableRow.getCellCount(); c++) {
-        // cell decorator on column
-        IColumn<?> col = cset.getColumn(c);
-        col.decorateCell(tableRow);
-        // cell decorator on table
-        this.decorateCell(tableRow, col);
+  private void enqueueValueChangeTasks(ITableRow row, Set<Integer> valueChangedColumns) {
+    for (Integer colIndex : valueChangedColumns) {
+      Set<ITableRow> rows = m_rowValueChangeBuffer.get(colIndex);
+      if (rows == null) {
+        rows = new HashSet<ITableRow>();
       }
-    }
-    catch (Exception ex) {
-      LOG.error("Error occured while applying row decoration", ex);
-    }
-    finally {
-      tableRow.setRowPropertiesChanged(false);
-      tableRow.setRowChanging(false);
-    }
-  }
-
-  private void applyLookupResult(InternalTableRow tableRow, int columnIndex, List<ILookupRow<?>> result) {
-    // disable row changed trigger on row
-    try {
-      tableRow.setRowChanging(true);
-      //
-      Cell cell = (Cell) tableRow.getCell(columnIndex);
-      if (result.size() == 1) {
-        cell.setText(result.get(0).getText());
-        cell.setTooltipText(result.get(0).getTooltipText());
-      }
-      else if (result.size() > 1) {
-        StringBuffer buf = new StringBuffer();
-        StringBuffer bufTooltip = new StringBuffer();
-
-        for (int i = 0; i < result.size(); i++) {
-          if (i > 0) {
-            if (isMultilineText()) {
-              buf.append("\n");
-              bufTooltip.append("\n");
-            }
-            else {
-              buf.append(", ");
-              bufTooltip.append(", ");
-            }
-          }
-          ILookupRow<?> row = result.get(i);
-          buf.append(row.getText());
-          bufTooltip.append(row.getTooltipText());
-        }
-        cell.setText(buf.toString());
-        cell.setTooltipText(bufTooltip.toString());
-      }
-      else {
-        cell.setText("");
-        cell.setTooltipText("");
-      }
-    }
-    finally {
-      tableRow.setRowPropertiesChanged(false);
-      tableRow.setRowChanging(false);
+      rows.add(row);
+      m_rowValueChangeBuffer.put(colIndex, rows);
     }
   }
 
@@ -3869,6 +3824,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void fireRowsUpdated(List<? extends ITableRow> rows) {
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("fire rows updated " + rows);
     }
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROWS_UPDATED, rows);
     // For each row, add information about updated columns to the event. (A row may also be updated if
@@ -4553,24 +4511,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
   }
-
-  private static class P_CellLookup {
-    private final ITableRow m_row;
-    private final IContentAssistColumn<?, ?> m_column;
-
-    public P_CellLookup(ITableRow row, IContentAssistColumn<?, ?> col) {
-      m_row = row;
-      m_column = col;
-    }
-
-    public ITableRow getRow() {
-      return m_row;
-    }
-
-    public IContentAssistColumn<?, ?> getColumn() {
-      return m_column;
-    }
-  }// end private class
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<Object> {
 

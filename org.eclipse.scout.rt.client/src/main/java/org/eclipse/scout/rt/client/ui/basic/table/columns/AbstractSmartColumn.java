@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ISmartColumnExtension;
 
@@ -22,12 +23,12 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractMixedSmartColum
 
   @Override
   protected final VALUE execConvertKeyToValue(VALUE key) {
-    return key;
+    return TypeCastUtility.castValue(key, getType());
   }
 
   @Override
   protected final VALUE execConvertValueToKey(VALUE value) {
-    return value;
+    return TypeCastUtility.castValue(value, getType());
   }
 
   protected static class LocalSmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends LocalMixedSmartColumnExtension<VALUE, VALUE, OWNER> implements ISmartColumnExtension<VALUE, OWNER> {

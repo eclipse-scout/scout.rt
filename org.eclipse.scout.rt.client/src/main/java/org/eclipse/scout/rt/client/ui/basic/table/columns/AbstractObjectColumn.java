@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,6 +50,14 @@ public abstract class AbstractObjectColumn extends AbstractColumn<Object> implem
       c = StringUtility.compareIgnoreCase(o1.toString(), o2.toString());
     }
     return c;
+  }
+
+  /**
+   * Empty no display text by default
+   */
+  @Override
+  protected String formatValueInternal(ITableRow row, Object value) {
+    return "";
   }
 
   protected static class LocalObjectColumnExtension<OWNER extends AbstractObjectColumn> extends LocalColumnExtension<Object, OWNER> implements IObjectColumnExtension<OWNER> {
