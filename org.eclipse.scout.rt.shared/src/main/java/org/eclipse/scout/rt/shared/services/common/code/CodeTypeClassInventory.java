@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 
 /**
- * Service for finding code types for registration. Uses jandex class inventory to find classes.
+ * Inventory service for code types classes for registration. Uses jandex class inventory to find classes.
  * *
  * <p>
  * By default all direct subclasses of {@link ICodeType} are scanned. Make sure your code type classes are available in
@@ -32,15 +32,15 @@ import org.eclipse.scout.rt.platform.inventory.IClassInfo;
  * </p>
  */
 @ApplicationScoped
-public class CodeTypeRegistrationService {
+public class CodeTypeClassInventory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSharedCodeService.class);
   private final IFilter<IClassInfo> m_filter;
 
-  public CodeTypeRegistrationService() {
+  public CodeTypeClassInventory() {
     this(BEANS.get(CodeTypeClassFilter.class));
   }
 
-  public CodeTypeRegistrationService(IFilter<IClassInfo> filter) {
+  public CodeTypeClassInventory(IFilter<IClassInfo> filter) {
     m_filter = filter;
   }
 
@@ -48,7 +48,7 @@ public class CodeTypeRegistrationService {
    * All code type classes in the jandex {@link ClassInventory} that are instanciable and not ignored with
    * {@link IgnoreBean}.
    */
-  public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
+  public Set<Class<? extends ICodeType<?, ?>>> getClasses() {
     Set<IClassInfo> allKnownCodeTypes = findClasses();
     Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
     for (IClassInfo codeTypeInfo : allKnownCodeTypes) {

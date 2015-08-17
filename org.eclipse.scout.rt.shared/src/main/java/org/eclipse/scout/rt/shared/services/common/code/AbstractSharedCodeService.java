@@ -152,7 +152,7 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
   }
 
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
-    return BEANS.get(CodeTypeRegistrationService.class).getAllCodeTypeClasses();
+    return BEANS.get(CodeTypeClassInventory.class).getClasses();
   }
 
   @Override

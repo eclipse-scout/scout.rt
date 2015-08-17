@@ -28,16 +28,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests for {@link CodeTypeRegistrationService}
+ * Tests for {@link CodeTypeClassInventory}
  */
 @RunWith(PlatformTestRunner.class)
-public class CodeTypeRegistrationServiceTest {
+public class CodeTypeClassInventoryTest {
 
-  private CodeTypeRegistrationService m_service;
+  private CodeTypeClassInventory m_service;
 
   @Before
   public void before() {
-    m_service = BEANS.get(CodeTypeRegistrationService.class);
+    m_service = BEANS.get(CodeTypeClassInventory.class);
   }
 
   /**
@@ -45,7 +45,7 @@ public class CodeTypeRegistrationServiceTest {
    */
   @Test
   public void testCodeTypeClasses() {
-    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = m_service.getAllCodeTypeClasses();
+    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = m_service.getClasses();
     assertTrue(allCodeTypes.contains(TestCodeType1.class));
     assertFalse(allCodeTypes.contains(IgnoredCodeType.class));
     assertFalse(allCodeTypes.contains(AbstractCodeType.class));
@@ -53,8 +53,8 @@ public class CodeTypeRegistrationServiceTest {
 
   @Test
   public void testCodeTypeClass_IgnoredName() throws ProcessingException {
-    CodeTypeRegistrationService testService = new CodeTypeRegistrationService(new IgnoreTestCodeType1Filter());
-    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = testService.getAllCodeTypeClasses();
+    CodeTypeClassInventory testService = new CodeTypeClassInventory(new IgnoreTestCodeType1Filter());
+    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = testService.getClasses();
     assertFalse(allCodeTypes.contains(TestCodeType1.class));
     assertTrue(allCodeTypes.contains(TestCodeType2.class));
   }
