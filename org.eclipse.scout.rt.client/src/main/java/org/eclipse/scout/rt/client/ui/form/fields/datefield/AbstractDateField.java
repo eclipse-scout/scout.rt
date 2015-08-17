@@ -233,14 +233,14 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
 
-    setFormat(getConfiguredFormat());
-    setDateFormatPattern(getConfiguredDateFormatPattern());
-    setTimeFormatPattern(getConfiguredTimeFormatPattern());
-
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
     setAutoTimeMillis(getConfiguredAutoTimeMillis());
     setAutoDate(getConfiguredAutoDate());
+
+    setDateFormatPattern(getConfiguredDateFormatPattern());
+    setTimeFormatPattern(getConfiguredTimeFormatPattern());
+    setFormat(getConfiguredFormat());
   }
 
   /**
