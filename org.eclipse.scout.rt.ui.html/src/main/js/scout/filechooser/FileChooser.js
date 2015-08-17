@@ -84,11 +84,11 @@ scout.FileChooser.prototype._render = function($parent) {
   }
 
   this.$buttons = $.makeDiv('file-chooser-buttons')
-    .appendTo(this.$content);
+    .appendTo(this.$container);
   if (scout.device.supportsFile()) {
     this.$addFileButton = $('<button>')
       .unfocusable()
-      .text(this.session.text('ui.Browse')) // XXX BSH
+      .text(this.session.text('ui.Browse'))
       .on('click', this._onAddFileButtonClicked.bind(this))
       .appendTo(this.$buttons);
   }
@@ -113,6 +113,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$container.addClass('calc-helper');
   this.$container.css('min-width', this.$container.width() + 100);
   this.$container.removeClass('calc-helper');
+  this._updateButtonWidths();
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
 
@@ -273,4 +274,29 @@ scout.FileChooser.prototype.detach = function() {
   this.$container.detach();
 
   this.attached = false;
+};
+
+scout.FileChooser.prototype._updateButtonWidths = function() {
+  // Find all visible buttons
+  var $visibleButtons = [];
+  this.$buttons.children().each(function() {
+    var $button = $(this);
+    if ($button.isVisible()) {
+      $visibleButtons.push($button);
+    }
+  });
+
+  // Manually calculate equal width fore each button, addding remaining pixels to last button.
+  // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
+  var availableWidth = this.$container.width();
+  var w = Math.floor(availableWidth / $visibleButtons.length);
+  $visibleButtons.forEach(function($button, index) {
+    if (index === $visibleButtons.length - 1) {
+      w = availableWidth;
+    }
+    else {
+      availableWidth -= w;
+    }
+    $button.outerWidth(w);
+  });
 };
