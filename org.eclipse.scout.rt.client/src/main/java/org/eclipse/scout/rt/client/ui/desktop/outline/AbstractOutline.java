@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -152,10 +153,31 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Called during initialization of this outline. Allows to add child pages to the outline tree. All added pages are
-   * roots of the visible tree.
+   * Called during initialization of this outline. Creates the root node of this outline.
    * <p>
-   * Subclasses can override this method. The default does nothing.
+   * Subclasses should overwrite either this method or {@link AbstractOutline#execCreateChildPages(List)}.
+   * <p>
+   * The default creates an {@link AbstractPageWithNodes} which is invisible according to the default of
+   * {@link AbstractTree#getConfiguredRootNodeVisible()}
+   *
+   * @since 5.1
+   */
+  @ConfigOperation
+  @Order(85)
+  protected IPage<?> execCreateRootPage() {
+    return new InvisibleRootPage();
+  }
+
+  /**
+   * Called during initialization of this outline. Allows to add child pages to the outline tree. All added pages are
+   * children of the invisible root node and thus roots of the visible tree.
+   * <p>
+   * An outline has an invisible root node unless a custom root node is provided by overwriting
+   * {@link AbstractOutline#execCreateRootPage()}. <b>If a custom root node is provided, this method has no effect.<b>
+   * <p>
+   * Subclasses should overwrite either this method or {@link AbstractOutline#execCreateRootPage()}.
+   * <p>
+   * The default does nothing.
    *
    * @param pageList
    *          live collection to add pages to the outline tree
@@ -208,8 +230,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     addTreeListener(new P_OutlineListener());
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
-    setRootNodeVisible(false);
-    IPage<?> rootPage = new InvisibleRootPage();
+    IPage<?> rootPage = interceptCreateRootPage();
     setRootNode(rootPage);
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
@@ -808,6 +829,12 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
+  protected final IPage<?> interceptCreateRootPage() {
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
+    OutlineCreateRootPageChain chain = new OutlineCreateRootPageChain(extensions);
+    return chain.execCreateRootPage();
+  }
+
   protected final void interceptCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     OutlineCreateChildPagesChain chain = new OutlineCreateChildPagesChain(extensions);
@@ -823,6 +850,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     @Override
     public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
       getOwner().execCreateChildPages(pageList);
+    }
+
+    @Override
+    public IPage<?> execCreateRootPage(OutlineCreateRootPageChain chain) {
+      return getOwner().execCreateRootPage();
     }
   }
 

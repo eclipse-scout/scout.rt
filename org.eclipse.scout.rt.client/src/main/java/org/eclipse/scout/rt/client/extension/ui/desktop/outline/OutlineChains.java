@@ -41,4 +41,22 @@ public final class OutlineChains {
 
     }
   }
+
+  public static class OutlineCreateRootPageChain extends AbstractOutlineChain {
+
+    public OutlineCreateRootPageChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
+      super(extensions);
+    }
+
+    public IPage<?> execCreateRootPage() {
+      MethodInvocation<IPage<?>> methodInvocation = new MethodInvocation<IPage<?>>() {
+        @Override
+        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) throws ProcessingException {
+          setReturnValue(next.execCreateRootPage(OutlineCreateRootPageChain.this));
+        }
+      };
+      callChain(methodInvocation);
+      return methodInvocation.getReturnValue();
+    }
+  }
 }
