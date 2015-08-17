@@ -411,7 +411,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Configures whether this field should vertically fill the grid cell.<br>
-   * If the property is set to true, the field takes all the vertical space and therefore is as height as the grid cell.<br>
+   * If the property is set to true, the field takes all the vertical space and therefore is as height as the grid cell.
+   * <br>
    * If it's set to false, the height is computed based on the properties {@link #getConfiguredGridUseUiHeight()} and
    * {@link #getConfiguredHeightInPixel()}. If non of these are set, a default value is used which typically is the
    * height of a logical grid row.
@@ -1730,7 +1731,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public boolean isContentValid() {
-    return !hasError();
+    return !hasError() && isMandatoryFulfilled();
+  }
+
+  @Override
+  public boolean isMandatoryFulfilled() {
+    return !isMandatory() || !isEmpty();
   }
 
   /**
@@ -1986,7 +1992,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalFormFieldExtension<OWNER extends AbstractFormField> extends AbstractExtension<OWNER> implements IFormFieldExtension<OWNER> {
+  protected static class LocalFormFieldExtension<OWNER extends AbstractFormField> extends AbstractExtension<OWNER>implements IFormFieldExtension<OWNER> {
 
     public LocalFormFieldExtension(OWNER owner) {
       super(owner);

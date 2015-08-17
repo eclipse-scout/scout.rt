@@ -660,17 +660,11 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     return super.isContentValid() && isMandatoryFulfilled();
   }
 
-  @Override
-  public boolean isMandatoryFulfilled() {
-    return !isMandatory() || getValue() != null;
-  }
-
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-      implements IValueFieldExtension<VALUE, OWNER> {
+  protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

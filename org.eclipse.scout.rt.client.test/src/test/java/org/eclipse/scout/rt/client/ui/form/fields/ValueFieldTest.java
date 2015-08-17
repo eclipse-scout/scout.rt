@@ -40,6 +40,7 @@ public class ValueFieldTest {
   private static final String UNPARSABLE_VALUE = "unparsable";
   private static final String INVALID_VALUE = "invalid";
   private static final String EXCEPTION_VALUE = "EXCEPTION!!!";
+  private static final String EMPTY_VALUE = "I'M EMPTY";
 
   @Test
   public void testNoInitialError() {
@@ -54,6 +55,25 @@ public class ValueFieldTest {
     assertEquals(PARSE_ERROR_MESSAGE, v.getErrorStatus().getMessage());
     assertEquals(IStatus.ERROR, v.getErrorStatus().getSeverity());
     assertFalse(v.isContentValid());
+  }
+
+  /**
+   * A mandatory field if execEmpty is overriden
+   */
+  @Test
+  public void testMandatoryFieldInvalidOverridenExecEmpty() {
+    MandatoryErrorField v = new MandatoryErrorField();
+    v.setMandatory(true);
+    v.setValue(EMPTY_VALUE);
+    assertFalse(v.isContentValid());
+  }
+
+  @Test
+  public void testMandatoryFieldValidOverridenExecEmpty() {
+    MandatoryErrorField v = new MandatoryErrorField();
+    v.setMandatory(true);
+    v.setValue("valid");
+    assertTrue(v.isContentValid());
   }
 
   /**
@@ -185,6 +205,13 @@ public class ValueFieldTest {
   private void assertInvalid(IFormField field, String expectedMessage) {
     assertFalse(field.isContentValid());
     assertEquals(expectedMessage, field.getErrorStatus().getMessage());
+  }
+
+  static class MandatoryErrorField extends AbstractValueField<String> {
+    @Override
+    protected boolean execIsEmpty() throws ProcessingException {
+      return EMPTY_VALUE.equals(getValue());
+    }
   }
 
   static class ParseErrorField extends AbstractValueField<String> {

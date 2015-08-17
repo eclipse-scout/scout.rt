@@ -639,4 +639,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    */
   void setStatusVisible(boolean statusVisible);
 
+  /**
+   * @return true, if the mandatory property is fulfilled (a value set or not mandatory)
+   */
+  boolean isMandatoryFulfilled();
 }

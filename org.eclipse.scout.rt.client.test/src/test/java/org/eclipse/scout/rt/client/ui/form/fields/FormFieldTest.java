@@ -180,6 +180,15 @@ public class FormFieldTest {
   class SimpleTestFormField extends AbstractFormField {
   }
 
+  class MandatoryTestFormField extends AbstractFormField {
+    protected boolean iAmEmpty = false;
+
+    @Override
+    protected boolean execIsEmpty() throws ProcessingException {
+      return iAmEmpty;
+    }
+  }
+
   /**
    * Form with two injected fields
    */
@@ -516,6 +525,27 @@ public class FormFieldTest {
     assertNotEquals(status0, status1);
     assertEquals(status1, status2);
     assertEquals(1, counter.getCount());
+  }
+
+  /**
+   * A mandatory field is invalid, if it is empty
+   */
+  @Test
+  public void testMandatoryFieldInvalid() {
+    MandatoryTestFormField v = new MandatoryTestFormField();
+    v.setMandatory(true);
+    v.iAmEmpty = true;
+    v.checkEmpty();
+    assertFalse(v.isContentValid());
+  }
+
+  @Test
+  public void testMandatoryFieldValid() {
+    MandatoryTestFormField v = new MandatoryTestFormField();
+    v.setMandatory(true);
+    v.iAmEmpty = false;
+    v.checkEmpty();
+    assertTrue(v.isContentValid());
   }
 
   @Test

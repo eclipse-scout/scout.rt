@@ -139,9 +139,4 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   void setAutoAddDefaultMenus(boolean b);
 
-  /**
-   * @return true, if the mandatory property is fulfilled (a value set or not mandatory)
-   */
-  boolean isMandatoryFulfilled();
-
 }
