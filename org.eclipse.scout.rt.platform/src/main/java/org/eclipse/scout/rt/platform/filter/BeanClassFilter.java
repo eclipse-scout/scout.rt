@@ -8,25 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.common.code;
+package org.eclipse.scout.rt.platform.filter;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 
 /**
- *
+ * Class filter for beans classes.
  */
-@Bean
-public class CodeTypeClassFilter implements IFilter<IClassInfo> {
+public class BeanClassFilter implements IFilter<IClassInfo> {
 
   /**
-   * Checks whether the given class is a CodeType class that should be registered
+   * Checks whether the given class can be registered as a bean
    *
-   * @param ci
-   *          the class to be checked
-   * @return Returns <code>true</code> if the class is an accepted code type class. <code>false</code> otherwise.
+   * @return Returns <code>true</code> if the class is instanciable and not ignored with {@link IgnoreBean}, <code>false
+   *         <code> otherwise.
    */
   @Override
   public boolean accept(IClassInfo ci) {

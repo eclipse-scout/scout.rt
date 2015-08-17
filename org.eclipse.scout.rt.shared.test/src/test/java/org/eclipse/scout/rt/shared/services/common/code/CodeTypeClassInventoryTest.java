@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.filter.BeanClassFilter;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.IgnoredCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType1;
@@ -41,7 +42,7 @@ public class CodeTypeClassInventoryTest {
   }
 
   /**
-   * Tests that a code type class is found by {@link ICodeService#getAllCodeTypeClasses(String)}
+   * Tests that a code type class is found by {@link CodeTypeClassInventory#getAllCodeTypeClasses)}
    */
   @Test
   public void testCodeTypeClasses() {
@@ -62,7 +63,7 @@ public class CodeTypeClassInventoryTest {
   /**
    * Accept everything except TestCodeType1
    */
-  static class IgnoreTestCodeType1Filter extends CodeTypeClassFilter {
+  static class IgnoreTestCodeType1Filter extends BeanClassFilter {
 
     @Override
     public boolean accept(IClassInfo ci) {
