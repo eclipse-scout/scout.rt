@@ -189,7 +189,7 @@ scout.Tree.prototype._renderEnabled = function() {
         node = $node.data('node');
 
       $node.children('.tree-node-checkbox')
-        .children('div')
+        .children('.check-box')
         .toggleClass('disabled', !(enabled && node.enabled));
     });
   }
@@ -237,7 +237,7 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
         if (this.rendered && node.$node) {
           node.$node
             .children('.tree-node-checkbox')
-            .children('div')
+            .children('.check-box')
             .toggleClass('childrenChecked', true);
         }
         break;
@@ -247,7 +247,7 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
       node.childrenChecked = false;
       if (this.rendered && node.$node) {
         node.$node.children('.tree-node-checkbox')
-          .children('div')
+          .children('.check-box')
           .toggleClass('childrenChecked', false);
       }
     }
@@ -283,11 +283,11 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
     if (this.rendered && node.parentNode.$node) {
       if (checked) {
         node.parentNode.$node.children('.tree-node-checkbox')
-          .children('div')
+          .children('.check-box')
           .toggleClass('childrenChecked', true);
       } else {
         node.parentNode.$node.children('.tree-node-checkbox')
-          .children('div')
+          .children('.check-box')
           .toggleClass('childrenChecked', false);
       }
     }
@@ -992,7 +992,7 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
 
   var $checkbox = node.$node
     .children('.tree-node-checkbox')
-    .children('div')
+    .children('.check-box')
     .toggleClass('checked', node.checked);
 };
 
@@ -1063,7 +1063,7 @@ scout.Tree.prototype._renderTreeItemControl = function($node) {
 scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   var $node = node.$node,
     $controlItem = $node.prependDiv('tree-node-checkbox');
-  var $checkboxDiv = $('<div>')
+  var $checkboxDiv = $.makeDiv('check-box')
     .appendTo($controlItem)
     .toggleClass('checked', node.checked)
     .toggleClass('disabled', !(this.enabled && node.enabled));
@@ -1127,8 +1127,7 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
 };
 
 scout.Tree.prototype._isCheckboxClicked = function(event) {
-  var $target = $(event.target);
-  return $target.is('div') && $target.parent().hasClass('tree-node-checkbox');
+  return $(event.target).is('.check-box');
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -1353,7 +1352,7 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   if (oldNode.enabled !== updatedNode.enabled) {
     oldNode.enabled = updatedNode.enabled;
     oldNode.$node.children('.tree-node-checkbox')
-      .children('div')
+      .children('.check-box')
       .toggleClass('disabled', !(this.enabled && oldNode.enabled));
     propertiesChanged = true;
   }
