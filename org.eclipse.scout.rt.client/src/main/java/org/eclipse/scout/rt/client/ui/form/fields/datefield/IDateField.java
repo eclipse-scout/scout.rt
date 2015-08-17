@@ -21,6 +21,7 @@ public interface IDateField extends IBasicField<Date> {
   String PROP_HAS_TIME = "hasTime";
   String PROP_DATE_FORMAT_PATTERN = "dateFormatPattern";
   String PROP_TIME_FORMAT_PATTERN = "timeFormatPattern";
+  String PROP_AUTO_DATE = "autoDate";
 
   @Override
   IDateFieldUIFacade getUIFacade();
@@ -61,36 +62,19 @@ public interface IDateField extends IBasicField<Date> {
   void setHasTime(boolean b);
 
   /**
-   * if {@link IDateField#isHasTime()} == true the auto time millis is considered if only a date input occurs.<BR>
-   * <b>NOTE:</b> in case of 0l the current time will be taken.
-   *
-   * @param l
+   * @param autoDate
+   *          The date to be used when setting a value "automatically", e.g. when the date picker is opened initially or
+   *          when a date or time is entered and the other component has to be filled. <code>null</code> means
+   *          "use current date and time".
    */
-  void setAutoTimeMillis(long l);
+  void setAutoDate(Date autoDate);
 
   /**
-   * if {@link IDateField#isHasTime()} == true the auto time millis is considered if only a date input occurs.<BR>
-   * <b>NOTE:</b> in case of 0l the current time will be taken.
-   *
-   * @param l
+   * @return the date to be used when setting a value "automatically", e.g. when the date picker is opened initially or
+   *         when a date or time is entered and the other component has to be filled. If the return value is
+   *         <code>null</code>, the current date and time should be used.
    */
-  void setAutoDate(Date d);
-
-  /**
-   * if {@link IDateField#isHasDate()} == true the auto date is considered if only a time input occurs.<br>
-   * <b>NOTE:</b> in case of null the current date will be taken.
-   *
-   * @param l
-   */
-  void setAutoTimeMillis(int hour, int minute, int second);
-
-  /**
-   * if {@link IDateField#isHasTime()} == true the auto time millis is considered if only a date input occurs.<BR>
-   * <b>NOTE:</b> in case of 0l the current time will be taken.
-   *
-   * @param l
-   */
-  long getAutoTimeMillis();
+  Date getAutoDate();
 
   /**
    * @return the time value as a double in the range from [0..1[ for 00:00 - 23:59:59

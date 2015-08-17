@@ -59,16 +59,16 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * ...
  * public class MyDateField extends AbstractDateField {
  * }
- * 
+ *
  * //Use SimpleDateFormat to get a String representation of the date.
  * Date d = formData.getMyDate().getValue();
  * DateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd - HH:mm:ss&quot;, Locale.ENGLISH);
  * String formattedDate = dateFormat.format(d);
  * System.out.println(formattedDate);
- * 
+ *
  * //Send the formData to the server using a service:
  * BEANS.get(IMyService.class).load(MyFormData formData)
- * 
+ *
  * //Use SimpleDateFormat to get a String representation of the date in the service implementation.
  * public MyFormData load(MyFormData formData) {
  *     Date d = formData.getMyDate().getValue();
@@ -88,12 +88,10 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
 @ClassId("f73eed8c-1e70-4903-a23f-4a29d884e5ea")
-public abstract class AbstractDateField extends AbstractBasicField<Date> implements IDateField {
+public abstract class AbstractDateField extends AbstractBasicField<Date>implements IDateField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDateField.class);
 
   private IDateFieldUIFacade m_uiFacade;
-  private long m_autoTimeMillis;
-  private Date m_autoDate;
 
   public AbstractDateField() {
     this(true);
@@ -137,17 +135,9 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   /**
-   * When a date without time is picked, this time value is used as hh/mm/ss.
-   */
-  @ConfigProperty(ConfigProperty.LONG)
-  @Order(270)
-  protected long getConfiguredAutoTimeMillis() {
-    return 0;
-  }
-
-  /**
-   * When a time without date is picked, this date value is used as day.<br>
-   * <b>NOTE:</b> in case of null the current date will be taken.
+   * Date to be used when setting a value "automatically", e.g. when the date picker is opened initially or when a date
+   * or time is entered and the other component has to be filled. If no auto date is set (which is the default), the
+   * current date and time is used.
    */
   @Order(270)
   protected Date getConfiguredAutoDate() {
@@ -235,7 +225,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
 
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
-    setAutoTimeMillis(getConfiguredAutoTimeMillis());
     setAutoDate(getConfiguredAutoDate());
 
     setDateFormatPattern(getConfiguredDateFormatPattern());
@@ -368,27 +357,13 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   }
 
   @Override
-  public void setAutoTimeMillis(long l) {
-    m_autoTimeMillis = l;
+  public void setAutoDate(Date autoDate) {
+    propertySupport.setProperty(PROP_AUTO_DATE, autoDate);
   }
 
   @Override
-  public void setAutoDate(Date d) {
-    m_autoDate = d;
-  }
-
-  @Override
-  public void setAutoTimeMillis(int hour, int minute, int second) {
-    setAutoTimeMillis(((hour * 60L + minute) * 60L + second) * 1000L);
-  }
-
-  @Override
-  public long getAutoTimeMillis() {
-    return m_autoTimeMillis;
-  }
-
   public Date getAutoDate() {
-    return m_autoDate;
+    return (Date) propertySupport.getProperty(PROP_AUTO_DATE);
   }
 
   @Override
@@ -396,16 +371,13 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     Date d = getValue();
     if (d == null) {
       d = applyAutoDate(d);
-      d = applyAutoTime(d);
     }
-    else {
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(d);
-      cal.add(Calendar.DATE, days);
-      cal.add(Calendar.MONTH, months);
-      cal.add(Calendar.YEAR, years);
-      d = cal.getTime();
-    }
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(d);
+    cal.add(Calendar.DATE, days);
+    cal.add(Calendar.MONTH, months);
+    cal.add(Calendar.YEAR, years);
+    d = cal.getTime();
     setValue(d);
   }
 
@@ -414,15 +386,12 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     Date d = getValue();
     if (d == null) {
       d = applyAutoDate(d);
-      d = applyAutoTime(d);
     }
-    else {
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(d);
-      cal.add(Calendar.MINUTE, minutes);
-      cal.add(Calendar.HOUR_OF_DAY, hours);
-      d = cal.getTime();
-    }
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(d);
+    cal.add(Calendar.MINUTE, minutes);
+    cal.add(Calendar.HOUR_OF_DAY, hours);
+    d = cal.getTime();
     setValue(d);
   }
 
@@ -450,38 +419,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Override
   public void setTimeValue(Double d) {
     setValue(DateUtility.convertDoubleTimeToDate(d));
-  }
-
-  /**
-   * @since Build 200
-   * @rn imo, 06.04.2006, only adjust date not date/time
-   */
-  protected Date applyAutoTime(Date d) {
-    if (d == null) {
-      return d;
-    }
-    Calendar timeCal = Calendar.getInstance();
-    long autoTime = getAutoTimeMillis();
-    if (autoTime == 0L && isHasTime()) {
-      // use current time
-    }
-    else {
-      timeCal.set(Calendar.MILLISECOND, (int) (autoTime % 1000));
-      autoTime = autoTime / 1000;
-      timeCal.set(Calendar.SECOND, (int) (autoTime % 60));
-      autoTime = autoTime / 60;
-      timeCal.set(Calendar.MINUTE, (int) (autoTime % 60));
-      autoTime = autoTime / 60;
-      timeCal.set(Calendar.HOUR_OF_DAY, (int) (autoTime % 24));
-    }
-    Calendar c = Calendar.getInstance();
-    c.setTime(d);
-    c.set(Calendar.MILLISECOND, timeCal.get(Calendar.MILLISECOND));
-    c.set(Calendar.SECOND, timeCal.get(Calendar.SECOND));
-    c.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
-    c.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
-    d = c.getTime();
-    return d;
   }
 
   protected Date applyAutoDate(Date d) {
@@ -576,9 +513,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     @Override
     public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
       String invalidText = StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText));
-      ParsingFailedStatus status = new ParsingFailedStatus(
-          ScoutTexts.get("InvalidValueMessageX", invalidText),
-          invalidDateText + "\n" + invalidTimeText); // don't use join()!
+      ParsingFailedStatus status = new ParsingFailedStatus(ScoutTexts.get("InvalidValueMessageX", invalidText), invalidDateText + "\n" + invalidTimeText); // don't use join()!
       addErrorStatus(status);
       setDisplayText(invalidText);
     }
@@ -601,7 +536,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     chain.execShiftDate(level, value);
   }
 
-  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalBasicFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
+  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalBasicFieldExtension<Date, OWNER>implements IDateFieldExtension<OWNER> {
 
     public LocalDateFieldExtension(OWNER owner) {
       super(owner);

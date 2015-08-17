@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -33,13 +32,13 @@ import org.eclipse.scout.rt.platform.util.DateFormatProvider;
  * Column holding Date
  */
 @ClassId("9185f9ed-3dc2-459b-b06b-f39c6c6fed2e")
-public abstract class AbstractDateColumn extends AbstractColumn<Date> implements IDateColumn {
+public abstract class AbstractDateColumn extends AbstractColumn<Date>implements IDateColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
   private String m_format;
   private boolean m_hasTime;
   private boolean m_hasDate;
-  private long m_autoTimeMillis;
+  private Date m_autoDate;
 
   public AbstractDateColumn() {
     super();
@@ -92,12 +91,14 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   }
 
   /**
-   * When a date without time is picked, this time value is used as hh/mm/ss.
+   * Only relevant when the date field has both the date and the time part enabled. When the user picks a date or the
+   * time, the other value is set automatically using the return value of this method. If it is <code>null</code> (the
+   * default), the current date and time is used.
    */
   @ConfigProperty(ConfigProperty.LONG)
   @Order(152)
-  protected long getConfiguredAutoTimeMillis() {
-    return 0;
+  protected Date getConfiguredAutoDate() {
+    return null;
   }
 
   @Override
@@ -106,7 +107,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     setFormat(getConfiguredFormat());
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
-    setAutoTimeMillis(getConfiguredAutoTimeMillis());
+    setAutoDate(getConfiguredAutoDate());
   }
 
   /*
@@ -146,54 +147,13 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   }
 
   @Override
-  public void setAutoTimeMillis(long l) {
-    m_autoTimeMillis = l;
+  public Date getAutoDate() {
+    return m_autoDate;
   }
 
   @Override
-  public void setAutoTimeMillis(int hour, int minute, int second) {
-    setAutoTimeMillis(((hour * 60L + minute) * 60L + second) * 1000L);
-  }
-
-  @Override
-  public long getAutoTimeMillis() {
-    return m_autoTimeMillis;
-  }
-
-  @Override
-  protected Date parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
-    //legacy support
-    if (rawValue instanceof Number) {
-      rawValue = convertDoubleTimeToDate((Number) rawValue);
-    }
-    Date validValue = null;
-    if (rawValue == null) {
-      validValue = null;
-    }
-    else if (rawValue instanceof Date) {
-      validValue = (Date) rawValue;
-    }
-    else {
-      throw new ProcessingException("invalid Date value in column '" + getClass().getSimpleName() + "': " + rawValue + " class=" + rawValue.getClass());
-    }
-    return validValue;
-  }
-
-  private Date convertDoubleTimeToDate(Number d) {
-    if (d == null) {
-      return null;
-    }
-    int m = (int) (((long) (d.doubleValue() * MILLIS_PER_DAY + 0.5)) % MILLIS_PER_DAY);
-    Calendar c = Calendar.getInstance();
-    c.clear();
-    c.set(Calendar.MILLISECOND, m % 1000);
-    m = m / 1000;
-    c.set(Calendar.SECOND, m % 60);
-    m = m / 60;
-    c.set(Calendar.MINUTE, m % 60);
-    m = m / 60;
-    c.set(Calendar.HOUR_OF_DAY, m % 24);
-    return c.getTime();
+  public void setAutoDate(Date autoDate) {
+    m_autoDate = autoDate;
   }
 
   @Override
@@ -214,7 +174,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     f.setFormat(getFormat());
     f.setHasDate(isHasDate());
     f.setHasTime(isHasTime());
-    f.setAutoTimeMillis(getAutoTimeMillis());
+    f.setAutoDate(getAutoDate());
   }
 
   @Override
@@ -245,7 +205,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return df;
   }
 
-  protected static class LocalDateColumnExtension<OWNER extends AbstractDateColumn> extends LocalColumnExtension<Date, OWNER> implements IDateColumnExtension<OWNER> {
+  protected static class LocalDateColumnExtension<OWNER extends AbstractDateColumn> extends LocalColumnExtension<Date, OWNER>implements IDateColumnExtension<OWNER> {
 
     public LocalDateColumnExtension(OWNER owner) {
       super(owner);

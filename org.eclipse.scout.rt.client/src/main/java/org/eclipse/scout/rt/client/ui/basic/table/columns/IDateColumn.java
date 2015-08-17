@@ -27,10 +27,7 @@ public interface IDateColumn extends IColumn<Date> {
 
   void setHasTime(boolean b);
 
-  void setAutoTimeMillis(long l);
+  void setAutoDate(Date autoDate);
 
-  void setAutoTimeMillis(int hour, int minute, int second);
-
-  long getAutoTimeMillis();
-
+  Date getAutoDate();
 }
