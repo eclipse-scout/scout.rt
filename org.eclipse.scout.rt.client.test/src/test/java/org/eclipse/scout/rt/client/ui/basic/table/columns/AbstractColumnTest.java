@@ -267,6 +267,15 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     assertNull(String.format("The valid cell should not have an error status: value '%s'", c.getValue()), c.getErrorStatus());
   }
 
+  @Test
+  public void testUpdateDisplayText() throws ProcessingException {
+    final TestDecorationTable table = new TestDecorationTable();
+    ITableRow row = table.createRow();
+    table.getC1Column().setValue(row, "newValue");
+    assertEquals("newValue", table.getC1Column().getDisplayText(table.getRow(0)));
+    row = table.addRow(row);
+  }
+
   public class TestTable extends AbstractTable {
 
     public ValidateTestColumn getValidateTestColumn() {

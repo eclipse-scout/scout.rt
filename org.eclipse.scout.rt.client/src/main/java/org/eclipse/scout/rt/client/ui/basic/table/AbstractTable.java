@@ -2859,6 +2859,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       newIRows = createInternalRows(newRows);
 
+      addCellObserver(newIRows);
       // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
       for (ITableRow newIRow : newIRows) {
@@ -2883,7 +2884,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableChanging(false);
     }
 
-    addCellObserver(newIRows);
     return new ArrayList<ITableRow>(newIRows);
   }
 
@@ -4617,7 +4617,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE> implements ITableExtension<TABLE> {
+  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE>implements ITableExtension<TABLE> {
 
     public LocalTableExtension(TABLE owner) {
       super(owner);
