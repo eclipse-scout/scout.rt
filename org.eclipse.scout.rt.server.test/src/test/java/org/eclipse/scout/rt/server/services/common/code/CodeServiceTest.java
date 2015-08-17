@@ -11,25 +11,17 @@
 package org.eclipse.scout.rt.server.services.common.code;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
-import org.eclipse.scout.rt.server.services.common.code.fixture.IgnoredCodeType;
-import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType1;
-import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType2;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
@@ -64,63 +56,6 @@ public class CodeServiceTest {
   @After
   public void after() {
     TestingUtility.unregisterBeans(m_reg);
-  }
-
-  /**
-   * Tests that a code type class is found by {@link ICodeService#getAllCodeTypeClasses(String)}
-   */
-  @Test
-  public void testCodeTypeClasses() {
-    ICodeService service = BEANS.get(ICodeService.class);
-    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
-    assertTrue(allCodeTypes.contains(TestCodeType1.class));
-  }
-
-  /**
-   * Tests that a Codetype with Annotation {@link IgnoreBean} is not found
-   */
-  @Test
-  public void testCodeTypeClass_IgnoredNotFound() {
-    ICodeService service = BEANS.get(ICodeService.class);
-    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
-    assertFalse(allCodeTypes.contains(IgnoredCodeType.class));
-  }
-
-  /**
-   * Tests that a Codetype that is not instanciable is not found
-   */
-  @Test
-  public void testCodeTypeClass_AbstractNotFound() {
-    ICodeService service = BEANS.get(ICodeService.class);
-    Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
-    assertFalse(allCodeTypes.contains(AbstractCodeType.class));
-  }
-
-  @Test
-  public void testCodeTypeClass_IgnoredName() throws ProcessingException {
-    CodeService_IgnoreClassName1_Mock testService = new CodeService_IgnoreClassName1_Mock();
-    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).withInitialInstance(testService).withApplicationScoped(true));
-    try {
-      ICodeService service = BEANS.get(ICodeService.class);
-      Collection<Class<? extends ICodeType<?, ?>>> allCodeTypes = service.getAllCodeTypeClasses("");
-      assertFalse(allCodeTypes.contains(TestCodeType1.class));
-      assertTrue(allCodeTypes.contains(TestCodeType2.class));
-    }
-    finally {
-      TestingUtility.unregisterBeans(reg);
-    }
-  }
-
-  static class CodeService_IgnoreClassName1_Mock extends CodeService {
-
-    public CodeService_IgnoreClassName1_Mock() throws ProcessingException {
-      super();
-    }
-
-    @Override
-    protected boolean acceptClassName(String name) {
-      return super.acceptClassName(name) && CompareUtility.notEquals(name, TestCodeType1.class.getName());
-    }
   }
 
   /**

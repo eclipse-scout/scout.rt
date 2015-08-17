@@ -12,19 +12,14 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.IgnoreBean;
-import org.eclipse.scout.rt.platform.inventory.ClassInventory;
-import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
@@ -35,7 +30,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
  * @since 4.3.0 (Mars-M5)
  */
 public abstract class AbstractSharedCodeService extends AbstractService implements ICodeService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSharedCodeService.class);
   private static final Long DEFAULT_PARTITION_ID = 0L;
 
   private final CodeTypeStore m_codeTypeStore;
@@ -158,21 +152,7 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
   }
 
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
-    Set<IClassInfo> allKnownCodeTypes = ClassInventory.get().getAllKnownSubClasses(ICodeType.class);
-    Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
-    for (IClassInfo codeTypeInfo : allKnownCodeTypes) {
-      if (acceptClass(codeTypeInfo)) {
-        try {
-          @SuppressWarnings("unchecked")
-          Class<? extends ICodeType<?, ?>> codeTypeClass = (Class<? extends ICodeType<?, ?>>) codeTypeInfo.resolveClass();
-          discoveredCodeTypes.add(codeTypeClass);
-        }
-        catch (Exception e) {
-          LOG.error("Error loading code type class", e);
-        }
-      }
-    }
-    return CollectionUtility.hashSet(discoveredCodeTypes);
+    return BEANS.get(CodeTypeRegistrationService.class).getAllCodeTypeClasses();
   }
 
   @Override
@@ -194,24 +174,6 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
 
   private CodeTypeCache getCodeTypeCache(Long partitionId) {
     return m_codeTypeStore.getCodeTypeCache(partitionId, NlsLocale.get());
-  }
-
-  /**
-   * Checks whether the given class is a CodeType class that should be visible to this service.
-   *
-   * @param c
-   *          the class to be checked
-   * @return Returns <code>true</code> if the class is an accepted code type class. <code>false</code> otherwise.
-   */
-  protected boolean acceptClass(IClassInfo c) {
-    return c.isInstanciable() && !c.hasAnnotation(IgnoreBean.class) && acceptClassName(c.name());
-  }
-
-  /**
-   * Checks whether the given class name is a potential code type class. By default, all code types are accepted.
-   */
-  protected boolean acceptClassName(String className) {
-    return true;
   }
 
   /**
