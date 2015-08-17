@@ -326,7 +326,16 @@ scout.Table.prototype._unwrapCells = function(cells) {
 };
 
 scout.Table.prototype._isFooterVisible = function() {
-  return this.tableStatusVisible || this.tableControls.length > 0;
+  return this.tableStatusVisible || this._hasVisibleTableControls();
+};
+
+scout.Table.prototype._hasVisibleTableControls = function() {
+  return this.tableControls.some(function(control) {
+    if (control.visible) {
+      return true;
+    }
+    return false;
+  });
 };
 
 scout.Table.prototype._createHeader = function() {
