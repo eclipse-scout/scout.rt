@@ -16,6 +16,7 @@
 
   &.disabled > .label {
     color: @control-disabled-color;
+    cursor: default;
   }
 
   & > .check-box {
@@ -50,6 +51,20 @@
 
     &.checked::before {
       #scout.checkbox-label-before-checked();
+    }
+  }
+
+  &.cell-editor-field {
+
+    & > .check-box {
+      display: inline-block;
+      width: @check-box-size;
+      height: @check-box-size;
+      position: relative;
+
+      &::before {
+        top: 0;
+      }
     }
   }
 }
