@@ -270,10 +270,9 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   @Test
   public void testUpdateDisplayText() throws ProcessingException {
     final TestDecorationTable table = new TestDecorationTable();
-    ITableRow row = table.createRow();
+    ITableRow row = table.addRow();
     table.getC1Column().setValue(row, "newValue");
     assertEquals("newValue", table.getC1Column().getDisplayText(table.getRow(0)));
-    row = table.addRow(row);
   }
 
   public class TestTable extends AbstractTable {
