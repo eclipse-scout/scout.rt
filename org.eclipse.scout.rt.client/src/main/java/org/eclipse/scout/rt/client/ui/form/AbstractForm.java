@@ -949,68 +949,74 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * form subclass
    */
   protected IForm startInternal(final IFormHandler handler) throws ProcessingException {
-    if (m_blockingCondition.isBlocking()) {
-      throw new ProcessingException("The form " + getFormId() + " has already been started");
-    }
-    // Ensure that boolean is set not only once by the constructor
-    setFormLoading(true);
-    setHandler(handler);
-    m_closeType = IButton.SYSTEM_TYPE_NONE;
-    m_blockingCondition.setBlocking(true);
-    try {
-      // check if form was made invisible ( = access control denied access)
-      if (!getRootGroupBox().isVisible()) {
-        disposeFormInternal();
-        return this;
-      }
-      initForm();
-      // check if form was made invisible ( = access control denied access)
-      if (!getRootGroupBox().isVisible()) {
-        // make sure the form is storing since it is not showing
-        disposeFormInternal();
-        return this;
-      }
-      loadStateInternal();
-      // check if form was made invisible ( = access control denied access)
-      if (!isFormStarted()) {
-        disposeFormInternal();
-        return this;
-      }
-      if (!getRootGroupBox().isVisible()) {
-        disposeFormInternal();
-        return this;
-      }
-      if (getHandler().isGuiLess()) {
-        // make sure the form is storing since it is not showing
-        storeStateInternal();
-        markSaved();
-        doFinally();
-        disposeFormInternal();
-        return this;
-      }
-    }
-    catch (ProcessingException e) {
-      e.addContextMessage(AbstractForm.this.getClass().getSimpleName());
-      disposeFormInternal();
-      if (e instanceof VetoException) {
-        interceptOnVetoException((VetoException) e, e.getStatus().getCode());
-      }
-      else {
-        throw e;
-      }
-    }
-    catch (Exception e) {
-      disposeFormInternal();
-      throw new ProcessingException("failed showing " + getTitle(), e);
-    }
+    ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
 
-    setButtonsArmed(true);
-    setCloseTimerArmed(true);
+      @Override
+      public void run() throws Exception {
+        if (m_blockingCondition.isBlocking()) {
+          throw new ProcessingException("The form " + getFormId() + " has already been started");
+        }
+        // Ensure that boolean is set not only once by the constructor
+        setFormLoading(true);
+        setHandler(handler);
+        m_closeType = IButton.SYSTEM_TYPE_NONE;
+        m_blockingCondition.setBlocking(true);
+        try {
+          // check if form was made invisible ( = access control denied access)
+          if (!getRootGroupBox().isVisible()) {
+            disposeFormInternal();
+            return;
+          }
+          initForm();
+          // check if form was made invisible ( = access control denied access)
+          if (!getRootGroupBox().isVisible()) {
+            // make sure the form is storing since it is not showing
+            disposeFormInternal();
+            return;
+          }
+          loadStateInternal();
+          // check if form was made invisible ( = access control denied access)
+          if (!isFormStarted()) {
+            disposeFormInternal();
+            return;
+          }
+          if (!getRootGroupBox().isVisible()) {
+            disposeFormInternal();
+            return;
+          }
+          if (getHandler().isGuiLess()) {
+            // make sure the form is storing since it is not showing
+            storeStateInternal();
+            markSaved();
+            doFinally();
+            disposeFormInternal();
+            return;
+          }
+        }
+        catch (ProcessingException e) {
+          e.addContextMessage(AbstractForm.this.getClass().getSimpleName());
+          disposeFormInternal();
+          if (e instanceof VetoException) {
+            interceptOnVetoException((VetoException) e, e.getStatus().getCode());
+          }
+          else {
+            throw e;
+          }
+        }
+        catch (Exception e) {
+          disposeFormInternal();
+          throw new ProcessingException("failed showing " + getTitle(), e);
+        }
 
-    // Notify the UI to display this form.
-    if (isShowOnStart()) {
-      getDesktop().showForm(this);
-    }
+        setButtonsArmed(true);
+        setCloseTimerArmed(true);
+
+        // Notify the UI to display this form.
+        if (isShowOnStart()) {
+          getDesktop().showForm(AbstractForm.this);
+        }
+      }
+    });
 
     return this;
   }

@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -32,6 +33,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardExtension;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActiveStepChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
@@ -53,6 +55,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -410,64 +413,78 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @SuppressWarnings({"boxing", "unchecked"})
   protected void initConfig() {
-    setDisplayHint(getConfiguredDisplayHint());
-    setDisplayViewId(getConfiguredDisplayViewId());
-    setModal(getConfiguredModal());
-    setTitle(getConfiguredTitle());
-    setTitleHtml(getConfiguredTitleHtml());
-    setTooltipText(getConfiguredTooltipText());
-    setIconId(getConfiguredIconId());
-    setWizardNo(getConfiguredWizardNo());
-    // initially the wizard is in state "closed"
-    propertySupport.setPropertyBool(PROP_CLOSED, true);
-    m_contributionHolder = new ContributionComposite(this);
-    setCloseTypeInternal(CloseType.Unknown);
+    try {
+      m_containerForm = createContainerForm();
 
-    // steps
-    List<Class<? extends IWizardStep<? extends IForm>>> configuredAvailableSteps = getConfiguredAvailableSteps();
-    List<IWizardStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWizardStep.class);
-    OrderedCollection<IWizardStep<? extends IForm>> steps = new OrderedCollection<IWizardStep<? extends IForm>>();
-    for (Class<? extends IWizardStep<? extends IForm>> element : configuredAvailableSteps) {
-      try {
-        IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(this, element);
-        steps.addOrdered(step);
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
-      }
-    }
-    for (IWizardStep step : contributedSteps) {
-      steps.addOrdered(step);
-    }
-    injectStepsInternal(steps);
-    ExtensionUtility.moveModelObjects(steps);
-    setAvailableSteps(steps.getOrderedList());
+      // Run the initialization on behalf of the container form.
+      ClientRunContexts.copyCurrent().withForm(m_containerForm).run(new IRunnable() {
 
-    // add listener to listen on any field in active form
-    m_anyFieldChangeListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        try {
-          interceptAnyFieldChanged((IFormField) e.getSource());
+        @Override
+        public void run() throws Exception {
+          setDisplayHint(getConfiguredDisplayHint());
+          setDisplayViewId(getConfiguredDisplayViewId());
+          setModal(getConfiguredModal());
+          setTitle(getConfiguredTitle());
+          setTitleHtml(getConfiguredTitleHtml());
+          setTooltipText(getConfiguredTooltipText());
+          setIconId(getConfiguredIconId());
+          setWizardNo(getConfiguredWizardNo());
+          // initially the wizard is in state "closed"
+          propertySupport.setPropertyBool(PROP_CLOSED, true);
+          m_contributionHolder = new ContributionComposite(AbstractWizard.this);
+          setCloseTypeInternal(CloseType.Unknown);
+
+          // steps
+          List<Class<? extends IWizardStep<? extends IForm>>> configuredAvailableSteps = getConfiguredAvailableSteps();
+          List<IWizardStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWizardStep.class);
+          OrderedCollection<IWizardStep<? extends IForm>> steps = new OrderedCollection<IWizardStep<? extends IForm>>();
+          for (Class<? extends IWizardStep<? extends IForm>> element : configuredAvailableSteps) {
+            try {
+              IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(AbstractWizard.this, element);
+              steps.addOrdered(step);
+            }
+            catch (Exception e) {
+              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
+            }
+          }
+          for (IWizardStep step : contributedSteps) {
+            steps.addOrdered(step);
+          }
+          injectStepsInternal(steps);
+          ExtensionUtility.moveModelObjects(steps);
+          setAvailableSteps(steps.getOrderedList());
+
+          // add listener to listen on any field in active form
+          m_anyFieldChangeListener = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+              try {
+                interceptAnyFieldChanged((IFormField) e.getSource());
+              }
+              catch (Exception t) {
+                LOG.error("" + e.getSource() + " " + e.getPropertyName() + "=" + e.getNewValue(), t);
+              }
+            }
+          };
+          propertySupport.addPropertyChangeListener(PROP_WIZARD_FORM, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+              IForm oldForm = (IForm) e.getOldValue();
+              IForm newForm = (IForm) e.getNewValue();
+              if (oldForm != null) {
+                oldForm.getRootGroupBox().removeSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
+              }
+              if (newForm != null) {
+                newForm.getRootGroupBox().addSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
+              }
+            }
+          });
         }
-        catch (Exception t) {
-          LOG.error("" + e.getSource() + " " + e.getPropertyName() + "=" + e.getNewValue(), t);
-        }
-      }
-    };
-    propertySupport.addPropertyChangeListener(PROP_WIZARD_FORM, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        IForm oldForm = (IForm) e.getOldValue();
-        IForm newForm = (IForm) e.getNewValue();
-        if (oldForm != null) {
-          oldForm.getRootGroupBox().removeSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
-        }
-        if (newForm != null) {
-          newForm.getRootGroupBox().addSubtreePropertyChangeListener(IValueField.PROP_VALUE, m_anyFieldChangeListener);
-        }
-      }
-    });
+      });
+    }
+    catch (ProcessingException e) {
+      throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
+    }
   }
 
   protected IWizardExtension<? extends AbstractWizard> createLocalExtension() {
@@ -1036,8 +1053,16 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     m_blockingCondition.setBlocking(true);
     propertySupport.setPropertyBool(PROP_CLOSED, false);
     setCloseTypeInternal(CloseType.Unknown);
-    createContainerForm();
-    interceptStart();
+
+    // Run the initialization on behalf of this Form.
+    ClientRunContexts.copyCurrent().withForm(m_containerForm).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        interceptStart();
+      }
+    });
+
     if (m_containerForm != null && !m_containerForm.isFormStarted()) {
       m_containerForm.startWizard();
     }
@@ -1265,10 +1290,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   @Override
   public IWizardContainerForm createContainerForm() throws ProcessingException {
-    if (m_containerForm == null) {
-      m_containerForm = interceptCreateContainerForm();
-    }
-    return m_containerForm;
+    return interceptCreateContainerForm();
   }
 
   @Override
@@ -1285,7 +1307,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER> implements IWizardExtension<OWNER> {
+  protected static class LocalWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER>implements IWizardExtension<OWNER> {
 
     public LocalWizardExtension(OWNER owner) {
       super(owner);

@@ -20,13 +20,21 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard;
 import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.FirstWizardStep;
 import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.SecondWizardStep;
 import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.ThirdWizardStep;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class MoveWizardStepTest extends AbstractLocalExtensionTestCase {
 
   @Test
