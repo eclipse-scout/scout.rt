@@ -2819,6 +2819,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public ITableRow addRow() throws ProcessingException {
+    return addRow(true);
+  }
+
+  @Override
+  public ITableRow addRow(boolean markAsInserted) throws ProcessingException {
+    return addRow(createRow(), markAsInserted);
+  }
+
+  @Override
   public ITableRow addRow(ITableRow newRow) throws ProcessingException {
     return addRow(newRow, false);
   }

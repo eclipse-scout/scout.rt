@@ -693,6 +693,21 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setContextColumn(IColumn<?> col);
 
   /**
+   * Creates and inserts a new {@link ITableRow} (with status {@link ITableRow#STATUS_INSERTED})
+   */
+  ITableRow addRow() throws ProcessingException;
+
+  /**
+   * Adds a new {@link ITableRow}
+   *
+   * @param markAsInserted
+   *          if <code>true</code>, the status of the new row is {@link ITableRow#STATUS_INSERTED},
+   *          otherwise the status{@link ITableRow#STATUS_NON_CHANGED}
+   * @throws ProcessingException
+   */
+  ITableRow addRow(boolean markAsInserted) throws ProcessingException;
+
+  /**
    * calls {@link #addRow(ITableRow, false)}
    */
   ITableRow addRow(ITableRow newRow) throws ProcessingException;

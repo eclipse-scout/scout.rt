@@ -60,6 +60,13 @@ public class TableTest {
     assertValidTestTable(table, ITableRow.STATUS_DELETED);
   }
 
+  @Test
+  public void testAddRow() throws ProcessingException {
+    P_Table table = new P_Table();
+    final ITableRow row = table.addRow();
+    assertEquals(ITableRow.STATUS_INSERTED, row.getStatus());
+  }
+
   /**
    * Test that new inserted rows are automatically discarded.
    */
@@ -397,7 +404,7 @@ public class TableTest {
   }
 
   private void addTableRow(P_Table table, Integer first, String second, Integer third) throws ProcessingException {
-    ITableRow r = table.addRow(table.createRow());
+    ITableRow r = table.addRow();
     table.getFirstColumn().setValue(r, first);
     table.getSecondColumn().setValue(r, second);
     table.getThirdColumn().setValue(r, third);
