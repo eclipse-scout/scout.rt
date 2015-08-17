@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -145,6 +147,17 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
 
   @Override
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
+    final Set<Class<? extends ICodeType<?, ?>>> filteredClasses = new LinkedHashSet<>();
+    final Collection<Class<? extends ICodeType<?, ?>>> classes = getAllCodeTypeClasses();
+    for (Class<? extends ICodeType<?, ?>> c : classes) {
+      if (c.getName().startsWith(classPrefix)) {
+        filteredClasses.add(c);
+      }
+    }
+    return filteredClasses;
+  }
+
+  public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
     Set<IClassInfo> allKnownCodeTypes = ClassInventory.get().getAllKnownSubClasses(ICodeType.class);
     Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
     for (IClassInfo codeTypeInfo : allKnownCodeTypes) {

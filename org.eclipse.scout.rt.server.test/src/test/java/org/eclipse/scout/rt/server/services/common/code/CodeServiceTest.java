@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.code;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,18 +26,24 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.server.TestServerSession;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.services.common.code.fixture.IgnoredCodeType;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType1;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType2;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
+import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 /**
  * Test for {@link ICodeService}
@@ -43,6 +52,19 @@ import org.junit.runner.RunWith;
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
 public class CodeServiceTest {
+  private ClientNotificationRegistry m_clientNotificationReg;
+  private List<IBean<?>> m_reg;
+
+  @Before
+  public void before() {
+    m_clientNotificationReg = Mockito.mock(ClientNotificationRegistry.class);
+    m_reg = TestingUtility.registerBeans(new BeanMetaData(ClientNotificationRegistry.class).withInitialInstance(m_clientNotificationReg).withApplicationScoped(true));
+  }
+
+  @After
+  public void after() {
+    TestingUtility.unregisterBeans(m_reg);
+  }
 
   /**
    * Tests that a code type class is found by {@link ICodeService#getAllCodeTypeClasses(String)}
@@ -101,62 +123,39 @@ public class CodeServiceTest {
     }
   }
 
-//TODO aho/jgu adapt to new client notification
-//  /* ---------------------------------------------------------------------------------------------- */
-//  /* Tests for Bug 444213 - Test that IClientNotificationService is called in unloadCodeTypeCache() */
-//  /* ---------------------------------------------------------------------------------------------- */
-//
-//  @Test
-//  public void testReloadCodeType() throws Exception {
-//    IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
-//    List<IBean<?>> reg = TestingUtility.registerBeans(
-//        new BeanMetaData(IClientNotificationService.class).
-//            initialInstance(clientNotificationService).
-//            applicationScoped(true));
-//    try {
-//      CodeService codeService = new CodeService();
-//
-//      codeService.reloadCodeType(SomeCodeType.class);
-//
-//      ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
-//      ArgumentCaptor<IClientNotificationFilter> filter = ArgumentCaptor.forClass(IClientNotificationFilter.class);
-//      Mockito.verify(clientNotificationService).putNotification(notification.capture(), filter.capture());
-//
-//      assertEquals("CodeType list in the notification size", 1, notification.getValue().getCodeTypes().size());
-//      assertEquals("CodeType list(0) class", SomeCodeType.class, notification.getValue().getCodeTypes().get(0));
-//    }
-//    finally {
-//      TestingUtility.unregisterBeans(reg);
-//    }
-//  }
-//
-//  @Test
-//  public void testReloadCodeTypes() throws Exception {
-//    IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
-//    List<IBean<?>> reg = TestingUtility.registerBeans(
-//        new BeanMetaData(IClientNotificationService.class).
-//            initialInstance(clientNotificationService).
-//            applicationScoped(true));
-//    try {
-//      CodeService codeService = new CodeService();
-//
-//      List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
-//      list.add(SomeCodeType.class);
-//      list.add(DummyCodeType.class);
-//      codeService.reloadCodeTypes(list);
-//
-//      ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
-//      ArgumentCaptor<IClientNotificationFilter> filter = ArgumentCaptor.forClass(IClientNotificationFilter.class);
-//      Mockito.verify(clientNotificationService).putNotification(notification.capture(), filter.capture());
-//
-//      assertEquals("CodeType list in the notification size", 2, notification.getValue().getCodeTypes().size());
-//      assertEquals("CodeType list(0) class", SomeCodeType.class, notification.getValue().getCodeTypes().get(0));
-//      assertEquals("CodeType list(1) class", DummyCodeType.class, notification.getValue().getCodeTypes().get(1));
-//    }
-//    finally {
-//      TestingUtility.unregisterBeans(reg);
-//    }
-//  }
+  /**
+   * Tests that a client notification is created when reloading a code type {@link CodeService#reloadCodeType}
+   *
+   * @throws ProcessingException
+   */
+  @Test
+  public void testReloadCodeType() throws ProcessingException {
+    CodeService codeService = new CodeService();
+    codeService.reloadCodeType(SomeCodeType.class);
+
+    ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
+    verify(m_clientNotificationReg).putTransactionalForAllSessions(notification.capture());
+
+    assertEquals("CodeType set in the notification size", 1, notification.getValue().getCodeTypes().size());
+    assertTrue(notification.getValue().getCodeTypes().contains(SomeCodeType.class));
+  }
+
+  @Test
+  public void testReloadCodeTypes() throws ProcessingException {
+    CodeService codeService = new CodeService();
+
+    List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    list.add(SomeCodeType.class);
+    list.add(DummyCodeType.class);
+    codeService.reloadCodeTypes(list);
+
+    ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
+    verify(m_clientNotificationReg).putTransactionalForAllSessions(notification.capture());
+
+    assertEquals("CodeType list in the notification size", 2, notification.getValue().getCodeTypes().size());
+    assertTrue(notification.getValue().getCodeTypes().contains(SomeCodeType.class));
+    assertTrue(notification.getValue().getCodeTypes().contains(DummyCodeType.class));
+  }
 
   public static class SomeCodeType extends AbstractCodeType<Long, String> {
 
