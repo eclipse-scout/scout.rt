@@ -289,6 +289,15 @@ a,
     padding-top: 32px;
     text-align: center;
   }
+
+  &.small {
+    background-size: 25%;
+    padding-top: 100px;
+  }
+
+  &.centered {
+    text-align: center;
+  }
 }
 
 noscript {

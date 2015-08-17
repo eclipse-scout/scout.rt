@@ -1,7 +1,5 @@
 scout.logout = {
 
-  // FIXME AWE: pretty graphics for unsupported / logout?
-
   init: function(opts) {
     var $container,
       defaultOpts = {
@@ -14,8 +12,8 @@ scout.logout = {
       options = $.extend({}, defaultOpts, opts),
       texts = new scout.Texts(options.texts),
       $box = $('<div>')
-        .addClass('box-with-logo')
-        .text(texts.get('ui.logoutSuccessful'))
+        .addClass('box-with-logo small centered')
+        .html(scout.strings.nl2br(texts.get('ui.logoutSuccessful')))
         .appendTo($('body')),
       $buttonBar = $('<div>')
         .addClass('button')
