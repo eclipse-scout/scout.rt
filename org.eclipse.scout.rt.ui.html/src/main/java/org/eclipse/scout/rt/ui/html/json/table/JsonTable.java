@@ -44,7 +44,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -66,6 +68,7 @@ import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonUserTableFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
@@ -630,24 +633,48 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected void handleUiAddFilter(JsonEvent event) {
     JSONObject data = event.getData();
-    IColumn column = extractColumn(data);
-    JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
-    Set<Object> selectedValues = new HashSet<Object>();
-    for (int i = 0; i < jsonSelectedValues.length(); i++) {
-      selectedValues.add(jsonSelectedValues.get(i));
-    }
-    UserFilter filter = new UserFilter(column);
-    filter.setSelectedValues(selectedValues);
-    //FIXME CGU filter removed?
+    IUserTableFilter filter = createFilter(data);
     getModel().getUIFacade().fireFilterAddedFromUI(filter);
   }
 
+  @SuppressWarnings("unchecked")
+  protected IUserTableFilter createFilter(JSONObject data) {
+    String filterType = data.getString("filterType");
+    if ("column".equals(filterType)) {
+      IColumn column = extractColumn(data);
+      JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
+      Set<Object> selectedValues = new HashSet<Object>();
+      for (int i = 0; i < jsonSelectedValues.length(); i++) {
+        selectedValues.add(jsonSelectedValues.get(i));
+      }
+      ColumnUserTableFilter filter = new ColumnUserTableFilter(column);
+      filter.setSelectedValues(selectedValues);
+      return filter;
+    }
+    else if ("text".equals(filterType)) {
+      String text = data.getString("text");
+      TextUserTableFilter filter = new TextUserTableFilter();
+      filter.setText(text);
+      return filter;
+    }
+    return null;
+  }
+
+  protected IUserTableFilter getFilter(JSONObject data) {
+    String type = data.getString("filterType");
+    if ("column".equals(type)) {
+      IColumn column = extractColumn(data);
+      Object key = ColumnUserTableFilter.createKeyForColumn(column);
+      return getModel().getUserFilterManager().getFilter(key);
+    }
+
+    return getModel().getUserFilterManager().getFilter(type);
+  }
+
   protected void handleUiRemoveFilter(JsonEvent event) {
-    IColumn column = extractColumn(event.getData());
-    UserFilter filter = getModel().getUserFilterManager().getFilter(column);
+    IUserTableFilter filter = getFilter(event.getData());
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
@@ -790,11 +817,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return m_tableRowIds.get(row);
   }
 
-  protected JSONArray filtersToJson(Collection<UserFilter> filters) {
+  protected JSONArray filtersToJson(Collection<IUserTableFilter> filters) {
     JSONArray jsonFilters = new JSONArray();
-    for (UserFilter filter : filters) {
-      JSONObject jsonFilter = new JsonUserFilter(filter, this).toJson();
-      jsonFilters.put(jsonFilter);
+    for (IUserTableFilter filter : filters) {
+      JsonUserTableFilter jsonFilter = (JsonUserTableFilter) MainJsonObjectFactory.get().createJsonObject(filter);
+      jsonFilter.setJsonTable(this);
+      jsonFilters.put(jsonFilter.toJson());
     }
     return jsonFilters;
   }

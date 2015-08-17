@@ -7,7 +7,6 @@ scout.TableFooter = function(table) {
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
-scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
 scout.TableFooter.CONTAINER_SIZE = 345;
 
 scout.TableFooter.prototype._render = function($parent) {
@@ -54,7 +53,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .appendTo(this.$container)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));
-  filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
+  filter = this._table.getFilter(scout.TextUserTableFilter.Type);
   if (filter) {
     this._$filterField.val(filter.text);
   }
@@ -118,25 +117,19 @@ scout.TableFooter.prototype._uninstallKeyStrokeAdapter = function() {
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
-  var $input = $(event.currentTarget),
+  var filter,
+    $input = $(event.currentTarget),
     filterText = $input.val();
 
-  var filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
-  if (!filter && filterText) {
-    filter = {
-      accept: function($row) {
-        var rowText = $row.text().toLowerCase();
-        return rowText.indexOf(this.text) > -1;
-      }
-    };
-    this._table.registerFilter(scout.TableFooter.FILTER_KEY, filter);
-  } else if (filter && !filterText) {
-    this._table.unregisterFilter(scout.TableFooter.FILTER_KEY);
-  }
-
-  if (filter) {
+  if (filterText) {
+    filter = new scout.TextUserTableFilter();
+    filter.init({
+      table: this._table
+    }, this.session);
     filter.text = filterText.toLowerCase();
-    filter.label = filterText;
+    this._table.registerFilter(filter);
+  } else if (!filterText) {
+    this._table.unregisterFilter(scout.TextUserTableFilter.Type);
   }
 
   this._table.filter();

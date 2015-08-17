@@ -116,7 +116,6 @@ __include("scout/table/control/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/Table.js");
 __include("scout/table/TableFooter.js");
 __include("scout/table/TableControlKeyStrokeAdapter.js");
-__include("scout/table/TableColumnFilter.js");
 __include("scout/table/TableAdditionalControlsKeyStrokes.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");
@@ -130,6 +129,9 @@ __include("scout/table/TableTooltip.js");
 __include("scout/table/editor/CellEditorPopup.js");
 __include("scout/table/editor/CellEditorPopupLayout.js");
 __include("scout/table/editor/CellEditorPopupKeyStrokeAdapter.js");
+__include("scout/table/userfilter/UserTableFilter.js");
+__include("scout/table/userfilter/ColumnUserTableFilter.js");
+__include("scout/table/userfilter/TextUserTableFilter.js");
 // Desktop
 __include("scout/tree/Tree.js");
 __include("scout/tree/TreeCompact.js");

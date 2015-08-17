@@ -32,6 +32,10 @@ describe("ObjectFactory", function() {
       model.selectedDate = '2015-04-06 00:00:00.000';
     } else if ('Form' === objectType) {
       model.displayHint = 'view';
+    } else if ('ColumnUserTableFilter' === objectType) {
+      model.table = {};
+      model.column = {};
+      model.calculateCube = function(){};
     } else if ('TabBox' === objectType) {
       var tabItemId = 'tabItem' + id;
       model.selectedTab = 0;

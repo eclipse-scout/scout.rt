@@ -17,10 +17,13 @@ describe("TableHeaderMenu", function() {
     jasmine.clock().uninstall();
   });
 
-  function createAndRegisterFilter(table, column0, selectedValues) {
-    var filter = new scout.TableColumnFilter(table, column0);
-    filter.selectedValues = selectedValues;
-    table.registerFilter(column0, filter);
+  function createAndRegisterColumnFilter(table, column, selectedValues) {
+    var filter = new scout.ColumnUserTableFilter();
+    helper.createAndRegisterColumnFilter({
+      table: table,
+      column: column,
+      selectedValues: selectedValues
+    }, session);
     return filter;
   }
 
@@ -50,7 +53,7 @@ describe("TableHeaderMenu", function() {
       });
 
       it("reflects the state of the filter", function() {
-        var filter = helper.createAndRegisterFilter(table, column, ['AnotherValue']);
+        var filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 
@@ -64,7 +67,7 @@ describe("TableHeaderMenu", function() {
       });
 
       it("correctly updates the list after inserting a new row, if a filter is applied", function() {
-        var filter = helper.createAndRegisterFilter(table, column, ['AnotherValue']);
+        var filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
         table.render(session.$entryPoint);
         expect(table.filteredRows().length).toBe(1);
 

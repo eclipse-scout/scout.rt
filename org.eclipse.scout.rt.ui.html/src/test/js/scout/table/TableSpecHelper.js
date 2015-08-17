@@ -165,10 +165,10 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
   return table;
 };
 
-TableSpecHelper.prototype.createAndRegisterFilter = function (table, column, selectedValues) {
-  var filter = new scout.TableColumnFilter(table, column);
-  filter.selectedValues = selectedValues;
-  table.registerFilter(column.id, filter);
+TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model, session) {
+  var filter = new scout.ColumnUserTableFilter();
+  filter.init(model, session);
+  model.table.registerFilter(filter);
   return filter;
 };
 

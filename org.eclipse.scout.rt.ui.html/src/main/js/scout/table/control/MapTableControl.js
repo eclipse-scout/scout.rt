@@ -125,9 +125,14 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
       };
 
       var filter = that.table.getFilter(scout.MapTableControl.FILTER_KEY) || {};
-      filter.label = that.tooltipText;
+      filter.createLabel = function() {
+        return that.tooltipText;
+      };
       filter.accept = filterFunc;
-      that.table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
+      filter.createKey = function() {
+        return scout.MapTableControl.FILTER_KEY;
+      };
+      that.table.registerFilter(filter);
     } else {
       that.table.unregisterFilter(scout.MapTableControl.FILTER_KEY);
     }

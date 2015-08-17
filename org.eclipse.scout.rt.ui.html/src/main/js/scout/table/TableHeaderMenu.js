@@ -145,7 +145,11 @@ scout.TableHeaderMenu.prototype._render = function() {
 
   var filter = table.getFilter(column.id);
   if (!filter) {
-    filter = new scout.TableColumnFilter(table, column);
+    filter = new scout.ColumnUserTableFilter();
+    filter.init({
+      table: table,
+      column: column
+    }, this.session);
   } else {
     filter.calculateCube();
   }
@@ -358,7 +362,7 @@ scout.TableHeaderMenu.prototype._render = function() {
     });
 
     if (filter.selectedValues.length > 0) {
-      table.registerFilter(column.id, filter);
+      table.registerFilter(filter);
     } else {
       table.unregisterFilter(column.id);
     }

@@ -1795,7 +1795,7 @@ scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
   for (var key in this._filterMap) {
     var filter = this._filterMap[key];
-    filteredBy.push(filter.label);
+    filteredBy.push(filter.createLabel());
   }
   return filteredBy;
 };
@@ -1820,31 +1820,28 @@ scout.Table.prototype.resetFilter = function() {
 };
 
 /**
- * @param filter object with name and accept()
+ * @param filter object with createKey() and accept()
  */
-scout.Table.prototype.registerFilter = function(key, filter) {
+scout.Table.prototype.registerFilter = function(filter) {
+  var key = filter.createKey();
   if (!key) {
     throw new Error('key has to be defined');
   }
   this._filterMap[key] = filter;
 
-  if (filter.column) {
-    var data = {
-      columnId: filter.column.id,
-      selectedValues: filter.selectedValues
-    };
-    this.remoteHandler(this.id, 'addFilter', data);
+  if (filter instanceof scout.UserTableFilter) {
+    this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
   }
 };
 
-scout.Table.prototype.getFilter = function(key, filter) {
+scout.Table.prototype.getFilter = function(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
   return this._filterMap[key];
 };
 
-//TODO CGU rename to remove, add
+//TODO CGU rename to remove, add, use filter as param or rename to unregisterFilterByKey
 scout.Table.prototype.unregisterFilter = function(key) {
   if (!key) {
     throw new Error('key has to be defined');
@@ -1852,11 +1849,8 @@ scout.Table.prototype.unregisterFilter = function(key) {
   var filter = this._filterMap[key];
   delete this._filterMap[key];
 
-  if (filter.column) {
-    var data = {
-      columnId: filter.column.id
-    };
-    this.remoteHandler(this.id, 'removeFilter', data);
+  if (filter instanceof scout.UserTableFilter) {
+    this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
   }
 };
 
@@ -2111,11 +2105,12 @@ scout.Table.prototype._syncFilters = function(filters) {
     this.resetFilter();
   } else {
     filters.forEach(function(filterData) {
-      var column = this.columnById(filterData.column),
-        filter = new scout.TableColumnFilter(this, column);
-
-      filter.selectedValues = filterData.selectedValues;
-      this._filterMap[column.id] = filter;
+      if (filterData.column) {
+        filterData.column = this.columnById(filterData.column);
+      }
+      filterData.table = this;
+      var filter = this.session.objectFactory.create(filterData);
+      this.registerFilter(filter);
     }, this);
   }
 };

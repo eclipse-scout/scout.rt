@@ -869,9 +869,14 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       };
 
       var filter = that.table.getFilter(scout.ChartTableControl.FILTER_KEY) || {};
-      filter.label = that.tooltipText;
+      filter.createLabel = function() {
+        return that.tooltipText;
+      };
       filter.accept = filterFunc;
-      that.table.registerFilter(scout.ChartTableControl.FILTER_KEY, filter);
+      filter.createKey = function() {
+        return scout.ChartTableControl.FILTER_KEY;
+      };
+      that.table.registerFilter(filter);
 
     } else {
       that.table.unregisterFilter(scout.ChartTableControl.FILTER_KEY);
