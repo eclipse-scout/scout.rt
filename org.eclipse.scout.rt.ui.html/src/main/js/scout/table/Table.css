@@ -151,14 +151,14 @@
     display: inline-block;
     width: @check-box-size;
     height: @check-box-size;
-    #scout.checkbox-label-before-border();
+    #scout.checkbox-before-border();
   }
   & > .check-box.checked::before {
-    #scout.checkbox-label-before-checked();
+    #scout.checkbox-before-checked();
   }
   & > .check-box.disabled::before,
   .table.disabled > .table-data > .table-row > & > .check-box::before {
-    #scout.checkbox-label-before-disabled();
+    #scout.checkbox-before-disabled();
   }
 }
 

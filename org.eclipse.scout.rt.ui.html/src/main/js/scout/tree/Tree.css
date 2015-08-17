@@ -79,29 +79,29 @@
     font-size: 13px;
 
     &.disabled {
-      #scout.checkbox-label-disabled();
+      cursor: default;
     }
 
     &::before {
-      #scout.checkbox-label-before();
-      #scout.checkbox-label-before-border();
+      #scout.checkbox-before();
+      #scout.checkbox-before-border();
       margin-top: -12px;
     }
 
     &.disabled::before {
-      #scout.checkbox-label-before-disabled();
+      #scout.checkbox-before-disabled();
     }
 
     &.disabled:hover::before {
-      #scout.checkbox-label-before-disabled-border();
+      #scout.checkbox-before-disabled-border();
     }
 
     &.checked::before {
-      #scout.checkbox-label-before-checked();
+      #scout.checkbox-before-checked();
     }
 
-    &.children-checked::before {
-      #scout.checkbox-label-before-child-checked();
+    &:not(.checked).children-checked::after {
+      #scout.checkbox-after-children-checked();
     }
   }
 }
