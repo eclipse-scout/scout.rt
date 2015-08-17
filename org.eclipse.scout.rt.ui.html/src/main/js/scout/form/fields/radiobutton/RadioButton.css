@@ -32,7 +32,7 @@
     height: 7px;
     background-color: @palette-gray-8;
     border: 2px solid @palette-gray-8;
-    border-radius: 100%;
+    border-radius: 50%;
   }
 
   &:focus::before {
