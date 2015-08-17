@@ -31,6 +31,7 @@ import org.json.JSONObject;
 public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField<DATE_FIELD> {
 
   private static final String PROP_TIMESTAMP = "timestamp";
+  private static final String PROP_AUTO_TIMESTAMP = "autoTimestamp";
   private static final String PROP_INVALID_DISPLAY_TEXT = "invalidDisplayText";
   private static final String PROP_INVALID_DATE_TEXT = "invalidDateText";
   private static final String PROP_INVALID_TIME_TEXT = "invalidTimeText";
@@ -82,7 +83,6 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
         return jsonStatus;
       }
     });
-
     putJsonProperty(new JsonProperty<DATE_FIELD>(PROP_TIMESTAMP, model) {
       @Override
       protected Date modelValue() {
@@ -91,10 +91,18 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        if (value == null) {
-          return null;
-        }
-        return new JsonDate((Date) value).asJsonString(false, getModel().isHasDate(), getModel().isHasTime());
+        return dateToJson((Date) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<DATE_FIELD>(PROP_AUTO_TIMESTAMP, model) {
+      @Override
+      protected Date modelValue() {
+        return getModel().getAutoDate();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return dateToJson((Date) value);
       }
     });
     putJsonProperty(new JsonProperty<DATE_FIELD>(IDateField.PROP_HAS_TIME, model) {
@@ -123,16 +131,28 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
     });
   }
 
+  protected String dateToJson(Date date) {
+    if (date == null) {
+      return null;
+    }
+    return new JsonDate(date).asJsonString(false, getModel().isHasDate(), getModel().isHasTime());
+  }
+
   @Override
   protected void handleModelPropertyChange(PropertyChangeEvent event) {
     String propertyName = event.getPropertyName();
+    // Translate "value changed" to "timestamp changed"
     if (IDateField.PROP_VALUE.equals(propertyName)) {
       PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
       if (filteredEvent != null) {
-        // Translate "value changed" to "timestamp changed"
-        Date newValue = (Date) event.getNewValue();
-        String timestamp = new JsonDate(newValue).asJsonString(false, getModel().isHasDate(), getModel().isHasTime());
-        addPropertyChangeEvent(PROP_TIMESTAMP, timestamp);
+        addPropertyChangeEvent(PROP_TIMESTAMP, dateToJson((Date) event.getNewValue()));
+      }
+    }
+    // Translate "auto date changed" to "auto timestamp changed"
+    else if (IDateField.PROP_AUTO_DATE.equals(propertyName)) {
+      PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
+      if (filteredEvent != null) {
+        addPropertyChangeEvent(PROP_AUTO_TIMESTAMP, dateToJson((Date) event.getNewValue()));
       }
     }
     else {

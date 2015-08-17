@@ -492,3 +492,12 @@ cannot be migrated, because it is now performed in the UI only.
 
 JGU 03.08.2015
 - changed ILookupRow to fluent API: use with... instead of set...
+
+BSH 17.08.2015
+Removed the members m_autoDate and m_autoTimeMillis from AbstractDateField. They were replaced by a single
+property PROP_AUTO_DATE of type java.util.Date.
+Migration:
+- Replace getConfiguredAutoTimeMillis()/setAutoTimeMillis()/getAutoTimeMillis() by getConfiguredAutoDate()/
+  setAutoDate()/getAutoDate(). If both a date and time part should be set, combine them in the same
+  java.util.Date argument. The methods DateUtility.createDateTime() and DateUtility.convertDoubleTimeToDate()
+  may be useful.

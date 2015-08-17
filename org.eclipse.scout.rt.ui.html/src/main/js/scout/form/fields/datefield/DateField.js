@@ -58,6 +58,7 @@ scout.DateField.prototype._renderProperties = function() {
   this._renderDateFormatPattern();
   this._renderTimeFormatPattern();
   this._renderTimestamp();
+  this._renderAutoTimestamp();
 
   // Has to be the last call, otherwise _renderErrorStatus() would operate on the wrong state.
   scout.DateField.parent.prototype._renderProperties.call(this);
@@ -179,6 +180,10 @@ scout.DateField.prototype._renderTimestamp = function() {
   this.updateDisplayText(this.timestampAsDate);
 };
 
+scout.DateField.prototype._renderAutoTimestamp = function() {
+  this.autoTimestampAsDate = scout.dates.parseJsonDate(this.autoTimestamp);
+};
+
 /**
  * @override FormField.js
  */
@@ -250,7 +255,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     displayText = this.$dateField.val(),
     prediction = this._$predictDateField && this._$predictDateField.val(),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
-    pickerStartDate = null,
+    pickerStartDate = this._referenceDate(),
     shiftDate = true;
 
   // Don't propagate tab to cell editor -> tab should focus time field
@@ -302,7 +307,6 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
   if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
     if (!this._datePickerPopup.isOpen()) {
       if (!displayText || !this.timestamp) {
-        pickerStartDate = new Date();
         this.updateDisplayText(pickerStartDate);
         shiftDate = false; // don't shift if field has no value yet and popup was not open
       }
@@ -332,7 +336,6 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
 
     if (!this._datePickerPopup.isOpen()) {
       if (!displayText || !this.timestamp) {
-        pickerStartDate = new Date();
         this.updateDisplayText(pickerStartDate);
         shiftDate = false; // don't shift if field has no value yet and popup was not open
       }
@@ -453,7 +456,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
       if (timePrediction && timePrediction.date) {
         this._tempTimeDate = timePrediction.date;
       } else {
-        this._tempTimeDate = this.timestampAsDate || new Date();
+        this._tempTimeDate = this._referenceDate();
         shiftDate = false;
       }
     }
@@ -591,7 +594,7 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
 scout.DateField.prototype._newTimestampAsDate = function(date, time) {
   var result = null;
   if (date || time) {
-    result = this.timestampAsDate || new Date();
+    result = this._referenceDate();
     if (date) {
       result = scout.dates.combineDateTime(date, result);
     }
@@ -600,6 +603,18 @@ scout.DateField.prototype._newTimestampAsDate = function(date, time) {
     }
   }
   return result;
+};
+
+/**
+ * Returns the reference date for this date field, which is used in various places (i.e. opening the date picker, analyzing user inputs).
+ *
+ * The reference date is either (in that order):
+ * - the current timestamp (as date), or
+ * - the model's "auto timestamp" (as date), or
+ * - the current date/time
+ */
+scout.DateField.prototype._referenceDate = function() {
+  return this.timestampAsDate || this.autoTimestampAsDate || new Date();
 };
 
 scout.DateField.prototype.updateTimestamp = function(timestampAsDate) {
@@ -632,7 +647,7 @@ scout.DateField.prototype._syncToServer = function() {
  *          optional, Date to pass to the date picker
  */
 scout.DateField.prototype._openDatePicker = function(date) {
-  date = date || this.timestampAsDate;
+  date = date || this._referenceDate();
   this._datePickerPopup.selectDate(date);
 };
 
@@ -694,7 +709,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     };
   }
 
-  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this.timestampAsDate);
+  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this.timestampAsDate || this.autoTimestampAsDate);
   if (analyzeInfo.error) {
     this._setDateValid(false, inputText);
     return null;
@@ -733,7 +748,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
 scout.DateField.prototype._predictTime = function(inputText) {
   inputText = inputText || '';
 
-  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this.timestampAsDate);
+  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this.timestampAsDate || this.autoTimestampAsDate);
   if (analyzeInfo.error) {
     this._setTimeValid(false, inputText);
     return null;
@@ -845,6 +860,9 @@ scout.DateField.prototype._hasUiErrorStatus = function() {
   return !!(this.errorStatus && (this.errorStatus.invalidDateText || this.errorStatus.invalidTimeText));
 };
 
+/**
+ * @Override FormField.js
+ */
 scout.DateField.prototype.prepareForCellEdit = function(opts) {
   scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
   opts = opts || {};

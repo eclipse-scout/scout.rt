@@ -229,7 +229,7 @@ describe("scout.dates", function() {
       expect(/^\d+$/.test(ts)).toBe(true);
 
       var date = scout.dates.create('2014-11-21 00:33:00.000Z');
-      expect(scout.dates.timestamp(date)).toBe('20141121003300000');
+      expect(scout.dates.timestamp(date, true)).toBe('20141121003300000');
     });
 
   });

@@ -99,17 +99,28 @@ scout.dates = {
    * Returns the time (with milliseconds) for the given date as a string in the format
    * [year#4][month#2][day#2][hour#2][minute#2][second#2][#millisecond#3]. All characters
    * are guaranteed to be digits. If the date argument is omitted, the current date is
-   * used. Note: The date is returned in UTC.
+   * used. The returned string in in UTC if the argument 'utc' is true, otherwise the
+   * result is in local time (default).
    */
-  timestamp: function(date) {
+  timestamp: function(date, utc) {
+    // (note: month is 0-indexed)
     var d = date || new Date();
-    return '' + d.getUTCFullYear() +
-      scout.strings.padZeroLeft((d.getUTCMonth() + 1), 2) + // (0-indexed)
-    scout.strings.padZeroLeft(d.getUTCDate(), 2) +
-      scout.strings.padZeroLeft(d.getUTCHours(), 2) +
-      scout.strings.padZeroLeft(d.getUTCMinutes(), 2) +
-      scout.strings.padZeroLeft(d.getUTCSeconds(), 2) +
-      scout.strings.padZeroLeft(d.getUTCMilliseconds(), 3);
+    if (utc) {
+      return scout.strings.padZeroLeft(d.getUTCFullYear(), 4) +
+        scout.strings.padZeroLeft((d.getUTCMonth() + 1), 2) +
+        scout.strings.padZeroLeft(d.getUTCDate(), 2) +
+        scout.strings.padZeroLeft(d.getUTCHours(), 2) +
+        scout.strings.padZeroLeft(d.getUTCMinutes(), 2) +
+        scout.strings.padZeroLeft(d.getUTCSeconds(), 2) +
+        scout.strings.padZeroLeft(d.getUTCMilliseconds(), 3);
+    }
+    return scout.strings.padZeroLeft(d.getFullYear(), 4) +
+      scout.strings.padZeroLeft((d.getMonth() + 1), 2) +
+      scout.strings.padZeroLeft(d.getDate(), 2) +
+      scout.strings.padZeroLeft(d.getHours(), 2) +
+      scout.strings.padZeroLeft(d.getMinutes(), 2) +
+      scout.strings.padZeroLeft(d.getSeconds(), 2) +
+      scout.strings.padZeroLeft(d.getMilliseconds(), 3);
   },
 
   orderWeekdays: function(weekdays, firstDayOfWeek) {
@@ -287,18 +298,20 @@ scout.dates = {
     }
     var datePart, timePart, utcPart;
     if (utc) {
+      // (note: month is 0-indexed)
       datePart = scout.strings.padZeroLeft(date.getUTCFullYear(), 4) + '-' +
-        scout.strings.padZeroLeft((date.getUTCMonth() + 1), 2) + '-' + // (0-indexed)
-      scout.strings.padZeroLeft(date.getUTCDate(), 2);
+        scout.strings.padZeroLeft((date.getUTCMonth() + 1), 2) + '-' +
+        scout.strings.padZeroLeft(date.getUTCDate(), 2);
       timePart = scout.strings.padZeroLeft(date.getUTCHours(), 2) + ':' +
         scout.strings.padZeroLeft(date.getUTCMinutes(), 2) + ':' +
         scout.strings.padZeroLeft(date.getUTCSeconds(), 2) + '.' +
         scout.strings.padZeroLeft(date.getUTCMilliseconds(), 3);
       utcPart = 'Z';
     } else {
+      // (note: month is 0-indexed)
       datePart = scout.strings.padZeroLeft(date.getFullYear(), 4) + '-' +
-        scout.strings.padZeroLeft((date.getMonth() + 1), 2) + '-' + // (0-indexed)
-      scout.strings.padZeroLeft(date.getDate(), 2);
+        scout.strings.padZeroLeft((date.getMonth() + 1), 2) + '-' +
+        scout.strings.padZeroLeft(date.getDate(), 2);
       timePart = scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
         scout.strings.padZeroLeft(date.getMinutes(), 2) + ':' +
         scout.strings.padZeroLeft(date.getSeconds(), 2) + '.' +
@@ -327,7 +340,10 @@ scout.dates = {
   },
 
   /**
-   * Creates a new JavaScript Date object by parsing the given string. The format is as follows:
+   * Creates a new JavaScript Date object by parsing the given string. This method is not intended to be
+   * used in application code, but provides a quick way to create dates in unit tests.
+   *
+   * The format is as follows:
    *
    * [Year#4]-[Month#2]-[Day#2] [Hours#2]:[Minutes#2]:[Seconds#2].[Milliseconds#3][Z]
    *

@@ -90,6 +90,18 @@ describe("DateField", function() {
       expect(dateField.$dateField.val()).toBe('02.11.2015');
     });
 
+    it("accepts the prediction with autoTimestamp", function() {
+      var model = createModel();
+      model.autoTimestamp = '1999-10-14';
+      var dateField = createFieldAndFocusAndOpenPicker(model);
+
+      dateField.$dateField.val('02');
+
+      dateField._onDateFieldBlur();
+
+      expect(dateField.$dateField.val()).toBe('02.10.1999');
+    });
+
     it("updates the model with the selected value", function() {
       var model = createModel();
       model.timestamp = '2014-10-01';
