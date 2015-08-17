@@ -100,7 +100,7 @@
       #scout.checkbox-label-before-checked();
     }
 
-    &.childrenChecked::before {
+    &.children-checked::before {
       #scout.checkbox-label-before-child-checked();
     }
   }

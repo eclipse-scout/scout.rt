@@ -238,7 +238,7 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
           node.$node
             .children('.tree-node-checkbox')
             .children('.check-box')
-            .toggleClass('childrenChecked', true);
+            .toggleClass('children-checked', true);
         }
         break;
       }
@@ -248,7 +248,7 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
       if (this.rendered && node.$node) {
         node.$node.children('.tree-node-checkbox')
           .children('.check-box')
-          .toggleClass('childrenChecked', false);
+          .toggleClass('children-checked', false);
       }
     }
   }
@@ -284,11 +284,11 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
       if (checked) {
         node.parentNode.$node.children('.tree-node-checkbox')
           .children('.check-box')
-          .toggleClass('childrenChecked', true);
+          .toggleClass('children-checked', true);
       } else {
         node.parentNode.$node.children('.tree-node-checkbox')
           .children('.check-box')
-          .toggleClass('childrenChecked', false);
+          .toggleClass('children-checked', false);
       }
     }
   }
@@ -1069,9 +1069,9 @@ scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
     .toggleClass('disabled', !(this.enabled && node.enabled));
 
   if (node.childrenChecked) {
-    $checkboxDiv.toggleClass('childrenChecked', true);
+    $checkboxDiv.toggleClass('children-checked', true);
   } else {
-    $checkboxDiv.toggleClass('childrenChecked', false);
+    $checkboxDiv.toggleClass('children-checked', false);
   }
 };
 
