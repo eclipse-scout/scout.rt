@@ -58,7 +58,6 @@ scout.MessageBox.prototype._render = function($parent) {
     this.$cancelButton = buttons.renderButton('cancel', this.cancelButtonText);
     this._$closeButton = this.$cancelButton;
   }
-  this._updateButtonWidths();
 
   // Render properties
   this._renderIconId(this.iconId);
@@ -76,6 +75,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$container.addClass('calc-helper');
   this.$container.css('min-width', this.$container.width());
   this.$container.removeClass('calc-helper');
+  this._updateButtonWidths();
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
   this.$container.addClassForAnimation('shown');
@@ -169,10 +169,19 @@ scout.MessageBox.prototype._updateButtonWidths = function() {
       $visibleButtons.push($button);
     }
   });
-  // Set equal width in percent
-  var width = (1 / $visibleButtons.length) * 100;
-  $($visibleButtons).each(function() {
-    this.css('width', width + '%');
+
+  // Manually calculate equal width fore each button, addding remaining pixels to last button.
+  // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
+  var availableWidth = this.$container.width();
+  var w = Math.floor(availableWidth / $visibleButtons.length);
+  $visibleButtons.forEach(function($button, index) {
+    if (index === $visibleButtons.length - 1) {
+      w = availableWidth;
+    }
+    else {
+      availableWidth -= w;
+    }
+    $button.outerWidth(w);
   });
 };
 
