@@ -64,9 +64,12 @@ scout.ViewTabsController.prototype.selectViewTab = function(viewTab) {
   // Deselect the current selected tab.
   this.deselectViewTab();
 
+  // set _selectedViewTab before selecting view tab. if this is not done before there is a problem when refreshing the webpage.
+  // parent is not set as selected, but rendered, before child-> child is rendered into same view because parent is not deselect.
+  // parent viewTab.select calls rendering of child.
+  this._selectedViewTab = viewTab;
   // Select the new view tab.
   viewTab.select();
-  this._selectedViewTab = viewTab;
 
   // Invalidate layout and focus.
   this._desktop._layoutTaskBar();
