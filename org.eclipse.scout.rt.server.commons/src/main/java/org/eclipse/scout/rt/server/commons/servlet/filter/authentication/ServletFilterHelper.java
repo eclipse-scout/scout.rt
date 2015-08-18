@@ -128,21 +128,21 @@ public class ServletFilterHelper {
   }
 
   /**
-   * forward the request to the login.jsp
+   * forward the request to the login.html
    * <p>
    * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
    */
   public void forwardToLoginForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-    forwardTo(req, resp, "/login.jsp");
+    forwardTo(req, resp, "/login.html");
   }
 
   /**
-   * forward the request to the logout.jsp
+   * forward the request to the logout.html
    * <p>
    * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
    */
   public void forwardToLogoutForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-    forwardTo(req, resp, "/logout.jsp");
+    forwardTo(req, resp, "/logout.html");
   }
 
   public void forwardTo(HttpServletRequest req, HttpServletResponse resp, String targetLocation) throws IOException, ServletException {

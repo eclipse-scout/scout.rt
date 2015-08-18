@@ -41,7 +41,7 @@ public class JettyServer {
     File webappFolder = null;
     String webappParam = System.getProperty(WEB_APP_FOLDER_KEY);
     if (webappParam == null || webappParam.isEmpty()) {
-      webappFolder = new File(Paths.get(".").toAbsolutePath().normalize().toFile(), "/target/classes");
+      webappFolder = new File(Paths.get(".").toAbsolutePath().normalize().toFile(), "/src/main/webapp/");
     }
     else {
       webappFolder = new File(webappParam);
@@ -78,7 +78,6 @@ public class JettyServer {
         "org.eclipse.jetty.webapp.WebInfConfiguration",
         "org.eclipse.jetty.webapp.WebXmlConfiguration",
         "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-        "org.eclipse.jetty.annotations.AnnotationConfiguration",
         "org.eclipse.jetty.plus.webapp.PlusConfiguration",
         "org.eclipse.jetty.plus.webapp.EnvConfiguration",
     });

@@ -53,11 +53,11 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
   }
 
   protected boolean isLogoutRequest(HttpServletRequest req) {
-    return "/logout".equals(getPath(req));
+    return "/logout".equals(req.getPathInfo());
   }
 
   protected boolean isLoginRequest(HttpServletRequest req) {
-    return "/login".equals(getPath(req));
+    return "/login".equals(req.getPathInfo());
   }
 
   @Override
