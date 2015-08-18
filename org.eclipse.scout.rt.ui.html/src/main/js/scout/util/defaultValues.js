@@ -22,7 +22,7 @@ scout.defaultValues = {
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8',
       cache: true,
-      url: 'ui/res/defaultValues.json',
+      url: 'res/defaultValues.json',
       data: ''
     }).done(function(data) {
       that._loadDefaultsConfiguration(data);

@@ -81,7 +81,7 @@ scout.login = {
       if (!url) {
         url = (window.location.href || '').trim();
         var prepareRedirectUrlFunc = this.options.prepareRedirectUrlFunc || prepareRedirectUrl;
-        // Remove login.jsp and everything after it from the URL
+        // Remove login.html and everything after it from the URL
         url = prepareRedirectUrlFunc(url);
       }
 
@@ -111,7 +111,7 @@ scout.login = {
     function prepareRedirectUrl(url) {
       var urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart
       var filteredBaseUrl = urlParts[1]
-        .replace(/login.jsp$/, '')
+        .replace(/login.html$/, '')
         .replace(/login$/, '')
         .replace(/logout$/, '');
       return filteredBaseUrl + (urlParts[2] ? urlParts[2] : '') + (urlParts[3] ? urlParts[3] : '');

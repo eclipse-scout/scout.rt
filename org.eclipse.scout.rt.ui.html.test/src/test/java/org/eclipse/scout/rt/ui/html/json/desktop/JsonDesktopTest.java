@@ -303,7 +303,7 @@ public class JsonDesktopTest {
     jsonDesktop.handleModelDownloadResource(new DownloadHandler(new BinaryResource("foo.txt", null), 100));
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
     JSONObject data = events.get(0).getData();
-    assertEquals("ui/dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data.getString("uri")); // counter = 0 first for test run
     assertEquals("download", data.getString("hint"));
   }
 }

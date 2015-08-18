@@ -15,6 +15,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Matcher;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.ui.html.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
+import org.eclipse.scout.rt.ui.html.res.HtmlDocumentParserParameters.IScriptFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -51,10 +53,8 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestInterceptor.class);
 
-  public static final String INDEX_JSP = "/index.jsp";
-  public static final String MOBILE_INDEX_JSP = "/index-mobile.jsp";
-
-  private static final String UTF_8 = "UTF-8";
+  public static final String INDEX_HTML = "/index.html";
+  public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -67,7 +67,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     IHttpCacheControl httpCacheControl = BEANS.get(IHttpCacheControl.class);
     HttpCacheObject cacheObj = httpCacheControl.getCacheObject(req, pathInfo);
     if (cacheObj == null) {
-      cacheObj = loadResource(servlet, req, pathInfo);
+      cacheObj = loadResource(servlet.getServletContext(), req, pathInfo);
       // store in cache
       if (cacheObj != null) {
         httpCacheControl.putCacheObject(req, cacheObj);
@@ -124,55 +124,55 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       return null;
     }
     if ("/".equals(pathInfo)) {
-      pathInfo = resolveIndexJsp(req);
+      pathInfo = resolveIndexHtml(req);
     }
     return pathInfo;
   }
 
-  protected String resolveIndexJsp(HttpServletRequest request) {
+  protected String resolveIndexHtml(HttpServletRequest request) {
     BrowserInfo browserInfo = BrowserInfo.createFrom(request);
     if (browserInfo.isMobile()) {
-      // Return index-mobile.jsp, but only if index-mobile.jsp exists (project may decide to always use index.jsp)
-      URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_JSP);
+      // Return index-mobile.html, but only if index-mobile.html exists (project may decide to always use index.html)
+      URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_HTML);
       if (url != null) {
-        return MOBILE_INDEX_JSP;
+        return MOBILE_INDEX_HTML;
       }
     }
-    return INDEX_JSP;
+    return INDEX_HTML;
   }
 
   /**
    * Loads a resource with an appropriate method, based on the URL
    */
-  protected HttpCacheObject loadResource(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadResource(ServletContext context, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     if (pathInfo.matches("^/icon/.*")) {
-      return loadIcon(servlet, req, pathInfo);
+      return loadIcon(context, req, pathInfo);
     }
     if (pathInfo.matches("^/dynamic/.*")) {
-      return loadDynamicAdapterResource(servlet, req, pathInfo);
+      return loadDynamicAdapterResource(context, req, pathInfo);
     }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
-      return loadScriptFile(servlet, req, pathInfo);
+      return loadScriptFile(context, req, pathInfo);
     }
     if (pathInfo.endsWith(".html")) {
-      return loadHtmlFile(servlet, req, pathInfo);
+      return loadHtmlFile(context, req, pathInfo);
     }
     if (pathInfo.endsWith(".json")) {
-      return loadJsonFile(servlet, req, pathInfo);
+      return loadJsonFile(context, req, pathInfo);
     }
-    return loadBinaryFile(servlet, req, pathInfo);
+    return loadBinaryFile(context, req, pathInfo);
   }
 
   /**
    * This method loads static icon images from {@link IconLocator} (<code>/resource/icons</code> folders of all jars on
    * the classpath).
    */
-  protected HttpCacheObject loadIcon(UiServlet servlet, HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadIcon(ServletContext context, HttpServletRequest req, String pathInfo) {
     final String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
     if (iconSpec != null) {
       // cache: use max-age caching for at most 4 hours
-      BinaryResource content = new BinaryResource(iconSpec.getName(), detectContentType(servlet, pathInfo), iconSpec.getContent(), System.currentTimeMillis());
+      BinaryResource content = new BinaryResource(iconSpec.getName(), detectContentType(context, pathInfo), iconSpec.getContent(), System.currentTimeMillis());
       return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     }
     return null;
@@ -181,32 +181,31 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   /**
    * js, css
    */
-  protected HttpCacheObject loadScriptFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadScriptFile(ServletContext context, HttpServletRequest req, String pathInfo) throws IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), getSharedScriptProcessor());
     builder.setMinifyEnabled(UiHints.isMinifyHint(req));
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
-      BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(servlet, pathInfo), out.getContent(), out.getLastModified());
+      BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(context, pathInfo), out.getContent(), out.getLastModified());
       return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_ONE_YEAR, content);
     }
     return null;
   }
 
-  // FIXME AWE: make this work with JSP (try a filter which works after JSP has done its magic)
-  // check also if resolveIndexJsp must be removed
-
   /**
    * html
    */
-  protected HttpCacheObject loadHtmlFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadHtmlFile(ServletContext context, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;
     }
     byte[] bytes = IOUtility.readFromUrl(url);
-    bytes = replaceHtmlScriptTags(servlet, req, bytes);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, System.currentTimeMillis());
+    HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(context, req);
+    HtmlDocumentParser parser = new HtmlDocumentParser(params, bytes);
+    bytes = parser.parseDocument();
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(context, pathInfo), bytes, System.currentTimeMillis());
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
     HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, true, -1, content);
@@ -227,19 +226,32 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     return httpCacheObject;
   }
 
+  private HtmlDocumentParserParameters createHtmlDocumentParserParameters(final ServletContext context, final HttpServletRequest req) {
+    HtmlDocumentParserParameters params = new HtmlDocumentParserParameters();
+    params.setMinify(UiHints.isMinifyHint(req));
+    params.setCacheEnabled(UiHints.isCacheHint(req));
+    params.setScriptFileLoader(new IScriptFileLoader() {
+      @Override
+      public HttpCacheObject loadScriptFile(String scriptPath) throws IOException {
+        return ResourceRequestInterceptor.this.loadScriptFile(context, req, scriptPath);
+      }
+    });
+    return params;
+  }
+
   /**
    * json
    */
-  protected HttpCacheObject loadJsonFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadJsonFile(ServletContext context, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;
     }
     // TODO BSH Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
-    String json = new String(IOUtility.readFromUrl(url), UTF_8);
+    String json = new String(IOUtility.readFromUrl(url), Encoding.UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), json.getBytes(UTF_8), System.currentTimeMillis());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(context, pathInfo), json.getBytes(Encoding.UTF_8), System.currentTimeMillis());
     return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 
@@ -250,7 +262,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
    * <p>
    * The pathInfo is expected to have the following form: <code>/dynamic/[uiSessionId]/[adapterId]/[filename]</code>
    */
-  protected HttpCacheObject loadDynamicAdapterResource(UiServlet servlet, HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadDynamicAdapterResource(ServletContext context, HttpServletRequest req, String pathInfo) {
     Matcher m = BinaryResourceUrlUtility.PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
     if (!m.matches()) {
       return null;
@@ -275,7 +287,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     }
     String contentType = binaryResource.get().getContentType();
     if (contentType == null) {
-      contentType = detectContentType(servlet, pathInfo);
+      contentType = detectContentType(context, pathInfo);
     }
     BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.get().getContent(), binaryResource.get().getLastModified());
     HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
@@ -289,7 +301,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   /**
    * Static binary file png, jpg, woff, pdf, docx
    */
-  protected HttpCacheObject loadBinaryFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadBinaryFile(ServletContext context, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
@@ -297,15 +309,15 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     }
     byte[] bytes = IOUtility.readFromUrl(url);
     URLConnection uc = url.openConnection();
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(context, pathInfo), bytes, uc.getLastModified());
     return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 
-  protected String detectContentType(UiServlet servlet, String path) {
+  protected String detectContentType(ServletContext context, String path) {
     int lastSlash = path.lastIndexOf('/');
     String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
     //Prefer mime type mapping from container
-    String contentType = servlet.getServletContext().getMimeType(fileName);
+    String contentType = context.getMimeType(fileName);
     if (contentType != null) {
       return contentType;
     }
@@ -314,56 +326,4 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     return FileUtility.getContentTypeForExtension(fileExtension);
   }
 
-  /**
-   * Process all js and css script tags that contain the marker text "fingerprint". The marker text is replaced by the
-   * effective files {@link HttpCacheObject#getFingerprint()} in hex format
-   */
-  protected byte[] replaceHtmlScriptTags(UiServlet servlet, HttpServletRequest req, byte[] content) throws IOException, ServletException {
-    String oldHtml = new String(content, UTF_8);
-    Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(oldHtml);
-    StringBuilder buf = new StringBuilder();
-    int lastEnd = 0;
-    int replaceCount = 0;
-    while (m.find()) {
-      buf.append(oldHtml.substring(lastEnd, m.start()));
-      if ("fingerprint".equals(m.group(4))) {
-        replaceCount++;
-        String fingerprint = null;
-        if (UiHints.isCacheHint(req)) {
-          HttpCacheObject obj = loadScriptFile(servlet, req, m.group());
-          if (obj == null) {
-            LOG.warn("Failed to locate resource referenced in html file '" + req.getPathInfo() + "': " + m.group());
-          }
-          fingerprint = (obj != null ? Long.toHexString(obj.getResource().getFingerprint()) : m.group(4));
-        }
-        buf.append(m.group(1));
-        buf.append(m.group(2));
-        buf.append("-");
-        buf.append(m.group(3));
-        if (fingerprint != null) {
-          buf.append("-");
-          buf.append(fingerprint);
-        }
-        if (UiHints.isMinifyHint(req)) {
-          buf.append(".min");
-        }
-        buf.append(".");
-        buf.append(m.group(5));
-      }
-      else {
-        buf.append(m.group());
-      }
-      //next
-      lastEnd = m.end();
-    }
-    if (replaceCount == 0) {
-      return content;
-    }
-    buf.append(oldHtml.substring(lastEnd));
-    String newHtml = buf.toString();
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("process html script tags:\nINPUT\n" + oldHtml + "\n\nOUTPUT\n" + newHtml);
-    }
-    return newHtml.getBytes(UTF_8);
-  }
 }

@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.ui.html.res.ResourceRequestInterceptor;
 /**
  * Instances of this class must be registered as servlet root path "/"
  * <p>
- * The index.jsp is served as "/" or "/index.jsp" using HTTP GET, see {@link ResourceRequestInterceptor}
+ * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link ResourceRequestInterceptor}
  * <p>
  * Scripts js and css are served using HTTP GET, see {@link ResourceRequestInterceptor}
  * <p>

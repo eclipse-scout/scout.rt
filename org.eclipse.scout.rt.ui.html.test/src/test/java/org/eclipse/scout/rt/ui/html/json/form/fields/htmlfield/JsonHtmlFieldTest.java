@@ -48,7 +48,7 @@ public class JsonHtmlFieldTest extends BaseFormFieldTest {
   public void testToImageByBinaryResourceReplacement() throws JSONException {
     m_model.setDisplayText(HTML.imgByBinaryResource("test_resource").toEncodedHtml());
     JSONObject json = m_htmlField.toJson();
-    assertEquals("<img src=\"ui/dynamic/" + m_session.getUiSessionId() + "/" + m_htmlField.getId() + "/test_resource\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
+    assertEquals("<img src=\"dynamic/" + m_session.getUiSessionId() + "/" + m_htmlField.getId() + "/test_resource\">", json.get(IHtmlField.PROP_DISPLAY_TEXT));
   }
 
 }

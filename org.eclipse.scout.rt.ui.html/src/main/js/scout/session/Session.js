@@ -67,7 +67,7 @@ scout.Session = function($entryPoint, options) {
   this._startup;
   this._unload;
   this.desktop;
-  this.url = 'ui/json';
+  this.url = 'json';
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
   this._initObjectFactory(options.objectFactories);
@@ -682,7 +682,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   var uploadAjaxOptions = {
     async: true,
     type: 'POST',
-    url: 'ui/upload/' + this.uiSessionId + '/' + target.id,
+    url: 'upload/' + this.uiSessionId + '/' + target.id,
     cache: false,
     // Don't touch the data (do not convert it to string)
     processData: false,

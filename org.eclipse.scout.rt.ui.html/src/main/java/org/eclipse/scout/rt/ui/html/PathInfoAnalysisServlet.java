@@ -41,12 +41,12 @@ import javax.servlet.http.HttpServletResponse;
  * res/logo.jpg:  OK
  * 
  * 
- * http://localhost:8080/imo/index.jsp
+ * http://localhost:8080/imo/index.html
  * 
- * RequestURI: '/imo/index.jsp'
- * RequestURL: 'http://localhost:8080/imo/index.jsp'
+ * RequestURI: '/imo/index.html'
+ * RequestURL: 'http://localhost:8080/imo/index.html'
  * ServletContext.ContextPath: '/imo'
- * PathInfo: '/index.jsp'
+ * PathInfo: '/index.html'
  * res/logo.jpg:  OK
  *
  * </pre>
@@ -87,7 +87,7 @@ public class PathInfoAnalysisServlet extends HttpServlet {
     resp.getOutputStream().println("RequestURL: '" + req.getRequestURL() + "'<br/>");
     resp.getOutputStream().println("ServletContext.ContextPath: '" + getServletContext().getContextPath() + "'<br/>");
     resp.getOutputStream().println("PathInfo: '" + pathInfo + "'<br/>");
-    resp.getOutputStream().println("ui/res/logo.jpg: <img src=\"ui/res/logo.jpg\">");
+    resp.getOutputStream().println("res/logo.jpg: <img src=\"res/logo.jpg\">");
     resp.getOutputStream().println("</body>");
     resp.getOutputStream().println("</html>");
   }

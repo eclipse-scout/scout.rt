@@ -42,9 +42,9 @@ scout.checkBrowserCompability = function(options, dataPartId) {
   var device = scout.device;
   if (device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && device.browserVersion < 9) {
     var $entryPoint = $('.scout[data-partId="' + dataPartId + '"'),
-      $box = $entryPoint.appendDiv('box-with-logo'),
+      $box = $entryPoint.appendDiv('box-with-logo small'),
       session = this;
-    $box.load('unsupported-browser.jsp', function() {
+    $box.load('unsupported-browser.html', function() {
       $box.find('button').click(function() {
         $box.remove();
         session.init(options);
