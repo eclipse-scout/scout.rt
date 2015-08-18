@@ -12,9 +12,7 @@ scout.inherits(scout.TabItemMnemonicKeyStroke, scout.MnemonicKeyStroke);
  * @Override scout.KeyStroke
  */
 scout.TabItemMnemonicKeyStroke.prototype.handle = function(event) {
-  // FIXME AWE/NBU: das kann mit der neuen TabBox nicht mehr funktionieren (data tabIndex gibt es nicht mehr)
-  var index = this._field.$tabContainer.data('tabIndex');
-  this._field.parent._selectTab(index);
+  this._field.parent._selectTab(this._field);
   event.preventDefault();
 };
 /**
