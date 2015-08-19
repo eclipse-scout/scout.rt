@@ -103,4 +103,6 @@ public interface ITableUIFacade {
   void fireFilterAddedFromUI(IUserTableFilter filter);
 
   void fireFilterRemovedFromUI(IUserTableFilter filter);
+
+  void setFilteredRowsFromUI(List<? extends ITableRow> rows);
 }

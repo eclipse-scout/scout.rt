@@ -169,6 +169,11 @@ public class TableRow implements ITableRow {
   }
 
   @Override
+  public List<ITableRowFilter> getRejectedBy() {
+    return new ArrayList<ITableRowFilter>();
+  }
+
+  @Override
   public int getCellCount() {
     return m_cells.size();
   }

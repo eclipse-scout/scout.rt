@@ -65,6 +65,8 @@ public interface ITableRow {
 
   boolean isFilterAccepted();
 
+  List<ITableRowFilter> getRejectedBy();
+
   int getCellCount();
 
   ICell getCell(IColumn column);
