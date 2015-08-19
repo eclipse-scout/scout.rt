@@ -18,10 +18,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
+import org.eclipse.scout.rt.client.ui.basic.tree.UserTreeNodeFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -50,6 +53,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
   public static final String EVENT_CHILD_NODE_ORDER_CHANGED = "childNodeOrderChanged";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
+  public static final String EVENT_NODES_FILTERED = "nodesFiltered";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
   public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
 
@@ -138,7 +142,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
     attachAdapters(getModel().getKeyStrokes());
-    attachNodes(getTopLevelNodes(true), true);
+    attachNodes(getTopLevelNodes(), true);
   }
 
   @Override
@@ -172,6 +176,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   protected void attachNodes(Collection<ITreeNode> nodes, boolean attachChildren) {
     for (ITreeNode node : nodes) {
+      if (!isNodeAccepted(node)) {
+        continue;
+      }
       attachNode(node, attachChildren);
     }
   }
@@ -203,7 +210,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JSONArray jsonNodes = new JSONArray();
-    for (ITreeNode childNode : getTopLevelNodes(true)) {
+    for (ITreeNode childNode : getTopLevelNodes()) {
+      if (!isNodeAccepted(childNode)) {
+        continue;
+      }
       jsonNodes.put(treeNodeToJson(childNode));
     }
     putProperty(json, PROP_NODES, jsonNodes);
@@ -230,7 +240,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     registerAsBufferedEventsAdapter();
   }
 
-  protected void bufferModelEvent(TreeEvent event) {
+  protected void bufferModelEvent(final TreeEvent event) {
     switch (event.getType()) {
       case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
         // Convert the "filter changed" event to a NODES_DELETED and a NODES_INSERTED event. This prevents sending unnecessary
@@ -238,10 +248,35 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         // NOTE: This may lead to a temporary inconsistent situation, where node events exist in the buffer after the
         // node itself is deleted. This is because the node is not really deleted from the model. However, when processing
         // the buffered events, the "wrong" events will be ignored and everything is fixed again.
-        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_DELETED, event.getTree().getRootNode()));
-        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_INSERTED, getTopLevelNodes(true)));
-        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_SELECTED, event.getTree().getSelectedNodes()));
-        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_CHECKED, event.getTree().getCheckedNodes()));
+        final List<ITreeNode> nodesToInsert = new ArrayList<>();
+        final List<ITreeNode> nodesToDelete = new ArrayList<>();
+        getModel().visitTree(new ITreeVisitor() {
+
+          @Override
+          public boolean visit(ITreeNode node) {
+            if (isInvisibleRootNode(node)) {
+              return true;
+            }
+
+            String existingNodeId = getNodeId(node);
+            if (node.isFilterAccepted()) {
+              if (existingNodeId == null) {
+                // Node is not filtered but JsonTree does not know it yet --> handle as insertion event
+                nodesToInsert.add(node);
+              }
+            }
+            else if (!isNodeRejectedByUserNodeFilter(node)) {
+              if (existingNodeId != null) {
+                // Node is filtered, but JsonTree has it in its list --> handle as deletion event
+                nodesToDelete.add(node);
+              }
+            }
+            return true;
+          }
+        });
+        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_DELETED, nodesToDelete));
+        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_INSERTED, nodesToInsert));
+
         break;
       }
       default: {
@@ -318,15 +353,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         break;
     }
     // TODO Tree | Events not yet implemented:
-    // - TYPE_BEFORE_NODES_SELECTED
     // - TYPE_NODE_REQUEST_FOCUS
-    // - TYPE_NODE_ENSURE_VISIBLE
-    // Probabely not needed:
-    // - TYPE_NODE_ACTION
+    // - TYPE_NODE_ENSURE_VISIBLE what is the difference to scroll_to_selection? delete in treeevent
     // - TYPE_NODES_DRAG_REQUEST
     // - TYPE_DRAG_FINISHED
     // - TYPE_NODE_DROP_ACTION, partly implemented with consumeBinaryResource(...)
-    // - TYPE_NODE_CLICK
     // - TYPE_NODE_DROP_TARGET_CHANGED
   }
 
@@ -337,7 +368,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleModelNodeExpanded(ITreeNode modelNode, boolean recursive) {
-    if (modelNode.isStatusDeleted() || !modelNode.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+    if (!isNodeAccepted(modelNode)) {
       return;
     }
     String nodeId = getNodeId(modelNode);
@@ -355,7 +386,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     JSONArray jsonNodes = new JSONArray();
     attachNodes(event.getNodes(), true);//FIXME CGU why not inside loop? attaching for rejected nodes?
     for (ITreeNode node : event.getNodes()) {
-      if (node.isStatusDeleted() || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if (!isNodeAccepted(node)) {
         continue;
       }
       jsonNodes.put(treeNodeToJson(node));
@@ -372,7 +403,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected void handleModelNodesUpdated(TreeEvent event) {
     JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : event.getNodes()) {
-      if (node.isStatusDeleted() || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if (!isNodeAccepted(node)) {
         continue;
       }
       String nodeId = getNodeId(node);
@@ -413,7 +444,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     // Small optimization: If there is no parent node (i.e. the root node was deleted) or no nodes remain, just
     // send "all" instead of every single nodeId. (However, the nodes must be disposed individually.)
     // Caveat: This can only be optimized when no nodes were inserted again in the same "tree changing" scope.
-    if (event.getCommonParentNode() == null || event.getCommonParentNode().getFilteredChildNodes().size() == 0) {
+    if (event.getCommonParentNode() == null || getFilteredRowCount(event.getCommonParentNode()) == 0) {
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
     else {
@@ -445,7 +476,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected void handleModelNodesChecked(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      if (node.isStatusDeleted() || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if (!isNodeAccepted(node)) {
         continue;
       }
       String nodeId = getNodeId(node);
@@ -466,7 +497,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleModelNodeChanged(ITreeNode modelNode) {
-    if (modelNode.isStatusDeleted() || !modelNode.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+    if (!isNodeAccepted(modelNode)) {
       return;
     }
     String nodeId = getNodeId(modelNode);
@@ -484,7 +515,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     jsonEvent.put("parentNodeId", getNodeId(event.getCommonParentNode()));
     boolean hasNodeIds = false;
     for (ITreeNode childNode : event.getChildNodes()) {
-      if (childNode.isStatusDeleted() || !childNode.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if (!isNodeAccepted(childNode)) {
         continue;
       }
       String childNodeId = getNodeId(childNode);
@@ -535,7 +566,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean ignoreDeletedNodes, boolean autoCreateNodeId) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      if ((ignoreDeletedNodes && node.isStatusDeleted()) || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if (!isNodeAccepted(node, ignoreDeletedNodes)) {
         continue;
       }
       String nodeId;
@@ -597,12 +628,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return false;
   }
 
-  protected List<ITreeNode> getTopLevelNodes(boolean filteredOnly) {
+  protected List<ITreeNode> getTopLevelNodes() {
     ITreeNode rootNode = getModel().getRootNode();
     if (getModel().isRootNodeVisible()) {
       return CollectionUtility.arrayList(rootNode);
     }
-    return (filteredOnly ? rootNode.getFilteredChildNodes() : rootNode.getChildNodes());
+    return rootNode.getChildNodes();
   }
 
   protected void putCellProperties(JSONObject json, ICell cell) {
@@ -627,7 +658,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
-      for (ITreeNode childNode : node.getFilteredChildNodes()) {
+      for (ITreeNode childNode : node.getChildNodes()) {
+        if (!isNodeAccepted(childNode)) {
+          continue;
+        }
         jsonChildNodes.put(treeNodeToJson(childNode));
       }
     }
@@ -676,6 +710,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     else if (EVENT_NODES_CHECKED.equals(event.getType())) {
       handleUiNodesChecked(event);
     }
+    else if (EVENT_NODES_FILTERED.equals(event.getType())) {
+      handleUiNodesFiltered(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -714,6 +751,54 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
+  }
+
+  protected void handleUiNodesFiltered(JsonEvent event) {
+    final List<ITreeNode> nodes = extractTreeNodes(event.getData());
+    // Always add invisible root node to make sure rootNode.isFilterAccepted() returns true, otherwise no child node would be visible
+    if (!getModel().isRootNodeVisible()) {
+      nodes.add(0, getModel().getRootNode());
+    }
+    getModel().getUIFacade().setFilteredNodesFromUI(nodes);
+  }
+
+  /**
+   * Ignore deleted or filtered nodes, because for the UI, they don't exist
+   */
+  protected boolean isNodeAccepted(ITreeNode node, boolean ignoreDeletedNodes) {
+    if (node.isStatusDeleted()) {
+      return false;
+    }
+    if (!node.isFilterAccepted()) {
+      // Accept if rejected by user row filter because gui is and should be aware of that row
+      return isNodeRejectedByUserNodeFilter(node);
+    }
+    return true;
+  }
+
+  protected boolean isNodeAccepted(ITreeNode node) {
+    return isNodeAccepted(node, true);
+  }
+
+  /**
+   * @return true if only the user row filter has rejected the row
+   */
+  protected boolean isNodeRejectedByUserNodeFilter(ITreeNode node) {
+    List<ITreeNodeFilter> rejectedBy = node.getRejectedBy();
+    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof UserTreeNodeFilter;
+  }
+
+  protected int getFilteredRowCount(ITreeNode parentNode) {
+    if (getModel().getNodeFilters().size() == 0) {
+      return parentNode.getChildNodeCount();
+    }
+    int filteredNodeCount = 0;
+    for (ITreeNode node : parentNode.getChildNodes()) {
+      if (node.isFilterAccepted() || isNodeRejectedByUserNodeFilter(node)) {
+        filteredNodeCount++;
+      }
+    }
+    return filteredNodeCount;
   }
 
   protected AbstractEventBuffer<TreeEvent> eventBuffer() {

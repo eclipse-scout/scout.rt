@@ -302,7 +302,6 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
     // Request focus on first element in new outlineTab.
     this.session.focusManager.validateFocus();
 
-    // FIXME CGU: maybe include in render?
     content.htmlComp.validateLayout();
     content.htmlComp.validateRoot = true;
   }

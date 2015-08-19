@@ -123,9 +123,9 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
       table: this._table
     }, this.session);
     filter.text = filterText.toLowerCase();
-    this._table.registerFilter(filter);
+    this._table.addFilter(filter);
   } else if (!filterText) {
-    this._table.unregisterFilter(scout.TextUserTableFilter.Type);
+    this._table.removeFilter(scout.TextUserTableFilter.Type);
   }
 
   this._table.filter();

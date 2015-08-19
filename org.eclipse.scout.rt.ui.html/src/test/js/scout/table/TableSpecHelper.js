@@ -168,7 +168,7 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
 TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model, session) {
   var filter = new scout.ColumnUserTableFilter();
   filter.init(model, session);
-  model.table.registerFilter(filter);
+  model.table.addFilter(filter);
   return filter;
 };
 

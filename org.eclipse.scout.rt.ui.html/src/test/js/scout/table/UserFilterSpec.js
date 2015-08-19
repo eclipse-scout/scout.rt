@@ -52,7 +52,7 @@ describe("UserFilter", function() {
       expect(filteredRows.length).toBe(1);
       expect(filteredRows[0]).toBe(table.rows[1]);
 
-      table.unregisterFilter(filter.column.id);
+      table.removeFilter(filter.column.id);
       table.filter();
 
       filteredRows = table.filteredRows();

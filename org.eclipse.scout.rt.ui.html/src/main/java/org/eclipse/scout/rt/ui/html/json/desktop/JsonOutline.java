@@ -99,6 +99,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject json = super.treeNodeToJson(node);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
+//    putTableRowId(json, page);
     if (page.getParentPage() != null) {
       putProperty(json, "lazyAddToTree", page.getParentPage().isLazyAddChildPagesToOutline());
     }
@@ -135,6 +136,20 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       putAdapterIdProperty(json, PROP_DETAIL_TABLE, page.getTable());
     }
   }
+
+//  protected void putTableRowId(JSONObject json, IPage page) {
+//    IPage<?> parentPage = page.getParentPage();
+//    ITableRow tableRow = parentPage.getTableRowFor(page);
+//    ITable table = parentPage.getTable();
+//    if (table != null) {
+//      JsonTable<ITable> jsonTable = getGlobalAdapter(table);
+//      if (jsonTable == null) {
+//        throw new IllegalStateException("No json table found for " + table);
+//      }
+//      String tableRowId = jsonTable.getTableRowId(tableRow);
+//      putProperty(json, "rowId", tableRowId);
+//    }
+//  }
 
   @Override
   protected void disposeNode(ITreeNode node, boolean disposeChildren) {

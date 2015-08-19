@@ -19,7 +19,7 @@ scout.Table = function() {
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
   this.tooltips = [];
-  this.animationRowLimit = 25;
+  this._animationRowLimit = 25;
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
@@ -62,6 +62,7 @@ scout.Table.prototype._initRow = function(row) {
   this._unwrapCells(row.cells);
   scout.defaultValues.applyTo(row.cells, 'Cell');
   this.rowsMap[row.id] = row;
+  this.trigger('rowInitialized', {row: row});
 };
 
 scout.Table.prototype._initColumns = function() {
@@ -481,7 +482,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
     $sortedRows = $();
 
   //store old position
-  if ($rows.length < that.animationRowLimit) {
+  if ($rows.length < that._animationRowLimit) {
     $rows.each(function() {
       $row = $(this);
 
@@ -1657,7 +1658,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
   var filteredRows = [];
   for (var i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
-    if (!row.invisibleDueToFilter) {
+    if (!row.rejectedByFilter) {
       filteredRows.push(row);
     }
   }
@@ -1665,6 +1666,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
   return filteredRows;
 };
 
+//TODO CGU still necessary? maybe better remove and use rows(), filteredRows() and selectedRows instead
 scout.Table.prototype.$rows = function(includeSumRows) {
   var selector = '.table-row';
   if (includeSumRows) {
@@ -1760,7 +1762,7 @@ scout.Table.prototype.filter = function() {
   });
 
   // Show / hide rows that changed their state during filtering
-  useAnimation = ((rowsToShow.length + rowsToHide.length) <= that.animationRowLimit);
+  useAnimation = ((rowsToShow.length + rowsToHide.length) <= that._animationRowLimit);
   rowsToHide.forEach(function(row) {
     that.hideRow(row.$row, useAnimation);
   });
@@ -1828,7 +1830,7 @@ scout.Table.prototype.filteredBy = function() {
 scout.Table.prototype.resetFilter = function() {
   // remove filters
   for (var key in this._filterMap) {
-    this.unregisterFilter(key);
+    this.removeFilter(key);
   }
   this._filterMap = {};
 
@@ -1840,7 +1842,7 @@ scout.Table.prototype.resetFilter = function() {
 /**
  * @param filter object with createKey() and accept()
  */
-scout.Table.prototype.registerFilter = function(filter) {
+scout.Table.prototype.addFilter = function(filter) {
   var key = filter.createKey();
   if (!key) {
     throw new Error('key has to be defined');
@@ -1852,15 +1854,8 @@ scout.Table.prototype.registerFilter = function(filter) {
   }
 };
 
-scout.Table.prototype.getFilter = function(key) {
-  if (!key) {
-    throw new Error('key has to be defined');
-  }
-  return this._filterMap[key];
-};
-
-//TODO CGU rename to remove, add, use filter as param or rename to unregisterFilterByKey
-scout.Table.prototype.unregisterFilter = function(key) {
+//TODO CGU use filter as param or rename to removeFilterByKey
+scout.Table.prototype.removeFilter = function(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
@@ -1872,6 +1867,13 @@ scout.Table.prototype.unregisterFilter = function(key) {
   }
 };
 
+scout.Table.prototype.getFilter = function(key) {
+  if (!key) {
+    throw new Error('key has to be defined');
+  }
+  return this._filterMap[key];
+};
+
 scout.Table.prototype.showRow = function($row, useAnimation) {
   var that = this,
     row = $row.data('row');
@@ -1879,7 +1881,7 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
     return;
   }
 
-  row.invisibleDueToFilter = false;
+  row.rejectedByFilter = false;
   if (useAnimation) {
     $row.stop().slideDown({
       duration: 250,
@@ -1903,7 +1905,7 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
   }
 
   // flag is necessary to get correct filter count even when animation is still in progress
-  row.invisibleDueToFilter = true;
+  row.rejectedByFilter = true;
   if (useAnimation) {
     $row.stop().slideUp({
       duration: 250,
@@ -2121,7 +2123,7 @@ scout.Table.prototype._syncMenus = function(menus) {
 
 scout.Table.prototype._syncFilters = function(filters) {
   for (var key in this._filterMap) {
-    this.unregisterFilter(key);
+    this.removeFilter(key);
   }
   if (filters) {
     filters.forEach(function(filterData) {
@@ -2130,7 +2132,7 @@ scout.Table.prototype._syncFilters = function(filters) {
       }
       filterData.table = this;
       var filter = this.session.objectFactory.create(filterData);
-      this.registerFilter(filter);
+      this.addFilter(filter);
     }, this);
   }
 

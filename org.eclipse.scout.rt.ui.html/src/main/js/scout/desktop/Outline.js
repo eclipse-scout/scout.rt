@@ -5,11 +5,12 @@ scout.Outline = function() {
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
-  this._tableSelectionListener;
+  this._detailTableListener;
   this.inBackground = false;
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
+  this._nodeIdToRowMap = {};
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -19,6 +20,7 @@ scout.Outline.prototype._init = function(model, session) {
   this.formController = new scout.FormController(this, session);
   this.messageBoxController = new scout.MessageBoxController(this, session);
   this.fileChooserController = new scout.FileChooserController(this, session);
+  this.addFilter(new scout.DetailTableTreeFilter());
 };
 
 scout.Outline.prototype._createKeyStrokeAdapter = function() {
@@ -63,11 +65,60 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
-    this._addOutlineNavigationButtons(node.detailTable, node);
+    this._initDetailTable(node);
   }
   if (node.detailForm) {
     node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
-    this._addOutlineNavigationButtons(node.detailForm, node);
+    this._initDetailForm(node);
+  }
+
+  if (node.parentNode && node.parentNode.detailTable) {
+    // link node with row, if it hasn't been linked yet
+    if (node.id in this._nodeIdToRowMap) {
+      node.row = this._nodeIdToRowMap[node.id];
+      if (!node.row) {
+        throw new Error('node.row is not defined');
+      }
+      delete this._nodeIdToRowMap[node.id];
+    }
+  }
+};
+
+scout.Outline.prototype._initDetailTable = function(node) {
+  var menus = this._createOutlineNavigationButtons(node, node.detailTable.staticMenus),
+    button = this._getMenu(menus, scout.NavigateDownButton),
+    that = this;
+  node.detailTable.staticMenus = menus;
+
+  // link already existing rows (rows which are inserted later are linked by _onDetailTableRowInitialized)
+  node.detailTable.rows.forEach(function(row) {
+    this._linkNodeWithRow(row);
+  }, this);
+
+  this._detailTableListener = {
+    func: function(event) {
+      event.detailTable = node.detailTable;
+      that._onDetailTableEvent(event);
+    }
+  };
+  node.detailTable.events.addListener(this._detailTableListener);
+};
+
+scout.Outline.prototype._initDetailForm = function(node) {
+  var menus = this._createOutlineNavigationButtons(node, node.detailForm.staticMenus);
+  node.detailForm.rootGroupBox.staticMenus = menus;
+};
+
+scout.Outline.prototype._linkNodeWithRow = function(row) {
+  var node = this.nodesMap[row.nodeId];
+  if (node) {
+    node.row = row;
+    if (!node.row) {
+      throw new Error('node.row is not defined');
+    }
+  } else {
+    // Prepare for linking later because node has not been inserted yet
+    this._nodeIdToRowMap[row.nodeId] = row;
   }
 };
 
@@ -82,8 +133,8 @@ scout.Outline.prototype._decorateNode = function(node) {
   }
 };
 
-scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
-  var menus = scout.arrays.ensure(formOrTable.staticMenus);
+scout.Outline.prototype._createOutlineNavigationButtons = function(node, staticMenus) {
+  var menus = scout.arrays.ensure(staticMenus);
   if (!this._hasMenu(menus, scout.NavigateUpButton)) {
     var upButton = new scout.NavigateUpButton(this, node);
     menus.push(upButton);
@@ -92,16 +143,7 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
     var downButton = new scout.NavigateDownButton(this, node);
     menus.push(downButton);
   }
-  if (formOrTable instanceof scout.Form) {
-    formOrTable.rootGroupBox.staticMenus = menus;
-  } else {
-    var table = formOrTable,
-      button = this._getMenu(menus, scout.NavigateDownButton);
-    table.staticMenus = menus;
-    this._tableSelectionListener = table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
-      button.updateEnabled();
-    });
-  }
+  return menus;
 };
 
 scout.Outline.prototype._getMenu = function(menus, menuClass) {
@@ -120,7 +162,7 @@ scout.Outline.prototype._hasMenu = function(menus, menuClass) {
 scout.Outline.prototype._onNodeDeleted = function(node) {
   // Destroy table, which is attached at the root adapter. Form gets destroyed by form close event
   if (node.detailTable) {
-    node.detailTable.events.off(this._tableSelectionListener);
+    node.detailTable.events.removeListener(this._detailTableListener);
     node.detailTable.destroy();
     node.detailTable = null;
   }
@@ -214,6 +256,30 @@ scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedN
 
 /* event handling */
 
+scout.Outline.prototype._onDetailTableRowsSelected = function(event) {
+  var button = this._getMenu(event.detailTable.staticMenus, scout.NavigateDownButton);
+  button.updateEnabled();
+};
+
+scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
+  this.filter();
+};
+
+//FIXME CGU better use inserted and updated? weil sowieso bei der Initialisierung kein Event getriggert werden kann.
+scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
+  this._linkNodeWithRow(event.row);
+};
+
+scout.Outline.prototype._onDetailTableEvent = function(event) {
+  if (event.type === 'rowInitialized') {
+    this._onDetailTableRowInitialized(event);
+  } else if (event.type === 'rowsFiltered') {
+    this._onDetailTableRowsFiltered(event);
+  } else if (event.type === 'rowsSelected') {
+    this._onDetailTableRowsSelected(event);
+  }
+};
+
 scout.Outline.prototype._onPageChanged = function(event) {
   if (event.nodeId) {
     var node = this.nodesMap[event.nodeId];
@@ -221,13 +287,13 @@ scout.Outline.prototype._onPageChanged = function(event) {
     node.detailFormVisible = event.detailFormVisible;
     node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
     if (node.detailForm) {
-      this._addOutlineNavigationButtons(node.detailForm, node);
+      this._initDetailForm(node);
     }
 
     node.detailTableVisible = event.detailTableVisible;
     node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
     if (node.detailTable) {
-      this._addOutlineNavigationButtons(node.detailTable, node);
+      this._initDetailTable(node);
     }
 
     // If the following condition is false, the selection state is not synchronized yet which

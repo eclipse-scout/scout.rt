@@ -876,10 +876,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       filter.createKey = function() {
         return scout.ChartTableControl.FILTER_KEY;
       };
-      that.table.registerFilter(filter);
+      that.table.addFilter(filter);
 
     } else {
-      that.table.unregisterFilter(scout.ChartTableControl.FILTER_KEY);
+      that.table.removeFilter(scout.ChartTableControl.FILTER_KEY);
     }
 
     that.table.filter();

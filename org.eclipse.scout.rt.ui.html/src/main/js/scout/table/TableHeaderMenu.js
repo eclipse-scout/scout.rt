@@ -362,9 +362,9 @@ scout.TableHeaderMenu.prototype._render = function() {
     });
 
     if (filter.selectedValues.length > 0) {
-      table.registerFilter(filter);
+      table.addFilter(filter);
     } else {
-      table.unregisterFilter(column.id);
+      table.removeFilter(column.id);
     }
 
     // callback to table

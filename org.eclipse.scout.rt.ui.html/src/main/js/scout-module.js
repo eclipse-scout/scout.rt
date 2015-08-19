@@ -159,6 +159,7 @@ __include("scout/desktop/FormToolButton.js");
 __include("scout/desktop/FormToolPopup.js");
 __include("scout/desktop/Outline.js");
 __include("scout/desktop/OutlineKeyStrokeAdapter.js");
+__include("scout/desktop/DetailTableTreeFilter.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/OutlineViewButton.js");

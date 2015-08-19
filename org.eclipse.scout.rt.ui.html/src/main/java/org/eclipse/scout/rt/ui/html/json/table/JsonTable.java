@@ -762,7 +762,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return jsonRowIds;
   }
 
-  /*
+  /**
    * Ignore deleted or filtered rows, because for the UI, they don't exist
    */
   protected boolean isRowAccepted(ITableRow row) {
@@ -843,7 +843,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return row;
   }
 
-  protected String getTableRowId(ITableRow row) {
+  public String getTableRowId(ITableRow row) {
     if (row == null) {
       return null;
     }
