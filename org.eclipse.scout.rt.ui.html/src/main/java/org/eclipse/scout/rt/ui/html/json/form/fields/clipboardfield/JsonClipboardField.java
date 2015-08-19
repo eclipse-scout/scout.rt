@@ -10,21 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.clipboardfield;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.IClipboardField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonClipboardField<T extends IClipboardField> extends JsonValueField<T> implements IBinaryResourceConsumer {
+public class JsonClipboardField<T extends IClipboardField> extends JsonValueField<T>implements IBinaryResourceConsumer {
 
   public JsonClipboardField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -64,7 +68,13 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
     // IE9 does not support java script Blob objects (legacy support for text transfer)
     for (Entry<String, String> property : uploadProperties.entrySet()) {
       if (property.getKey().matches("textTransferObject\\d+")) {
-        binaryResources.add(new BinaryResource(MimeType.TEXT_PLAIN, property.getValue().getBytes()));
+        try {
+          byte[] bytes = property.getValue().getBytes(Encoding.UTF_8);
+          binaryResources.add(new BinaryResource(MimeType.TEXT_PLAIN, bytes));
+        }
+        catch (UnsupportedEncodingException e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
       }
     }
     // Pass binary resources to clipboard field

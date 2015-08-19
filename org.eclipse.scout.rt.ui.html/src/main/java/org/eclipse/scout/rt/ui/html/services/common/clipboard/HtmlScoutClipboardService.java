@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.services.common.clipboard;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -25,7 +27,6 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
 
 @Client
 public class HtmlScoutClipboardService extends AbstractService implements IClipboardService {
-  //private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlScoutClipboardService.class);
 
   @Override
   public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) throws ProcessingException {
@@ -51,8 +52,15 @@ public class HtmlScoutClipboardService extends AbstractService implements IClipb
   @Override
   public void setTextContents(String textContents) throws ProcessingException {
     ClipboardForm form = new ClipboardForm();
-    form.setMimeTypes(new MimeType[]{MimeType.TEXT_PLAIN});
-    form.getClipboardField().setValue(Collections.singleton(new BinaryResource(MimeType.TEXT_PLAIN, textContents.getBytes())));
+    form.setMimeTypes(MimeType.TEXT_PLAIN);
+    BinaryResource binaryResource;
+    try {
+      binaryResource = new BinaryResource(MimeType.TEXT_PLAIN, textContents.getBytes(Encoding.UTF_8));
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new ProcessingException("Unsupported encoding", e);
+    }
+    form.getClipboardField().setValue(Collections.singleton(binaryResource));
     form.startCopy();
   }
 }
