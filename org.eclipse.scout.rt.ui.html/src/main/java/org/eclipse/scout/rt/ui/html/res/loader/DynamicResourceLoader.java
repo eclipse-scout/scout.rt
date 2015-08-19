@@ -27,14 +27,14 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 
 /**
  * This class loads resources that are temporary or dynamically registered on the {@link IUiSession}. This includes
- * adapter/form-fields such as the image field, WordAddIn docx documents, temporary and time-limited landing page
- * files etc.
+ * adapter/form-fields such as the image field, WordAddIn docx documents, temporary and time-limited landing page files
+ * etc.
  * <p>
  * The pathInfo is expected to have the following form: <code>/dynamic/[uiSessionId]/[adapterId]/[filename]</code>
  */
 public class DynamicResourceLoader extends AbstractResourceLoader {
 
-  DynamicResourceLoader(HttpServletRequest req) {
+  public DynamicResourceLoader(HttpServletRequest req) {
     super(req);
   }
 

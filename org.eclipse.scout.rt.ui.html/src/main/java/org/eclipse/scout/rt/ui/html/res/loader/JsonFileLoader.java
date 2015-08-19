@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
  */
 public class JsonFileLoader extends AbstractResourceLoader {
 
-  JsonFileLoader(HttpServletRequest req) {
+  public JsonFileLoader(HttpServletRequest req) {
     super(req);
   }
 

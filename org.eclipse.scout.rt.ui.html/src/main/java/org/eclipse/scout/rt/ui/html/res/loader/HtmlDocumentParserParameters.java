@@ -18,57 +18,52 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
-class HtmlDocumentParserParameters {
+public class HtmlDocumentParserParameters {
 
   private boolean m_minify;
-
   private boolean m_cacheEnabled;
-
   private ScriptProcessor m_scriptProcessor;
-
   /**
-   * Cache key from HTML document.
+   * Cache key of HTML document.
    */
   private HttpCacheKey m_cacheKey;
-
   private HttpServletRequest m_req;
 
-  boolean isMinify() {
+  public boolean isMinify() {
     return m_minify;
   }
 
-  boolean isCacheEnabled() {
+  public boolean isCacheEnabled() {
     return m_cacheEnabled;
   }
 
-  void setMinify(boolean minify) {
+  public void setMinify(boolean minify) {
     m_minify = minify;
   }
 
-  void setCacheEnabled(boolean cacheEnabled) {
+  public void setCacheEnabled(boolean cacheEnabled) {
     m_cacheEnabled = cacheEnabled;
   }
 
-  void setScriptProcessor(ScriptProcessor scriptProcessor) {
+  public void setScriptProcessor(ScriptProcessor scriptProcessor) {
     m_scriptProcessor = scriptProcessor;
   }
 
-  void setRequest(HttpServletRequest request) {
+  public void setRequest(HttpServletRequest request) {
     m_req = request;
   }
 
-  void setCacheKey(HttpCacheKey cacheKey) {
+  public void setCacheKey(HttpCacheKey cacheKey) {
     m_cacheKey = cacheKey;
   }
 
-  String getHtmlPath() {
+  public String getHtmlPath() {
     return m_cacheKey.getResourcePath();
   }
 
-  HttpCacheObject loadScriptFile(String resourcePath) throws IOException {
+  public HttpCacheObject loadScriptFile(String resourcePath) throws IOException {
     ScriptFileLoader scriptFileLoader = new ScriptFileLoader(m_req, m_scriptProcessor);
     HttpCacheKey cacheKey = scriptFileLoader.createCacheKey(resourcePath, m_cacheKey.getLocale());
     return scriptFileLoader.loadResource(cacheKey);
   }
-
 }

@@ -20,12 +20,12 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 
 /**
- * This class loads static icon images from {@link IconLocator} (<code>/resource/icons</code> folders of all jars on
- * the classpath).
+ * This class loads static icon images from {@link IconLocator} (<code>/resource/icons</code> folders of all jars on the
+ * classpath).
  */
 public class IconLoader extends AbstractResourceLoader {
 
-  IconLoader(HttpServletRequest req) {
+  public IconLoader(HttpServletRequest req) {
     super(req);
   }
 

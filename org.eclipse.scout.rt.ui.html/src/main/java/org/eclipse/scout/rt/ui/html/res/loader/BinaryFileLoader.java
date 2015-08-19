@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
  */
 public class BinaryFileLoader extends AbstractResourceLoader {
 
-  BinaryFileLoader(HttpServletRequest req) {
+  public BinaryFileLoader(HttpServletRequest req) {
     super(req);
   }
 

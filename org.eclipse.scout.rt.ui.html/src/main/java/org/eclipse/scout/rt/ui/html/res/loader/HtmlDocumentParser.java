@@ -28,19 +28,17 @@ import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
  */
-class HtmlDocumentParser {
-
+public class HtmlDocumentParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlDocumentParser.class);
 
   private final HtmlDocumentParserParameters m_params;
-
   private String m_workingContent;
 
-  HtmlDocumentParser(HtmlDocumentParserParameters params) {
+  public HtmlDocumentParser(HtmlDocumentParserParameters params) {
     m_params = params;
   }
 
-  byte[] parseDocument(byte[] document) throws IOException {
+  public byte[] parseDocument(byte[] document) throws IOException {
     // the order of calls is important: first we must resolve all includes
     m_workingContent = new String(document, Encoding.UTF_8);
     replaceIncludeTags();
@@ -49,7 +47,7 @@ class HtmlDocumentParser {
     return m_workingContent.getBytes(Encoding.UTF_8);
   }
 
-  private void replaceIncludeTags() throws IOException {
+  protected void replaceIncludeTags() throws IOException {
     // <scout:include template="no-script.html" />
     Pattern pattern = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     Matcher m = pattern.matcher(m_workingContent);
@@ -70,7 +68,7 @@ class HtmlDocumentParser {
     m_workingContent = sb.toString();
   }
 
-  private void replaceMessageTags() {
+  protected void replaceMessageTags() {
     // <scout:message key="ui.javascriptDisabledTitle" />
     Pattern pattern = Pattern.compile("<scout\\:message key=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     Matcher m = pattern.matcher(m_workingContent);
@@ -106,7 +104,7 @@ class HtmlDocumentParser {
     m_workingContent = sb.toString();
   }
 
-  private String toJavaScriptString(String text) {
+  protected String toJavaScriptString(String text) {
     // escape single quotes
     text = text.replaceAll("'", "\\'");
     // escape new-lines
@@ -118,7 +116,7 @@ class HtmlDocumentParser {
    * Process all js and css script tags that contain the marker text "fingerprint". The marker text is replaced by the
    * effective files {@link HttpCacheObject#getFingerprint()} in hex format
    */
-  void replaceScriptTags() throws IOException {
+  protected void replaceScriptTags() throws IOException {
     Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(m_workingContent);
     StringBuilder buf = new StringBuilder();
     int lastEnd = 0;

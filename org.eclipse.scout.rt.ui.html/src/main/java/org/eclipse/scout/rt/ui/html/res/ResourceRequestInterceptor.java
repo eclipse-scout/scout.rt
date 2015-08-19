@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
@@ -43,27 +42,31 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
-  private ResourceLoaderFactory m_factory = new ResourceLoaderFactory();
+  // Remember bean instances to save lookups on each GET request
+  private ResourceLoaderFactory m_resourceLoaderFactory = BEANS.get(ResourceLoaderFactory.class);
+  private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String resourcePath = resolveResourcePath(req);
-    Locale locale = ServletRunContexts.copyCurrent().getLocale();
 
-    // lookup cache or load
-    IResourceLoader resourceLoader = m_factory.createResourceLoader(req, resourcePath);
+    // Create loader for the requested resource type
+    IResourceLoader resourceLoader = m_resourceLoaderFactory.createResourceLoader(req, resourcePath);
 
-    // create cache key for resource and check if resource exists in cache
-    IHttpCacheControl httpCacheControl = BEANS.get(IHttpCacheControl.class);
-    HttpCacheKey cacheKey = resourceLoader.createCacheKey(resourcePath, locale);
-    HttpCacheObject resource = httpCacheControl.getCacheObject(req, cacheKey);
-    LOG.debug("Lookup resource in cache: " + cacheKey + " found=" + (resource != null));
+    // Create cache key for resource and check if resource exists in cache
+    HttpCacheKey cacheKey = resourceLoader.createCacheKey(resourcePath, NlsLocale.get(false));
+    HttpCacheObject resource = m_httpCacheControl.getCacheObject(req, cacheKey);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Lookup resource in cache: " + cacheKey + " (found=" + (resource != null) + ")");
+    }
     if (resource == null) {
+      // Resource not found in cache --> load it
       resource = resourceLoader.loadResource(cacheKey);
-      // not found: store resource in cache
       if (resource != null) {
-        httpCacheControl.putCacheObject(req, resource);
-        LOG.debug("Stored resource in cache: " + cacheKey);
+        m_httpCacheControl.putCacheObject(req, resource);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Stored resource in cache: " + cacheKey);
+        }
       }
     }
 
@@ -82,10 +85,11 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     resp.setContentLength(resource.getResource().getContentLength());
 
     // cached in browser? -> returns 304 if the resource has not been modified
-    // Important: Check is only done if the request still processes the requested resource and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
+    // Important: Check is only done if the request still processes the requested resource
+    // and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
     String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
     if (originalPathInfo == null || resourcePath.equals(originalPathInfo)) {
-      if (httpCacheControl.checkAndUpdateCacheHeaders(req, resp, resource)) {
+      if (m_httpCacheControl.checkAndUpdateCacheHeaders(req, resp, resource)) {
         return true;
       }
     }
@@ -102,6 +106,14 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   @Override
   public boolean interceptPost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
+  }
+
+  protected ResourceLoaderFactory resourceLoaderFactory() {
+    return m_resourceLoaderFactory;
+  }
+
+  protected IHttpCacheControl httpCacheControl() {
+    return m_httpCacheControl;
   }
 
   protected String resolveResourcePath(HttpServletRequest req) {
@@ -126,5 +138,4 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
     }
     return INDEX_HTML;
   }
-
 }

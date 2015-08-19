@@ -12,17 +12,19 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
+@ApplicationScoped
 public class ResourceLoaderFactory {
 
   private ScriptProcessor m_scriptProcessor;
 
   /**
-   * Since creating a new instance of ScriptProcessor is an expensive operation
-   * we take care that only one instance exists.
+   * Since creating a new instance of ScriptProcessor is an expensive operation we take care that only one instance
+   * exists.
    */
-  private synchronized ScriptProcessor getScriptProcessor() {
+  protected synchronized ScriptProcessor getScriptProcessor() {
     if (m_scriptProcessor == null) {
       m_scriptProcessor = new ScriptProcessor();
     }
@@ -47,5 +49,4 @@ public class ResourceLoaderFactory {
     }
     return new BinaryFileLoader(req);
   }
-
 }

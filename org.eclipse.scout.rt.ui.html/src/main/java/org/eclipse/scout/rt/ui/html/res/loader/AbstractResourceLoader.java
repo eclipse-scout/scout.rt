@@ -15,15 +15,17 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 
-abstract class AbstractResourceLoader implements IResourceLoader {
+public abstract class AbstractResourceLoader implements IResourceLoader {
 
   private final HttpServletRequest m_req;
 
-  AbstractResourceLoader(HttpServletRequest req) {
+  public AbstractResourceLoader(HttpServletRequest req) {
+    Assertions.assertNotNull(req, "Argument 'req' must not be null");
     m_req = req;
   }
 

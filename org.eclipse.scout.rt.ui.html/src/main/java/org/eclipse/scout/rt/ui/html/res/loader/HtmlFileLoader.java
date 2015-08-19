@@ -55,7 +55,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     }
     byte[] document = IOUtility.readFromUrl(url);
     HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(cacheKey);
-    HtmlDocumentParser parser = new HtmlDocumentParser(params);
+    HtmlDocumentParser parser = createHtmlDocumentParser(params);
     byte[] parsedDocument = parser.parseDocument(document);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), parsedDocument, System.currentTimeMillis());
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
@@ -78,7 +78,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     return httpCacheObject;
   }
 
-  private HtmlDocumentParserParameters createHtmlDocumentParserParameters(HttpCacheKey cacheKey) {
+  protected HtmlDocumentParserParameters createHtmlDocumentParserParameters(HttpCacheKey cacheKey) {
     HtmlDocumentParserParameters params = new HtmlDocumentParserParameters();
     params.setMinify(isMinify());
     params.setCacheEnabled(isCacheEnabled());
@@ -88,4 +88,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     return params;
   }
 
+  protected HtmlDocumentParser createHtmlDocumentParser(HtmlDocumentParserParameters params) {
+    return new HtmlDocumentParser(params);
+  }
 }
