@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -30,20 +31,17 @@ public class HtmlDocumentParser {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlDocumentParser.class);
 
-  private byte[] m_content;
+  private final HtmlDocumentParserParameters m_params;
 
   private String m_workingContent;
 
-  private final HtmlDocumentParserParameters m_params;
-
-  public HtmlDocumentParser(HtmlDocumentParserParameters params, byte[] content) {
+  public HtmlDocumentParser(HtmlDocumentParserParameters params) {
     m_params = params;
-    m_content = content;
   }
 
-  public byte[] parseDocument() throws IOException {
+  public byte[] parseDocument(byte[] document) throws IOException {
     // the order of calls is important: first we must resolve all includes
-    m_workingContent = new String(m_content, Encoding.UTF_8);
+    m_workingContent = new String(document, Encoding.UTF_8);
     replaceIncludeTags();
     replaceMessageTags();
     replaceScriptTags();

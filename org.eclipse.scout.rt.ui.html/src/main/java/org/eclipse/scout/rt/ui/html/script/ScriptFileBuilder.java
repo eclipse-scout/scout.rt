@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -43,8 +44,6 @@ public class ScriptFileBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
 
   private static final Pattern INCLUDE_PAT = Pattern.compile("(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)[;]*");
-
-  private static final String UTF_8 = "UTF-8";
 
   /**
    * Pattern for a script url that is not a {@link NodeType#SRC_FRAGMENT}
@@ -182,11 +181,11 @@ public class ScriptFileBuilder {
     }
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(IOUtility.readFromUrl(script.getURL()), UTF_8);
+    String content = new String(IOUtility.readFromUrl(script.getURL()), Encoding.UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
-      buf.write(content.substring(pos, mat.start()).getBytes(UTF_8));
+      buf.write(content.substring(pos, mat.start()).getBytes(Encoding.UTF_8));
       String includePath = basePath + StringUtility.nvl(mat.group(1), mat.group(2));
       ScriptSource includeScript = locateNonFragmentScript(includePath);
       byte[] replacement = null;
@@ -218,15 +217,15 @@ public class ScriptFileBuilder {
       // Add debug information to returned content
       if (!isMinifyEnabled()) {
         if (script.getFileType() == ScriptSource.FileType.JS) {
-          buf.write(("// --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " ---\n").getBytes(UTF_8));
+          buf.write(("// --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " ---\n").getBytes(Encoding.UTF_8));
           if (replacement == null) {
-            buf.write("// !!! NOT PROCESSED\n".getBytes(UTF_8));
+            buf.write("// !!! NOT PROCESSED\n".getBytes(Encoding.UTF_8));
           }
         }
         else if (script.getFileType() == ScriptSource.FileType.CSS) {
-          buf.write(("/* --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " --- */\n").getBytes(UTF_8));
+          buf.write(("/* --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " --- */\n").getBytes(Encoding.UTF_8));
           if (replacement == null) {
-            buf.write("/* !!! NOT PROCESSED */\n".getBytes(UTF_8));
+            buf.write("/* !!! NOT PROCESSED */\n".getBytes(Encoding.UTF_8));
           }
         }
       }
@@ -235,7 +234,7 @@ public class ScriptFileBuilder {
       }
       pos = mat.end();
     }
-    buf.write(content.substring(pos).getBytes(UTF_8));
+    buf.write(content.substring(pos).getBytes(Encoding.UTF_8));
     return new ScriptOutput(pathInfo, buf.toByteArray(), lastModified);
   }
 
@@ -245,7 +244,7 @@ public class ScriptFileBuilder {
     }
     StringBuilder buf = new StringBuilder();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(IOUtility.readFromUrl(script.getURL()), UTF_8);
+    String content = new String(IOUtility.readFromUrl(script.getURL()), Encoding.UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -256,7 +255,7 @@ public class ScriptFileBuilder {
       if (includeFragment != null) {
         switch (includeFragment.getNodeType()) {
           case SRC_FRAGMENT: {
-            replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), UTF_8);
+            replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), Encoding.UTF_8);
             lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
             break;
           }
@@ -296,7 +295,7 @@ public class ScriptFileBuilder {
     if (isMinifyEnabled()) {
       result = minifyModule(script.getFileType(), result);
     }
-    return new ScriptOutput(pathInfo, result.getBytes(UTF_8), lastModified);
+    return new ScriptOutput(pathInfo, result.getBytes(Encoding.UTF_8), lastModified);
   }
 
   protected String compileModule(ScriptSource.FileType fileType, String content) throws IOException {

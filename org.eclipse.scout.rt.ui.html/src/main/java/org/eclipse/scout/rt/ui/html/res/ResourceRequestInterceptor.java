@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -144,6 +145,8 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   /**
    * Loads a resource with an appropriate method, based on the URL
    */
+  // FIXME AWE: must consider Locale when caching .html documents (because of server-side includes and message-tag replacing)
+  // FIXME AWE: document in architektur_entscheide.txt why JSP support has been removed
   protected HttpCacheObject loadResource(ServletContext context, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     if (pathInfo.matches("^/icon/.*")) {
       return loadIcon(context, req, pathInfo);
@@ -198,14 +201,14 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   protected HttpCacheObject loadHtmlFile(ServletContext context, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
-      //not handled here
+      // not handled here
       return null;
     }
-    byte[] bytes = IOUtility.readFromUrl(url);
+    byte[] document = IOUtility.readFromUrl(url);
     HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(context, req);
-    HtmlDocumentParser parser = new HtmlDocumentParser(params, bytes);
-    bytes = parser.parseDocument();
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(context, pathInfo), bytes, System.currentTimeMillis());
+    HtmlDocumentParser parser = new HtmlDocumentParser(params);
+    byte[] parsedDocument = parser.parseDocument(document);
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(context, pathInfo), parsedDocument, System.currentTimeMillis());
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
     HttpCacheObject httpCacheObject = new HttpCacheObject(pathInfo, true, -1, content);

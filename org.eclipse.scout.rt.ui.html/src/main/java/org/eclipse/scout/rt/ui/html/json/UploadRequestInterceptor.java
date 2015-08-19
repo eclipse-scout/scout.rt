@@ -29,6 +29,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -51,7 +52,6 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestInterceptor.class);
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
-  private static final String UTF_8 = "UTF-8";
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -144,7 +144,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
 
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException, ProcessingException {
     ServletFileUpload upload = new ServletFileUpload();
-    upload.setHeaderEncoding(UTF_8);
+    upload.setHeaderEncoding(Encoding.UTF_8);
     upload.setSizeMax(maxSize);
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
@@ -153,7 +153,7 @@ public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor imp
 
       if (item.isFormField()) {
         // Handle non-file fields (interpreted as properties)
-        uploadProperties.put(name, Streams.asString(stream, UTF_8));
+        uploadProperties.put(name, Streams.asString(stream, Encoding.UTF_8));
       }
       else {
         // Handle files

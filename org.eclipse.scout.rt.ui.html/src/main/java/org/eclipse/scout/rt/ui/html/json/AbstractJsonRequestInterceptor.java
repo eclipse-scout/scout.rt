@@ -15,6 +15,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -83,12 +84,12 @@ public abstract class AbstractJsonRequestInterceptor implements IServletRequestI
 
   protected void writeResponse(HttpServletResponse httpResp, JSONObject jsonResp) throws IOException {
     String jsonText = jsonResp.toString();
-    byte[] data = jsonText.getBytes("UTF-8");
+    byte[] data = jsonText.getBytes(Encoding.UTF_8);
     httpResp.setContentLength(data.length);
     if (httpResp.getContentType() == null) {
       httpResp.setContentType("application/json");
     }
-    httpResp.setCharacterEncoding("UTF-8");
+    httpResp.setCharacterEncoding(Encoding.UTF_8);
     httpResp.getOutputStream().write(data);
     if (LOG.isTraceEnabled()) {
       LOG.trace("Returned: " + jsonText);
