@@ -150,6 +150,11 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
     // May happen when selecting elements with chrome dev tools
     return;
   }
+  if (!this.table.rendered) {
+    // May happen when the table is removed between the mouse down and the mouse up event
+    // (e.g. when the user clicks 3 times very fast --> table is removed after double click).
+    return;
+  }
 
   this._mouseDown = false;
   this.table.$data.off('mouseover', this.mouseOverHandler);
