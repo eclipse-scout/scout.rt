@@ -193,9 +193,9 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     $menuParents = $(candidate).parents('div.menubar');
     $tabParents = $(candidate).parents('div.tab-area');
     $messageBoxButtons = $(candidate).parents('div.messagebox-buttons');
-    if (!firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
+    if (($menuParents.length> 0 ||$tabParents.length> 0 || $messageBoxButtons.length  > 0 ) && !firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
       firstButton = candidate;
-    } else if (!$menuParents.length && !$tabParents.length && !$messageBoxButtons.length && typeof candidate.focus === 'function') {
+    } else if (!$menuParents.length && !$tabParents.length && !$messageBoxButtons.length && typeof candidate.focus === 'function') { //inline buttons and menues are selectable before choosing button or menu from bar
       return candidate;
     }
   }
