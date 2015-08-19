@@ -26,21 +26,21 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
 public class HttpCacheObject implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final String m_cacheId;
+  private final HttpCacheKey m_cacheKey;
   private final boolean m_cachingAllowed;
   private final int m_cacheMaxAge;
   private final BinaryResource m_resource;
   private final Set<IHttpResponseInterceptor> m_httpResponseInterceptors = new HashSet<>();
 
-  public HttpCacheObject(String cacheId, boolean cachingAllowed, int cacheMaxAge, BinaryResource resource) {
-    m_cacheId = cacheId;
+  public HttpCacheObject(HttpCacheKey cacheKey, boolean cachingAllowed, int cacheMaxAge, BinaryResource resource) {
+    m_cacheKey = cacheKey;
     m_cachingAllowed = cachingAllowed;
     m_cacheMaxAge = cacheMaxAge;
     m_resource = resource;
   }
 
-  public String getCacheId() {
-    return m_cacheId;
+  public HttpCacheKey getCacheKey() {
+    return m_cacheKey;
   }
 
   public boolean isCachingAllowed() {

@@ -28,7 +28,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   /**
    * This cache is servlet-wide (all sessions)
    */
-  private Map<String, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<String, HttpCacheObject>());
+  private Map<HttpCacheKey, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<HttpCacheKey, HttpCacheObject>());
 
   public DefaultHttpCacheControl() {
   }
@@ -41,23 +41,23 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     if (!obj.isCachingAllowed()) {
       return;
     }
-    m_cache.put(obj.getCacheId(), obj);
+    m_cache.put(obj.getCacheKey(), obj);
   }
 
   @Override
-  public HttpCacheObject getCacheObject(HttpServletRequest req, String cacheId) {
+  public HttpCacheObject getCacheObject(HttpServletRequest req, HttpCacheKey cacheKey) {
     if (!UiHints.isCacheHint(req)) {
       return null;
     }
-    return m_cache.get(cacheId);
+    return m_cache.get(cacheKey);
   }
 
   @Override
-  public HttpCacheObject removeCacheObject(HttpServletRequest req, String cacheId) {
+  public HttpCacheObject removeCacheObject(HttpServletRequest req, HttpCacheKey cacheKey) {
     if (!UiHints.isCacheHint(req)) {
       return null;
     }
-    return m_cache.remove(cacheId);
+    return m_cache.remove(cacheKey);
   }
 
   @Override

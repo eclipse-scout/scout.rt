@@ -43,14 +43,14 @@ public interface IHttpCacheControl extends Serializable {
    */
   int MAX_AGE_4_HOURS = 4 * 3600;
 
-  void putCacheObject(HttpServletRequest req, HttpCacheObject o);
+  void putCacheObject(HttpServletRequest req, HttpCacheObject obj);
 
-  HttpCacheObject getCacheObject(HttpServletRequest req, String cacheId);
+  HttpCacheObject getCacheObject(HttpServletRequest req, HttpCacheKey cacheKey);
 
   /**
    * @return the removed object or null if it was not cached
    */
-  HttpCacheObject removeCacheObject(HttpServletRequest req, String cacheId);
+  HttpCacheObject removeCacheObject(HttpServletRequest req, HttpCacheKey cacheKey);
 
   /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.

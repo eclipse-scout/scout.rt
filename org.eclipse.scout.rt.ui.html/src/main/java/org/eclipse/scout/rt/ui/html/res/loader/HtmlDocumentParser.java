@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.res;
+package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,12 +22,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
  */
-public class HtmlDocumentParser {
+class HtmlDocumentParser {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlDocumentParser.class);
 
@@ -35,11 +36,11 @@ public class HtmlDocumentParser {
 
   private String m_workingContent;
 
-  public HtmlDocumentParser(HtmlDocumentParserParameters params) {
+  HtmlDocumentParser(HtmlDocumentParserParameters params) {
     m_params = params;
   }
 
-  public byte[] parseDocument(byte[] document) throws IOException {
+  byte[] parseDocument(byte[] document) throws IOException {
     // the order of calls is important: first we must resolve all includes
     m_workingContent = new String(document, Encoding.UTF_8);
     replaceIncludeTags();
@@ -117,7 +118,7 @@ public class HtmlDocumentParser {
    * Process all js and css script tags that contain the marker text "fingerprint". The marker text is replaced by the
    * effective files {@link HttpCacheObject#getFingerprint()} in hex format
    */
-  protected void replaceScriptTags() throws IOException {
+  void replaceScriptTags() throws IOException {
     Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(m_workingContent);
     StringBuilder buf = new StringBuilder();
     int lastEnd = 0;
@@ -128,11 +129,11 @@ public class HtmlDocumentParser {
         replaceCount++;
         String fingerprint = null;
         if (m_params.isCacheEnabled()) {
-          HttpCacheObject obj = m_params.loadScriptFile(m.group());
-          if (obj == null) {
-            LOG.warn("Failed to locate resource referenced in html file '" + m_params.getResourcePath() + "': " + m.group());
+          HttpCacheObject script = m_params.loadScriptFile(m.group());
+          if (script == null) {
+            LOG.warn("Failed to locate script referenced in html file '" + m_params.getHtmlPath() + "': " + m.group());
           }
-          fingerprint = (obj != null ? Long.toHexString(obj.getResource().getFingerprint()) : m.group(4));
+          fingerprint = (script != null ? Long.toHexString(script.getResource().getFingerprint()) : m.group(4));
         }
         buf.append(m.group(1));
         buf.append(m.group(2));
