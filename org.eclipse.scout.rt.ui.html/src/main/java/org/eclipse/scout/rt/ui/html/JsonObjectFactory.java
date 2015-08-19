@@ -368,7 +368,7 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     return null;
   }
 
-  private IJsonAdapter<?> createTable(ITable table, IUiSession session, String id, IJsonAdapter<?> parent) {
+  protected IJsonAdapter<?> createTable(ITable table, IUiSession session, String id, IJsonAdapter<?> parent) {
     IPage page = (IPage) table.getProperty(JsonOutlineTable.PROP_PAGE);
     if (page != null) {
       return new JsonOutlineTable<ITable>(table, session, id, parent, page);

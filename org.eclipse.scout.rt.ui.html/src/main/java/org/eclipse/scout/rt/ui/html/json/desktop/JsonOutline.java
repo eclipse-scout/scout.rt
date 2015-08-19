@@ -109,7 +109,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     return json;
   }
 
-  private void putNodeType(JSONObject json, ITreeNode node) {
+  protected void putNodeType(JSONObject json, ITreeNode node) {
     String nodeType = null;
     if (node instanceof IPageWithNodes) {
       nodeType = "nodes";
