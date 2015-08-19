@@ -21,10 +21,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTableEvent;
 import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
@@ -44,10 +46,12 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   private final ITable m_scoutTable;
   private final RwtScoutList m_uiList;
   private boolean m_multiline;
+  private final IRwtEnvironment m_env;
 
   public RwtScoutListModel(ITable scoutTable, RwtScoutList uiTable) {
     m_scoutTable = scoutTable;
     m_uiList = uiTable;
+    m_env = uiTable.getUiEnvironment();
   }
 
   @Override
@@ -192,6 +196,10 @@ public class RwtScoutListModel implements IRwtScoutListModel {
       if (markupEnabled || multiline) {
         text = HtmlTextUtility.transformPlainTextToHtml(text);
       }
+    }
+
+    if (cell instanceof Cell) {
+      m_env.getHtmlValidator().validate(text, (Cell) cell);
     }
     return text;
   }

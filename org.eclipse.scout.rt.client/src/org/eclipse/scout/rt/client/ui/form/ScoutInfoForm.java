@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -227,7 +228,7 @@ public class ScoutInfoForm extends AbstractForm {
     StringBuffer contentBuf = new StringBuffer();
     createHtmlPropertyTableContent(contentBuf);
     buf.append(contentBuf.toString());
-    buf.append("<tr><td>" + ScoutTexts.get("DetailedVersion") + ":</td><td>&nbsp;</td><td>" + v.toString() + "</td></tr>");
+    buf.append("<tr><td>" + StringUtility.htmlEncode(ScoutTexts.get("DetailedVersion")) + ":</td><td>&nbsp;</td><td>" + v.toString() + "</td></tr>");
     //
     buf.append("</table>");
   }
@@ -238,9 +239,9 @@ public class ScoutInfoForm extends AbstractForm {
     long memTotal = Runtime.getRuntime().totalMemory() / 1024 / 1024;
     long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
     //
-    buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get().getDisplayLanguage() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get() + "</td></tr>");
+    buf.append("<tr><td>" + StringUtility.htmlEncode(ScoutTexts.get("Username")) + ":</td><td>&nbsp;</td><td>" + StringUtility.htmlEncode(session.getUserId()) + "</td></tr>");
+    buf.append("<tr><td>" + StringUtility.htmlEncode(ScoutTexts.get("Language")) + ":</td><td>&nbsp;</td><td>" + StringUtility.htmlEncode(LocaleThreadLocal.get().getDisplayLanguage()) + "</td></tr>");
+    buf.append("<tr><td>" + StringUtility.htmlEncode(ScoutTexts.get("FormattingLocale")) + ":</td><td>&nbsp;</td><td>" + StringUtility.htmlEncode(LocaleThreadLocal.get().toString()) + "</td></tr>");
 
     /**
      * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then

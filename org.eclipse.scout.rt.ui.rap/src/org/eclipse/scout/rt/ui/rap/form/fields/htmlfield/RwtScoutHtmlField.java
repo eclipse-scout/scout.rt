@@ -181,6 +181,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
     }
     String cleanHtml = getUiEnvironment().styleHtmlText(this, rawHtml);
     cleanHtml = m_browserExtension.adaptHyperlinks(cleanHtml);
+    // TODO kle: Programmer is responsible for output encoding in the Scout model
     //fast create of browser content if there are no attachments
     if (CollectionUtility.isEmpty(getScoutObject().getAttachments())) {
       getUiField().setText(cleanHtml);

@@ -185,6 +185,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
         backgroundColorInheritScript = "";
       }
 
+      // Output encoding is not necessary. Programmer is responsible that a non-malicious svgText is loaded.
       // set the html content to the browser
       getUiField().setText("<html><body style=\"overflow: hidden;\" width=\"100%\" height=\"100%\" onload=\"" + backgroundColorInheritScript + "\" onclick=\"" + contextMenuHideScript + "\">" + svgText + "</body></html>");
     }

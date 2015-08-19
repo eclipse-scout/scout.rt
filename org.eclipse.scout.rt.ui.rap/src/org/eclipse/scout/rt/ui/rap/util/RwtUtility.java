@@ -28,6 +28,7 @@ import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.dnd.ClientFileTransfer;
+import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
@@ -75,6 +76,8 @@ import org.eclipse.swt.widgets.Widget;
 
 public final class RwtUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtUtility.class);
+
+  public static final boolean VALIDATE_HTML_CAPABLE = BundleContextUtility.parseBooleanProperty("scout.ui.rap.validate.htmlCapable", true);
 
   public static final String BROWSER_INFO = "browser-Info";
 

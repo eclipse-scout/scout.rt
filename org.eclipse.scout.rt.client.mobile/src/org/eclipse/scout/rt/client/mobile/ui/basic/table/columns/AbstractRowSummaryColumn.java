@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.rt.client.mobile.Activator;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
@@ -92,6 +93,11 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     catch (Throwable t) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", t);
     }
+  }
+
+  @Override
+  protected boolean getConfiguredHtmlEnabled() {
+    return true;
   }
 
   @Override
@@ -349,7 +355,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return "";
     }
     else {
-      return "<img width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+      return "<img width=\"16\" height=\"16\" src=\"cid:" + HTML.fragment(iconId).toEncodedHtml() + "\"/>";
     }
   }
 

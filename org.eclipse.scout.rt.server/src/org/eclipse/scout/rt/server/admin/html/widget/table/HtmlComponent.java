@@ -91,6 +91,7 @@ public class HtmlComponent {
     endLinkAction();
   }
 
+  // TODO kle: Verify general input validation
   public void startLinkAction(AbstractHtmlAction action) {
     String actionId = buildActionId(action);
     m_actionMap.put(actionId, action);

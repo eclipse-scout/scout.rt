@@ -876,7 +876,7 @@ public final class StringUtility {
 
   /**
    * @return encoded text, ready to be included in a html text
-   *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   *         <xmp>replaces &, ", ', <, >, / and all whitespace</xmp>
    */
   public static String htmlEncode(String s) {
     return htmlEncode(s, false);
@@ -894,6 +894,7 @@ public final class StringUtility {
     s = s.replace("'", "&#39;");
     s = s.replace("<", "&lt;");
     s = s.replace(">", "&gt;");
+    s = s.replace("/", "&#47;");
     s = s.replace("\n\r", "<br/>");
     s = s.replace("\n", "<br/>");
 
@@ -1780,7 +1781,7 @@ public final class StringUtility {
     }
 
     Pattern pat = Pattern.compile("[^1-9" + format.getDecimalFormatSymbols().getZeroDigit() + "]");
-	String decimalSeparator = String.valueOf(format.getDecimalFormatSymbols().getDecimalSeparator());
+    String decimalSeparator = String.valueOf(format.getDecimalFormatSymbols().getDecimalSeparator());
     String[] parts = futureText.split(Pattern.quote(decimalSeparator));
     if (parts.length >= 1) {
       String intPartDigits = pat.matcher(parts[0]).replaceAll("");

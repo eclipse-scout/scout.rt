@@ -164,6 +164,7 @@ public class LogoutFilter implements Filter {
       servletPath += "&" + REDIRECT_PARAM + "=" + redirectParamValue;
     }
     servletPath = response.encodeRedirectURL(servletPath);
+    // TODO kle: Validation necessary for redirect URL
     String redirectHtml = redirectHtmlTemplate.replace("#redirectUrl#", servletPath);
     response.setContentType("text/html");
     response.getWriter().print(redirectHtml);

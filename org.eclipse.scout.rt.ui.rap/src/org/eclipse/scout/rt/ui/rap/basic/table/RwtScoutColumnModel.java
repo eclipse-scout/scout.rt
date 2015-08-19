@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -16,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
@@ -40,14 +42,16 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
   private int m_defaultRowHeight;
+  private final IRwtEnvironment m_env;
 
   public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
     m_uiTable = uiTable;
     m_columnManager = columnManager;
-    m_imgCheckboxTrue = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
-    m_imgCheckboxFalse = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
-    m_disabledForegroundColor = getUiTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
+    m_env = getUiTable().getUiEnvironment();
+    m_imgCheckboxTrue = m_env.getIcon(RwtIcons.CheckboxYes);
+    m_imgCheckboxFalse = m_env.getIcon(RwtIcons.CheckboxNo);
+    m_disabledForegroundColor = m_env.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
     rebuildCache();
   }
 
@@ -83,8 +87,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       text = "";
     }
     else if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
-      text = getUiTable().getUiEnvironment().adaptHtmlCell(getUiTable(), text);
-      text = getUiTable().getUiEnvironment().convertLinksInHtmlCell(getUiTable(), text);
+      text = m_env.adaptHtmlCell(getUiTable(), text);
+      text = m_env.convertLinksInHtmlCell(getUiTable(), text);
     }
     else {
       boolean multiline = isMultiline(text);
@@ -104,6 +108,11 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
         text = HtmlTextUtility.transformPlainTextToHtml(text, replaceBreakableChars);
       }
     }
+
+    if (cell instanceof Cell) {
+      return m_env.getHtmlValidator().validate(text, (Cell) cell);
+    }
+
     return text;
   }
 
@@ -164,7 +173,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     else if (columnOrder[1] == columnIndex) {
       iconId = element.getIconId();
     }
-    Image decoImage = getUiTable().getUiEnvironment().getIcon(iconId);
+    Image decoImage = m_env.getIcon(iconId);
     //merge
     if (checkBoxImage != null && decoImage != null) {
       //TODO rap/rwt: new GC(Image) is not possible since in rwt an image does not implement Drawable.
@@ -183,7 +192,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (columnIndex > 0) {
       ICell cell = getCell(element, columnIndex);
       if (cell != null) {
-        return getUiTable().getUiEnvironment().getColor(cell.getBackgroundColor());
+        return m_env.getColor(cell.getBackgroundColor());
       }
     }
     return null;
@@ -193,7 +202,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (columnIndex > 0) {
       ICell cell = getCell(element, columnIndex);
       if (cell != null) {
-        Color col = getUiTable().getUiEnvironment().getColor(cell.getForegroundColor());
+        Color col = m_env.getColor(cell.getForegroundColor());
         if (col == null) {
           if (!element.isEnabled() || !cell.isEnabled()) {
             col = m_disabledForegroundColor;
@@ -209,7 +218,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (columnIndex > 0) {
       ICell cell = getCell(element, columnIndex);
       if (cell != null) {
-        return getUiTable().getUiEnvironment().getFont(cell.getFont(), getUiTable().getUiField().getFont());
+        return m_env.getFont(cell.getFont(), getUiTable().getUiField().getFont());
       }
     }
     return null;
@@ -217,7 +226,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   @Override
   public String getToolTipText(Object element) {
-    Display display = getUiTable().getUiEnvironment().getDisplay();
+    Display display = m_env.getDisplay();
     Point cursorOnTable = display.map(null, getUiTable().getUiField(), display.getCursorLocation());
     ViewerCell uiCell = getUiTable().getUiTableViewer().getCell(cursorOnTable);
     String text = "";
@@ -231,6 +240,8 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
           text = cell.getText();
           if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
             //Tooltips don't support html -> convert to plain text
+            //Tooltips with HTML are supported since RAP 2.2, see org.eclipse.rap.rwt.RWT.TOOLTIP_MARKUP_ENABLED
+            //However, since this property is not set to true in Scout, HTML encoding is currently not necessary
             text = HTMLUtility.getPlainText(text);
           }
           if (text == null || text.indexOf("\n") <= 0) {
