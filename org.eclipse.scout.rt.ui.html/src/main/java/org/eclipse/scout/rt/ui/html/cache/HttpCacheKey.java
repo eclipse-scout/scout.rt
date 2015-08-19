@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
  * Cache key is a composite of 'resourcePath' and 'locale'. When a resource is not dependent on a Locale, it should use
  * the resourcePath constructor, to create a HttpCacheKey instance.
  */
-public class HttpCacheKey {
+public class HttpCacheKey implements Serializable {
+  private static final long serialVersionUID = 1L;
 
   private final String m_resourcePath;
-
   private final Locale m_locale;
 
   public HttpCacheKey(String resourcePath) {
@@ -83,5 +84,4 @@ public class HttpCacheKey {
   public String toString() {
     return "HttpCacheKey[m_resourcePath=" + m_resourcePath + " m_locale=" + m_locale + "]";
   }
-
 }
