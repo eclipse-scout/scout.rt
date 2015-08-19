@@ -27,11 +27,10 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.utility.TestUtility;
-import org.eclipse.scout.rt.platform.util.csv.CsvHelper;
-import org.eclipse.scout.rt.platform.util.csv.IDataConsumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +63,7 @@ public class CsvHelperTest {
     };
     List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
-    m_csvHelper.exportData(m_data, m_testFile, "UTF-8", columnNames, true, null, false);
+    m_csvHelper.exportData(m_data, m_testFile, Encoding.UTF_8, columnNames, true, null, false);
 
     Reader reader = new FileReader(m_testFile);
     IDataConsumer dataConsumer = mock(IDataConsumer.class);
@@ -91,7 +90,7 @@ public class CsvHelperTest {
     };
     List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
-    m_csvHelper.exportData(m_data, m_testFile, "UTF-8", columnNames, true, null, false);
+    m_csvHelper.exportData(m_data, m_testFile, Encoding.UTF_8, columnNames, true, null, false);
 
     Reader reader = new FileReader(m_testFile);
     try {
@@ -116,7 +115,7 @@ public class CsvHelperTest {
     };
     List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
-    m_csvHelper.exportData(data, m_testFile, "UTF-8", columnNames, true, null, false);
+    m_csvHelper.exportData(data, m_testFile, Encoding.UTF_8, columnNames, true, null, false);
 
     Reader reader = new FileReader(m_testFile);
     Object[][] result = m_csvHelper.importData(reader, 1, Arrays.asList(new String[]{"string", "string", "string", "string", "string"}), 4);
@@ -133,7 +132,7 @@ public class CsvHelperTest {
     };
     List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
-    m_csvHelper.exportData(data, m_testFile, "UTF-8", columnNames, true, null, false);
+    m_csvHelper.exportData(data, m_testFile, Encoding.UTF_8, columnNames, true, null, false);
 
     String content = IOUtility.getContent(new FileReader(m_testFile));
     String[] lines = content.split("\n");

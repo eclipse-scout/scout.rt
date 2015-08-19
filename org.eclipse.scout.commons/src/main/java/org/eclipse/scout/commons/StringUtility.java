@@ -1551,7 +1551,7 @@ public final class StringUtility {
       int len;
       while ((len = in.read(c)) > 0) {
         String str = new String(c, 0, len);
-        byte[] b = str.getBytes("UTF-8");
+        byte[] b = str.getBytes(Encoding.UTF_8);
         deflaterOutputStream.write(b, 0, b.length);
       }
     }
@@ -1600,7 +1600,7 @@ public final class StringUtility {
     InflaterInputStream inflaterInputStream = new InflaterInputStream(in, inflater);
     StringWriter out = new StringWriter();
     try {
-      InputStreamReader reader = new InputStreamReader(inflaterInputStream, "UTF-8");
+      InputStreamReader reader = new InputStreamReader(inflaterInputStream, Encoding.UTF_8);
       char[] b = new char[102400];
       int len;
       while ((len = reader.read(b)) > 0) {

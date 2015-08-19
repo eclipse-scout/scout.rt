@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -178,7 +179,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
 
   @Override
   public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException {
-    return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, "UTF-8");
+    return getRemoteFiles(folderPath, filter, existingFileInfoOnClient, Encoding.UTF_8);
   }
 
   public RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient, String charsetName) throws ProcessingException {

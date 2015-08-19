@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import org.eclipse.scout.commons.Encoding;
+
 public class DecompressedReader extends Reader {
   private RemoteFile m_remoteFile;
   private ByteArrayInputStream m_buffer;
@@ -29,7 +31,7 @@ public class DecompressedReader extends Reader {
   private InputStreamReader m_inputReader;
 
   public DecompressedReader(RemoteFile f) {
-    this(f, "UTF-8");
+    this(f, Encoding.UTF_8);
   }
 
   public DecompressedReader(RemoteFile f, String charsetName) {

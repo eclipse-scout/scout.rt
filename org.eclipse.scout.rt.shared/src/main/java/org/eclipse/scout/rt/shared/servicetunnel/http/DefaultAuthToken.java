@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.HexUtility;
 import org.eclipse.scout.commons.HexUtility.HexOutputStream;
 import org.eclipse.scout.commons.SecurityUtility;
@@ -59,13 +60,13 @@ public class DefaultAuthToken {
     }
 
     try {
-      String userId = new String(HexUtility.decode(parts[0]), "UTF-8");
+      String userId = new String(HexUtility.decode(parts[0]), Encoding.UTF_8);
       long validUntil = Long.parseLong(parts[1], 16);
       String[] customArgs = null;
       if (parts.length > 3) {
         customArgs = Arrays.copyOfRange(parts, 2, parts.length - 1);
         for (int i = 0; i < customArgs.length; i++) {
-          customArgs[i] = new String(HexUtility.decode(customArgs[i]), "UTF-8");
+          customArgs[i] = new String(HexUtility.decode(customArgs[i]), Encoding.UTF_8);
         }
       }
       if (customArgs != null && customArgs.length == 0) {
@@ -142,13 +143,13 @@ public class DefaultAuthToken {
 
   protected byte[] createUnsignedData() {
     try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); HexOutputStream hex = new HexOutputStream(bytes)) {
-      hex.write(m_userId.getBytes("UTF-8"));
+      hex.write(m_userId.getBytes(Encoding.UTF_8));
       bytes.write(partsDelimiter());
       bytes.write(Long.toHexString(m_validUntil).getBytes());
       if (m_customArgs != null) {
         for (String arg : m_customArgs) {
           bytes.write(partsDelimiter());
-          hex.write(arg.getBytes("UTF-8"));
+          hex.write(arg.getBytes(Encoding.UTF_8));
         }
       }
       return bytes.toByteArray();

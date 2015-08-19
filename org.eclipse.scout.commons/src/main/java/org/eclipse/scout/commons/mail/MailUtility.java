@@ -45,6 +45,7 @@ import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.RFCWrapperPart;
@@ -64,8 +65,6 @@ public class MailUtility {
   public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
   public static final String CONTENT_TYPE_MULTIPART = "alternative";
-
-  private static final String UTF_8 = "UTF-8";
 
   private MailUtility() {
   }
@@ -310,7 +309,7 @@ public class MailUtility {
         m.setSender(addrSender);
       }
       if (StringUtility.hasText(mailMessage.getSubject())) {
-        m.setSubject(mailMessage.getSubject(), UTF_8);
+        m.setSubject(mailMessage.getSubject(), Encoding.UTF_8);
       }
       if (!CollectionUtility.isEmpty(mailMessage.getToRecipients())) {
         m.setRecipients(Message.RecipientType.TO, parseAddresses(mailMessage.getToRecipients()));
@@ -362,7 +361,7 @@ public class MailUtility {
    */
   private static MimeBodyPart createSingleBodyPart(String bodyText, String contentType) throws MessagingException {
     MimeBodyPart part = new MimeBodyPart();
-    part.setText(bodyText, UTF_8);
+    part.setText(bodyText, Encoding.UTF_8);
     part.addHeader(CONTENT_TYPE_ID, contentType);
     return part;
   }
@@ -405,7 +404,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new FileDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), "UTF-8", null));
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), Encoding.UTF_8, null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -442,7 +441,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new BinaryResourceDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getFilename(), "UTF-8", null));
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getFilename(), Encoding.UTF_8, null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -549,7 +548,7 @@ public class MailUtility {
   private static String getCharacterEncodingOfMimePart(MimePart part) throws MessagingException {
     Pattern pattern = Pattern.compile("charset=\".*\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     Matcher matcher = pattern.matcher(part.getContentType());
-    String characterEncoding = UTF_8; // default, a good guess in Europe
+    String characterEncoding = Encoding.UTF_8; // default, a good guess in Europe
     if (matcher.find()) {
       if (matcher.group(0).split("\"").length >= 2) {
         characterEncoding = matcher.group(0).split("\"")[1];

@@ -90,7 +90,7 @@ public final class IOUtility {
    * @throws ProcessingException
    */
   public static String getContentUtf8(InputStream stream) throws ProcessingException {
-    return getContent(stream, "UTF-8");
+    return getContent(stream, Encoding.UTF_8);
   }
 
   public static byte[] getContent(InputStream in, int len) throws IOException {
@@ -647,7 +647,7 @@ public final class IOUtility {
     }
 
     try {
-      s = URLEncoder.encode(s, "UTF-8");
+      s = URLEncoder.encode(s, Encoding.UTF_8);
       s = StringUtility.replace(s, "+", "%20");
     }
     catch (UnsupportedEncodingException e) {
@@ -675,7 +675,7 @@ public final class IOUtility {
     }
 
     try {
-      s = URLDecoder.decode(s, "UTF-8");
+      s = URLDecoder.decode(s, Encoding.UTF_8);
     }
     catch (UnsupportedEncodingException e) {
       LOG.error("Unsupported encoding", e);

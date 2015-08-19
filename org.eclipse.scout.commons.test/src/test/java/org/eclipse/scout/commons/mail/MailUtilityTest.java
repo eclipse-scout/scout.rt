@@ -37,6 +37,7 @@ import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -188,7 +189,7 @@ public class MailUtilityTest {
     message.setContent(multiPart);
 
     MimeBodyPart bodyPart = new MimeBodyPart();
-    bodyPart.setText("plain text", "UTF-8");
+    bodyPart.setText("plain text", Encoding.UTF_8);
     bodyPart.addHeader(MailUtility.CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_PLAIN);
     multiPart.addBodyPart(bodyPart);
 
@@ -232,7 +233,7 @@ public class MailUtilityTest {
     MailUtility.addAttachmentsToMimeMessage(message, attachments);
 
     // verify added attachments in java instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", Encoding.UTF_8, null));
 
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -240,7 +241,7 @@ public class MailUtilityTest {
     message = MailUtility.createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", Encoding.UTF_8, null));
   }
 
   @Test
@@ -267,7 +268,7 @@ public class MailUtilityTest {
     MailUtility.addResourcesAsAttachments(message, attachments);
 
     // verify added attachments in java instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", Encoding.UTF_8, null));
 
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -275,7 +276,7 @@ public class MailUtilityTest {
     message = MailUtility.createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", Encoding.UTF_8, null));
   }
 
   @Test

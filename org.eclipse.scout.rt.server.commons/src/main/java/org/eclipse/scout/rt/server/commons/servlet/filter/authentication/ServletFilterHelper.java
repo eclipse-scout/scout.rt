@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
@@ -193,7 +194,7 @@ public class ServletFilterHelper {
 
   protected void sendJsonSessionTimeout(HttpServletResponse resp) throws IOException {
     resp.setContentType("application/json");
-    resp.setCharacterEncoding("UTF-8");
+    resp.setCharacterEncoding(Encoding.UTF_8);
     resp.getWriter().print(JSON_SESSION_TIMEOUT_RESPONSE); // JsonResponse.ERR_SESSION_TIMEOUT
   }
 

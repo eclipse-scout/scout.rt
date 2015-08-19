@@ -20,6 +20,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
@@ -41,7 +42,7 @@ public final class MessageContexts {
   public static String getSoapMessage(final SOAPMessageContext context) throws SOAPException, IOException {
     try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
       context.getMessage().writeTo(bos);
-      return bos.toString("UTF-8");
+      return bos.toString(Encoding.UTF_8);
     }
   }
 

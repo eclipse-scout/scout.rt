@@ -18,6 +18,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -177,7 +178,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
       LogRecorderHandler handler = new LogRecorderHandler(tempLogDir.getAbsolutePath(), 1024 * 1024, 1024, false);
       handler.setLevel(Level.FINEST);
       handler.setFormatter(new JavaLogFormatter());
-      handler.setEncoding("UTF-8");
+      handler.setEncoding(Encoding.UTF_8);
       return handler;
     }
     catch (Exception e) {

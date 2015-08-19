@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -44,7 +45,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 public class RemoteFile implements Serializable {
   private static final int ONE_HUNDRED_KILO_BYTE = 102400;
   public static final long DEFAULT_MAX_BLOCK_SIZE = 20000000; // 20MB
-  private static final String DEFAULT_CHARSETNAME = "UTF-8";
+  private static final String DEFAULT_CHARSETNAME = Encoding.UTF_8;
   private static final long serialVersionUID = 1L;
   private String m_dir;
   private String m_name;

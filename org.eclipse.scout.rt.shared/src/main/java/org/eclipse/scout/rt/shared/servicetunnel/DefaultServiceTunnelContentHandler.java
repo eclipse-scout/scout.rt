@@ -30,6 +30,7 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -143,7 +144,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
     }
-    try (OutputStreamWriter out = new OutputStreamWriter(stream, "UTF-8")) {
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, Encoding.UTF_8)) {
 
       // build soap message without sax (hi-speed)
       boolean compressed = isUseCompression();
@@ -176,7 +177,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
     finally {
       if (debugEnabled) {
-        String sentData = ((DebugOutputStream) stream).getContent("UTF-8");
+        String sentData = ((DebugOutputStream) stream).getContent(Encoding.UTF_8);
         int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
         Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
         LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
@@ -190,7 +191,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
     }
-    try (OutputStreamWriter out = new OutputStreamWriter(stream, "UTF-8")) {
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, Encoding.UTF_8)) {
 
       // build soap message without sax (hi-speed)
       boolean compressed = isUseCompression();
@@ -235,7 +236,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
     finally {
       if (debugEnabled) {
-        String sentData = ((DebugOutputStream) stream).getContent("UTF-8");
+        String sentData = ((DebugOutputStream) stream).getContent(Encoding.UTF_8);
         int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
         Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
         LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
@@ -289,7 +290,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     String dataPart = null;
     boolean compressed = true;
     try {
-      Reader r = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+      Reader r = new BufferedReader(new InputStreamReader(in, Encoding.UTF_8));
       StringBuilder buf = new StringBuilder();
       int ch;
       while ((ch = r.read()) >= 0) {
@@ -321,7 +322,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
     finally {
       if (LOG.isDebugEnabled()) {
-        String receivedData = ((DebugInputStream) in).getContent("UTF-8");
+        String receivedData = ((DebugInputStream) in).getContent(Encoding.UTF_8);
         int lastReadCharacter = ((DebugInputStream) in).getLastReadCharacter();
         Throwable lastThrownException = ((DebugInputStream) in).getLastThrownException();
         LOG.debug("lastReadCharacter=" + lastReadCharacter + ",lastThrownException=" + lastThrownException + ", receivedData:\n" + receivedData);

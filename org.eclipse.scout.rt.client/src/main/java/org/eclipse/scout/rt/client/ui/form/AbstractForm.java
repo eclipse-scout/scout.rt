@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.PreferredValue;
@@ -2432,7 +2433,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void doExportXml(boolean saveAs) {
     // export search parameters
-    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, "UTF-8")) {
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, Encoding.UTF_8)) {
       XmlUtility.wellformDocument(storeToXml(), w);
       BinaryResource res = new BinaryResource("form.xml", bos.toByteArray());
       getDesktop().downloadResource(res);

@@ -161,7 +161,7 @@ public class PropertiesHelperTest {
 
         @Override
         public InputStream getInputStream() throws IOException {
-          return new ByteArrayInputStream(m_configPropertiesContent.getBytes("UTF-8"));
+          return new ByteArrayInputStream(m_configPropertiesContent.getBytes(Encoding.UTF_8));
         }
 
         @Override

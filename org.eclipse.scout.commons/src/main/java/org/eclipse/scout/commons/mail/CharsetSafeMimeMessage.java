@@ -20,12 +20,14 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
+import org.eclipse.scout.commons.Encoding;
+
 public class CharsetSafeMimeMessage extends MimeMessage {
   private String m_charset;
 
   public CharsetSafeMimeMessage() {
     super((Session) null);
-    m_charset = "UTF-8";
+    m_charset = Encoding.UTF_8;
   }
 
   public CharsetSafeMimeMessage(String charset) {

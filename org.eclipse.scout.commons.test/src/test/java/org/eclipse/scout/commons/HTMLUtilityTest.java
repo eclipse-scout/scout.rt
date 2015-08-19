@@ -686,7 +686,7 @@ public class HTMLUtilityTest {
   private String readResourceAsText(String relativeFileName) {
     InputStream in = ResourceBase.class.getResourceAsStream(relativeFileName);
     try {
-      return new String(IOUtility.getContent(in), "UTF-8");
+      return new String(IOUtility.getContent(in), Encoding.UTF_8);
     }
     catch (Exception e) {
       fail("could not read input file: " + ResourceBase.class.getPackage() + "/" + relativeFileName);

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsUtility;
@@ -276,7 +277,7 @@ public class CsvHelper {
   public void exportData(Object[][] data, File f, String encoding, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) throws ProcessingException {
     try {
       if (encoding == null) {
-        encoding = "UTF-8";
+        encoding = Encoding.UTF_8;
       }
       Writer writer = new OutputStreamWriter(new FileOutputStream(f), encoding);
       try {

@@ -50,6 +50,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -375,7 +376,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
         // encoding
         Pattern pattern = Pattern.compile("charset=\".*\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(mimePart.getContentType());
-        String htmlCharacterEncoding = "UTF-8"; // default, a good guess in Europe
+        String htmlCharacterEncoding = Encoding.UTF_8; // default, a good guess in Europe
         if (matcher.find()) {
           if (matcher.group(0).split("\"").length >= 2) {
             htmlCharacterEncoding = matcher.group(0).split("\"")[1];

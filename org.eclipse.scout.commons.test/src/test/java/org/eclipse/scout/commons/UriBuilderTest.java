@@ -22,7 +22,7 @@ import org.junit.Test;
 
 /**
  * JUnit test for {@link UriBuilder}
- * 
+ *
  * @since 3.8.1
  */
 public class UriBuilderTest {
@@ -199,7 +199,7 @@ public class UriBuilderTest {
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
-    assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI("UTF-8").toASCIIString());
+    assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI(Encoding.UTF_8).toASCIIString());
     //
     URI baseUri = new URI("http://www.eclipse.org/scout");
     builder = new UriBuilder(baseUri);

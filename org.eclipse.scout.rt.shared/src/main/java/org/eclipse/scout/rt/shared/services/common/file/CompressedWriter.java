@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,8 +20,10 @@ import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
+import org.eclipse.scout.commons.Encoding;
+
 public class CompressedWriter extends Writer {
-  private static final String DEFAULT_CHARSETNAME = "UTF-8";
+  private static final String DEFAULT_CHARSETNAME = Encoding.UTF_8;
   private RemoteFile m_remoteFile;
   private ByteArrayOutputStream m_buffer;
   private Deflater m_deflater;
