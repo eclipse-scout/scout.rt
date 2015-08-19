@@ -54,13 +54,16 @@ public class HtmlDocumentParser {
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String includeName = m.group(1);
-      URL inlcudeUrl = BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
-      if (inlcudeUrl == null) {
+      URL includeUrl = BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
+      if (includeUrl == null) {
         throw new IOException("Could not resolve include '" + includeName + "'");
       }
       else {
-        byte[] includeContent = IOUtility.readFromUrl(inlcudeUrl);
-        m.appendReplacement(sb, new String(includeContent, Encoding.UTF_8));
+        byte[] includeContent = IOUtility.readFromUrl(includeUrl);
+        String replacement = new String(includeContent, Encoding.UTF_8);
+        // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
+        replacement = "\n" + replacement.trim() + "\n";
+        m.appendReplacement(sb, replacement);
         LOG.info("Resolved include '" + includeName + "'");
       }
     }
@@ -94,9 +97,6 @@ public class HtmlDocumentParser {
       else {
         // Plain normal replacement
         text = TEXTS.get(keyAttr);
-        if (text == null) {
-          text = "Undefined text: " + keyAttr;
-        }
       }
       m.appendReplacement(sb, Matcher.quoteReplacement(text));
     }
