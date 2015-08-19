@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.ui.html;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,12 +66,16 @@ public class UiServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.empty().withServletRequest(req).withServletResponse(resp).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          m_requestHandlerGet.handleRequest(req, resp);
-        }
-      }, BEANS.get(ExceptionTranslator.class));
+      ServletRunContexts.empty()
+          .withServletRequest(req)
+          .withServletResponse(resp)
+          .withLocale(getPreferredLocale(req))
+          .run(new IRunnable() {
+            @Override
+            public void run() throws Exception {
+              m_requestHandlerGet.handleRequest(req, resp);
+            }
+          }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-GET request from UI", e);
@@ -80,17 +86,30 @@ public class UiServlet extends HttpServlet {
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.empty().withServletRequest(req).withServletResponse(resp).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          m_requestHandlerPost.handleRequest(req, resp);
-        }
-      }, BEANS.get(ExceptionTranslator.class));
+      ServletRunContexts.empty()
+          .withServletRequest(req)
+          .withServletResponse(resp)
+          .withLocale(getPreferredLocale(req))
+          .run(new IRunnable() {
+            @Override
+            public void run() throws Exception {
+              m_requestHandlerPost.handleRequest(req, resp);
+            }
+          }, BEANS.get(ExceptionTranslator.class));
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+  }
+
+  private Locale getPreferredLocale(HttpServletRequest req) {
+    for (Cookie cookie : req.getCookies()) {
+      if (IUiSession.HTTP_COOKIE_LOCALE.equals(cookie.getName())) {
+        return Locale.forLanguageTag(cookie.getValue());
+      }
+    }
+    return req.getLocale();
   }
 
   /**

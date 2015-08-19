@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -44,6 +45,7 @@ public final class JsonTestUtility {
     String uiSessionId = "1.1";
     String clientSessionId = "testClientSession123";
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     HttpSession httpSession = Mockito.mock(HttpSession.class);
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
@@ -60,7 +62,7 @@ public final class JsonTestUtility {
     }
     JsonRequest jsonRequest = new JsonRequest(jsonReqObj);
     IUiSession uiSession = new TestEnvironmentUiSession();
-    uiSession.init(request, new JsonStartupRequest(jsonRequest));
+    uiSession.init(request, response, new JsonStartupRequest(jsonRequest));
     return uiSession;
   }
 

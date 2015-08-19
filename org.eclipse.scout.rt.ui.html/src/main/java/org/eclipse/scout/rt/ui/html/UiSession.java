@@ -24,7 +24,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
@@ -196,7 +198,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public void init(HttpServletRequest httpRequest, JsonStartupRequest jsonStartupRequest) {
+  public void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
     if (currentSubject() == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
@@ -210,26 +212,29 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     touch();
 
     try {
-      m_currentHttpRequest.set(httpRequest);
-      m_currentJsonRequest = jsonStartupRequest;
+      m_currentHttpRequest.set(req);
+      m_currentJsonRequest = jsonStartupReq;
 
-      m_clientSessionId = jsonStartupRequest.getClientSessionId();
-      m_uiSessionId = jsonStartupRequest.getUiSessionId();
+      m_clientSessionId = jsonStartupReq.getClientSessionId();
+      m_uiSessionId = jsonStartupReq.getUiSessionId();
 
-      HttpSession httpSession = httpRequest.getSession();
+      HttpSession httpSession = req.getSession();
       m_currentHttpSession = httpSession;
 
       // Look up the requested client session (create and start a new one if necessary)
-      m_clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
+      m_clientSession = getOrCreateClientSession(httpSession, req, jsonStartupReq);
 
       // At this point we have a valid, active clientSession. Therefore, we may now safely store it in the HTTP session
       storeClientSessionInHttpSession(httpSession, m_clientSession);
+
+      // Add a cookie with the preferred user-language
+      storePreferredLocaleInCookie(resp, m_clientSession.getLocale());
 
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
       // Handle detach
-      handleDetach(jsonStartupRequest, httpSession);
+      handleDetach(jsonStartupReq, httpSession);
 
       // Start desktop
       fireDesktopOpened();
@@ -264,7 +269,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     return m_lastAccessedTime;
   }
 
-  protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
+  protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
     IClientSession clientSession = loadClientSessionFromHttpSession(httpSession);
 
     if (clientSession != null) {
@@ -274,7 +279,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     else {
       // No client session for the requested ID was found, so create one
       LOG.info("Creating new client session [clientSessionId=" + m_clientSessionId + "]");
-      clientSession = createAndStartClientSession(request.getLocale(), createUserAgent(jsonStartupRequest), extractSessionInitParams(jsonStartupRequest.getCustomParams()));
+      clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
       // Ensure session is active
       if (!clientSession.isActive()) {
         throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + m_clientSessionId + "]");
@@ -287,8 +292,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     if (m_clientSessionId == null) {
       throw new IllegalStateException("Missing clientSessionId in JSON request");
     }
-    IClientSession clientSession = (IClientSession) httpSession.getAttribute(CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId);
-    return clientSession;
+    return (IClientSession) httpSession.getAttribute(CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId);
   }
 
   protected void storeClientSessionInHttpSession(HttpSession httpSession, IClientSession clientSession) {
@@ -310,6 +314,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       throw new IllegalStateException("Missing clientSessionId in JSON request");
     }
     return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId;
+  }
+
+  private void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
+    Cookie cookie = new Cookie(HTTP_COOKIE_LOCALE, locale.toLanguageTag());
+    cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
+    resp.addCookie(cookie);
   }
 
   protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
@@ -349,8 +359,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }, uiJobs.newModelJobInput("startUp jsonClientSession", clientSession, false), RuntimeExceptionTranslator.class);
   }
 
-  protected void handleDetach(JsonStartupRequest jsonStartupRequest, HttpSession httpSession) {
-    String parentUiSessionId = jsonStartupRequest.getParentUiSessionId();
+  protected void handleDetach(JsonStartupRequest jsonStartupReq, HttpSession httpSession) {
+    String parentUiSessionId = jsonStartupReq.getParentUiSessionId();
     if (parentUiSessionId != null) {
       IUiSession parentUiSession = (IUiSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentUiSessionId);
       if (parentUiSession != null) {
@@ -394,11 +404,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
   }
 
-  protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
+  protected UserAgent createUserAgent(JsonStartupRequest jsonStartupReq) {
     IUiLayer uiLayer = UiLayer.HTML;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = currentHttpRequest().getHeader("User-Agent");
-    JSONObject userAgent = jsonStartupRequest.getUserAgent();
+    JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {
       // FIXME CGU: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
@@ -572,7 +582,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public JSONObject processJsonRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
+  public JSONObject processJsonRequest(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
 
     if (LOG.isDebugEnabled()) {
@@ -580,8 +590,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
 
     try {
-      m_currentHttpRequest.set(httpRequest);
-      m_currentJsonRequest = jsonRequest;
+      m_currentHttpRequest.set(req);
+      m_currentJsonRequest = jsonReq;
 
       // Process events in model job
       uiJobs.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {
@@ -641,11 +651,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public JSONObject processFileUpload(HttpServletRequest httpReq, final IBinaryResourceConsumer resourceConsumer, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
+  public JSONObject processFileUpload(HttpServletRequest req, final IBinaryResourceConsumer resourceConsumer,
+      final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
-
     try {
-      m_currentHttpRequest.set(httpReq);
+      m_currentHttpRequest.set(req);
 
       // Process file upload in model job
       uiJobs.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.resource.BinaryResource;
@@ -39,7 +40,12 @@ public interface IUiSession {
    */
   String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.uisession."/*+JsonRequest.PROP_UI_SESSION_ID*/;
 
-  void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
+  /**
+   * Cookie name used to store the preferred language of a user (even after user has logged out).
+   */
+  String HTTP_COOKIE_LOCALE = "scout.locale";
+
+  void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq);
 
   /**
    * @return <code>true</code> if {@link #init(HttpServletRequest, JsonStartupRequest)} was been called. Note: This will
@@ -88,7 +94,7 @@ public interface IUiSession {
   /**
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
-  JSONObject processJsonRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
+  JSONObject processJsonRequest(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq);
 
   /**
    * @param httpRequest

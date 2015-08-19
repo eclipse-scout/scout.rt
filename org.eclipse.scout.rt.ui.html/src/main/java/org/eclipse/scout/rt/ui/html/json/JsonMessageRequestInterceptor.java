@@ -48,9 +48,9 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
   }
 
   @Override
-  public boolean interceptPost(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
+  public boolean interceptPost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /json
-    String pathInfo = httpReq.getPathInfo();
+    String pathInfo = req.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
       return false;
     }
@@ -59,15 +59,15 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
     JsonRequest jsonReq = null;
     try {
       //disable cache
-      BEANS.get(IHttpCacheControl.class).disableCacheHeaders(httpReq, httpResp);
-      JSONObject jsonReqObj = decodeJSONRequest(httpReq);
+      BEANS.get(IHttpCacheControl.class).disableCacheHeaders(req, resp);
+      JSONObject jsonReqObj = decodeJSONRequest(req);
       if (isPingRequest(jsonReqObj)) {
-        writeResponse(httpResp, createPingResponse());
+        writeResponse(resp, createPingResponse());
         return true;
       }
 
       jsonReq = new JsonRequest(jsonReqObj);
-      uiSession = getOrCreateUiSession(servlet, httpReq, httpResp, jsonReq);
+      uiSession = getOrCreateUiSession(req, resp, jsonReq);
       if (uiSession == null) {
         return true;
       }
@@ -81,7 +81,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
 
         if (jsonReq.isPollForBackgroundJobsRequest()) {
           int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
-          int maxIdle = httpReq.getSession().getMaxInactiveInterval();
+          int maxIdle = req.getSession().getMaxInactiveInterval();
           // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
           // because that might trigger many very short polling calls until the ui session is really disposed.
           int pollWait = Math.max(Math.min(maxIdle - curIdle, BACKGROUND_POLLING_INTERVAL_SECONDS), 3);
@@ -98,7 +98,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         }
         else if (jsonReq.isCancelRequest()) {
           uiSession.processCancelRequest();
-          writeResponse(httpResp, createEmptyResponse());
+          writeResponse(resp, createEmptyResponse());
           return true;
         }
 
@@ -110,18 +110,18 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         try {
           if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
             if (jsonReq.isPollForBackgroundJobsRequest()) { // TODO BSH isManualLogout?
-              writeResponse(httpResp, createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
+              writeResponse(resp, createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
             }
             else {
-              writeResponse(httpResp, createSessionTimeoutResponse());
+              writeResponse(resp, createSessionTimeoutResponse());
             }
             return true;
           }
-          JSONObject jsonResp = uiSession.processJsonRequest(httpReq, jsonReq);
+          JSONObject jsonResp = uiSession.processJsonRequest(req, resp, jsonReq);
           if (jsonResp == null) {
             jsonResp = createEmptyResponse();
           }
-          writeResponse(httpResp, jsonResp);
+          writeResponse(resp, jsonResp);
         }
         finally {
           uiSession.uiSessionLock().unlock();
@@ -150,11 +150,11 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
-        writeResponse(httpResp, createStartupFailedResponse());
+        writeResponse(resp, createStartupFailedResponse());
       }
       else {
         LOG.error("Unexpected error while processing JSON request", e);
-        writeResponse(httpResp, createUnrecoverableFailureResponse());
+        writeResponse(resp, createUnrecoverableFailureResponse());
       }
     }
     return true;
@@ -167,7 +167,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
     return json.has("ping");
   }
 
-  protected IUiSession getOrCreateUiSession(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
+  protected IUiSession getOrCreateUiSession(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
     String uiSessionAttributeName = IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getUiSessionId();
     HttpSession httpSession = req.getSession();
 
@@ -210,7 +210,7 @@ public class JsonMessageRequestInterceptor extends AbstractJsonRequestIntercepto
         uiSession = BEANS.get(IUiSession.class);
         uiSession.uiSessionLock().lock();
         try {
-          uiSession.init(req, new JsonStartupRequest(jsonReq));
+          uiSession.init(req, resp, new JsonStartupRequest(jsonReq));
           httpSession.setAttribute(uiSessionAttributeName, uiSession);
         }
         finally {
