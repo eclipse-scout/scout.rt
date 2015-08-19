@@ -49,7 +49,7 @@ public class ClipboardForm extends AbstractForm {
     return m_mimeTypes;
   }
 
-  public void setMimeTypes(MimeType[] mimeTypes) {
+  public void setMimeTypes(MimeType... mimeTypes) {
     m_mimeTypes = mimeTypes;
 
     List<String> allowedMimeTypesListAsString = new ArrayList<String>();
