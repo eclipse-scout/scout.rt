@@ -2068,6 +2068,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     selectRows(selectedRows, false);
   }
 
+  /**
+   * Replace rows by applying insert/update/delete on existing rows by
+   * primary key match
+   */
   private void replaceRowsCase2(List<? extends ITableRow> newRows) throws ProcessingException {
     try {
       setTableChanging(true);
@@ -2851,10 +2855,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException {
-    return addRows(newRows, markAsInserted, insertIndexes, false);
-  }
-
-  private List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes, boolean startObserving) throws ProcessingException {
     if (newRows == null) {
       return CollectionUtility.emptyArrayList();
     }
