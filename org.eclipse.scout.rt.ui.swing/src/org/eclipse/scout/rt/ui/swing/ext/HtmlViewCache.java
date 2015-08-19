@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext;
 
-import java.awt.Color;
 import java.util.HashMap;
 
 import javax.swing.JLabel;
@@ -18,8 +17,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.CompositeObject;
 
 /**
  * Since html rendering is very expensive in swing and tables render views every
@@ -41,32 +39,26 @@ public class HtmlViewCache {
 		m_viewMap = new HashMap<Object, View>();
 	}
 
-	/**
-	 * update html view using the cache
-	 */
-	public void updateHtmlView(JLabel label, boolean customForeground) {
-		String text = label.getText();
-		View value = null;
-		if (BasicHTML.isHTMLString(text)) {
-			if (!customForeground) {
-				label.setForeground(label.isEnabled() ? UIManager.getDefaults()
-						.getColor("TextField.foreground") : UIManager
-						.getDefaults().getColor("TextField.inactiveForeground"));
-			}
-
-			Color fg = label.getForeground();
-			// Key needs to be unique. To reduce memory usage the string is been
-			// compressed.
-			Object key = Base64Utility.encode(StringUtility.compress(text + "."
-					+ label.getFont() + "." + (fg != null ? fg.getRGB() : 0)));
-			value = m_viewMap.get(key);
-			if (value == null) {
-				value = BasicHTML.createHTMLView(label, text);
-				if (value != null) {
-					m_viewMap.put(key, value);
-				}
-			}
-		}
-		label.putClientProperty(BasicHTML.propertyKey, value);
-	}
+  /**
+   * update html view using the cache
+   */
+  public void updateHtmlView(JLabel label, boolean customForeground) {
+    String text = label.getText();
+    View value = null;
+    if (BasicHTML.isHTMLString(text)) {
+      if (!customForeground) {
+        label.setForeground(label.isEnabled() ? UIManager.getDefaults().getColor("TextField.foreground") : UIManager.getDefaults().getColor("TextField.inactiveForeground"));
+      }
+      // Key needs to be unique.
+      CompositeObject key = new CompositeObject(text, String.valueOf(label.getFont()), label.getForeground());
+      value = m_viewMap.get(key);
+      if (value == null) {
+        value = BasicHTML.createHTMLView(label, text);
+        if (value != null) {
+          m_viewMap.put(key, value);
+        }
+      }
+    }
+    label.putClientProperty(BasicHTML.propertyKey, value);
+  }
 }
