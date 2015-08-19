@@ -31,7 +31,8 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   this.$field.html(this.displayText);
   this.$field.find('.app-link')
     .on('click', this._onAppLinkAction.bind(this))
-    .attr('tabindex', '0');
+    .attr('tabindex', '0')
+    .unfocusable();
 
   // this method replaces the content, the scroll bars get lost -> render again (only necessary if already rendered, otherwise it is done by renderProperties)
   if (this.rendered) {
