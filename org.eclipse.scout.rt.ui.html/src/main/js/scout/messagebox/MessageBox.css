@@ -93,7 +93,7 @@
     border-bottom-right-radius: @border-radius;
   }
 
-  .severity-error & > button:focus::before {
+  .severity-error & > .button:focus::before {
     border-color: @error-border-color;
     #scout.glow(@error-glow-color);
   }

@@ -86,19 +86,25 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$buttons = $.makeDiv('file-chooser-buttons')
     .appendTo(this.$container);
   if (scout.device.supportsFile()) {
-    this.$addFileButton = $('<button>')
+    this.$addFileButton = $('<div>')
       .unfocusable()
+      .attr('tabindex', 0)
+      .addClass('button')
       .text(this.session.text('ui.Browse'))
       .on('click', this._onAddFileButtonClicked.bind(this))
       .appendTo(this.$buttons);
   }
-  this.$okButton = $('<button>')
+  this.$okButton = $('<div>')
+    .attr('tabindex', 0)
+    .addClass('button')
     .unfocusable()
     .attr('disabled', true)
     .text(this.session.text('ui.Upload'))
     .on('click', this._onOkButtonClicked.bind(this))
     .appendTo(this.$buttons);
-  this.$cancelButton = $('<button>')
+  this.$cancelButton = $('<div>')
+    .attr('tabindex', 0)
+    .addClass('button')
     .unfocusable()
     .text(this.session.text('Cancel'))
     .on('click', this._onCancelButtonClicked.bind(this))
@@ -116,8 +122,13 @@ scout.FileChooser.prototype._render = function($parent) {
   this._updateButtonWidths();
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 
   this.attached = true;
+};
+
+scout.FileChooser.prototype._createKeyStrokeAdapter = function(){
+  return new scout.MessageBoxKeyStrokeAdapter(this);
 };
 
 scout.FileChooser.prototype._postRender = function() {
