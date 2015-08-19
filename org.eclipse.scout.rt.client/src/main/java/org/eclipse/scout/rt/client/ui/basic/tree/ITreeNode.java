@@ -187,6 +187,13 @@ public interface ITreeNode {
   void resetFilterCache();
 
   /**
+   * FIXME CGU javadoc
+   */
+  List<ITreeNodeFilter> getRejectedBy();
+
+  void setRejectedBy(List<ITreeNodeFilter> filters);
+
+  /**
    * a dirty marked node is marked for child reload its children are reloaded on
    * the next ui call to {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
    * {@link ITreeUIFacade#setNodeSelectedAndExpandedFromUI(ITreeNode)}

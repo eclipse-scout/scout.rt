@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -25,6 +26,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   private ITreeNode m_parentNode;
   private ITreeNode m_resolvedNode;
   private boolean m_filterAccepted;
+  private List<ITreeNodeFilter> m_rejectedBy;
   private final Cell m_cell;
   private int m_childNodeIndex;
 
@@ -141,6 +143,19 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void resetFilterCache() {
+  }
+
+  @Override
+  public List<ITreeNodeFilter> getRejectedBy() {
+    if (m_rejectedBy == null) {
+      m_rejectedBy = new ArrayList<ITreeNodeFilter>();
+    }
+    return m_rejectedBy;
+  }
+
+  @Override
+  public void setRejectedBy(List<ITreeNodeFilter> filters) {
+    m_rejectedBy = CollectionUtility.arrayList(filters);
   }
 
   @Override

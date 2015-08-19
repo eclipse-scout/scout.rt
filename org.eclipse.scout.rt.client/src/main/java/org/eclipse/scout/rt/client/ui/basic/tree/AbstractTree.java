@@ -796,15 +796,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (inode == null) {
       return;
     }
+    List<ITreeNodeFilter> rejectedBy = new ArrayList<ITreeNodeFilter>();
     inode.setFilterAccepted(true);
     if (m_nodeFilters.size() > 0) {
       for (ITreeNodeFilter filter : m_nodeFilters) {
         if (!filter.accept(inode, level)) {
           inode.setFilterAccepted(false);
-          break;
+          rejectedBy.add(filter);
         }
       }
     }
+    inode.setRejectedBy(rejectedBy);
     if (!inode.isFilterAccepted() && isSelectedNode(inode)) {
       // invisible nodes cannot be selected
       deselectNode(inode);
@@ -2929,6 +2931,30 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       catch (ProcessingException se) {
         se.addContextMessage(nodes.toString());
         BEANS.get(ExceptionHandler.class).handle(se);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setFilteredNodesFromUI(List<? extends ITreeNode> nodes) {
+      try {
+        pushUIProcessor();
+        // Remove existing filter first, so that only one UserTableRowFilter is active
+        for (ITreeNodeFilter filter : getNodeFilters()) {
+          if (filter instanceof UserTreeNodeFilter) {
+            // Do not use removeRowFilter to prevent applyRowFilters
+            m_nodeFilters.remove(filter);
+          }
+        }
+        // Create and add a new filter
+        if (!nodes.isEmpty()) {
+          UserTreeNodeFilter filter = new UserTreeNodeFilter(nodes);
+          // Do not use addRowFilter to prevent applyRowFilters
+          m_nodeFilters.add(filter);
+        }
+        applyNodeFilters();
       }
       finally {
         popUIProcessor();
