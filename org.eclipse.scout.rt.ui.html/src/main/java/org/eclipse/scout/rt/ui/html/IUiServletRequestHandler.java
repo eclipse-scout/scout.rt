@@ -19,21 +19,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * This interceptor contributes to the {@link UiServlet}
+ * Interface for handlers contributing to the {@link UiServlet}.
  */
 @ApplicationScoped
-public interface IServletRequestInterceptor {
+public interface IUiServletRequestHandler {
 
   String MDC_SCOUT_SESSION_ID = "scout.session.id";
   String MDC_SCOUT_UI_SESSION_ID = "scout.ui.session.id";
 
   /**
-   * @return true if the request was consumed by the interceptor, no further action is then necessary
+   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
+   *         <code>false</code> is returned, other handlers may handle the request afterwards.
    */
-  boolean interceptPost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
   /**
-   * @return true if the request was consumed by the interceptor, no further action is then necessary
+   * @return <code>true</code> if the request was consumed by the handler, no further action is then necessary. If
+   *         <code>false</code> is returned, other handlers may handle the request afterwards.
    */
-  boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean handleGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 }

@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceLoader;
 
 public class BinaryResourceUrlUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryResourceUrlUtility.class);
@@ -97,10 +98,9 @@ public class BinaryResourceUrlUtility {
   }
 
   /**
-   * @return a relative URL for a resource handled by an adapter, see
-   *         {@link ResourceRequestInterceptor#loadDynamicAdapterResource(javax.servlet.http.HttpServletRequest, String)}
+   * @return a relative URL for a resource handled by an adapter, see {@link DynamicResourceLoader}.
    *         <p>
-   *         The calling adapter must implement {@link IBinaryResourceProvider}
+   *         The calling adapter must implement {@link IBinaryResourceProvider}.
    * @see #PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH
    */
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {

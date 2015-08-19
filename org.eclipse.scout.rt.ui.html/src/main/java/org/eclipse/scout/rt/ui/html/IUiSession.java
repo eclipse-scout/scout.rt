@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
@@ -59,7 +59,7 @@ public interface IUiSession {
   ReentrantLock uiSessionLock();
 
   /**
-   * All requests except the polling requests are calling this method from the {@link JsonMessageRequestInterceptor}
+   * All requests except the polling requests are calling this method from the {@link JsonMessageRequestHandler}
    * <p>
    * Note that {@link HttpSession#getLastAccessedTime()} is also updated on polling requests
    */

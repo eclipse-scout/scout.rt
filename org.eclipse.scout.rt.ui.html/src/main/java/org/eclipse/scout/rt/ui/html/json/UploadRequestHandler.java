@@ -37,7 +37,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
@@ -45,21 +44,16 @@ import org.json.JSONObject;
 import org.slf4j.MDC;
 
 /**
- * This interceptor contributes to the {@link UiServlet} as the POST handler for /upload
+ * This handler contributes to the {@link UiServlet} as the POST handler for /upload
  */
 @Order(30)
-public class UploadRequestInterceptor extends AbstractJsonRequestInterceptor implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestInterceptor.class);
+public class UploadRequestHandler extends AbstractJsonRequestHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UploadRequestHandler.class);
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   @Override
-  public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    return false;
-  }
-
-  @Override
-  public boolean interceptPost(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
+  public boolean handlePost(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
     //serve only /upload
     String pathInfo = httpReq.getPathInfo();
     Matcher matcher = PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH.matcher(pathInfo);

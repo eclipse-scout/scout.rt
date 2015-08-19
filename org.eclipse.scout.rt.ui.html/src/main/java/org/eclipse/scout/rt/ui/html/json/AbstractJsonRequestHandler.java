@@ -21,16 +21,16 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Base class for request interceptors dealing with JSON messages.
+ * Base class for request handlers dealing with JSON messages.
  */
-public abstract class AbstractJsonRequestInterceptor implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonRequestInterceptor.class);
+public abstract class AbstractJsonRequestHandler extends AbstractUiServletRequestHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonRequestHandler.class);
 
   protected JSONObject createUnrecoverableFailureResponse() {
     JsonResponse response = new JsonResponse();

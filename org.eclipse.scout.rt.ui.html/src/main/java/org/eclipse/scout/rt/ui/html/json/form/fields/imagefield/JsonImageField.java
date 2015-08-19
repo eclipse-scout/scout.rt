@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
+public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD>implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
 
   public static final String PROP_IMAGE_URL = "imageUrl";
 
@@ -146,7 +146,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   protected String getImageUrl() {
     if (getModel().getImage() != null) {
       // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
-      // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
+      // The client will request the image in a separate http request. See: ResourceRequestHandler
       BinaryResource imageResource = extractBinaryResource(getModel().getImage());
       if (imageResource != null) {
         return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource.getFilename());

@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
@@ -31,13 +31,13 @@ import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
 import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaderFactory;
 
 /**
- * This interceptor contributes to the {@link UiServlet} as the default GET handler for
+ * This handler contributes to the {@link UiServlet} as the default GET handler for
  * <p>
- * js, css, html, png, gif, jpg, woff, json
+ * /dynamic/*, /icon/*, *.js, *.css, *.html, *.png, *.gif, *.jpg, *.woff, *.json
  */
 @Order(20)
-public class ResourceRequestInterceptor implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestInterceptor.class);
+public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ResourceRequestHandler.class);
 
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
@@ -47,7 +47,7 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
   private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
 
   @Override
-  public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handleGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String resourcePath = resolveResourcePath(req);
 
     // Create loader for the requested resource type
@@ -101,11 +101,6 @@ public class ResourceRequestInterceptor implements IServletRequestInterceptor {
       resp.getOutputStream().write(resource.getResource().getContent());
     }
     return true;
-  }
-
-  @Override
-  public boolean interceptPost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    return false;
   }
 
   protected ResourceLoaderFactory resourceLoaderFactory() {

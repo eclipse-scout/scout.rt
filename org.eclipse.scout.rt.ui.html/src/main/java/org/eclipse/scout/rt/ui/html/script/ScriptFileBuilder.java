@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.ui.html.res.ResourceRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
@@ -34,8 +34,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * <p>
  * Version is <code>1.2.3</code> or <code>1.2.3-fingerprint</code> where fingerprint is a hex number
  * <p>
- * If the fingerprint is the text "fingerprint" then
- * {@link ResourceRequestInterceptor#resolveIndexHtml(javax.servlet.http.HttpServletRequest)} replaces it with the
+ * If the fingerprint is the text "fingerprint" then {@link HtmlFileLoader} replaces it with the
  * effective hex fingerprint.
  * <p>
  * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UiHints}

@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -32,23 +31,18 @@ import org.json.JSONObject;
 import org.slf4j.MDC;
 
 /**
- * This interceptor contributes to the {@link UiServlet} as the POST handler for /json.
+ * This handler contributes to the {@link UiServlet} as the POST handler for /json.
  * <p>
  * Provides the {@link MDC#put(String, String)} properties {@value #MDC_SCOUT_SESSION_ID}
  */
 @Order(10)
-public class JsonMessageRequestInterceptor extends AbstractJsonRequestInterceptor implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
+public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestHandler.class);
 
   private static final int BACKGROUND_POLLING_INTERVAL_SECONDS = 60;
 
   @Override
-  public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    return false;
-  }
-
-  @Override
-  public boolean interceptPost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /json
     String pathInfo = req.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {

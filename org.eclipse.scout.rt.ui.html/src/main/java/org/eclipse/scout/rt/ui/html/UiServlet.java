@@ -28,19 +28,19 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
-import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.res.ResourceRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
+import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
 
 /**
- * Instances of this class must be registered as servlet root path "/"
+ * Instances of this class must be registered global handler for "/*".
  * <p>
- * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link ResourceRequestInterceptor}
+ * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link ResourceRequestHandler}.
  * <p>
- * Scripts js and css are served using HTTP GET, see {@link ResourceRequestInterceptor}
+ * Scripts js and css are served using HTTP GET, see {@link ResourceRequestHandler}.
  * <p>
- * Images and fonts are served using HTTP GET, see {@link ResourceRequestInterceptor}
+ * Images and fonts are served using HTTP GET, see {@link ResourceRequestHandler}.
  * <p>
- * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
+ * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestHandler}.
  */
 public class UiServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
@@ -130,13 +130,13 @@ public class UiServlet extends HttpServlet {
         if (LOG.isDebugEnabled()) {
           LOG.debug("request started");
         }
-        List<IServletRequestInterceptor> interceptors = BEANS.all(IServletRequestInterceptor.class);
-        for (IServletRequestInterceptor interceptor : interceptors) {
-          if (intercept(interceptor, req, resp)) {
+        List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
+        for (IUiServletRequestHandler handler : handlers) {
+          if (delegateRequest(handler, req, resp)) {
             return;
           }
         }
-        // No interceptor was able to handle the request
+        // No handler was able to handle the request
         LOG.info("404_NOT_FOUND_POST: " + req.getPathInfo());
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
@@ -151,7 +151,7 @@ public class UiServlet extends HttpServlet {
       }
     }
 
-    protected abstract boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
   }
 
   protected class P_RequestHandlerGet extends P_AbstractRequestHandler {
@@ -176,8 +176,8 @@ public class UiServlet extends HttpServlet {
     }
 
     @Override
-    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptGet(UiServlet.this, req, resp);
+    protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      return handler.handleGet(UiServlet.this, req, resp);
     }
   }
 
@@ -188,8 +188,8 @@ public class UiServlet extends HttpServlet {
     }
 
     @Override
-    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptPost(UiServlet.this, req, resp);
+    protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      return handler.handlePost(UiServlet.this, req, resp);
     }
   }
 }
