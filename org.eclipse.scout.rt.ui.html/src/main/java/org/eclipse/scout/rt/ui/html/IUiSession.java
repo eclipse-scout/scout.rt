@@ -43,7 +43,7 @@ public interface IUiSession {
   /**
    * Cookie name used to store the preferred language of a user (even after user has logged out).
    */
-  String HTTP_COOKIE_LOCALE = "scout.locale";
+  String PREFERRED_LOCALE_COOKIE_NAME = "scout.preferredLocale";
 
   void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq);
 
@@ -139,8 +139,8 @@ public interface IUiSession {
   <M> List<IJsonAdapter<M>> getJsonAdapters(M model);
 
   /**
-   * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance.
-   * As a side-effect a newly created adapter is added to the current JSON response.
+   * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance. As a
+   * side-effect a newly created adapter is added to the current JSON response.
    */
   <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent);
 

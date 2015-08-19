@@ -97,8 +97,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
   /**
-   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
-   * The variable is accessed by different threads, thus it is an atomic reference.
+   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest() The variable is accessed by
+   * different threads, thus it is an atomic reference.
    */
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private HttpSession m_currentHttpSession;
@@ -316,8 +316,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId;
   }
 
-  private void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
-    Cookie cookie = new Cookie(HTTP_COOKIE_LOCALE, locale.toLanguageTag());
+  protected void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
+    Cookie cookie = new Cookie(PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
     cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
     resp.addCookie(cookie);
   }
@@ -534,8 +534,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   /**
    * Creates an adapter instance for the given model using {@link MainJsonObjectFactory} and calls the
-   * <code>init()</code> method
-   * on the created instance.
+   * <code>init()</code> method on the created instance.
    */
   public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent) {
     String id = createUniqueIdFor(null); // FIXME CGU
@@ -634,8 +633,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   /**
    * <b>Do not call this internal method directly!</b> It should only be called be
-   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required
-   * state is set up correctly (and will be cleaned up later) and is run as a model job.
+   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required state is set up
+   * correctly (and will be cleaned up later) and is run as a model job.
    */
   protected void processJsonRequestInternal() {
     jsonEventProcessor().processEvents(currentJsonRequest(), currentJsonResponse());
@@ -643,8 +642,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   /**
    * <b>Do not call this internal method directly!</b> It should only be called be
-   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required
-   * state is set up correctly (and will be cleaned up later) and is run as a model job.
+   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required state is set up
+   * correctly (and will be cleaned up later) and is run as a model job.
    */
   protected JSONObject responseToJsonInternal() {
     return currentJsonResponse().toJson();
@@ -778,9 +777,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   /**
-   * An instance of this class should be added to the HTTP session for each
-   * client session. If the HTTP session is invalidated, this listener is
-   * called and can shutdown the client session model.
+   * An instance of this class should be added to the HTTP session for each client session. If the HTTP session is
+   * invalidated, this listener is called and can shutdown the client session model.
    */
   protected static class P_ClientSessionCleanupHandler implements HttpSessionBindingListener {
 
