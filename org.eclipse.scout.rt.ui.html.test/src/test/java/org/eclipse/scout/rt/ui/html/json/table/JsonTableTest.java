@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -88,7 +90,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
+    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event);
 
     assertTrue(row.isSelected());
@@ -111,7 +113,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonSelectedEvent(null);
+    JsonEvent event = createJsonRowsSelectedEvent(null);
 
     jsonTable.handleUiEvent(event);
 
@@ -131,7 +133,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
+    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
@@ -161,7 +163,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
+    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
     assertFalse(row2.isSelected());
     assertFalse(row4.isSelected());
@@ -204,7 +206,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonSelectedEvent(null);
+    JsonEvent event = createJsonRowsSelectedEvent(null);
 
     assertTrue(row2.isSelected());
     assertFalse(row4.isSelected());
@@ -667,6 +669,237 @@ public class JsonTableTest {
   }
 
   /**
+   * If the rows are filtered using {@link UserTableRowFilter}, the rows must not be deleted from json table and no
+   * delete event must be sent -> gui knows which rows are filtered and keeps the invisible rows in memory
+   */
+  @Test
+  public void testUserRowFilter() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+    ITableRow row2 = table.getRow(2);
+
+    jsonTable.toJson();
+
+    String row0Id = jsonTable.getOrCreatedRowId(row0);
+    String row2Id = jsonTable.getOrCreatedRowId(row2);
+
+    JsonEvent event = createJsonRowsFilteredEvent(row0Id, row2Id);
+    jsonTable.handleUiEvent(event);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
+    assertEquals(3, jsonTable.tableRowIdsMap().size());
+
+    // expect that NO delete event is sent
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_DELETED);
+    assertTrue(responseEvents.size() == 0);
+  }
+
+  /**
+   * If toJson is called and a user filter is active, every row must be returned and not only the filtered ones
+   */
+  @Test
+  public void testUserRowFilter_toJson() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+    ITableRow row2 = table.getRow(2);
+
+    List<ITableRow> filteredRows = new ArrayList<ITableRow>();
+    filteredRows.add(row0);
+    filteredRows.add(row2);
+    table.getUIFacade().setFilteredRowsFromUI(filteredRows);
+
+    jsonTable.toJson();
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
+    assertEquals(3, jsonTable.tableRowIdsMap().size());
+  }
+
+  @Test
+  public void testUserRowFilter_UpdateEvent() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    // Simulate that the full table is sent to the UI
+    jsonTable.toJson();
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // Now reject the first row
+    ITableRow row0 = table.getRow(0);
+    ITableRow row1 = table.getRow(1);
+    ITableRow row2 = table.getRow(2);
+    String row0Id = jsonTable.getOrCreatedRowId(row0);
+    String row1Id = jsonTable.getOrCreatedRowId(row1);
+    String row2Id = jsonTable.getOrCreatedRowId(row2);
+    assertNotNull(row0Id);
+    assertNotNull(jsonTable.getTableRow(row0Id));
+
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() > 0; // hide first row
+      }
+    });
+
+    // and reject the third row by the user row filter
+    JsonEvent event = createJsonRowsFilteredEvent(row0Id, row1Id);
+    jsonTable.handleUiEvent(event);
+
+    // Update the (now hidden) row 0 --> should not trigger an update event, because the row does not exist in the UI
+    row0.getCellForUpdate(0).setValue("Updated text");
+    row2.getCellForUpdate(0).setValue("Updated text");
+
+    // We expect the first row to be removed from the table, but not the third row
+    assertEquals(3, table.getRowCount());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+    //TODO BSH CGU delete ? assertEquals(6, jsonTable.eventBuffer().size()); // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED = TYPE_ROWS_DELETED + TYPE_ROWS_INSERTED + TYPE_ROWS_UPDATED (row0) + TYPE_ROWS_UPDATED (row2)
+
+    // Rejection of row 0 generates a deleted event, rejection of row 2 an update event
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    List<JsonEvent> eventList = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(2, eventList.size());
+    JsonEvent jsonEvent = eventList.get(0);
+    assertEquals("rowsDeleted", jsonEvent.getType());
+    assertEquals(1, jsonEvent.getData().getJSONArray(JsonTable.PROP_ROW_IDS).length());
+    assertEquals(row0Id, jsonEvent.getData().getJSONArray(JsonTable.PROP_ROW_IDS).get(0));
+    jsonEvent = eventList.get(1);
+    assertEquals("rowsUpdated", jsonEvent.getType());
+    assertEquals(1, jsonEvent.getData().getJSONArray("rows").length());
+    assertEquals(row2Id, ((JSONObject) jsonEvent.getData().getJSONArray("rows").get(0)).getString("id"));
+  }
+
+  /**
+   * If the rows are filtered using {@link UserTableRowFilter}, the rows must not be deleted from json table and no
+   * delete event must be sent, EXCEPT if the row is filtered by a model based row filter. In that case rows must be
+   * deleted in the ui.
+   */
+  @Test
+  public void testUserRowFilter_AndAnotherRowFilter() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+    ITableRow row2 = table.getRow(2);
+
+    jsonTable.toJson();
+
+    String row0Id = jsonTable.getOrCreatedRowId(row0);
+    String row2Id = jsonTable.getOrCreatedRowId(row2);
+
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() > 0; // hide first row
+      }
+    });
+
+    JsonEvent event = createJsonRowsFilteredEvent(row0Id, row2Id);
+    jsonTable.handleUiEvent(event);
+
+    // In the model, 3 rows exist, but only 1 is visible (accepted by filters), in the ui 2 rows exist and 1 is visible
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertEquals(3, table.getRowCount());
+    assertEquals(1, table.getFilteredRowCount());
+    assertEquals(2, jsonTable.tableRowIdsMap().size());
+
+    // expect that first row gets deleted because a "real" row filter does not accept the first row
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_DELETED);
+    assertTrue(responseEvents.size() == 1);
+  }
+
+  /**
+   * JsonTable generates an allRowsDeleted event if a row is deleted and filteredRowCount is 0. This must not happen if
+   * the row has been filtered by the user.
+   */
+  @Test
+  public void testUserRowFilter_preventAllRowsDeleted() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(2);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+
+    jsonTable.toJson();
+
+    String row0Id = jsonTable.getOrCreatedRowId(row0);
+
+    JsonEvent event = createJsonRowsFilteredEvent(row0Id);
+    jsonTable.handleUiEvent(event);
+
+    table.deleteRow(row0);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertEquals(1, table.getRowCount());
+    assertEquals(0, table.getFilteredRowCount());
+    assertEquals(1, jsonTable.tableRowIdsMap().size());
+
+    // expect that NO deleteAll event is sent
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ALL_ROWS_DELETED);
+    assertTrue(responseEvents.size() == 0);
+  }
+
+  /**
+   * JsonTable generates an allRowsDeleted event if a row is deleted and filteredRowCount is 0. This happens only if a
+   * filter is active, otherwise table generates a all rows deleted event by itself
+   */
+  @Test
+  public void testAllRowsDeleted_whenFilterActive() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(2);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+
+    jsonTable.toJson();
+
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() == 0; // hide second row
+      }
+    });
+
+    table.deleteRow(row0);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertEquals(1, table.getRowCount());
+    assertEquals(0, table.getFilteredRowCount());
+    assertEquals(0, jsonTable.tableRowIdsMap().size());
+
+    // expect that deleteAll event is sent
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ALL_ROWS_DELETED);
+    assertTrue(responseEvents.size() == 1);
+  }
+
+  /**
    * Tests that multiple model events are coalseced in JSON layer
    */
   @Test
@@ -855,7 +1088,7 @@ public class JsonTableTest {
     return table;
   }
 
-  public static JsonEvent createJsonSelectedEvent(String rowId) throws JSONException {
+  public static JsonEvent createJsonRowsSelectedEvent(String rowId) throws JSONException {
     String tableId = "x"; // never used
     JSONObject data = new JSONObject();
     JSONArray rowIds = new JSONArray();
@@ -864,6 +1097,19 @@ public class JsonTableTest {
     }
     data.put(JsonTable.PROP_ROW_IDS, rowIds);
     return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SELECTED, data);
+  }
+
+  public static JsonEvent createJsonRowsFilteredEvent(String... rowIds) throws JSONException {
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
+    JSONArray jsonRowIds = new JSONArray();
+    if (rowIds != null) {
+      for (String rowId : rowIds) {
+        jsonRowIds.put(rowId);
+      }
+    }
+    data.put(JsonTable.PROP_ROW_IDS, jsonRowIds);
+    return new JsonEvent(tableId, JsonTable.EVENT_ROWS_FILTERED, data);
   }
 
   public static JsonEvent createJsonColumnMovedEvent(String columnId, int index) throws JSONException {

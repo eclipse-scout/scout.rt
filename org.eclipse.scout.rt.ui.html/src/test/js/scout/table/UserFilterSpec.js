@@ -184,21 +184,21 @@ describe("UserFilter", function() {
         expect(listener._onRowsFiltered).toHaveBeenCalled();
       });
 
-      it("gets fired if rows are filtered", function() {
-        var model = helper.createModelFixture(2, 2),
-          table = helper.createTable(model),
-          column0 = table.columns[0];
-
-        table.render(session.$entryPoint);
-
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
-
-        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
-        table.filter();
-
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
-      });
+//      it("gets fired if filter is resetted", function() {
+//        var model = helper.createModelFixture(2, 2),
+//          table = helper.createTable(model),
+//          column0 = table.columns[0];
+//
+//        table.render(session.$entryPoint);
+//
+//        spyOn(listener, '_onRowsFiltered');
+//        table.on('rowsFiltered', listener._onRowsFiltered);
+//
+//        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+//        table.resetFilter();
+//
+//        expect(listener._onRowsFiltered).toHaveBeenCalled();
+//      });
 
       it("gets fired if rows are filtered during updateRows", function() {
         var model = helper.createModelFixture(2, 2),
@@ -244,6 +244,24 @@ describe("UserFilter", function() {
         expect(table.filteredRows().length).toBe(1);
         expect(listener._onRowsFiltered).not.toHaveBeenCalled();
       });
+
+//      it("gets sent to server containing rowIds when rows are filtered", function() {
+//        var model = helper.createModelFixture(2, 5);
+//        var table = helper.createTable(model);
+//        table.render(session.$entryPoint);
+//
+//        var rows = [table.rows[0], table.rows[4]];
+//        table.selectRows(rows, true);
+//
+//        sendQueuedAjaxCalls();
+//
+//        expect(jasmine.Ajax.requests.count()).toBe(1);
+//
+//        var event = new scout.Event(table.id, 'rowsSelected', {
+//          rowIds: helper.getRowIds(rows)
+//        });
+//        expect(mostRecentJsonRequest()).toContainEvents(event);
+//      });
     });
   });
 });

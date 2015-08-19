@@ -127,7 +127,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
 scout.Table.prototype.handleAppLinkAction = function(event) {
   var $appLink = $(event.target);
   var column = this._columnAtX($appLink.offset().left);
-  this.sendAppLinkAction(column.id, $appLink.data('ref'));
+  this._sendAppLinkAction(column.id, $appLink.data('ref'));
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -214,18 +214,18 @@ scout.Table.prototype._render = function($parent) {
       $appLink = that._find$AppLink(event);
     }
     if ($appLink) {
-      that.sendAppLinkAction(column.id, $appLink.data('ref'));
+      that._sendAppLinkAction(column.id, $appLink.data('ref'));
     } else if (column.guiOnly) {
-      that.sendRowClicked($row, mouseButton);
+      that._sendRowClicked($row, mouseButton);
     } else {
-      that.sendRowClicked($row, mouseButton, column.id);
+      that._sendRowClicked($row, mouseButton, column.id);
     }
   }
 
   function onDoubleClick(event) {
     var $row = $(event.currentTarget),
       column = that._columnAtX(event.pageX);
-    that.sendRowAction($row, column.id);
+    that._sendRowAction($row, column.id);
   }
 
   this.attached = true;
@@ -344,6 +344,14 @@ scout.Table.prototype._createHeader = function() {
 
 scout.Table.prototype._createFooter = function() {
   return new scout.TableFooter(this);
+};
+
+scout.Table.prototype.reload = function() {
+  this._sendReload();
+};
+
+scout.Table.prototype.exportToClipboard = function() {
+  this._sendExportToClipboard();
 };
 
 scout.Table.prototype.clearSelection = function(dontFire) {
@@ -858,7 +866,7 @@ scout.Table.prototype._updateMenuBar = function() {
 
 scout.Table.prototype.notifyRowSelectionFinished = function() {
   if (this._sendRowsPending) {
-    this.sendRowsSelected(this._rowsToIds(this.selectedRows));
+    this._sendRowsSelected(this._rowsToIds(this.selectedRows));
     this._sendRowsPending = false;
   }
   this._triggerRowsSelected();
@@ -880,7 +888,7 @@ scout.Table.prototype.onResize = function() {
   this.htmlComp.revalidateLayoutTree();
 };
 
-scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
+scout.Table.prototype._sendRowClicked = function($row, mouseButton, columnId) {
   var data = {
     rowId: $row.data('row').id,
     mouseButton: mouseButton
@@ -899,10 +907,10 @@ scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
  */
 scout.Table.prototype.prepareCellEdit = function(rowId, columnId, openFieldPopupOnCellEdit) {
   this.openFieldPopupOnCellEdit = scout.helpers.nvl(openFieldPopupOnCellEdit, false);
-  this.sendPrepareCellEdit(rowId, columnId);
+  this._sendPrepareCellEdit(rowId, columnId);
 };
 
-scout.Table.prototype.sendPrepareCellEdit = function(rowId, columnId) {
+scout.Table.prototype._sendPrepareCellEdit = function(rowId, columnId) {
   var data = {
     rowId: rowId,
     columnId: columnId
@@ -910,21 +918,21 @@ scout.Table.prototype.sendPrepareCellEdit = function(rowId, columnId) {
   this.remoteHandler(this.id, 'prepareCellEdit', data);
 };
 
-scout.Table.prototype.sendCompleteCellEdit = function(fieldId) {
+scout.Table.prototype._sendCompleteCellEdit = function(fieldId) {
   var data = {
     fieldId: fieldId
   };
   this.remoteHandler(this.id, 'completeCellEdit', data);
 };
 
-scout.Table.prototype.sendCancelCellEdit = function(fieldId) {
+scout.Table.prototype._sendCancelCellEdit = function(fieldId) {
   var data = {
     fieldId: fieldId
   };
   this.remoteHandler(this.id, 'cancelCellEdit', data);
 };
 
-scout.Table.prototype.sendRowsChecked = function(rows) {
+scout.Table.prototype._sendRowsChecked = function(rows) {
   var data = {
     rows: []
   };
@@ -939,27 +947,33 @@ scout.Table.prototype.sendRowsChecked = function(rows) {
   this.remoteHandler(this.id, 'rowsChecked', data);
 };
 
-scout.Table.prototype.sendRowsSelected = function(rowIds) {
+scout.Table.prototype._sendRowsSelected = function(rowIds) {
   this.remoteHandler(this.id, 'rowsSelected', {
     rowIds: rowIds
   });
 };
 
-scout.Table.prototype.sendRowAction = function($row, columnId) {
+scout.Table.prototype._sendRowsFiltered = function(rowIds) {
+  this.remoteHandler(this.id, 'rowsFiltered', {
+    rowIds: rowIds
+  });
+};
+
+scout.Table.prototype._sendRowAction = function($row, columnId) {
   this.remoteHandler(this.id, 'rowAction', {
     rowId: $row.data('row').id,
     columnId: columnId
   });
 };
 
-scout.Table.prototype.sendAppLinkAction = function(columnId, ref) {
+scout.Table.prototype._sendAppLinkAction = function(columnId, ref) {
   this.remoteHandler(this.id, 'appLinkAction', {
     columnId: columnId,
     ref: ref
   });
 };
 
-scout.Table.prototype.sendReload = function() {
+scout.Table.prototype._sendReload = function() {
   if (this.hasReloadHandler) {
     this.$data.empty();
     // scoll bar must be (re)installed after all content has been removed (because also scrollbars are removed)..
@@ -970,7 +984,7 @@ scout.Table.prototype.sendReload = function() {
   }
 };
 
-scout.Table.prototype.sendExportToClipboard = function() {
+scout.Table.prototype._sendExportToClipboard = function() {
   this.remoteHandler(this.id, 'exportToClipboard');
 };
 
@@ -1197,7 +1211,7 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
           .css('text-align', alignment);
       } else {
         $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
-        .css('text-align', alignment);
+          .css('text-align', alignment);
       }
     } else {
       $cell = $.makeDiv('table-cell', '&nbsp').addClass('empty');
@@ -1335,7 +1349,7 @@ scout.Table.prototype.checkRow = function(row, checked) {
   }
   row.checked = checked;
   updatedRows.push(row);
-  this.sendRowsChecked(updatedRows);
+  this._sendRowsChecked(updatedRows);
   if (this.rendered) {
     this._renderRowChecked(row);
   }
@@ -1586,7 +1600,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
     }
     if (!ongoingSelection) {
       this._triggerRowsSelected();
-      this.sendRowsSelected(this._rowsToIds(this.selectedRows));
+      this._sendRowsSelected(this._rowsToIds(this.selectedRows));
     } else {
       this._sendRowsPending = true;
     }
@@ -1601,7 +1615,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
     this.selectedRows = rows;
     // FIXME CGU send delayed in case of key navigation
     if (notifyServer) {
-      this.sendRowsSelected(this._rowsToIds(rows));
+      this._sendRowsSelected(this._rowsToIds(rows));
     }
   }
 
@@ -1647,6 +1661,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
       filteredRows.push(row);
     }
   }
+  //FIXME CGU maybe cache, every listener reads filter count -> a lot of loops
   return filteredRows;
 };
 
@@ -1733,7 +1748,7 @@ scout.Table.prototype.filter = function() {
 
     show = that._rowAcceptedByFilters($row);
     if (show) {
-    if ($row.hasClass('invisible')) {
+      if ($row.hasClass('invisible')) {
         rowsToShow.push(row);
       }
       rowCount++;
@@ -1765,6 +1780,7 @@ scout.Table.prototype._rowsFiltered = function(invisibleRows) {
   this.deselectRows(invisibleRows);
 
   // notify
+  this._sendRowsFiltered(this._rowsToIds(this.filteredRows()));
   this._triggerRowsFiltered();
 };
 
@@ -1810,21 +1826,14 @@ scout.Table.prototype.filteredBy = function() {
 };
 
 scout.Table.prototype.resetFilter = function() {
-  // reset rows
-  if (this.rendered) {
-    var that = this;
-    var $rows = this.$rows();
-    $rows.each(function() {
-      that.showRow($(this), ($rows.length <= that.animationRowLimit));
-    });
-    this._group();
-  }
-
   // remove filters
   for (var key in this._filterMap) {
     this.unregisterFilter(key);
   }
   this._filterMap = {};
+
+  // reset rows
+  this.filter();
   this._triggerFilterResetted();
 };
 
@@ -1926,7 +1935,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
     .css('max-width', width);
   if (scout.device.tableAdditionalDivRequired) {
     this.$cellsForColIndexWidthFix(colNum, true)
-      .css('max-width', (width - this.cellHorizontalPadding - 2 /* unknown IE9 extra space */));
+      .css('max-width', (width - this.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ));
     // same calculation in scout.Column.prototype.buildCell;
   }
   this.$rows(true)
@@ -2048,6 +2057,7 @@ scout.Table.prototype._triggerRowsSelected = function() {
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
+  //FIXME CGU create all rows filtered event
   this.events.trigger(scout.Table.GUI_EVENT_ROWS_FILTERED);
 };
 
@@ -2110,9 +2120,10 @@ scout.Table.prototype._syncMenus = function(menus) {
 };
 
 scout.Table.prototype._syncFilters = function(filters) {
-  if (!filters) {
-    this.resetFilter();
-  } else {
+  for (var key in this._filterMap) {
+    this.unregisterFilter(key);
+  }
+  if (filters) {
     filters.forEach(function(filterData) {
       if (filterData.column) {
         filterData.column = this.columnById(filterData.column);
@@ -2121,6 +2132,11 @@ scout.Table.prototype._syncFilters = function(filters) {
       var filter = this.session.objectFactory.create(filterData);
       this.registerFilter(filter);
     }, this);
+  }
+
+  // if filters change after initialization, call filter
+  if (this.rendered) {
+    this.filter();
   }
 };
 

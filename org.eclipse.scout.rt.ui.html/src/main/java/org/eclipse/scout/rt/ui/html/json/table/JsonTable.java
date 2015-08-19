@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -47,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -104,6 +106,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
   public static final String EVENT_ADD_FILTER = "addFilter";
   public static final String EVENT_REMOVE_FILTER = "removeFilter";
+  public static final String EVENT_ROWS_FILTERED = "rowsFiltered";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -362,8 +365,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     putProperty(json, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     putAdapterIdsProperty(json, ITable.PROP_KEY_STROKES, getModel().getKeyStrokes());
     JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : getModel().getFilteredRows()) {
-      if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
+    for (ITableRow row : getModel().getRows()) {
+      if (!isRowAccepted(row)) {
         continue;
       }
       JSONObject jsonRow = tableRowToJson(row);
@@ -433,6 +436,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
     else if (EVENT_REMOVE_FILTER.equals(event.getType())) {
       handleUiRemoveFilter(event);
+    }
+    else if (EVENT_ROWS_FILTERED.equals(event.getType())) {
+      handleUiRowsFiltered(event);
     }
     else {
       super.handleUiEvent(event);
@@ -678,6 +684,11 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
+  protected void handleUiRowsFiltered(JsonEvent event) {
+    List<ITableRow> tableRows = extractTableRows(event.getData());
+    getModel().getUIFacade().setFilteredRowsFromUI(tableRows);
+  }
+
   protected JSONObject tableRowToJson(ITableRow row) {
     JSONArray jsonCells = new JSONArray();
     for (IColumn<?> column : getModel().getColumnSet().getColumns()) {
@@ -739,7 +750,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   protected JSONArray rowIdsToJson(Collection<ITableRow> modelRows) {
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
+      if (!isRowAccepted(row)) {
         continue;
       }
       String rowId = getTableRowId(row);
@@ -749,6 +760,28 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       jsonRowIds.put(rowId);
     }
     return jsonRowIds;
+  }
+
+  /*
+   * Ignore deleted or filtered rows, because for the UI, they don't exist
+   */
+  protected boolean isRowAccepted(ITableRow row) {
+    if (row.isStatusDeleted()) {
+      return false;
+    }
+    if (!row.isFilterAccepted()) {
+      // Accept if rejected by user row filter because gui is and should be aware of that row
+      return isRowRejectedByUserRowFilter(row);
+    }
+    return true;
+  }
+
+  /**
+   * @return true if only the user row filter has rejected the row
+   */
+  protected boolean isRowRejectedByUserRowFilter(ITableRow row) {
+    List<ITableRowFilter> rejectedBy = row.getRejectedBy();
+    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof UserTableRowFilter;
   }
 
   protected List<ITableRow> extractTableRows(JSONObject json) {
@@ -855,7 +888,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
               rowsToInsert.add(row);
             }
           }
-          else {
+          else if (!isRowRejectedByUserRowFilter(row)) {
             if (existingRowId != null) {
               // Row is filtered, but JsonTable has it in its list --> handle as deletion event
               rowsToDelete.add(row);
@@ -939,7 +972,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   protected void handleModelRowsInserted(Collection<ITableRow> modelRows) {
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
+      if (!isRowAccepted(row)) {
         continue;
       }
       JSONObject jsonRow = tableRowToJson(row);
@@ -956,7 +989,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
+      if (!isRowAccepted(row)) {
         continue;
       }
       JSONObject jsonRow = tableRowToJson(row);
@@ -974,7 +1007,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     if (modelRows.isEmpty()) {
       return;
     }
-    if (getModel().getFilteredRowCount() == 0) {
+    if (getFilteredRowCount() == 0) {
       handleModelAllRowsDeleted();
       return;
     }
@@ -995,6 +1028,22 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
   }
 
+  /**
+   * @return the filtered row count excluding rows filtered by the user
+   */
+  protected int getFilteredRowCount() {
+    if (getModel().getRowFilters().size() == 0) {
+      return getModel().getRowCount();
+    }
+    int filteredRowCount = 0;
+    for (ITableRow row : getModel().getRows()) {
+      if (row.isFilterAccepted() || isRowRejectedByUserRowFilter(row)) {
+        filteredRowCount++;
+      }
+    }
+    return filteredRowCount;
+  }
+
   protected void handleModelAllRowsDeleted() {
     if (m_tableRows.isEmpty()) {
       return;
@@ -1013,7 +1062,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   protected void handleModelRowsChecked(Collection<ITableRow> modelRows) {
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
+      if (!isRowAccepted(row)) {
         continue;
       }
       JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
@@ -1032,7 +1081,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
+      if (!isRowAccepted(row)) {
         continue;
       }
       jsonRowIds.put(getTableRowId(row));

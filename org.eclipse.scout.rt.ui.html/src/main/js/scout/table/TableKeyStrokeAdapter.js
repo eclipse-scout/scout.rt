@@ -119,7 +119,7 @@ scout.inherits(scout.TableRefreshKeyStroke, scout.KeyStroke);
  * @Override
  */
 scout.TableRefreshKeyStroke.prototype.handle = function(event) {
-  this._table.sendReload();
+  this._table.reload();
   event.preventDefault();
 };
 
@@ -147,6 +147,6 @@ scout.inherits(scout.TableCopyKeyStroke, scout.KeyStroke);
  * @Override
  */
 scout.TableCopyKeyStroke.prototype.handle = function(event) {
-  this._table.sendExportToClipboard();
+  this._table.exportToClipboard();
   event.preventDefault();
 };

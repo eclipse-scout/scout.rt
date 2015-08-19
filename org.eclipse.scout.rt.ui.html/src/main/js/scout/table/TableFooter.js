@@ -80,10 +80,6 @@ scout.TableFooter.prototype._render = function($parent) {
     this._updateInfoFilterVisibility();
   }.bind(this));
 
-  this._table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    this._setInfoVisible(this._$infoFilter, false);
-  }.bind(this));
-
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
     var numRows = 0;
     if (event.rows) {
@@ -262,7 +258,7 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
 };
 
 scout.TableFooter.prototype._onClickInfoLoad = function() {
-  this._table.sendReload();
+  this._table.reload();
 };
 
 scout.TableFooter.prototype._onClickInfoFilter = function() {
