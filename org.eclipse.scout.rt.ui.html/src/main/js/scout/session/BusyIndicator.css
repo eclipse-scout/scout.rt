@@ -76,46 +76,47 @@
 
 .busyindicator-buttons {
 
-  & button {
+  & .button {
     position: relative;
     padding: 12px;
     background-color: @palette-gray-2;
     border: 1px solid @color-busyindicator-border;
     cursor: pointer;
+    text-align: center;
     #scout.overflow-ellipsis-nowrap();
   }
 
-  & > button:active {
+  & > .button:active {
     background-color: @palette-gray-3;
   }
 
-  & > button:first-child {
+  & > .button:first-child {
     border-bottom-left-radius: @border-radius;
   }
 
-  & > button:last-child {
+  & > .button:last-child {
     border-bottom-right-radius: @border-radius;
   }
 
-  & > button:first-child ~ button {
+  & > .button:first-child ~ button {
     border-left-width: 0px;
   }
 
-  & > button:focus {
+  & > .button:focus {
     outline: none;
   }
 
-  & > button:focus::before {
+  & > .button:focus::before {
     #scout.focus-border();
     #scout.overlay(2px, 2px, -4px, -4px);
     z-index: 1;
   }
 
-  & > button:first-child:focus::before {
+  & > .button:first-child:focus::before {
     border-bottom-left-radius: @border-radius;
   }
 
-  & > button:last-child:focus::before {
+  & > .button:last-child:focus::before {
     border-bottom-right-radius: @border-radius;
   }
 }

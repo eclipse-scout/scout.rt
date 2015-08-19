@@ -163,7 +163,7 @@ scout.MessageBox.prototype._onMessageBoxClosed = function(event) {
 scout.MessageBox.prototype._updateButtonWidths = function() {
   // Find all visible buttons
   var $visibleButtons = [];
-  this.$container.find('button').each(function() {
+  this.$container.find('.button').each(function() {
     var $button = $(this);
     if ($button.isVisible()) {
       $visibleButtons.push($button);

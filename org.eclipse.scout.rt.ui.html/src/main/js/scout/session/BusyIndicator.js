@@ -54,6 +54,12 @@ scout.BusyIndicator.prototype._render = function($parent) {
     // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
     this.session.focusManager.validateFocus();
   }.bind(this), 2500);
+
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+};
+
+scout.BusyIndicator.prototype._createKeyStrokeAdapter = function() {
+  return new scout.BusyIndicatorKeyStrokeAdapter(this);
 };
 
 scout.BusyIndicator.prototype._onClickCancel = function(event) {

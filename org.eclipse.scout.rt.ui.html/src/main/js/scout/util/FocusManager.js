@@ -166,7 +166,7 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
  * Finds the first focusable element of the given $container, or null if not found.
  */
 scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
-  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents,
+  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents, $messageBoxButtons,
     $candidates = $container
       .find(':focusable')
       .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
@@ -192,10 +192,11 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
 
     $menuParents = $(candidate).parents('div.menubar');
     $tabParents = $(candidate).parents('div.tab-area');
-    if (!firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) { // TODO [nbu] menu-items are not focusable, why this check?
+    $messageBoxButtons = $(candidate).parents('div.messagebox-buttons');
+    if (!firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
       firstButton = candidate;
-    } else if (!$menuParents.length && !$tabParents.length && typeof candidate.focus === 'function') {
-      return candidate; // TODO [nbu] why is this necessary? is immediate return correct?
+    } else if (!$menuParents.length && !$tabParents.length && !$messageBoxButtons.length && typeof candidate.focus === 'function') {
+      return candidate;
     }
   }
 

@@ -8,8 +8,10 @@ scout.MessageBoxButtons = function($parent, onClickHandler) {
 
 scout.MessageBoxButtons.prototype.renderButton = function(option, text) {
   text = scout.strings.removeAmpersand(text);
-  return $('<button>')
+  return $('<div>')
     .text(text)
+    .attr('tabindex', 0)
+    .addClass('button')
     .unfocusable()
     .on('click', this._onClick.bind(this))
     .data('buttonOption', option)
