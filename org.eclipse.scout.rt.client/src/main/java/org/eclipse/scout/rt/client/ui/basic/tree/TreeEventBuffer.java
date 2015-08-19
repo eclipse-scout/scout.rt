@@ -77,9 +77,9 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
    * Removes the given 'nodesToRemove' from all 'events'. Recursive child nodes are also removed (but will not be
    * returned). The event list is traversed backwards.
    *
-   * @return a list with the same nodes as 'nodesToRemove', except those that were removed from an
-   *         event whose type matches one of the 'creationTypes'. This allows for completely removing
-   *         a node that was created and deleted in the same request.
+   * @return a list with the same nodes as 'nodesToRemove', except those that were removed from an event whose type
+   *         matches one of the 'creationTypes'. This allows for completely removing a node that was created and deleted
+   *         in the same request.
    */
   protected List<ITreeNode> removeNodesFromPreviousEvents(Collection<ITreeNode> nodesToRemove, List<TreeEvent> events, Integer... creationTypes) {
     List<Integer> creationTypesList = Arrays.asList(creationTypes);
@@ -120,24 +120,33 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     Collection<ITreeNode> nodes = event.getNodes();
     for (Iterator<ITreeNode> it = nodes.iterator(); it.hasNext();) {
       ITreeNode node = it.next();
-      if (node == nodeToRemove) {
+      if (CompareUtility.equals(node, nodeToRemove)) {
         it.remove();
       }
     }
-    return replaceNodesInEvent(event, nodes);
+    return replaceNodesInEvent(event, event.getCommonParentNode(), nodes);
+  }
+
+  /**
+   * Serves as a replacement for the missing "event.setNodes()" method. The same "common parent node" as in the given
+   * event is used. If you want to replace the common parent node, use
+   * {@link #replaceNodesInEvent(TreeEvent, ITreeNode, Collection)}.
+   */
+  protected TreeEvent replaceNodesInEvent(TreeEvent event, Collection<ITreeNode> nodes) {
+    return replaceNodesInEvent(event, event.getCommonParentNode(), nodes);
   }
 
   /**
    * Serves as a replacement for the missing "event.setNodes()" method.
    */
-  protected TreeEvent replaceNodesInEvent(TreeEvent event, Collection<ITreeNode> nodes) {
-    return new TreeEvent(event.getTree(), event.getType(), event.getCommonParentNode(), nodes);
+  protected TreeEvent replaceNodesInEvent(TreeEvent event, ITreeNode commonParentNode, Collection<ITreeNode> nodes) {
+    return new TreeEvent(event.getTree(), event.getType(), commonParentNode, nodes);
   }
 
   /**
-   * Traverses the given list of events backwards, and checks for each event of type 'newType'
-   * if there is an older event of type 'oldType' that already contains the same nodes. If yes,
-   * the corresponding nodes are removed from the newer event.
+   * Traverses the given list of events backwards, and checks for each event of type 'newType' if there is an older
+   * event of type 'oldType' that already contains the same nodes. If yes, the corresponding nodes are removed from the
+   * newer event.
    * <p>
    * Example: INSERT(A[B,C[E],D]), UPDATE(C[E],F) => UPDATE(C[E]) can be removed because INSERT already contains C[E] as
    * child of A.
@@ -185,7 +194,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
    */
   protected boolean containsNodeRec(Collection<ITreeNode> nodes, ITreeNode nodeToFind) {
     for (ITreeNode node : nodes) {
-      if (node == nodeToFind) {
+      if (CompareUtility.equals(node, nodeToFind)) {
         return true;
       }
       if (containsNodeRec(node.getChildNodes(), nodeToFind)) {
@@ -227,8 +236,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Merge events of the same type in the given list into the current and delete the other events
-   * from the list.
+   * Merge events of the same type in the given list into the current and delete the other events from the list.
    *
    * @return the updated event (with other events merged into it)
    */
@@ -249,13 +257,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected boolean hasSameCommonParentNode(TreeEvent event1, TreeEvent event2) {
     ITreeNode node1 = event1.getCommonParentNode();
     ITreeNode node2 = event2.getCommonParentNode();
-    if (node1 == null && node2 == null) {
-      return true;
-    }
-    else if (node1 != null && node2 != null) {
-      return (node1 == node2);
-    }
-    return false;
+    return CompareUtility.equals(node1, node2);
   }
 
   /**
@@ -266,8 +268,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Merge list of nodes, such that, if the same node is in both lists, only the one of the second list (later
-   * event) is kept.
+   * Merge list of nodes, such that, if the same node is in both lists, only the one of the second list (later event) is
+   * kept.
    */
   protected List<ITreeNode> mergeNodes(Collection<ITreeNode> first, Collection<ITreeNode> second) {
     List<ITreeNode> nodes = new ArrayList<>();
@@ -285,7 +287,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected void removeEmptyEvents(List<TreeEvent> events) {
     for (Iterator<TreeEvent> it = events.iterator(); it.hasNext();) {
       TreeEvent event = it.next();
-      if (isNodesRequired(event.getType()) && event.getNodes().isEmpty()) {
+      if (isNodesRequired(event.getType()) && event.getNodes().isEmpty()
+          || isCommonParentNodeRequired(event.getType()) && event.getCommonParentNode() == null) {
         it.remove();
       }
     }
@@ -403,6 +406,48 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         // Single node
         return true;
       }
+      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED:
+      case TreeEvent.TYPE_BEFORE_NODES_SELECTED:
+      case TreeEvent.TYPE_NODES_SELECTED:
+      case TreeEvent.TYPE_DRAG_FINISHED:
+      case TreeEvent.TYPE_NODE_REQUEST_FOCUS:
+      case TreeEvent.TYPE_REQUEST_FOCUS:
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
+      case TreeEvent.TYPE_NODES_CHECKED:
+      default: {
+        return false;
+      }
+    }
+  }
+
+  protected boolean isCommonParentNodeRequired(int type) {
+    switch (type) {
+      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED: {
+        return true;
+      }
+      case TreeEvent.TYPE_NODES_INSERTED:
+      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
+      case TreeEvent.TYPE_NODES_UPDATED:
+      case TreeEvent.TYPE_NODES_DELETED:
+      case TreeEvent.TYPE_NODE_FILTER_CHANGED:
+      case TreeEvent.TYPE_BEFORE_NODES_SELECTED:
+      case TreeEvent.TYPE_NODES_SELECTED:
+      case TreeEvent.TYPE_NODE_EXPANDED:
+      case TreeEvent.TYPE_NODE_COLLAPSED:
+      case TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE:
+      case TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE:
+      case TreeEvent.TYPE_NODE_ACTION:
+      case TreeEvent.TYPE_NODES_DRAG_REQUEST:
+      case TreeEvent.TYPE_DRAG_FINISHED:
+      case TreeEvent.TYPE_NODE_DROP_ACTION:
+      case TreeEvent.TYPE_NODE_REQUEST_FOCUS:
+      case TreeEvent.TYPE_NODE_ENSURE_VISIBLE:
+      case TreeEvent.TYPE_REQUEST_FOCUS:
+      case TreeEvent.TYPE_NODE_CLICK:
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
+      case TreeEvent.TYPE_NODE_CHANGED:
+      case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED:
+      case TreeEvent.TYPE_NODES_CHECKED:
       default: {
         return false;
       }

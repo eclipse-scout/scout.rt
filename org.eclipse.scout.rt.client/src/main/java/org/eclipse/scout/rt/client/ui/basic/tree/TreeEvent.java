@@ -83,8 +83,8 @@ public class TreeEvent extends EventObject implements IModelEvent {
   public static final int TYPE_NODE_ACTION = 705;
 
   /**
-   * valid attributes are parentNode (if common parent of all nodes), nodes
-   * register the drag object using the setDragObject method
+   * valid attributes are parentNode (if common parent of all nodes), nodes register the drag object using the
+   * setDragObject method
    */
   public static final int TYPE_NODES_DRAG_REQUEST = 730;
 
@@ -94,8 +94,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   public static final int TYPE_DRAG_FINISHED = 735;
 
   /**
-   * valid attributes are node get the drop object using the getDropObject
-   * method
+   * valid attributes are node get the drop object using the getDropObject method
    */
   public static final int TYPE_NODE_DROP_ACTION = 740;
   /**
@@ -332,6 +331,9 @@ public class TreeEvent extends EventObject implements IModelEvent {
     buf.append(getClass().getSimpleName() + "[");
     buf.append(getTypeName());
     // nodes
+    if (getCommonParentNode() != null) {
+      buf.append(" CPN=").append(getCommonParentNode());
+    }
     if (CollectionUtility.hasElements(m_nodes) && getTree() != null) {
       buf.append(" ");
       if (m_nodes.size() == 1) {
