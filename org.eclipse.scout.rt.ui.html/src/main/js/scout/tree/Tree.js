@@ -1018,8 +1018,8 @@ scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
   }
   updatedNodes.push(node);
   this._updateMarkChildrenChecked(node, false, checked, true);
-  updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
   if (!suppressSend) {
+    updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
     this.sendNodesChecked(updatedNodes);
   }
   if (this.rendered) {
