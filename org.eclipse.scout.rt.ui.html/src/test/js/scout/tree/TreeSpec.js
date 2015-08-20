@@ -403,7 +403,7 @@ describe("Tree", function() {
       var node = tree.nodes[0];
 
       if (node) {
-        tree.checkNode(node, true, true);
+        tree.checkNode(node, true, false);
       }
 
       var nodesToCheck = node.childNodes.slice();
