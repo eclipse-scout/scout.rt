@@ -46,8 +46,8 @@ public class AbstractRowDataColumnTest {
     table.getRowDataColumn().setValue(row, "newValue");
     row = table.addRow(row);
 
-    assertEquals("newValue", table.getRowDataColumn().getDisplayText(table.getRow(0)));
     assertEquals("newValue", table.getRowDataColumn().getValue(0));
+    assertEquals(null, table.getRowDataColumn().getDisplayText(table.getRow(0)));
     assertEquals("newValue", table.getStringTestColumn().getValue(0));
     assertEquals("newValue", table.getStringTestColumn().getDisplayText(table.getRow(0)));
   }
@@ -62,8 +62,8 @@ public class AbstractRowDataColumnTest {
     row.setRowData("newValue");
 
     table.importFromTableBeanData(tableBean);
-    assertEquals("newValue", table.getRowDataColumn().getDisplayText(table.getRow(0)));
     assertEquals("newValue", table.getRowDataColumn().getValue(0));
+    assertEquals(null, table.getRowDataColumn().getDisplayText(table.getRow(0)));
     assertEquals("newValue", table.getStringTestColumn().getValue(0));
     assertEquals("newValue", table.getStringTestColumn().getDisplayText(table.getRow(0)));
     assertEquals(ITableRow.STATUS_NON_CHANGED, table.getRow(0).getStatus());
@@ -84,7 +84,7 @@ public class AbstractRowDataColumnTest {
     }
 
     @Order(20.0)
-    public class RowDataColumn extends AbstractRowDataColumn<String> {
+    public class RowDataColumn extends AbstractTestRowDataColumn<String> {
 
       @Override
       protected void updateTableColumns(ITableRow r, String newValue) throws ProcessingException {
@@ -162,7 +162,7 @@ class TestTableBean extends AbstractTableFieldBeanData {
 
 }
 
-abstract class AbstractRowDataColumn<T> extends AbstractColumn<T> {
+abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
 
   private TableListener m_updateTableRowListener;
 

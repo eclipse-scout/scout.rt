@@ -1433,7 +1433,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public VALUE/* validValue */validateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
+  public VALUE/* validValue */ validateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
     VALUE vinternal = validateValueInternal(row, rawValue);
     VALUE validatedValue = interceptValidateValue(row, vinternal);
     return validatedValue;
@@ -1592,8 +1592,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     cell.setText(formatValueInternal(row, value));
   }
 
+  /**
+   * by default, there is not display text set on the column
+   */
   protected String formatValueInternal(ITableRow row, VALUE value) {
-    return StringUtility.nullIfEmpty(value);
+    return null;
   }
 
   @Override
