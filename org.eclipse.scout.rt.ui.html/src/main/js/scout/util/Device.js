@@ -182,20 +182,29 @@ scout.Device.prototype.supportsIframeSecurityAttribute = function() {
 
 /**
  * Currently the browserVersion is only set for IE. Because the only version-check we do,
- * is whether or not we use an old IE version.
+ * is whether or not we use an old IE version. Version regex only matches the first number pair
+ * but not the revision-version. Example:
+ * - 21     match: 21
+ * - 21.1   match: 21.1
+ * - 21.1.3 match: 21.1
+ *
  */
 scout.Device.prototype.parseBrowserVersion = function(userAgent) {
-  var versionRegex;
-  if (this.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER) {
-    versionRegex = /MSIE ([0-9\.])/;
-  } else if (this.browser === scout.Device.SupportedBrowsers.SAFARI) {
-    versionRegex = /Version\/([0-9\.])/;
-  } else if (this.browser === scout.Device.SupportedBrowsers.FIREFOX) {
-    versionRegex = /Firefox\/([0-9\.])/;
+  var versionRegex, browsers = scout.Device.SupportedBrowsers;
+  if (this.browser === browsers.INTERNET_EXPLORER) {
+    versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
+  } else if (this.browser === browsers.SAFARI) {
+    versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
+  } else if (this.browser === browsers.FIREFOX) {
+    versionRegex = /Firefox\/([0-9]+\.?[0-9]*)/;
+  } else if (this.browser === browsers.CHROME) {
+    versionRegex = /Chrome\/([0-9]+\.?[0-9]*)/;
   }
   if (versionRegex) {
     var matches = versionRegex.exec(userAgent);
     if (Array.isArray(matches) && matches.length === 2) {
+      // remove minor-version
+      matches[1] =
       this.browserVersion = parseFloat(matches[1]);
     }
   }

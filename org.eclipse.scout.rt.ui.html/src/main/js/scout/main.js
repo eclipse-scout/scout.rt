@@ -55,9 +55,15 @@ scout.checkBrowserCompability = function(options, dataPartId) {
   return true;
 };
 
+/**
+ * This method returns false for very old browsers. Basically we check for the first version that supports ECMA 5.
+ * Also we exclude otherwise lame browsers
+ */
 scout.supportedBrowser = function(browser, version) {
   var browsers = scout.Device.SupportedBrowsers;
   if (browser === browsers.INTERNET_EXPLORER && version < 9 ||
+      browser === browsers.CHROME && version < 23 ||
+      browser === browsers.FIREFOX && version < 21 ||
       browser === browsers.SAFARI && version < 7) {
     return false;
   }

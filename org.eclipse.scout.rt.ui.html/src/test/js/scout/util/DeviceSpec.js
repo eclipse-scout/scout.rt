@@ -67,6 +67,10 @@ describe('Device', function() {
       expect(device.browserVersion).toEqual(21.0);
 
       // Chrome (23) from v23 Chrome supports ECMA 5
+      userAgent = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.6 Safari/537.11';
+      device = new scout.Device(userAgent);
+      expect(device.browser).toBe(scout.Device.SupportedBrowsers.CHROME);
+      expect(device.browserVersion).toEqual(23.0);
     });
 
   });
