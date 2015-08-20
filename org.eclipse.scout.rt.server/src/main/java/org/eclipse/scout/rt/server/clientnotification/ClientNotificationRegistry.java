@@ -46,10 +46,7 @@ public class ClientNotificationRegistry {
   private final Map<String /*notificationNodeId*/, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
 
   /**
-   * This method should only be accessed from {@link ClientNotificationService}
-   *
-   * @param nodeId
-   * @param session
+   * Register a session with corresponding user for a given node
    */
   void registerSession(String nodeId, String sessionId, String userId) {
     synchronized (m_notificationQueues) {
@@ -61,7 +58,7 @@ public class ClientNotificationRegistry {
    * Unregister a session with the corresponding user for a specific node. No notifications are consumed anymore for
    * this session.
    */
-  public void unregisterSession(String nodeId, String sessionId, String userId) {
+  void unregisterSession(String nodeId, String sessionId, String userId) {
     synchronized (m_notificationQueues) {
       getQueue(nodeId).unregisterSession(sessionId, userId);
     }
@@ -110,7 +107,7 @@ public class ClientNotificationRegistry {
   }
 
   /**
-   * To access all session id's having to whom notifications will be providen by this server node.
+   * To access all session id's having to whom notifications will be provided by this server node.
    *
    * @return
    */

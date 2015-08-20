@@ -23,8 +23,6 @@ public interface IClientNotificationService {
 
   void unregisterSession(String notificationNodeId, String sessionId, String userId);
 
-  void unregisterSession(String notificationNodeId);
-
   List<ClientNotificationMessage> getNotifications(String notificationNodeId);
 
 }

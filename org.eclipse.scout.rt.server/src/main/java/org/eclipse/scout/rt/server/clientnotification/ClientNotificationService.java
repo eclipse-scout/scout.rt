@@ -19,6 +19,9 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
+/**
+ * Service to consume notifications. Accessible from the client.
+ */
 public class ClientNotificationService implements IClientNotificationService {
   private final int m_blockingTimeout;
   private final int m_maxNotifications;
@@ -36,11 +39,6 @@ public class ClientNotificationService implements IClientNotificationService {
   @Override
   public void unregisterSession(String nodeId, String sessionId, String userId) {
     BEANS.get(ClientNotificationRegistry.class).unregisterSession(nodeId, sessionId, userId);
-  }
-
-  @Override
-  public void unregisterSession(String notificationNodeId) {
-    //BEANS.get(ClientNotificationRegistry.class).unregisterNode(notificationNodeId);
   }
 
   @Override

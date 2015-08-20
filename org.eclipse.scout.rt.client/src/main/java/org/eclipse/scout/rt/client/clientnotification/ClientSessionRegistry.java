@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
@@ -68,15 +69,18 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
    *
    * @param session
    */
-  protected void clientSessionStopping(IClientSession session) {
-    String userId = session.getUserId();
-    LOG.debug(String.format("client session [%s] stopping", userId));
+  protected void sessionStopped(final IClientSession session) {
+    checkSession(session);
+    final String sessionId = session.getId();
+    final String userId = session.getUserId();
+    LOG.debug(String.format("Unregister client session [sessionid=%s, userId=%s].", sessionId, userId));
+
     // unregister user remote
     try {
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).unregisterSession(NOTIFICATION_NODE_ID);
+          BEANS.get(IClientNotificationService.class).unregisterSession(NOTIFICATION_NODE_ID, sessionId, userId);
         }
       });
     }
@@ -91,16 +95,42 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   }
 
   /**
-   * this method is expected to be called in the context of the specific session.
+   * Register the session after session start. This method is expected to be called in the context of the specific
+   * session.
    *
    * @param session
-   * @throws ProcessingException
    */
   public void sessionStarted(final IClientSession session) {
-    // lookup the userid remote because the user is not necessarily set on the client session.
-    BEANS.get(IPingService.class).ping("ensure shared context is loaded...");
-    LOG.debug(String.format("client session [sessionid=%s, userId=%s] registered on client session registry", session.getId(), session.getUserId()));
-    // local linking
+    ensureUserIdAvailable(session);
+    checkSession(session);
+    LOG.debug(String.format("Register client session [sessionid=%s, userId=%s].", session.getId(), session.getUserId()));
+    registerSessionOnClient(session);
+    registerSessionOnServer(session);
+  }
+
+  private void checkSession(final IClientSession session) {
+    Assertions.assertNotNull(session.getId(), "No sessionId available");
+    Assertions.assertNotNull(session.getUserId(), "No userId available");
+  }
+
+  private void registerSessionOnServer(final IClientSession session) {
+    try {
+      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          BEANS.get(IClientNotificationService.class).registerSession(NOTIFICATION_NODE_ID, session.getId(), session.getUserId());
+        }
+      });
+    }
+    catch (ProcessingException e) {
+      LOG.warn(String.format("Could not register session[%s] for remote notifications.", session), e);
+    }
+  }
+
+  /**
+   * local linking
+   */
+  private void registerSessionOnClient(final IClientSession session) {
     synchronized (m_cacheLock) {
       List<WeakReference<IClientSession>> sessionRefs = m_userToSessions.get(session.getUserId());
       if (sessionRefs != null) {
@@ -127,18 +157,14 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         m_userToSessions.put(session.getUserId(), sessionRefs);
       }
     }
-    // register on backend
-    try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).registerSession(NOTIFICATION_NODE_ID, session.getId(), session.getUserId());
-        }
-      });
-    }
-    catch (ProcessingException e) {
-      LOG.warn(String.format("Could not register session[%s] for remote notifications.", session), e);
-    }
+  }
+
+  /**
+   * Make sure, the userid is set on the session. A first server-lookup creates the server session and synchronized the
+   * userid.
+   */
+  protected void ensureUserIdAvailable(IClientSession session) {
+    BEANS.get(IPingService.class).ping("ensure shared context is loaded...");
   }
 
   @Override
@@ -215,7 +241,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         sessionStarted((IClientSession) event.getSource());
         break;
       case SessionEvent.TYPE_STOPPED:
-        clientSessionStopping((IClientSession) event.getSource());
+        sessionStopped((IClientSession) event.getSource());
       default:
         break;
     }
