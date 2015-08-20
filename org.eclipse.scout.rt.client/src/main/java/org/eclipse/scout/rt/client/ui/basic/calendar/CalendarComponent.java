@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -123,63 +122,11 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
   }
 
   /**
-   * Convenience for getting the specific (composite) displayed tooltip of an
-   * item for a specific day This includes the start date, the end date and the
-   * label of the item
-   */
-  @Deprecated
-  public String getTooltip(Date day) {
-    day = DateUtility.truncDate(day);
-    String s = createDayTooltip(day);
-    String s2 = m_item.getDescription();
-    if (s2 != null && s2.length() > 0) {
-      s = s + "\n" + s2;
-    }
-    return s;
-  }
-
-  /**
    * Convenience for getting all days this item is covering the dates returned
    * have all time 00:00:00
    */
   public Date[] getCoveredDays() {
     return m_coveredDays;
-  }
-
-  /**
-   * FIXME AWE: (post-swing) remove when Swing client is no more.
-   */
-  @Deprecated
-  private String createDayTooltip(Date dayTruncated) {
-    Date a = getFromDate();
-    Date b = getToDate();
-    DateFormat timeFmt = m_calendar.getDateTimeFormatFactory().getHourMinute();
-    DateFormat dayFmt = m_calendar.getDateTimeFormatFactory().getDayMonth(DateFormat.MEDIUM);
-    if (m_coveredDays.length == 1) {
-      if (isFullDay()) {
-        return m_item.getSubject();
-      }
-      else if (DateUtility.equals(a, b)) {
-        if (DateUtility.equals(a, dayTruncated)) {
-          // the date is at 00:00 so probably time is irrelevant
-          return m_item.getSubject();
-        }
-        else {
-          return timeFmt.format(a) + " " + m_item.getSubject();
-        }
-      }
-      else {
-        return timeFmt.format(a) + "-" + timeFmt.format(b) + " " + m_item.getSubject();
-      }
-    }
-    else {// not just one day
-      if (isFullDay()) {
-        return dayFmt.format(a) + " - " + dayFmt.format(b) + "  " + m_item.getSubject();
-      }
-      else {
-        return dayFmt.format(a) + " " + timeFmt.format(a) + " - " + dayFmt.format(b) + " " + timeFmt.format(b) + "  " + m_item.getSubject();
-      }
-    }
   }
 
   /**
