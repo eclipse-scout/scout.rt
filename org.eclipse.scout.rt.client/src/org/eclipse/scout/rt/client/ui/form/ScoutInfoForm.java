@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -219,10 +220,10 @@ public class ScoutInfoForm extends AbstractForm {
       buf.append("<img src=\"" + f.getPath() + "\">");
     }
     else {
-      buf.append("<h3>" + title + "</h3>");
+      buf.append(HTML.h3(title).toEncodedHtml());
     }
     buf.append("<p>");
-    buf.append("<h2>" + title + " " + v.getMajor() + "." + v.getMinor() + "." + v.getMicro() + "</h2>");
+    buf.append(HTML.h2(title + " " + v.getMajor() + "." + v.getMinor() + "." + v.getMicro()).toEncodedHtml());
     buf.append("<table cellspacing=0 cellpadding=0>");
     //
     StringBuffer contentBuf = new StringBuffer();
