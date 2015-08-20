@@ -81,7 +81,7 @@ describe("NavigateUpButton", function() {
       menu._drill();
       expect(outline.navigateUpInProgress).toBe(true);
       expect(outline.setNodesSelected).toHaveBeenCalledWith(node.parentNode);
-      expect(outline.setNodeExpanded).toHaveBeenCalledWith(node.parentNode, false);
+      expect(outline.setNodeExpanded).toHaveBeenCalledWith(node.parentNode, false, {collapseChildNodes: true});
     });
 
     it("shows default detail-form by removing selection from tree", function() {

@@ -98,7 +98,6 @@ describe("NavigateDownButton", function() {
     spyOn(outline, 'setNodeExpanded');
     menu._drill();
     expect(outline.setNodesSelected).toHaveBeenCalledWith(drillNode);
-    expect(outline.setNodeExpanded).toHaveBeenCalledWith(drillNode, false);
   });
 
 });

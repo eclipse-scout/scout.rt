@@ -53,18 +53,20 @@ scout.NavigateDownButton.prototype._drill = function() {
     try {
       // Collapse other expanded child nodes
       var parentNode = drillNode.parentNode;
-      parentNode.childNodes.forEach(function(childNode) {
-        if (childNode.expanded && childNode !== drillNode) {
-          this.outline.setNodeExpanded(childNode, false, {animateExpansion: false});
-        }
-      }.bind(this));
+      if (parentNode) {
+        parentNode.childNodes.forEach(function(childNode) {
+          if (childNode.expanded && childNode !== drillNode) {
+            this.outline.setNodeExpanded(childNode, false, {animateExpansion: false});
+          }
+        }.bind(this));
+      }
 
       // Select the target node
       this.outline.setNodesSelected(drillNode); // this also expands the parent node, if required
 
       // If the parent node is a table page node, expand the drillNode
       // --> Same logic as in OutlineMediator.mediateTableRowAction()
-      if (parentNode.nodeType === 'table') {
+      if (parentNode && parentNode.nodeType === 'table') {
         this.outline.setNodeExpanded(drillNode, true);
       }
     }
