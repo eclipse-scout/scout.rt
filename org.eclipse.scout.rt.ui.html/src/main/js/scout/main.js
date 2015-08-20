@@ -40,6 +40,7 @@ scout.inherits = function(childCtor, parentCtor) {
 
 scout.checkBrowserCompability = function(options, dataPartId) {
   var device = scout.device;
+  $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
   if (!this.supportedBrowser(device.browser, device.browserVersion)) {
     var $entryPoint = $('.scout[data-partId="' + dataPartId + '"'),
       $box = $entryPoint.appendDiv('box-with-logo small'),

@@ -52,27 +52,27 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
   var i, device, iosDevices = ['iPad', 'iPhone'];
   for (i = 0; i < iosDevices.length; i++) {
     device = iosDevices[i];
-    if (contains(userAgent, device)) {
+    if (this.contains(userAgent, device)) {
       this.device = device;
       this.system = scout.Device.SYSTEM_IOS;
       break;
     }
   }
   // check for browser
-  if (contains(userAgent, 'Firefox')) {
+  if (this.contains(userAgent, 'Firefox')) {
     this.browser = scout.Device.SupportedBrowsers.FIREFOX;
-  } else if (contains(userAgent, 'MSIE') || contains(userAgent, 'Trident')) {
+  } else if (this.contains(userAgent, 'MSIE') || this.contains(userAgent, 'Trident')) {
     this.browser = scout.Device.SupportedBrowsers.INTERNET_EXPLORER;
-  } else if (contains(userAgent, 'Chrome')) {
+  } else if (this.contains(userAgent, 'Chrome')) {
     this.browser = scout.Device.SupportedBrowsers.CHROME;
-  } else if (contains(userAgent, 'Safari')) {
+  } else if (this.contains(userAgent, 'Safari')) {
     this.browser = scout.Device.SupportedBrowsers.SAFARI;
   }
+};
 
-  // we cannot use scout.strings at the time parseUserAgent is executed
-  function contains(haystack, needle) {
-    return haystack.indexOf(needle) !== -1;
-  }
+//we cannot use scout.strings at the time parseUserAgent is executed
+scout.Device.prototype.contains = function contains(haystack, needle) {
+  return haystack.indexOf(needle) !== -1;
 };
 
 scout.Device.prototype.supportsFeature = function(property, checkFunc) {
@@ -192,7 +192,14 @@ scout.Device.prototype.supportsIframeSecurityAttribute = function() {
 scout.Device.prototype.parseBrowserVersion = function(userAgent) {
   var versionRegex, browsers = scout.Device.SupportedBrowsers;
   if (this.browser === browsers.INTERNET_EXPLORER) {
-    versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
+    // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
+    // additionally in new version the version-number after Trident/ is not the browser-version
+    // but the engine-version.
+    if (this.contains(userAgent, 'MSIE')) {
+      versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
+    } else {
+      versionRegex = /rv:([0-9]+\.?[0-9]*)\)/;
+    }
   } else if (this.browser === browsers.SAFARI) {
     versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
   } else if (this.browser === browsers.FIREFOX) {
@@ -203,8 +210,6 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
   if (versionRegex) {
     var matches = versionRegex.exec(userAgent);
     if (Array.isArray(matches) && matches.length === 2) {
-      // remove minor-version
-      matches[1] =
       this.browserVersion = parseFloat(matches[1]);
     }
   }

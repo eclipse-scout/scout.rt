@@ -48,7 +48,13 @@ describe('Device', function() {
     it('recognizes supported browsers', function() {
       var userAgent, device;
 
-      // Internet Explorer
+      // Internet Explorer 11
+      userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko';
+      device = new scout.Device(userAgent);
+      expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
+      expect(device.browserVersion).toEqual(11.0);
+
+      // Internet Explorer 8
       userAgent = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; WOW64; Trident/4.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; InfoPath.2; .NET CLR 3.5.30729; .NET CLR 3.0.30729)';
       device = new scout.Device(userAgent);
       expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
