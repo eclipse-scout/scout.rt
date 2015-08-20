@@ -107,7 +107,8 @@ public interface IUiSession {
    *          a map of all other submitted string properties (usually not needed)
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
-  JSONObject processFileUpload(HttpServletRequest httpReq, IBinaryResourceConsumer resourceConsumer, List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
+  JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse resp, IBinaryResourceConsumer resourceConsumer,
+      List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
 
   void processCancelRequest();
 

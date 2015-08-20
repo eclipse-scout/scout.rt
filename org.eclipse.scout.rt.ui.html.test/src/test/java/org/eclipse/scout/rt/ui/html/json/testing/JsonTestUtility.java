@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.UiSession;
+import org.eclipse.scout.rt.ui.html.UiSession.HttpContext;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
@@ -74,11 +74,9 @@ public final class JsonTestUtility {
     field.setAccessible(true);
     field.set(uiSession, new JsonResponse());
 
-    field = UiSession.class.getDeclaredField("m_currentHttpRequest");
+    field = UiSession.class.getDeclaredField("m_currentHttpContext");
     field.setAccessible(true);
-    @SuppressWarnings("unchecked")
-    AtomicReference<HttpServletRequest> ref = (AtomicReference<HttpServletRequest>) field.get(uiSession);
-    ref.set(null);
+    ((HttpContext) field.get(uiSession)).clear();
   }
 
   /**

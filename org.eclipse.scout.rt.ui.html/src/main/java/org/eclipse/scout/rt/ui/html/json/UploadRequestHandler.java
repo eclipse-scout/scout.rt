@@ -53,9 +53,9 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   @Override
-  public boolean handlePost(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
+  public boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /upload
-    String pathInfo = httpReq.getPathInfo();
+    String pathInfo = req.getPathInfo();
     Matcher matcher = PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
     if (!matcher.matches()) {
       return false;
@@ -64,7 +64,7 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
     String targetAdapterId = matcher.group(2);
 
     // Check if is really a file upload
-    if (!ServletFileUpload.isMultipartContent(httpReq)) {
+    if (!ServletFileUpload.isMultipartContent(req)) {
       return false;
     }
 
@@ -78,16 +78,16 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
 
       // Resolve session
       MDC.put(MDC_SCOUT_UI_SESSION_ID, uiSessionId);
-      IUiSession uiSession = resolveUiSession(httpReq, uiSessionId);
+      IUiSession uiSession = resolveUiSession(req, uiSessionId);
       IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
 
       // Read uploaded data
       Map<String, String> uploadProperties = new HashMap<String, String>();
       List<BinaryResource> uploadResources = new ArrayList<>();
-      readUploadData(httpReq, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
+      readUploadData(req, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
 
       if (uploadProperties.containsKey("legacyFormTextPlainAnswer")) {
-        httpResp.setContentType("text/plain");
+        resp.setContentType("text/plain");
       }
 
       try {
@@ -98,14 +98,14 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
         uiSession.uiSessionLock().lock();
         try {
           if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
-            writeResponse(httpResp, createSessionTimeoutResponse());
+            writeResponse(resp, createSessionTimeoutResponse());
             return true;
           }
-          JSONObject jsonResp = uiSession.processFileUpload(httpReq, binaryResourceConsumer, uploadResources, uploadProperties);
+          JSONObject jsonResp = uiSession.processFileUpload(req, resp, binaryResourceConsumer, uploadResources, uploadProperties);
           if (jsonResp == null) {
             jsonResp = createEmptyResponse();
           }
-          writeResponse(httpResp, jsonResp);
+          writeResponse(resp, jsonResp);
         }
         finally {
           uiSession.uiSessionLock().unlock();
@@ -131,7 +131,7 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
-      writeResponse(httpResp, createUnrecoverableFailureResponse());
+      writeResponse(resp, createUnrecoverableFailureResponse());
     }
     return true;
   }

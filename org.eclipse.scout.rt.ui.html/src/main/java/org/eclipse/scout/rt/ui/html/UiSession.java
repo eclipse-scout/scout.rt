@@ -20,7 +20,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
@@ -72,6 +71,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class UiSession implements IUiSession, HttpSessionBindingListener {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiSession.class);
 
   /**
@@ -97,10 +97,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
   /**
-   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest() The variable is accessed by
-   * different threads, thus it is an atomic reference.
+   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
+   * The variable is accessed by different threads, thus all methods on HttpContext are synchronized.
    */
-  private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
+  private HttpContext m_currentHttpContext = new HttpContext();
   private HttpSession m_currentHttpSession;
   private final JsonEventProcessor m_jsonEventProcessor;
   private volatile boolean m_disposing;
@@ -212,12 +212,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     touch();
 
     try {
-      m_currentHttpRequest.set(req);
+      m_currentHttpContext.set(req, resp);
       m_currentJsonRequest = jsonStartupReq;
 
       m_clientSessionId = jsonStartupReq.getClientSessionId();
       m_uiSessionId = jsonStartupReq.getUiSessionId();
-
       HttpSession httpSession = req.getSession();
       m_currentHttpSession = httpSession;
 
@@ -244,7 +243,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
     }
     finally {
-      m_currentHttpRequest.set(null);
+      m_currentHttpContext.clear();
       m_currentJsonRequest = null;
     }
   }
@@ -320,6 +319,17 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     Cookie cookie = new Cookie(PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
     cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(30));
     resp.addCookie(cookie);
+  }
+
+  /**
+   * Updates the locale Cookie but only when a current HTTP response exists. Which means
+   * when the locale of the session changes during a client-job, the cookie cannot be updated.
+   */
+  private void updatePreferredLocaleCookie(Locale locale) {
+    HttpServletResponse resp = m_currentHttpContext.getResponse();
+    if (resp != null) {
+      storePreferredLocaleInCookie(resp, locale);
+    }
   }
 
   protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
@@ -442,6 +452,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     // Notify waiting requests - should not delay web-container shutdown
     notifyPollingBackgroundJobRequests();
     m_jsonAdapterRegistry.disposeAdapters();
+    m_currentHttpContext.clear();
     m_currentJsonResponse = null;
     m_currentHttpSession = null;
   }
@@ -568,7 +579,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public HttpServletRequest currentHttpRequest() {
-    return m_currentHttpRequest.get();
+    return m_currentHttpContext.getRequest();
   }
 
   @Override
@@ -585,7 +596,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
 
     try {
-      m_currentHttpRequest.set(req);
+      m_currentHttpContext.set(req, resp);
       m_currentJsonRequest = jsonReq;
 
       // Process events in model job
@@ -621,7 +632,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       return result;
     }
     finally {
-      m_currentHttpRequest.set(null);
+      m_currentHttpContext.clear();
       m_currentJsonRequest = null;
       if (m_disposing) {
         dispose();
@@ -648,10 +659,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public JSONObject processFileUpload(HttpServletRequest req, final IBinaryResourceConsumer resourceConsumer, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
+  public JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse resp,
+      final IBinaryResourceConsumer resourceConsumer, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
     try {
-      m_currentHttpRequest.set(req);
+      m_currentHttpContext.set(req, resp);
 
       // Process file upload in model job
       uiJobs.runAsModelJobAndHandleException(Callables.callable(new IRunnable() {
@@ -680,7 +692,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       return result;
     }
     finally {
-      m_currentHttpRequest.set(null);
+      m_currentHttpContext.clear();
       if (m_disposing) {
         dispose();
       }
@@ -723,6 +735,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putLocaleData(jsonEvent, locale);
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_LOCALE_CHANGED, jsonEvent);
+    updatePreferredLocaleCookie(locale);
   }
 
   /**
@@ -852,5 +865,30 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     finally {
       m_uiSessionLock.unlock();
     }
+  }
+
+  public static class HttpContext {
+
+    private HttpServletRequest m_req;
+    private HttpServletResponse m_resp;
+
+    public synchronized void clear() {
+      m_req = null;
+      m_resp = null;
+    }
+
+    public synchronized void set(HttpServletRequest req, HttpServletResponse resp) {
+      m_req = req;
+      m_resp = resp;
+    }
+
+    public synchronized HttpServletRequest getRequest() {
+      return m_req;
+    }
+
+    public synchronized HttpServletResponse getResponse() {
+      return m_resp;
+    }
+
   }
 }

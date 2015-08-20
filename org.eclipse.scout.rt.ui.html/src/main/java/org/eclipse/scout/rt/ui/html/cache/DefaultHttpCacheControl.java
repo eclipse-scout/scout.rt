@@ -42,6 +42,9 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       return;
     }
     m_cache.put(obj.getCacheKey(), obj);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Stored object in cache: " + obj.getCacheKey());
+    }
   }
 
   @Override
@@ -49,7 +52,11 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     if (!UiHints.isCacheHint(req)) {
       return null;
     }
-    return m_cache.get(cacheKey);
+    HttpCacheObject obj = m_cache.get(cacheKey);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Lookup object in cache: " + cacheKey + " found=" + (obj != null));
+    }
+    return obj;
   }
 
   @Override
@@ -94,7 +101,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     String etag = obj.createETag();
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     if (notModified(ifNoneMatch, etag)) {
-      LOG.info("use http cached object (etag): " + req.getPathInfo());
+      LOG.info("Use http cached object (etag): " + req.getPathInfo());
       resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
@@ -102,7 +109,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
-        LOG.info("use http cached object (ifModifiedSince): " + req.getPathInfo());
+        LOG.info("Use http cached object (ifModifiedSince): " + req.getPathInfo());
         resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return true;
       }
