@@ -29,13 +29,18 @@ public class ClientNotificationService implements IClientNotificationService {
   }
 
   @Override
-  public void registerSession(String notificationNodeId, String sessionId, String userId) {
-    BEANS.get(ClientNotificationRegistry.class).registerSession(notificationNodeId, sessionId, userId);
+  public void registerSession(String nodeId, String sessionId, String userId) {
+    BEANS.get(ClientNotificationRegistry.class).registerSession(nodeId, sessionId, userId);
+  }
+
+  @Override
+  public void unregisterSession(String nodeId, String sessionId, String userId) {
+    BEANS.get(ClientNotificationRegistry.class).unregisterSession(nodeId, sessionId, userId);
   }
 
   @Override
   public void unregisterSession(String notificationNodeId) {
-    BEANS.get(ClientNotificationRegistry.class).unregisterNode(notificationNodeId);
+    //BEANS.get(ClientNotificationRegistry.class).unregisterNode(notificationNodeId);
   }
 
   @Override

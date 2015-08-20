@@ -75,6 +75,19 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
+   * If a session is unregistered, no notification is consumed.
+   */
+  @Test
+  public void testNotificationsUnregisteredSession() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    reg.registerSession("testNodeId", TEST_SESSION, TEST_USER);
+    reg.unregisterSession("testNodeId", TEST_SESSION, TEST_USER);
+    reg.putForSession(TEST_SESSION, TEST_NOTIFICATION);
+    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
+    assertTrue(notificationsNode.isEmpty());
+  }
+
+  /**
    * Tests that a notification for a single user is only consumed by nodes that have the user registered.
    */
   @Test
@@ -122,11 +135,7 @@ public class ClientNotificationRegistryTest {
       final String currentNode = "Node1";
       final String otherNode = "Node2";
 
-      ServerRunContexts
-      .copyCurrent()
-      .withNotificationNodeId(currentNode)
-      .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
-      .run(new IRunnable() {
+      ServerRunContexts.copyCurrent().withNotificationNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
 
         @Override
         public void run() throws Exception {
@@ -162,28 +171,24 @@ public class ClientNotificationRegistryTest {
     final String currentNode = "Node1";
     final String otherNode = "Node2";
 
-    ServerRunContexts
-        .copyCurrent()
-        .withNotificationNodeId(currentNode)
-        .withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector())
-        .run(new IRunnable() {
+    ServerRunContexts.copyCurrent().withNotificationNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            ClientNotificationRegistry reg = new ClientNotificationRegistry();
-            reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
-            reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
-            reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
-            commit();
-            //no notifications for current request (piggy back)
-            List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().values();
-            assertTrue(notifications.isEmpty());
-            //notifications for current nodes
-            assertSingleTestNotification(consumeNoWait(reg, currentNode));
-            //notifications for other nodes
-            assertSingleTestNotification(consumeNoWait(reg, otherNode));
-          }
-        });
+      @Override
+      public void run() throws Exception {
+        ClientNotificationRegistry reg = new ClientNotificationRegistry();
+        reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
+        reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
+        reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
+        commit();
+        //no notifications for current request (piggy back)
+        List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().values();
+        assertTrue(notifications.isEmpty());
+        //notifications for current nodes
+        assertSingleTestNotification(consumeNoWait(reg, currentNode));
+        //notifications for other nodes
+        assertSingleTestNotification(consumeNoWait(reg, otherNode));
+      }
+    });
   }
 
   private void commit() throws ProcessingException {

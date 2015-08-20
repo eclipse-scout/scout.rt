@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -46,9 +47,8 @@ public class ClientNotificationNodeQueue {
   private final Integer m_capacity;
   private final BlockingDeque<ClientNotificationMessage> m_notifications;
 
-  //TODO [aho] only keyset of m_sessionsToUser, m_userToSessions is used. Remove values?
   private final ReentrantReadWriteLock m_sessionUserCacheLock = new ReentrantReadWriteLock();
-  private final Map<String /*sessionId*/, String /*userId*/> m_sessionsToUser = new HashMap<>();
+  private final Set<String /*sessionId*/> m_sessions = new HashSet<>();
   private final Map<String /*userId*/, Set<String /*sessionId*/>> m_userToSessions = new HashMap<>();
 
   public ClientNotificationNodeQueue() {
@@ -80,13 +80,34 @@ public class ClientNotificationNodeQueue {
     Assertions.assertNotNull(userId);
     m_sessionUserCacheLock.writeLock().lock();
     try {
-      m_sessionsToUser.put(sessionId, userId);
+      m_sessions.add(sessionId);
       Set<String> userSessions = m_userToSessions.get(sessionId);
       if (userSessions == null) {
         userSessions = new HashSet<String>();
         m_userToSessions.put(userId, userSessions);
       }
       userSessions.add(sessionId);
+    }
+    finally {
+      m_sessionUserCacheLock.writeLock().unlock();
+    }
+  }
+
+  public void unregisterSession(String sessionId, String userId) {
+    Assertions.assertNotNull(sessionId);
+    Assertions.assertNotNull(userId);
+    m_sessionUserCacheLock.writeLock().lock();
+    try {
+      m_sessions.remove(sessionId);
+      for (Entry<String, Set<String>> e : m_userToSessions.entrySet()) {
+        Set<String> sessions = e.getValue();
+        if (sessions.contains(sessionId)) {
+          sessions.remove(sessionId);
+        }
+        if (sessions.isEmpty()) {
+          m_userToSessions.remove(e.getKey());
+        }
+      }
     }
     finally {
       m_sessionUserCacheLock.writeLock().unlock();
@@ -168,16 +189,13 @@ public class ClientNotificationNodeQueue {
   }
 
   public boolean isRelevant(ClientNotificationAddress address) {
-    return address.isNotifyAllSessions()
-        || address.isNotifyAllNodes()
-        || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds())
-        || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
+    return address.isNotifyAllSessions() || address.isNotifyAllNodes() || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds()) || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
   }
 
   public Set<String /*sessionId*/> getAllSessionIds() {
     m_sessionUserCacheLock.readLock().lock();
     try {
-      return new HashSet<String>(m_sessionsToUser.keySet());
+      return new HashSet<String>(m_sessions);
     }
     finally {
       m_sessionUserCacheLock.readLock().unlock();

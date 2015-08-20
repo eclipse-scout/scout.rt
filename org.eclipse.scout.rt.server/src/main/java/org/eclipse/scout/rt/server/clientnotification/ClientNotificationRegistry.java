@@ -53,8 +53,17 @@ public class ClientNotificationRegistry {
    */
   void registerSession(String nodeId, String sessionId, String userId) {
     synchronized (m_notificationQueues) {
-      ClientNotificationNodeQueue queue = getQueue(nodeId);
-      queue.registerSession(sessionId, userId);
+      getQueue(nodeId).registerSession(sessionId, userId);
+    }
+  }
+
+  /**
+   * Unregister a session with the corresponding user for a specific node. No notifications are consumed anymore for
+   * this session.
+   */
+  public void unregisterSession(String nodeId, String sessionId, String userId) {
+    synchronized (m_notificationQueues) {
+      getQueue(nodeId).unregisterSession(sessionId, userId);
     }
   }
 
