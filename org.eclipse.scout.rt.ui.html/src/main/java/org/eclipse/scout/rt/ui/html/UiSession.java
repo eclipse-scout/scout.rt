@@ -584,10 +584,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   public JSONObject processJsonRequest(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.size());
-    }
-
     try {
       m_currentHttpRequest.set(req);
       m_currentJsonRequest = jsonReq;
@@ -614,6 +610,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           // This must happen synchronized (as it always is, in a model-job) to avoid concurrency issues
           // FIXME AWE: (json-layer) ausprobieren, ob die currentResponse auch im Fall von einer Exception zurück gesetzt werden muss.
           m_currentJsonResponse = createJsonResponse();
+
+          if (LOG.isDebugEnabled()) {
+            // Do this inside a model job to ensure synchronized access to registry.
+            LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.size());
+          }
           return json;
         }
       }, uiJobs.newModelJobInput("response-to-json", getClientSession(), m_currentJsonRequest.isPollForBackgroundJobsRequest()), RuntimeExceptionTranslator.class);
@@ -624,9 +625,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentJsonRequest = null;
       if (m_disposing) {
         dispose();
-      }
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.size());
       }
     }
   }
@@ -650,8 +648,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public JSONObject processFileUpload(HttpServletRequest req, final IBinaryResourceConsumer resourceConsumer,
-      final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
+  public JSONObject processFileUpload(HttpServletRequest req, final IBinaryResourceConsumer resourceConsumer, final List<BinaryResource> uploadResources, final Map<String, String> uploadProperties) {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
     try {
       m_currentHttpRequest.set(req);
