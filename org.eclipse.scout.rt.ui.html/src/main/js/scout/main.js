@@ -40,7 +40,7 @@ scout.inherits = function(childCtor, parentCtor) {
 
 scout.checkBrowserCompability = function(options, dataPartId) {
   var device = scout.device;
-  if (device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && device.browserVersion < 9) {
+  if (!this.supportedBrowser(device.browser, device.browserVersion)) {
     var $entryPoint = $('.scout[data-partId="' + dataPartId + '"'),
       $box = $entryPoint.appendDiv('box-with-logo small'),
       session = this;
@@ -50,6 +50,15 @@ scout.checkBrowserCompability = function(options, dataPartId) {
         session.init(options);
       });
     });
+    return false;
+  }
+  return true;
+};
+
+scout.supportedBrowser = function(browser, version) {
+  var browsers = scout.Device.SupportedBrowsers;
+  if (browser === browsers.INTERNET_EXPLORER && version < 9 ||
+      browser === browsers.SAFARI && version < 7) {
     return false;
   }
   return true;

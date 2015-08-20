@@ -18,15 +18,14 @@ scout.Device = function(userAgent) {
   this.parseBrowserVersion(userAgent);
 };
 
-// FIXME AWE: user info from server-side BrowserInfo class
-
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
 scout.Device.SupportedBrowsers = {
   UNKNOWN: 'Unknown',
   FIREFOX: 'Firefox',
   CHROME: 'Chrome',
-  INTERNET_EXPLORER: 'InternetExplorer'
+  INTERNET_EXPLORER: 'InternetExplorer',
+  SAFARI: 'Safari'
 };
 
 scout.Device.SYSTEM_IOS = 'IOS';
@@ -66,6 +65,8 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
     this.browser = scout.Device.SupportedBrowsers.INTERNET_EXPLORER;
   } else if (contains(userAgent, 'Chrome')) {
     this.browser = scout.Device.SupportedBrowsers.CHROME;
+  } else if (contains(userAgent, 'Safari')) {
+    this.browser = scout.Device.SupportedBrowsers.SAFARI;
   }
 
   // we cannot use scout.strings at the time parseUserAgent is executed
@@ -187,6 +188,10 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
   var versionRegex;
   if (this.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER) {
     versionRegex = /MSIE ([0-9\.])/;
+  } else if (this.browser === scout.Device.SupportedBrowsers.SAFARI) {
+    versionRegex = /Version\/([0-9\.])/;
+  } else if (this.browser === scout.Device.SupportedBrowsers.FIREFOX) {
+    versionRegex = /Firefox\/([0-9\.])/;
   }
   if (versionRegex) {
     var matches = versionRegex.exec(userAgent);

@@ -53,6 +53,20 @@ describe('Device', function() {
       device = new scout.Device(userAgent);
       expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
       expect(device.browserVersion).toEqual(8.0);
+
+      // Safari (6)
+      userAgent = 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25';
+      device = new scout.Device(userAgent);
+      expect(device.browser).toBe(scout.Device.SupportedBrowsers.SAFARI);
+      expect(device.browserVersion).toEqual(6.0);
+
+      // Firefox (21) from v21 Firefox supports ECMA 5
+      userAgent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1';
+      device = new scout.Device(userAgent);
+      expect(device.browser).toBe(scout.Device.SupportedBrowsers.FIREFOX);
+      expect(device.browserVersion).toEqual(21.0);
+
+      // Chrome (23) from v23 Chrome supports ECMA 5
     });
 
   });
