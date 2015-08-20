@@ -922,6 +922,7 @@ public final class StringUtility {
     s = s.replace("&quot;", "\"");
     s = s.replace("&apos;", "'");
     s = s.replace("&#39;", "'");
+    s = s.replace("&#47;", "/");
     s = s.replace("&lt;", "<");
     s = s.replace("&gt;", ">");
     s = s.replace("&amp;", "&");
