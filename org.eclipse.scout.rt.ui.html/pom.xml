@@ -140,10 +140,6 @@
       <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
     </dependency>
     <dependency>
-      <artifactId>org.eclipse.scout.rt.ui.html.client.ext</artifactId>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-    </dependency>
-    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
