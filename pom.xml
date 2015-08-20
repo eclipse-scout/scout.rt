@@ -45,11 +45,6 @@
     <module>org.eclipse.scout.rt.svg.client</module>
     <module>org.eclipse.scout.rt.svg.client.test</module>
 
-    <module>org.eclipse.scout.rt.ui.swing</module>
-    <module>org.eclipse.scout.rt.ui.swing.test</module>
-    <module>org.eclipse.scout.rt.ui.swing.browser.swt.fragment</module>
-    <module>org.eclipse.scout.rt.svg.ui.swing</module>
-
     <module>org.eclipse.scout.dev.jetty</module>
   </modules>
 
@@ -176,12 +171,6 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.ui.swing</artifactId>
         <version>${project.version}</version>
       </dependency>
 
