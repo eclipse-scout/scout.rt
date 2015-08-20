@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -19,6 +18,15 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 
+/**
+ * There is no Scout model-class for a TabItem. We simply use the GroupBox class in that case.
+ * Problem with that approach is, that the GroupBox does not have a "marked" property. That's
+ * why the JSON Layer must store that state. In a future Scout release we should create a new
+ * AbstractTabItem class extending GroupBox, adding the missing property. Than we could move
+ * a lot of code from here to the new model class.
+ *
+ * @param <GROUP_BOX>
+ */
 public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP_BOX> {
 
   public static final String PROP_MARKED = "marked";
@@ -45,13 +53,6 @@ public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP
     });
   }
 
-  /* TODO AWE: (scout) das problem ist, dass es kein model für TabItem gibt. Man nimmt einfach
-   * die GroupBox als Model. Dieses hat aber keine "marked" Property. Darum muss sich das UI
-   * künstlich den marked Zustand merken (siehe Swing-Code). In der neuen Scout-Version sollte
-   * es ein AbstractTabItem geben, könnte GroupBox extenden. Dann könnte viel Code von hier auf
-   * dem Model behandelt werden.
-   */
-
   @Override
   protected void attachModel() {
     super.attachModel();
@@ -76,11 +77,6 @@ public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP
     ICompositeField parent = getModel().getParentField();
     if (parent instanceof ITabBox) {
       return ((ITabBox) parent).getMarkStrategy() == markStrategy;
-    }
-    // TODO AWE: (scout) check if this legacy-else-if is still required
-    else if (getModel().getForm() instanceof ISearchForm) {
-      // legacy
-      return true;
     }
     return false;
   }
