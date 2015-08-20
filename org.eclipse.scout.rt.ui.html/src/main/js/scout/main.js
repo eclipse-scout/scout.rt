@@ -27,6 +27,8 @@ scout.init = function(options) {
     session.init();
     scout.sessions.push(session);
   });
+  // Cleanup up DOM, <noscript> is not necessary (apparently...)
+  $('noscript').remove();
 };
 
 /**
