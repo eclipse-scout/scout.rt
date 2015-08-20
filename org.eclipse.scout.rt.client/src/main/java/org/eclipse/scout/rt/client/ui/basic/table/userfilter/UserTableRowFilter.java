@@ -11,19 +11,20 @@
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 
 /**
  * @since 5.1
  */
-public class UserTableRowFilter implements ITableRowFilter {
-  private Collection<? extends ITableRow> m_rows;
+public class UserTableRowFilter implements ITableRowFilter, IUserFilter {
+  private Set<? extends ITableRow> m_rows;
 
   public UserTableRowFilter(Collection<? extends ITableRow> rows) {
-    m_rows = CollectionUtility.arrayList(rows);
+    m_rows = new HashSet<ITableRow>(rows);
   }
 
   @Override

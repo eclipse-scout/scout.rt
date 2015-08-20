@@ -105,4 +105,6 @@ public interface ITableUIFacade {
   void fireFilterRemovedFromUI(IUserTableFilter filter);
 
   void setFilteredRowsFromUI(List<? extends ITableRow> rows);
+
+  void removeFilteredRowsFromUI();
 }

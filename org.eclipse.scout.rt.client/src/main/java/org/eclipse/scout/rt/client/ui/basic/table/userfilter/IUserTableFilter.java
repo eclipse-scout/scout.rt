@@ -16,7 +16,7 @@ import java.io.Serializable;
  * @since 5.1
  */
 public interface IUserTableFilter extends Serializable {
-
+  //FIXME CGU maybe rename to filter state
   String getType();
 
   void setType(String type);

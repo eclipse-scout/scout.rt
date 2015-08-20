@@ -4583,24 +4583,41 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         pushUIProcessor();
         // Remove existing filter first, so that only one UserTableRowFilter is active
-        for (ITableRowFilter filter : getRowFilters()) {
-          if (filter instanceof UserTableRowFilter) {
-            // Do not use removeRowFilter to prevent applyRowFilters
-            m_rowFilters.remove(filter);
-          }
-        }
+        removeUserRowFilters();
+
         // Create and add a new filter
-        if (!rows.isEmpty()) {
-          UserTableRowFilter filter = new UserTableRowFilter(rows);
-          // Do not use addRowFilter to prevent applyRowFilters
-          m_rowFilters.add(filter);
-        }
+        UserTableRowFilter filter = new UserTableRowFilter(rows);
+
+        // Do not use addRowFilter to prevent applyRowFilters
+        m_rowFilters.add(filter);
         applyRowFilters();
       }
       finally {
         popUIProcessor();
       }
     }
+
+    protected void removeUserRowFilters() {
+      for (ITableRowFilter filter : getRowFilters()) {
+        if (filter instanceof UserTableRowFilter) {
+          // Do not use removeRowFilter to prevent applyRowFilters
+          m_rowFilters.remove(filter);
+        }
+      }
+    }
+
+    @Override
+    public void removeFilteredRowsFromUI() {
+      try {
+        pushUIProcessor();
+        removeUserRowFilters();
+        applyRowFilters();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
   }
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<Object> {

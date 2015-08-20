@@ -2938,30 +2938,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void setFilteredNodesFromUI(List<? extends ITreeNode> nodes) {
-      try {
-        pushUIProcessor();
-        // Remove existing filter first, so that only one UserTableRowFilter is active
-        for (ITreeNodeFilter filter : getNodeFilters()) {
-          if (filter instanceof UserTreeNodeFilter) {
-            // Do not use removeRowFilter to prevent applyRowFilters
-            m_nodeFilters.remove(filter);
-          }
-        }
-        // Create and add a new filter
-        if (!nodes.isEmpty()) {
-          UserTreeNodeFilter filter = new UserTreeNodeFilter(nodes);
-          // Do not use addRowFilter to prevent applyRowFilters
-          m_nodeFilters.add(filter);
-        }
-        applyNodeFilters();
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
-
-    @Override
     public void fireNodeClickFromUI(ITreeNode node, MouseButton mouseButton) {
       try {
         pushUIProcessor();

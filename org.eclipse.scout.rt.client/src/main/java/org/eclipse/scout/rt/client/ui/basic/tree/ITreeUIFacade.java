@@ -56,6 +56,4 @@ public interface ITreeUIFacade {
   void fireNodeDropTargetChangedFromUI(ITreeNode node);
 
   void fireAppLinkActionFromUI(String ref);
-
-  void setFilteredNodesFromUI(List<? extends ITreeNode> nodes);
 }

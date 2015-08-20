@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
@@ -799,7 +800,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), false);
   }
 
-  private class P_TableFilterBasedTreeNodeFilter implements ITreeNodeFilter {
+  private class P_TableFilterBasedTreeNodeFilter implements ITreeNodeFilter, IUserFilter {
     @Override
     public boolean accept(ITreeNode node, int level) {
       ITreeNode parentNode = node.getParentNode();

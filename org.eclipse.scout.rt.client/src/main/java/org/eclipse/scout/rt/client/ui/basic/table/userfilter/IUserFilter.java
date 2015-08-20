@@ -8,25 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.tree;
-
-import java.util.Collection;
-
-import org.eclipse.scout.commons.CollectionUtility;
+package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
 /**
+ * FIXME CGU javadoc
  * @since 5.1
  */
-public class UserTreeNodeFilter implements ITreeNodeFilter {
-  private Collection<? extends ITreeNode> m_nodes;
-
-  public UserTreeNodeFilter(Collection<? extends ITreeNode> nodes) {
-    m_nodes = CollectionUtility.arrayList(nodes);
-  }
-
-  @Override
-  public boolean accept(ITreeNode node, int level) {
-    return m_nodes.contains(node);
-  }
+public interface IUserFilter {
 
 }
