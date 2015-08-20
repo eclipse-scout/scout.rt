@@ -72,7 +72,6 @@ public class HtmlFileLoader extends AbstractResourceLoader {
           // Send headers only for IE
           super.intercept(httpServlet, httpReq, httpResp);
         }
-        return;
       }
     });
     return httpCacheObject;
