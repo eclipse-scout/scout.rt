@@ -31,6 +31,9 @@ import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 public class HtmlDocumentParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlDocumentParser.class);
 
+  private static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message key=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
   private final HtmlDocumentParserParameters m_params;
   private String m_workingContent;
 
@@ -49,8 +52,7 @@ public class HtmlDocumentParser {
 
   protected void replaceIncludeTags() throws IOException {
     // <scout:include template="no-script.html" />
-    Pattern pattern = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    Matcher m = pattern.matcher(m_workingContent);
+    Matcher m = PATTERN_INCLUDE_TAG.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String includeName = m.group(1);
@@ -73,8 +75,7 @@ public class HtmlDocumentParser {
 
   protected void replaceMessageTags() {
     // <scout:message key="ui.javascriptDisabledTitle" />
-    Pattern pattern = Pattern.compile("<scout\\:message key=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    Matcher m = pattern.matcher(m_workingContent);
+    Matcher m = PATTERN_MESSAGE_TAG.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String keyAttr = m.group(1);
