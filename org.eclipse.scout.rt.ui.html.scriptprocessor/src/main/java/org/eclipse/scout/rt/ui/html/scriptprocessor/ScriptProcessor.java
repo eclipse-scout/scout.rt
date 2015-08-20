@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.CompileCssWithLess;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyCssWithYui;
@@ -61,7 +63,26 @@ public class ScriptProcessor implements AutoCloseable {
   }
 
   public String minifyCss(String content) throws IOException {
-    return runInClassLoader(m_yuiLoader, MinifyCssWithYui.class.getName(), content);
+    // Work around YUI bug: https://github.com/yui/yuicompressor/issues/59
+    // 1. Protect whitespace inside calc() expressions
+    Pattern p = Pattern.compile("calc\\s*\\(\\s*(.*?)\\s*\\)");
+    Matcher m = p.matcher(content);
+    StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+      String s = "calc(" + m.group(1).replaceAll("\\s+", "___YUICSSMIN_SPACE_IN_CALC___") + ")";
+      m.appendReplacement(sb, s);
+    }
+    m.appendTail(sb);
+    content = sb.toString();
+    sb = null; // free memory early
+
+    // 2. Run YUI compressor
+    content = runInClassLoader(m_yuiLoader, MinifyCssWithYui.class.getName(), content);
+
+    // 3. Restore protected whitespace
+    content = content.replaceAll("___YUICSSMIN_SPACE_IN_CALC___", " ");
+
+    return content;
   }
 
   public String minifyJs(String content) throws IOException {
@@ -87,5 +108,4 @@ public class ScriptProcessor implements AutoCloseable {
       throw new IOException("Failed running " + classname, e1);
     }
   }
-
 }

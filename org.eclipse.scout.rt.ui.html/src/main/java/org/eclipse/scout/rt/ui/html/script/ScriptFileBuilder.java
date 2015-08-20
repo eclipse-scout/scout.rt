@@ -313,10 +313,7 @@ public class ScriptFileBuilder {
       case JS:
         return m_scriptProcessor.minifyJs(content);
       case CSS:
-        /*FIXME imo, cgu: destroys css!
-         * return m_thirdPartyScriptProcessorService.minifyCss(content);
-         */
-        return content;
+        return m_scriptProcessor.minifyCss(content);
       default:
         return content;
     }
