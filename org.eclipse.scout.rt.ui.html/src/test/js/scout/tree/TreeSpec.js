@@ -594,6 +594,111 @@ describe("Tree", function() {
     });
   });
 
+  describe("tree filter", function() {
+
+    beforeEach(function() {
+      // Disable animation
+      $.fx.off = true;
+    });
+
+    afterEach(function() {
+      $.fx.off = false;
+    });
+
+    it("filters nodes when filter() is called", function() {
+      var model = createModelFixture(1, 1, true);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var filter = {
+        accept: function($node) {
+          return $node.data('node') === tree.nodes[0];
+        }
+      };
+      tree.addFilter(filter);
+      tree.filter();
+      expect(tree.nodes[0].filterAccepted).toBe(true);
+      expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(false);
+
+      tree.removeFilter(filter);
+      tree.filter();
+      expect(tree.nodes[0].filterAccepted).toBe(true);
+      expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(true);
+    });
+
+    it("filters nodes when tree gets rendered", function() {
+      var model = createModelFixture(1, 1, true);
+      var tree = createTree(model);
+      var filter = {
+        accept: function($node) {
+          return $node.data('node') === tree.nodes[0];
+        }
+      };
+      tree.addFilter(filter);
+      tree.render(session.$entryPoint);
+
+      expect(tree.nodes[0].filterAccepted).toBe(true);
+      expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(false);
+
+      tree.removeFilter(filter);
+      tree.filter();
+      expect(tree.nodes[0].filterAccepted).toBe(true);
+      expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(true);
+    });
+
+    it("makes sure only filtered nodes are displayed when node gets expanded", function() {
+      var model = createModelFixture(2, 1);
+      var tree = createTree(model);
+      var filter = {
+        accept: function($node) {
+          var node = $node.data('node');
+          return node === tree.nodes[0] || node === tree.nodes[0].childNodes[0];
+        }
+      };
+      tree.addFilter(filter);
+      tree.render(session.$entryPoint);
+
+      expect(tree.nodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[0].$node).toBeFalsy();
+      expect(tree.nodes[0].childNodes[1].$node).toBeFalsy();
+
+      tree.setNodeExpanded(tree.nodes[0], true);
+      expect(tree.nodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[0].childNodes[1].$node.isVisible()).toBe(false);
+    });
+
+    it("applies filter if a node gets changed", function() {
+      var model = createModelFixture(2, 1);
+      var tree = createTree(model);
+      var filter = {
+        accept: function($node) {
+          return $node.text() === 'node 0';
+        }
+      };
+      tree.addFilter(filter);
+      tree.render(session.$entryPoint);
+
+      expect(tree.nodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+
+      var event = createNodeChangedEvent(model, tree.nodes[0].id);
+      event.text = 'new Text';
+      var message = {
+        events: [event]
+      };
+      session._processSuccessResponse(message);
+
+      expect(tree.nodes[0].text).toBe(event.text);
+      // text has changed -> filter condition returns false -> must not be visible anymore
+      expect(tree.nodes[0].$node.isVisible()).toBe(false);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+    });
+
+  });
+
   describe("onModelAction", function() {
 
     describe("nodesInserted event", function() {

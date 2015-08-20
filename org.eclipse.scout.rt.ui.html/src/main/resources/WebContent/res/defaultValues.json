@@ -172,7 +172,8 @@
     },
     "TableRow": {
       "checked": false,
-      "enabled": true
+      "enabled": true,
+      "filterAccepted": true
     },
     "Column": {
       "editable": false,
@@ -192,7 +193,8 @@
       "enabled": true,
       "expanded": false,
       "leaf": false,
-      "childNodes": []
+      "childNodes": [],
+      "filterAccepted": true
     }
   },
 

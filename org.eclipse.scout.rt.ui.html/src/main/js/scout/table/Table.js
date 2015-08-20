@@ -728,12 +728,13 @@ scout.Table.prototype._installRows = function($rows) {
       row = $row.data('row');
 
     // Apply row filter and memorize the new invisible rows
-    if (that._applyFiltersForRow($row)) {
-      if (!$row.isVisible()) {
+    if (that._applyFiltersForRow(row)) {
+      filterChanged = true;
+      if (!row.filterAccepted) {
         newInvisibleRows.push(row);
       }
-      filterChanged = true;
     }
+    that._renderRowFilterAccepted(row);
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -955,9 +956,15 @@ scout.Table.prototype._sendRowsSelected = function(rowIds) {
 };
 
 scout.Table.prototype._sendRowsFiltered = function(rowIds) {
-  this.remoteHandler(this.id, 'rowsFiltered', {
-    rowIds: rowIds
-  });
+  if (rowIds.length === this.rows.length) {
+    this.remoteHandler(this.id, 'rowsFiltered', {
+      remove: true
+    });
+  } else {
+    this.remoteHandler(this.id, 'rowsFiltered', {
+      rowIds: rowIds
+    });
+  }
 };
 
 scout.Table.prototype._sendRowAction = function($row, columnId) {
@@ -1658,7 +1665,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
   var filteredRows = [];
   for (var i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
-    if (!row.rejectedByFilter) {
+    if (row.filterAccepted) {
       filteredRows.push(row);
     }
   }
@@ -1745,17 +1752,16 @@ scout.Table.prototype.filter = function() {
 
   // Filter rows
   this.rows.forEach(function(row) {
-    var show,
-      $row = row.$row;
+    var $row = row.$row;
 
-    show = that._rowAcceptedByFilters($row);
-    if (show) {
+    that._applyFiltersForRow(row);
+    if (row.filterAccepted) {
       if ($row.hasClass('invisible')) {
         rowsToShow.push(row);
       }
       rowCount++;
     } else {
-      if (!$row.hasClass('invisible')) {
+       if (!$row.hasClass('invisible')) {
         rowsToHide.push(row);
       }
     }
@@ -1786,10 +1792,10 @@ scout.Table.prototype._rowsFiltered = function(invisibleRows) {
   this._triggerRowsFiltered();
 };
 
-scout.Table.prototype._rowAcceptedByFilters = function($row) {
+scout.Table.prototype._rowAcceptedByFilters = function(row) {
   for (var key in this._filterMap) {
     var filter = this._filterMap[key];
-    if (!filter.accept($row)) {
+    if (!filter.accept(row.$row)) {
       return false;
     }
   }
@@ -1799,19 +1805,29 @@ scout.Table.prototype._rowAcceptedByFilters = function($row) {
 /**
  * @returns {Boolean} true if row state has changed, false if not
  */
-scout.Table.prototype._applyFiltersForRow = function($row) {
-  if (!this._rowAcceptedByFilters($row)) {
-    if (!$row.hasClass('invisible')) {
-      this.hideRow($row);
+scout.Table.prototype._applyFiltersForRow = function(row) {
+  if (this._rowAcceptedByFilters(row)) {
+    if (!row.filterAccepted) {
+      row.filterAccepted = true;
       return true;
     }
   } else {
-    if ($row.hasClass('invisible')) {
-      this.showRow($row);
+    if (row.filterAccepted) {
+      // flag is necessary to get correct filter count even when animation is still in progress
+      // and to store filter state to prevent unnecessary events
+      row.filterAccepted = false;
       return true;
     }
   }
   return false;
+};
+
+scout.Table.prototype._renderRowFilterAccepted = function(row) {
+  if (row.filterAccepted) {
+    this.showRow(row.$row);
+  } else {
+    this.hideRow(row.$row);
+  }
 };
 
 /**
@@ -1881,7 +1897,6 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
     return;
   }
 
-  row.rejectedByFilter = false;
   if (useAnimation) {
     $row.stop().slideDown({
       duration: 250,
@@ -1904,8 +1919,6 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
     return;
   }
 
-  // flag is necessary to get correct filter count even when animation is still in progress
-  row.rejectedByFilter = true;
   if (useAnimation) {
     $row.stop().slideUp({
       duration: 250,

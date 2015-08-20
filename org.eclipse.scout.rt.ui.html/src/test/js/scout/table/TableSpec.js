@@ -647,7 +647,8 @@ describe("Table", function() {
       render(table);
 
       expect(table.$sumRows().length).toBe(0);
-      table.hideRow(table.$rows().eq(2));
+      table.rows[2].filterAccepted = false;
+      table._renderRowFilterAccepted(table.rows[2]);
       table.group();
       expect(table.$sumRows().length).toBe(1);
     });
@@ -671,7 +672,8 @@ describe("Table", function() {
       rows[2].cells[1].value = 3;
       render(table);
 
-      table.hideRow(table.$rows().eq(2));
+      table.rows[2].filterAccepted = false;
+      table._renderRowFilterAccepted(table.rows[2]);
       table.group();
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('3');

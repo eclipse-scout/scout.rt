@@ -264,12 +264,7 @@ public class JsonTreeTest {
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_DELETED);
     assertTrue(responseEvents.size() == 1);
-
-    JsonEvent event = responseEvents.get(0);
-    JSONArray nodeIds = event.getData().getJSONArray("nodeIds");
-
-    assertTrue(nodeIds.length() == 1);
-    assertTrue(nodeIds.get(0).equals(node1Id));
+    assertEventTypeAndNodeIds(responseEvents.get(0), "nodesDeleted", node1Id);
   }
 
   /**
@@ -323,6 +318,78 @@ public class JsonTreeTest {
     assertNull(jsonTree.getNodeId(nodes.get(0)));
     assertNull(jsonTree.getNode(node0Id));
   }
+
+  @Test
+  public void testNodeFilter_events() throws ProcessingException, JSONException {
+    TreeNode nodeToFilter = new TreeNode();
+    nodeToFilter.setEnabled(false);
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(nodeToFilter);
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+    jsonTree.toJson();
+
+    String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
+    assertNotNull(node0Id);
+    assertNotNull(jsonTree.getNode(node0Id));
+
+    tree.addNodeFilter(new ITreeNodeFilter() {
+
+      @Override
+      public boolean accept(ITreeNode node, int level) {
+        return node.isEnabled();
+      }
+    });
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertNull(jsonTree.getNodeId(nodes.get(0)));
+    assertNull(jsonTree.getNode(node0Id));
+
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEventTypeAndNodeIds(events.get(0), "nodesDeleted", node0Id);
+  }
+
+//  @Test
+//  public void testNodeAndUserFilter() throws ProcessingException, JSONException {
+//    TreeNode node0 = new TreeNode();
+//    TreeNode node1 = new TreeNode();
+//    TreeNode node2 = new TreeNode();
+//    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+//    nodes.add(node0);
+//    nodes.add(node1);
+//    nodes.add(node2);
+//    ITree tree = createTree(nodes);
+//    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+//    jsonTree.toJson();
+//
+//    String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
+//    assertNotNull(node0Id);
+//    assertNotNull(jsonTree.getNode(node0Id));
+//
+//    node0.setEnabled(false);
+//    tree.addNodeFilter(new ITreeNodeFilter() {
+//
+//      @Override
+//      public boolean accept(ITreeNode node, int level) {
+//        return node.isEnabled();
+//      }
+//    });
+//
+//    JsonEvent event = createJsonRowsFilteredEvent(row0Id, row2Id);
+//    jsonTree.handleUiEvent(event);
+//
+//    JsonTestUtility.processBufferedEvents(m_uiSession);
+//    assertNull(jsonTree.getNodeId(nodes.get(0)));
+//    assertNull(jsonTree.getNode(node0Id));
+//
+//    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+//    assertEquals(1, events.size());
+//    assertEventTypeAndNodeIds(events.get(0), "nodesDeleted", node0Id);
+//  }
 
   /**
    * Tests whether the child nodes gets removed from the maps after deletion (m_treeNodes, m_treeNodeIds)
@@ -466,33 +533,40 @@ public class JsonTreeTest {
     ITree tree = createTree(nodes);
     tree.addChildNode(tree.getRootNode().getChildNode(0), new TreeNode());
     tree.addChildNode(tree.getRootNode().getChildNode(0), new TreeNode());
-    tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), new TreeNode());
+    TreeNode node0000 = new TreeNode();
+    node0000.setEnabled(false);
+    tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), node0000);
     tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), new TreeNode());
     tree.addChildNode(tree.getRootNode().getChildNode(1), new TreeNode());
 
-    IJsonAdapter<? super ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     m_uiSession.currentJsonResponse().addAdapter(jsonTree);
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
     System.out.println("Response #1: " + response);
+    String node0000Id = jsonTree.getNodeId(node0000);
     JsonTestUtility.endRequest(m_uiSession);
 
     // --------------------------------------
 
     // 3 events: filterChanged, nodeChanged, filterChanged
-    // filterChanged events are converted to allNodesDeleted + nodesInserted + nodesSelected events in JsonTree. Because of coalesce,
-    // the nodeChanged event will be removed (it is obsolete, because nodes are deleted and re-inserted later).
-    tree.applyNodeFilters();
-    tree.getRootNode().getChildNode(0).getChildNode(0).getCellForUpdate().setText("Test-Text");
+    // filterChanged events are converted to nodesDeleted event in JsonTree.
+    // Because of coalesce the nodeChanged event will be removed (it is obsolete, because nodes are deleted and re-inserted later).
+    tree.addNodeFilter(new ITreeNodeFilter() {
+
+      @Override
+      public boolean accept(ITreeNode node, int level) {
+        return node.isEnabled();
+      }
+    });
+    node0000.getCellForUpdate().setText("Test-Text");
     tree.applyNodeFilters();
 
     response = m_uiSession.currentJsonResponse().toJson();
     System.out.println("Response #2: " + response);
 
     List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
-    assertEquals(3, events.size());
-    assertEquals("allNodesDeleted", events.get(0).getType());
-    assertEquals("nodesInserted", events.get(1).getType());
-    assertEquals("nodesSelected", events.get(2).getType());
+    assertEquals(1, events.size());
+    assertEventTypeAndNodeIds(events.get(0), "nodesDeleted", node0000Id);
   }
 
   /**
@@ -515,6 +589,16 @@ public class JsonTreeTest {
     List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
     assertEquals(1, events.size());
     assertEquals("nodesInserted", events.get(0).getType());
+  }
+
+  protected void assertEventTypeAndNodeIds(JsonEvent event, String expectedType, String... expectedNodeIds) {
+    assertEquals(expectedType, event.getType());
+
+    JSONArray nodeIds = event.getData().getJSONArray("nodeIds");
+    assertTrue(nodeIds.length() == expectedNodeIds.length);
+    for (int i = 0; i < expectedNodeIds.length; i++) {
+      assertTrue(nodeIds.get(i).equals(expectedNodeIds[i]));
+    }
   }
 
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {

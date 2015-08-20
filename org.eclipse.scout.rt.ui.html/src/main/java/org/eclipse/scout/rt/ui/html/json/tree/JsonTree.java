@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
@@ -24,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
-import org.eclipse.scout.rt.client.ui.basic.tree.UserTreeNodeFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -53,7 +53,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
   public static final String EVENT_CHILD_NODE_ORDER_CHANGED = "childNodeOrderChanged";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
-  public static final String EVENT_NODES_FILTERED = "nodesFiltered";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
   public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
 
@@ -563,10 +562,14 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return getModel().getDropMaximumSize();
   }
 
-  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean ignoreDeletedNodes, boolean autoCreateNodeId) {
+  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean autoCreateNodeId) {
+    return nodeIdsToJson(modelNodes, true, autoCreateNodeId);
+  }
+
+  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean checkNodeAccepted, boolean autoCreateNodeId) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      if (!isNodeAccepted(node, ignoreDeletedNodes)) {
+      if (checkNodeAccepted && !isNodeAccepted(node)) {
         continue;
       }
       String nodeId;
@@ -710,9 +713,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     else if (EVENT_NODES_CHECKED.equals(event.getType())) {
       handleUiNodesChecked(event);
     }
-    else if (EVENT_NODES_FILTERED.equals(event.getType())) {
-      handleUiNodesFiltered(event);
-    }
     else {
       super.handleUiEvent(event);
     }
@@ -753,19 +753,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
   }
 
-  protected void handleUiNodesFiltered(JsonEvent event) {
-    final List<ITreeNode> nodes = extractTreeNodes(event.getData());
-    // Always add invisible root node to make sure rootNode.isFilterAccepted() returns true, otherwise no child node would be visible
-    if (!getModel().isRootNodeVisible()) {
-      nodes.add(0, getModel().getRootNode());
-    }
-    getModel().getUIFacade().setFilteredNodesFromUI(nodes);
-  }
-
   /**
    * Ignore deleted or filtered nodes, because for the UI, they don't exist
    */
-  protected boolean isNodeAccepted(ITreeNode node, boolean ignoreDeletedNodes) {
+  protected boolean isNodeAccepted(ITreeNode node) {
     if (node.isStatusDeleted()) {
       return false;
     }
@@ -776,16 +767,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return true;
   }
 
-  protected boolean isNodeAccepted(ITreeNode node) {
-    return isNodeAccepted(node, true);
-  }
-
   /**
    * @return true if only the user row filter has rejected the row
    */
   protected boolean isNodeRejectedByUserNodeFilter(ITreeNode node) {
     List<ITreeNodeFilter> rejectedBy = node.getRejectedBy();
-    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof UserTreeNodeFilter;
+    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof IUserFilter;
   }
 
   protected int getFilteredRowCount(ITreeNode parentNode) {

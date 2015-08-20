@@ -46,9 +46,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextUserTableFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -685,8 +685,13 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   protected void handleUiRowsFiltered(JsonEvent event) {
-    List<ITableRow> tableRows = extractTableRows(event.getData());
-    getModel().getUIFacade().setFilteredRowsFromUI(tableRows);
+    if (event.getData().optBoolean("remove")) {
+      getModel().getUIFacade().removeFilteredRowsFromUI();
+    }
+    else {
+      List<ITableRow> tableRows = extractTableRows(event.getData());
+      getModel().getUIFacade().setFilteredRowsFromUI(tableRows);
+    }
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {
@@ -781,7 +786,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
    */
   protected boolean isRowRejectedByUserRowFilter(ITableRow row) {
     List<ITableRowFilter> rejectedBy = row.getRejectedBy();
-    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof UserTableRowFilter;
+    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof IUserFilter;
   }
 
   protected List<ITableRow> extractTableRows(JSONObject json) {

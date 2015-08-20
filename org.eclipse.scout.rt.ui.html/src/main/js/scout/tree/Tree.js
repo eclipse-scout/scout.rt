@@ -997,6 +997,16 @@ scout.Tree.prototype._decorateNode = function(node) {
     $node.attr('title', node.tooltipText);
   }
 
+  // apply node filter
+  if (this._applyFiltersForNode(node)) {
+    var newInvisibleNodes = [];
+    if (!node.filterAccepted) {
+      newInvisibleNodes.push(node);
+    }
+    this._nodesFiltered(newInvisibleNodes);
+  }
+  this._renderNodeFilterAccepted(node);
+
   this.dragAndDropHandler.install($node);
   // TODO BSH More attributes...
   // iconId
@@ -1084,12 +1094,6 @@ scout.Tree.prototype._sendNodesChecked = function(nodes) {
   }
 
   this.remoteHandler(this.id, 'nodesChecked', data);
-};
-
-scout.Tree.prototype._sendNodesFiltered = function(nodeIds) {
-  this.remoteHandler(this.id, 'nodesFiltered', {
-    nodeIds: nodeIds
-  });
 };
 
 scout.Tree.prototype._renderTreeItemControl = function($node) {
@@ -1360,18 +1364,6 @@ scout.Tree.prototype.selectedNodes = function() {
   return nodes;
 };
 
-scout.Tree.prototype.filteredNodes = function() {
-  var filteredNodes = [];
-  for (var i = 0; i < this.nodes.length; i++) {
-    var node = this.nodes[i];
-    if (!node.rejectedByFilter) {
-      filteredNodes.push(node);
-    }
-  }
-  //FIXME CGU maybe cache, every listener reads filter count -> a lot of loops
-  return filteredNodes;
-};
-
 /**
  * @param filter object with createKey() and accept()
  */
@@ -1394,15 +1386,13 @@ scout.Tree.prototype.filter = function() {
 
   // Filter rows
   this._visitNodes(this.nodes, function(node) {
-    var show,
-      $node = node.$node;
-
+    var $node = node.$node;
     if (!$node) {
       //FIXME CGU zusammengeklappte nodes auch durchgehen? eigentlich ja...
       return;
     }
-    show = that._nodeAcceptedByFilters($node);
-    if (show) {
+    that._applyFiltersForNode(node);
+    if (node.filterAccepted) {
       if ($node.hasClass('invisible')) {
         nodesToShow.push(node);
       }
@@ -1429,15 +1419,12 @@ scout.Tree.prototype.filter = function() {
 scout.Tree.prototype._nodesFiltered = function(invisibleNodes) {
   // non visible nodes must be deselected
   this.deselectNodes(invisibleNodes);
-
-  // notify
-  this._sendNodesFiltered(this._nodesToIds(this.filteredNodes()));
 };
 
-scout.Tree.prototype._nodeAcceptedByFilters = function($node) {
+scout.Tree.prototype._nodeAcceptedByFilters = function(node) {
   for (var i=0; i < this._filters.length; i++) {
     var filter = this._filters[i];
-    if (!filter.accept($node)) {
+    if (!filter.accept(node.$node)) {
       return false;
     }
   }
@@ -1447,21 +1434,30 @@ scout.Tree.prototype._nodeAcceptedByFilters = function($node) {
 /**
  * @returns {Boolean} true if node state has changed, false if not
  */
-scout.Tree.prototype._applyFiltersForNode = function($node) {
-  if (!this._nodeAcceptedByFilters($node)) {
-    if (!$node.hasClass('invisible')) {
-      this.hideNode($node);
+scout.Tree.prototype._applyFiltersForNode = function(node) {
+  if (this._nodeAcceptedByFilters(node)) {
+    if (!node.filterAccepted) {
+      node.filterAccepted = true;
       return true;
     }
   } else {
-    if ($node.hasClass('invisible')) {
-      this.showNode($node);
+    if (node.filterAccepted) {
+      // flag is necessary to get correct filter count even when animation is still in progress
+      // and to store filter state to prevent unnecessary events
+      node.filterAccepted = false;
       return true;
     }
   }
   return false;
 };
 
+scout.Tree.prototype._renderNodeFilterAccepted = function(node) {
+  if (node.filterAccepted) {
+    this.showNode(node.$node);
+  } else {
+    this.hideNode(node.$node);
+  }
+};
 
 scout.Tree.prototype.showNode = function($node, useAnimation) {
   var that = this,
@@ -1470,7 +1466,6 @@ scout.Tree.prototype.showNode = function($node, useAnimation) {
     return;
   }
 
-  node.rejectedByFilter = false;
   if (useAnimation) {
     $node.stop().slideDown({
       duration: 250,
@@ -1493,8 +1488,6 @@ scout.Tree.prototype.hideNode = function($node, useAnimation) {
     return;
   }
 
-  // flag is necessary to get correct filter count even when animation is still in progress
-  node.rejectedByFilter = true;
   if (useAnimation) {
     $node.stop().slideUp({
       duration: 250,

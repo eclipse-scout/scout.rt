@@ -1,5 +1,5 @@
 /* global TableSpecHelper*/
-describe("UserFilter", function() {
+describe("Table Filter", function() {
   var session;
   var helper;
 
