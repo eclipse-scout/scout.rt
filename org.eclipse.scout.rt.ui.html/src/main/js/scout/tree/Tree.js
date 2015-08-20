@@ -336,7 +336,23 @@ scout.Tree.prototype.collapseAll = function() {
 
 };
 
-scout.Tree.prototype.setNodeExpanded = function(node, expanded, forceRenderExpansion) {
+scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
+  opts = opts || {};
+
+  // Optionally collapse all children (recursively)
+  if (opts.collapseChildNodes) {
+    // Suppress render expansion
+    var childOpts = scout.objects.valueCopy(opts);
+    childOpts.renderExpansion = false;
+
+    node.childNodes.forEach(function(childNode) {
+      if (childNode.expanded) {
+        this.setNodeExpanded(childNode, false, childOpts);
+      }
+    }.bind(this));
+  }
+
+  // Set expansion state
   if (node.expanded !== expanded) {
     node.expanded = expanded;
 
@@ -346,12 +362,15 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, forceRenderExpan
     });
   }
 
-  if (this.rendered || forceRenderExpansion) {
-    this._renderExpansion(node);
+  // Render expansion
+  if (this.rendered && scout.helpers.nvl(opts.renderExpansion, true)) {
+    this._renderExpansion(node, null, opts.animateExpansion);
   }
 };
 
-scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
+scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
+  animate = scout.helpers.nvl(animate, true);
+
   var $wrapper,
     $node = node.$node,
     expanded = node.expanded;
@@ -383,7 +402,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
     if (!$node.hasClass('leaf') && !$node.hasClass('expanded')) { // can expand
       if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
         var $newNodes = scout.Tree.collectSubtree($node, false);
-        if ($newNodes.length) {
+        if (animate && $newNodes.length) {
           $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
           var h = $wrapper.outerHeight();
           var removeContainer = function() {
@@ -410,9 +429,12 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor) {
             delete node.$node;
           }
         });
-        $wrapper = $existingNodes.wrapAll('<div class="animationWrapper">)').parent();
-        $wrapper
-          .animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
+        if (animate) {
+          $wrapper = $existingNodes.wrapAll('<div class="animationWrapper">)').parent();
+          $wrapper.animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
+        } else {
+          $existingNodes.remove();
+        }
       }
     }
   }
@@ -499,7 +521,7 @@ scout.Tree.prototype._renderSelection = function() {
 
     // in case of breadcrumb, expand
     if (this._breadcrumbEnabled) {
-      this.setNodeExpanded($nodes[i].data('node'), true, true);
+      this.setNodeExpanded($nodes[i].data('node'), true, {renderExpansion: true}); // force render expansion
     }
   }
 
@@ -543,7 +565,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       if (!$parentNode) {
         throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
-      this.setNodeExpanded(parentNodes[i], true, true);
+      this.setNodeExpanded(parentNodes[i], true, {renderExpansion: true}); // force render expansion
     }
   }
 };
@@ -1155,14 +1177,15 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   var $node = $(event.currentTarget).parent();
   var node = $node.data('node');
   var expanded = !$node.hasClass('expanded');
+  var expansionOpts = {};
 
   // Click on "show all" control shows all nodes
   if ($node.hasClass('show-all')) {
-    if (event.which === 3) {
-      // Right mouse button --> collapse (because the normal collapse icon is not visible)
+    if (event.ctrlKey || event.shiftKey) {
+      // Collapse
       expanded = false;
-    }
-    else {
+      expansionOpts.collapseChildNodes = true;
+    } else {
       // Show all nodes
       this._showAllNodes(node);
       return false;
@@ -1171,7 +1194,7 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
 
   // FIXME cru/cgu: talk about click on not selected nodes
   this.setNodesSelected(node);
-  this.setNodeExpanded(node, expanded);
+  this.setNodeExpanded(node, expanded, expansionOpts);
 
   // prevent immediately reopening
   return false;

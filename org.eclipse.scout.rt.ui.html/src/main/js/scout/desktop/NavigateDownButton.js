@@ -51,8 +51,22 @@ scout.NavigateDownButton.prototype._drill = function() {
     $.log.debug('drill down to node ' + drillNode);
     this.outline.lazyAddChildNodesToTree(true);
     try {
+      // Collapse other expanded child nodes
+      var parentNode = drillNode.parentNode;
+      parentNode.childNodes.forEach(function(childNode) {
+        if (childNode.expanded && childNode !== drillNode) {
+          this.outline.setNodeExpanded(childNode, false, {animateExpansion: false});
+        }
+      }.bind(this));
+
+      // Select the target node
       this.outline.setNodesSelected(drillNode); // this also expands the parent node, if required
-      this.outline.setNodeExpanded(drillNode, false);
+
+      // If the parent node is a table page node, expand the drillNode
+      // --> Same logic as in OutlineMediator.mediateTableRowAction()
+      if (parentNode.nodeType === 'table') {
+        this.outline.setNodeExpanded(drillNode, true);
+      }
     }
     finally {
       this.outline.lazyAddChildNodesToTree(false);
