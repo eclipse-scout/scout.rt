@@ -445,6 +445,10 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
   protected void handleUiRowClicked(JsonEvent event) {
     ITableRow tableRow = extractTableRow(event.getData());
+    if (tableRow == null) {
+      LOG.warn("Requested table-row doesn't exist anymore -> skip rowClicked event");
+      return;
+    }
     IColumn column = extractColumn(event.getData());
     ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
     rows.add(tableRow);
@@ -488,7 +492,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   protected void handleUiResetColumns(JsonEvent event) {
-    //FIXME AWE/CGU Code from ResetColumnsMenu, move to ITableUiFacade
+    // FIXME AWE/CGU Code from ResetColumnsMenu, move to ITableUiFacade
     try {
       getModel().setTableChanging(true);
       getModel().resetDisplayableColumns();
@@ -576,6 +580,10 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
   protected void handleUiPrepareCellEdit(JsonEvent event) {
     ITableRow row = extractTableRow(event.getData());
+    if (row == null) {
+      LOG.warn("Requested table-row doesn't exist anymore. Skip prepareCellEdit event");
+      return;
+    }
     IColumn column = extractColumn(event.getData());
     IFormField field = getModel().getUIFacade().prepareCellEditFromUI(row, column);
     if (field == null) {
@@ -780,11 +788,19 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   protected List<ITableRow> extractTableRows(JSONObject json) {
-    return jsonToTableRows(json.getJSONArray(PROP_ROW_IDS));
+    JSONArray rowIds = json.getJSONArray(PROP_ROW_IDS);
+    List<ITableRow> rows = new ArrayList<>(rowIds.length());
+    for (int i = 0; i < rowIds.length(); i++) {
+      ITableRow tableRow = optTableRow((String) rowIds.get(i));
+      if (tableRow != null) {
+        rows.add(tableRow);
+      }
+    }
+    return rows;
   }
 
   protected ITableRow extractTableRow(JSONObject json) {
-    return getTableRow(json.getString(PROP_ROW_ID));
+    return optTableRow(json.getString(PROP_ROW_ID));
   }
 
   protected IColumn extractColumn(JSONObject json) {
@@ -822,18 +838,23 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     return jsonColumn.getId();
   }
 
-  protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
-    List<ITableRow> rows = new ArrayList<>(rowIds.length());
-    for (int i = 0; i < rowIds.length(); i++) {
-      rows.add(getTableRow((String) rowIds.get(i)));
-    }
-    return rows;
+  /**
+   * Returns a tableRow for the given rowId, or null when no row is found for the given rowId.
+   */
+  protected ITableRow optTableRow(String rowId) {
+    return m_tableRows.get(rowId);
   }
 
+  /**
+   * Returns a tableRow for the given rowId.
+   *
+   * @throws UiException
+   *           when no rowiss found for the given rowId
+   */
   protected ITableRow getTableRow(String rowId) {
-    ITableRow row = m_tableRows.get(rowId);
+    ITableRow row = optTableRow(rowId);
     if (row == null) {
-      throw new UiException("No row found for id " + rowId);
+      throw new UiException("No table-row found for ID " + rowId);
     }
     return row;
   }
@@ -1218,13 +1239,15 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     CheckedInfo checkInfo = new CheckedInfo();
     for (int i = 0; i < jsonRows.length(); i++) {
       JSONObject jsonObject = jsonRows.optJSONObject(i);
-      ITableRow row = m_tableRows.get(jsonObject.getString("rowId"));
-      checkInfo.getAllRows().add(row);
-      if (jsonObject.optBoolean("checked")) {
-        checkInfo.getCheckedRows().add(row);
-      }
-      else {
-        checkInfo.getUncheckedRows().add(row);
+      ITableRow row = optTableRow(jsonObject.getString("rowId"));
+      if (row != null) {
+        checkInfo.getAllRows().add(row);
+        if (jsonObject.optBoolean("checked")) {
+          checkInfo.getCheckedRows().add(row);
+        }
+        else {
+          checkInfo.getUncheckedRows().add(row);
+        }
       }
     }
     return checkInfo;

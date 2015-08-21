@@ -1081,6 +1081,18 @@ public class JsonTableTest {
     assertNull(events); // No events should be emitted
   }
 
+  @Test
+  public void testOptTableRow() throws Exception {
+    JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(new TableWith3Cols(), null);
+    assertNull(jsonTable.optTableRow("foo"));
+  }
+
+  @Test(expected = UiException.class)
+  public void testGetTableRow() throws Exception {
+    JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(new TableWith3Cols(), null);
+    jsonTable.getTableRow("foo");
+  }
+
   public static Table createTableFixture(int numRows) throws ProcessingException {
     Table table = new Table();
     table.fill(numRows);

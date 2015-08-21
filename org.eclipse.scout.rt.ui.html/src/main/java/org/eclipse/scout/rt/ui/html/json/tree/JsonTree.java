@@ -9,6 +9,8 @@ import java.util.Map;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -39,6 +41,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
 
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_NODES_UPDATED = "nodesUpdated";
@@ -417,7 +421,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       // Check for virtual nodes that were replaces with real nodes (this will have triggered an NODES_UPDATED event).
       // This would not really be necessary, as both nodes are considered "equal" (see implementation of VirtualTreeNode),
       // but some properties have to be updated in the UI, therefore we replace the nodes in our internal maps.
-      ITreeNode cachedNode = getNode(nodeId);
+      ITreeNode cachedNode = optTreeNodeForNodeId(nodeId);
       if (cachedNode instanceof IVirtualTreeNode && cachedNode != node) {
         m_treeNodeIds.put(node, nodeId);
         m_treeNodes.put(nodeId, node);
@@ -615,13 +619,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return m_treeNodeIds.get(node);
   }
 
-  protected ITreeNode getNode(String nodeId) {
-    if (nodeId == null) {
-      return null;
-    }
-    return m_treeNodes.get(nodeId);
-  }
-
   protected boolean isInvisibleRootNode(ITreeNode node) {
     if (!getModel().isRootNodeVisible()) {
       return (node == getModel().getRootNode());
@@ -671,8 +668,21 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return json;
   }
 
+  /**
+   * Returns a treeNode for the given nodeId, or null when no node is found for the given nodeId.
+   */
+  public ITreeNode optTreeNodeForNodeId(String nodeId) { // FIXME AWE: check where to use this method
+    return m_treeNodes.get(nodeId);
+  }
+
+  /**
+   * Returns a treeNode for the given nodeId.
+   *
+   * @throws UiException
+   *           when no node is found for the given nodeId
+   */
   public ITreeNode getTreeNodeForNodeId(String nodeId) {
-    ITreeNode node = m_treeNodes.get(nodeId);
+    ITreeNode node = optTreeNodeForNodeId(nodeId);
     if (node == null) {
       throw new UiException("No node found for id " + nodeId);
     }
@@ -680,13 +690,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   public List<ITreeNode> extractTreeNodes(JSONObject json) {
-    return jsonToTreeNodes(json.getJSONArray(PROP_NODE_IDS));
-  }
-
-  public List<ITreeNode> jsonToTreeNodes(JSONArray nodeIds) {
+    JSONArray nodeIds = json.getJSONArray(PROP_NODE_IDS);
     List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
     for (int i = 0; i < nodeIds.length(); i++) {
-      ITreeNode node = getNode(nodeIds.getString(i));
+      ITreeNode node = optTreeNodeForNodeId(nodeIds.getString(i));
       if (node != null) {
         nodes.add(node);
       }
@@ -728,12 +735,22 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleUiNodeClicked(JsonEvent event) {
-    final ITreeNode node = getTreeNodeForNodeId(event.getData().getString(PROP_NODE_ID));
+    String nodeId = event.getData().getString(PROP_NODE_ID);
+    ITreeNode node = optTreeNodeForNodeId(nodeId);
+    if (node == null) {
+      LOG.warn("Requested tree-node with ID " + nodeId + " doesn't exist. Skip nodeClicked event");
+      return;
+    }
     getModel().getUIFacade().fireNodeClickFromUI(node, MouseButton.Left);
   }
 
   protected void handleUiNodeAction(JsonEvent event) {
-    final ITreeNode node = getTreeNodeForNodeId(event.getData().getString(PROP_NODE_ID));
+    String nodeId = event.getData().getString(PROP_NODE_ID);
+    ITreeNode node = optTreeNodeForNodeId(nodeId);
+    if (node == null) {
+      LOG.warn("Requested tree-node with ID " + nodeId + " doesn't exist. Skip nodeAction event");
+      return;
+    }
     getModel().getUIFacade().fireNodeActionFromUI(node);
   }
 
@@ -744,7 +761,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleUiNodeExpanded(JsonEvent event) {
-    ITreeNode node = getTreeNodeForNodeId(event.getData().getString(PROP_NODE_ID));
+    String nodeId = event.getData().getString(PROP_NODE_ID);
+    ITreeNode node = optTreeNodeForNodeId(nodeId);
+    if (node == null) {
+      LOG.warn("Requested tree-node with ID " + nodeId + " doesn't exist. Skip nodeExpanded event");
+      return;
+    }
     boolean expanded = event.getData().getBoolean(PROP_EXPANDED);
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
