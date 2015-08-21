@@ -1,7 +1,8 @@
 scout.NavigateUpButton = function(outline, node) {
   scout.NavigateUpButton.parent.call(this, outline, node);
-  this._text1 = 'ui.Back';
-  this._text2 = 'ui.Up';
+  this._text1 = ''; // FIXME AWE: remove or use as tooltip
+  this._text2 = '';
+  this.iconId = scout.icons.CHEVRON_UP;
   this.objectType = 'NavigateUpButton';
   this.keyStroke = 'backspace';
   this.initKeyStrokeParts();

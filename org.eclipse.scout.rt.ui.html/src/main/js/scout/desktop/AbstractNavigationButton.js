@@ -14,7 +14,6 @@ scout.AbstractNavigationButton = function(outline, node) {
   this.visible = true;
   this.enabled = true;
   this.mandatory = false;
-  this.actionStyle = scout.Action.ActionStyle.BUTTON;
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Menu);
 
@@ -26,10 +25,10 @@ scout.inherits(scout.AbstractNavigationButton, scout.Menu);
 scout.AbstractNavigationButton.prototype._render = function($parent) {
   if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
-    this.text = this.session.text(this._text1);
+    this.text = ''; // this.session.text(this._text1);
   } else {
     this._onClickFunc = this._drill.bind(this);
-    this.text = this.session.text(this._text2);
+    this.text = ''; // this.session.text(this._text2);
   }
   this.enabled = this._buttonEnabled();
   scout.AbstractNavigationButton.parent.prototype._render.call(this, $parent);

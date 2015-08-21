@@ -83,23 +83,20 @@ scout.Outline.prototype._decorateNode = function(node) {
 };
 
 scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
-  var menus = scout.arrays.ensure(formOrTable.staticMenus);
-  if (!this._hasMenu(menus, scout.NavigateUpButton)) {
-    var upButton = new scout.NavigateUpButton(this, node);
-    menus.push(upButton);
-  }
-  if (!this._hasMenu(menus, scout.NavigateDownButton)) {
-    var downButton = new scout.NavigateDownButton(this, node);
-    menus.push(downButton);
+  var menus = scout.arrays.ensure(formOrTable.staticMenus),
+    navMenu = this._getMenu(menus, scout.NavigationMenu);
+
+  if (!navMenu) {
+    navMenu = new scout.NavigationMenu(this, node);
+    menus.push(navMenu);
   }
   if (formOrTable instanceof scout.Form) {
     formOrTable.rootGroupBox.staticMenus = menus;
   } else {
-    var table = formOrTable,
-      button = this._getMenu(menus, scout.NavigateDownButton);
+    var table = formOrTable;
     table.staticMenus = menus;
     this._tableSelectionListener = table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
-      button.updateEnabled();
+      navMenu.updateEnabled();
     });
   }
 };
