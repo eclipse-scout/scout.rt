@@ -22,5 +22,9 @@ scout.DetailTableTreeFilter.prototype.accept = function($node) {
     // detailTable may be undefined if node.detailTableVisible is false
     return true;
   }
+  if (!node.row) {
+    // link not yet established, as soon as row gets inserted and filtered, a refilter will be triggered on the tree
+    return true;
+  }
   return node.row.filterAccepted;
 };

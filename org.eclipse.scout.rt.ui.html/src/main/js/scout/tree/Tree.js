@@ -726,7 +726,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
+scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
   var parentNode, nodes;
 
   if (parentNodeId >= 0) {
@@ -1559,8 +1559,8 @@ scout.Tree.prototype.onModelAction = function(event) {
     this._onNodesUpdated(event.nodes, event.commonParentNodeId);
   } else if (event.type === 'nodesDeleted') {
     this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
-  } else if (event.type === 'allNodesDeleted') {
-    this._onAllNodesDeleted(event.commonParentNodeId);
+  } else if (event.type === 'allChildNodesDeleted') {
+    this._onAllChildNodesDeleted(event.commonParentNodeId);
   } else if (event.type === 'nodesSelected') {
     this._onNodesSelected(event.nodeIds);
   } else if (event.type === 'nodeExpanded') {

@@ -121,11 +121,11 @@ describe("Tree", function() {
     };
   }
 
-  function createAllNodesDeletedEvent(model, commonParentNodeId) {
+  function createAllChildNodesDeletedEvent(model, commonParentNodeId) {
     return {
       target: model.id,
       commonParentNodeId: commonParentNodeId,
-      type: 'allNodesDeleted'
+      type: 'allChildNodesDeleted'
     };
   }
 
@@ -989,7 +989,7 @@ describe("Tree", function() {
 
     });
 
-    describe("allNodesDeleted event", function() {
+    describe("allChildNodesDeleted event", function() {
       var model;
       var tree;
       var node0;
@@ -1015,7 +1015,7 @@ describe("Tree", function() {
         expect(Object.keys(tree.nodesMap).length).toBe(12);
 
         var message = {
-          events: [createAllNodesDeletedEvent(model)]
+          events: [createAllChildNodesDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
 
@@ -1029,7 +1029,7 @@ describe("Tree", function() {
         expect(findAllNodes(tree).length).toBe(12);
 
         var message = {
-          events: [createAllNodesDeletedEvent(model)]
+          events: [createAllChildNodesDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
 
@@ -1041,7 +1041,7 @@ describe("Tree", function() {
         expect(Object.keys(tree.nodesMap).length).toBe(12);
 
         var message = {
-          events: [createAllNodesDeletedEvent(model, node1.id)]
+          events: [createAllChildNodesDeletedEvent(model, node1.id)]
         };
         session._processSuccessResponse(message);
 
@@ -1055,7 +1055,7 @@ describe("Tree", function() {
         expect(findAllNodes(tree).length).toBe(12);
 
         var message = {
-          events: [createAllNodesDeletedEvent(model, node1.id)]
+          events: [createAllChildNodesDeletedEvent(model, node1.id)]
         };
         session._processSuccessResponse(message);
 
@@ -1251,7 +1251,7 @@ describe("Tree", function() {
 
         //Delete child nodes from node0
         var message = {
-          events: [createAllNodesDeletedEvent(model, node0.id)]
+          events: [createAllChildNodesDeletedEvent(model, node0.id)]
         };
         session._processSuccessResponse(message);
         expect(node0.childNodes.length).toBe(0);

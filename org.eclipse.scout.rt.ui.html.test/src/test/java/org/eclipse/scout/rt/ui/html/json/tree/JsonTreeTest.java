@@ -438,7 +438,7 @@ public class JsonTreeTest {
     tree.removeChildNodes(tree.getRootNode(), tree.getRootNode().getChildNodes());
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        m_uiSession.currentJsonResponse(), JsonTree.EVENT_ALL_NODES_DELETED);
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_ALL_CHILD_NODES_DELETED);
     JsonEvent event = responseEvents.get(0);
     assertNull(event.getData().optJSONArray("nodeIds"));
   }

@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -46,7 +45,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserTableFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -776,17 +774,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
     if (!row.isFilterAccepted()) {
       // Accept if rejected by user row filter because gui is and should be aware of that row
-      return isRowRejectedByUserRowFilter(row);
+      return row.isRejectedByUser();
     }
     return true;
-  }
-
-  /**
-   * @return true if only the user row filter has rejected the row
-   */
-  protected boolean isRowRejectedByUserRowFilter(ITableRow row) {
-    List<ITableRowFilter> rejectedBy = row.getRejectedBy();
-    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof IUserFilter;
   }
 
   protected List<ITableRow> extractTableRows(JSONObject json) {
@@ -893,7 +883,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
               rowsToInsert.add(row);
             }
           }
-          else if (!isRowRejectedByUserRowFilter(row)) {
+          else if (!row.isRejectedByUser()) {
             if (existingRowId != null) {
               // Row is filtered, but JsonTable has it in its list --> handle as deletion event
               rowsToDelete.add(row);
@@ -1042,7 +1032,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     }
     int filteredRowCount = 0;
     for (ITableRow row : getModel().getRows()) {
-      if (row.isFilterAccepted() || isRowRejectedByUserRowFilter(row)) {
+      if (row.isFilterAccepted() || row.isRejectedByUser()) {
         filteredRowCount++;
       }
     }

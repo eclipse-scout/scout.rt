@@ -16,10 +16,8 @@ import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
@@ -45,7 +43,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_NODES_UPDATED = "nodesUpdated";
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
-  public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
+  public static final String EVENT_ALL_CHILD_NODES_DELETED = "allChildNodesDeleted";
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_CLICKED = "nodeClicked";
   public static final String EVENT_NODE_ACTION = "nodeAction";
@@ -264,7 +262,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
                 nodesToInsert.add(node);
               }
             }
-            else if (!isNodeRejectedByUserNodeFilter(node)) {
+            else if (!node.isRejectedByUser()) {
               if (existingNodeId != null) {
                 // Node is filtered, but JsonTree has it in its list --> handle as deletion event
                 nodesToDelete.add(node);
@@ -440,14 +438,14 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected void handleModelNodesDeleted(TreeEvent event) {
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
-    // Small optimization: If there is no parent node (i.e. the root node was deleted) or no nodes remain, just
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
+    // Small optimization: If no nodes remain, just
     // send "all" instead of every single nodeId. (However, the nodes must be disposed individually.)
     // Caveat: This can only be optimized when no nodes were inserted again in the same "tree changing" scope.
-    if (event.getCommonParentNode() == null || getFilteredRowCount(event.getCommonParentNode()) == 0) {
-      addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
+    if (event.getCommonParentNode() != null && getFilteredNodeCount(event.getCommonParentNode()) == 0) {
+      addActionEvent(EVENT_ALL_CHILD_NODES_DELETED, jsonEvent);
     }
     else {
-      putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
       JSONArray jsonNodeIds = nodeIdsToJson(nodes, false, false);
       if (jsonNodeIds.length() > 0) {
         putProperty(jsonEvent, PROP_NODE_IDS, jsonNodeIds);
@@ -460,7 +458,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   protected void handleModelAllChildNodesDeleted(TreeEvent event) {
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
-    addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
+    addActionEvent(EVENT_ALL_CHILD_NODES_DELETED, jsonEvent);
     // Read the removed nodes from the event, because they are no longer contained in the model
     disposeNodes(event.getChildNodes(), true);
   }
@@ -762,26 +760,21 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     }
     if (!node.isFilterAccepted()) {
       // Accept if rejected by user row filter because gui is and should be aware of that row
-      return isNodeRejectedByUserNodeFilter(node);
+      return node.isRejectedByUser();
     }
     return true;
   }
 
   /**
-   * @return true if only the user row filter has rejected the row
+   * @return the filtered node count excluding nodes filtered by the user
    */
-  protected boolean isNodeRejectedByUserNodeFilter(ITreeNode node) {
-    List<ITreeNodeFilter> rejectedBy = node.getRejectedBy();
-    return rejectedBy.size() == 1 && rejectedBy.get(0) instanceof IUserFilter;
-  }
-
-  protected int getFilteredRowCount(ITreeNode parentNode) {
+  protected int getFilteredNodeCount(ITreeNode parentNode) {
     if (getModel().getNodeFilters().size() == 0) {
       return parentNode.getChildNodeCount();
     }
     int filteredNodeCount = 0;
     for (ITreeNode node : parentNode.getChildNodes()) {
-      if (node.isFilterAccepted() || isNodeRejectedByUserNodeFilter(node)) {
+      if (node.isFilterAccepted() || node.isRejectedByUser()) {
         filteredNodeCount++;
       }
     }

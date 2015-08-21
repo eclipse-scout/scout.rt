@@ -78,11 +78,11 @@ describe("Outline", function() {
     };
   }
 
-  function createAllNodesDeletedEvent(model, commonParentNodeId) {
+  function createAllChildNodesDeletedEvent(model, commonParentNodeId) {
     return {
       target: model.id,
       commonParentNodeId: commonParentNodeId,
-      type: 'allNodesDeleted'
+      type: 'allChildNodesDeleted'
     };
   }
 
@@ -148,7 +148,7 @@ describe("Outline", function() {
 
     });
 
-    describe("allNodesDeleted event", function() {
+    describe("allChildNodesDeleted event", function() {
       var model, tree, node0, node1, node2;
 
       beforeEach(function() {
@@ -164,7 +164,7 @@ describe("Outline", function() {
         spyOn(tree, '_onNodeDeleted');
 
         var message = {
-          events: [createAllNodesDeletedEvent(model)]
+          events: [createAllChildNodesDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
 
