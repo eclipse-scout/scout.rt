@@ -1600,4 +1600,14 @@ public final class RwtUtility {
     int keyCode = getRwtKeyCode(ks);
     return LegacyActionTools.convertAccelerator(stateMask | keyCode);
   }
+
+  /**
+   * Checks if the given widget is enabled for markup.
+   * 
+   * @since 4.0.200-RC6
+   */
+  public static boolean isMarkupEnabled(Widget w) {
+    return Boolean.TRUE.equals(w.getData(RWT.MARKUP_ENABLED));
+  }
+
 }

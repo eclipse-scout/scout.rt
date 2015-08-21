@@ -16,11 +16,9 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -28,6 +26,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -133,33 +132,28 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   @Override
   public String getText(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
-    if (scoutNode != null && scoutNode.getCell() != null) {
-      ICell cell = scoutNode.getCell();
-      String text = cell.getText();
-      if (text == null) {
-        text = "";
-      }
 
-      if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        text = m_env.adaptHtmlCell(getUiTree(), text);
-        text = m_env.convertLinksInHtmlCell(getUiTree(), text);
-      }
-      else {
-        if (text.indexOf("\n") >= 0) {
-          text = StringUtility.replaceNewLines(text, " ");
-        }
-        boolean markupEnabled = Boolean.TRUE.equals(getUiTree().getUiField().getData(RWT.MARKUP_ENABLED));
-        if (markupEnabled) {
-          text = HtmlTextUtility.transformPlainTextToHtml(text);
-        }
-      }
-
-      if (cell instanceof Cell) {
-        return m_env.getHtmlValidator().validate(text, (Cell) cell);
-      }
-      return text;
+    if (scoutNode == null || scoutNode.getCell() == null) {
+      return "";
     }
-    return "";
+
+    ICell cell = scoutNode.getCell();
+    String text = StringUtility.nvl(cell.getText(), "");
+
+    if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
+      text = m_env.adaptHtmlCell(getUiTree(), text);
+      text = m_env.convertLinksInHtmlCell(getUiTree(), text);
+    }
+    else {
+      if (text.indexOf("\n") >= 0) {
+        text = StringUtility.replaceNewLines(text, " ");
+      }
+      if (cell.isHtmlEnabled() && RwtUtility.isMarkupEnabled(getUiTree().getUiField())) {
+        return HtmlTextUtility.transformPlainTextToHtml(text);
+      }
+    }
+
+    return HtmlTextUtility.validateHtmlCapableText(m_env.getHtmlValidator(), cell, text);
   }
 
   @Override

@@ -6,10 +6,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -21,6 +19,7 @@ import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -95,25 +94,19 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       if (!multiline) {
         text = replaceLineBreaksInMultilineText(text);
       }
-      boolean isMultilineTable = getScoutTable().isMultilineText();
-      boolean markupEnabled = Boolean.TRUE.equals(getUiTable().getUiField().getData(RWT.MARKUP_ENABLED));
 
-      if (markupEnabled || multiline) {
+      if (cell.isHtmlEnabled() && (RwtUtility.isMarkupEnabled(getUiTable().getUiField()) || multiline)) {
         boolean replaceBreakableChars = true;
         IColumn<?> column = m_columnManager.getColumnByModelIndex(columnIndex - 1);
-        if (column instanceof IStringColumn && isMultilineTable) {
+        if (column instanceof IStringColumn && getScoutTable().isMultilineText()) {
           IStringColumn stringColumn = (IStringColumn) column;
           replaceBreakableChars = !stringColumn.isTextWrap();
         }
-        text = HtmlTextUtility.transformPlainTextToHtml(text, replaceBreakableChars);
+        return HtmlTextUtility.transformPlainTextToHtml(text, replaceBreakableChars);
       }
     }
 
-    if (cell instanceof Cell) {
-      return m_env.getHtmlValidator().validate(text, (Cell) cell);
-    }
-
-    return text;
+    return HtmlTextUtility.validateHtmlCapableText(m_env.getHtmlValidator(), cell, text);
   }
 
   private boolean isMultiline(String text) {
