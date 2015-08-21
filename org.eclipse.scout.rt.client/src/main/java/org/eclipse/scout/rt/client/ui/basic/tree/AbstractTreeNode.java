@@ -71,7 +71,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_childrenVolatile;
   private boolean m_childrenDirty;
   private boolean m_filterAccepted;
-  private List<ITreeNodeFilter> m_rejectedBy;
+  private boolean m_rejectedByUser;
   private Object m_primaryKey;// user object
   // enabled is defined as: enabledGranted && enabledProperty
   private boolean m_enabled;
@@ -400,16 +400,13 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public List<ITreeNodeFilter> getRejectedBy() {
-    if (m_rejectedBy == null) {
-      m_rejectedBy = new ArrayList<ITreeNodeFilter>();
-    }
-    return m_rejectedBy;
+  public boolean isRejectedByUser() {
+    return m_rejectedByUser;
   }
 
   @Override
-  public void setRejectedBy(List<ITreeNodeFilter> filters) {
-    m_rejectedBy = CollectionUtility.arrayList(filters);
+  public void setRejectedByUser(boolean rejectedByUser) {
+    m_rejectedByUser = rejectedByUser;
   }
 
   @Override

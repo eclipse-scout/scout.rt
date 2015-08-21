@@ -169,8 +169,8 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public List<ITableRowFilter> getRejectedBy() {
-    return new ArrayList<ITableRowFilter>();
+  public boolean isRejectedByUser() {
+    return false;
   }
 
   @Override

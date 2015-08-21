@@ -68,7 +68,7 @@ public interface ITableRow {
   /**
    * FIXME CGU javadoc
    */
-  List<ITableRowFilter> getRejectedBy();
+  boolean isRejectedByUser();
 
   int getCellCount();
 

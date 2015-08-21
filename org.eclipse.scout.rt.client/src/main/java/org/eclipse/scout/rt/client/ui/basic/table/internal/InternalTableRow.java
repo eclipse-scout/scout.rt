@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.annotations.Internal;
@@ -28,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -43,7 +41,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   private int m_rowChanging = 0;
   private boolean m_rowPropertiesChanged;
   private boolean m_filterAccepted = true;
-  private List<ITableRowFilter> m_rejectedBy;
+  private boolean m_rejectedByUser;
   private final Map<ICell, Set<Integer>> m_updatedCells = new HashMap<>();
 
   private InternalTableRow() {
@@ -149,15 +147,12 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public List<ITableRowFilter> getRejectedBy() {
-    if (m_rejectedBy == null) {
-      m_rejectedBy = new ArrayList<ITableRowFilter>();
-    }
-    return m_rejectedBy;
+  public boolean isRejectedByUser() {
+    return m_rejectedByUser;
   }
 
-  public void setRejectedBy(List<ITableRowFilter> filters) {
-    m_rejectedBy = CollectionUtility.arrayList(filters);
+  public void setRejectedByUser(boolean rejectedByUser) {
+    m_rejectedByUser = rejectedByUser;
   }
 
   @Override

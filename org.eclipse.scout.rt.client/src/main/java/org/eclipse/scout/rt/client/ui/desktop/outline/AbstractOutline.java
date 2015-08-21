@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
@@ -800,26 +799,27 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), false);
   }
 
-  private class P_TableFilterBasedTreeNodeFilter implements ITreeNodeFilter, IUserFilter {
+  private class P_TableFilterBasedTreeNodeFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node, int level) {
       ITreeNode parentNode = node.getParentNode();
       if (parentNode != null && !parentNode.isFilterAccepted()) {
         // hide page if parent page is filtered
+        node.setRejectedByUser(parentNode.isRejectedByUser());
         return false;
       }
-      if (parentNode instanceof IPageWithTable<?>) {
-        ITableRow tableRow = ((IPageWithTable<?>) parentNode).getTableRowFor(node);
-        return tableRow == null || tableRow.isFilterAccepted();
+      if (!(parentNode instanceof IPage<?>)) {
+        return true;
       }
-      else if (parentNode instanceof IPageWithNodes) {
-        for (ITreeNode child : parentNode.getChildNodes()) {
-          if (child.equals(node)) {
-            return ((IPageWithNodes) parentNode).isFilterAcceptedForChildNode(node);
-          }
-        }
+      IPage<?> parentPage = (IPage<?>) parentNode;
+      ITableRow tableRow = parentPage.getTableRowFor(node);
+      if (tableRow == null) {
+        return true;
       }
-      return true;
+      if (!tableRow.isFilterAccepted()) {
+        node.setRejectedByUser(tableRow.isRejectedByUser());
+      }
+      return tableRow.isFilterAccepted();
     }
   }
 

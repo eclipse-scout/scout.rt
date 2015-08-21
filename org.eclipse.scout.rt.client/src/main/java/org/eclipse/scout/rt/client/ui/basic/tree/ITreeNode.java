@@ -189,9 +189,9 @@ public interface ITreeNode {
   /**
    * FIXME CGU javadoc
    */
-  List<ITreeNodeFilter> getRejectedBy();
+  boolean isRejectedByUser();
 
-  void setRejectedBy(List<ITreeNodeFilter> filters);
+  void setRejectedByUser(boolean rejectedByUser);
 
   /**
    * a dirty marked node is marked for child reload its children are reloaded on

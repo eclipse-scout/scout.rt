@@ -99,6 +99,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
@@ -1282,8 +1283,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void applyRowFiltersInternal(InternalTableRow row) {
-    List<ITableRowFilter> rejectedBy = new ArrayList<ITableRowFilter>();
+    List<ITableRowFilter> rejectingFilters = new ArrayList<ITableRowFilter>();
     row.setFilterAcceptedInternal(true);
+    row.setRejectedByUser(false);
     if (m_rowFilters.size() > 0) {
       for (ITableRowFilter filter : m_rowFilters) {
         if (!filter.accept(row)) {
@@ -1294,11 +1296,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           if (isSelectedRow(row)) {
             deselectRow(row);
           }
-          rejectedBy.add(filter);
+          rejectingFilters.add(filter);
         }
       }
     }
-    row.setRejectedBy(rejectedBy);
+
+    // Prefer row.isRejectedByUser to allow a filter to set this flag
+    row.setRejectedByUser(row.isRejectedByUser()
+        || rejectingFilters.size() == 1 && rejectingFilters.get(0) instanceof IUserFilter);
   }
 
   @Override
