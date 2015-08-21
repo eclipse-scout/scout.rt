@@ -183,10 +183,10 @@
   }
 
   &.has-warning.tooltip-active {
-    color: @palette-blue-35;
+    color: @palette-blue-4;
   }
 
   &.has-warning.tooltip-active:hover {
-    color: @palette-blue-4;
+    color: @palette-blue-6;
   }
 }

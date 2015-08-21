@@ -61,8 +61,8 @@
   text-align: center;
 
   &:hover {
-    color: @palette-blue-4;
-    border-color: @palette-blue-4;
+    color: @palette-blue-6;
+    border-color: @palette-blue-6;
   }
 
   &::after {

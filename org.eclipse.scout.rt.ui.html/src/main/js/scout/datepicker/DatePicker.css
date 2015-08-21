@@ -65,7 +65,7 @@
   }
 
   &.date-picker-weekend {
-    color: @palette-blue-4;
+    color: @palette-blue-6;
   }
 
   &.date-picker-out-weekend {

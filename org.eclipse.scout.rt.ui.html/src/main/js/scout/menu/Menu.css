@@ -57,34 +57,21 @@
     padding-right: 2px;
   }
 
-  /* This definition is required because the negative margin causes wrong results
-   * when we check if the menu-bar is over-sized. When a float:right element has
-   * a negative margin, the scrollWidth of its parent is _always_ > its clientWidth
-   * just because of the negative margin. Furthermore we have no way to read the
-   * margin dynamically with JQuery, since ::before elements are not part of the DOM
-   * and thus there's no way to access the with JavaScript. When the negative margin
-   * is removed above, this definition may also be removed.
-   */
-  &.right-aligned.last[data-icon]::before {
-    margin-right: 0;
-    padding-right: 0;
-  }
-
-  &[data-icon]:hover::before {
+  &:not(.disabled):hover {
     color: @hover-color;
-  }
 
-  &:hover {
-    color: @hover-color;
+    &.default-menu {
+      background-color: @palette-blue-5;
+    }
+
+    &:not(.default-menu) > .font-icon {
+      color:@hover-color;
+    }
   }
 
   &.disabled {
     color: @disabled-color;
     cursor: default;
-  }
-
-  &[data-icon].disabled::before {
-    color: @disabled-color;
   }
 
   &:not(.last) {
@@ -143,10 +130,6 @@
   /* cut off. We should find a better solution for this. */
   white-space: nowrap;
 
-  &:hover :not(:disabled) {
-    color: @hover-color;
-  }
-
   &:not(.disabled):active {
     background-color: @palette-gray-3;
     border-right-color: @border-color;
@@ -172,12 +155,16 @@
     }
 
     &:active {
-      background-color: @palette-blue-5;
+      background-color: @palette-blue-7;
     }
   }
 
+  &.default-menu > .font-icon {
+    color: @icon-inverted-color;
+  }
+
   &.disabled {
-    background-color: @palette-white;
+    background-color: @control-background-color;
     color: @disabled-color;
     cursor: default;
   }
@@ -194,5 +181,17 @@
 
   &:not(.last) {
     margin-right: @menu-item-margin-right;
+  }
+
+  &.small-gap {
+    margin-right: 4px;
+  }
+
+  &.small {
+    min-width: 53px;
+
+    & > .font-icon {
+      font-size: 16px;
+    }
   }
 }

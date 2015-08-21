@@ -215,7 +215,7 @@ button::-moz-focus-inner {
     content: '';
     border-radius: @application-loading-size;
     border: 3px solid @palette-gray-4;
-    border-right-color: @palette-blue-4;
+    border-right-color: @palette-blue-6;
     width: @application-loading-size;
     height: @application-loading-size;
     position: absolute;

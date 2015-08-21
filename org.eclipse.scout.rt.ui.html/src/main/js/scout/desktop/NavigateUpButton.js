@@ -1,7 +1,9 @@
 scout.NavigateUpButton = function(outline, node) {
   scout.NavigateUpButton.parent.call(this, outline, node);
-  this._text1 = 'ui.Back';
-  this._text2 = 'ui.Up';
+  this._defaultIconId = scout.icons.CHEVRON_UP;
+  this._defaultText = 'ui.Up';
+  this._additionalCssClass = 'small-gap';
+  this.iconId = scout.icons.CHEVRON_UP;
   this.objectType = 'NavigateUpButton';
   this.keyStroke = 'backspace';
   this.initKeyStrokeParts();

@@ -10,7 +10,7 @@
   }
 
   &.in-background .tree-node.selected {
-    background-color: @palette-blue-35;
+    background-color: @palette-blue-4;
     color: @palette-white;
   }
 }

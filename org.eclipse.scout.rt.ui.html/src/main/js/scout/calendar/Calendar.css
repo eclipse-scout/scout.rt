@@ -180,7 +180,7 @@
 
   &.comp-selected {
     background-color: @palette-blue-3;
-    border-left-color: @palette-blue-4;
+    border-left-color: @palette-blue-6;
   }
 
   /* Colors for type Appointment */
@@ -355,7 +355,7 @@
   }
 
   & .weekend::before {
-    color: @palette-blue-4;
+    color: @palette-blue-6;
   }
 
   & .weekend-out::before {

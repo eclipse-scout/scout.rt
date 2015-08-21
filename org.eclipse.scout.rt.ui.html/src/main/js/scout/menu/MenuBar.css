@@ -47,8 +47,14 @@
   height: 55px;
   padding-top: 11px;
 
-  & > .menu-item > .font-icon {
-    font-size: 22px;
+  & > .menu-item {
+    &.small > .font-icon {
+      font-size: 14px;
+      vertical-align: baseline;
+    }
+    & > .font-icon {
+      font-size: 22px;
+    }
   }
 
   & > .menu-item.last {

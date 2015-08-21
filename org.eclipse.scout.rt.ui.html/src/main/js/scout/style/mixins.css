@@ -144,7 +144,7 @@
   .checkbox-before-checked() {
     #scout.font-icon();
     content: @icon-checked;
-    color: @palette-blue-4;
+    color: @palette-blue-6;
     font-size: 11px;
     text-align: center;
     line-height: 15px;
@@ -169,7 +169,7 @@
     display: inline-block;
     height: 8px;
     width: 8px;
-    background-color: @palette-blue-4;
+    background-color: @palette-blue-6;
     border-radius: 2px;
     position: absolute;
     top: -7px;

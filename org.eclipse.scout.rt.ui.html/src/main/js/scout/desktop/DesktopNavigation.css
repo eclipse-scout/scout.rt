@@ -43,6 +43,10 @@
 
   &:hover {
     cursor: pointer;
+
+    & > .font-icon {
+      color: @hover-color;
+    }
   }
 
   &.selected {

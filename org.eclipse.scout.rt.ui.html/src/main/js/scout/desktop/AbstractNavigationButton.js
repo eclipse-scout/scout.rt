@@ -15,6 +15,10 @@ scout.AbstractNavigationButton = function(outline, node) {
   this.enabled = true;
   this.mandatory = false;
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
+  /**
+   * Additional CSS class to be applied in _render method.
+   */
+  this._additionalCssClass = '';
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Menu);
 
@@ -26,13 +30,20 @@ scout.inherits(scout.AbstractNavigationButton, scout.Menu);
 scout.AbstractNavigationButton.prototype._render = function($parent) {
   if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
-    this.text = this.session.text(this._text1);
   } else {
     this._onClickFunc = this._drill.bind(this);
-    this.text = this.session.text(this._text2);
+  }
+  if (this.overflow) {
+    this.text = this.session.text(this._defaultText);
+    this.iconId = null;
+  } else {
+    this.text = null;
+    this.iconId = this._defaultIconId;
   }
   this.enabled = this._buttonEnabled();
   scout.AbstractNavigationButton.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('small');
+  this.$container.addClass(this._additionalCssClass);
   this._registerButtonKeyStroke();
 };
 
