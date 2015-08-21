@@ -44,7 +44,7 @@
   &:hover {
     cursor: pointer;
 
-    & > .font-icon {
+    &:not(.selected) > .font-icon {
       color: @hover-color;
     }
   }
