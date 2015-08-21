@@ -789,8 +789,9 @@
     }
     return this.addClass('app-link')
       .text(appLinkBean.name)
-      .attr('tabindex', "0")
+      .attr('tabindex', '0')
       .attr('data-ref', appLinkBean.ref)
+      .unfocusable()
       .on('click', func);
   };
 
