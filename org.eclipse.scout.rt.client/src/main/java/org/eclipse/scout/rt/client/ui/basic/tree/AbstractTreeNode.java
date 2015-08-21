@@ -71,6 +71,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_childrenVolatile;
   private boolean m_childrenDirty;
   private boolean m_filterAccepted;
+  private boolean m_rejectedByUser;
   private Object m_primaryKey;// user object
   // enabled is defined as: enabledGranted && enabledProperty
   private boolean m_enabled;
@@ -396,6 +397,16 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     synchronized (m_filteredChildNodesLock) {
       m_filteredChildNodes = null;
     }
+  }
+
+  @Override
+  public boolean isRejectedByUser() {
+    return m_rejectedByUser;
+  }
+
+  @Override
+  public void setRejectedByUser(boolean rejectedByUser) {
+    m_rejectedByUser = rejectedByUser;
   }
 
   @Override

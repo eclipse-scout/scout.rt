@@ -10,20 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
-import java.io.Serializable;
-
 /**
+ * FIXME CGU javadoc
  * @since 5.1
  */
-public interface IUserTableFilter extends Serializable {
-  //FIXME CGU maybe rename to filter state
-  String getType();
-
-  void setType(String type);
-
-  /**
-   * Computes a key which is used by the table to store the filter.
-   */
-  Object createKey();
+public interface IUserFilter {
 
 }

@@ -99,8 +99,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -1281,7 +1283,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void applyRowFiltersInternal(InternalTableRow row) {
+    List<ITableRowFilter> rejectingFilters = new ArrayList<ITableRowFilter>();
     row.setFilterAcceptedInternal(true);
+    row.setRejectedByUser(false);
     if (m_rowFilters.size() > 0) {
       for (ITableRowFilter filter : m_rowFilters) {
         if (!filter.accept(row)) {
@@ -1292,10 +1296,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           if (isSelectedRow(row)) {
             deselectRow(row);
           }
-          break;
+          rejectingFilters.add(filter);
         }
       }
     }
+
+    // Prefer row.isRejectedByUser to allow a filter to set this flag
+    row.setRejectedByUser(row.isRejectedByUser()
+        || rejectingFilters.size() == 1 && rejectingFilters.get(0) instanceof IUserFilter);
   }
 
   @Override
@@ -4574,6 +4582,47 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         popUIProcessor();
       }
     }
+
+    @Override
+    public void setFilteredRowsFromUI(List<? extends ITableRow> rows) {
+      try {
+        pushUIProcessor();
+        // Remove existing filter first, so that only one UserTableRowFilter is active
+        removeUserRowFilters();
+
+        // Create and add a new filter
+        UserTableRowFilter filter = new UserTableRowFilter(rows);
+
+        // Do not use addRowFilter to prevent applyRowFilters
+        m_rowFilters.add(filter);
+        applyRowFilters();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    protected void removeUserRowFilters() {
+      for (ITableRowFilter filter : getRowFilters()) {
+        if (filter instanceof UserTableRowFilter) {
+          // Do not use removeRowFilter to prevent applyRowFilters
+          m_rowFilters.remove(filter);
+        }
+      }
+    }
+
+    @Override
+    public void removeFilteredRowsFromUI() {
+      try {
+        pushUIProcessor();
+        removeUserRowFilters();
+        applyRowFilters();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
   }
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<Object> {
@@ -4627,7 +4676,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE>implements ITableExtension<TABLE> {
+  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE> implements ITableExtension<TABLE> {
 
     public LocalTableExtension(TABLE owner) {
       super(owner);

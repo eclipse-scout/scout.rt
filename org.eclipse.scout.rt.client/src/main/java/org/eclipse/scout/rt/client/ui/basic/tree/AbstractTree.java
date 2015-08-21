@@ -67,6 +67,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -796,15 +797,22 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (inode == null) {
       return;
     }
+    List<ITreeNodeFilter> rejectingFilters = new ArrayList<ITreeNodeFilter>();
     inode.setFilterAccepted(true);
+    inode.setRejectedByUser(false);
     if (m_nodeFilters.size() > 0) {
       for (ITreeNodeFilter filter : m_nodeFilters) {
         if (!filter.accept(inode, level)) {
           inode.setFilterAccepted(false);
-          break;
+          rejectingFilters.add(filter);
         }
       }
     }
+
+    // Prefer inode.isRejectedByUser to allow a filter to set this flag
+    inode.setRejectedByUser(inode.isRejectedByUser()
+        || (rejectingFilters.size() == 1 && rejectingFilters.get(0) instanceof IUserFilter));
+
     if (!inode.isFilterAccepted() && isSelectedNode(inode)) {
       // invisible nodes cannot be selected
       deselectNode(inode);
@@ -815,6 +823,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       while (tmp != null) {
         if (tmp instanceof AbstractTreeNode) {
           ((AbstractTreeNode) tmp).setFilterAccepted(true);
+          ((AbstractTreeNode) tmp).setRejectedByUser(false);
         }
         tmp = tmp.getParentNode();
       }

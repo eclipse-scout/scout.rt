@@ -10,20 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
-import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 
 /**
  * @since 5.1
  */
-public interface IUserTableFilter extends Serializable {
-  //FIXME CGU maybe rename to filter state
-  String getType();
+public class UserTableRowFilter implements ITableRowFilter, IUserFilter {
+  private Set<? extends ITableRow> m_rows;
 
-  void setType(String type);
+  public UserTableRowFilter(Collection<? extends ITableRow> rows) {
+    m_rows = new HashSet<ITableRow>(rows);
+  }
 
-  /**
-   * Computes a key which is used by the table to store the filter.
-   */
-  Object createKey();
+  @Override
+  public boolean accept(ITableRow row) {
+    return m_rows.contains(row);
+  }
 
 }

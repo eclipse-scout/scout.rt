@@ -169,6 +169,11 @@ public class TableRow implements ITableRow {
   }
 
   @Override
+  public boolean isRejectedByUser() {
+    return false;
+  }
+
+  @Override
   public int getCellCount() {
     return m_cells.size();
   }

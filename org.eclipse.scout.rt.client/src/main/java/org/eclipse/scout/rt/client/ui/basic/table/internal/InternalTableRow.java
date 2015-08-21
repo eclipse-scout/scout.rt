@@ -41,6 +41,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   private int m_rowChanging = 0;
   private boolean m_rowPropertiesChanged;
   private boolean m_filterAccepted = true;
+  private boolean m_rejectedByUser;
   private final Map<ICell, Set<Integer>> m_updatedCells = new HashMap<>();
 
   private InternalTableRow() {
@@ -143,6 +144,15 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
    */
   public void setFilterAcceptedInternal(boolean b) {
     m_filterAccepted = b;
+  }
+
+  @Override
+  public boolean isRejectedByUser() {
+    return m_rejectedByUser;
+  }
+
+  public void setRejectedByUser(boolean rejectedByUser) {
+    m_rejectedByUser = rejectedByUser;
   }
 
   @Override
