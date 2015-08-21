@@ -501,3 +501,27 @@ Migration:
   setAutoDate()/getAutoDate(). If both a date and time part should be set, combine them in the same
   java.util.Date argument. The methods DateUtility.createDateTime() and DateUtility.convertDoubleTimeToDate()
   may be useful.
+
+BSH 21.08.2015
+Removed "populate status" and "selection status" methods from IPage and ITableField.
+The only status is on the table itself and is called "table status".
+IPage and ITableField have new convenience methods for getting/setting the table status (without requiring
+null checks on getTable()).
+Migration:
+[IPage]
+- Replace setPagePopulateStatus() by setTableStatus()
+- Replace getPagePopulateStatus() by getTableStatus()
+[ITableField]
+- Properties PROP_TABLE_SELECTION_STATUS, PROP_TABLE_POPULATE_STATUS, PROP_TABLE_STATUS_VISIBLE no longer
+  exist on ITableField. If you need to listen to them, change your listener target the the field's ITable.
+- Method createDefaultTableStatus() was dropped without replacement. "Selection status" is not supported
+  by Html UI at the moment (selection is visualized on the UI only, not in the model).
+- get/setTableStatus() convenience methods with Strings were dropped without replacement. Use
+  getTableStatus().get/setMessage() instead.
+- get/setTableSelectionStatus() were dropped without replacement. "Selection status" is not supported
+  by Html UI at the moment (selection is visualized on the UI only, not in the model).
+- Change get/setTablePopulateStatus() to get/setTableStatus()
+- updateTableStatus() was dropped without replacement. Simply set the table status with setTableStatus().
+- getConfiguredTableStatusVisible() was dropped without replacement. Instead, the initial "table status
+  visible" property should be set on the table. (In most cases, you can simply move the
+  getConfiguredTableStatusVisible() method from the table field to the table.
