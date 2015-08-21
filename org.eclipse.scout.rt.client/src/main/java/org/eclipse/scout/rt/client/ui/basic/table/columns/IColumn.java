@@ -25,8 +25,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable, IHtmlCapable {
   /**
@@ -351,6 +353,15 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * Convenience for {@link ColumnSet#getSortColumns()} and finding the index
    */
   int getSortIndex();
+
+  /**
+   * Used for mapping an {@link AbstractTableRowData} to an {@link ITableRow} by {@link TableRowDataMapper}
+   * <p>
+   * Do not use this method for normal value setting! Use {@link IColumn#setValue(ITableRow, Object)} instead.
+   * <p>
+   * The default implementation writes the given value directly into the corresponding cell.
+   */
+  void importValue(ITableRow row, Object value) throws ProcessingException;
 
   /**
    * Parse row and set value to ensure correct type and valid value

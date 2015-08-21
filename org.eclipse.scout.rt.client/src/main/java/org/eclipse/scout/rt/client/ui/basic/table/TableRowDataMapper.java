@@ -146,7 +146,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
         continue;
       }
       Object value = getValue(column, rowData);
-      row.getCellForUpdate(column).setValue(value);
+      column.importValue(row, value);
     }
     row.setStatus(rowData.getRowState());
   }

@@ -1391,6 +1391,17 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       }
     }
   }
+  /**
+   * Used for mapping an {@link AbstractTableRowData} to an {@link ITableRow} by {@link TableRowDataMapper}
+   * <p>
+   * Do not use this method for normal value setting! Use {@link IColumn#setValue(ITableRow, Object)} instead.
+   * <p>
+   * The default implementation writes the given value directly into the corresponding cell.
+   */
+  @Override
+  public void importValue(ITableRow row, Object value) throws ProcessingException {
+    row.getCellForUpdate(this).setValue(value);
+  }
 
   /**
    * Parses values in table row and sets it to the table row
