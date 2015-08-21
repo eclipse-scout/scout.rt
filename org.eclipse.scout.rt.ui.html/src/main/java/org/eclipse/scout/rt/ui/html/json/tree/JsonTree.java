@@ -60,7 +60,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public static final String PROP_NODE = "node";
   public static final String PROP_NODES = "nodes";
   public static final String PROP_EXPANDED = "expanded";
-  public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
+  public static final String PROP_SELECTED_NODES = "selectedNodes";
 
   private TreeListener m_treeListener;
   private final Map<String, ITreeNode> m_treeNodes;
@@ -214,7 +214,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       jsonNodes.put(treeNodeToJson(childNode));
     }
     putProperty(json, PROP_NODES, jsonNodes);
-    putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
+    putProperty(json, PROP_SELECTED_NODES, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
     putContextMenu(json);
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
     return json;

@@ -49,7 +49,7 @@ scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
-  if (this.selectedNodeIds.length === 0) {
+  if (this.selectedNodes.length === 0) {
     this._showDefaultDetailForm();
   }
 };
@@ -184,7 +184,7 @@ scout.Outline.prototype._renderSelection = function() {
   scout.Outline.parent.prototype._renderSelection.call(this);
 
   // Outline does not support multi selection -> [0]
-  var node = this.nodesMap[this.selectedNodeIds[0]];
+  var node = this.selectedNodes[0];
   if (node) {
     this._updateOutlineNode(node);
   } else {
@@ -238,7 +238,8 @@ scout.Outline.prototype._updateOutlineNode = function(node) {
  * the first selected row is returned.
  */
 scout.Outline.prototype.selectedRow = function() {
-  var table, node, nodes = this.selectedNodes();
+  var table, node,
+    nodes = this.selectedNodes;
   if (nodes.length === 0) {
     return null;
   }
@@ -310,7 +311,7 @@ scout.Outline.prototype._onPageChanged = function(event) {
 
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.
-    if (this.selectedNodeIds.indexOf(node.id) !== -1) {
+    if (this.selectedNodes.indexOf(node) !== -1) {
       this._updateOutlineNode(node);
     }
   } else {

@@ -218,13 +218,13 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      expect(tree.selectedNodeIds.length).toBe(0);
+      expect(tree.selectedNodes.length).toBe(0);
 
       var $node = tree.$container.find('.tree-node:first');
       $node.triggerClick();
 
-      expect(tree.selectedNodeIds.length).toBe(1);
-      expect(tree.selectedNodeIds[0]).toBe(model.nodes[0].id);
+      expect(tree.selectedNodes.length).toBe(1);
+      expect(tree.selectedNodes[0].id).toBe(model.nodes[0].id);
     });
   });
 
@@ -578,7 +578,7 @@ describe("Tree", function() {
     it("clears the selection", function() {
       var model = createModelFixture(1, 1);
       var node0 = model.nodes[0];
-      model.selectedNodeIds = [node0.id];
+      model.selectedNodes = [node0.id];
 
       var tree = createTree(model);
       tree.render(session.$entryPoint);
@@ -587,7 +587,7 @@ describe("Tree", function() {
       tree.clearSelection();
 
       //Check model
-      expect(tree.selectedNodeIds.length).toBe(0);
+      expect(tree.selectedNodes.length).toBe(0);
 
       //Check gui
       expect(tree.$selectedNodes().length).toBe(0);
@@ -1096,8 +1096,8 @@ describe("Tree", function() {
         session._processSuccessResponse(message);
 
         //Check model
-        expect(tree.selectedNodeIds.length).toBe(1);
-        expect(tree.selectedNodeIds[0]).toBe(node0.id);
+        expect(tree.selectedNodes.length).toBe(1);
+        expect(tree.selectedNodes[0].id).toBe(node0.id);
 
         //Check gui
         expect(tree.$selectedNodes().length).toBe(1);
@@ -1190,7 +1190,7 @@ describe("Tree", function() {
       });
 
       it("updates custom cssClass of model and html node", function() {
-        tree.selectedNodeIds = [node0.id];
+        tree.selectedNodes = [node0];
         tree.render(session.$entryPoint);
 
         var event = createNodeChangedEvent(model, node0.id);

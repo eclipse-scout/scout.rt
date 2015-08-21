@@ -4,7 +4,6 @@
 scout.Tree = function() {
   scout.Tree.parent.call(this);
   this.$data;
-  this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
   this._breadcrumbEnabled = false;
@@ -30,6 +29,7 @@ scout.inherits(scout.Tree, scout.ModelAdapter);
 scout.Tree.prototype._init = function(model, session) {
   scout.Tree.parent.prototype._init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+  this.selectedNodes = this._nodesByIds(this.selectedNodes);
   var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.session, menuSorter);
   this.menuBar.bottom();
@@ -105,7 +105,7 @@ scout.Tree.prototype.destroy = function() {
 
 scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
-  scout.arrays.remove(this.selectedNodeIds, node.id); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
+  scout.arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
 
   if (this._onNodeDeleted) { // Necessary for subclasses
     this._onNodeDeleted(node);
@@ -175,7 +175,7 @@ scout.Tree.prototype._render = function($parent) {
     this.lazyAddChildNodesToTree(false);
   }
 
-  if (this.selectedNodeIds.length > 0) {
+  if (this.selectedNodes.length > 0) {
     this._renderSelection();
   }
   this._updateItemPath();
@@ -203,10 +203,10 @@ scout.Tree.prototype._renderMenus = function() {
 
 scout.Tree.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   allowedTypes = allowedTypes || [];
-  if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodeIds.length !== 1) {
+  if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodes.length !== 1) {
     scout.arrays.remove(allowedTypes, 'Tree.SingleSelection');
   }
-  if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodeIds.length <= 1) {
+  if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodes.length <= 1) {
     scout.arrays.remove(allowedTypes, 'Tree.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
@@ -479,8 +479,8 @@ scout.Tree.prototype.scrollTo = function(node) {
 };
 
 scout.Tree.prototype.revealSelection = function() {
-  if (this.selectedNodeIds.length > 0) {
-    this.scrollTo(this.nodesMap[this.selectedNodeIds[0]]);
+  if (this.selectedNodes.length > 0) {
+    this.scrollTo(this.selectedNodes[0]);
   }
 };
 
@@ -489,58 +489,39 @@ scout.Tree.prototype.clearSelection = function() {
 };
 
 //FIXME CGU rename to selectNodes
-scout.Tree.prototype.setNodesSelected = function(nodes) {
+scout.Tree.prototype.setNodesSelected = function(nodes, notifyServer) {
   nodes = scout.arrays.ensure(nodes);
-  var nodeIds = scout.arrays.init(nodes.length);
-  for (var i = 0; i < nodes.length; i++) {
-    nodeIds[i] = nodes[i].id;
+  notifyServer = scout.helpers.nvl(notifyServer, true);
+  if (this.rendered) {
+    this._removeSelection();
   }
-  this._updateSelectedNodeIds(nodeIds, true);
+
+  this.selectedNodes = nodes;
+  if (notifyServer) {
+    this.remoteHandler(this.id, 'nodesSelected', {
+      nodeIds: this._nodesToIds(nodes)
+    });
+  }
+
+  if (this.rendered) {
+    this._renderSelection();
+    this._renderMenus();
+  }
 };
 
 scout.Tree.prototype.deselectNodes = function(nodes) {
   nodes = scout.arrays.ensure(nodes);
-  var selectedNodes = this.selectedNodes().slice(); // copy
+  var selectedNodes = this.selectedNodes.slice(); // copy
   if (scout.arrays.removeAll(selectedNodes, nodes)) {
     this.setNodesSelected(selectedNodes);
   }
-};
-
-scout.Tree.prototype._updateSelectedNodeIds = function(selectedNodeIds, notifyServer) {
-  if (!scout.arrays.equalsIgnoreOrder(selectedNodeIds, this.selectedNodeIds)) {
-    if (this.rendered) {
-      this._removeSelection();
-    }
-
-    this.selectedNodeIds = selectedNodeIds;
-
-    if (scout.helpers.nvl(notifyServer, true)) {
-      this.remoteHandler(this.id, 'nodesSelected', {
-        nodeIds: selectedNodeIds
-      });
-    }
-
-    // FIXME BSH Keystroke | "scroll into view"
-    if (this.rendered) {
-      this._renderSelection();
-      this._renderMenus();
-    }
-    this._triggerNodesSelected(selectedNodeIds);
-  }
-};
-
-scout.Tree.prototype._triggerNodesSelected = function(nodeIds) {
-  this.events.trigger('nodesSelected', {
-    nodeIds: nodeIds
-  });
 };
 
 scout.Tree.prototype._renderSelection = function() {
   var i, node, $node,
     $nodes = [];
 
-  for (i = 0; i < this.selectedNodeIds.length; i++) {
-    node = this.nodesMap[this.selectedNodeIds[i]];
+  this.selectedNodes.forEach(function(node) {
     $node = node.$node;
 
     // If $node is currently not displayed (due to a collapsed parent node), expand the parents
@@ -553,7 +534,7 @@ scout.Tree.prototype._renderSelection = function() {
     }
 
     $nodes.push($node);
-  }
+  }, this);
 
   // render selection
   for (i = 0; i < $nodes.length; i++) {
@@ -576,13 +557,12 @@ scout.Tree.prototype._renderSelection = function() {
 };
 
 scout.Tree.prototype._removeSelection = function() {
-  for (var i = 0; i < this.selectedNodeIds.length; i++) {
-    var node = this.nodesMap[this.selectedNodeIds[i]];
+  this.selectedNodes.forEach(function(node) {
     var $node = node.$node;
     if ($node) { // TODO BSH Check if $node can be undefined
       $node.select(false);
     }
-  }
+  }, this);
 };
 
 scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
@@ -789,7 +769,8 @@ scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
 };
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
-  this._updateSelectedNodeIds(nodeIds, false);
+  var nodes = this._nodesByIds(nodeIds);
+  this.setNodesSelected(nodes, false);
 };
 
 scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded, recursive) {
@@ -1303,7 +1284,7 @@ scout.Tree.prototype._updateItemPath = function() {
   this.$data.find('.tree-node').removeClass('parent children group');
 
   // if no selection: mark all top elements as children
-  if (this.selectedNodeIds.length === 0) {
+  if (this.selectedNodes.length === 0) {
     this.$data.children().addClass('children');
     return;
   }
@@ -1383,15 +1364,6 @@ scout.Tree.prototype.$selectedNodes = function() {
 
 scout.Tree.prototype.$nodes = function() {
   return this.$data.find('.tree-node');
-};
-
-scout.Tree.prototype.selectedNodes = function() {
-  //FIXME CGU resolve selectedNodes during init and selection change, see planner.js
-  var nodes = [];
-  for (var i = 0; i < this.selectedNodeIds.length; i++) {
-    nodes.push(this.nodesMap[this.selectedNodeIds[i]]);
-  }
-  return nodes;
 };
 
 /**
@@ -1537,6 +1509,12 @@ scout.Tree.prototype._nodesToIds = function(nodes) {
   return nodes.map(function(node) {
     return node.id;
   });
+};
+
+scout.Tree.prototype._nodesByIds = function(ids) {
+  return ids.map(function(id) {
+    return this.nodesMap[id];
+  }.bind(this));
 };
 
 scout.Tree.prototype._onRequestFocus = function() {
