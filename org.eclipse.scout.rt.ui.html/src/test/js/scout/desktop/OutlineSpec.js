@@ -174,7 +174,7 @@ describe("Outline", function() {
 
     });
 
-    describe("setNodesSelected", function() {
+    describe("selectNodes", function() {
       var model, outline, node;
 
       beforeEach(function() {
@@ -185,7 +185,7 @@ describe("Outline", function() {
 
       it("handle navigateUp only once", function() {
         outline.navigateUpInProgress = true;
-        outline.setNodesSelected([]);
+        outline.selectNodes([]);
         expect(outline.navigateUpInProgress).toBe(false);
       });
 
@@ -198,11 +198,11 @@ describe("Outline", function() {
         outline._renderMenus = function() {};
 
         // don't change the visibleByUi flag when selection is != 1
-        outline.setNodesSelected([]);
+        outline.selectNodes([]);
         expect(node.detailFormVisibleByUi).toBe(false);
 
         // set the visibleByUi flag to true when selection is exactly 1
-        outline.setNodesSelected([node]);
+        outline.selectNodes([node]);
         expect(node.detailFormVisibleByUi).toBe(true);
       });
     });

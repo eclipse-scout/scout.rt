@@ -25,7 +25,7 @@ scout.AbstractTreeNavigationKeyStroke.prototype._accept = function(event) {
 scout.AbstractTreeNavigationKeyStroke.prototype.handle = function(event) {
   var newNodeSelection = this._handleInternal(event._$treeCurrentNode, event._treeCurrentNode);
   if (newNodeSelection) {
-    this.field.setNodesSelected(newNodeSelection);
+    this.field.selectNodes(newNodeSelection);
     this.field.scrollTo(newNodeSelection);
   }
 };

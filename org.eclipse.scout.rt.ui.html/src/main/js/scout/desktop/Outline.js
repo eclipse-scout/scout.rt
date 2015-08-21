@@ -192,8 +192,8 @@ scout.Outline.prototype._renderSelection = function() {
   }
 };
 
-scout.Outline.prototype.setNodesSelected = function(nodes) {
-  scout.Outline.parent.prototype.setNodesSelected.call(this, nodes);
+scout.Outline.prototype.selectNodes = function(nodes) {
+  scout.Outline.parent.prototype.selectNodes.call(this, nodes);
   if (this.navigateUpInProgress) {
     this.navigateUpInProgress = false;
   } else {

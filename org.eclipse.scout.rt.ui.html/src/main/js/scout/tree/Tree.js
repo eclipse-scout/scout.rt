@@ -485,11 +485,10 @@ scout.Tree.prototype.revealSelection = function() {
 };
 
 scout.Tree.prototype.clearSelection = function() {
-  this.setNodesSelected([]);
+  this.selectNodes([]);
 };
 
-//FIXME CGU rename to selectNodes
-scout.Tree.prototype.setNodesSelected = function(nodes, notifyServer) {
+scout.Tree.prototype.selectNodes = function(nodes, notifyServer) {
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.helpers.nvl(notifyServer, true);
   if (this.rendered) {
@@ -513,7 +512,7 @@ scout.Tree.prototype.deselectNodes = function(nodes) {
   nodes = scout.arrays.ensure(nodes);
   var selectedNodes = this.selectedNodes.slice(); // copy
   if (scout.arrays.removeAll(selectedNodes, nodes)) {
-    this.setNodesSelected(selectedNodes);
+    this.selectNodes(selectedNodes);
   }
 };
 
@@ -770,7 +769,7 @@ scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   var nodes = this._nodesByIds(nodeIds);
-  this.setNodesSelected(nodes, false);
+  this.selectNodes(nodes, false);
 };
 
 scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded, recursive) {
@@ -1169,7 +1168,7 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   var $node = $(event.currentTarget);
   var node = $node.data('node');
 
-  this.setNodesSelected(node);
+  this.selectNodes(node);
 
   if (this.checkable && this._isCheckboxClicked(event)) {
     this.checkNode(node, !node.checked);
@@ -1224,7 +1223,7 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
     }
   }
 
-  this.setNodesSelected(node);
+  this.selectNodes(node);
   this.setNodeExpanded(node, expanded, expansionOpts);
 
   // prevent immediately reopening

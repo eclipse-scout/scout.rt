@@ -64,7 +64,7 @@ scout.NavigateDownButton.prototype._drill = function() {
       }
 
       // Select the target node
-      this.outline.setNodesSelected(drillNode); // this also expands the parent node, if required
+      this.outline.selectNodes(drillNode); // this also expands the parent node, if required
 
       // If the parent node is a table page node, expand the drillNode
       // --> Same logic as in OutlineMediator.mediateTableRowAction()
