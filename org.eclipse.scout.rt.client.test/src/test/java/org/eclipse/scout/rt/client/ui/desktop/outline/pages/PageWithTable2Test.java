@@ -57,7 +57,7 @@ public class PageWithTable2Test {
     assertEquals("row count", 1, table.getRowCount());
     assertEquals("IColumn value", I1, table.getIColumn().getValue(0));
     assertEquals("SColumn value", S1, table.getSColumn().getValue(0));
-    assertEquals("Status", null, page.getPagePopulateStatus());
+    assertEquals("Status", null, page.getTableStatus());
   }
 
   /**
@@ -70,8 +70,8 @@ public class PageWithTable2Test {
 
     Table table = page.getTable();
     assertEquals("row count", 3, table.getRowCount());
-    assertEquals("Status - severity", IStatus.WARNING, page.getPagePopulateStatus().getSeverity());
-    assertEquals("Status - message", TEXTS.get("MaxOutlineRowWarning", "3"), page.getPagePopulateStatus().getMessage());
+    assertEquals("Status - severity", IStatus.WARNING, page.getTableStatus().getSeverity());
+    assertEquals("Status - message", TEXTS.get("MaxOutlineRowWarning", "3"), page.getTableStatus().getMessage());
   }
 
   public class SimpleTablePage extends AbstractPageWithTable<SimpleTablePage.Table> {

@@ -104,12 +104,21 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public IStatus getPagePopulateStatus() {
+  public IStatus getTableStatus() {
     return null;
   }
 
   @Override
-  public void setPagePopulateStatus(IStatus status) {
+  public void setTableStatus(IStatus tableStatus) {
+  }
+
+  @Override
+  public boolean isTableStatusVisible() {
+    return false;
+  }
+
+  @Override
+  public void setTableStatusVisible(boolean tableStatusVisible) {
   }
 
   /**

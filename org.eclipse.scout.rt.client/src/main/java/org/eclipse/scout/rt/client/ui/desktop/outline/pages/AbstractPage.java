@@ -76,7 +76,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private boolean m_pageMenusAdded;
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
-  private IStatus m_pagePopulateStatus;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
   private boolean m_lazyAddChildPagesToOutline; // local value (configured or manually set value)
@@ -446,16 +445,36 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public IStatus getPagePopulateStatus() {
-    return m_pagePopulateStatus;
+  public IStatus getTableStatus() {
+    T table = getTable();
+    if (table != null) {
+      return table.getTableStatus();
+    }
+    return null;
   }
 
   @Override
-  public void setPagePopulateStatus(IStatus status) {
-    m_pagePopulateStatus = status;
+  public void setTableStatus(IStatus tableStatus) {
     T table = getTable();
     if (table != null) {
-      getTable().setTableStatus(status);
+      table.setTableStatus(tableStatus);
+    }
+  }
+
+  @Override
+  public boolean isTableStatusVisible() {
+    T table = getTable();
+    if (table != null) {
+      return table.isTableStatusVisible();
+    }
+    return false;
+  }
+
+  @Override
+  public void setTableStatusVisible(boolean tableStatusVisible) {
+    T table = getTable();
+    if (table != null) {
+      table.setTableStatusVisible(tableStatusVisible);
     }
   }
 

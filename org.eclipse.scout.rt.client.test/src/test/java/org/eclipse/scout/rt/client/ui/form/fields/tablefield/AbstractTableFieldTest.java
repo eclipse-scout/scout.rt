@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigDecimal;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,12 +67,10 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
   }
 
   @Test
-  public void testSumNumberColumsInCreateDefaultTableStatus() {
-    String tableStatus = createDefaultTableStatus();
-    assertTrue("TableStatus does not contain sum of Integer-column as expected. (tableStatus [" + tableStatus + "])", tableStatus.contains("Integer: " + getTable().getIntegerColumn().getFormat().format(45)));
-    assertTrue("TableStatus does not contain sum of Long-column as expected. (tableStatus [" + tableStatus + "])", tableStatus.contains("Long: " + getTable().getLongColumn().getFormat().format(90)));
-    String formattedBigDecimalSum = "BigDecimal: " + getTable().getBigDecimalColumn().getFormat().format(FAR_BELOW_ZERO.multiply(BigDecimal.TEN).add(BigDecimal.valueOf(49.95d)));
-    assertTrue("TableStatus does not contain sum of BigDecimal-column as expected. (expected [" + formattedBigDecimalSum + "] in tableStatus [" + tableStatus + "])", tableStatus.contains(formattedBigDecimalSum));
+  public void testSetTableStatusToTable() {
+    IStatus status = new Status("Hello hello", IStatus.ERROR);
+    setTableStatus(status);
+    Assert.assertSame(status, getTable().getTableStatus());
   }
 
   private String getTextFor(int size, String separator) {

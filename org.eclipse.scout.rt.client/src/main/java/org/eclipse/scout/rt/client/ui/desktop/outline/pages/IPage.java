@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 
 /**
  * A page is a tree node for the outline and a table in the main view<br>
@@ -102,24 +101,28 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   void setTableVisible(boolean b);
 
   /**
-   * see {@link ITableField#getTablePopulateStatus()}
-   * <p>
-   * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
-   * replaced by a simple page with just N forms.
-   *
-   * @since 3.8.2
+   * Convenience function for <code>getTable().getTableStatus()</code> (returns <code>null</code> when table is
+   * <code>null</code>).
    */
-  IStatus getPagePopulateStatus();
+  IStatus getTableStatus();
 
   /**
-   * see {@link ITableField#setTablePopulateStatus(IStatus)}
-   * <p>
-   * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
-   * replaced by a simple page with just N forms.
-   *
-   * @since 3.8.2
+   * Convenience function for <code>getTable().setTableStatus(status)</code> (does nothing when table is
+   * <code>null</code>).
    */
-  void setPagePopulateStatus(IStatus status);
+  void setTableStatus(IStatus tableStatus);
+
+  /**
+   * Convenience function for <code>getTable().isTableStatusVisible()</code> (returns <code>false</code> when table is
+   * <code>null</code>).
+   */
+  boolean isTableStatusVisible();
+
+  /**
+   * Convenience function for <code>getTable().setTableStatusVisible(b)</code> (does nothing when table is
+   * <code>null</code>).
+   */
+  void setTableStatusVisible(boolean tableStatusVisible);
 
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>

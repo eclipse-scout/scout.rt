@@ -11,8 +11,6 @@ import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationUtility;
 import org.eclipse.scout.rt.client.mobile.transformation.MobileDeviceTransformation;
@@ -45,7 +43,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 
@@ -488,11 +485,6 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
         }
 
         @Override
-        protected boolean getConfiguredTableStatusVisible() {
-          return false;
-        }
-
-        @Override
         protected boolean getConfiguredGridUseUiHeight() {
           //If there is a detail form make the table as height as necessary to avoid a second scrollbar.
           //If there is no detail form make the table itself scrollable.
@@ -500,60 +492,12 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
         }
 
         @Override
-        protected void execUpdateTableStatus() {
-          execUpdatePageTableStatus();
-        }
-
-        @Override
-        public String createDefaultTableStatus() {
-          return createDefaultPageTableStatus(getTable());
+        protected void setTableInternal(ITable table) {
+          super.setTableInternal(table);
+          setTableStatusVisible(false);
         }
       }
-
     }
-  }
-
-  protected void execUpdatePageTableStatus() {
-    if (!m_pageFormConfig.isTableStatusVisible()) {
-      return;
-    }
-    if (getPage() instanceof IPageWithTable<?>) {
-      //popuplate status
-      IPageWithTable<?> tablePage = (IPageWithTable<?>) getPage();
-      IStatus populateStatus = tablePage.getPagePopulateStatus();
-      getPageTableField().setTablePopulateStatus(populateStatus);
-      //selection status
-      if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
-        getPageTableField().setTableSelectionStatus(null);
-      }
-      else if (populateStatus != null && populateStatus.getSeverity() == IStatus.WARNING) {
-        getPageTableField().setTableSelectionStatus(null);
-      }
-      else {
-        getPageTableField().setTableSelectionStatus(new Status(getPageTableField().createDefaultTableStatus(), IStatus.INFO));
-      }
-    }
-    else {
-      getPageTableField().setTablePopulateStatus(null);
-      getPageTableField().setTableSelectionStatus(null);
-    }
-  }
-
-  protected String createDefaultPageTableStatus(ITable table) {
-    StringBuilder statusText = new StringBuilder();
-    if (table != null) {
-      int nTotal = table.getFilteredRowCount();
-      if (nTotal == 1) {
-        statusText.append(ScoutTexts.get("OneRow"));
-      }
-      else {
-        statusText.append(ScoutTexts.get("XRows", NumberUtility.format(nTotal)));
-      }
-    }
-    if (statusText.length() == 0) {
-      return null;
-    }
-    return statusText.toString();
   }
 
   @Override

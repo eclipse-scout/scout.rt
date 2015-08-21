@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -23,7 +22,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
@@ -32,7 +30,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.ITableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldReloadTableDataChain;
@@ -40,20 +37,16 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFiel
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveDeletedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveInsertedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveUpdatedRowChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldUpdateTableStatusChain;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ValidateTableFieldDescriptor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -68,7 +61,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   private T m_table;
   private boolean m_tableExternallyManaged;
   private P_ManagedTableListener m_managedTableListener;
-  private P_TableStatusListener m_tableStatusListener;
 
   public AbstractTableField() {
     this(true);
@@ -92,77 +84,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @ConfigOperation
   @Order(190)
   protected void execReloadTableData() throws ProcessingException {
-  }
-
-  /**
-   * @return the visible row count, filtered row count, selected row count and the sum of all numeric columns
-   *         <p>
-   *         returns null if no table is contained within this table field
-   */
-  @Override
-  public String createDefaultTableStatus() {
-    StringBuilder statusText = new StringBuilder();
-    ITable table = getTable();
-    if (table != null) {
-      int nTotal = table.getFilteredRowCount();
-      if (nTotal == 1) {
-        statusText.append(ScoutTexts.get("OneRow"));
-      }
-      else {
-        statusText.append(ScoutTexts.get("XRows", NumberUtility.format(nTotal)));
-      }
-
-      int fTotal = table.getRowCount() - nTotal;
-      if (fTotal == 1) {
-        statusText.append(", " + ScoutTexts.get("OneFiltered"));
-      }
-      else if (fTotal > 1) {
-        statusText.append(", " + ScoutTexts.get("XFiltered", NumberUtility.format(fTotal)));
-      }
-      int nSel = table.getSelectedRowCount();
-      if (nSel == 1) {
-        statusText.append(", " + ScoutTexts.get("OneSelected"));
-      }
-      else if (nSel > 1) {
-        statusText.append(", " + ScoutTexts.get("XSelected", NumberUtility.format(nSel)));
-        // show sums of numeric columns
-        for (IColumn<?> c : table.getColumnSet().getVisibleColumns()) {
-          if (c instanceof INumberColumn) {
-            NumberFormat fmt = null;
-            Object sum = null;
-            fmt = ((INumberColumn) c).getFormat();
-            @SuppressWarnings("unchecked")
-            INumberColumn<? extends Number> numberColumn = (INumberColumn) c;
-            sum = NumberUtility.sum(numberColumn.getSelectedValues());
-            if (fmt != null && sum != null) {
-              statusText.append(", " + c.getHeaderCell().getText() + ": " + fmt.format(sum));
-            }
-          }
-        }
-      }
-    }
-    if (statusText.length() == 0) {
-      return null;
-    }
-    return statusText.toString();
-  }
-
-  /**
-   * Called when the table status is updated, i.e. when {@link #updateTableStatus()} is called due to a change in the
-   * table (rows inserted, deleted, selected, ...).
-   * <p>
-   * Subclasses can override this method. The default calls {@link #createDefaultTableStatus()} and
-   * {@link #setTableStatus(String)} if the table status is visible.
-   *
-   * @throws ProcessingException
-   */
-  @ConfigOperation
-  @Order(195)
-  protected void execUpdateTableStatus() {
-    if (!isTableStatusVisible()) {
-      return;
-    }
-    setTableStatus(createDefaultTableStatus());
   }
 
   /**
@@ -218,19 +139,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     reloadTableData();
   }
 
-  /**
-   * Configures the visibility of the table status.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   *
-   * @return {@code true} if the table status is visible, {@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(200)
-  protected boolean getConfiguredTableStatusVisible() {
-    return false;
-  }
-
   protected Class<? extends ITable> getConfiguredTable() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ITable>> f = ConfigurationUtility.filterClasses(dca, ITable.class);
@@ -255,7 +163,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   protected void initConfig() {
     super.initConfig();
-    setTableStatusVisible(getConfiguredTableStatusVisible());
     setTableInternal(createTable());
     // local enabled listener
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
@@ -319,7 +226,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     setTableInternal(newTable);
   }
 
-  private void setTableInternal(T table) {
+  protected void setTableInternal(T table) {
     if (m_table == table) {
       return;
     }
@@ -333,10 +240,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           m_managedTableListener = null;
         }
       }
-      if (m_tableStatusListener != null) {
-        m_table.removeTableListener(m_tableStatusListener);
-        m_tableStatusListener = null;
-      }
     }
     m_table = table;
     if (m_table instanceof AbstractTable) {
@@ -349,9 +252,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         m_managedTableListener = new P_ManagedTableListener();
         m_table.addTableListener(m_managedTableListener);
       }
-      m_tableStatusListener = new P_TableStatusListener();
-      m_table.addTableListener(m_tableStatusListener);
-      updateTableStatus();
       m_table.setEnabled(isEnabled());
     }
     boolean changed = propertySupport.setProperty(PROP_TABLE, m_table);
@@ -564,61 +464,36 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public String getTableStatus() {
-    IStatus status = getTableSelectionStatus();
-    return status != null ? status.getMessage() : null;
-  }
-
-  @Override
-  public void setTableStatus(String statusText) {
-    Status status = statusText != null ? new Status(statusText, IStatus.INFO) : null;
-    setTableSelectionStatus(status);
+  public IStatus getTableStatus() {
     T table = getTable();
     if (table != null) {
-      table.setTableStatus(status);
+      return table.getTableStatus();
     }
+    return null;
   }
 
   @Override
-  public IStatus getTableSelectionStatus() {
-    return (IStatus) propertySupport.getProperty(PROP_TABLE_SELECTION_STATUS);
-  }
-
-  @Override
-  public void setTableSelectionStatus(IStatus status) {
-    propertySupport.setProperty(PROP_TABLE_SELECTION_STATUS, status);
-  }
-
-  @Override
-  public IStatus getTablePopulateStatus() {
-    return (IStatus) propertySupport.getProperty(PROP_TABLE_POPULATE_STATUS);
-  }
-
-  @Override
-  public void setTablePopulateStatus(IStatus status) {
-    propertySupport.setProperty(PROP_TABLE_POPULATE_STATUS, status);
+  public void setTableStatus(IStatus tableStatus) {
+    T table = getTable();
+    if (table != null) {
+      table.setTableStatus(tableStatus);
+    }
   }
 
   @Override
   public boolean isTableStatusVisible() {
-    return propertySupport.getPropertyBool(PROP_TABLE_STATUS_VISIBLE);
+    T table = getTable();
+    if (table != null) {
+      return table.isTableStatusVisible();
+    }
+    return false;
   }
 
   @Override
-  public void setTableStatusVisible(boolean b) {
-    propertySupport.setPropertyBool(PROP_TABLE_STATUS_VISIBLE, b);
-    if (b) {
-      updateTableStatus();
-    }
-  }
-
-  @Override
-  public void updateTableStatus() {
-    try {
-      interceptUpdateTableStatus();
-    }
-    catch (Exception t) {
-      LOG.warn("Updating status of " + AbstractTableField.this.getClass().getName(), t);
+  public void setTableStatusVisible(boolean tableStatusVisible) {
+    T table = getTable();
+    if (table != null) {
+      table.setTableStatusVisible(tableStatusVisible);
     }
   }
 
@@ -691,24 +566,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
   }
 
-  private class P_TableStatusListener extends TableAdapter {
-    @Override
-    public void tableChanged(TableEvent e) {
-      switch (e.getType()) {
-        case TableEvent.TYPE_ROWS_INSERTED:
-        case TableEvent.TYPE_ROWS_UPDATED:
-        case TableEvent.TYPE_ROWS_DELETED:
-        case TableEvent.TYPE_ROWS_SELECTED:
-        case TableEvent.TYPE_ALL_ROWS_DELETED:
-        case TableEvent.TYPE_ROW_FILTER_CHANGED:
-        case TableEvent.TYPE_TABLE_POPULATED: {
-          updateTableStatus();
-          break;
-        }
-      }
-    }
-  }
-
   protected static class LocalTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends LocalFormFieldExtension<OWNER>implements ITableFieldExtension<T, OWNER> {
 
     public LocalTableFieldExtension(OWNER owner) {
@@ -718,11 +575,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     @Override
     public void execReloadTableData(TableFieldReloadTableDataChain<? extends ITable> chain) throws ProcessingException {
       getOwner().execReloadTableData();
-    }
-
-    @Override
-    public void execUpdateTableStatus(TableFieldUpdateTableStatusChain<? extends ITable> chain) {
-      getOwner().execUpdateTableStatus();
     }
 
     @Override
@@ -755,12 +607,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldReloadTableDataChain<T> chain = new TableFieldReloadTableDataChain<T>(extensions);
     chain.execReloadTableData();
-  }
-
-  protected final void interceptUpdateTableStatus() {
-    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    TableFieldUpdateTableStatusChain<T> chain = new TableFieldUpdateTableStatusChain<T>(extensions);
-    chain.execUpdateTableStatus();
   }
 
   protected final void interceptSaveInsertedRow(ITableRow row) throws ProcessingException {

@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
@@ -145,12 +144,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * Runtime
    */
 
-  @Override
-  public void setPagePopulateStatus(IStatus status) {
-    super.setPagePopulateStatus(status);
-    getTable().tablePopulated();
-  }
-
   /**
    * Called whenever this page is selected in the outline tree.
    * <p>
@@ -241,7 +234,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     try {
       getTable().setTableChanging(true);
       rebuildTableInternal();
-      setPagePopulateStatus(null);
+      setTableStatus(null);
     }
     finally {
       getTable().setTableChanging(false);

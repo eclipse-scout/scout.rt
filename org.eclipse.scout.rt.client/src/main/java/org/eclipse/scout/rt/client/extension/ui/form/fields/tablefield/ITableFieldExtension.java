@@ -9,7 +9,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFiel
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveDeletedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveInsertedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveUpdatedRowChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldUpdateTableStatusChain;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -17,8 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 public interface ITableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends IFormFieldExtension<OWNER> {
 
   void execReloadTableData(TableFieldReloadTableDataChain<? extends ITable> chain) throws ProcessingException;
-
-  void execUpdateTableStatus(TableFieldUpdateTableStatusChain<? extends ITable> chain);
 
   void execSaveInsertedRow(TableFieldSaveInsertedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
 

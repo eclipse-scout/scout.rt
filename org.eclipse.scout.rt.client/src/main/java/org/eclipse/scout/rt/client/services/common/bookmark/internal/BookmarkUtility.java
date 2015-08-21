@@ -705,10 +705,9 @@ public final class BookmarkUtility {
 
     // check, whether table column filter must be reset
     if (resetViewAndWarnOnFail) {
-      if (childPage == null
-          || (!childPage.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled())) {
+      if (childPage == null || (!childPage.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled())) {
         table.getColumnFilterManager().reset();
-        tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResetColumnFilters"), IStatus.WARNING));
+        tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResetColumnFilters"), IStatus.WARNING));
       }
     }
 
@@ -717,10 +716,10 @@ public final class BookmarkUtility {
       if (resetViewAndWarnOnFail) {
         // set appropriate warning
         if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
-          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.ERROR));
+          tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.ERROR));
         }
         else {
-          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
+          tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
         }
       }
       childPage = null;
@@ -748,7 +747,7 @@ public final class BookmarkUtility {
       }
       // set appropriate warning if child page is not available or filtered out
       if (childPage == null && resetViewAndWarnOnFail) {
-        nodePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
+        nodePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
       }
     }
     return childPage;

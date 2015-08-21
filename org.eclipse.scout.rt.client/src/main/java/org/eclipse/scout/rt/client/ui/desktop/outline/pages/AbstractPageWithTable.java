@@ -296,17 +296,17 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
-      setPagePopulateStatus(new Status(ScoutTexts.get("TooManyRows"), IStatus.WARNING));
+      setTableStatus(new Status(ScoutTexts.get("TooManyRows"), IStatus.WARNING));
     }
     else {
-      setPagePopulateStatus(null);
+      setTableStatus(null);
     }
     if (isLimitedResult()) {
       String maxOutlineWarningKey = "MaxOutlineRowWarning";
       if (UserAgentUtility.isTouchDevice()) {
         maxOutlineWarningKey = "MaxOutlineRowWarningMobile";
       }
-      setPagePopulateStatus(new Status(TEXTS.get(maxOutlineWarningKey, "" + getTable().getRowCount()), IStatus.WARNING));
+      setTableStatus(new Status(TEXTS.get(maxOutlineWarningKey, "" + getTable().getRowCount()), IStatus.WARNING));
     }
   }
 
@@ -763,12 +763,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
-  @Override
-  public void setPagePopulateStatus(IStatus status) {
-    super.setPagePopulateStatus(status);
-    getTable().tablePopulated();
-  }
-
   /**
    * Import the content of the tablePageData in the table of the page.
    *
@@ -814,7 +808,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           pe = new ProcessingException(t.getMessage(), t);
         }
         if (pe.isInterruption()) {
-          setPagePopulateStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
+          setTableStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
         }
         else {
           String message = null;
@@ -824,7 +818,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           if (StringUtility.isNullOrEmpty(message)) {
             message = ScoutTexts.get("ErrorWhileLoadingData");
           }
-          setPagePopulateStatus(new Status(message, IStatus.ERROR));
+          setTableStatus(new Status(message, IStatus.ERROR));
         }
         throw pe;
       }

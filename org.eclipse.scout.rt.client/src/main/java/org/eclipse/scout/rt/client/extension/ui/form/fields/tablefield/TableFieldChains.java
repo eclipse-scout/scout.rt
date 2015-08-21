@@ -43,23 +43,6 @@ public final class TableFieldChains {
     }
   }
 
-  public static class TableFieldUpdateTableStatusChain<T extends ITable> extends AbstractTableFieldChain<T> {
-
-    public TableFieldUpdateTableStatusChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
-      super(extensions);
-    }
-
-    public void execUpdateTableStatus() {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>> next) {
-          next.execUpdateTableStatus(TableFieldUpdateTableStatusChain.this);
-        }
-      };
-      callChain(methodInvocation);
-    }
-  }
-
   public static class TableFieldSaveInsertedRowChain<T extends ITable> extends AbstractTableFieldChain<T> {
 
     public TableFieldSaveInsertedRowChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
