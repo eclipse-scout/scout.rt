@@ -39,8 +39,21 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 };
 
 scout.DesktopViewTab.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-view-tab')
-    .on('mousedown', this._onMouseDown.bind(this));
+  var parentTab = this.session.desktop.viewTabsController.viewTab(this._view.parent);
+  if(parentTab){
+      this.$container = parentTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
+        var $wrapper = this.$container.wrapAll('<div class="animationWrapper">').parent().css('display', 'inline-block');
+        var w = $wrapper.width();
+        var removeContainer = function() {
+          $(this).replaceWith($(this).contents());
+        };
+        $wrapper.css('width', 0)
+          .animateAVCSD('width', w, removeContainer, false, 1500);
+  }
+  else{
+    this.$container = $parent.appendDiv('desktop-view-tab');
+  }
+  this.$container.on('mousedown', this._onMouseDown.bind(this));
   this._$title = this.$container.appendDiv('title');
   this._$subTitle = this.$container.appendDiv('sub-title');
   this._titlesUpdated();

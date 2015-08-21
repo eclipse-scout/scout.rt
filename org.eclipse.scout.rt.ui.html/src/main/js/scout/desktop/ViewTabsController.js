@@ -20,12 +20,20 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view) {
   viewTab.on('tabClicked', this.selectViewTab.bind(this));
   viewTab.on('remove', this._removeViewTab.bind(this, viewTab, viewId));
 
+  var index = this._viewTabs.length;
+  var parentViewTab = this.viewTab(viewTab._view.parent);
+  if(parentViewTab){
+    index = this._viewTabs.indexOf(parentViewTab)+1;
+  }
+
   // Register the view tab.
-  this._viewTabs.push(viewTab);
+  scout.arrays.insert(this._viewTabs, viewTab, index);
   this._viewTabMap[viewId] = viewTab;
 
   // Render the view tab.
   if (this._desktop._hasTaskBar()) {
+
+
     viewTab.render(this._desktop._$viewTabBar);
   }
 
@@ -37,13 +45,24 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view) {
  */
 scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
   // Unregister the view tab.
+  var viewTabIndexBefore = this._viewTabs.indexOf(viewTab)-1;
   scout.arrays.remove(this._viewTabs, viewTab);
   delete this._viewTabMap[viewId];
 
   // Select next available view tab.
   // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
+
   if (this._selectedViewTab === viewTab) {
-    this._selectLastViewTab();
+    var parentViewTab=this.viewTab(viewTab._view.parent);
+//    if(parentViewTab){
+//      this.selectViewTab(parentViewTab);
+//    }
+    if(viewTabIndexBefore>=0){
+      this.selectViewTab(this._viewTabs[viewTabIndexBefore]);
+    }
+    else{
+      this._selectLastViewTab();
+    }
   }
 
   this._desktop._layoutTaskBar();
