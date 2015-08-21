@@ -29,15 +29,16 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
 
 /**
- * Supports the servlet init-params
- * <p>
- * get_min_size = minimum size that is compressed
- * <p>
- * post_min_size = minimum size that is compressed
- * <p>
- * get_pattern = regex of pathInfo that is compressed
- * <p>
- * post_pattern = regex of pathInfo that is compressed
+ * Supports the following servlet init-params:
+ * <ul>
+ * <li><b>get_min_size:</b> minimum size in bytes that is compressed for GET requests (default value = <code>256</code>)
+ * <li><b>post_min_size:</b> minimum size in bytes that is compressed for POST requests (default value =
+ * <code>256</code>)
+ * <li><b>get_pattern:</b> regex of pathInfo that is compressed for GET requests (default value =
+ * <code>.*\.(html|css|js|json|txt)</code>)
+ * <li><b>post_pattern:</b> regex of pathInfo that is compressed for POST requests (default value =
+ * <code>.{@literal *}/json</code>)
+ * </ul>
  */
 public class GzipServletFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletFilter.class);
@@ -56,9 +57,9 @@ public class GzipServletFilter implements Filter {
   @Override
   public void init(FilterConfig config) throws ServletException {
     // read config
-    m_getMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("get_min_size"), "64"));
-    m_postMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("post_min_size"), "64"));
-    m_getPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("get_pattern"), ".*\\.(html|css|js)"), Pattern.CASE_INSENSITIVE);
+    m_getMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("get_min_size"), "256"));
+    m_postMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("post_min_size"), "256"));
+    m_getPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("get_pattern"), ".*\\.(html|css|js|json|txt)"), Pattern.CASE_INSENSITIVE);
     m_postPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("post_pattern"), ".*/json"), Pattern.CASE_INSENSITIVE);
   }
 
