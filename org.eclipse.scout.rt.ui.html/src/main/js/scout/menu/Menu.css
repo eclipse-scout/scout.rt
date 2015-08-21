@@ -157,6 +157,10 @@
     &:active {
       background-color: @palette-blue-7;
     }
+
+    & > .font-icon {
+      font-weight: normal;
+    }
   }
 
   &.default-menu > .font-icon {
