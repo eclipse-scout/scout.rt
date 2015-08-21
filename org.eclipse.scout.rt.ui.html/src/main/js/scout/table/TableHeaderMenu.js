@@ -150,16 +150,17 @@ scout.TableHeaderMenu.prototype._render = function() {
       table: table,
       column: column
     }, this.session);
-  } else {
-    filter.calculateCube();
   }
+  // always recalculate available values to make sure new/updated/deleted rows are considered
+  filter.calculateCube();
+  
   var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
-
   filter.availableValues.forEach(function(availableValue, index, arr) {
-    var $filterItem = $headerFilterContainer.appendDiv('header-filter', availableValue)
+    var $filterItem = $headerFilterContainer.appendDiv('header-filter', availableValue.text)
+      .data('key', availableValue.key)
       .on('click', onFilterClick);
 
-    if (filter.selectedValues.indexOf(availableValue) > -1) {
+    if (filter.selectedValues.indexOf(availableValue.key) > -1) {
       $filterItem.addClass('selected');
     }
     if (index === arr.length - 1) {
@@ -357,8 +358,8 @@ scout.TableHeaderMenu.prototype._render = function() {
 
     // find selected values
     filter.selectedValues = [];
-    $('.selected', $headerFilter).each(function() {
-      filter.selectedValues.push($(this).text());
+    $headerFilter.find('.selected').each(function() {
+      filter.selectedValues.push($(this).data('key'));
     });
 
     if (filter.selectedValues.length > 0) {

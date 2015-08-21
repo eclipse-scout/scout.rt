@@ -125,3 +125,14 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
   popup.pack();
   return popup;
 };
+
+scout.Column.prototype.getValueForGrouping = function(row) {
+  var cell = this.table.cell(this, row);
+  if (cell.value !== undefined) {//htmlEnabled) {
+    return cell.value;
+  }
+  if (!row.$row) {
+    throw new Error('row not rendered yet');
+  }
+  return this.table.$cell(this, row.$row).text();
+};

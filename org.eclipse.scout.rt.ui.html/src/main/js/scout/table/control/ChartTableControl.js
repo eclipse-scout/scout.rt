@@ -858,12 +858,14 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     if (filters.length) {
       filterFunc = function($row) {
         var row = $row.data('row');
-        var nX = xAxis.norm(that.table.cellValue(xAxis.column, row));
+        var key = xAxis.column.getValueForGrouping(row);
+        var nX = xAxis.norm(key);
 
         if (oneDim) {
           return (filters.indexOf(nX) > -1);
         } else {
-          var nY = yAxis.norm(that.table.cellValue(yAxis.column, row));
+          key = yAxis.column.getValueForGrouping(row);
+          var nY = yAxis.norm(key);
           return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
         }
       };

@@ -25,3 +25,11 @@ scout.BeanColumn.prototype.buildCell = function(row) {
 scout.BeanColumn.prototype._renderValue = function($cell, value) {
   // to be implemented by the subclass
 };
+
+scout.BeanColumn.prototype.getValueForGrouping = function(row) {
+  if (!row.$row) {
+    throw new Error('row not rendered yet');
+  }
+  //TODO CGU this does not work well when multiple lines are displayed
+  return this.table.$cell(this, row.$row).text();
+};
