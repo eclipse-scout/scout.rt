@@ -47,8 +47,10 @@ scout.ViewMenuTab.prototype._update = function() {
 
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
+     .unfocusable()
     .on('mousedown', this.togglePopup.bind(this))
     .data('tooltipText', function() { return this.text; }.bind(this));
+
   this.$title = this.$container.appendSpan('view-button-tab-title has-menu')
     .icon(this.iconId);
   this.$menuButton = this.$container.appendSpan('view-menu-button')
