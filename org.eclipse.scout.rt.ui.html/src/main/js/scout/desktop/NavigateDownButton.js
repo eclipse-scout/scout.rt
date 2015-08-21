@@ -1,8 +1,7 @@
 scout.NavigateDownButton = function(outline, node) {
   scout.NavigateDownButton.parent.call(this, outline, node);
-  this._text1 = ''; // FIXME AWE: remove
-  this._text2 = '';
-  this.iconId = scout.icons.CHEVRON_DOWN;
+  this._text1 = 'ui.Continue';
+  this._text2 = 'ui.Show';
   this.objectType = 'NavigateDownButton';
   this.keyStroke = 'enter';
   this.initKeyStrokeParts();

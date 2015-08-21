@@ -250,5 +250,4 @@ __include("scout/form/fields/wrappedform/WrappedFormField.js");
 __include("scout/desktop/AbstractNavigationButton.js"); // requires Button.js
 __include("scout/desktop/NavigateDownButton.js");
 __include("scout/desktop/NavigateUpButton.js");
-__include("scout/desktop/NavigationMenu.js");
 }(window.scout = window.scout || {}, jQuery));

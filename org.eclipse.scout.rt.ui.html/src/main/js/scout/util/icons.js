@@ -1,9 +1,7 @@
 scout.icons = {
 
-  CHEVRON_DOWN: 'font:\uF078',
-  CHEVRON_UP: 'font:\uF077',
-  ELLIPSIS_V: 'font:\uE040',
   OUTLINE: 'font:\uE043',
+  ELLIPSIS_V: 'font:\uE040',
 
   /**
    * Returns an Icon object with structured info contained in the iconId string.
