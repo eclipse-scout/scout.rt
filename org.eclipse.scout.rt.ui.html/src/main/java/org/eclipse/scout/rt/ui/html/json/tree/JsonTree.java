@@ -44,6 +44,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
+
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_NODES_UPDATED = "nodesUpdated";
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
