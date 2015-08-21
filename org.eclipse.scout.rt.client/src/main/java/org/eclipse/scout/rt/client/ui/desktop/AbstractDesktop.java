@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1627,7 +1629,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireDataChangedImpl(Object... dataTypes) {
     if (dataTypes != null && dataTypes.length > 0) {
-      HashMap<DataChangeListener, Set<Object>> map = new HashMap<DataChangeListener, Set<Object>>();
+      // Important: Use LinkedHashMaps to make event firing deterministic!
+      // (If listeners would be called in random order, bugs may not be reproduced very well.)
+      HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<DataChangeListener, Set<Object>>();
       for (Object dataType : dataTypes) {
         if (dataType != null) {
           EventListenerList list = m_dataChangeListenerList.get(dataType);
@@ -1635,7 +1639,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
               Set<Object> typeSet = map.get(listener);
               if (typeSet == null) {
-                typeSet = new HashSet<Object>();
+                typeSet = new LinkedHashSet<Object>();
                 map.put(listener, typeSet);
               }
               typeSet.add(dataType);
