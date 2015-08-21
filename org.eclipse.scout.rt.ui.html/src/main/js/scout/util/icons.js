@@ -1,7 +1,7 @@
 scout.icons = {
 
-  CHEVRON_DOWN: 'font:\uF078',
-  CHEVRON_UP: 'font:\uF077',
+  ANGLE_DOWN: 'font:\uF107',
+  ANGLE_UP: 'font:\uF106',
   OUTLINE: 'font:\uE043',
   ELLIPSIS_V: 'font:\uE040',
 

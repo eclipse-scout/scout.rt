@@ -1,9 +1,9 @@
 scout.NavigateDownButton = function(outline, node) {
   scout.NavigateDownButton.parent.call(this, outline, node);
   // FIXME AWE: remove texts ui.Show and ui.Back? still required?
-  this._defaultIconId = scout.icons.CHEVRON_DOWN;
+  this._defaultIconId = scout.icons.ANGLE_DOWN;
   this._defaultText = 'ui.Continue';
-  this.iconId = scout.icons.CHEVRON_DOWN;
+  this.iconId = this._defaultIconId;
   this.objectType = 'NavigateDownButton';
   this.keyStroke = 'enter';
   this.initKeyStrokeParts();
