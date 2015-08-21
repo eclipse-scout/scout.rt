@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class JsonResponse {
     m_adapterMap = new HashMap<>();
     m_eventList = new ArrayList<>();
     m_idToPropertyChangeEventMap = new HashMap<>();
-    m_bufferedEventsAdapters = new HashSet<>();
+    m_bufferedEventsAdapters = new LinkedHashSet<>(); // use ordered map to make fireProcessBufferedEvents() deterministic
   }
 
   /**
