@@ -491,6 +491,10 @@ scout.Tree.prototype.clearSelection = function() {
 scout.Tree.prototype.selectNodes = function(nodes, notifyServer) {
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.helpers.nvl(notifyServer, true);
+  if (scout.arrays.equalsIgnoreOrder(nodes, this.selectedNodes)) {
+    return;
+  }
+
   if (this.rendered) {
     this._removeSelection();
   }
@@ -544,7 +548,9 @@ scout.Tree.prototype._renderSelection = function() {
 
     // in case of breadcrumb, expand
     if (this._breadcrumbEnabled) {
-      this.setNodeExpanded($nodes[i].data('node'), true, {renderExpansion: true}); // force render expansion
+      this.setNodeExpanded($nodes[i].data('node'), true, {
+        renderExpansion: true
+      }); // force render expansion
     }
   }
 
@@ -587,7 +593,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       if (!$parentNode) {
         throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
-      this.setNodeExpanded(parentNodes[i], true, {renderExpansion: true}); // force render expansion
+      this.setNodeExpanded(parentNodes[i], true, {
+        renderExpansion: true
+      }); // force render expansion
     }
   }
 };
@@ -1423,7 +1431,7 @@ scout.Tree.prototype._nodesFiltered = function(invisibleNodes) {
 };
 
 scout.Tree.prototype._nodeAcceptedByFilters = function(node) {
-  for (var i=0; i < this._filters.length; i++) {
+  for (var i = 0; i < this._filters.length; i++) {
     var filter = this._filters[i];
     if (!filter.accept(node.$node)) {
       return false;
