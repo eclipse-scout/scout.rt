@@ -26,15 +26,13 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link ClientNotificationRegistry}
  */
-@RunWith(PlatformTestRunner.class)
 public class ClientNotificationRegistryTest {
+  private static final String TEST_NODE = "Node1";
   private static final String TEST_NOTIFICATION = "testNotification";
   private static final String TEST_SESSION = "testSessionId";
   private static final String TEST_USER = "User1";
@@ -60,13 +58,13 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsSingleSession() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry();
-    reg.registerSession("Node1", TEST_SESSION, TEST_USER);
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.registerSession("Node2", TEST_SESSION, TEST_USER);
     reg.registerSession("Node2", "otherSession", TEST_USER);
     reg.registerSession("Node3", "otherSession", TEST_USER);
     reg.putForSession(TEST_SESSION, TEST_NOTIFICATION);
 
-    List<ClientNotificationMessage> notificationsN1 = consumeNoWait(reg, "Node1");
+    List<ClientNotificationMessage> notificationsN1 = consumeNoWait(reg, TEST_NODE);
     List<ClientNotificationMessage> notificationsN2 = consumeNoWait(reg, "Node2");
     List<ClientNotificationMessage> notificationsN3 = consumeNoWait(reg, "Node3");
     assertSingleTestNotification(notificationsN1);
@@ -93,13 +91,13 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsSingleUser() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry();
-    reg.registerSession("Node1", TEST_SESSION, TEST_USER);
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.registerSession("Node2", TEST_SESSION, "User2");
     reg.registerSession("Node2", "otherSession", TEST_USER);
     reg.registerSession("Node3", "otherSession", "User2");
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
 
-    List<ClientNotificationMessage> notificationsN1 = consumeNoWait(reg, "Node1");
+    List<ClientNotificationMessage> notificationsN1 = consumeNoWait(reg, TEST_NODE);
     List<ClientNotificationMessage> notificationsN2 = consumeNoWait(reg, "Node2");
     List<ClientNotificationMessage> notificationsN3 = consumeNoWait(reg, "Node3");
     assertSingleTestNotification(notificationsN1);
@@ -113,14 +111,53 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testMultipleNotifications() throws Exception {
     ClientNotificationRegistry reg = new ClientNotificationRegistry();
-    reg.registerSession("Node1", TEST_SESSION, TEST_USER);
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
     reg.putForUser(TEST_USER, "notification2");
 
-    List<ClientNotificationMessage> notificationsN1 = reg.consume("Node1", 10, 1, TimeUnit.MILLISECONDS);
+    List<ClientNotificationMessage> notificationsN1 = reg.consume(TEST_NODE, 10, 1, TimeUnit.MILLISECONDS);
     assertEquals(2, notificationsN1.size());
     assertEquals(TEST_NOTIFICATION, notificationsN1.get(0).getNotification());
     assertEquals("notification2", notificationsN1.get(1).getNotification());
+  }
+
+  @Test
+  public void registeredNodeAvailable() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    assertTrue(reg.getRegisteredNodeIds().contains(TEST_NODE));
+  }
+
+  /**
+   * If no sessions are registered, the node should not be available in the registry
+   */
+  @Test
+  public void registeredNodeInitiallsNotAvailable() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
+  }
+
+  /**
+   * If all sessions are gone, the node should not be available in the registry.
+   */
+  @Test
+  public void registeredNodeNotAvailable_afterUnregister() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    reg.unregisterSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
+  }
+
+  /**
+   * If not sessions are removed, the node should be available.
+   */
+  @Test
+  public void testNodeAvailable_AfterUnregisterSession() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    reg.registerSession(TEST_NODE, "testSession2", TEST_USER);
+    reg.unregisterSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    assertTrue(reg.getRegisteredNodeIds().contains(TEST_NODE));
   }
 
   /**
@@ -132,7 +169,7 @@ public class ClientNotificationRegistryTest {
     try {
       IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(mock(HttpServletResponse.class));
 
-      final String currentNode = "Node1";
+      final String currentNode = TEST_NODE;
       final String otherNode = "Node2";
 
       ServerRunContexts.copyCurrent().withNotificationNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {
@@ -168,7 +205,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testTransactionalNoPiggyBack() throws Exception {
-    final String currentNode = "Node1";
+    final String currentNode = TEST_NODE;
     final String otherNode = "Node2";
 
     ServerRunContexts.copyCurrent().withNotificationNodeId(currentNode).withTransactionalClientNotificationCollector(new TransactionalClientNotificationCollector()).run(new IRunnable() {

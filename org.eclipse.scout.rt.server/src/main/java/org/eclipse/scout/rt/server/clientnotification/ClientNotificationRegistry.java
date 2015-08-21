@@ -60,7 +60,11 @@ public class ClientNotificationRegistry {
    */
   void unregisterSession(String nodeId, String sessionId, String userId) {
     synchronized (m_notificationQueues) {
-      getQueue(nodeId).unregisterSession(sessionId, userId);
+      ClientNotificationNodeQueue queue = getQueue(nodeId);
+      queue.unregisterSession(sessionId, userId);
+      if (queue.getAllSessionIds().isEmpty()) {
+        m_notificationQueues.remove(nodeId);
+      }
     }
   }
 
@@ -111,7 +115,7 @@ public class ClientNotificationRegistry {
    *
    * @return
    */
-  public Set<String> getAllSessionIds() {
+  public Set<String> getRegisteredSessionIds() {
     Set<String> allSessionIds = new HashSet<>();
     synchronized (m_notificationQueues) {
       for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
@@ -119,6 +123,15 @@ public class ClientNotificationRegistry {
       }
     }
     return allSessionIds;
+  }
+
+  /**
+   * Nodes that have been registered with {@link #registerSession(String, String, String)}
+   */
+  public Set<String> getRegisteredNodeIds() {
+    synchronized (m_notificationQueues) {
+      return new HashSet<>(m_notificationQueues.keySet());
+    }
   }
 
   // put methods
