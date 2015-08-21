@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 /**
  * Node-oriented page (one of the two types of IPage @see IPage)<br>
@@ -27,12 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
  * tree events are delegated to the table<br>
  */
 public interface IPageWithNodes extends IPage<ITable> {
-
-  /**
-   * @param childPageNode
-   * @return the value {@link ITableRow#isFilterAccepted()} on the corresponding row of the inner table
-   */
-  boolean isFilterAcceptedForChildNode(ITreeNode childPageNode);
 
   void rebuildTableInternal() throws ProcessingException;
 

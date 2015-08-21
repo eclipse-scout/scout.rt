@@ -270,12 +270,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
   }
 
-  @Override
-  public boolean isFilterAcceptedForChildNode(ITreeNode childPageNode) {
-    ITableRow tableRow = getTableRowFor(childPageNode);
-    return tableRow == null || tableRow.isFilterAccepted();
-  }
-
   private List<? extends IMenu> m_pageMenusOfSelection;
 
   protected void updateContextMenusForSelection() {
