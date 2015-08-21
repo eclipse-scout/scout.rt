@@ -3,6 +3,13 @@ scout.FileChooserField = function() {
 };
 scout.inherits(scout.FileChooserField, scout.ValueField);
 
+/**
+ * @override Widget.js
+ */
+scout.FileChooserField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
+
 scout.FileChooserField.prototype._render = function($parent) {
   this.addContainer($parent, 'file-chooser-field');
   this.addLabel();

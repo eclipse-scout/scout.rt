@@ -1,7 +1,6 @@
 scout.ButtonAdapterMenu = function() {
   scout.ButtonAdapterMenu.parent.call(this);
   this._removeAdapterProperties('childActions'); // managed by button
-  this.defaultKeyStroke;
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 

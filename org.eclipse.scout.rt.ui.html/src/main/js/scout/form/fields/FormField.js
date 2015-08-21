@@ -50,10 +50,6 @@ scout.FormField.prototype._init = function(model, session) {
   this._syncMenus(this.menus);
 };
 
-scout.FormField.prototype._createKeyStrokeAdapter = function() {
-  return new scout.FormFieldKeyStrokeAdapter(this);
-};
-
 /**
  * All sub-classes of scout.FormField must implement a _render method. The default implementation
  * will throw an Error when _render is called. The _render method should call the various add*
@@ -294,14 +290,14 @@ scout.FormField.prototype._updateMenus = function() {
 scout.FormField.prototype._syncMenus = function(menus) {
   if (this.initialized && this._hasMenus()) {
     this.menus.forEach(function(menu) {
-      this.keyStrokeAdapter.unregisterKeyStroke(menu);
+      this.keyStrokeContext.unregisterKeyStroke(menu);
     }, this);
   }
   this.menus = menus;
   if (this._hasMenus()) {
     this.menus.forEach(function(menu) {
       if (menu.enabled) {
-        this.keyStrokeAdapter.registerKeyStroke(menu);
+        this.keyStrokeContext.registerKeyStroke(menu);
       }
     }, this);
   }
@@ -421,21 +417,8 @@ scout.FormField.prototype.getForm = function() {
   return parent;
 };
 
-scout.FormField.prototype.registerRootKeyStroke = function(keyStroke) {
-  var form = this.getForm();
-  if (form.initialized) {
-    form.rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
-  } else {
-    // FIXME AWE/CGU: is this code still required?
-    // When form is not initialized yet, do it later...
-    form.on('initialized', function() {
-      form.rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
-    }.bind(this));
-  }
-};
-
-scout.FormField.prototype.unregisterRootKeyStroke = function(keyStroke) {
-  this.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(keyStroke);
+scout.FormField.prototype.rootKeyStrokeContext = function() {
+  return this.getForm().keyStrokeContext;
 };
 
 scout.FormField.prototype._goOffline = function() {

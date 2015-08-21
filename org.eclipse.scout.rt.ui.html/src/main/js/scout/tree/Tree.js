@@ -36,15 +36,49 @@ scout.Tree.prototype._init = function(model, session) {
   this.addChild(this.menuBar);
 };
 
+/**
+ * @override ModelAdapter.js
+ */
+scout.Tree.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Tree.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  this._initTreeKeyStrokeContext(keyStrokeContext);
+};
+
+scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
+  var modifierBitMask = scout.keyStrokeModifier.NONE;
+
+  keyStrokeContext.registerKeyStroke([
+      new scout.TreeSpaceKeyStroke(this),
+      new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
+      new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
+      new scout.TreeCollapseAllKeyStroke(this, modifierBitMask),
+      new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
+      new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+    ]
+    .concat(this.menus));
+
+  // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
+  // Otherwise, an '↑-event' on the first node, or an '↓-event' on the last row will bubble up (because not consumed by tree navigation keystrokes) and cause a superior tree to move its selection;
+  // Use case: - outline tree with a detail form that contains a tree;
+  //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
+  keyStrokeContext.registerStopPropagationInterceptor(function(event) {
+    if (!event.ctrlKey && !event.altKey && scout.helpers.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+  });
+};
+
 scout.Tree.prototype._syncMenus = function(menus) {
   var i;
   for (i = 0; i < this.menus.length; i++) {
-    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
+    this.keyStrokeContext.unregisterKeyStroke(this.menus[i]);
   }
   this.menus = menus;
   for (i = 0; i < this.menus.length; i++) {
     if (this.menus[i].enabled) {
-      this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+      this.keyStrokeContext.registerKeyStroke(this.menus[i]);
     }
   }
 };
@@ -76,10 +110,6 @@ scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   if (this._onNodeDeleted) { // Necessary for subclasses
     this._onNodeDeleted(node);
   }
-};
-
-scout.Tree.prototype._createKeyStrokeAdapter = function() {
-  return new scout.TreeKeyStrokeAdapter(this);
 };
 
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {

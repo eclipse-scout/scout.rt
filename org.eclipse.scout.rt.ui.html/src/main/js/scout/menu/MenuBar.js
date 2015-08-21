@@ -1,5 +1,6 @@
 scout.MenuBar = function(session, menuSorter) {
   scout.MenuBar.parent.call(this);
+  this._addKeyStrokeContextSupport();
   this.init(session);
 
   this.menuSorter = menuSorter;
@@ -19,8 +20,6 @@ scout.MenuBar = function(session, menuSorter) {
    */
   this.visibleMenuItems = [];
 
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
-
   this._menuItemPropertyChangeListener = function(event) {
     // We do not update the items directly, because this listener may be fired many times in one
     // user request (because many menus change one or more properties). Therefore, we just invalidate
@@ -38,11 +37,17 @@ scout.MenuBar = function(session, menuSorter) {
 };
 scout.inherits(scout.MenuBar, scout.Widget);
 
-/**
- * @implements Widgets.js
- */
-scout.MenuBar.prototype._createKeyStrokeAdapter = function() {
-  return new scout.MenuBarKeyStrokeAdapter(this);
+scout.MenuBar.prototype.init = function(session) {
+  scout.MenuBar.parent.prototype.init.call(this, session);
+
+  this._initKeyStrokeContext(this.keyStrokeContext);
+};
+
+scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  keyStrokeContext.registerKeyStroke([
+    new scout.MenuBarLeftKeyStroke(this),
+    new scout.MenuBarRightKeyStroke(this)
+  ]);
 };
 
 /**
@@ -129,8 +134,7 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   if (!sameMenuItems || hasUnrenderedMenuItems) {
     this._internalMenuItems = menuItems;
     this.rebuildItems(); // Re-layout menubar
-  }
-  else {
+  } else {
     // Don't rebuild menubar, but update "markers"
     this.updateVisibility();
     this.updateDefaultMenu();
@@ -214,20 +218,16 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 
 scout.MenuBar.prototype.updateVisibility = function() {
   var oldVisible = this.htmlComp.isVisible(),
-    visible = !this.hiddenByUi && this.menuItems.some(function(m) { return m.visible; });
+    visible = !this.hiddenByUi && this.menuItems.some(function(m) {
+      return m.visible;
+    });
 
-  // Update visibility, layout and key-strokes
+  // Update visibility, layout
   if (visible !== oldVisible) {
     this.$container.setVisible(visible);
     this.htmlComp.invalidateLayoutTree();
-    if (visible) {
-      this._installKeyStrokeAdapter();
-    } else {
-      this._uninstallKeyStrokeAdapter();
-    }
   }
 };
-
 
 /**
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
@@ -244,7 +244,7 @@ scout.MenuBar.prototype.updateDefaultMenu = function() {
 scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
   var found = false;
   items.some(function(item) {
-    if (item.visible && item.enabled && item.keyStrokeKeyPart === scout.keys.ENTER) {
+    if (item.visible && item.enabled && scout.helpers.isOneOf(scout.keys.ENTER, item.actionKeyStroke.which)) {
       if (this._defaultMenu && this._defaultMenu !== item) {
         this._defaultMenu.$container.removeClass('default-menu');
       }

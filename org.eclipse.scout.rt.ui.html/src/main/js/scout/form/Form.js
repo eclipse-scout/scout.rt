@@ -28,6 +28,12 @@ scout.Form.prototype._init = function(model, session) {
   this._glassPaneRenderer = new scout.GlassPaneRenderer(session, this, renderGlassPanes);
 };
 
+scout.Form.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Form.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+};
+
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
 
@@ -249,7 +255,6 @@ scout.Form.prototype.attach = function() {
   }
 
   this.session.detachHelper.afterAttach(this.$container);
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   // form is attached even if children are not yet
   this.attached = true;
@@ -281,7 +286,6 @@ scout.Form.prototype.detach = function() {
   this.messageBoxController.detach();
   this.fileChooserController.detach();
 
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 

@@ -1,8 +1,16 @@
 scout.HtmlField = function() {
   scout.HtmlField.parent.call(this);
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 scout.inherits(scout.HtmlField, scout.ValueField);
+
+/**
+ * @override FormField.js
+ */
+scout.HtmlField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.HtmlField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
+};
 
 scout.HtmlField.prototype._render = function($parent) {
 
@@ -40,11 +48,6 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   }
 
   this.invalidateLayoutTree();
-};
-
-scout.HtmlField.prototype._init = function(model, session) {
-  scout.HtmlField.parent.prototype._init.call(this, model, session);
-  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
 scout.HtmlField.prototype._remove = function() {

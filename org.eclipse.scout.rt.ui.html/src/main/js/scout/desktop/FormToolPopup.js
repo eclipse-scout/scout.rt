@@ -32,7 +32,6 @@ scout.FormToolPopup.prototype._renderHead = function() {
 
 scout.FormToolPopup.prototype.detach = function() {
   this._detachCloseHandler();
-  this._uninstallKeyStrokeAdapter();
 
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
@@ -45,7 +44,6 @@ scout.FormToolPopup.prototype.attach = function() {
 
   this._triggerPopupOpenEvent();
   this._attachCloseHandler();
-  this._installKeyStrokeAdapter();
 
   this.session.detachHelper.afterAttach(this.$container);
 

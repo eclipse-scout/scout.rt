@@ -3,6 +3,13 @@ scout.NumberField = function() {
 };
 scout.inherits(scout.NumberField, scout.ValueField);
 
+/**
+ * @override Widget.js
+ */
+scout.NumberField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
+
 scout.NumberField.prototype._render = function($parent) {
   this.addContainer($parent, 'number-field');
   this.addLabel();

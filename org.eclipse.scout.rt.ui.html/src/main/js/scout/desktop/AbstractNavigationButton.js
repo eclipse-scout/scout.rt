@@ -44,7 +44,7 @@ scout.AbstractNavigationButton.prototype._render = function($parent) {
   scout.AbstractNavigationButton.parent.prototype._render.call(this, $parent);
   this.$container.addClass('small');
   this.$container.addClass(this._additionalCssClass);
-  this._registerButtonKeyStroke();
+  this.outline.keyStrokeContext.registerKeyStroke(this);
 };
 
 /**
@@ -52,7 +52,7 @@ scout.AbstractNavigationButton.prototype._render = function($parent) {
  */
 scout.AbstractNavigationButton.prototype._remove = function() {
   scout.AbstractNavigationButton.parent.prototype._remove.call(this);
-  this._unregisterButtonKeyStroke();
+  this.outline.keyStrokeContext.unregisterKeyStroke(this);
 };
 
 scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
@@ -80,21 +80,3 @@ scout.AbstractNavigationButton.prototype.updateEnabled = function() {
   }
 };
 
-/**
- * @override
- */
-scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
-  this._unregisterButtonKeyStroke();
-  if (this.keyStroke) {
-    // register buttons key stroke on root group-box
-    this.outline.keyStrokeAdapter.registerKeyStroke(this);
-  }
-};
-
-/**
- * @override
- */
-scout.AbstractNavigationButton.prototype._unregisterButtonKeyStroke = function() {
-  // unregister buttons key stroke on root group-box
-  this.outline.keyStrokeAdapter.unregisterKeyStroke(this);
-};

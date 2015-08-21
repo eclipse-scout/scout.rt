@@ -2,22 +2,6 @@ scout.Action = function() {
   this._hoverBound = false;
   scout.Action.parent.call(this);
 
-  // keyStroke
-  this.keyStroke;
-  this.keyStrokeKeyPart;
-  this.ctrl = false;
-  this.alt = false;
-  this.shift = false;
-  this.bubbleUp = false;
-  this.drawHint = true;
-  this.preventDefaultOnEvent = true;
-  this.stopImmediate = true;
-
-  /**
-   * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
-   */
-  this.invokeAcceptInputOnActiveValueField = true;
-
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */
@@ -30,6 +14,8 @@ scout.Action = function() {
    * - button: menu looks like a button
    */
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
+
+  this.actionKeyStroke = this._createActionKeyStroke();
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -53,9 +39,9 @@ scout.Action.prototype._renderProperties = function() {
   this._renderTabbable();
 };
 
-scout.Action.prototype._init = function(model, session) {
-  scout.Action.parent.prototype._init.call(this, model, session);
-  this.initKeyStrokeParts();
+scout.Action.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Action.parent.prototype._initKeyStrokeContext(this, keyStrokeContext);
+  this.actionKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };
 
 scout.Action.prototype._remove = function() {
@@ -170,7 +156,7 @@ scout.Action.prototype.doAction = function(event) {
   if (!this.prepareDoAction(event)) {
     return false;
   }
-
+  
   if (this.actionStyle === scout.Action.ActionStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else {
@@ -239,47 +225,9 @@ scout.Action.prototype.sendSelected = function() {
   });
 };
 
-// KeyStrokes
-
-scout.Action.prototype.ignore = function(event) {
-  return false;
-};
-
 scout.Action._syncKeyStroke = function(keyStroke) {
-  // When model's 'keystroke' property changes, also update keystroke parts
   this.keyStroke = keyStroke;
-  this.initKeyStrokeParts();
-};
-
-scout.Action.prototype.initKeyStrokeParts = function() {
-  this.keyStrokeKeyPart = undefined;
-  if (!this.keyStroke) {
-    return;
-  }
-  var keyStrokeParts = this.keyStroke.split('-');
-  for (var i = 0; i < keyStrokeParts.length; i++) {
-    var part = keyStrokeParts[i];
-    // see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
-    if (part === 'alternate' || part === 'alt') {
-      this.alt = true;
-    } else if (part === 'control' || part ==='ctrl') {
-      this.ctrl = true;
-    } else if (part === 'shift') {
-      this.shift = true;
-    } else {
-      this.keyStrokeKeyPart = scout.keys[part.toUpperCase()];
-    }
-  }
-};
-
-scout.Action.prototype.accept = function(event) {
-  if (this.ignore(event)) {
-    return false;
-  }
-  if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift && event.which === this.keyStrokeKeyPart) {
-    return true;
-  }
-  return false;
+  this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
 };
 
 scout.Action.prototype.setTabbable = function(tabbable) {
@@ -289,39 +237,6 @@ scout.Action.prototype.setTabbable = function(tabbable) {
   }
 };
 
-scout.Action.prototype.handle = function(event) {
-  var actionPerformed = this.doAction(event);
-  if (actionPerformed && this.preventDefaultOnEvent) {
-    event.preventDefault();
-  }
-};
-
-scout.Action.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
-  if (drawedKeys[this.keyStrokeName()]) {
-    return;
-  }
-  if (this.drawHint) {
-    this._drawKeyBox($container);
-  }
-  drawedKeys[this.keyStrokeName()] = true;
-};
-
-scout.Action.prototype._drawKeyBox = function($container) {
-  if (!this.drawHint || !this.keyStroke || !this.visible || !this.enabled || !this.rendered) {
-    return;
-  }
-  var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-  scout.keyStrokeBox.drawSingleKeyBoxItem(4, keyBoxText, $container, this.ctrl, this.alt, this.shift);
-};
-
-scout.Action.prototype.removeKeyBox = function($container) {
-  $('.key-box', $container).remove();
-  $('.key-box-additional', $container).remove();
-};
-
-scout.Action.prototype.keyStrokeName = function() {
-  var name = this.ctrl ? 'ctrl+' : '';
-  name += this.alt ? 'alt+' : '';
-  name += this.shift ? 'shift+' : '';
-  return name + this.keyStrokeKeyPart;
+scout.Action.prototype._createActionKeyStroke = function() {
+  return new scout.ActionKeyStroke(this);
 };

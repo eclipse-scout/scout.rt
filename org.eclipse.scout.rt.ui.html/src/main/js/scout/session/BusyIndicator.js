@@ -1,12 +1,32 @@
 scout.BusyIndicator = function(session, cancellable) {
   scout.BusyIndicator.parent.call(this);
+  this._addEventSupport();
+  this._addKeyStrokeContextSupport();
   this.init(session);
 
   this.parent = session.desktop;
-  this._cancellable = (cancellable === undefined ? true : !!cancellable);
-  this._addEventSupport();
+  this._cancellable = (cancellable === undefined ? true : !! cancellable);
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
+
+/**
+ * @override Widget.js
+ */
+scout.BusyIndicator.prototype.init = function(session) {
+  scout.BusyIndicator.parent.prototype.init.call(this, session);
+  this._initKeyStrokeContext(this.keyStrokeContext);
+};
+
+scout.BusyIndicator.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  keyStrokeContext.registerKeyStroke([
+    new scout.ClickActiveElementKeyStroke(this, [
+      scout.keys.SPACE, scout.keys.ENTER
+    ]),
+    new scout.CloseKeyStroke(this, function() {
+      return this.$cancelButton;
+    }.bind(this))
+  ]);
+};
 
 scout.BusyIndicator.prototype._render = function($parent) {
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
@@ -32,8 +52,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
     var buttons = new scout.MessageBoxButtons(this.$buttons, this._onClickCancel.bind(this));
     this.$cancelButton = buttons.renderButton('cancel', this.session.text('Cancel'));
     this.$cancelButton.css('width', '100%');
-  }
-  else {
+  } else {
     this.$content.addClass('no-buttons');
   }
 
@@ -54,12 +73,6 @@ scout.BusyIndicator.prototype._render = function($parent) {
     // FIXME [dwi] maybe, this is not required if problem with single-button form is solved!
     this.session.focusManager.validateFocus();
   }.bind(this), 2500);
-
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
-};
-
-scout.BusyIndicator.prototype._createKeyStrokeAdapter = function() {
-  return new scout.BusyIndicatorKeyStrokeAdapter(this);
 };
 
 scout.BusyIndicator.prototype._onClickCancel = function(event) {
@@ -90,3 +103,12 @@ scout.BusyIndicator.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
+/**
+ * Used by CloseKeyStroke.js
+ */
+scout.BusyIndicator.prototype.close = function() {
+  if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
+    this.$cancelButton.focus();
+    this.$cancelButton.click();
+  }
+};

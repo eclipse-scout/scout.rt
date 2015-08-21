@@ -6,6 +6,8 @@
 scout.Popup = function(session, options) {
   // FIXME AWE: use this.options property here
   scout.Popup.parent.call(this);
+  this._addEventSupport();
+  this._addKeyStrokeContextSupport();
   this.init(session);
 
   options = options || {};
@@ -13,7 +15,6 @@ scout.Popup = function(session, options) {
   this._scrollHandler;
   this._popupOpenHandler;
 
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this.openEvent;
   this.anchorBounds = options.anchorBounds;
   if (options.location) {
@@ -28,9 +29,18 @@ scout.Popup = function(session, options) {
   });
   this.focusableContainer = scout.helpers.nvl(options.focusableContainer, false);
   this.triggerPopupOpenEvent = scout.helpers.nvl(options.triggerPopupOpenEvent, true);
-  this._addEventSupport();
 };
 scout.inherits(scout.Popup, scout.Widget);
+
+scout.Popup.prototype.init = function(session) {
+  scout.Popup.parent.prototype.init.call(this, session);
+
+  this._initKeyStrokeContext(this.keyStrokeContext);
+};
+
+scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  keyStrokeContext.registerKeyStroke(new scout.CloseKeyStroke(this));
+};
 
 scout.Popup.prototype.render = function($parent, event) {
   this.openEvent = event;
@@ -256,10 +266,6 @@ scout.Popup.prototype.setLocation = function(location) {
 
 scout.Popup.prototype._triggerLocationChanged = function() {
   this.trigger('locationChanged');
-};
-
-scout.Popup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.PopupKeyStrokeAdapter(this);
 };
 
 /**

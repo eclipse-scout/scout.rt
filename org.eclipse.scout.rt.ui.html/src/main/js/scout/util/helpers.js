@@ -201,11 +201,7 @@ scout.helpers = {
       else {
         argsToCheck = Array.prototype.slice.call(arguments, 1);
       }
-      for (var i = 0; i < argsToCheck.length; i++) {
-        if (value === argsToCheck[i]) {
-          return true;
-        }
-      }
+      return argsToCheck.indexOf(value) !== -1;
     }
     return false;
   }

@@ -1,41 +1,28 @@
 scout.ButtonKeyStroke = function(button, keyStroke) {
   scout.ButtonKeyStroke.parent.call(this);
-  this.drawHint = true;
-  this.keyStroke = keyStroke;
-  this._button = button;
-  this.initKeyStrokeParts();
-  this.bubbleUp = false;
+  this.field = button;
+  this.parseAndSetKeyStroke(keyStroke);
+  this.stopPropagation = true;
+
+  this.renderingHints.offset = 16;
+  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.$drawingArea = function($drawingArea, event) {
+    return this.field.$container;
+  }.bind(this);
 };
 scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
+
 /**
- * @Override scout.KeyStroke
+ * @override KeyStroke.js
+ */
+scout.ButtonKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.ButtonKeyStroke.parent.prototype._accept.call(this, event);
+  return accepted && jQuery.contains(document.documentElement, this.field.$field[0]);
+};
+
+/**
+ * @override KeyStroke.js
  */
 scout.ButtonKeyStroke.prototype.handle = function(event) {
-  var actionPerformed = this._button.doAction();
-  if (actionPerformed && this.preventDefaultOnEvent) {
-    event.preventDefault();
-  }
-};
-
-/**
- * @Override scout.Action
- */
-scout.ButtonKeyStroke.prototype.accept = function(event) {
-  if (!jQuery.contains(document.documentElement, this._button.$field[0])) {
-    return false;
-  }
-  return scout.ButtonKeyStroke.parent.prototype.accept.call(this, event);
-};
-
-/**
- * @override Menu.js
- */
-scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
-  $container = this._button.$container;
-  var keyBoxOffset = this.keyBoxOffset || 16,
-    keyBoxAlignRight = this.keyBoxAlignRight === undefined ? true : this.keyBoxAlignRight;
-  if ($container && this._button.enabled && this._button.visible) {
-    var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(keyBoxOffset, keyBoxText, $container, this.ctrl, this.alt, this.shift, keyBoxAlignRight);
-  }
+  this.field.doAction();
 };

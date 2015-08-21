@@ -23,12 +23,24 @@ scout.Outline.prototype._init = function(model, session) {
   this.addFilter(new scout.DetailTableTreeFilter());
 };
 
-scout.Outline.prototype._createKeyStrokeAdapter = function() {
-  return new scout.OutlineKeyStrokeAdapter(this);
-};
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
+  var modifierBitMask = scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT;
 
-scout.Outline.prototype._installKeyStrokeAdapter = function() {
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container.closest('.scout'));
+  keyStrokeContext.registerKeyStroke([
+      new scout.TreeSpaceKeyStroke(this),
+      new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
+      new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
+      new scout.TreeCollapseAllKeyStroke(this, modifierBitMask),
+      new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
+      new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+    ]
+    .concat(this.menus));
+  keyStrokeContext.$bindTarget = function() {
+    return this.session.$entryPoint;
+  }.bind(this);
 };
 
 /**

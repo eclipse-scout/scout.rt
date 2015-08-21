@@ -3,7 +3,6 @@ scout.Menu = function() {
   this.childActions = [];
   this._addAdapterProperties('childActions');
   this.popup;
-  this.keyStrokeAdapter;
 
   /**
    * This property is true when the menu instance was moved into a overflow-menu
@@ -13,6 +12,15 @@ scout.Menu = function() {
   this.overflow = false;
 };
 scout.inherits(scout.Menu, scout.Action);
+
+/**
+ * @override ModelAdapter
+ */
+scout.Menu.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Menu.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke(new scout.MenuExecKeyStroke(this));
+};
 
 scout.Menu.prototype._render = function($parent) {
   if (this.separator) {
@@ -41,9 +49,6 @@ scout.Menu.prototype._renderItem = function($parent) {
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }
-  if (this.visible && this.enabled) {
-    this._registerKeyStrokeAdapter();
-  }
 
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
@@ -68,24 +73,6 @@ scout.Menu.prototype._onMouseEvent = function(event) {
     this.doAction(event);
   } else if ((event.type === 'click' || event.type ==='contextmenu') && !hasChildActions) {
     this.doAction(event);
-  }
-};
-
-scout.Menu.prototype._renderEnabled = function(enabled) {
-  scout.Menu.parent.prototype._renderEnabled.call(this, enabled);
-  if (enabled) {
-    this._registerKeyStrokeAdapter();
-  } else {
-    this._unregisterKeyStrokeAdapter();
-  }
-};
-
-scout.Menu.prototype._renderVisible = function(visible) {
-  scout.Menu.parent.prototype._renderVisible.call(this, visible);
-  if (visible) {
-    this._registerKeyStrokeAdapter();
-  } else {
-    this._unregisterKeyStrokeAdapter();
   }
 };
 
@@ -150,17 +137,4 @@ scout.Menu.prototype.doAction = function(event) {
   }
   // Default action handling
   return scout.Menu.parent.prototype.doAction.call(this, event);
-};
-
-scout.Menu.prototype._drawKeyBox = function($container) {
-  scout.Menu.parent.prototype._drawKeyBox.call(this, this.$container);
-};
-
-scout.Menu.prototype._registerKeyStrokeAdapter = function() {
-  this.keyStrokeAdapter = this.keyStrokeAdapter || new scout.MenuKeyStrokeAdapter(this);
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
-};
-
-scout.Menu.prototype._unregisterKeyStrokeAdapter = function() {
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
 };

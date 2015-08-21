@@ -8,8 +8,17 @@ scout.CellEditorPopup = function(column, row, cell, session) {
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
 
-scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.CellEditorPopupKeyStrokeAdapter(this);
+/**
+ * @override Popup.js
+ */
+scout.CellEditorPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.CellEditorPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([
+    new scout.CellEditorCompleteEditKeyStroke(this),
+    new scout.CellEditorCancelEditKeyStroke(this),
+    new scout.CellEditorTabKeyStroke(this)
+  ]);
 };
 
 scout.CellEditorPopup.prototype._render = function($parent) {

@@ -11,6 +11,18 @@ scout.RadioButtonGroup = function() {
 
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
 
+/**
+ * @override ModelAdapter.js
+ */
+scout.RadioButtonGroup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.RadioButtonGroup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([
+    new scout.RadioButtonGroupLeftKeyStroke(this),
+    new scout.RadioButtonGroupRightKeyStroke(this)
+  ]);
+};
+
 scout.RadioButtonGroup.prototype._render = function($parent) {
   var env = scout.HtmlEnvironment,
     htmlBodyContainer;
@@ -61,8 +73,8 @@ scout.RadioButtonGroup.prototype._provideTabIndex = function() {
 scout.RadioButtonGroup.prototype.setNewSelection = function(formField) {
   for (var i = 0; i < this.formFields.length; i++) {
     if (this.formFields[i] instanceof scout.RadioButton) {
-      if(this.formFields[i]===formField){
-        if(!formField.enabled){
+      if (this.formFields[i] === formField) {
+        if (!formField.enabled) {
           return;
         }
         this.formFields[i].selected = true;
@@ -70,16 +82,11 @@ scout.RadioButtonGroup.prototype.setNewSelection = function(formField) {
         this.formFields[i].session.send(this.formFields[i].id, 'selected');
         this.formFields[i]._renderTabbable(true);
         this.$field.focus();
-      }
-      else{
+      } else {
         this.formFields[i].selected = false;
         this.formFields[i].$field.toggleClass('checked', false);
         this.formFields[i]._renderTabbable(false);
       }
     }
   }
-};
-
-scout.RadioButtonGroup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.RadioButtonGroupKeyStrokeAdapter(this);
 };

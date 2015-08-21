@@ -1,0 +1,178 @@
+scout.KeyStroke = function() {
+  this.field; // optional model field
+
+  this.which = []; // keys which this keystroke is bound to. Typically, this is a single key, but may be multiple keys if handling the same action (e.g. ENTER and SPACE on a button).
+  this.ctrl = false;
+  this.alt = false;
+  this.shift = false;
+  this.preventDefault = true;
+  this.stopPropagation = false;
+  this.stopImmediatePropagation = false;
+
+  // Hints to control rendering of the key(s).
+  this.renderingHints = {
+    render: function() {
+      if (this.field && this.field.rendered !== undefined) {
+        return this.field.rendered; // only render key if associated field is visible.
+      } else {
+        return true; // by default, keystrokes are rendered
+      }
+    }.bind(this),
+    offset: 4,
+    hAlign: scout.hAlign.LEFT,
+    text: null,
+    $drawingArea: function($drawingArea, event) {
+      return $drawingArea;
+    }
+  };
+
+  /**
+   * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
+   */
+  this.invokeAcceptInputOnActiveValueField = false;
+};
+
+/**
+ * Parses the given keystroke name into the key parts like 'ctrl', 'shift', 'alt' and 'which'.
+ */
+scout.KeyStroke.prototype.parseAndSetKeyStroke = function(keyStroke) {
+  this.alt = this.ctrl = this.shift = false;
+  this.which = [];
+
+  if (!keyStroke) {
+    return;
+  }
+
+  // see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
+  keyStroke.split('-').forEach(function(part) {
+    if (part === 'alternate' || part === 'alt') {
+      this.alt = true;
+    } else if (part === 'control' || part === 'ctrl') {
+      this.ctrl = true;
+    } else if (part === 'shift') {
+      this.shift = true;
+    } else {
+      this.which = [scout.keys[part.toUpperCase()]];
+    }
+  }, this);
+};
+
+/**
+ * Returns true if this event is handled by this keystroke, and if so sets the propagation flags accordingly.
+ */
+scout.KeyStroke.prototype.accept = function(event) {
+  if (!this._isEnabled()) {
+    return false;
+  }
+
+  // Check whether this event is accepted for execution.
+  if (!this._accept(event)) {
+    return false;
+  }
+
+  // Apply propagation flags to the event.
+  this._applyPropagationFlags(event);
+
+  return true;
+};
+
+/**
+ * Method invoked to handle the given keystroke event, and is only called if the event was accepted by 'KeyStroke.accept(event)'.
+ */
+scout.KeyStroke.prototype.handle = function(event) {
+  throw new Error('keystroke event not handled: ' + event);
+};
+
+/**
+ * Method invoked in the context of accepting a keystroke, and returns true if the keystroke is accessible to the user.
+ */
+scout.KeyStroke.prototype._isEnabled = function() {
+  // Hint: do not check for which.length because there are keystrokes without a which, e.g. RangeKeyStroke.js
+
+  if (this.field) {
+    // Check visibility
+    if (this.field.visible !== undefined && !this.field.visible) {
+      return false;
+    }
+    // Check enabled state
+    if (this.field.enabled !== undefined && !this.field.enabled) {
+      return false;
+    }
+  }
+  return true;
+};
+
+/**
+ * Method invoked in the context of accepting a keystroke, and returns true if the event matches this keystroke.
+ */
+scout.KeyStroke.prototype._accept = function(event) {
+  return this._acceptModifer(this.ctrl, event.ctrlKey) &&
+    this._acceptModifer(this.alt, event.altKey) &&
+    this._acceptModifer(this.shift, event.shiftKey) &&
+    scout.helpers.isOneOf(event.which, this.which);
+};
+
+scout.KeyStroke.prototype._acceptModifer = function(modifier, eventModifier) {
+  return modifier === undefined || modifier === eventModifier;
+};
+
+/**
+ * Method invoked in the context of accepting a keystroke, and sets the propagation flags accordingly.
+ */
+scout.KeyStroke.prototype._applyPropagationFlags = function(event) {
+  if (this.stopPropagation) {
+    event.stopPropagation();
+  }
+  if (this.stopImmediatePropagation) {
+    event.stopImmediatePropagation();
+  }
+  if (this.preventDefault) {
+    event.preventDefault();
+  }
+};
+
+/**
+ * Returns the key(s) associated with this keystroke. Typically, this is a single key, but may be multiple if this keystroke is associated with multiple keys, e.g. ENTER and SPACE on a button.
+ */
+scout.KeyStroke.prototype.keys = function() {
+  return this.which.map(function(which) {
+    return new scout.Key(this, which);
+  }, this);
+};
+
+/**
+ * Renders the visual representation of this keystroke, with the 'which' as given by the event.
+ *
+ * @return $drawingArea on which the key was finally rendered.
+ */
+scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
+  $drawingArea = this.renderingHints.$drawingArea($drawingArea, event);
+  if (!$drawingArea || !$drawingArea.length) {
+    return null;
+  }
+
+  scout.keyStrokeBox.drawSingleKeyBoxItem(
+    this.renderingHints.offset,
+    this.renderingHints.text || scout.codesToKeys[event.which],
+    $drawingArea,
+    this.ctrl, this.alt, this.shift,
+    this.renderingHints.hAlign === scout.hAlign.RIGHT);
+
+  this._postRenderKeyBox($drawingArea);
+  return $drawingArea;
+};
+
+/**
+ * Method invoked after this keystroke was rendered, and is typically overwritten to reposition the visual representation.
+ */
+scout.KeyStroke.prototype._postRenderKeyBox = function($drawingArea) {};
+
+/**
+ * Removes the visual representation of this keystroke.
+ */
+scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
+  if ($drawingArea) {
+    $('.key-box', $drawingArea).remove();
+    $('.key-box-additional', $drawingArea).remove();
+  }
+};

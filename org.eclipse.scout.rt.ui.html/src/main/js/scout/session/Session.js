@@ -94,9 +94,7 @@ scout.Session = function($entryPoint, options) {
 
   // Install focus management for this session.
   this.focusManager = new scout.FocusManager(this, options);
-
-  // Prevent browser from interpreting some reserved keystrokes.
-  scout.keyStrokeUtils.disableBrowserKeyStrokes(this.$entryPoint);
+  this.keyStrokeManager = new scout.KeyStrokeManager(this);
 };
 
 /**

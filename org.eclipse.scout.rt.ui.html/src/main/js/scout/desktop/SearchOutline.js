@@ -3,9 +3,31 @@ scout.SearchOutline = function() {
   this.$searchPanel;
   this.$searchStatus;
   this.$queryField;
-  this.searchFieldKeyStrokeAdapter;
 };
 scout.inherits(scout.SearchOutline, scout.Outline);
+
+/**
+ * @override Tree.js
+ */
+scout.SearchOutline.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.SearchOutline.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
+};
+
+scout.SearchOutline.prototype._createKeyStrokeContextForSearchField = function() {
+  var keyStrokeContext = new scout.KeyStrokeContext();
+  keyStrokeContext.$scopeTarget = function() {
+    return this.$searchPanel;
+  }.bind(this);
+  keyStrokeContext.$bindTarget = function() {
+    return this.$queryField;
+  }.bind(this);
+  keyStrokeContext.registerStopPropagationKeys(scout.keyStrokeModifier.NONE, [
+    scout.keys.ENTER, scout.keys.BACKSPACE
+  ]);
+  return keyStrokeContext;
+};
 
 scout.SearchOutline.prototype._render = function($parent) {
   scout.SearchOutline.parent.prototype._render.call(this, $parent);
@@ -18,17 +40,11 @@ scout.SearchOutline.prototype._render = function($parent) {
     .on('keypress', this._onQueryFieldKeyPress.bind(this))
     .appendTo(this.$searchPanel);
   this.$searchStatus = this.$searchPanel.appendDiv('search-status');
-
-  // add keystroke adapter for search field
-  if (!this.searchFieldKeyStrokeAdapter) {
-    this.searchFieldKeyStrokeAdapter = new scout.SearchFieldKeyStrokeAdapter(this);
-  }
-  // reinstall
-  scout.keyStrokeUtils.uninstallAdapter(this.searchFieldKeyStrokeAdapter);
-  scout.keyStrokeUtils.installAdapter(this.session, this.searchFieldKeyStrokeAdapter, this.$queryField);
+  this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 
 scout.SearchOutline.prototype._remove = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   this.$searchPanel.remove();
   scout.SearchOutline.parent.prototype._remove.call(this);
 };
@@ -47,7 +63,7 @@ scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
   this.$searchStatus.textOrNbsp(searchStatus);
 };
 
-scout.SearchOutline.prototype._sendSearch  = function() {
+scout.SearchOutline.prototype._sendSearch = function() {
   this.remoteHandler(this.id, 'search', {
     query: this.searchQuery
   });

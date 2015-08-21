@@ -26,7 +26,7 @@ scout.TableSelectionHandler.prototype.clearLastSelectedRowMarker = function() {
   this.lastActionRow = undefined;
 };
 
-// TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
+// TODO BSH Table Selection | Try to merge this with TableKeystrokeContext
 scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
   //detect context menu button event ie event.buttons is 4 others 0
   if (event.which === 3 && event.button === 2 && (event.buttons === 0 || event.buttons === 4)) {

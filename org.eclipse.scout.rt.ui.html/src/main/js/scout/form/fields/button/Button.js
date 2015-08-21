@@ -2,8 +2,8 @@ scout.Button = function() {
   scout.Button.parent.call(this);
   this._$label;
   this._addAdapterProperties('menus');
-  this.keyStroke;
-  this.defaultKeyStroke;
+
+  this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
 };
 scout.inherits(scout.Button, scout.FormField);
 
@@ -22,6 +22,23 @@ scout.Button.DisplayStyle = {
   TOGGLE: 1,
   RADIO: 2,
   LINK: 3
+};
+
+scout.Button.prototype._init = function(model, session) {
+  scout.Button.parent.prototype._init.call(this, model, session);
+  this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
+};
+
+/**
+ * @override ModelAdapter
+ */
+scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Button.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([
+    new scout.ButtonKeyStroke(this, 'ENTER'),
+    new scout.ButtonKeyStroke(this, 'SPACE')
+  ]);
 };
 
 /**
@@ -58,14 +75,14 @@ scout.Button.prototype._render = function($parent) {
   });
   if (this.menus && this.menus.length > 0) {
     this.menus.forEach(function(menu) {
-      this.keyStrokeAdapter.registerKeyStroke(menu);
+      this.keyStrokeContext.registerKeyStroke(menu);
     }, this);
     if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
       $button.addClass('has-submenu');
     }
   }
   $button.unfocusable();
-  this._registerButtonKeyStroke();
+  this.rootKeyStrokeContext().registerKeyStroke(this.buttonKeyStroke);
 };
 
 scout.Button.prototype._onClick = function() {
@@ -74,13 +91,9 @@ scout.Button.prototype._onClick = function() {
   }
 };
 
-scout.Button.prototype._createKeyStrokeAdapter = function() {
-  return new scout.ButtonKeyStrokeAdapter(this);
-};
-
 scout.Button.prototype._remove = function() {
   scout.Button.parent.prototype._remove.call(this);
-  this._unregisterButtonKeyStroke();
+  this.rootKeyStrokeContext().unregisterKeyStroke(this.buttonKeyStroke);
 };
 
 /**
@@ -119,7 +132,6 @@ scout.Button.prototype._openPopup = function() {
   popup.render();
   return popup;
 };
-
 
 scout.Button.prototype.setSelected = function(selected) {
   this.selected = selected;
@@ -170,29 +182,11 @@ scout.Button.prototype._renderIconId = function() {
   this.$field.icon(this.iconId);
   if (this.iconId) {
     var $icon = this.$field.data('$icon');
-    $icon.toggleClass('with-label', !!this.label);
-  }
-};
-
-scout.Button.prototype._registerButtonKeyStroke = function() {
-  // register buttons key stroke on root Groupbox
-  if (this.defaultKeyStroke) {
-    this._unregisterButtonKeyStroke();
-  }
-  if (this.keyStroke) {
-    this.defaultKeyStroke = new scout.ButtonKeyStroke(this, this.keyStroke);
-    this.registerRootKeyStroke(this.defaultKeyStroke);
-  }
-};
-
-scout.Button.prototype._unregisterButtonKeyStroke = function() {
-  // unregister buttons key stroke on root Groupbox
-  if (this.defaultKeyStroke) {
-    this.unregisterRootKeyStroke(this.defaultKeyStroke);
+    $icon.toggleClass('with-label', !! this.label);
   }
 };
 
 scout.Button.prototype._syncKeyStroke = function(keyStroke) {
   this.keyStroke = keyStroke;
-  this._registerButtonKeyStroke();
+  this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };

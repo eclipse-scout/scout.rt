@@ -17,6 +17,15 @@ scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
 scout.ViewMenuPopup.MAX_MENU_WIDTH = 300;
 
+/**
+ * @override Popup.js
+ */
+scout.ViewMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.ViewMenuPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  scout.menuNavigationKeyStrokes.registerKeyStrokes(keyStrokeContext, this, 'view-button-menu');
+};
+
 scout.ViewMenuPopup.prototype._render = function($parent) {
   scout.ViewMenuPopup.parent.prototype._render.call(this, $parent);
 
@@ -91,8 +100,4 @@ scout.ViewMenuPopup.prototype.alignTo = function() {
   this.$body.cssTop(bodyTop);
 
   this.setLocation(new scout.Point(0, 0));
-};
-
-scout.ViewMenuPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.ViewMenuKeyStrokeAdapter(this);
 };

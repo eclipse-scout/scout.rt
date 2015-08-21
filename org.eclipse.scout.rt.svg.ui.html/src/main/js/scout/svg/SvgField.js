@@ -1,6 +1,5 @@
 scout.SvgField = function() {
   scout.SvgField.parent.call(this);
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 scout.inherits(scout.SvgField, scout.ValueField);
 
@@ -17,10 +16,14 @@ scout.SvgField.prototype._renderProperties = function() {
   this._renderSvgDocument();
 };
 
-scout.SvgField.prototype._init = function(model, session) {
-  scout.SvgField.parent.prototype._init.call(this, model, session);
-  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
-};
+/**
+ * @override FormField.js
+ */
+scout.SvgField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.SvgField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
+}
 
 scout.SvgField.prototype._renderSvgDocument = function() {
   if (!this.svgDocument) {

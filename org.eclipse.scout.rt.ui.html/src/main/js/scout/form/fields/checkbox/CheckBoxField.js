@@ -5,6 +5,15 @@ scout.CheckBoxField = function() {
 };
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
+/**
+ * @override ModelAdapter
+ */
+scout.CheckBoxField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.CheckBoxField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
+};
+
 scout.CheckBoxField.prototype._render = function($parent) {
   this.addContainer($parent, 'check-box-field');
   this.addLabel();
@@ -28,10 +37,6 @@ scout.CheckBoxField.prototype._render = function($parent) {
   });
 
   this.addStatus();
-};
-
-scout.CheckBoxField.prototype._createKeyStrokeAdapter = function() {
-  return new scout.CheckBoxKeyStrokeAdapter(this);
 };
 
 scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {

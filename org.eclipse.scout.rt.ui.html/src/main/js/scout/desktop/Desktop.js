@@ -13,7 +13,7 @@ scout.Desktop = function() {
   this._outlineContent;
 
   /**
-   * FIXME DWI: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
+   * FIXME DWI: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeContext.js)
    * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
    * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
@@ -89,12 +89,54 @@ scout.Desktop.prototype._render = function($parent) {
     }
   });
 
-  // Keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
-  scout.keyStrokeUtils.installAdapter(this.session, new scout.DesktopBenchKeyStrokeAdapter(this));
-  // Keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
-  scout.keyStrokeUtils.installAdapter(this.session, new scout.DesktopViewButtonBarKeyStrokeAdapter(this));
-  // Keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
-  scout.keyStrokeUtils.installAdapter(this.session, new scout.DesktopTaskBarKeyStrokeAdapter(this));
+  // Installs global keystrokes on dekstop
+  this._installKeyStrokeContextForDesktopBench();
+  this._installKeyStrokeContextForDesktopViewButtonBar();
+  this._installKeyStrokeContextForDesktopTaskBar();
+};
+
+/**
+ * Installs the keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
+ */
+scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
+  var keyStrokeContext = new scout.KeyStrokeContext();
+
+  keyStrokeContext.$bindTarget = this.session.$entryPoint;
+  keyStrokeContext.$scopeTarget = this.$bench;
+  keyStrokeContext.registerKeyStroke(this.keyStrokes);
+
+  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
+};
+
+/**
+ * Installs the keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
+ */
+scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = function() {
+  var keyStrokeContext = new scout.KeyStrokeContext();
+
+  keyStrokeContext.$bindTarget = this.session.$entryPoint;
+  keyStrokeContext.$scopeTarget = this.navigation.$viewButtons;
+  keyStrokeContext.registerKeyStroke([
+    new scout.ViewMenuOpenKeyStroke(this.navigation)
+  ].concat(this.viewButtons));
+
+  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
+};
+
+/**
+ * Installs the keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
+ */
+scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
+  var keyStrokeContext = new scout.KeyStrokeContext();
+
+  keyStrokeContext.$bindTarget = this.session.$entryPoint;
+  keyStrokeContext.$scopeTarget = this._$taskBar;
+  keyStrokeContext.registerKeyStroke([
+    new scout.ViewTabSelectKeyStroke(this),
+    new scout.DisableBrowserTabSwitchingKeyStroke(this)
+  ].concat(this.actions));
+
+  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
 };
 
 scout.Desktop.prototype._postRender = function() {
@@ -105,13 +147,13 @@ scout.Desktop.prototype._postRender = function() {
 
   // Align a potential open popup to its respective tool button.
   this.actions
-      .filter(function(action) {
-        return action.selected && action.popup && action.popup.alignTo;
-      })
-      .some(function(action) {
-        action.popup.alignTo(); // TODO [dwi] positioning of the popup does not work properly, and must be analyzed in more detail (likely a timing problem; approx 10px too far on the left side)
-        return true;
-      });
+    .filter(function(action) {
+      return action.selected && action.popup && action.popup.alignTo;
+    })
+    .some(function(action) {
+      action.popup.alignTo(); // TODO [dwi] positioning of the popup does not work properly, and must be analyzed in more detail (likely a timing problem; approx 10px too far on the left side)
+      return true;
+    });
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {
@@ -279,7 +321,6 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 
 scout.Desktop.prototype.setOutlineContent = function(content) {
   if (this._outlineContent && this._outlineContent !== content) {
-    scout.keyStrokeUtils.uninstallAdapter(this._outlineContent.keyStrokeAdapter);
     this._outlineContent.remove();
     this._outlineContent = null;
   }
@@ -377,7 +418,7 @@ scout.Desktop.prototype._onModelOpenUri = function(event) {
   if (event.hint === 'download') {
     this._openUriInIFrame(event.uri);
   } else if (event.hint === 'open-application') {
-      // TODO BSH Does that really work on all platforms?
+    // TODO BSH Does that really work on all platforms?
     this._openUriInIFrame(event.uri);
   } else {
     // 'new-window' -> Open popup
@@ -513,9 +554,9 @@ scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
 scout.Desktop.prototype.glassPaneTargets = function() {
   // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
   return $.makeArray(this.$container
-      .children()
-      .not('.splitter') // exclude splitter to be locked
-      .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
+    .children()
+    .not('.splitter') // exclude splitter to be locked
+    .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
 };
 
 /**

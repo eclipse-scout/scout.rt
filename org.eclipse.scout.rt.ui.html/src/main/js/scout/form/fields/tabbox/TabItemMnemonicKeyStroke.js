@@ -1,33 +1,20 @@
 scout.TabItemMnemonicKeyStroke = function(keyStroke, field) {
-  scout.TabItemMnemonicKeyStroke.parent.call(this);
-  this.keyStroke = keyStroke;
-  this.drawHint = true;
+  scout.TabItemMnemonicKeyStroke.parent.call(this, keyStroke, field);
+
   this.ctrl = true;
   this.shift = true;
-  this._field = field;
-  this.initKeyStrokeParts();
+
+  this.renderingHints.offset = 16;
+  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.$drawingArea = function($drawingArea, event) {
+    return this.field.$tabContainer;
+  }.bind(this);
 };
 scout.inherits(scout.TabItemMnemonicKeyStroke, scout.MnemonicKeyStroke);
-/**
- * @Override scout.KeyStroke
- */
-scout.TabItemMnemonicKeyStroke.prototype.handle = function(event) {
-  this._field.parent._selectTab(this._field);
-  event.preventDefault();
-};
-/**
- * @Override scout.KeyStroke
- */
-scout.TabItemMnemonicKeyStroke.prototype._drawKeyBox = function($container) {
-  if (this._field.$tabContainer) {
-    var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._field.$tabContainer, this.ctrl, this.alt, this.shift, true);
-  }
-};
 
 /**
- * @Override scout.KeyStroke
+ * @override KeyStroke.js
  */
-scout.TabItemMnemonicKeyStroke.prototype.removeKeyBox = function($container) {
-  $('.key-box', this._field.$tabContainer).remove();
+scout.TabItemMnemonicKeyStroke.prototype.handle = function(event) {
+  this.field.parent._selectTab(this.field);
 };

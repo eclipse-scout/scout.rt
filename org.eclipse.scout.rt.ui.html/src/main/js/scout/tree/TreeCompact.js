@@ -7,6 +7,7 @@ scout.TreeCompact = function() {
   this.$nodesWrapper;
   this.$nodes;
   this._domMap = {};
+  this._addAdapterProperties(['keyStrokes']);
   this._selectedNodeIndex = -1;
 };
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);

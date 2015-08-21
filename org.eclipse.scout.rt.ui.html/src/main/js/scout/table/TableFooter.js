@@ -1,13 +1,25 @@
 scout.TableFooter = function(table) {
   scout.TableFooter.parent.call(this);
   this.init(table.session);
-
   this._table = table;
-  this.filterKeyStrokeAdapter = new scout.FilterInputKeyStrokeAdapter(this._table);
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
 scout.TableFooter.CONTAINER_SIZE = 345;
+
+scout.TableFooter.prototype.init = function(session) {
+  scout.TableFooter.parent.prototype.init.call(this, session);
+
+  // Keystroke context for the search field.
+  // TODO [dwi] migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
+  this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
+  this.searchFieldKeyStrokeContext.$bindTarget = function() {
+    return this._$filterField;
+  }.bind(this);
+  this.searchFieldKeyStrokeContext.$scopeTarget = function() {
+    return this._$filterField;
+  }.bind(this);
+};
 
 scout.TableFooter.prototype._render = function($parent) {
   var filter;
@@ -94,22 +106,13 @@ scout.TableFooter.prototype._render = function($parent) {
     this._updateInfoTableStatusVisibility();
   }.bind(this));
 
-  this._installKeyStrokeAdapter();
+  this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 
 scout.TableFooter.prototype._remove = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   scout.TableFooter.parent.prototype._remove.call(this);
   this._hideTableStatusTooltip();
-};
-
-scout.TableFooter.prototype._installKeyStrokeAdapter = function() {
-  scout.TableFooter.parent.prototype._installKeyStrokeAdapter.call(this);
-  scout.keyStrokeUtils.installAdapter(this.session, this.filterKeyStrokeAdapter, this._$filterField);
-};
-
-scout.TableFooter.prototype._uninstallKeyStrokeAdapter = function() {
-  scout.TableFooter.parent.prototype._uninstallKeyStrokeAdapter.call(this);
-  scout.keyStrokeUtils.uninstallAdapter(this.filterKeyStrokeAdapter);
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
@@ -308,7 +311,6 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
 };
 
 scout.TableFooter.prototype.closeControlContainer = function(control) {
-  scout.keyStrokeUtils.uninstallAdapter(this.tableControlKeyStrokeAdapter);
   this.$controlContainer.stop(true).show().animate({
     height: 0
   }, {

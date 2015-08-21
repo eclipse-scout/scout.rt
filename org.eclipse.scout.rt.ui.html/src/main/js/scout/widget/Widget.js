@@ -1,7 +1,6 @@
 scout.Widget = function() {
   this.parent;
   this.session;
-  this.keyStrokeAdapter;
   this.children = [];
   this.rendered = false;
   this.destroyed = false;
@@ -21,7 +20,7 @@ scout.Widget.prototype.render = function($parent) {
     throw new Error('Widget is destroyed: ' + this);
   }
   this._renderInternal($parent);
-  this._installKeyStrokeAdapter();
+  this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendered = true;
   this._postRender();
 };
@@ -84,8 +83,8 @@ scout.Widget.prototype.remove = function() {
   this.children.slice().reverse().forEach(function(child) {
     child.remove();
   });
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   this._remove();
-  this._uninstallKeyStrokeAdapter();
   this.rendered = false;
   this._trigger('remove');
 };
@@ -194,6 +193,27 @@ scout.Widget.prototype._addEventSupport = function() {
   this.events = new scout.EventSupport();
 };
 
+/**
+ * Call this function in the constructor of your widget if you need keystroke context support.
+ **/
+scout.Widget.prototype._addKeyStrokeContextSupport = function() {
+  this.keyStrokeContext = this._createKeyStrokeContext();
+  this.keyStrokeContext.$scopeTarget = function() {
+    return this.$container;
+  }.bind(this);
+  this.keyStrokeContext.$bindTarget = function() {
+    return this.$container;
+  }.bind(this);
+};
+
+/**
+ * Creates a new keystroke context.
+ * This method is intended to be overwritten by subclasses to provide another keystroke context.
+ */
+scout.Widget.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
 scout.Widget.prototype.trigger = function(type, event) {
   event = event || {};
   event.source = this;
@@ -206,20 +226,6 @@ scout.Widget.prototype.on = function(type, func) {
 
 scout.Widget.prototype.off = function(type, func) {
   this.events.off(type, func);
-};
-
-// --- KeyStrokeAdapter methods ---
-
-scout.Widget.prototype._createKeyStrokeAdapter = function() {
-  // to be implemented by subclass
-};
-
-scout.Widget.prototype._installKeyStrokeAdapter = function() {
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
-};
-
-scout.Widget.prototype._uninstallKeyStrokeAdapter = function() {
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.Widget.prototype.toString = function() {

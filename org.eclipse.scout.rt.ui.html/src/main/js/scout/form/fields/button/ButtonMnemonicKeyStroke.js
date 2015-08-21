@@ -1,22 +1,15 @@
 scout.ButtonMnemonicKeyStroke = function(keyStroke, field) {
   scout.ButtonMnemonicKeyStroke.parent.call(this, keyStroke, field);
+
+  this.renderingHints.$drawingArea = function($drawingArea, event) {
+    return this.field.$field;
+  }.bind(this);
 };
 scout.inherits(scout.ButtonMnemonicKeyStroke, scout.MnemonicKeyStroke);
 
 /**
- * @Override scout.MnemonicKeyStroke
+ * @override MnemonicKeyStroke.js
  */
 scout.ButtonMnemonicKeyStroke.prototype.handle = function(event) {
-  if (this._field.enabled && this._field.visible) {
-    this._field.doAction();
-    if (this.preventDefaultOnEvent) {
-      event.preventDefault();
-    }
-  }
-};
-/**
- * @Override scout.MnemonicKeyStroke
- */
-scout.ButtonMnemonicKeyStroke.prototype._$containerForKeyBox = function(){
-  return this._field.$field;
+  this.field.doAction();
 };

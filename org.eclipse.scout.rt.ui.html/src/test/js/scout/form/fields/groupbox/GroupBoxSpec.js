@@ -11,6 +11,10 @@ describe("GroupBox", function() {
 
   function createField(model, parent) {
     var field = new scout.GroupBox();
+    field.getForm = function() {
+      return createSimpleModel('Form');
+    };
+
     field.init(model, session);
     return field;
   }

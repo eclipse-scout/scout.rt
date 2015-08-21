@@ -3,8 +3,23 @@ scout.RichTextField = function() {
 };
 scout.inherits(scout.RichTextField, scout.ValueField);
 
-scout.RichTextField.prototype._createKeyStrokeAdapter = function() {
-  return new scout.RichTextFieldKeyStrokeAdapter(this);
+/**
+ * @override Widget.js
+ */
+scout.RichTextField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
+
+/**
+ * @override ModelAdapter.js
+ */
+scout.RichTextField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.RichTextField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerStopPropagationKeys(scout.keyStrokeModifier.NONE, [
+    scout.keys.ENTER,
+    scout.keys.BACKSPACE
+  ]);
 };
 
 scout.RichTextField.prototype._renderProperties = function() {
@@ -110,7 +125,7 @@ scout.RichTextField.prototype._onChange = function(event) {
   // update scrollbar
   scout.scrollbars.update(this.$field);
 
-/* FIXME CRU Check if the following code is needed. If yes, use it! If no, remove it.
+  /* FIXME CRU Check if the following code is needed. If yes, use it! If no, remove it.
 
   // maybe necessary scroll to selection
   //  scout.scrollbars.scrollTo(this.$field, $divAtCursor);

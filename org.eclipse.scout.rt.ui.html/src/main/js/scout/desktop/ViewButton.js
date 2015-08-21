@@ -32,7 +32,9 @@ scout.ViewButton.prototype._renderAsMenu = function($parent) {
 scout.ViewButton.prototype._renderAsTab = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .on('mousedown', this._onMouseEvent)
-    .data('tooltipText', function() { return this.text; }.bind(this));
+    .data('tooltipText', function() {
+      return this.text;
+    }.bind(this));
 
   this.$title = this.$container.appendSpan('view-button-tab-title');
 };
@@ -58,7 +60,9 @@ scout.ViewButton.prototype._renderSelected = function(selected) {
       scout.tooltips.uninstall(this.$container);
       this.$title.text(this.text);
     } else {
-      scout.tooltips.install(this.$container, this.session, {text: this.text});
+      scout.tooltips.install(this.$container, this.session, {
+        text: this.text
+      });
       this.$title.text('');
     }
   }
@@ -98,13 +102,24 @@ scout.ViewButton.prototype.last = function() {
 /**
  * @override Action.js
  */
-scout.ViewButton.prototype._drawKeyBox = function($container) {
-  scout.ViewButton.parent.prototype._drawKeyBox.call(this,$container);
-  if(this.iconId){
-    var wIcon = this.$container.width();
-    var wKeybox = this.$container.find('.key-box').outerWidth();
-    var containerPadding = Number(this.$container.css('padding-left').replace('px', ''));
-    var leftKeyBox = wIcon/2 - wKeybox/2 + containerPadding;
-    this.$container.find('.key-box').css('left', leftKeyBox+'px');
+scout.ViewButton.prototype._createActionKeyStroke = function() {
+  return new scout.ViewButtonActionKeyStroke(this);
+};
+
+/**
+ * ViewButtonActionKeyStroke
+ */
+scout.ViewButtonActionKeyStroke = function(action) {
+  scout.ViewButtonActionKeyStroke.parent.call(this, action);
+};
+scout.inherits(scout.ViewButtonActionKeyStroke, scout.ActionKeyStroke);
+
+scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+  if (this.field.iconId) {
+    var wIcon = $drawingArea.width();
+    var wKeybox = $drawingArea.find('.key-box').outerWidth();
+    var containerPadding = Number($drawingArea.css('padding-left').replace('px', ''));
+    var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
+    $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
   }
 };

@@ -3,7 +3,6 @@
  */
 scout.BeanField = function() {
   scout.BeanField.parent.call(this);
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this._onAppLinkAction);
 };
 scout.inherits(scout.BeanField, scout.ValueField);
 
@@ -21,7 +20,15 @@ scout.BeanField.prototype._renderProperties = function() {
 
 scout.BeanField.prototype._init = function(model, session) {
   scout.BeanField.parent.prototype._init.call(this, model, session);
-  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
+};
+
+/**
+ * @override FormField.js
+ */
+scout.BeanField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.BeanField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
 };
 
 /**

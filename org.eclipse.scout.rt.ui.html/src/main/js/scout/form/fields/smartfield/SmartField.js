@@ -22,14 +22,10 @@ scout.SmartField = function() {
 scout.inherits(scout.SmartField, scout.ValueField);
 
 /**
- * @override
+ * @override Widget.js
  */
-scout.SmartField.prototype._createKeyStrokeAdapter = function() {
-  // FIXME AWE/NBU: (smart-field) andere key-strokes implementieren
-  // keyup(controller) in KeyStrokeUtil#installAdapter ergänzen
-  // Idee: nur registrieren, wenn keystroke ein handleKeyUp hat, event object ergänzen
-  // oder zusätzlichen parameter um zw. keyup / keydown zu unterscheiden?
-  return new scout.SmartFieldKeyStrokeAdapter(this);
+scout.SmartField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
 };
 
 scout.SmartField.prototype._render = function($parent) {
@@ -70,7 +66,6 @@ scout.SmartField.prototype._renderProperties = function() {
   scout.SmartField.parent.prototype._renderProperties.call(this);
   this._renderProposalChooser();
 };
-
 
 scout.SmartField.prototype._syncDisplayText = function(displayText) {
   this._oldSearchText = displayText;
@@ -125,7 +120,7 @@ scout.SmartField.prototype._onIconClick = function(event) {
 };
 
 scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
-  var doPrevent = !!this.proposalChooser;
+  var doPrevent = !! this.proposalChooser;
   $.log.trace('(SmartField#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
   return doPrevent;
 };
@@ -210,7 +205,6 @@ scout.SmartField.prototype._onKeyUp = function(e) {
   }
 };
 
-
 scout.SmartField.prototype._onFocus = function(e) {
   this._oldSearchText = this._readDisplayText();
 };
@@ -261,7 +255,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   this._sendTimeoutId = null;
 
   forceClose = scout.helpers.nvl(forceClose, false);
-  var proposalChooserOpen = !!this.proposalChooser,
+  var proposalChooserOpen = !! this.proposalChooser,
     searchText = this._readDisplayText();
 
   $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen);
@@ -292,7 +286,6 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     }
   }.bind(this));
 };
-
 
 scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalChooserOpen, forceClose) {
   this.displayText = searchText;

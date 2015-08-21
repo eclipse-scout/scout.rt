@@ -5,6 +5,13 @@ scout.ClipboardField = function() {
 };
 scout.inherits(scout.ClipboardField, scout.ValueField);
 
+/**
+ * @override Widget.js
+ */
+scout.ClipboardField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
+
 scout.ClipboardField.prototype._render = function($parent) {
   this.addContainer($parent, 'clipboard-field');
   this.addLabel();

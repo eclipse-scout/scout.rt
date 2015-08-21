@@ -35,21 +35,31 @@ describe("ObjectFactory", function() {
     } else if ('ColumnUserTableFilter' === objectType) {
       model.table = {};
       model.column = {};
-      model.calculateCube = function(){};
+      model.calculateCube = function() {};
     } else if ('TabBox' === objectType) {
       var tabItemId = 'tabItem' + id;
       model.selectedTab = 0;
+
       model.tabItems = [tabItemId];
       session._adapterDataCache[tabItemId] = {
         id: tabItemId,
-        objectType: 'TabItem'
+        objectType: 'TabItem',
+        getForm: function() {
+          return createSimpleModel("Form");
+        }
       };
-    }
-    else if ('ButtonAdapterMenu' === objectType) {
+    } else if ('ButtonAdapterMenu' === objectType) {
       model.button = {
-          on: function() {}
+        on: function() {}
       };
     }
+
+    if ('GroupBox' === objectType || 'TabItem' === objectType) {
+      model.getForm = function() {
+        return createSimpleModel("Form");
+      };
+    }
+
     return model;
   }
 

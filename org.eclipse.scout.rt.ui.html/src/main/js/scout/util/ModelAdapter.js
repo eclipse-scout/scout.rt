@@ -15,6 +15,7 @@
  */
 scout.ModelAdapter = function() {
   scout.ModelAdapter.parent.call(this);
+
   this._adapterProperties = [];
 
   // Adapter structure
@@ -25,6 +26,7 @@ scout.ModelAdapter = function() {
   this._register = true;
   this.destroyed = false;
   this._addEventSupport();
+  this._addKeyStrokeContextSupport();
 };
 scout.inherits(scout.ModelAdapter, scout.Widget);
 
@@ -56,16 +58,24 @@ scout.ModelAdapter.prototype.init = function(model, session, register) {
     this[propertyName] = value;
   }.bind(this));
 
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  // Register model keystrokes.
+  if (this.keyStrokes) {
+    this.keyStrokeContext.registerKeyStroke(this.keyStrokes);
+  }
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
   this._init(model, session);
+  this._initKeyStrokeContext(this.keyStrokeContext);
   this.initialized = true;
   this.trigger('initialized');
 };
 
 scout.ModelAdapter.prototype._init = function(model, session) {
+  // NOP
+};
+
+scout.ModelAdapter.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   // NOP
 };
 

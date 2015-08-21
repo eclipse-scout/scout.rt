@@ -19,13 +19,16 @@ scout.DateField = function() {
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
+/**
+ * @override Widget.js
+ */
+scout.DateField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
+
 scout.DateField.prototype._init = function(model, session) {
   scout.DateField.parent.prototype._init.call(this, model, session);
   this._syncErrorStatus(this.errorStatus);
-};
-
-scout.DateField.prototype._createKeyStrokeAdapter = function() {
-  return new scout.DateFieldKeyStrokeAdapter(this);
 };
 
 scout.DateField.prototype._syncErrorStatus = function(errorStatus) {

@@ -4,13 +4,33 @@ scout.TableControl = function() {
   this.form;
   this._addAdapterProperties('form');
   this.contentRendered = false;
-  this.tableControlKeyStrokeAdapter;
 };
 scout.inherits(scout.TableControl, scout.Action);
 
 scout.TableControl.prototype._init = function(model, session) {
   scout.TableControl.parent.prototype._init.call(this, model, session);
   this._syncForm(this.form);
+};
+
+/**
+ * @override ModelAdapter.js
+ */
+scout.TableControl.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.TableControl.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  this.tableControlKeyStrokeContext = this._createKeyStrokeContextForTableControl();
+};
+
+scout.TableControl.prototype._createKeyStrokeContextForTableControl = function() {
+  var keyStrokeContext = new scout.KeyStrokeContext();
+  keyStrokeContext.$scopeTarget = function() {
+    return this.tableFooter.$controlContent;
+  }.bind(this);
+  keyStrokeContext.$bindTarget = function() {
+    return this.tableFooter.$controlContent;
+  }.bind(this);
+  keyStrokeContext.registerKeyStroke(new scout.TableControlCloseKeyStroke(this));
+  return keyStrokeContext;
 };
 
 scout.TableControl.prototype._render = function($parent) {
@@ -42,9 +62,12 @@ scout.TableControl.prototype._renderContent = function($parent) {
   this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.revalidateLayout();
+  this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
+
 };
 
 scout.TableControl.prototype._removeContent = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.tableControlKeyStrokeContext);
   this.form.remove();
 };
 
@@ -83,10 +106,7 @@ scout.TableControl.prototype.renderContent = function() {
     }
     this._renderContent(this.tableFooter.$controlContent);
     this.contentRendered = true;
-    this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
-    scout.keyStrokeUtils.installAdapter(this.session, this.tableControlKeyStrokeAdapter, this.tableFooter.$controlContent);
   }
-
 };
 
 scout.TableControl.prototype.onControlContainerOpened = function() {
@@ -151,10 +171,6 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
     this._renderSelected(selected, closeWhenUnselected);
   }
   this.sendSelected();
-
-  if (!selected) {
-    scout.keyStrokeUtils.uninstallAdapter(this.tableControlKeyStrokeAdapter);
-  }
 };
 
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
@@ -215,21 +231,32 @@ scout.TableControl.prototype.onResize = function() {
   }
 };
 
-scout.TableControl.prototype._drawKeyBox = function($container) {
-  if (this.rendered) {
-
-    if (!this.drawHint || !this.keyStroke) {
-      return;
-    }
-    var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(6, keyBoxText, this.$container, this.ctrl, this.alt, this.shift);
-
-  }
+/**
+ * @override Action.js
+ */
+scout.TableControl.prototype._createActionKeyStroke = function() {
+  return new scout.TableControlActionKeyStroke(this);
 };
 
-scout.TableControl.prototype.handle = function(event) {
-  this.toggle();
-  if (this.preventDefaultOnEvent) {
-    event.preventDefault();
+/**
+ * TableControlActionKeyStroke
+ */
+scout.TableControlActionKeyStroke = function(action) {
+  scout.TableControlActionKeyStroke.parent.call(this, action);
+  this.renderingHints.offset = 6;
+};
+scout.inherits(scout.TableControlActionKeyStroke, scout.ActionKeyStroke);
+
+scout.TableControlActionKeyStroke.prototype.handle = function(event) {
+  this.field.toggle();
+};
+
+scout.TableControlActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+  if (this.field.iconId) {
+    var wIcon = $drawingArea.find('.icon').width();
+    var wKeybox = $drawingArea.find('.key-box').outerWidth();
+    var containerPadding = Number($drawingArea.css('padding-left').replace('px', ''));
+    var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
+    $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
   }
 };

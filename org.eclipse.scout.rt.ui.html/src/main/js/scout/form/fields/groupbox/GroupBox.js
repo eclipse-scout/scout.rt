@@ -26,10 +26,11 @@ scout.GroupBox.prototype._init = function(model, session) {
 };
 
 /**
- * @override
+ * @override ModelAdapter.js
  */
-scout.GroupBox.prototype._createKeyStrokeAdapter = function() {
-  return new scout.GroupBoxKeyStrokeAdapter(this);
+scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  this.keyStrokeContext = this.getForm().keyStrokeContext; // keystrokes on a group box are always registered on form level.
+  scout.GroupBox.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
 };
 
 scout.GroupBox.prototype._render = function($parent) {
@@ -117,7 +118,7 @@ scout.GroupBox.prototype._prepareFields = function() {
       for (var k = 0; k < field.tabItems.length; k++) {
         var tabMnemonic = this._getMnemonic(field.tabItems[k]);
         if (tabMnemonic) {
-          this.registerRootKeyStroke(new scout.TabItemMnemonicKeyStroke(tabMnemonic, field.tabItems[k]));
+          this.keyStrokeContext.registerKeyStroke(new scout.TabItemMnemonicKeyStroke(tabMnemonic, field.tabItems[k]));
         }
       }
     } else {
@@ -129,22 +130,19 @@ scout.GroupBox.prototype._prepareFields = function() {
 scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
   var mnemonic = this._getMnemonic(button);
   if (mnemonic) {
-    this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(mnemonic, button));
+    this.keyStrokeContext.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(mnemonic, button));
   }
   if (button.keyStrokes) {
-    var i, keyStroke;
-    for (i = 0; i < button.keyStrokes.length; i++) {
-      keyStroke = button.keyStrokes[i];
-      // FIXME [dwi][nbu] ensure proper drawing container; $drawKeyBoxContainer was removed because looking for a better solution. // keyStroke.$drawKeyBoxContainer = button.$container;
-      this.keyStrokeAdapter.registerKeyStroke(keyStroke);
-    }
+    button.keyStrokes.forEach(function(keyStroke) {
+      this.keyStrokeContext.registerKeyStroke(keyStroke);
+    }, this);
   }
 };
 
 scout.GroupBox.prototype._getMnemonic = function(field) {
   var res;
   if (field.label !== scout.strings.removeAmpersand(field.label)) {
-    //Add mnemonic keyStrokevar
+    //Add mnemonic keyStroke
     var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
     res = mnemonic.charAt(mnemonic.length - 1);
   }
@@ -266,7 +264,7 @@ scout.GroupBox.prototype._renderMenus = function() {
 
   // register keystrokes on root group-box
   menuItems.forEach(function(menuItem) {
-    this.registerRootKeyStroke(menuItem);
+    this.keyStrokeContext.registerKeyStroke(menuItem);
     this._registerButtonKeyStrokes(menuItem);
   }, this);
 

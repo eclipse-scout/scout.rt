@@ -23,7 +23,6 @@ scout.Table = function() {
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
-  this._appLinkKeyStroke = new scout.AppLinkKeyStroke(this, this.handleAppLinkAction);
 
   this.attached = false; // Indicates whether this table is currently visible to the user.
 };
@@ -54,7 +53,6 @@ scout.Table.prototype._init = function(model, session) {
 
   this._syncSelectedRows(this.selectedRows);
   this._syncFilters(this.filters);
-  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -86,8 +84,47 @@ scout.Table.prototype._initColumns = function() {
   this._updateRowWidth();
 };
 
-scout.Table.prototype._createKeyStrokeAdapter = function() {
-  return new scout.TableKeyStrokeAdapter(this);
+/**
+ * @override ModelAdapter.js
+ */
+scout.Table.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Table.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  this._initTableKeyStrokeContext(keyStrokeContext);
+};
+
+scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
+  keyStrokeContext.registerKeyStroke([
+      new scout.TableNavigationUpKeyStroke(this),
+      new scout.TableNavigationDownKeyStroke(this),
+      new scout.TableNavigationPageUpKeyStroke(this),
+      new scout.TableNavigationPageDownKeyStroke(this),
+      new scout.TableNavigationHomeKeyStroke(this),
+      new scout.TableNavigationEndKeyStroke(this),
+
+      new scout.TableFocusFilterFieldKeyStroke(this),
+      new scout.TableStartCellEditKeyStroke(this),
+      new scout.TableSelectAllKeyStroke(this),
+      new scout.TableRefreshKeyStroke(this),
+      new scout.TableToggleRowKeyStroke(this),
+      new scout.TableCopyKeyStroke(this),
+      new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
+      new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
+    ]
+    .concat(this.tableControls)
+    .concat(this.menus));
+
+  // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
+  // Otherwise, an '↑-event' on the first row, or an '↓-event' on the last row will bubble up (because not consumed by table navigation keystrokes) and cause a superior table to move its selection.
+  // Use case: - outline page table with search form that contains a table field;
+  //           - shift + '↑-event'/'↓-event' are not consumed by a single selection table, and would propagate otherwise;
+  //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
+  keyStrokeContext.registerStopPropagationInterceptor(function(event) {
+    if (!event.ctrlKey && !event.altKey && scout.helpers.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+  });
 };
 
 scout.Table.prototype._insertCheckBoxColumn = function() {
@@ -287,12 +324,12 @@ scout.Table.prototype._renderTableControls = function(dummy) {
 scout.Table.prototype._syncTableControls = function(controls) {
   var i;
   for (i = 0; i < this.tableControls.length; i++) {
-    this.keyStrokeAdapter.unregisterKeyStroke(this.tableControls[i]);
+    this.keyStrokeContext.unregisterKeyStroke(this.tableControls[i]);
   }
   this.tableControls = controls;
   for (i = 0; i < this.tableControls.length; i++) {
     if (this.tableControls[i].enabled) {
-      this.keyStrokeAdapter.registerKeyStroke(this.tableControls[i]);
+      this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
     }
   }
 };
@@ -1523,8 +1560,8 @@ scout.Table.prototype._rowsToIds = function(rows) {
  */
 scout.Table.prototype.renderSelection = function($row, deselect) {
   //TODO CGU rewrite, render selection based on model and not using jquery selectors
-  var $previousElement = $row.prevAll('.table-row:not(.invisible)').first(),
-    $followingElement = $row.nextAll('.table-row:not(.invisible)').first();
+  var $previousElement = this.$prevFilteredRow($row, false), // TODO [dwi] verify
+    $followingElement = this.$nextFilteredRow($row, false); // TODO [dwi] verify
   $row.removeClass('select-middle select-top select-bottom select-single selected');
   if (!deselect) {
     $row.select(true);
@@ -1682,28 +1719,32 @@ scout.Table.prototype.$rows = function(includeSumRows) {
   return this.$data.find(selector);
 };
 
-scout.Table.prototype.$filteredRows = function(includeSumRows) {
+scout.Table.prototype.newFilteredRowsSelector = function(includeSumRows) {
   var selector = '.table-row:not(.invisible)';
   if (includeSumRows) {
     selector += ', .table-row-sum:not(.invisible)';
   }
-  return this.$data.find(selector);
+  return selector;
+};
+
+scout.Table.prototype.$filteredRows = function(includeSumRows) {
+  return this.$data.find(this.newFilteredRowsSelector(includeSumRows));
+};
+
+scout.Table.prototype.$prevFilteredRow = function($row, includeSumRow) {
+  return $row.prev(this.newFilteredRowsSelector(includeSumRow));
 };
 
 scout.Table.prototype.$prevFilteredRows = function($row, includeSumRows) {
-  var selector = '.table-row:not(.invisible)';
-  if (includeSumRows) {
-    selector += ', .table-row-sum:not(.invisible)';
-  }
-  return $row.prevAll(selector);
+  return $row.prevAll(this.newFilteredRowsSelector(includeSumRows));
+};
+
+scout.Table.prototype.$nextFilteredRow = function($row, includeSumRow) {
+  return $row.next(this.newFilteredRowsSelector(includeSumRow));
 };
 
 scout.Table.prototype.$nextFilteredRows = function($row, includeSumRows) {
-  var selector = '.table-row:not(.invisible)';
-  if (includeSumRows) {
-    selector += ', .table-row-sum:not(.invisible)';
-  }
-  return $row.nextAll(selector);
+  return $row.nextAll(this.newFilteredRowsSelector(includeSumRows));
 };
 
 scout.Table.prototype.$sumRows = function() {
@@ -2124,12 +2165,12 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
 scout.Table.prototype._syncMenus = function(menus) {
   var i;
   for (i = 0; i < this.menus.length; i++) {
-    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
+    this.keyStrokeContext.unregisterKeyStroke(this.menus[i]);
   }
   this.menus = menus;
   for (i = 0; i < this.menus.length; i++) {
     if (this.menus[i].enabled) {
-      this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+      this.keyStrokeContext.registerKeyStroke(this.menus[i]);
     }
   }
 };
@@ -2266,16 +2307,6 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
   if (this.autoResizeColumns) {
     this.invalidateLayoutTree();
   }
-};
-
-scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
-  if (adapter === this.keyStrokeAdapter) {
-    return;
-  }
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
-  this.keyStrokeAdapter = adapter;
-  this.keyStrokeAdapter.registerKeyStroke(this._appLinkKeyStroke);
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, target);
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
@@ -2485,7 +2516,6 @@ scout.Table.prototype.attach = function() {
   htmlComp.setSize(htmlParent.getSize());
 
   this.session.detachHelper.afterAttach(this.$container);
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   this.attached = true;
 };
@@ -2503,7 +2533,6 @@ scout.Table.prototype.detach = function() {
     return;
   }
 
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 

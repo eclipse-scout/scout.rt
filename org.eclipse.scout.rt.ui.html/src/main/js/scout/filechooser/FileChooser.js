@@ -12,6 +12,23 @@ scout.FileChooser.prototype._init = function(model, session) {
   this._glassPaneRenderer = new scout.GlassPaneRenderer(session, this, true);
 };
 
+/**
+ * @override ModelAdapter
+ */
+scout.FileChooser.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.FileChooser.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([
+    new scout.FocusAdjacentElementKeyStroke(this.session, this),
+    new scout.ClickActiveElementKeyStroke(this, [
+      scout.keys.SPACE, scout.keys.ENTER
+    ]),
+    new scout.CloseKeyStroke(this, function() {
+      return this.$cancelButton;
+    }.bind(this))
+  ]);
+};
+
 scout.FileChooser.prototype._render = function($parent) {
   this._$parent = $parent;
 
@@ -60,12 +77,12 @@ scout.FileChooser.prototype._render = function($parent) {
     this.$legacyFormTarget = $('<iframe>')
       .attr('name', 'legacyFileUpload' + this.id)
       .on('load', function() {
-          var text = this.$legacyFormTarget.contents().text();
-          if (scout.strings.hasText(text)) {
-            var json = $.parseJSON(text);
-            this.session.onAjaxDone({}, json);
-            this.session.onAjaxAlways({}, json);
-          }
+        var text = this.$legacyFormTarget.contents().text();
+        if (scout.strings.hasText(text)) {
+          var json = $.parseJSON(text);
+          this.session.onAjaxDone({}, json);
+          this.session.onAjaxAlways({}, json);
+        }
       }.bind(this))
       .appendTo(this.$container);
     this.$fileInputField
@@ -122,13 +139,8 @@ scout.FileChooser.prototype._render = function($parent) {
   this._updateButtonWidths();
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 
   this.attached = true;
-};
-
-scout.FileChooser.prototype._createKeyStrokeAdapter = function(){
-  return new scout.MessageBoxKeyStrokeAdapter(this);
 };
 
 scout.FileChooser.prototype._postRender = function() {
@@ -196,8 +208,7 @@ scout.FileChooser.prototype.addFiles = function(files) {
     var file = files[i];
     if (this.multiSelect) {
       this._files.push(file);
-    }
-    else {
+    } else {
       this._files = [file];
       this.$files.empty();
     }
@@ -262,7 +273,6 @@ scout.FileChooser.prototype.attach = function() {
 
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   this.attached = true;
 };
@@ -280,7 +290,6 @@ scout.FileChooser.prototype.detach = function() {
     return;
   }
 
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 
@@ -304,10 +313,18 @@ scout.FileChooser.prototype._updateButtonWidths = function() {
   $visibleButtons.forEach(function($button, index) {
     if (index === $visibleButtons.length - 1) {
       w = availableWidth;
-    }
-    else {
+    } else {
       availableWidth -= w;
     }
     $button.outerWidth(w);
   });
+};
+
+/**
+ * Used by CloseKeyStroke.js
+ */
+scout.FileChooser.prototype.close = function() {
+  if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
+    this.$cancelButton.click();
+  }
 };

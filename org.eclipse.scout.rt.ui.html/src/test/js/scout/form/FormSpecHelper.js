@@ -5,7 +5,7 @@ var FormSpecHelper = function(session) {
 FormSpecHelper.prototype.createFormWithOneField = function(session, parentId) {
   var form = this.createFormModel();
   var rootGroupBox = this.createGroupBoxModel();
-  var field = this.createFieldModel();
+  var field = this.createFieldModel('StringField', form);
 
   form.rootGroupBox = rootGroupBox.id;
   rootGroupBox.mainBox = true;
@@ -28,10 +28,17 @@ FormSpecHelper.prototype.createFormModel = function() {
   return form;
 };
 
-FormSpecHelper.prototype.createFieldModel = function(objectType) {
+FormSpecHelper.prototype.createFieldModel = function(objectType, form) {
   var model = createSimpleModel(objectType || 'StringField');
   model.enabled = true;
   model.visible = true;
+  model.getForm = function() {
+    if (form) {
+      return form;
+    } else {
+      return createSimpleModel('Form');
+    }
+  };
 
   return model;
 };

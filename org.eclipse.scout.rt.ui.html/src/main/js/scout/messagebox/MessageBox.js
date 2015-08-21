@@ -23,6 +23,23 @@ scout.MessageBox.SEVERITY = {
   ERROR: 16777216
 };
 
+/**
+ * @override ModelAdapter
+ */
+scout.MessageBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.MessageBox.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([
+    new scout.FocusAdjacentElementKeyStroke(this.session, this),
+    new scout.ClickActiveElementKeyStroke(this, [
+      scout.keys.SPACE, scout.keys.ENTER
+    ]),
+    new scout.CloseKeyStroke(this, function() {
+      return this._$closeButton;
+    }.bind(this))
+  ]);
+};
+
 scout.MessageBox.prototype._render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
@@ -67,8 +84,6 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderHtml(this.html);
   this._renderHiddenText(this.hiddenText);
 
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
-
   // FIXME MOT: Somehow let the user copy the 'copyPasteText' - but how?
 
   // Prevent resizing when message-box is dragged off the viewport
@@ -93,10 +108,6 @@ scout.MessageBox.prototype._remove = function() {
   this.attached = false;
 
   scout.MessageBox.parent.prototype._remove.call(this);
-};
-
-scout.MessageBox.prototype._createKeyStrokeAdapter = function() {
-  return new scout.MessageBoxKeyStrokeAdapter(this);
 };
 
 scout.MessageBox.prototype._position = function() {
@@ -177,17 +188,18 @@ scout.MessageBox.prototype._updateButtonWidths = function() {
   $visibleButtons.forEach(function($button, index) {
     if (index === $visibleButtons.length - 1) {
       w = availableWidth;
-    }
-    else {
+    } else {
       availableWidth -= w;
     }
     $button.outerWidth(w);
   });
 };
 
+/**
+ * Used by CloseKeyStroke.js
+ */
 scout.MessageBox.prototype.close = function() {
-  if (this._$closeButton) {
-    this._$closeButton.focus();
+  if (this._$closeButton && this.session.focusManager.requestFocus(this._$closeButton)) {
     this._$closeButton.click();
   }
 };
@@ -207,7 +219,6 @@ scout.MessageBox.prototype.attach = function() {
 
   this._$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
-  scout.keyStrokeUtils.installAdapter(this.session, this.keyStrokeAdapter, this.$container);
 
   this.attached = true;
 };
@@ -225,7 +236,6 @@ scout.MessageBox.prototype.detach = function() {
     return;
   }
 
-  scout.keyStrokeUtils.uninstallAdapter(this.keyStrokeAdapter);
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
 

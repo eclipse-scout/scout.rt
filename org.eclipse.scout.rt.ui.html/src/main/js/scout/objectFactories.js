@@ -309,7 +309,7 @@ scout.defaultObjectFactories = [{
 }, {
   objectType: 'KeyStroke',
   create: function() {
-    return new scout.KeyStroke();
+    return new scout.Action(); // a model keystroke is represented as an Action
   }
 }, {
   objectType: 'ProposalChooser',

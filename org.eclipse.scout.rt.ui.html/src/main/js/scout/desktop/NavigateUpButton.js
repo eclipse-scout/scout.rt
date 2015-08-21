@@ -6,7 +6,7 @@ scout.NavigateUpButton = function(outline, node) {
   this.iconId = this._defaultIconId;
   this.objectType = 'NavigateUpButton';
   this.keyStroke = 'backspace';
-  this.initKeyStrokeParts();
+  this._initKeyStrokeContext(this.keyStrokeContext);
 };
 scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);
 

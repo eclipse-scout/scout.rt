@@ -4,12 +4,27 @@ scout.StringField = function() {
 scout.inherits(scout.StringField, scout.ValueField);
 
 scout.StringField.FORMAT = {
-    LOWER: 'a' /* IStringField.FORMAT_LOWER */,
-    UPPER: 'A' /* IStringField.FORMAT_UPPER */
-  };
+  LOWER: 'a' /* IStringField.FORMAT_LOWER */ ,
+  UPPER: 'A' /* IStringField.FORMAT_UPPER */
+};
 
-scout.StringField.prototype._createKeyStrokeAdapter = function(){
-  return new scout.StringFieldKeyStrokeAdapter(this);
+/**
+ * @override ModelAdapter.js
+ */
+scout.StringField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.StringField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([
+    new scout.StringFieldEnterKeyStroke(this),
+    new scout.StringFieldCtrlEnterKeyStroke(this)
+  ]);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.StringField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
 };
 
 scout.StringField.prototype._render = function($parent) {
@@ -20,12 +35,11 @@ scout.StringField.prototype._render = function($parent) {
   var $field;
   if (this.multilineText) {
     $field = $('<textarea>').
-      on('DOMMouseScroll mousewheel', function(event) {
-        // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
-        event.stopPropagation();
-      });
-  }
-  else {
+    on('DOMMouseScroll mousewheel', function(event) {
+      // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
+      event.stopPropagation();
+    });
+  } else {
     $field = scout.fields.new$TextField();
   }
   $field.on('blur', this._onFieldBlur.bind(this))
@@ -33,9 +47,13 @@ scout.StringField.prototype._render = function($parent) {
 
   // add drag and drop support
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-      scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      function() { return this.dropType; }.bind(this),
-      function() { return this.dropMaximumSize; }.bind(this));
+    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    function() {
+      return this.dropType;
+    }.bind(this),
+    function() {
+      return this.dropMaximumSize;
+    }.bind(this));
   this.dragAndDropHandler.install($field);
 
   this.addField($field);
@@ -58,7 +76,7 @@ scout.StringField.prototype._renderProperties = function() {
   // no render operation necessary: this._renderSelectionTrackingEnabled(...);
 };
 
-scout.StringField.prototype._renderMaxLength = function(maxLength0){
+scout.StringField.prototype._renderMaxLength = function(maxLength0) {
   var maxLength = maxLength0 || this.maxLength;
   if (this.$field[0].maxLength) {
     this.$field[0].maxLength = maxLength;
@@ -75,22 +93,22 @@ scout.StringField.prototype._renderMaxLength = function(maxLength0){
   }
 };
 
-scout.StringField.prototype._renderSelectionStart = function(selectionStart){
+scout.StringField.prototype._renderSelectionStart = function(selectionStart) {
   this.$field[0].selectionStart = selectionStart;
 };
 
-scout.StringField.prototype._renderSelectionEnd = function(selectionEnd){
+scout.StringField.prototype._renderSelectionEnd = function(selectionEnd) {
   this.$field[0].selectionEnd = selectionEnd;
 };
 
-scout.StringField.prototype._renderInputMasked = function(inputMasked){
+scout.StringField.prototype._renderInputMasked = function(inputMasked) {
   if (this.multilineText) {
     return;
   }
   this.$field.attr('type', (inputMasked ? 'password' : 'text'));
 };
 
-scout.StringField.prototype._renderHasAction = function(decorationLink){
+scout.StringField.prototype._renderHasAction = function(decorationLink) {
   if (decorationLink) {
     this.$container.addClass("has-action");
     this.addIcon();
@@ -103,7 +121,7 @@ scout.StringField.prototype._renderHasAction = function(decorationLink){
   }
 };
 
-scout.StringField.prototype._renderFormat = function(fmt){
+scout.StringField.prototype._renderFormat = function(fmt) {
   if (fmt === scout.StringField.FORMAT.LOWER) {
     this.$field.css('text-transform', 'lowercase');
   } else if (fmt === scout.StringField.FORMAT.UPPER) {
@@ -111,7 +129,7 @@ scout.StringField.prototype._renderFormat = function(fmt){
   }
 };
 
-scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnabled){
+scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnabled) {
   if (spellCheckEnabled) {
     this.$field.attr('spellcheck', 'true');
   } else {
