@@ -35,8 +35,7 @@ public final class UiHints {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiHints.class);
 
   /**
-   * Enables/disables cache, compress, minify. Also decides if scoutClass attribute is added to the DOM for
-   * form-fields.
+   * Enables/disables cache, compress, minify. Also decides if scoutClass attribute is added to the DOM for form-fields.
    */
   private static final String URL_PARAM_DEBUG = "debug";
   private static final String URL_PARAM_CACHE_HINT = "cache";

@@ -31,17 +31,17 @@ public class ScriptProcessor implements AutoCloseable {
 
   public ScriptProcessor() {
     //set up an external private class loader
-    m_yuiLoader = new SandboxClassLoaderBuilder().
-        addLocalJar("private-libs/yuicompressor.jar").
-        addJarContaining(ScriptProcessor.class).
-        build(null);
-    m_lessLoader = new SandboxClassLoaderBuilder().
-        addLocalJar("private-libs/commons-cli.jar").
-        addLocalJar("private-libs/commons-logging.jar").
-        addLocalJar("private-libs/rhino.jar").
-        addLocalJar("private-libs/lesscss-engine.jar").
-        addJarContaining(ScriptProcessor.class).
-        build(null);
+    m_yuiLoader = new SandboxClassLoaderBuilder()
+        .addLocalJar("private-libs/yuicompressor.jar")
+        .addJarContaining(ScriptProcessor.class)
+        .build(null);
+    m_lessLoader = new SandboxClassLoaderBuilder()
+        .addLocalJar("private-libs/commons-cli.jar")
+        .addLocalJar("private-libs/commons-logging.jar")
+        .addLocalJar("private-libs/rhino.jar")
+        .addLocalJar("private-libs/lesscss-engine.jar")
+        .addJarContaining(ScriptProcessor.class)
+        .build(null);
   }
 
   @Override

@@ -19,8 +19,7 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
   String getId();
 
   /**
-   * Returns a string used to identify the object-type in the JSON output
-   * (JSON attribute 'objectType').
+   * Returns a string used to identify the object-type in the JSON output (JSON attribute 'objectType').
    */
   String getObjectType();
 
@@ -47,8 +46,8 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
   void handleUiEvent(JsonEvent event);
 
   /**
-   * An adapter may clean up it's event filters when this method is called after an UI event has been processed.
-   * By default this method does nothing.
+   * An adapter may clean up it's event filters when this method is called after an UI event has been processed. By
+   * default this method does nothing.
    */
   void cleanUpEventFilters();
 

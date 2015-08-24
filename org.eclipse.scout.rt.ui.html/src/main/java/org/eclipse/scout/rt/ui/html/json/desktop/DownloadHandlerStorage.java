@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
- * This class manages downloadable items. Each item has a TTL, after that time the item is removed automatically.
- * When the item is removed before the timeout occurs, the scheduled removal-job will be canceled.
+ * This class manages downloadable items. Each item has a TTL, after that time the item is removed automatically. When
+ * the item is removed before the timeout occurs, the scheduled removal-job will be canceled.
  */
 public class DownloadHandlerStorage {
 

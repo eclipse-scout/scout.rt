@@ -89,9 +89,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   /**
-   * Override this method in order to attach listeners on the Scout model object.
-   * At this point a JsonAdapter instance has been already created for the model object.
-   * The default implementation does nothing.
+   * Override this method in order to attach listeners on the Scout model object. At this point a JsonAdapter instance
+   * has been already created for the model object. The default implementation does nothing.
    */
   protected void attachModel() {
   }
@@ -312,8 +311,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   /**
-   * Like {@link #addActionEvent(String, JSONObject)} but if there are already action events for the same
-   * event in the current response, all existing events are removed before adding the new event.
+   * Like {@link #addActionEvent(String, JSONObject)} but if there are already action events for the same event in the
+   * current response, all existing events are removed before adding the new event.
    */
   protected final void replaceActionEvent(String eventName, JSONObject eventData) {
     getUiSession().currentJsonResponse().replaceActionEvent(getId(), eventName, eventData);

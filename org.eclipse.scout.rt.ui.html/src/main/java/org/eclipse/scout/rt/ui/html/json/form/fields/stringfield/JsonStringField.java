@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValueField<STRING_FIELD> implements IBinaryResourceConsumer {
+public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValueField<STRING_FIELD>implements IBinaryResourceConsumer {
 
   public static final String EVENT_CALL_ACTION = "callAction";
   public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";

@@ -69,11 +69,10 @@ public class PropertyEventFilterTest {
   }
 
   /**
-   * This test reproduces a problem where we filter a value, set another value (fooBar) which is _not_ filtered,
-   * and finally change the value back to the original filtered value (theValue). Without the correct impl.
-   * The second propertyChange to 'theValue' would be filtered, which would cause errors, since the value has
-   * been changed to 'fooBar' in the meantime. So we must handle the value change event for 'theValue' although
-   * is is filtered.
+   * This test reproduces a problem where we filter a value, set another value (fooBar) which is _not_ filtered, and
+   * finally change the value back to the original filtered value (theValue). Without the correct impl. The second
+   * propertyChange to 'theValue' would be filtered, which would cause errors, since the value has been changed to
+   * 'fooBar' in the meantime. So we must handle the value change event for 'theValue' although is is filtered.
    */
   @Test
   public void testChangeBackToFilteredValue() {

@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.servicetunnel.StaticDate;
 
 /**
- * Helper to transform {@link java.util.Date} to a JSON string. Because JSON has no built-in date type, we
- * use a string in a canonical format. There are three valid formats:
+ * Helper to transform {@link java.util.Date} to a JSON string. Because JSON has no built-in date type, we use a string
+ * in a canonical format. There are three valid formats:
  * <ul>
  * <li>"Full": {@value #JSON_PATTERN_FULL}
  * <li>"Date only": {@value #JSON_PATTERN_DATE_ONLY} (time part is implicitly 00:00:00.000)
@@ -76,20 +76,19 @@ public class JsonDate implements IJsonObject {
   }
 
   /**
-   * Returns the value as a JSON string in one of the canonical formats. Both date and time parts
-   * are returned. The local time zone is used (non-UTC-mode).
+   * Returns the value as a JSON string in one of the canonical formats. Both date and time parts are returned. The
+   * local time zone is used (non-UTC-mode).
    */
   public String asJsonString() {
     return asJsonString(false);
   }
 
   /**
-   * Returns the value as a JSON string in one of the canonical formats. Both date and time parts
-   * are returned.
+   * Returns the value as a JSON string in one of the canonical formats. Both date and time parts are returned.
    *
    * @param utc
-   *          If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with
-   *          a <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
+   *          If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with a
+   *          <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
    */
   public String asJsonString(boolean utc) {
     return asJsonString(utc, true, true);
@@ -99,8 +98,8 @@ public class JsonDate implements IJsonObject {
    * Returns the value as a JSON string in one of the canonical formats.
    *
    * @param utc
-   *          If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with
-   *          a <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
+   *          If <code>true</code>, the date is normalized to the UTC time zone. The return value will then end with a
+   *          <code>'Z'</code> character. Otherwise, the local time zone is used (no trailing <code>'Z'</code>).
    * @param date
    *          If <code>true</code>, the "date part" (year/month/date) is included in the return value. If the date is
    *          not of concern, you can omit it in the output (and save some space) by setting this parameter to

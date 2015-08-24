@@ -36,9 +36,8 @@ public class DefaultValuesFilter {
   private final Map<String, Map<String, Object>> m_defaults = new HashMap<>();
 
   /**
-   * Map holding the full object type hierarchy for all known object types. The object type hierarchy
-   * is a list of object types from the type itself (equal to the map entry's key) to the most far
-   * parent type.
+   * Map holding the full object type hierarchy for all known object types. The object type hierarchy is a list of
+   * object types from the type itself (equal to the map entry's key) to the most far parent type.
    * <p>
    * <code>ObjectType -> [ ObjectType, ParentOfObjectType, ..., TopLevelObjectType ]</code>
    */

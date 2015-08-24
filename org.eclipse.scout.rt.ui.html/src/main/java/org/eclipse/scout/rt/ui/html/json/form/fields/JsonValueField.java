@@ -36,12 +36,12 @@ import org.json.JSONObject;
  *
  * @param <VALUE_FIELD>
  */
-public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends JsonFormField<VALUE_FIELD> implements IJsonContextMenuOwner {
+public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends JsonFormField<VALUE_FIELD>implements IJsonContextMenuOwner {
 
   /**
-   * This event is used when display-text has changed after field loses focus or when the display-text has changed
-   * while typing (this event is send after each key-press). You can distinct the two cases by looking on the while-
-   * Typing flag.
+   * This event is used when display-text has changed after field loses focus or when the display-text has changed while
+   * typing (this event is send after each key-press). You can distinct the two cases by looking on the while- Typing
+   * flag.
    */
   public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 

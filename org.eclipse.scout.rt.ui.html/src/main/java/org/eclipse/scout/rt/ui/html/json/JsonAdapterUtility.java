@@ -30,9 +30,8 @@ public final class JsonAdapterUtility {
   }
 
   /**
-   * Returns the ID of the JSON adapter for the given model.
-   * This method requires that the adapter has already been created before.
-   * The method will never create a new adapter instance.
+   * Returns the ID of the JSON adapter for the given model. This method requires that the adapter has already been
+   * created before. The method will never create a new adapter instance.
    */
   public static <M> String getAdapterIdForModel(IUiSession uiSession, M model, IJsonAdapter<?> parent, IFilter<M> filter) {
     if (filter != null && !filter.accept(model)) {
@@ -46,9 +45,8 @@ public final class JsonAdapterUtility {
   }
 
   /**
-   * Returns a list of IDs of the JSON adapters for the given models.
-   * This method requires that the adapter has already been created before.
-   * The method will never create a new adapter instance.
+   * Returns a list of IDs of the JSON adapters for the given models. This method requires that the adapter has already
+   * been created before. The method will never create a new adapter instance.
    */
   public static <M> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent, IFilter<M> filter) {
     JSONArray jsonAdapterIds = new JSONArray();
@@ -77,8 +75,8 @@ public final class JsonAdapterUtility {
 
   /**
    * Resolves the adapter for the given formField, even when it is not a direct child adapter of the given
-   * parentJsonAdapter (but the child adapter of a child adapter). If the formField does not belong to
-   * the adapter/field hierarchy of the given parent, <code>null</code> is returned.
+   * parentJsonAdapter (but the child adapter of a child adapter). If the formField does not belong to the adapter/field
+   * hierarchy of the given parent, <code>null</code> is returned.
    */
   public static IJsonAdapter<?> findChildAdapter(IJsonAdapter<?> parentJsonAdapter, IFormField formField) {
     // Find all parent model fields of the given formField (ordered from top to bottom)

@@ -17,8 +17,7 @@ import org.json.JSONObject;
 
 /**
  * The {@link JsonStartupRequest} contains all information used to create a new {@link IUiSession} and a new
- * {@link IClientSession}.
- * The information sources are listed in the following table
+ * {@link IClientSession}. The information sources are listed in the following table
  * <ul>
  * <li>tabId - calculated in scout.init() using the current timestamp</li>
  * <li>portletPartId - attribute 'data-partid' of scout html element</li>

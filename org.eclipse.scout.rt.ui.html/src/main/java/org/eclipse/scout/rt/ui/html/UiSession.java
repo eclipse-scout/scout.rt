@@ -97,8 +97,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
   /**
-   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
-   * The variable is accessed by different threads, thus all methods on HttpContext are synchronized.
+   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest() The variable is accessed by
+   * different threads, thus all methods on HttpContext are synchronized.
    */
   private HttpContext m_currentHttpContext = new HttpContext();
   private HttpSession m_currentHttpSession;
@@ -322,8 +322,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   /**
-   * Updates the locale Cookie but only when a current HTTP response exists. Which means
-   * when the locale of the session changes during a client-job, the cookie cannot be updated.
+   * Updates the locale Cookie but only when a current HTTP response exists. Which means when the locale of the session
+   * changes during a client-job, the cookie cannot be updated.
    */
   private void updatePreferredLocaleCookie(Locale locale) {
     HttpServletResponse resp = m_currentHttpContext.getResponse();

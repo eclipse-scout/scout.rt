@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> extends JsonValueField<FILE_CHOOSER_FIELD> implements IBinaryResourceConsumer {
+public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> extends JsonValueField<FILE_CHOOSER_FIELD>implements IBinaryResourceConsumer {
 
   public static final String EVENT_CHOOSE_FILE = "chooseFile";
 

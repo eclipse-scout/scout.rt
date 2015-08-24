@@ -52,8 +52,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   /**
    * Adds a property to the list of JSON properties. These properties are automatically managed by the JsonAdapter,
-   * which means they're automatically included in the object returned by the <code>toJson()</code> method and also
-   * are propagated to the browser-side client when a property change event occurs.
+   * which means they're automatically included in the object returned by the <code>toJson()</code> method and also are
+   * propagated to the browser-side client when a property change event occurs.
    */
   @SuppressWarnings("unchecked")
   protected void putJsonProperty(JsonProperty jsonProperty) {
@@ -76,8 +76,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   /**
-   * Adds a filter condition for the given property and value to the current response. When later in this event
-   * handler a property change event occurs with the same value, the event is not sent back to the client (=filtered).
+   * Adds a filter condition for the given property and value to the current response. When later in this event handler
+   * a property change event occurs with the same value, the event is not sent back to the client (=filtered).
    */
   protected void addPropertyEventFilterCondition(String propertyName, Object value) {
     m_propertyEventFilter.addCondition(new PropertyChangeEventFilterCondition(propertyName, value));
@@ -178,10 +178,10 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   /**
-   * This method is called, when a PropertyChangeEvent from the model occurs and no JsonProperty is registered for
-   * the given propertyName. Note that you must check if the property-change-event has been filtered by using the
-   * {@link #filterPropertyChangeEvent(PropertyChangeEvent)} method before you add an event to the JSON response.
-   * The default implementation does nothing.
+   * This method is called, when a PropertyChangeEvent from the model occurs and no JsonProperty is registered for the
+   * given propertyName. Note that you must check if the property-change-event has been filtered by using the
+   * {@link #filterPropertyChangeEvent(PropertyChangeEvent)} method before you add an event to the JSON response. The
+   * default implementation does nothing.
    */
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
   }

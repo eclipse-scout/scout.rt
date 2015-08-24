@@ -74,7 +74,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserver<TABLE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
+public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserver<TABLE>implements IJsonContextMenuOwner, IBinaryResourceConsumer {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
@@ -288,8 +288,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   /**
-   * Removes all column mappings without querying the model. Can be useful when the
-   * model is already updated (e.g. while handling the "column structure changed" event).
+   * Removes all column mappings without querying the model. Can be useful when the model is already updated (e.g. while
+   * handling the "column structure changed" event).
    */
   protected void disposeAllColumns() {
     m_jsonColumns.clear();

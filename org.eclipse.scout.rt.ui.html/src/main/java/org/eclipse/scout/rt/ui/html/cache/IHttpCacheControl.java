@@ -59,8 +59,7 @@ public interface IHttpCacheControl extends Serializable {
    * If info is null, then this method does nothing
    *
    * @return true if the file hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} response
-   *         is
-   *         then sent by this method and the caller should end its processing of this request.
+   *         is then sent by this method and the caller should end its processing of this request.
    *         <p>
    *         false if the content of the file needs to be returned, Etag, IfModifiedSince and MaxAge headers were set if
    *         appropriate.

@@ -19,11 +19,10 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 
 /**
- * There is no Scout model-class for a TabItem. We simply use the GroupBox class in that case.
- * Problem with that approach is, that the GroupBox does not have a "marked" property. That's
- * why the JSON Layer must store that state. In a future Scout release we should create a new
- * AbstractTabItem class extending GroupBox, adding the missing property. Than we could move
- * a lot of code from here to the new model class.
+ * There is no Scout model-class for a TabItem. We simply use the GroupBox class in that case. Problem with that
+ * approach is, that the GroupBox does not have a "marked" property. That's why the JSON Layer must store that state. In
+ * a future Scout release we should create a new AbstractTabItem class extending GroupBox, adding the missing property.
+ * Than we could move a lot of code from here to the new model class.
  *
  * @param <GROUP_BOX>
  */

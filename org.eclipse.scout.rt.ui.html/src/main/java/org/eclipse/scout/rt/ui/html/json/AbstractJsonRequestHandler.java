@@ -66,8 +66,8 @@ public abstract class AbstractJsonRequestHandler extends AbstractUiServletReques
 
   /**
    * @param redirectUrl
-   *          optional, URL where to redirect the UI. If <code>null</code>, session is informed about
-   *          session termination, but no redirection happens.
+   *          optional, URL where to redirect the UI. If <code>null</code>, session is informed about session
+   *          termination, but no redirection happens.
    */
   protected JSONObject createSessionTerminatedResponse(String redirectUrl) {
     JSONObject json = new JSONObject();

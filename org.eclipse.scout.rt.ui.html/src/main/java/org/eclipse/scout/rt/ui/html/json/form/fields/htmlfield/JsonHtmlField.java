@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 /**
  * This class creates JSON output for an <code>IHtmlField</code>.
  */
-public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField<HTML_FIELD> implements IBinaryResourceProvider {
+public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField<HTML_FIELD>implements IBinaryResourceProvider {
 
   public JsonHtmlField(HTML_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

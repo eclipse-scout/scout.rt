@@ -32,12 +32,12 @@ public class UiJobs {
   protected static final String POLLING_REQUEST_HINT = "pollingRequest";
 
   /**
-   * Blocks until all model jobs for the given session are done. Blocked jobs (e.g. waitFor) are ignored.
-   * If the calling thread is already the model thread, an exception is thrown!
+   * Blocks until all model jobs for the given session are done. Blocked jobs (e.g. waitFor) are ignored. If the calling
+   * thread is already the model thread, an exception is thrown!
    *
    * @throws UiException
-   *           in case the current thread was interrupted, or the waiting timeout elapsed, or the current thread
-   *           is the model thread.
+   *           in case the current thread was interrupted, or the waiting timeout elapsed, or the current thread is the
+   *           model thread.
    */
   public void awaitAllModelJobs(final IClientSession clientSession) {
     Assertions.assertNotNull(clientSession, "Argument 'clientSession' must not be null");

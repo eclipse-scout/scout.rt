@@ -177,9 +177,9 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
   }
 
   /**
-   * Returns the {@link IBinaryResourceConsumer} that is registered to the specified
-   * session under the given adapter ID. If the adapter could not be found, or the
-   * adapter is not a {@link IBinaryResourceConsumer}, a runtime exception is thrown.
+   * Returns the {@link IBinaryResourceConsumer} that is registered to the specified session under the given adapter ID.
+   * If the adapter could not be found, or the adapter is not a {@link IBinaryResourceConsumer}, a runtime exception is
+   * thrown.
    */
   protected IBinaryResourceConsumer resolveJsonAdapter(IUiSession uiSession, String targetAdapterId) {
     // Resolve adapter

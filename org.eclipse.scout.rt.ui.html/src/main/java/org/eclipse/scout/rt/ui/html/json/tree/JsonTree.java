@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
+public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<TREE>implements IJsonContextMenuOwner, IBinaryResourceConsumer {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
 

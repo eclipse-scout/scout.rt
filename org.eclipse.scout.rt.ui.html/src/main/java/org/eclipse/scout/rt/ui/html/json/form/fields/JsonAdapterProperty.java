@@ -96,8 +96,8 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   }
 
   /**
-   * If the property is a collection: Disposes every old model if the new list does not contain it.
-   * If the property is not a collection: Dispose the old model.
+   * If the property is a collection: Disposes every old model if the new list does not contain it. If the property is
+   * not a collection: Dispose the old model.
    */
   protected void disposeAdapters(Object newModels) {
     Set<IJsonAdapter> attachedAdapters = new HashSet<IJsonAdapter>(m_ownedAdapters);

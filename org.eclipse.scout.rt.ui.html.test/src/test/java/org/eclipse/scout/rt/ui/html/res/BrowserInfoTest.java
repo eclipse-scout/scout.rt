@@ -24,8 +24,8 @@ import org.junit.Test;
 
 /**
  * The list of user agents for all tests that start with "bulkTests*" was initially retrieved from
- * http://techpatterns.com/downloads/firefox/useragentswitcher.xml on 2015-01-05.
- * (See http://techpatterns.com/forums/about304.html for details.)
+ * http://techpatterns.com/downloads/firefox/useragentswitcher.xml on 2015-01-05. (See
+ * http://techpatterns.com/forums/about304.html for details.)
  */
 public class BrowserInfoTest {
 
@@ -128,7 +128,8 @@ public class BrowserInfoTest {
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML like Gecko) Maxthon/4.0.0.2000 Chrome/22.0.1229.79 Safari/537.1", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
+        FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
@@ -139,7 +140,8 @@ public class BrowserInfoTest {
     checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; Media Center PC 6.0; InfoPath.3; MS-RTC LM 8; Zune 4.7)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0",
+        FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));

@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonFormField<BROWSER_FIELD> implements IBinaryResourceProvider {
+public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonFormField<BROWSER_FIELD>implements IBinaryResourceProvider {
 
   private BrowserFieldListener m_browserFieldListener;
 

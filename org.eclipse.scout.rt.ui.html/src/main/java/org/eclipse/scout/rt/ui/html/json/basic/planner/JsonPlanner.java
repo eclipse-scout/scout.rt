@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<PLANNER> implements IJsonContextMenuOwner {
+public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<PLANNER>implements IJsonContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonPlanner.class);
 
   // from model

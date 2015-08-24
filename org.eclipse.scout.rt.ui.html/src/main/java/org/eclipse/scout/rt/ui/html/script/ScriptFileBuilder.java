@@ -34,8 +34,8 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * <p>
  * Version is <code>1.2.3</code> or <code>1.2.3-fingerprint</code> where fingerprint is a hex number
  * <p>
- * If the fingerprint is the text "fingerprint" then {@link HtmlFileLoader} replaces it with the
- * effective hex fingerprint.
+ * If the fingerprint is the text "fingerprint" then {@link HtmlFileLoader} replaces it with the effective hex
+ * fingerprint.
  * <p>
  * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UiHints}
  */

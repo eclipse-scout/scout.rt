@@ -18,23 +18,23 @@ import org.json.JSONObject;
 public class JsonGraphTableControl<GRAPH_TABLE_CONTROL extends IGraphTableControl> extends JsonTableControl<GRAPH_TABLE_CONTROL> {
 
   //FIXME add to model
-  private static final String GRAPH = "{\"nodes\": [{\"id\": 0, \"name\": \"Daniel Anders\", \"type\": \"center\"}," +
-      "                            {\"id\": 1, \"name\": \"VISECA\", \"type\": \"company\"}," +
-      "                            {\"id\": 2, \"name\": \"Markus Brunold\", \"type\": \"internal\"}," +
-      "                            {\"id\": 3, \"name\": \"Hansruedi Näf\", \"type\": \"person\"}," +
-      "                            {\"id\": 4, \"name\": \"Christina Rusche\", \"type\": \"internal\"}," +
-      "                            {\"id\": 5, \"name\": \"Stefan Kämpfer\", \"type\": \"person\"}," +
-      "                            {\"id\": 6, \"name\": \"Andrea Mafioretti\", \"type\": \"person\"}," +
-      "                            {\"id\": 7, \"name\": \"Herbert Bucheli\", \"type\": \"person\"}," +
-      "                            {\"id\": 8, \"name\": \"ITS2.3\", \"type\": \"department\"}]," +
-      "                 \"links\": [{\"source\": 0, \"target\": 1, \"label\": \"\"}," +
-      "                           {\"source\": 0, \"target\": 2, \"label\": \"Betreuer\"}," +
-      "                           {\"source\": 0, \"target\": 3, \"label\": \"Studienfreund\"}," +
-      "                           {\"source\": 0, \"target\": 4, \"label\": \"Hauptbetreuer\"}," +
-      "                           {\"source\": 0, \"target\": 8, \"label\": \"Vorgesetzer\"}," +
-      "                           {\"source\": 5, \"target\": 8, \"label\": \"Mitarbeiter\"}," +
-      "                           {\"source\": 6, \"target\": 8, \"label\": \"Mitarbeiter\"}," +
-      "                           {\"source\": 7, \"target\": 8, \"label\": \"Mitarbeiter\"}]}";
+  private static final String GRAPH = "{\"nodes\": [{\"id\": 0, \"name\": \"Daniel Anders\", \"type\": \"center\"},"
+      + "                            {\"id\": 1, \"name\": \"VISECA\", \"type\": \"company\"},"
+      + "                            {\"id\": 2, \"name\": \"Markus Brunold\", \"type\": \"internal\"},"
+      + "                            {\"id\": 3, \"name\": \"Hansruedi Näf\", \"type\": \"person\"},"
+      + "                            {\"id\": 4, \"name\": \"Christina Rusche\", \"type\": \"internal\"},"
+      + "                            {\"id\": 5, \"name\": \"Stefan Kämpfer\", \"type\": \"person\"},"
+      + "                            {\"id\": 6, \"name\": \"Andrea Mafioretti\", \"type\": \"person\"},"
+      + "                            {\"id\": 7, \"name\": \"Herbert Bucheli\", \"type\": \"person\"},"
+      + "                            {\"id\": 8, \"name\": \"ITS2.3\", \"type\": \"department\"}],"
+      + "                 \"links\": [{\"source\": 0, \"target\": 1, \"label\": \"\"},"
+      + "                           {\"source\": 0, \"target\": 2, \"label\": \"Betreuer\"},"
+      + "                           {\"source\": 0, \"target\": 3, \"label\": \"Studienfreund\"},"
+      + "                           {\"source\": 0, \"target\": 4, \"label\": \"Hauptbetreuer\"},"
+      + "                           {\"source\": 0, \"target\": 8, \"label\": \"Vorgesetzer\"},"
+      + "                           {\"source\": 5, \"target\": 8, \"label\": \"Mitarbeiter\"},"
+      + "                           {\"source\": 6, \"target\": 8, \"label\": \"Mitarbeiter\"},"
+      + "                           {\"source\": 7, \"target\": 8, \"label\": \"Mitarbeiter\"}]}";
 
   public JsonGraphTableControl(GRAPH_TABLE_CONTROL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

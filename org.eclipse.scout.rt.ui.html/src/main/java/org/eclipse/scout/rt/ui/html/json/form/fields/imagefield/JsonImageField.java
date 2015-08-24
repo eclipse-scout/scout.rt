@@ -140,8 +140,8 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   }
 
   /**
-   * Returns an URL for the image or imageId, respectively (first one that is not <code>null</code>).
-   * If no image is set, <code>null</code> is returned.
+   * Returns an URL for the image or imageId, respectively (first one that is not <code>null</code>). If no image is
+   * set, <code>null</code> is returned.
    */
   protected String getImageUrl() {
     if (getModel().getImage() != null) {

@@ -30,7 +30,7 @@ import org.json.JSONObject;
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
-public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeField<GROUP_BOX, IFormField> implements IJsonContextMenuOwner {
+public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeField<GROUP_BOX, IFormField>implements IJsonContextMenuOwner {
 
   // from UI
   public static final String EVENT_EXPANDED = "expanded";

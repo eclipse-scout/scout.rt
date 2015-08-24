@@ -59,9 +59,9 @@ public class JsonResponse {
   }
 
   /**
-   * Adds an adapter to the response. All adapters stored on the response are transferred to the client (browser)
-   * as JSON object. Only new adapters must be transferred, adapters already transferred to the client can be
-   * solely referenced by their ID.
+   * Adds an adapter to the response. All adapters stored on the response are transferred to the client (browser) as
+   * JSON object. Only new adapters must be transferred, adapters already transferred to the client can be solely
+   * referenced by their ID.
    * <p>
    * Note that in javascript the adapters are not created unless the first event is received or
    * {@link IJsonAdapter#isCreateImmediately()} is set
@@ -162,9 +162,9 @@ public class JsonResponse {
    * @param errorCode
    *          An arbitrary number indicating the type of error.
    * @param errorMessage
-   *          A message describing the error. This message is mostly useful for debugging purposes. Usually, it is
-   *          not shown to the user, because it is not language-dependent. If possible, the displayed message is
-   *          translated by the client using the <code>errorCode</code> parameter (see Session.js).
+   *          A message describing the error. This message is mostly useful for debugging purposes. Usually, it is not
+   *          shown to the user, because it is not language-dependent. If possible, the displayed message is translated
+   *          by the client using the <code>errorCode</code> parameter (see Session.js).
    */
   public void markAsError(int errorCode, String errorMessage) {
     m_error = true;
@@ -179,21 +179,21 @@ public class JsonResponse {
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
 
   /**
-   * Returns a JSON string representation of this instance. This method is called at the end of a request.
-   * The return value of this method is returned to the client-side GUI. There are some noteworthy points:
+   * Returns a JSON string representation of this instance. This method is called at the end of a request. The return
+   * value of this method is returned to the client-side GUI. There are some noteworthy points:
    * <ul>
    * <li>All new adapters (= adapters not yet transferred to the client), are put as a list in the 'adapterData'
    * property.</li>
    * <li>All events are transferred in the 'events' property.</li>
    * </ul>
    * This method will call the <code>toJson()</code> method on all adapter objects. Note that you can NOT create new
-   * adapter instances when the toJson() method runs! All new adapter instances must be created before: either in
-   * the <code>attachModel()</code> method or in an event handler method like <code>handleXYZ()</code>. The technical
-   * reason for this is, first: new adapters are added to the current response (see UiSession), but at the
-   * point in time toJson() is called, we already have a new instance of the current response. Second: when we loop
-   * through the adapterMap and call toJson() for each adapter, if the adapter would create another adapter in its
-   * toJson() method, the adapterMap would grow, which would cause a ConcurrentModificationException. Additionally
-   * we should conceptually separate object creation from JSON output creation.
+   * adapter instances when the toJson() method runs! All new adapter instances must be created before: either in the
+   * <code>attachModel()</code> method or in an event handler method like <code>handleXYZ()</code>. The technical reason
+   * for this is, first: new adapters are added to the current response (see UiSession), but at the point in time
+   * toJson() is called, we already have a new instance of the current response. Second: when we loop through the
+   * adapterMap and call toJson() for each adapter, if the adapter would create another adapter in its toJson() method,
+   * the adapterMap would grow, which would cause a ConcurrentModificationException. Additionally we should conceptually
+   * separate object creation from JSON output creation.
    */
   public JSONObject toJson() {
     // Ensure all buffered events are handled. This might cause the addition of more events and adapters to this response.
@@ -270,8 +270,8 @@ public class JsonResponse {
   }
 
   /**
-   * When we send a new adapter in the JSON response we have to ignore all events
-   * for that adapter, since the adapter data already describes the latest state of the adapter.
+   * When we send a new adapter in the JSON response we have to ignore all events for that adapter, since the adapter
+   * data already describes the latest state of the adapter.
    * <p>
    * For property change events this is just an optimization to reduce the response size.<br>
    * For other event types it may be crucial that the events are not sent.<br>
@@ -285,8 +285,8 @@ public class JsonResponse {
   }
 
   /**
-   * Removes all traces of the adapter with the given ID from the current response. This includes all events with
-   * the given ID as target. Also, if the adapter was registered as "buffered events adapter", it is unregistered
+   * Removes all traces of the adapter with the given ID from the current response. This includes all events with the
+   * given ID as target. Also, if the adapter was registered as "buffered events adapter", it is unregistered
    * automatically. Any deferred model event for this adapter will therefore not be handled.
    *
    * @param id

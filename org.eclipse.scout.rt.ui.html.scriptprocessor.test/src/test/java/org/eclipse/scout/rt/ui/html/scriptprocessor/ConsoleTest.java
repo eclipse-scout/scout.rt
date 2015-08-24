@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.scriptprocessor;
 
-
 public final class ConsoleTest implements ExampleScripts {
 
   private ConsoleTest() {
