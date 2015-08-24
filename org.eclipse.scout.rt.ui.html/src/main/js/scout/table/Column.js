@@ -140,7 +140,6 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
   popup = new scout.CellEditorPopup(this, row, cell, this.session);
   popup.$anchor = $cell;
   popup.render(this.table.$data);
-  popup.alignTo();
   popup.pack();
   return popup;
 };

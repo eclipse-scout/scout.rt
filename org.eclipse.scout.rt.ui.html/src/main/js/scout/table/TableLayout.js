@@ -45,7 +45,7 @@ scout.TableLayout.prototype.layout = function($container) {
     tooltip.position();
   }.bind(this));
   if (this.table.cellEditorPopup && this.table.cellEditorPopup.rendered) {
-    this.table.cellEditorPopup.alignTo();
+    this.table.cellEditorPopup.position();
     this.table.cellEditorPopup.pack();
   }
   scout.scrollbars.update(this.table.$data);

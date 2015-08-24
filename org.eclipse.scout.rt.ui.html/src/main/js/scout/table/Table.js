@@ -1650,7 +1650,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
 
       // Make sure the cell editor popup is correctly layouted because selection changes the cell bounds
       if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
-        this.cellEditorPopup.alignTo();
+        this.cellEditorPopup.position();
         this.cellEditorPopup.pack();
       }
     }, this);

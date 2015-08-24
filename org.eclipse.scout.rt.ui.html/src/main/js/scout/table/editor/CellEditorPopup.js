@@ -49,10 +49,10 @@ scout.CellEditorPopup.prototype._render = function($parent) {
     if (event.animating) {
       // row is only set while animating
       if (event.row === this.row) {
-        this.alignTo();
+        this.position();
       }
     } else {
-      this.alignTo();
+      this.position();
     }
   }.bind(this);
   this.table.events.on(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
@@ -84,7 +84,7 @@ scout.CellEditorPopup.prototype._remove = function() {
   this.$anchor.css('visibility', '');
 };
 
-scout.CellEditorPopup.prototype.alignTo = function() {
+scout.CellEditorPopup.prototype.position = function() {
   var cellBounds, rowBounds,
     $tableData = this.table.$data,
     $row = this.row.$row,
@@ -114,5 +114,5 @@ scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
 };
 
 scout.CellEditorPopup.prototype._onAnchorScroll = function(event) {
-  this.alignTo();
+  this.position();
 };
