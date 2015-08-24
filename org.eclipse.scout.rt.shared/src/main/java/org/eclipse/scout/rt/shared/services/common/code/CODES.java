@@ -39,15 +39,6 @@ public final class CODES {
     return BEANS.get(ICodeService.class).findCodeTypeById(id);
   }
 
-  /**
-   * @param id
-   * @return Note that this method does not load code types, but only searches code types already loaded into the code
-   *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeType(Class)} etc.
-   */
-  public static <T> ICodeType<T, ?> findCodeTypeById(Long partitionId, T codeTypeId) {
-    return BEANS.get(ICodeService.class).findCodeTypeById(partitionId, codeTypeId);
-  }
-
   @SuppressWarnings("unchecked")
   public static List<ICodeType<?, ?>> getCodeTypes(Class<?>... types) {
     if (types == null) {

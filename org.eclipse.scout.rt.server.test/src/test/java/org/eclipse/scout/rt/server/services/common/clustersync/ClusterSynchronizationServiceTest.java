@@ -28,9 +28,9 @@ import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterN
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.server.services.common.security.AccessControlClusterNotification;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
+import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
-import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -159,9 +159,7 @@ public class ClusterSynchronizationServiceTest {
   public void testTransactionalWithCoalesce() throws Exception {
     m_svc.publishTransactional(new AccessControlClusterNotification());
     m_svc.publishTransactional(new AccessControlClusterNotification());
-    ArrayList<Class<? extends ICodeType<?, ?>>> codeTypes = new ArrayList<>();
-    codeTypes.add(TestCodeType.class);
-    m_svc.publishTransactional(new CodeTypeChangedNotification(codeTypes));
+    m_svc.publishTransactional(new InvalidateCacheNotification("TEST", new AllCacheEntryFilter<>()));
     ITransaction.CURRENT.get().commitPhase1();
     ITransaction.CURRENT.get().commitPhase2();
     verify(m_messageService, times(1)).publishNotifications(any(List.class));

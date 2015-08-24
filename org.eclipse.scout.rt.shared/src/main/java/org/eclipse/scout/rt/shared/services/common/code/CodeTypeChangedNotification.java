@@ -18,11 +18,16 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.cache.ICache;
+import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 
 /**
  * Notification is sent from server to client to notify that the code type has changed and the client should clear its
  * cache
+ *
+ * @deprecated replaced with {@link InvalidateCacheNotification}. Will be removed in Scout 6.1. See {@link ICache}
  */
+@Deprecated
 public class CodeTypeChangedNotification implements Serializable {
 
   private static final long serialVersionUID = 1L;

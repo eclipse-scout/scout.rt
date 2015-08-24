@@ -11,31 +11,19 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.services.lookup.DefaultLookupCallProvisioningService;
-import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
-import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -44,28 +32,6 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractSmartColumnTest {
   private P_Table table = new P_Table();
-  private static List<IBean<?>> s_regs;
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    TestingCodeService codeService = new TestingCodeService(new TestCodeType());
-    DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
-    s_regs = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class)
-            .withInitialInstance(codeService)
-            .withApplicationScoped(true),
-        new BeanMetaData(ICodeLookupCallFactoryService.class)
-            .withInitialInstance(codeLookupCallFactoryService)
-            .withApplicationScoped(true),
-        new BeanMetaData(ILookupCallProvisioningService.class)
-            .withInitialInstance(new DefaultLookupCallProvisioningService())
-            .withApplicationScoped(true));
-  }
-
-  @AfterClass
-  public static void afterClass() throws Exception {
-    TestingUtility.unregisterBeans(s_regs);
-  }
 
   @Test
   public void testResetInvalidValue() throws ProcessingException {
@@ -73,6 +39,7 @@ public class AbstractSmartColumnTest {
     ITableRow testRow = table.getRow(0);
 
     parseAndSetInEditField(testRow, "invalid Text");
+    assertFalse(testRow.getCell(0).isContentValid());
     parseAndSetInEditField(testRow, "Test");
 
     assertEquals("Test", testRow.getCell(0).getText());

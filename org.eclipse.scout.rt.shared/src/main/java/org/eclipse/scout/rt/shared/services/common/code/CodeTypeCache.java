@@ -18,12 +18,15 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.shared.cache.ICache;
 
 /**
  * Maintains a cache of ICodeType objects that can be (re)loaded using the methods reloadCodeType, reloadCodeTypes
  *
  * @since 4.3.0 (mars-M5)
+ * @deprecated replaced with {@link ICache}. Will be removed in Scout 6.1.
  */
+@Deprecated
 public class CodeTypeCache {
   private Object m_cacheLock = new Object();
   private HashMap<Class<? extends ICodeType>, ICodeType> m_cache = new HashMap<Class<? extends ICodeType>, ICodeType>();

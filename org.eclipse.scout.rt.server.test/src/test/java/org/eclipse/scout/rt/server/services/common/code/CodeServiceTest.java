@@ -12,18 +12,23 @@ package org.eclipse.scout.rt.server.services.common.code;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
+import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
-import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
+import org.eclipse.scout.rt.shared.services.common.code.CodeService;
+import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheEntryFilter;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -65,31 +70,34 @@ public class CodeServiceTest {
    */
   @Test
   public void testReloadCodeType() throws ProcessingException {
-    CodeService codeService = new CodeService();
+    ICodeService codeService = BEANS.get(ICodeService.class);
     codeService.reloadCodeType(SomeCodeType.class);
 
-    ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
-    verify(m_clientNotificationReg).putTransactionalForAllSessions(notification.capture());
+    ArgumentCaptor<InvalidateCacheNotification> notification = ArgumentCaptor.forClass(InvalidateCacheNotification.class);
+    verify(m_clientNotificationReg).putTransactionalForAllNodes(notification.capture(), anyBoolean());
 
-    assertEquals("CodeType set in the notification size", 1, notification.getValue().getCodeTypes().size());
-    assertTrue(notification.getValue().getCodeTypes().contains(SomeCodeType.class));
+    Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses = ((CodeTypeCacheEntryFilter) notification.getValue().getFilter()).getCodeTypeClasses();
+    assertEquals("CodeType list in the notification size", 1, codeTypeClasses.size());
+    assertEquals("CodeType list(0) class", SomeCodeType.class, codeTypeClasses.iterator().next());
   }
 
   @Test
   public void testReloadCodeTypes() throws ProcessingException {
-    CodeService codeService = new CodeService();
+    ICodeService codeService = BEANS.get(ICodeService.class);
 
     List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
     list.add(SomeCodeType.class);
     list.add(DummyCodeType.class);
     codeService.reloadCodeTypes(list);
 
-    ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
-    verify(m_clientNotificationReg).putTransactionalForAllSessions(notification.capture());
+    ArgumentCaptor<InvalidateCacheNotification> notification = ArgumentCaptor.forClass(InvalidateCacheNotification.class);
+    verify(m_clientNotificationReg).putTransactionalForAllNodes(notification.capture(), anyBoolean());
 
-    assertEquals("CodeType list in the notification size", 2, notification.getValue().getCodeTypes().size());
-    assertTrue(notification.getValue().getCodeTypes().contains(SomeCodeType.class));
-    assertTrue(notification.getValue().getCodeTypes().contains(DummyCodeType.class));
+    Set<Class<? extends ICodeType<?, ?>>> codeTypeClasses = ((CodeTypeCacheEntryFilter) notification.getValue().getFilter()).getCodeTypeClasses();
+    assertEquals("CodeType list in the notification size", 2, codeTypeClasses.size());
+    for (Class<? extends ICodeType<?, ?>> codeTypeClass : codeTypeClasses) {
+      assertTrue("CodeTypes not invalidated", codeTypeClass == SomeCodeType.class || codeTypeClass == DummyCodeType.class);
+    }
   }
 
   public static class SomeCodeType extends AbstractCodeType<Long, String> {
@@ -100,7 +108,6 @@ public class CodeServiceTest {
     public Long getId() {
       return 100L;
     }
-
   }
 
   public static class DummyCodeType extends AbstractCodeType<Long, String> {

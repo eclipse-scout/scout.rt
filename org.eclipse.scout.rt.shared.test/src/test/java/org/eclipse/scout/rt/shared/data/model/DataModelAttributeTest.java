@@ -29,26 +29,17 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.MutableCode;
-import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
-import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -58,26 +49,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class DataModelAttributeTest {
 
-  private static List<IBean<?>> s_services;
   private Locale m_oldLocale;
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    TestingCodeService codeService = new TestingCodeService(new AttributeTestCodeType());
-    DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
-    s_services = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class)
-            .withInitialInstance(codeService)
-            .withApplicationScoped(true),
-        new BeanMetaData(ICodeLookupCallFactoryService.class)
-            .withInitialInstance(codeLookupCallFactoryService)
-            .withApplicationScoped(true));
-  }
-
-  @AfterClass
-  public static void afterClass() throws Exception {
-    TestingUtility.unregisterBeans(s_services);
-  }
 
   @Before
   public void before() {

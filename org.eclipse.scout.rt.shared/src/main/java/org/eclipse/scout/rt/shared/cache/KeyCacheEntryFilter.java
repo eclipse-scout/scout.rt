@@ -1,0 +1,53 @@
+/*******************************************************************************
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.shared.cache;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.scout.commons.CollectionUtility;
+
+/**
+ * Special filter that accepts entries according to a set of keys.
+ * <p>
+ * This class is immutable.
+ * 
+ * @since 5.2
+ */
+public final class KeyCacheEntryFilter<K, V> implements ICacheEntryFilter<K, V> {
+  private static final long serialVersionUID = 1L;
+  private final Set<K> m_keys;
+
+  public KeyCacheEntryFilter(Collection<K> keys) {
+    m_keys = CollectionUtility.hashSetWithoutNullElements(keys);
+  }
+
+  public Set<K> getKeys() {
+    return Collections.unmodifiableSet(m_keys);
+  }
+
+  @Override
+  public boolean accept(K key, V value) {
+    return m_keys.contains(key);
+  }
+
+  @Override
+  public ICacheEntryFilter<K, V> coalesce(ICacheEntryFilter<K, V> other) {
+    if (other instanceof KeyCacheEntryFilter) {
+      HashSet<K> newKeySet = new HashSet<K>(m_keys);
+      newKeySet.addAll(((KeyCacheEntryFilter<K, V>) other).m_keys);
+      return new KeyCacheEntryFilter<K, V>(newKeySet);
+    }
+    return null;
+  }
+}

@@ -17,11 +17,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.services.lookup.DefaultLookupCallProvisioningService;
-import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -30,20 +26,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
-import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -55,30 +42,6 @@ import org.mockito.Mockito;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractMixedSmartColumnTest {
-
-  private static List<IBean<?>> s_regs;
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    TestingCodeService codeService = new TestingCodeService(new TestCodeType());
-    DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
-    s_regs = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class)
-            .withInitialInstance(codeService)
-            .withApplicationScoped(true),
-        new BeanMetaData(ICodeLookupCallFactoryService.class)
-            .withInitialInstance(codeLookupCallFactoryService)
-            .withApplicationScoped(true),
-        new BeanMetaData(ILookupCallProvisioningService.class)
-            .withInitialInstance(new DefaultLookupCallProvisioningService())
-            .withApplicationScoped(true));
-
-  }
-
-  @AfterClass
-  public static void afterClass() throws Exception {
-    TestingUtility.unregisterBeans(s_regs);
-  }
 
   @Test
   public void testPrepareEditInternal() throws ProcessingException {

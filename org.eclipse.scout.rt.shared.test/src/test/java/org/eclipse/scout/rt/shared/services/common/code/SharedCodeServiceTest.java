@@ -23,12 +23,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * JUnit test for {@link AbstractSharedCodeService}. See Bug 444213.
+ * JUnit test for {@link CodeService}. See Bug 444213.
  *
  * @since 4.3.0 (Mars-M5)
  */
@@ -39,12 +40,12 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getAllCodeTypeClasses(java.lang.String)}
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypeClasses(java.lang.String)}
    * .
    */
   @Test
   public void testGetAllCodeTypeClasses() {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = newCodeServiceInstance();
     Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses1 = service.getAllCodeTypeClasses("");
     assertEquals("codeTypeClasses1 size", 2, codeTypeClasses1.size());
     assertEquals("codeTypeClasses1 contains AbcCodeType", true, codeTypeClasses1.contains(AbcCodeType.class));
@@ -58,12 +59,12 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getAllCodeTypes(java.lang.String)}
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypes(java.lang.String)}
    * .
    */
   @Test
   public void testGetAllCodeTypesString() {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = newCodeServiceInstance();
     Collection<ICodeType<?, ?>> codeTypes1 = service.getAllCodeTypes("");
     assertEquals("size", 2, codeTypes1.size());
     Set<Class<?>> codeTypeClasses = new HashSet<Class<?>>(2);
@@ -80,11 +81,11 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getCodeType(java.lang.Class)}.
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getCodeType(java.lang.Class)}.
    */
   @Test
   public void testGetCodeTypeClass() {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes("");
 
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
@@ -98,11 +99,11 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getCodeTypes(List)}.
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getCodeTypes(List)}.
    */
   @Test
   public void testGetCodeTypesList() {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes("");
 
     List<Class<? extends ICodeType<?, ?>>> types1 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
@@ -136,13 +137,13 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#reloadCodeType(Class)}.
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeType(Class)}.
    *
    * @throws Exception
    */
   @Test
   public void testReloadCodeType() throws Exception {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes("");
 
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
@@ -160,13 +161,13 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#reloadCodeTypes(List)}.
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeTypes(List)}.
    *
    * @throws Exception
    */
   @Test
-  public void testReloadCodeTypse() throws Exception {
-    ICodeService service = new P_SharedCodeService();
+  public void testReloadCodeTypes() throws Exception {
+    ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes("");
 
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
@@ -186,18 +187,18 @@ public class SharedCodeServiceTest {
     assertNotSame(zyxCodeType1, codeTypes1.get(1));
 
     List<ICodeType<?, ?>> r = service.reloadCodeTypes(null);
-    assertNull(r);
+    assertTrue(r.isEmpty());
   }
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#findCodeTypeById(Object)} .
+   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#findCodeTypeById(Object)} .
    *
    * @throws Exception
    */
   @Test
   public void testFindCodeTypeById() throws Exception {
-    ICodeService service = new P_SharedCodeService();
+    ICodeService service = newCodeServiceInstance();
 
     ICodeType<Long, ?> abcCodeType1 = service.findCodeTypeById(ABC_ID);
     ICodeType<Long, ?> abcCodeType2 = service.findCodeTypeById(ABC_ID);
@@ -215,7 +216,13 @@ public class SharedCodeServiceTest {
     assertNull(r);
   }
 
-  static class P_SharedCodeService extends AbstractSharedCodeService {
+  protected ICodeService newCodeServiceInstance() {
+    ICodeService service = new P_SharedCodeService();
+    BeanInstanceUtil.initializeInstance(service);
+    return service;
+  }
+
+  static class P_SharedCodeService extends CodeService {
     private boolean m_isFirst = true;
 
     @Override

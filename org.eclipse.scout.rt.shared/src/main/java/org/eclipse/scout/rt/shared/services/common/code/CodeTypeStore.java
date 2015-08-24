@@ -16,12 +16,16 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.cache.ICache;
 
 /**
  * CodeType store Maintains a map of partition- and language-dependent code type caches
  *
  * @since 4.3.0 (mars-M5)
+ * @deprecated replaced with {@link ICache}. Will be removed in Scout 6.1.
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class CodeTypeStore {
   private Object m_storeLock;
   private HashMap<PartitionLanguageComposite, CodeTypeCache> m_store;

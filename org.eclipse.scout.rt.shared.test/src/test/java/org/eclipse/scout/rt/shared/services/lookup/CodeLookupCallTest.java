@@ -18,21 +18,14 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
-import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.ILegacyCodeLookupCallVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,21 +47,6 @@ public class CodeLookupCallTest {
   private static final String ROW30_TEXT = "dolor";
   private static final Integer ROW31_KEY = Integer.valueOf(43);
   private static final String ROW31_TEXT = "mor";
-
-  private static List<IBean<?>> s_services;
-
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    s_services = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class)
-            .withInitialInstance(new TestingCodeService(new CodeLookupCallTestCodeType()))
-            .withApplicationScoped(true));
-  }
-
-  @AfterClass
-  public static void afterClass() throws Exception {
-    TestingUtility.unregisterBeans(s_services);
-  }
 
   @Test
   public void testGetDataByAll() throws Exception {
@@ -231,7 +209,7 @@ public class CodeLookupCallTest {
     private static final long serialVersionUID = 1L;
   }
 
-  private static class CodeLookupCallTestCodeType extends AbstractCodeType<Long, Integer> {
+  public static class CodeLookupCallTestCodeType extends AbstractCodeType<Long, Integer> {
     private static final long serialVersionUID = 1L;
     public static final Long ID = Long.valueOf(22);
 
