@@ -8,21 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.extension.ui.form.fields;
+package org.eclipse.scout.rt.client.ui.form.fields;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.BottomBox.BottomBoxField;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.BottomBox.ChildBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.TopBox.TopBoxField;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveStringField;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,6 +47,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertEquals(0, form.getTopBox().getFieldCount());
     assertNull(field.getParentField());
     assertSame(form, field.getForm());
+    assertNoFieldPropertyChangeListener(field);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -92,6 +95,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertEquals(0, form.getTopBox().getFieldCount());
     assertNull(field.getParentField());
     assertSame(form, field.getForm());
+    assertNoFieldPropertyChangeListener(field);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -127,9 +131,10 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
 
     form.getTopBox().addField(field);
     Assert.assertEquals(2, form.getTopBox().getFieldCount());
-    Assert.assertEquals(0, form.getBottomBox().getFieldCount());
+    Assert.assertEquals(1, form.getBottomBox().getFieldCount());
     assertSame(form, field.getForm());
     assertSame(form.getTopBox(), field.getParentField());
+    assertFieldPropertyChangeListener(field);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -149,6 +154,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     form.getTopBox().addField(field);
     assertSame(form.getTopBox(), field.getParentField());
     assertSame(form, field.getForm());
+    assertFieldPropertyChangeListener(field);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -166,11 +172,13 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     form.getTopBox().addField(field);
     assertSame(form.getTopBox(), field.getParentField());
     assertSame(form, field.getForm());
+    assertFieldPropertyChangeListener(field);
 
     field = new AddRemoveStringField();
     form.getTopBox().addField(field);
     assertSame(form.getTopBox(), field.getParentField());
     assertSame(form, field.getForm());
+    assertFieldPropertyChangeListener(field);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -211,12 +219,73 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   public void testMoveFieldExisting() throws Exception {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
+    assertFieldPropertyChangeListener(field);
+
     form.getTopBox().moveFieldTo(field, form.getBottomBox());
     assertEquals(0, form.getTopBox().getFieldCount());
     assertSame(form.getBottomBox(), field.getParentField());
     assertSame(form, field.getForm());
+    assertGetFieldMethodsOnContainer(form.getTopBox(), field, TopBoxField.class);
+    assertFieldPropertyChangeListener(field);
+  }
 
-    assertGetFieldMethodsOnContainer(form, form.getTopBox(), field, TopBoxField.class);
+  @Test
+  public void testMoveFieldToChildComposite() throws Exception {
+    AddRemoveFieldsForm form = new AddRemoveFieldsForm();
+    BottomBoxField field = form.getBottomBoxField();
+    assertFieldPropertyChangeListener(field);
+    ChildBox childBox = form.getChildBox();
+    assertSame(childBox.getParentField(), field.getParentField());
+
+    form.getBottomBox().moveFieldTo(field, childBox);
+    assertEquals(1, form.getBottomBox().getFieldCount());
+    assertSame(childBox, field.getParentField());
+    assertSame(form, field.getForm());
+    assertGetFieldMethodsOnContainer(form.getBottomBox(), field, BottomBoxField.class);
+    assertFieldPropertyChangeListener(field);
+  }
+
+  @Test
+  public void testMoveFieldToSameComposite() throws Exception {
+    AddRemoveFieldsForm form = new AddRemoveFieldsForm();
+    TopBoxField field = form.getTopBoxField();
+    assertFieldPropertyChangeListener(field);
+
+    form.getTopBox().moveFieldTo(field, form.getTopBox());
+    assertEquals(1, form.getTopBox().getFieldCount());
+    assertSame(form.getTopBox(), field.getParentField());
+    assertSame(form, field.getForm());
+    assertGetFieldMethodsOnContainer(form.getTopBox(), field, TopBoxField.class);
+    assertFieldPropertyChangeListener(field);
+  }
+
+  /**
+   * Assert that field is in a composite and there is exactly one
+   * {@link AbstractCompositeField.P_FieldPropertyChangeListener} registered
+   */
+  protected void assertFieldPropertyChangeListener(AbstractFormField field) {
+    ArrayList<PropertyChangeListener> propertyChangeListeners = field.getPropertyChangeListeners();
+    int count = 0;
+    for (PropertyChangeListener listener : propertyChangeListeners) {
+      if (listener instanceof AbstractCompositeField.P_FieldPropertyChangeListener) {
+        ++count;
+        assertTrue(((AbstractCompositeField.P_FieldPropertyChangeListener) listener).isDirectChildOfComposite(field));
+      }
+    }
+    assertEquals(1, count);
+  }
+
+  /**
+   * Assert that there is no {@link AbstractCompositeField.P_FieldPropertyChangeListener} registered
+   */
+  protected void assertNoFieldPropertyChangeListener(AbstractFormField field) {
+    int count = 0;
+    for (PropertyChangeListener listener : field.getPropertyChangeListeners()) {
+      if (listener instanceof AbstractCompositeField.P_FieldPropertyChangeListener) {
+        ++count;
+      }
+    }
+    assertEquals(0, count);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -240,8 +309,10 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     form.getBottomBox().moveFieldTo(field, form.getMainBox());
 
     assertSame(field, form.getTopBoxField());
-    assertGetFieldMethodsOnContainer(form, form.getTopBox(), field, TopBoxField.class);
-    assertGetFieldMethodsOnContainer(form, form.getBottomBox(), field, TopBoxField.class);
+    assertSame(form.getMainBox(), field.getParentField());
+    assertGetFieldMethodsOnContainer(form.getTopBox(), field, TopBoxField.class);
+    assertGetFieldMethodsOnContainer(form.getBottomBox(), field, TopBoxField.class);
+    assertFieldPropertyChangeListener(field);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -263,10 +334,10 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     assertEquals(0, form.getTopBox().getFieldCount());
     assertSame(form.getBottomBox(), field.getParentField());
     assertSame(form, field.getForm());
-    assertGetFieldMethodsOnContainer(form, form.getTopBox(), field, TopBoxField.class);
+    assertGetFieldMethodsOnContainer(form.getTopBox(), field, TopBoxField.class);
   }
 
-  protected static void assertGetFieldMethodsOnContainer(IForm form, ICompositeField container, IFormField field, Class<? extends IFormField> fieldType) {
+  protected static void assertGetFieldMethodsOnContainer(ICompositeField container, IFormField field, Class<? extends IFormField> fieldType) {
     assertSame(field, container.getFieldByClass(fieldType));
     assertSame(field, container.getFieldById(field.getFieldId()));
     assertSame(field, container.getFieldById(field.getFieldId(), fieldType));
