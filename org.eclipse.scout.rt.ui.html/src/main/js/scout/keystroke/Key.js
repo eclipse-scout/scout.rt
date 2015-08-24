@@ -5,6 +5,8 @@ scout.Key = function(keyStroke, which) {
   this.ctrl = keyStroke.ctrl;
   this.alt = keyStroke.alt;
   this.shift = keyStroke.shift;
+
+  this.keyStrokeMode = keyStroke.keyStrokeMode;
 };
 
 scout.Key.prototype.render = function($drawingArea, event) {

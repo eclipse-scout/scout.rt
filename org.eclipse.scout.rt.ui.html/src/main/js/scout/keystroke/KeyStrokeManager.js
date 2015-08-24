@@ -61,6 +61,7 @@ scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeCon
 
   keyStrokeContext._handler.$target = keyStrokeContext.$getBindTarget();
   keyStrokeContext._handler.$target.keydown(keyStrokeContext._handler);
+  keyStrokeContext._handler.$target.keyup(keyStrokeContext._handler);
 };
 
 /**
@@ -75,6 +76,7 @@ scout.KeyStrokeManager.prototype.uninstallKeyStrokeContext = function(keyStrokeC
   }
 
   keyStrokeContext._handler.$target.off('keydown', keyStrokeContext._handler);
+  keyStrokeContext._handler.$target.off('up', keyStrokeContext._handler);
   keyStrokeContext._handler.$target = null;
   keyStrokeContext._handler = null;
 };
@@ -95,7 +97,7 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
       var keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
 
       keys.forEach(function(key) {
-        var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, event.target);
+        var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
 
         if (keyStrokeContext.accept(virtualKeyStrokeEvent) &&
           keyStroke.accept(virtualKeyStrokeEvent) && !this._isPreventedByDescendantContext(key, event.target, descendantContexts)) {
@@ -111,7 +113,7 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
 };
 
 scout.KeyStrokeManager.prototype._isPreventedByDescendantContext = function(key, target, descendantContexts) {
-  var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, event.target);
+  var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
 
   // Check whether any descendant keyStrokeContext prevents this keystroke from execution.
   return descendantContexts.some(function(descendantContext) {

@@ -8,6 +8,7 @@ scout.KeyStroke = function() {
   this.preventDefault = true;
   this.stopPropagation = false;
   this.stopImmediatePropagation = false;
+  this.keyStrokeMode = scout.keyStrokeMode.UP;
 
   // Hints to control rendering of the key(s).
   this.renderingHints = {
@@ -72,8 +73,8 @@ scout.KeyStroke.prototype.accept = function(event) {
 
   // Apply propagation flags to the event.
   this._applyPropagationFlags(event);
-
-  return true;
+  //only accept on correct event type -> keyup or keydown. But propagation flags should be set to prevent execution of upper keyStrokes.
+  return event.type === this.keyStrokeMode;
 };
 
 /**
@@ -175,4 +176,9 @@ scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
     $('.key-box', $drawingArea).remove();
     $('.key-box-additional', $drawingArea).remove();
   }
+};
+
+scout.keyStrokeMode = {
+    UP: 'keyup',
+    DOWN: 'keydown'
 };

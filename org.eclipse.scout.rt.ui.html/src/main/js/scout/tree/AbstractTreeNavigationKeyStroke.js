@@ -7,6 +7,8 @@ scout.AbstractTreeNavigationKeyStroke = function(tree, modifierBitMask) {
   this.ctrl = scout.keyStrokeModifier.isCtrl(modifierBitMask);
   this.shift = scout.keyStrokeModifier.isShift(modifierBitMask);
   this.alt = scout.keyStrokeModifier.isAlt(modifierBitMask);
+
+  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
 };
 scout.inherits(scout.AbstractTreeNavigationKeyStroke, scout.KeyStroke);
 

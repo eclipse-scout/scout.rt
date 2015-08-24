@@ -14,17 +14,14 @@ scout.RangeKeyStroke.prototype.registerRange = function(from, to) {
   });
 };
 
-scout.RangeKeyStroke.prototype.accept = function(event) {
-  return scout.RangeKeyStroke.parent.prototype.accept.call(this, event);
-};
-
 /**
  * @override KeyStroke.js
  */
 scout.RangeKeyStroke.prototype._accept = function(event) {
   if (event.ctrlKey !== this.ctrl ||
     event.altKey !== this.alt ||
-    event.shiftKey !== this.shift) {
+    event.shiftKey !== this.shift
+    ) {
     return false;
   }
 

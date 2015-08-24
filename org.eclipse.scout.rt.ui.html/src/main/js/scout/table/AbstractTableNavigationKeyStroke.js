@@ -3,6 +3,7 @@ scout.AbstractTableNavigationKeyStroke = function(table) {
   this.field = table;
   this.shift = table.multiSelect ? undefined : false; // multiselect tables have both, shift and not-shift functionality
   this.stopPropagation = true;
+  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
 };
 scout.inherits(scout.AbstractTableNavigationKeyStroke, scout.KeyStroke);
 

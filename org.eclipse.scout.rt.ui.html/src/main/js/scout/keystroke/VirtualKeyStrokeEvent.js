@@ -1,9 +1,10 @@
-scout.VirtualKeyStrokeEvent = function(which, ctrl, alt, shift, target) {
+scout.VirtualKeyStrokeEvent = function(which, ctrl, alt, shift, keyStrokeMode, target) {
   this.which = which;
   this.ctrlKey = ctrl;
   this.altKey = alt;
   this.shiftKey = shift;
   this.target = target;
+  this.type = keyStrokeMode;
 
   this._propagationStopped = false;
   this._immediatePropagationStopped = false;
