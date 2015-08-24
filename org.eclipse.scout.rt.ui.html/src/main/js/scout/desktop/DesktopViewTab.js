@@ -41,38 +41,36 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 
 scout.DesktopViewTab.prototype._render = function($parent) {
 // FIXME NBU: animation causes selenium tests to fail - commented out until these problems have been solved.
-//  var parentTab = this.session.desktop.viewTabsController.viewTab(this._view.parent);
-//  if (parentTab) {
-//    this.$container = parentTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
-//  } else {
-//    this.$container = $parent.prependDiv('desktop-view-tab').addClass('hidden');
-//  }
-//  this._mouseListener = this._onMouseDown.bind(this);
-//  this.$container.on('mousedown', this._mouseListener);
-//  var $wrapper = this.$container.wrapAll('<div class="animationWrapper">').parent().copyCss(this.$container, 'display border-right');
-//  var w = $wrapper.width();
-//  var removeContainer = function() {
-//    $(this).replaceWith($(this).contents());
-//  };
-//  $wrapper.css('width', 0)
-//    .animateAVCSD('width', w, removeContainer, false, 1500);
-  this.$container = $parent.appendDiv('desktop-view-tab')
-    .on('mousedown', this._onMouseDown.bind(this));
+  var parentTab = this.session.desktop.viewTabsController.viewTab(this._view.parent);
+  if (parentTab) {
+    this.$container = parentTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
+  } else {
+    this.$container = $parent.prependDiv('desktop-view-tab').addClass('hidden');
+  }
+  this._mouseListener = this._onMouseDown.bind(this);
+  this.$container.on('mousedown', this._mouseListener);
+  var $wrapper = this.$container.wrapAll('<div class="animationWrapper">').parent().copyCss(this.$container, 'display border-right');
+  var w = $wrapper.width();
+  var removeContainer = function() {
+    $(this).replaceWith($(this).contents());
+  };
+  $wrapper.css('width', 0)
+    .animateAVCSD('width', w, removeContainer, false, 750);
   this._$title = this.$container.appendDiv('title');
   this._$subTitle = this.$container.appendDiv('sub-title');
   this._titlesUpdated();
   this._cssClassUpdated(this._view.cssClass, null);
 };
 
-//scout.DesktopViewTab.prototype._remove = function() {
-//  this.$container.off('mousedown', this._mouseListener);
-//  var removeContainer = function() {
-//    this.$container.remove();
-//    this.$container = null;
-//  }.bind(this);
-//  this.$container
-//  .animateAVCSD('width', 0, removeContainer, false, 200);
-//};
+scout.DesktopViewTab.prototype._remove = function() {
+  this.$container.off('mousedown', this._mouseListener);
+  var removeContainer = function() {
+    this.$container.remove();
+    this.$container = null;
+  }.bind(this);
+  this.$container
+  .animateAVCSD('width', 0, removeContainer, false, 200);
+};
 
 scout.DesktopViewTab.prototype._renderView = function($parent) {
   if (this._view.rendered) {
