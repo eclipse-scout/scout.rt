@@ -40,7 +40,6 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 };
 
 scout.DesktopViewTab.prototype._render = function($parent) {
-  // FIXME NBU: animation causes selenium tests to fail - commented out until these problems have been solved.
   var parentTab = this.session.desktop.viewTabsController.viewTab(this._view.parent);
   if (parentTab) {
     this.$container = parentTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
