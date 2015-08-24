@@ -47,8 +47,8 @@ public class ClientNotificationRegistry {
   private final Map<String /*notificationNodeId*/, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
 
   /**
-   * If no message is consumed for a certain amount of time, queues are removed to avoid overflows. This may happen, if
-   * a node does not properly unregister (e.g. due to a crash).
+   * If no message is consumed for a certain amount of time [ms], queues are removed to avoid overflows. This may
+   * happen, if a node does not properly unregister (e.g. due to a crash).
    */
   private final int m_queueExpireTime;
 
