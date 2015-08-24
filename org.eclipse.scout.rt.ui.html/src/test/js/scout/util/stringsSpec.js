@@ -242,4 +242,66 @@ describe("scout.strings", function() {
 
   });
 
+  describe("plainText", function() {
+
+    it("converts html to plain text", function() {
+      var htmlText = '<b>hello</b>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello');
+
+      htmlText = '<b>hello</b> world! <span class="xyz">Some more html...</span>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello world! Some more html...');
+    });
+
+    it("considers upper and lower case tags", function() {
+      var htmlText = '<B>hello</B>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello');
+
+      htmlText = '<b>hello</b> world! <SPAN class="xyz">Some more html...</SPAN>';
+      expect(scout.strings.plainText(htmlText)).toBe('hello world! Some more html...');
+    });
+
+    it("converts br, p, div into new lines", function() {
+      var htmlText = '<b>1. line</b><br><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+
+      htmlText = '<b>1. line</b><br/><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+
+      htmlText = '<p><b>1. line</b></p><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+
+      htmlText = '<div><b>1. line</b></div><i>2. line</i>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line');
+    });
+
+    it("converts li, tr into new lines", function() {
+      var htmlText = '<ul><li><b>1. line</b></li><li><i>2. line</i></li></ul>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line\n');
+
+      htmlText = '<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. line\n2. line\n');
+    });
+
+    it("converts td into whitespaces", function() {
+      var htmlText = '<table><tr><td>1. cell</td><td>2. cell</td></tr></table>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. cell 2. cell\n');
+
+      htmlText =
+        '<table>' +
+        '  <tr><td>1. cell</td><td>2. cell</td></tr></table>' +
+        '  <tr><td>1. cell(r2)</td><td>2. cell(r2)</td></tr>' +
+        '</table>';
+      expect(scout.strings.plainText(htmlText)).toBe('1. cell 2. cell\n1. cell(r2) 2. cell(r2)\n');
+    });
+
+    it("converts &nbsp;, &amp;", function() {
+      var htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first word next word');
+
+      htmlText = '<b>first&amp;word</b>&amp;next word';
+      expect(scout.strings.plainText(htmlText)).toBe('first&word&next word');
+    });
+
+  });
+
 });

@@ -858,13 +858,13 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     if (filters.length) {
       filterFunc = function($row) {
         var row = $row.data('row');
-        var key = xAxis.column.getValueForGrouping(row);
+        var key = xAxis.column.cellValueForGrouping(row);
         var nX = xAxis.norm(key);
 
         if (oneDim) {
           return (filters.indexOf(nX) > -1);
         } else {
-          key = yAxis.column.getValueForGrouping(row);
+          key = yAxis.column.cellValueForGrouping(row);
           var nY = yAxis.norm(key);
           return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
         }

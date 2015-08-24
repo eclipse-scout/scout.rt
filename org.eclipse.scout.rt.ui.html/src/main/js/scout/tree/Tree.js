@@ -1397,7 +1397,8 @@ scout.Tree.prototype.filter = function() {
   this._visitNodes(this.nodes, function(node) {
     var $node = node.$node;
     if (!$node) {
-      //FIXME CGU zusammengeklappte nodes auch durchgehen? eigentlich ja...
+      // filter may only be called for rendered nodes because the filter may want to use the actual html content
+      // if a node is collapsed, it is not rendered -> filter is called when node gets expanded
       return;
     }
     that._applyFiltersForNode(node);

@@ -57,8 +57,7 @@ scout.Table.prototype._init = function(model, session) {
 
 scout.Table.prototype._initRow = function(row) {
   scout.defaultValues.applyTo(row, 'TableRow');
-  this._unwrapCells(row.cells);
-  scout.defaultValues.applyTo(row.cells, 'Cell');
+  this._initCells(row);
   this.rowsMap[row.id] = row;
   this.trigger('rowInitialized', {row: row});
 };
@@ -342,25 +341,14 @@ scout.Table.prototype._renderTableStatus = function() {
   this.trigger(scout.Table.GUI_EVENT_STATUS_CHANGED);
 };
 
-/**
- * Converts each element of the given cell array that is of type string to an object with
- * a property 'text' with the original value.
- *
- * Example:
- * 'My Company' --> { text: 'MyCompany'; }
- *
- * @see JsonCell.java
- */
-scout.Table.prototype._unwrapCells = function(cells) {
-  for (var i = 0; i < cells.length; i++) {
-    var cell = cells[i];
-    if (typeof cell === 'string') {
-      cell = {
-        text: cell
-      };
-      cells[i] = cell;
+scout.Table.prototype._initCells = function(row) {
+  this.columns.forEach(function(column) {
+    if (!column.guiOnly) {
+      var cell = row.cells[column.index];
+      cell = column.initCell(cell);
+      row.cells[column.index] = cell;
     }
-  }
+  });
 };
 
 scout.Table.prototype._isFooterVisible = function() {
@@ -1061,11 +1049,7 @@ scout.Table.prototype.cellByCellIndex = function(cellIndex, row) {
 
 scout.Table.prototype.cellValue = function(column, row) {
   var cell = this.cell(column, row);
-
-  if (cell === null) { //cell may be a number so don't use !cell
-    return null;
-  }
-  if (typeof cell !== 'object') {
+  if (!cell) {
     return cell;
   }
   if (cell.value !== undefined) {
@@ -1076,12 +1060,8 @@ scout.Table.prototype.cellValue = function(column, row) {
 
 scout.Table.prototype.cellText = function(column, row) {
   var cell = this.cell(column, row);
-
   if (!cell) {
     return '';
-  }
-  if (typeof cell !== 'object') {
-    return cell;
   }
   return cell.text || '';
 };

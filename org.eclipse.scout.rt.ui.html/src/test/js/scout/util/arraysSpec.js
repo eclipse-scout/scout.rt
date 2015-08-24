@@ -12,6 +12,25 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("ensure", function() {
+
+    it("creates an array if the param is not an array", function() {
+      expect(scout.arrays.ensure()).toEqual([]);
+      expect(scout.arrays.ensure(undefined)).toEqual([]);
+      expect(scout.arrays.ensure(null)).toEqual([]);
+      expect(scout.arrays.ensure('')).toEqual(['']);
+      expect(scout.arrays.ensure(true)).toEqual([true]);
+      expect(scout.arrays.ensure(false)).toEqual([false]);
+    });
+
+    it("returns the param if the param already is an array", function() {
+      var arr = [];
+      expect(scout.arrays.ensure(arr)).toBe(arr);
+      arr = [0, 1];
+      expect(scout.arrays.ensure(arr)).toBe(arr);
+    });
+  });
+
   describe("remove", function() {
 
     it("removes elements", function() {

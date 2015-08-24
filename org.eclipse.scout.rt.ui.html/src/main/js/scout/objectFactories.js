@@ -77,6 +77,11 @@ scout.defaultObjectFactories = [{
     return new scout.BeanColumn();
   }
 },  {
+  objectType: 'DateColumn',
+  create: function() {
+    return new scout.DateColumn();
+  }
+}, {
   objectType: 'IconColumn',
   create: function() {
     return new scout.IconColumn();

@@ -26,10 +26,15 @@ scout.BeanColumn.prototype._renderValue = function($cell, value) {
   // to be implemented by the subclass
 };
 
-scout.BeanColumn.prototype.getValueForGrouping = function(row) {
+/**
+ * Default approach reads the html and uses _prepareTextForGrouping to generate the value. Just using text() does not work because new lines get omitted.
+ * If this approach does not work for a specific bean column, just override this method.
+ */
+scout.BeanColumn.prototype.cellValueForGrouping = function(row) {
   if (!row.$row) {
     throw new Error('row not rendered yet');
   }
-  //TODO CGU this does not work well when multiple lines are displayed
-  return this.table.$cell(this, row.$row).text();
+
+  var text = this.table.$cell(this, row.$row).html();
+  return this._prepareTextForGrouping(text, true);
 };

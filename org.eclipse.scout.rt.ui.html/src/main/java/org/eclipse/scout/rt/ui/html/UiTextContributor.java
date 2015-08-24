@@ -13,7 +13,6 @@ public class UiTextContributor implements IUiTextContributor {
         "ResetTableColumns",
         "ColumnSorting",
         "Column",
-        "Cancel",
         "Ok",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
@@ -23,6 +22,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.CalendarCalendarWeek",
         "ui.CalendarMonth",
         "ui.CalendarYear",
+        "ui.BooleanColumnGroupingTrue",
+        "ui.BooleanColumnGroupingFalse",
         "ui.InvalidDateFormat",
         "ui.EmptyCell",
         "ui.FilterBy_",

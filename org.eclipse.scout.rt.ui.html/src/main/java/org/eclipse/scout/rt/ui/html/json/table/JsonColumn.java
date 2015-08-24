@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
@@ -80,12 +78,6 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
   }
 
   protected String computeColumnType(IColumn column) {
-    if (column instanceof INumberColumn) {
-      return "number";
-    }
-    if (column instanceof IDateColumn) {
-      return "date";
-    }
     return "text";
   }
 

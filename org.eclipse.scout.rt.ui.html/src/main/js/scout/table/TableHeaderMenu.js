@@ -153,10 +153,10 @@ scout.TableHeaderMenu.prototype._render = function() {
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
   filter.calculateCube();
-  
+
   var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
   filter.availableValues.forEach(function(availableValue, index, arr) {
-    var $filterItem = $headerFilterContainer.appendDiv('header-filter', availableValue.text)
+    var $filterItem = $headerFilterContainer.appendDiv('header-filter').text(availableValue.text)
       .data('key', availableValue.key)
       .on('click', onFilterClick);
 

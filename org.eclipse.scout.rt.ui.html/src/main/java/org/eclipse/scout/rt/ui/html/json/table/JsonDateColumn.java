@@ -18,6 +18,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -32,6 +33,8 @@ public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
+    json.put("hasDate", getColumn().isHasDate());
+    json.put("hasTime", getColumn().isHasTime());
     // FIXME CGU: update IDateColumnInterface
     // getDateFormat uses NlsLocale. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
     // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
@@ -59,5 +62,15 @@ public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<
       return new JsonDate(date).asJsonString(false, getColumn().isHasDate(), getColumn().isHasTime());
     }
     return null;
+  }
+
+  @Override
+  protected String computeColumnType(IColumn column) {
+    return "date";
+  }
+
+  @Override
+  public String getObjectType() {
+    return "DateColumn";
   }
 }

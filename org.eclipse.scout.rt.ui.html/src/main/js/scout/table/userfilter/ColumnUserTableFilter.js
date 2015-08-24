@@ -6,7 +6,17 @@ scout.ColumnUserTableFilter = function() {
 scout.inherits(scout.ColumnUserTableFilter, scout.UserTableFilter);
 
 scout.ColumnUserTableFilter.prototype.calculateCube = function() {
-  var group = (this.column.type === 'date') ? scout.ChartTableControlMatrix.DateGroup.YEAR : -1;
+  var group = -1;
+  if (this.column.type === 'date') {
+    if (this.column.hasDate) {
+      // Default grouping for date columns is year
+      group = scout.ChartTableControlMatrix.DateGroup.YEAR;
+    }
+    else {
+      // No grouping for time columns
+      group = scout.ChartTableControlMatrix.DateGroup.NONE;
+    }
+  }
   this.matrix = new scout.ChartTableControlMatrix(this.table, this.session),
   this.xAxis = this.matrix.addAxis(this.column, group);
   this.matrix.calculateCube();
@@ -52,7 +62,7 @@ scout.ColumnUserTableFilter.prototype.accept = function($row) {
     this.calculateCube();
   }
   var row = $row.data('row'),
-    key = this.column.getValueForGrouping(row),
+    key = this.column.cellValueForGrouping(row),
     normKey = this.xAxis.norm(key);
 
   if (this.column.type === 'text') {

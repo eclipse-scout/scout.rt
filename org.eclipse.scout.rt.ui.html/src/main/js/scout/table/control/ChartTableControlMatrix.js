@@ -95,7 +95,8 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
 scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale,
-    emptyCell = this.session.text('ui.EmptyCell');
+    getText = this.session.text.bind(this.session),
+    emptyCell = getText('ui.EmptyCell');
 
   // collect all axis
   this._allAxis.push(keyAxis);
@@ -123,15 +124,20 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         if (f === null || f === '') {
           return null;
         } else {
-          var date = scout.dates.parseJsonDate(f);
-          return date.getTime();
+          return f.getTime();
         }
       };
       keyAxis.format = function(n) {
         if (n === null) {
           return null;
         } else {
-          return locale.dateFormat.format(new Date(n));
+          var format = axis.format;
+          if (format) {
+            format = new scout.DateFormat(locale, format);
+          } else {
+            format = locale.dateFormat;
+          }
+          return format.format(new Date(n));
         }
       };
     } else if (axisGroup === scout.ChartTableControlMatrix.DateGroup.YEAR) {
@@ -139,8 +145,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         if (f === null || f === '') {
           return null;
         } else {
-          var date = scout.dates.parseJsonDate(f);
-          return date.getFullYear();
+          return f.getFullYear();
         }
       };
       keyAxis.format = function(n) {
@@ -155,8 +160,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         if (f === null || f === '') {
           return null;
         } else {
-          var date = scout.dates.parseJsonDate(f);
-          return date.getMonth();
+          return f.getMonth();
         }
       };
       keyAxis.format = function(n) {
@@ -171,8 +175,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         if (f === null || f === '') {
           return null;
         } else {
-          var date = scout.dates.parseJsonDate(f);
-          var b = (date.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+          var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
           return b;
         }
       };
@@ -196,7 +199,29 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
       if (isNaN(n) || n === null) {
         return emptyCell;
       } else {
-        return locale.decimalFormat.format(n);
+        var format = axis.format;
+        if (format) {
+          format = new scout.DecimalFormat(locale, format);
+        }
+        else {
+          format = locale.decimalFormat;
+        }
+        return format.format(n);
+      }
+    };
+  } else if (axis.type === 'boolean') {
+    keyAxis.norm = function(f) {
+      if (!f) {
+        return 0;
+      } else {
+        return 1;
+      }
+    };
+    keyAxis.format = function(n) {
+      if (n === 0) {
+        return getText('ui.BooleanColumnGroupingFalse');
+      } else {
+        return getText('ui.BooleanColumnGroupingTrue');
       }
     };
   } else {
@@ -240,7 +265,7 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
       var column = this._allAxis[k].column;
-      key = column.getValueForGrouping(row);
+      key = column.cellValueForGrouping(row);
       normKey = this._allAxis[k].norm(key);
 
       if (normKey !== undefined) {

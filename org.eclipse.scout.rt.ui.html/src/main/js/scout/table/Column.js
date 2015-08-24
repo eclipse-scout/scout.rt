@@ -15,6 +15,25 @@ scout.Column.prototype.init = function(model, session) {
   }
 };
 
+/**
+ * Converts the cell if it is of type string to an object with
+ * a property 'text' with the original value.
+ *
+ * Example:
+ * 'My Company' --> { text: 'MyCompany'; }
+ *
+ * @see JsonCell.java
+ */
+scout.Column.prototype.initCell = function(cell) {
+  if (typeof cell === 'string') {
+    cell = {
+      text: cell
+    };
+  }
+  scout.defaultValues.applyTo(cell, 'Cell');
+  return cell;
+};
+
 scout.Column.prototype.buildCell = function(row) {
   var cell = this.table.cell(this, row);
   var text = this.table.cellText(this, row);
@@ -126,13 +145,31 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
   return popup;
 };
 
-scout.Column.prototype.getValueForGrouping = function(row) {
+/**
+ * Returns the cell value to be used for grouping and filtering (chart, column filter).
+ */
+scout.Column.prototype.cellValueForGrouping = function(row) {
   var cell = this.table.cell(this, row);
-  if (cell.value !== undefined) {//htmlEnabled) {
+  if (cell.value !== undefined) {
     return cell.value;
   }
-  if (!row.$row) {
-    throw new Error('row not rendered yet');
+  if (!cell.text) {
+    return null;
   }
-  return this.table.$cell(this, row.$row).text();
+  return this._prepareTextForGrouping(cell.text, cell.htmlEnabled);
+};
+
+/**
+ * Removes html tags, converts to single line, removes leading and trailing whitespaces.
+ */
+scout.Column.prototype._prepareTextForGrouping = function(text, htmlEnabled) {
+  if (htmlEnabled) {
+    // remove html tags
+    text = scout.strings.plainText(text);
+  }
+
+  // convert to single line
+  text = text.replace('\n', ' ');
+  text = text.trim();
+  return text;
 };

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.json.JSONObject;
 
@@ -29,5 +30,10 @@ public class JsonNumberColumn<NUMBER_COLUMN extends INumberColumn<?>> extends Js
   @Override
   public Object cellValueToJson(Object value) {
     return value;
+  }
+
+  @Override
+  protected String computeColumnType(IColumn column) {
+    return "number";
   }
 }

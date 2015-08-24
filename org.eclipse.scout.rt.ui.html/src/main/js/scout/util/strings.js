@@ -111,6 +111,38 @@ scout.strings = {
   },
 
   /**
+   * Returns the plain text of the given html string using simple tag replacement.<p>
+   * Tries to preserve the new lines. Since it does not consider the style, it won't be right in any cases.
+   * A div for example always generates a new line, even if display style is not set to block.
+   */
+  plainText: function(text) {
+    if (text === undefined || text === null) {
+      return text;
+    }
+    // Regexp is used to replace the tags.
+    // It is not possible to use jquery's text() function or to create a html element and use textContent, because the new lines get omitted.
+    // Node.innerText would preserve the new lines but it is not supported by firefox
+
+    // Preserve new lines
+    text = text.replace(/<br>|<br\/>|<\/p>|<p\/>|<\/div>|<\/li>|<\/tr>/gi, '\n');
+
+    // Separate td with ' '
+    text = text.replace(/<\/td>/gi, ' ');
+
+    // Replace remaining tags
+    text = text.replace(/<[^>]+>/gi, '');
+
+    // Remove spaces at the beginning and end of each line
+    text = text.replace(/^[ ]+/gm, '');
+    text = text.replace(/[ ]+$/gm, '');
+
+    // Replace character entities
+    text = text.replace(/&nbsp;/gi, " ");
+    text = text.replace(/&amp;/gi, "&");
+    return text;
+  },
+
+  /**
    * Joins a list of strings to a single string using the given separator. Elements that are
    * not defined or have zero length are ignored. The default return value is the empty string.
    *

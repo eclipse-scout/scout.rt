@@ -103,6 +103,10 @@
       "multilineText": false,
       "updateDisplayTextOnModify": false
     },
+    "DateField": {
+      "hasDate": true,
+      "hasTime": false
+    },
     "Table": {
       "autoResizeColumns": false,
       "checkable": false,
@@ -188,6 +192,10 @@
       "type": "text",
       "width": 60
     },
+    "DateColumn": {
+      "hasDate": true,
+      "hasTime": false
+    },
     "TreeNode": {
       "checked": false,
       "enabled": true,
@@ -257,6 +265,11 @@
       "Outline": {
         "SearchOutline": null
       }
+    },
+    "Column": {
+      "BeanColumn": null,
+      "BooleanColumn": null,
+      "DateColumn": null
     }
   }
 }
