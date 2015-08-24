@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
-/**
- * Service to consume notifications. Accessible from the client.
- */
 public class ClientNotificationService implements IClientNotificationService {
   private final int m_blockingTimeout;
   private final int m_maxNotifications;

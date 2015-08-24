@@ -22,10 +22,6 @@ import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
  * This is the base class for translations access in scout applications.<br>
  * It provides prioritized access to all text services available to the scope.
  *
- * @see IClientSession#getNlsTexts()
- * @see IServerSession#getNlsTexts()
- * @see ClientJob
- * @see ServerJob
  * @see ITextProviderService
  */
 public class ScoutTexts {

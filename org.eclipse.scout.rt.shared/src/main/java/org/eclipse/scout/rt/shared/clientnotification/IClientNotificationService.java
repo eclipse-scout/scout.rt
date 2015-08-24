@@ -15,14 +15,44 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
+/**
+ * Service to consume notifications. Accessible from the client.
+ */
 @ApplicationScoped
 @TunnelToServer
 public interface IClientNotificationService {
 
-  void registerSession(String notificationNodeId, String sessionId, String userId);
+  /**
+   * Register a session with the corresponding user and client node
+   *
+   * @param nodeId
+   *          unique id of the client node
+   * @param sessionId
+   *          unique id of the client session
+   * @param userId
+   *          unique id of the user
+   */
+  void registerSession(String nodeId, String sessionId, String userId);
 
-  void unregisterSession(String notificationNodeId, String sessionId, String userId);
+  /**
+   * Unregister a session with the corresponding user and client node
+   *
+   * @param nodeId
+   *          unique id of the client node
+   * @param sessionId
+   *          unique id of the client session
+   * @param userId
+   *          unique id of the user
+   */
+  void unregisterSession(String nodeId, String sessionId, String userId);
 
-  List<ClientNotificationMessage> getNotifications(String notificationNodeId);
+  /**
+   * Receive new notifications relevant for the given node
+   *
+   * @param nodeId
+   *          unique id of the client node
+   * @return list of new notification messages never <code>null</code>
+   */
+  List<ClientNotificationMessage> getNotifications(String nodeId);
 
 }

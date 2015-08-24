@@ -38,8 +38,8 @@ public interface ISession {
   String getUserId();
 
   /**
-   * @returns the shared variable map. Shared variables are automatically updated on the client by client notifications
-   *          when changed on the server.
+   * @return the shared variable map. Shared variables are automatically updated on the client by client notifications
+   *         when changed on the server.
    */
   Map<String, Object> getSharedVariableMap();
 

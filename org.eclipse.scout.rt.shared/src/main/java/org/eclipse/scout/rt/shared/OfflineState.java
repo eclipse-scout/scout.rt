@@ -34,7 +34,7 @@ public final class OfflineState {
   }
 
   /**
-   * Sets the default state. Thread-specific values {@link #setOfflineInCurrentThread()} are not changed by this method.
+   * Sets the default state. Thread-specific values {@link #CURRENT} are not changed by this method.
    */
   public static void setOfflineDefault(boolean b) {
     defaultValue = b;
