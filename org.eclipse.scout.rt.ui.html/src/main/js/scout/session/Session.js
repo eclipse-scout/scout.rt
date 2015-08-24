@@ -386,12 +386,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxDone(data) {
     try {
-      if (data.error) {
-        this._processErrorJsonResponse(data.error);
-      } else {
-        this._processSuccessResponse(data);
-        success = true;
-      }
+      success = this.processJsonResponse(data);
     } catch (err) {
       jsError = jsError || err;
     }
@@ -490,6 +485,17 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     this._backgroundJobPollingSupport.setFailed();
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
+};
+
+scout.Session.prototype.processJsonResponse = function(data) {
+  var success = false;
+  if (data.error) {
+    this._processErrorJsonResponse(data.error);
+  } else {
+    this._processSuccessResponse(data);
+    success = true;
+  }
+  return success;
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {

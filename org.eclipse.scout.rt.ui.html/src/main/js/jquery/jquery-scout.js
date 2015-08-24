@@ -80,6 +80,18 @@
   };
 
   /**
+   * If the event target is disabled (according to $.fn.isEnabled()), the event is suppressed
+   * and the method returns true. Otherwise, false is returned.
+   */
+  $.suppressEventIfDisabled = function(event) {
+    if (!$(event.target).isEnabled()) {
+      $.suppressEvent(event);
+      return true;
+    }
+    return false;
+  };
+
+  /**
    * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
    * (in milliseconds), but if the same function is called a second time within the waiting time,
    * the timer is reset. The default value for 'delay' is 250 ms.
@@ -239,14 +251,6 @@
     return this;
   };
 
-  $.fn.setTabbable = function(tabbable) {
-    var tabIndex = 0;
-    if (!tabbable) {
-      tabIndex = null;
-    }
-    this.attr('tabIndex', tabIndex);
-  };
-
   $.fn.isEnabled = function() {
     return !this.hasClass('disabled');
   };
@@ -265,6 +269,14 @@
 
   $.fn.isDisplayNone = function() {
     return this.css('display') === 'none';
+  };
+
+  $.fn.setTabbable = function(tabbable) {
+    var tabIndex = 0;
+    if (!tabbable) {
+      tabIndex = null;
+    }
+    this.attr('tabIndex', tabIndex);
   };
 
   $.fn.icon = function(iconId) {

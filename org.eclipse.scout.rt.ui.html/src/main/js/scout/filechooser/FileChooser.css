@@ -11,7 +11,6 @@
     border: 0 solid @palette-gray-4;
     border-left-width: 1px;
     border-right-width: 1px;
-    border-bottom-width: 1px;
     background-color: @control-background-color;
     padding: 10px 20px;
 
@@ -84,5 +83,15 @@
 
   &.modality-highlight {
     #scout.animation-shake();
+  }
+}
+
+.legacy-upload-form {
+
+  & > .legacy-upload-file-input {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    height: @logical-grid-height;
   }
 }

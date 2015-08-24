@@ -40,14 +40,15 @@ scout.FileChooser.prototype._render = function($parent) {
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
 
-  this.$container.on('dragenter', this._onDragEnterOrOver.bind(this))
-    .on('dragover', this._onDragEnterOrOver.bind(this))
-    .on('drop', this._onDrop.bind(this));
-
   this.$container.appendDiv('closable')
     .on('click', function() {
       this._doCancel();
     }.bind(this));
+
+  this.$content = this.$container.appendDiv('file-chooser-content');
+  this.$title = $.makeDiv('file-chooser-title')
+    .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'))
+    .appendTo(this.$content);
 
   this.$fileInputField = $('<input>')
     .attr('type', 'file')
@@ -57,41 +58,52 @@ scout.FileChooser.prototype._render = function($parent) {
 
   if (scout.device.supportsFile()) {
     this.$fileInputField.appendTo(this.$container);
-  }
 
-  this.$content = this.$container.appendDiv('file-chooser-content');
-  this.$title = $.makeDiv('file-chooser-title')
-    .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'))
-    .appendTo(this.$content);
+    // Install DnD support
+    this.$container.on('dragenter', this._onDragEnterOrOver.bind(this))
+      .on('dragover', this._onDragEnterOrOver.bind(this))
+      .on('drop', this._onDrop.bind(this));
 
-  // explanation for file chooser
-  this.$content.appendDiv('file-chooser-label')
-    .text(this.session.text('ui.FileChooserHint'));
+    // explanation for file chooser
+    this.$content.appendDiv('file-chooser-label')
+      .text(this.session.text('ui.FileChooserHint'));
 
-  if (scout.device.supportsFile()) {
+    // List of files
     this.$files = $.makeDiv('file-chooser-files')
       .appendTo(this.$content);
     scout.scrollbars.install(this.$files, this.session);
+
   } else {
     // legacy iframe code
     this.$legacyFormTarget = $('<iframe>')
       .attr('name', 'legacyFileUpload' + this.id)
       .on('load', function() {
-        var text = this.$legacyFormTarget.contents().text();
-        if (scout.strings.hasText(text)) {
-          var json = $.parseJSON(text);
-          this.session.onAjaxDone({}, json);
-          this.session.onAjaxAlways({}, json);
+        // Manually handle JSON response from iframe
+        try {
+          // "onAjaxDone"
+          var text = this.$legacyFormTarget.contents().text();
+          if (scout.strings.hasText(text)) {
+            // Manually handle JSON response
+            var json = $.parseJSON(text);
+            this.session.processJsonResponse(json);
+          }
+        }
+        finally {
+          // "onAjaxAlways"
+          this.session.setBusy(false);
+          this.session.layoutValidator.validate();
         }
       }.bind(this))
       .appendTo(this.$container);
     this.$fileInputField
-      .attr('name', 'file');
+      .attr('name', 'file')
+      .addClass('legacy-upload-file-input');
     this.$legacyForm = $('<form>')
       .attr('action', 'upload/' + this.session.uiSessionId + '/' + this.id)
       .attr('enctype', 'multipart/form-data')
       .attr('method', 'post')
       .attr('target', 'legacyFileUpload' + this.id)
+      .addClass('legacy-upload-form')
       .append(this.$fileInputField)
       .appendTo(this.$content);
     $('<input>')
@@ -100,6 +112,7 @@ scout.FileChooser.prototype._render = function($parent) {
       .appendTo(this.$legacyForm);
   }
 
+  // Buttons
   this.$buttons = $.makeDiv('file-chooser-buttons')
     .appendTo(this.$container);
   if (scout.device.supportsFile()) {
@@ -111,13 +124,13 @@ scout.FileChooser.prototype._render = function($parent) {
       .on('click', this._onAddFileButtonClicked.bind(this))
       .appendTo(this.$buttons);
   }
-  this.$okButton = $('<div>')
+  this.$uploadButton = $('<div>')
     .attr('tabindex', 0)
     .addClass('button')
     .unfocusable()
-    .attr('disabled', true)
+    .setEnabled(false)
     .text(this.session.text('ui.Upload'))
-    .on('click', this._onOkButtonClicked.bind(this))
+    .on('click', this._onUploadButtonClicked.bind(this))
     .appendTo(this.$buttons);
   this.$cancelButton = $('<div>')
     .attr('tabindex', 0)
@@ -159,7 +172,7 @@ scout.FileChooser.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.FileChooser.prototype._doOk = function() {
+scout.FileChooser.prototype._doUpload = function() {
   if (scout.device.supportsFile()) {
     if (this._files.length === 0) {
       this._doCancel();
@@ -168,6 +181,7 @@ scout.FileChooser.prototype._doOk = function() {
     this.session.uploadFiles(this, this._files, undefined, this.maximumUploadSize);
   } else if (this.$fileInputField[0].value) {
     // legacy iframe code
+    this.session.setBusy(true);
     this.$legacyForm[0].submit();
   }
 };
@@ -181,23 +195,33 @@ scout.FileChooser.prototype._doAddFile = function() {
   this.$fileInputField.click();
 };
 
-scout.FileChooser.prototype._onOkButtonClicked = function(event) {
-  this._doOk();
+scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
+  if ($.suppressEventIfDisabled(event)) {
+    return;
+  }
+  this._doUpload();
 };
 
 scout.FileChooser.prototype._onCancelButtonClicked = function(event) {
+  if ($.suppressEventIfDisabled(event)) {
+    return;
+  }
   this._doCancel();
 };
 
 scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
+  if ($.suppressEventIfDisabled(event)) {
+    return;
+  }
   this._doAddFile();
 };
 
 scout.FileChooser.prototype._onFileChange = function(event) {
   if (scout.device.supportsFile()) {
     this.addFiles(this.$fileInputField[0].files);
+  } else {
+    this.$uploadButton.setEnabled(this.$fileInputField[0].value);
   }
-  this.$okButton.attr('disabled', false);
 };
 
 /**
@@ -219,8 +243,9 @@ scout.FileChooser.prototype.addFiles = function(files) {
       .addClass('menu-item')
       .text(this.session.text('Remove'))
       .one('click', this.removeFile.bind(this, file, this.$files.children().last()));
-    scout.scrollbars.update(this.$files);
   }
+  this.$uploadButton.setEnabled(this._files.length > 0);
+  scout.scrollbars.update(this.$files);
 };
 
 scout.FileChooser.prototype.removeFile = function(file, $file) {
@@ -231,7 +256,7 @@ scout.FileChooser.prototype.removeFile = function(file, $file) {
   if ($file) {
     $file.remove();
   }
-  this.$okButton.attr('disabled', this._files.length <= 0);
+  this.$uploadButton.setEnabled(this._files.length > 0);
   scout.scrollbars.update(this.$files);
 };
 
@@ -251,9 +276,7 @@ scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
 
 scout.FileChooser.prototype._onDrop = function(event) {
   if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    event.stopPropagation();
-    event.preventDefault();
-
+    $.suppressEvent(event);
     this.addFiles(event.originalEvent.dataTransfer.files);
   }
 };
