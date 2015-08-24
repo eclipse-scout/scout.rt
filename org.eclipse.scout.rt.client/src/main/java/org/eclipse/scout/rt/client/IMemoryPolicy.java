@@ -57,18 +57,18 @@ public interface IMemoryPolicy {
   void pageSearchFormStarted(IPageWithTable<?> page) throws ProcessingException;
 
   /**
-   * Whenever a new page is selected this methode is called to give the possibility to release unused pages.
+   * Whenever a new page is selected this method is called to give the possibility to release unused pages.
    */
   void afterOutlineSelectionChanged(IDesktop desktop) throws ProcessingException;
 
   /**
-   * Before data is fetched and loaded this methode is called to give the possibility to previously manipulate the
+   * Before data is fetched and loaded this method is called to give the possibility to previously manipulate the
    * table.
    */
   void beforeTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
 
   /**
-   * After data is fetched and loaded this methode is called to give the possibility to manipulate the table.
+   * After data is fetched and loaded this method is called to give the possibility to manipulate the table.
    */
   void afterTablePageLoadData(IPageWithTable<?> page) throws ProcessingException;
 

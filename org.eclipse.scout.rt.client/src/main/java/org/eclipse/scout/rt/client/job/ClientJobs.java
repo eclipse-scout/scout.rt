@@ -28,9 +28,9 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a
  * <code>ClientRunContext</code>. Such jobs are called client jobs. This class is for convenience purpose to facilitate
  * the creation and scheduling of client jobs.
- * <p/>
+ * <p>
  * <strong>By definition, a <code>ClientJob</code> requires a <code>ClientSession</code>.</strong>
- * <p/>
+ * </p>
  * The following code snippet illustrates what happens behind the scene:
  *
  * <pre>
@@ -39,11 +39,11 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(session).withLocale(Locale.US);
  *   </i>
  *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
- * 
+ *
  *       &#064;Override
  *       public void run() throws Exception {
  *         clientRunContext.run(new IRunnable() {
- * 
+ *
  *           &#064;Override
  *           public void run() throws Exception {
  *             // do some work
@@ -66,17 +66,19 @@ public final class ClientJobs {
    * Runs the given {@link IRunnable} asynchronously on behalf of a worker thread at the next reasonable opportunity.
    * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * <p/>
+   * </p>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param runnable
    *          <code>IRunnable</code> to be executed.
    * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   * @see IJobManager#schedule(Callable, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable) {
     return ClientJobs.schedule(runnable, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
@@ -86,17 +88,19 @@ public final class ClientJobs {
    * Runs the given {@link Callable} asynchronously on behalf of a worker thread at the next reasonable opportunity. The
    * caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * <p/>
+   * </p>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param callable
    *          <code>Callable</code> to be executed.
    * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   * @see IJobManager#schedule(Callable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable) {
     return ClientJobs.schedule(callable, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
@@ -106,10 +110,11 @@ public final class ClientJobs {
    * Runs the given {@link IRunnable} asynchronously on behalf of a worker thread at the next reasonable opportunity.
    * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param runnable
    *          <code>IRunnable</code> to be executed.
@@ -117,7 +122,7 @@ public final class ClientJobs {
    *          describes the job to be executed and contains execution instructions like 'serial execution' or
    *          'expiration', and tells the job manager in what {@link ClientRunContext} to run the job.
    * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   * @see IJobManager#schedule(Callable, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
     return BEANS.get(IJobManager.class).schedule(Callables.callable(runnable), ClientJobs.validateInput(input));
@@ -127,10 +132,11 @@ public final class ClientJobs {
    * Runs the given {@link Callable} asynchronously on behalf of a worker thread at the next reasonable opportunity. The
    * caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param callable
    *          <code>Callable</code> to be executed.
@@ -138,7 +144,7 @@ public final class ClientJobs {
    *          describes the job to be executed and contains execution instructions like 'serial execution' or
    *          'expiration', and tells the job manager in what {@link ClientRunContext} to run the job.
    * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, JobInput)
+   * @see IJobManager#schedule(Callable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
     return BEANS.get(IJobManager.class).schedule(callable, ClientJobs.validateInput(input));
@@ -148,12 +154,14 @@ public final class ClientJobs {
    * Runs the given {@link IRunnable} asynchronously on behalf of a worker thread after the specified delay has elapsed.
    * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * <p/>
+   * </p>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param runnable
    *          <code>IRunnable</code> to be executed.
@@ -162,7 +170,7 @@ public final class ClientJobs {
    * @param delayUnit
    *          the time unit of the <code>delay</code> argument.
    * @return Future to wait for the job's completion or to cancel the job's execution.
-   * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
+   * @see IJobManager#schedule(Callable, long, TimeUnit, JobInput)
    */
   public static IFuture<Void> schedule(final IRunnable runnable, final long delay, final TimeUnit delayUnit) {
     return ClientJobs.schedule(runnable, delay, delayUnit, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
@@ -172,12 +180,14 @@ public final class ClientJobs {
    * Runs the given {@link Callable} asynchronously on behalf of a worker thread after the specified delay has elapsed.
    * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
-   * <p/>
+   * </p>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param callable
    *          <code>Callable</code> to be executed.
@@ -196,10 +206,11 @@ public final class ClientJobs {
    * Runs the given {@link IRunnable} asynchronously on behalf of a worker thread after the specified delay has elapsed.
    * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param runnable
    *          <code>IRunnable</code> to be executed.
@@ -221,10 +232,11 @@ public final class ClientJobs {
    * Runs the given {@link Callable} asynchronously on behalf of a worker thread after the specified delay has elapsed.
    * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
    * commence execution once acquired the mutex.
-   * <p/>
+   * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = ClientJobs.schedule(...).awaitDone();</code>.
+   * </p>
    *
    * @param callable
    *          <code>Callable</code> to be executed.
@@ -238,12 +250,12 @@ public final class ClientJobs {
    * @return Future to wait for the job's completion or to cancel the job's execution.
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
-  public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return BEANS.get(IJobManager.class).schedule(executable, delay, delayUnit, ClientJobs.validateInput(input));
+  public static <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final long delay, final TimeUnit delayUnit, final JobInput input) {
+    return BEANS.get(IJobManager.class).schedule(callable, delay, delayUnit, ClientJobs.validateInput(input));
   }
 
   /**
-   * Periodically runs the given job on behalf of a worker thread.<br/>
+   * Periodically runs the given job on behalf of a worker thread.<br>
    * The first execution is after the given <code>initialDelay</code>, the second after <code>initialDelay+period</code>
    * , the third after <code>initialDelay+period+period</code> and so on. If an execution takes longer than the
    * <code>period</code>, the subsequent execution is delayed and starts only once the current execution completed. The
@@ -268,7 +280,7 @@ public final class ClientJobs {
   }
 
   /**
-   * Periodically runs the given job on behalf of a worker thread.<br/>
+   * Periodically runs the given job on behalf of a worker thread.<br>
    * The first execution is after the given <code>initialDelay</code>, and subsequently with the given
    * <code>delay</code> between the termination of one execution and the commencement of the next. The job only
    * terminates via cancellation or termination of the job manager.
@@ -309,20 +321,21 @@ public final class ClientJobs {
 
   /**
    * Creates a {@link JobInput} initialized with the given {@link ClientRunContext}
-   * <p/>
+   * <p>
    * A <code>JobInput</code> contains information about the job like its name and execution instructions, whereas a
    * <code>RunContext</code> defines contextual values such as <code>Subject</code>, <code>Locale</code>,
    * <code>Session</code>, and more. The context given to the <code>JobInput</code> is applied during the job's
    * execution. A context is created as following:
+   * </p>
    *
    * <pre>
    * <code>
    * // to create a "snapshot" of the current calling state
    * ClientRunContexts.copyCurrent();
-   * 
+   *
    * // to create a "snapshot" of the current calling state, but with some values changed
    * ClientRunContexts.copyCurrent().withSession(...).withSubject(...).withLocale(Locale.US)
-   * 
+   *
    * // to create an empty context with no values set
    * ClientRunContexts.empty();
    * </code>
@@ -337,8 +350,9 @@ public final class ClientJobs {
    * Creates a filter to accept Futures of all client jobs (and not model jobs) that comply with some specific
    * characteristics. The filter returned accepts all client job Futures. The filter is designed to support method
    * chaining.
-   * <p/>
+   * <p>
    * To accept both, client and model jobs, use a construct like the following:
+   * </p>
    *
    * <pre>
    * new OrFilter&lt;&gt;(ClientJobs.newFutureFilter(), ModelJobs.newFutureFilter());
@@ -352,8 +366,9 @@ public final class ClientJobs {
    * Creates a filter to accept events of all client jobs (and not model jobs) that comply with some specific
    * characteristics. The filter returned accepts all client job events. The filter is designed to support method
    * chaining.
-   * <p/>
+   * <p>
    * To accept both, client and model jobs, use a construct like the following:
+   * </p>
    *
    * <pre>
    * new OrFilter&lt;&gt;(ClientJobs.newEventFilter(), ModelJobs.newEventFilter());

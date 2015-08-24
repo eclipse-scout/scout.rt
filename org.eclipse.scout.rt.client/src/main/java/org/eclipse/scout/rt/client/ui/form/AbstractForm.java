@@ -550,7 +550,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @param kill
    *          true if a widget close icon (normally the X on the titlebar) was pressed or ESC was pressed
    * @param enabledButtonSystemTypes
-   *          set of all {@link IButton#SYSTEM_TYPE_*} of all enabled and visible buttons of this form (never
+   *          set of all <code>IButton#SYSTEM_TYPE_*</code> of all enabled and visible buttons of this form (never
    *          <code>null</code>)
    */
   @ConfigOperation
@@ -1316,9 +1316,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * <p>
+   * <ul>
    * <li>If a classId was set with {@link #setClassId(String)} this value is returned.
    * <li>Else if the class is annotated with {@link ClassId}, the annotation value is returned.
    * <li>Otherwise the class name is returned.
+   * </ul>
    */
   @Override
   public String classId() {
@@ -1886,12 +1888,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       };
       visitFields(collector);
       if (collector.getCollectionCount() > 0 && isAskIfNeedSave()) {
-        int result = MessageBoxes
-            .createYesNoCancel()
-            .withDisplayParent(this)
-            .withHeader(getCancelVerificationText())
-            .withSeverity(IStatus.INFO)
-            .show();
+        int result = MessageBoxes.createYesNoCancel().withDisplayParent(this).withHeader(getCancelVerificationText()).withSeverity(IStatus.INFO).show();
 
         if (result == IMessageBox.YES_OPTION) {
           doOk();
@@ -2437,11 +2434,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
         catch (Exception e) {
           LOG.warn("loading: " + newPath + " Exception: " + e);
-          MessageBoxes
-              .createOk()
-              .withDisplayParent(this)
-              .withHeader(TEXTS.get("LoadFormXmlFailedText"))
-              .show();
+          MessageBoxes.createOk().withDisplayParent(this).withHeader(TEXTS.get("LoadFormXmlFailedText")).show();
         }
       }
     }

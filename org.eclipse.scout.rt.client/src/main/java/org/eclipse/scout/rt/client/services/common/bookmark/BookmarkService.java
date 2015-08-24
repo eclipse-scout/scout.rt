@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
 /**
  * Client side service for bookmark support
  * <p>
- * Uses the server side {@link org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkStorageService} for data
+ * Uses the server side {@link IBookmarkStorageService} for data
  * persistence
  * <p>
  * service state is per {@link IClientSession} instance

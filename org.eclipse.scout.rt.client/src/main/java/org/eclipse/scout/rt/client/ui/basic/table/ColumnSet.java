@@ -548,7 +548,7 @@ public class ColumnSet {
    */
 
   /**
-   * @param column
+   * @param col
    * @param multiSort
    *          True: Multiple sort columns are supported, which means the given column is added to the list of sort
    *          columns, if not added yet.<br>

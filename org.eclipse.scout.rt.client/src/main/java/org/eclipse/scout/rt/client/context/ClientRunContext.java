@@ -35,11 +35,11 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Use this class to propagate client-side context.
- * <p/>
+ * <p>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * client state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
- * <p/>
+ * </p>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>

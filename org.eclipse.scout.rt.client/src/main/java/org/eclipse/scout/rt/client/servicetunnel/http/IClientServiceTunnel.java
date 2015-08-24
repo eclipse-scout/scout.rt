@@ -24,9 +24,9 @@ public interface IClientServiceTunnel extends IServiceTunnel {
 
   /**
    * If true the client notification polling process analyzes network latency to optimize the poll interval in order to
-   * save the network. for Experts: constant N is defined as: N=10 Assertion is: pollInterval > N*networkLatency
+   * save the network. for Experts: constant N is defined as: N=10 Assertion is: pollInterval &gt; N*networkLatency
    * Example: the initial pollInterval is 2000ms and the moving average of the networkLatency reaches 700ms, then the
-   * used polling interval will be max(2000ms,N*700ms) -> 7000ms
+   * used polling interval will be max(2000ms,N*700ms) -&gt; 7000ms
    */
   void setAnalyzeNetworkLatency(boolean b);
 

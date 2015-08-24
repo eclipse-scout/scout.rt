@@ -415,7 +415,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setEnabledProcessingButton(boolean b);
 
   /**
-   * @return {@link #isEnabledGranted()} && {@link #getEnabledProperty()}
+   * @return {@link #isEnabledGranted()} &amp;&amp; {@link #getEnabledProperty()}
    */
   boolean isEnabled();
 
@@ -486,8 +486,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setErrorStatus(IStatus status);
 
   /**
-   * @param clear
-   *          error status
+   * clear all error statuses
    */
   void clearErrorStatus();
 

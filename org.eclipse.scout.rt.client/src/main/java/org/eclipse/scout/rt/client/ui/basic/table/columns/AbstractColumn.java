@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -65,6 +66,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -728,9 +730,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   private boolean contentEquals(Cell cell, IValueField<VALUE> field) throws ProcessingException {
-    return CompareUtility.equals(cell.getText(), field.getDisplayText()) &&
-        CompareUtility.equals(cell.getValue(), editFieldToCellValue(field)) &&
-        CompareUtility.equals(cell.getErrorStatus(), field.getErrorStatus());
+    return CompareUtility.equals(cell.getText(), field.getDisplayText()) && CompareUtility.equals(cell.getValue(), editFieldToCellValue(field)) && CompareUtility.equals(cell.getErrorStatus(), field.getErrorStatus());
   }
 
   /**

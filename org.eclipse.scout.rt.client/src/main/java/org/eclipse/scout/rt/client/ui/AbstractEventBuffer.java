@@ -22,12 +22,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * A buffer for events ({@link IModelEvent}) with coalesce functionality:
- * <p>
  * <ul>
  * <li>Unnecessary events are removed.
  * <li>Events are merged, if possible.
  * </ul>
- * </p>
  * Not thread safe, to be accessed in client model job.
  *
  * @param T

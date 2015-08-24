@@ -13,12 +13,10 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 
 /**
  * A buffer for planner events ({@link PlannerEvent}) with coalesce functionality:
- * <p>
  * <ul>
  * <li>Unnecessary events are removed.
  * <li>Events are merged, if possible.
  * </ul>
- * </p>
  * Not thread safe, to be accessed in client model job.
  */
 public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
@@ -314,9 +312,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     if (event1 == null || event2 == null) {
       return false;
     }
-    boolean identical = (event1.getType() == event2.getType()
-        && CollectionUtility.equalsCollection(event1.getResources(), event2.getResources(), true)
-        && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus()));
+    boolean identical = (event1.getType() == event2.getType() && CollectionUtility.equalsCollection(event1.getResources(), event2.getResources(), true) && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus()));
     return identical;
   }
 

@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  * The table is by default multi-select.
  * <p>
  * Columns are defined as inner classes.
- * <p>
+ * </p>
  * For every inner column class there is a generated getXYColumn method directly on the table.
  */
 public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IAppLinkCapable, IContextMenuOwner {
@@ -355,7 +355,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException;
 
   /**
-   * @see #setScrollToSelection()
+   * @see #setScrollToSelection(boolean)
    */
   boolean isScrollToSelection();
 
@@ -453,6 +453,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * <li>Swing: The property is ignored.
    * </ul>
    * </p>
+   * <p>
    * This hint defines the table row height in pixels being used as the row height for all table rows of this table
    * dependent of the GUI port.
    * </p>
@@ -662,7 +663,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * column that represented the last ui (mouse click) context
-   * {@link ITableUIFacade#setContextCellFromUI(ITableRow,IColumn)} see {@link #setContextCell(ITableRow, IColumn)}
+   * {@link ITableUIFacade#setContextColumnFromUI(IColumn)} see {@link #setContextColumn(IColumn)}
    */
   IColumn<?> getContextColumn();
 
@@ -854,7 +855,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * initialize all columns: visible/invisible, order, sorting, width
    * <p>
-   * same as calling {@link #resetColumns(true, true, true, true)}
+   * same as calling <code>resetColumns(true, true, true, true)</code>
    */
   void resetDisplayableColumns();
 
@@ -928,11 +929,12 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Creates table rows for the given matrix of row values. The created rows are not added to the table yet. One row is
    * created for each row in the matrix. The row state of each created row is set to {@link ITableRow#STATUS_INSERTED}.
-   * <p/>
+   * <p>
    * Performance note:<br>
    * Since the matrix may contain large amounts of data, the matrix can be passed as an
    * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
    * the holder to null while processing.
+   * </p>
    *
    * @param dataMatrixOrReference
    *          Can be an Object[][] or an <code>AtomicReference&lt;Object&gt;</code>(that holds Object[][])
@@ -945,11 +947,12 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Creates table rows from the given matrix of row values. The created rows are not added to the table yet. One row is
    * created for each row in the matrix. The row state of each created row is set according to the
    * <code>rowStatus</code> parameter.
-   * <p/>
+   * <p>
    * Performance note:<br>
    * Since the matrix may contain large amounts of data, the matrix can be passed as an
    * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
    * the holder to null while processing.
+   * </p>
    *
    * @param dataMatrixOrReference
    * @param rowStatus
@@ -1037,7 +1040,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setTableStatusVisible(boolean visible);
 
   /**
-   * @return the data fetching>/loading status, warnings and other general messages related with data currently loaded
+   * @return the data fetching/loading status, warnings and other general messages related with data currently loaded
    *         into this table
    * @since 5.1.0
    */

@@ -84,7 +84,7 @@ public class KeyStrokeNormalizer {
    * </code> <br>
    * If the keystroke is invalid, {@link #isValid()} will return <code>false</code>, all modifiers ({@link #hasAlt()},
    * {@link #hasCtrl()}, {@link #hasShift()}) will be <code>false</code> and the
-   * <code>{@link #getNormalizedKeystroke()} will return <code>null</code>
+   * {@link #getNormalizedKeystroke()} will return <code>null</code>
    */
   public void normalize() {
     String keyStroke = m_originalKeyStroke;
@@ -226,7 +226,6 @@ public class KeyStrokeNormalizer {
   /**
    * returns the normalized version of the Scout keystroke. <br>
    * Examples:
-   * <p>
    * <table>
    * <tr>
    * <th>Original Keystroke</th>
@@ -245,7 +244,6 @@ public class KeyStrokeNormalizer {
    * <td>control-8</td>
    * </tr>
    * </table>
-   * </p>
    */
   public String getNormalizedKeystroke() {
     return m_normalizedKeyStroke;

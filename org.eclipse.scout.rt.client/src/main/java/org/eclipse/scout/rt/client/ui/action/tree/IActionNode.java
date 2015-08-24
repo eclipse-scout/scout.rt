@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 public interface IActionNode<T extends IActionNode> extends IAction {
 
   /**
-   * property-type: {@link List}<T>
+   * property-type: {@link List}&lt;T&gt;
    */
   String PROP_CHILD_ACTIONS = "childActions";
 
@@ -44,7 +44,7 @@ public interface IActionNode<T extends IActionNode> extends IAction {
 
   /**
    * @return a copy of the list of actions<br>
-   *         When changing this list, use {@link #setChildActions(List)} to apply them to the model
+   *         When changing this list, use {@link #setChildActions(Collection)} to apply them to the model
    */
   List<T> getChildActions();
 

@@ -88,7 +88,7 @@ public final class BookmarkUtility {
   /**
    * @param columns
    *          is the set of available columns to search in
-   * @param className
+   * @param identifier
    *          is the columnId, simple class name or class name of the columns to find
    */
   public static IColumn resolveColumn(List<? extends IColumn> columns, String identifier) {
@@ -265,10 +265,10 @@ public final class BookmarkUtility {
 
   /**
    * Load a {@link Bookmark} on the specified {@link IDesktop} model.
-   * <p />
+   * <p>
    * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and selected, afterwards every page from the
    * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
-   * <p />
+   * </p>
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */

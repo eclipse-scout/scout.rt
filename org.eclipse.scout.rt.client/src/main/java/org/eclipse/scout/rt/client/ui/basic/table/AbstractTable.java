@@ -1300,8 +1300,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     // Prefer row.isRejectedByUser to allow a filter to set this flag
-    row.setRejectedByUser(row.isRejectedByUser()
-        || rejectingFilters.size() == 1 && rejectingFilters.get(0) instanceof IUserFilter);
+    row.setRejectedByUser(row.isRejectedByUser() || rejectingFilters.size() == 1 && rejectingFilters.get(0) instanceof IUserFilter);
   }
 
   @Override
@@ -3805,7 +3804,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @param visiblity
+   * @param visibility
    *          {@code true} if the visibility is reset.
    * @param order
    *          {@code true} if the order is reset.

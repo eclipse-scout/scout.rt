@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.TTLCache;
  * The events are kept in history for at most n milliseconds using a {@link TTLCache}
  * <p>
  * This object is thread safe.
- * 
+ *
  * @since 3.8
  */
 public abstract class AbstractEventHistory<T> implements IEventHistory<T> {
@@ -29,7 +29,7 @@ public abstract class AbstractEventHistory<T> implements IEventHistory<T> {
   }
 
   /**
-   * override and call {@link #addToCache(Object)} for relevant events
+   * override and call {@link #addToCache(Object, Object)} for relevant events
    */
   @Override
   public abstract void notifyEvent(T event);

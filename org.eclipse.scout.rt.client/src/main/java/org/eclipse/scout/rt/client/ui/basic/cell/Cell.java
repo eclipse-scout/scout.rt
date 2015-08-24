@@ -250,9 +250,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public void setFont(FontSpec f) {
-    if (m_cellSpecialization.getFont() == null && f != null
-        || m_cellSpecialization.getFont() != null && f == null
-        || CompareUtility.notEquals(m_cellSpecialization.getFont(), f)) {
+    if (m_cellSpecialization.getFont() == null && f != null || m_cellSpecialization.getFont() != null && f == null || CompareUtility.notEquals(m_cellSpecialization.getFont(), f)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setFont(f);
       setValueInternal(FONT_BIT, newStyle);
@@ -415,7 +413,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   /**
-   * @return true, if it contains an error status with severity >= IStatus.ERROR
+   * @return true, if it contains an error status with severity &gt;= IStatus.ERROR
    */
   public boolean hasError() {
     IStatus errorStatus = getErrorStatus();

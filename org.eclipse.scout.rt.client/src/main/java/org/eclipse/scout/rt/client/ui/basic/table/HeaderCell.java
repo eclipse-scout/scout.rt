@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IStyleable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public class HeaderCell implements IHeaderCell, IStyleable {
@@ -122,8 +124,8 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   }
 
   /**
-   * this method is not in interface, use {@link #IColumn.decorateHeaderCell()} and
-   * {@link #IColumn.execDecorateHeaderCell()}
+   * this method is not in interface, use {@link IColumn#decorateHeaderCell()} and
+   * {@link AbstractColumn#execDecorateHeaderCell()}
    */
   public void setText(String s) {
     m_text = s;

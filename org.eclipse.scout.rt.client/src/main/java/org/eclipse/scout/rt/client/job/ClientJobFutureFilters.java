@@ -33,7 +33,7 @@ public final class ClientJobFutureFilters {
   }
 
   /**
-   * Filter to accept Futures of all client- and model jobs that comply with the given characteristics.<br/>
+   * Filter to accept Futures of all client- and model jobs that comply with the given characteristics.<br>
    * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
    *
    * @since 5.1

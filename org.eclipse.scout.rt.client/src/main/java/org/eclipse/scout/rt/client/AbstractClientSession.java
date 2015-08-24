@@ -164,8 +164,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   /**
    * Returns the {@link ScoutTexts} instance assigned to the type (class) of the current ClientSession.
-   * <p/>
+   * <p>
    * Override this method to set the application specific texts implementation
+   * </p>
    */
   @Override
   public ScoutTexts getTexts() {
@@ -509,10 +510,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void logRunningJobs() {
     final List<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
-      LOG.warn(""
-          + "Some running client jobs found while client session is going to shutdown. "
-          + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. "
-          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}", new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
+      LOG.warn("" + "Some running client jobs found while client session is going to shutdown. " + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. " + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}", new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
     }
   }
 

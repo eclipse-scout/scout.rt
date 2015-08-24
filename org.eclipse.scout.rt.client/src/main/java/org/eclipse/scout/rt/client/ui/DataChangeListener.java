@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 /**
  * Listener to observe arbitrary changes on any abstract data model or enumerations see
- * {@link IDesktop#addDataChangeListener(IDataChangeListener, Object...)} and
- * {@link IDesktop#removeDataChangeListener(IDataChangeListener, Object...)}
+ * {@link IDesktop#addDataChangeListener(DataChangeListener, Object...)} and
+ * {@link IDesktop#removeDataChangeListener(DataChangeListener, Object...)}
  */
 public interface DataChangeListener extends EventListener {
 

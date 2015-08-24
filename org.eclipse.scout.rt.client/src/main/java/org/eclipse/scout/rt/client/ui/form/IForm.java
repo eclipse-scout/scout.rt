@@ -289,7 +289,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @param filter
    *          a filter that can be used to specify which form properties should be imported
    * @throws ProcessingException
-   * @see {@link IPropertyFilter}
+   * @see IPropertyFilter
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter) throws ProcessingException;
 
@@ -298,16 +298,16 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    *
    * @param source
    *          the FormData to import
-   * @param valueChangeTriggersEnabledspecifies
-   *          if the {@link AbstractFormField}.execChangedValue should be called on a field value change caused by this
-   *          import.
+   * @param valueChangeTriggersEnabled
+   *          specifies if the {@link AbstractFormField}.execChangedValue should be called on a field value change
+   *          caused by this import.
    * @param filter
    *          a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
    *          a filter that can be used to specify which form fields should be imported
    * @throws ProcessingException
-   * @see {@link IPropertyFilter#accept(org.eclipse.scout.commons.beans.FastPropertyDescriptor)}
-   * @see {@link IFormFieldFilter#accept(IFormField)}
+   * @see IPropertyFilter#accept(org.eclipse.scout.commons.beans.FastPropertyDescriptor)
+   * @see IFormFieldFilter#accept(IFormField)
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter) throws ProcessingException;
 
