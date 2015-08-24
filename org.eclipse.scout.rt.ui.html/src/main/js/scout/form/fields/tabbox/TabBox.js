@@ -150,13 +150,7 @@ scout.TabBox.prototype._onKeyDown = function(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  tabIndex = this.selectedTab;
-  if (event.which === scout.keys.LEFT) {
-    tabIndex--;
-  }
-  else if (event.which === scout.keys.RIGHT) {
-    tabIndex++;
-  }
+  tabIndex = this._getNextVisibleTabIndexForKeyStroke(this.selectedTab, event.which);
 
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
     var tabItem = this.tabItems[tabIndex];
@@ -164,6 +158,23 @@ scout.TabBox.prototype._onKeyDown = function(event) {
         this._selectTab(tabItem);
     }
   }
+};
+
+scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualIndex, keyStroke) {
+  var modifier = keyStroke === scout.keys.LEFT ? -1 : 1;
+  var endFunc = function(i) {
+    if (keyStroke === scout.keys.LEFT){
+      return i >=0;
+    }
+    return i < this.tabItems.length;
+  }.bind(this);
+  for(var i = actualIndex+modifier; endFunc(i); i=i+modifier){
+    var tabItem = this.tabItems[i];
+    if(tabItem.visible){
+      return i;
+    }
+  }
+  return actualIndex;
 };
 
 scout.TabBox.prototype._renderTabContent = function($tabContent) {
