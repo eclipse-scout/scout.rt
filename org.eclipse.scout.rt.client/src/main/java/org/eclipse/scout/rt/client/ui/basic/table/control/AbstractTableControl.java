@@ -62,8 +62,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
   }
 
   /**
-   * Initializes the form associated with this button. This method is called before the
-   * form is used for the first time.
+   * Initializes the form associated with this button. This method is called before the form is used for the first time.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
@@ -164,7 +163,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalTableControlExtension<OWNER extends AbstractTableControl> extends AbstractAction.LocalActionExtension<OWNER> implements ITableControlExtension<OWNER> {
+  protected static class LocalTableControlExtension<OWNER extends AbstractTableControl> extends AbstractAction.LocalActionExtension<OWNER>implements ITableControlExtension<OWNER> {
 
     public LocalTableControlExtension(OWNER owner) {
       super(owner);

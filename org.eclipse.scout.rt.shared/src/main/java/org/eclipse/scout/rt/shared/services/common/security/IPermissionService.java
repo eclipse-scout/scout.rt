@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public interface IPermissionService {
 
   /**
-   * @return Returns all permissions classes that are necessary for this scout application.
-   *         The actual strategy to find these permissions is up to the implementation.
+   * @return Returns all permissions classes that are necessary for this scout application. The actual strategy to find
+   *         these permissions is up to the implementation.
    */
   Set<Class<? extends Permission>> getAllPermissionClasses();
 

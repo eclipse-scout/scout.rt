@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerFie
 /**
  * Column holding {@link BigInteger}
  */
-public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigInteger> implements IBigIntegerColumn {
+public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigInteger>implements IBigIntegerColumn {
 
   public AbstractBigIntegerColumn() {
     super();
@@ -71,7 +71,7 @@ public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigI
     };
   }
 
-  protected static class LocalBigIntegerColumnExtension<OWNER extends AbstractBigIntegerColumn> extends LocalNumberColumnExtension<BigInteger, OWNER> implements IBigIntegerColumnExtension<OWNER> {
+  protected static class LocalBigIntegerColumnExtension<OWNER extends AbstractBigIntegerColumn> extends LocalNumberColumnExtension<BigInteger, OWNER>implements IBigIntegerColumnExtension<OWNER> {
 
     public LocalBigIntegerColumnExtension(OWNER owner) {
       super(owner);

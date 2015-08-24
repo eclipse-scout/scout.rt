@@ -61,8 +61,8 @@ public interface INumberValueContainer<T extends Number> {
   boolean isGroupingUsed();
 
   /**
-   * Set the minimum value. Value <code>null</code> means no limitation if supported by generic type else
-   * the smallest possible value for the type.
+   * Set the minimum value. Value <code>null</code> means no limitation if supported by generic type else the smallest
+   * possible value for the type.
    * <p>
    * If new value is bigger than {@link #getMaxValue()} maxValue is set to the same new value.
    */
@@ -71,8 +71,8 @@ public interface INumberValueContainer<T extends Number> {
   T getMinValue();
 
   /**
-   * Set the maximum value. Value <code>null</code> means no limitation if supported by generic type else
-   * the biggest possible value for the type.
+   * Set the maximum value. Value <code>null</code> means no limitation if supported by generic type else the biggest
+   * possible value for the type.
    * <p>
    * If new value is smaller than {@link #getMinValue()} minValue is set to the same new value.
    */

@@ -14,12 +14,10 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Optimistic locking with one accepted writer in critical section usage for
- * writers with access check is as follows: try{ if(lock.acquire()){ ... } }
- * finally{ lock.release(); } usage for writers with no access check is as
- * follows: try{ lock.acquire() ... } finally{ lock.release(); } usage for
- * tester is as follows: if(lock.isAcquired()){ ... } or if(lock.isReleased()){
- * ... }
+ * Optimistic locking with one accepted writer in critical section usage for writers with access check is as follows:
+ * try{ if(lock.acquire()){ ... } } finally{ lock.release(); } usage for writers with no access check is as follows:
+ * try{ lock.acquire() ... } finally{ lock.release(); } usage for tester is as follows: if(lock.isAcquired()){ ... } or
+ * if(lock.isReleased()){ ... }
  */
 public class OptimisticLock {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(OptimisticLock.class);

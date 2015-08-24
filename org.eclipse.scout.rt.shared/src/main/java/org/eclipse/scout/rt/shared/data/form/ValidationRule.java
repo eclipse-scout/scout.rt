@@ -87,13 +87,12 @@ public @interface ValidationRule {
 
   /**
    * When setting this annotation property, the scout sdk will not generate the validation rule value based on the
-   * method return value but
-   * use exactly this string as generated source code.
+   * method return value but use exactly this string as generated source code.
    * <p>
    * Example:
    *
    * <pre>
-   * @ValidationRule(value=ValidationRule.CODE_TYPE, generatedSourceCode="com.myproject.shared.services.code.StatusCodeType.class")
+   * &#64;ValidationRule(value=ValidationRule.CODE_TYPE, generatedSourceCode="com.myproject.shared.services.code.StatusCodeType.class")
    * Class <? extends {@link ICodeType}> getConfiguredCodeType(){
    *   return ClientSpecificStatusCodeType.class;
    * }
@@ -102,11 +101,10 @@ public @interface ValidationRule {
   String generatedSourceCode() default "";
 
   /**
-   * When setting skip to true, the scout sdk will not generate code for this validation rule at all.
-   * Example:
+   * When setting skip to true, the scout sdk will not generate code for this validation rule at all. Example:
    *
    * <pre>
-   * @ValidationRule(value=ValidationRule.CODE_TYPE, skip=true)
+   * &#64;ValidationRule(value=ValidationRule.CODE_TYPE, skip=true)
    * Class <? extends {@link ICodeType}> getConfiguredCodeType(){
    *   return ClientSpecificStatusCodeType.class;
    * }

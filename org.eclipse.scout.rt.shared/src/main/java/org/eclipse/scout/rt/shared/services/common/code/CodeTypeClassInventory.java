@@ -18,8 +18,7 @@ import org.eclipse.scout.rt.platform.inventory.FilteredClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 
 /**
- * Inventory service for code types classes for registration. Uses jandex class inventory to find classes.
- * *
+ * Inventory service for code types classes for registration. Uses jandex class inventory to find classes. *
  * <p>
  * By default all direct subclasses of {@link ICodeType} are scanned. Make sure your code type classes are available in
  * the {@link ClassInventory}.

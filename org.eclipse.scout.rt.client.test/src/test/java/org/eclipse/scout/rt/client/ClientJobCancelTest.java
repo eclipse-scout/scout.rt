@@ -62,10 +62,9 @@ public class ClientJobCancelTest {
   public void before() throws Exception {
 
     m_serviceReg = TestingUtility.registerBeans(
-        new BeanMetaData(MockServerProcessingCancelService.class).
-        withInitialInstance(new MockServerProcessingCancelService()).
-        withApplicationScoped(true).withOrder(-1)
-        );
+        new BeanMetaData(MockServerProcessingCancelService.class)
+            .withInitialInstance(new MockServerProcessingCancelService())
+            .withApplicationScoped(true).withOrder(-1));
 
   }
 

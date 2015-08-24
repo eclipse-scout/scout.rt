@@ -15,8 +15,8 @@ import java.util.HashSet;
 /**
  * {@link IFormFieldFilter} implementation that allows to provide a set of excluded {@link IFormField}s.<br>
  * The filter will accept all non-null fields that are not in the excluded list.<br>
- * The fields are compared using the {@link IFormField#getFieldId()}.
- * So a field is discarded if the fieldId matches one of the fieldIds of the excluded list.
+ * The fields are compared using the {@link IFormField#getFieldId()}. So a field is discarded if the fieldId matches one
+ * of the fieldIds of the excluded list.
  */
 public class ExcludeFormFieldFilter implements IFormFieldFilter {
 

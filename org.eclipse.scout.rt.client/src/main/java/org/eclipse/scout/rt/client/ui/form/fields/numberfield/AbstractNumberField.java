@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")
-public abstract class AbstractNumberField<NUMBER extends Number> extends AbstractBasicField<NUMBER> implements INumberField<NUMBER> {
+public abstract class AbstractNumberField<NUMBER extends Number> extends AbstractBasicField<NUMBER>implements INumberField<NUMBER> {
 
   private IBasicFieldUIFacade m_uiFacade;
 
@@ -486,7 +486,8 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * @param insertText
    *          The new text that should be inserted at the given replace range.
    * @return String that fulfills the given {@link DecimalFormat} length constraints
-   * @throws throws a {@link ProcessingException} if the number's digits before the decimal point would be cut off
+   * @throws throws
+   *           a {@link ProcessingException} if the number's digits before the decimal point would be cut off
    */
   public static String createNumberWithinFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) throws ProcessingException {
     // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
@@ -533,7 +534,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return result.toString();
   }
 
-  protected static class LocalNumberFieldExtension<NUMBER extends Number, OWNER extends AbstractNumberField<NUMBER>> extends LocalBasicFieldExtension<NUMBER, OWNER> implements INumberFieldExtension<NUMBER, OWNER> {
+  protected static class LocalNumberFieldExtension<NUMBER extends Number, OWNER extends AbstractNumberField<NUMBER>> extends LocalBasicFieldExtension<NUMBER, OWNER>implements INumberFieldExtension<NUMBER, OWNER> {
 
     public LocalNumberFieldExtension(OWNER owner) {
       super(owner);

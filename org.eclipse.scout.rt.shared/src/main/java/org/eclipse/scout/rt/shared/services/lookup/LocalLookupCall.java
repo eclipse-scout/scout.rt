@@ -52,8 +52,8 @@ public class LocalLookupCall<T> extends LookupCall<T> {
 
   /**
    * @param humanReadbleFilterPattern
-   *          is not a regex and may contain *,%,? as wildcards for searching
-   *          override this method for custom filter pattern creation
+   *          is not a regex and may contain *,%,? as wildcards for searching override this method for custom filter
+   *          pattern creation
    */
   protected Pattern createSearchPattern(String humanReadbleFilterPattern) {
     return createLowerCaseSearchPattern(humanReadbleFilterPattern);

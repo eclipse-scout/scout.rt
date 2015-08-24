@@ -55,7 +55,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT>implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
 
   protected final JobManager m_jobManager;
 
@@ -346,8 +346,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Asserts that the current job (if applicable) does not share the same mutex as the job to be awaited for.
-   * Otherwise, that would end up in a deadlock.
+   * Asserts that the current job (if applicable) does not share the same mutex as the job to be awaited for. Otherwise,
+   * that would end up in a deadlock.
    */
   private void assertNotSameMutex() {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();

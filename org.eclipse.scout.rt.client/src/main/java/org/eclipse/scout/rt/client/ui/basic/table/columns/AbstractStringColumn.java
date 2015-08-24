@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
  * Column holding Strings
  */
 @ClassId("e564abbc-5f57-4ccc-a50c-003c408df519")
-public abstract class AbstractStringColumn extends AbstractColumn<String> implements IStringColumn {
+public abstract class AbstractStringColumn extends AbstractColumn<String>implements IStringColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -40,8 +40,8 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    */
 
   /**
-   * Configures the maximum length of text in this column. This configuration only limits the text length
-   * in case of editable cells.
+   * Configures the maximum length of text in this column. This configuration only limits the text length in case of
+   * editable cells.
    * <p>
    * Subclasses can override this method. Default is {@code 4000}.
    *
@@ -197,11 +197,10 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
 
   /**
    * do not use or override this internal method<br>
-   * subclasses perform specific value validations here and set the
-   * default textual representation of the value
+   * subclasses perform specific value validations here and set the default textual representation of the value
    */
   @Override
-  protected String/* validValue */validateValueInternal(ITableRow row, String rawValue) throws ProcessingException {
+  protected String/* validValue */ validateValueInternal(ITableRow row, String rawValue) throws ProcessingException {
     String value = super.validateValueInternal(row, rawValue);
     if (value != null) {
       if (value.length() > getMaxLength()) {
@@ -256,7 +255,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return StringUtility.compareIgnoreCase(s1, s2);
   }
 
-  protected static class LocalStringColumnExtension<OWNER extends AbstractStringColumn> extends LocalColumnExtension<String, OWNER> implements IStringColumnExtension<OWNER> {
+  protected static class LocalStringColumnExtension<OWNER extends AbstractStringColumn> extends LocalColumnExtension<String, OWNER>implements IStringColumnExtension<OWNER> {
 
     public LocalStringColumnExtension(OWNER owner) {
       super(owner);

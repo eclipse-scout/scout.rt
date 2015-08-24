@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
 /**
  * FIXME CGU javadoc
+ * 
  * @since 5.1
  */
 public interface IUserFilter {

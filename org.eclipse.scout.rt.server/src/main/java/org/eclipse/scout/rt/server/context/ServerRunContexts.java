@@ -49,9 +49,9 @@ public final class ServerRunContexts {
   /**
    * Creates an empty {@link ServerRunContext}.
    *
-   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is
-   *             NOT registered as child monitor, meaning that it will not be cancelled once the current
-   *             {@link RunMonitor} is cancelled.
+   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT
+   *             registered as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor}
+   *             is cancelled.
    * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
    */
   public static final ServerRunContext empty() {

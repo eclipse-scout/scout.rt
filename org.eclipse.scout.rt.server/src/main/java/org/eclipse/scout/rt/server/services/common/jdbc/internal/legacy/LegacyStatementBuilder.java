@@ -67,8 +67,7 @@ public class LegacyStatementBuilder {
   }
 
   /**
-   * add sql part with bind references to :S and #S# the ADD keyword is added
-   * (pre-pended) automatically
+   * add sql part with bind references to :S and #S# the ADD keyword is added (pre-pended) automatically
    */
   public void addWhereToken(String sql, Object valueForS) {
     if (sql != null) {
@@ -82,8 +81,7 @@ public class LegacyStatementBuilder {
   }
 
   /**
-   * add sql part with custom binds the ADD keyword is NOT added (pre-pended)
-   * automatically
+   * add sql part with custom binds the ADD keyword is NOT added (pre-pended) automatically
    */
   public void addWhere(String sql, NVPair... customBinds) {
     if (sql != null) {
@@ -103,8 +101,7 @@ public class LegacyStatementBuilder {
   }
 
   /**
-   * Replace bind name by unique bind name so that it is not
-   * conflicting with other parts that use the same statement
+   * Replace bind name by unique bind name so that it is not conflicting with other parts that use the same statement
    * part and bind name. For example S is replaces by __S123.
    */
   protected String localizeBindName(String bindName, String prefix) {
@@ -137,7 +134,7 @@ public class LegacyStatementBuilder {
    *
    *         <pre>
    * return something in the form of: attribute + &quot;=&quot; + &quot;:&quot; + bindName;
-   * </pre>
+   *         </pre>
    */
   protected String createComposerAttributeOpPattern(int op, String attribute, String bindName, Object value) {
     switch (op) {

@@ -31,21 +31,19 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 public interface IDesktopUIFacade {
 
   /**
-   * GUI fires this event as soon as the desktop was completely setup and
-   * displayed
+   * GUI fires this event as soon as the desktop was completely setup and displayed
    */
   void fireDesktopOpenedFromUI();
 
   /**
-   * GUI fires this event when it is in the process of closing the workbench /
-   * application
+   * GUI fires this event when it is in the process of closing the workbench / application
    * <p>
    * The default case is to pass <code>false</code> as parameter.
    * 
    * @param forcedClosing
    *          If set to <code>true</code> all vetos to stop the closing process (see
-   *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code> vetos
-   *          are accepted.
+   *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code>
+   *          vetos are accepted.
    */
   void fireDesktopClosingFromUI(boolean forcedClosing);
 

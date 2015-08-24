@@ -38,8 +38,8 @@ public final class HolderUtility {
   }
 
   /**
-   * when passing IHolder values to remote services it is necessary to create a
-   * value copy of the holder for serialization
+   * when passing IHolder values to remote services it is necessary to create a value copy of the holder for
+   * serialization
    */
   public static <T> IHolder<T> createSerializableHolder(IHolder<T> h) {
     if (h == null) {

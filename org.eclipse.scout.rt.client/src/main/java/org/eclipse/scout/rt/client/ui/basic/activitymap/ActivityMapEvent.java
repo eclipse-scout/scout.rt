@@ -23,28 +23,23 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 public class ActivityMapEvent extends java.util.EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
   /**
-   * Some activities have been added valid properties: activities,
-   * firstActivity, lastActivity
+   * Some activities have been added valid properties: activities, firstActivity, lastActivity
    */
   public static final int TYPE_ACTIVITIES_INSERTED = 100;
   /**
-   * Some activities have been updated valid properties: activities,
-   * firstActivity, lastActivity
+   * Some activities have been updated valid properties: activities, firstActivity, lastActivity
    */
   public static final int TYPE_ACTIVITIES_UPDATED = 101;
   /**
-   * Some activities have been deleted valid properties: activities,
-   * firstActivity, lastActivity
+   * Some activities have been deleted valid properties: activities, firstActivity, lastActivity
    */
   public static final int TYPE_ACTIVITIES_DELETED = 102;
   /**
-   * A row has been activated valid properties: activities, firstActivity,
-   * lastActivity, resourceId, column
+   * A row has been activated valid properties: activities, firstActivity, lastActivity, resourceId, column
    */
   public static final int TYPE_CELL_ACTION = 104;
   /**
-   * All activities have been deleted valid properties: activities,
-   * firstActivity, lastActivity
+   * All activities have been deleted valid properties: activities, firstActivity, lastActivity
    */
   public static final int TYPE_ALL_ACTIVITIES_DELETED = 105;
 

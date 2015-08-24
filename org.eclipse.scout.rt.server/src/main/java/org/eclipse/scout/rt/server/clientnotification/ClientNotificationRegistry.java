@@ -35,10 +35,10 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 /**
  * The {@link ClientNotificationRegistry} is the registry for all notifications. It keeps a
  * {@link ClientNotificationNodeQueue} for each notification node (usually a client node). The
- * {@link ClientNotificationService} consumes the notifications per node. The consumption of the notifications waits
- * for a given timeout for notifications. If no notifications are scheduled within this timeout the lock will be
- * released and returns without any notifications. In case a notification gets scheduled during this timeout the
- * request will be released immediately.
+ * {@link ClientNotificationService} consumes the notifications per node. The consumption of the notifications waits for
+ * a given timeout for notifications. If no notifications are scheduled within this timeout the lock will be released
+ * and returns without any notifications. In case a notification gets scheduled during this timeout the request will be
+ * released immediately.
  */
 @ApplicationScoped
 public class ClientNotificationRegistry {
@@ -248,8 +248,8 @@ public class ClientNotificationRegistry {
 
   /**
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
-   * {@link ITransaction} surrounding the server call.
-   * The notification will be distributed to all sessions of the given userId.
+   * {@link ITransaction} surrounding the server call. The notification will be distributed to all sessions of the given
+   * userId.
    *
    * @param userId
    *          the addressed user
@@ -267,8 +267,8 @@ public class ClientNotificationRegistry {
 
   /**
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
-   * {@link ITransaction} surrounding the server call.
-   * The notification will be distributed to all sessions of the given userids.
+   * {@link ITransaction} surrounding the server call. The notification will be distributed to all sessions of the given
+   * userids.
    *
    * @param userIds
    *          the addressed user
@@ -286,8 +286,8 @@ public class ClientNotificationRegistry {
 
   /**
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
-   * {@link ITransaction} surrounding the server call.
-   * The notification will be distributed to the session addressed with the unique sessionId.
+   * {@link ITransaction} surrounding the server call. The notification will be distributed to the session addressed
+   * with the unique sessionId.
    *
    * @param sessionId
    *          the addressed session
@@ -305,8 +305,7 @@ public class ClientNotificationRegistry {
 
   /**
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
-   * {@link ITransaction} surrounding the server call.
-   * This notification will be distributed to all sessions.
+   * {@link ITransaction} surrounding the server call. This notification will be distributed to all sessions.
    *
    * @param notification
    * @param distributeOverCluster
@@ -322,8 +321,7 @@ public class ClientNotificationRegistry {
 
   /**
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
-   * {@link ITransaction} surrounding the server call.
-   * This notification will be distributed to all client nodes.
+   * {@link ITransaction} surrounding the server call. This notification will be distributed to all client nodes.
    *
    * @param notification
    * @param distributeOverCluster
@@ -358,8 +356,7 @@ public class ClientNotificationRegistry {
   }
 
   /**
-   * Publish messages to other cluster nodes.
-   * Message not foreseen for cluster distributions are filtered.
+   * Publish messages to other cluster nodes. Message not foreseen for cluster distributions are filtered.
    */
   private void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
     Collection<ClientNotificationMessage> filteredMessages = new LinkedList<ClientNotificationMessage>();

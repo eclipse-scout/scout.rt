@@ -76,9 +76,8 @@ public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlC
   boolean isSpellCheckEnabled();
 
   /**
-   * Returns whether this field should be monitored for spelling errors in the
-   * background ("check as you type"). If it is not defined, null is returned,
-   * then the application default is used.
+   * Returns whether this field should be monitored for spelling errors in the background ("check as you type"). If it
+   * is not defined, null is returned, then the application default is used.
    */
   Boolean isSpellCheckAsYouTypeEnabled();
 

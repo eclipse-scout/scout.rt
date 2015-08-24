@@ -41,8 +41,7 @@ public interface ISvgField extends IFormField, IAppLinkCapable {
   /**
    * @return the point of the selection. This is set by the ui facade when a click or hyperlink occurs. Use
    *         {@link org.eclipse.scout.rt.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
-   *         to find affected
-   *         elements
+   *         to find affected elements
    */
   SVGPoint getSelection();
 

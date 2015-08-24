@@ -279,8 +279,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   }
 
   /**
-   * used by
-   * TYPE_COLUMN_ORDER_CHANGED,TYPE_SORT_REQUEST,TYPE_COLUMN_HEADERS_CHANGED
+   * used by TYPE_COLUMN_ORDER_CHANGED,TYPE_SORT_REQUEST,TYPE_COLUMN_HEADERS_CHANGED
    */
   public Collection<IColumn<?>> getColumns() {
     return CollectionUtility.arrayList(m_columns);

@@ -43,8 +43,8 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   void initPage() throws ProcessingException;
 
   /**
-   * This method is used to override the bookmark identifier used for this page
-   * in case multiple instances of this page are used in the same child list<br>
+   * This method is used to override the bookmark identifier used for this page in case multiple instances of this page
+   * are used in the same child list<br>
    * By default this returns null.
    * <p>
    * Note that the value of this id is final and <b>not</b> dynamic to prevent some unexpected behaviours due to id
@@ -56,35 +56,31 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
 
   /**
    * Reload this page content.<br>
-   * This will first remove all child nodes, add new nodes/table rows and
-   * trigger execPageDataLoaded
+   * This will first remove all child nodes, add new nodes/table rows and trigger execPageDataLoaded
    */
   void reloadPage() throws ProcessingException;
 
   /**
    * @return the detail form, the detail form is not automatically started<br>
-   *         This returns the detail form for THIS node (page), NOT for child
-   *         nodes of this page
+   *         This returns the detail form for THIS node (page), NOT for child nodes of this page
    */
   IForm getDetailForm();
 
   /**
-   * set the detail form, the form must either be in non-started state or
-   * displayHint must be {@link IForm#DISPLAY_HINT_VIEW} and {@link IForm#isShowOnStart()} must be false
+   * set the detail form, the form must either be in non-started state or displayHint must be
+   * {@link IForm#DISPLAY_HINT_VIEW} and {@link IForm#isShowOnStart()} must be false
    */
   void setDetailForm(IForm form);
 
   /**
-   * @return the child page at the index
-   *         Note that this is <b>not</b> exactly the same as (IPage)getChildNode().
-   *         see {@link VirtualPage} for more details.
+   * @return the child page at the index Note that this is <b>not</b> exactly the same as (IPage)getChildNode(). see
+   *         {@link VirtualPage} for more details.
    */
   IPage<?> getChildPage(int index);
 
   /**
-   * @return all child pages
-   *         Note that this is <b>not</b> exactly the same as (IPage)getChildNodes().
-   *         see {@link VirtualPage} for more details.
+   * @return all child pages Note that this is <b>not</b> exactly the same as (IPage)getChildNodes(). see
+   *         {@link VirtualPage} for more details.
    *         <p>
    *         Note: Calling this method effectively creates all child page objects and may be expensive on pages with
    *         many child pages.
@@ -165,8 +161,8 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
 
   /**
    * @return <code>true</code> if child pages should be added lazily to the outline tree, i.e. only after the user
-   *         explicitly requests them with the "show all" function. <code>false</code> otherwise. Please note that
-   *         this method does not return a static boolean value, but performs some calculations.
+   *         explicitly requests them with the "show all" function. <code>false</code> otherwise. Please note that this
+   *         method does not return a static boolean value, but performs some calculations.
    */
   boolean isLazyAddChildPagesToOutline();
 

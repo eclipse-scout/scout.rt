@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.keystroke;
 
-
 public class KeyStroke extends AbstractKeyStroke {
   private String m_id;
 

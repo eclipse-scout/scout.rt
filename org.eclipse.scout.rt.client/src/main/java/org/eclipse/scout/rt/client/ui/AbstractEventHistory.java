@@ -15,8 +15,7 @@ import java.util.Collection;
 import org.eclipse.scout.commons.TTLCache;
 
 /**
- * The events are kept in history for at most n milliseconds
- * using a {@link TTLCache}
+ * The events are kept in history for at most n milliseconds using a {@link TTLCache}
  * <p>
  * This object is thread safe.
  * 

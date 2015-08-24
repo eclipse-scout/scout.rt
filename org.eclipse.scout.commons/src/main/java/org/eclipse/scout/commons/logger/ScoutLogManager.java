@@ -82,8 +82,8 @@ public final class ScoutLogManager {
   }
 
   /**
-   * To start recording log messages. If a recording is already in progress by a previous call to this method, this
-   * call has no effect.
+   * To start recording log messages. If a recording is already in progress by a previous call to this method, this call
+   * has no effect.
    *
    * @return true if the recording is started or false, if the recording is already in progress.
    * @throws ProcessingException

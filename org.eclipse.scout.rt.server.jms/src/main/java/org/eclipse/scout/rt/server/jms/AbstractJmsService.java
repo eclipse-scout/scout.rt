@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchroni
  * <ul>
  * <li>A {@link Connection} is a is a relatively heavyweight object. It supports concurrent use. Therefore it should be
  * shared.
- * <li> {@link Session}, {@link MessageConsumer} and {@link MessageProducer} are lightweight objects and should not be
+ * <li>{@link Session}, {@link MessageConsumer} and {@link MessageProducer} are lightweight objects and should not be
  * used by different threads.
  * <li>To receive new messages one should not use the method
  * {@link MessageConsumer#setMessageListener(javax.jms.MessageListener)} as this is a J2EE container private method.

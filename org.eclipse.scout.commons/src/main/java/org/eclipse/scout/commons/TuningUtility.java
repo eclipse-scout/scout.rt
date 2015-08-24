@@ -136,9 +136,8 @@ public final class TuningUtility {
    * print out a list of all timers that were stored (added to a batch)
    *
    * @param clearTimers
-   *          <code>true</code> if any timers have not been stopped yet, they will be removed
-   *          first. A warning message is still printed.<code>false</code> only a note will be printed, but unfinished
-   *          timers will not be stopped
+   *          <code>true</code> if any timers have not been stopped yet, they will be removed first. A warning message
+   *          is still printed.<code>false</code> only a note will be printed, but unfinished timers will not be stopped
    */
   public static void finishAll(boolean clearTimers) {
     if (!TIMER_STACK.isEmpty()) {

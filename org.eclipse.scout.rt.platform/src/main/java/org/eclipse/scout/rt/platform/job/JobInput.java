@@ -105,9 +105,9 @@ public class JobInput {
   /**
    * Sets the {@link RunContext} to be applied during job execution. Also, the context's {@link RunMonitor} is
    * associated with the jobs's {@link IFuture}, meaning that cancellation requests to the {@link IFuture} or
-   * {@link RunContext} are equivalent.
-   * However, if no context is provided, the job manager ensures a {@link RunMonitor} to be installed, so that executing
-   * code can always query the cancellation status by <code>RunMonitor.CURRENT.get().isCancelled()</code>.
+   * {@link RunContext} are equivalent. However, if no context is provided, the job manager ensures a {@link RunMonitor}
+   * to be installed, so that executing code can always query the cancellation status by
+   * <code>RunMonitor.CURRENT.get().isCancelled()</code>.
    */
   public JobInput withRunContext(final RunContext runContext) {
     m_runContext = runContext;
@@ -119,9 +119,9 @@ public class JobInput {
   }
 
   /**
-   * Instruments the job manager to log uncaught exceptions on behalf of the installed {@link ExceptionHandler}.
-   * That is enabled by default, but might be disabled, if the caller handles exceptions himself by waiting for the job
-   * to complete.
+   * Instruments the job manager to log uncaught exceptions on behalf of the installed {@link ExceptionHandler}. That is
+   * enabled by default, but might be disabled, if the caller handles exceptions himself by waiting for the job to
+   * complete.
    */
   public JobInput withLogOnError(final boolean logOnError) {
     m_logOnError = logOnError;

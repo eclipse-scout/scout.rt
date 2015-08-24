@@ -37,8 +37,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
   void setText(String s);
 
   /**
-   * @return the type of field to display to select a value for this attribute
-   *         see the TYPE_* values
+   * @return the type of field to display to select a value for this attribute see the TYPE_* values
    */
   int getType();
 

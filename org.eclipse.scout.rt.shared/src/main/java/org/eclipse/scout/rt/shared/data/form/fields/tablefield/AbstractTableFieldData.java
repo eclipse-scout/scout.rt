@@ -95,19 +95,19 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
   }
 
   @Override
-  public int/* newIndex */addRow() {
+  public int/* newIndex */ addRow() {
     return addRow(STATUS_NON_CHANGED);
   }
 
-  public int/* newIndex */addRow(int rowState) {
+  public int/* newIndex */ addRow(int rowState) {
     return addRow(null, rowState);
   }
 
-  public int/* newIndex */addRow(Object[] values) {
+  public int/* newIndex */ addRow(Object[] values) {
     return addRow(values, STATUS_NON_CHANGED);
   }
 
-  public int/* newIndex */addRow(Object[] values, int rowState) {
+  public int/* newIndex */ addRow(Object[] values, int rowState) {
     m_rowList.add(new Object[getColumnCount() + 1]);// +1 for status
     int newRowIndex = m_rowList.size() - 1;
     if (values != null) {

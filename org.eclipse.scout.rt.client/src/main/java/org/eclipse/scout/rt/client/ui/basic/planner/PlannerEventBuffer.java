@@ -66,12 +66,11 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
 
   /**
    * Removes the given 'resourcesToRemove' from all 'events'. The event list is traversed backwards. This process is
-   * stopped,
-   * when a event that may change resource indexes is encountered.
+   * stopped, when a event that may change resource indexes is encountered.
    *
-   * @return a list with the same resources as 'resourcesToRemove', except those that were removed from an
-   *         event whose type matches one of the 'creationTypes'. This allows for completely removing
-   *         a resource that was created and deleted in the same request.
+   * @return a list with the same resources as 'resourcesToRemove', except those that were removed from an event whose
+   *         type matches one of the 'creationTypes'. This allows for completely removing a resource that was created
+   *         and deleted in the same request.
    */
   protected List<Resource> removeResourcesFromPreviousEvents(List<? extends Resource> resourcesToRemove, List<PlannerEvent> events, Integer... creationTypes) {
     List<Integer> creationTypesList = Arrays.asList(creationTypes);
@@ -144,8 +143,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
 
   /**
    * Updates previous resources in the list, if it is of the given type. Breaks, if events are encountered, that may
-   * change
-   * the resource order.
+   * change the resource order.
    */
   protected void updatePreviousResource(PlannerEvent event, List<PlannerEvent> events, int type) {
     for (ListIterator<PlannerEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
@@ -192,8 +190,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
 
   /**
    * Merge events of the same type in the given list (resources and columns) into the current and delete the other
-   * events
-   * from the list.
+   * events from the list.
    */
   protected void coalesceConsecutivePrevious(PlannerEvent event, List<PlannerEvent> list) {
     for (ListIterator<PlannerEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
@@ -319,8 +316,7 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     }
     boolean identical = (event1.getType() == event2.getType()
         && CollectionUtility.equalsCollection(event1.getResources(), event2.getResources(), true)
-        && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus())
-        );
+        && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus()));
     return identical;
   }
 

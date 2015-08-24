@@ -29,8 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Bug 349468: Cloning of a form data does not replace the inner synthetic member
- * see {@link AbstractFormData}
+ * Bug 349468: Cloning of a form data does not replace the inner synthetic member see {@link AbstractFormData}
  */
 @RunWith(PlatformTestRunner.class)
 public class FormDataCloneTest {

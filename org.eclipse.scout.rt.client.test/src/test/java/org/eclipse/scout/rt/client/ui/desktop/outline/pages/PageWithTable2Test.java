@@ -33,8 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test for {@link AbstractPageWithTable}: importPageData, status
- * Bug 419138
+ * Test for {@link AbstractPageWithTable}: importPageData, status Bug 419138
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")

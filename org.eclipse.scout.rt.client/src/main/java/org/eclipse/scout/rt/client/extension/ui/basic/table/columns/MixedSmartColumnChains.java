@@ -11,7 +11,8 @@ public final class MixedSmartColumnChains {
   private MixedSmartColumnChains() {
   }
 
-  protected abstract static class AbstractMixedSmartColumnChain<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractExtensionChain<IMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, ? extends AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>>> {
+  protected abstract static class AbstractMixedSmartColumnChain<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
+      extends AbstractExtensionChain<IMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, ? extends AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>>> {
 
     public AbstractMixedSmartColumnChain(List<? extends IColumnExtension<VALUE_TYPE, ? extends AbstractColumn<VALUE_TYPE>>> extensions) {
       super(extensions, IMixedSmartColumnExtension.class);

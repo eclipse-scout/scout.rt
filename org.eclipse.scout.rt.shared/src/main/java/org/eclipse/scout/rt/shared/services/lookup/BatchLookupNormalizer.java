@@ -18,8 +18,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * Normalize batch lookup calls.
- * see {@link #normalize(LookupCall[])}
+ * Normalize batch lookup calls. see {@link #normalize(LookupCall[])}
  * <p>
  * Instances of this type are intended to be used on one-time per-call basis.
  * <p>

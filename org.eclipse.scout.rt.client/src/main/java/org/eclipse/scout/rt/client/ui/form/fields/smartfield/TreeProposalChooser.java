@@ -45,10 +45,10 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * Proposal chooser with a tree to choose hierarchical proposals. You can provide your own tree implementation
- * when your smart-field defines an inner AbstractTree class. You should call <code>smartField.acceptProposal()</code>
- * in your <code>tree.execNodeClick(ITreeNode, MouseButton)</code> method, otherwise the proposal-chooser isn't
- * closed when a proposal is selected in the tree.
+ * Proposal chooser with a tree to choose hierarchical proposals. You can provide your own tree implementation when your
+ * smart-field defines an inner AbstractTree class. You should call <code>smartField.acceptProposal()</code> in your
+ * <code>tree.execNodeClick(ITreeNode, MouseButton)</code> method, otherwise the proposal-chooser isn't closed when a
+ * proposal is selected in the tree.
  *
  * @since 6.0.0
  * @param <LOOKUP_KEY>
@@ -428,8 +428,8 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   }
 
   /**
-   * Override this method to change that behaviour of what is a single match.
-   * By default a single match is when there is a single enabled LEAF node in the tree
+   * Override this method to change that behaviour of what is a single match. By default a single match is when there is
+   * a single enabled LEAF node in the tree
    */
   @ConfigOperation
   @Order(40)

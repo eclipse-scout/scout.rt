@@ -22,8 +22,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
- * <h3>AbstractWizardContainerForm</h3> The form to extends to provide a
- * customized wizard container form.
+ * <h3>AbstractWizardContainerForm</h3> The form to extends to provide a customized wizard container form.
  *
  * @since 24.11.2009
  */
@@ -156,7 +155,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
     }
   }
 
-  protected static class LocalWizardContainerFormExtension<OWNER extends AbstractWizardContainerForm> extends LocalFormExtension<OWNER> implements IWizardContainerFormExtension<OWNER> {
+  protected static class LocalWizardContainerFormExtension<OWNER extends AbstractWizardContainerForm> extends LocalFormExtension<OWNER>implements IWizardContainerFormExtension<OWNER> {
 
     public LocalWizardContainerFormExtension(OWNER owner) {
       super(owner);

@@ -36,10 +36,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * This class tests the behavior of sent client notifications when
- * the shared variable map changes on the server side.<br/>
- * {@code SharedContextChangedNotification}s should only be sent if
- * the default offline state matches the offline state of the current thread.
+ * This class tests the behavior of sent client notifications when the shared variable map changes on the server side.
+ * <br/>
+ * {@code SharedContextChangedNotification}s should only be sent if the default offline state matches the offline state
+ * of the current thread.
  *
  * @see <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=379721">Bugzilla 379721</a>
  */

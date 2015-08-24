@@ -78,7 +78,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("3dc8747d-19eb-4c0a-b5fc-c3dc2ad0783d")
-public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> implements IListBox<KEY> {
+public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>>implements IListBox<KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractListBox.class);
 
   private ITable m_table;
@@ -141,8 +141,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   /**
-   * @return true: a filter is added to the listbox table that only accepts rows
-   *         that are active or checked.<br>
+   * @return true: a filter is added to the listbox table that only accepts rows that are active or checked.<br>
    *         Default is true<br>
    *         Affects {@link ITable#getFilteredRows()}
    */
@@ -153,8 +152,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   /**
-   * @return true: a filter is added to the listbox table that only accepts
-   *         checked rows<br>
+   * @return true: a filter is added to the listbox table that only accepts checked rows<br>
    *         Default is false<br>
    *         Affects {@link ITable#getFilteredRows()}<br>
    */
@@ -175,8 +173,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   /**
-   * On any value change or call to {@link #checkEmpty()} this method is called
-   * to calculate if the field represents an empty state (semantics)
+   * On any value change or call to {@link #checkEmpty()} this method is called to calculate if the field represents an
+   * empty state (semantics)
    * <p>
    */
   @Override
@@ -196,8 +194,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(260)
@@ -223,9 +221,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   /**
-   * Intercepter is called after data was fetched from LookupCall and is adding
-   * a table row for every LookupRow using IListBoxTable.createTableRow(row) and
-   * ITable.addRows()
+   * Intercepter is called after data was fetched from LookupCall and is adding a table row for every LookupRow using
+   * IListBoxTable.createTableRow(row) and ITable.addRows()
    * <p>
    * For most cases the override of just {@link #interceptLoadTableData()} is sufficient
    *
@@ -1084,7 +1081,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     chain.execPrepareLookup(call);
   }
 
-  protected static class LocalListBoxExtension<KEY, OWNER extends AbstractListBox<KEY>> extends LocalValueFieldExtension<Set<KEY>, OWNER> implements IListBoxExtension<KEY, OWNER> {
+  protected static class LocalListBoxExtension<KEY, OWNER extends AbstractListBox<KEY>> extends LocalValueFieldExtension<Set<KEY>, OWNER>implements IListBoxExtension<KEY, OWNER> {
 
     public LocalListBoxExtension(OWNER owner) {
       super(owner);

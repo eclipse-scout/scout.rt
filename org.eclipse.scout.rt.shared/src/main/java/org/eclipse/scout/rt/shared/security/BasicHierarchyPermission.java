@@ -81,8 +81,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
   }
 
   /**
-   * array of available levels, starting with the lowest, ending with the
-   * highest
+   * array of available levels, starting with the lowest, ending with the highest
    */
   public final List<Integer> getValidLevels() {
     return CollectionUtility.arrayList(m_validLevels);
@@ -131,8 +130,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
 
   /**
    * when p.level has value {@link #LEVEL_UNDEFINED} and also {@link #calculateLevel(int)} returns #
-   * {@link #LEVEL_UNDEFINED} then set
-   * p.level to the maximum of its level
+   * {@link #LEVEL_UNDEFINED} then set p.level to the maximum of its level
    */
   @Override
   public boolean implies(Permission p) {
@@ -186,8 +184,8 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
    * #LEVEL_UNDEFINED
    * 
    * @param requiredLevel
-   *          default implementation calls {@link #execCheckLevelData(int)} and
-   *          returns true if data yields rows and first rows first value is 1
+   *          default implementation calls {@link #execCheckLevelData(int)} and returns true if data yields rows and
+   *          first rows first value is 1
    */
   @SuppressWarnings("boxing")
   protected boolean execCheckLevel(int requiredLevel) throws ProcessingException {
@@ -196,8 +194,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
   }
 
   /**
-   * called by {@link #implies(Permission)} via execCheckLevel when level has
-   * value #LEVEL_UNDEFINED
+   * called by {@link #implies(Permission)} via execCheckLevel when level has value #LEVEL_UNDEFINED
    * 
    * @param requiredLevel
    * @return data with data[0][0]=1 as true

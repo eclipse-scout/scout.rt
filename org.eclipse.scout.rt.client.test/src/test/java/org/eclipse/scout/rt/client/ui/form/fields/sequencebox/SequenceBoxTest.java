@@ -65,8 +65,8 @@ public class SequenceBoxTest {
   private static final int ONE_MINUTE = 60000;
 
   /**
-   * Test method for {@link
-   * org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox#execCheckFromTo(org.eclipse.scout.rt.
+   * Test method for
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox#execCheckFromTo(org.eclipse.scout.rt.
    * client.ui.form.fields.IValueField<T>[], int)}.
    */
   @Test

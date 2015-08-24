@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 @ValidateAnnotationMarker
 public @interface CodeValue {
 
-  Class<? extends ICodeType> value();
+  Class<? extends ICodeType>value();
 
   /**
    * subtree=false is the default, the check is applied to the parameter or field only.

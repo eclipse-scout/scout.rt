@@ -265,8 +265,7 @@ public class DefaultTransactionDelegate {
 
   /**
    * Check pass 3 {@link RemoteServiceAccessPermission} if a client (gui) is allowed to call this service from remote
-   * using a
-   * remote service proxy.
+   * using a remote service proxy.
    * <p>
    * Deny access by default.
    * <p>
@@ -347,8 +346,8 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(IServiceTunnelRequest)}.
-   * Override this method to do central output validation inside the transaction context.
+   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(IServiceTunnelRequest)}. Override this
+   * method to do central output validation inside the transaction context.
    * <p>
    * This method is part of the protected api and can be overridden.
    */
@@ -439,7 +438,8 @@ public class DefaultTransactionDelegate {
   }
 
   protected void warnMissingInputValidation(Object serviceImpl, Method op) {
-    LOG.warn("Legacy security hint for: " + op.getDeclaringClass().getName() + "#" + op.getName() + ": missing either annotation " + InputValidation.class.getSimpleName() + " or override of server-side " + getClass().getSimpleName() + "#findInputValidationStrategyByPolicy. To support legacy the QUERY strategy is used.");
+    LOG.warn("Legacy security hint for: " + op.getDeclaringClass().getName() + "#" + op.getName() + ": missing either annotation " + InputValidation.class.getSimpleName() + " or override of server-side " + getClass().getSimpleName()
+        + "#findInputValidationStrategyByPolicy. To support legacy the QUERY strategy is used.");
   }
 
   /**

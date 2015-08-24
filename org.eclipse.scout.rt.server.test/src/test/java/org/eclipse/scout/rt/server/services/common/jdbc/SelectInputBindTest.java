@@ -41,8 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
- * Different types of arrays used as input bind.
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}). Different types of arrays used as input bind.
  */
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)
@@ -50,8 +49,7 @@ import org.junit.runner.RunWith;
 public class SelectInputBindTest {
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * Direct batch update.
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). Direct batch update.
    */
   @Test
   public void testBatchUpdateFromTableFieldData() throws Exception {
@@ -62,8 +60,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * TableData for batch update is in NVPair bind.
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData for batch update is in
+   * NVPair bind.
    */
   @Test
   public void testBatchUpdateFromTableFieldDataInNVPair() throws Exception {
@@ -74,8 +72,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * TableData for batch update is in Map bind.
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData for batch update is in
+   * Map bind.
    */
   @Test
   public void testBatchUpdateFromTableFieldDataInMap() throws Exception {
@@ -87,8 +85,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * TableData for batch update is in a bean (ContainerBean).
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData for batch update is in a
+   * bean (ContainerBean).
    */
   @Test
   public void testBatchUpdateFromTableFieldDataInBean() throws Exception {
@@ -101,8 +99,7 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna).
-   * Direct batch update.
+   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). Direct batch update.
    */
   @Test
   public void testBatchUpdateFromTableHolderFilter() throws Exception {
@@ -114,8 +111,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna).
-   * TableData for batch update is in NVPair bind.
+   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). TableData for batch
+   * update is in NVPair bind.
    */
   @Test
   public void testBatchUpdateFromTableHolderFilterInNVPair() throws Exception {
@@ -127,8 +124,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna).
-   * TableData for batch update is in Map bind.
+   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). TableData for batch
+   * update is in Map bind.
    */
   @Test
   public void testBatchUpdateFromTableHolderFilterInMap() throws Exception {
@@ -141,8 +138,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna).
-   * TableData for batch update is in a bean (ContainerBean).
+   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). TableData for batch
+   * update is in a bean (ContainerBean).
    */
   @Test
   public void testBatchUpdateFromTableHolderFilterInBean() throws Exception {
@@ -180,8 +177,7 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * Direct batch update.
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). Direct batch update.
    */
   @Test
   public void testBatchUpdateFromTableFieldBeanData() throws Exception {
@@ -192,8 +188,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * TableData for batch update is in NVPair bind.
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData for batch update
+   * is in NVPair bind.
    */
   @Test
   public void testBatchUpdateFromTableFieldBeanDataInNVPair() throws Exception {
@@ -204,8 +200,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * TableData for batch update is in Map bind.
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData for batch update
+   * is in Map bind.
    */
   @Test
   public void testBatchUpdateFromTableFieldBeanDataInMap() throws Exception {
@@ -217,8 +213,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * TableData for batch update is in a bean (ContainerBean).
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData for batch update
+   * is in a bean (ContainerBean).
    */
   @Test
   public void testBatchUpdateFromTableFieldBeanDataInBean() throws Exception {
@@ -231,8 +227,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna).
-   * Direct batch update.
+   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna). Direct batch
+   * update.
    */
   @Test
   public void testBatchUpdateFromTableBeanHolderFilter() throws Exception {
@@ -244,8 +240,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna).
-   * TableData for batch update is in NVPair bind.
+   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna). TableData for
+   * batch update is in NVPair bind.
    */
   @Test
   public void testBatchUpdateFromTableBeanHolderFilterInNVPair() throws Exception {
@@ -257,8 +253,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna).
-   * TableData for batch update is in Map bind.
+   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna). TableData for
+   * batch update is in Map bind.
    */
   @Test
   public void testBatchUpdateFromTableBeanHolderFilterInMap() throws Exception {
@@ -271,8 +267,8 @@ public class SelectInputBindTest {
   }
 
   /**
-   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna).
-   * TableData for batch update is in a bean (ContainerBean).
+   * {@link TableFieldBeanData} in combination with {@link TableBeanHolderFilter} (introduced with Luna). TableData for
+   * batch update is in a bean (ContainerBean).
    */
   @Test
   public void testBatchUpdateFromTableBeanHolderFilterInBean() throws Exception {
@@ -314,14 +310,14 @@ public class SelectInputBindTest {
     return sql;
   }
 
-  private static final String EXPECTED_PROTOCOL = "Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)\n" +
-      "PreparedStatement.setObject(1, 1, 4)\n" +
-      "PreparedStatement.setObject(2, 3, 4)\n" +
-      "PreparedStatement.setObject(3, lorem, 12)\n" +
-      "Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)\n" +
-      "PreparedStatement.setObject(1, 0, 4)\n" +
-      "PreparedStatement.setObject(2, 6, 4)\n" +
-      "PreparedStatement.setObject(3, ipsum, 12)\n";
+  private static final String EXPECTED_PROTOCOL = "Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)\n"
+      + "PreparedStatement.setObject(1, 1, 4)\n"
+      + "PreparedStatement.setObject(2, 3, 4)\n"
+      + "PreparedStatement.setObject(3, lorem, 12)\n"
+      + "Connection.prepareStatement(UDPATE my_table SET a = ?, s = ? where n = ?)\n"
+      + "PreparedStatement.setObject(1, 0, 4)\n"
+      + "PreparedStatement.setObject(2, 6, 4)\n"
+      + "PreparedStatement.setObject(3, ipsum, 12)\n";
 
   private static void assertExpectedProtocol(SqlServiceMock sql) {
     assertEquals(EXPECTED_PROTOCOL, sql.getProtocol().toString());
@@ -448,12 +444,12 @@ public class SelectInputBindTest {
   }
 
   private static final String PREPARE_STATEMENT = "Connection.prepareStatement(UDPATE this_table SET v = ? where r = ? and p = ?)\n";
-  private static final String OBJECTS_RECORD_1 = "PreparedStatement.setObject(1, lorem, 12)\n" +
-      "PreparedStatement.setObject(2, 5, -5)\n" +
-      "PreparedStatement.setObject(3, 9, -5)\n";
-  private static final String OBJECTS_RECORD_2 = "PreparedStatement.setObject(1, lorem, 12)\n" +
-      "PreparedStatement.setObject(2, 6, -5)\n" +
-      "PreparedStatement.setObject(3, 9, -5)\n";
+  private static final String OBJECTS_RECORD_1 = "PreparedStatement.setObject(1, lorem, 12)\n"
+      + "PreparedStatement.setObject(2, 5, -5)\n"
+      + "PreparedStatement.setObject(3, 9, -5)\n";
+  private static final String OBJECTS_RECORD_2 = "PreparedStatement.setObject(1, lorem, 12)\n"
+      + "PreparedStatement.setObject(2, 6, -5)\n"
+      + "PreparedStatement.setObject(3, 9, -5)\n";
 
   private static final String EXPECTED_PROTOCOL_2_V1 = PREPARE_STATEMENT + OBJECTS_RECORD_1 + PREPARE_STATEMENT + OBJECTS_RECORD_2;
   private static final String EXPECTED_PROTOCOL_2_V2 = PREPARE_STATEMENT + OBJECTS_RECORD_2 + PREPARE_STATEMENT + OBJECTS_RECORD_1;

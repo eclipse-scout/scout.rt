@@ -113,7 +113,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    *
    * @param messageBody
    *          a human-readable message, localized to the current locale, is never <code>null</null>
-   * @param cause
+   * &#64;param cause
    *          a low-level exception, or <code>null</code> if not applicable
    * @param code
    *          the custom status code
@@ -129,9 +129,9 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    *
    * @param messageTitle
    *          a human-readable title, localized to the current locale, can be <code>null</null>
-   * @param messageBody
+   * &#64;param messageBody
    *          a human-readable message, localized to the current locale, is never <code>null</null>
-   * @param cause
+   * &#64;param cause
    *          a low-level exception, or <code>null</code> if not applicable
    * @param code
    *          the custom status code
@@ -263,8 +263,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
   }
 
   /**
-   * Returns a string representation of the status, suitable for debugging
-   * purposes only.
+   * Returns a string representation of the status, suitable for debugging purposes only.
    */
   @Override
   public String toString() {

@@ -33,8 +33,7 @@ public final class ServiceTunnelUtility {
     return (T) Proxy.newProxyInstance(
         serviceInterfaceClass.getClassLoader(),
         new Class[]{serviceInterfaceClass},
-        handler
-        );
+        handler);
   }
 
 }

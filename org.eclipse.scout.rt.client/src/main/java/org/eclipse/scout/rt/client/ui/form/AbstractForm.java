@@ -411,8 +411,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * AskIfNeedSave defines if a message box with yes, no and cancel option is shown to the user for confirmation
-   * after having made at least one change in the form and then having pressed the cancel button.
+   * AskIfNeedSave defines if a message box with yes, no and cancel option is shown to the user for confirmation after
+   * having made at least one change in the form and then having pressed the cancel button.
    *
    * @return <code>true</code> if message box is shown for confirmation, <code>false</code> otherwise.
    */
@@ -432,8 +432,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * {@link IForm#TOOLBAR_VIEW_PART}.
-   * In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
+   * {@link IForm#TOOLBAR_VIEW_PART}. In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
    *
    * @return {@link IForm#TOOLBAR_FORM_HEADER} | {@link IForm#TOOLBAR_VIEW_PART}
    */
@@ -445,24 +444,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(170)
-  protected int/* seconds */getConfiguredCloseTimer() {
+  protected int/* seconds */ getConfiguredCloseTimer() {
     return 0;
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(180)
-  protected int/* seconds */getConfiguredCustomTimer() {
+  protected int/* seconds */ getConfiguredCustomTimer() {
     return 0;
   }
 
   /**
-   * This method is called to get an exclusive key of the form. The key is used
-   * to open the same form with the same handler only once. Obviously this
-   * behavior can only be used for view forms.
+   * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
+   * handler only once. Obviously this behavior can only be used for view forms.
    *
    * @see AbstractDesktop#getSimilarViewForms(IForm)
-   * @return null for exclusive form behavior an exclusive key to ensure similar
-   *         handling.
+   * @return null for exclusive form behavior an exclusive key to ensure similar handling.
    * @throws ProcessingException
    */
   @Override
@@ -471,8 +468,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Initialize the form and all of its fields.
-   * By default any of the #start* methods of the form call this method
+   * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
    * <p>
    * This method is called in the process of the initialization. The UI is not ready yet.
    *
@@ -503,16 +499,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * This method is called in order to check field validity.<br>
-   * This method is called before {@link IFormHandler#interceptCheckFields()} and
-   * before the form is validated and stored.<br>
-   * After this method, the form is checking fields itself and displaying a
-   * dialog with missing and invalid fields.
+   * This method is called before {@link IFormHandler#interceptCheckFields()} and before the form is validated and
+   * stored.<br>
+   * After this method, the form is checking fields itself and displaying a dialog with missing and invalid fields.
    *
-   * @return true when this check is done and further checks can continue, false
-   *         to silently cancel the current process
+   * @return true when this check is done and further checks can continue, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user
-   *           notification such as a dialog
+   *           to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(13)
@@ -521,16 +514,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * This method is called in order to update derived states like button
-   * enablings.<br>
-   * This method is called before {@link IFormHandler#interceptValidate()} and before
-   * the form is stored.
+   * This method is called in order to update derived states like button enablings.<br>
+   * This method is called before {@link IFormHandler#interceptValidate()} and before the form is stored.
    *
-   * @return true when validate is successful, false to silently cancel the
-   *         current process
+   * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user
-   *           notification such as a dialog
+   *           to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(14)
@@ -539,8 +528,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * This method is called in order to update pages on the desktop after the
-   * form stored data.<br>
+   * This method is called in order to update pages on the desktop after the form stored data.<br>
    * This method is called after {@link IFormHandler#execStore()}.
    */
   @ConfigOperation
@@ -550,8 +538,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * @throws ProcessingException
-   *           / {@link VetoException} if the exception should produce further
-   *           info messages (default)
+   *           / {@link VetoException} if the exception should produce further info messages (default)
    */
   @ConfigOperation
   @Order(17)
@@ -561,11 +548,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * @param kill
-   *          true if a widget close icon (normally the X on the titlebar) was
-   *          pressed or ESC was pressed
+   *          true if a widget close icon (normally the X on the titlebar) was pressed or ESC was pressed
    * @param enabledButtonSystemTypes
-   *          set of all {@link IButton#SYSTEM_TYPE_*} of all enabled and
-   *          visible buttons of this form (never <code>null</code>)
+   *          set of all {@link IButton#SYSTEM_TYPE_*} of all enabled and visible buttons of this form (never
+   *          <code>null</code>)
    */
   @ConfigOperation
   @Order(18)
@@ -911,8 +897,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these
-   * dataTypes<br>
+   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -946,8 +931,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * This method is called from the implemented handler methods in a explicit
-   * form subclass
+   * This method is called from the implemented handler methods in a explicit form subclass
    */
   protected IForm startInternal(final IFormHandler handler) throws ProcessingException {
     ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
@@ -1676,8 +1660,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Store state of form, regardless of validity and completeness do not use or
-   * override this internal method directly
+   * Store state of form, regardless of validity and completeness do not use or override this internal method directly
    */
   protected void storeStateInternal() throws ProcessingException {
     if (!m_blockingCondition.isBlocking()) {
@@ -1966,10 +1949,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Save data and close the form.
-   * It will make this decision based on {@link #isSaveNeeded}.
-   * Saving usually involves calling the <code>execStore</code> method
-   * of the current form handler.
+   * Save data and close the form. It will make this decision based on {@link #isSaveNeeded}. Saving usually involves
+   * calling the <code>execStore</code> method of the current form handler.
    *
    * @see AbstractFormHandler#execStore()
    */
@@ -2115,7 +2096,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     visitFields(v);
   }
 
-  private boolean/* ok */checkForVerifyingFields() {
+  private boolean/* ok */ checkForVerifyingFields() {
     // check all fields that might be invalid
     P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
       @Override
@@ -3142,7 +3123,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM> implements IFormExtension<FORM> {
+  protected static class LocalFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM>implements IFormExtension<FORM> {
 
     /**
      * @param owner

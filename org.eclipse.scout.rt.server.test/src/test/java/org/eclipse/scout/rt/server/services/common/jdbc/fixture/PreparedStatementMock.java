@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 
-public class PreparedStatementMock extends VerboseMock implements InvocationHandler/*, java.sql.PreparedStatement*/{
+public class PreparedStatementMock extends VerboseMock implements InvocationHandler/*, java.sql.PreparedStatement*/ {
   private final PreparedStatement m_ps;
   private final Object[][] m_resultData;
 

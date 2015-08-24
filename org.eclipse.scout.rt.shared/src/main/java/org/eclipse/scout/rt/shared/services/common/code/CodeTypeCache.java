@@ -20,8 +20,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
- * Maintains a cache of ICodeType objects that can be (re)loaded using the
- * methods reloadCodeType, reloadCodeTypes
+ * Maintains a cache of ICodeType objects that can be (re)loaded using the methods reloadCodeType, reloadCodeTypes
  *
  * @since 4.3.0 (mars-M5)
  */

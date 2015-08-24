@@ -26,8 +26,7 @@ public abstract class AbstractSchedulerJobWithFormula extends AbstractSchedulerJ
   private Object[] m_args;
 
   /**
-   * see {@link AbstractSchedulerJobWithFormula(String, String, String, String,
-   * Object[])}
+   * see {@link AbstractSchedulerJobWithFormula(String, String, String, String, Object[])}
    */
   public AbstractSchedulerJobWithFormula(String groupId, String jobId, String formula) throws ProcessingException {
     this(groupId, jobId, formula, null);
@@ -36,13 +35,10 @@ public abstract class AbstractSchedulerJobWithFormula extends AbstractSchedulerJ
   /**
    * @param formula
    *          see syntax in {@link com.bsiag.scheduler.formula.FormulaParser} FORMULA is a boolean expression that can
-   *          use the following
-   *          variables: second (0..59) minute (0..59) hour (0..23) day (1..31)
-   *          week (1..52) month (1..12) year (1900..9999) dayOfWeek (1..7) 1 is
-   *          monday dayOfMonthReverse (1..31) 1 is last day of month dayOfYear
-   *          (1..365) arg0....argN where arg0 is the value of param args[0],...
-   *          Examples of a formula: (second==0) && (minute % 2 == 0) //every
-   *          even minute (second==0) && (minute==0) && (hour==13) && (day==1)
+   *          use the following variables: second (0..59) minute (0..59) hour (0..23) day (1..31) week (1..52) month
+   *          (1..12) year (1900..9999) dayOfWeek (1..7) 1 is monday dayOfMonthReverse (1..31) 1 is last day of month
+   *          dayOfYear (1..365) arg0....argN where arg0 is the value of param args[0],... Examples of a formula:
+   *          (second==0) && (minute % 2 == 0) //every even minute (second==0) && (minute==0) && (hour==13) && (day==1)
    *          //every first day of each month at 13:00:00
    */
   public AbstractSchedulerJobWithFormula(String groupId, String jobId, String formula, String action, Object... args) throws ProcessingException {

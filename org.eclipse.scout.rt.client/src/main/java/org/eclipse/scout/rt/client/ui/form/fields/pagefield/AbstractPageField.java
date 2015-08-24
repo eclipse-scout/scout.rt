@@ -37,8 +37,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
- * Representation of a page as a composite of detailForm, table, searchForm for
- * usage inside a {@link IForm}
+ * Representation of a page as a composite of detailForm, table, searchForm for usage inside a {@link IForm}
  */
 @ClassId("e2f4e714-637f-4a9b-b3be-d672900e1374")
 public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGroupBox implements IPageField<PAGE> {
@@ -127,9 +126,8 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   }
 
   /**
-   * If the given table has a table control of type {@link SearchFormTableControl}, this
-   * table control is removed. Otherwise, the form would be rendered twice (1x table control,
-   * 1x SearchFormField).
+   * If the given table has a table control of type {@link SearchFormTableControl}, this table control is removed.
+   * Otherwise, the form would be rendered twice (1x table control, 1x SearchFormField).
    */
   protected ITable detachSearchFormTableControl(ITable table) {
     SearchFormTableControl searchControl = table.getTableControl(SearchFormTableControl.class);
@@ -245,7 +243,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     chain.execPageChanged(oldPage, newPage);
   }
 
-  protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER> implements IPageFieldExtension<T, OWNER> {
+  protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER>implements IPageFieldExtension<T, OWNER> {
 
     public LocalPageFieldExtension(OWNER owner) {
       super(owner);

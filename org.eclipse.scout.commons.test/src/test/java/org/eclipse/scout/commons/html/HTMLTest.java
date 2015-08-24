@@ -33,10 +33,10 @@ public class HTMLTest {
   private static final String ENCODED_BIND_TEXT = "Test Last Name&amp;";
   private static final String TEST_URL = "http://SCOUTBLABLA.com";
 
-  private static final String sampleCSS = "p {" +
-      "    text-align: center;" +
-      "    color: red;" +
-      "}";
+  private static final String sampleCSS = "p {"
+      + "    text-align: center;"
+      + "    color: red;"
+      + "}";
 
   @Test
   public void testHtmlNoBinds() {
@@ -109,8 +109,7 @@ public class HTMLTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-            cell(BIND_TEXT))
-        );
+            cell(BIND_TEXT)));
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
 
@@ -118,8 +117,7 @@ public class HTMLTest {
   public void testLinkWithBoldNoBinds() throws Exception {
     final IHtmlElement html = HTML.bold(
         BIND_TEXT,
-        link(TEST_URL, BIND_TEXT)
-        );
+        link(TEST_URL, BIND_TEXT));
     assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a></b>", html.toEncodedHtml());
   }
 
@@ -180,8 +178,7 @@ public class HTMLTest {
   public void testComplexHtml() {
     final IHtmlElement html = HTML.div(
         link(TEST_URL, BIND_TEXT),
-        HTML.table(row(cell(BIND_TEXT), cell(BIND_TEXT), cell(BIND_TEXT)))
-        );
+        HTML.table(row(cell(BIND_TEXT), cell(BIND_TEXT), cell(BIND_TEXT))));
     String expected = "<div><a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a><table><tr><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td></tr></table></div>";
     assertEquals(expected, html.toEncodedHtml());
   }
@@ -214,8 +211,7 @@ public class HTMLTest {
   public void testFullHtml() {
     IHtmlDocument html = HTML.html(
         HTML.cssStyle(sampleCSS),
-        BIND_TEXT
-        );
+        BIND_TEXT);
     String expected = "<html><head><style type=\"text/css\">" + sampleCSS + "</style>"
         + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
     assertEquals(expected, html.toEncodedHtml());
@@ -225,8 +221,7 @@ public class HTMLTest {
   public void testFullHtmlDocType() {
     IHtmlDocument html = HTML.html5(
         HTML.cssStyle(sampleCSS),
-        BIND_TEXT
-        );
+        BIND_TEXT);
     String expected = "<!DOCTYPE html><html><head><style type=\"text/css\">" + sampleCSS + "</style>"
         + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
     assertEquals(expected, html.toEncodedHtml());
@@ -250,8 +245,7 @@ public class HTMLTest {
 
     IHtmlElement html = HTML.div(
         h2,
-        table
-        );
+        table);
 
     String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
     assertEquals(exp, html.toEncodedHtml());

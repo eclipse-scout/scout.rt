@@ -37,8 +37,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * JUnit test for {@link CodeLookupCall}.
- * Test that the implementation of Bug 364312 does not affect the lookup call's behaviour (no side effects).
+ * JUnit test for {@link CodeLookupCall}. Test that the implementation of Bug 364312 does not affect the lookup call's
+ * behaviour (no side effects).
  */
 @RunWith(PlatformTestRunner.class)
 public class CodeLookupCallTest {
@@ -60,10 +60,9 @@ public class CodeLookupCallTest {
   @BeforeClass
   public static void beforeClass() throws Exception {
     s_services = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class).
-            withInitialInstance(new TestingCodeService(new CodeLookupCallTestCodeType())).
-            withApplicationScoped(true)
-        );
+        new BeanMetaData(ICodeService.class)
+            .withInitialInstance(new TestingCodeService(new CodeLookupCallTestCodeType()))
+            .withApplicationScoped(true));
   }
 
   @AfterClass
@@ -211,7 +210,9 @@ public class CodeLookupCallTest {
   }
 
   private static boolean equals(ILookupRow<?> row1, ILookupRow<?> row2) {
-    return CompareUtility.equals(row1.getBackgroundColor(), row2.getBackgroundColor()) && CompareUtility.equals(row1.getFont(), row2.getFont()) && CompareUtility.equals(row1.getForegroundColor(), row2.getForegroundColor()) && CompareUtility.equals(row1.getIconId(), row2.getIconId()) && CompareUtility.equals(row1.getKey(), row2.getKey()) && CompareUtility.equals(row1.getParentKey(), row2.getParentKey()) && CompareUtility.equals(row1.getText(), row2.getText()) && CompareUtility.equals(row1.getTooltipText(), row2.getTooltipText());
+    return CompareUtility.equals(row1.getBackgroundColor(), row2.getBackgroundColor()) && CompareUtility.equals(row1.getFont(), row2.getFont()) && CompareUtility.equals(row1.getForegroundColor(), row2.getForegroundColor())
+        && CompareUtility.equals(row1.getIconId(), row2.getIconId()) && CompareUtility.equals(row1.getKey(), row2.getKey()) && CompareUtility.equals(row1.getParentKey(), row2.getParentKey())
+        && CompareUtility.equals(row1.getText(), row2.getText()) && CompareUtility.equals(row1.getTooltipText(), row2.getTooltipText());
   }
 
   private class P_NewCodeLookupCall extends CodeLookupCall<Integer> {

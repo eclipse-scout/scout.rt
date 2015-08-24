@@ -34,8 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test the reload of a page when multiple summary columns are present.
- * Should not produce an error.
+ * Test the reload of a page when multiple summary columns are present. Should not produce an error.
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")

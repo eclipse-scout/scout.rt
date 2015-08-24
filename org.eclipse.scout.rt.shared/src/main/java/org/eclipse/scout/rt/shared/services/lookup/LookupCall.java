@@ -31,8 +31,7 @@ import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 /**
  * There are 2 variants to use lookup values <br>
  * a) with a service that yields data (external data, large amount, on database) <br>
- * b) with data directly generated in the call itself (local data, small amount,
- * in memory)
+ * b) with data directly generated in the call itself (local data, small amount, in memory)
  * <p>
  * When using (a) the configured property getConfiguredService is non-null <br>
  * When using (b) the method execCreateLookupRows() is non-empty. The subclass CodeLookupCall is implementing this
@@ -182,8 +181,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
 
   /**
    * @return {@link TriState#TRUE} if only active rows should be fetched, {@link TriState#FALSE} if only incative rows
-   *         should be fetched and {@link TriState#UNDEFINED} if active and inactive rows should be
-   *         fetched
+   *         should be fetched and {@link TriState#UNDEFINED} if active and inactive rows should be fetched
    */
   @Override
   public TriState getActive() {
@@ -302,8 +300,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   /**
    * Same as {@link #getDataByKey()} but in background.<br>
    * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called in the background thread
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
    *
@@ -359,8 +356,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   /**
    * Same as {@link #getDataByText()} but in background.<br>
    * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called in the background thread
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
    *
@@ -416,8 +412,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   /**
    * Same as {@link #getDataByAll()} but in background.<br>
    * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called in the background thread
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
    *
@@ -472,8 +467,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   /**
    * Same as {@link #getDataByRec()} but in background.<br>
    * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called in the background thread
+   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
    * <p>
    * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
    *

@@ -358,8 +358,7 @@ public class JobCancelTest {
     assertEquals(CollectionUtility.hashSet(
         "job-2-interrupted",
         "job-2-cancelled (future)",
-        "job-2-cancelled (monitor)"
-        ), protocol);
+        "job-2-cancelled (monitor)"), protocol);
   }
 
   /**
@@ -449,8 +448,7 @@ public class JobCancelTest {
         "job-1-cancelled (monitor)",
         "job-2-interrupted",
         "job-2-cancelled (future)",
-        "job-2-cancelled (monitor)"
-        ), protocol);
+        "job-2-cancelled (monitor)"), protocol);
   }
 
   /**

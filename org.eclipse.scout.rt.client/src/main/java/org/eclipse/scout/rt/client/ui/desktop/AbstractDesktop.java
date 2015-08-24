@@ -119,8 +119,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>menubar menus
  * <li>toolbar and viewbar actions
  * </ul>
- * The Eclipse Scout SDK creates a subclass of this class that can be used as
- * initial desktop.
+ * The Eclipse Scout SDK creates a subclass of this class that can be used as initial desktop.
  */
 public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop, IContributionOwner, IExtensibleObject {
 
@@ -212,8 +211,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Configuration
    */
   /**
-   * Configures the title of this desktop. The title is typically used as title for the main application
-   * window.
+   * Configures the title of this desktop. The title is typically used as title for the main application window.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
@@ -226,9 +224,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Configures whether this Scout application should be represented within the OS system tray.
-   * Representations in the system tray might differ for different operating systems or different UI.
-   * A system tray may not be available at all.
+   * Configures whether this Scout application should be represented within the OS system tray. Representations in the
+   * system tray might differ for different operating systems or different UI. A system tray may not be available at
+   * all.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
@@ -242,9 +240,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Configures the outlines associated with this desktop. If multiple outlines are configured,
-   * there is typically a need to provide some means of switching between different outlines,
-   * such as a {@link AbstractOutlineViewButton}.
+   * Configures the outlines associated with this desktop. If multiple outlines are configured, there is typically a
+   * need to provide some means of switching between different outlines, such as a {@link AbstractOutlineViewButton}.
    * <p>
    * Note that {@linkplain IDesktopExtension desktop extensions} might contribute additional outlines to this desktop.
    * <p>
@@ -266,8 +263,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * If isAutoTabKeyStrokesEnabled is true this modifier is used in combination with a number to select tab.
-   * possible values:
+   * If isAutoTabKeyStrokesEnabled is true this modifier is used in combination with a number to select tab. possible
+   * values:
    * <ul>
    * <li>IKeyStroke.CONTROL</li>
    * <li>IKeyStroke.SHIFT</li>
@@ -465,8 +462,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called while the tray popup is being built. This method may call {@link #getMenu(Class)} to find an existing
-   * menu on this desktop by class type.
+   * Called while the tray popup is being built. This method may call {@link #getMenu(Class)} to find an existing menu
+   * on this desktop by class type.
    * <p>
    * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
    * called on each and then checked if the menu is visible.
@@ -2348,7 +2345,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP> implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
+  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP>implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
 
     public LocalDesktopExtension(DESKTOP desktop) {
       super(desktop);

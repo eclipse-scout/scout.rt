@@ -131,8 +131,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   /**
-   * DESIGN: should return false if the asked property is set to null - see
-   * setProperty() as well. (tha, 16.2.6)
+   * DESIGN: should return false if the asked property is set to null - see setProperty() as well. (tha, 16.2.6)
    */
   public boolean hasProperty(String name) {
     return m_props.containsKey(name);
@@ -261,15 +260,14 @@ public class BasicPropertySupport implements IEventListenerSource {
     return setProperty(name, newValue, null);
   }
 
-  public boolean/* changed */setPropertyNoFire(String name, Object newValue) {
+  public boolean/* changed */ setPropertyNoFire(String name, Object newValue) {
     Object oldValue = m_props.get(name);
     m_props.put(name, newValue);
     return !CompareUtility.equals(oldValue, newValue);
   }
 
   /**
-   * DESIGN: should remove property if set to null - see hasProperty() as well
-   * (tha, 16.2.6)
+   * DESIGN: should remove property if set to null - see hasProperty() as well (tha, 16.2.6)
    */
   public boolean setProperty(String name, Object newValue, Object defaultOldValueWhenNull) {
     Object oldValue = m_props.get(name);

@@ -71,7 +71,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * instead.
  */
 @ScoutSdkIgnore
-public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
+public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE>implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
@@ -152,8 +152,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
-   * If this method is not overwritten, and the content assist field has a codeType then
-   * the value of browseHierarchy is automatically determined by {@link ICodeType#isHierarchy()}
+   * If this method is not overwritten, and the content assist field has a codeType then the value of browseHierarchy is
+   * automatically determined by {@link ICodeType#isHierarchy()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
@@ -162,10 +162,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
-   * When the smart proposal finds no matching records and this property is not
-   * null, then it displays a link or menu with this label.<br>
-   * When clicked the method {@link #interceptBrowseNew(String)} is invoked, which in
-   * most cases is implemented as opening a "New XY..." dialog
+   * When the smart proposal finds no matching records and this property is not null, then it displays a link or menu
+   * with this label.<br>
+   * When clicked the method {@link #interceptBrowseNew(String)} is invoked, which in most cases is implemented as
+   * opening a "New XY..." dialog
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(315)
@@ -186,8 +186,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   /**
    * variant B: lookup by backend lookup service<br>
    * 3.0: no support for {@code<eval>} tags anymore<br>
-   * 3.0: still valid are {@code<text><key><all><rec>} tags in lookup statements
-   * in the backend
+   * 3.0: still valid are {@code<text><key><all><rec>} tags in lookup statements in the backend
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(250)
@@ -213,8 +212,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
-   * @return
-   *         default height: 280
+   * @return default height: 280
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(280)
@@ -286,8 +284,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(280)
@@ -298,8 +296,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(290)
@@ -310,8 +308,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(300)
@@ -322,8 +320,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(310)
@@ -334,8 +332,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(320)
@@ -702,8 +700,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
-   * Notice: This method is called from a worker originated outside the scout
-   * thread (sync into scout model thread)
+   * Notice: This method is called from a worker originated outside the scout thread (sync into scout model thread)
    */
   protected void installLookupRowContext(ILookupRow<LOOKUP_KEY> row) {
     if (row == null) {
@@ -909,8 +906,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   protected abstract VALUE returnLookupRowAsValue(ILookupRow<LOOKUP_KEY> lookupRow);
 
   /**
-   * This method is called when a value is set, but no single match has been found for the given text.
-   * Will be implemented differently by SmartField and ProposalField.
+   * This method is called when a value is set, but no single match has been found for the given text. Will be
+   * implemented differently by SmartField and ProposalField.
    */
   protected abstract VALUE handleMissingLookupRow(String text) throws VetoException;
 
@@ -1237,7 +1234,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
   }
 
-  protected static class LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> extends LocalValueFieldExtension<VALUE, OWNER> implements IContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
+  protected static class LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> extends LocalValueFieldExtension<VALUE, OWNER>
+      implements IContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
 
     public LocalContentAssistFieldExtension(OWNER owner) {
       super(owner);

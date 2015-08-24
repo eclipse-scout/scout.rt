@@ -26,8 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public interface ILookupCallFetcher<T> {
 
   /**
-   * This method may be called in a background thread out of the scout session
-   * context
+   * This method may be called in a background thread out of the scout session context
    * 
    * @param rows
    *          that were fetched from the data provider

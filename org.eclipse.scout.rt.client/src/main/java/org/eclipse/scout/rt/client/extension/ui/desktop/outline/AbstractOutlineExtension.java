@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.Ou
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
-public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> extends AbstractTreeExtension<OWNER> implements IOutlineExtension<OWNER> {
+public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> extends AbstractTreeExtension<OWNER>implements IOutlineExtension<OWNER> {
 
   public AbstractOutlineExtension(OWNER owner) {
     super(owner);

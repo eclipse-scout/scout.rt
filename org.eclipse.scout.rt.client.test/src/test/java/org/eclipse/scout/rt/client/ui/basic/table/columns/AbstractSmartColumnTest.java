@@ -51,16 +51,15 @@ public class AbstractSmartColumnTest {
     TestingCodeService codeService = new TestingCodeService(new TestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_regs = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class).
-            withInitialInstance(codeService).
-            withApplicationScoped(true),
-        new BeanMetaData(ICodeLookupCallFactoryService.class).
-            withInitialInstance(codeLookupCallFactoryService).
-            withApplicationScoped(true),
-        new BeanMetaData(ILookupCallProvisioningService.class).
-            withInitialInstance(new DefaultLookupCallProvisioningService()).
-            withApplicationScoped(true)
-        );
+        new BeanMetaData(ICodeService.class)
+            .withInitialInstance(codeService)
+            .withApplicationScoped(true),
+        new BeanMetaData(ICodeLookupCallFactoryService.class)
+            .withInitialInstance(codeLookupCallFactoryService)
+            .withApplicationScoped(true),
+        new BeanMetaData(ILookupCallProvisioningService.class)
+            .withInitialInstance(new DefaultLookupCallProvisioningService())
+            .withApplicationScoped(true));
   }
 
   @AfterClass

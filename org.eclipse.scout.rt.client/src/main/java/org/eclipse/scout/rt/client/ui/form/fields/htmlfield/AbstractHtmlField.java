@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.shared.data.form.ValidationRule;
  * fragment such as microsoft word editor)
  */
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
-public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
+public abstract class AbstractHtmlField extends AbstractValueField<String>implements IHtmlField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlField.class);
 
   private IHtmlFieldUIFacade m_uiFacade;
@@ -93,8 +93,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    * @param path
    *          {@link URL#getPath()}
    * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
+   *          true if the url is not a valid external url but a local model url (http://local/...)
    * @deprecated use {@link #execAppLinkAction(String)} instead
    */
   @ConfigOperation
@@ -295,10 +294,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   /**
-   * Returns whether this html component should be monitored for spelling errors
-   * in the background ("check as you type").<br>
-   * If it is not defined, null is returned, then the application default is
-   * used.
+   * Returns whether this html component should be monitored for spelling errors in the background ("check as you type"
+   * ).<br>
+   * If it is not defined, null is returned, then the application default is used.
    */
   @Override
   public Boolean isSpellCheckAsYouTypeEnabled() {
@@ -306,8 +304,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   /**
-   * Sets whether to monitor this html component for spelling errors in the
-   * background ("check as you type").<br>
+   * Sets whether to monitor this html component for spelling errors in the background ("check as you type").<br>
    * Use null for application default.
    */
   public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
@@ -330,7 +327,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     chain.execAppLinkAction(ref);
   }
 
-  protected static class LocalHtmlFieldExtension<OWNER extends AbstractHtmlField> extends LocalValueFieldExtension<String, OWNER> implements IHtmlFieldExtension<OWNER> {
+  protected static class LocalHtmlFieldExtension<OWNER extends AbstractHtmlField> extends LocalValueFieldExtension<String, OWNER>implements IHtmlFieldExtension<OWNER> {
 
     public LocalHtmlFieldExtension(OWNER owner) {
       super(owner);

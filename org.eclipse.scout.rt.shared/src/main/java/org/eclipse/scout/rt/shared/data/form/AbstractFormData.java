@@ -180,18 +180,15 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   /**
-   * @return all fields of the form data itself, not including fields in
-   *         external field templates
+   * @return all fields of the form data itself, not including fields in external field templates
    */
   public AbstractFormFieldData[] getFields() {
     return m_fieldMap.values().toArray(new AbstractFormFieldData[m_fieldMap.size()]);
   }
 
   /**
-   * @return all fields of the form data and all its external template field
-   *         datas in a map with qualified ids<br>
-   *         The array of returned fields is the result of a top-down
-   *         breadth-first tree traversal
+   * @return all fields of the form data and all its external template field datas in a map with qualified ids<br>
+   *         The array of returned fields is the result of a top-down breadth-first tree traversal
    *         <p>
    *         Example:
    *
@@ -204,7 +201,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * B
    *   X
    *   Y
-   * </pre>
+   *         </pre>
    *
    *         would be returned as A B U V X Y E F
    */
@@ -268,8 +265,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   /**
-   * Searches the given form field data in this form data as well as in all externally referenced template
-   * field data.
+   * Searches the given form field data in this form data as well as in all externally referenced template field data.
    *
    * @param breadthFirstMap
    *          The breadth-first search map as returned by {@link AbstractFormData#getAllFieldsRec()}. If
@@ -301,10 +297,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   /**
-   * @return all properties of the form data and all its external template field
-   *         data in a map with qualified ids<br>
-   *         The array of returned fields is the result of a top-down
-   *         breadth-first tree traversal
+   * @return all properties of the form data and all its external template field data in a map with qualified ids<br>
+   *         The array of returned fields is the result of a top-down breadth-first tree traversal
    *         <p>
    *         Example:
    *
@@ -317,7 +311,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * B
    *   X (p2)
    *   Y
-   * </pre>
+   *         </pre>
    *
    *         would be returned as p1, p4, p2, p3
    */
@@ -349,8 +343,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   /**
-   * Searches the given property data in this form data as well as in all externally referenced template
-   * field data.
+   * Searches the given property data in this form data as well as in all externally referenced template field data.
    *
    * @param breadthFirstMap
    *          The breadth-first search map as returned by {@link AbstractFormData#getAllPropertiesRec()}. If
@@ -392,8 +385,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   }
 
   /**
-   * Checks whether the given fully qualified fieldId matches all parts of the given class identifier.
-   * The last segment is checked against the given objects's type.
+   * Checks whether the given fully qualified fieldId matches all parts of the given class identifier. The last segment
+   * is checked against the given objects's type.
    *
    * @param valueTypeIdentifier
    * @param fullyQualifiedFieldId

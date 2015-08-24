@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public abstract class AbstractClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
+public abstract class AbstractClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER>implements IClientSessionExtension<OWNER> {
 
   public AbstractClientSessionExtension(OWNER owner) {
     super(owner);

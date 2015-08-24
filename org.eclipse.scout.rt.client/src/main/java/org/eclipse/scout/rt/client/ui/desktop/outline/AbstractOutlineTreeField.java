@@ -88,7 +88,7 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField impleme
     }
   }
 
-  protected static class LocalOutlineTreeFieldExtension<OWNER extends AbstractOutlineTreeField> extends LocalTreeFieldExtension<OWNER> implements IOutlineTreeFieldExtension<OWNER> {
+  protected static class LocalOutlineTreeFieldExtension<OWNER extends AbstractOutlineTreeField> extends LocalTreeFieldExtension<OWNER>implements IOutlineTreeFieldExtension<OWNER> {
 
     public LocalOutlineTreeFieldExtension(OWNER owner) {
       super(owner);

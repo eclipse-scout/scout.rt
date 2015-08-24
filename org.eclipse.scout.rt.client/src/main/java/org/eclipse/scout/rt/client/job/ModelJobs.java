@@ -55,7 +55,6 @@ import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
  *         });
  *       }
  *     }, BEANS.get(JobInput.class).<strong>mutex(session)</strong>);
- *
  * </pre>
  *
  * @since 5.1
@@ -69,8 +68,8 @@ public final class ModelJobs {
 
   /**
    * Runs the given {@link IRunnable} asynchronously on behalf of a model thread at the next reasonable opportunity. The
-   * caller of
-   * this method continues to run in parallel. The job will only commence execution once acquired the model mutex.
+   * caller of this method continues to run in parallel. The job will only commence execution once acquired the model
+   * mutex.
    * <p/>
    * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
    * <p/>

@@ -35,22 +35,19 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 /**
  * <h4>LDAPSecurityFilter</h4> The following properties can be set in the <code>config.properties</code> file:
  * <ul>
- * <li><code>&lt;fully qualified name of class&gt;#active=true/false</code> <b>might be set in the extension point</b></li>
+ * <li><code>&lt;fully qualified name of class&gt;#active=true/false</code> <b>might be set in the extension point</b>
+ * </li>
  * <li><code>&lt;fully qualified name of class&gt;#realm=abcde</code> <b>required</b></li>
  * <li><code>&lt;fully qualified name of class&gt;#failover=true/false</code> <b>default false</b></li>
- * <li>
- * <code>&lt;fully qualified name of class&gt;#ldapServer=[e.g. ldap://100.100.29.4]</code> <b>required</b></li>
- * <li>
- * <code>&lt;fully qualified name of class&gt;#ldapBaseDN=[e.g. o=bsiag]</code> <b>required</b></li>
- * <li>
- * <code>&lt;fully qualified name of class&gt;#lDAPgroupDN=[e.g. ou=bsi_baden,ou=bsi_bern]</code> <b>required</b></li>
- * <li>
- * <code>&lt;fully qualified name of class&gt;#lDAPgroupAttributeId=[e.g. cn]</code> <b>required</b></li>
+ * <li><code>&lt;fully qualified name of class&gt;#ldapServer=[e.g. ldap://100.100.29.4]</code> <b>required</b></li>
+ * <li><code>&lt;fully qualified name of class&gt;#ldapBaseDN=[e.g. o=bsiag]</code> <b>required</b></li>
+ * <li><code>&lt;fully qualified name of class&gt;#lDAPgroupDN=[e.g. ou=bsi_baden,ou=bsi_bern]</code> <b>required</b>
+ * </li>
+ * <li><code>&lt;fully qualified name of class&gt;#lDAPgroupAttributeId=[e.g. cn]</code> <b>required</b></li>
  * </ul>
  * <p>
  *
- * @since 1.0.0 02.07.2008
- *        TODO imo remove in 6.0, convert to LDAPAuthenticator
+ * @since 1.0.0 02.07.2008 TODO imo remove in 6.0, convert to LDAPAuthenticator
  */
 public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LDAPSecurityFilter.class);
@@ -126,8 +123,7 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
    * @param attributeId
    *          e.g. equivalentToMe <br>
    *          Name of the user DN attribute
-   * @return something like
-   *         "cn=KippingSte,ou=KS,ou=LM,ou=HLG,ou=ZENTRALE,o=HERMES"
+   * @return something like "cn=KippingSte,ou=KS,ou=LM,ou=HLG,ou=ZENTRALE,o=HERMES"
    * @throws ServletException
    */
   @SuppressWarnings("unchecked")

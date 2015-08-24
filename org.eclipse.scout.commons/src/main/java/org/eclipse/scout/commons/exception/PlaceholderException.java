@@ -14,11 +14,9 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
 /**
- * This exception class is used as place holder for exceptions that are most
- * likely not known by external callers. The class carries the common exception
- * properties as well as the original exception's fully qualified class name.
- * The stack trace of this class looks exactly the same as the stack trace of
- * the replaced exception.
+ * This exception class is used as place holder for exceptions that are most likely not known by external callers. The
+ * class carries the common exception properties as well as the original exception's fully qualified class name. The
+ * stack trace of this class looks exactly the same as the stack trace of the replaced exception.
  */
 public class PlaceholderException extends Exception {
   private static final long serialVersionUID = 1L;
@@ -43,9 +41,8 @@ public class PlaceholderException extends Exception {
   }
 
   /**
-   * Transforms the given throwable and its recursively referenced throwables
-   * into a new exception hierarchy. Exceptions that are most likely not known
-   * by an external calling party are replaced by a {@link PlaceholderException} object:
+   * Transforms the given throwable and its recursively referenced throwables into a new exception hierarchy. Exceptions
+   * that are most likely not known by an external calling party are replaced by a {@link PlaceholderException} object:
    * <ul>
    * <li>{@link ProcessingException} are mapped to itself if possible, otherwise to a {@link ProcessingException}</li>
    * <li>Exceptions in package <code>java.*</code> are mapped to itself if possible, otherwise to a
@@ -103,8 +100,7 @@ public class PlaceholderException extends Exception {
 
   /**
    * Creates a new instance of the given throwable using the given cause. The {@link IProcessingStatus} of the given
-   * throwable is preserved if the given
-   * throwable is a {@link ProcessingException}.
+   * throwable is preserved if the given throwable is a {@link ProcessingException}.
    * 
    * @param throwable
    * @param cause

@@ -147,8 +147,7 @@ public class CsvHelperTest {
 
   /**
    * This test methods verifies the default settings of the csv helper regarding separator, text delimiter and line
-   * separator.
-   * If in any case these defaults change, migration notes must be provided.
+   * separator. If in any case these defaults change, migration notes must be provided.
    */
   @Test
   public void testDefaultSettings() {

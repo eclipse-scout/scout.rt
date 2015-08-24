@@ -140,8 +140,8 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   /**
    * Configures the view order of this wizard step. The view order determines the order in which the steps appear. The
-   * order of steps with no view order configured ({@code < 0}) is initialized based on the {@link Order} annotation
-   * of the wizard step class.
+   * order of steps with no view order configured ({@code < 0}) is initialized based on the {@link Order} annotation of
+   * the wizard step class.
    * <p>
    * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
    *
@@ -166,9 +166,8 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   /**
    * @param stepKind
-   *          any of the STEP_* constants activate this step normally creates a
-   *          form, calls {@link IForm#startWizardStep(IWizardStep, Class)} on
-   *          the form and places the form inside the wizard
+   *          any of the STEP_* constants activate this step normally creates a form, calls
+   *          {@link IForm#startWizardStep(IWizardStep, Class)} on the form and places the form inside the wizard
    *          {@link IWizard#setWizardForm(org.eclipse.scout.rt.client.ui.form.IForm)}
    */
   @Order(10)
@@ -198,8 +197,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
-   * When the cached form is stored (it may still be open) this method is
-   * called.
+   * When the cached form is stored (it may still be open) this method is called.
    *
    * @param activation
    *          true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
@@ -212,8 +210,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
-   * When the cached form is discarded (save was either not requested or it was
-   * forcedly closed) this method is called.
+   * When the cached form is discarded (save was either not requested or it was forcedly closed) this method is called.
    *
    * @param activation
    *          true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
@@ -226,14 +223,12 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
-   * When the cached form is closed (after some store and/or a discard
-   * operation) this method is called.
+   * When the cached form is closed (after some store and/or a discard operation) this method is called.
    *
    * @param activation
    *          true if this method is called by the wizard itself by {@link IWizardStep#activate(int)},
    *          {@link IWizardStep#deactivate(int)} or {@link IWizardStep#dispose()} The default implementation calls
-   *          {@link IWizard#doNextStep()} iff activation=false and form was
-   *          saved (formDataChanged=true)
+   *          {@link IWizard#doNextStep()} iff activation=false and form was saved (formDataChanged=true)
    */
   @Order(60)
   @ConfigOperation
@@ -259,8 +254,8 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
-   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 3.10.0-M4
    */
@@ -571,7 +566,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends AbstractExtension<OWNER> implements IWizardStepExtension<FORM, OWNER> {
+  protected static class LocalWizardStepExtension<FORM extends IForm, OWNER extends AbstractWizardStep<FORM>> extends AbstractExtension<OWNER>implements IWizardStepExtension<FORM, OWNER> {
 
     public LocalWizardStepExtension(OWNER owner) {
       super(owner);

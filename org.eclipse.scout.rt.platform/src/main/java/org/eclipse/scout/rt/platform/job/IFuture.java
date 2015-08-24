@@ -142,7 +142,8 @@ public interface IFuture<RESULT> extends ICancellable {
    *           <li>if this thread was interrupted while waiting for the job to complete; see
    *           {@link ProcessingException#isInterruption()}</li>
    *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
-   *           <li>if this job did not return within the timeout specified; see {@link ProcessingException#isTimeout()}</li>
+   *           <li>if this job did not return within the timeout specified; see {@link ProcessingException#isTimeout()}
+   *           </li>
    *           </ul>
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;

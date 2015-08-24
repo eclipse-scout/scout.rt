@@ -328,11 +328,11 @@ public class StringUtilityTest {
     assertEquals("consetetur sadipscing elitr", StringUtility.getTag(input, "strong"));
 
     //with HTML attribute:
-    input = "<table>\n" +
-        "<tr id=\"a_tr_id\">\n" +
-        "<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>\n" +
-        "</tr>\n" +
-        "</table>\n";
+    input = "<table>\n"
+        + "<tr id=\"a_tr_id\">\n"
+        + "<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>\n"
+        + "</tr>\n"
+        + "</table>\n";
 
     assertEquals("Claritas: *", StringUtility.getTag(input, "strong"));
     assertEquals("Lorem <strong>Claritas: *</strong> ipsum", StringUtility.getTag(input, "td"));
@@ -369,11 +369,11 @@ public class StringUtilityTest {
     String input;
 
     //HTML attributes:
-    input = "<table>" +
-        "<tr id=\"a_tr_id\">" +
-        "<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>" +
-        "</tr>" +
-        "</table>";
+    input = "<table>"
+        + "<tr id=\"a_tr_id\">"
+        + "<td class=\"a_td_class\" valign=\"top\">Lorem <strong>Claritas: *</strong> ipsum</td>"
+        + "</tr>"
+        + "</table>";
 
     assertEquals("X", StringUtility.replaceTags(input, "table", "X"));
     assertEquals("<table>X</table>", StringUtility.replaceTags(input, "tr", "X"));
@@ -386,8 +386,8 @@ public class StringUtilityTest {
     assertEquals("Lorem  dolore  est!", StringUtility.replaceTags(input, "em", ""));
 
     //multiple replacement
-    input = "<meta name=\"timestamp\" content=\"01.01.2013\"/>\n" +
-        "<meta name=\"date.modified\" content=\"20130314\"/>";
+    input = "<meta name=\"timestamp\" content=\"01.01.2013\"/>\n"
+        + "<meta name=\"date.modified\" content=\"20130314\"/>";
     assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
   }
 

@@ -102,8 +102,8 @@ public class MultiSessionCookieStoreTest {
   }
 
   /**
-   * Simple test with two client sessions to ensure that adding works and the client sessions
-   * don't see each others' cookies.
+   * Simple test with two client sessions to ensure that adding works and the client sessions don't see each others'
+   * cookies.
    */
   @Test
   public void testAddMultipleClients() throws Exception {

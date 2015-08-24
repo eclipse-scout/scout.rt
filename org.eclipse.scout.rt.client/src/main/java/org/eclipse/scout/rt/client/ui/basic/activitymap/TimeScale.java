@@ -20,8 +20,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.CompositeObject;
 
 /**
- * ui model to represent time column model with a major scale and a minor scale
- * (contained in the major scale)
+ * ui model to represent time column model with a major scale and a minor scale (contained in the major scale)
  */
 public class TimeScale {
   private DateFormat m_dateFormat;
@@ -114,12 +113,11 @@ public class TimeScale {
   }
 
   /**
-   * Normalized range [begin,end] of the item The normalized space starts at 0.0
-   * and ends at 1.0 Every minor column has the same with in this space
+   * Normalized range [begin,end] of the item The normalized space starts at 0.0 and ends at 1.0 Every minor column has
+   * the same with in this space
    * 
-   * @return double[begin,end] or null when item is not intersecting this time
-   *         scale. May return values <0 or >1 when item is reaching outside of
-   *         the range
+   * @return double[begin,end] or null when item is not intersecting this time scale. May return values <0 or >1 when
+   *         item is reaching outside of the range
    */
   public double[] getRangeOf(Date beginTime, Date endTime) {
     Integer a = null, b = null;
@@ -188,8 +186,7 @@ public class TimeScale {
   }
 
   /**
-   * Normalized range [begin,end] of the column The normalized space starts at
-   * 0.0 and ends at 1.0
+   * Normalized range [begin,end] of the column The normalized space starts at 0.0 and ends at 1.0
    * 
    * @return double[begin,end] or null
    */
@@ -206,8 +203,7 @@ public class TimeScale {
   }
 
   /**
-   * Normalized location [begin,end] of the column The normalized space starts
-   * at 0.0 and ends at 1.0
+   * Normalized location [begin,end] of the column The normalized space starts at 0.0 and ends at 1.0
    * 
    * @return double[begin,end] or null
    */

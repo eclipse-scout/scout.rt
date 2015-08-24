@@ -266,8 +266,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * @return true: deleted nodes are automatically erased<br>
-   *         false: deleted nodes are cached for later processing (service
-   *         deletion)
+   *         false: deleted nodes are cached for later processing (service deletion)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
@@ -303,9 +302,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Configures whether this tree should save and restore its coordinates of the vertical and horizontal scrollbars.
-   * If this property is set to {@code true}, the tree saves its scrollbars coordinates to the {@link #ClientSession}
-   * upon
+   * Configures whether this tree should save and restore its coordinates of the vertical and horizontal scrollbars. If
+   * this property is set to {@code true}, the tree saves its scrollbars coordinates to the {@link #ClientSession} upon
    * detaching the UI component from Scout. The coordinates are restored (if the coordnates are available), when the UI
    * component is attached to Scout.
    * <p>
@@ -320,8 +318,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Moved from AbstractTreeBox to AbstractTree
-   * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
+   * Moved from AbstractTreeBox to AbstractTree Checks / unchecks all visible child nodes if the parent node gets
+   * checked / unchecked.
    * <p>
    * Makes only sense if
    *
@@ -378,8 +376,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * @param path
    *          {@link URL#getPath()}
    * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
+   *          true if the url is not a valid external url but a local model url (http://local/...)
    */
   @ConfigOperation
   @Order(18)
@@ -411,8 +408,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * this method should not be implemented if you support {@link AbstractTree#interceptDrag(ITreeNode[])} (drag of
-   * mulitple
-   * nodes), as it takes precedence
+   * mulitple nodes), as it takes precedence
    *
    * @return a transferable object representing the given row
    */
@@ -423,8 +419,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
-   * the method {@link AbstractTree#interceptDrag(ITreeNode)} must not be implemented then.
+   * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout, the method
+   * {@link AbstractTree#interceptDrag(ITreeNode)} must not be implemented then.
    *
    * @return a transferable object representing the given rows
    */
@@ -443,8 +439,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * This method gets called when the drop node is changed, e.g. the dragged object
-   * is moved over a new drop target.
+   * This method gets called when the drop node is changed, e.g. the dragged object is moved over a new drop target.
    *
    * @since 4.0-M7
    */
@@ -2477,8 +2472,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * This method gets called when the drop node is changed, e.g. the dragged object
-   * is moved over a new drop target.
+   * This method gets called when the drop node is changed, e.g. the dragged object is moved over a new drop target.
    *
    * @since 4.0-M7
    */
@@ -2566,8 +2560,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * affects columns with lookup calls or code types<br>
-   * cells that have changed values fetch new texts/decorations from the lookup
-   * service in one single batch call lookup (performance optimization)
+   * cells that have changed values fetch new texts/decorations from the lookup service in one single batch call lookup
+   * (performance optimization)
    */
   private void processTreeBuffers() {
     //loop detection
@@ -2613,8 +2607,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * fire events tree changes are finished now, fire all buffered events
-   * and call lookups
+   * fire events tree changes are finished now, fire all buffered events and call lookups
    */
   private void processEventBuffer() {
     if (!getEventBuffer().isEmpty()) {
@@ -2736,8 +2729,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * @return the new tree node for this node data or null to skip this node
-   *         It is the responsibility of this method to add the new nopde to the tree.
+   * @return the new tree node for this node data or null to skip this node It is the responsibility of this method to
+   *         add the new nopde to the tree.
    */
   protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) throws ProcessingException {
     return null;
@@ -3065,7 +3058,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalTreeExtension<OWNER extends AbstractTree> extends AbstractExtension<OWNER> implements ITreeExtension<OWNER> {
+  protected static class LocalTreeExtension<OWNER extends AbstractTree> extends AbstractExtension<OWNER>implements ITreeExtension<OWNER> {
 
     public LocalTreeExtension(OWNER owner) {
       super(owner);

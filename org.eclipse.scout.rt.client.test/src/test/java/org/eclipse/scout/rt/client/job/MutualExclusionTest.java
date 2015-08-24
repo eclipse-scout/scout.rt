@@ -99,9 +99,9 @@ public class MutualExclusionTest {
 
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobManager.class).
-            withInitialInstance(m_jobManager).
-            withApplicationScoped(true));
+        new BeanMetaData(JobManager.class)
+            .withInitialInstance(m_jobManager)
+            .withApplicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
@@ -410,8 +410,8 @@ public class MutualExclusionTest {
 
   /**
    * We have 3 jobs that are scheduled simultaneously. Thereby, job1 enters a blocking condition which in turn lets job2
-   * run. Job2 goes to sleep forever, meaning that job3 will never start running. The test verifies, that when job1
-   * is interrupted, job3 must not be scheduled because the mutex-owner is still job2.
+   * run. Job2 goes to sleep forever, meaning that job3 will never start running. The test verifies, that when job1 is
+   * interrupted, job3 must not be scheduled because the mutex-owner is still job2.
    */
   @Test
   public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException, ProcessingException {
@@ -625,10 +625,10 @@ public class MutualExclusionTest {
 
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
-        new BeanMetaData(IJobManager.class).
-            withOrder(-1000).
-            withInitialInstance(jobManager).
-            withApplicationScoped(true)));
+        new BeanMetaData(IJobManager.class)
+            .withOrder(-1000)
+            .withInitialInstance(jobManager)
+            .withApplicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
 
@@ -752,10 +752,10 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
 
     m_beans.addAll(TestingUtility.registerBeans(
-        new BeanMetaData(IJobManager.class).
-            withOrder(-1000).
-            withInitialInstance(jobManager).
-            withApplicationScoped(true)));
+        new BeanMetaData(IJobManager.class)
+            .withOrder(-1000)
+            .withInitialInstance(jobManager)
+            .withApplicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);

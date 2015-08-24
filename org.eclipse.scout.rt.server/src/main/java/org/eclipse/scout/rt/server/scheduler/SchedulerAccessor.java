@@ -13,10 +13,9 @@ package org.eclipse.scout.rt.server.scheduler;
 import java.util.Collection;
 
 /**
- * This accessor can be used to give individual sessions limited access to a
- * global {@link IScheduler} via their {@link com.bsiag.service.scheduler.ISchedulerService} This implementation is
- * a transparent proxy. Override the methods that are subject to access control
- * restrictions
+ * This accessor can be used to give individual sessions limited access to a global {@link IScheduler} via their
+ * {@link com.bsiag.service.scheduler.ISchedulerService} This implementation is a transparent proxy. Override the
+ * methods that are subject to access control restrictions
  */
 public class SchedulerAccessor implements IScheduler {
 

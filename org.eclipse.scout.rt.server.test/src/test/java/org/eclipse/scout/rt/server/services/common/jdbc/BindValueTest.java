@@ -30,8 +30,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
- * Use {@link NVPair} to test different configuration of binds.
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}). Use {@link NVPair} to test different
+ * configuration of binds.
  */
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)

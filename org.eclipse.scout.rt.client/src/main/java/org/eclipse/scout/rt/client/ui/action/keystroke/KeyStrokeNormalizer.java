@@ -71,8 +71,7 @@ public class KeyStrokeNormalizer {
   }
 
   /**
-   * This method parses and normalizes the Scout keystroke and sets the class' member variables.
-   * Example: <code>
+   * This method parses and normalizes the Scout keystroke and sets the class' member variables. Example: <code>
    * {@link KeyStrokeNormalizer} ks = new {@link KeyStrokeNormalizer}("ALT-shiFt-F11");<br>
    * ks.{@link #normalize()};<br>
    * <br>
@@ -82,8 +81,7 @@ public class KeyStrokeNormalizer {
    * ks.{@link #hasAlt()}; //returns 'true' <br>
    * ks.{@link #hasCtrl()}; //returns 'false'<br>
    * ks.{@link #isValid()}; //returns 'true' <br>
-   * </code>
-   * <br>
+   * </code> <br>
    * If the keystroke is invalid, {@link #isValid()} will return <code>false</code>, all modifiers ({@link #hasAlt()},
    * {@link #hasCtrl()}, {@link #hasShift()}) will be <code>false</code> and the
    * <code>{@link #getNormalizedKeystroke()} will return <code>null</code>

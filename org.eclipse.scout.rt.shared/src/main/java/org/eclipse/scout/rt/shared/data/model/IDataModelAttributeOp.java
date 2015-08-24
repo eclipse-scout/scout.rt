@@ -28,14 +28,13 @@ public interface IDataModelAttributeOp {
 
   /**
    * @return the field type to display to select a value for usiong this operation, use
-   *         {@link IComposerAttribute#TYPE_INHERITED} when the type of the attribute should be used
-   *         see {@link IComposerAttribute}.TYPE_* values
+   *         {@link IComposerAttribute#TYPE_INHERITED} when the type of the attribute should be used see
+   *         {@link IComposerAttribute}.TYPE_* values
    */
   int getType();
 
   /**
-   * @return the unique operator type
-   *         see {@link ComposerConstants#OPERATOR_*} values
+   * @return the unique operator type see {@link ComposerConstants#OPERATOR_*} values
    */
   int getOperator();
 }

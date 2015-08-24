@@ -86,19 +86,18 @@ public class ServiceTunnelServletTest {
     m_serverSessionProviderSpy = spy(BEANS.get(ServerSessionProvider.class));
 
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(StickySessionCacheService.class).
-        withOrder(TEST_SERVICE_ORDER).
-        withApplicationScoped(true),
-        new BeanMetaData(IAccessControlService.class).
-        withInitialInstance(new AbstractAccessControlService() {
-        }).
-        withOrder(TEST_SERVICE_ORDER).
-        withApplicationScoped(true),
-        new BeanMetaData(ServerSessionProvider.class).
-        withInitialInstance(m_serverSessionProviderSpy).
-        withOrder(TEST_SERVICE_ORDER).
-        withApplicationScoped(true)
-        );
+        new BeanMetaData(StickySessionCacheService.class)
+            .withOrder(TEST_SERVICE_ORDER)
+            .withApplicationScoped(true),
+        new BeanMetaData(IAccessControlService.class)
+            .withInitialInstance(new AbstractAccessControlService() {
+            })
+            .withOrder(TEST_SERVICE_ORDER)
+            .withApplicationScoped(true),
+        new BeanMetaData(ServerSessionProvider.class)
+            .withInitialInstance(m_serverSessionProviderSpy)
+            .withOrder(TEST_SERVICE_ORDER)
+            .withApplicationScoped(true));
 
     m_testServiceTunnelServlet = new ServiceTunnelServlet();
     m_testServiceTunnelServlet.lazyInit(null, null);

@@ -11,8 +11,7 @@
 package org.eclipse.scout.commons.status;
 
 /**
- * A status object represents the outcome of an operation.
- * A status carries the following information:
+ * A status object represents the outcome of an operation. A status carries the following information:
  * <ul>
  * <li>severity (required)</li>
  * <li>message (required) - localized to current locale</li>
@@ -64,12 +63,11 @@ public interface IStatus extends Comparable<IStatus> {
   int getSeverity();
 
   /**
-   * Returns whether the severity of this status matches the given
-   * severity mask.
+   * Returns whether the severity of this status matches the given severity mask.
    *
    * @param severityMask
-   *          a mask formed by bitwise or'ing severity mask
-   *          constants (<code>ERROR</code>, <code>WARNING</code>, <code>INFO</code>, <code>CANCEL</code>)
+   *          a mask formed by bitwise or'ing severity mask constants (<code>ERROR</code>, <code>WARNING</code>,
+   *          <code>INFO</code>, <code>CANCEL</code>)
    * @return <code>true</code> if there is at least one match, <code>false</code> if there are no matches
    * @see #getSeverity()
    * @see #ERROR
@@ -86,8 +84,8 @@ public interface IStatus extends Comparable<IStatus> {
   String getMessage();
 
   /**
-   * Returns whether this status is a multi-status.
-   * A multi-status describes the outcome of an operation involving multiple operands.
+   * Returns whether this status is a multi-status. A multi-status describes the outcome of an operation involving
+   * multiple operands.
    * <p>
    * The severity of a multi-status is derived from the severities of its children.
    * </p>

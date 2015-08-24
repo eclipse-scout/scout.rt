@@ -23,7 +23,7 @@ public abstract class AbstractToolButton extends AbstractAction implements ITool
     super(callInitializer);
   }
 
-  protected static class LocalToolButtonExtension<OWNER extends AbstractToolButton> extends LocalActionExtension<OWNER> implements IToolButtonExtension<OWNER> {
+  protected static class LocalToolButtonExtension<OWNER extends AbstractToolButton> extends LocalActionExtension<OWNER>implements IToolButtonExtension<OWNER> {
 
     public LocalToolButtonExtension(OWNER owner) {
       super(owner);

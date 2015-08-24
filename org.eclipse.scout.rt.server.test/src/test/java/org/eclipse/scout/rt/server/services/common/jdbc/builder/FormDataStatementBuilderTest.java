@@ -142,7 +142,8 @@ public class FormDataStatementBuilderTest {
         new ClassIdentifier(
             FormData.Template1GroupBox.class,
             FormData.Template1GroupBox.MasterTemplateGroupBox.class,
-            FormData.Template1GroupBox.MasterTemplateGroupBox.MasterTemplateProp.class), "MASTER_TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
+            FormData.Template1GroupBox.MasterTemplateGroupBox.MasterTemplateProp.class),
+        "MASTER_TEMPLATE1_PROP", DataModelConstants.OPERATOR_EQ);
     assertEquals("  AND MASTER_TEMPLATE1_PROP=:__a1", m_builder.build(m_formData));
     assertNotNull(m_builder.getBindMap());
     assertEquals(1, m_builder.getBindMap().size());

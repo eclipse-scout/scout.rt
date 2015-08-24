@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
-public abstract class AbstractStringField extends AbstractBasicField<String> implements IStringField {
+public abstract class AbstractStringField extends AbstractBasicField<String>implements IStringField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
@@ -71,8 +71,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
-   * @return true if all characters should be masked (e.g. for a password field). default
-   *         is false.
+   * @return true if all characters should be masked (e.g. for a password field). default is false.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(250)
@@ -207,8 +206,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   /**
-   * When a field is marked as link this method will be called. Implement it to
-   * add a link action behaviour.
+   * When a field is marked as link this method will be called. Implement it to add a link action behaviour.
    */
   @ConfigOperation
   @Order(240)
@@ -550,7 +548,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-  implements IStringFieldExtension<OWNER_FIELD> {
+      implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);

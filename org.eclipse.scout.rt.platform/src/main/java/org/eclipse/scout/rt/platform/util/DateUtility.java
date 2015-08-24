@@ -479,8 +479,7 @@ public final class DateUtility {
   }
 
   /**
-   * @return true if the ranges intersect minDate and maxDate must not be null
-   *         fromDate or toDate may be null
+   * @return true if the ranges intersect minDate and maxDate must not be null fromDate or toDate may be null
    */
   public static boolean intersects(Date fromDate, Date toDate, Date minDate, Date maxDate) {
     if (minDate == null || maxDate == null) {
@@ -609,9 +608,8 @@ public final class DateUtility {
   }
 
   /**
-   * Correctly calculate covered days of a day range. 13.3.2008 00:00 -
-   * 14.3.2008 00:00 only covers 1 day (13.3.) 13.3.2008 12:00 - 14.3.2008 12:00
-   * covers 2 days (13.3., 14.3.)
+   * Correctly calculate covered days of a day range. 13.3.2008 00:00 - 14.3.2008 00:00 only covers 1 day (13.3.)
+   * 13.3.2008 12:00 - 14.3.2008 12:00 covers 2 days (13.3., 14.3.)
    *
    * @return array of days that with time set to 00:00:00.000
    */
@@ -755,9 +753,8 @@ public final class DateUtility {
   }
 
   /**
-   * Calculates the number of days between <code>start</code> and <code>end</code>.
-   * If the end date is before the start date, the result will be positive as well.
-   * Example:
+   * Calculates the number of days between <code>start</code> and <code>end</code>. If the end date is before the start
+   * date, the result will be positive as well. Example:
    * <ul>
    * <li>start = 1.1.2000, end = 2.1.2000 --> getDaysBetween(start, end) = 1
    * <li>start = 2.1.2000, end = 1.1.2000 --> getDaysBetween(start, end) = 1

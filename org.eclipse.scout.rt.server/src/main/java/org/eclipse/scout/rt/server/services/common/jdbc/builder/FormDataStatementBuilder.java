@@ -236,10 +236,10 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @return true to consume child contributions by this entity.
-   *         Default returns true. If the entity is a 1:1 or 1:0 relation to its base and its sql contribution is just a
-   *         join clause or similar, this method must return false to let the parent entity colelct all parts. Use
-   *         <code>return {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
+   * @return true to consume child contributions by this entity. Default returns true. If the entity is a 1:1 or 1:0
+   *         relation to its base and its sql contribution is just a join clause or similar, this method must return
+   *         false to let the parent entity colelct all parts. Use <code>return 
+   *         {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
    */
   protected boolean isConsumeChildContributions(EntityPath ePath) {
     return true;
@@ -381,14 +381,13 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   /**
    * <b>Data model attribute</b>:<br>
-   * The sqlAttribute is something like LAST_NAME, STATUS or @PERSON@.LAST_NAME, @PERSON@.STATUS.
-   * 
-   * @PERSON@ will be replaced by the parent entitie's generated alias.
-   *          <p>
-   *          The @PERSON@ prefix is added automatically if missing, but only if the entity where the attribute is
-   *          contained has only <b>one</b> alias.<br>
-   *          When multiple occurrences are simultaneously used, the sqlAttribute may be written as
-   *          <code>(&lt;attribute&gt;ORDER_STATUS&lt;/attribute&gt; OR &lt;attribute&gt;DELIVERY_STATUS&lt;/attribute&gt;)</code>
+   * The sqlAttribute is something like LAST_NAME, STATUS or @PERSON@.LAST_NAME, @PERSON@.STATUS. @PERSON@ will be
+   * replaced by the parent entitie's generated alias.
+   * <p>
+   * The @PERSON@ prefix is added automatically if missing, but only if the entity where the attribute is contained has
+   * only <b>one</b> alias.<br>
+   * When multiple occurrences are simultaneously used, the sqlAttribute may be written as
+   * <code>(&lt;attribute&gt;ORDER_STATUS&lt;/attribute&gt; OR &lt;attribute&gt;DELIVERY_STATUS&lt;/attribute&gt;)</code>
    */
   public void setDataModelAttributeDefinition(Class<? extends IDataModelAttribute> attributeType, String sqlAttribute) {
     setDataModelAttributeDefinition(attributeType, sqlAttribute, false);
@@ -445,9 +444,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * )
    * </pre></code> It is not allowed, that the selectClause contains a <i>UNION</i> because this part is needed for
    * aggregation too.<br>
-   * The <i>selectParts</i> tag is replaced with all attributes which are selected.
-   * If there are more than one attributes, they are separated by a comma
-   * "<i>attribute1</i> <i>,</i> <i>attribute2</i>".<br>
+   * The <i>selectParts</i> tag is replaced with all attributes which are selected. If there are more than one
+   * attributes, they are separated by a comma "<i>attribute1</i> <i>,</i> <i>attribute2</i>".<br>
    * The <i>whereParts</i> tag is replaced with all attributes contained in the entity that have no aggregation type.
    * Every attribute contributes a "AND <i>attribute</i> <i>op</i> <i>value</i>" line.<br>
    * The <i>groupBy</i> tag is only used when there are attributes in the entity that have an aggregation type.<br>
@@ -642,8 +640,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * add sql part with custom binds the ADD keyword is NOT added (pre-pended)
-   * automatically
+   * add sql part with custom binds the ADD keyword is NOT added (pre-pended) automatically
    */
   public void addWhere(String sql, NVPair... customBinds) {
     if (sql != null) {
@@ -672,8 +669,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * Replace bind name by unique bind name so that it is not
-   * conflicting with other parts that use the same statement
+   * Replace bind name by unique bind name so that it is not conflicting with other parts that use the same statement
    * part and bind name. For example S is replaces by __S123.
    */
   public String localizeBindName(String bindName, String prefix) {
@@ -1149,15 +1145,16 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * Evaluates the collecting tags in the entity statement and fills in the values of the {@link EntityContribution}.
-   * If the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
+   * Evaluates the collecting tags in the entity statement and fills in the values of the {@link EntityContribution}. If
+   * the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
    * and as 'where' on {@link EntityStrategy#BuildConstraints}
    * <p>
    * Default calls {@link EntityContributionUtility#createEntityPart(String, EntityContribution, boolean)}
    * 
    * @param entityStrategy
    * @param entityPartWithTags
-   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts<br/>
+   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
+   *          <br/>
    *          as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
    *          part.
    * @param childContributions
@@ -1220,8 +1217,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public static final int STATUS_CODE_INVALID_GROUP_BY_PART = EntityContributionUtility.STATUS_CODE_INVALID_GROUP_BY_PART;
 
   /**
-   * Check if a group by part is valid, i.e. ist not a SELECT clause.
-   * default uses {@link EntityContributionUtility#checkGroupByPart(String)}
+   * Check if a group by part is valid, i.e. ist not a SELECT clause. default uses
+   * {@link EntityContributionUtility#checkGroupByPart(String)}
    * 
    * @throws ProcessingException
    *           with {@link IStatus#getCode()} = X
@@ -1239,7 +1236,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
-  public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+  public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind,
+      Map<String, String> parentAliasMap) throws ProcessingException {
     if (stm == null) {
       return new EntityContribution();
     }
@@ -1360,7 +1358,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       contrib.getFromParts().add(fromPart);
     }
     switch (attributeStrategy) {
-    //select ... where
+      //select ... where
       case BuildQueryOfAttributeAndConstraintOfContext: {
         //select
         if (attPart != null) {
@@ -1382,7 +1380,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         }
         break;
       }
-      //where / having
+        //where / having
       case BuildConstraintOfAttribute: {
         if (attPart != null) {
           String sql = createSqlPart(aggregationType, attPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);
@@ -1434,7 +1432,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
-  public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap) throws ProcessingException {
+  public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap)
+      throws ProcessingException {
     EntityContribution contrib = createAttributePart(attributeStrategy, aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap);
     if (contrib.isEmpty()) {
       return null;

@@ -231,9 +231,9 @@ public class RemoteFile implements Serializable {
   }
 
   /**
-   * @return true if this is a large file that could not be transfered in one
-   *         block. Use {@link IRemoteFileService#getRemoteFilePart(RemoteFile, long)} to get the
-   *         next block of the large server file.
+   * @return true if this is a large file that could not be transfered in one block. Use
+   *         {@link IRemoteFileService#getRemoteFilePart(RemoteFile, long)} to get the next block of the large server
+   *         file.
    */
   public boolean hasMoreParts() {
     return getContentLength() == RemoteFile.DEFAULT_MAX_BLOCK_SIZE;
@@ -292,11 +292,11 @@ public class RemoteFile implements Serializable {
     return new DecompressedInputStream(this);
   }
 
-  public long/* crc */writeData(File f) throws IOException {
+  public long/* crc */ writeData(File f) throws IOException {
     return writeData(new FileOutputStream(f));
   }
 
-  public long/* crc */writeData(Writer w) throws IOException {
+  public long/* crc */ writeData(Writer w) throws IOException {
     Reader in = null;
     BufferedWriter out = null;
     try {
@@ -320,7 +320,7 @@ public class RemoteFile implements Serializable {
     return getCRC();
   }
 
-  public long/* crc */writeData(OutputStream os) throws IOException {
+  public long/* crc */ writeData(OutputStream os) throws IOException {
     InputStream in = null;
     BufferedOutputStream out = null;
     try {
@@ -344,11 +344,11 @@ public class RemoteFile implements Serializable {
     return getCRC();
   }
 
-  public long/* crc */readData(File f) throws IOException {
+  public long/* crc */ readData(File f) throws IOException {
     return readData(new FileInputStream(f));
   }
 
-  public long/* crc */readData(Reader r) throws IOException {
+  public long/* crc */ readData(Reader r) throws IOException {
     Writer out = null;
     BufferedReader in = null;
     try {
@@ -373,11 +373,11 @@ public class RemoteFile implements Serializable {
     return getCRC();
   }
 
-  public long/* crc */readData(InputStream is) throws IOException {
+  public long/* crc */ readData(InputStream is) throws IOException {
     return readData(is, 0, -1);
   }
 
-  public long/* crc */readData(InputStream is, long startPosition, long maxReadSize) throws IOException {
+  public long/* crc */ readData(InputStream is, long startPosition, long maxReadSize) throws IOException {
     OutputStream out = null;
     BufferedInputStream in = null;
     setPartStartPosition((int) startPosition);
@@ -422,8 +422,8 @@ public class RemoteFile implements Serializable {
   }
 
   /**
-   * If the remote file is a zip archive, unpack its content to the directory
-   * see {@link #readZipContentFromDirectory(File)}
+   * If the remote file is a zip archive, unpack its content to the directory see
+   * {@link #readZipContentFromDirectory(File)}
    */
   public void writeZipContentToDirectory(File directory) throws IOException {
     directory.mkdirs();
@@ -433,8 +433,8 @@ public class RemoteFile implements Serializable {
   }
 
   /**
-   * Read all files from the directory and pack them as zip, so this remote file represents a zip archive
-   * see {@link #writeZipContentToDirectory(File)}
+   * Read all files from the directory and pack them as zip, so this remote file represents a zip archive see
+   * {@link #writeZipContentToDirectory(File)}
    */
   public void readZipContentFromDirectory(File directory) throws IOException {
     File tmp = File.createTempFile("tmp", ".zip");
@@ -460,6 +460,7 @@ public class RemoteFile implements Serializable {
    * @since 2.7
    */
   private static final Map<String, String> FILE_EXTENSION_TO_MIME_TYPE_MAP;
+
   static {
     FILE_EXTENSION_TO_MIME_TYPE_MAP = new HashMap<String, String>();
     FILE_EXTENSION_TO_MIME_TYPE_MAP.put("ai", "application/postscript");

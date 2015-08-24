@@ -50,11 +50,11 @@ public class StatementProcessorTest {
     BeanInstanceUtil.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
-        "SELECT P.PERSON_NR,P.NAME" +
-            " FROM PERSON P " +
-            " WHERE P.PERSON_NR=:key " +
-            " AND P.NAME like '%'||:text||'%'",
-            new Object[]{call});
+        "SELECT P.PERSON_NR,P.NAME"
+            + " FROM PERSON P "
+            + " WHERE P.PERSON_NR=:key "
+            + " AND P.NAME like '%'||:text||'%'",
+        new Object[]{call});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);
@@ -88,13 +88,13 @@ public class StatementProcessorTest {
     BeanInstanceUtil.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
-        "SELECT COUNT(*) " +
-            "FROM PERSON P " +
-            "WHERE NVL(:birthdate,TO_DATE('1.1.3000','dd.mm.yyyy')) >= SYSDATE " +
-            "AND :name like '%Me%' " +
-            "AND :{addressTable.street} like '%Park%' " +
-            "INTO :countConcurrent ",
-            new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
+        "SELECT COUNT(*) "
+            + "FROM PERSON P "
+            + "WHERE NVL(:birthdate,TO_DATE('1.1.3000','dd.mm.yyyy')) >= SYSDATE "
+            + "AND :name like '%Me%' "
+            + "AND :{addressTable.street} like '%Park%' "
+            + "INTO :countConcurrent ",
+        new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);

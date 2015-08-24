@@ -111,8 +111,8 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * Reads the contents of the given file into a new {@link BinaryResource}. This constructor is intended to
-   * read from temporary files only. If the file is not accessible, the constructor will fail.
+   * Reads the contents of the given file into a new {@link BinaryResource}. This constructor is intended to read from
+   * temporary files only. If the file is not accessible, the constructor will fail.
    */
   public BinaryResource(File file) throws ProcessingException {
     this(file.getName(), FileUtility.getContentType(file), IOUtility.getContent(file), file.lastModified());
@@ -133,8 +133,8 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * @return the content type (MIME type), as passed to the constructor. May be <code>null</code>. In this case,
-   *         the filename extension might give a hint to determine the content type.
+   * @return the content type (MIME type), as passed to the constructor. May be <code>null</code>. In this case, the
+   *         filename extension might give a hint to determine the content type.
    */
   public String getContentType() {
     return m_contentType;
@@ -155,8 +155,8 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * Convenience method to get the length of the byte array returend by {@link #getContent()}. If the content
-   * is <code>null</code>, this method returns <code>-1</code>.
+   * Convenience method to get the length of the byte array returend by {@link #getContent()}. If the content is
+   * <code>null</code>, this method returns <code>-1</code>.
    */
   public int getContentLength() {
     return m_content != null ? m_content.length : -1;
@@ -170,9 +170,9 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * @return a checksum-style fingerprint of the binary content. This fingerprint was calculated during the
-   *         constructor by applying the Adler32 algorithm to the content. If the content is <code>null</code>, this
-   *         method returns <code>-1</code>.
+   * @return a checksum-style fingerprint of the binary content. This fingerprint was calculated during the constructor
+   *         by applying the Adler32 algorithm to the content. If the content is <code>null</code>, this method returns
+   *         <code>-1</code>.
    */
   public long getFingerprint() {
     return m_fingerprint;

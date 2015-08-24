@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerVal
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerValueBox;
 
-public abstract class AbstractComposerValueBoxExtension<OWNER extends AbstractComposerValueBox> extends AbstractGroupBoxExtension<OWNER> implements IComposerValueBoxExtension<OWNER> {
+public abstract class AbstractComposerValueBoxExtension<OWNER extends AbstractComposerValueBox> extends AbstractGroupBoxExtension<OWNER>implements IComposerValueBoxExtension<OWNER> {
 
   public AbstractComposerValueBoxExtension(OWNER owner) {
     super(owner);

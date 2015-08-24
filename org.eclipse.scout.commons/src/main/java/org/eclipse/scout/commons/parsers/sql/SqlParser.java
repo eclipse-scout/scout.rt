@@ -54,8 +54,7 @@ import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Unparsed;
 import org.eclipse.scout.commons.parsers.token.TextToken;
 
 /**
- * Parser for sql SELECT statements
- * Syntax (EBNF):
+ * Parser for sql SELECT statements Syntax (EBNF):
  *
  * <pre>
  * <code>
@@ -86,7 +85,9 @@ public class SqlParser {
   private static final Pattern QUOT_PAT = Pattern.compile("(\"[^\"]*\")");
   //make all uppercase and single space (order of tokens matters!)
   private static final Pattern UNION_PAT = Pattern.compile("[^" + nameChars + "](UNION ALL|INTERSECT|MINUS|UNION)[^" + nameChars + "]");
-  private static final Pattern PART_PAT = Pattern.compile("[^" + nameChars + "](WITH|AS|SELECT|FROM|LEFT JOIN|OUTER JOIN|INNER JOIN|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY( NOCYCLE)?|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES|CASE|ELSE|END|THEN|WHEN)[^" + nameChars + "]");
+  private static final Pattern PART_PAT = Pattern.compile(
+      "[^" + nameChars + "](WITH|AS|SELECT|FROM|LEFT JOIN|OUTER JOIN|INNER JOIN|JOIN|ON|WHERE|GROUP BY|HAVING|ORDER BY|INSERT INTO|INSERT|INTO|CONNECT BY( NOCYCLE)?|START WITH|UPDATE|DELETE FROM|DELETE|SET|VALUES|CASE|ELSE|END|THEN|WHEN)[^"
+          + nameChars + "]");
   private static final Pattern OUTER_JOIN_PAT = Pattern.compile("(\\(\\+\\))");
   private static final Pattern OR_OP_PAT = Pattern.compile("[^" + nameChars + "](OR)[^" + nameChars + "]");
   private static final Pattern AND_OP_PAT = Pattern.compile("[^" + nameChars + "](AND)[^" + nameChars + "]");
@@ -670,8 +671,8 @@ public class SqlParser {
   }
 
   /**
-   * Tokenize a string into Whitespace (containing Comment and HintComment), Text and Token items.
-   * There are no Raw objects left.
+   * Tokenize a string into Whitespace (containing Comment and HintComment), Text and Token items. There are no Raw
+   * objects left.
    *
    * @throws ParseException
    */

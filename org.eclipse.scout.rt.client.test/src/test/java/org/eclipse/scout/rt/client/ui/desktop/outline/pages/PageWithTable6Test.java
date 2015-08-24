@@ -39,8 +39,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * A menu opened in empty space should not consider any selection on a row.
- * Thus the menu should open anyway (not querying the selection status of any row).
+ * A menu opened in empty space should not consider any selection on a row. Thus the menu should open anyway (not
+ * querying the selection status of any row).
  * <p>
  */
 @RunWith(ClientTestRunner.class)

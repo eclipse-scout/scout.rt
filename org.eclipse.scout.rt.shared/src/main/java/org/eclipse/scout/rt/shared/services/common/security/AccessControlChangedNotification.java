@@ -13,8 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.security;
 import java.security.Permissions;
 
 /**
- * Notification is sent from server to client to notify that the permission set
- * has changed
+ * Notification is sent from server to client to notify that the permission set has changed
  */
 public class AccessControlChangedNotification implements IAccessControlNotification {
   private static final long serialVersionUID = 1L;

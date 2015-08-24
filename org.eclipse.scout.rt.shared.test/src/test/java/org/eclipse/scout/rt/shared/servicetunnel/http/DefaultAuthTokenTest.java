@@ -58,8 +58,7 @@ public class DefaultAuthTokenTest {
     s_pair = SecurityUtility.generateKeyPair();
     s_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(AuthTokenPrivateKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPrivateKeyPropertyEx()),
-        new BeanMetaData(AuthTokenPublicKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPublicKeyPropertyEx())
-        ));
+        new BeanMetaData(AuthTokenPublicKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPublicKeyPropertyEx())));
   }
 
   @AfterClass

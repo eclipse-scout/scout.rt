@@ -15,9 +15,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2 seconds
- * that the Runnable is executed every 2 seconds. If an execution takes longer than the period, the subsequent execution
- * starts immediately.
+ * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2
+ * seconds that the Runnable is executed every 2 seconds. If an execution takes longer than the period, the subsequent
+ * execution starts immediately.
  * <p/>
  * This class is necessary because {@link ScheduledThreadPoolExecutor} is not applicable for {@link JobManager} due to
  * its fixed-size thread pool. That means, that once the <code>core-pool-size</code> is exceeded, the creation of

@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public abstract class AbstractCalendarExtension<OWNER extends AbstractCalendar> extends AbstractExtension<OWNER> implements ICalendarExtension<OWNER> {
+public abstract class AbstractCalendarExtension<OWNER extends AbstractCalendar> extends AbstractExtension<OWNER>implements ICalendarExtension<OWNER> {
 
   /**
    * @param owner
@@ -36,7 +36,8 @@ public abstract class AbstractCalendarExtension<OWNER extends AbstractCalendar> 
   }
 
   @Override
-  public void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
+  public void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes,
+      Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
     chain.execFilterCalendarItems(changedProviderTypes, componentsByProvider);
   }
 

@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
 /**
- * This convenience class implements the interface {@link IScoutTestParameter}.
- * It holds the name of the test parameter and implements the getter.
+ * This convenience class implements the interface {@link IScoutTestParameter}. It holds the name of the test parameter
+ * and implements the getter.
  */
 public abstract class AbstractScoutTestParameter implements IScoutTestParameter {
 

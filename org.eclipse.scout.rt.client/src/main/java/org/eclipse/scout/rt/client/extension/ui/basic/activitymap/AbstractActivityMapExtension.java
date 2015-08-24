@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public abstract class AbstractActivityMapExtension<RI, AI, OWNER extends AbstractActivityMap<RI, AI>> extends AbstractExtension<OWNER> implements IActivityMapExtension<RI, AI, OWNER> {
+public abstract class AbstractActivityMapExtension<RI, AI, OWNER extends AbstractActivityMap<RI, AI>> extends AbstractExtension<OWNER>implements IActivityMapExtension<RI, AI, OWNER> {
 
   public AbstractActivityMapExtension(OWNER owner) {
     super(owner);

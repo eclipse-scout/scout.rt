@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
-public abstract class AbstractFileChooserField extends AbstractValueField<BinaryResource> implements IFileChooserField {
+public abstract class AbstractFileChooserField extends AbstractValueField<BinaryResource>implements IFileChooserField {
 
   private IFileChooserFieldUIFacade m_uiFacade;
 
@@ -196,7 +196,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     }
   }
 
-  protected static class LocalFileChooserFieldExtension<OWNER extends AbstractFileChooserField> extends LocalValueFieldExtension<BinaryResource, OWNER> implements IFileChooserFieldExtension<OWNER> {
+  protected static class LocalFileChooserFieldExtension<OWNER extends AbstractFileChooserField> extends LocalValueFieldExtension<BinaryResource, OWNER>implements IFileChooserFieldExtension<OWNER> {
 
     public LocalFileChooserFieldExtension(OWNER owner) {
       super(owner);

@@ -74,9 +74,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to a tree NOTE: the passed argument MUST be referenced
-   * by the source type, otherwise it is garbage collected immediately after
-   * adding
+   * Add a weak reference to a tree NOTE: the passed argument MUST be referenced by the source type, otherwise it is
+   * garbage collected immediately after adding
    */
   public void registerTree(ITree tree) {
     if (!m_enabled) {
@@ -88,9 +87,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to a tree node NOTE: the passed argument MUST be
-   * referenced by the source type, otherwise it is garbage collected
-   * immediately after adding
+   * Add a weak reference to a tree node NOTE: the passed argument MUST be referenced by the source type, otherwise it
+   * is garbage collected immediately after adding
    */
   public void registerTreeNode(ITreeNode node) {
     if (!m_enabled) {
@@ -102,9 +100,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to a table NOTE: the passed argument MUST be
-   * referenced by the source type, otherwise it is garbage collected
-   * immediately after adding
+   * Add a weak reference to a table NOTE: the passed argument MUST be referenced by the source type, otherwise it is
+   * garbage collected immediately after adding
    */
   public void registerTable(ITable table) {
     if (!m_enabled) {
@@ -116,9 +113,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to a table row NOTE: the passed argument MUST be
-   * referenced by the source type, otherwise it is garbage collected
-   * immediately after adding
+   * Add a weak reference to a table row NOTE: the passed argument MUST be referenced by the source type, otherwise it
+   * is garbage collected immediately after adding
    */
   public void registerTableRow(ITableRow row) {
     if (!m_enabled) {
@@ -130,9 +126,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to a form NOTE: the passed argument MUST be referenced
-   * by the source type, otherwise it is garbage collected immediately after
-   * adding
+   * Add a weak reference to a form NOTE: the passed argument MUST be referenced by the source type, otherwise it is
+   * garbage collected immediately after adding
    */
   public void registerForm(IForm form) {
     if (!m_enabled) {
@@ -144,9 +139,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to a form field NOTE: the passed argument MUST be
-   * referenced by the source type, otherwise it is garbage collected
-   * immediately after adding
+   * Add a weak reference to a form field NOTE: the passed argument MUST be referenced by the source type, otherwise it
+   * is garbage collected immediately after adding
    */
   public void registerFormField(IFormField formField) {
     if (!m_enabled) {
@@ -158,9 +152,8 @@ public final class DesktopProfiler {
   }
 
   /**
-   * Add a weak reference to an arbitrary object NOTE: the passed argument MUST
-   * be referenced by the source type, otherwise it is garbage collected
-   * immediately after adding
+   * Add a weak reference to an arbitrary object NOTE: the passed argument MUST be referenced by the source type,
+   * otherwise it is garbage collected immediately after adding
    */
   public void registerObject(Object o) {
     if (!m_enabled) {

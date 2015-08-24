@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 /**
- * Wrapper for {@link Permissions} that is serialize safe.
- * This is useful to transfer permission collections that may contain permissions not known by the consumer.
- * This wrapper simply ignores those.
+ * Wrapper for {@link Permissions} that is serialize safe. This is useful to transfer permission collections that may
+ * contain permissions not known by the consumer. This wrapper simply ignores those.
  */
 public class LenientPermissionsWrapper implements Serializable {
   private static final long serialVersionUID = 1L;

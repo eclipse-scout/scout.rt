@@ -57,8 +57,7 @@ public class StatementProcessorCreateSqlDumpTest {
   }
 
   /**
-   * This test illustrate the bug 371963.
-   * The first selected value '?' is not a place holder for :myText
+   * This test illustrate the bug 371963. The first selected value '?' is not a place holder for :myText
    */
   @Test
   public void testSelectPlainText() throws Exception {

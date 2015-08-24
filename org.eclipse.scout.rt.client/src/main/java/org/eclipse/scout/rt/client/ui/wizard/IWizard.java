@@ -76,9 +76,8 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void removeWizardListener(WizardListener listener);
 
   /**
-   * when the wizard is changed (for example the state) all these changes are
-   * accumulated and then fired in single events Therefore the whole block is
-   * normally inside a try...finally
+   * when the wizard is changed (for example the state) all these changes are accumulated and then fired in single
+   * events Therefore the whole block is normally inside a try...finally
    *
    * @see IWizard#doNextStep()
    */
@@ -173,32 +172,28 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   IDesktop getDesktop() throws ProcessingException;
 
   /**
-   * @return current wizard form or <code>null</code> if there is no current
-   *         wizard form.
+   * @return current wizard form or <code>null</code> if there is no current wizard form.
    */
   IForm getWizardForm();
 
   /**
-   * Set current wizard form or <code>null</code> if there is no current wizard
-   * form. Use handle
+   * Set current wizard form or <code>null</code> if there is no current wizard form. Use handle
    */
   void setWizardForm(IForm form);
 
   /**
    * Wait until form is closed<br>
-   * If the form is modal this method returns just after the modal handler has
-   * terminated<br>
-   * If the form is non-modal this starts a sub event dispatcher that loops (and
-   * blocks) until form handling is false (i.e. form has been closed)
+   * If the form is modal this method returns just after the modal handler has terminated<br>
+   * If the form is non-modal this starts a sub event dispatcher that loops (and blocks) until form handling is false
+   * (i.e. form has been closed)
    */
   void waitFor() throws ProcessingException;
 
   int WAIT_FOR_ERROR_CODE = 69218;
 
   /**
-   * This method by default calls {@link #execRefreshButtonPolicy()} which is
-   * used to make then wizard buttons visible/invisible/enabled/disabled based
-   * on the current form and wizard state.
+   * This method by default calls {@link #execRefreshButtonPolicy()} which is used to make then wizard buttons
+   * visible/invisible/enabled/disabled based on the current form and wizard state.
    */
   void refreshButtonPolicy();
 
@@ -288,14 +283,12 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   IWizardStep<? extends IForm> getNextEnabledStep();
 
   /**
-   * Set and activate a new wizard state, throws a {@link VetoException} if the
-   * new step could not be activated, for example if the currently active step
-   * vetoed in its deactivate() method Detailed: 1. calculate direction of
-   * change, either {@link IWizardStep#STEP_NEXT} or {@link IWizardStep#STEP_PREVIOUS} 2. call
-   * {@link IWizardStep#deactivate(int)} on the old step if that step exists 3.
-   * call {@link IWizardStep#activate(int)} on the new step if that step exists
-   * When calling {@link #activateStep(null)} with a null argument it simply
-   * calls deactivate on the existing step.
+   * Set and activate a new wizard state, throws a {@link VetoException} if the new step could not be activated, for
+   * example if the currently active step vetoed in its deactivate() method Detailed: 1. calculate direction of change,
+   * either {@link IWizardStep#STEP_NEXT} or {@link IWizardStep#STEP_PREVIOUS} 2. call
+   * {@link IWizardStep#deactivate(int)} on the old step if that step exists 3. call {@link IWizardStep#activate(int)}
+   * on the new step if that step exists When calling {@link #activateStep(null)} with a null argument it simply calls
+   * deactivate on the existing step.
    */
   void activateStep(IWizardStep<? extends IForm> step) throws ProcessingException;
 
@@ -303,13 +296,12 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * set the current wizard state
    *
    * @param jumpForward
-   *          true simply jumps to the new step, false activates/deactivates
-   *          every step inbetween the old and the new step
+   *          true simply jumps to the new step, false activates/deactivates every step inbetween the old and the new
+   *          step
    * @param jumpBackward
-   *          true simply jumps to the new step, false activates/deactivates
-   *          every step inbetween the old and the new step The jump parameters
-   *          are only relevant if the new step is not the direct previous or
-   *          next step of the old step.
+   *          true simply jumps to the new step, false activates/deactivates every step inbetween the old and the new
+   *          step The jump parameters are only relevant if the new step is not the direct previous or next step of the
+   *          old step.
    */
   void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward) throws ProcessingException;
 
@@ -346,9 +338,8 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void doReset() throws ProcessingException;
 
   /**
-   * This is a delegate method that is normally called by the wizard status
-   * field in the {@link IWizardContainerForm} whenever a link is
-   * clicked.
+   * This is a delegate method that is normally called by the wizard status field in the {@link IWizardContainerForm}
+   * whenever a link is clicked.
    */
   @Override
   void doAppLinkAction(String ref) throws ProcessingException;
@@ -362,8 +353,8 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void doWizardStepAction(IWizardStep<? extends IForm> wizardStep) throws ProcessingException;
 
   /**
-   * The container form is created when it does not exist already. By default
-   * the container form is created upon start of the wizard.
+   * The container form is created when it does not exist already. By default the container form is created upon start
+   * of the wizard.
    */
   IWizardContainerForm createContainerForm() throws ProcessingException;
 

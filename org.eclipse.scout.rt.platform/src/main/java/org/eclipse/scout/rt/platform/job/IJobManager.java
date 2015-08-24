@@ -99,8 +99,8 @@ public interface IJobManager {
   /**
    * Periodically runs the given job on behalf of a worker thread.<br/>
    * The first execution is after the given <code>initialDelay</code>, and subsequently with the given
-   * <code>delay</code> between the termination of one execution and the commencement of the next. The
-   * job only terminates via cancellation or termination of the job manager.
+   * <code>delay</code> between the termination of one execution and the commencement of the next. The job only
+   * terminates via cancellation or termination of the job manager.
    *
    * @param runnable
    *          the runnable to be executed periodically.

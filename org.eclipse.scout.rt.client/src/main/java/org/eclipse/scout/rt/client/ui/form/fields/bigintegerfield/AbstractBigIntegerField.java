@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("4c09f9f0-84fe-4c6c-95dd-1f51e92058d8")
-public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInteger> implements IBigIntegerField {
+public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInteger>implements IBigIntegerField {
   private static final BigInteger DEFAULT_MIN_VALUE = new BigInteger("-999999999999999999999999999999999999999999999999999999999999");
   private static final BigInteger DEFAULT_MAX_VALUE = new BigInteger("999999999999999999999999999999999999999999999999999999999999");
 
@@ -76,7 +76,7 @@ public abstract class AbstractBigIntegerField extends AbstractNumberField<BigInt
     return retVal;
   }
 
-  protected static class LocalBigIntegerFieldExtension<OWNER extends AbstractBigIntegerField> extends LocalNumberFieldExtension<BigInteger, OWNER> implements IBigIntegerFieldExtension<OWNER> {
+  protected static class LocalBigIntegerFieldExtension<OWNER extends AbstractBigIntegerField> extends LocalNumberFieldExtension<BigInteger, OWNER>implements IBigIntegerFieldExtension<OWNER> {
 
     public LocalBigIntegerFieldExtension(OWNER owner) {
       super(owner);

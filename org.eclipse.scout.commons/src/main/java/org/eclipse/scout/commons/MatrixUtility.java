@@ -23,13 +23,10 @@ public final class MatrixUtility {
   }
 
   /**
-   * If data is a single value: returns a matrix with 1 row and 2 columns
-   * [0..n/2][0..1] and the value is at [0][0] If data is an array: transforms a
-   * list with n values into a matrix with n/2 rows and 2 columns [0..n/2][0..1]
-   * always 2 values are used to create one matrix row If data is a matrix:
-   * transforms a matrix with n values into a matrix with n/2 rows and 2 columns
-   * [0..n/2][0..1] always 2 values are used to create one matrix traversal is
-   * row-wise
+   * If data is a single value: returns a matrix with 1 row and 2 columns [0..n/2][0..1] and the value is at [0][0] If
+   * data is an array: transforms a list with n values into a matrix with n/2 rows and 2 columns [0..n/2][0..1] always 2
+   * values are used to create one matrix row If data is a matrix: transforms a matrix with n values into a matrix with
+   * n/2 rows and 2 columns [0..n/2][0..1] always 2 values are used to create one matrix traversal is row-wise
    */
   public static Object[][] toTupels(Object data) {
     if (data == null) {
@@ -105,9 +102,8 @@ public final class MatrixUtility {
   }
 
   /**
-   * union all matrixes into a single matrix where the number of rows is the sum
-   * of rows of all matrixes every list is interpreted as a matrix row in sql:
-   * UNION ALL
+   * union all matrixes into a single matrix where the number of rows is the sum of rows of all matrixes every list is
+   * interpreted as a matrix row in sql: UNION ALL
    */
   public static Object[][] union(Object... matrixes) {
     int rowCount = 0;
@@ -285,8 +281,7 @@ public final class MatrixUtility {
   }
 
   /**
-   * lookup a row by its key (keyIndex=0) and return the value at valueIndex in
-   * the same row
+   * lookup a row by its key (keyIndex=0) and return the value at valueIndex in the same row
    */
   public static Object lookup(Object matrix, Object lookupKey, int valueIndex) {
     int keyIndex = 0;

@@ -16,8 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 /**
  * Marker subclass so we know inside
  * {@link AbstractSequenceBox#execCheckFromTo(org.eclipse.scout.rt.client.ui.form.fields.IValueField[], int)} that a
- * previous failure was due to invalid sequence values and can safely be
- * cleared once the sequence is valid again.
+ * previous failure was due to invalid sequence values and can safely be cleared once the sequence is valid again.
  */
 @Order(50.0)
 public class InvalidSequenceStatus extends ScoutFieldStatus {

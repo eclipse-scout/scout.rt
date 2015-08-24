@@ -44,8 +44,7 @@ public class TableFieldTest {
 
   /**
    * Test method for {@link AbstractTableField#importFormFieldData(AbstractFormFieldData, boolean)} With and without
-   * primary keys.
-   * Bug 414674
+   * primary keys. Bug 414674
    */
 
   @Test

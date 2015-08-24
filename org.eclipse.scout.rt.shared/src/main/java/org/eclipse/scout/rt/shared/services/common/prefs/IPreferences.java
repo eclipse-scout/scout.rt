@@ -142,8 +142,7 @@ public interface IPreferences extends Serializable {
 
   /**
    * Associates the specified <code>boolean</code> value with the specified <code>key</code> in this node. This method
-   * is
-   * intended for use in conjunction with {@link #getBoolean(String, boolean)} method.
+   * is intended for use in conjunction with {@link #getBoolean(String, boolean)} method.
    *
    * @param key
    *          Key with which the value is to be associated. Must not be <code>null</code>.
@@ -306,8 +305,7 @@ public interface IPreferences extends Serializable {
   ISession userScope();
 
   /**
-   * Forces any changes in the contents of this node and its descendants to
-   * the persistent store.
+   * Forces any changes in the contents of this node and its descendants to the persistent store.
    * <p>
    * Once this method returns successfully, it is safe to assume that all changes made in the subtree rooted at this
    * node prior to the method invocation have become permanent.
@@ -320,12 +318,10 @@ public interface IPreferences extends Serializable {
    * guaranteed to be made persistent.
    *
    * @throws BackingStoreException
-   *           if this operation cannot be completed due
-   *           to a failure in the backing store, or inability to communicate
+   *           if this operation cannot be completed due to a failure in the backing store, or inability to communicate
    *           with it.
    * @throws IllegalStateException
-   *           if this node (or an ancestor) has been
-   *           removed with the {@link #removeNode()} method.
+   *           if this node (or an ancestor) has been removed with the {@link #removeNode()} method.
    * @see #sync()
    */
 

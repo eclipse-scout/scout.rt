@@ -22,9 +22,8 @@ public interface IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends ICo
   boolean isSortCodesByDisplayText();
 
   /**
-   * Sorting of columns with attached {@link ICodeType} can be based on the
-   * codes sort order or their display texts. Default is sort by codes sort
-   * order.
+   * Sorting of columns with attached {@link ICodeType} can be based on the codes sort order or their display texts.
+   * Default is sort by codes sort order.
    * 
    * @since 04.11.2009 ticket 82478
    */

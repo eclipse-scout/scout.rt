@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.basic.cell;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
- * A cell style represents the graphical properties of a particular cell. These values are kept in a
- * different class so that they can be shared between {@link Cell} instances.
+ * A cell style represents the graphical properties of a particular cell. These values are kept in a different class so
+ * that they can be shared between {@link Cell} instances.
  */
 public class CellStyle implements ICellSpecialization {
 

@@ -32,8 +32,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 
 /**
- * <h4>AbstractChainableSecurityFilter</h4> The following properties can be set
- * in the <code>web.xml</code> file:
+ * <h4>AbstractChainableSecurityFilter</h4> The following properties can be set in the <code>web.xml</code> file:
  * <ul>
  * <li><code>realm=abcde</code> <b>default: "Default"</b></li>
  * <li><code>failover=true/false</code> <b>default false</b></li>
@@ -49,8 +48,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  * &lt;Manager className="org.apache.catalina.session.StandardManager" pathname=""&gt; &lt;/Manager&gt;
  * </pre>
  *
- * @since 1.0.3 06.02.2009
- *        TODO imo remove in 6.0
+ * @since 1.0.3 06.02.2009 TODO imo remove in 6.0
  */
 public abstract class AbstractChainableSecurityFilter implements Filter {
   public static final String PROP_SUBJECT = Subject.class.getName();

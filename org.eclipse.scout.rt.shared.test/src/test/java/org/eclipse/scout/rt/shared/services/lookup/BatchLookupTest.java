@@ -61,10 +61,9 @@ public class BatchLookupTest {
 
     m_reg.add(
         TestingUtility.registerBean(
-            new BeanMetaData(IFlowerLookupService.class).
-            withInitialInstance(m_lookupService).
-            withApplicationScoped(true)
-            ));
+            new BeanMetaData(IFlowerLookupService.class)
+                .withInitialInstance(m_lookupService)
+                .withApplicationScoped(true)));
   }
 
   @After
@@ -272,7 +271,7 @@ public class BatchLookupTest {
     private static final long serialVersionUID = 1L;
   }
 
-  public static class LocalFlowerLookupCallNoMembersNoEqualsOverride extends LocalLookupCall<Object> implements IFlowerLookupCall {
+  public static class LocalFlowerLookupCallNoMembersNoEqualsOverride extends LocalLookupCall<Object>implements IFlowerLookupCall {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -297,7 +296,7 @@ public class BatchLookupTest {
     }
   }
 
-  public static class LocalFlowerLookupCallNoMembersWithEqualsOverride extends LocalLookupCall<Object> implements IFlowerLookupCall {
+  public static class LocalFlowerLookupCallNoMembersWithEqualsOverride extends LocalLookupCall<Object>implements IFlowerLookupCall {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -344,7 +343,7 @@ public class BatchLookupTest {
     }
   }
 
-  public static class LocalFlowerLookupCallWithMembersWithEqualsOverride extends LocalLookupCall<Object> implements IFlowerLookupCall {
+  public static class LocalFlowerLookupCallWithMembersWithEqualsOverride extends LocalLookupCall<Object>implements IFlowerLookupCall {
     private static final long serialVersionUID = 1L;
 
     private Long m_latinId;

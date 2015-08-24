@@ -178,8 +178,8 @@ public final class NumberUtility {
   }
 
   /**
-   * Calculates the sum of a Collection of Numbers. Elements that have no valid BigDecimal
-   * representation (e.g. Double.NaN, null, ...) are treated as <code>BigDecimal.ZERO</code>
+   * Calculates the sum of a Collection of Numbers. Elements that have no valid BigDecimal representation (e.g.
+   * Double.NaN, null, ...) are treated as <code>BigDecimal.ZERO</code>
    */
   public static BigDecimal sum(Collection<? extends Number> numbers) {
     BigDecimal sum = BigDecimal.ZERO;
@@ -451,9 +451,9 @@ public final class NumberUtility {
   /**
    * Converts a Long to an int with special attention to overflow issues.
    *
-   * @return The converted int. If the Long is larger than Integer.MAX_VALUE, it returns Integer.MAX_VALUE.
-   *         If the Long is smaller than Integer.MIN_VALUE, it returns Integer.MIN_VALUE.
-   *         If the parameter is <code>null</code>, it returns 0.
+   * @return The converted int. If the Long is larger than Integer.MAX_VALUE, it returns Integer.MAX_VALUE. If the Long
+   *         is smaller than Integer.MIN_VALUE, it returns Integer.MIN_VALUE. If the parameter is <code>null</code>, it
+   *         returns 0.
    */
   public static int longToInt(Long l) {
     if (l != null) {
@@ -472,8 +472,7 @@ public final class NumberUtility {
    * Converts an object to a BigDecimal using the string representation of the object.
    *
    * @return The converted BigDecimal. Returns <code>null</code> if the object is <code>null</code> or the string
-   *         representation of the object is a zero
-   *         length string.
+   *         representation of the object is a zero length string.
    */
   public static BigDecimal getBigDecimalValue(Object o) {
     if (o != null && o.toString().length() > 0) {

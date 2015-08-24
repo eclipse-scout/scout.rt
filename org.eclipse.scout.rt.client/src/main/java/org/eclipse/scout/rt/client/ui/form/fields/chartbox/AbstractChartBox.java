@@ -39,8 +39,7 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
    * Configuration
    */
   /**
-   * Fully qualified class name of a ISwingChartProvider class with bundle
-   * symbolic name prefix<br>
+   * Fully qualified class name of a ISwingChartProvider class with bundle symbolic name prefix<br>
    * Example: <code>com.bsiag.crm.ui.swing / com.bsiag.crm.ui.swing.chart.ForecastChart</code>
    */
   @ConfigProperty(ConfigProperty.CHART_QNAME)
@@ -109,7 +108,7 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
 
   }
 
-  protected static class LocalChartBoxExtension<OWNER extends AbstractChartBox> extends LocalFormFieldExtension<OWNER> implements IChartBoxExtension<OWNER> {
+  protected static class LocalChartBoxExtension<OWNER extends AbstractChartBox> extends LocalFormFieldExtension<OWNER>implements IChartBoxExtension<OWNER> {
 
     public LocalChartBoxExtension(OWNER owner) {
       super(owner);

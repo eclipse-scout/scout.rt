@@ -121,8 +121,7 @@ public class HttpAuthJaasFilter implements Filter {
               chain.doFilter(secureReq, res);
               return null;
             }
-          }
-          );
+          });
     }
     catch (PrivilegedActionException e) {
       Throwable t = e.getCause();

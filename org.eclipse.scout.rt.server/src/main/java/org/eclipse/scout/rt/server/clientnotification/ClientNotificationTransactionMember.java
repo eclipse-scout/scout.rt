@@ -21,9 +21,8 @@ import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**
- * This transaction member is used to collect all transactional notifications issued during a transaction.
- * On successful commit, the notifications will be added to the
- * {@link ServerRunContext#getTransactionalClientNotificationCollector()
+ * This transaction member is used to collect all transactional notifications issued during a transaction. On successful
+ * commit, the notifications will be added to the {@link ServerRunContext#getTransactionalClientNotificationCollector()
  * )} to be included in the request's response (piggyback). That allows immediate processing of the transactional
  * notifications on client side.
  */

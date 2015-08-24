@@ -129,7 +129,8 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testContributeOnlyToOneNestedTemplateUsageOverSpecified() throws Exception {
-    BEANS.get(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, FirstTemplateBox.class, TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
+    BEANS.get(IExtensionRegistry.class).register(ContributedTestField.class,
+        new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, FirstTemplateBox.class, TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);

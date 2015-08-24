@@ -37,11 +37,9 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 
 /**
- * A limited navigation history for storing the navigation history and navigating in that
- * history.
+ * A limited navigation history for storing the navigation history and navigating in that history.
  *
- * @see org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService
- *      NavigationHistoryService
+ * @see org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService NavigationHistoryService
  */
 public class UserNavigationHistory {
   private static final int MAX_HISTORY_SIZE = 25;
@@ -104,9 +102,7 @@ public class UserNavigationHistory {
   }
 
   /**
-   * Logs a warning and returns <code>null</code> for the bookmark that should
-   * be used in
-   * case of the error.
+   * Logs a warning and returns <code>null</code> for the bookmark that should be used in case of the error.
    *
    * @param t
    *          error to be handled
@@ -148,8 +144,7 @@ public class UserNavigationHistory {
   }
 
   /**
-   * Adds a bookmark to the history as newest element, if it is not null and not
-   * the same as the last element.
+   * Adds a bookmark to the history as newest element, if it is not null and not the same as the last element.
    * <p>
    * Removes all elements newer than the currently active element, if the next element in the history is not the same as
    * the element to add.
@@ -237,8 +232,8 @@ public class UserNavigationHistory {
    *          the old bookmark to compare
    * @param newbm
    *          the new bookmark to compare
-   * @return true, if the bookmarks oldbm and newbm have the same title and the
-   *         same parent search form states and parent labels.
+   * @return true, if the bookmarks oldbm and newbm have the same title and the same parent search form states and
+   *         parent labels.
    */
   private boolean isSameBookmark(Bookmark oldbm, Bookmark newbm) {
     List<AbstractPageState> oldPath = oldbm.getPath();
@@ -271,8 +266,7 @@ public class UserNavigationHistory {
   }
 
   /**
-   * @return the currently active bookmark or <code>null</code>, if no bookmark
-   *         is active
+   * @return the currently active bookmark or <code>null</code>, if no bookmark is active
    */
   public Bookmark getActiveBookmark() {
     if (m_index < m_bookmarks.size()) {

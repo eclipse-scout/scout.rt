@@ -37,8 +37,7 @@ public final class Base64Utility {
   }
 
   /**
-   * Base-64 encodes the supplied block of data. Line wrapping is not applied on
-   * output.
+   * Base-64 encodes the supplied block of data. Line wrapping is not applied on output.
    *
    * @param bytes
    *          The block of data that is to be Base-64 encoded.

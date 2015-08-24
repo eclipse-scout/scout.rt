@@ -44,9 +44,9 @@ public class PermissionServiceTest {
 
   private void testImpl(IPermissionService testService, boolean testPermission1Expected, boolean testPermission2Expected) {
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanMetaData(IPermissionService.class).
-            withInitialInstance(testService).
-            withApplicationScoped(true));
+        new BeanMetaData(IPermissionService.class)
+            .withInitialInstance(testService)
+            .withApplicationScoped(true));
     try {
       IPermissionService service = BEANS.get(IPermissionService.class);
       assertSame(testService, service);

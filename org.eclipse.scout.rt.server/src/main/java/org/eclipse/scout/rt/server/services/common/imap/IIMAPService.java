@@ -16,8 +16,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
- * This service is normally registered as a scout server service extension, so
- * it exists per session
+ * This service is normally registered as a scout server service extension, so it exists per session
  */
 public interface IIMAPService extends IService {
 

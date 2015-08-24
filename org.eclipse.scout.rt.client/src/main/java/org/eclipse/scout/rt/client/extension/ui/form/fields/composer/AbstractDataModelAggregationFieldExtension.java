@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.AbstractS
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractDataModelAggregationField;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 
-public abstract class AbstractDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends AbstractSmartFieldExtension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
+public abstract class AbstractDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends AbstractSmartFieldExtension<Integer, OWNER>implements IDataModelAggregationFieldExtension<OWNER> {
 
   public AbstractDataModelAggregationFieldExtension(OWNER owner) {
     super(owner);

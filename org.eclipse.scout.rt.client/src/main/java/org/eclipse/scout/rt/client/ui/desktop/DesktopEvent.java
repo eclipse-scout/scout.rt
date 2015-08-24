@@ -110,14 +110,13 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_DOWNLOAD_RESOURCE = 921;
   /**
-   * Send a broadcast event to find the {@link IFormField} that owns the focus
-   * The listener can store the result using {@link #setFocusedField()} The event waits some time to give asynchronous
-   * jobs a chance to complete (default is 2000 ms)
+   * Send a broadcast event to find the {@link IFormField} that owns the focus The listener can store the result using
+   * {@link #setFocusedField()} The event waits some time to give asynchronous jobs a chance to complete (default is
+   * 2000 ms)
    */
   public static final int TYPE_FIND_FOCUS_OWNER = 1000;
   /**
-   * Broadcast request to add all popup menus for the tray menu
-   * collector: popupMenus
+   * Broadcast request to add all popup menus for the tray menu collector: popupMenus
    */
   public static final int TYPE_TRAY_POPUP = 1010;
 

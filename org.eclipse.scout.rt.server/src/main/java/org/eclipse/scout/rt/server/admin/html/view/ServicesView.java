@@ -293,8 +293,7 @@ public class ServicesView extends DefaultView {
                     LOG.error("setting " + finalDesc.getName() + "=" + propText, e);
                   }
                 }
-              }
-              );
+              });
         }
         p.startTableRow();
         p.tableCell(propName);

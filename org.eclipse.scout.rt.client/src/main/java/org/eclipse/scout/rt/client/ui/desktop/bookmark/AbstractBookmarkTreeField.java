@@ -92,8 +92,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   }
 
   /**
-   * It's up to the Eclipse Scout implementation to handle bookmark publishing,
-   * e.g. selection of receivers of the published bookmark
+   * It's up to the Eclipse Scout implementation to handle bookmark publishing, e.g. selection of receivers of the
+   * published bookmark
    *
    * @param command
    *          the command to publish a bookmark
@@ -103,9 +103,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   }
 
   /**
-   * If an application needs to execute additional code when a bookmark is opened,
-   * it can inject a command here.
-   * Please note: The command should at least open the bookmark, by calling {@link IDesktop#activateBookmark()}
+   * If an application needs to execute additional code when a bookmark is opened, it can inject a command here. Please
+   * note: The command should at least open the bookmark, by calling {@link IDesktop#activateBookmark()}
    *
    * @param command
    *          the command to be executed when a user opens a bookmark

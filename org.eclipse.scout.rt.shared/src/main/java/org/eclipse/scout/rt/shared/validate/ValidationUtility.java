@@ -232,9 +232,8 @@ public final class ValidationUtility {
   }
 
   /**
-   * Checks if the string value (if not null) matches the regex.
-   * If the regex is a string, the pattern created uses case insensitive {@link Pattern#CASE_INSENSITIVE} and
-   * full-text-scan {@link Pattern#DOTALL}.
+   * Checks if the string value (if not null) matches the regex. If the regex is a string, the pattern created uses case
+   * insensitive {@link Pattern#CASE_INSENSITIVE} and full-text-scan {@link Pattern#DOTALL}.
    *
    * @param value
    * @param regex
@@ -499,9 +498,8 @@ public final class ValidationUtility {
 
   /**
    * Traverse all objects in the subtree and call {@link #visitObject(Object, Annotation[])} on every traversed Object
-   * in the
-   * hierarchy. For fields the annotations are collected (including annotations placed on types with reference to the
-   * field).
+   * in the hierarchy. For fields the annotations are collected (including annotations placed on types with reference to
+   * the field).
    * <p>
    * Override {@link #visitObject(Object, Annotation[])} for custom handling.
    */
@@ -518,9 +516,8 @@ public final class ValidationUtility {
     }
 
     /**
-     * Visit an object in the composite object tree.
-     * If you want the visitor to continue and visit the subtree of this object, then call visitSubTree(), otherwiese
-     * simply return to not visit the subtree under this Object.
+     * Visit an object in the composite object tree. If you want the visitor to continue and visit the subtree of this
+     * object, then call visitSubTree(), otherwiese simply return to not visit the subtree under this Object.
      * <p>
      * Override this method for custom handling
      */

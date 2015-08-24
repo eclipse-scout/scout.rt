@@ -40,7 +40,8 @@ public interface IFileChooser {
    * scope. Possible parents are {@link IDesktop}, {@link IOutline}, or {@link IForm}:
    * <ul>
    * <li>Desktop: {@link IFileChooser} is always accessible; blocks the entire desktop;</li>
-   * <li>Outline: {@link IFileChooser} is only accessible when the given outline is active; only blocks the outline;</li>
+   * <li>Outline: {@link IFileChooser} is only accessible when the given outline is active; only blocks the outline;
+   * </li>
    * <li>Form: {@link IFileChooser} is only accessible when the given Form is active; only blocks the Form;</li>
    * </ul>
    *

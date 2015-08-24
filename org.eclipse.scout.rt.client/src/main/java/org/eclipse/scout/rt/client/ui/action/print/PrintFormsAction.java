@@ -38,8 +38,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
  * Create a screenshot of one or more form into a destination folder. For every {@link ITabBox} a separate image is
- * created for every tab. Default format is
- * image/jpg.
+ * created for every tab. Default format is image/jpg.
  * <ul>
  * <li>Naming for forms is &lt;form fully qualified class name&gt;.jpg</li>
  * <li>If a form type has multiple instances, the name is &lt;form fully qualified class name&gt;_&lt;index&gt;.jpg</li>

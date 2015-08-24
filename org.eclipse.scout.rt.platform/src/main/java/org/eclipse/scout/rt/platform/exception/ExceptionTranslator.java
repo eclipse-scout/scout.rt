@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 public class ExceptionTranslator implements IThrowableTranslator<Exception> {
 
   /**
-   * Translates the given {@link Throwable} into an {@link Exception}. Solely, an {@link Error} is not
-   * translated but re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
+   * Translates the given {@link Throwable} into an {@link Exception}. Solely, an {@link Error} is not translated but
+   * re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
    */
   @Override
   public Exception translate(final Throwable t) {

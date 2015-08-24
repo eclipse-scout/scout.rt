@@ -87,8 +87,8 @@ public abstract class AbstractTableRowBuilder<T> {
   /**
    * Performance note:<br>
    * Since the matrix may contain large amount of data, the Object[][] can be passed as a
-   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][])
-   * so that the further processing can set the content of the holder to null while processing.
+   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
+   * the holder to null while processing.
    */
   public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
     return createRowsByMatrix(dataMatrixOrReference, ITableRow.STATUS_INSERTED);
@@ -97,8 +97,8 @@ public abstract class AbstractTableRowBuilder<T> {
   /**
    * Performance note:<br>
    * Since the matrix may contain large amount of data, the Object[][] can be passed as a
-   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][])
-   * so that the further processing can set the content of the holder to null while processing.
+   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
+   * the holder to null while processing.
    */
   public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException {
     Object dataMatrix;

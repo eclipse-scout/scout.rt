@@ -135,7 +135,8 @@ public class HtmlComponent {
   public void radioBoxOption(String fieldName, String text, AbstractHtmlAction action, boolean selected) {
     String actionId = buildActionId(action);
     m_actionMap.put(actionId, action);
-    out.print("<input type=\"radio\" name=\"" + fieldName + "\" value=\"" + actionId + "\" " + (selected ? " checked=\"checked\" " : "") + " onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\">" + javaToHtml(text) + "</input>");
+    out.print("<input type=\"radio\" name=\"" + fieldName + "\" value=\"" + actionId + "\" " + (selected ? " checked=\"checked\" " : "") + " onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\">"
+        + javaToHtml(text) + "</input>");
   }
 
   /**

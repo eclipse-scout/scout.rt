@@ -70,7 +70,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
  * A page containing a list of "menu" entries<br>
  * child pages are explicitly added
  */
-public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
+public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T>implements IPageWithTable<T>, IContributionOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
 
   private ISearchForm m_searchForm;
@@ -87,10 +87,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * calling the constructor with callInitializer == false means, the table won't be constructed upon init
-   * but upon activation. this is a performance-optimization and especially recommended for tablepages
-   * where the parent is directly another table page (and no folder- or plain page) in this case the parent page can
-   * have a huge amount of child pages with a lot of tables to be constructed but never used.
+   * calling the constructor with callInitializer == false means, the table won't be constructed upon init but upon
+   * activation. this is a performance-optimization and especially recommended for tablepages where the parent is
+   * directly another table page (and no folder- or plain page) in this case the parent page can have a huge amount of
+   * child pages with a lot of tables to be constructed but never used.
    *
    * @param callInitializer
    */
@@ -138,9 +138,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Configures whether table data is automatically loaded (through a search with default constraints)
-   * or whether loading the table data must be triggered explicitly by the user. Set this property to {@code true} if
-   * you expect large amount of data for an unconstrained search.
+   * Configures whether table data is automatically loaded (through a search with default constraints) or whether
+   * loading the table data must be triggered explicitly by the user. Set this property to {@code true} if you expect
+   * large amount of data for an unconstrained search.
    * <p>
    * This property is read by {@link #interceptPopulateTable()}, if you override that method, this configuration
    * property might not have any effect. This configuration property does not have any effect if no search form is
@@ -177,9 +177,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Configures the visibility of table row menus on this page's table. Table row menus are typically available
-   * on each existing row. Typical table row menus will affect exactly one existing row (for example an 'Edit row...'
-   * menu or a 'Delete row' menu).
+   * Configures the visibility of table row menus on this page's table. Table row menus are typically available on each
+   * existing row. Typical table row menus will affect exactly one existing row (for example an 'Edit row...' menu or a
+   * 'Delete row' menu).
    * <p>
    * Note that setting this property to {@code false} will effectively stop all table row menus from being displayed on
    * the GUI. However, if this property is set to {@code true}, single menus can still individually be set to invisible.
@@ -209,8 +209,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * By default, child pages of table pages are not shown immediately in the outline tree
-   * ("lazy add child pages to outline" setting). However, the setting is set to false when the child page count is less
+   * By default, child pages of table pages are not shown immediately in the outline tree (
+   * "lazy add child pages to outline" setting). However, the setting is set to false when the child page count is less
    * or equal to this threshold.
    * <p>
    * Subclasses can override this method. Default is {@code 1}.
@@ -311,9 +311,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Creates a child page for every table row that was added to this page's table. This method is called when
-   * resolving a virtual tree node to a real node. Overriding this method is the recommended way to build the
-   * outline tree structure.
+   * Creates a child page for every table row that was added to this page's table. This method is called when resolving
+   * a virtual tree node to a real node. Overriding this method is the recommended way to build the outline tree
+   * structure.
    * <p>
    * Subclasses can override this method. The default returns {@code null}.
    *
@@ -339,10 +339,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Creates a virtual child page for every table row that was added to this page's table. The virtual page
-   * is a place holder for a real page and is transformed (resolved) into the real page when it is activated for the
-   * first time. This reduces memory consumption and improves performance for large table pages, where most of the child
-   * pages are never activated, but solely displayed in the outline tree.
+   * Creates a virtual child page for every table row that was added to this page's table. The virtual page is a place
+   * holder for a real page and is transformed (resolved) into the real page when it is activated for the first time.
+   * This reduces memory consumption and improves performance for large table pages, where most of the child pages are
+   * never activated, but solely displayed in the outline tree.
    * <p>
    * Subclasses can override this method. In most cases it is preferable to override
    * {@link #interceptCreateChildPage(ITableRow)} instead.<br/>
@@ -460,8 +460,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Ensures that the search form is initialized but not started, if one is defined for this table.
-   * This allows lazy initialization of search forms.
+   * Ensures that the search form is initialized but not started, if one is defined for this table. This allows lazy
+   * initialization of search forms.
    */
   protected void ensureSearchFormCreated() {
     if (m_searchForm == null) {
@@ -615,8 +615,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Initializes the search form associated with this page. This method is called before the
-   * search form is used for the first time.
+   * Initializes the search form associated with this page. This method is called before the search form is used for the
+   * first time.
    * <p>
    * Legacy: If the search form is defined as inner class, this method is called when this page is initialized.
    * <p>
@@ -735,8 +735,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   /**
    * Indicates if the result displayed in the table is the whole result or if there is more data in the server (that
-   * wasn't sent to the client).
-   * Is set if {@link #importPageData(AbstractTablePageData)} was used.
+   * wasn't sent to the client). Is set if {@link #importPageData(AbstractTablePageData)} was used.
    *
    * @since 3.10.0-M3
    */
@@ -831,8 +830,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   /**
    * load tree children<br>
    * this method delegates to the table reload<br>
-   * when the table is loaded and this node is not a leaf node then the table
-   * rows are mirrored in child nodes
+   * when the table is loaded and this node is not a leaf node then the table rows are mirrored in child nodes
    */
   @Override
   public final void loadChildren() throws ProcessingException {
@@ -932,8 +930,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * Computes the list of linked child pages for the given table rows. Revalidates the the pages cell
-   * if <code>updateChildPageCells</code> is true. Otherwise, the cells are not updated.
+   * Computes the list of linked child pages for the given table rows. Revalidates the the pages cell if
+   * <code>updateChildPageCells</code> is true. Otherwise, the cells are not updated.
    */
   private List<IPage<?>> getChildPagesFor(List<? extends ITableRow> tableRows, boolean updateChildPageCells) {
     List<IPage<?>> result = new ArrayList<IPage<?>>();
@@ -967,8 +965,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   /**
    * Table listener and tree controller<br>
-   * the table is reflected in tree children only if the tree/page node is not
-   * marked as being a leaf
+   * the table is reflected in tree children only if the tree/page node is not marked as being a leaf
    */
   private class P_TableListener extends TableAdapter {
     @Override
@@ -1089,7 +1086,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     chain.execInitSearchForm();
   }
 
-  protected static class LocalPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends LocalPageExtension<OWNER> implements IPageWithTableExtension<T, OWNER> {
+  protected static class LocalPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends LocalPageExtension<OWNER>implements IPageWithTableExtension<T, OWNER> {
 
     public LocalPageWithTableExtension(OWNER owner) {
       super(owner);

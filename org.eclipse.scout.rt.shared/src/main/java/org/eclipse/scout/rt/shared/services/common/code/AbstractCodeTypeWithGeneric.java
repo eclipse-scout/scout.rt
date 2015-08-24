@@ -194,7 +194,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   /**
-   * This method is called on server side to load additional dynamic codes to the {@link #interceptCreateCodes()} list<br>
+   * This method is called on server side to load additional dynamic codes to the {@link #interceptCreateCodes()} list
+   * <br>
    * Sample for sql call:
    *
    * <pre>
@@ -214,9 +215,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   /**
    * When there are configured codes (inner classes) that are overwritten by {@link #execLoadCodes(Class)} then this
-   * method
-   * is
-   * called to give a chance to merge attributes of the old configured code to the new dynamic code.
+   * method is called to give a chance to merge attributes of the old configured code to the new dynamic code.
    * <p>
    * The default merges the following properties from the old code to the new iff they are null on the new code.
    * <ul>
@@ -562,8 +561,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    *
    * @since 4.0
    * @param index
-   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1
-   *          and the codeId did not exist, then the code is appended to the end.
+   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1 and
+   *          the codeId did not exist, then the code is appended to the end.
    */
   protected void addRootCodeInternal(int index, CODE code) {
     if (code == null) {
@@ -662,7 +661,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>, OWNER extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> extends AbstractSerializableExtension<OWNER> implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
+  protected static class LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>, OWNER extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> extends AbstractSerializableExtension<OWNER>
+      implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalCodeTypeWithGenericExtension(OWNER owner) {

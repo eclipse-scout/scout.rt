@@ -78,10 +78,10 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   }
 
   /**
-   * Replace the desktop with an other instance ({@link #m_testDesktop}). Can be used to install a mock or a spy.
-   * Unlike {@link #setDesktop(IDesktop)} it will not check if the desktop is already active.
-   * If a test desktop ({@link #m_testDesktop}) is set, {@link #getDesktop()} will return this instance.
-   * Do not forget to set the test desktop to null at the end of your test.
+   * Replace the desktop with an other instance ({@link #m_testDesktop}). Can be used to install a mock or a spy. Unlike
+   * {@link #setDesktop(IDesktop)} it will not check if the desktop is already active. If a test desktop (
+   * {@link #m_testDesktop}) is set, {@link #getDesktop()} will return this instance. Do not forget to set the test
+   * desktop to null at the end of your test.
    *
    * @param desktop
    *          the test desktop

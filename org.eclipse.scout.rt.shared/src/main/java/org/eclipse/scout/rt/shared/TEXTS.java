@@ -43,7 +43,8 @@ public class TEXTS {
    * <ul>
    * <li>TEXTS.get("MissingFile1"); with MissingFile1="The File could not be found."</li>
    * <li>TEXTS.get("MissingFile2", fileName); with MissingFile2="The File {0} could not be found."</li>
-   * <li>TEXTS.get("MissingFile3", fileName, dir); with MissingFile3="The File {0} in Folder {1} could not be found."</li>
+   * <li>TEXTS.get("MissingFile3", fileName, dir); with MissingFile3="The File {0} in Folder {1} could not be found."
+   * </li>
    * </ul>
    *
    * @param key
@@ -68,8 +69,8 @@ public class TEXTS {
    * <ul>
    * <li>TEXTS.get(locale, "MissingFile1"); with MissingFile1="The File could not be found."</li>
    * <li>TEXTS.get(locale, "MissingFile2", fileName); with MissingFile2="The File {0} could not be found."</li>
-   * <li>TEXTS.get(locale, "MissingFile3", fileName, dir); with
-   * MissingFile3="The File {0} in Folder {1} could not be found."</li>
+   * <li>TEXTS.get(locale, "MissingFile3", fileName, dir); with MissingFile3=
+   * "The File {0} in Folder {1} could not be found."</li>
    * </ul>
    *
    * @param locale

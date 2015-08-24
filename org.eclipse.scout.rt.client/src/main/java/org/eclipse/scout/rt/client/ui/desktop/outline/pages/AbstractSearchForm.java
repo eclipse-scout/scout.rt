@@ -18,8 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
  * Search form for the outline must contain a SearchHandler<br>
- * The method startSearch() starts the first inner class of type IFormHandler
- * that is found
+ * The method startSearch() starts the first inner class of type IFormHandler that is found
  */
 public abstract class AbstractSearchForm extends AbstractForm implements ISearchForm {
 
@@ -49,7 +48,7 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
     return false;
   }
 
-  protected static class LocalSearchFormExtension<OWNER extends AbstractSearchForm> extends LocalFormExtension<OWNER> implements ISearchFormExtension<OWNER> {
+  protected static class LocalSearchFormExtension<OWNER extends AbstractSearchForm> extends LocalFormExtension<OWNER>implements ISearchFormExtension<OWNER> {
 
     public LocalSearchFormExtension(OWNER owner) {
       super(owner);

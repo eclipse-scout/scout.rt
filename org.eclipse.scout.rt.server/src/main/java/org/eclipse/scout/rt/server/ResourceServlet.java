@@ -138,8 +138,7 @@ public class ResourceServlet extends HttpServlet {
 
   protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, String contentType, long lastModified, int contentLength) {
     String etag = null;
-    if (lastModified != -1 && contentLength != -1)
-    {
+    if (lastModified != -1 && contentLength != -1) {
       etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     }
 

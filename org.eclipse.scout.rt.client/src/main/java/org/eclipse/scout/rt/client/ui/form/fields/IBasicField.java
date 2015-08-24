@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 /**
- * Interface for simple fields (String field, Number field, Decimal field).
- * No picker, no proposal form, no button...
+ * Interface for simple fields (String field, Number field, Decimal field). No picker, no proposal form, no button...
  *
  * @since 3.10.0-M3
  */

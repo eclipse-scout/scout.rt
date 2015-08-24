@@ -23,11 +23,10 @@ public interface IScheduler {
   Ticker getTicker();
 
   /**
-   * Add a new job to the scheduler. All jobs with matching groupId || jobId are
-   * disposed (removed). A null value for groupId or jobId is interpreted as
-   * wildcard when no existing matching job is currently running, then this new
-   * job is immediately scheduled when ready otherwiese it is just queued and
-   * the existing jobs are finished (not interrupted)
+   * Add a new job to the scheduler. All jobs with matching groupId || jobId are disposed (removed). A null value for
+   * groupId or jobId is interpreted as wildcard when no existing matching job is currently running, then this new job
+   * is immediately scheduled when ready otherwiese it is just queued and the existing jobs are finished (not
+   * interrupted)
    */
   void addJob(ISchedulerJob newJob);
 
@@ -64,9 +63,8 @@ public interface IScheduler {
   int getRunningJobCount();
 
   /**
-   * convenience for getJobs(null,jobId) Note that this will return the first
-   * found job with that id even though there might be other jobs with that same
-   * id
+   * convenience for getJobs(null,jobId) Note that this will return the first found job with that id even though there
+   * might be other jobs with that same id
    */
   ISchedulerJob getJob(String jobId);
 
@@ -85,9 +83,8 @@ public interface IScheduler {
   Collection<ISchedulerJob> getRunningJobs(String groupId, String jobId);
 
   /**
-   * Override this filter to control the running of scheduler jobs This method
-   * is synchronous and must wait until the call to {@link ISchedulerJob#run(TickSignal)} has returned The default
-   * implementation just calls job.run(signal);
+   * Override this filter to control the running of scheduler jobs This method is synchronous and must wait until the
+   * call to {@link ISchedulerJob#run(TickSignal)} has returned The default implementation just calls job.run(signal);
    */
   void handleJobExecution(ISchedulerJob job, TickSignal signal) throws ProcessingException;
 
@@ -97,8 +94,8 @@ public interface IScheduler {
   void start();
 
   /**
-   * stop scheduler if not running, this method does nothing else it interrupts
-   * all jobs, disposes all jobs and stops scheduler
+   * stop scheduler if not running, this method does nothing else it interrupts all jobs, disposes all jobs and stops
+   * scheduler
    */
   void stop();
 }

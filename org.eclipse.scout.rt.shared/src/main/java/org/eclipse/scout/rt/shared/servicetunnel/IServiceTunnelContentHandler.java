@@ -14,8 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * This is the content handler that defines the format in which data is
- * exchanged through a service tunnel.
+ * This is the content handler that defines the format in which data is exchanged through a service tunnel.
  * <p>
  * Most implementations also implement {@link IServiceTunnelContentObserver}
  */

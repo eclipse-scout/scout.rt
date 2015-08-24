@@ -253,22 +253,10 @@ public class DiagnosticSession {
   }
 
   /**
-   * Returns array list of strings with the following system information:
-   * - java runtime
-   * - application directory
-   * - VM memory max
-   * - VM memory currently reserved
-   * - VM memory currently used
-   * - OS name & version
-   * - OS Architecture
-   * - user name
-   * - user home directory
-   * - user country (OS)
-   * - timezone (OS)
-   * - locale
-   * - number of available (logical) processors
-   * - client host address
-   * - client host name
+   * Returns array list of strings with the following system information: - java runtime - application directory - VM
+   * memory max - VM memory currently reserved - VM memory currently used - OS name & version - OS Architecture - user
+   * name - user home directory - user country (OS) - timezone (OS) - locale - number of available (logical) processors
+   * - client host address - client host name
    *
    * @return ArrayList<String>
    */

@@ -25,8 +25,7 @@ public abstract class AbstractHolderArgumentVisitor {
   }
 
   /**
-   * equality to Object[] is explicitly needed here, do not change to
-   * "instanceof"
+   * equality to Object[] is explicitly needed here, do not change to "instanceof"
    */
   private void visitImpl(Object[] input, Object[] output, int depth, int maxDepth, boolean autoCreateOutputStructure) {
     for (int i = 0; i < input.length; i++) {

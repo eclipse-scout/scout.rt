@@ -81,8 +81,8 @@ public final class ScoutAssert {
   }
 
   /**
-   * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0).
-   * This can be useful when two {@link java.math.BigDecimal} are compared.
+   * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0). This can be useful when two
+   * {@link java.math.BigDecimal} are compared.
    *
    * @since 3.10.0-M3
    */
@@ -91,8 +91,8 @@ public final class ScoutAssert {
   }
 
   /**
-   * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0).
-   * This can be useful when two {@link java.math.BigDecimal} are compared.
+   * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0). This can be useful when two
+   * {@link java.math.BigDecimal} are compared.
    *
    * @since 3.10.0-M3
    */

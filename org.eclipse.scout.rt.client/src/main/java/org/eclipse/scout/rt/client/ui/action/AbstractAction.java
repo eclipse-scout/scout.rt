@@ -86,8 +86,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * This is the init of the runtime model after the environment (form, fields, ..) are built
-   * and configured
+   * This is the init of the runtime model after the environment (form, fields, ..) are built and configured
    */
   @Override
   public final void initAction() throws ProcessingException {
@@ -124,10 +123,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * Defines the keystroke for this action. A keystroke is built from optional modifiers (alt, control, shift)
-   * and a key (p, f11, delete).
-   * The keystroke has to follow a certain pattern: The modifiers (alt, shift, control) are separated from the key by a
-   * '-'. Examples:
+   * Defines the keystroke for this action. A keystroke is built from optional modifiers (alt, control, shift) and a key
+   * (p, f11, delete). The keystroke has to follow a certain pattern: The modifiers (alt, shift, control) are separated
+   * from the key by a '-'. Examples:
    * <ul>
    * <li>control-alt-1 (combineKeyStrokes(IKeyStroke.CONTROL,IKeyStroke.ALT,"1"))
    * <li>control-shift-alt-1 (combineKeyStrokes(IKeyStroke.CONTROL,IKeyStroke.SHIFT,IKeyStroke.ALT,"1"))
@@ -166,11 +164,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * @return true if {@link #prepareAction()} should in addition consider the
-   *         context of the action to decide for visibility and enabled.<br>
+   * @return true if {@link #prepareAction()} should in addition consider the context of the action to decide for
+   *         visibility and enabled.<br>
    *         For example a menu of a table field with {@link #isInheritAccessibility()}==true is invisible when the
-   *         table
-   *         field is disabled or invisible
+   *         table field is disabled or invisible
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(22)
@@ -185,8 +182,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * @return true if the AbstractAction should be rendered as a separating line.
-   *         If true, the AbstractAction can not trigger any action ({@link #execAction()})
+   * @return true if the AbstractAction should be rendered as a separating line. If true, the AbstractAction can not
+   *         trigger any action ({@link #execAction()})
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
@@ -308,8 +305,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 4.0.1
    */
@@ -369,9 +366,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * Please double check if implementing this method!
-   * Consider using {@link #interceptAction()} instead. If no other option ensure super call when overriding this
-   * method.
+   * Please double check if implementing this method! Consider using {@link #interceptAction()} instead. If no other
+   * option ensure super call when overriding this method.
    *
    * @throws ProcessingException
    */
@@ -728,7 +724,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER> implements IActionExtension<OWNER> {
+  protected static class LocalActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER>implements IActionExtension<OWNER> {
 
     public LocalActionExtension(OWNER owner) {
       super(owner);

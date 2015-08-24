@@ -14,8 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * ui model to represent an intraday column (hour, half hour, quarter hour,
- * etc..)
+ * ui model to represent an intraday column (hour, half hour, quarter hour, etc..)
  */
 public class MinorTimeColumn {
   private Date m_beginTime;

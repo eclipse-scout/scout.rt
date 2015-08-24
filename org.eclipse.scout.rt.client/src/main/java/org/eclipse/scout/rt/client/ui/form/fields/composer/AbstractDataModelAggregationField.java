@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  * Expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
 @ClassId("678308dc-6f45-4284-9295-617b28b03cea")
-public abstract class AbstractDataModelAggregationField extends AbstractSmartField<Integer> implements IDataModelAggregationField {
+public abstract class AbstractDataModelAggregationField extends AbstractSmartField<Integer>implements IDataModelAggregationField {
 
   public AbstractDataModelAggregationField() {
     this(true);
@@ -119,7 +119,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     chain.execAttributeChanged(attribute);
   }
 
-  protected static class LocalDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends LocalSmartFieldExtension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
+  protected static class LocalDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends LocalSmartFieldExtension<Integer, OWNER>implements IDataModelAggregationFieldExtension<OWNER> {
 
     public LocalDataModelAggregationFieldExtension(OWNER owner) {
       super(owner);

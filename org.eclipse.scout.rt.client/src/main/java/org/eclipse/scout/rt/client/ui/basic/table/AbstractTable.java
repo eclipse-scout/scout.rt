@@ -123,8 +123,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 /**
  * Columns are defined as inner classes<br>
- * for every inner column class there is a generated getXYColumn method directly
- * on the table
+ * for every inner column class there is a generated getXYColumn method directly on the table
  */
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTable.class);
@@ -1174,8 +1173,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * This is the init of the runtime model after the table and columns are built
-   * and configured
+   * This is the init of the runtime model after the table and columns are built and configured
    */
   @Override
   public final void initTable() throws ProcessingException {
@@ -1907,8 +1905,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Checks whether the menu with the given class has been replaced by another menu. If so, the replacing
-   * menu's class is returned. Otherwise the given class itself.
+   * Checks whether the menu with the given class has been replaced by another menu. If so, the replacing menu's class
+   * is returned. Otherwise the given class itself.
    *
    * @param c
    * @return Returns the possibly available replacing menu class for the given class.
@@ -1979,9 +1977,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * Performance note:<br>
-   * Since the matrix may contain large amount of data, the Object[][] can be passed as new
-   * AtomicReference<Object>(Object[][])
-   * so that the further processing can set the content of the holder to null while processing.
+   * Since the matrix may contain large amount of data, the Object[][] can be passed as new AtomicReference
+   * <Object>(Object[][]) so that the further processing can set the content of the holder to null while processing.
    */
   @Override
   public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
@@ -1990,9 +1987,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * Performance note:<br>
-   * Since the matrix may contain large amount of data, the Object[][] can be passed as new
-   * AtomicReference<Object>(Object[][])
-   * so that the further processing can set the content of the holder to null while processing.
+   * Since the matrix may contain large amount of data, the Object[][] can be passed as new AtomicReference
+   * <Object>(Object[][]) so that the further processing can set the content of the holder to null while processing.
    */
   @Override
   public List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException {
@@ -2006,9 +2002,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * Performance note:<br>
-   * Since the matrix may contain large amount of data, the Object[][] can be passed as new
-   * AtomicReference<Object>(Object[][])
-   * so that the further processing can set the content of the holder to null while processing.
+   * Since the matrix may contain large amount of data, the Object[][] can be passed as new AtomicReference
+   * <Object>(Object[][]) so that the further processing can set the content of the holder to null while processing.
    */
   @Override
   public void replaceRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException {
@@ -2077,8 +2072,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Replace rows by applying insert/update/delete on existing rows by
-   * primary key match
+   * Replace rows by applying insert/update/delete on existing rows by primary key match
    */
   private void replaceRowsCase2(List<? extends ITableRow> newRows) throws ProcessingException {
     try {
@@ -2618,8 +2612,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * @return a copy of a row<br>
-   *         when the row is changed it has to be applied to the table using
-   *         modifyRow(row);
+   *         when the row is changed it has to be applied to the table using modifyRow(row);
    */
   @Override
   public ITableRow getRow(int rowIndex) {
@@ -2746,8 +2739,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * @return a copy of a deleted row<br>
-   *         when the row is changed it has to be applied to the table using
-   *         modifyRow(row);
+   *         when the row is changed it has to be applied to the table using modifyRow(row);
    */
   @Override
   public List<ITableRow> getDeletedRows() {
@@ -3225,8 +3217,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * discard is the same as delete with the exception that discarded rows are
-   * not collected in the deletedRows list
+   * discard is the same as delete with the exception that discarded rows are not collected in the deletedRows list
    */
   @Override
   public void discardRows(Collection<? extends ITableRow> rows) {
@@ -3582,8 +3573,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * Affects columns with lookup calls or code types<br>
-   * cells that have changed values fetch new texts/decorations from the lookup
-   * service in one single batch call lookup (performance optimization)
+   * cells that have changed values fetch new texts/decorations from the lookup service in one single batch call lookup
+   * (performance optimization)
    */
   private void processDecorationBuffer() {
     /*
@@ -4676,7 +4667,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE> implements ITableExtension<TABLE> {
+  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE>implements ITableExtension<TABLE> {
 
     public LocalTableExtension(TABLE owner) {
       super(owner);

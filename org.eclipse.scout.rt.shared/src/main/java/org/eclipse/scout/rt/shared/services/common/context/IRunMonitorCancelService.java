@@ -30,9 +30,9 @@ public interface IRunMonitorCancelService extends IService {
   String CANCEL_METHOD = "cancel";
 
   /**
-   * Cancels all running operations which are associated with the given <code>requestSequence</code>.
-   * Technically, that is any {@link ICancellable} which was bound to the {@link RunMonitor} of the originating service
-   * request and includes {@link RunContext} executions, jobs and transactions.
+   * Cancels all running operations which are associated with the given <code>requestSequence</code>. Technically, that
+   * is any {@link ICancellable} which was bound to the {@link RunMonitor} of the originating service request and
+   * includes {@link RunContext} executions, jobs and transactions.
    *
    * @param requestSequence
    *          <code>requestSequence</code> to identify the {@link RunMonitor} to cancel.

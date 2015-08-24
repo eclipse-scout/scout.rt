@@ -69,8 +69,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
           public void bookmarksChanged(BookmarkServiceEvent e) {
             handleBookmarksChanged();
           }
-        }
-        );
+        });
     handleBookmarksChanged();
   }
 

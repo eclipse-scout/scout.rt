@@ -92,9 +92,8 @@ public final class ServiceUtility {
   }
 
   /**
-   * Holders and nvpairs need to be copied as value clones. A smartfield for
-   * example is a holder and must not go to backend. NVPairs with holder values
-   * ae replaced by NVPair with serializable holder arguments
+   * Holders and nvpairs need to be copied as value clones. A smartfield for example is a holder and must not go to
+   * backend. NVPairs with holder values ae replaced by NVPair with serializable holder arguments
    */
   public static Object[] filterHolderArguments(Object[] callerArgs) {
     Object[] serializableArgs = new Object[callerArgs.length];

@@ -41,8 +41,6 @@ public final class ServerConfigProperties {
 
   public static class ClusterSyncNodeIdProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.clusterNodeId";
@@ -67,8 +65,6 @@ public final class ServerConfigProperties {
 
   public static class RemoteFilesRootDirProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.file.RemoteFileService#rootPath";
@@ -76,8 +72,6 @@ public final class ServerConfigProperties {
   }
 
   public static class ImapHostProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -87,8 +81,6 @@ public final class ServerConfigProperties {
 
   public static class ImapPortProperty extends AbstractPortConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#port";
@@ -96,8 +88,6 @@ public final class ServerConfigProperties {
   }
 
   public static class ImapMailboxProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -107,8 +97,6 @@ public final class ServerConfigProperties {
 
   public static class ImapUsernameProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#userName";
@@ -116,8 +104,6 @@ public final class ServerConfigProperties {
   }
 
   public static class ImapPasswordProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -127,8 +113,6 @@ public final class ServerConfigProperties {
 
   public static class ImapSslProtocolsProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.imap.AbstractIMAPService#sslProtocols";
@@ -136,8 +120,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SmtpHostProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -147,8 +129,6 @@ public final class ServerConfigProperties {
 
   public static class SmtpPortProperty extends AbstractPortConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#port";
@@ -156,8 +136,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SmtpUsernameProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -167,8 +145,6 @@ public final class ServerConfigProperties {
 
   public static class SmtpPasswordProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#password";
@@ -176,8 +152,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SmtpSubjectPrefixProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -187,8 +161,6 @@ public final class ServerConfigProperties {
 
   public static class SmtpDefaultFromEmailProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#defaultFromEmail";
@@ -196,8 +168,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SmtpDebugReceiverEmailProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -207,8 +177,6 @@ public final class ServerConfigProperties {
 
   public static class SmtpSslProtocolsProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#sslProtocols";
@@ -216,8 +184,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SmtpUseAuthenticationProperty extends AbstractBooleanConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -227,8 +193,6 @@ public final class ServerConfigProperties {
 
   public static class SmtpUseSmtpsProperty extends AbstractBooleanConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#useSmtps";
@@ -236,8 +200,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlTransactionMemberIdProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -247,8 +209,6 @@ public final class ServerConfigProperties {
 
   public static class SqlJndiNameProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jndiName";
@@ -256,8 +216,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlJndiInitialContextFactoryProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -267,8 +225,6 @@ public final class ServerConfigProperties {
 
   public static class SqlJndiProviderUrlProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jndiProviderUrl";
@@ -276,8 +232,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlJndiUrlPkgPrefixesProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -287,8 +241,6 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcMappingNameProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcMappingName";
@@ -296,8 +248,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlJdbcDriverNameProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -307,8 +257,6 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcPropertiesProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcProperties";
@@ -316,8 +264,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlUsernameProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -327,8 +273,6 @@ public final class ServerConfigProperties {
 
   public static class SqlPasswordProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#password";
@@ -336,8 +280,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlDirectJdbcConnectionProperty extends AbstractBooleanConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -347,8 +289,6 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcPoolConnectionLifetimeProperty extends AbstractPositiveLongConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcPoolConnectionLifetime";
@@ -356,8 +296,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlJdbcPoolConnectionBusyTimeoutProperty extends AbstractPositiveLongConfigProperty {
-
-
 
     @Override
     public String getKey() {
@@ -367,8 +305,6 @@ public final class ServerConfigProperties {
 
   public static class SqlJdbcStatementCacheSizeProperty extends AbstractPositiveIntegerConfigProperty {
 
-
-
     @Override
     public String getKey() {
       return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcStatementCacheSize";
@@ -376,8 +312,6 @@ public final class ServerConfigProperties {
   }
 
   public static class SqlJdbcPoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
-
-
 
     @Override
     public String getKey() {

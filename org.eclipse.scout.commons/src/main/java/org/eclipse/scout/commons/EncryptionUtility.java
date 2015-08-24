@@ -34,8 +34,8 @@ public final class EncryptionUtility {
    * @param data
    *          in base 64 format
    * @param tripleDesKey
-   *          24 bytes triple-des key, the default {@link #DEFAULT_KEY} may also
-   *          be used decrypt data using the triple-des key
+   *          24 bytes triple-des key, the default {@link #DEFAULT_KEY} may also be used decrypt data using the
+   *          triple-des key
    */
   public static byte[] decryptBase64(String data, byte[] tripleDesKey) {
     if (data == null) {
@@ -50,8 +50,8 @@ public final class EncryptionUtility {
   /**
    * @param data
    * @param tripleDesKey
-   *          24 bytes triple-des key, the default {@link #DEFAULT_KEY} may also
-   *          be used decrypt data using the triple-des key
+   *          24 bytes triple-des key, the default {@link #DEFAULT_KEY} may also be used decrypt data using the
+   *          triple-des key
    */
   public static byte[] decrypt(byte[] data, byte[] tripleDesKey) {
     if (data == null) {
@@ -72,8 +72,7 @@ public final class EncryptionUtility {
   /**
    * @param data
    * @param tripleDesKey
-   *          24 bytes triple-des key, the default {@link #DEFAULT_KEY} may also
-   *          be used
+   *          24 bytes triple-des key, the default {@link #DEFAULT_KEY} may also be used
    * @return encrypted data using the triple-des key
    */
   public static byte[] encrypt(byte[] data, byte[] tripleDesKey) {

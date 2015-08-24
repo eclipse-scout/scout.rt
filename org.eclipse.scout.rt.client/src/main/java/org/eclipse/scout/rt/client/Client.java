@@ -22,5 +22,5 @@ import org.eclipse.scout.rt.platform.Bean;
 @Documented
 @Inherited
 public @interface Client {
-  Class<? extends IClientSession> value() default IClientSession.class;
+  Class<? extends IClientSession>value() default IClientSession.class;
 }

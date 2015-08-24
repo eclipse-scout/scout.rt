@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 
 /**
  * Compared to the default InitFormVisitor used in
- * {@link FormUtility#initFormFields(org.eclipse.scout.rt.client.ui.form.IForm)), the inner form of a
- * wrappedFormField is never initialized. This is necessary to avoid a double initialization because the inner form
- * always is initialized already.
+ * {@link FormUtility#initFormFields(org.eclipse.scout.rt.client.ui.form.IForm)), the inner form of a wrappedFormField
+ * is never initialized. This is necessary to avoid a double initialization because the inner form always is initialized
+ * already.
  */
 public class PageFormInitFieldVisitor implements IFormFieldVisitor {
   private ProcessingException m_firstEx;

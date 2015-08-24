@@ -87,16 +87,16 @@ public interface ITableRow {
   Object getCellValue(int columnIndex);
 
   /**
-   * Warning: this method is not validating the new value against the
-   * corresponding table column use {@link IColumn#setValue(ITableRow, Object)} instead
+   * Warning: this method is not validating the new value against the corresponding table column use
+   * {@link IColumn#setValue(ITableRow, Object)} instead
    *
    * @return true if value was in fact changed
    */
   boolean setCellValue(int columnIndex, Object value) throws ProcessingException;
 
   /**
-   * Warning: this method is not validating the new value against the
-   * corresponding table column use {@link IColumn#setValue(ITableRow, Object)} instead
+   * Warning: this method is not validating the new value against the corresponding table column use
+   * {@link IColumn#setValue(ITableRow, Object)} instead
    *
    * @return true if value was in fact changed
    */
@@ -195,26 +195,22 @@ public interface ITableRow {
   void setRowChanging(boolean b);
 
   /**
-   * move this row to the top this method has no effect if sorting is activated
-   * on the table
+   * move this row to the top this method has no effect if sorting is activated on the table
    */
   void moveToTop();
 
   /**
-   * move this row to the bottom this method has no effect if sorting is
-   * activated on the table
+   * move this row to the bottom this method has no effect if sorting is activated on the table
    */
   void moveToBottom();
 
   /**
-   * move this row one up this method has no effect if sorting is activated on
-   * the table
+   * move this row one up this method has no effect if sorting is activated on the table
    */
   void moveUp();
 
   /**
-   * move this row one down this method has no effect if sorting is activated on
-   * the table
+   * move this row one down this method has no effect if sorting is activated on the table
    */
   void moveDown();
 }

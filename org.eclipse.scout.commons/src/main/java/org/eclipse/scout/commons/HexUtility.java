@@ -39,8 +39,7 @@ public final class HexUtility {
   }
 
   /**
-   * Hex encodes the supplied block of data. Line wrapping is not applied on
-   * output.
+   * Hex encodes the supplied block of data. Line wrapping is not applied on output.
    *
    * @param bytes
    *          The block of data that is to be Hex encoded.

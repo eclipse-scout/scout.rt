@@ -46,9 +46,8 @@ public interface IBookmarkStorageService extends IService {
    *
    * @param publishFolder
    * @param targetGroup
-   *          is a map that contains for example userId=scott or something like ou=eclipse.org,
-   *          department=dev
-   *          It is up to the implementation to define and handle the target group parameter
+   *          is a map that contains for example userId=scott or something like ou=eclipse.org, department=dev It is up
+   *          to the implementation to define and handle the target group parameter
    */
   @InputValidation(IValidationStrategy.NO_CHECK.class)
   void publishBookmarkData(BookmarkFolder publishFolder, Map<String, Object> targetGroup) throws ProcessingException;

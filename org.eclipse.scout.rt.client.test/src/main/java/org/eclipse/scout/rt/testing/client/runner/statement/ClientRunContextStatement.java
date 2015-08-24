@@ -57,7 +57,8 @@ public class ClientRunContextStatement extends Statement {
         @Override
         public void evaluate() throws Throwable {
           final Class<? extends ClientSessionProvider> clientSessionProvider = m_clientSessionAnnotation.provider();
-          final Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
+          final Subject subject =
+              Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
           // Obtain the client session. Depending on the session provider, a new session is created or a cached session returned.
           final IClientSession clientSession = BEANS.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent());

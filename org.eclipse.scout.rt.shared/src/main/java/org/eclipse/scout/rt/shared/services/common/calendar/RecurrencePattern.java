@@ -348,8 +348,7 @@ public class RecurrencePattern implements java.io.Serializable {
       d = cal.getTime();
       /**
        * @rn sle, 05.07.2006,
-       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-       *        reported by MBR, ORS / SSC, BAP PK
+       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
       if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
         break;
@@ -381,8 +380,7 @@ public class RecurrencePattern implements java.io.Serializable {
           }
           /**
            * @rn sle, 05.07.2006,
-           * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-           *        reported by MBR, ORS / SSC, BAP PK
+           * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
            */
           if (m_noEndDate == false) {
             if (m_lastDate == null) {
@@ -400,8 +398,7 @@ public class RecurrencePattern implements java.io.Serializable {
       d = cal.getTime();
       /**
        * @rn sle, 05.07.2006,
-       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-       *        reported by MBR, ORS / SSC, BAP PK
+       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
@@ -446,8 +443,7 @@ public class RecurrencePattern implements java.io.Serializable {
       d = cal.getTime();
       /**
        * @rn sle, 05.07.2006,
-       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-       *        reported by MBR, ORS / SSC, BAP PK
+       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
@@ -512,8 +508,7 @@ public class RecurrencePattern implements java.io.Serializable {
       d = cal.getTime();
       /**
        * @rn sle, 05.07.2006,
-       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-       *        reported by MBR, ORS / SSC, BAP PK
+       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
@@ -551,8 +546,7 @@ public class RecurrencePattern implements java.io.Serializable {
       d = cal.getTime();
       /**
        * @rn sle, 05.07.2006,
-       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-       *        reported by MBR, ORS / SSC, BAP PK
+       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {
@@ -619,8 +613,7 @@ public class RecurrencePattern implements java.io.Serializable {
       d = cal.getTime();
       /**
        * @rn sle, 05.07.2006,
-       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true
-       *        reported by MBR, ORS / SSC, BAP PK
+       * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
       if (m_noEndDate == false) {
         if (m_lastDate == null) {

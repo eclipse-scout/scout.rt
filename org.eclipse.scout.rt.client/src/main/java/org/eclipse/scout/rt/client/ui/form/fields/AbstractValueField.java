@@ -90,8 +90,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
 
   /**
-   * @deprecated no replacement. Will be removed in the O-Release.
-   *             Indicates whether setting the field's value results in an update of the display text.
+   * @deprecated no replacement. Will be removed in the O-Release. Indicates whether setting the field's value results
+   *             in an update of the display text.
    */
   @Deprecated
   @Order(200)
@@ -487,11 +487,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   /**
-   * WHILE (not after) a new value is validating (that means the new value has
-   * not yet been set), this methode is called.<br>
-   * Check the new proposed value and either make it valid by returning this or
-   * another valid value or reject by throwing a {@link VetoException}, it will
-   * then appear red in the gui.
+   * WHILE (not after) a new value is validating (that means the new value has not yet been set), this methode is
+   * called.<br>
+   * Check the new proposed value and either make it valid by returning this or another valid value or reject by
+   * throwing a {@link VetoException}, it will then appear red in the gui.
    *
    * @return the validated value or throws an exception
    */
@@ -502,15 +501,13 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   /**
-   * AFTER a new valid value was stored (that means the value is valid), this
-   * method is called and can be used to broadcast this change to other fields
-   * by for example calling {@link IValueField#setValue(Object)} on another
-   * field.<br>
-   * If this new value seems to be invalid (even though it has been validated
-   * correctly) use {@link #setErrorStatus(IStatus)} to mark the value
-   * as incorrect. It will appear red in the gui.<br>
-   * In case this method throws exceptions, this will NOT invalidate the value
-   * of the field (like {@link #execValidateValue(Object)} does)
+   * AFTER a new valid value was stored (that means the value is valid), this method is called and can be used to
+   * broadcast this change to other fields by for example calling {@link IValueField#setValue(Object)} on another field.
+   * <br>
+   * If this new value seems to be invalid (even though it has been validated correctly) use
+   * {@link #setErrorStatus(IStatus)} to mark the value as incorrect. It will appear red in the gui.<br>
+   * In case this method throws exceptions, this will NOT invalidate the value of the field (like
+   * {@link #execValidateValue(Object)} does)
    */
   @ConfigOperation
   @Order(220)

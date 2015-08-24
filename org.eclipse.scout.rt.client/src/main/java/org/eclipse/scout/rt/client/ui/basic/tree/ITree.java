@@ -102,8 +102,8 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
 
   /**
    * @param b
-   *          true: advices the attached ui to make the current selection visible.
-   *          The current selection will be scrolled to visible (again, whenever the table size changes).
+   *          true: advices the attached ui to make the current selection visible. The current selection will be
+   *          scrolled to visible (again, whenever the table size changes).
    */
   void setScrollToSelection(boolean b);
 
@@ -169,8 +169,8 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   String getPathText(ITreeNode node, String delimiter);
 
   /**
-   * A virtual node is a marker tree node used to optimize performance in large trees.
-   * It is used mainly in the {@link IPage}, {@link IOutline} area with {@link VirtualPage}s
+   * A virtual node is a marker tree node used to optimize performance in large trees. It is used mainly in the
+   * {@link IPage}, {@link IOutline} area with {@link VirtualPage}s
    * <p>
    * This method resolves a virtual node by its real node and generates a {@link TreeEvent#TYPE_NODES_UPDATED} event.
    * <p>
@@ -260,26 +260,22 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   void deselectNodes(Collection<? extends ITreeNode> nodes);
 
   /**
-   * Select the previous selectable node in this tree. Does not expand any
-   * nodes.
+   * Select the previous selectable node in this tree. Does not expand any nodes.
    */
   void selectPreviousNode();
 
   /**
-   * Select the next visible and selectable node in this tree. Does not expand
-   * any nodes.
+   * Select the next visible and selectable node in this tree. Does not expand any nodes.
    */
   void selectNextNode();
 
   /**
-   * Select the first visible and selectable node in this tree. Does not expand
-   * any nodes.
+   * Select the first visible and selectable node in this tree. Does not expand any nodes.
    */
   void selectFirstNode();
 
   /**
-   * Select the last visible and selectable node in this tree. Does not expand
-   * any nodes.
+   * Select the last visible and selectable node in this tree. Does not expand any nodes.
    */
   void selectLastNode();
 
@@ -356,8 +352,8 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   void setCheckable(boolean b);
 
   /**
-   * This is a hint for the UI if it is not capable of having variable node height based on node contents
-   * (such as rap/rwt).
+   * This is a hint for the UI if it is not capable of having variable node height based on node contents (such as
+   * rap/rwt).
    * <p>
    * This hint defines the node height in pixels being used as the fixed node height for all nodes of this tree.
    *
@@ -430,8 +426,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   void addChildNode(ITreeNode parent, ITreeNode child);
 
   /**
-   * append a list of child nodes or a complete subtree to the end of the
-   * children of parent
+   * append a list of child nodes or a complete subtree to the end of the children of parent
    */
   void addChildNodes(ITreeNode parent, List<? extends ITreeNode> children);
 

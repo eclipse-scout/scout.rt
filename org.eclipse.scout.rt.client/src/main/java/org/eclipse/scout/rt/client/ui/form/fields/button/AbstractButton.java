@@ -68,8 +68,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * Configuration
    */
   /**
-   * Configures the system type of this button. See {@code IButton.SYSTEM_TYPE_* } constants for valid values.
-   * System buttons are buttons with pre-defined behavior (such as an 'Ok' button or a 'Cancel' button).
+   * Configures the system type of this button. See {@code IButton.SYSTEM_TYPE_* } constants for valid values. System
+   * buttons are buttons with pre-defined behavior (such as an 'Ok' button or a 'Cancel' button).
    * <p>
    * Subclasses can override this method. Default is {@code IButton.SYSTEM_TYPE_NONE}.
    *
@@ -83,8 +83,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Configures whether this button is a process button. Process buttons are typically displayed on a
-   * dedicated button bar at the bottom of a form. Non-process buttons can be placed anywhere on a form.
+   * Configures whether this button is a process button. Process buttons are typically displayed on a dedicated button
+   * bar at the bottom of a form. Non-process buttons can be placed anywhere on a form.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    *
@@ -176,8 +176,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Called whenever this button is clicked. This button is disabled and cannot be clicked again
-   * until this method returns.
+   * Called whenever this button is clicked. This button is disabled and cannot be clicked again until this method
+   * returns.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
@@ -483,7 +483,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     chain.execClickAction();
   }
 
-  protected static class LocalButtonExtension<OWNER extends AbstractButton> extends LocalFormFieldExtension<OWNER> implements IButtonExtension<OWNER> {
+  protected static class LocalButtonExtension<OWNER extends AbstractButton> extends LocalFormFieldExtension<OWNER>implements IButtonExtension<OWNER> {
 
     public LocalButtonExtension(OWNER owner) {
       super(owner);

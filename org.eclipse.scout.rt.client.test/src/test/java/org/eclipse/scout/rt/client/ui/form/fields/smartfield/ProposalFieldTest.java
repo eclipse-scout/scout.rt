@@ -75,8 +75,8 @@ public class ProposalFieldTest {
   }
 
   /**
-   * Proposal for "a" returns one match. Other than the SmartField the ProposalField does not
-   * automatically set a single proposal match as value, it only sets the searchText as value.
+   * Proposal for "a" returns one match. Other than the SmartField the ProposalField does not automatically set a single
+   * proposal match as value, it only sets the searchText as value.
    */
   @Test
   public void testSingleMatch() throws ProcessingException, InterruptedException {
@@ -84,8 +84,8 @@ public class ProposalFieldTest {
   }
 
   /**
-   * Proposal for "b" returns two matches. When we accept the proposal for "b" the ProposalField
-   * simply sets the value (other than the SmartField which throws a VetoException in that case).
+   * Proposal for "b" returns two matches. When we accept the proposal for "b" the ProposalField simply sets the value
+   * (other than the SmartField which throws a VetoException in that case).
    */
   @Test
   public void testMultiMatch() throws ProcessingException, InterruptedException {

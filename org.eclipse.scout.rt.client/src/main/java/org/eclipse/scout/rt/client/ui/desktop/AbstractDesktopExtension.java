@@ -178,9 +178,9 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   /**
-   * Called just after the core desktop receives the request to close the desktop.
-   * This allows the desktop extension to execute custom code before the desktop gets into its closing state.
-   * By throwing an explicit {@link VetoException} the closing process will be stopped.
+   * Called just after the core desktop receives the request to close the desktop. This allows the desktop extension to
+   * execute custom code before the desktop gets into its closing state. By throwing an explicit {@link VetoException}
+   * the closing process will be stopped.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
@@ -257,11 +257,10 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   /**
-   * Called right before a form is added to the core desktop. This means this method is called
-   * before any UI is informed about the new form. The form is provided in a
-   * holder. This allows it to prevent the form being added to the desktop (set
-   * reference to {@code null}), do some general modifications needed to be done prior UI instantiation,
-   * or even replace it with a different instance.
+   * Called right before a form is added to the core desktop. This means this method is called before any UI is informed
+   * about the new form. The form is provided in a holder. This allows it to prevent the form being added to the desktop
+   * (set reference to {@code null}), do some general modifications needed to be done prior UI instantiation, or even
+   * replace it with a different instance.
    * <p>
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
@@ -349,8 +348,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   /**
-   * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop
-   * to find an existing menu on the core desktop by class type.
+   * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop to find
+   * an existing menu on the core desktop by class type.
    * <p>
    * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
    * called on each and then checked if the menu is visible.
@@ -370,8 +369,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   /**
-   * Configures the outlines contributed by this desktop extension. These outlines
-   * are automatically added to the core desktop which holds this extension.
+   * Configures the outlines contributed by this desktop extension. These outlines are automatically added to the core
+   * desktop which holds this extension.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *

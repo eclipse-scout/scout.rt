@@ -65,10 +65,10 @@ public class SqlFunctionReplaceTest {
 
     assertTrue("no DatabaseSpecificToken found", dbSpecTokenFound > 0);
 
-    sql = "SELECT A, B, C " +
-        "FROM   TABLE1 " +
-        "WHERE  COLUMN1 != $$nvl(:val1,0) " +
-        "INTO   :{a}, :{b}, {c} ";
+    sql = "SELECT A, B, C "
+        + "FROM   TABLE1 "
+        + "WHERE  COLUMN1 != $$nvl(:val1,0) "
+        + "INTO   :{a}, :{b}, {c} ";
 
     bindModel = new BindParser(sql).parse();
     tokens = bindModel.getAllTokens();
@@ -99,8 +99,8 @@ public class SqlFunctionReplaceTest {
 
     assertTrue("no DatabaseSpecificToken found", dbSpecTokenFound > 0);
 
-    sql = "INSERT INTO TABLE1 (A, B, C) " +
-        "VALUES (:{a}, :{b}, :{c}) ";
+    sql = "INSERT INTO TABLE1 (A, B, C) "
+        + "VALUES (:{a}, :{b}, :{c}) ";
 
     bindModel = new BindParser(sql).parse();
     tokens = bindModel.getAllTokens();

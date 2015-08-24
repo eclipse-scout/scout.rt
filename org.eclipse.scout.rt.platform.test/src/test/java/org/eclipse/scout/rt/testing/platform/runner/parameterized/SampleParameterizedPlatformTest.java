@@ -22,9 +22,8 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * This test illustrates the use of the {@link ParameterizedServerTestRunner}. <br/>
  * The test runner executes the test case {@link #testIsGreaterZero()} for each parameter which is returned from
- * {@link #getParameters()}.
- * It creates an instance of the test class for each parameter (and test case), hands the parameter over as constructor
- * argument and executes the test case.
+ * {@link #getParameters()}. It creates an instance of the test class for each parameter (and test case), hands the
+ * parameter over as constructor argument and executes the test case.
  *
  * @see ParameterizedServerTestRunner
  */

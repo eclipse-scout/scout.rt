@@ -36,8 +36,8 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   }
 
   /**
-   * Creates a new instance of the proposal model if the smart-field has an inner class for tree or table,
-   * or returns an instance of the default class for the proposal model.
+   * Creates a new instance of the proposal model if the smart-field has an inner class for tree or table, or returns an
+   * instance of the default class for the proposal model.
    */
   protected T createConfiguredOrDefaultModel(Class<?> modelInterface) throws ProcessingException {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(m_contentAssistField.getClass());
@@ -62,14 +62,14 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   abstract protected T createModel() throws ProcessingException;
 
   /**
-   * Called when smart-field doesn't provide a inner class for a proposal model (tree or table).
-   * Returns the default proposal model.
+   * Called when smart-field doesn't provide a inner class for a proposal model (tree or table). Returns the default
+   * proposal model.
    */
   abstract protected T createDefaultModel() throws ProcessingException;
 
   /**
-   * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set.
-   * The default implementation does nothing.
+   * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set. The
+   * default implementation does nothing.
    */
   protected void init() throws ProcessingException {
   }
@@ -95,9 +95,9 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   protected abstract void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount);
 
   /**
-   * Returns true when search text is "browse all" (*). This is required to avoid a problem where we have a lookup
-   * call that returns only a single row. If execSingleMatch() would apply in that case it wouldn't be possible
-   * to set the field to null, because the single match is always selected automatically.
+   * Returns true when search text is "browse all" (*). This is required to avoid a problem where we have a lookup call
+   * that returns only a single row. If execSingleMatch() would apply in that case it wouldn't be possible to set the
+   * field to null, because the single match is always selected automatically.
    *
    * @return
    */
@@ -125,9 +125,9 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   }
 
   /**
-   * Note: currently a SmartField with a tree does not show a status when no proposals
-   * have been found. That's inconsistent with SmartFields with a table. They do show
-   * a status in that case, saying 'no proposals have been found'.
+   * Note: currently a SmartField with a tree does not show a status when no proposals have been found. That's
+   * inconsistent with SmartFields with a table. They do show a status in that case, saying 'no proposals have been
+   * found'.
    */
   @Override
   public void setStatus(IStatus status) {

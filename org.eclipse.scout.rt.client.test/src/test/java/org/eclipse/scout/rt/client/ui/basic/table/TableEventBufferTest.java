@@ -106,8 +106,8 @@ public class TableEventBufferTest {
   }
 
   /**
-   * If all rows are deleted, previous row related events should be removed: row_action, scroll_to_selection,...
-   * Other events should remain in the list.
+   * If all rows are deleted, previous row related events should be removed: row_action, scroll_to_selection,... Other
+   * events should remain in the list.
    */
   @Test
   public void testAllRowsDeleted() {
@@ -425,8 +425,7 @@ public class TableEventBufferTest {
 
   /**
    * If two rows are deleted separately, both should be present in the event list. This test checks that checks are
-   * _not_
-   * done by checking for the same rowIndex.
+   * _not_ done by checking for the same rowIndex.
    */
   @Test
   public void testDeleteTwoRows() {

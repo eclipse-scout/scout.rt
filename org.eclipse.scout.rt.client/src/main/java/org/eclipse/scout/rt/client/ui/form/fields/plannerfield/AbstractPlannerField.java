@@ -90,9 +90,8 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   /**
-   * Interceptor is called after data was fetched from LookupCall and is adding
-   * a table row for every LookupRow using IListBoxTable.createTableRow(row) and
-   * ITable.addRows()
+   * Interceptor is called after data was fetched from LookupCall and is adding a table row for every LookupRow using
+   * IListBoxTable.createTableRow(row) and ITable.addRows()
    * <p>
    * For most cases the override of just {@link #execLoadTableData()} is sufficient
    *
@@ -208,7 +207,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     chain.execPopulateResources();
   }
 
-  protected static class LocalPlannerFieldExtension<P extends IPlanner<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<P, RI, AI>> extends LocalFormFieldExtension<OWNER> implements IPlannerFieldExtension<P, RI, AI, OWNER> {
+  protected static class LocalPlannerFieldExtension<P extends IPlanner<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<P, RI, AI>> extends LocalFormFieldExtension<OWNER>implements IPlannerFieldExtension<P, RI, AI, OWNER> {
 
     public LocalPlannerFieldExtension(OWNER owner) {
       super(owner);

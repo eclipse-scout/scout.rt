@@ -27,8 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests if hacking attack can compromise form field data values (invalid type and range)
- * see {@link AbstractFormData}
+ * Tests if hacking attack can compromise form field data values (invalid type and range) see {@link AbstractFormData}
  */
 @SuppressWarnings("unchecked")
 @RunWith(PlatformTestRunner.class)

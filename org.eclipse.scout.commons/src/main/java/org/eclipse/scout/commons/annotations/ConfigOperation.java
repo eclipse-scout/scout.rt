@@ -16,8 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Method is a callback or a method that can be overrided. By convention these
- * methods have a name prefix <i>exec</i>...
+ * Method is a callback or a method that can be overrided. By convention these methods have a name prefix <i>exec</i>...
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -79,8 +79,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   /**
    * Call this method to refresh all existing pages in this outline<br>
-   * If currently active page(s) are affected they reload their data, otherwise
-   * the pages is simply marked dirty and reloaded on next activation
+   * If currently active page(s) are affected they reload their data, otherwise the pages is simply marked dirty and
+   * reloaded on next activation
    */
   void refreshPages(List<Class<? extends IPage>> pageTypes);
 
@@ -150,8 +150,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   /**
    * This method returns all menus available for this page. The menus are not wrapped - so there might be inherited
-   * menus with any different menu type from {@link TreeMenuType#SingleSelection}.
-   * In the returned list are:
+   * menus with any different menu type from {@link TreeMenuType#SingleSelection}. In the returned list are:
    * <ul>
    * <li>All menus of the outline itself.</li>
    * <li>If the page is a {@link IPageWithTable} all empty space menus of the pages table will be included.</li>

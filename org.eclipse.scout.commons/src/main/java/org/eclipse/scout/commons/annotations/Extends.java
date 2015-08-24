@@ -35,12 +35,12 @@ public @interface Extends {
    *
    * @return The owner class.
    */
-  Class<?> value();
+  Class<?>value();
 
   /**
    * References {@link ClassIdentifier}
    *
    * @return
    */
-  Class[] pathToContainer() default {};
+  Class[]pathToContainer() default {};
 }

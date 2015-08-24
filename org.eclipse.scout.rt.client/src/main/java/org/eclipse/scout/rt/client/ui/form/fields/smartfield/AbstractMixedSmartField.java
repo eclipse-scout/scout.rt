@@ -50,16 +50,15 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
 /**
- * A smart field with a key type different from the value type.
- * The default implementation of {@link #convertKeyToValue(Object)} and {@link #convertValueToKey(Object)} methods works
- * for any case where <VALUE_TYPE extends LOOKUP_CALL_KEY_TYPE>. For all other cases provide your own conversion
- * methods.
+ * A smart field with a key type different from the value type. The default implementation of
+ * {@link #convertKeyToValue(Object)} and {@link #convertValueToKey(Object)} methods works for any case where
+ * <VALUE_TYPE extends LOOKUP_CALL_KEY_TYPE>. For all other cases provide your own conversion methods.
  *
  * @param <VALUE>
  * @param <LOOKUP_KEY>
  */
 @ScoutSdkIgnore
-public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
+public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY>implements IMixedSmartField<VALUE, LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
   @SuppressWarnings("deprecation")
   private IContentAssistFieldUIFacadeLegacy m_uiFacadeLegacy;
@@ -439,7 +438,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
   }
 
-  protected static class LocalMixedSmartFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractMixedSmartField<VALUE, LOOKUP_KEY>> extends LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> implements IMixedSmartFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
+  protected static class LocalMixedSmartFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractMixedSmartField<VALUE, LOOKUP_KEY>> extends LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER>
+      implements IMixedSmartFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
 
     public LocalMixedSmartFieldExtension(OWNER owner) {
       super(owner);

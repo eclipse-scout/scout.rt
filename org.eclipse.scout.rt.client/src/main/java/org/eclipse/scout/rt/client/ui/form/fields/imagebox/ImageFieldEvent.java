@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 
-
 public class ImageFieldEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 

@@ -47,18 +47,18 @@ public class ClientNotificationsStatement extends Statement {
         .withNotificationNodeId(m_nodeId)
         .run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        try {
-          m_next.evaluate();
-        }
-        catch (final Exception | Error e) {
-          throw e;
-        }
-        catch (final Throwable e) {
-          throw new Error(e);
-        }
-      }
-    }, BEANS.get(ThrowableTranslator.class));
+          @Override
+          public void run() throws Exception {
+            try {
+              m_next.evaluate();
+            }
+            catch (final Exception | Error e) {
+              throw e;
+            }
+            catch (final Throwable e) {
+              throw new Error(e);
+            }
+          }
+        }, BEANS.get(ThrowableTranslator.class));
   }
 }

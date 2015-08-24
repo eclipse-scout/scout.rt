@@ -145,8 +145,8 @@ public class ToStringBuilder {
   }
 
   /**
-   * Appends the given {@code varArg} values; <code>null</code> values are filtered; multiple values are separated
-   * by comma.
+   * Appends the given {@code varArg} values; <code>null</code> values are filtered; multiple values are separated by
+   * comma.
    *
    * @return <code>this</code> supporting the fluent API
    */

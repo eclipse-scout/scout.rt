@@ -120,11 +120,9 @@ public class BasicSecurityFilterTest {
   private <SERVICE> void registerTestService(SERVICE service, Class<? extends SERVICE> clazz) {
     m_registeredServices.add(
         TestingUtility.registerBean(
-            new BeanMetaData(clazz).
-            withInitialInstance(service).
-            withApplicationScoped(true)
-            )
-        );
+            new BeanMetaData(clazz)
+                .withInitialInstance(service)
+                .withApplicationScoped(true)));
   }
 
   private String subjectProperty() {

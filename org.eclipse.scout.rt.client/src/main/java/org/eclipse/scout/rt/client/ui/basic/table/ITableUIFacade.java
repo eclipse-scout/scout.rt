@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * Columns are defined as inner classes for every inner column class there is a
- * generated getXYColumn method directly on the table
+ * Columns are defined as inner classes for every inner column class there is a generated getXYColumn method directly on
+ * the table
  */
 public interface ITableUIFacade {
 

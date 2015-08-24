@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
  *
  */
 public abstract class AbstractBasicFieldExtension<VALUE, OWNER extends AbstractBasicField<VALUE>>
-extends AbstractValueFieldExtension<VALUE, OWNER>
-implements IBasicFieldExtension<VALUE, OWNER> {
+    extends AbstractValueFieldExtension<VALUE, OWNER>
+    implements IBasicFieldExtension<VALUE, OWNER> {
 
   /**
    * @param owner

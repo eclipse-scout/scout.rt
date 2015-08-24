@@ -75,8 +75,8 @@ public final class TableUtility {
   }
 
   /**
-   * In order to use caching of results on lookup calls, it is crucial that the javabean concepts are valid,
-   * especially hashCode and equals (when the subclass has additional member fields).
+   * In order to use caching of results on lookup calls, it is crucial that the javabean concepts are valid, especially
+   * hashCode and equals (when the subclass has additional member fields).
    * <p>
    * Scout tries to help developers to find problems related to this issue and write a warning in development mode on
    * all local lookup call subclasses that do not overwrite hashCode and equals.

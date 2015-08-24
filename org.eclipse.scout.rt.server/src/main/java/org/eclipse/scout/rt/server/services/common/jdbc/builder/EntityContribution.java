@@ -63,8 +63,8 @@ public class EntityContribution {
   }
 
   /**
-   * @return the life list
-   *         Note that when adding a non-aggregated part to this list, also add it to the {@link #getGroupByParts()}
+   * @return the life list Note that when adding a non-aggregated part to this list, also add it to the
+   *         {@link #getGroupByParts()}
    *         <p>
    *         The entity builder checks if the size of {@link #getSelectParts()} and {@link #getGroupByParts()} is
    *         different. If yes, it activates the groupBy clause otherwise it hides it.

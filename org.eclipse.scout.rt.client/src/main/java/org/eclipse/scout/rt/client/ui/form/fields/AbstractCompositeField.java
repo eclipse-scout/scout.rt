@@ -187,12 +187,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
-   * To change the order or specify the insert position use {@link IFormField#setOrder(double)}.
-   * The default implementation checks for {@link InjectFieldTo} annotations in the enclosing (runtime) classes.
+   * To change the order or specify the insert position use {@link IFormField#setOrder(double)}. The default
+   * implementation checks for {@link InjectFieldTo} annotations in the enclosing (runtime) classes.
    *
    * @param fields
-   *          live and mutable collection of configured fields, not yet initialized
-   *          and added to composite field
+   *          live and mutable collection of configured fields, not yet initialized and added to composite field
    */
   protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
     FormFieldInjectionThreadLocal.injectFields(this, fields);
@@ -228,8 +227,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * Returns <code>true</code> if this field is a template group box, i.e. an abstract box class containing
-   * other {@link IFormField}s.
+   * Returns <code>true</code> if this field is a template group box, i.e. an abstract box class containing other
+   * {@link IFormField}s.
    * <p/>
    * This default implementation checks the path of super classes, starting by the most specific one and stopping by
    * this class or one of its well known direct sub classes (i.e {@link AbstractGroupBox}, {@link AbstractSequenceBox},
@@ -436,8 +435,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * when granting of enabled property changes, broadcast and set this property
-   * on all children that have no permission set
+   * when granting of enabled property changes, broadcast and set this property on all children that have no permission
+   * set
    */
   @Override
   public void setEnabledGranted(boolean b) {
@@ -450,8 +449,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * when granting of visible property changes, do not broadcast and set this
-   * property on all children that have no permission set
+   * when granting of visible property changes, do not broadcast and set this property on all children that have no
+   * permission set
    */
   @Override
   public void setVisibleGranted(boolean b) {
@@ -474,7 +473,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   /**
    * Sets the property on the field and on every child.
-   * @see #getConfiguredStatusVisible() 
+   * 
+   * @see #getConfiguredStatusVisible()
    */
   @Override
   public void setStatusVisible(boolean statusVisible) {
@@ -511,8 +511,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * Implementation of PropertyChangeListener Proxy on all attached fields (not
-   * groups)
+   * Implementation of PropertyChangeListener Proxy on all attached fields (not groups)
    */
   private class P_FieldPropertyChangeListener implements PropertyChangeListener {
     @Override
@@ -530,7 +529,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     }
   }// end private class
 
-  protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER> implements ICompositeFieldExtension<OWNER> {
+  protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER>implements ICompositeFieldExtension<OWNER> {
 
     public LocalCompositeFieldExtension(OWNER owner) {
       super(owner);

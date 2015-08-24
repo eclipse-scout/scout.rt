@@ -61,8 +61,7 @@ public class AccessControlServiceTest {
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(
         new BeanMetaData(IAccessControlService.class).withInitialInstance(m_accessControlService).withApplicationScoped(true),
-        new BeanMetaData(MaxNotificationBlockingTimeOut.class).withInitialInstance(new TestBlockingProperty()).withApplicationScoped(true)
-        );
+        new BeanMetaData(MaxNotificationBlockingTimeOut.class).withInitialInstance(new TestBlockingProperty()).withApplicationScoped(true));
 
     //register test session
     final IClientNotificationService registry = BEANS.get(IClientNotificationService.class);
@@ -138,8 +137,8 @@ public class AccessControlServiceTest {
   }
 
   /**
-   * Tests that no client notification at all is sent when the cache is cleared (no
-   * users): {@link AbstractAccessControlService#clearCacheOfUserIds(Collection)}
+   * Tests that no client notification at all is sent when the cache is cleared (no users):
+   * {@link AbstractAccessControlService#clearCacheOfUserIds(Collection)}
    */
   @Test
   public void testClientNotificationSentForClearCacheNoUsers() {

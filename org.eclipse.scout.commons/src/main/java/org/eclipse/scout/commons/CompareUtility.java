@@ -96,8 +96,7 @@ public final class CompareUtility {
   }
 
   /**
-   * Indicates whether some Object a is not "equal to" another Object b. See {@link #equals} for more
-   * detail.
+   * Indicates whether some Object a is not "equal to" another Object b. See {@link #equals} for more detail.
    *
    * @param a
    *          the second Object to be compared.

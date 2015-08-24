@@ -30,29 +30,15 @@ import org.eclipse.scout.rt.server.scheduler.internal.node.StringAtom;
 import org.eclipse.scout.rt.server.scheduler.internal.node.WrappedToken;
 
 /**
- * Parser for dynamic formulas
- * Syntax (EBNF):
- * token=token0   = token1 (S? op1 S? token1)* .
- * token1         = token2 (S? op2 S? token2)* .
- * token2         = token3 (S? op3 S? token3)* .
- * token3         = token4 (S? op4 S? token4)* .
- * token4         = token5 (S? op5 S? token5)* .
- * token5         = atom .
- * op1            = '&&' | '||' .
- * op2            = '==' | '<=' | '>=' | '<>' | '!=' | '<' | '>'.
- * op3            = '+' | '-' .
- * op4            = '*' | '/' | '%' .
- * op5            = '^' | '.' | '&' | '|' | '<<' | '>>'.
- * atom           = wrapped-token | not-token | null-atom | int-atom | boolean-atom | string-atom | signal-ref | arg-ref .
- * wrapped-token  = '(' S? token S? ')' .
- * not-token      = '!' token .
- * null-atom      = 'null' .
- * int-atom      = [+-]? [0-9]* [.]? [0-9]* .
- * boolean-atom   = 'true' | 'false' .
- * string-atom    = `'` [^delim]* `'` | `"` [^delim]* `"` . NOTE: delim is the delimiting character
- * signal-ref     = 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year' | 'dayOfWeek' | 'dayOfMonthReverse' | 'dayOfYear' | 'secondOfDay' .
- * arg-ref        = 'arg' [0-9]+ .
- * S              = ([ \n\t\r] | S_comment)+ .
+ * Parser for dynamic formulas Syntax (EBNF): token=token0 = token1 (S? op1 S? token1)* . token1 = token2 (S? op2 S?
+ * token2)* . token2 = token3 (S? op3 S? token3)* . token3 = token4 (S? op4 S? token4)* . token4 = token5 (S? op5 S?
+ * token5)* . token5 = atom . op1 = '&&' | '||' . op2 = '==' | '<=' | '>=' | '<>' | '!=' | '<' | '>'. op3 = '+' | '-' .
+ * op4 = '*' | '/' | '%' . op5 = '^' | '.' | '&' | '|' | '<<' | '>>'. atom = wrapped-token | not-token | null-atom |
+ * int-atom | boolean-atom | string-atom | signal-ref | arg-ref . wrapped-token = '(' S? token S? ')' . not-token = '!'
+ * token . null-atom = 'null' . int-atom = [+-]? [0-9]* [.]? [0-9]* . boolean-atom = 'true' | 'false' . string-atom =
+ * `'` [^delim]* `'` | `"` [^delim]* `"` . NOTE: delim is the delimiting character signal-ref = 'second' | 'minute' |
+ * 'hour' | 'day' | 'week' | 'month' | 'year' | 'dayOfWeek' | 'dayOfMonthReverse' | 'dayOfYear' | 'secondOfDay' .
+ * arg-ref = 'arg' [0-9]+ . S = ([ \n\t\r] | S_comment)+ .
  */
 
 public class FormulaParser {
@@ -174,13 +160,14 @@ public class FormulaParser {
       pos.setIndex(save);
       return leftToken;
     }// end if parse token of next level
-    // failed
+     // failed
     return null;
   }
 
   private String parseOp(int level) throws ParseException {
     int index = pos.getIndex();
-    if (matches("&&") || matches("||") || matches("==") || matches("<=") || matches(">=") || matches("<>") || matches("!=") || matches("<<") || matches(">>") || matches("<") || matches(">") || matches("+") || matches("-") || matches("*") || matches("/") || matches("%") || matches("^") || matches("&") || matches("|")) {
+    if (matches("&&") || matches("||") || matches("==") || matches("<=") || matches(">=") || matches("<>") || matches("!=") || matches("<<") || matches(">>") || matches("<") || matches(">") || matches("+") || matches("-") || matches("*")
+        || matches("/") || matches("%") || matches("^") || matches("&") || matches("|")) {
       // ok,found op, valid in current level ?
       String op = str.substring(index, pos.getIndex());
       if (level == 1) {

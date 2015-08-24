@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.internal.AccessControlStore;
 
 /**
- * Common logic for {@link IAccessControlService} implementations.
- * Implementations should override {@link #execLoadPermissions()}
+ * Common logic for {@link IAccessControlService} implementations. Implementations should override
+ * {@link #execLoadPermissions()}
  *
  * @since 4.3.0 (Mars-M5)
  */
@@ -67,8 +67,7 @@ public abstract class AbstractSharedAccessControlService extends AbstractService
   }
 
   /**
-   * Set the pattern by which the userId is searched for in the list of jaas
-   * principal names.<br>
+   * Set the pattern by which the userId is searched for in the list of jaas principal names.<br>
    * The first group of the pattern is assumed to be the username.<br>
    * By default the following patterns are applied in this order:
    * <ul>
@@ -181,8 +180,7 @@ public abstract class AbstractSharedAccessControlService extends AbstractService
   }
 
   /**
-   * This default implementation does nothing
-   * Override this method to retrieve permissions from a custom store
+   * This default implementation does nothing Override this method to retrieve permissions from a custom store
    */
   protected Permissions execLoadPermissions() {
     return null;

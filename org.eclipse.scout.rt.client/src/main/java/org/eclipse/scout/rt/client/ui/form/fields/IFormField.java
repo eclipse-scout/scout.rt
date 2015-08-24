@@ -32,8 +32,8 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.w3c.dom.Element;
 
 /**
- * The {@link IForm} and <code>IFormField</code> classes are the prominent classes
- * of the application model: An <code>IForm</code> consists of multiple <code>IFormField</code>s.<br/>
+ * The {@link IForm} and <code>IFormField</code> classes are the prominent classes of the application model: An
+ * <code>IForm</code> consists of multiple <code>IFormField</code>s.<br/>
  * A wide variety of form fields exist, the most important are the following:<br/>
  * <ul>
  * <li>{@link IValueField}:<br/>
@@ -50,8 +50,7 @@ import org.w3c.dom.Element;
  * <li>{@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton IButton}:<br/>
  * Buttons allow the user to trigger events on the GUI. Typical examples on a form are the 'Ok' and 'Close' buttons (see
  * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton AbstractOkButton} or
- * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton
- * AbstractCancelButton}).</li>
+ * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton AbstractCancelButton}).</li>
  * <li>{@link IComposite}:<br/>
  * Composite fields group multiple form fields. The most common are:<br/>
  * <ul>
@@ -99,8 +98,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * see {@link #getGridDataHints()}<br>
-   * this marker value defines the field to have a logical spanning all over the
-   * group box width
+   * this marker value defines the field to have a logical spanning all over the group box width
    */
   int FULL_WIDTH = 0;
 
@@ -115,8 +113,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    */
   int LABEL_POSITION_LEFT = 1;
   /**
-   * position the label on the field, meaning that the label is only displayed
-   * when the field is empty (vista style)<br>
+   * position the label on the field, meaning that the label is only displayed when the field is empty (vista style)<br>
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
   int LABEL_POSITION_ON_FIELD = 2;
@@ -150,14 +147,12 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   IForm getForm();
 
   /**
-   * Use this listener only in very rare cases and only if absolutely needed
-   * (performance!)
+   * Use this listener only in very rare cases and only if absolutely needed (performance!)
    */
   void addSubtreePropertyChangeListener(PropertyChangeListener listener);
 
   /**
-   * Use this listener only in very rare cases and only if absolutely needed
-   * (performance!)
+   * Use this listener only in very rare cases and only if absolutely needed (performance!)
    */
   void addSubtreePropertyChangeListener(String propName, PropertyChangeListener listener);
 
@@ -171,14 +166,12 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setFormInternal(IForm form);
 
   /**
-   * get the first ancestor of this field (not including this field) which is of
-   * type IGroupBox
+   * get the first ancestor of this field (not including this field) which is of type IGroupBox
    */
   IGroupBox getParentGroupBox();
 
   /**
-   * get the first ancestor of this field (not including this field) which is of
-   * type ICompositeField
+   * get the first ancestor of this field (not including this field) which is of type ICompositeField
    */
   ICompositeField getParentField();
 
@@ -208,8 +201,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setView(boolean visible, boolean enabled, boolean mandatory);
 
   /**
-   * create a FormData structure to be sent to the backend the configurator is
-   * creating typed subclasses of FormData and FormFieldData
+   * create a FormData structure to be sent to the backend the configurator is creating typed subclasses of FormData and
+   * FormFieldData
    * <p>
    * Do not override this method
    */
@@ -238,8 +231,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   boolean hasProperty(String name);
 
   /**
-   * marks field as changing all model events and property events are cached
-   * until the change is done
+   * marks field as changing all model events and property events are cached until the change is done
    * <p>
    * when done, all cached events are sent as a batch
    */
@@ -248,8 +240,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   boolean isFieldChanging();
 
   /**
-   * This property controls whether value changes are calling {@link AbstractValueField#execChangedValue()}.
-   * The {@link IValueField#PROP_VALUE} property change is always fired.
+   * This property controls whether value changes are calling {@link AbstractValueField#execChangedValue()}. The
+   * {@link IValueField#PROP_VALUE} property change is always fired.
    * <p>
    * When FormFieldData is being applied this property may be set to false, see
    * {@link #importFormFieldData(AbstractFormFieldData, boolean)} to disable sideeffects when the new data is applied to
@@ -315,46 +307,42 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * @since 19.11.2009
-   * @return one of the LABEL_POSITION_* constants or a custom constants
-   *         interpreted by the ui
+   * @return one of the LABEL_POSITION_* constants or a custom constants interpreted by the ui
    */
   int getLabelPosition();
 
   /**
    * @since 19.11.2009
    * @param pos
-   *          one of the LABEL_POSITION_* constants or a custom constants
-   *          interpreted by the ui
+   *          one of the LABEL_POSITION_* constants or a custom constants interpreted by the ui
    */
   void setLabelPosition(int pos);
 
   /**
    * @since 19.11.2009
-   * @return the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or
-   *         LABEL_WIDTH_UI for ui-dependent label width
+   * @return the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
    */
   int getLabelWidthInPixel();
 
   /**
    * @since 19.11.2009
    * @param w
-   *          the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or
-   *          LABEL_WIDTH_UI for ui-dependent label width
+   *          the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
    */
   void setLabelWidthInPixel(int w);
 
   /**
    * @since 19.11.2009
-   * @return negative for left, 0 for center and positive for right,
-   *         LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of ui
+   * @return negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
+   *         ui
    */
   int getLabelHorizontalAlignment();
 
   /**
    * @since 19.11.2009
    * @param a
-   *          negative for left, 0 for center and positive for right,
-   *          LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of ui
+   *          negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
+   *          ui
    */
   void setLabelHorizontalAlignment(int a);
 
@@ -371,8 +359,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * Meta property over labelVisible<br>
    * This property is used to suppress the label even if it is visible<br>
    * see {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox ISequenceBox} where the label of the
-   * first visible child field
-   * is suppressed and appended to the range box's label
+   * first visible child field is suppressed and appended to the range box's label
    */
   boolean isLabelSuppressed();
 
@@ -420,8 +407,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   /**
    * This property is used by buttons. Buttons set the property to false while in work.
    *
-   * @return true if process button is not in
-   *         {@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton#doClick() IButton#doClick()} action
+   * @return true if process button is not in {@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton#doClick()
+   *         IButton#doClick()} action
    */
   boolean isEnabledProcessingButton();
 
@@ -486,8 +473,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * @param message
-   *          error status of currently set value In order to set a custom icon
-   *          as the field status, use {@link ScoutFieldStatus}
+   *          error status of currently set value In order to set a custom icon as the field status, use
+   *          {@link ScoutFieldStatus}
    */
   @Deprecated
   void setErrorStatus(String message);
@@ -506,8 +493,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * @return true if field content (value on value fields) is valid, no error status is set on field and mandatory
-   *         property is met.
-   *         Shorthand form for {@link #getContentProblemDescriptor()==null}
+   *         property is met. Shorthand form for {@link #getContentProblemDescriptor()==null}
    */
   boolean isContentValid();
 
@@ -521,8 +507,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setTooltipText(String text);
 
   /**
-   * Rebuild the {@link IFormField#PROP_KEY_STROKES} property using the internal
-   * set of properties and by calling {@link #getContributedKeyStrokes()} and {@link #getLocalKeyStrokes()}
+   * Rebuild the {@link IFormField#PROP_KEY_STROKES} property using the internal set of properties and by calling
+   * {@link #getContributedKeyStrokes()} and {@link #getLocalKeyStrokes()}
    */
   void updateKeyStrokes();
 
@@ -562,16 +548,15 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * @return the grid data hints used by the {@link org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder
-   *         GridDataBuilder} to create the final grid data which can be
-   *         accessed using {@link #getGridData()}.
+   *         GridDataBuilder} to create the final grid data which can be accessed using {@link #getGridData()}.
    */
   GridData getGridDataHints();
 
   void setGridDataHints(GridData data);
 
   /**
-   * @return the resulting (validated) grid data which is also used by the ui layout manager to layout this field
-   *         in a logical grid.
+   * @return the resulting (validated) grid data which is also used by the ui layout manager to layout this field in a
+   *         logical grid.
    */
   GridData getGridData();
 

@@ -24,9 +24,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * <h4>NlsResourceBundle</h4> Other than {@link ResourceBundle} this bundle loads bundles by their intuitive names.
- * Example: There are bundles Texts.properties (default English), Texts_de.properties and Texts_fr.properties {@link
- * ResourceBundle#getBundle("Texts",de_CH)} will yield Texts_de.properties! This cache will yield Texts.properties
- * (which basically is the correct solution)
+ * Example: There are bundles Texts.properties (default English), Texts_de.properties and Texts_fr.properties
+ * {@link ResourceBundle#getBundle("Texts",de_CH)} will yield Texts_de.properties! This cache will yield
+ * Texts.properties (which basically is the correct solution)
  *
  * @author Ivan Motsch
  */

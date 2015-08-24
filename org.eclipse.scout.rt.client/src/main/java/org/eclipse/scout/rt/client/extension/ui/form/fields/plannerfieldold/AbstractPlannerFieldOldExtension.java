@@ -13,7 +13,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.AbstractPlannerFieldOld;
 
-public abstract class AbstractPlannerFieldOldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerFieldOld<T, P, RI, AI>> extends AbstractFormFieldExtension<OWNER> implements IPlannerFieldOldExtension<T, P, RI, AI, OWNER> {
+public abstract class AbstractPlannerFieldOldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerFieldOld<T, P, RI, AI>> extends AbstractFormFieldExtension<OWNER>
+    implements IPlannerFieldOldExtension<T, P, RI, AI, OWNER> {
 
   public AbstractPlannerFieldOldExtension(OWNER owner) {
     super(owner);
@@ -35,7 +36,8 @@ public abstract class AbstractPlannerFieldOldExtension<T extends ITable, P exten
   }
 
   @Override
-  public Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
+  public Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows)
+      throws ProcessingException {
     return chain.execLoadActivityMapData(resourceIds, resourceRows);
   }
 }

@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * Proposal chooser with a table to choose proposals. You can provide your own table implementation
- * when your smart-field defines an inner ContentAssistFieldTable class.
+ * Proposal chooser with a table to choose proposals. You can provide your own table implementation when your
+ * smart-field defines an inner ContentAssistFieldTable class.
  *
  * @since 6.0.0
  * @param <LOOKUP_KEY>

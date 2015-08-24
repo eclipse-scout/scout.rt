@@ -418,7 +418,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = getConfiguredDecimalConversionStrategy().convertDecimalType(rs.getBigDecimal(jdbcBindIndex));
         break;
       }
-      // Long
+        // Long
       case Types.BIT:
       case Types.BIGINT:
       case Types.SMALLINT:
@@ -427,20 +427,20 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = new Long(rs.getLong(jdbcBindIndex));
         break;
       }
-      // Double
+        // Double
       case Types.DOUBLE:
       case Types.FLOAT:
       case Types.REAL: {
         o = new Double(rs.getDouble(jdbcBindIndex));
         break;
       }
-      // String
+        // String
       case Types.VARCHAR:
       case Types.CHAR: {
         o = rs.getString(jdbcBindIndex);
         break;
       }
-      // Date
+        // Date
       case Types.DATE: {
         // Build 154: changed from getDate to getTimestamp()
         // o=result.getDate(i+1);
@@ -455,7 +455,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = rs.getTimestamp(jdbcBindIndex);
         break;
       }
-      // Raw
+        // Raw
       case Types.LONGVARCHAR: {
         try {
           o = rs.getString(jdbcBindIndex);
@@ -811,12 +811,14 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   @Override
   public String createTimeIsInMinutes(String attribute, String bindName) {
-    return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24/60))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+((" + adaptBindNameTimeDateOp(bindName) + "+1)/24/60))/24/60";
+    return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24/60))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(("
+        + adaptBindNameTimeDateOp(bindName) + "+1)/24/60))/24/60";
   }
 
   @Override
   public String createTimeIsInHours(String attribute, String bindName) {
-    return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24)+(1/24/60))/24/60";
+    return attribute + ">=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(" + adaptBindNameTimeDateOp(bindName) + "/24))/24/60 AND " + attribute + "<((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+("
+        + adaptBindNameTimeDateOp(bindName) + "/24)+(1/24/60))/24/60";
   }
 
   @Override
@@ -930,7 +932,6 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   }
 
   protected abstract int getMaxListSize();
-
 
   @Override
   public String createInList(String attribute, Object array) {
@@ -1073,8 +1074,8 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
    * Gets the strategy to convert a decimal / numeric DB type into a data type in Java.
    * <code>DecimalConversion.NONE</code> means that nothing is converted. <code>DecimalConversion.LEGACY</code> means
    * that the old implementation (prior to Scout 3.10.0-M2) will be used: Numeric / decimal types without a scale are
-   * converted to <code>java.lang.Long</code>, with a scale they are converted to <code>java.lang.Double</code>.
-   * By default <code>DecimalConversion.NONE</code> will be returned.
+   * converted to <code>java.lang.Long</code>, with a scale they are converted to <code>java.lang.Double</code>. By
+   * default <code>DecimalConversion.NONE</code> will be returned.
    *
    * @since 3.10.0-M2
    * @return strategy for the decimal conversion

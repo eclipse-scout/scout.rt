@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
 /**
- * The <code>JmsRunContext</code> facilitates propagation of the <i>JMS Java Message Service</i> state. This
- * context is not intended to be propagated across different threads.
+ * The <code>JmsRunContext</code> facilitates propagation of the <i>JMS Java Message Service</i> state. This context is
+ * not intended to be propagated across different threads.
  * <p/>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * state.

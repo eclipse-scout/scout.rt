@@ -75,10 +75,13 @@ public class EntityContributionUtilityTest {
     s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts></groupBy>", new EntityContribution(), true).getSelectParts().get(0);
     assertEquals("SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 GROUP BY T.GROUP", s);
     //
-    s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING 1=1 <havingParts/></groupBy>", new EntityContribution(), true).getSelectParts().get(0);
+    s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING 1=1 <havingParts/></groupBy>", new EntityContribution(), true)
+        .getSelectParts().get(0);
     assertEquals("SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 GROUP BY T.GROUP HAVING 1=1 ", s);
     //
-    s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy>", new EntityContribution(), true).getSelectParts().get(0);
+    s = EntityContributionUtility
+        .mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy>", new EntityContribution(), true).getSelectParts()
+        .get(0);
     assertEquals("SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 GROUP BY T.GROUP HAVING SUM(T.TEST) > 0", s);
     //
     s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>HAVING 1=1 <havingParts/></groupBy>", new EntityContribution(), true).getSelectParts().get(0);
@@ -90,13 +93,14 @@ public class EntityContributionUtilityTest {
     EntityContribution e = new EntityContribution();
     e.addSelectExpression("T.OTHER_ATTRIBUTE", false);
     e.addSelectExpression("AVG(T.NUM)", true);
-    s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy>", e, true).getSelectParts().get(0);
+    s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy>", e, true)
+        .getSelectParts().get(0);
     assertEquals("SELECT SUM(T.B), T.OTHER_ATTRIBUTE, AVG(T.NUM) FROM SCOUT_TABLE T WHERE T.W = 14 GROUP BY T.GROUP, T.OTHER_ATTRIBUTE HAVING SUM(T.TEST) > 0", s);
     //
     s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery,
-        baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy> " +
-            "UNION " +
-            baseSqlWithTags + " <groupBy>GROUP BY <groupByParts/> HAVING 1=1 <havingParts/></groupBy>",
+        baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy> "
+            + "UNION "
+            + baseSqlWithTags + " <groupBy>GROUP BY <groupByParts/> HAVING 1=1 <havingParts/></groupBy>",
         new EntityContribution(), true).getSelectParts().get(0);
     assertEquals("SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 GROUP BY T.GROUP HAVING SUM(T.TEST) > 0 UNION SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 ", s);
   }

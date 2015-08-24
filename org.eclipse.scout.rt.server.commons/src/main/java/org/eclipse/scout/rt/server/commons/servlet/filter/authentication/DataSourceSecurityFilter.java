@@ -43,29 +43,23 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  * <ul>
  * <li><code>realm=abcde</code> <b>default "Default"</b></li>
  * <li><code>failover=true/false</code> <b>default false</b></li>
- * <li>
- * <code>jdbcDriverName=[e.g. oracle.jdbc.OracleDriver]</code> <b>required for JDBC</b></li>
- * <li>
- * <code>jdbcMappingName=[e.g. jdbc:oracle:thin:@dbUrl:1521:DBNAME]</code> <b>required for JDBC</b></li>
+ * <li><code>jdbcDriverName=[e.g. oracle.jdbc.OracleDriver]</code> <b>required for JDBC</b></li>
+ * <li><code>jdbcMappingName=[e.g. jdbc:oracle:thin:@dbUrl:1521:DBNAME]</code> <b>required for JDBC</b></li>
  * <li><code>jdbcUsername=USER</code> <b>required for JDBC, optional JNDI</b></li>
  * <li><code>jdbcPassword=PASS</code> <b>required for JDBC, optional JNDI</b></li>
  * <li><code>selectUserPass=<br>
  * [e.g. SELECT LOWER(USERNAME), SALT FROM TAB_USER WHERE ACCOUNT_LOCKED=0 AND NVL(EVT_ACCOUNT_EXPIRY,SYSDATE)>=SYSDATE AND LOWER(USERNAME)=? AND PASSWORD=?]</code>
  * <b>required for JDBC</b></li>
- * <li>
- * <code>useJndiConnection=false</code> <b>default false</b></li>
- * <li>
- * <code>jndiName=[e.g. jdbc/jndiDbname]</code> <b>required for JNDI</b></li>
- * <li>
- * <code>jndiInitialContextFactory=</code></li>
+ * <li><code>useJndiConnection=false</code> <b>default false</b></li>
+ * <li><code>jndiName=[e.g. jdbc/jndiDbname]</code> <b>required for JNDI</b></li>
+ * <li><code>jndiInitialContextFactory=</code></li>
  * <li><code>jndiProviderUrl=</code></li>
  * <li><code>jndiUrlPkgPrefixes=</code></li>
  * </ul>
  * <p>
  *
  * @author Michael Rudolf
- * @since 1.0.3 06.02.2009
- *        TODO imo remove in 6.0 and convert to DataSourceAuthenticator
+ * @since 1.0.3 06.02.2009 TODO imo remove in 6.0 and convert to DataSourceAuthenticator
  */
 public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
 

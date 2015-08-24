@@ -100,9 +100,9 @@ public class JettyServer {
 
       /**
        * Overwritten to enable resolution of resources contained in other JARs. That is according to the method's
-       * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current
-       * context root, or relative to the /META-INF/resources directory of a JAR file inside the web application's
-       * /WEB-INF/lib directory.</>
+       * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current context
+       * root, or relative to the /META-INF/resources directory of a JAR file inside the web application's /WEB-INF/lib
+       * directory.</>
        *
        * @see javax.servlet.ServletContext#getResource(String)
        */
@@ -121,9 +121,9 @@ public class JettyServer {
 
       /**
        * Overwritten to enable resolution of resources contained in other JARs. That is according to the method's
-       * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current
-       * context root, or relative to the /META-INF/resources directory of a JAR file inside the web application's
-       * /WEB-INF/lib directory.</>
+       * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current context
+       * root, or relative to the /META-INF/resources directory of a JAR file inside the web application's /WEB-INF/lib
+       * directory.</>
        *
        * @see javax.servlet.ServletContext#getResourcePaths(String)
        */

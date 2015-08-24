@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
- * Common definition of a password management service that may be used by
- * projects to manage a private set of users in an application.
+ * Common definition of a password management service that may be used by projects to manage a private set of users in
+ * an application.
  * <p>
  * However, the use of external existing user administration for single-sign-in and password management is highly
  * recommended. <br>
@@ -33,8 +33,7 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 public interface IPasswordManagementService extends IService {
 
   /**
-   * @return a localized text that describes the policy to the user (may contain
-   *         new lines)
+   * @return a localized text that describes the policy to the user (may contain new lines)
    */
   String getPasswordPolicyText();
 
@@ -50,8 +49,7 @@ public interface IPasswordManagementService extends IService {
 
   /**
    * reset the password of a user <br>
-   * In the implementation make sure to use sufficient permission rights to
-   * enable this method.
+   * In the implementation make sure to use sufficient permission rights to enable this method.
    */
   void resetPassword(String userId, String newPassword) throws ProcessingException;
 

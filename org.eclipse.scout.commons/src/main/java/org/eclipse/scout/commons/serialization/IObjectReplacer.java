@@ -23,16 +23,16 @@ import java.io.ObjectOutputStream;
 public interface IObjectReplacer {
 
   /**
-   * Replaces the given object with a different one during object serialization.
-   * The method is invoked by an {@link ObjectOutputStream}'s replaceObject method.
-   * Typically, replacements performed by this method are restored by {@link #resolveObject(Object)}
+   * Replaces the given object with a different one during object serialization. The method is invoked by an
+   * {@link ObjectOutputStream}'s replaceObject method. Typically, replacements performed by this method are restored by
+   * {@link #resolveObject(Object)}
    */
   Object replaceObject(Object obj) throws IOException;
 
   /**
-   * Substitutes an object with a different one during object deserialization.
-   * The method is invoked by an {@link ObjectInputStream}'s resolveObject method.
-   * Typically, this method restores the changes done by {@link #replaceObject(Object)}.
+   * Substitutes an object with a different one during object deserialization. The method is invoked by an
+   * {@link ObjectInputStream}'s resolveObject method. Typically, this method restores the changes done by
+   * {@link #replaceObject(Object)}.
    */
   Object resolveObject(Object obj) throws IOException;
 }

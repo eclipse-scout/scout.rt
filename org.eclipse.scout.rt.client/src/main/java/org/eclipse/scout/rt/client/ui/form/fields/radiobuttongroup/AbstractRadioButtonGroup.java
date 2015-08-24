@@ -60,11 +60,10 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
 /**
  * AbstractRadioButtonGroup contains a set of {@link IRadioButton} and can also contain other {@link IFormField}s at the
- * same time. In an AbstractRadioButtonGroup only 1 RadioButton
- * can be selected at a time.
+ * same time. In an AbstractRadioButtonGroup only 1 RadioButton can be selected at a time.
  */
 @ClassId("20dd4412-e677-4996-afcc-13c43b9dcae8")
-public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T>, ICompositeField {
+public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T>implements IRadioButtonGroup<T>, ICompositeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRadioButtonGroup.class);
 
   private boolean m_valueAndSelectionMediatorActive;
@@ -98,10 +97,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
-   * All codes returned by the configured {@link ICodeType} are used as radio
-   * buttons.<br>
-   * However, the {@link #interceptFilterLookupResult(LookupCall, List)} can be used
-   * to manipulate the codes which shall be used.
+   * All codes returned by the configured {@link ICodeType} are used as radio buttons.<br>
+   * However, the {@link #interceptFilterLookupResult(LookupCall, List)} can be used to manipulate the codes which shall
+   * be used.
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
@@ -129,8 +127,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(270)
@@ -495,8 +493,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
-   * when granting of enabled property changes, broadcast and set this property
-   * on all children that have no permission set
+   * when granting of enabled property changes, broadcast and set this property on all children that have no permission
+   * set
    */
   @Override
   public void setEnabledGranted(boolean b) {
@@ -657,7 +655,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     chain.execFilterLookupResult(call, result);
   }
 
-  protected static class LocalRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends LocalValueFieldExtension<T, OWNER> implements IRadioButtonGroupExtension<T, OWNER> {
+  protected static class LocalRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends LocalValueFieldExtension<T, OWNER>implements IRadioButtonGroupExtension<T, OWNER> {
 
     public LocalRadioButtonGroupExtension(OWNER owner) {
       super(owner);

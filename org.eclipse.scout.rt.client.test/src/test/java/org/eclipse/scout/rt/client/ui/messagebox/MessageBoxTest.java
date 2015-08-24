@@ -67,8 +67,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a single object in a list.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a single object in a list. Bug 440433.
    *
    * @throws Exception
    */
@@ -113,8 +112,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list. Bug 440433.
    *
    * @throws Exception
    */
@@ -136,8 +134,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an empty list. Bug 440433.
    *
    * @throws Exception
    */
@@ -159,8 +156,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list. Bug 440433.
    *
    * @throws Exception
    */
@@ -171,8 +167,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list. Bug 440433.
    *
    * @throws Exception
    */
@@ -195,8 +190,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a list containing a null.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a list containing a null. Bug 440433.
    *
    * @throws Exception
    */
@@ -218,8 +212,7 @@ public class MessageBoxTest {
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a big list.
-   * Bug 440433.
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a big list. Bug 440433.
    *
    * @throws Exception
    */

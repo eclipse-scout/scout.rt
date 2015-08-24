@@ -74,9 +74,8 @@ public interface IDesktopExtension {
   ContributionCommand desktopOpenedDelegate() throws ProcessingException;
 
   /**
-   * Called just after the core desktop receives the request to close the desktop, i.e. before the desktop
-   * gets into its closing state.
-   * The desktop extension is allowed to veto the closing process by throwing a {@link VetoException}.
+   * Called just after the core desktop receives the request to close the desktop, i.e. before the desktop gets into its
+   * closing state. The desktop extension is allowed to veto the closing process by throwing a {@link VetoException}.
    *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
@@ -125,11 +124,10 @@ public interface IDesktopExtension {
   ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException;
 
   /**
-   * Called right before a form is added to the core desktop. This means this method is called
-   * before any UI is informed about the new form. The form is provided in a
-   * holder. This allows it to prevent the form being added to the desktop (set
-   * reference to {@code null}), do some general modifications needed to be done prior UI instantiation,
-   * or even replace it with a different instance.
+   * Called right before a form is added to the core desktop. This means this method is called before any UI is informed
+   * about the new form. The form is provided in a holder. This allows it to prevent the form being added to the desktop
+   * (set reference to {@code null}), do some general modifications needed to be done prior UI instantiation, or even
+   * replace it with a different instance.
    *
    * @param formHolder
    *          contains the form that will be added to the core desktop
@@ -190,8 +188,8 @@ public interface IDesktopExtension {
   ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) throws ProcessingException;
 
   /**
-   * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop
-   * to find an existing menu on the core desktop by class type.
+   * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop to find
+   * an existing menu on the core desktop by class type.
    * <p>
    * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
    * called on each and then checked if the menu is visible.
@@ -218,8 +216,8 @@ public interface IDesktopExtension {
 
   /**
    * Adds the actions configured with this extension to the {@code actions} collection. This is a live list of
-   * contributed actions ({@link IMenu}, {@link IKeyStroke}, {@link IToolButton}, {@link IViewButton}).
-   * They are NOT yet initialized.
+   * contributed actions ({@link IMenu}, {@link IKeyStroke}, {@link IToolButton}, {@link IViewButton}). They are NOT yet
+   * initialized.
    * <p>
    * Use the {@link Order} annotation or {@link IAction#setOrder(double)} to define the sort order of the contributed
    * actions.

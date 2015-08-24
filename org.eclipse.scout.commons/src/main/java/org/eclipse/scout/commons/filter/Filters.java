@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.filter;
 
-
 /**
  * Factory and utility methods for Filters.
  *

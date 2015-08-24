@@ -16,11 +16,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 public interface IStringFieldUIFacade extends IBasicFieldUIFacade {
 
   /**
-   * The text passed to this method is tried to wellform as an URL and {@link IStringField#execAction()} will be
-   * called. The link action
-   * handling has to be done by overriding the execLinkAction on the string
-   * field. If the text can not be transformed into an URL the execLinkAction
-   * method is called with null.
+   * The text passed to this method is tried to wellform as an URL and {@link IStringField#execAction()} will be called.
+   * The link action handling has to be done by overriding the execLinkAction on the string field. If the text can not
+   * be transformed into an URL the execLinkAction method is called with null.
    *
    * @param text
    */

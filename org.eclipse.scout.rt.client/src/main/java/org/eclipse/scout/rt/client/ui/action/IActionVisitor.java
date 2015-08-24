@@ -17,8 +17,7 @@ public interface IActionVisitor {
    */
   int CONTINUE = 1;
   /**
-   * continues visiting the tree only on this branch (load children if not
-   * loaded)
+   * continues visiting the tree only on this branch (load children if not loaded)
    */
   int CONTINUE_BRANCH = 2;
   /**

@@ -20,33 +20,29 @@ public interface ISchedulerJob {
   String getGroupId();
 
   /**
-   * every job (should) have a unique id which is composed of the jobId and the
-   * groupId
+   * every job (should) have a unique id which is composed of the jobId and the groupId
    */
   String getJobId();
 
   /**
-   * This call is synchronous from the job queue and therefore must not block
-   * for long times during execution
+   * This call is synchronous from the job queue and therefore must not block for long times during execution
    */
   boolean acceptTick(TickSignal signal);
 
   void run(IScheduler scheduler, TickSignal signal) throws ProcessingException;
 
   /**
-   * the interrupted property is set to false by the scheduler every time just
-   * before the job is run the interrupted property is set to true by the
-   * scheduler whenever the scheduler or one of its job should interrupt
+   * the interrupted property is set to false by the scheduler every time just before the job is run the interrupted
+   * property is set to true by the scheduler whenever the scheduler or one of its job should interrupt
    */
   boolean isInterrupted();
 
   void setInterrupted(boolean b);
 
   /**
-   * the dispose property when set to true (by the scheduler or by the job
-   * itself) causes the scheduler to remove the job from the queue after its
-   * pending execution when a job is (re-) added to the scheduler this property
-   * is set to false by the scheduler
+   * the dispose property when set to true (by the scheduler or by the job itself) causes the scheduler to remove the
+   * job from the queue after its pending execution when a job is (re-) added to the scheduler this property is set to
+   * false by the scheduler
    */
   boolean isDisposed();
 

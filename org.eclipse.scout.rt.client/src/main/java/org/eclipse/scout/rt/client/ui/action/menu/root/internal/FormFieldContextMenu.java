@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 /**
  *
  */
-public class FormFieldContextMenu<T extends IFormField> extends AbstractPropertyObserverContextMenu<T> implements IFormFieldContextMenu {
+public class FormFieldContextMenu<T extends IFormField> extends AbstractPropertyObserverContextMenu<T>implements IFormFieldContextMenu {
 
   /**
    * @param owner

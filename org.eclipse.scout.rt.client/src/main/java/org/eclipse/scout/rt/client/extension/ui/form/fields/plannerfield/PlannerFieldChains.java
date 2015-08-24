@@ -15,7 +15,8 @@ public final class PlannerFieldChains {
   private PlannerFieldChains() {
   }
 
-  protected abstract static class AbstractPlannerFieldChain<P extends IPlanner<RI, AI>, RI, AI> extends AbstractExtensionChain<IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>>> {
+  protected abstract static class AbstractPlannerFieldChain<P extends IPlanner<RI, AI>, RI, AI>
+      extends AbstractExtensionChain<IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>>> {
 
     public AbstractPlannerFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions, IPlannerFieldExtension.class);

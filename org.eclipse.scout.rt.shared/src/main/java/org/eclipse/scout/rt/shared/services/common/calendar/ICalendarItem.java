@@ -79,8 +79,8 @@ public interface ICalendarItem {
   void setExternalKey(Serializable externalKey);
 
   /**
-   * @return a detailed description of this item. The description contains the body and other fields
-   *         depending on the item-type.
+   * @return a detailed description of this item. The description contains the body and other fields depending on the
+   *         item-type.
    */
   String getDescription();
 

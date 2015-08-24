@@ -183,7 +183,8 @@ public class ReplaceTableTest {
     assertSame(form.getSecondGroupBox().getInnerTableField().getTable().getFirstMenu(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(1));
     assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getThirdMenu2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(2));
 
-    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenuByClass(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(),
+        form.getSecondGroupBox().getInnerTableField().getTable().getMenuByClass(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
     assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenuByClass(ExtendedFormUsingTemplates.InnerTableFieldEx1.InnerTableEx1.SecondMenuEx2.class));
   }
 

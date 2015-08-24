@@ -47,8 +47,8 @@ public interface IBeanArrayHolder<T> {
   }
 
   /**
-   * Gets the the number of beans with a state that is contained in the passed states.
-   * If no states are passed the number of all beans in the holder is returned.
+   * Gets the the number of beans with a state that is contained in the passed states. If no states are passed the
+   * number of all beans in the holder is returned.
    * 
    * @param states
    * @return a value corresponding to the number of beans in this holder with a given state
@@ -59,8 +59,8 @@ public interface IBeanArrayHolder<T> {
    * gets all beans with belonging to the set of supplied states
    * 
    * @param states
-   *          that should be returned. If <code>null</code> or an empty
-   *          array is passed, then all beans regardless of state are returned.
+   *          that should be returned. If <code>null</code> or an empty array is passed, then all beans regardless of
+   *          state are returned.
    * @return an array of beans, does never return <code>null</code>
    */
   T[] getBeans(State... states);

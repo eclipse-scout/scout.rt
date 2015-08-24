@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.perf.internal;
 
-
 public class PerformanceSampleSet {
   private Object m_samplesLock = new Object();
   private long[] m_samples;

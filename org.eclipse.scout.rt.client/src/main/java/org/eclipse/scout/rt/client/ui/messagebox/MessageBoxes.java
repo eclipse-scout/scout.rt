@@ -94,8 +94,7 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets",
-   *          ...
+   *          display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
    *          one item or array of multiple items
    */
@@ -118,8 +117,7 @@ public final class MessageBoxes {
    * Convenience function for simple delete confirmation message box
    *
    * @param itemType
-   *          display text in plural such as "Persons", "Relations", "Tickets",
-   *          ...
+   *          display text in plural such as "Persons", "Relations", "Tickets", ...
    * @param items
    *          a list of multiple items
    * @since Scout 4.0.1

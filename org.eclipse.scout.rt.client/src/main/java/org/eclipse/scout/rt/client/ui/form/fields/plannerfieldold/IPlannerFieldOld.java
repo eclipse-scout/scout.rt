@@ -20,15 +20,15 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * The planner contains a list of resources that are associated with 0..n
- * timeline activities.<br>
- * As "meeting planner", the subjects are "persons" and the activities are
- * "busy/free" timespans.
+ * The planner contains a list of resources that are associated with 0..n timeline activities.<br>
+ * As "meeting planner", the subjects are "persons" and the activities are "busy/free" timespans.
  * <p>
  * This class strintly uses java.util.Date staticly AND dynamicly<br>
- * All Date-Objects and subclasses are run through {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#toUtilDate(java.util.Date)}()
+ * All Date-Objects and subclasses are run through
+ * {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#toUtilDate(java.util.Date)}()
  * <p>
- * The planner field contains one inner class extending {@link ITable} and another one extending {@link IActivityMap}<br>
+ * The planner field contains one inner class extending {@link ITable} and another one extending {@link IActivityMap}
+ * <br>
  * The inner table contains a primary key column, the type of the primary key column corresponds with RI the type
  * parameter for the resourceId. The the type parameter AI for the activityId is passed on together with RI to
  * {@link IActivityMap}<br>
@@ -55,11 +55,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  *     }
  *   }
  * }
- * 
- * 
- * 
- * 
- * 
  * </pre>
  */
 

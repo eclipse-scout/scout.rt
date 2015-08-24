@@ -410,8 +410,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   }
 
   /**
-   * TreeNode implementation with delegation of loadChildren to
-   * this.loadChildNodes()
+   * TreeNode implementation with delegation of loadChildren to this.loadChildNodes()
    */
   private class P_InternalTreeNode extends AbstractTreeNode {
 
@@ -437,7 +436,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
   }
 
-  protected static class LocalTreeFieldExtension<OWNER extends AbstractTreeField> extends LocalFormFieldExtension<OWNER> implements ITreeFieldExtension<OWNER> {
+  protected static class LocalTreeFieldExtension<OWNER extends AbstractTreeField> extends LocalFormFieldExtension<OWNER>implements ITreeFieldExtension<OWNER> {
 
     public LocalTreeFieldExtension(OWNER owner) {
       super(owner);

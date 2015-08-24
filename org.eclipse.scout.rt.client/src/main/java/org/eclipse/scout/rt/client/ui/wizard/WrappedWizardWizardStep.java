@@ -17,9 +17,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Wizard step containing another wizard. This step invokes the parent's <code>doNextStep()</code> method when
- * terminated (i.e. either finished or
- * canceled).
- * vastly reduced amount of automation and allows for much more custom
+ * terminated (i.e. either finished or canceled). vastly reduced amount of automation and allows for much more custom
  * flexibility in handling wizard processes.
  */
 public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {

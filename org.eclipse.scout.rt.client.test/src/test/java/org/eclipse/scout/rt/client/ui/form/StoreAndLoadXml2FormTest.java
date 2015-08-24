@@ -40,9 +40,9 @@ import org.junit.runner.RunWith;
 public class StoreAndLoadXml2FormTest {
 
   static final Object[][] TABLE_DATA = new Object[][]{
-    new Object[]{1L, "One", new java.util.Date()},
-    new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
-    new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
+      new Object[]{1L, "One", new java.util.Date()},
+      new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
+      new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
   };
 
   public static class InnerClass implements Serializable {

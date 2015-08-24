@@ -118,8 +118,8 @@ public final class FormFieldInjectionThreadLocal {
    * @param container
    *          is the container field that is being added potential injected fields
    * @param fields
-   *          live and mutable collection of currently (configured) fields, not yet initialized
-   *          or added to the container field
+   *          live and mutable collection of currently (configured) fields, not yet initialized or added to the
+   *          container field
    */
   public static void injectFields(IFormField container, OrderedCollection<IFormField> fields) {
     THREAD_LOCAL.get().injectFieldsInternal(container, fields);

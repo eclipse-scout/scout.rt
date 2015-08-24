@@ -72,8 +72,8 @@ public class TreeBoxTest {
 
   /**
    * Select a parent node in a tree box and check whether only this node is selected..
-   * {@link AbstractTreeBox#getConfiguredAutoCheckChildNodes} returns false on the {@link SimpleTreeBox}.
-   * Bug 368107 - Check child nodes when parent node is checked
+   * {@link AbstractTreeBox#getConfiguredAutoCheckChildNodes} returns false on the {@link SimpleTreeBox}. Bug 368107 -
+   * Check child nodes when parent node is checked
    */
   @Test
   public void testDefaultBehavior() throws Exception {
@@ -96,8 +96,7 @@ public class TreeBoxTest {
   /**
    * Select a parent node in a tree box with auto check child nodes activated, and check whether this node and all child
    * nodes are selected. {@link AbstractTreeBox#getConfiguredAutoCheckChildNodes} returns true on the
-   * {@link AutoSelectTreeBox}.
-   * Bug 368107 - Check child nodes when parent node is checked
+   * {@link AutoSelectTreeBox}. Bug 368107 - Check child nodes when parent node is checked
    */
   @Test
   public void testAutoSelectBehavior() throws Exception {
@@ -124,8 +123,7 @@ public class TreeBoxTest {
   /**
    * Select a parent node in a tree box with auto check child nodes activated, and check whether this node and all child
    * nodes are selected (extended test). {@link AbstractTreeBox#getConfiguredAutoCheckChildNodes} returns true on the
-   * {@link AutoSelectTreeBox}.
-   * Bug 368107 - Check child nodes when parent node is checked
+   * {@link AutoSelectTreeBox}. Bug 368107 - Check child nodes when parent node is checked
    */
   @Test
   public void testAutoSelectBehaviorExtended() throws Exception {

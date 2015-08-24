@@ -30,8 +30,7 @@ public class ProcessingException extends Exception implements Serializable {
   private transient boolean m_consumed;
 
   /**
-   * Empty constructor is used to support auto-webservice publishing with java
-   * bean support
+   * Empty constructor is used to support auto-webservice publishing with java bean support
    */
   public ProcessingException() {
     this("undefined");
@@ -158,8 +157,7 @@ public class ProcessingException extends Exception implements Serializable {
   }
 
   /**
-   * @return the complete stacktrace of the Throwable and all its causes
-   *         (recursive)
+   * @return the complete stacktrace of the Throwable and all its causes (recursive)
    */
   public static StackTraceElement[] unionStackTrace(Throwable t) {
     ArrayList<StackTraceElement> list = new ArrayList<StackTraceElement>();

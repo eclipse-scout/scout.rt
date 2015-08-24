@@ -24,8 +24,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 /**
- * Common logic for the {@link ICodeService} implementations.
- * Delegates to {@link CodeTypeStore}
+ * Common logic for the {@link ICodeService} implementations. Delegates to {@link CodeTypeStore}
  *
  * @since 4.3.0 (Mars-M5)
  */
@@ -177,8 +176,8 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
   }
 
   /**
-   * Method to provide the current partitionId.
-   * Child classes can override this method to get the partitionId from the session.
+   * Method to provide the current partitionId. Child classes can override this method to get the partitionId from the
+   * session.
    *
    * @return partitionId
    */

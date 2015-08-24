@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.testing.commons;
 
 /**
- * Utility class to check for the underlying Operating System name. Currently,
- * only the latest Windows versions are implemented.
+ * Utility class to check for the underlying Operating System name. Currently, only the latest Windows versions are
+ * implemented.
  */
 public final class OsUtility {
 

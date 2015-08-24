@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 
 /**
- * Ensures that the platform is started, when the servlet context is ready. Likewise, the platform is stopped,
- * when the servlet context is destroyed.
+ * Ensures that the platform is started, when the servlet context is ready. Likewise, the platform is stopped, when the
+ * servlet context is destroyed.
  * <p>
  * If an even earlier platform start is required, check the javadoc of {@link Platform}.
  */

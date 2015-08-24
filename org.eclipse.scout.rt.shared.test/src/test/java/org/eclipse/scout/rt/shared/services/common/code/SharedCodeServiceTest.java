@@ -28,8 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * JUnit test for {@link AbstractSharedCodeService}.
- * See Bug 444213.
+ * JUnit test for {@link AbstractSharedCodeService}. See Bug 444213.
  *
  * @since 4.3.0 (Mars-M5)
  */

@@ -21,11 +21,10 @@ import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
- * Access control facility.
- * The default implementation in org.eclipse.scout.rt.shared.services.common.security.AccessControlService has service
- * ranking low (-1)
- * and caches permissions per user principal for maximum performance when using stateless request/response patterns as
- * in webservice environments.
+ * Access control facility. The default implementation in
+ * org.eclipse.scout.rt.shared.services.common.security.AccessControlService has service ranking low (-1) and caches
+ * permissions per user principal for maximum performance when using stateless request/response patterns as in
+ * webservice environments.
  */
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IAccessControlService extends IService {
@@ -37,18 +36,15 @@ public interface IAccessControlService extends IService {
   int getPermissionLevel(Permission p);
 
   /**
-   * only use this method to transfer permissions, don't use it for access
-   * control or adding permissions see also {@link #checkPermission(Permission)} and
-   * {@link #getPermissionLevel(BasicHierarchyPermission)}
+   * only use this method to transfer permissions, don't use it for access control or adding permissions see also
+   * {@link #checkPermission(Permission)} and {@link #getPermissionLevel(BasicHierarchyPermission)}
    */
   Permissions getPermissions();
 
   /**
-   * @return true if this service is a proxy to the real access control service
-   *         This property is queried by {@link com.bsiag.security.BasicHierarchyPermission} to decide
-   *         whether fine-grained access control can be calculated right away
-   *         (no proxy) or must be delegated to the real access control service
-   *         in the backend
+   * @return true if this service is a proxy to the real access control service This property is queried by
+   *         {@link com.bsiag.security.BasicHierarchyPermission} to decide whether fine-grained access control can be
+   *         calculated right away (no proxy) or must be delegated to the real access control service in the backend
    */
   boolean isProxyService();
 
@@ -60,9 +56,7 @@ public interface IAccessControlService extends IService {
 
   /**
    * Clear cache of specified userIds.<br>
-   * This can be useful when some permissions and/or user-role mappings have
-   * changed.
-   * This method is lenient.
+   * This can be useful when some permissions and/or user-role mappings have changed. This method is lenient.
    */
   @RemoteServiceAccessDenied
   void clearCacheOfUserIds(Collection<String> userIds);

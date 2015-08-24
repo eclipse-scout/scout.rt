@@ -349,8 +349,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
                   }
                 }
               }
-            }
-            );
+            });
 
         // local enabled listener
         addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
@@ -926,7 +925,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     return chain.execCreateEntityNode(parentNode, e, negated, values, texts);
   }
 
-  protected static class LocalComposerFieldExtension<OWNER extends AbstractComposerField> extends LocalFormFieldExtension<OWNER> implements IComposerFieldExtension<OWNER> {
+  protected static class LocalComposerFieldExtension<OWNER extends AbstractComposerField> extends LocalFormFieldExtension<OWNER>implements IComposerFieldExtension<OWNER> {
 
     public LocalComposerFieldExtension(OWNER owner) {
       super(owner);
@@ -953,7 +952,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
 
     @Override
-    public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+    public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values,
+        List<String> texts) {
       return getOwner().execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
     }
 

@@ -155,9 +155,9 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   /**
-   * Configures the view order of this code. The view order determines the order in which the codes appear. The
-   * order of codes with no view order configured ({@code < 0}) is initialized based on the {@link Order} annotation
-   * of the code class.
+   * Configures the view order of this code. The view order determines the order in which the codes appear. The order of
+   * codes with no view order configured ({@code < 0}) is initialized based on the {@link Order} annotation of the code
+   * class.
    * <p>
    * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
    *
@@ -170,8 +170,8 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   /**
-   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 3.10.0-M4
    */
@@ -220,8 +220,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
           getConfiguredExtKey(),
           getConfiguredValue(),
           0,
-          calculateViewOrder()
-          ));
+          calculateViewOrder()));
     }
     m_contributionHolder = new ContributionComposite(this);
     // add configured child codes
@@ -562,7 +561,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER> implements ICodeExtension<T, OWNER> {
+  protected static class LocalCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER>implements ICodeExtension<T, OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalCodeExtension(OWNER owner) {

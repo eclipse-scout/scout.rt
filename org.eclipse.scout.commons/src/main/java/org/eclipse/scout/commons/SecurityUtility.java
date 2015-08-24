@@ -45,8 +45,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 /**
  * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
  * Please note that this class requires the following providers to be available and authenticated in the running JRE:
- * SUN, SunJCE, SunEC. See <a
- * href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SunJCEProvider">Java
+ * SUN, SunJCE, SunEC. See
+ * <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SunJCEProvider">Java
  * Cryptography Architecture Oracle Providers Documentation for JDK 8</a>.
  *
  * @since 5.1
@@ -81,8 +81,8 @@ public final class SecurityUtility {
   private static final String ELLIPTIC_CURVE_NAME = "secp256k1";
 
   /**
-   * SHA-512 hash algorithms defined in the <a
-   * href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS PUB 180-4</a>.
+   * SHA-512 hash algorithms defined in the
+   * <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS PUB 180-4</a>.
    */
   private static final String MESSAGE_DIGEST_ALGORITHM = "SHA-512";
 
@@ -94,8 +94,8 @@ public final class SecurityUtility {
   private static final String SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
 
   /**
-   * Password-based key-derivation algorithm (<a href="http://tools.ietf.org/search/rfc2898">PKCS #5 2.0</a>) using
-   * The HmacSHA algorithm (<a href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a>) as pseudo-random function.
+   * Password-based key-derivation algorithm (<a href="http://tools.ietf.org/search/rfc2898">PKCS #5 2.0</a>) using The
+   * HmacSHA algorithm (<a href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a>) as pseudo-random function.
    */
   private static final String SECRET_ALGORITHM = "PBKDF2WithHmacSHA256";
 
@@ -115,9 +115,9 @@ public final class SecurityUtility {
   private static final String EC_ALGORITHM_PROVIDER = "SunEC";
 
   /**
-   * Advanced Encryption Standard as specified by <a
-   * href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">NIST in FIPS 197</a>. Also known as the Rijndael
-   * algorithm by Joan Daemen and Vincent Rijmen. AES is a 128-bit block cipher.
+   * Advanced Encryption Standard as specified by
+   * <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">NIST in FIPS 197</a>. Also known as the
+   * Rijndael algorithm by Joan Daemen and Vincent Rijmen. AES is a 128-bit block cipher.
    */
   private static final String CIPHER_ALGORITHM = "AES";
 
@@ -133,14 +133,16 @@ public final class SecurityUtility {
   private static final String CIPHER_ALGORITHM_PADDING = "PKCS5Padding";
 
   /**
-   * Length (in bytes) of Initialization Vector for Galois/Counter Mode (as defined in <a
-   * href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>).
+   * Length (in bytes) of Initialization Vector for Galois/Counter Mode (as defined in
+   * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>
+   * ).
    */
   private static final int GCM_INITIALIZATION_VECTOR_LEN = 16;
 
   /**
-   * Length (in bits) of authentication tag T of Initialization Vector for Galois/Counter Mode (as defined in <a
-   * href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>).
+   * Length (in bits) of authentication tag T of Initialization Vector for Galois/Counter Mode (as defined in
+   * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>
+   * ).
    */
   private static final int GCM_AUTH_TAG_BIT_LEN = 128;
 
@@ -153,10 +155,10 @@ public final class SecurityUtility {
    * {@link #encrypt(byte[], String, byte[], int)}.<br>
    * <br>
    * <b>Note:</b><br>
-   * It uses AES (as defined in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">NIST FIPS
-   * 197</a>) in Galois/Counter Mode (as defined in <a
-   * href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>)
-   * with PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>) to decrypt the
+   * It uses AES (as defined in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">NIST FIPS 197</a>)
+   * in Galois/Counter Mode (as defined in
+   * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>
+   * ) with PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>) to decrypt the
    * data.<br>
    * This algorithms is only available with JRE 1.8 or newer. To have the best security ensure to use the latest JRE
    * 1.8!
@@ -170,8 +172,8 @@ public final class SecurityUtility {
    * @param keyLen
    *          The key length (in bits) to use. Valid values are 128, 192, or 256. <b>Note:</b> To use key lengths other
    *          than 128bits the "Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files" must be
-   *          installed in the JRE (see <a
-   *          href="http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html">Java
+   *          installed in the JRE (see
+   *          <a href="http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html">Java
    *          Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 8 Download</a>).
    * @return The original clear text data.
    * @throws ProcessingException
@@ -185,13 +187,14 @@ public final class SecurityUtility {
 
   /**
    * Encrypts the given data using the given key and salt.<br>
-   * Use {@link #decrypt(byte[], String, byte[], int)} to decrypt the data again (using the same key, salt and keyLen).<br>
+   * Use {@link #decrypt(byte[], String, byte[], int)} to decrypt the data again (using the same key, salt and keyLen).
+   * <br>
    * <br>
    * <b>Note:</b><br>
-   * It uses AES (as defined in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">NIST FIPS
-   * 197</a>) in Galois/Counter Mode (as defined in <a
-   * href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>)
-   * with PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>) to encrypt the
+   * It uses AES (as defined in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">NIST FIPS 197</a>)
+   * in Galois/Counter Mode (as defined in
+   * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>
+   * ) with PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>) to encrypt the
    * data.<br>
    * This algorithms is only available with JRE 1.8 or newer. To have the best security ensure to use the latest JRE
    * 1.8!
@@ -202,14 +205,14 @@ public final class SecurityUtility {
    *          The password to use for the encryption. Must not be null or empty.
    * @param salt
    *          The salt to use for the encryption. Must not be null or empty. It is important to create a separate random
-   *          salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes()} to
-   *          generate a new salt for a key. It is safe to store the salt in clear text alongside the encrypted data.
-   *          This salt will then be used to decrypt the data again.
+   *          salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes()} to generate a
+   *          new salt for a key. It is safe to store the salt in clear text alongside the encrypted data. This salt
+   *          will then be used to decrypt the data again.
    * @param keyLen
    *          The key length (in bits) to use. Valid values are 128, 192, or 256. <b>Note:</b> To use key lengths other
    *          than 128bits the "Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files" must be
-   *          installed in the JRE (see <a
-   *          href="http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html">Java
+   *          installed in the JRE (see
+   *          <a href="http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html">Java
    *          Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 8 Download</a>).
    * @return The encrypted data.
    * @throws ProcessingException

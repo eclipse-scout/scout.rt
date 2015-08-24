@@ -57,8 +57,8 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * Before the form is activated, this method loads its data.<br>
-   * After this method call, the form is in the state "Saved / Unchanged" All
-   * field value changes done here appear as unchanged in the form.
+   * After this method call, the form is in the state "Saved / Unchanged" All field value changes done here appear as
+   * unchanged in the form.
    */
   @ConfigOperation
   @Order(10)
@@ -67,10 +67,9 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * Load additional form state<br>
-   * this method call is after the form was loaded into the state
-   * "Saved / Unchanged"<br>
-   * any changes to fields might result in the form ot fields being changed and
-   * therefore in the state "Save needed / Changed"
+   * this method call is after the form was loaded into the state "Saved / Unchanged"<br>
+   * any changes to fields might result in the form ot fields being changed and therefore in the state
+   * "Save needed / Changed"
    */
   @ConfigOperation
   @Order(20)
@@ -79,16 +78,13 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * This method is called in order to check field validity.<br>
-   * This method is called just after the {@link IForm#interceptCheckFields()} but
-   * before the form is validated and stored.<br>
-   * After this method, the form is checking fields itself and displaying a
-   * dialog with missing and invalid fields.
+   * This method is called just after the {@link IForm#interceptCheckFields()} but before the form is validated and
+   * stored.<br>
+   * After this method, the form is checking fields itself and displaying a dialog with missing and invalid fields.
    *
-   * @return true when this check is done and further checks can continue, false
-   *         to silently cancel the current process
+   * @return true when this check is done and further checks can continue, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user
-   *           notification such as a dialog
+   *           to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(40)
@@ -97,16 +93,12 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   /**
-   * This method is called in order to update derived states like button
-   * enablings.<br>
-   * This method is called after the {@link IForm#interceptValidate()} but before the
-   * form is stored.<br>
+   * This method is called in order to update derived states like button enablings.<br>
+   * This method is called after the {@link IForm#interceptValidate()} but before the form is stored.<br>
    *
-   * @return true when validate is successful, false to silently cancel the
-   *         current process
+   * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
-   *           to cancel the current process with error handling and user
-   *           notification such as a dialog
+   *           to cancel the current process with error handling and user notification such as a dialog
    */
   @ConfigOperation
   @Order(50)
@@ -116,9 +108,8 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * Store form state<br>
-   * after this method call, the form is in the state "Saved / Unchanged" When
-   * the form is closed using Ok, Save, Search, Next, etc.. this method is
-   * called to apply the changes to the persistency layer
+   * after this method call, the form is in the state "Saved / Unchanged" When the form is closed using Ok, Save,
+   * Search, Next, etc.. this method is called to apply the changes to the persistency layer
    */
   @ConfigOperation
   @Order(40)
@@ -126,8 +117,8 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   /**
-   * When the form is closed using cancel or close this method is called to
-   * manage the case that no changes should be performed (revert case)
+   * When the form is closed using cancel or close this method is called to manage the case that no changes should be
+   * performed (revert case)
    */
   @ConfigOperation
   @Order(30)
@@ -136,9 +127,8 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * Finalize form state<br>
-   * called whenever the handler is finished and the form is closed When the
-   * form is closed in any way this method is called to dispose of resources or
-   * deallocate services
+   * called whenever the handler is finished and the form is closed When the form is closed in any way this method is
+   * called to dispose of resources or deallocate services
    */
   @ConfigOperation
   @Order(60)
@@ -306,7 +296,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalFormHandlerExtension<OWNER extends AbstractFormHandler> extends AbstractExtension<OWNER> implements IFormHandlerExtension<OWNER> {
+  protected static class LocalFormHandlerExtension<OWNER extends AbstractFormHandler> extends AbstractExtension<OWNER>implements IFormHandlerExtension<OWNER> {
 
     public LocalFormHandlerExtension(OWNER owner) {
       super(owner);

@@ -138,8 +138,7 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   /**
    * @return the first hour of a day<br>
-   *         When a working day starts at 08:00 and ends at 17:00, this value is
-   *         8.
+   *         When a working day starts at 08:00 and ends at 17:00, this value is 8.
    */
   int getFirstHourOfDay();
 
@@ -150,8 +149,8 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   /**
    * @return the last hour of a day<br>
-   *         When a working day starts at 08:00 and ends at 17:00, this value is
-   *         16 since the last hour starts at 16:00 and ends at 16:59.
+   *         When a working day starts at 08:00 and ends at 17:00, this value is 16 since the last hour starts at 16:00
+   *         and ends at 16:59.
    */
   int getLastHourOfDay();
 

@@ -29,7 +29,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends AbstractService implements ILookupService<LOOKUP_ROW_KEY_TYPE> {
 
   /**
-   * Convenience function to sort data for later call to {@link #createLookupRowArray(Object[][], LookupCall, Class)}.<br>
+   * Convenience function to sort data for later call to {@link #createLookupRowArray(Object[][], LookupCall, Class)}.
+   * <br>
    * The sort indices are 0-based.
    */
   public static void sortData(Object[][] data, int... sortColumns) {
@@ -47,8 +48,7 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> extends Abstrac
    * Convenience function to transform Object[][] data into LookupRow[]
    *
    * @param maxColumnIndex
-   *          the maximum column index to be used to create the code rows, all
-   *          column indexes >= columnCount are ignored
+   *          the maximum column index to be used to create the code rows, all column indexes >= columnCount are ignored
    * @param data
    *          The Object[][] must contain rows with the elements in the following order:
    *          <ul>

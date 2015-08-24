@@ -37,7 +37,7 @@ public abstract class AbstractCustomField extends AbstractFormField implements I
     super.initConfig();
   }
 
-  protected static class LocalCustomFieldExtension<OWNER extends AbstractCustomField> extends LocalFormFieldExtension<OWNER> implements ICustomFieldExtension<OWNER> {
+  protected static class LocalCustomFieldExtension<OWNER extends AbstractCustomField> extends LocalFormFieldExtension<OWNER>implements ICustomFieldExtension<OWNER> {
 
     public LocalCustomFieldExtension(OWNER owner) {
       super(owner);

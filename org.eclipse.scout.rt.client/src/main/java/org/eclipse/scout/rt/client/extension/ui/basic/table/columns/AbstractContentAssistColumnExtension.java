@@ -6,7 +6,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractContentAssistColumn;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-public abstract class AbstractContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends AbstractColumnExtension<VALUE, OWNER> implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
+public abstract class AbstractContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends AbstractColumnExtension<VALUE, OWNER>
+    implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
 
   public AbstractContentAssistColumnExtension(OWNER owner) {
     super(owner);

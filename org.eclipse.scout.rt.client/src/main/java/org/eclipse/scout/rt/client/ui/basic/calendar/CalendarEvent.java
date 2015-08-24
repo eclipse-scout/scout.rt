@@ -28,14 +28,12 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
   public static final int TYPE_COMPONENT_ACTION = 20;
 
   /**
-   * Broadcast request to add actions for component popup valid properties:
-   * component add actions to: popupActions
+   * Broadcast request to add actions for component popup valid properties: component add actions to: popupActions
    */
   public static final int TYPE_COMPONENT_POPUP = 30;
 
   /**
-   * Broadcast request to add actions for "new" popup valid properties: add
-   * actions to: popupActions
+   * Broadcast request to add actions for "new" popup valid properties: add actions to: popupActions
    */
   public static final int TYPE_NEW_POPUP = 31;
 
@@ -68,8 +66,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
   }
 
   /**
-   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to add
-   * actions
+   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to add actions
    */
   public void addPopupMenu(IMenu menu) {
     if (menu != null) {
@@ -81,8 +78,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
   }
 
   /**
-   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to add
-   * actions
+   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to add actions
    */
   public void addPopupMenus(List<IMenu> menus) {
     if (menus != null) {
@@ -94,16 +90,14 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
   }
 
   /**
-   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to
-   * collect actions
+   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to collect actions
    */
   public List<IMenu> getPopupMenus() {
     return CollectionUtility.arrayList(m_popupMenus);
   }
 
   /**
-   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to
-   * collect actions
+   * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to collect actions
    */
   public int getPopupMenuCount() {
     if (m_popupMenus != null) {

@@ -72,8 +72,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
               }
             }
           }
-        }
-        );
+        });
     // add change listener
     m_outline.addPropertyChangeListener(
         new PropertyChangeListener() {
@@ -94,8 +93,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
               setIconId((String) v);
             }
           }
-        }
-        );
+        });
   }
 
   /**
@@ -184,7 +182,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
     return m_outline;
   }
 
-  protected static class LocalOutlineViewButtonExtension<OWNER extends AbstractOutlineViewButton> extends LocalViewButtonExtension<OWNER> implements IOutlineViewButtonExtension<OWNER> {
+  protected static class LocalOutlineViewButtonExtension<OWNER extends AbstractOutlineViewButton> extends LocalViewButtonExtension<OWNER>implements IOutlineViewButtonExtension<OWNER> {
 
     public LocalOutlineViewButtonExtension(OWNER owner) {
       super(owner);

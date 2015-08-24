@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- package org.eclipse.scout.rt.server.services.common.jdbc.fixture;
+package org.eclipse.scout.rt.server.services.common.jdbc.fixture;
 
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 

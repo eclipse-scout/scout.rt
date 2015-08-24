@@ -14,8 +14,7 @@ import org.eclipse.scout.rt.server.scheduler.internal.visitor.IEvalVisitor;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.IFormatVisitor;
 
 /**
- * always returns the referenced value except the method getReference() return
- * the reference itself
+ * always returns the referenced value except the method getReference() return the reference itself
  */
 public class SignalRef extends AbstractNode implements INode {
   public static final int SECOND = 1;

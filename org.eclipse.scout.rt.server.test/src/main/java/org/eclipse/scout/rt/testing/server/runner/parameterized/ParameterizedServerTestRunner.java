@@ -27,9 +27,8 @@ import org.junit.runners.model.Statement;
 
 /**
  * Parameterized form of {@link ServerTestRunner}. <br/>
- * <b>Note:</b>
- * The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method, but it is no
- * invoked within an {@link IServerSession} context.<br/>
+ * <b>Note:</b> The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method, but it
+ * is no invoked within an {@link IServerSession} context.<br/>
  * <b>Example:</b>
  *
  * <pre>

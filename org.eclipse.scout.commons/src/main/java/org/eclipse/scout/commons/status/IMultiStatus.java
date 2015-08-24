@@ -20,8 +20,8 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 public interface IMultiStatus extends IStatus {
 
   /**
-   * Returns a list of status objects immediately contained in this
-   * multi-status, or an empty list if there are no children available.
+   * Returns a list of status objects immediately contained in this multi-status, or an empty list if there are no
+   * children available.
    * <p>
    * The list of children is sorted from highest to lowest severity ({@link IStatus#ERROR} to {@link IStatus#OK}), then
    * by lowest to highest order (see {@link IOrdered}), then by message.

@@ -23,8 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
- * dont cache table page search form contents, releaseUnusedPages before every page reload and force gc to free
- * memory
+ * dont cache table page search form contents, releaseUnusedPages before every page reload and force gc to free memory
  */
 public class SmallMemoryPolicy extends AbstractMemoryPolicy {
 

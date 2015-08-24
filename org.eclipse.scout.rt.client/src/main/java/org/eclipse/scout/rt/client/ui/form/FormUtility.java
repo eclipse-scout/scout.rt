@@ -26,9 +26,8 @@ public final class FormUtility {
   }
 
   /**
-   * Complete the configurations of the complete field tree of the form. This
-   * method is normally called by the form's constructor after the form
-   * initConfig. This method is normally called before {@link #initFormFields(IForm)}.
+   * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
+   * constructor after the form initConfig. This method is normally called before {@link #initFormFields(IForm)}.
    */
   public static void postInitConfig(IForm form) throws ProcessingException {
     PostInitConfigFieldVisitor v = new PostInitConfigFieldVisitor();
@@ -37,9 +36,9 @@ public final class FormUtility {
   }
 
   /**
-   * Complete the configurations of the complete field tree of the form. This
-   * method is normally called by the form's constructor after the form
-   * initConfig and postInitConfig. This method is normally called before {@link #initFormFields(IForm)}.
+   * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
+   * constructor after the form initConfig and postInitConfig. This method is normally called before
+   * {@link #initFormFields(IForm)}.
    */
   public static void rebuildFieldGrid(IForm form, boolean initMainBoxGridData) throws ProcessingException {
     RebuildFieldGridVisitor v = new RebuildFieldGridVisitor();

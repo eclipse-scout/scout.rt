@@ -158,8 +158,7 @@ public final class BookmarkUtility {
   }
 
   /**
-   * intercept objects that are not remoting-capable or not serializable and
-   * replace by strings
+   * intercept objects that are not remoting-capable or not serializable and replace by strings
    */
   @SuppressWarnings("unchecked")
   public static List<Object> makeSerializableKeys(List<?> a, boolean useLegacySupport) {
@@ -229,8 +228,7 @@ public final class BookmarkUtility {
   }
 
   /**
-   * return String.class for classes that are not remoting-capable or not
-   * serializable
+   * return String.class for classes that are not remoting-capable or not serializable
    */
   public static Class makeSerializableClass(Class c, boolean useLegacySupport) {
     if (c == null) {
@@ -357,13 +355,13 @@ public final class BookmarkUtility {
   }
 
   /**
-   * Constructs a list of {@link TableColumnState} objects which
-   * describe the set of columns of the given {@link ITable}.
+   * Constructs a list of {@link TableColumnState} objects which describe the set of columns of the given {@link ITable}
+   * .
    *
    * @param table
    *          The table with the columns to back-up.
-   * @return A {@link List} of {@link TableColumnState} objects that
-   *         can be restored via {@link #restoreTableColumns(ITable, List)}
+   * @return A {@link List} of {@link TableColumnState} objects that can be restored via
+   *         {@link #restoreTableColumns(ITable, List)}
    */
   public static List<TableColumnState> backupTableColumns(ITable table) {
     ArrayList<TableColumnState> allColumns = new ArrayList<TableColumnState>();
@@ -399,8 +397,8 @@ public final class BookmarkUtility {
    * @param table
    *          The table to be restored.
    * @param oldColumns
-   *          A {@link List} of {@link TableColumnState} objects to
-   *          restore. Such can be retrieved by the {@link #backupTableColumns(ITable)} method.
+   *          A {@link List} of {@link TableColumnState} objects to restore. Such can be retrieved by the
+   *          {@link #backupTableColumns(ITable)} method.
    */
   public static void restoreTableColumns(ITable table, List<TableColumnState> oldColumns) throws ProcessingException {
     if (oldColumns != null && oldColumns.size() > 0 && table != null) {

@@ -46,8 +46,8 @@ public interface ICode<T> extends ITypeWithClassId, IOrdered {
    *
    * @since 4.0
    * @param index
-   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1
-   *          and the codeId did not exist, then the code is appended to the end.
+   *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1 and
+   *          the codeId did not exist, then the code is appended to the end.
    */
   void addChildCodeInternal(int index, ICode<T> code);
 

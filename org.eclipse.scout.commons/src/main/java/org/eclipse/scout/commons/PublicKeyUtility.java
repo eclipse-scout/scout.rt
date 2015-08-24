@@ -42,7 +42,7 @@ public final class PublicKeyUtility {
    * @return two Strings, the public key (index 0) and the private key (index 1)
    * @throws NoSuchAlgorithmException
    */
-  public static byte[][]/* public key/private key */createKeyPair(String keyAlgorithm, int bitSize) throws NoSuchAlgorithmException {
+  public static byte[][]/* public key/private key */ createKeyPair(String keyAlgorithm, int bitSize) throws NoSuchAlgorithmException {
     if (keyAlgorithm == null) {
       keyAlgorithm = "DSA";
     }
@@ -70,7 +70,7 @@ public final class PublicKeyUtility {
    * @throws InvalidKeyException
    * @throws SignatureException
    */
-  public static byte[]/* Signature */sign(byte[] data, byte[] privateKey, String keyAlgorithm, String signAlgorithm) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+  public static byte[]/* Signature */ sign(byte[] data, byte[] privateKey, String keyAlgorithm, String signAlgorithm) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
     if (keyAlgorithm == null) {
       keyAlgorithm = "DSA";
     }
@@ -101,8 +101,7 @@ public final class PublicKeyUtility {
    *          default is DSA
    * @param signAlgorithm
    *          default is SHA1withDSA
-   * @return true if the verification of the signature on data with the public
-   *         key succeeds.
+   * @return true if the verification of the signature on data with the public key succeeds.
    * @throws NoSuchAlgorithmException
    * @throws InvalidKeyException
    * @throws SignatureException

@@ -49,9 +49,8 @@ public final class EventListenerProfiler {
   }
 
   /**
-   * Add a weak reference to a source provider NOTE: the passed argument MUST be
-   * referenced by the source type, otherwise it is garbage collected
-   * immediately after adding
+   * Add a weak reference to a source provider NOTE: the passed argument MUST be referenced by the source type,
+   * otherwise it is garbage collected immediately after adding
    */
   public void registerSourceAsWeakReference(IEventListenerSource source) {
     if (!m_enabled) {

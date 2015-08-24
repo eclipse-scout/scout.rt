@@ -29,8 +29,8 @@ public class TableLoadingPerfTest {
   int TEST_RUN_COUNT = 10;
 
   /**
-   * Tests that adding rows to a table is fast.<b>
-   * Executes tests multiple times to avoid temporary problems with infrastructure.
+   * Tests that adding rows to a table is fast.<b> Executes tests multiple times to avoid temporary problems with
+   * infrastructure.
    */
   @Test
   public void testLoadingMatrix() throws ProcessingException {

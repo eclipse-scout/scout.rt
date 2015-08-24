@@ -47,15 +47,15 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    *            HAVING 1=1 &lt;havingParts/&gt;
    *          &lt;/groupBy&gt;
    *        )
-   * </pre>
+   *          </pre>
    *          <p>
    *          whereParts and havingParts is replaced in the build process by the corresponding attributes with/without
    *          aggregation.
    * @param selectClause
-   *          is the clause to add n attributes of an entity to the base entity.
-   *          This parameter is the join clause used to join the additional entity to the
-   *          base entity in the select part. It must have the form (SELECT <selectParts/> FROM ... ) or a similar form
-   *          containing a <column/> tag and a @parent.TableAlias@.PRIMARY_KEY_ID
+   *          is the clause to add n attributes of an entity to the base entity. This parameter is the join clause used
+   *          to join the additional entity to the base entity in the select part. It must have the form (SELECT
+   *          <selectParts/> FROM ... ) or a similar form containing a <column/> tag and
+   *          a @parent.TableAlias@.PRIMARY_KEY_ID
    *          <p>
    *          Example for a Person-Contact-Entity-join select-clause:
    *
@@ -68,7 +68,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    *  GROUP BY &lt;groupByParts/&gt;
    *   HAVING 1=1 &lt;havingParts/&gt;
    *  &lt;/groupBy&gt;
-   * </pre>
+   *          </pre>
    *          <p>
    */
   public DataModelEntityPartDefinition(Class<? extends IDataModelEntity> entityType, String whereClause, String selectClause) {

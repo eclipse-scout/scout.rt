@@ -18,9 +18,8 @@ public class WizardEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 
   /**
-   * One or more of the following changes occured (state machine) State
-   * transition has occured, next step was activated (but not run) History has
-   * changed Expected future has changed
+   * One or more of the following changes occured (state machine) State transition has occured, next step was activated
+   * (but not run) History has changed Expected future has changed
    */
   public static final int TYPE_STATE_CHANGED = 10;
 

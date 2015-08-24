@@ -17,8 +17,7 @@ import java.lang.annotation.Target;
 
 /**
  * In order to annotate fields that are not accessible (for example in subclassed types) this annotation can be placed
- * on a phantom field
- * together with validations. These validations are then applied to the referenced field instead.
+ * on a phantom field together with validations. These validations are then applied to the referenced field instead.
  * <p>
  * Example:
  * 

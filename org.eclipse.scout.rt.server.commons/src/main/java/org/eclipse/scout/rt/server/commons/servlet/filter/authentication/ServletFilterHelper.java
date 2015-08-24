@@ -86,8 +86,7 @@ public class ServletFilterHelper {
               chain.doFilter(secureReq, res);
               return null;
             }
-          }
-          );
+          });
     }
     catch (PrivilegedActionException e) {
       Throwable t = e.getCause();

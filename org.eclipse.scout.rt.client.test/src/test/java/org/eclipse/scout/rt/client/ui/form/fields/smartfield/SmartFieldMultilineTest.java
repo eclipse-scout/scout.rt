@@ -72,9 +72,8 @@ public class SmartFieldMultilineTest {
   }
 
   /**
-   * Tests if the text of a multiline lookup row which is the currentLookupRow
-   * matches the displayText of the field. Otherwise we'd always get a validation
-   * error for this field, even when the user has just selected a valid proposal
+   * Tests if the text of a multiline lookup row which is the currentLookupRow matches the displayText of the field.
+   * Otherwise we'd always get a validation error for this field, even when the user has just selected a valid proposal
    * from the proposal chooser.
    */
   @Test

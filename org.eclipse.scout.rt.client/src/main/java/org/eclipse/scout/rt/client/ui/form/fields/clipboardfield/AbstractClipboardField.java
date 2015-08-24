@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * Clipboard field to receive paste events, e.g. can be used where a paste event must be triggered on a specific field
  * to be caught.
  */
-public abstract class AbstractClipboardField extends AbstractValueField<Collection<BinaryResource>> implements IClipboardField {
+public abstract class AbstractClipboardField extends AbstractValueField<Collection<BinaryResource>>implements IClipboardField {
 
   public AbstractClipboardField() {
     this(true);
@@ -126,7 +126,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
     }
   }
 
-  protected static class LocalClipboardFieldExtension<OWNER extends AbstractClipboardField> extends LocalValueFieldExtension<Collection<BinaryResource>, OWNER> implements IClipboardFieldExtension<OWNER> {
+  protected static class LocalClipboardFieldExtension<OWNER extends AbstractClipboardField> extends LocalValueFieldExtension<Collection<BinaryResource>, OWNER>implements IClipboardFieldExtension<OWNER> {
 
     public LocalClipboardFieldExtension(OWNER owner) {
       super(owner);

@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  * as a scout swing fragment under epl.
  */
 @ClassId("4c022ea1-a522-43a5-b603-954d9cb8705c")
-public abstract class AbstractDocumentField extends AbstractValueField<RemoteFile> implements IDocumentField {
+public abstract class AbstractDocumentField extends AbstractValueField<RemoteFile>implements IDocumentField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDocumentField.class);
 
   private final EventListenerList m_listenerList = new EventListenerList();
@@ -225,7 +225,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     chain.execComReadyStatusChanged(ready);
   }
 
-  protected static class LocalDocumentFieldExtension<OWNER extends AbstractDocumentField> extends LocalValueFieldExtension<RemoteFile, OWNER> implements IDocumentFieldExtension<OWNER> {
+  protected static class LocalDocumentFieldExtension<OWNER extends AbstractDocumentField> extends LocalValueFieldExtension<RemoteFile, OWNER>implements IDocumentFieldExtension<OWNER> {
 
     public LocalDocumentFieldExtension(OWNER owner) {
       super(owner);

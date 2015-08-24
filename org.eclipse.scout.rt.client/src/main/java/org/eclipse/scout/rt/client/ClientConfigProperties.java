@@ -28,8 +28,6 @@ public final class ClientConfigProperties {
    */
   public static class MemoryPolicyProperty extends AbstractStringConfigProperty {
 
-
-
     @Override
     protected String parse(String value) {
       String p = super.parse(value);
@@ -55,8 +53,6 @@ public final class ClientConfigProperties {
    * @see FileSystemUserPreferencesStorageService
    */
   public static class UserAreaProperty extends AbstractStringConfigProperty {
-
-
 
     @Override
     public String getKey() {

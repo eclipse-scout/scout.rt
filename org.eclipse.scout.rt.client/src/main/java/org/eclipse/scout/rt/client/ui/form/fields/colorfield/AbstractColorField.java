@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public abstract class AbstractColorField extends AbstractBasicField<String> implements IColorField {
+public abstract class AbstractColorField extends AbstractBasicField<String>implements IColorField {
   private IBasicFieldUIFacade m_uiFacade;
 
   protected static final Pattern RGB_COLOR_PATTERN = Pattern.compile("^([0-9]{1,3})[\\-\\,\\;\\/\\\\\\s]{1}([0-9]{1,3})[\\-\\,\\;\\/\\\\\\s]{1}([0-9]{1,3})$");
@@ -91,7 +91,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
     propertySupport.setPropertyString(PROP_ICON_ID, s);
   }
 
-  protected static class LocalColorFieldExtension<OWNER extends AbstractColorField> extends LocalBasicFieldExtension<String, OWNER> implements IColorFieldExtension<OWNER> {
+  protected static class LocalColorFieldExtension<OWNER extends AbstractColorField> extends LocalBasicFieldExtension<String, OWNER>implements IColorFieldExtension<OWNER> {
 
     public LocalColorFieldExtension(OWNER owner) {
       super(owner);

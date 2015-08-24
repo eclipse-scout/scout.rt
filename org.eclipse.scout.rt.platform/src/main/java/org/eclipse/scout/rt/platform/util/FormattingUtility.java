@@ -25,8 +25,8 @@ public final class FormattingUtility {
   }
 
   /**
-   * Formats the given object respecting the current thread's {@link NlsLocale} and converts it to a String.
-   * Supported types are:
+   * Formats the given object respecting the current thread's {@link NlsLocale} and converts it to a String. Supported
+   * types are:
    * <ul>
    * <li>{@link String}</li>
    * <li>{@link java.util.Date} with empty time part is formatted using {@link java.text.DateFormat#MEDIUM}

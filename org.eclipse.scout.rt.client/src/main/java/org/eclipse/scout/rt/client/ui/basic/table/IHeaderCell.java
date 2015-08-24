@@ -17,8 +17,7 @@ public interface IHeaderCell {
   int getColumnIndex();
 
   /**
-   * When doing single column sort, all previous columns are kept as implicit
-   * history and are marked sortExplicit=false
+   * When doing single column sort, all previous columns are kept as implicit history and are marked sortExplicit=false
    * <p>
    * When doing multi-column sort, all columns are kept as explicit history and are marked sortExplicit=true
    */
@@ -29,11 +28,9 @@ public interface IHeaderCell {
   boolean isSortActive();
 
   /**
-   * @return true if column is either a permanent head sort column or a
-   *         permanent tail sort column.<br>
-   *         This means that the column remains sort column unlesss explicitly
-   *         removed using {@link ColumnSet#clearPermanentHeadSortColumns()} or
-   *         {@link ColumnSet#clearPermanentTailSortColumns()}
+   * @return true if column is either a permanent head sort column or a permanent tail sort column.<br>
+   *         This means that the column remains sort column unlesss explicitly removed using
+   *         {@link ColumnSet#clearPermanentHeadSortColumns()} or {@link ColumnSet#clearPermanentTailSortColumns()}
    */
   boolean isSortPermanent();
 

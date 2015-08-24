@@ -15,8 +15,8 @@ package org.eclipse.scout.commons.holders;
  */
 
 /**
- * Holder for table data value access of columns is done by Bean introspection
- * column methods must have a rowIndex argument, see example comment below
+ * Holder for table data value access of columns is done by Bean introspection column methods must have a rowIndex
+ * argument, see example comment below
  */
 public interface ITableHolder {
   /**
@@ -44,7 +44,7 @@ public interface ITableHolder {
    */
   int STATUS_DELETED = 3;
 
-  int/* newIndex */addRow();
+  int/* newIndex */ addRow();
 
   void ensureSize(int size);
 

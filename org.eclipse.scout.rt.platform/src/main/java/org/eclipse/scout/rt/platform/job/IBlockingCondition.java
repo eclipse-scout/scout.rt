@@ -45,8 +45,8 @@ public interface IBlockingCondition {
    * @throws ProcessingException
    *           <ul>
    *           <li>if this thread was interrupted while waiting for this condition to fall; see
-   *           {@link ProcessingException#isInterruption()}</li> <li>if being a mutually exclusive job and the mutex
-   *           could not be acquired anew upon unblocking</li>
+   *           {@link ProcessingException#isInterruption()}</li>
+   *           <li>if being a mutually exclusive job and the mutex could not be acquired anew upon unblocking</li>
    *           </ul>
    */
   void waitFor() throws ProcessingException;
@@ -68,8 +68,8 @@ public interface IBlockingCondition {
    * @throws ProcessingException
    *           <ul>
    *           <li>if this thread was interrupted while waiting for this condition to fall; see
-   *           {@link ProcessingException#isInterruption()}</li> <li>if being a mutually exclusive job and the mutex
-   *           could not be acquired anew upon unblocking</li>
+   *           {@link ProcessingException#isInterruption()}</li>
+   *           <li>if being a mutually exclusive job and the mutex could not be acquired anew upon unblocking</li>
    *           </ul>
    */
   boolean waitFor(long timeout, TimeUnit unit) throws ProcessingException;

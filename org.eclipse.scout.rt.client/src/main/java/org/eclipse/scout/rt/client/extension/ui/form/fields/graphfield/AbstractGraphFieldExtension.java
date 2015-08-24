@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.GraphFiel
 import org.eclipse.scout.rt.client.ui.form.fields.graphfield.AbstractGraphField;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 
-public abstract class AbstractGraphFieldExtension<OWNER extends AbstractGraphField> extends AbstractValueFieldExtension<GraphModel, OWNER> implements IGraphFieldExtension<OWNER> {
+public abstract class AbstractGraphFieldExtension<OWNER extends AbstractGraphField> extends AbstractValueFieldExtension<GraphModel, OWNER>implements IGraphFieldExtension<OWNER> {
 
   public AbstractGraphFieldExtension(OWNER owner) {
     super(owner);

@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  * A <code>RunMonitor</code> provides cancellation support for operations typically running on behalf of a
- * {@link RunContext}. By default, when {@link RunContexts#copyCurrent() copying} the current RunContext to run
- * some operations on behalf, a new {@link RunMonitor} is created and registered as child monitor in the monitor of the
+ * {@link RunContext}. By default, when {@link RunContexts#copyCurrent() copying} the current RunContext to run some
+ * operations on behalf, a new {@link RunMonitor} is created and registered as child monitor in the monitor of the
  * current calling context to allow nested cancellation. However, if that child monitor is cancelled, cancellation is
  * not propagated to the parent monitors.
  * <p>

@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
-
 /**
  * Allows to get inventory information about services.
  */
 public interface IServiceInventory {
 
   /**
-   * @return plain or html styled text describing the current inventory of the
-   *         service
+   * @return plain or html styled text describing the current inventory of the service
    */
   String getInventory();
 

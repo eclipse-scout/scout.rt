@@ -31,8 +31,8 @@ public interface IProcessingStatus extends IStatus {
   String getBody();
 
   /**
-   * Returns a list of context informations that were collected while the
-   * exception was traveling from its origin to the handler
+   * Returns a list of context informations that were collected while the exception was traveling from its origin to the
+   * handler
    *
    * @return a list of localized context messages
    */

@@ -14,8 +14,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 /**
- * This service creates a lookup call for a code type.
- * It can be used to create custom {@link CodeLookupCall} instances.
+ * This service creates a lookup call for a code type. It can be used to create custom {@link CodeLookupCall} instances.
  * <p>
  * Known callers are {@link ISmartField}, {@link IListBox}, {@link ITreeBox}, {@link IRadioButtonGroup},
  * {@link ISmartColumn}

@@ -95,7 +95,8 @@ public class TickSignal {
   }
 
   public String getTextLong() {
-    return formatAsDoubleDigit(m_day) + "." + formatAsDoubleDigit(m_month) + "." + m_year + " " + formatAsDoubleDigit(m_hour) + ":" + formatAsDoubleDigit(m_minute) + ":" + formatAsDoubleDigit(m_second) + " dayOfWeek=" + m_dayOfWeek + " dayOfMonthReverse=" + m_dayOfMonthReverse + " week=" + m_week + " dayOfYear=" + m_dayOfYear;
+    return formatAsDoubleDigit(m_day) + "." + formatAsDoubleDigit(m_month) + "." + m_year + " " + formatAsDoubleDigit(m_hour) + ":" + formatAsDoubleDigit(m_minute) + ":" + formatAsDoubleDigit(m_second) + " dayOfWeek=" + m_dayOfWeek
+        + " dayOfMonthReverse=" + m_dayOfMonthReverse + " week=" + m_week + " dayOfYear=" + m_dayOfYear;
   }
 
   @Override

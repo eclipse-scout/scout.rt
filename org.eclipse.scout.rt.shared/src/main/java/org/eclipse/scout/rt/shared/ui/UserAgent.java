@@ -18,10 +18,9 @@ import org.eclipse.scout.commons.ConfigUtility;
 /**
  * Holds information about the kind of user interface used on the client side like {@link IUiLayer} and
  * {@link IUiDeviceType}. <br/>
- * There is also a device id ({@link UserAgent#getUiDeviceId()} which holds even more
- * information about the used device. As default it only provides information about the underlying operation system. In
- * case of a web based ui {@link IUiLayer#isWebUi()} it provides the original user agent string containing information
- * about the browser.
+ * There is also a device id ({@link UserAgent#getUiDeviceId()} which holds even more information about the used device.
+ * As default it only provides information about the underlying operation system. In case of a web based ui
+ * {@link IUiLayer#isWebUi()} it provides the original user agent string containing information about the browser.
  * <p>
  * In order to export the user agent data as string you can use {@link #createIdentifier()} which uses
  * {@link DefaultUserAgentParser}. If you would like to export it in a custom format just create a custom

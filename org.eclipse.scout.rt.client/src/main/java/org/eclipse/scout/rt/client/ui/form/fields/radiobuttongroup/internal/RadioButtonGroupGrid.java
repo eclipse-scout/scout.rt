@@ -20,8 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 
 /**
- * Grid (model) layout of radio button group only visible process-buttons are
- * used
+ * Grid (model) layout of radio button group only visible process-buttons are used
  */
 public class RadioButtonGroupGrid {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RadioButtonGroupGrid.class);

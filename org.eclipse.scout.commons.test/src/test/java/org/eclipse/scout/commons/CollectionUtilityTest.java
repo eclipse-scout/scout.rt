@@ -117,6 +117,7 @@ public class CollectionUtilityTest {
     // one element
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
       private static final long serialVersionUID = 1L;
+
       {
         add(1L);
       }
@@ -124,6 +125,7 @@ public class CollectionUtilityTest {
     // two elements
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
       private static final long serialVersionUID = 1L;
+
       {
         add(1L);
         add(2L);
@@ -132,6 +134,7 @@ public class CollectionUtilityTest {
     // many elements
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
       private static final long serialVersionUID = 1L;
+
       {
         add(1L);
         add(2L);

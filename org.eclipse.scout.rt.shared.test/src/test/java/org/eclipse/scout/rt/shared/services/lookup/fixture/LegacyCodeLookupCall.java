@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  *
  * @see CodeLookupCallTest
  */
-public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_TYPE> implements Serializable {
+public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_TYPE>implements Serializable {
   private static final long serialVersionUID = 0L;
 
   private Class<? extends ICodeType<?, CODE_ID_TYPE>> m_codeTypeClass;

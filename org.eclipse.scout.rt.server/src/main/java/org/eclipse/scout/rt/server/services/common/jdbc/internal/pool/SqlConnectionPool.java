@@ -25,9 +25,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 
 /**
- * System-wide connection pool for pooling connections There is one pool for
- * every ISqlService sub class type If possible, every scout Session is provided
- * with always the same connection it had in the last request this class is
+ * System-wide connection pool for pooling connections There is one pool for every ISqlService sub class type If
+ * possible, every scout Session is provided with always the same connection it had in the last request this class is
  * thread-safe
  */
 public final class SqlConnectionPool {

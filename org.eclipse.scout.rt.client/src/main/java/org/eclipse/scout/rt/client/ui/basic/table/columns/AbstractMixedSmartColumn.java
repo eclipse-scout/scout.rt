@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> implements IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>, IContributionOwner {
+public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>implements IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>, IContributionOwner {
   private boolean m_sortCodesByDisplayText;
   private IContributionOwner m_contributionHolder;
 
@@ -76,10 +76,10 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
   }
 
   /**
-   * When the smart proposal finds no matching records and this property is not
-   * null, then it displays a link or menu with this label.<br>
-   * When clicked the method {@link AbstractSmartField#execBrowseNew(String)} is invoked, which in
-   * most cases is implemented as opening a "New XY..." dialog
+   * When the smart proposal finds no matching records and this property is not null, then it displays a link or menu
+   * with this label.<br>
+   * When clicked the method {@link AbstractSmartField#execBrowseNew(String)} is invoked, which in most cases is
+   * implemented as opening a "New XY..." dialog
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(315)
@@ -197,7 +197,8 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
     return chain.execConvertKeyToValue(key);
   }
 
-  protected static class LocalMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, OWNER extends AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>> extends LocalContentAssistColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, OWNER> implements IMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, OWNER> {
+  protected static class LocalMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, OWNER extends AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>>
+      extends LocalContentAssistColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, OWNER>implements IMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, OWNER> {
 
     public LocalMixedSmartColumnExtension(OWNER owner) {
       super(owner);

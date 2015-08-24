@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.security;
 
-
 /**
- * Notification is sent from server to client to notify that the code type has
- * changed and the client should clear its cache
+ * Notification is sent from server to client to notify that the code type has changed and the client should clear its
+ * cache
  */
 public class ResetAccessControlChangedNotification implements IAccessControlNotification {
   private static final long serialVersionUID = 1L;

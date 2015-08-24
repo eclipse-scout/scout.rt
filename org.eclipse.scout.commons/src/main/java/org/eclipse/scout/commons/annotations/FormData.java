@@ -16,8 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class annotation on a form or form field used in Scout SDK as a marker to
- * manage the FormData.
+ * Class annotation on a form or form field used in Scout SDK as a marker to manage the FormData.
  * <p>
  * The following properties are supported:
  * <table border="1">
@@ -61,7 +60,7 @@ import java.lang.annotation.Target;
  * <td vAlign="top">All subtypes will be ignored in the formdata.</td>
  * </tr>
  * <tr>
- * <td> {@link FormData.DefaultSubtypeSdkCommand#DEFAULT}</td>
+ * <td>{@link FormData.DefaultSubtypeSdkCommand#DEFAULT}</td>
  * <td vAlign="top">Not to use in the code.</td>
  * </tr>
  * <tr>
@@ -153,7 +152,7 @@ public @interface FormData {
 
   int genericOrdinal() default -1;
 
-  Class[] interfaces() default {};
+  Class[]interfaces() default {};
 
   public static enum SdkCommand {
     CREATE, USE, IGNORE, DEFAULT

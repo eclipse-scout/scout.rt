@@ -43,8 +43,8 @@ public class ClientUIPreferences {
   /**
    * @return a new instance of the {@link ClientUIPreferences}
    * @throws IllegalArgumentException
-   *           When no {@link IClientSession} is available in the current thread context
-   *           ({@link ClientSessionThreadLocal}).
+   *           When no {@link IClientSession} is available in the current thread context (
+   *           {@link ClientSessionThreadLocal}).
    */
   public static ClientUIPreferences getInstance() {
     return new ClientUIPreferences(ClientSessionProvider.currentSession());
@@ -109,8 +109,7 @@ public class ClientUIPreferences {
             new Integer(tok.nextToken()).intValue(),
             new Integer(tok.nextToken()).intValue(),
             new Integer(tok.nextToken()).intValue(),
-            new Integer(tok.nextToken()).intValue()
-            );
+            new Integer(tok.nextToken()).intValue());
         return r;
       }
       catch (Exception e) {
@@ -623,8 +622,7 @@ public class ClientUIPreferences {
             new Integer(tok.nextToken()).intValue(),
             new Integer(tok.nextToken()).intValue(),
             new Integer(tok.nextToken()).intValue(),
-            new Integer(tok.nextToken()).intValue()
-            );
+            new Integer(tok.nextToken()).intValue());
         return r;
       }
       catch (Exception e) {

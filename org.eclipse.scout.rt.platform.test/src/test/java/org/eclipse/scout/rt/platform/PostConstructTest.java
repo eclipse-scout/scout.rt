@@ -40,9 +40,9 @@ public class PostConstructTest {
   }
 
   /**
-   * Tests if an initialize method (annotated with @PostConstruct) is called when a bean gets instanciated.
-   * An singleton (annotated with @ApplicationScoped) is only created once therefore the initialze method is also only
-   * called once on several lookups.
+   * Tests if an initialize method (annotated with @PostConstruct) is called when a bean gets instanciated. An singleton
+   * (annotated with @ApplicationScoped) is only created once therefore the initialze method is also only called once on
+   * several lookups.
    */
   @Test
   public void testInitialize() {

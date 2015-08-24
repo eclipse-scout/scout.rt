@@ -11,9 +11,8 @@
 package org.eclipse.scout.rt.shared.security;
 
 /**
- * This exception is thrown by {@link BasicHierarchyPermission#implies(java.security.Permission)} when
- * fine-grained access has to be calculated (on backend) but the permission
- * check is done in the frontend (by a service proxy) The
+ * This exception is thrown by {@link BasicHierarchyPermission#implies(java.security.Permission)} when fine-grained
+ * access has to be calculated (on backend) but the permission check is done in the frontend (by a service proxy) The
  * {@link org.eclipse.scout.rt.shared.services.common.security.bsiag.service.ac.IAccessControlService} proxy will then
  * delegate the check to the backend
  */

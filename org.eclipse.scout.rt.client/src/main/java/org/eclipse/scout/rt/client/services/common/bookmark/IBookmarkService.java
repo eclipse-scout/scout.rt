@@ -57,8 +57,8 @@ public interface IBookmarkService extends IService {
   void activate(Bookmark bm) throws ProcessingException;
 
   /**
-   * Finds the given bookmark among the user's bookmark and updates it
-   * with the currently visible view (analog to setting start-up view).
+   * Finds the given bookmark among the user's bookmark and updates it with the currently visible view (analog to
+   * setting start-up view).
    */
   void updateBookmark(Bookmark bm) throws ProcessingException;
 

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-
 /**
  * convenience subclass of {@link AbstractDateColumn} with hasDate=false and hasTime=true
  */

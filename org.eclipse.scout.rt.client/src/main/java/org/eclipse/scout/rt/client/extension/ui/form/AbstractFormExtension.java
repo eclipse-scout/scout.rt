@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-public abstract class AbstractFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM> implements IFormExtension<FORM> {
+public abstract class AbstractFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM>implements IFormExtension<FORM> {
 
   public AbstractFormExtension(FORM ownerForm) {
     super(ownerForm);

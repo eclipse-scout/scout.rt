@@ -17,16 +17,14 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * Code types are dynamic enumerations used in front- and back-end. <br>
- * A code type may (must not) contain codes divided into different partitions
- * (german: Mandanten) using the partitionId. <br>
- * If partitions are used, a context contains to a certain partition and
- * receives only his codes.
+ * A code type may (must not) contain codes divided into different partitions (german: Mandanten) using the partitionId.
+ * <br>
+ * If partitions are used, a context contains to a certain partition and receives only his codes.
  */
 public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITypeWithClassId {
 
   /**
-   * property into ISharedContextService's Map to get default partitionId of
-   * current Subject / User
+   * property into ISharedContextService's Map to get default partitionId of current Subject / User
    */
   String PROP_PARTITION_ID = "partitionId";
 
@@ -62,15 +60,13 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITy
 
   /**
    * @return the index (starting at 0) of this code, -1 when not found <br>
-   *         When the code type is a tree, the top-down-left-right traversal
-   *         index is used
+   *         When the code type is a tree, the top-down-left-right traversal index is used
    */
   int getCodeIndex(final CODE_ID id);
 
   /**
    * @return the index (starting at 0) of this code, -1 when not found <br>
-   *         When the code type is a tree, the top-down-left-right traversal
-   *         index is used
+   *         When the code type is a tree, the top-down-left-right traversal index is used
    */
   int getCodeIndex(final ICode<CODE_ID> c);
 

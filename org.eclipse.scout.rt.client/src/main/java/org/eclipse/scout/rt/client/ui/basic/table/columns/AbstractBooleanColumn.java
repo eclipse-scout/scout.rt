@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
  * Column holding Boolean values
  */
 @ClassId("62fcae6b-6b75-4e8c-bb3f-ea3b400e7e30")
-public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> implements IBooleanColumn {
+public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean>implements IBooleanColumn {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -114,7 +114,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
     return -1; // top position
   }
 
-  protected static class LocalBooleanColumnExtension<OWNER extends AbstractBooleanColumn> extends LocalColumnExtension<Boolean, OWNER> implements IBooleanColumnExtension<OWNER> {
+  protected static class LocalBooleanColumnExtension<OWNER extends AbstractBooleanColumn> extends LocalColumnExtension<Boolean, OWNER>implements IBooleanColumnExtension<OWNER> {
 
     public LocalBooleanColumnExtension(OWNER owner) {
       super(owner);

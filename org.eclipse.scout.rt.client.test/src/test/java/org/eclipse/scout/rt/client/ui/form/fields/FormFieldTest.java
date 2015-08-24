@@ -264,8 +264,8 @@ public class FormFieldTest {
   }
 
   /**
-   * Tests if the property change listener is triggered when setStatusVisible() is called
-   * and if the property value is changed as expected.
+   * Tests if the property change listener is triggered when setStatusVisible() is called and if the property value is
+   * changed as expected.
    */
   @Test
   public void testStatusVisible_setStatusVisible() throws Exception {

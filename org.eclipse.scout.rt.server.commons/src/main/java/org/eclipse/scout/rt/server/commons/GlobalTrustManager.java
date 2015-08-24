@@ -45,9 +45,9 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
  * Factory to create a global {@link TrustManager}. If a certificate is not trusted by the manager, the request is
- * delegates to other installed {@link TrustManager}'s, e.g. the JAVA default keystore cacerts.
- * Trusted certificates should be placed in <i>/externalfiles/certificates/</i>. Please consider that only *.DER
- * certificate files are considered.
+ * delegates to other installed {@link TrustManager}'s, e.g. the JAVA default keystore cacerts. Trusted certificates
+ * should be placed in <i>/externalfiles/certificates/</i>. Please consider that only *.DER certificate files are
+ * considered.
  */
 @ApplicationScoped
 public class GlobalTrustManager {

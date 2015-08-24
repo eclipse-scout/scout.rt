@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 
 /**
- * An outline button is associated with an {@link IOutline} instance, a click on the
- * button activates the outline on the desktop.
+ * An outline button is associated with an {@link IOutline} instance, a click on the button activates the outline on the
+ * desktop.
  */
 @ClassId("b235fb65-6b50-4870-895a-f8a26ee41c96")
 public abstract class AbstractOutlineButton extends AbstractButton {
@@ -113,8 +113,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
                 }
               }
             }
-          }
-          );
+          });
       // add change listener
       m_outline.addPropertyChangeListener(
           new PropertyChangeListener() {
@@ -135,14 +134,13 @@ public abstract class AbstractOutlineButton extends AbstractButton {
                 setIconId((String) v);
               }
             }
-          }
-          );
+          });
     }
   }
 
   /**
-   * Activates the outline associated with this outline button (i.e. sets
-   * the outline as the active outline on the desktop) if {@code selected} is {@code true}, does nothing otherwise.
+   * Activates the outline associated with this outline button (i.e. sets the outline as the active outline on the
+   * desktop) if {@code selected} is {@code true}, does nothing otherwise.
    *
    * @param selected
    *          the state of the toggle button

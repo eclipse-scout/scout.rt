@@ -101,10 +101,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   /**
    * Configures the border visibility for this group box. <br>
-   * If the property is set to true, a border will be displayed
-   * around the group box. The style of the border is configured by {@link #getConfiguredBorderDecoration()}.<br>
-   * If the
-   * property is set to false, no border will be displayed and the margin reserved for the border will be removed.
+   * If the property is set to true, a border will be displayed around the group box. The style of the border is
+   * configured by {@link #getConfiguredBorderDecoration()}.<br>
+   * If the property is set to false, no border will be displayed and the margin reserved for the border will be
+   * removed.
    * <p>
    * <b>Hint:</b> Keep in mind that setting the border to invisible also removes the margin which could lead to a
    * misalignment of the fields if several group boxes are used on a form. In order to preserve the correct alignment
@@ -646,7 +646,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     }
   }
 
-  protected static class LocalGroupBoxExtension<OWNER extends AbstractGroupBox> extends LocalCompositeFieldExtension<OWNER> implements IGroupBoxExtension<OWNER> {
+  protected static class LocalGroupBoxExtension<OWNER extends AbstractGroupBox> extends LocalCompositeFieldExtension<OWNER>implements IGroupBoxExtension<OWNER> {
 
     public LocalGroupBoxExtension(OWNER owner) {
       super(owner);

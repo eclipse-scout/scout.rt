@@ -93,8 +93,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   /**
-   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 3.10.0-M4
    */
@@ -553,8 +553,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   /**
-   * Method is called in case the raw value is null.
-   * This method may be overridden by subclass in order to provide a different formatted value for null values.
+   * Method is called in case the raw value is null. This method may be overridden by subclass in order to provide a
+   * different formatted value for null values.
    *
    * @return null
    */
@@ -689,8 +689,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * <li>{@link DataModelConstants#TYPE_NUMBER_TREE}</li>
    * <li>{@link DataModelConstants#TYPE_SMART}</li>
    * </ul>
-   * If whether code type class nor lookup call is set, the return value will be null.
-   * The method does not throw an exception. In case of failure, the return value is the empty string.
+   * If whether code type class nor lookup call is set, the return value will be null. The method does not throw an
+   * exception. In case of failure, the return value is the empty string.
    *
    * @param rawValue
    *          Raw value to format
@@ -774,7 +774,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER> implements IDataModelAttributeExtension<OWNER> {
+  protected static class LocalDataModelAttributeExtension<OWNER extends AbstractDataModelAttribute> extends AbstractSerializableExtension<OWNER>implements IDataModelAttributeExtension<OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalDataModelAttributeExtension(OWNER owner) {

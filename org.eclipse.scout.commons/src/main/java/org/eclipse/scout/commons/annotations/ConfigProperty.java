@@ -180,8 +180,7 @@ public @interface ConfigProperty {
    */
   String VERTICAL_ALIGNMENT = "VERTICAL_ALIGNMENT";
   /**
-   * Fully qualified class name of a ISwingChartProvider class with bundle
-   * symbolic name prefix<br>
+   * Fully qualified class name of a ISwingChartProvider class with bundle symbolic name prefix<br>
    */
   String CHART_QNAME = "CHART_QNAME";
   /**
@@ -198,8 +197,7 @@ public @interface ConfigProperty {
    */
   String MENU_CLASS = "MENU_CLASS";
   /**
-   * Class&lt;?&gt; but must be a primitive wrapper type: String, Double, Float,
-   * Long, Integer, Byte
+   * Class&lt;?&gt; but must be a primitive wrapper type: String, Double, Float, Long, Integer, Byte
    */
   String PRIMITIVE_TYPE = "PRIMITIVE_TYPE";
   /**

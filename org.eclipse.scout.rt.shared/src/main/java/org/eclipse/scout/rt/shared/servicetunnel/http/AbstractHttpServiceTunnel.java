@@ -95,9 +95,8 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
    * @param call
    *          the original call
    * @param callData
-   *          the data created by the {@link IServiceTunnelContentHandler} used
-   *          by this tunnel Create url connection and write post data (if
-   *          required)
+   *          the data created by the {@link IServiceTunnelContentHandler} used by this tunnel Create url connection and
+   *          write post data (if required)
    * @throws IOException
    *           override this method to customize the creation of the {@link URLConnection} see
    *           {@link #addCustomHeaders(URLConnection, String)}
@@ -161,9 +160,8 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * @return msgEncoder used to encode and decode a request / response to and
-   *         from the binary stream. Default is the {@link DefaultServiceTunnelContentHandler} which handles soap style
-   *         messages
+   * @return msgEncoder used to encode and decode a request / response to and from the binary stream. Default is the
+   *         {@link DefaultServiceTunnelContentHandler} which handles soap style messages
    */
   public IServiceTunnelContentHandler getContentHandler() {
     return m_contentHandler;
@@ -171,9 +169,8 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
 
   /**
    * @param msgEncoder
-   *          that can encode and decode a request / response to and from the
-   *          binary stream. Default is the {@link DefaultServiceTunnelContentHandler} which handles soap
-   *          style messages
+   *          that can encode and decode a request / response to and from the binary stream. Default is the
+   *          {@link DefaultServiceTunnelContentHandler} which handles soap style messages
    */
   public void setContentHandler(IServiceTunnelContentHandler e) {
     m_contentHandler = e;
@@ -246,9 +243,8 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * This method is called just after the http response is received but before
-   * the http response is processed by scout. This might be used to read and
-   * interpret custom http headers.
+   * This method is called just after the http response is received but before the http response is processed by scout.
+   * This might be used to read and interpret custom http headers.
    *
    * @since 06.07.2009
    */

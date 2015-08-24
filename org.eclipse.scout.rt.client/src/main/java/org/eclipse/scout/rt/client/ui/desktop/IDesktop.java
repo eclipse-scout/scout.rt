@@ -185,8 +185,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void activateForm(IForm form);
 
   /**
-   * sets the given outline on desktop
-   * and brings its content to front
+   * sets the given outline on desktop and brings its content to front
    */
   void activateOutline(IOutline outline);
 
@@ -267,8 +266,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @param displayParent
    *          'displayParent' like {@link IDesktop}, {@link IOutline} or {@link IForm}.
    * @param includeChildDialogs
-   *          <code>true</code> to include child dialogs, or <code>false</code> to only
-   *          include direct children of the
+   *          <code>true</code> to include child dialogs, or <code>false</code> to only include direct children of the
    *          given {@link IDisplayParent}.
    */
   List<IForm> getDialogs(IDisplayParent displayParent, boolean includeChildDialogs);
@@ -293,8 +291,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Removes the given {@link IForm} from the Form's {@link IDisplayParent} and hides it. However, the form is not
-   * closed,
-   * meaning that it can be added anew in order to be displayed.
+   * closed, meaning that it can be added anew in order to be displayed.
    *
    * @deprecated use {@link #hideForm(IForm)}; will be removed in version 6.1.
    */
@@ -303,8 +300,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Removes the given {@link IForm} from its {@link IDisplayParent} and hides it. However, the form is not closed,
-   * meaning that it can be added anew in order to be displayed. This method has no effect if the {@link IForm} is
-   * not showing.
+   * meaning that it can be added anew in order to be displayed. This method has no effect if the {@link IForm} is not
+   * showing.
    */
   void hideForm(IForm form);
 
@@ -356,8 +353,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void removeMessageBox(IMessageBox messageBox);
 
   /**
-   * Removes the given {@link IMessageBox} from its {@link IDisplayParent} and hides it. However, the message box is
-   * not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the
+   * Removes the given {@link IMessageBox} from its {@link IDisplayParent} and hides it. However, the message box is not
+   * closed, meaning that it can be added anew in order to be displayed. This method has no effect if the
    * {@link IMessageBox} is not showing.
    */
   void hideMessageBox(IMessageBox messageBox);
@@ -394,8 +391,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Call this method to refresh all existing pages in all outlines<br>
-   * If currently active page(s) are affected they reload their data, otherwise
-   * the pages is simply marked dirty and reloaded on next activation
+   * If currently active page(s) are affected they reload their data, otherwise the pages is simply marked dirty and
+   * reloaded on next activation
    */
   void refreshPages(List<Class<? extends IPage>> pages);
 
@@ -467,8 +464,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException;
 
   /**
-   * Unload and release unused pages in all outlines, such as closed and
-   * non-selected nodes
+   * Unload and release unused pages in all outlines, such as closed and non-selected nodes
    */
   void releaseUnusedPages();
 
@@ -623,8 +619,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void showFileChooser(IFileChooser fileChooser);
 
   /**
-   * Removes the given {@link IFileChooser} from its {@link IDisplayParent} and hides it. However, the file chooser
-   * is not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the file
+   * Removes the given {@link IFileChooser} from its {@link IDisplayParent} and hides it. However, the file chooser is
+   * not closed, meaning that it can be added anew in order to be displayed. This method has no effect if the file
    * chooser is not showing.
    */
   void hideFileChooser(IFileChooser fileChooser);
@@ -727,8 +723,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Transfers the keyboard focus to the next possible location. The next location is defined as the default focus
-   * traversal
-   * as defined by the UI layer.<br>
+   * traversal as defined by the UI layer.<br>
    * This operation is not supported in the RAP UI!
    *
    * @since 4.0.0
@@ -737,8 +732,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Transfers the keyboard focus to the previous location. The previous location is defined as the default backwards
-   * focus
-   * traversal as defined by the UI layer.<br>
+   * focus traversal as defined by the UI layer.<br>
    * This operation is not supported in the RAP UI!
    *
    * @since 4.0.0

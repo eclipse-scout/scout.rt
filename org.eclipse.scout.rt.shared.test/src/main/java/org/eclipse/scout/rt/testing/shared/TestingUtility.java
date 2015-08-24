@@ -179,7 +179,8 @@ public final class TestingUtility {
     if (beanData == null) {
       return null;
     }
-    Assertions.assertFalse(Mockito.mockingDetails(beanData.getBeanClazz()).isMock() && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]", beanData.getBeanClazz());
+    Assertions.assertFalse(Mockito.mockingDetails(beanData.getBeanClazz()).isMock() && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]",
+        beanData.getBeanClazz());
     if (beanData.getBeanAnnotation(Order.class) == null) {
       beanData.withOrder(TESTING_BEAN_ORDER);
     }

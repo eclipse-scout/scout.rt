@@ -38,15 +38,15 @@ public final class StringUtility {
   private static final String[] EMPTY_ARRAY = new String[0];
 
   public interface ITagProcessor {
-    String/* tagReplacement */processTag(String tagName, String tagContent);
+    String/* tagReplacement */ processTag(String tagName, String tagContent);
   }
 
   private StringUtility() {
   }
 
   /**
-   * Checks whether a given string is {@code null} or empty. A string is considered empty if it
-   * equals the empty string "" (internally this method checks whether the string length is 0).
+   * Checks whether a given string is {@code null} or empty. A string is considered empty if it equals the empty string
+   * "" (internally this method checks whether the string length is 0).
    *
    * @param s
    *          the string to be checked
@@ -58,9 +58,8 @@ public final class StringUtility {
 
   /**
    * Checks whether the given {@link CharSequence} contains visible characters. <br>
-   * More formally:
-   * Checks whether the given {@link CharSequence} contains at least one character bigger than the whitespace character:
-   * '\u0020'.
+   * More formally: Checks whether the given {@link CharSequence} contains at least one character bigger than the
+   * whitespace character: '\u0020'.
    *
    * @param s
    *          The {@link CharSequence} to check.
@@ -81,8 +80,7 @@ public final class StringUtility {
 
   /**
    * Wildcard Pattern may contain only: wildcards: *,%,?,_ characters:<br>
-   * A-Z,a-z,0-9 % and * are replaced by .* ? and _ are replaced by . all
-   * invalid characters are also replaced by .
+   * A-Z,a-z,0-9 % and * are replaced by .* ? and _ are replaced by . all invalid characters are also replaced by .
    */
   public static String toRegExPattern(String wildcardPattern) {
     if (wildcardPattern == null) {
@@ -164,9 +162,8 @@ public final class StringUtility {
   }
 
   /**
-   * Tokenize a String s by given character c. Take care about empty String
-   * between two separating chars. {@link java.util.StringTokenizer} does not
-   * care about empty string between separating chars.
+   * Tokenize a String s by given character c. Take care about empty String between two separating chars.
+   * {@link java.util.StringTokenizer} does not care about empty string between separating chars.
    *
    * @param s
    *          String to tokenize.
@@ -202,12 +199,15 @@ public final class StringUtility {
   }
 
   private static final Set<String> BOOLEAN_TRUE = new HashSet<String>(3);
+
   static {
     BOOLEAN_TRUE.add("true");
     BOOLEAN_TRUE.add("yes");
     BOOLEAN_TRUE.add("1");
   }
+
   private static final Set<String> BOOLEAN_FLASE = new HashSet<String>(3);
+
   static {
     BOOLEAN_FLASE.add("false");
     BOOLEAN_FLASE.add("no");
@@ -215,10 +215,9 @@ public final class StringUtility {
   }
 
   /**
-   * This method parses a string and returns the associated boolean value.
-   * If the string does not represent a valid boolean value, the defaultValue will be returned.
-   * If no defaultValue is given, Boolean.False will be returned.
-   * The Strings "true", "1", "yes" (case insensitive) are considered true whereas the strings "false", "0", "no" are
+   * This method parses a string and returns the associated boolean value. If the string does not represent a valid
+   * boolean value, the defaultValue will be returned. If no defaultValue is given, Boolean.False will be returned. The
+   * Strings "true", "1", "yes" (case insensitive) are considered true whereas the strings "false", "0", "no" are
    * considered false.
    * <p>
    * Examples:
@@ -255,8 +254,7 @@ public final class StringUtility {
   }
 
   /**
-   * @return the number of lines in the string s empty and null strings have 0
-   *         lines
+   * @return the number of lines in the string s empty and null strings have 0 lines
    * @since Build 153
    */
   public static int getLineCount(String s) {
@@ -346,13 +344,11 @@ public final class StringUtility {
    * "a\r\nb" -> "a b"
    * "a\nb" -> "a b"
    * </pre>
-   *
    * </p>
    *
    * @param text
    *          the {@link String} thats new line characters should be removed
-   * @return a string derived from this string by replacing every occurrence of new line character with a
-   *         blank.
+   * @return a string derived from this string by replacing every occurrence of new line character with a blank.
    */
   public static String removeNewLines(String text) {
     return replaceNewLines(text, " ");
@@ -587,11 +583,11 @@ public final class StringUtility {
     int startPos = 0;
     while (startPos < text.length() && (a = getStartTag(text, tagName, ignoreCase, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
-          text.substring(0, a.begin) +
-              start +
-              text.substring(a.end, b) +
-              end +
-              text.substring(b + tagName.length() + 3);
+          text.substring(0, a.begin)
+              + start
+              + text.substring(a.end, b)
+              + end
+              + text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -915,8 +911,7 @@ public final class StringUtility {
   }
 
   /**
-   * @return encoded text, ready to be included in a html text
-   *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @return encoded text, ready to be included in a html text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
    */
   public static String htmlEncode(String s) {
     return htmlEncode(s, false);
@@ -953,11 +948,11 @@ public final class StringUtility {
   private static final String ONE_OR_MORE_WHITESPACES = "\\s+?";
 
   private static final Pattern BR = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "br" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
-  private static final Pattern TABS = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "span" + ONE_OR_MORE_WHITESPACES + "style" + ZERO_OR_MORE_WHITESPACES + "=" + ZERO_OR_MORE_WHITESPACES + "\"white-space:pre\"" + ZERO_OR_MORE_WHITESPACES + ">&#9;<" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + "span" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
+  private static final Pattern TABS = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "span" + ONE_OR_MORE_WHITESPACES + "style" + ZERO_OR_MORE_WHITESPACES + "=" + ZERO_OR_MORE_WHITESPACES + "\"white-space:pre\"" + ZERO_OR_MORE_WHITESPACES
+      + ">&#9;<" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + "span" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
 
   /**
-   * @return decoded text, ready to be printed as text
-   *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @return decoded text, ready to be printed as text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
    */
   public static String htmlDecode(String s) {
     if (s == null || s.length() == 0) {
@@ -981,9 +976,9 @@ public final class StringUtility {
   }
 
   /**
-   * Compares two Strings, ignoring case considerations.
-   * Uses the method <code>java.lang.String.equalsIgnoreCase()</code>.
-   * Null strings are converted to zero length strings before comparison.
+   * Compares two Strings, ignoring case considerations. Uses the method
+   * <code>java.lang.String.equalsIgnoreCase()</code>. Null strings are converted to zero length strings before
+   * comparison.
    */
   public static boolean equalsIgnoreCase(String a, String b) {
     if (a == null) {
@@ -996,9 +991,9 @@ public final class StringUtility {
   }
 
   /**
-   * Compares two Strings, ignoring case considerations.
-   * Uses the method <code>java.lang.String.equalsIgnoreCase()</code>.
-   * Null strings are converted to zero length strings before comparison.
+   * Compares two Strings, ignoring case considerations. Uses the method
+   * <code>java.lang.String.equalsIgnoreCase()</code>. Null strings are converted to zero length strings before
+   * comparison.
    */
   public static boolean notEqualsIgnoreCase(String a, String b) {
     if (a == null) {
@@ -1038,8 +1033,7 @@ public final class StringUtility {
   }
 
   /**
-   * converts all non-allowed characters in the text to the text contained in
-   * replacementText
+   * converts all non-allowed characters in the text to the text contained in replacementText
    * <p>
    * <b>Example</b>: <code>filterText("test-text/info.12345","a-zA-Z0-2","_")</code> yields "test_text_info12___" <br>
    * since JRE 1.5 same as: <code>"test-text/info.12345".replaceAll("[^a-zA-Z0-2]","_")</code>
@@ -1066,23 +1060,19 @@ public final class StringUtility {
   }
 
   /**
-   * Format phone numbers (to international phone number format - eg +41 41 882
-   * 32 21)
+   * Format phone numbers (to international phone number format - eg +41 41 882 32 21)
    *
    * @since
    * @param phoneNumber
-   *          Unformatted/Formatted phone number with optional country code.
-   *          Brackets for area code and special characters (like -) for local
-   *          number is supported.
+   *          Unformatted/Formatted phone number with optional country code. Brackets for area code and special
+   *          characters (like -) for local number is supported.
    * @param formattingPattern
-   *          Defines the format of the phone number (eg. ## ### ## ## for 41
-   *          841 44 44). The formattingPattern must not include the country
-   *          code.
+   *          Defines the format of the phone number (eg. ## ### ## ## for 41 841 44 44). The formattingPattern must not
+   *          include the country code.
    * @param countryCode
    *          Country code (+41, 0041, 41)
-   * @return If the phone number does not match the formatting pattern the
-   *         original phone number will be returned. Otherwise the formatted
-   *         phone number will be returned.
+   * @return If the phone number does not match the formatting pattern the original phone number will be returned.
+   *         Otherwise the formatted phone number will be returned.
    */
   public static String formatPhone(String phoneNumber, String formattingPattern, String countryCode) {
     if (phoneNumber == null) {
@@ -1192,9 +1182,8 @@ public final class StringUtility {
   }
 
   /**
-   * Splits the string around matches of the regex.
-   * Returns an empty array if the provided string is null or has length null.
-   * Otherwise, the method returns the result of {@link java.lang.String#split}.
+   * Splits the string around matches of the regex. Returns an empty array if the provided string is null or has length
+   * null. Otherwise, the method returns the result of {@link java.lang.String#split}.
    */
   public static String[] split(String s, String regex) {
     if (s == null || s.length() == 0) {
@@ -1216,10 +1205,8 @@ public final class StringUtility {
         String.format("%s|%s|%s",
             "(?<=[A-Z])(?=[A-Z][a-z])",
             "(?<=[^A-Z])(?=[A-Z])",
-            "(?<=[A-Za-z])(?=[^A-Za-z])"
-            ),
-        " "
-        );
+            "(?<=[A-Za-z])(?=[^A-Za-z])"),
+        " ");
   }
 
   public static String substring(String s, int start) {
@@ -1439,8 +1426,8 @@ public final class StringUtility {
   }
 
   /**
-   * Concatenates the raw input of {@link Object}s separated by <code>delimiter</code>. On
-   * each object {@link Object#toString()} is invoked.<br />
+   * Concatenates the raw input of {@link Object}s separated by <code>delimiter</code>. On each object
+   * {@link Object#toString()} is invoked.<br />
    * <code>null</code> values or those {@link Object#toString()} is empty are neglected.
    *
    * @param delimiter
@@ -1495,9 +1482,8 @@ public final class StringUtility {
   }
 
   /**
-   * Boxes the string with the given prefix and suffix. The result is the empty
-   * string, if the string to box has no text. <code>null</code> or empty
-   * prefixes and suffixes are neglected.
+   * Boxes the string with the given prefix and suffix. The result is the empty string, if the string to box has no
+   * text. <code>null</code> or empty prefixes and suffixes are neglected.
    * <p>
    * <b>Example</b>: <code>box("(", "foo", ")");</code> returns <code>"(foo)"</code>.
    *
@@ -1761,8 +1747,8 @@ public final class StringUtility {
    * Attempts to match the entire region against the regex.
    * </p>
    * <p>
-   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
-   * </small>
+   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more
+   * information} </small>
    * </p>
    *
    * @param s

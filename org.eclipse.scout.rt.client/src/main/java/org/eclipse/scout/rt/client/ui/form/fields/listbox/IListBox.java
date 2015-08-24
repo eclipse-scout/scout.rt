@@ -23,12 +23,12 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * A listbox contains at least 3 columns, where index 0 is the key column, index
- * 1 is the text column and index 2 is the active-flag column
+ * A listbox contains at least 3 columns, where index 0 is the key column, index 1 is the text column and index 2 is the
+ * active-flag column
  * <p>
  * The listbox value is a Collection of Object where the Collction<Object> is the set of checked keys of the listbox<br>
- * the inner table shows those rows as checked which have the key value as a part of the listbox value
- * (Collection<Object>)
+ * the inner table shows those rows as checked which have the key value as a part of the listbox value (Collection
+ * <Object>)
  * <p>
  * Note, that the listbox might not necessarily show all checked rows since the value of the listbox might contain
  * inactive keys that are not reflected in the listbox<br>
@@ -56,8 +56,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
   ITable getTable();
 
   /**
-   * @return true: a filter is added to the listbox table that only accepts
-   *         checked rows<br>
+   * @return true: a filter is added to the listbox table that only accepts checked rows<br>
    *         Affects {@link ITable#getFilteredRows()}<br>
    *         see also {@link #getFilterCheckedRowsValue()} and {@link #setFilterCheckedRows(boolean)}
    */
@@ -73,8 +72,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
   void setFilterCheckedRowsValue(boolean b);
 
   /**
-   * @return true: a filter is added to the listbox table that only accepts rows
-   *         that are active or checked.<br>
+   * @return true: a filter is added to the listbox table that only accepts rows that are active or checked.<br>
    *         Affects {@link ITable#getFilteredRows()}<br>
    *         see also {@link #getActiveFilter()} and {@link #setActiveFilter(TriState)}
    */
@@ -142,8 +140,8 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
   void checkKey(KEY key);
 
   /**
-   * @return the keys that have been checked with regard to the initial keys of
-   *         the listbox. Initial keys are those after the last save or init
+   * @return the keys that have been checked with regard to the initial keys of the listbox. Initial keys are those
+   *         after the last save or init
    */
   Set<KEY> getUncheckedKeys();
 

@@ -11,16 +11,15 @@ package org.eclipse.scout.rt.client.ui.desktop;
 public enum OpenUriHint implements IOpenUriHint {
 
   /**
-   * The URI represents a downloadable object which should not be handled by the browser's rendering engine.
-   * Instead the "Save as..." dialog should appear which allows the user to store the resource to his
-   * local file system. The application's location does not change, and no browser windows or tabs should
-   * be opened.
+   * The URI represents a downloadable object which should not be handled by the browser's rendering engine. Instead the
+   * "Save as..." dialog should appear which allows the user to store the resource to his local file system. The
+   * application's location does not change, and no browser windows or tabs should be opened.
    */
   DOWNLOAD("download"),
   /**
-   * The URI should be opened in an external application. This is similar to {@link #DOWNLOAD} but should launch
-   * an external application to handle the URI. The handler is registered with the browser, usually using
-   * a special URI protocol (such as "tel:...", "mailto:..." etc.)
+   * The URI should be opened in an external application. This is similar to {@link #DOWNLOAD} but should launch an
+   * external application to handle the URI. The handler is registered with the browser, usually using a special URI
+   * protocol (such as "tel:...", "mailto:..." etc.)
    */
   OPEN_APPLICATION("open-application"),
   /**

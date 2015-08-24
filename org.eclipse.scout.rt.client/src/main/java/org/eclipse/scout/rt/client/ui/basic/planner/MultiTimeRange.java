@@ -22,8 +22,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 
 /**
- * Description: Allows to store multiple time ranges. There
- * are no overlapping on the stored ranges.
+ * Description: Allows to store multiple time ranges. There are no overlapping on the stored ranges.
  * <p>
  * e.g. {'1.1.2006 13:00'-'1.1.2006 14:00', '2.1.2006 12:00'-'3.1.2006 12:00'} Copyright (c) 2006 BSI AG Company: BSI AG
  * - www.bsiag.com

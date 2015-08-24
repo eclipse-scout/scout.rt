@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public abstract class AbstractRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends AbstractValueFieldExtension<T, OWNER> implements IRadioButtonGroupExtension<T, OWNER> {
+public abstract class AbstractRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends AbstractValueFieldExtension<T, OWNER>implements IRadioButtonGroupExtension<T, OWNER> {
 
   public AbstractRadioButtonGroupExtension(OWNER owner) {
     super(owner);

@@ -17,15 +17,11 @@ import java.util.regex.Pattern;
 
 /**
  * Example of simple log record [FATAL] 2008-02-01 08:21:06.934 TP-Processor23
- * org.eclipse.scout.rt.server.servlet.HttpProxyHandlerServlet.service(
- * HttpProxyHandlerServlet.java:102) Example of eclipse log record !ENTRY
- * org.eclipse
- * .scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService
- * .handleException(LogExceptionHandlerService.java:33) 4 0 2008-09-23
- * 08:11:43.776 !MESSAGE ProcessingStatus[ERROR code=0
- * Client=BSIAG\Administrator@127.0.0.1/127.0.0.1 / Identity=BSIAG\Administrator
- * / cannot find a userNr for 'administrator' java.lang.SecurityException:
- * access denied] !STACK 0 and !SESSION 2008-09-30 12:20:35.435
+ * org.eclipse.scout.rt.server.servlet.HttpProxyHandlerServlet.service( HttpProxyHandlerServlet.java:102) Example of
+ * eclipse log record !ENTRY org.eclipse .scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService
+ * .handleException(LogExceptionHandlerService.java:33) 4 0 2008-09-23 08:11:43.776 !MESSAGE ProcessingStatus[ERROR
+ * code=0 Client=BSIAG\Administrator@127.0.0.1/127.0.0.1 / Identity=BSIAG\Administrator / cannot find a userNr for
+ * 'administrator' java.lang.SecurityException: access denied] !STACK 0 and !SESSION 2008-09-30 12:20:35.435
  * ----------------------------------------------- ...
  */
 public abstract class AbstractLogFilter implements ILogFilter {
@@ -44,11 +40,10 @@ public abstract class AbstractLogFilter implements ILogFilter {
 
   /**
    * @param parsePattern
-   *          defines the first log line of a log entry and consists of some
-   *          groups
+   *          defines the first log line of a log entry and consists of some groups
    * @param formatPattern
-   *          defines a pattern with the variables {1},{2},{3},{4},{5} that
-   *          represent (severity) (date) (thread) (source) (message)
+   *          defines a pattern with the variables {1},{2},{3},{4},{5} that represent (severity) (date) (thread)
+   *          (source) (message)
    */
   public AbstractLogFilter(String formatPattern, String dateFormat) {
     m_formatPattern = formatPattern;

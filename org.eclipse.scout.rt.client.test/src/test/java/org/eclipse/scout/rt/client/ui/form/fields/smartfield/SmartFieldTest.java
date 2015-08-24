@@ -219,8 +219,8 @@ public class SmartFieldTest {
   @Before
   public void setUp() throws Throwable {
     m_reg = TestingUtility.registerBeans(
-        new BeanMetaData(StyleLookupService.class).
-            withApplicationScoped(true));
+        new BeanMetaData(StyleLookupService.class)
+            .withApplicationScoped(true));
     m_form = new TestForm();
     m_form.startForm();
   }

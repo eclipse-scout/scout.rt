@@ -11,10 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 /**
- * A smart field with a key type different from the value type.
- * The default implementation of {@link #convertKeyToValue(Object)} and {@link #convertValueToKey(Object)} methods works
- * for any case where <VALUE_TYPE extends LOOKUP_CALL_KEY_TYPE>. For all other cases provide your own conversion
- * methods.
+ * A smart field with a key type different from the value type. The default implementation of
+ * {@link #convertKeyToValue(Object)} and {@link #convertValueToKey(Object)} methods works for any case where
+ * <VALUE_TYPE extends LOOKUP_CALL_KEY_TYPE>. For all other cases provide your own conversion methods.
  *
  * @param <VALUE>
  * @param <LOOKUP_KEY>

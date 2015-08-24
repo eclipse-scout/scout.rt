@@ -95,8 +95,8 @@ public final class ConfigUtility {
   }
 
   /**
-   * Gets the property with given key as int. If a property with given key does not exist or is no valid int
-   * value, the given default value is returned.
+   * Gets the property with given key as int. If a property with given key does not exist or is no valid int value, the
+   * given default value is returned.
    *
    * @param key
    *          The key of the property.
@@ -111,8 +111,8 @@ public final class ConfigUtility {
   }
 
   /**
-   * Gets the property with given key as long. If a property with given key does not exist or is no valid long
-   * value, the given default value is returned.
+   * Gets the property with given key as long. If a property with given key does not exist or is no valid long value,
+   * the given default value is returned.
    *
    * @param key
    *          The key of the property.
@@ -127,8 +127,8 @@ public final class ConfigUtility {
   }
 
   /**
-   * Gets the property with given key as float. If a property with given key does not exist or is no valid float
-   * value, the given default value is returned.
+   * Gets the property with given key as float. If a property with given key does not exist or is no valid float value,
+   * the given default value is returned.
    *
    * @param key
    *          The key of the property.

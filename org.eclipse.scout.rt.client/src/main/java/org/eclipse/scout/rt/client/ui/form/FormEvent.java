@@ -23,8 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.pagefield.IPageField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 
 /**
- * Form lifecycle for observing form "open" event attach to IDesktop and listen
- * for FORM_ADDED
+ * Form lifecycle for observing form "open" event attach to IDesktop and listen for FORM_ADDED
  */
 public class FormEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
@@ -46,10 +45,9 @@ public class FormEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_PRINTED = 4010;
   /**
-   * When the field structure changes Examples: a field changes its "visible"
-   * property a {@link IWrappedFormField} changes its inner form a {@link IPageField} changes its table/search/detail a
-   * custom field changes
-   * in a way that the form structure is different
+   * When the field structure changes Examples: a field changes its "visible" property a {@link IWrappedFormField}
+   * changes its inner form a {@link IPageField} changes its table/search/detail a custom field changes in a way that
+   * the form structure is different
    */
   public static final int TYPE_STRUCTURE_CHANGED = 5000;
   /**
@@ -73,11 +71,10 @@ public class FormEvent extends EventObject implements IModelEvent {
   private final File m_printedFile;
 
   /**
-   * A form event is sent whenever a form changes. You can register
-   * to receive such events via {@link IForm#addFormListener(FormListener)}.
-   * The form listener will get sent form events via <code>formChanged</code>.
-   * Once you implement your form listener and receive your form events, you'll
-   * probably be interested in the <b>type</b> you get via <code>getType</code>.
+   * A form event is sent whenever a form changes. You can register to receive such events via
+   * {@link IForm#addFormListener(FormListener)}. The form listener will get sent form events via
+   * <code>formChanged</code>. Once you implement your form listener and receive your form events, you'll probably be
+   * interested in the <b>type</b> you get via <code>getType</code>.
    */
   public FormEvent(IForm form, int type) {
     this(form, type, null, null, null);

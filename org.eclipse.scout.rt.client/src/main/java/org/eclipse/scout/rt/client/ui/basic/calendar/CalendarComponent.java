@@ -106,24 +106,21 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
   }
 
   /**
-   * Convenience for getting the start date of the item Guaranteed to be never
-   * null
+   * Convenience for getting the start date of the item Guaranteed to be never null
    */
   public Date getFromDate() {
     return m_fromDate;
   }
 
   /**
-   * Convenience for getting the end date of the item Guaranteed to be never
-   * null
+   * Convenience for getting the end date of the item Guaranteed to be never null
    */
   public Date getToDate() {
     return m_toDate;
   }
 
   /**
-   * Convenience for getting all days this item is covering the dates returned
-   * have all time 00:00:00
+   * Convenience for getting all days this item is covering the dates returned have all time 00:00:00
    */
   public Date[] getCoveredDays() {
     return m_coveredDays;

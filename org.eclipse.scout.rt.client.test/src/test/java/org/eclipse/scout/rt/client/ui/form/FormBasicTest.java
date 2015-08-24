@@ -52,8 +52,7 @@ public class FormBasicTest {
         new DynamicStringField("f2", "Last Name"),
         new DynamicStringField("f3", "Address"),
         new DynamicOkButton(),
-        new DynamicCancelButton()
-        );
+        new DynamicCancelButton());
     final DynamicForm f = new DynamicForm("Form1", mainBox);
     f.setModal(modal);
     f.setDisplayHint(displayHint);

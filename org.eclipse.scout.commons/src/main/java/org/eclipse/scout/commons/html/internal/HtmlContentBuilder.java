@@ -19,8 +19,7 @@ import org.eclipse.scout.commons.html.IHtmlBind;
 import org.eclipse.scout.commons.html.IHtmlContent;
 
 /**
- * Empty node for HTML fragments:
- * Creates a node that may contain other html content, but does not have a tag name.
+ * Empty node for HTML fragments: Creates a node that may contain other html content, but does not have a tag name.
  */
 public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHtmlContent {
   private final List<? extends IHtmlBind> m_texts;

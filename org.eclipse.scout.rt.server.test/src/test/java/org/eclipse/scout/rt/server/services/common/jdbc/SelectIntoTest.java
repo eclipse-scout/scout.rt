@@ -26,8 +26,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
- * Methods under test {@link ISqlService#selectInto(String, Object...)}.
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}). Methods under test
+ * {@link ISqlService#selectInto(String, Object...)}.
  */
 @RunWith(PlatformTestRunner.class)
 public class SelectIntoTest {

@@ -172,11 +172,11 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
-   * If this method returns without throwing in exception, the location is considered a valid URI.
-   * By default, {@link URI} is used to check the location for syntax errors. If no scheme is defined,
-   * a {@link RuntimeException} is thrown, <i>unless</i> the location starts with <code>//</code>. An URL
-   * starting with <code>//</code> is considered a "protocol relative URL", i.e. it re-uses the current
-   * scheme, without explicitly specifying it. See also: http://www.paulirish.com/2010/the-protocol-relative-url
+   * If this method returns without throwing in exception, the location is considered a valid URI. By default,
+   * {@link URI} is used to check the location for syntax errors. If no scheme is defined, a {@link RuntimeException} is
+   * thrown, <i>unless</i> the location starts with <code>//</code>. An URL starting with <code>//</code> is considered
+   * a "protocol relative URL", i.e. it re-uses the current scheme, without explicitly specifying it. See also:
+   * http://www.paulirish.com/2010/the-protocol-relative-url
    */
   protected void validateLocation(String location) {
     try {
@@ -325,7 +325,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     chain.execPostMessage(data, origin);
   }
 
-  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER> implements IBrowserFieldExtension<OWNER> {
+  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER>implements IBrowserFieldExtension<OWNER> {
 
     public LocalBrowserFieldExtension(OWNER owner) {
       super(owner);

@@ -52,16 +52,16 @@ public interface IExtensionRegistry extends IService {
    * <li>Otherwise the owner of the surrounding {@link IExtension} class is reused if present.</li>
    * <li>If still no owner could be determined, an {@link IllegalExtensionException} is thrown.</li>
    * </ol>
-   * The detected owner must support the type of the given contribution.
-   * E.g.: A contribution of type IMenu is valid for an IMenu owner because menus may contain other menus. But this
-   * contribution may not be valid for {@link ICode} owners because these do not support menus.<br>
+   * The detected owner must support the type of the given contribution. E.g.: A contribution of type IMenu is valid for
+   * an IMenu owner because menus may contain other menus. But this contribution may not be valid for {@link ICode}
+   * owners because these do not support menus.<br>
    * A contribution is considered to be valid for an owner if there is at least one
    * {@link IExtensionRegistrationValidatorService} registered that declares the given combination to be valid.<br>
    * </ol>
    *
    * @param extensionOrContributionClass
-   *          The extension or contribution class that should be registered. Must not be null and must
-   *          either be a primary class or a static class. See above for other restrictions on the given
+   *          The extension or contribution class that should be registered. Must not be null and must either be a
+   *          primary class or a static class. See above for other restrictions on the given
    *          extensionOrContributionClass parameter.
    * @throws IllegalExtensionException
    *           if the extensionOrContributionClass does not fulfill the restrictions described above.
@@ -91,8 +91,7 @@ public interface IExtensionRegistry extends IService {
    * E.g.: A contribution of type IMenu is valid for an IMenu owner because menus may contain other menus. But this
    * contribution may not be valid for {@link ICode} owners because these do not support menus.<br>
    * A contribution is considered to be valid if there is at least one {@link IExtensionRegistrationValidatorService}
-   * registered
-   * that declares the given combination to be valid.<br>
+   * registered that declares the given combination to be valid.<br>
    * If no owner is provided it is detected according to the following rule:
    * <ol>
    * <li>The value of the {@link Extends} annotation is used as owner if present.</li>
@@ -135,8 +134,7 @@ public interface IExtensionRegistry extends IService {
    * E.g.: A contribution of type IMenu is valid for an IMenu owner because menus may contain other menus. But this
    * contribution may not be valid for {@link ICode} owners because these do not support menus.<br>
    * A contribution is considered to be valid if there is at least one {@link IExtensionRegistrationValidatorService}
-   * registered
-   * that declares the given combination to be valid.<br>
+   * registered that declares the given combination to be valid.<br>
    * If no owner is provided it is detected according to the following rule:
    * <ol>
    * <li>The value of the {@link Extends} annotation is used as owner if present.</li>
@@ -185,8 +183,7 @@ public interface IExtensionRegistry extends IService {
    * E.g.: A contribution of type IMenu is valid for an IMenu owner because menus may contain other menus. But this
    * contribution may not be valid for {@link ICode} owners because these do not support menus.<br>
    * A contribution is considered to be valid if there is at least one {@link IExtensionRegistrationValidatorService}
-   * registered
-   * that declares the given combination to be valid.<br>
+   * registered that declares the given combination to be valid.<br>
    * If no owner is provided it is detected according to the following rule:
    * <ol>
    * <li>The value of the {@link Extends} annotation is used as owner if present.</li>
@@ -231,8 +228,7 @@ public interface IExtensionRegistry extends IService {
    * E.g.: A contribution of type IMenu is valid for an IMenu owner because menus may contain other menus. But this
    * contribution may not be valid for {@link ICode} owners because these do not support menus.<br>
    * A contribution is considered to be valid if there is at least one {@link IExtensionRegistrationValidatorService}
-   * registered
-   * that declares the given combination to be valid.<br>
+   * registered that declares the given combination to be valid.<br>
    * If no owner is provided it is detected according to the following rule:
    * <ol>
    * <li>The value of the {@link Extends} annotation is used as owner if present.</li>
@@ -299,8 +295,8 @@ public interface IExtensionRegistry extends IService {
    * @param newOrder
    *          The new order. If null, the existing order is not changed.
    * @param newContainerClass
-   *          The new container class. The container is not changed if it is null. A matching model object is moved
-   *          to top level if the new container class is {@link IMoveModelObjectToRootMarker}.
+   *          The new container class. The container is not changed if it is null. A matching model object is moved to
+   *          top level if the new container class is {@link IMoveModelObjectToRootMarker}.
    * @throws IllegalExtensionException
    *           In the following cases:
    *           <ul>
@@ -339,8 +335,8 @@ public interface IExtensionRegistry extends IService {
    * @param newOrder
    *          The new order. If null, the existing order is not changed.
    * @param newContainerClass
-   *          The new container class. The container is not changed if it is null. A matching model object is moved
-   *          to top level if the new container class is {@link IMoveModelObjectToRootMarker}.
+   *          The new container class. The container is not changed if it is null. A matching model object is moved to
+   *          top level if the new container class is {@link IMoveModelObjectToRootMarker}.
    * @throws IllegalExtensionException
    *           In the following cases:
    *           <ul>
@@ -366,8 +362,8 @@ public interface IExtensionRegistry extends IService {
    *          The new order. If null, the existing order is not changed.
    * @param newContainerClassIdentifier
    *          The {@link ClassIdentifier} describing the container in which the given modelClassIdentifer should be
-   *          moved. The container is not changed if it is null. A matching model object is moved
-   *          to top level if the newContainerClassIdentifier only contains {@link IMoveModelObjectToRootMarker}.
+   *          moved. The container is not changed if it is null. A matching model object is moved to top level if the
+   *          newContainerClassIdentifier only contains {@link IMoveModelObjectToRootMarker}.
    * @throws IllegalExtensionException
    *           In the following cases:
    *           <ul>
@@ -383,9 +379,9 @@ public interface IExtensionRegistry extends IService {
   void registerMove(ClassIdentifier modelClassIdentifer, Double newOrder, ClassIdentifier newContainerClassIdentifier);
 
   /**
-   * Registers a move operation for the given modelClassIdentifer. The element is moved from its current
-   * container into the context-specific root container. The root container of a form field is the hosting form's root
-   * group box. The root of an {@link ICode} is its {@link ICodeType}'s root code list.
+   * Registers a move operation for the given modelClassIdentifer. The element is moved from its current container into
+   * the context-specific root container. The root container of a form field is the hosting form's root group box. The
+   * root of an {@link ICode} is its {@link ICodeType}'s root code list.
    * <p/>
    * This method has the same effect as invoking {@link #registerMove(ClassIdentifier, Double, Class)} using
    * {@link IMoveModelObjectToRootMarker} as target class.

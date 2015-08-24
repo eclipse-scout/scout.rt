@@ -33,9 +33,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test for {@link FindFieldByFormDataIdVisitor}.
- * Bugzilla entry 399610: Form: exportFormData/importFormData incorrect for forms containing wrapped inner forms.
- * https://bugs.eclipse.org/bugs/show_bug.cgi?id=399610
+ * Test for {@link FindFieldByFormDataIdVisitor}. Bugzilla entry 399610: Form: exportFormData/importFormData incorrect
+ * for forms containing wrapped inner forms. https://bugs.eclipse.org/bugs/show_bug.cgi?id=399610
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")

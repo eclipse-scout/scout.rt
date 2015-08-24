@@ -37,9 +37,8 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
   }
 
   /**
-   * Configures the value represented by this radio button. This is the value that is
-   * returned if you query a radio button group for the current value and this button is the
-   * currently selected radio button.
+   * Configures the value represented by this radio button. This is the value that is returned if you query a radio
+   * button group for the current value and this button is the currently selected radio button.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    * 
@@ -70,7 +69,7 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
     propertySupport.setProperty(PROP_RADIOVALUE, o);
   }
 
-  protected static class LocalRadioButtonExtension<T, OWNER extends AbstractRadioButton<T>> extends LocalButtonExtension<OWNER> implements IRadioButtonExtension<T, OWNER> {
+  protected static class LocalRadioButtonExtension<T, OWNER extends AbstractRadioButton<T>> extends LocalButtonExtension<OWNER>implements IRadioButtonExtension<T, OWNER> {
 
     public LocalRadioButtonExtension(OWNER owner) {
       super(owner);

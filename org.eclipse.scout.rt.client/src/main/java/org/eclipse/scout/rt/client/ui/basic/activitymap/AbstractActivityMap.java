@@ -168,12 +168,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   /**
-   * Indicates whether this ActivityMap should draw the
-   * red and green bordered rectangle sections
-   * around the area selected by the mouse.
+   * Indicates whether this ActivityMap should draw the red and green bordered rectangle sections around the area
+   * selected by the mouse.
    *
-   * @return true if the colored sections should be displayed,
-   *         false if not. Default is true.
+   * @return true if the colored sections should be displayed, false if not. Default is true.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
@@ -1123,9 +1121,9 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
               (CompareUtility.equals(cell.getEndTime(), endTime)
                   // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
                   || (cell != null
-                  && cell.getEndTime() != null
-                  && endTime != null
-                  && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
+                      && cell.getEndTime() != null
+                      && endTime != null
+                      && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
             setSelectedActivityCell(cell);
             return;
           }
@@ -1231,11 +1229,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   /**
-   * step through all resources and collect best activities with a scoring
-   * algorithm<br>
+   * step through all resources and collect best activities with a scoring algorithm<br>
    * build a sorted map<br>
-   * the key is either (startDate-now) in minutes [if duration is ok] otherwise
-   * the key is 1000000-duration in minutes [if duration is at least 15 minutes]
+   * the key is either (startDate-now) in minutes [if duration is ok] otherwise the key is 1000000-duration in minutes
+   * [if duration is at least 15 minutes]
    * <p>
    * the value is the plannedActivity for that resource
    */
@@ -1279,11 +1276,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   /**
-   * step through all resources and collect best activities with a scoring
-   * algorithm<br>
+   * step through all resources and collect best activities with a scoring algorithm<br>
    * build a sorted map<br>
-   * the key is either (startDate-now) in minutes [if duration is ok] otherwise
-   * the key is 1000000-duration in minutes [if duration is at least 15 minutes]
+   * the key is either (startDate-now) in minutes [if duration is ok] otherwise the key is 1000000-duration in minutes
+   * [if duration is at least 15 minutes]
    * <p>
    * the value is the plannedActivity for that resource
    */
@@ -1384,7 +1380,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalActivityMapExtension<RI, AI, OWNER extends AbstractActivityMap<RI, AI>> extends AbstractExtension<OWNER> implements IActivityMapExtension<RI, AI, OWNER> {
+  protected static class LocalActivityMapExtension<RI, AI, OWNER extends AbstractActivityMap<RI, AI>> extends AbstractExtension<OWNER>implements IActivityMapExtension<RI, AI, OWNER> {
 
     public LocalActivityMapExtension(OWNER owner) {
       super(owner);

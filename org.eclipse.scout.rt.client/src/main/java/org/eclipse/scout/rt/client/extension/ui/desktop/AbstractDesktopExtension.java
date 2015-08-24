@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP> implements IDesktopExtension<DESKTOP> {
+public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP>implements IDesktopExtension<DESKTOP> {
 
   public AbstractDesktopExtension(DESKTOP owner) {
     super(owner);

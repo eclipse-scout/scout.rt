@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
  * Long firstPersonNr = queryResult[0][0];
  * Long thirdPersonName = queryResult[2][1];
  * </pre>
- * 
  * </p>
  * 
  * @see ISqlService

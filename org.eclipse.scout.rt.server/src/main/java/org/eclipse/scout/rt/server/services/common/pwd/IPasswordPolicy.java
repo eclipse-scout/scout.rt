@@ -14,8 +14,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 
 /**
- * Title: BSI Scout V3 Copyright:
- * Copyright (c) 2001,2009 BSI AG
+ * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG
  * 
  * @version 3.x
  */
@@ -23,9 +22,8 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 public interface IPasswordPolicy {
 
   /**
-   * @return a localized text that describes the policy to the user use {@link NlsLocale#get()} to access the
-   *         language for user
-   *         messages
+   * @return a localized text that describes the policy to the user use {@link NlsLocale#get()} to access the language
+   *         for user messages
    */
   String getText();
 

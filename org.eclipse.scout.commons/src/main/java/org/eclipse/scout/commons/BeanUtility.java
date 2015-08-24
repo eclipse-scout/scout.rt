@@ -85,8 +85,8 @@ public final class BeanUtility {
 
   /**
    * @param lenient
-   *          true just logs warnings on exceptions, false throws exceptions
-   *          set all properties on to, filtering with filter
+   *          true just logs warnings on exceptions, false throws exceptions set all properties on to, filtering with
+   *          filter
    */
   public static void setProperties(Object to, Map<String, Object> map, boolean lenient, IPropertyFilter filter) throws ProcessingException {
     FastBeanInfo toInfo = getFastBeanInfo(to.getClass(), null);
@@ -341,8 +341,8 @@ public final class BeanUtility {
    * @param actualType
    *          The type of the object used in the actual method invocation.
    * @return Returns -1 if the distance cannot be computed or the declared type is not assignable from the actual type.
-   *         It
-   *         returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0 otherwise.
+   *         It returns 0 for a perfect match (i.e. <code>declaredType == actualType</code> and a number &gt;0
+   *         otherwise.
    * @since 3.8.1
    */
   public static int computeTypeDistance(Class<?> declaredType, Class<?> actualType) {

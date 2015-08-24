@@ -213,8 +213,8 @@ public final class SVGUtility {
   }
 
   /**
-   * Set the text content of a text element, in case it contains newlines then add tspan elements.
-   * Requires the GVT tree to be attached to the svg document.
+   * Set the text content of a text element, in case it contains newlines then add tspan elements. Requires the GVT tree
+   * to be attached to the svg document.
    *
    * @param textElement
    * @param value
@@ -509,11 +509,13 @@ public final class SVGUtility {
    * Bug fix: batik sometimes creates a new namespace for xlink even though the namespace is already defined. This
    * utility method fixes that behaviour.
    * <p>
-   * Bug: <xmp><a xlink:actuate="onRequest" xlink:type="simple" xlink:show="replace"
-   * xmlns:ns3="http://www.w3.org/1999/xlink" ns3:href="http://local/info-prev">....</a></xmp>
+   * Bug:
+   * <xmp><a xlink:actuate="onRequest" xlink:type="simple" xlink:show="replace" xmlns:ns3="http://www.w3.org/1999/xlink"
+   * ns3:href="http://local/info-prev">....</a></xmp>
    * <p>
-   * Fixed: <xmp><a xlink:actuate="onRequest" xlink:type="simple" xlink:show="replace"
-   * xlink:href="http://local/info-prev">....</a></xmp>
+   * Fixed:
+   * <xmp><a xlink:actuate="onRequest" xlink:type="simple" xlink:show="replace" xlink:href="http://local/info-prev">....
+   * </a></xmp>
    */
   public static void addHyperlink(Element e, String url) {
     SVGAElement aElem = (SVGAElement) e.getOwnerDocument().createElementNS(SVG_NS, "a");
@@ -597,8 +599,8 @@ public final class SVGUtility {
   }
 
   /**
-   * Removes an app link.
-   * This is done by removing class "app-link" and, if the former was present, the attribute "data-ref" </br>
+   * Removes an app link. This is done by removing class "app-link" and, if the former was present, the attribute
+   * "data-ref" </br>
    * If no "app-link" class is present, this method does nothing (i.e. does not change the presence of a "data-ref"
    * attribute)
    */

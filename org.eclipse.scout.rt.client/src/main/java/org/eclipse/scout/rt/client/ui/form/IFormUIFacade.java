@@ -18,15 +18,13 @@ public interface IFormUIFacade {
 
   /**
    * Request to close the form<br>
-   * This request might be ignored when the form is not ready for closing or in
-   * pending state.
+   * This request might be ignored when the form is not ready for closing or in pending state.
    */
   void fireFormClosingFromUI();
 
   /**
    * Notification that ui closed the form view<br>
-   * This request is a forced close of the form from the ui and closes the form
-   * model regardless of its state.
+   * This request is a forced close of the form from the ui and closes the form model regardless of its state.
    */
   void fireFormKilledFromUI();
 

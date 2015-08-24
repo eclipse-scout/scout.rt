@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata;
 
-
 public class SaveAsData {
   private String m_name;
   private String m_format;

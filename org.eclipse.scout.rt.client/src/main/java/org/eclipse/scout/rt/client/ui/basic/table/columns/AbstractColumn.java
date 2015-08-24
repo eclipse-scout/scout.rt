@@ -84,8 +84,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_summary;
   private boolean m_initialized;
   /**
-   * A column is presented to the user when it is displayable AND visible this
-   * column is visible to the user only used when displayable=true
+   * A column is presented to the user when it is displayable AND visible this column is visible to the user only used
+   * when displayable=true
    */
   private boolean m_visibleProperty;
   private boolean m_visibleGranted;
@@ -238,10 +238,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Configures whether the column width is fixed, meaning that it is not changed by resizing/auto-resizing
-   * and cannot be resized by the user.
-   * If <code>true</code>, the configured width is fixed.
-   * Defaults to <code>false</code>.
+   * Configures whether the column width is fixed, meaning that it is not changed by resizing/auto-resizing and cannot
+   * be resized by the user. If <code>true</code>, the configured width is fixed. Defaults to <code>false</code>.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(75)
@@ -379,8 +377,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   /**
    * Configures the sort index of this column. A sort index {@code < 0} means that the column is not considered for
-   * sorting. For a column to be considered for sorting, the sort index must be {@code >= 0}. Several columns
-   * might have set a sort index. Sorting starts with the column having the the lowest sort index ({@code >= 0}).
+   * sorting. For a column to be considered for sorting, the sort index must be {@code >= 0}. Several columns might have
+   * set a sort index. Sorting starts with the column having the the lowest sort index ({@code >= 0}).
    * <p>
    * Subclasses can override this method. Default is {@code -1}.
    *
@@ -536,7 +534,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    */
   @ConfigOperation
   @Order(20)
-  protected VALUE/* validValue */execParseValue(ITableRow row, Object rawValue) throws ProcessingException {
+  protected VALUE/* validValue */ execParseValue(ITableRow row, Object rawValue) throws ProcessingException {
     return parseValueInternal(row, rawValue);
   }
 
@@ -557,7 +555,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    */
   @ConfigOperation
   @Order(30)
-  protected VALUE/* validValue */execValidateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
+  protected VALUE/* validValue */ execValidateValue(ITableRow row, VALUE rawValue) throws ProcessingException {
     return rawValue;
   }
 
@@ -601,8 +599,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * Subclasses can override this method. The default returns an appropriate field based on the column data type.
    * <p>
-   * The mapping from the cell value to the field value is achieved using
-   * {@link #cellToEditField(Object, String, IMultiStatus, IFormField))}
+   * The mapping from the cell value to the field value is achieved using {@link #cellToEditField(Object, String,
+   * IMultiStatus, IFormField))}
    *
    * @param row
    *          on which editing occurs
@@ -837,8 +835,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 3.10.0-M4
    */
@@ -1391,6 +1389,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       }
     }
   }
+
   /**
    * Used for mapping an {@link AbstractTableRowData} to an {@link ITableRow} by {@link TableRowDataMapper}
    * <p>
@@ -1429,17 +1428,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public final VALUE/* validValue */parseValue(ITableRow row, Object rawValue) throws ProcessingException {
+  public final VALUE/* validValue */ parseValue(ITableRow row, Object rawValue) throws ProcessingException {
     VALUE parsedValue = interceptParseValue(row, rawValue);
     return validateValue(row, parsedValue);
   }
 
   /**
    * do not use or override this internal method<br>
-   * subclasses perform specific value validations here and set the
-   * default textual representation of the value
+   * subclasses perform specific value validations here and set the default textual representation of the value
    */
-  protected VALUE/* validValue */parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+  protected VALUE/* validValue */ parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
     return TypeCastUtility.castValue(rawValue, getDataType());
   }
 
@@ -1452,10 +1450,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   /**
    * do not use or override this internal method<br>
-   * subclasses perform specific value validations here and set the
-   * default textual representation of the value
+   * subclasses perform specific value validations here and set the default textual representation of the value
    */
-  protected VALUE/* validValue */validateValueInternal(ITableRow row, VALUE rawValue) throws ProcessingException {
+  protected VALUE/* validValue */ validateValueInternal(ITableRow row, VALUE rawValue) throws ProcessingException {
     return rawValue;
   }
 
@@ -1510,8 +1507,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * @return a default editor independent of the current row.
-   *         Should only be created once for performance reasons.
+   * @return a default editor independent of the current row. Should only be created once for performance reasons.
    */
   protected IValueField<VALUE> createDefaultEditor() {
     return new AbstractValueField<VALUE>() {
@@ -1821,8 +1817,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   /**
    * true: Whenever table content changes, automatically calculate optimized column width so that all column content is
-   * displayed without
-   * cropping.
+   * displayed without cropping.
    * <p>
    * This may display a horizontal scroll bar on the table.
    */
@@ -1877,7 +1872,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends AbstractExtension<OWNER> implements IColumnExtension<VALUE, OWNER> {
+  protected static class LocalColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> extends AbstractExtension<OWNER>implements IColumnExtension<VALUE, OWNER> {
 
     public LocalColumnExtension(OWNER owner) {
       super(owner);

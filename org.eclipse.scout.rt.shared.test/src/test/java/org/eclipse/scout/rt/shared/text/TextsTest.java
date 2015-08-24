@@ -42,9 +42,8 @@ public class TextsTest {
   @Before
   public void before() throws InterruptedException {
     m_testTextService = TestingUtility.registerBeans(
-        new BeanMetaData(TestTextProviderService.class).
-            withApplicationScoped(true)
-        );
+        new BeanMetaData(TestTextProviderService.class)
+            .withApplicationScoped(true));
     ScoutTexts.CURRENT.set(new ScoutTexts(BEANS.all(ITextProviderService.class)));
   }
 

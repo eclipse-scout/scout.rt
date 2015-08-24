@@ -15,13 +15,13 @@ import java.util.EventListener;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * A form listener must implement the method {@link #formChanged}.
- * Register a listener via {@link IForm#addFormListener(FormListener)} in order to react to certain changes.
+ * A form listener must implement the method {@link #formChanged}. Register a listener via
+ * {@link IForm#addFormListener(FormListener)} in order to react to certain changes.
  */
 public interface FormListener extends EventListener {
   /**
-   * When implementing a form listener, you will get a {@link FormEvent}.
-   * Its type will tell you more about the event you're getting.
+   * When implementing a form listener, you will get a {@link FormEvent}. Its type will tell you more about the event
+   * you're getting.
    */
   void formChanged(FormEvent e) throws ProcessingException;
 }

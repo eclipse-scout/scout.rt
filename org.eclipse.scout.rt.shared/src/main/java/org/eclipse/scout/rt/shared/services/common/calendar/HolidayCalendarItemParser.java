@@ -32,11 +32,11 @@ import org.w3c.dom.Element;
 
 /**
  * Default implementation of a calendar service delivering holiday items <br>
- * Produces data using XML resource file XML records can be recurring (with year
- * 0000) and/or single entries (with specific year)
+ * Produces data using XML resource file XML records can be recurring (with year 0000) and/or single entries (with
+ * specific year)
  *
  * <pre>
- * @code <holidays>
+ * &#64;code <holidays>
  *   <!--1st april every year-->
  *   <holiday date="01.04.0000" color="RRGGBB" text_de="..." tooltip_de="..." text_en="..." tooltip_en="..."/>
  *   <!--1st april only in 2005-->

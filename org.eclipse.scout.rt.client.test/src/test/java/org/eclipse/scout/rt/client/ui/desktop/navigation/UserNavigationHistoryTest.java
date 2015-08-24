@@ -250,8 +250,7 @@ public class UserNavigationHistoryTest {
   }
 
   /**
-   * Tests the stepping one step forward in the history.
-   * No exception should be thrown
+   * Tests the stepping one step forward in the history. No exception should be thrown
    */
   @Test
   public void testSteppingForwardOnEmptyHistory() throws ProcessingException {
@@ -261,8 +260,7 @@ public class UserNavigationHistoryTest {
   }
 
   /**
-   * Tests the stepping one step backwards in the history, if no element is available.
-   * No exception should be thrown
+   * Tests the stepping one step backwards in the history, if no element is available. No exception should be thrown
    */
   @Test
   public void testSteppingBackwardOnEmptyHistory() throws ProcessingException {

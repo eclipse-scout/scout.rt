@@ -138,12 +138,10 @@ public final class CollectionUtility {
   }
 
   /**
-   * Returns a sub list with the provided indices.
-   * This methods supports negative indices in the sense that -1 addresses the last element and -2 the 2nd last.
-   * For positive indices, the methods uses {@link java.util.List#subList(int, int)} with one change: It is returning
-   * the sub list starting with c[fromIndex] to c[toIndex].
-   * slice(c, 0, 0): first element of c
-   * slice(c, 0, -3): c without the last two elements
+   * Returns a sub list with the provided indices. This methods supports negative indices in the sense that -1 addresses
+   * the last element and -2 the 2nd last. For positive indices, the methods uses
+   * {@link java.util.List#subList(int, int)} with one change: It is returning the sub list starting with c[fromIndex]
+   * to c[toIndex]. slice(c, 0, 0): first element of c slice(c, 0, -3): c without the last two elements
    *
    * @param c
    * @param fromIndex
@@ -346,8 +344,7 @@ public final class CollectionUtility {
 
   /**
    * Null safe creation of a {@link LinkedHashSet} out of a given collection. The returned {@link LinkedHashSet} is
-   * modifiable and
-   * never null.
+   * modifiable and never null.
    *
    * @param c
    * @return an {@link LinkedHashSet} containing the given collection's elements. Never null.
@@ -365,8 +362,7 @@ public final class CollectionUtility {
    *
    * @param c
    * @return an {@link LinkedHashSet} containing the given collection's elements without <code>null</code> elements.
-   *         Never
-   *         null.
+   *         Never null.
    */
   public static <T> LinkedHashSet<T> orderedHashSetWithoutNullElements(Collection<? extends T> c) {
     LinkedHashSet<T> set = orderedHashSet(c);
@@ -600,8 +596,8 @@ public final class CollectionUtility {
 
   /**
    * Returns a new empty {@link HashMap}.<br>
-   * This method differs to {@link Collections#emptyMap()} in that way that the {@link HashMap} returned by this
-   * method can be modified hence is no shared instance.
+   * This method differs to {@link Collections#emptyMap()} in that way that the {@link HashMap} returned by this method
+   * can be modified hence is no shared instance.
    *
    * @return An empty but modifiable {@link HashMap} with an initial capacity of <code>0</code>.
    */
@@ -648,8 +644,8 @@ public final class CollectionUtility {
 
   /**
    * Returns a new empty {@link HashSet}.<br>
-   * This method differs to {@link Collections#emptyList()} in that way that the {@link HashSet} returned by this
-   * method can be modified hence is no shared instance.
+   * This method differs to {@link Collections#emptyList()} in that way that the {@link HashSet} returned by this method
+   * can be modified hence is no shared instance.
    *
    * @return An empty but modifiable {@link HashSet} with an initial capacity of <code>0</code>.
    */
@@ -659,8 +655,8 @@ public final class CollectionUtility {
 
   /**
    * Returns a new empty {@link TreeSet}.<br>
-   * This method differs to {@link Collections#emptySet()} in that way that the {@link TreeSet} returned by this
-   * method can be modified hence is no shared instance.
+   * This method differs to {@link Collections#emptySet()} in that way that the {@link TreeSet} returned by this method
+   * can be modified hence is no shared instance.
    *
    * @return An empty but modifiable {@link TreeSet} with an initial capacity of <code>0</code>.
    */
@@ -669,8 +665,7 @@ public final class CollectionUtility {
   }
 
   /**
-   * combine all lists into one list containing all elements. the order of the
-   * items is preserved
+   * combine all lists into one list containing all elements. the order of the items is preserved
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T> combine(Collection<?>... collections) {

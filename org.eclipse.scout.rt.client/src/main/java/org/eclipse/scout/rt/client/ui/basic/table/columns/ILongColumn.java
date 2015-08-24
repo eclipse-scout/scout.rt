@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-
 public interface ILongColumn extends INumberColumn<Long> {
 
 }

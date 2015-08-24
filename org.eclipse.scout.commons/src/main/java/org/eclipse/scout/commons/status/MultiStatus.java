@@ -100,8 +100,8 @@ public class MultiStatus extends Status implements IMultiStatus {
   }
 
   /**
-   * Adds the given status to this multi-status.
-   * Sets the severity to the maximum severity of the children and the message to the message of the max Severity.
+   * Adds the given status to this multi-status. Sets the severity to the maximum severity of the children and the
+   * message to the message of the max Severity.
    *
    * @param status
    *          the new child status, not <code>null</code>

@@ -20,8 +20,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Notification is sent from server to client to notify that the code type has
- * changed and the client should clear its cache
+ * Notification is sent from server to client to notify that the code type has changed and the client should clear its
+ * cache
  */
 public class CodeTypeChangedNotification implements Serializable {
 

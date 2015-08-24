@@ -14,9 +14,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Assigns an absolute order to a type. To remove all Order-annotations theses
- * regular expressions can be used: search for: (@Order\()(\d+)(\.0f) replace
- * with: $1$2 search for: (@Order\()(\d+)(\.\d+)f replace with: $1$2$3
+ * Assigns an absolute order to a type. To remove all Order-annotations theses regular expressions can be used: search
+ * for: (@Order\()(\d+)(\.0f) replace with: $1$2 search for: (@Order\()(\d+)(\.\d+)f replace with: $1$2$3
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Order {

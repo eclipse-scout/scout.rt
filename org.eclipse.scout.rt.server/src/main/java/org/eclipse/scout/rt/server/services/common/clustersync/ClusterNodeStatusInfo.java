@@ -139,7 +139,8 @@ public class ClusterNodeStatusInfo {
 
     @Override
     public String toString() {
-      return "ClusterNodeStatusBean [sentMessageCount=" + m_sentMessageCount + ", receivedMessageCount=" + m_receivedMessageCount + ", lastChangedDate=" + m_lastChangedDate + ", lastChangedUserId=" + m_lastChangedUserId + ", lastChangedOriginNodeId=" + m_lastChangedOriginNodeId + "]";
+      return "ClusterNodeStatusBean [sentMessageCount=" + m_sentMessageCount + ", receivedMessageCount=" + m_receivedMessageCount + ", lastChangedDate=" + m_lastChangedDate + ", lastChangedUserId=" + m_lastChangedUserId
+          + ", lastChangedOriginNodeId=" + m_lastChangedOriginNodeId + "]";
     }
 
   }

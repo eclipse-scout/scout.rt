@@ -46,8 +46,8 @@ public final class ReflectionUtility {
   }
 
   /**
-   * Returns the interfaces which are implemented by the given class or its super types. However, only direct
-   * interfaces are returned, and not the whole interface hierarchy.
+   * Returns the interfaces which are implemented by the given class or its super types. However, only direct interfaces
+   * are returned, and not the whole interface hierarchy.
    */
   public static Class<?>[] getInterfaces(Class<?> clazz) {
     if (clazz.isInterface()) {

@@ -45,8 +45,7 @@ public interface IScoutLogger {
   /**
    * Is the logger instance enabled for the TRACE level?
    *
-   * @return True if this Logger is enabled for the TRACE level,
-   *         false otherwise.
+   * @return True if this Logger is enabled for the TRACE level, false otherwise.
    * @since 1.4
    */
   boolean isTraceEnabled();
@@ -61,8 +60,7 @@ public interface IScoutLogger {
   void trace(String msg);
 
   /**
-   * Log a message at the TRACE level according to the specified format
-   * and argument.
+   * Log a message at the TRACE level according to the specified format and argument.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the TRACE level.
    * </p>
@@ -76,8 +74,7 @@ public interface IScoutLogger {
   void trace(String format, Object arg);
 
   /**
-   * Log a message at the TRACE level according to the specified format
-   * and arguments.
+   * Log a message at the TRACE level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the TRACE level.
    * </p>
@@ -93,8 +90,7 @@ public interface IScoutLogger {
   void trace(String format, Object arg1, Object arg2);
 
   /**
-   * Log a message at the TRACE level according to the specified format
-   * and arguments.
+   * Log a message at the TRACE level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the TRACE level.
    * </p>
@@ -108,8 +104,7 @@ public interface IScoutLogger {
   void trace(String format, Object[] argArray);
 
   /**
-   * Log an exception (throwable) at the TRACE level with an
-   * accompanying message.
+   * Log an exception (throwable) at the TRACE level with an accompanying message.
    *
    * @param msg
    *          the message accompanying the exception
@@ -122,8 +117,7 @@ public interface IScoutLogger {
   /**
    * Is the logger instance enabled for the DEBUG level?
    *
-   * @return True if this Logger is enabled for the DEBUG level,
-   *         false otherwise.
+   * @return True if this Logger is enabled for the DEBUG level, false otherwise.
    */
   boolean isDebugEnabled();
 
@@ -136,8 +130,7 @@ public interface IScoutLogger {
   void debug(String msg);
 
   /**
-   * Log a message at the DEBUG level according to the specified format
-   * and argument.
+   * Log a message at the DEBUG level according to the specified format and argument.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the DEBUG level.
    * </p>
@@ -150,8 +143,7 @@ public interface IScoutLogger {
   void debug(String format, Object arg);
 
   /**
-   * Log a message at the DEBUG level according to the specified format
-   * and arguments.
+   * Log a message at the DEBUG level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the DEBUG level.
    * </p>
@@ -166,8 +158,7 @@ public interface IScoutLogger {
   void debug(String format, Object arg1, Object arg2);
 
   /**
-   * Log a message at the DEBUG level according to the specified format
-   * and arguments.
+   * Log a message at the DEBUG level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the DEBUG level.
    * </p>
@@ -180,8 +171,7 @@ public interface IScoutLogger {
   void debug(String format, Object[] argArray);
 
   /**
-   * Log an exception (throwable) at the DEBUG level with an
-   * accompanying message.
+   * Log an exception (throwable) at the DEBUG level with an accompanying message.
    *
    * @param msg
    *          the message accompanying the exception
@@ -193,8 +183,7 @@ public interface IScoutLogger {
   /**
    * Is the logger instance enabled for the INFO level?
    *
-   * @return True if this Logger is enabled for the INFO level,
-   *         false otherwise.
+   * @return True if this Logger is enabled for the INFO level, false otherwise.
    */
   boolean isInfoEnabled();
 
@@ -207,8 +196,7 @@ public interface IScoutLogger {
   void info(String msg);
 
   /**
-   * Log a message at the INFO level according to the specified format
-   * and argument.
+   * Log a message at the INFO level according to the specified format and argument.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the INFO level.
    * </p>
@@ -221,8 +209,7 @@ public interface IScoutLogger {
   void info(String format, Object arg);
 
   /**
-   * Log a message at the INFO level according to the specified format
-   * and arguments.
+   * Log a message at the INFO level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the INFO level.
    * </p>
@@ -237,8 +224,7 @@ public interface IScoutLogger {
   void info(String format, Object arg1, Object arg2);
 
   /**
-   * Log a message at the INFO level according to the specified format
-   * and arguments.
+   * Log a message at the INFO level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the INFO level.
    * </p>
@@ -251,8 +237,7 @@ public interface IScoutLogger {
   void info(String format, Object[] argArray);
 
   /**
-   * Log an exception (throwable) at the INFO level with an
-   * accompanying message.
+   * Log an exception (throwable) at the INFO level with an accompanying message.
    *
    * @param msg
    *          the message accompanying the exception
@@ -264,8 +249,7 @@ public interface IScoutLogger {
   /**
    * Is the logger instance enabled for the WARN level?
    *
-   * @return True if this Logger is enabled for the WARN level,
-   *         false otherwise.
+   * @return True if this Logger is enabled for the WARN level, false otherwise.
    */
   boolean isWarnEnabled();
 
@@ -278,8 +262,7 @@ public interface IScoutLogger {
   void warn(String msg);
 
   /**
-   * Log a message at the WARN level according to the specified format
-   * and argument.
+   * Log a message at the WARN level according to the specified format and argument.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the WARN level.
    * </p>
@@ -292,8 +275,7 @@ public interface IScoutLogger {
   void warn(String format, Object arg);
 
   /**
-   * Log a message at the WARN level according to the specified format
-   * and arguments.
+   * Log a message at the WARN level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the WARN level.
    * </p>
@@ -306,8 +288,7 @@ public interface IScoutLogger {
   void warn(String format, Object[] argArray);
 
   /**
-   * Log a message at the WARN level according to the specified format
-   * and arguments.
+   * Log a message at the WARN level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the WARN level.
    * </p>
@@ -322,8 +303,7 @@ public interface IScoutLogger {
   void warn(String format, Object arg1, Object arg2);
 
   /**
-   * Log an exception (throwable) at the WARN level with an
-   * accompanying message.
+   * Log an exception (throwable) at the WARN level with an accompanying message.
    *
    * @param msg
    *          the message accompanying the exception
@@ -335,8 +315,7 @@ public interface IScoutLogger {
   /**
    * Is the logger instance enabled for the ERROR level?
    *
-   * @return True if this Logger is enabled for the ERROR level,
-   *         false otherwise.
+   * @return True if this Logger is enabled for the ERROR level, false otherwise.
    */
   boolean isErrorEnabled();
 
@@ -349,8 +328,7 @@ public interface IScoutLogger {
   void error(String msg);
 
   /**
-   * Log a message at the ERROR level according to the specified format
-   * and argument.
+   * Log a message at the ERROR level according to the specified format and argument.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the ERROR level.
    * </p>
@@ -363,8 +341,7 @@ public interface IScoutLogger {
   void error(String format, Object arg);
 
   /**
-   * Log a message at the ERROR level according to the specified format
-   * and arguments.
+   * Log a message at the ERROR level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the ERROR level.
    * </p>
@@ -379,8 +356,7 @@ public interface IScoutLogger {
   void error(String format, Object arg1, Object arg2);
 
   /**
-   * Log a message at the ERROR level according to the specified format
-   * and arguments.
+   * Log a message at the ERROR level according to the specified format and arguments.
    * <p>
    * This form avoids superfluous object creation when the logger is disabled for the ERROR level.
    * </p>
@@ -393,8 +369,7 @@ public interface IScoutLogger {
   void error(String format, Object[] argArray);
 
   /**
-   * Log an exception (throwable) at the ERROR level with an
-   * accompanying message.
+   * Log an exception (throwable) at the ERROR level with an accompanying message.
    *
    * @param msg
    *          the message accompanying the exception

@@ -199,16 +199,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setTitle(String s);
 
   /**
-   * @return the context in which the table and column settings (order, width,
-   *         visible,...) are loaded and stored from the {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences
-   *         ClientUIPreferences}
+   * @return the context in which the table and column settings (order, width, visible,...) are loaded and stored from
+   *         the {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences ClientUIPreferences}
    */
   String getUserPreferenceContext();
 
   /**
-   * Set the context in which the table and column settings (order, width,
-   * visible,...) are loaded and stored from the {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences
-   * ClientUIPreferences}
+   * Set the context in which the table and column settings (order, width, visible,...) are loaded and stored from the
+   * {@link org.eclipse.scout.rt.client.ui.ClientUIPreferences ClientUIPreferences}
    * <p>
    * Be very careful when changing this property during runtime and when the table is initialized. Use the constructor
    * argument instead.
@@ -216,8 +214,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setUserPreferenceContext(String context);
 
   /**
-   * true: all columns are resized so that the table never needs horizontal
-   * scrolling
+   * true: all columns are resized so that the table never needs horizontal scrolling
    */
   boolean isAutoResizeColumns();
 
@@ -256,8 +253,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   List<ITableRow> getRows();
 
   /**
-   * Returns all rows that remain after applying all {@link ITableRowFilter}s. To get all rows (including the
-   * unaccepted ones) use {@link #getRows()}.
+   * Returns all rows that remain after applying all {@link ITableRowFilter}s. To get all rows (including the unaccepted
+   * ones) use {@link #getRows()}.
    * <p>
    * This method is thread-safe.
    * <p>
@@ -273,27 +270,25 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   int getFilteredRowCount();
 
   /**
-   * Returns a row with its index relative to the list of filtered rows ({@link #getFilteredRows()}).
-   * Because the list of filtered rows might be smaller than the total row count, this index differs
-   * from the ordinary {@link ITableRow#getRowIndex()}. It can be obtained with {@link #getFilteredRowIndex(ITableRow)}.
+   * Returns a row with its index relative to the list of filtered rows ({@link #getFilteredRows()}). Because the list
+   * of filtered rows might be smaller than the total row count, this index differs from the ordinary
+   * {@link ITableRow#getRowIndex()}. It can be obtained with {@link #getFilteredRowIndex(ITableRow)}.
    * <p>
    * This method is thread-safe.
    */
   ITableRow getFilteredRow(int index);
 
   /**
-   * Returns the index of a given row relative to the list of filtered rows (instead of all rows).
-   * Because the list of filtered rows might be smaller than the total row count, this index differs
-   * from the ordinary {@link ITableRow#getRowIndex()}. It can be used to retrieve a row again with
-   * {@link #getFilteredRow(int)}.
+   * Returns the index of a given row relative to the list of filtered rows (instead of all rows). Because the list of
+   * filtered rows might be smaller than the total row count, this index differs from the ordinary
+   * {@link ITableRow#getRowIndex()}. It can be used to retrieve a row again with {@link #getFilteredRow(int)}.
    * <p>
    * This method is thread-safe.
    */
   int getFilteredRowIndex(ITableRow row);
 
   /**
-   * @return matrix[rowCount][columnCount] with cell values all calls (also
-   *         invisible and primary key) are considered
+   * @return matrix[rowCount][columnCount] with cell values all calls (also invisible and primary key) are considered
    */
   Object[][] getTableData();
 
@@ -353,8 +348,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setKeyStrokes(List<? extends IKeyStroke> keyStrokes);
 
   /**
-   * Run a menu The menu is first prepared and only executed when it is visible
-   * and enabled
+   * Run a menu The menu is first prepared and only executed when it is visible and enabled
    *
    * @return true if menu was executed
    */
@@ -367,8 +361,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * @param b
-   *          true: advices the attached ui to make the current selection visible.
-   *          The current selection will be scrolled to visible (again, whenever the table size changes).
+   *          true: advices the attached ui to make the current selection visible. The current selection will be
+   *          scrolled to visible (again, whenever the table size changes).
    */
   void setScrollToSelection(boolean b);
 
@@ -403,9 +397,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ICell getSummaryCell(int rowIndex);
 
   /**
-   * composite cell containing the union of all values of this rows that are in
-   * a column with property summary=true when no summary column visible or there
-   * are none, this defaults to the first defined visible column
+   * composite cell containing the union of all values of this rows that are in a column with property summary=true when
+   * no summary column visible or there are none, this defaults to the first defined visible column
    *
    * @see IColumn#isSummary()
    */
@@ -453,8 +446,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setMultilineText(boolean on);
 
   /**
-   * This is a hint for the UI iff it is not capable of
-   * having variable table row height based on cell contents.
+   * This is a hint for the UI iff it is not capable of having variable table row height based on cell contents.
    * <p>
    * This property is interpreted in different manner for each GUI port:
    * <ul>
@@ -476,8 +468,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * other than isMultilineText this property reflects the default multiLine state of the table that is used when
-   * wrapping columns become
-   * visible or get hidden
+   * wrapping columns become visible or get hidden
    */
   boolean isInitialMultilineText();
 
@@ -487,10 +478,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setInitialMultilineText(boolean on);
 
   /**
-   * this property is used to enable keyboard navigation of a table.
-   * The row starting with the typed string will be selected. The considered
-   * column is the context column; either the last selected column or the column
-   * having a sort order.
+   * this property is used to enable keyboard navigation of a table. The row starting with the typed string will be
+   * selected. The considered column is the context column; either the last selected column or the column having a sort
+   * order.
    */
   boolean hasKeyboardNavigation();
 
@@ -516,10 +506,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * This property changes the behaviour of {@link #replaceRows(List<? extends ITableRow>)} and
-   * {@link #deleteRows(int[])} true
-   * discards rows when deleted, false keeps
-   * them in the cache for later usage in change management Default value is
-   * true for {@link IPageWithTable} and false for
+   * {@link #deleteRows(int[])} true discards rows when deleted, false keeps them in the cache for later usage in change
+   * management Default value is true for {@link IPageWithTable} and false for
    * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField}
    */
   boolean isAutoDiscardOnDelete();
@@ -574,9 +562,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   IEventHistory<TableEvent> getEventHistory();
 
   /**
-   * when performing a batch mutation use this marker like try{
-   * setTableChanging(true); ...modify columns, rows, perform sorting etc. }
-   * finally{ setTableChanging(false); }
+   * when performing a batch mutation use this marker like try{ setTableChanging(true); ...modify columns, rows, perform
+   * sorting etc. } finally{ setTableChanging(false); }
    */
   void setTableChanging(boolean b);
 
@@ -597,19 +584,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void updateAllRows();
 
   /**
-   * replace rows based on a comparison of their primary keys similar to
-   * updateRows(), this method modifies existing rows the difference is that
-   * newRows is a NEW set of rows whereas updateRows processes changes on
-   * existing rows the idea is that a reload of table data does not delete and
-   * (re)add rows but intelligently update existing rows if their primary key
-   * matches the key of a new row in detail: for every argument newRow: 1. if
-   * for an existingRow the check getRowKeys(newRow)==getRowKeys(existingRow) is
-   * true, then existingRow is replaced by newRow when there are multiple
-   * existingRow's that match, only the first one is replaced and the others are
-   * removed 2. if for no existingRow the check
-   * getRowKeys(newRow)==getRowKeys(existingRow) is true then the newRow is
-   * added to the table as a really new row 3. all existing rows that do not
-   * match any newRow are deleted
+   * replace rows based on a comparison of their primary keys similar to updateRows(), this method modifies existing
+   * rows the difference is that newRows is a NEW set of rows whereas updateRows processes changes on existing rows the
+   * idea is that a reload of table data does not delete and (re)add rows but intelligently update existing rows if
+   * their primary key matches the key of a new row in detail: for every argument newRow: 1. if for an existingRow the
+   * check getRowKeys(newRow)==getRowKeys(existingRow) is true, then existingRow is replaced by newRow when there are
+   * multiple existingRow's that match, only the first one is replaced and the others are removed 2. if for no
+   * existingRow the check getRowKeys(newRow)==getRowKeys(existingRow) is true then the newRow is added to the table as
+   * a really new row 3. all existing rows that do not match any newRow are deleted
    */
   void replaceRows(List<? extends ITableRow> newRows) throws ProcessingException;
 
@@ -617,9 +599,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * Performance note:<br>
-   * Since the matrix may contain large amount of data, the Object[][] can be passed as new
-   * AtomicReference<Object>(Object[][])
-   * so that the further processing can set the content of the holder to null while processing.
+   * Since the matrix may contain large amount of data, the Object[][] can be passed as new AtomicReference
+   * <Object>(Object[][]) so that the further processing can set the content of the holder to null while processing.
    */
   void replaceRowsByMatrix(Object dataMatrix) throws ProcessingException;
 
@@ -686,9 +667,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   IColumn<?> getContextColumn();
 
   /**
-   * Set the column that represents the last ui (mouse click) column context, normally
-   * called by {@link ITableUIFacade#setContextColumnFromUI(IColumn)} and not by client code. see
-   * {@link #getContextColumn()}
+   * Set the column that represents the last ui (mouse click) column context, normally called by
+   * {@link ITableUIFacade#setContextColumnFromUI(IColumn)} and not by client code. see {@link #getContextColumn()}
    */
   void setContextColumn(IColumn<?> col);
 
@@ -701,8 +681,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Adds a new {@link ITableRow}
    *
    * @param markAsInserted
-   *          if <code>true</code>, the status of the new row is {@link ITableRow#STATUS_INSERTED},
-   *          otherwise the status{@link ITableRow#STATUS_NON_CHANGED}
+   *          if <code>true</code>, the status of the new row is {@link ITableRow#STATUS_INSERTED}, otherwise the status
+   *          {@link ITableRow#STATUS_NON_CHANGED}
    * @throws ProcessingException
    */
   ITableRow addRow(boolean markAsInserted) throws ProcessingException;
@@ -713,9 +693,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ITableRow addRow(ITableRow newRow) throws ProcessingException;
 
   /**
-   * the newRow is added to the table. After the add succeeds the argument row
-   * newRow has a valid reference to its coresponding ITableRow and the new
-   * ITableRow is returned
+   * the newRow is added to the table. After the add succeeds the argument row newRow has a valid reference to its
+   * coresponding ITableRow and the new ITableRow is returned
    */
   ITableRow addRow(ITableRow newRow, boolean markAsInserted) throws ProcessingException;
 
@@ -730,10 +709,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted) throws ProcessingException;
 
   /**
-   * all newRows are added to the table. After the add succeeds the argument
-   * rows newRows have valid references to their coresponding ITableRow and the
-   * new ITableRows are returned Using insertIndexes: assume the rows have been
-   * added to the table; insertIndexes = what indexes should they cover
+   * all newRows are added to the table. After the add succeeds the argument rows newRows have valid references to their
+   * coresponding ITableRow and the new ITableRows are returned Using insertIndexes: assume the rows have been added to
+   * the table; insertIndexes = what indexes should they cover
    *
    * @return added rows in order as they were passed to the method
    */
@@ -940,8 +918,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ITableContextMenu getContextMenu();
 
   /**
-   * Creates an empty table row.
-   * The created row is not added to the table yet.
+   * Creates an empty table row. The created row is not added to the table yet.
    *
    * @return the created table row
    * @throws ProcessingException
@@ -949,9 +926,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ITableRow createRow() throws ProcessingException;
 
   /**
-   * Creates table rows for the given matrix of row values. The created rows are not added to the table yet.
-   * One row is created for each row in the matrix. The row state of each created row is set to
-   * {@link ITableRow#STATUS_INSERTED}.
+   * Creates table rows for the given matrix of row values. The created rows are not added to the table yet. One row is
+   * created for each row in the matrix. The row state of each created row is set to {@link ITableRow#STATUS_INSERTED}.
    * <p/>
    * Performance note:<br>
    * Since the matrix may contain large amounts of data, the matrix can be passed as an
@@ -966,8 +942,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException;
 
   /**
-   * Creates table rows from the given matrix of row values. The created rows are not added to the table yet.
-   * One row is created for each row in the matrix. The row state of each created row is set according to the
+   * Creates table rows from the given matrix of row values. The created rows are not added to the table yet. One row is
+   * created for each row in the matrix. The row state of each created row is set according to the
    * <code>rowStatus</code> parameter.
    * <p/>
    * Performance note:<br>
@@ -993,8 +969,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) throws ProcessingException;
 
   /**
-   * Creates a new table row from the <code>rowValues</code> argument.
-   * The created row is not added to the table yet.
+   * Creates a new table row from the <code>rowValues</code> argument. The created row is not added to the table yet.
    *
    * @param rowValues
    *          The values to be filled into the new table row. Must be an array.
@@ -1004,8 +979,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ITableRow createRow(Object rowValues) throws ProcessingException;
 
   /**
-   * Creates new table rows from the given (one dimensional) array.
-   * The created rows are not added to the table yet.
+   * Creates new table rows from the given (one dimensional) array. The created rows are not added to the table yet.
    *
    * @param dataArray
    *          The values to be filled into the new table rows.
@@ -1015,9 +989,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   List<ITableRow> createRowsByArray(Object dataArray) throws ProcessingException;
 
   /**
-   * Creates new table rows from the given (one dimensional) array.
-   * The created rows are not added to the table yet. The row state of each created row is set according to the
-   * <code>rowStatus</code> parameter.
+   * Creates new table rows from the given (one dimensional) array. The created rows are not added to the table yet. The
+   * row state of each created row is set according to the <code>rowStatus</code> parameter.
    *
    * @param dataArray
    *          The values to be filled into the new table rows.

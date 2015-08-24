@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.checkbox;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 
 /**
- * Convenience subclass for {@link IBooleanField} due to popular usage of the
- * word "checkBox" instead of "booleanField"<br>
+ * Convenience subclass for {@link IBooleanField} due to popular usage of the word "checkBox" instead of "booleanField"
+ * <br>
  * do not add further code or methods to this class
  */
 public interface ICheckBox extends IBooleanField {

@@ -20,12 +20,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public interface IStatementProcessorMonitor {
 
   /**
-   * Called after data has been completely fetched and before operation is going
-   * to close affected resources.
+   * Called after data has been completely fetched and before operation is going to close affected resources.
    * 
    * @param rows
-   *          is the life list of rows fetched so far, changes to this list will
-   *          be returned by the original method call. Used in methods
+   *          is the life list of rows fetched so far, changes to this list will be returned by the original method
+   *          call. Used in methods
    *          {@link IStatementProcessor#processSelect(Connection, IStatementCache, IStatementProcessorMonitor)}
    *          {@link IStatementProcessor#processSelectInto(Connection, IStatementCache, IStatementProcessorMonitor)}
    */

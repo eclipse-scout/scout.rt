@@ -29,8 +29,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.commons.CompositeObject;
 
 /**
- * Analyze a log file with records of the following format LOG_MESSAGE_LINE
- * optional STACK TRACE and info
+ * Analyze a log file with records of the following format LOG_MESSAGE_LINE optional STACK TRACE and info
  */
 public class LogAnalyzer {
   private int m_totalCount;

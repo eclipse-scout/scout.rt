@@ -422,8 +422,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   /**
    * Called just before the transaction is being committed or rollbacked.<br>
-   * Do not call commit here, the flag is just meant as a hint.
-   * Statements are executed, even if the transaction is canceled.
+   * Do not call commit here, the flag is just meant as a hint. Statements are executed, even if the transaction is
+   * canceled.
    */
   @ConfigOperation
   @Order(50)
@@ -711,8 +711,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   /**
-   * When the service completes work with an exception, a xa rollback is done on
-   * ALL used service request resources
+   * When the service completes work with an exception, a xa rollback is done on ALL used service request resources
    *
    * @see commit
    */
@@ -741,9 +740,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   /**
-   * @return the class loaded by the first bundle with a matching symbolic name
-   *         Example: name "com.myapp.shared.core.security.ReadDataPermission" is loaded by the bundle with symbolic
-   *         name "com.myapp.shared.core".
+   * @return the class loaded by the first bundle with a matching symbolic name Example: name
+   *         "com.myapp.shared.core.security.ReadDataPermission" is loaded by the bundle with symbolic name
+   *         "com.myapp.shared.core".
    */
   private Class loadBundleClassLenient(Map<String, List<Class<?>>> map, String name) {
     String base = name;

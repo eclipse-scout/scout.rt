@@ -52,12 +52,10 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  */
 
 /**
- * This class is used as a placeholder of virtual desktop while the desktop is
- * loading until the desktop is set onto the {@link IClientSession}. Reasons for
- * that are observer attachments and data change registration in the init block
- * of forms, fields, pages that must be done while the desktop is loading. This
- * pattern solves the bird/egg problem in initialization of an object with
- * self-references.
+ * This class is used as a placeholder of virtual desktop while the desktop is loading until the desktop is set onto the
+ * {@link IClientSession}. Reasons for that are observer attachments and data change registration in the init block of
+ * forms, fields, pages that must be done while the desktop is loading. This pattern solves the bird/egg problem in
+ * initialization of an object with self-references.
  */
 public class VirtualDesktop implements IDesktop {
 

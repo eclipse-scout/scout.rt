@@ -194,11 +194,10 @@ public interface ITreeNode {
   void setRejectedByUser(boolean rejectedByUser);
 
   /**
-   * a dirty marked node is marked for child reload its children are reloaded on
-   * the next ui call to {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
+   * a dirty marked node is marked for child reload its children are reloaded on the next ui call to
+   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
    * {@link ITreeUIFacade#setNodeSelectedAndExpandedFromUI(ITreeNode)}
-   * {@link ITreeUIFacade#setNodesSelectedFromUI(ITreeNode[])} and the dirty
-   * flag is reset to false default is false
+   * {@link ITreeUIFacade#setNodesSelectedFromUI(ITreeNode[])} and the dirty flag is reset to false default is false
    */
   boolean isChildrenDirty();
 
@@ -208,8 +207,8 @@ public interface ITreeNode {
   void setChildrenDirty(boolean b);
 
   /**
-   * a node with volatile (rapidly and constantly changing) children is reloaded
-   * on ANY ui call to {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
+   * a node with volatile (rapidly and constantly changing) children is reloaded on ANY ui call to
+   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
    * {@link ITreeUIFacade#setNodeSelectedAndExpandedFromUI(ITreeNode)}
    * {@link ITreeUIFacade#setNodesSelectedFromUI(ITreeNode[])} default is false
    */

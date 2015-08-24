@@ -15,8 +15,7 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
- * Title: BSI Scout V3 Copyright:
- * Copyright (c) 2001,2009 BSI AG
+ * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG
  * 
  * @version 3.x
  */

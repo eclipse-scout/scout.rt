@@ -143,8 +143,7 @@ public class ClientRunContext extends RunContext {
   }
 
   /**
-   * Returns the {@link IForm} which is associated with this {@link ClientRunContext}, or <code>null</code> if not
-   * set.
+   * Returns the {@link IForm} which is associated with this {@link ClientRunContext}, or <code>null</code> if not set.
    */
   public IForm getForm() {
     return m_form;

@@ -16,13 +16,10 @@ import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 
 /**
- * Cause Derby supports no sequences, we model this behavior with a table
- * with only one column AND entry of type BIGINT (or other numeric type).
- * This table needs to have at the beginning this one entry. The default
- * column name is "LAST_VAL". With the method {@link AbstractDerbySqlService#getConfiguredSequenceColumnName()} one can
- * customize the name of this column.
- * NOTE: With "CREATE SYNONYM DUAL FOR SYSIBM.SYSDUMMY1" one can better reuse
- * Oracle styled SQL.
+ * Cause Derby supports no sequences, we model this behavior with a table with only one column AND entry of type BIGINT
+ * (or other numeric type). This table needs to have at the beginning this one entry. The default column name is
+ * "LAST_VAL". With the method {@link AbstractDerbySqlService#getConfiguredSequenceColumnName()} one can customize the
+ * name of this column. NOTE: With "CREATE SYNONYM DUAL FOR SYSIBM.SYSDUMMY1" one can better reuse Oracle styled SQL.
  */
 public abstract class AbstractDerbySqlService extends AbstractSqlService {
 

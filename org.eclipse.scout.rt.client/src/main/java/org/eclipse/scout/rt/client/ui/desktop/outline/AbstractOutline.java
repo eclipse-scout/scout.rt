@@ -193,8 +193,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * By default the outline tree tries to delegate the drop to the affected
-   * page.
+   * By default the outline tree tries to delegate the drop to the affected page.
    */
   @Override
   protected void execDrop(ITreeNode node, TransferObject t) {
@@ -207,8 +206,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Initializes the default detail form associated with this page. This method is called before the
-   * default detail form is used for the first time.
+   * Initializes the default detail form associated with this page. This method is called before the default detail form
+   * is used for the first time.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
@@ -261,8 +260,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 4.0.1
    */
@@ -842,7 +841,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     chain.execCreateChildPages(pageList);
   }
 
-  protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER> implements IOutlineExtension<OWNER> {
+  protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER>implements IOutlineExtension<OWNER> {
 
     public LocalOutlineExtension(OWNER owner) {
       super(owner);

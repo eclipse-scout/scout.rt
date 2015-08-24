@@ -309,8 +309,8 @@ public class ColumnSet {
   }
 
   /**
-   * Checks whether the column with the given class has been replaced by another column. If so, the replacing
-   * column's class is returned. Otherwise the given class itself.
+   * Checks whether the column with the given class has been replaced by another column. If so, the replacing column's
+   * class is returned. Otherwise the given class itself.
    *
    * @param c
    * @return Returns the possibly available replacing column class for the given class.
@@ -726,8 +726,7 @@ public class ColumnSet {
   }
 
   /**
-   * add column at beginning of sort columns but keep sort history of max
-   * keepHistoryCount last columns
+   * add column at beginning of sort columns but keep sort history of max keepHistoryCount last columns
    * <p>
    * The column is added as a user sort column
    */

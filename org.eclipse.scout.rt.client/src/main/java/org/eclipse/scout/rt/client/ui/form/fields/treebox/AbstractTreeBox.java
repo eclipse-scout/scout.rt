@@ -68,7 +68,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("5648579d-1968-47be-a0c9-a8c846d2caf4")
-public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> implements ITreeBox<T> {
+public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>>implements ITreeBox<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeBox.class);
 
   private ITree m_tree;
@@ -176,8 +176,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   /**
-   * @return true: a filter is added to the treebox tree that only accepts nodes
-   *         that are active or checked.<br>
+   * @return true: a filter is added to the treebox tree that only accepts nodes that are active or checked.<br>
    *         Affects {@link ITreeNode#getFilteredChildNodes()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -187,8 +186,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   /**
-   * @return true: a filter is added to the treebox tree that only accepts
-   *         checked nodes<br>
+   * @return true: a filter is added to the treebox tree that only accepts checked nodes<br>
    *         Affects {@link ITreeNode#getFilteredChildNodes()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -227,8 +225,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   /**
-   * On any value change or call to {@link #checkEmpty()} this method is called
-   * to calculate if the field represents an empty state (semantics)
+   * On any value change or call to {@link #checkEmpty()} this method is called to calculate if the field represents an
+   * empty state (semantics)
    * <p>
    */
   @Override
@@ -248,8 +246,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    * @param call
    *          that produced this result
    * @param result
-   *          live list containing the result rows. Add, remove, set, replace
-   *          and clear of entries in this list is supported
+   *          live list containing the result rows. Add, remove, set, replace and clear of entries in this list is
+   *          supported
    */
   @ConfigOperation
   @Order(240)
@@ -340,8 +338,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
                   }
                 }
               }
-            }
-            );
+            });
         m_tree.setEnabled(isEnabled());
         // default icon
         if (this.getConfiguredIconId() != null) {
@@ -1067,8 +1064,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   /**
-   * TreeNode implementation with delegation of loadChildren to
-   * this.loadChildNodes()
+   * TreeNode implementation with delegation of loadChildren to this.loadChildNodes()
    */
   private class P_InternalTreeNode extends AbstractTreeNode {
     private boolean m_active;
@@ -1152,7 +1148,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     chain.execFilterLookupResult(call, result);
   }
 
-  protected static class LocalTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends LocalValueFieldExtension<Set<T>, OWNER> implements ITreeBoxExtension<T, OWNER> {
+  protected static class LocalTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends LocalValueFieldExtension<Set<T>, OWNER>implements ITreeBoxExtension<T, OWNER> {
 
     public LocalTreeBoxExtension(OWNER owner) {
       super(owner);

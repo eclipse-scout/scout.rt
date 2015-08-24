@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.labelfield.ILabelFie
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
 @ClassId("7e531d93-ad27-4316-9529-7766059b3886")
-public abstract class AbstractLabelField extends AbstractValueField<String> implements ILabelField {
+public abstract class AbstractLabelField extends AbstractValueField<String>implements ILabelField {
   public AbstractLabelField() {
     this(true);
   }
@@ -116,7 +116,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return text;
   }
 
-  protected static class LocalLabelFieldExtension<OWNER extends AbstractLabelField> extends LocalValueFieldExtension<String, OWNER> implements ILabelFieldExtension<OWNER> {
+  protected static class LocalLabelFieldExtension<OWNER extends AbstractLabelField> extends LocalValueFieldExtension<String, OWNER>implements ILabelFieldExtension<OWNER> {
 
     public LocalLabelFieldExtension(OWNER owner) {
       super(owner);

@@ -122,12 +122,12 @@ public class DefaultTimezoneDateAdapterTest {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     format.setTimeZone(expectedTimeZone);
     format.format(date);
-    assertEquals(expectedYear + "-" +
-        StringUtility.lpad(expectedMonth + "", "0", 2) + "-" +
-        StringUtility.lpad(expectedDay + "", "0", 2) + " " +
-        StringUtility.lpad(expectedHour + "", "0", 2) + ":" +
-        StringUtility.lpad(expectedMinute + "", "0", 2) + ":" +
-        StringUtility.lpad(expectedSecond + "", "0", 2),
+    assertEquals(expectedYear + "-" 
++        StringUtility.lpad(expectedMonth + "", "0", 2) + "-" 
++        StringUtility.lpad(expectedDay + "", "0", 2) + " " 
++        StringUtility.lpad(expectedHour + "", "0", 2) + ":" 
++        StringUtility.lpad(expectedMinute + "", "0", 2) + ":" 
++        StringUtility.lpad(expectedSecond + "", "0", 2),
         format.format(date));
   }
 }

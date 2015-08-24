@@ -46,8 +46,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Creates an outline consisting of a PageWithTable and PageWithNode as child. Tests if menus appear on parent
- * as well on client node correctly.
+ * Creates an outline consisting of a PageWithTable and PageWithNode as child. Tests if menus appear on parent as well
+ * on client node correctly.
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")

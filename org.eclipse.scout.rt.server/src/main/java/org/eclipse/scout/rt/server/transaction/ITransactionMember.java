@@ -23,8 +23,7 @@ public interface ITransactionMember {
   boolean needsCommit();
 
   /**
-   * Two-phase commit.
-   * Temporary commits the transaction member
+   * Two-phase commit. Temporary commits the transaction member
    * <p>
    * 
    * @return true without any exception if the commit phase 1 was successful.

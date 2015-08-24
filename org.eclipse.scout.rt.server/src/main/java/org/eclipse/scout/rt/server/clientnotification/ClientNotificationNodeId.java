@@ -14,7 +14,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 
 /**
  * Every client node opens a connection to a server node to access notifications. This connection is addressed by the
- * {@link ClientNotificationNodeId}. The node id is provided on every {@link ServiceTunnelRequest#getClientNotificationNodeId()}.
+ * {@link ClientNotificationNodeId}. The node id is provided on every
+ * {@link ServiceTunnelRequest#getClientNotificationNodeId()}.
  */
 public class ClientNotificationNodeId {
 

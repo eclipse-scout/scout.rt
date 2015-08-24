@@ -26,10 +26,9 @@ public class AliasMapper {
   private static final Pattern ENTITY_NAME = Pattern.compile("[@](parent\\.)?([a-zA-Z0-9_]+)[@]");
 
   /**
-   * Pattern to recognize entity definitions.
-   * The pattern does not recognize an entity definition in case the
-   * string is terminated after the ending @. Thus when using the entity definition,
-   * append a space to the string before applying the pattern.
+   * Pattern to recognize entity definitions. The pattern does not recognize an entity definition in case the string is
+   * terminated after the ending @. Thus when using the entity definition, append a space to the string before applying
+   * the pattern.
    */
   private static final Pattern ENTITY_DEFINITION = Pattern.compile("[@]([a-zA-Z0-9_]+)[@]([^.])");
 
@@ -81,8 +80,7 @@ public class AliasMapper {
   }
 
   /**
-   * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t}
-   *         never returns null
+   * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t} never returns null
    */
   public Map<String, String> getRootAliases() {
     return m_rootAliases;
@@ -121,8 +119,7 @@ public class AliasMapper {
   }
 
   /**
-   * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t}
-   *         never returns null
+   * @return the live map with the effective aliases per entity for example {PERSON = p, TASK = t} never returns null
    */
   public Map<String, String> getNodeAliases(Object node) {
     Map<String, String> map = m_nodeAliases.get(node);

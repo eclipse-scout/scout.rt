@@ -333,8 +333,7 @@ public class MailUtilityTest {
 
     definition.addAttachments(CollectionUtility.arrayList(
         new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)),
-        new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null))
-        ));
+        new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null))));
 
     Assert.assertEquals("Number of attachments is wrong", 2, definition.getAttachments().size());
   }

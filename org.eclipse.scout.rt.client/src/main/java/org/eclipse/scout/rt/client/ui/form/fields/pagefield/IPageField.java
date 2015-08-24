@@ -19,8 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 
 /**
- * Representation of a page as a composite of detailForm, table, searchForm for
- * usage inside a {@link IForm}
+ * Representation of a page as a composite of detailForm, table, searchForm for usage inside a {@link IForm}
  */
 public interface IPageField<T extends IPage> extends IGroupBox {
 

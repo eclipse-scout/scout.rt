@@ -315,8 +315,7 @@ public class PageFormManager {
 
   /**
    * Mainly a copy from AbstractTree.getUIFacade.setNodeSelectedAndExpandedFromUI() without setTreeChanging(true/false)
-   * and additional outline change.
-   * TreeChanging must not be set otherwise collecting node menus does not work anymore.
+   * and additional outline change. TreeChanging must not be set otherwise collecting node menus does not work anymore.
    */
   private void selectAndExpandPage(IPage<?> page) throws ProcessingException {
     try {

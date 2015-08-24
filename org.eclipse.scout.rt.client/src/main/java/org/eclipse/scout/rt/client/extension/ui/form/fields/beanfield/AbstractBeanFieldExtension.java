@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldEx
 import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.BeanFieldChains.BeanFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.AbstractBeanField;
 
-public abstract class AbstractBeanFieldExtension<VALUE, OWNER extends AbstractBeanField<VALUE>> extends AbstractValueFieldExtension<VALUE, OWNER> implements IBeanFieldExtension<VALUE, OWNER> {
+public abstract class AbstractBeanFieldExtension<VALUE, OWNER extends AbstractBeanField<VALUE>> extends AbstractValueFieldExtension<VALUE, OWNER>implements IBeanFieldExtension<VALUE, OWNER> {
 
   public AbstractBeanFieldExtension(OWNER owner) {
     super(owner);

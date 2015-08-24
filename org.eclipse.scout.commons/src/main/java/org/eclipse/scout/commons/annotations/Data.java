@@ -21,5 +21,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Data {
-  Class<?> value() default Object.class;
+  Class<?>value() default Object.class;
 }

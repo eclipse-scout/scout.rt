@@ -19,8 +19,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
- * {@link #isMultiSelectionAction()}, {@link #isNonSelectionAction()}, {@link #isEmptySpaceAction()} and the
- * granting {@link #isInheritAccessibility()}
+ * {@link #isMultiSelectionAction()}, {@link #isNonSelectionAction()}, {@link #isEmptySpaceAction()} and the granting
+ * {@link #isInheritAccessibility()}
  * <p>
  * Examples:<br>
  * A typical NEW menu on a table that is only visible on the empty space of the table and only when the table field is
@@ -120,11 +120,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   void setVisible(boolean b);
 
   /**
-   * @return true if {@link #prepareAction()} should in addition consider the
-   *         context of the action to decide for visibility and enabled.<br>
+   * @return true if {@link #prepareAction()} should in addition consider the context of the action to decide for
+   *         visibility and enabled.<br>
    *         For example a menu of a table field with {@link #isInheritAccessibility()}==true is invisible when the
-   *         table
-   *         field is disabled or invisible
+   *         table field is disabled or invisible
    */
   boolean isInheritAccessibility();
 

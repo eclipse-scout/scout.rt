@@ -42,9 +42,8 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 
 /**
- * maintains a cache of ICodeType objects that can be (re)loaded using the
- * methods loadCodeType, loadCodeTypes if getters and finders are called with
- * partitionId, cache is not used.
+ * maintains a cache of ICodeType objects that can be (re)loaded using the methods loadCodeType, loadCodeTypes if
+ * getters and finders are called with partitionId, cache is not used.
  * <p>
  * Service state is per [{@link IClientSession}.class,{@link NlsLocale#get()},partitionId]
  */

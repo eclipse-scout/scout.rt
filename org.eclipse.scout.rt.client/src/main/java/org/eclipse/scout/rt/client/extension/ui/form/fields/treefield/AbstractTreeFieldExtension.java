@@ -12,7 +12,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldC
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 
-public abstract class AbstractTreeFieldExtension<OWNER extends AbstractTreeField> extends AbstractFormFieldExtension<OWNER> implements ITreeFieldExtension<OWNER> {
+public abstract class AbstractTreeFieldExtension<OWNER extends AbstractTreeField> extends AbstractFormFieldExtension<OWNER>implements ITreeFieldExtension<OWNER> {
 
   public AbstractTreeFieldExtension(OWNER owner) {
     super(owner);

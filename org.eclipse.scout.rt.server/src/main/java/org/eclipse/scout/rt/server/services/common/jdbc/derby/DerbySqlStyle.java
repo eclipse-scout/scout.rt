@@ -72,7 +72,8 @@ public class DerbySqlStyle extends AbstractSqlStyle {
 
   @Override
   public String createDateIsInLastDays(String attribute, String bindName) {
-    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
+    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD
+        + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
@@ -82,27 +83,32 @@ public class DerbySqlStyle extends AbstractSqlStyle {
 
   @Override
   public String createDateIsInDays(String attribute, String bindName) {
-    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + " + 1, CURRENT_TIMESTAMP)} AS DATE)";
+    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD
+        + "{FN TIMESTAMPADD(SQL_TSI_DAY, :" + bindName + " + 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
   public String createDateIsInWeeks(String attribute, String bindName) {
-    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
+    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD
+        + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_WEEK, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
   public String createDateIsInLastMonths(String attribute, String bindName) {
-    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MONTH,(-1)*:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
+    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MONTH,(-1)*:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD
+        + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, CURRENT_TIMESTAMP)} AS DATE)";
   }
 
   @Override
   public String createDateIsInNextMonths(String attribute, String bindName) {
-    return CAST_SQL_METHOD + attribute + " AS DATE) >= CURRENT_DATE AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
+    return CAST_SQL_METHOD + attribute + " AS DATE) >= CURRENT_DATE AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName
+        + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
   public String createDateIsInMonths(String attribute, String bindName) {
-    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MONTH,:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
+    return CAST_SQL_METHOD + attribute + " AS DATE) >= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MONTH,:" + bindName + ", CURRENT_TIMESTAMP)} AS DATE) AND " + CAST_SQL_METHOD + attribute + " AS DATE) < " + CAST_SQL_METHOD
+        + "{FN TIMESTAMPADD(SQL_TSI_DAY, 1, {FN TIMESTAMPADD(SQL_TSI_MONTH, :" + bindName + ", CURRENT_TIMESTAMP)})} AS DATE)";
   }
 
   @Override
@@ -220,37 +226,37 @@ public class DerbySqlStyle extends AbstractSqlStyle {
   public String createTimeIsNow(String attribute){
     return attribute + ">= CURRENT_TIME AND " + attribute + " < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)} AS TIME)";
   }
-
+  
   @Override
   public String createTimeIsNotNow(String attribute){
     return "(" + attribute + " < CURRENT_TIME OR " + attribute + " > " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)} AS TIME))";
   }
-
+  
   @Override
   public String createTimeIsInMinutes(String attribute, String bindName){
     return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME) AND " + attribute + " < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
   }
-
+  
   @Override
   public String createTimeIsInHours(String attribute, String bindName){
     return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME) AND " + attribute + " < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
   }
-
+  
   @Override
   public String createTimeIsInLEMinutes(String attribute, String bindName){
     return attribute + "< " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
   }
-
+  
   @Override
   public String createTimeIsInLEHours(String attribute, String bindName){
     return attribute + "< " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
   }
-
+  
   @Override
   public String createTimeIsInGEMinutes(String attribute, String bindName){
     return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME)";
   }
-
+  
   @Override
   public String createTimeIsInGEHours(String attribute, String bindName){
     return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME)";

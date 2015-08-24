@@ -204,8 +204,7 @@ public class BasicPartDefinition implements DataModelConstants {
   /**
    * Override this method to intercept and change part instance properties such as values, operation type, etc.<br>
    * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
-   * attribute
-   * itself as the complete statement part.
+   * attribute itself as the complete statement part.
    *
    * @param builder
    * @param formData
@@ -232,8 +231,7 @@ public class BasicPartDefinition implements DataModelConstants {
      */
     ArrayList<Object> valueDatas = new ArrayList<Object>(valueTypes.length);
     /**
-     * by default the names "a", "b", "c", ... represent the bindValues in the same order as the
-     * values
+     * by default the names "a", "b", "c", ... represent the bindValues in the same order as the values
      */
     ArrayList<String> bindNames = new ArrayList<String>(valueTypes.length);
     /**

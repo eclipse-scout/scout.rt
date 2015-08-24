@@ -57,8 +57,7 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   }
 
   /**
-   * Update values of this variable map with the new one if version of new map
-   * is newer <br>
+   * Update values of this variable map with the new one if version of new map is newer <br>
    * Does not fire a change event
    */
   public void updateInternal(SharedVariableMap newMap) {
@@ -69,8 +68,8 @@ public class SharedVariableMap implements Serializable, Map<String, Object> {
   }
 
   /**
-   * @return the version seq of the map state. This version number is changed every time the variable map changes.
-   *         Note that even a different number means that the version changed, it must not be higher, just different.
+   * @return the version seq of the map state. This version number is changed every time the variable map changes. Note
+   *         that even a different number means that the version changed, it must not be higher, just different.
    *         <p>
    *         see https://bugs.eclipse.org/bugs/show_bug.cgi?id=358344
    */

@@ -26,8 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests the editable property in a table (model)
- * see {@link AbstractColumn}
+ * Tests the editable property in a table (model) see {@link AbstractColumn}
  */
 @RunWith(PlatformTestRunner.class)
 public class ColumnEditableTest {

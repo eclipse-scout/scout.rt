@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 /**
  * The invisible root menu node of any activity map. (internal usage only)
  */
-public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<IActivityMap<?, ?>> implements IActivityMapContextMenu {
+public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<IActivityMap<?, ?>>implements IActivityMapContextMenu {
 
   public ActivityMapContextMenu(IActivityMap<?, ?> owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);

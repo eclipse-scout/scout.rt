@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public abstract class AbstractTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER> implements ITreeNodeExtension<OWNER> {
+public abstract class AbstractTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER>implements ITreeNodeExtension<OWNER> {
 
   public AbstractTreeNodeExtension(OWNER owner) {
     super(owner);

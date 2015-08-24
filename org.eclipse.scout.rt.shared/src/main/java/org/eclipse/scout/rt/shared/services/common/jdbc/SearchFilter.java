@@ -30,8 +30,7 @@ public class SearchFilter implements Serializable, Cloneable {
   }
 
   /**
-   * @return live map of all binds changes to this map are immediately reflected
-   *         inside the instance
+   * @return live map of all binds changes to this map are immediately reflected inside the instance
    */
   public AbstractFormData getFormData() {
     return m_formData;

@@ -333,8 +333,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * Initialize the properties of the client session.
-   * This method is called in the process of the initialization right before the session is activated.
+   * Initialize the properties of the client session. This method is called in the process of the initialization right
+   * before the session is activated.
    *
    * @throws ProcessingException
    */
@@ -512,8 +512,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       LOG.warn(""
           + "Some running client jobs found while client session is going to shutdown. "
           + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. "
-          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}"
-          , new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
+          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}", new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
     }
   }
 
@@ -609,9 +608,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * Sets the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before
-   * it is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without
-   * waiting for client jobs to finish.
+   * Sets the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before it
+   * is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without waiting for
+   * client jobs to finish.
    */
   public void setMaxShutdownWaitTime(long maxShutdownWaitTime) {
     m_maxShutdownWaitTime = maxShutdownWaitTime;
@@ -629,7 +628,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
+  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER>implements IClientSessionExtension<OWNER> {
 
     public LocalClientSessionExtension(OWNER owner) {
       super(owner);

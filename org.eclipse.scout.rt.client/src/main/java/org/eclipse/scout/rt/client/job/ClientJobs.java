@@ -219,9 +219,8 @@ public final class ClientJobs {
 
   /**
    * Runs the given {@link Callable} asynchronously on behalf of a worker thread after the specified delay has elapsed.
-   * The caller of
-   * this method continues to run in parallel. If the job is subject for mutual exclusion, the job only commence
-   * execution once acquired the mutex.
+   * The caller of this method continues to run in parallel. If the job is subject for mutual exclusion, the job only
+   * commence execution once acquired the mutex.
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
@@ -271,8 +270,8 @@ public final class ClientJobs {
   /**
    * Periodically runs the given job on behalf of a worker thread.<br/>
    * The first execution is after the given <code>initialDelay</code>, and subsequently with the given
-   * <code>delay</code> between the termination of one execution and the commencement of the next. The
-   * job only terminates via cancellation or termination of the job manager.
+   * <code>delay</code> between the termination of one execution and the commencement of the next. The job only
+   * terminates via cancellation or termination of the job manager.
    *
    * @param runnable
    *          the runnable to be executed periodically.

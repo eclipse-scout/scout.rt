@@ -76,7 +76,8 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * When using this service the database column types are converted to Java types using {@link TypeCastUtility} that can
  * match basically all "normal" java types.
  * </p>
- * </p> <h3>Input Binds</h3>
+ * </p>
+ * <h3>Input Binds</h3>
  * <p>
  * Input binds are treated as follows
  * <ul>

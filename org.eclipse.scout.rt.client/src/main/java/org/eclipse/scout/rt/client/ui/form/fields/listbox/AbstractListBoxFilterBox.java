@@ -25,11 +25,8 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
- * Filter panel normally displayed below the listbox
- * table. Showing 2 radio button groups, one for checked filter, one for active
- * filter.
- * o show checked o show all
- * o show active o show inactive o show all
+ * Filter panel normally displayed below the listbox table. Showing 2 radio button groups, one for checked filter, one
+ * for active filter. o show checked o show all o show active o show inactive o show all
  */
 @ClassId("ebca1411-044f-425f-b63c-4920cde6bb1b")
 public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {

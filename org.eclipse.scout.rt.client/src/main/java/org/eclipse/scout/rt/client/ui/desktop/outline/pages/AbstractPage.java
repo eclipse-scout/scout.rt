@@ -183,9 +183,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
 
   /**
-   * Configures the visibility of this page's table. Typical subclasses of this abstract class use a tabular
-   * structure to display data, this includes {@link AbstractPageWithTable} as well as {@link AbstractPageWithNodes}.
-   * Set this property to {@code false} if you want to display a detail form within this page.
+   * Configures the visibility of this page's table. Typical subclasses of this abstract class use a tabular structure
+   * to display data, this includes {@link AbstractPageWithTable} as well as {@link AbstractPageWithNodes}. Set this
+   * property to {@code false} if you want to display a detail form within this page.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    *
@@ -268,8 +268,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Called after this page has been added to the outline tree. This method may set a detail form or check
-   * some parameters.
+   * Called after this page has been added to the outline tree. This method may set a detail form or check some
+   * parameters.
    * <p>
    * Do not load table data here, this should be done lazily in {@link AbstractPageWithTable.execLoadTableData}.
    * <p>
@@ -297,8 +297,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   /**
    * Called by the data change listener registered with this page (and the current desktop) through
-   * {@link #registerDataChangeListener(Object...)}. Use this callback method
-   * to react to data change events by reloading current data, or throwing away cached data etc.
+   * {@link #registerDataChangeListener(Object...)}. Use this callback method to react to data change events by
+   * reloading current data, or throwing away cached data etc.
    * <p>
    * Subclasses can override this method.<br/>
    * This default implementation does the following:
@@ -361,8 +361,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Called after this page has (re)loaded its data. This method is called after {@link #loadChildren()} has
-   * been called.
+   * Called after this page has (re)loaded its data. This method is called after {@link #loadChildren()} has been
+   * called.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
@@ -398,8 +398,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Initializes the detail form associated with this page. This method is called before the
-   * detail form is used for the first time.
+   * Initializes the detail form associated with this page. This method is called before the detail form is used for the
+   * first time.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
@@ -743,8 +743,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these
-   * dataTypes<br>
+   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -813,8 +812,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
-   * Tree can also be null during shutdown.
+   * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null. Tree can also be null
+   * during shutdown.
    */
   protected void firePageChanged(IPage page) {
     if (getOutline() != null) {
@@ -906,7 +905,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return chain.execCalculateLazyAddChildPagesToOutline();
   }
 
-  protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
+  protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER>implements IPageExtension<OWNER> {
 
     public LocalPageExtension(OWNER owner) {
       super(owner);

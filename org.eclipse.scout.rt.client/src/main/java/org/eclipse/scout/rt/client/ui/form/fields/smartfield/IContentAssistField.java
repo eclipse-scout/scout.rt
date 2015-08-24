@@ -56,10 +56,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void setProposalChooserProvider(IProposalChooserProvider<LOOKUP_KEY> provider);
 
   /**
-   * true: inactive rows are display and can be also be parsed using the UI
-   * facade according to {@link #getActiveFilter()} false: inactive rows are
-   * only display when the smart field valid is set by the model. The UI facade
-   * cannot choose such a value.
+   * true: inactive rows are display and can be also be parsed using the UI facade according to
+   * {@link #getActiveFilter()} false: inactive rows are only display when the smart field valid is set by the model.
+   * The UI facade cannot choose such a value.
    */
   boolean isActiveFilterEnabled();
 
@@ -69,9 +68,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void setActiveFilterEnabled(boolean b);
 
   /**
-   * This has only an effect if {@link #isActiveFilterEnabled()} is set to true.
-   * true: include only active values false: include only inactive values
-   * undefined: include active and inactive values
+   * This has only an effect if {@link #isActiveFilterEnabled()} is set to true. true: include only active values false:
+   * include only inactive values undefined: include active and inactive values
    */
   TriState getActiveFilter();
 
@@ -103,8 +101,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   boolean isMultilineText();
 
   /**
-   * For performance optimization, style loading is done lazily.
-   * However, sometimes it is useful to apply these changes immediately.
+   * For performance optimization, style loading is done lazily. However, sometimes it is useful to apply these changes
+   * immediately.
    * <p>
    * This method is called automatically by {@link #getDisplayText()}, {@link #getTooltipText()},
    * {@link #getBackgroundColor()}, {@link #getForegroundColor()} and {@link #getFont()}
@@ -139,13 +137,11 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void doBrowseNew(String newText);
 
   /**
-   * Filter selection of hierarchy browse tree. The level reported here is
-   * different than the one used in
+   * Filter selection of hierarchy browse tree. The level reported here is different than the one used in
    * {@link AbstractTree#execAcceptSelection(org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode, int)} such as this
-   * level is one smaller. This is because a tree smart field
-   * assumes its tree to have multiple roots, but the ITree model is built as
-   * single-root tree with invisible root node. level=-1 is the invisible
-   * (anonymous) root level=0 are the multiple roots of the smart tree ...
+   * level is one smaller. This is because a tree smart field assumes its tree to have multiple roots, but the ITree
+   * model is built as single-root tree with invisible root node. level=-1 is the invisible (anonymous) root level=0 are
+   * the multiple roots of the smart tree ...
    */
   boolean acceptBrowseHierarchySelection(LOOKUP_KEY value, int level, boolean leaf);
 
@@ -172,15 +168,12 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void prepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException;
 
   /**
-   * If the browse lookup call yields exactly one value, assign it to the
-   * smartfield, otherwise do nothing.
+   * If the browse lookup call yields exactly one value, assign it to the smartfield, otherwise do nothing.
    *
    * @param background
-   *          true (default) if assignment should be done later which allows for
-   *          one batch call for all smartfields. Using background=false assigns
-   *          the value immediately, which results in an immediate call to the
-   *          data provider. Whenever possible, background=true should be used
-   *          to allow for batch calls to the backend.
+   *          true (default) if assignment should be done later which allows for one batch call for all smartfields.
+   *          Using background=false assigns the value immediately, which results in an immediate call to the data
+   *          provider. Whenever possible, background=true should be used to allow for batch calls to the backend.
    * @since 22.05.2009
    */
   void setUniquelyDefinedValue(boolean background) throws ProcessingException;
@@ -215,9 +208,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) throws ProcessingException;
 
   /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called back in the model thread. The smartfield is automatically starting
-   * an internal background thread and syncs the result back into the model
+   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
+   * The smartfield is automatically starting an internal background thread and syncs the result back into the model
    * thread.
    *
    * @return the created async job if applicable or null, see
@@ -230,9 +222,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException;
 
   /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called back in the model thread. The smartfield is automatically starting
-   * an internal background thread and syncs the result back into the model
+   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
+   * The smartfield is automatically starting an internal background thread and syncs the result back into the model
    * thread.
    *
    * @return the created async job if applicable or null, see
@@ -241,9 +232,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
   /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called back in the model thread. The smartfield is automatically starting
-   * an internal background thread and syncs the result back into the model
+   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
+   * The smartfield is automatically starting an internal background thread and syncs the result back into the model
    * thread.
    *
    * @return the created async job if applicable or null, see

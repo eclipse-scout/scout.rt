@@ -42,8 +42,7 @@ public interface IFileService extends IService {
   /**
    * @param checkCache
    *          default true<br>
-   *          If {@link #syncRemoteFiles(String, FilenameFilter)} has been
-   *          called checkCache may be passed as false.<br>
+   *          If {@link #syncRemoteFiles(String, FilenameFilter)} has been called checkCache may be passed as false.<br>
    *          This is used when a large number of files is processed.
    */
   File getRemoteFile(String dir, String simpleName, Locale locale, boolean checkCache) throws ProcessingException;

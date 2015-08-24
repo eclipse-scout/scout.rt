@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 
-public abstract class AbstractImageFieldExtension<OWNER extends AbstractImageField> extends AbstractFormFieldExtension<OWNER> implements IImageFieldExtension<OWNER> {
+public abstract class AbstractImageFieldExtension<OWNER extends AbstractImageField> extends AbstractFormFieldExtension<OWNER>implements IImageFieldExtension<OWNER> {
 
   public AbstractImageFieldExtension(OWNER owner) {
     super(owner);

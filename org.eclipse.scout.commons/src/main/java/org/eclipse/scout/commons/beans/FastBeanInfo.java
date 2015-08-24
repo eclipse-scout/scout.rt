@@ -15,9 +15,8 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * The java bean {@link BeanInfo} extracts all info from all beans.
- * Sometimes it is useful to have a hi-speed variant of bean info only providing and extracting bean name, type, getters
- * and setters
+ * The java bean {@link BeanInfo} extracts all info from all beans. Sometimes it is useful to have a hi-speed variant of
+ * bean info only providing and extracting bean name, type, getters and setters
  * <p>
  * This lenient implementation creates SimplePropertyDescriptor objects that are also speed optimized.
  */
@@ -43,8 +42,8 @@ public class FastBeanInfo {
   /**
    * @return the property descriptor for that name
    *         <p>
-   *         This method is lenient and checks for upper and lower case named properties. For example {@link
-   *         #getPropertyDescriptor("vATRate")} will also check for property "VATRate" and vis versa.
+   *         This method is lenient and checks for upper and lower case named properties. For example
+   *         {@link #getPropertyDescriptor("vATRate")} will also check for property "VATRate" and vis versa.
    */
   public FastPropertyDescriptor getPropertyDescriptor(String name) {
     FastPropertyDescriptor p = propertyMap.get(name);

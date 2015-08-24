@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.util.List;
 
 /**
- * inside gui handling or in non-model threads don't use this adapter because it
- * might reduce performance when batch events are handled as single events
+ * inside gui handling or in non-model threads don't use this adapter because it might reduce performance when batch
+ * events are handled as single events
  */
 public class TreeAdapter implements TreeListener {
 

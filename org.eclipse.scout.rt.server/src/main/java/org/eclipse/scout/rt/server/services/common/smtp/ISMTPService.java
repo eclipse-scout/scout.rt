@@ -36,8 +36,8 @@ import org.eclipse.scout.rt.platform.service.IService;
 public interface ISMTPService extends IService {
 
   /**
-   * sends the message over the configured session. Ensure to have set receiver
-   * email addresses, sender email addresses, subject and body parts.
+   * sends the message over the configured session. Ensure to have set receiver email addresses, sender email addresses,
+   * subject and body parts.
    *
    * @param message
    * @throws ProcessingException
@@ -46,8 +46,8 @@ public interface ISMTPService extends IService {
   void sendMessage(MimeMessage message) throws ProcessingException;
 
   /**
-   * sends the message over the session given as an argument. Ensure to have set
-   * receiver email addresses, sender email addresses, subject and body parts.
+   * sends the message over the session given as an argument. Ensure to have set receiver email addresses, sender email
+   * addresses, subject and body parts.
    *
    * @param session
    *          to send the message.
@@ -77,14 +77,13 @@ public interface ISMTPService extends IService {
   String getDebugReceiverEmail();
 
   /**
-   * @return Returns <code>true</code> if the communication between this
-   *         service and the SMTP host is encrypted (i.e. SMTPS).
+   * @return Returns <code>true</code> if the communication between this service and the SMTP host is encrypted (i.e.
+   *         SMTPS).
    */
   boolean isUseSmtps();
 
   /**
-   * @return Returns a comma-separated list of SSL protocols used for
-   *         establishing the connection to the SMTP host.
+   * @return Returns a comma-separated list of SSL protocols used for establishing the connection to the SMTP host.
    */
   String getSslProtocols();
 

@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
  * <table>
  * <tr>
  * <td>Examples for bind names:</td>
- * <td> <code>personId</code>, <code>id</code>, <code>name</code>, <code>age</code>, <code>active</code></td>
+ * <td><code>personId</code>, <code>id</code>, <code>name</code>, <code>age</code>, <code>active</code></td>
  * </tr>
  * <tr>
  * <td>Examples for plain bind values inclusive marker prefix:</td>
@@ -103,8 +103,8 @@ public interface ISqlStyle extends Serializable {
    * @param o
    *          the value to be bound. If the value is a {@link IHolder} then its content value is used
    * @param nullType
-   *          only used in case o is null. If the type is a {@link IHolder} type then its component type is used
-   *          Ignored otherwise.
+   *          only used in case o is null. If the type is a {@link IHolder} type then its component type is used Ignored
+   *          otherwise.
    */
   SqlBind buildBindFor(Object o, Class nullType);
 
@@ -173,8 +173,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * @return <code>true</code> to handle string as <code>CLOB</code> resp. <code>LONG VARCHAR</code> or
-   *         <code>false</code> to handle
-   *         string as simple {@link String} see {@link #isClobEnabled()}
+   *         <code>false</code> to handle string as simple {@link String} see {@link #isClobEnabled()}
    */
   boolean isLargeString(String s);
 
@@ -361,8 +360,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>nvl(P.NAME,0) = 0</code><br />
-   * special case for '<code>number is null</code>', if <code>0</code> and <code>null</code> are
-   * treated equally
+   * special case for '<code>number is null</code>', if <code>0</code> and <code>null</code> are treated equally
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -375,8 +373,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>nvl(P.NAME,0)<>0</code><br />
-   * special case for '<code>number is null</code>', if <code>0</code> and <code>null</code> are
-   * treated equally
+   * special case for '<code>number is null</code>', if <code>0</code> and <code>null</code> are treated equally
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -389,8 +386,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>nvl(P.NAME,'0')=='0'</code><br />
-   * special case for '<code>text is null</code>', if <code>'0'</code> and <code>null</code> are
-   * treated equally
+   * special case for '<code>text is null</code>', if <code>'0'</code> and <code>null</code> are treated equally
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -403,8 +399,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>nvl(P.NAME,'0')<>'0'</code><br />
-   * special case for '<code>text is null</code>' when <code>'0'</code> and <code>null</code> are
-   * treated equally
+   * special case for '<code>text is null</code>' when <code>'0'</code> and <code>null</code> are treated equally
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -468,8 +463,8 @@ public interface ISqlStyle extends Serializable {
   /**
    * Style can handle arrays as bind or as literal replacement.
    *
-   * @return true if calls to {@link ISqlStyle.createInList(String attribute, Object array)} or {@link
-   *         ISqlStyle.createNotInList(String attribute, Object array)} produce SQL binds.
+   * @return true if calls to {@link ISqlStyle.createInList(String attribute, Object array)} or
+   *         {@link ISqlStyle.createNotInList(String attribute, Object array)} produce SQL binds.
    */
   boolean isCreatingInListGeneratingBind(Object array);
 
@@ -673,7 +668,8 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * <code>( attribute <TRUNC(SYSDATE) OR  attribute >=TRUNC(SYSDATE+1))</pre>
+   * <code>( attribute <TRUNC(SYSDATE) OR attribute >=TRUNC(SYSDATE+1))
+   * </pre>
    * </p>
    */
   String createDateIsNotToday(String attribute);

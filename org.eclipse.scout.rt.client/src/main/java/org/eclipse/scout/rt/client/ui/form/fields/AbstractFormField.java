@@ -197,8 +197,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * One of the LABEL_POSITION_* constants or a custom constants interpreted by
-   * the ui.
+   * One of the LABEL_POSITION_* constants or a custom constants interpreted by the ui.
    *
    * @since 17.11.2009
    */
@@ -210,8 +209,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * @since 19.11.2009
-   * @return the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or
-   *         LABEL_WIDTH_UI for ui-dependent label width
+   * @return the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(16)
@@ -221,8 +219,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * @since 19.11.2009
-   * @return negative for left, 0 for center and positive for right,
-   *         LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of ui
+   * @return negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
+   *         ui
    */
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
   @Order(17)
@@ -503,8 +501,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Configures the row span of this field.<br>
    * Compared to the number of columns, which is a configurable value and therefore static, the number of rows is
    * dynamic. That number depends on the number of fields used in the group box which contains this field, as well as
-   * the
-   * number of columns defined by that group box.
+   * the number of columns defined by that group box.
    * <p>
    * <b>Example:</b> A group box with 2 columns contains 3 fields: The first 2 fields have gridW = 1 and gridH = 1 and
    * the third field has gridW = 1 and gridH = 2. In this case the third field would be as height as the other 2 fields
@@ -705,8 +702,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * On any value change or call to {@link #checkSaveNeeded()} this method is
-   * called to calculate if the field needs save
+   * On any value change or call to {@link #checkSaveNeeded()} this method is called to calculate if the field needs
+   * save
    */
   @ConfigOperation
   @Order(11)
@@ -723,8 +720,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * on any value change or call to {@link #checkEmpty()} this method is called
-   * to calculate if the field represents an empty state (semantics)
+   * on any value change or call to {@link #checkEmpty()} this method is called to calculate if the field represents an
+   * empty state (semantics)
    */
   @ConfigOperation
   @Order(13)
@@ -823,7 +820,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       setLabelFont(FontSpec.parse(getConfiguredLabelFont()));
     }
     setFocusable(getConfiguredFocusable());
-    setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), getConfiguredGridUseUiWidth(), getConfiguredGridUseUiHeight(), getConfiguredHorizontalAlignment(), getConfiguredVerticalAlignment(), getConfiguredFillHorizontal(), getConfiguredFillVertical(), getConfiguredWidthInPixel(), getConfiguredHeightInPixel()));
+    setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), getConfiguredGridUseUiWidth(), getConfiguredGridUseUiHeight(),
+        getConfiguredHorizontalAlignment(), getConfiguredVerticalAlignment(), getConfiguredFillHorizontal(), getConfiguredFillVertical(), getConfiguredWidthInPixel(), getConfiguredHeightInPixel()));
     setMasterRequired(getConfiguredMasterRequired());
     // private listener for subtree property change events
     addPropertyChangeListener(new PropertyChangeListener() {
@@ -835,8 +833,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Calculates the formfield's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the formfield's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0.
+   * If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 4.0.1
    */
@@ -900,8 +898,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * This is the init of the runtime model after the form and fields are built
-   * and configured
+   * This is the init of the runtime model after the form and fields are built and configured
    */
   @Override
   public final void initField() throws ProcessingException {
@@ -968,8 +965,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these
-   * dataTypes<br>
+   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
    * Example:
    *
    * <pre>
@@ -1580,8 +1576,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * do not use this internal method, there is no access control for system
-   * buttons CANCEL and CLOSE
+   * do not use this internal method, there is no access control for system buttons CANCEL and CLOSE
    */
   protected void calculateVisibleInternal() {
     // access control

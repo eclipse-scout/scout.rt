@@ -74,8 +74,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}.
-   *             will be removed in version 6.1.
+   *             {@link #withForegroundColor(String)}. will be removed in version 6.1.
    */
   @Deprecated
   public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor) {
@@ -84,8 +83,8 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)(String)}.
-   *             will be removed in version 6.1.
+   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)(String)}. will be removed in version
+   *             6.1.
    */
   @Deprecated
   public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font) {
@@ -94,8 +93,8 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)}, {@link #withEnabled(boolean)},
-   *             will be removed in version 6.1.
+   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)}, {@link #withEnabled(boolean)}, will
+   *             be removed in version 6.1.
    */
   @Deprecated
   public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled) {
@@ -148,8 +147,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
    *          String foreground color <br>
    *          String font <br>
    *          Boolean enabled <br>
-   *          Object parentKey used in hierarchical structures to point to the parents
-   *          primary key <br>
+   *          Object parentKey used in hierarchical structures to point to the parents primary key <br>
    *          Boolean active (0,1) see {@link TriState#parse(Object)}
    * @param maxColumnIndex
    *          index describing the last column in cells that should be evaluated

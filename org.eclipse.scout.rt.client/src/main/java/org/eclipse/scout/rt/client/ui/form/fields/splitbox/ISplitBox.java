@@ -48,12 +48,10 @@ public interface ISplitBox extends ICompositeField {
   void setCacheSplitterPosition(boolean b);
 
   /**
-   * set the storeSplitterPositionPropertyName to store the splitter position ui
-   * side. all splitboxes with the same positionPropertyName have the same
-   * position of the splitter.
+   * set the storeSplitterPositionPropertyName to store the splitter position ui side. all splitboxes with the same
+   * positionPropertyName have the same position of the splitter.
    * 
-   * @return null to avoid storing the location a String to store the location
-   *         under the given name.
+   * @return null to avoid storing the location a String to store the location under the given name.
    */
   String getCacheSplitterPositionPropertyName();
 

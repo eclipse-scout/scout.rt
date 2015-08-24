@@ -23,8 +23,8 @@ public interface ITreeField extends IFormField {
   String PROP_TREE = "tree";
 
   /**
-   * Tree contained in tree field. If the tree is an inner type, then init,
-   * dispose, load and store is handled by the tree field.
+   * Tree contained in tree field. If the tree is an inner type, then init, dispose, load and store is handled by the
+   * tree field.
    */
   ITree getTree();
 
@@ -32,14 +32,12 @@ public interface ITreeField extends IFormField {
    * Install a (new) tree into the tree field.
    * 
    * @param externallyManaged
-   *          true means init, dispose, load and store are not handled by the
-   *          tree field
+   *          true means init, dispose, load and store are not handled by the tree field
    */
   void setTree(ITree newTree, boolean externallyManaged);
 
   /**
-   * Populate tree with data from service all existing data in the tree is
-   * discarded
+   * Populate tree with data from service all existing data in the tree is discarded
    * 
    * @see execFilterTreeNode
    */

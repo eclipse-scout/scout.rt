@@ -114,8 +114,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
   }
 
   /**
-   * Executes the "wizard step action" for the given step index. May throw an exception if
-   * the step index is invalid.
+   * Executes the "wizard step action" for the given step index. May throw an exception if the step index is invalid.
    * <p>
    * The default implementation resolves the step and then calls {@link IWizardStep#doAction()} on it.
    */
@@ -189,7 +188,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     chain.execWizardStepIndex(stepIndex);
   }
 
-  protected static class LocalWizardProgressFieldExtension<OWNER extends AbstractWizardProgressField> extends LocalFormFieldExtension<OWNER> implements IWizardProgressFieldExtension<OWNER> {
+  protected static class LocalWizardProgressFieldExtension<OWNER extends AbstractWizardProgressField> extends LocalFormFieldExtension<OWNER>implements IWizardProgressFieldExtension<OWNER> {
 
     public LocalWizardProgressFieldExtension(OWNER owner) {
       super(owner);

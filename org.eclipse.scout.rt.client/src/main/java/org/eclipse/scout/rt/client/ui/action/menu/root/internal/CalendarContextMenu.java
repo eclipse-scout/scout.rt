@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 /**
  * The invisible root menu node of any calendar. (internal usage only)
  */
-public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICalendar> implements ICalendarContextMenu {
+public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICalendar>implements ICalendarContextMenu {
   /**
    * @param owner
    */

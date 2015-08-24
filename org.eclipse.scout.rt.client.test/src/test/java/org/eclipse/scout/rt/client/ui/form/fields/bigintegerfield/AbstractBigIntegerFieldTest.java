@@ -65,8 +65,10 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
 
     assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(new BigDecimal(getMaxPossibleValue()).toPlainString()));
     assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(new BigDecimal(getMinPossibleValue()).toPlainString()));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, new BigDecimal(getMaxPossibleValue().add(BigInteger.ONE)).toPlainString());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, new BigDecimal(getMinPossibleValue().subtract(BigInteger.ONE)).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this,
+        new BigDecimal(getMaxPossibleValue().add(BigInteger.ONE)).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this,
+        new BigDecimal(getMinPossibleValue().subtract(BigInteger.ONE)).toPlainString());
   }
 
   @Test

@@ -13,11 +13,9 @@ package org.eclipse.scout.commons;
 import java.util.EventListener;
 
 /**
- * marker interface for weak event listener WeakEventListener's are removed from
- * scout's models automatically when their reference (WeakReference) is null.
- * NOTE: weak listeners should be referenced by their host since the model will
- * not hold a valid reference to weak objects. best practice is to have a member
- * variable referencing every weak listener.
+ * marker interface for weak event listener WeakEventListener's are removed from scout's models automatically when their
+ * reference (WeakReference) is null. NOTE: weak listeners should be referenced by their host since the model will not
+ * hold a valid reference to weak objects. best practice is to have a member variable referencing every weak listener.
  */
 
 public interface WeakEventListener extends EventListener {

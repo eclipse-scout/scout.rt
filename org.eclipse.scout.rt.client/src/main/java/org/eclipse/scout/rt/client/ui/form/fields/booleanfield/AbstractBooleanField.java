@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("3f14b55f-b49b-428a-92c4-05745d6d48c4")
-public abstract class AbstractBooleanField extends AbstractValueField<Boolean> implements IBooleanField {
+public abstract class AbstractBooleanField extends AbstractValueField<Boolean>implements IBooleanField {
   private IBooleanFieldUIFacade m_uiFacade;
 
   public AbstractBooleanField() {
@@ -118,7 +118,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     }
   }
 
-  protected static class LocalBooleanFieldExtension<OWNER extends AbstractBooleanField> extends LocalValueFieldExtension<Boolean, OWNER> implements IBooleanFieldExtension<OWNER> {
+  protected static class LocalBooleanFieldExtension<OWNER extends AbstractBooleanField> extends LocalValueFieldExtension<Boolean, OWNER>implements IBooleanFieldExtension<OWNER> {
 
     public LocalBooleanFieldExtension(OWNER owner) {
       super(owner);

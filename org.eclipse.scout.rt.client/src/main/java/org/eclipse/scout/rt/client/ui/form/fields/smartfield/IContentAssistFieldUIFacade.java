@@ -16,22 +16,20 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 public interface IContentAssistFieldUIFacade {
 
   /**
-   * Called when smart-field is clicked or when a key (character or navigation) is pressed in the smart-field.
-   * Proposal chooser must be closed.<br/>
+   * Called when smart-field is clicked or when a key (character or navigation) is pressed in the smart-field. Proposal
+   * chooser must be closed.<br/>
    * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
    * {@link IContentAssistField}.
    */
   void openProposalChooserFromUI(String text, boolean selectCurrentValue);
 
   /**
-   * Called when ever a (non-navigation) key is pressed in the smart-field.
-   * Proposal chooser must be open.
+   * Called when ever a (non-navigation) key is pressed in the smart-field. Proposal chooser must be open.
    */
   void proposalTypedFromUI(String text);
 
   /**
-   * Called when Escape key has been pressed or a mouse click event occurs.
-   * Proposal chooser must be open.<br/>
+   * Called when Escape key has been pressed or a mouse click event occurs. Proposal chooser must be open.<br/>
    * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
    * {@link IContentAssistField}.
    */
@@ -45,9 +43,8 @@ public interface IContentAssistFieldUIFacade {
    * @param text
    * @param chooser
    * @param forceClose
-   *          whether or not the proposal chooser must be closed - this is the case when a
-   *          user clicks on another field, but not when he tries to leave the field by
-   *          using the TAB key.
+   *          whether or not the proposal chooser must be closed - this is the case when a user clicks on another field,
+   *          but not when he tries to leave the field by using the TAB key.
    */
   void acceptProposalFromUI(String text, boolean chooser, boolean forceClose);
 

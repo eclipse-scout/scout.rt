@@ -27,9 +27,8 @@ public interface IServiceInitializer {
   }
 
   /**
-   * @return one of the ServiceInitializerResult enums.
-   *         ServiceInitializerResult.CONINUE lets the following initializer do their job
-   *         ServiceInitializerResult.STOP breaks up and ignores the following initializers.
+   * @return one of the ServiceInitializerResult enums. ServiceInitializerResult.CONINUE lets the following initializer
+   *         do their job ServiceInitializerResult.STOP breaks up and ignores the following initializers.
    */
   ServiceInitializerResult initializeService(IService service);
 

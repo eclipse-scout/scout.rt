@@ -33,7 +33,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    *         <pre>
    * ID    NUMBER required
    * DATA  BINARY BookmarkFolder object required
-   * </pre>
+   *         </pre>
    */
   @ConfigOperation
   @Order(10)
@@ -47,7 +47,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    *         <pre>
    * ID    NUMBER required
    * DATA  BINARY BookmarkFolder object required
-   * </pre>
+   *         </pre>
    */
   @ConfigOperation
   @Order(11)
@@ -78,19 +78,16 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    * <pre>
    * SQL.insert(
    *     &quot;INSERT INTO BOOKMARKS(ID,BINARY) VALUES( SEQ.NEXTVAL, :kind, :folderData )&quot;,
-   *     new NVPair(&quot;folderData&quot;, folderData)
-   *     );
+   *     new NVPair(&quot;folderData&quot;, folderData));
    * 
    * SQL.update(
    *     &quot;UPDATE BOOKMARKS SET BINARY=folderData WHERE ID=:id&quot;,
    *     new NVPair(&quot;id&quot;, id),
-   *     new NVPair(&quot;folderData&quot;, folderData)
-   *     );
+   *     new NVPair(&quot;folderData&quot;, folderData));
    * 
    * SQL.delete(
    *     &quot;DELETE FROM BOOKMARKS WHERE ID=:id&quot;,
-   *     new NVPair(&quot;id&quot;, id)
-   *     );
+   *     new NVPair(&quot;id&quot;, id));
    * </pre>
    */
   @ConfigOperation
@@ -121,19 +118,16 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    * <pre>
    * SQL.insert(
    *     &quot;INSERT INTO BOOKMARKS(ID,BINARY) VALUES( SEQ.NEXTVAL, :kind, :folderData )&quot;,
-   *     new NVPair(&quot;folderData&quot;, folderData)
-   *     );
+   *     new NVPair(&quot;folderData&quot;, folderData));
    * 
    * SQL.update(
    *     &quot;UPDATE BOOKMARKS SET BINARY=folderData WHERE ID=:id&quot;,
    *     new NVPair(&quot;id&quot;, id),
-   *     new NVPair(&quot;folderData&quot;, folderData)
-   *     );
+   *     new NVPair(&quot;folderData&quot;, folderData));
    * 
    * SQL.delete(
    *     &quot;DELETE FROM BOOKMARKS WHERE ID=:id&quot;,
-   *     new NVPair(&quot;id&quot;, id)
-   *     );
+   *     new NVPair(&quot;id&quot;, id));
    * </pre>
    */
   @ConfigOperation

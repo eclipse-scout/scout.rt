@@ -67,8 +67,7 @@ public class SortSpec implements Serializable {
   }
 
   /**
-   * @return the order of the sort column in the list of sort columns (starting
-   *         with 0)
+   * @return the order of the sort column in the list of sort columns (starting with 0)
    */
   public int getSortColumnOrder(int columnIndex) {
     for (int i = 0; i < m_columns.length; i++) {

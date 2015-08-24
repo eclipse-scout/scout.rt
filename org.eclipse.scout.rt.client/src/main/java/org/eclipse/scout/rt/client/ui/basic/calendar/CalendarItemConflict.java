@@ -17,8 +17,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 
 /**
- * Two or more items of different {@link ICalendarItemProvider}s that have same
- * subject and overlapping dates.
+ * Two or more items of different {@link ICalendarItemProvider}s that have same subject and overlapping dates.
  */
 public class CalendarItemConflict {
   private Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
@@ -32,9 +31,8 @@ public class CalendarItemConflict {
   }
 
   /**
-   * Average match in percent. 1.0 = full match (appointment[subject, start,
-   * end], task[subject, start, due, complete]) ... 0.5 = date ranges overlap in
-   * 50% ... 0.0 = date ranges just touch
+   * Average match in percent. 1.0 = full match (appointment[subject, start, end], task[subject, start, due, complete])
+   * ... 0.5 = date ranges overlap in 50% ... 0.0 = date ranges just touch
    */
   public double getMatch() {
     return m_match;
@@ -45,8 +43,7 @@ public class CalendarItemConflict {
   }
 
   /**
-   * Accept only the component of this provider, all other items are removed
-   * from the componentsByProvider map.
+   * Accept only the component of this provider, all other items are removed from the componentsByProvider map.
    */
   public void acceptComponentOf(Class<? extends ICalendarItemProvider> providerType) {
     for (CalendarComponent comp : m_components) {

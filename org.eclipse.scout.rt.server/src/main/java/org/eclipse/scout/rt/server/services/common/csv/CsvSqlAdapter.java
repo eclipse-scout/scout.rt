@@ -63,8 +63,7 @@ public class CsvSqlAdapter {
    * @param tableName
    *          database table to export from
    * @param groupKeyColumnName
-   *          the column where the id for this import is stored (or null if not
-   *          used)
+   *          the column where the id for this import is stored (or null if not used)
    * @param groupKeyValue
    *          the id for this csv import
    * @param lineNumberColumnName
@@ -79,7 +78,8 @@ public class CsvSqlAdapter {
    *          the sql types of the corresponding column
    * @throws ProcessingException
    */
-  public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName, List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) throws ProcessingException {
+  public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
+      List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) throws ProcessingException {
     if (encoding == null) {
       encoding = Encoding.UTF_8;
     }
@@ -134,7 +134,8 @@ public class CsvSqlAdapter {
    *          the sql types of the corresponding column
    * @throws ProcessingException
    */
-  public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumNames, List<String> csvColumnTypes, boolean writeColumnTypes) throws ProcessingException {
+  public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumNames,
+      List<String> csvColumnTypes, boolean writeColumnTypes) throws ProcessingException {
     if (encoding == null) {
       encoding = Encoding.UTF_8;
     }
@@ -245,7 +246,8 @@ public class CsvSqlAdapter {
     }
   }
 
-  public void importDataIntoTable(File f, String encoding, Locale contentLocale, int headerRowCount, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName, List<String> csvColumnNames, List<String> csvColumnTypes, boolean allowVariableColumnCount) throws ProcessingException {
+  public void importDataIntoTable(File f, String encoding, Locale contentLocale, int headerRowCount, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
+      List<String> csvColumnNames, List<String> csvColumnTypes, boolean allowVariableColumnCount) throws ProcessingException {
     if (encoding == null) {
       encoding = Encoding.UTF_8;
     }

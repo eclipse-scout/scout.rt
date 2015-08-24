@@ -31,9 +31,9 @@ public interface IVirtualTreeNode extends ITreeNode {
   ITreeNode getResolvedNode();
 
   /**
-   * Attaches the real node to this virtual node. This method takes care
-   * to establish the contract of {@link IVirtualTreeNode} and {@link ITreeNode} with respect to the methods
-   * <code>equals(Object)</code> and <code>hashCode()</code>.
+   * Attaches the real node to this virtual node. This method takes care to establish the contract of
+   * {@link IVirtualTreeNode} and {@link ITreeNode} with respect to the methods <code>equals(Object)</code> and
+   * <code>hashCode()</code>.
    */
   void setResolvedNode(ITreeNode resolvedNode);
 }

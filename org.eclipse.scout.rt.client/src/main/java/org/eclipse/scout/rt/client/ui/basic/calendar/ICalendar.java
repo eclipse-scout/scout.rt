@@ -42,8 +42,7 @@ public interface ICalendar extends IPropertyObserver, IContextMenuOwner {
    */
   String PROP_SELECTED_COMPONENT = "selectedComponent";
   /**
-   * type int (DISPLAY_MODE_DAY,DISPLAY_MODE_WEEK,DISPLAY_MODE_MONTH,
-   * DISPLAY_MODE_WORKWEEK)
+   * type int (DISPLAY_MODE_DAY,DISPLAY_MODE_WEEK,DISPLAY_MODE_MONTH, DISPLAY_MODE_WORKWEEK)
    */
   String PROP_DISPLAY_MODE = "displayMode";
   /**
@@ -201,8 +200,8 @@ public interface ICalendar extends IPropertyObserver, IContextMenuOwner {
   void setStartHour(int hour);
 
   /**
-   * The starting hour of the calendar. Only visible when the calendar is in day, week or work-week mode.
-   * Together with getStartHour and getUseOverflowCells is defines the timeline of a day.
+   * The starting hour of the calendar. Only visible when the calendar is in day, week or work-week mode. Together with
+   * getStartHour and getUseOverflowCells is defines the timeline of a day.
    * <p>
    * Default {@code 19}.
    *

@@ -204,8 +204,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   /**
    * create and eventually open a form containing the wizard.<br>
-   * this method may be overwritten to provide an own wizard representation
-   * form.
+   * this method may be overwritten to provide an own wizard representation form.
    */
   @ConfigOperation
   @Order(5)
@@ -225,8 +224,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   /**
    * Whenever the active step changes (due to {@link #activateStep(IWizardStep)} then this method is called. It can be
-   * used for example to decorate the step
-   * labels and description depending on the current state or to decorate the
+   * used for example to decorate the step labels and description depending on the current state or to decorate the
    * current wizard form in {@link #getWizardForm()}
    */
   @ConfigOperation
@@ -236,11 +234,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   /**
    * startup wizard The container form is available at {@link #getContainerForm()}. After this operation the container
-   * form is
-   * started if not already started in this method. Normally custom code in this
-   * method activates a step using {@link IWizardStep#activate(int)} The default
-   * implementation simply copies the available step list to the step list and
-   * activates the first step
+   * form is started if not already started in this method. Normally custom code in this method activates a step using
+   * {@link IWizardStep#activate(int)} The default implementation simply copies the available step list to the step list
+   * and activates the first step
    */
   @Order(10)
   @ConfigOperation
@@ -263,8 +259,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * previous The default implementation activates the step before the current
-   * one
+   * previous The default implementation activates the step before the current one
    */
   @Order(30)
   @ConfigOperation
@@ -274,8 +269,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * finish button clicked The default implementation just activates a null step
-   * and closes the wizard
+   * finish button clicked The default implementation just activates a null step and closes the wizard
    */
   @Order(40)
   @ConfigOperation
@@ -311,9 +305,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * This method is called whenever a field value has changed. It can be used to
-   * refresh the button policy by calling {@link #refreshButtonPolicy()} The
-   * default implementation does nothing
+   * This method is called whenever a field value has changed. It can be used to refresh the button policy by calling
+   * {@link #refreshButtonPolicy()} The default implementation does nothing
    */
   @ConfigOperation
   @Order(70)
@@ -321,10 +314,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * This method is used to make then wizard buttons
-   * visible/invisible/enabled/disabled based on the current form and wizard
-   * state. The default implementation just sets the previous, next and finish
-   * buttons correctly based on the {@link #getSteps()}.
+   * This method is used to make then wizard buttons visible/invisible/enabled/disabled based on the current form and
+   * wizard state. The default implementation just sets the previous, next and finish buttons correctly based on the
+   * {@link #getSteps()}.
    */
   @ConfigOperation
   @Order(80)
@@ -348,16 +340,14 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * This is a delegate methode that is normally called by the wizard status
-   * field (html field) in the {@link IWizardContainerForm} whenever a link is
-   * clicked.
+   * This is a delegate methode that is normally called by the wizard status field (html field) in the
+   * {@link IWizardContainerForm} whenever a link is clicked.
    *
    * @param url
    * @param path
    *          {@link URL#getPath()}
    * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
+   *          true if the url is not a valid external url but a local model url (http://local/...)
    * @deprecated use {@link #execAppLinkAction(String)} instead
    */
   @ConfigOperation

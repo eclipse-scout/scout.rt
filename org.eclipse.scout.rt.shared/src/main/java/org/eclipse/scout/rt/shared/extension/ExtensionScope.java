@@ -31,7 +31,8 @@ import org.eclipse.scout.commons.CollectionUtility;
  * <ul>
  * <li><b>Sub scoping</b>: The set of potential matches is subsequently reduced by creating sub extension scopes
  * containing only those extensions which current path is matching the scopes defined so far. The caller is responsible
- * for iterating through the scopes. This strategy is used for top-down searches. See {@link #createSubScope(Class)}.</li>
+ * for iterating through the scopes. This strategy is used for top-down searches. See {@link #createSubScope(Class)}.
+ * </li>
  * <li><b>Filtering</b>: The caller provides an {@link Iterator} that is going through the list of parent model objects.
  * The extension scope is responsible for iterating through the scopes. This strategy is used fro bottom-up searches.
  * See {@link #filterScopeItems(Class, Iterator)}.</li>

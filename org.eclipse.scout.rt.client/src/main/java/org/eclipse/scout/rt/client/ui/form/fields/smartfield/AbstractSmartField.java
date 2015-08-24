@@ -14,14 +14,14 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ISmartFieldExtension;
 
 /**
- * import org.eclipse.scout.commons.annotations.ClassId;
- * A content assist field allowing only values out of the lookup row set.
+ * import org.eclipse.scout.commons.annotations.ClassId; A content assist field allowing only values out of the lookup
+ * row set.
  *
  * @param <VALUE>
  *          The value type and key type of the lookup rows.
  */
 @ClassId("8129f1a3-5f00-4973-b089-c3dbd91d1c9d")
-public abstract class AbstractSmartField<VALUE> extends AbstractMixedSmartField<VALUE, VALUE> implements ISmartField<VALUE> {
+public abstract class AbstractSmartField<VALUE> extends AbstractMixedSmartField<VALUE, VALUE>implements ISmartField<VALUE> {
 
   public AbstractSmartField() {
     this(true);
@@ -47,7 +47,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractMixedSmartField<
     return super.execConvertValueToKey(value);
   }
 
-  protected static class LocalSmartFieldExtension<VALUE, OWNER extends AbstractSmartField<VALUE>> extends LocalMixedSmartFieldExtension<VALUE, VALUE, OWNER> implements ISmartFieldExtension<VALUE, OWNER> {
+  protected static class LocalSmartFieldExtension<VALUE, OWNER extends AbstractSmartField<VALUE>> extends LocalMixedSmartFieldExtension<VALUE, VALUE, OWNER>implements ISmartFieldExtension<VALUE, OWNER> {
 
     public LocalSmartFieldExtension(OWNER owner) {
       super(owner);

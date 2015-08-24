@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
-public abstract class AbstractComposerFieldExtension<OWNER extends AbstractComposerField> extends AbstractFormFieldExtension<OWNER> implements IComposerFieldExtension<OWNER> {
+public abstract class AbstractComposerFieldExtension<OWNER extends AbstractComposerField> extends AbstractFormFieldExtension<OWNER>implements IComposerFieldExtension<OWNER> {
 
   public AbstractComposerFieldExtension(OWNER owner) {
     super(owner);

@@ -25,11 +25,9 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 public interface IRemoteFileService extends IService {
 
   /**
-   * @return RemoteFile when spec.getLastModified() is different than on server,
-   *         null otherwise <br>
-   *         If the realFile.lastModified is <= spec.lastModified then no
-   *         content is returned assuming that the caller already has the
-   *         content. <br>
+   * @return RemoteFile when spec.getLastModified() is different than on server, null otherwise <br>
+   *         If the realFile.lastModified is <= spec.lastModified then no content is returned assuming that the caller
+   *         already has the content. <br>
    *         spec normally doesn't contain any content
    *         <p>
    *         Example with no path: path=null, name="template.dot" <br>
@@ -40,15 +38,13 @@ public interface IRemoteFileService extends IService {
   RemoteFile getRemoteFile(RemoteFile spec) throws ProcessingException;
 
   /**
-   * @return RemoteFile of specified file block. Use this method to get a large
-   *         file from server to client. <br>
+   * @return RemoteFile of specified file block. Use this method to get a large file from server to client. <br>
    *         The flag hasMoreParts indicates if there are more parts to follow.
    */
   RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) throws ProcessingException;
 
   /**
-   * Same as {@link #getRemoteFile(RemoteFile)} with the difference that no
-   * content is read and returned.
+   * Same as {@link #getRemoteFile(RemoteFile)} with the difference that no content is read and returned.
    */
   RemoteFile getRemoteFileHeader(RemoteFile spec) throws ProcessingException;
 
@@ -56,17 +52,14 @@ public interface IRemoteFileService extends IService {
   void putRemoteFile(RemoteFile spec) throws ProcessingException;
 
   /**
-   * @return all files specified in foldePath and filter including
-   *         existingFileInfoOnClient <br>
-   *         Note: existing files that have not changed, are returned without
-   *         content <br>
+   * @return all files specified in foldePath and filter including existingFileInfoOnClient <br>
+   *         Note: existing files that have not changed, are returned without content <br>
    *         spec normally doesn't contain any content
    */
   RemoteFile[] getRemoteFiles(String folderPath, FilenameFilter filter, RemoteFile[] existingFileInfoOnClient) throws ProcessingException;
 
   /**
-   * The file is not returned but immediately streamed from the original
-   * location to the destination. <br>
+   * The file is not returned but immediately streamed from the original location to the destination. <br>
    * The destination is not closed after write.
    * <p>
    * Throws an exception if the file does not exist.

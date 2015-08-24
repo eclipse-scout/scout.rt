@@ -14,6 +14,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 /**
  * A column that renders its content as a font icon or image
  */
-public abstract class AbstractIconColumn extends AbstractColumn<String> implements IIconColumn {
+public abstract class AbstractIconColumn extends AbstractColumn<String>implements IIconColumn {
 
 }

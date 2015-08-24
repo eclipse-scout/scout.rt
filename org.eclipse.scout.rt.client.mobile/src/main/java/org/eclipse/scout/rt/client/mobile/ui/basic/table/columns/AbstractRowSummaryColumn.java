@@ -472,8 +472,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
   }
 
   /**
-   * Replace spaces with non breaking spaces.
-   * Can't use &nbsp; because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
+   * Replace spaces with non breaking spaces. Can't use &nbsp; because of
+   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=379088
    */
   private String replaceSpaces(String text) {
     return text.replaceAll("\\s", "&#160;");

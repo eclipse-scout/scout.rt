@@ -58,8 +58,7 @@ public class HtmlContentBuilderTest {
 
     IHtmlElement html = HTML.div(
         h2,
-        table
-        );
+        table);
 
     String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
     assertEquals(exp, html.toEncodedHtml());

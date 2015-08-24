@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.beans;
 
-
 public interface IPropertyFilter {
 
   /**

@@ -14,8 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
 /**
- * Field type representing a fractional, decimal number such as Float, Double,
- * BigDecimal
+ * Field type representing a fractional, decimal number such as Float, Double, BigDecimal
  */
 public interface IDecimalField<T extends Number> extends INumberField<T>, IDecimalValueContainer<T> {
 

@@ -9,8 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 /**
  * A {@link IActionNode} which wraps a {@link IButton}. <br/>
- * {@link PropertyChangeEvent}s fired by the button are delegated
- * to the action
+ * {@link PropertyChangeEvent}s fired by the button are delegated to the action
  * 
  * @since 3.9.0
  */

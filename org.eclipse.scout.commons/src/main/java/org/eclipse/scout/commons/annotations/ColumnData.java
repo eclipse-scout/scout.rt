@@ -27,11 +27,11 @@ import java.lang.annotation.Target;
  * </tr>
  * <tr>
  * <td rowspan="2" vAlign="top"><code>value</code></td>
- * <td> {@link SdkColumnCommand#CREATE}</td>
+ * <td>{@link SdkColumnCommand#CREATE}</td>
  * <td>Scout SDK creates a property for the given column in the table data.</td>
  * </tr>
  * <tr>
- * <td> {@link SdkColumnCommand#IGNORE}</td>
+ * <td>{@link SdkColumnCommand#IGNORE}</td>
  * <td>Scout SDK ignores the column in the table data.</td>
  * </tr>
  * <tr>

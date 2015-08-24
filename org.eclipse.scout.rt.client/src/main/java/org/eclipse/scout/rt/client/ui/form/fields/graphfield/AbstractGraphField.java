@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 
-public class AbstractGraphField extends AbstractValueField<GraphModel> implements IGraphField {
+public class AbstractGraphField extends AbstractValueField<GraphModel>implements IGraphField {
 
   private IGraphFieldUIFacade m_uiFacade;
 
@@ -36,8 +36,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
    * @param path
    *          {@link URL#getPath()}
    * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
+   *          true if the url is not a valid external url but a local model url (http://local/...)
    */
   @ConfigOperation
   @Order(230)
@@ -81,7 +80,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
     chain.execAppLinkAction(ref);
   }
 
-  protected static class LocalGraphFieldExtension<OWNER extends AbstractGraphField> extends LocalValueFieldExtension<GraphModel, OWNER> implements IGraphFieldExtension<OWNER> {
+  protected static class LocalGraphFieldExtension<OWNER extends AbstractGraphField> extends LocalValueFieldExtension<GraphModel, OWNER>implements IGraphFieldExtension<OWNER> {
 
     public LocalGraphFieldExtension(OWNER owner) {
       super(owner);

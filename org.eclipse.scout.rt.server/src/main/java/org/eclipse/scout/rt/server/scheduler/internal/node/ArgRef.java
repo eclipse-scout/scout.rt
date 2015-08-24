@@ -14,8 +14,7 @@ import org.eclipse.scout.rt.server.scheduler.internal.visitor.IEvalVisitor;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.IFormatVisitor;
 
 /**
- * always returns the referenced value except the method getReference() return
- * the reference itself
+ * always returns the referenced value except the method getReference() return the reference itself
  */
 public class ArgRef extends AbstractNode implements INode {
   private int m_index;

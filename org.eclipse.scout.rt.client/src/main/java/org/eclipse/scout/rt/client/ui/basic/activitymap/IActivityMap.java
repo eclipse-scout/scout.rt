@@ -27,7 +27,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldO
 public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   /**
-   * {@link java.util.Date}[] truncated to day using {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#truncDate(Date)}
+   * {@link java.util.Date}[] truncated to day using
+   * {@link org.eclipse.scout.rt.platform.util.bsiag.DateUtility#truncDate(Date)}
    */
   String PROP_DAYS = "days";
   /**
@@ -178,8 +179,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwn
 
   /**
    * @return the first hour of a day<br>
-   *         When a working day starts at 08:00 and ends at 17:00, this value is
-   *         8.
+   *         When a working day starts at 08:00 and ends at 17:00, this value is 8.
    */
   int getFirstHourOfDay();
 
@@ -190,8 +190,8 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwn
 
   /**
    * @return the last hour of a day<br>
-   *         When a working day starts at 08:00 and ends at 17:00, this value is
-   *         16 since the last hour starts at 16:00 and ends at 16:59.
+   *         When a working day starts at 08:00 and ends at 17:00, this value is 16 since the last hour starts at 16:00
+   *         and ends at 16:59.
    */
   int getLastHourOfDay();
 
@@ -234,8 +234,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwn
   void decorateActivityCell(ActivityCell<RI, AI> p);
 
   /**
-   * collect all selected days from starthour to endhour and intersect with
-   * earliest and latest time range
+   * collect all selected days from starthour to endhour and intersect with earliest and latest time range
    */
   MultiTimeRange calculateSelectedTimeRanges(Date earliestBeginTime, Date latestEndTime);
 
@@ -243,21 +242,19 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwn
    * Create a planned activity that includes one of the selected persons.
    *
    * @param singleMatch
-   *          true=plan an activity for only one of the selected resource.
-   *          false=plan an activity for all of the selected resources
+   *          true=plan an activity for only one of the selected resource. false=plan an activity for all of the
+   *          selected resources
    * @param chooseRandom
-   *          only used in combination with singleMatch=true. true=a random
-   *          person is chosen, false=the first matching resource is chosen
+   *          only used in combination with singleMatch=true. true=a random person is chosen, false=the first matching
+   *          resource is chosen
    * @param earliestBeginTime
    *          consider only matches that start after this time; {@link System#currentTimeMillis()} is used when null is
    *          passed
    * @param latestEndTime
    *          consider only matches that end before this time; {@link System#currentTimeMillis()}+10 years is used when
-   *          null is
-   *          passed
+   *          null is passed
    * @param preferredDuration
-   *          (in milliseconds) the preferred duration of the planned activity;
-   *          30 minutes is used when 0 is passed
+   *          (in milliseconds) the preferred duration of the planned activity; 30 minutes is used when 0 is passed
    */
   void planActivityForSelectedResources(boolean singleMatch, boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration);
 
@@ -306,23 +303,19 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwn
   void isSelectedResourceId(RI resourceId);
 
   /**
-   * Indicates whether the selected sections in the activity
-   * map should be visualized (by a rectangle with red and
-   * green borders).
+   * Indicates whether the selected sections in the activity map should be visualized (by a rectangle with red and green
+   * borders).
    *
-   * @return true if the activity map draws these sections,
-   *         false if not.
+   * @return true if the activity map draws these sections, false if not.
    */
   boolean isDrawSections();
 
   /**
-   * Sets whether the selected sections in the activity
-   * map should be visualized (by a rectangle with red and
-   * green borders).
+   * Sets whether the selected sections in the activity map should be visualized (by a rectangle with red and green
+   * borders).
    *
    * @param drawSections
-   *          true if the activity map should draw these sections,
-   *          false if not.
+   *          true if the activity map should draw these sections, false if not.
    */
   void setDrawSections(boolean drawSections);
 

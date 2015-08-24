@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * For performance optimizations, child pages are only loaded when needed.
- * Until then they are virtualized using VirtualPage objects.
+ * For performance optimizations, child pages are only loaded when needed. Until then they are virtualized using
+ * VirtualPage objects.
  * <p>
  * A call to {@link IPage#getChildPage(int)}, {@link IPage#getChildPages()} or selecting a virtual page effectively
  * constructs the child page.

@@ -97,14 +97,11 @@ public final class NlsUtility {
    * @param key
    *          nls text key
    * @param messageArguments
-   *          the translation of the text might contain variables
-   *          {0},{1},{2},... Examples: getText("MissingFile1"); with
-   *          translation: MissingFile1=Das File konnte nicht gefunden werden
-   *          getText("MissingFile2",fileName); with translation:
-   *          MissingFile2=Das File {0} konnte nicht gefunden werden.
-   *          getText("MissingFile3",fileName,dir); with translation:
-   *          MissingFile3=Das File {0} im Ordner {1} konnte nicht gefunden
-   *          werden
+   *          the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
+   *          with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
+   *          with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
+   *          getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
+   *          nicht gefunden werden
    */
   public static String bindText(String text, String... messageArguments) {
     if (text != null) {
@@ -138,11 +135,11 @@ public final class NlsUtility {
   }
 
   /**
-   * Only use this {@link Locale} resolver if the calling code is executed in both, server- and client side.
-   * On client side, use {@link Locale#getDefault()} whereas on server side use {@link NlsLocale#get()}.
+   * Only use this {@link Locale} resolver if the calling code is executed in both, server- and client side. On client
+   * side, use {@link Locale#getDefault()} whereas on server side use {@link NlsLocale#get()}.
    *
-   * @return the locale hold by the current thread in {@link NlsLocale} or if not set by the instance of the
-   *         Java Virtual Machine.
+   * @return the locale hold by the current thread in {@link NlsLocale} or if not set by the instance of the Java
+   *         Virtual Machine.
    */
   public static Locale getDefaultLocale() {
     Locale locale = NlsLocale.get();

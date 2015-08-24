@@ -18,8 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.NullFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * Representation of a {@link IForm} inside another form as inline field
- * (wrapped)
+ * Representation of a {@link IForm} inside another form as inline field (wrapped)
  */
 public interface IWrappedFormField<T extends IForm> extends IFormField {
 

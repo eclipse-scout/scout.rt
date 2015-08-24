@@ -99,8 +99,8 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   /**
-   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
-   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0. If
+   * no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
    *
    * @since 3.10.0-M4
    */
@@ -495,7 +495,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
+  protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER>implements IDataModelEntityExtension<OWNER> {
     private static final long serialVersionUID = 1L;
 
     public LocalDataModelEntityExtension(OWNER owner) {

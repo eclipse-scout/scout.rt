@@ -21,8 +21,8 @@ public class ArrayComparator implements Comparator<Object[]> {
   }
 
   /**
-   * Convenience constructor that creates {@link ColumnComparator ColumnComparators} with
-   * {@link DefaultObjectComparator DefaultObjectComparators} for all sort columns.
+   * Convenience constructor that creates {@link ColumnComparator ColumnComparators} with {@link DefaultObjectComparator
+   * DefaultObjectComparators} for all sort columns.
    *
    * @param locale
    * @param sortCols
@@ -98,7 +98,7 @@ public class ArrayComparator implements Comparator<Object[]> {
    * comparator for objects which follows these rules
    * <ol>
    * <li>Strings are comnpared by {@link StringUtility#compareIgnoreCase(Locale, String, String)}
-   * <li> {@link Comparable Comparables} are compared using their natural order.
+   * <li>{@link Comparable Comparables} are compared using their natural order.
    * <li>For all other objects the String representation is compared by
    * {@link StringUtility#compareIgnoreCase(Locale, String, String)}.
    * </ol>

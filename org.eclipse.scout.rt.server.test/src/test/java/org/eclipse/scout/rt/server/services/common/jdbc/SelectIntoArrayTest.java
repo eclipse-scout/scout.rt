@@ -42,11 +42,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
- * Methods under test:
- * - {@link ISqlService#select(String, Object...)}.
- * - {@link ISqlService#selectInto(String, Object...)}.
- * With different types of arrays used as output bind.
+ * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}). Methods under test: -
+ * {@link ISqlService#select(String, Object...)}. - {@link ISqlService#selectInto(String, Object...)}. With different
+ * types of arrays used as output bind.
  */
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)
@@ -133,8 +131,7 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * Direct select.
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). Direct select.
    */
   @Test
   public void testSelectIntoTableFieldData() throws Exception {
@@ -146,8 +143,7 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * TableData is in NVPair bind.
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData is in NVPair bind.
    */
   @Test
   public void testSelectIntoTableFieldDataInNVPair() throws Exception {
@@ -159,8 +155,7 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * TableData is in Map bind.
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData is in Map bind.
    */
   @Test
   public void testSelectIntoTableFieldDataInMap() throws Exception {
@@ -173,8 +168,8 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna).
-   * TableData is in a bean (ContainerBean).
+   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData is in a bean
+   * (ContainerBean).
    */
   @Test
   public void testSelectIntoTableFieldDataInBean() throws Exception {
@@ -197,8 +192,7 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * Direct select.
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). Direct select.
    */
   @Test
   public void testSelectIntoTableFieldBeanData() throws Exception {
@@ -210,8 +204,8 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * TableData is in NVPair bind.
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData is in NVPair
+   * bind.
    */
   @Test
   public void testSelectIntoTableFieldBeanDataInNVPair() throws Exception {
@@ -223,8 +217,7 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * TableData is in Map bind.
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData is in Map bind.
    */
   @Test
   public void testSelectIntoTableFieldBeanDataInMap() throws Exception {
@@ -237,8 +230,8 @@ public class SelectIntoArrayTest {
   }
 
   /**
-   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna).
-   * TableData is in a bean (ContainerBean).
+   * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData is in a bean
+   * (ContainerBean).
    */
   @Test
   public void testSelectIntoTableFieldBeanDataInBean() throws Exception {

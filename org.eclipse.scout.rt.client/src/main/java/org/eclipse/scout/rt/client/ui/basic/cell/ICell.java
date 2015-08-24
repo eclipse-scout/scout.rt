@@ -66,8 +66,7 @@ public interface ICell {
   IMultiStatus getErrorStatus();
 
   /**
-   * @return true if the content is valid, no error status is set on field and mandatory
-   *         property is met.
+   * @return true if the content is valid, no error status is set on field and mandatory property is met.
    */
   boolean isContentValid();
 

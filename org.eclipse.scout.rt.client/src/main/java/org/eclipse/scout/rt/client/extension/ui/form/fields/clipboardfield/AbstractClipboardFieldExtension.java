@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboa
 /**
  *
  */
-public abstract class AbstractClipboardFieldExtension<OWNER extends AbstractClipboardField> extends AbstractValueFieldExtension<Collection<BinaryResource>, OWNER> implements IClipboardFieldExtension<OWNER> {
+public abstract class AbstractClipboardFieldExtension<OWNER extends AbstractClipboardField> extends AbstractValueFieldExtension<Collection<BinaryResource>, OWNER>implements IClipboardFieldExtension<OWNER> {
 
   /**
    * @param owner

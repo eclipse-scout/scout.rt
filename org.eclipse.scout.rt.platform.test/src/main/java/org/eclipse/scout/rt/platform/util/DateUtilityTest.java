@@ -558,7 +558,8 @@ public class DateUtilityTest {
    *          Date defined with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
    */
   private void testConvertDateToDoubleTimeToDate(String input) {
-    assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", DateUtility.parse(input, YEAR_DATE_TIME_PATTERN), DateUtility.convertDoubleTimeToDate(DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN))));
+    assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", DateUtility.parse(input, YEAR_DATE_TIME_PATTERN),
+        DateUtility.convertDoubleTimeToDate(DateUtility.convertDateToDoubleTime(DateUtility.parse(input, YEAR_DATE_TIME_PATTERN))));
   }
 
   @Test

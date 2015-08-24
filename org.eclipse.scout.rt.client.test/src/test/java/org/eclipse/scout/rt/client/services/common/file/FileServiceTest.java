@@ -95,9 +95,9 @@ public class FileServiceTest {
   public void syncRemoteFilesToPath() {
     //register services
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanMetaData(DummyRemoteFileService.class).
-            withInitialInstance(new DummyRemoteFileService()).
-            withApplicationScoped(true));
+        new BeanMetaData(DummyRemoteFileService.class)
+            .withInitialInstance(new DummyRemoteFileService())
+            .withApplicationScoped(true));
 
     //start with clean setup
     File outFolder = new File(TEST_DIR_OUT);

@@ -46,16 +46,14 @@ public interface ICompositeField extends IFormField {
 
   /**
    * search all fields in this container and its subtree<br>
-   * the field ID is the simple class name of a field without the suffixes
-   * "Box", "Field", "Button"
+   * the field ID is the simple class name of a field without the suffixes "Box", "Field", "Button"
    */
   IFormField getFieldById(String id);
 
   /**
    * search all fields in this container and its subtree<br>
-   * the field ID is the simple class name of a field without the suffixes
-   * "Box", "Field", "Button"
-   * The field must be equal or a subtype of type
+   * the field ID is the simple class name of a field without the suffixes "Box", "Field", "Button" The field must be
+   * equal or a subtype of type
    */
   <T extends IFormField> T getFieldById(String id, Class<T> type);
 

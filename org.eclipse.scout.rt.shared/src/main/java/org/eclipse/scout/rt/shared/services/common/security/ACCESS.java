@@ -25,8 +25,7 @@ public final class ACCESS {
   }
 
   /**
-   * Convenience function to check if the resource is accessible with that level
-   * example: ACCESS.check(new
+   * Convenience function to check if the resource is accessible with that level example: ACCESS.check(new
    * CompanyReadPermission(CompanyReadPermission.OWNED)) -> true
    */
   public static boolean check(Permission p) {
@@ -34,8 +33,8 @@ public final class ACCESS {
   }
 
   /**
-   * Convenience function to get the level of access on the resource example:
-   * ACCESS.getLevel(new CompanyReadPermission()) -> CompanyReadPermission.ALL
+   * Convenience function to get the level of access on the resource example: ACCESS.getLevel(new
+   * CompanyReadPermission()) -> CompanyReadPermission.ALL
    */
   public static int getLevel(Permission p) {
     return BEANS.get(IAccessControlService.class).getPermissionLevel(p);

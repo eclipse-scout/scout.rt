@@ -191,8 +191,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   boolean contains(VALUE value);
 
   /**
-   * @return true if column is not unique, that means at least one value occurs
-   *         more than one time
+   * @return true if column is not unique, that means at least one value occurs more than one time
    */
   boolean containsDuplicateValues();
 
@@ -249,8 +248,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void setVisibleColumnIndexHint(int index);
 
   /**
-   * A column is presented to the user in the table when it is displayable AND
-   * visible<br>
+   * A column is presented to the user in the table when it is displayable AND visible<br>
    * this column is basically displayable to the user<br>
    * this property is used in combination with isVisible
    */
@@ -259,17 +257,16 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void setDisplayable(boolean b);
 
   /**
-   * @return Returns whether the column is visible to the user using the three properties
-   *         visible, dispalyable and visiblePermission.
+   * @return Returns whether the column is visible to the user using the three properties visible, dispalyable and
+   *         visiblePermission.
    */
   boolean isVisible();
 
   void setVisible(boolean b);
 
   /**
-   * @return Returns the column's internal visible state that does no take
-   *         permissions or the displayable property into account. This method is used by
-   *         the framework only.
+   * @return Returns the column's internal visible state that does no take permissions or the displayable property into
+   *         account. This method is used by the framework only.
    * @see IColumn#isVisible()
    */
   boolean isVisibleInternal();
@@ -280,8 +277,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   boolean isPrimaryKey();
 
   /**
-   * the value in this column is part of the row summary text (for example in a
-   * explorer tree node)
+   * the value in this column is part of the row summary text (for example in a explorer tree node)
    */
   boolean isSummary();
 
@@ -313,9 +309,8 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void setHorizontalAlignment(int hAglin);
 
   /**
-   * <0 for left alignment 0 for center alignment and > 0 for right alignment.
-   * This alignment is used for header cell and all column cells. Cell specific alignments can be
-   * applied by overriding the decorateCell methods.
+   * <0 for left alignment 0 for center alignment and > 0 for right alignment. This alignment is used for header cell
+   * and all column cells. Cell specific alignments can be applied by overriding the decorateCell methods.
    */
   int getHorizontalAlignment();
 
@@ -374,12 +369,12 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * @throws ProcessingException
    *           parse AND validate value
    */
-  VALUE/* validValue */parseValue(ITableRow row, Object rawValue) throws ProcessingException;
+  VALUE/* validValue */ parseValue(ITableRow row, Object rawValue) throws ProcessingException;
 
   /**
    * validate cell value on a row
    */
-  VALUE/* validValue */validateValue(ITableRow row, VALUE rawValue) throws ProcessingException;
+  VALUE/* validValue */ validateValue(ITableRow row, VALUE rawValue) throws ProcessingException;
 
   /**
    * Prepare editing of a cell in the table.
@@ -411,8 +406,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   /**
    * true: Whenever table content changes, automatically calculate optimized column width so that all column content is
-   * displayed without
-   * cropping.
+   * displayed without cropping.
    * <p>
    * This may display a horizontal scroll bar on the table.
    */

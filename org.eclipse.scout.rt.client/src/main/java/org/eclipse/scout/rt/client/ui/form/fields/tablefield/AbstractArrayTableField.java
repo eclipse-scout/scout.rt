@@ -18,8 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
 /**
- * Convenience Table Field that use an 'Array based TableData' (was the default with Eclipse Luna).
- * See Bug 455282
+ * Convenience Table Field that use an 'Array based TableData' (was the default with Eclipse Luna). See Bug 455282
  *
  * @since 4.3.0 (Mars-M5)
  */

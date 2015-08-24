@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 /**
  *
  */
-public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> implements IValueFieldContextMenu {
+public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>>implements IValueFieldContextMenu {
 
   /**
    * @param owner

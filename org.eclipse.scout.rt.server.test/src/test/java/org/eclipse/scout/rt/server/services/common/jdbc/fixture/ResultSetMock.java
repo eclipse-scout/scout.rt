@@ -22,7 +22,7 @@ import java.sql.SQLWarning;
  * Bug 402901: {@link java.sql.ResultSet} is different in Java 6 and Java 7. To avoid compilation error with one or the
  * other rt.jar, this mock class does not implement this interface
  */
-public class ResultSetMock extends VerboseMock implements InvocationHandler /*, java.sql.ResultSet */{
+public class ResultSetMock extends VerboseMock implements InvocationHandler /*, java.sql.ResultSet */ {
   private final ResultSet m_rs;
   private final ResultSetMetaData m_rsMeta;
   private Object[][] m_resultData;

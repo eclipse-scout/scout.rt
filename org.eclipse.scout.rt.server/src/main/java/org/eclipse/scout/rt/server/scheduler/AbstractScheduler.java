@@ -205,9 +205,8 @@ public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
   }
 
   /**
-   * convenience for getJobs(null,jobId) Note that this will return the first
-   * found job with that id even though there might be other jobs with that same
-   * id
+   * convenience for getJobs(null,jobId) Note that this will return the first found job with that id even though there
+   * might be other jobs with that same id
    */
   @Override
   public ISchedulerJob getJob(String jobId) {

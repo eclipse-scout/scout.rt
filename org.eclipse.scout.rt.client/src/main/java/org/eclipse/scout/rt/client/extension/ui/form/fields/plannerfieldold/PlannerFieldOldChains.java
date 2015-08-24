@@ -16,7 +16,8 @@ public final class PlannerFieldOldChains {
   private PlannerFieldOldChains() {
   }
 
-  protected abstract static class AbstractPlannerFieldOldChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractExtensionChain<IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> {
+  protected abstract static class AbstractPlannerFieldOldChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI>
+      extends AbstractExtensionChain<IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> {
 
     public AbstractPlannerFieldOldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions, IPlannerFieldOldExtension.class);
@@ -32,7 +33,8 @@ public final class PlannerFieldOldChains {
     public void execPopulateActivities(final List<RI> resourceIds, final List<ITableRow> resourceRows) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next)
+            throws ProcessingException {
           next.execPopulateActivities(PlannerFieldOldPopulateActivitiesChain.this, resourceIds, resourceRows);
         }
       };
@@ -53,7 +55,8 @@ public final class PlannerFieldOldChains {
     public Object[][] execLoadResourceTableData() throws ProcessingException {
       MethodInvocation<Object[][]> methodInvocation = new MethodInvocation<Object[][]>() {
         @Override
-        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next)
+            throws ProcessingException {
           setReturnValue(next.execLoadResourceTableData(PlannerFieldOldLoadResourceTableDataChain.this));
         }
       };
@@ -74,7 +77,8 @@ public final class PlannerFieldOldChains {
     public void execPopulateResourceTable() throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next)
+            throws ProcessingException {
           next.execPopulateResourceTable(PlannerFieldOldPopulateResourceTableChain.this);
         }
       };
@@ -95,7 +99,8 @@ public final class PlannerFieldOldChains {
     public Object[][] execLoadActivityMapData(final List<? extends RI> resourceIds, final List<? extends ITableRow> resourceRows) throws ProcessingException {
       MethodInvocation<Object[][]> methodInvocation = new MethodInvocation<Object[][]>() {
         @Override
-        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next) throws ProcessingException {
+        protected void callMethod(IPlannerFieldOldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerFieldOld<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>> next)
+            throws ProcessingException {
           setReturnValue(next.execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain.this, resourceIds, resourceRows));
         }
       };

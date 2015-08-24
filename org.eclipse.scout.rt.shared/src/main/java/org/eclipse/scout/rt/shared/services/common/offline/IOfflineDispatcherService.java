@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 /**
- * This service is representing a local server on the frontend used to process
- * server logic similiar to the backend in transactions and with transaction support. <br>
+ * This service is representing a local server on the frontend used to process server logic similiar to the backend in
+ * transactions and with transaction support. <br>
  */
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {

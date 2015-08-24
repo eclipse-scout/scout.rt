@@ -256,7 +256,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   }
 
   @Override
-  public boolean/* changed */setCellValue(int columnIndex, Object value) throws ProcessingException {
+  public boolean/* changed */ setCellValue(int columnIndex, Object value) throws ProcessingException {
     return getCellForUpdate(columnIndex).setValue(value);
   }
 

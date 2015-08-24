@@ -17,11 +17,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The ModelVariant annotation is used to mark Scout model classes. The annotation is read
- * by the JSON layer, where the value of the annotation is added to the class-name of the
- * model, like 'StringField.Custom' and returned by as objectType (see: <code>IJsonAdapter#getObjectType</code>),
- * which is used to look up a JSON adapter class in the object factories on the client-side and also
- * a JavaScript object in the registered object factories in the browser.
+ * The ModelVariant annotation is used to mark Scout model classes. The annotation is read by the JSON layer, where the
+ * value of the annotation is added to the class-name of the model, like 'StringField.Custom' and returned by as
+ * objectType (see: <code>IJsonAdapter#getObjectType</code>), which is used to look up a JSON adapter class in the
+ * object factories on the client-side and also a JavaScript object in the registered object factories in the browser.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

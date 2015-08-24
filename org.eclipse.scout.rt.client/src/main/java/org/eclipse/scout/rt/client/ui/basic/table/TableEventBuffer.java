@@ -80,9 +80,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * Removes the given 'rowsToRemove' from all 'events'. The event list is traversed backwards. This process is stopped,
    * when a event that may change row indexes is encountered.
    *
-   * @return a list with the same rows as 'rowsToRemove', except those that were removed from an
-   *         event whose type matches one of the 'creationTypes'. This allows for completely removing
-   *         a row that was created and deleted in the same request.
+   * @return a list with the same rows as 'rowsToRemove', except those that were removed from an event whose type
+   *         matches one of the 'creationTypes'. This allows for completely removing a row that was created and deleted
+   *         in the same request.
    */
   protected List<ITableRow> removeRowsFromPreviousEvents(List<ITableRow> rowsToRemove, List<TableEvent> events, Integer... creationTypes) {
     List<Integer> creationTypesList = Arrays.asList(creationTypes);
@@ -264,8 +264,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   }
 
   /**
-   * If a ROW_ORDER_CHANGED event happens directly after ROWS_INSERTED, we may removed the ROW_ORDER_CHANGED event
-   * and send the new order in the ROWS_INSERTED event instead.
+   * If a ROW_ORDER_CHANGED event happens directly after ROWS_INSERTED, we may removed the ROW_ORDER_CHANGED event and
+   * send the new order in the ROWS_INSERTED event instead.
    */
   protected void applyRowOrderChangedToRowsInserted(List<TableEvent> events) {
     for (int j = 0; j < events.size() - 1; j++) {
@@ -350,8 +350,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         && CompareUtility.equals(event1.getDropObject(), event2.getDropObject())
         && CompareUtility.equals(event1.getCopyObject(), event2.getCopyObject())
         && CompareUtility.equals(event1.getColumns(), event2.getColumns())
-        && event1.isSortInMemoryAllowed() == event2.isSortInMemoryAllowed()
-        );
+        && event1.isSortInMemoryAllowed() == event2.isSortInMemoryAllowed());
     return identical;
   }
 

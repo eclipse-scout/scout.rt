@@ -384,7 +384,8 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     chain.execPrepareLookup(call, row);
   }
 
-  protected static class LocalContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends LocalColumnExtension<VALUE, OWNER>implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
+  protected static class LocalContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends LocalColumnExtension<VALUE, OWNER>
+      implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
 
     public LocalContentAssistColumnExtension(OWNER owner) {
       super(owner);

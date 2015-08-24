@@ -43,6 +43,7 @@ public class IntoParser {
 
   private static final String S_MAP;
   private static final String NAME_MAP;
+
   static {
     S_MAP = " \n\t\r";
     NAME_MAP = "_.0123456789{}ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

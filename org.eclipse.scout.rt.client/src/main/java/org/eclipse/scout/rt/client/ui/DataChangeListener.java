@@ -16,8 +16,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 /**
- * Listener to observe arbitrary changes on any abstract data model or
- * enumerations see {@link IDesktop#addDataChangeListener(IDataChangeListener, Object...)} and
+ * Listener to observe arbitrary changes on any abstract data model or enumerations see
+ * {@link IDesktop#addDataChangeListener(IDataChangeListener, Object...)} and
  * {@link IDesktop#removeDataChangeListener(IDataChangeListener, Object...)}
  */
 public interface DataChangeListener extends EventListener {

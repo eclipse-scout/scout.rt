@@ -260,7 +260,7 @@ public class TableRow implements ITableRow {
   }
 
   @Override
-  public boolean/* changed */setCellValue(int columnIndex, Object value) throws ProcessingException {
+  public boolean/* changed */ setCellValue(int columnIndex, Object value) throws ProcessingException {
     try {
       setRowChanging(true);
       //

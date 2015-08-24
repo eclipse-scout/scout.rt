@@ -15,8 +15,8 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * Every implementation of this interface can be applied to coalesce objects of the same super class (generic
- * type of this class).
+ * Every implementation of this interface can be applied to coalesce objects of the same super class (generic type of
+ * this class).
  */
 @ApplicationScoped
 public interface ICoalescer<T> {

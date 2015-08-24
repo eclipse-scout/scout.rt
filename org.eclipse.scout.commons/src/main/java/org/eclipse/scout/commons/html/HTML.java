@@ -368,8 +368,7 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;.
-   * Example:<br>
+   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
    * <code>
    * HTML.table(<br>
         &nbsp;HTML.row(<br>
@@ -392,8 +391,7 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;.
-   * Example:<br>
+   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
    * <code>
    * HTML.table(<br>
         &nbsp;HTML.row(<br>
@@ -416,8 +414,7 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for a table.
-   * Example:<br>
+   * Create a html element with encoded text for a table. Example:<br>
    * <code>
    * HTML.table(<br>
         &nbsp;HTML.row(<br>
@@ -437,8 +434,7 @@ public final class HTML {
   }
 
   /**
-   * Create a html element with encoded text for a table.
-   * Example:<br>
+   * Create a html element with encoded text for a table. Example:<br>
    * <code>
    * HTML.table(<br>
         &nbsp;HTML.row(<br>
@@ -458,8 +454,7 @@ public final class HTML {
   }
 
   /**
-   * Creates an application local link
-   * String encodedHtml = HTML.appLink("path","text").toEncodedHtml(); <br>
+   * Creates an application local link String encodedHtml = HTML.appLink("path","text").toEncodedHtml(); <br>
    *
    * @param ref
    *          what the link is referring to

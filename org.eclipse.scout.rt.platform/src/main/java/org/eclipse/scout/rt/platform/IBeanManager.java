@@ -64,8 +64,8 @@ public interface IBeanManager {
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
   /**
-   * This is a convenience for {@link #registerBean(BeanMetaData)} and calls {@link #registerBean(BeanMetaData)} with a new
-   * {@link BeanMetaData#BeanData(Class)}
+   * This is a convenience for {@link #registerBean(BeanMetaData)} and calls {@link #registerBean(BeanMetaData)} with a
+   * new {@link BeanMetaData#BeanData(Class)}
    *
    * @param beanClazz
    * @return the registered {@link IBean}

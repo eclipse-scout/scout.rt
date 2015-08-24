@@ -231,8 +231,7 @@ public class BeanManagerImplementor implements IBeanManager {
               "Bean '%s' is marked with @%s and is not application scoped (@%s) - unexpected configuration! ",
               bean.getBeanClazz(),
               CreateImmediately.class.getSimpleName(),
-              ApplicationScoped.class.getSimpleName()
-              ));
+              ApplicationScoped.class.getSimpleName()));
         }
       }
     }

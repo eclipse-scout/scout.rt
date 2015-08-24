@@ -59,8 +59,8 @@ public final class EntityContributionUtility {
   }
 
   /**
-   * Creates constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped
-   * inside an EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...) clause.
+   * Creates constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped inside an
+   * EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...) clause.
    *
    * @return Returns an {@link EntityContribution} with constraints or null if the given {@link EntityContribution} is
    *         empty.
@@ -103,15 +103,16 @@ public final class EntityContributionUtility {
   }
 
   /**
-   * Evaluates the collecting tags in the entity statement and fills in the values of the {@link EntityContribution}.
-   * If the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
+   * Evaluates the collecting tags in the entity statement and fills in the values of the {@link EntityContribution}. If
+   * the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
    * and as 'where' on {@link EntityStrategy#BuildConstraints}
    * <p>
    * Before the call is processed, all {@link IFormDataStatementBuilderInjection}s are invoked.
    *
    * @param entityStrategy
    * @param entityPartWithTags
-   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts<br/>
+   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
+   *          <br/>
    *          as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
    *          part.
    * @param childContributions

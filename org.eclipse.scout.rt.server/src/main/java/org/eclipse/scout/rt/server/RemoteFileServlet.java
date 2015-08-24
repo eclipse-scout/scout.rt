@@ -98,8 +98,7 @@ public class RemoteFileServlet extends HttpServlet {
     // "/") then try index.*-files.
     if (StringUtility.isNullOrEmpty(pathInfo) || pathInfo.replaceAll("\\\\", "/").endsWith("/")) { //$NON-NLS-1$ //$NON-NLS-2$
       String prefix = "/"; //$NON-NLS-1$
-      if (pathInfo != null && pathInfo.replaceAll("\\\\", "/").endsWith("/"))
-      {
+      if (pathInfo != null && pathInfo.replaceAll("\\\\", "/").endsWith("/")) {
         prefix = pathInfo.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
       }
       fileList = Arrays.asList(
@@ -169,8 +168,7 @@ public class RemoteFileServlet extends HttpServlet {
 
   protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath, String contentType, long lastModified, int contentLength) {
     String etag = null;
-    if (lastModified != -1 && contentLength != -1)
-    {
+    if (lastModified != -1 && contentLength != -1) {
       etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     }
 

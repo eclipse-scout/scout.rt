@@ -80,8 +80,8 @@ public interface IBrowserField extends IFormField {
   String getLocation();
 
   /**
-   * Stores the given resource in the field, generates a dynamic resource URL for it
-   * and sets the location (value) to that URL.
+   * Stores the given resource in the field, generates a dynamic resource URL for it and sets the location (value) to
+   * that URL.
    */
   void setBinaryResource(BinaryResource binaryResource);
 
@@ -96,9 +96,9 @@ public interface IBrowserField extends IFormField {
   BinaryResource getBinaryResource();
 
   /**
-   * Adds additional resources that may be referenced by the main resource ({@link #getBinaryResource()}).
-   * To reference an attachment, set the "filename" attribute correspondingly. The attachment's URL
-   * shares the same base path, with a different filename at the end.
+   * Adds additional resources that may be referenced by the main resource ({@link #getBinaryResource()}). To reference
+   * an attachment, set the "filename" attribute correspondingly. The attachment's URL shares the same base path, with a
+   * different filename at the end.
    */
   void setAttachments(Set<BinaryResource> attachments);
 

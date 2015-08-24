@@ -66,10 +66,10 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    * @deprecated This decoration type is obsolete, do not use it anymore. This constant will be removed in the "O"
    *             release. To apply the "section style" to a group box, set its "expandable" property to
    *             <code>true</code> and set a decoration style that supports expandable group boxes (e.g.
-   *             {@link #BORDER_DECORATION_LINE}). In most cases, {@link #BORDER_DECORATION_AUTO} is also
-   *             acceptable. (Thus, the easiest way to migrate is probably to just remove your
-   *             <code>getConfiguredBorderDecoration()</code> declaration, thus falling back to the
-   *             default BORDER_DECORATION_AUTO).
+   *             {@link #BORDER_DECORATION_LINE}). In most cases, {@link #BORDER_DECORATION_AUTO} is also acceptable.
+   *             (Thus, the easiest way to migrate is probably to just remove your
+   *             <code>getConfiguredBorderDecoration()</code> declaration, thus falling back to the default
+   *             BORDER_DECORATION_AUTO).
    */
   @Deprecated
   String BORDER_DECORATION_SECTION = "section";
@@ -160,8 +160,7 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   /**
    * @param c
    *          column count for this composite box<br>
-   *          see {@value #GRID_COLUMN_COUNT_INHERITED} for inherited column
-   *          count
+   *          see {@value #GRID_COLUMN_COUNT_INHERITED} for inherited column count
    */
   void setGridColumnCountHint(int c);
 
@@ -175,8 +174,8 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   void setScrollable(boolean scrollable);
 
   /**
-   * @return true if the group <i>can</i> be collapsed
-   *         see {@link #isExpanded()} to see if border is effectively expanded or collapsed
+   * @return true if the group <i>can</i> be collapsed see {@link #isExpanded()} to see if border is effectively
+   *         expanded or collapsed
    */
   boolean isExpandable();
 

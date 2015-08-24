@@ -18,8 +18,7 @@ import java.util.Locale;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * CodeType store
- * Maintains a map of partition- and language-dependent code type caches
+ * CodeType store Maintains a map of partition- and language-dependent code type caches
  *
  * @since 4.3.0 (mars-M5)
  */

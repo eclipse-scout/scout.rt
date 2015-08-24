@@ -13,8 +13,8 @@ package org.eclipse.scout.commons.beans;
 import java.lang.reflect.Method;
 
 /**
- * The java bean FastPropertyDescriptor tries to find a read <b>and</b> write method of the
- * property, otherwise an exception is thrown.
+ * The java bean FastPropertyDescriptor tries to find a read <b>and</b> write method of the property, otherwise an
+ * exception is thrown.
  * <p>
  * This lenient implementation creates a FastPropertyDescriptor with an optional getter method and an optional setter
  * method so they exist.
@@ -50,10 +50,8 @@ public class FastPropertyDescriptor {
   /**
    * Gets the Class object for the property.
    *
-   * @return The Java type info for the property. Note that
-   *         the "Class" object may describe a built-in Java type such as "int".
-   *         The result may be "null" if this is an indexed property that
-   *         does not support non-indexed access.
+   * @return The Java type info for the property. Note that the "Class" object may describe a built-in Java type such as
+   *         "int". The result may be "null" if this is an indexed property that does not support non-indexed access.
    *         <p>
    *         This is the type that will be returned by the ReadMethod.
    */
@@ -64,8 +62,7 @@ public class FastPropertyDescriptor {
   /**
    * Gets the method that should be used to read the property value.
    *
-   * @return The method that should be used to read the property value.
-   *         May return null if the property can't be read.
+   * @return The method that should be used to read the property value. May return null if the property can't be read.
    */
   public Method getReadMethod() {
     return m_readMethod;
@@ -87,8 +84,8 @@ public class FastPropertyDescriptor {
   /**
    * Gets the method that should be used to write the property value.
    *
-   * @return The method that should be used to write the property value.
-   *         May return null if the property can't be written.
+   * @return The method that should be used to write the property value. May return null if the property can't be
+   *         written.
    */
   public Method getWriteMethod() {
     return m_writeMethod;

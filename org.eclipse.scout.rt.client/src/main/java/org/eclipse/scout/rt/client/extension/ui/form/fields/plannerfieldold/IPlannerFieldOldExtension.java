@@ -21,5 +21,6 @@ public interface IPlannerFieldOldExtension<T extends ITable, P extends IActivity
 
   void execPopulateResourceTable(PlannerFieldOldPopulateResourceTableChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException;
 
-  Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException;
+  Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows)
+      throws ProcessingException;
 }

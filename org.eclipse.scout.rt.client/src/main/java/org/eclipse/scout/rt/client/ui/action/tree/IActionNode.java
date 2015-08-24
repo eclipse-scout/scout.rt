@@ -44,8 +44,7 @@ public interface IActionNode<T extends IActionNode> extends IAction {
 
   /**
    * @return a copy of the list of actions<br>
-   *         When changing this list, use {@link #setChildActions(List)} to
-   *         apply them to the model
+   *         When changing this list, use {@link #setChildActions(List)} to apply them to the model
    */
   List<T> getChildActions();
 

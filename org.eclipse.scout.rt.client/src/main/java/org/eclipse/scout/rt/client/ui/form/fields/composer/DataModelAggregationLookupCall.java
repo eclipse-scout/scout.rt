@@ -105,9 +105,9 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   }
 
   /**
-   * @return the life list of lookup rows that were created for the current attribute
-   *         Changed whenever {@link #setAttribute(IDataModelAttribute)} is called with another attribute by
-   *         calling {@link #updateLookupRows()}.
+   * @return the life list of lookup rows that were created for the current attribute Changed whenever
+   *         {@link #setAttribute(IDataModelAttribute)} is called with another attribute by calling
+   *         {@link #updateLookupRows()}.
    */
   public List<ILookupRow<Integer>> getLookupRows() {
     return m_lookupRows;

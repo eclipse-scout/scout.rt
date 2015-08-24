@@ -84,8 +84,7 @@ public class PlannerEventBufferTest {
 
   /**
    * Multiple insert events on the same resource should be merged into a single event with the resources combined in the
-   * correct
-   * order.
+   * correct order.
    */
   @Test
   public void testCombineMultipleInsertsSameResources() {

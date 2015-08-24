@@ -55,8 +55,7 @@ public class FormWaitForTest {
     DynamicGroupBox mainBox = new DynamicGroupBox(
         new DynamicStringField("f1", "First Name"),
         new DynamicOkButton(),
-        new DynamicCancelButton()
-        );
+        new DynamicCancelButton());
     final DynamicForm form = new DynamicForm("Form1", mainBox);
     form.setModal(modal);
     form.setDisplayHint(displayHint);

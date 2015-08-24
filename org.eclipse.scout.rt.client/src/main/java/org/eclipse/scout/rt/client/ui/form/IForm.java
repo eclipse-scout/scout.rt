@@ -39,11 +39,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A form is the model used for anything containing fields: a dialog, a step
- * of a wizard, the details of a page, a search. Each form is represented by
- * a class.
- * A form has fields, buttons, and handlers. These elements
- * are all part of the same class, they are <b>inner classes</b> of the form.
+ * A form is the model used for anything containing fields: a dialog, a step of a wizard, the details of a page, a
+ * search. Each form is represented by a class. A form has fields, buttons, and handlers. These elements are all part of
+ * the same class, they are <b>inner classes</b> of the form.
  * <p>
  * A <b>field</b> is where you enter data: a string, a number, a date, a list of values. A <b>button</b> is where you
  * trigger actions: save data, cancel whatever you are doing, go on to the next or return to the previous step. A
@@ -120,19 +118,16 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   String VIEW_ID_PAGE_TABLE = "PAGE_TABLE";
 
   /**
-   * Initialize the form and all of its fields.
-   * By default any of the #start* methods of the form call this method
+   * Initialize the form and all of its fields. By default any of the #start* methods of the form call this method
    */
   void initForm() throws ProcessingException;
 
   /**
-   * This method is called to get an exclusive key of the form. The key is used
-   * to open the same form with the same handler only once. Obviously this
-   * behavior can only be used for view forms.
+   * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
+   * handler only once. Obviously this behavior can only be used for view forms.
    *
    * @see AbstractDesktop#getSimilarViewForms(IForm)
-   * @return null for exclusive form behavior an exclusive key to ensure similar
-   *         handling.
+   * @return null for exclusive form behavior an exclusive key to ensure similar handling.
    * @throws ProcessingException
    */
   Object computeExclusiveKey() throws ProcessingException;
@@ -187,14 +182,12 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void setPerspectiveId(String s);
 
   /**
-   * @return the {@link IWizard} that contains the step that started this form
-   *         using startWizardStep
+   * @return the {@link IWizard} that contains the step that started this form using startWizardStep
    */
   IWizard getWizard();
 
   /**
-   * @return the {@link IWizardStep} that started this form using
-   *         startWizardStep
+   * @return the {@link IWizardStep} that started this form using startWizardStep
    */
   IWizardStep getWizardStep();
 
@@ -202,15 +195,15 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @param wizardStep
    *          the step that starts this form. The form can then access the step with {@link #getWizardStep()}.
    * @param handlerType
-   *          the inner handler type used to load / store the form. An instance of this
-   *          handler type is created automatically and set to the form using {@link #setHandler(IFormHandler)}.
-   *          If this parameter is <code>null</code>, the current handler is used instead.
+   *          the inner handler type used to load / store the form. An instance of this handler type is created
+   *          automatically and set to the form using {@link #setHandler(IFormHandler)}. If this parameter is
+   *          <code>null</code>, the current handler is used instead.
    */
   void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType) throws ProcessingException;
 
   /**
-   * Like {@link #startWizardStep(IWizardStep, Class)} but without a custom handler type (uses the currently
-   * set handler).
+   * Like {@link #startWizardStep(IWizardStep, Class)} but without a custom handler type (uses the currently set
+   * handler).
    */
   void startWizardStep(IWizardStep<?> wizardStep) throws ProcessingException;
 
@@ -230,22 +223,20 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   boolean isShowing();
 
   /**
-   * @return true if the form is not (yet) started with a form handler and
-   *         therefore not active
+   * @return true if the form is not (yet) started with a form handler and therefore not active
    */
   boolean isFormClosed();
 
   /**
-   * @return true if the form is started with a form handler and therefore
-   *         active
+   * @return true if the form is started with a form handler and therefore active
    * @deprecated use {@link #isFormStarted()}; will be removed in version 6.1.
    */
   @Deprecated
   boolean isFormOpen();
 
   /**
-   * @return <code>true</code> if this {@link IForm} is started with a {@link IFormHandler}. However, it does not
-   *         imply that it is attached to the {@link IDesktop} and displayed in the UI.
+   * @return <code>true</code> if this {@link IForm} is started with a {@link IFormHandler}. However, it does not imply
+   *         that it is attached to the {@link IDesktop} and displayed in the UI.
    */
   boolean isFormStarted();
 
@@ -308,8 +299,8 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * @param source
    *          the FormData to import
    * @param valueChangeTriggersEnabledspecifies
-   *          if the {@link AbstractFormField}.execChangedValue should be called on a field value change
-   *          caused by this import.
+   *          if the {@link AbstractFormField}.execChangedValue should be called on a field value change caused by this
+   *          import.
    * @param filter
    *          a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
@@ -357,15 +348,13 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void setWrapperFieldInternal(IWrappedFormField w);
 
   /**
-   * the field ID is the simple class name of a field without the suffixes
-   * "Box", "Field", "Button"
+   * the field ID is the simple class name of a field without the suffixes "Box", "Field", "Button"
    */
   IFormField getFieldById(final String id);
 
   /**
-   * the field ID is the simple class name of a field without the suffixes
-   * "Box", "Field", "Button"
-   * The field must be equal or a subtype of type
+   * the field ID is the simple class name of a field without the suffixes "Box", "Field", "Button" The field must be
+   * equal or a subtype of type
    */
   <T extends IFormField> T getFieldById(String id, Class<T> type);
 
@@ -389,9 +378,8 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void doOk() throws ProcessingException;
 
   /**
-   * Validate the form, save it, and make all fields as saved.
-   * The net result is that calling this method again on the unchanged form
-   * will revalidate it, but will no longer save it.
+   * Validate the form, save it, and make all fields as saved. The net result is that calling this method again on the
+   * unchanged form will revalidate it, but will no longer save it.
    */
   void doSave() throws ProcessingException;
 
@@ -410,14 +398,13 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
 
   /**
    * Property is true by default.<br>
-   * This automatically calls {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)} when
-   * the form is started.<br>
+   * This automatically calls {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)} when the form is
+   * started.<br>
    * When using forms inside pages such as
    * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage#setDetailForm(IForm)} and
    * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable#getConfiguredSearchForm()} then this
-   * flag is set to false, because then the form should not be
-   * displayed unless the page it is contained in is activated. This activation
-   * will then call {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)}
+   * flag is set to false, because then the form should not be displayed unless the page it is contained in is
+   * activated. This activation will then call {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)}
    *
    * @deprecated use {@link #isShowOnStart()}; will be removed in version 6.1.
    */
@@ -612,17 +599,15 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void setCloseTimerArmed(boolean b);
 
   /**
-   * marker property to signal that the form changed some data (using services,
-   * backend)<br>
+   * marker property to signal that the form changed some data (using services, backend)<br>
    * property is normally used after the form handler is returned
    */
   boolean isFormStored();
 
   /**
-   * marker property to signal that the form changed some data (using services,
-   * backend)<br>
-   * this property is automatically set whenever the form has called the
-   * handlers execStore (disregarding whether this was successful or not)
+   * marker property to signal that the form changed some data (using services, backend)<br>
+   * this property is automatically set whenever the form has called the handlers execStore (disregarding whether this
+   * was successful or not)
    */
   void setFormStored(boolean b);
 
@@ -674,18 +659,17 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
 
   /**
    * Wait until form is closed<br>
-   * If the form is modal this method returns just after the modal handler has
-   * terminated<br>
-   * If the form is non-modal this starts a sub event dispatcher that loops (and
-   * blocks) until form handling is false (i.e. form has been closed)
+   * If the form is modal this method returns just after the modal handler has terminated<br>
+   * If the form is non-modal this starts a sub event dispatcher that loops (and blocks) until form handling is false
+   * (i.e. form has been closed)
    */
   void waitFor() throws ProcessingException;
 
   int WAIT_FOR_ERROR_CODE = 69218;
 
   /**
-   * reset, create, validate the search model that contains the form data, verbose search texts and a valid status
-   * see {@link SearchFilter#clear()} see {@link #doSaveWithoutMarkerChange()} is also resetting the search model
+   * reset, create, validate the search model that contains the form data, verbose search texts and a valid status see
+   * {@link SearchFilter#clear()} see {@link #doSaveWithoutMarkerChange()} is also resetting the search model
    */
   void resetSearchFilter();
 
@@ -724,10 +708,8 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void requestFocus(IFormField f);
 
   /**
-   * Add a {@link FormListener}. These listeners will be called
-   * when the form is activated, closed, discarded, before loading,
-   * after loading, before storing, after storing, when the structure changes, when it is
-   * printed, etc.
+   * Add a {@link FormListener}. These listeners will be called when the form is activated, closed, discarded, before
+   * loading, after loading, before storing, after storing, when the structure changes, when it is printed, etc.
    */
   void addFormListener(FormListener listener);
 

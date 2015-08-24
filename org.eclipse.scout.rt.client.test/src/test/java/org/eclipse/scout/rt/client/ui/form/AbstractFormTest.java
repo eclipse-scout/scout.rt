@@ -138,8 +138,7 @@ public class AbstractFormTest {
     String expectedErrorMessage = HTML.fragment(
         HTML.bold(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")),
         HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(": "))),
-        HTML.br()
-        ).toEncodedHtml();
+        HTML.br()).toEncodedHtml();
 
     try {
       form.validateForm();

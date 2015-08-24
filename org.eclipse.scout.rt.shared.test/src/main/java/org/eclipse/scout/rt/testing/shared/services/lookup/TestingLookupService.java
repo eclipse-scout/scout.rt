@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * Lookup service for testing purposes (Implementation of {@link ILookupService}).
- * Rows can be set dynamically with {@link #setRows(LookupRow[])}.
+ * Lookup service for testing purposes (Implementation of {@link ILookupService}). Rows can be set dynamically with
+ * {@link #setRows(LookupRow[])}.
  *
  * @since 3.9.0
  */

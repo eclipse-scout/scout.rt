@@ -43,8 +43,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 
 /**
- * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class
- * since the internal class does not belong to the public API.
+ * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class since the
+ * internal class does not belong to the public API.
  */
 public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implements IClientServiceTunnel {
 

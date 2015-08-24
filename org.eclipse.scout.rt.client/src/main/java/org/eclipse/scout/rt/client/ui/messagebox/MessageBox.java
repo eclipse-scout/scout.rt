@@ -264,7 +264,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           m_header,
           m_body,
           m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
-              m_hiddenText);
+          m_hiddenText);
     }
   }
 

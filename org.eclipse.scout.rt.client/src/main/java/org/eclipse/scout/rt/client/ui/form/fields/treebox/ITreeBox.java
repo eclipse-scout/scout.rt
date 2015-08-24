@@ -24,12 +24,11 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * A treebox represents a list of values which correspond to checked keys in
- * the tree. When setting loadIncremental=false just one LookupCall by
- * <b>all</b> is sent to load all tree nodes. It is expected that the returned {@link ILookupRow}s contains their
- * corresponding parentKey or null for root nodes.
- * When setting loadIncremental=true a {@link ILookupCall} by <b>rec</b> is sent
- * whenever a node's children are loaded and contains the parentKey.
+ * A treebox represents a list of values which correspond to checked keys in the tree. When setting
+ * loadIncremental=false just one LookupCall by <b>all</b> is sent to load all tree nodes. It is expected that the
+ * returned {@link ILookupRow}s contains their corresponding parentKey or null for root nodes. When setting
+ * loadIncremental=true a {@link ILookupCall} by <b>rec</b> is sent whenever a node's children are loaded and contains
+ * the parentKey.
  * <p>
  * The listbox value is a List<T> where the {@link List<T>} is the set of checked keys of the listbox<br>
  * the inner table shows those rows as checked which have the key value as a part of the listbox value (List<T>)
@@ -60,8 +59,8 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
   ITree getTree();
 
   /**
-   * true: a filter is added to the treebox tree that only accepts nodes that
-   * are active or checked. Affects {@link ITreeNode#getFilteredChildNodes()}
+   * true: a filter is added to the treebox tree that only accepts nodes that are active or checked. Affects
+   * {@link ITreeNode#getFilteredChildNodes()}
    */
   boolean isFilterActiveNodes();
 
@@ -75,8 +74,8 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
   void setFilterActiveNodesValue(TriState t);
 
   /**
-   * true: a filter is added to the treebox tree that only accepts checked
-   * nodes Affects {@link ITreeNode#getFilteredChildNodes()}
+   * true: a filter is added to the treebox tree that only accepts checked nodes Affects
+   * {@link ITreeNode#getFilteredChildNodes()}
    */
   boolean isFilterCheckedNodes();
 
@@ -90,8 +89,7 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
   void setFilterCheckedNodesValue(boolean b);
 
   /**
-   * Populate tree with data from service all existing data in the tree is
-   * discarded
+   * Populate tree with data from service all existing data in the tree is discarded
    *
    * @see execFilterTreeNode
    */

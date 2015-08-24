@@ -23,8 +23,8 @@ import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 
 /**
- * Parser for bind variables in arbitrary sql staments
- * The bind is (possibly) parsed together with its left operator (for better =ANY vs. IN handlings)
+ * Parser for bind variables in arbitrary sql staments The bind is (possibly) parsed together with its left operator
+ * (for better =ANY vs. IN handlings)
  * <p>
  * Bind Possibilities are
  * <ul>
@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
  * </ul>
  * <p>
  * Syntax (EBNF):
+ * 
  * <pre>
  * statement      = S? token-list .
  * token-list     = token (S? token)* .
@@ -59,15 +60,17 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
  * S              = ([ \n\t\r])+  .
  * </pre>
  * <p>
- * The legacy functionality supporting &...& binds - which can lead to sql injection if not carefully used - will be eliminated in future releases.
- * To avoid unexpected usages, a warning is thrown on every usage. Using the server-side config.properties property <b>org.eclipse.scout.commons.sqlplainbind=true|false</b>
- * true means activating the legacy functionality (which will be removed in future releases) and false throws an exception when using &...& binds.
+ * The legacy functionality supporting &...& binds - which can lead to sql injection if not carefully used - will be
+ * eliminated in future releases. To avoid unexpected usages, a warning is thrown on every usage. Using the server-side
+ * config.properties property <b>org.eclipse.scout.commons.sqlplainbind=true|false</b> true means activating the legacy
+ * functionality (which will be removed in future releases) and false throws an exception when using &...& binds.
  */
 public class BindParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BindParser.class);
 
   private static final String S_MAP;
   private static final String NAME_MAP;
+
   static {
     S_MAP = " \n\t\r";
     NAME_MAP = "_.0123456789{}[]ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

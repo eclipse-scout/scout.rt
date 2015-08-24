@@ -19,8 +19,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
- * Service interface for storing the navigation history and navigating in that
- * history.
+ * Service interface for storing the navigation history and navigating in that history.
  */
 public interface INavigationHistoryService extends IService {
   String SERVICE_DATA_KEY = "navigationHistoryServiceData";
@@ -56,8 +55,7 @@ public interface INavigationHistoryService extends IService {
   int getIndex();
 
   /**
-   * @return the currently active bookmark or <code>null</code>, if no bookmark
-   *         is active
+   * @return the currently active bookmark or <code>null</code>, if no bookmark is active
    */
   Bookmark getActiveBookmark();
 

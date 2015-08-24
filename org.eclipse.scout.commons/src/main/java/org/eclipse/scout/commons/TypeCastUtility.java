@@ -231,15 +231,15 @@ public final class TypeCastUtility {
    */
   private IllegalArgumentException createException(Object o, Class fromType, Class toType, int code, String msg) {
     return new IllegalArgumentException(
-        "converting " +
-            VerboseUtility.dumpObject(o) +
-            " from " +
-            VerboseUtility.dumpType(fromType) +
-            " to " +
-            VerboseUtility.dumpType(toType) +
-            " failed with code " +
-            code +
-            " (" + msg + ")");
+        "converting "
+            + VerboseUtility.dumpObject(o)
+            + " from "
+            + VerboseUtility.dumpType(fromType)
+            + " to "
+            + VerboseUtility.dumpType(toType)
+            + " failed with code "
+            + code
+            + " (" + msg + ")");
   }
 
   private Object castArrayValueImpl(Object o, Class fromType, Class toType) {
@@ -1923,7 +1923,7 @@ public final class TypeCastUtility {
     return result;
   }
 
-  private boolean/* foundStopType */visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector) {
+  private boolean/* foundStopType */ visitGenericsHierarchy(Type type, Class<?> stopType, int stopTypeGenericsParameterIndex, TypeDesc desc, Set<Type> loopDetector) {
     if (loopDetector.contains(type)) {
       return false;
     }

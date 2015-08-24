@@ -13,9 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.textfield;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
 /**
- * Convenience subclass for {@link IStringField} due to popular usage of the
- * word "textField" instead of "stringField" do not add further code or methods
- * to this class
+ * Convenience subclass for {@link IStringField} due to popular usage of the word "textField" instead of "stringField"
+ * do not add further code or methods to this class
  */
 public interface ITextField extends IStringField {
 }

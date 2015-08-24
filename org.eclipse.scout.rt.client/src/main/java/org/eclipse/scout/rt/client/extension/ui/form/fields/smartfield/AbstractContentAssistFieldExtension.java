@@ -19,7 +19,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssi
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public abstract class AbstractContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> extends AbstractValueFieldExtension<VALUE, OWNER> implements IContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
+public abstract class AbstractContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> extends AbstractValueFieldExtension<VALUE, OWNER>
+    implements IContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
 
   public AbstractContentAssistFieldExtension(OWNER owner) {
     super(owner);

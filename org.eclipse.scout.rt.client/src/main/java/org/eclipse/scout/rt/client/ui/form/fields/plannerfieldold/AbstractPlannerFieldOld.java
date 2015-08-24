@@ -101,9 +101,8 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
   }
 
   /**
-   * Interceptor is called after data was fetched from LookupCall and is adding
-   * a table row for every LookupRow using IListBoxTable.createTableRow(row) and
-   * ITable.addRows()
+   * Interceptor is called after data was fetched from LookupCall and is adding a table row for every LookupRow using
+   * IListBoxTable.createTableRow(row) and ITable.addRows()
    * <p>
    * For most cases the override of just {@link #execLoadTableData()} is sufficient
    *
@@ -142,9 +141,7 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
   /**
    * Load activity data<br>
    * By default loads data using {@link #interceptLoadActivityMapData(List, List)}, transforms to {@link ActivityCell},
-   * maps
-   * to resources using the resourceId, and sets the {@link ActivityCell}s on the
-   * corresponding activtyRow.
+   * maps to resources using the resourceId, and sets the {@link ActivityCell}s on the corresponding activtyRow.
    */
   @ConfigOperation
   @Order(10)
@@ -226,8 +223,7 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
                 m_activityMap.getContextMenu().callOwnerValueChanged();
               }
             }
-          }
-          );
+          });
     }
     else {
       LOG.warn("there is no inner class of type IActivityMap in " + getClass());
@@ -473,7 +469,8 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
     return chain.execLoadActivityMapData(resourceIds, resourceRows);
   }
 
-  protected static class LocalPlannerFieldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerFieldOld<T, P, RI, AI>> extends LocalFormFieldExtension<OWNER> implements IPlannerFieldOldExtension<T, P, RI, AI, OWNER> {
+  protected static class LocalPlannerFieldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerFieldOld<T, P, RI, AI>> extends LocalFormFieldExtension<OWNER>
+      implements IPlannerFieldOldExtension<T, P, RI, AI, OWNER> {
 
     public LocalPlannerFieldExtension(OWNER owner) {
       super(owner);
@@ -495,7 +492,8 @@ public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActiv
     }
 
     @Override
-    public Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
+    public Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows)
+        throws ProcessingException {
       return getOwner().execLoadActivityMapData(resourceIds, resourceRows);
     }
   }

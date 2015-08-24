@@ -32,8 +32,7 @@ public final class CODES {
 
   /**
    * @param id
-   * @return
-   *         Note that this method does not load code types, but only searches code types already loaded into the code
+   * @return Note that this method does not load code types, but only searches code types already loaded into the code
    *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeType(Class)} etc.
    */
   public static <T> ICodeType<T, ?> findCodeTypeById(T id) {
@@ -42,8 +41,7 @@ public final class CODES {
 
   /**
    * @param id
-   * @return
-   *         Note that this method does not load code types, but only searches code types already loaded into the code
+   * @return Note that this method does not load code types, but only searches code types already loaded into the code
    *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeType(Class)} etc.
    */
   public static <T> ICodeType<T, ?> findCodeTypeById(Long partitionId, T codeTypeId) {

@@ -239,7 +239,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
     return IActionVisitor.CONTINUE;
   }
 
-  protected static class LocalActionNodeExtension<T extends IActionNode, OWNER extends AbstractActionNode<T>> extends LocalActionExtension<OWNER> implements IActionNodeExtension<T, OWNER> {
+  protected static class LocalActionNodeExtension<T extends IActionNode, OWNER extends AbstractActionNode<T>> extends LocalActionExtension<OWNER>implements IActionNodeExtension<T, OWNER> {
 
     public LocalActionNodeExtension(OWNER owner) {
       super(owner);

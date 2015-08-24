@@ -23,8 +23,7 @@ import org.junit.runners.model.Statement;
 
 /**
  * Parameterized form of {@link PlatformTestRunner}. <br/>
- * <b>Note:</b>
- * The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method.<br/>
+ * <b>Note:</b> The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method.<br/>
  * <b>Example:</b>
  *
  * <pre>

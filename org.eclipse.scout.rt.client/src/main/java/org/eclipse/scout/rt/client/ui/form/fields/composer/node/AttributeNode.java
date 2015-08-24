@@ -109,16 +109,14 @@ public class AttributeNode extends AbstractComposerNode {
   }
 
   /**
-   * @return the operator type
-   *         see {@link ComposerConstants#AGGREGATION_*} values
+   * @return the operator type see {@link ComposerConstants#AGGREGATION_*} values
    */
   public Integer getAggregationType() {
     return m_aggregationType;
   }
 
   /**
-   * @return the operator type
-   *         see {@link ComposerConstants#AGGREGATION_*} values
+   * @return the operator type see {@link ComposerConstants#AGGREGATION_*} values
    */
   public void setAggregationType(Integer a) {
     if (a != null && a == DataModelConstants.AGGREGATION_NONE) {

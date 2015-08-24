@@ -52,7 +52,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    *          &lt;fromPart&gt;MY_PERSON @Person@&lt;/fromPart&gt;
    *          &lt;wherePart&gt;@Person@.PERSON_ID=...&lt;/wherePart&gt;
    *          &lt;havingPart&gt;...&lt;/havingPart&gt;
-   * </pre>
+   *          </pre>
    *
    *          That way the wherePart is added to the entities whereParts section and never to the havingParts section,
    *          which would be wrong.
@@ -123,8 +123,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
   /**
    * Override this method to intercept and change part instance properties such as values, operation type, etc.<br>
    * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
-   * attribute
-   * itself as the complete statement part.
+   * attribute itself as the complete statement part.
    *
    * @param builder
    *          containging all binds and sql parts
@@ -153,7 +152,8 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    *         {@link FormDataStatementBuilder2#addBind(String, Object)}
    * @throws ProcessingException
    */
-  public EntityContribution createInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, AttributeStrategy strategy, String stm, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) throws ProcessingException {
+  public EntityContribution createInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, AttributeStrategy strategy, String stm, List<String> bindNames, List<Object> bindValues,
+      Map<String, String> parentAliasMap) throws ProcessingException {
     return builder.createAttributePart(strategy, attributeNodeData.getAggregationType(), stm, attributeNodeData.getOperator(), bindNames, bindValues, this.isPlainBind(), parentAliasMap);
   }
 

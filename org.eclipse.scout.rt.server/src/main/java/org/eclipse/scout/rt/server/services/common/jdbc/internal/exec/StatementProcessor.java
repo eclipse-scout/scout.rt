@@ -547,8 +547,8 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   /**
-   * when there are batch inputs, all batch inputs must agree to have another
-   * batch when there are no batch inputs, only first batch is valid
+   * when there are batch inputs, all batch inputs must agree to have another batch when there are no batch inputs, only
+   * first batch is valid
    */
   private boolean hasNextInputBatch() {
     int nextIndex = m_currentInputBatchIndex + 1;
@@ -621,7 +621,7 @@ public class StatementProcessor implements IStatementProcessor {
     ISqlStyle sqlStyle = m_callerService.getSqlStyle();
     for (IBindInput in : m_inputList) {
       SqlBind bind = in.produceSqlBindAndSetReplaceToken(sqlStyle);
-      assert (bind != null) == in.isJdbcBind(sqlStyle);
+      assert(bind != null) == in.isJdbcBind(sqlStyle);
       if (bind != null) {
         m_currentInputBindMap.put(in.getJdbcBindIndex(), bind);
       }
@@ -1323,7 +1323,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
     }
-    else/* bean property */{
+    else/* bean property */ {
       // handle all terminal cases for bean property
       try {
         FastPropertyDescriptor pd = BeanUtility.getFastBeanInfo(bindBase.getClass(), null).getPropertyDescriptor(path[0]);

@@ -283,7 +283,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     return (ServiceTunnelResponse) read(in);
   }
 
-  protected Object/* msg */read(InputStream in) throws Exception {
+  protected Object/* msg */ read(InputStream in) throws Exception {
     if (LOG.isDebugEnabled()) {
       in = new DebugInputStream(in);
     }

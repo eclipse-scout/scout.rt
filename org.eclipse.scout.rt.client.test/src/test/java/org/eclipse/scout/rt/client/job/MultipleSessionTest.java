@@ -50,8 +50,8 @@ public class MultipleSessionTest {
   @Before
   public void before() {
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobManager.class).
-        withApplicationScoped(true));
+        new BeanMetaData(JobManager.class)
+            .withApplicationScoped(true));
     m_clientSession1 = mock(IClientSession.class);
     m_clientSession2 = mock(IClientSession.class);
   }

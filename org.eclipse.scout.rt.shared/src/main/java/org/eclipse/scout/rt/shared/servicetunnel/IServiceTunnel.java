@@ -32,9 +32,8 @@ public interface IServiceTunnel {
 
   /**
    * Invoke a remote service through a service tunnel<br>
-   * The argument array may contain IHolder values which are updated as OUT
-   * parameters when the backend call has completed flags are custom flags not
-   * used by the framework itself
+   * The argument array may contain IHolder values which are updated as OUT parameters when the backend call has
+   * completed flags are custom flags not used by the framework itself
    */
   Object invokeService(Class<?> serviceInterfaceClass, Method operation, Object[] args) throws ProcessingException;
 }

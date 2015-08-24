@@ -54,7 +54,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * A NodeManagedPage normally contains no menus, actions, etc. because the TableManagedPage handles node events on
  * itself AND its children
  */
-public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
+public abstract class AbstractPageWithNodes extends AbstractPage<ITable>implements IPageWithNodes {
 
   public AbstractPageWithNodes() {
     this(true, null);
@@ -124,9 +124,9 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   /**
-   * If the cell has changed (e.g. the text) we inform our parent as well.
-   * If the parent page is a {@link IPageWithNodes}, update its table accordingly.
-   * Since the table {@link P_Table} has only one column, we update the first column.
+   * If the cell has changed (e.g. the text) we inform our parent as well. If the parent page is a
+   * {@link IPageWithNodes}, update its table accordingly. Since the table {@link P_Table} has only one column, we
+   * update the first column.
    *
    * @since 3.10.0-M5
    */
@@ -410,7 +410,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     chain.execCreateChildPages(pageList);
   }
 
-  protected static class LocalPageWithNodesExtension<OWNER extends AbstractPageWithNodes> extends LocalPageExtension<OWNER> implements IPageWithNodesExtension<OWNER> {
+  protected static class LocalPageWithNodesExtension<OWNER extends AbstractPageWithNodes> extends LocalPageExtension<OWNER>implements IPageWithNodesExtension<OWNER> {
 
     public LocalPageWithNodesExtension(OWNER owner) {
       super(owner);

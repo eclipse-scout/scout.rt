@@ -87,9 +87,8 @@ public class GridCell {
   }
 
   /**
-   * used for splitting of items the weight is the maximum y (getMaxY()) but
-   * weighted with the column count. so an item of 4 rows and 2 columns adds a
-   * weight of 4*2
+   * used for splitting of items the weight is the maximum y (getMaxY()) but weighted with the column count. so an item
+   * of 4 rows and 2 columns adds a weight of 4*2
    */
   protected int getMaxWeight() {
     int wDown = m_down != null ? m_down.getMaxWeight() : 0;

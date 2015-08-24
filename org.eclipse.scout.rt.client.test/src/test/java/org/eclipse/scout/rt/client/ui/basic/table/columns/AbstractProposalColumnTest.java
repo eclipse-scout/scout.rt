@@ -47,13 +47,12 @@ public class AbstractProposalColumnTest {
     TestingCodeService codeService = new TestingCodeService(new TestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_regs = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class).
-        withInitialInstance(codeService).
-        withApplicationScoped(true),
-        new BeanMetaData(ICodeLookupCallFactoryService.class).
-        withInitialInstance(codeLookupCallFactoryService).
-        withApplicationScoped(true)
-        );
+        new BeanMetaData(ICodeService.class)
+            .withInitialInstance(codeService)
+            .withApplicationScoped(true),
+        new BeanMetaData(ICodeLookupCallFactoryService.class)
+            .withInitialInstance(codeLookupCallFactoryService)
+            .withApplicationScoped(true));
   }
 
   @AfterClass

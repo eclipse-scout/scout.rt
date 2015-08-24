@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
- * The {@link IClusterNotificationListener} provided by this interface is automatically added
- * through {@link IClusterSynchronizationService#addListener(IClusterNotificationListener)} when the cluster
- * synchronization service is enabled ({@link IClusterSynchronizationService#enable()}).
+ * The {@link IClusterNotificationListener} provided by this interface is automatically added through
+ * {@link IClusterSynchronizationService#addListener(IClusterNotificationListener)} when the cluster synchronization
+ * service is enabled ({@link IClusterSynchronizationService#enable()}).
  *
  * @deprecated use {@link INotificationHandler<>}
  */

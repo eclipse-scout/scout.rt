@@ -21,9 +21,8 @@ import org.eclipse.scout.rt.shared.validate.checks.MaxLengthCheck;
 import org.eclipse.scout.rt.shared.validate.checks.RegexMatchCheck;
 
 /**
- * The {@link DefaultValidator} in the
- * DefaultTransactionDelegate
- * reads this annotation in order to perform central input/output validation.
+ * The {@link DefaultValidator} in the DefaultTransactionDelegate reads this annotation in order to perform central
+ * input/output validation.
  */
 public interface IValidationStrategy {
 
@@ -33,8 +32,8 @@ public interface IValidationStrategy {
   boolean accept(IValidateCheck check);
 
   /**
-   * Perform no checks on arguments of the annotated method.
-   * Use this annotation on a service if you check the arguments yourself.
+   * Perform no checks on arguments of the annotated method. Use this annotation on a service if you check the arguments
+   * yourself.
    * <p>
    * see {@link ValidationUtility}
    */
@@ -54,7 +53,7 @@ public interface IValidationStrategy {
         CodeValueCheck.ID,
         LookupValueCheck.ID,
         RegexMatchCheck.ID
-        }));
+    }));
 
     @Override
     public boolean accept(IValidateCheck check) {

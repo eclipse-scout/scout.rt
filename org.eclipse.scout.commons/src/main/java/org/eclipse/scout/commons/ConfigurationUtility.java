@@ -38,8 +38,7 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Filters the given class array and sorts the remaining elements according to
-   * their {@link Order} annotation.
+   * Filters the given class array and sorts the remaining elements according to their {@link Order} annotation.
    * <p>
    * By default, the method throws an {@link IllegalArgumentException} if one of the remaining classes is not annotated
    * by {@link Order}. The behavior can be switched off by setting the system property
@@ -73,8 +72,7 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Filters the given class array and returns the first occurrence of an
-   * instantiable class of filter
+   * Filters the given class array and returns the first occurrence of an instantiable class of filter
    *
    * @param classes
    * @param filter
@@ -109,8 +107,7 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Filters the given class array and returns all occurrences of instantiable
-   * classes of filter
+   * Filters the given class array and returns all occurrences of instantiable classes of filter
    *
    * @param classes
    * @param filter
@@ -177,8 +174,7 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * get all declared classes (inner types) of the specified class and all its
-   * super classes
+   * get all declared classes (inner types) of the specified class and all its super classes
    */
   public static Class[] getDeclaredPublicClasses(Class c) {
     return c.getClasses();

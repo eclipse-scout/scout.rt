@@ -53,14 +53,14 @@ public class ErrorPopup {
   public void showMessageBox(Throwable error) {
     ensureErrorParsed(error);
 
-    MessageBoxes.create().
-        withHeader(m_text).
-        withBody(m_detail).
-        withHtml(m_htmlDetail).
-        withYesButtonText(m_acceptText).
-        withHiddenText(m_copyPasteText).
-        withSeverity(m_cause.getStatus().getSeverity()).
-        show();
+    MessageBoxes.create()
+        .withHeader(m_text)
+        .withBody(m_detail)
+        .withHtml(m_htmlDetail)
+        .withYesButtonText(m_acceptText)
+        .withHiddenText(m_copyPasteText)
+        .withSeverity(m_cause.getStatus().getSeverity())
+        .show();
   }
 
   @Internal

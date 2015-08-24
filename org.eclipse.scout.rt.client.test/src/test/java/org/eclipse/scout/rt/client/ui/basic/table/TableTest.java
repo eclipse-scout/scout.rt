@@ -84,9 +84,8 @@ public class TableTest {
   }
 
   /**
-   * Test that deleted tableRows can be discarded:
-   * NON_CHANGED rows goes in deletedRows list. (because the table has AutoDiscardOnDelete = false)
-   * discard these rows.
+   * Test that deleted tableRows can be discarded: NON_CHANGED rows goes in deletedRows list. (because the table has
+   * AutoDiscardOnDelete = false) discard these rows.
    */
   @Test
   public void testDeleteAllAndDiscardFirst() throws ProcessingException {
@@ -112,9 +111,8 @@ public class TableTest {
   }
 
   /**
-   * Test that deleted tableRows can be discarded:
-   * NON_CHANGED rows goes in deletedRows list. (because the table has AutoDiscardOnDelete = false)
-   * delete a row and discard it.
+   * Test that deleted tableRows can be discarded: NON_CHANGED rows goes in deletedRows list. (because the table has
+   * AutoDiscardOnDelete = false) delete a row and discard it.
    */
   @Test
   public void testDeleteAndDiscard() throws Exception {
@@ -139,9 +137,8 @@ public class TableTest {
   }
 
   /**
-   * Test that deleted tableRows can be discarded:
-   * NON_CHANGED rows goes in deletedRows list. (because the table has AutoDiscardOnDelete = false)
-   * discard these deletedRows with discardAllDeletedRows.
+   * Test that deleted tableRows can be discarded: NON_CHANGED rows goes in deletedRows list. (because the table has
+   * AutoDiscardOnDelete = false) discard these deletedRows with discardAllDeletedRows.
    */
   @Test
   public void testDeleteAllAndDiscardAll() throws Exception {
@@ -163,8 +160,8 @@ public class TableTest {
   }
 
   /**
-   * Test that deleted tableRows can be discarded:
-   * AutoDiscardOnDelete = true. Rows are automatically discarded (STATUS_INSERTED, or .STATUS_NON_CHANGED)
+   * Test that deleted tableRows can be discarded: AutoDiscardOnDelete = true. Rows are automatically discarded
+   * (STATUS_INSERTED, or .STATUS_NON_CHANGED)
    */
   @Test
   public void testDeleteAllAutoDiscard() throws Exception {
@@ -287,10 +284,8 @@ public class TableTest {
   }
 
   /**
-   * Test of {@link AbstractTable#sort()}. Sorted by:
-   * - 1. ThridColumn (defined with AlwaysIncludeSortAtBegin in the column)
-   * - 2. SecondColumn descending
-   * - 3. FirstColumn ascending.
+   * Test of {@link AbstractTable#sort()}. Sorted by: - 1. ThridColumn (defined with AlwaysIncludeSortAtBegin in the
+   * column) - 2. SecondColumn descending - 3. FirstColumn ascending.
    */
   @Test
   public void testSortTwoColumns() throws Exception {

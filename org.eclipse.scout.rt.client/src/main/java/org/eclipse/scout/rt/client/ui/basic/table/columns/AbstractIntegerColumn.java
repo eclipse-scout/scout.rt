@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
  * Column holding Integer
  */
 @ClassId("5ac66db0-da85-454a-bec5-8cffa2d2abef")
-public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer> implements IIntegerColumn {
+public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer>implements IIntegerColumn {
 
   public AbstractIntegerColumn() {
     super();
@@ -80,7 +80,7 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
     };
   }
 
-  protected static class LocalIntegerColumnExtension<OWNER extends AbstractIntegerColumn> extends LocalNumberColumnExtension<Integer, OWNER> implements IIntegerColumnExtension<OWNER> {
+  protected static class LocalIntegerColumnExtension<OWNER extends AbstractIntegerColumn> extends LocalNumberColumnExtension<Integer, OWNER>implements IIntegerColumnExtension<OWNER> {
 
     public LocalIntegerColumnExtension(OWNER owner) {
       super(owner);

@@ -22,5 +22,5 @@ import org.eclipse.scout.rt.platform.Bean;
 @Documented
 @Inherited
 public @interface Server {
-  Class<? extends IServerSession> value() default IServerSession.class;
+  Class<? extends IServerSession>value() default IServerSession.class;
 }

@@ -15,8 +15,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * Static date representation as string, independent of TimeZone and daylight
- * saving
+ * Static date representation as string, independent of TimeZone and daylight saving
  * <p>
  * {@link ServiceTunnelObjectReplacer}
  */

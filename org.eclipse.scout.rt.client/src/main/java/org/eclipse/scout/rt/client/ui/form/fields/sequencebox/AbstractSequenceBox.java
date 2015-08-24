@@ -76,15 +76,15 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    */
 
   /**
-   * @return true: A value change trigger ensures that all fields in the range
-   *         box have consistent (ascending values) by calling {@link #execCheckFromTo(IValueField)}
+   * @return true: A value change trigger ensures that all fields in the range box have consistent (ascending values) by
+   *         calling {@link #execCheckFromTo(IValueField)}
    *         <p>
    *         Examples:
    *
    *         <pre>
    * fromField.value &lt;= toField.value
    * minField.value &lt;= preferredField.value &lt;= maxField.value
-   * </pre>
+   *         </pre>
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
@@ -99,8 +99,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   /**
-   * Default implementation ensures that all fields in the range box have
-   * ascending values.<br>
+   * Default implementation ensures that all fields in the range box have ascending values.<br>
    * Only active when {@link #isAutoCheckFromTo()} resp. {@link #getConfiguredAutoCheckFromTo()} is set to true
    *
    * @param valueFields
@@ -175,8 +174,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   /**
-   * Validate all fields including own and remove error status when it is an
-   * InvalidSequenceStatus
+   * Validate all fields including own and remove error status when it is an InvalidSequenceStatus
    *
    * @param valueFields
    */
@@ -204,8 +202,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
               updateLabelComposition();
             }
           }
-        }
-        );
+        });
     // <bsh 2010-10-01>
     // If inner fields change their visibility dynamically, the label of the SequenceBox might change.
     for (IFormField field : getFields()) {
@@ -217,8 +214,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
                 updateLabelComposition();
               }
             }
-          }
-          );
+          });
     }
     updateLabelComposition();
     updateFieldStatusVisible();
@@ -246,8 +242,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
                   checkFromTo(valueFields, index);
                 }
               }
-            }
-            );
+            });
       }
     }
   }
@@ -472,7 +467,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return chain.execCreateLabelSuffix();
   }
 
-  protected static class LocalSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends LocalCompositeFieldExtension<OWNER> implements ISequenceBoxExtension<OWNER> {
+  protected static class LocalSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends LocalCompositeFieldExtension<OWNER>implements ISequenceBoxExtension<OWNER> {
 
     public LocalSequenceBoxExtension(OWNER owner) {
       super(owner);

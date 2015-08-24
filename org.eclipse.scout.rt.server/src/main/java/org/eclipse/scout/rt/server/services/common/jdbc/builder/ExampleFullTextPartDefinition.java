@@ -17,9 +17,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 /**
- * Example handler that demonstrates custom part building for a full-text search field based on a oracle
- * database
- * with full-text engine.
+ * Example handler that demonstrates custom part building for a full-text search field based on a oracle database with
+ * full-text engine.
  * <p>
  * the part is registered with {@link FormDataStatementBuilder#setPartDefinition(Class, new
  * PartDefinition("LAST_NAME"))}

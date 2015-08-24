@@ -39,8 +39,7 @@ public class TableRowMapper {
   }
 
   /**
-   * Convenience for mapping the values of this row to holders such as form
-   * fields and value containers
+   * Convenience for mapping the values of this row to holders such as form fields and value containers
    *
    * @see #exportRowData() and @see {@link #importRowData()}
    * @param enableExport

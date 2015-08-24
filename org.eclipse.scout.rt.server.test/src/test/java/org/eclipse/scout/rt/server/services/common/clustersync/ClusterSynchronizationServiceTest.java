@@ -63,10 +63,9 @@ public class ClusterSynchronizationServiceTest {
     m_messageService = mock(IPublishSubscribeMessageService.class);
     m_beans.add(
         TestingUtility.registerBean(
-            new BeanMetaData(IPublishSubscribeMessageService.class).
-            withInitialInstance(m_messageService).
-            withApplicationScoped(true)
-            ));
+            new BeanMetaData(IPublishSubscribeMessageService.class)
+                .withInitialInstance(m_messageService)
+                .withApplicationScoped(true)));
 
     m_svc = new ClusterSynchronizationService();
     m_svc.initializeService();

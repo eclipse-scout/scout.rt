@@ -189,8 +189,8 @@ public final class IOUtility {
   }
 
   /**
-   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
-   * If no encoding is provided, the system default encoding is used
+   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8" If no encoding is provided, the
+   * system default encoding is used
    */
   public static String getContentInEncoding(String filepath, String encoding) throws ProcessingException {
     try {
@@ -412,8 +412,8 @@ public final class IOUtility {
 
   /**
    * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
-   * deleted when the virtual machine terminates. The temporary file will look like this:
-   * <i>prefix</i>2093483323922923<i>.suffix</i>
+   * deleted when the virtual machine terminates. The temporary file will look like this: <i>prefix</i>2093483323922923
+   * <i>.suffix</i>
    *
    * @param prefix
    *          The prefix of the temporary file
@@ -567,8 +567,7 @@ public final class IOUtility {
   }
 
   /**
-   * @return a valid File representing s with support for both / and \ as path
-   *         separators.
+   * @return a valid File representing s with support for both / and \ as path separators.
    */
   public static File toFile(String s) {
     if (s == null) {
@@ -684,8 +683,8 @@ public final class IOUtility {
   }
 
   /**
-   * The text passed to this method is tried to wellform as an URL. If the text
-   * can not be transformed into an URL the method returns null.
+   * The text passed to this method is tried to wellform as an URL. If the text can not be transformed into an URL the
+   * method returns null.
    *
    * @param urlText
    */

@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 /**
  * Basic interface for all user fields where user inputs a value
  *
- * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser,
- *      IListBox, ITreeBox, ICheckBox, IRadioButton, IToogleButton
+ * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser, IListBox, ITreeBox, ICheckBox, IRadioButton,
+ *      IToogleButton
  */
 public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContextMenuOwner {
   /*
@@ -42,27 +42,24 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
   void refreshDisplayText();
 
   /**
-   * Property to signal that component value is being verified for example
-   * smartfield text-> value resolution This flag indicates that the ui value of
-   * the field changed and that the value needs to be resolved This is a
+   * Property to signal that component value is being verified for example smartfield text-> value resolution This flag
+   * indicates that the ui value of the field changed and that the value needs to be resolved This is a
    * ui-to-model-process. This process contains the subprocess {@link #isValueChanging()}.
    */
   boolean isValueParsing();
 
   /**
-   * Property to signal that component value is being set This flag indicates
-   * that the component value changed and validate triggers as well as change
-   * triggers are being processed This is a model-to-model-process This process
-   * can be part of the {@link #isValueParsing()} process. This process contains
-   * the subprocess {@link #isValueValidating()}.
+   * Property to signal that component value is being set This flag indicates that the component value changed and
+   * validate triggers as well as change triggers are being processed This is a model-to-model-process This process can
+   * be part of the {@link #isValueParsing()} process. This process contains the subprocess {@link #isValueValidating()}
+   * .
    */
   boolean isValueChanging();
 
   /**
-   * Property to signal that component value is being validated This flag
-   * indicates that the component value changed and validate triggers as well as
-   * change triggers are being processed This is a model-to-model-process This
-   * process is part of the {@link #isValueChanging()} process.
+   * Property to signal that component value is being validated This flag indicates that the component value changed and
+   * validate triggers as well as change triggers are being processed This is a model-to-model-process This process is
+   * part of the {@link #isValueChanging()} process.
    */
   boolean isValueValidating();
 
@@ -84,9 +81,8 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
   VALUE getValue();
 
   /**
-   * set a new value The new value is validated calls validateInternal and then
-   * delegates to execValidateValue after setting the value calls
-   * execChangedValue
+   * set a new value The new value is validated calls validateInternal and then delegates to execValidateValue after
+   * setting the value calls execChangedValue
    */
   @Override
   void setValue(VALUE o);
@@ -113,9 +109,8 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
   void setAutoDisplayText(boolean b);
 
   /**
-   * force a fire of valueChanged even if the value has not changed This can be
-   * used to manually re-trigger value change processing in complex business
-   * logic
+   * force a fire of valueChanged even if the value has not changed This can be used to manually re-trigger value change
+   * processing in complex business logic
    *
    * @see setValue()
    */

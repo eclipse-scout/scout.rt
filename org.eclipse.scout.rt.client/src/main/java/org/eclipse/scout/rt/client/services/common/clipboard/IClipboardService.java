@@ -19,17 +19,16 @@ import org.eclipse.scout.commons.resource.MimeType;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
- * This service provides access to the system clipboard and therefore to exchange
- * data with other applications. It is not intended to be used for application-internal
- * communication. In particular, all methods of this interface are considered to be
- * executed asynchronously (in fact, this is a requirement by the underlying
- * implementations which use UI resources for accessing the system clipboard).
+ * This service provides access to the system clipboard and therefore to exchange data with other applications. It is
+ * not intended to be used for application-internal communication. In particular, all methods of this interface are
+ * considered to be executed asynchronously (in fact, this is a requirement by the underlying implementations which use
+ * UI resources for accessing the system clipboard).
  */
 public interface IClipboardService extends IService {
 
   /**
-   * Puts the given transfer object into the system clipboard. Typically this is done
-   * asynchronously because the clipboard is a UI resource.
+   * Puts the given transfer object into the system clipboard. Typically this is done asynchronously because the
+   * clipboard is a UI resource.
    *
    * @param transferObject
    * @throws ProcessingException
@@ -38,9 +37,8 @@ public interface IClipboardService extends IService {
 
   /**
    * Reads the requested contents of the clipboard and returns them as {@link Collection} of {@link BinaryResource}.
-   * Empty collection is returned if user cancels this request.
-   * The optional requests var arg parameter conditions the content types of the {@link BinaryResource} which are
-   * returned, see {@link BinaryResource#getContentType()}.
+   * Empty collection is returned if user cancels this request. The optional requests var arg parameter conditions the
+   * content types of the {@link BinaryResource} which are returned, see {@link BinaryResource#getContentType()}.
    *
    * @param allowedMimeTypes
    * @throws ProcessingException

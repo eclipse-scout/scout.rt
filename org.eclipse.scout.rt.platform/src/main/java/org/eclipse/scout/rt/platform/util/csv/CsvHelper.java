@@ -589,8 +589,7 @@ public class CsvHelper {
 
   /**
    * @param reader
-   * @return the current row in the reader as cell tokens based on this helpers
-   *         context
+   * @return the current row in the reader as cell tokens based on this helpers context
    * @throws ProcessingException
    */
   public List<String> getCurrentRow(Reader reader) throws ProcessingException {

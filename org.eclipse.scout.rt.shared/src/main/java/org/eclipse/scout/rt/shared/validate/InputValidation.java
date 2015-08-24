@@ -28,6 +28,6 @@ public @interface InputValidation {
   /**
    * Any of the {@link IValidationStrategy} values or a custom strategy
    */
-  Class<? extends IValidationStrategy> value();
+  Class<? extends IValidationStrategy>value();
 
 }

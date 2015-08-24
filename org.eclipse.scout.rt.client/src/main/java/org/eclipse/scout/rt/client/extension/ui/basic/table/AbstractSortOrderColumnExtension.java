@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.AbstractColu
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractSortOrderColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
-public abstract class AbstractSortOrderColumnExtension<OWNER extends AbstractSortOrderColumn> extends AbstractColumnExtension<IColumn, OWNER> implements ISortOrderColumnExtension<OWNER> {
+public abstract class AbstractSortOrderColumnExtension<OWNER extends AbstractSortOrderColumn> extends AbstractColumnExtension<IColumn, OWNER>implements ISortOrderColumnExtension<OWNER> {
 
   public AbstractSortOrderColumnExtension(OWNER owner) {
     super(owner);

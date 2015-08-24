@@ -12,7 +12,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTabl
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends AbstractPageExtension<OWNER> implements IPageWithTableExtension<T, OWNER> {
+public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends AbstractPageExtension<OWNER>implements IPageWithTableExtension<T, OWNER> {
 
   public AbstractPageWithTableExtension(OWNER owner) {
     super(owner);

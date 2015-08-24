@@ -289,8 +289,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
                 updateLoadInProgressInternal();
               }
             }
-          }
-          );
+          });
     }
   }
 
@@ -324,8 +323,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    */
 
   /**
-   * This is the init of the runtime model after the table and columns are built
-   * and configured
+   * This is the init of the runtime model after the table and columns are built and configured
    */
   @Override
   public void initCalendar() throws ProcessingException {
@@ -993,14 +991,15 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalCalendarExtension<OWNER extends AbstractCalendar> extends AbstractExtension<OWNER> implements ICalendarExtension<OWNER> {
+  protected static class LocalCalendarExtension<OWNER extends AbstractCalendar> extends AbstractExtension<OWNER>implements ICalendarExtension<OWNER> {
 
     public LocalCalendarExtension(OWNER owner) {
       super(owner);
     }
 
     @Override
-    public void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
+    public void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes,
+        Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
       getOwner().execFilterCalendarItems(changedProviderTypes, componentsByProvider);
     }
 

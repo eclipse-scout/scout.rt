@@ -53,14 +53,11 @@ public class DynamicNls {
    * @param key
    *          nls text key
    * @param messageArguments
-   *          the translation of the text might contain variables
-   *          {0},{1},{2},... Examples: getText("MissingFile1"); with
-   *          translation: MissingFile1=Das File konnte nicht gefunden werden
-   *          getText("MissingFile2",fileName); with translation:
-   *          MissingFile2=Das File {0} konnte nicht gefunden werden.
-   *          getText("MissingFile3",fileName,dir); with translation:
-   *          MissingFile3=Das File {0} im Ordner {1} konnte nicht gefunden
-   *          werden
+   *          the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
+   *          with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
+   *          with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
+   *          getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
+   *          nicht gefunden werden
    */
   public final String getText(String key, String... messageArguments) {
     return getText(null, key, messageArguments);
@@ -72,14 +69,11 @@ public class DynamicNls {
    * @param key
    *          nls text key
    * @param messageArguments
-   *          the translation of the text might contain variables
-   *          {0},{1},{2},... Examples: getText("MissingFile1"); with
-   *          translation: MissingFile1=Das File konnte nicht gefunden werden
-   *          getText("MissingFile2",fileName); with translation:
-   *          MissingFile2=Das File {0} konnte nicht gefunden werden.
-   *          getText("MissingFile3",fileName,dir); with translation:
-   *          MissingFile3=Das File {0} im Ordner {1} konnte nicht gefunden
-   *          werden
+   *          the translation of the text might contain variables {0},{1},{2},... Examples: getText("MissingFile1");
+   *          with translation: MissingFile1=Das File konnte nicht gefunden werden getText("MissingFile2",fileName);
+   *          with translation: MissingFile2=Das File {0} konnte nicht gefunden werden.
+   *          getText("MissingFile3",fileName,dir); with translation: MissingFile3=Das File {0} im Ordner {1} konnte
+   *          nicht gefunden werden
    */
   public final String getText(Locale locale, String key, String... messageArguments) {
     if (key == null) {

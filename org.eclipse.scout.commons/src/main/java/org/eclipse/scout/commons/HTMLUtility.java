@@ -164,8 +164,8 @@ public final class HTMLUtility {
    *          to add missing meta directive &lt;meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
    * @param cleanupCss
    *          to cleanup CSS as HTML has some trouble with some style constructs.<br/>
-   *          <small>For more information, please refer to {@link HTMLUtility#cleanupCss(HTMLDocument, DefaultFont)}
-   *          </small>
+   *          <small>For more information, please refer to
+   *          {@link HTMLUtility#cleanupCss(HTMLDocument, DefaultFont)} </small>
    * @param defaultFont
    *          to ensure default font set
    * @param defaultHyperlinkColor
@@ -425,9 +425,8 @@ public final class HTMLUtility {
   }
 
   /**
-   * Mail HTML may contain cid:xxxx URLs for local contents. This method
-   * replaces such local cid URLs by real file URLs (normally a temporary
-   * folder)
+   * Mail HTML may contain cid:xxxx URLs for local contents. This method replaces such local cid URLs by real file URLs
+   * (normally a temporary folder)
    *
    * @deprecated Will be removed with scout 7.
    */
@@ -565,7 +564,8 @@ public final class HTMLUtility {
    *         </p>
    *         |
    *         <p/>
-   *         |</tr>|</table> create newlines </xmp></pre>
+   *         |</tr>|</table> create newlines </xmp>
+   *         </pre>
    */
   public static String getPlainText(String s) {
     s = StringUtility.getTag(s, "body", true);
@@ -652,8 +652,7 @@ public final class HTMLUtility {
   }
 
   /**
-   * @return encoded text, ready to be included in a html text
-   *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @return encoded text, ready to be included in a html text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
    * @deprecated Will be removed with scout 7. Use {@link StringUtility#htmlEncode(String, boolean)}
    */
   @Deprecated
@@ -662,8 +661,7 @@ public final class HTMLUtility {
   }
 
   /**
-   * @return decoded text, ready to be printed as text
-   *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @return decoded text, ready to be printed as text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
    * @deprecated Will be removed with scout 7. Use {@link StringUtility#htmlDecode(String)}
    */
   @Deprecated

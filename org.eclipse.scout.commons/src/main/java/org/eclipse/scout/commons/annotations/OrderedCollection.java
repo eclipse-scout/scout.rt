@@ -96,8 +96,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
    *
    * @param o
    *          The object to remove.
-   * @return
-   *         Returns <code>true</code> if the given element was part of this ordered collection. Otherwise
+   * @return Returns <code>true</code> if the given element was part of this ordered collection. Otherwise
    *         <code>false</code>.
    */
   public boolean remove(Object o) {
@@ -109,8 +108,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
    *
    * @param o
    *          The object to remove.
-   * @return
-   *         Returns <code>true</code> if the given element was part of this ordered collection. Otherwise
+   * @return Returns <code>true</code> if the given element was part of this ordered collection. Otherwise
    *         <code>false</code>.
    */
   public boolean removeAll(Collection<?> c) {

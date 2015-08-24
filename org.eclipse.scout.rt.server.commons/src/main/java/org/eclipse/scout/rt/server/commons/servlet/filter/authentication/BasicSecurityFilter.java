@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 
 /**
- * <h4>BasicSecurityFilter</h4> A simple security filter using username,password
- * tuples defined in the config.properties file. The following properties are supported:
+ * <h4>BasicSecurityFilter</h4> A simple security filter using username,password tuples defined in the config.properties
+ * file. The following properties are supported:
  * <ul>
  * <li><code>realm=abcde</code> <b>default: 'Default'</b></li>
  * <li><code>failover=true/false</code> <b>default false</b></li>
@@ -35,8 +35,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  * </ul>
  * <p>
  *
- * @since 1.0.3 06.02.2009
- *        TODO imo remove in 6.0
+ * @since 1.0.3 06.02.2009 TODO imo remove in 6.0
  */
 public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
   public static final String PROP_BASIC_ATTEMPT = "BasicSecurityFilter.basicAttempt";

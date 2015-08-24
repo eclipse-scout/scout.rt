@@ -15,8 +15,8 @@ import java.io.Serializable;
 import org.eclipse.scout.commons.html.IHtmlContent;
 
 /**
- * This class is a special subclass of {@link ProcessingException} to mark a
- * vetoed exception that is specialized from a general {@link ProcessingException}.
+ * This class is a special subclass of {@link ProcessingException} to mark a vetoed exception that is specialized from a
+ * general {@link ProcessingException}.
  * <p>
  * E.g. for actions that are not allowed or invalid data
  * </p>
@@ -30,8 +30,7 @@ public class VetoException extends ProcessingException implements Serializable {
   private IHtmlContent m_messageHtmlBody;
 
   /**
-   * Empty constructor is used to support auto-webservice publishing with java
-   * bean support
+   * Empty constructor is used to support auto-webservice publishing with java bean support
    */
   public VetoException() {
     super();

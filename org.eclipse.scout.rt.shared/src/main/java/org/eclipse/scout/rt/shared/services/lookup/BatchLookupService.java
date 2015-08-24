@@ -18,8 +18,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
- * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application.
- * See Bug 447592.
+ * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application. See Bug
+ * 447592.
  *
  * @since 4.3.0 (Mars-M5)
  */

@@ -69,9 +69,8 @@ public class BeanHierarchy<T> {
 
   /**
    * @return the most significant bean in this hierarchy - filtered and ordered by {@link Order} and {@link Replace} -
-   *         that represent the type of this hierarchy.
-   *         This means when B replaces A using {@link Replace} then A is not part of the result. Also if C extends A
-   *         without {@link Replace} then C is not part of the result.
+   *         that represent the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not
+   *         part of the result. Also if C extends A without {@link Replace} then C is not part of the result.
    */
   public List<IBean<T>> querySingle(IBeanScopeEvaluator evaluator) {
     return query(evaluator, true);
@@ -79,10 +78,8 @@ public class BeanHierarchy<T> {
 
   /**
    * @return all beans in this hierarchy - filtered and ordered by {@link Order} and {@link Replace} - that represent
-   *         the
-   *         type of this hierarchy.
-   *         This means when B replaces A using {@link Replace} then A is not part of the result. But if C extends A
-   *         without {@link Replace} then C is part of the result.
+   *         the type of this hierarchy. This means when B replaces A using {@link Replace} then A is not part of the
+   *         result. But if C extends A without {@link Replace} then C is part of the result.
    */
   public List<IBean<T>> queryAll(IBeanScopeEvaluator evaluator) {
     return query(evaluator, false);

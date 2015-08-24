@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-
 public interface IProposalField<LOOKUP_KEY> extends IContentAssistField<String, LOOKUP_KEY> {
 
 }
