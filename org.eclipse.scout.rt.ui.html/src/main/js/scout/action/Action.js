@@ -46,6 +46,7 @@ scout.Action.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Action.prototype._remove = function() {
   this._hoverBound = false;
+  this._removeTooltip();
   scout.Action.parent.prototype._remove.call(this);
 };
 
@@ -156,7 +157,7 @@ scout.Action.prototype.doAction = function(event) {
   if (!this.prepareDoAction(event)) {
     return false;
   }
-  
+
   if (this.actionStyle === scout.Action.ActionStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else {
