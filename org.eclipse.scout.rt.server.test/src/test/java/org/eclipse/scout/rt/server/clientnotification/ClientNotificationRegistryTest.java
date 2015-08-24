@@ -36,13 +36,14 @@ public class ClientNotificationRegistryTest {
   private static final String TEST_NOTIFICATION = "testNotification";
   private static final String TEST_SESSION = "testSessionId";
   private static final String TEST_USER = "User1";
+  private static final int TEST_QUEUE_EXPIRE_TIMEOUT = 10 + 60 * 1000;
 
   /**
    * Tests that a Notification for all nodes is consumed by multiple test nodes
    */
   @Test
   public void testNotificationsForAllNodes() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession("testNodeId", "testSessionId", TEST_USER);
     reg.registerSession("testNodeId2", "testSessionId", TEST_USER);
     reg.putForAllNodes(TEST_NOTIFICATION);
@@ -57,7 +58,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testNotificationsSingleSession() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.registerSession("Node2", TEST_SESSION, TEST_USER);
     reg.registerSession("Node2", "otherSession", TEST_USER);
@@ -77,7 +78,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testNotificationsUnregisteredSession() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession("testNodeId", TEST_SESSION, TEST_USER);
     reg.unregisterSession("testNodeId", TEST_SESSION, TEST_USER);
     reg.putForSession(TEST_SESSION, TEST_NOTIFICATION);
@@ -90,7 +91,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testNotificationsSingleUser() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.registerSession("Node2", TEST_SESSION, "User2");
     reg.registerSession("Node2", "otherSession", TEST_USER);
@@ -110,7 +111,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testMultipleNotifications() throws Exception {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
     reg.putForUser(TEST_USER, "notification2");
@@ -123,7 +124,7 @@ public class ClientNotificationRegistryTest {
 
   @Test
   public void registeredNodeAvailable() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     assertTrue(reg.getRegisteredNodeIds().contains(TEST_NODE));
   }
@@ -133,7 +134,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void registeredNodeInitiallsNotAvailable() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
   }
 
@@ -142,7 +143,7 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void registeredNodeNotAvailable_afterUnregister() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.unregisterSession(TEST_NODE, TEST_SESSION, TEST_USER);
     assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
@@ -153,11 +154,42 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testNodeAvailable_AfterUnregisterSession() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry();
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.registerSession(TEST_NODE, "testSession2", TEST_USER);
     reg.unregisterSession(TEST_NODE, TEST_SESSION, TEST_USER);
     assertTrue(reg.getRegisteredNodeIds().contains(TEST_NODE));
+  }
+
+  /**
+   * If no message is consumed, queue is removed
+   *
+   * @throws InterruptedException
+   */
+  @Test
+  public void testQueueRemovedAfterTimeout() throws InterruptedException {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(10);
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    Thread.sleep(100);
+    reg.putForAllNodes("notification");
+    List<ClientNotificationMessage> consumed = consumeNoWait(reg, TEST_NODE);
+    assertTrue(consumed.isEmpty());
+  }
+
+  /**
+   * If messages are consumed,the queue is not removed after the timeout.
+   */
+  @Test
+  public void testQueueNotRemovedIfConsumed() throws InterruptedException {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(100);
+    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
+    for (int i = 0; i < 100; i++) {
+      Thread.sleep(10);
+      consumeNoWait(reg, TEST_NODE);
+    }
+    reg.putForAllNodes("notification");
+    List<ClientNotificationMessage> consumed = consumeNoWait(reg, TEST_NODE);
+    assertFalse(consumed.isEmpty());
   }
 
   /**
@@ -176,7 +208,7 @@ public class ClientNotificationRegistryTest {
 
         @Override
         public void run() throws Exception {
-          ClientNotificationRegistry reg = new ClientNotificationRegistry();
+          ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
           reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
           reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
 
@@ -212,7 +244,7 @@ public class ClientNotificationRegistryTest {
 
       @Override
       public void run() throws Exception {
-        ClientNotificationRegistry reg = new ClientNotificationRegistry();
+        ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
         reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
         reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
         reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);

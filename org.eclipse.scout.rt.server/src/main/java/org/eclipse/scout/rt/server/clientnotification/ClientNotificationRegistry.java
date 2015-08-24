@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -44,6 +45,20 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 public class ClientNotificationRegistry {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationRegistry.class);
   private final Map<String /*notificationNodeId*/, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
+
+  /**
+   * If no message is consumed for a certain amount of time, queues are removed to avoid overflows. This may happen, if
+   * a node does not properly unregister (e.g. due to a crash).
+   */
+  private final int m_queueExpireTime;
+
+  public ClientNotificationRegistry() {
+    this(Assertions.assertNotNull(CONFIG.getPropertyValue(ClientNotificationProperties.NotificationQueueExpireTime.class)));
+  }
+
+  public ClientNotificationRegistry(int queueRemoveTimeout) {
+    m_queueExpireTime = queueRemoveTimeout;
+  }
 
   /**
    * Register a session with corresponding user for a given node
@@ -119,6 +134,7 @@ public class ClientNotificationRegistry {
     Set<String> allSessionIds = new HashSet<>();
     synchronized (m_notificationQueues) {
       for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
+
         allSessionIds.addAll(queue.getAllSessionIds());
       }
     }
@@ -237,9 +253,20 @@ public class ClientNotificationRegistry {
       for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
         if (!queue.getNodeId().equals(excludedUiNodeId)) {
           queue.put(messages);
+
+          if (isQueueExpired(queue)) {
+            LOG.debug("Removing expired queue " + queue.getNodeId());
+            m_notificationQueues.remove(queue.getNodeId());
+          }
         }
       }
     }
+  }
+
+  private boolean isQueueExpired(ClientNotificationNodeQueue queue) {
+    long now = System.currentTimeMillis();
+    long lastAccess = queue.getLastConsumeAccess();
+    return (now - lastAccess) > m_queueExpireTime;
   }
 
   public void putTransactionalForUser(String userId, Serializable notification) {

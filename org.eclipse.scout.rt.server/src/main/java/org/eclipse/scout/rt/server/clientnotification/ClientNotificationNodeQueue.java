@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions;
@@ -50,6 +51,7 @@ public class ClientNotificationNodeQueue {
   private final ReentrantReadWriteLock m_sessionUserCacheLock = new ReentrantReadWriteLock();
   private final Set<String /*sessionId*/> m_sessions = new HashSet<>();
   private final Map<String /*userId*/, Set<String /*sessionId*/>> m_userToSessions = new HashMap<>();
+  private final AtomicLong m_lastConsumeAccess;
 
   public ClientNotificationNodeQueue() {
     this(CONFIG.getPropertyValue(ClientNotificationProperties.NodeQueueCapacity.class));
@@ -58,6 +60,7 @@ public class ClientNotificationNodeQueue {
   public ClientNotificationNodeQueue(int capacity) {
     m_capacity = capacity;
     m_notifications = new LinkedBlockingDeque<>(capacity);
+    m_lastConsumeAccess = new AtomicLong(System.currentTimeMillis());
   }
 
   public void setNodeId(String nodeId) {
@@ -143,7 +146,16 @@ public class ClientNotificationNodeQueue {
     }
   }
 
+  /**
+   * @return time since messages have last been consumed
+   */
+  public long getLastConsumeAccess() {
+    return m_lastConsumeAccess.get();
+  }
+
   public List<ClientNotificationMessage> consume(int maxAmount, long maxWaitTime, TimeUnit unit) {
+    m_lastConsumeAccess.set(System.currentTimeMillis());
+
     List<ClientNotificationMessage> result = getNotifications(maxAmount, maxWaitTime, unit);
     if (LOG.isDebugEnabled()) {
       LOG.debug(String.format("consumed %s notifications.", result.size()));

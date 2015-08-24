@@ -69,4 +69,24 @@ public class ClientNotificationProperties {
     }
   }
 
+  /**
+   * If no message is consumed for a certain amount of time, notification queues are removed to avoid overflows and
+   * unnecessary memory consumption. This may happen, if a node does not properly unregister (e.g. due to a crash).
+   * <br>
+   * This timeout in milliseconds specifies the amount of time in seconds waited, until a queue (with possibly pending
+   * notifications) is removed, if notifications are not consumed.
+   */
+  public static class NotificationQueueExpireTime extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    protected Integer getDefaultValue() {
+      return Integer.valueOf(10 + 60);
+    }
+
+    @Override
+    public String getKey() {
+      return "org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry#m_queueExpireTime";
+    }
+  }
+
 }
