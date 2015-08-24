@@ -44,7 +44,9 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
 };
 
 scout.TabItem.prototype.focusTab = function() {
-  this.$tabContainer.focus();
+  if (this._tabRendered) {
+    this.$tabContainer.focus();
+  }
 };
 
 scout.TabItem.prototype.setTabActive = function(active) {
