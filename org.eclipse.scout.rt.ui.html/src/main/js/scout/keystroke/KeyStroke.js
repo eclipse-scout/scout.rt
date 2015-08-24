@@ -8,7 +8,7 @@ scout.KeyStroke = function() {
   this.preventDefault = true;
   this.stopPropagation = false;
   this.stopImmediatePropagation = false;
-  this.keyStrokeMode = scout.keyStrokeMode.UP;
+  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
 
   // Hints to control rendering of the key(s).
   this.renderingHints = {
