@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -42,7 +43,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   public JsonOutline(OUTLINE outline, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(outline, uiSession, id, parent);
-
     m_desktop = uiSession.getClientSession().getDesktop();
   }
 
@@ -75,6 +75,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void attachNode(ITreeNode node, boolean attachChildren) {
+    // Don't attach virtual nodes, if they are already resolved
+    node = unwrapResolvedNode(node);
+
     if (attachChildren) {
       attachNodes(node.getChildNodes(), attachChildren);
     }
@@ -91,7 +94,26 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
+  protected void handleModelTreeEvent(TreeEvent event) {
+    super.handleModelTreeEvent(event);
+
+    // When nodes are deleted, immediately dispose the nodes. If we would do this later when the event
+    // buffer is processed, there could have been other events in the meantime (e.g. table events) which
+    // fail when the nodes (and everything that is attached to them, namely detail tables) are still
+    // existing. (Disposing the nodes right away is correct, because no matter what the event buffer
+    // does, the nodes are definitively deleted.)
+    if (CompareUtility.isOneOf(event.getType(), TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED)) {
+      disposeNodes(event.getNodes(), true);
+    }
+  }
+
+  @Override
   protected JSONObject treeNodeToJson(ITreeNode node) {
+    // Virtual and resolved nodes are equal in maps, but they don't behave the same. For example, a
+    // a virtual page does not return a detail table, while the resolved node does. Therefore, we
+    // want to always use the resolved node, if it exists.
+    node = unwrapResolvedNode(node);
+
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
@@ -107,6 +129,20 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       putProperty(json, "classId", page.classId());
     }
     return json;
+  }
+
+  /**
+   * If the given node is a virtual node and has a resolved node, that resolved node is returned. Otherwise, the given
+   * node is returned.
+   */
+  protected ITreeNode unwrapResolvedNode(ITreeNode node) {
+    if (node instanceof IVirtualTreeNode) {
+      ITreeNode resolvedNode = ((IVirtualTreeNode) node).getResolvedNode();
+      if (resolvedNode != null) {
+        return resolvedNode;
+      }
+    }
+    return node;
   }
 
   protected void putNodeType(JSONObject json, ITreeNode node) {

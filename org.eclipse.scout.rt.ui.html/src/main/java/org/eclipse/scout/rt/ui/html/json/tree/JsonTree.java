@@ -839,7 +839,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   /**
-   * Called by {@link #handleModelNodesUpdated(TreeEvent)} when it has detected that a virtual tree node was resolved by
+   * Called by {@link #handleModelNodesUpdated(TreeEvent)} when it has detected that a virtual tree node was resolved to
    * a real node. Subclasses may override this method to put any updated properties to the JSON response.
    *
    * @param jsonNode
