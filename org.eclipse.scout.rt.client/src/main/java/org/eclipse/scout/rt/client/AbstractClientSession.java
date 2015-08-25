@@ -26,7 +26,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CollectorVisitor;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -39,7 +38,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
@@ -466,26 +464,16 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     final long shutdownWaitTime = getMaxShutdownWaitTime();
     if (shutdownWaitTime > 0) {
       // Wait for running jobs to complete prior shutdown the session.
-      ClientJobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            final Filter futureFilter = Jobs.newFutureFilter().andMatchFutures(findRunningJobs());
-            boolean timeoutElapsed = !Jobs.getJobManager().awaitDone(futureFilter, shutdownWaitTime, TimeUnit.MILLISECONDS);
-            if (timeoutElapsed) {
-              logRunningJobs();
-            }
-          }
-          finally {
-            inactivateSession();
-          }
-        }
-      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().withSession(this, true)).withName("Wait for client jobs to finish before shutdown the session"));
+      try {
+        final Filter futureFilter = Jobs.newFutureFilter().andMatchFutures(findRunningJobs());
+        Jobs.getJobManager().awaitDone(futureFilter, shutdownWaitTime, TimeUnit.MILLISECONDS);
+      }
+      catch (ProcessingException e) {
+        LOG.warn("Encountered an error while waiting for running jobs to complete.", e);
+      }
     }
-    else {
-      logRunningJobs();
-      inactivateSession();
-    }
+    logRunningJobs();
+    inactivateSession();
   }
 
   protected void inactivateSession() {
@@ -510,7 +498,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void logRunningJobs() {
     final List<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
-      LOG.warn("" + "Some running client jobs found while client session is going to shutdown. " + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. " + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}", new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
+      LOG.warn(
+          "" + "Some running client jobs found while client session is going to shutdown. " + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. "
+              + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}",
+          new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
     }
   }
 
