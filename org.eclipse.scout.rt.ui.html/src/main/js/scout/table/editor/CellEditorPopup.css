@@ -22,18 +22,3 @@
     padding-left: @table-cell-padding-left;
   }
 }
-
-.check-box-field.cell-editor-form-field {
-  & > .field {
-    /* same padding for left and right, it's by purpose */
-    padding-left: @table-cell-padding-left;
-    padding-right: @table-cell-padding-left;
-    margin: 0;
-  }
-
-  & > .field::before {
-    position: static;
-    margin: 0;
-    margin-top: -1px;
-  }
-}

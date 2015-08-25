@@ -55,16 +55,14 @@
   }
 
   &.cell-editor-field {
+    /* generate an invisible border to make it easier to work with, since other fields have a border too */
+    border: 1px solid transparent;
+    padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment;
+    padding-left: @table-cell-padding-left;
+    padding-right: @table-cell-padding-left;
 
-    & > .check-box {
-      display: inline-block;
-      width: @check-box-size;
-      height: @check-box-size;
-      position: relative;
-
-      &::before {
-        top: 0;
-      }
+    & > .check-box::before {
+      position: static;
     }
   }
 }
