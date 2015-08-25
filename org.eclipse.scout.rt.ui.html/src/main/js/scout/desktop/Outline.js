@@ -264,6 +264,10 @@ scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedN
     oldNode.classId = updatedNode.classId;
     propertiesChanged = true;
   }
+  if (oldNode.nodeType !== updatedNode.nodeType) {
+    oldNode.nodeType = updatedNode.nodeType;
+    propertiesChanged = true;
+  }
   return propertiesChanged;
 };
 
