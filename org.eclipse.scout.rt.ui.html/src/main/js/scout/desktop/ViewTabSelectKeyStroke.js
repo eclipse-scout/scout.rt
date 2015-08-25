@@ -7,7 +7,7 @@ scout.ViewTabSelectKeyStroke = function(desktop) {
   this._viewTabsController = desktop.viewTabsController;
 
   // modifier
-  this.parseAndSetKeyStroke(desktop.autoTabKeyStrokeModifier);
+  this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
 
   // range [1..9]
   this.registerRange(
@@ -31,7 +31,7 @@ scout.inherits(scout.ViewTabSelectKeyStroke, scout.RangeKeyStroke);
  */
 scout.ViewTabSelectKeyStroke.prototype._isEnabled = function() {
   var enabled = scout.ViewTabSelectKeyStroke.parent.prototype._isEnabled.call(this);
-  return enabled && this.field.autoTabKeyStrokesEnabled && this._viewTabs().length > 0;
+  return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
 };
 
 /**

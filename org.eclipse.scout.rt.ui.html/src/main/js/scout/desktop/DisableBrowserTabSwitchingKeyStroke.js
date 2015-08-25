@@ -9,7 +9,7 @@ scout.DisableBrowserTabSwitchingKeyStroke = function(desktop) {
   this.field = desktop;
 
   // modifier
-  this.parseAndSetKeyStroke(desktop.autoTabKeyStrokeModifier);
+  this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
 
   // range [1..9]
   this.registerRange(
@@ -29,7 +29,7 @@ scout.inherits(scout.DisableBrowserTabSwitchingKeyStroke, scout.RangeKeyStroke);
  */
 scout.DisableBrowserTabSwitchingKeyStroke.prototype._isEnabled = function() {
   var enabled = scout.DisableBrowserTabSwitchingKeyStroke.parent.prototype._isEnabled.call(this);
-  return enabled && this.field.autoTabKeyStrokesEnabled;
+  return enabled && this.field.selectViewTabsKeyStrokesEnabled;
 };
 
 /**
