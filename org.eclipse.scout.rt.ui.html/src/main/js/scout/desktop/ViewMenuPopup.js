@@ -81,7 +81,7 @@ scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
     scout.graphics.setSize($title, scout.graphics.getSize($blueprintTitle));
   }
 
-  $viewMenuButton.css('display', 'inline-block');
+  $viewMenuButton.css('display', (titleVisible ? 'inline-block' : 'none'));
   $viewMenuButton.addClass('menu-open');
 };
 

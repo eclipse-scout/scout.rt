@@ -14,8 +14,8 @@ scout.DesktopNavigation = function(desktop) {
   this._breadcrumb = false;
 };
 
-scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 190; // FIXME AWE: make dynamic (min. breadcrumb width)
-scout.DesktopNavigation.MIN_SPLITTER_SIZE = 50;
+scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 200; // FIXME AWE: make dynamic (min. breadcrumb width)
+scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
 
 scout.DesktopNavigation.prototype.render = function($parent) {
   this.$navigation = $parent.appendDiv('desktop-navigation');
@@ -110,9 +110,13 @@ scout.DesktopNavigation.prototype._setBreadcrumbEnabled = function(enabled) {
   var oldBreadcrumbEnabled = this._breadcrumbEnabled;
   if (oldBreadcrumbEnabled !== enabled) {
     this._breadcrumbEnabled = enabled;
-    this.$navigation.toggleClass('navigation-breadcrumb', enabled);
-    this.outline.setBreadcrumbEnabled(enabled);
+    // FIXME BSH Enable the following two lines again when the breadcrumb mode is fixed
+//    this.$navigation.toggleClass('navigation-breadcrumb', enabled);
+//    this.outline.setBreadcrumbEnabled(enabled);
     this.viewMenuTab.setBreadcrumbEnabled(enabled);
+    this._viewButtons('TAB').forEach(function(viewButton) {
+      viewButton.setBreadcrumbEnabled(enabled);
+    });
   }
 };
 

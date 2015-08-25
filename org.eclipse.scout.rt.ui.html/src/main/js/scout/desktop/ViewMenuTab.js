@@ -67,17 +67,18 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
 
 scout.ViewMenuTab.prototype._renderText = function() {
   if (this._breadcrumbEnabled) {
-    this.$title.css('display', 'none');
+    this.$title.css('display', ''); // reset to CSS default ('none')
   } else {
     this.$title.css('display', 'inline-block');
     this.$title.text(this.selected ? this.text : '');
   }
+  this._updateMenuButtonVisibility();
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
-  this.$menuButton.setVisible(this.selected && !this._inBackground);
-  if (this.selected) {
+  this._updateMenuButtonVisibility();
+  if (this.selected && !this._breadcrumbEnabled) {
     scout.tooltips.uninstall(this.$container);
   } else {
     scout.tooltips.install(this.$container, this.session, {text: this.text});
@@ -86,6 +87,10 @@ scout.ViewMenuTab.prototype._renderSelected = function() {
 
 scout.ViewMenuTab.prototype._renderIconId = function() {
   this.$container.icon(this.iconId);
+};
+
+scout.ViewMenuTab.prototype._updateMenuButtonVisibility = function() {
+  this.$menuButton.setVisible(this.selected && !this._inBackground && !this._breadcrumbEnabled);
 };
 
 /**
@@ -189,4 +194,5 @@ scout.ViewMenuTab.prototype.bringToFront = function() {
 scout.ViewMenuTab.prototype.setBreadcrumbEnabled = function(enabled) {
   this._breadcrumbEnabled = enabled;
   this._renderText();
+  this._renderSelected();
 };
