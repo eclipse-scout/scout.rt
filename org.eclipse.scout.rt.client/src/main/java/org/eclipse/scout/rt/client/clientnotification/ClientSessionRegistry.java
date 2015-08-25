@@ -39,12 +39,12 @@ import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
-/**
- *
- */
 public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSessionListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistry.class);
 
+  /**
+   * Subject for server calls for client notification related updates.
+   */
   protected final Subject NOTIFICATION_SUBJECT = CONFIG.getPropertyValue(NotificationSubjectProperty.class);
 
   private Object m_cacheLock = new Object();
@@ -56,11 +56,9 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     synchronized (m_cacheLock) {
       m_sessionIdToSession.put(sessionId, new WeakReference<IClientSession>(session));
     }
-    if (BEANS.get(IServiceTunnel.class).isActive()) {
-      // if the client session is already started, otherwise the listener will invoke the clientSessionStated method.
-      if (session.isActive()) {
-        sessionStarted(session);
-      }
+    // if the client session is already started, otherwise the listener will invoke the clientSessionStated method.
+    if (BEANS.get(IServiceTunnel.class).isActive() && session.isActive()) {
+      sessionStarted(session);
     }
   }
 
@@ -104,8 +102,8 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     ensureUserIdAvailable(session);
     checkSession(session);
     LOG.debug(String.format("Register client session [sessionid=%s, userId=%s].", session.getId(), session.getUserId()));
-    registerSessionOnClient(session);
-    registerSessionOnServer(session);
+    registerOnClient(session);
+    registerOnServer(session);
   }
 
   private void checkSession(final IClientSession session) {
@@ -113,7 +111,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     Assertions.assertNotNull(session.getUserId(), "No userId available");
   }
 
-  private void registerSessionOnServer(final IClientSession session) {
+  private void registerOnServer(final IClientSession session) {
     try {
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
@@ -130,7 +128,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   /**
    * local linking
    */
-  private void registerSessionOnClient(final IClientSession session) {
+  private void registerOnClient(final IClientSession session) {
     synchronized (m_cacheLock) {
       List<WeakReference<IClientSession>> sessionRefs = m_userToSessions.get(session.getUserId());
       if (sessionRefs != null) {

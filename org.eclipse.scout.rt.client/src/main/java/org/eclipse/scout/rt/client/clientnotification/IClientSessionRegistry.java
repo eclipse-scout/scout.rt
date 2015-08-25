@@ -15,27 +15,42 @@ import java.util.UUID;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.shared.ISession;
 
+/**
+ * Registry to keep track of {@link IClientSession}s and its users in order to dispatch client notifications..
+ */
 @ApplicationScoped
 public interface IClientSessionRegistry {
   String NOTIFICATION_NODE_ID = UUID.randomUUID().toString();
 
-  void register(IClientSession clientSession, String sessionId);
+  /**
+   * Register a new client session. The session does not need to be started. The id might not be available on the
+   * session yet.
+   *
+   * @param session
+   *          {@link IClientSession}
+   * @param sessionId
+   *          {@link} id of the session
+   */
+  void register(IClientSession session, String sessionId);
 
   /**
    * @param sessionid
-   * @return
+   *          the id of the session, see {@link ISession#getId()}
+   * @return the session for a given id
    */
   IClientSession getClientSession(String sessionid);
 
   /**
    * @param userId
-   * @return
+   *          the user of the session, see {@link ISession#getUserId()}
+   * @return the session for a given userid
    */
   List<IClientSession> getClientSessionsForUser(String userId);
 
   /**
-   * @return
+   * @return all registered client sessions
    */
   List<IClientSession> getAllClientSessions();
 

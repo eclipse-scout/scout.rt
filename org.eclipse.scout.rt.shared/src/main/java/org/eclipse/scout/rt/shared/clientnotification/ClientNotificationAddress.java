@@ -37,18 +37,42 @@ public class ClientNotificationAddress implements Serializable {
   protected ClientNotificationAddress() {
   }
 
+  /**
+   * Create an address for a notification that should to be handled once for each of the given sessions.
+   *
+   * @param sessionIds
+   *          the ids of the users for this address see <code>ISession.getId()</code>
+   * @return notification address
+   */
   public static ClientNotificationAddress createSessionAddress(final Set<String> sessionIds) {
     return new ClientNotificationAddress().withSessionIds(sessionIds);
   }
 
+  /**
+   * Create an address for a notification that should to be handled once for each of the given users.
+   *
+   * @param userIds
+   *          the ids of the users for this address see <code>ISession.getUserId()</code>
+   * @return notification address
+   */
   public static ClientNotificationAddress createUserAddress(final Set<String> userIds) {
     return new ClientNotificationAddress().withUserIds(userIds);
   }
 
+  /**
+   * Create an address for a notification that should to be handled once for each session.
+   *
+   * @return notification address
+   */
   public static ClientNotificationAddress createAllSessionsAddress() {
     return new ClientNotificationAddress().withNotifyAllSessions(true);
   }
 
+  /**
+   * Create an address for a notification that should to be handled once per client node.
+   *
+   * @return notification address
+   */
   public static ClientNotificationAddress createAllNodesAddress() {
     return new ClientNotificationAddress().withNotifyAllNodes(true);
   }
