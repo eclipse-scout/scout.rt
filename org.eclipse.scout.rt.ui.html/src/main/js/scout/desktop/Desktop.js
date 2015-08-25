@@ -112,6 +112,9 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
  * Installs the keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
  */
 scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = function() {
+  if(!this._hasNavigation()){
+    return;
+  }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
@@ -127,6 +130,9 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = functi
  * Installs the keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
  */
 scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
+  if(!this._hasTaskBar()){
+    return;
+  }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
