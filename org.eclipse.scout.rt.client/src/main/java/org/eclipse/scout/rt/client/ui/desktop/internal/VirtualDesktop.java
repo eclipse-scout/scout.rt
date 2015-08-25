@@ -211,22 +211,22 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public boolean isAutoTabKeyStrokesEnabled() {
+  public boolean isSelectViewTabsKeyStrokesEnabled() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void setAutoTabKeyStrokesEnabled(boolean b) {
+  public void setSelectViewTabsKeyStrokesEnabled(boolean selectViewTabsKeyStrokesEnabled) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public String getAutoTabKeyStrokeModifier() {
+  public String getSelectViewTabsKeyStrokeModifier() {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void setAutoTabKeyStrokeModifier(String modifier) {
+  public void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier) {
     throw createUnsupportedOperationException();
   }
 

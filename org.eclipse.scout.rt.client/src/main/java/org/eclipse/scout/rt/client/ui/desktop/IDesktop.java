@@ -88,11 +88,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /**
    * {@link Boolean}
    */
-  String PROP_AUTO_TAB_KEY_STROKES_ENABLED = "autoTabKeyStrokesEnabled";
+  String PROP_SELECT_VIEW_TABS_KEY_STROKES_ENABLED = "selectViewTabsKeyStrokesEnabled";
   /**
    * {@link Boolean}
    */
-  String PROP_AUTO_TAB_KEY_STROKE_MODIFIER = "autoTabKeyStrokeModifier";
+  String PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER = "selectViewTabsKeyStrokeModifier";
 
   String PROP_DESKTOP_STYLE = "desktopStyle";
 
@@ -542,13 +542,29 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   void setTitle(String s);
 
-  boolean isAutoTabKeyStrokesEnabled();
+  /**
+   * @return <code>true</code> if UI key strokes to select view tabs are enabled, <code>false</code> otherwise.
+   */
+  boolean isSelectViewTabsKeyStrokesEnabled();
 
-  void setAutoTabKeyStrokesEnabled(boolean b);
+  /**
+   * @param selectViewTabsKeyStrokesEnabled
+   *          <code>true</code> to enable UI key strokes to select view tabs, <code>false</code> to disable them.
+   */
+  void setSelectViewTabsKeyStrokesEnabled(boolean selectViewTabsKeyStrokesEnabled);
 
-  String getAutoTabKeyStrokeModifier();
+  /**
+   * @return optional modifier to use for UI key strokes to select view tabs (only relevant when
+   *         {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
+   */
+  String getSelectViewTabsKeyStrokeModifier();
 
-  void setAutoTabKeyStrokeModifier(String modifier);
+  /**
+   * @param selectViewTabsKeyStrokeModifier
+   *          optional modifier to use for UI key strokes to select view tabs (only relevant when
+   *          {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>).
+   */
+  void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier);
 
   /**
    * @return true: automatically prefix a * on any text field's search value

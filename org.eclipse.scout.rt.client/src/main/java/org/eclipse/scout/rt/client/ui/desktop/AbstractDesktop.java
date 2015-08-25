@@ -256,27 +256,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  /**
+   * @return <code>true</code> if UI key strokes to select view tabs are enabled, <code>false</code> otherwise. Default
+   *         value is <code>true</code>.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
-  protected boolean getConfiguredAutoTabKeyStrokesEnabled() {
+  protected boolean getConfiguredSelectViewTabsKeyStrokesEnabled() {
     return true;
   }
 
   /**
-   * If isAutoTabKeyStrokesEnabled is true this modifier is used in combination with a number to select tab. possible
-   * values:
-   * <ul>
-   * <li>IKeyStroke.CONTROL</li>
-   * <li>IKeyStroke.SHIFT</li>
-   * <li>IKeyStroke.ALT</li>
-   * </ul>
-   * default IKeyStroke.CONTROL
-   *
-   * @return
+   * @return optional modifier to use for UI key strokes to select view tabs (only relevant when
+   *         {@link #isSelectViewTabsKeyStrokesEnabled()} is <code>true</code>). Default value is
+   *         {@link IKeyStroke#CONTROL}.
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(40)
-  protected String getConfiguredAutoTabKeyStrokeModifier() {
+  protected String getConfiguredSelectViewTabsKeyStrokeModifier() {
     return IKeyStroke.CONTROL;
   }
 
@@ -519,8 +516,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
-    setAutoTabKeyStrokesEnabled(getConfiguredAutoTabKeyStrokesEnabled());
-    setAutoTabKeyStrokeModifier(getConfiguredAutoTabKeyStrokeModifier());
+    setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
+    setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setDesktopStyle(getConfiguredDesktopStyle());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
@@ -1368,23 +1365,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public boolean isAutoTabKeyStrokesEnabled() {
-    return propertySupport.getPropertyBool(PROP_AUTO_TAB_KEY_STROKES_ENABLED);
+  public boolean isSelectViewTabsKeyStrokesEnabled() {
+    return propertySupport.getPropertyBool(PROP_SELECT_VIEW_TABS_KEY_STROKES_ENABLED);
   }
 
   @Override
-  public void setAutoTabKeyStrokesEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_AUTO_TAB_KEY_STROKES_ENABLED, b);
+  public void setSelectViewTabsKeyStrokesEnabled(boolean selectViewTabsKeyStrokesEnabled) {
+    propertySupport.setPropertyBool(PROP_SELECT_VIEW_TABS_KEY_STROKES_ENABLED, selectViewTabsKeyStrokesEnabled);
   }
 
   @Override
-  public String getAutoTabKeyStrokeModifier() {
-    return propertySupport.getPropertyString(PROP_AUTO_TAB_KEY_STROKE_MODIFIER);
+  public String getSelectViewTabsKeyStrokeModifier() {
+    return propertySupport.getPropertyString(PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER);
   }
 
   @Override
-  public void setAutoTabKeyStrokeModifier(String modifier) {
-    propertySupport.setPropertyString(PROP_AUTO_TAB_KEY_STROKE_MODIFIER, modifier);
+  public void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier) {
+    propertySupport.setPropertyString(PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER, selectViewTabsKeyStrokeModifier);
   }
 
   @Override
