@@ -1,12 +1,23 @@
 scout.ColumnUserTableFilter = function() {
   scout.ColumnUserTableFilter.parent.call(this);
   this.filterType = 'column';
+
+  /**
+   * array of (normalized) key, text composite
+   */
+  this.availableValues = [];
+
+  /**
+   * array of (normalized) keys
+   */
   this.selectedValues = [];
 };
 scout.inherits(scout.ColumnUserTableFilter, scout.UserTableFilter);
 
 scout.ColumnUserTableFilter.prototype.calculateCube = function() {
-  var group = -1;
+  var containsSelectedValue, reorderAxis,
+    group = -1;
+
   if (this.column.type === 'date') {
     if (this.column.hasDate) {
       // Default grouping for date columns is year
@@ -20,6 +31,29 @@ scout.ColumnUserTableFilter.prototype.calculateCube = function() {
   this.matrix = new scout.ChartTableControlMatrix(this.table, this.session),
   this.xAxis = this.matrix.addAxis(this.column, group);
   this.matrix.calculateCube();
+
+  this.selectedValues.forEach(function(selectedValue) {
+    containsSelectedValue = false;
+    if (this.column.type === 'text') {
+      selectedValue = this.xAxis.norm(selectedValue);
+    }
+    this.xAxis.some(function(key) {
+      if (key === selectedValue) {
+        containsSelectedValue = true;
+        return true;
+      }
+    }, this);
+
+    if (!containsSelectedValue) {
+      this.xAxis.push(selectedValue);
+      reorderAxis = true;
+    }
+  }, this);
+
+  if (reorderAxis) {
+    this.xAxis.reorder();
+  }
+
   this.availableValues = [];
   this.xAxis.forEach(function(key) {
     var text = this.xAxis.format(key);

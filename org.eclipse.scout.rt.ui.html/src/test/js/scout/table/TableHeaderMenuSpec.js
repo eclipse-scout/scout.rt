@@ -121,6 +121,21 @@ describe("TableHeaderMenu", function() {
         expect($filterItems.eq(2).text()).toBe('Value');
         table.header.closeTableHeaderMenu();
       });
+
+      it("always displays the selected value, even if the table does not contain the value anymore", function() {
+        var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
+        var column = table.columns[0];
+        var filter = createAndRegisterColumnFilter(table, column, ['AnotherValueNotInTable']);
+        table.render(session.$entryPoint);
+        expect(table.filteredRows().length).toBe(0);
+
+        table.header.openTableHeaderMenu(column);
+        var $filterItems = find$FilterItems(table);
+        expect($filterItems.eq(0).text()).toBe('AnotherValue');
+        expect($filterItems.eq(1).text()).toBe('AnotherValueNotInTable');
+        expect($filterItems.eq(2).text()).toBe('Value');
+        table.header.closeTableHeaderMenu();
+      });
     });
 
 
