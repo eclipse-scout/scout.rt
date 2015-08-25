@@ -2,8 +2,8 @@ scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
   this._$viewTabBar;
-  this._$taskBar; // FIXME awe: uniform naming
-  this._$toolBar; // FIXME awe: uniform naming
+  this._$taskBar; // FIXME AWE: uniform naming
+  this._$toolBar; // FIXME AWE: uniform naming
   this.$bench;
 
   this.navigation;
@@ -29,12 +29,11 @@ scout.inherits(scout.Desktop, scout.BaseDesktop);
 
 scout.Desktop.prototype._init = function(model, session) {
   scout.Desktop.parent.prototype._init.call(this, model, session);
-
   this.viewTabsController = new scout.ViewTabsController(this);
-
   this.formController = new scout.FormController(this, session);
   this.messageBoxController = new scout.MessageBoxController(this, session);
   this.fileChooserController = new scout.FileChooserController(this, session);
+  this._addNullOutline(model.outline);
 };
 
 scout.DesktopStyle = {
@@ -524,6 +523,10 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   } else {
     this.setOutline(outline);
   }
+
+  if (this._hasNavigation()) {
+    this.navigation.revalidateLayout();
+  }
 };
 
 /**
@@ -572,4 +575,29 @@ scout.Desktop.prototype.glassPaneTargets = function() {
  */
 scout.Desktop.prototype.inFront = function() {
   return true; // Desktop is always available to the user.
+};
+
+
+/**
+ * Creates a local "null-outline" and an OutlineViewButton which is used, when no outline is available.
+ * This avoids a lot of if/else code. The OVB adds a property 'visibleInMenu' which is only used in
+ * the UI to decide whether or not the OVB will be shown in the ViewMenuPopup.js.
+ */
+scout.Desktop.prototype._addNullOutline = function(outline) {
+  if (outline) {
+    return;
+  }
+  var nullOutline = scout.localObjects.createObject(this.session, {
+      objectType: 'Outline'}),
+    ovb = scout.localObjects.createObject(this.session, {
+      objectType: 'OutlineViewButton',
+      displayStyle: 'MENU',
+      selected: true,
+      text: this.session.text('ui.Outlines'),
+      desktop: this,
+      visibleInMenu: false});
+
+  ovb.outline = nullOutline;
+  this.outline = nullOutline;
+  this.viewButtons.push(ovb);
 };

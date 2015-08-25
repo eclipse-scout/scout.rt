@@ -22,7 +22,6 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   this.$viewButtons = this.$navigation.appendDiv('view-buttons');
   this.htmlViewButtons = new scout.HtmlComponent(this.$viewButtons, this.session);
   this.htmlViewButtons.setLayout(new scout.ViewButtonsLayout(this.htmlViewButtons));
-
   this.viewMenuTab = new scout.ViewMenuTab(this._viewButtons('MENU'), this.session);
   this.viewMenuTab.render(this.$viewButtons);
 
@@ -35,10 +34,6 @@ scout.DesktopNavigation.prototype.render = function($parent) {
       viewTab.last();
     }
   }
-
-  this._viewButtons().forEach(function(viewButton) {
-    viewButton.on('propertyChange', this._onViewButtonPropertyChange.bind(this));
-  }, this);
 
   this.$container = this.$navigation.appendDiv('navigation-container')
     .on('mousedown', this._onNavigationMousedown.bind(this));
@@ -53,20 +48,6 @@ scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
     }
   });
   return viewButtons;
-};
-
-scout.DesktopNavigation.prototype._onViewButtonPropertyChange = function(event) {
-  if (event.changedProperties.indexOf('selected') !== -1) {
-    // this check here is required because there are multiple property change
-    // events while the outline changes. Sometimes we have none at all or two
-    // selected tabs at the same time. This makes it impossible to animate the
-    // view-buttons properly. With this check here we wait until all property
-    // change events have been processed. Assuming that in the end there's always
-    // on single selected view-button.
-    if (this._getNumSelectedTabs() === 1) {
-      this.htmlViewButtons.revalidateLayout();
-    }
-  }
 };
 
 scout.DesktopNavigation.prototype._getNumSelectedTabs = function () {
@@ -148,3 +129,16 @@ scout.DesktopNavigation.prototype.bringToFront = function() {
   this.viewMenuTab.bringToFront();
   this.outline.bringToFront();
 };
+
+scout.DesktopNavigation.prototype.revalidateLayout = function() {
+  // this check here is required because there are multiple property change
+  // events while the outline changes. Sometimes we have none at all or two
+  // selected tabs at the same time. This makes it impossible to animate the
+  // view-buttons properly. With this check here we wait until all property
+  // change events have been processed. Assuming that in the end there's always
+  // on single selected view-button.
+  if (this._getNumSelectedTabs() === 1) {
+    this.htmlViewButtons.revalidateLayout();
+  }
+};
+

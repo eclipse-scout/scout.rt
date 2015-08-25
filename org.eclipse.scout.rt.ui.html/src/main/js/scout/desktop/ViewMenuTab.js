@@ -47,13 +47,14 @@ scout.ViewMenuTab.prototype._update = function() {
 
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
-     .unfocusable()
+    .unfocusable()
     .on('mousedown', this.togglePopup.bind(this))
     .data('tooltipText', function() { return this.text; }.bind(this));
-
-  this.$title = this.$container.appendSpan('view-button-tab-title has-menu')
+  this.$title = this.$container
+    .appendSpan('view-button-tab-title has-menu')
     .icon(this.iconId);
-  this.$menuButton = this.$container.appendSpan('view-menu-button')
+  this.$menuButton = this.$container
+    .appendSpan('view-menu-button')
     .on('mousedown', this.togglePopup.bind(this));
   this._renderProperties();
 };
@@ -131,10 +132,25 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
 
 scout.ViewMenuTab.prototype._openPopup = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
-  var popup = new scout.ViewMenuPopup(this.session, this.$container, this.viewMenus, naviBounds, this._breadcrumbEnabled);
+  var popup = new scout.ViewMenuPopup(this.session, this.$container, this._popupViewMenus(), naviBounds, this._breadcrumbEnabled);
   popup.headText = this.text;
   popup.render();
   return popup;
+};
+
+/**
+ * An OutlineViewButton for a null-outline shouldn't be added to the menus
+ * displayed in the popup-menu. We recognize the null-outline be checking
+ * the 'visibleInMenu' property.
+ */
+scout.ViewMenuTab.prototype._popupViewMenus = function() {
+  var i, popupMenus = [];
+  this.viewMenus.forEach(function(viewMenu) {
+    if (scout.helpers.nvl(viewMenu.visibleInMenu, true)) {
+      popupMenus.push(viewMenu);
+    }
+  });
+  return popupMenus;
 };
 
 scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {
