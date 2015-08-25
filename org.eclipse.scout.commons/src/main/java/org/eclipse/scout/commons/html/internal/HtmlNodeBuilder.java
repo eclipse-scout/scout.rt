@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.html.IHtmlBind;
 import org.eclipse.scout.commons.html.IHtmlElement;
 
 /**
@@ -23,7 +24,7 @@ import org.eclipse.scout.commons.html.IHtmlElement;
  */
 public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement {
 
-  private final List<String> m_attributes = new ArrayList<>();
+  private final List<IHtmlBind> m_attributes = new ArrayList<>();
   private String m_tag;
 
   protected String getTag() {
@@ -78,13 +79,21 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
 
   @Override
   public IHtmlElement addAttribute(String name, CharSequence value) {
-    m_attributes.add(name + "=\"" + value + "\"");
+    HtmlContentBuilder content = new HtmlContentBuilder(
+        getBinds().put(name),
+        new HtmlPlainBuilder("=\""),
+        getBinds().put(value),
+        new HtmlPlainBuilder("\""));
+    m_attributes.add(content);
     return this;
   }
 
   @Override
   public void replaceBinds(Map<String/*old Bind*/, String/*new Bind*/> bindMap) {
     super.replaceBinds(bindMap);
+    for (IHtmlBind elem : m_attributes) {
+      elem.replaceBinds(bindMap);
+    }
     getBinds().replaceBinds(bindMap);
   }
 

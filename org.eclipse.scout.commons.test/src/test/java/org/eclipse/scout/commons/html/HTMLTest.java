@@ -96,7 +96,13 @@ public class HTMLTest {
   @Test
   public void testAppLinkNoBinds() {
     final IHtmlElement html = HTML.appLink("domain=123&text=456", "Link Text&");
-    assertEquals("<span class=\"app-link\" data-ref=\"domain=123&text=456\">Link Text&amp;</span>", html.toEncodedHtml());
+    assertEquals("<span class=\"app-link\" data-ref=\"domain=123&amp;text=456\">Link Text&amp;</span>", html.toEncodedHtml());
+  }
+
+  @Test
+  public void testBoldAppLink() {
+    final IHtmlElement html = HTML.bold("asdf", HTML.appLink("domain=123&text=456", "Link Text&"));
+    assertEquals("<b>asdf<span class=\"app-link\" data-ref=\"domain=123&amp;text=456\">Link Text&amp;</span></b>", html.toEncodedHtml());
   }
 
   @Test
@@ -107,17 +113,13 @@ public class HTMLTest {
 
   @Test
   public void testTableAttributesNoBinds() {
-    final IHtmlTable table = HTML.table(
-        row(
-            cell(BIND_TEXT)));
+    final IHtmlTable table = HTML.table(row(cell(BIND_TEXT)));
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
 
   @Test
-  public void testLinkWithBoldNoBinds() throws Exception {
-    final IHtmlElement html = HTML.bold(
-        BIND_TEXT,
-        link(TEST_URL, BIND_TEXT));
+  public void testLinkWithBoldNoBinds() {
+    final IHtmlElement html = HTML.bold(BIND_TEXT, link(TEST_URL, BIND_TEXT));
     assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a></b>", html.toEncodedHtml());
   }
 
@@ -176,9 +178,7 @@ public class HTMLTest {
 
   @Test
   public void testComplexHtml() {
-    final IHtmlElement html = HTML.div(
-        link(TEST_URL, BIND_TEXT),
-        HTML.table(row(cell(BIND_TEXT), cell(BIND_TEXT), cell(BIND_TEXT))));
+    final IHtmlElement html = HTML.div(link(TEST_URL, BIND_TEXT), HTML.table(row(cell(BIND_TEXT), cell(BIND_TEXT), cell(BIND_TEXT))));
     String expected = "<div><a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a><table><tr><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td></tr></table></div>";
     assertEquals(expected, html.toEncodedHtml());
   }
@@ -209,21 +209,15 @@ public class HTMLTest {
 
   @Test
   public void testFullHtml() {
-    IHtmlDocument html = HTML.html(
-        HTML.cssStyle(sampleCSS),
-        BIND_TEXT);
-    String expected = "<html><head><style type=\"text/css\">" + sampleCSS + "</style>"
-        + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
+    IHtmlDocument html = HTML.html(HTML.cssStyle(sampleCSS), BIND_TEXT);
+    String expected = "<html><head><style type=\"text/css\">" + sampleCSS + "</style>" + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
     assertEquals(expected, html.toEncodedHtml());
   }
 
   @Test
   public void testFullHtmlDocType() {
-    IHtmlDocument html = HTML.html5(
-        HTML.cssStyle(sampleCSS),
-        BIND_TEXT);
-    String expected = "<!DOCTYPE html><html><head><style type=\"text/css\">" + sampleCSS + "</style>"
-        + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
+    IHtmlDocument html = HTML.html5(HTML.cssStyle(sampleCSS), BIND_TEXT);
+    String expected = "<!DOCTYPE html><html><head><style type=\"text/css\">" + sampleCSS + "</style>" + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
     assertEquals(expected, html.toEncodedHtml());
   }
 
@@ -243,9 +237,7 @@ public class HTMLTest {
     IHtmlElement h2 = HTML.h2("h2");
     IHtmlTable table = createTable("0");
 
-    IHtmlElement html = HTML.div(
-        h2,
-        table);
+    IHtmlElement html = HTML.div(h2, table);
 
     String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
     assertEquals(exp, html.toEncodedHtml());

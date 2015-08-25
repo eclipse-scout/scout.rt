@@ -11,7 +11,6 @@
 package org.eclipse.scout.commons.html;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -126,31 +125,6 @@ public class HtmlBinds {
       }
     }
     return replaceMap;
-  }
-
-  /**
-   * Replace bind names with encoded values.
-   *
-   * @deprecated use {@link IHtmlElement#toEncodedHtml()} instead
-   */
-  @Deprecated
-  public String applyBindParameters(IHtmlContent... htmls) {
-    return applyBindParameters(Arrays.asList(htmls));
-  }
-
-  /**
-   * Replace bind names with encoded values.
-   *
-   * @deprecated use {@link IHtmlElement#toEncodedHtml()} instead
-   */
-  @Deprecated
-  public String applyBindParameters(List<? extends IHtmlContent> htmls) {
-    StringBuilder sb = new StringBuilder();
-    for (IHtmlContent html : htmls) {
-      html.setBinds(this);
-      sb.append(html.toEncodedHtml());
-    }
-    return sb.toString();
   }
 
   /**

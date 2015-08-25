@@ -47,14 +47,11 @@ public class HtmlContentBuilderTest {
     assertEquals("2", cb.getBinds().getBindMap().get(":b__2"));
   }
 
+
   @Test
   public void testManyBinds() throws Exception {
     IHtmlElement h2 = HTML.h2("h2");
-    System.out.println(h2.getBinds());
-    System.out.println(h2.toString());
     IHtmlTable table = createTable("0");
-    System.out.println(table.getBinds());
-    System.out.println(table.toString());
 
     IHtmlElement html = HTML.div(
         h2,
