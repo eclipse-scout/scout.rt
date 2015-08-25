@@ -11,7 +11,7 @@ scout.inherits(scout.TableNavigationEndKeyStroke, scout.AbstractTableNavigationK
 
 scout.TableNavigationEndKeyStroke.prototype._acceptForNavigation = function(event) {
   var accepted = scout.TableNavigationEndKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted && !this._isLastRowSelected();
+  return accepted;
 };
 
 scout.TableNavigationEndKeyStroke.prototype.handle = function(event) {
@@ -26,7 +26,6 @@ scout.TableNavigationEndKeyStroke.prototype.handle = function(event) {
     lastActionRow = lastActionRow || $selection.last().data('row');
     deselect = !lastActionRow.$row.isSelected();
     $newSelection = lastActionRow.$row.nextAll('.table-row:not(.invisible)');
-    table.selectionHandler.lastActionRow = lastActionRow.$row.next('.table-row:not(.invisible)').length > 0 ? lastActionRow.$row.next('.table-row:not(.invisible)').data('row') : lastActionRow;
   } else {
     $newSelection = $rows.last();
   }

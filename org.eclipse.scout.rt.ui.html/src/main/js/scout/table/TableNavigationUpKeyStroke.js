@@ -11,7 +11,7 @@ scout.inherits(scout.TableNavigationUpKeyStroke, scout.AbstractTableNavigationKe
 
 scout.TableNavigationUpKeyStroke.prototype._acceptForNavigation = function(event) {
   var accepted = scout.TableNavigationUpKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted && !this._isFirstRowSelected();
+  return accepted;
 };
 
 scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
@@ -24,8 +24,8 @@ scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
 
   if ($selection.length > 0 || lastActionRow) {
     lastActionRow = lastActionRow || $selection.first().data('row');
-    deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.prev('.table-row:not(.invisible)').isSelected();
-    $newSelection = deselect ? lastActionRow.$row : lastActionRow.$row.prev('.table-row:not(.invisible)');
+    deselect = lastActionRow.$row.isSelected() && lastActionRow.$row.prevAll('.table-row:not(.invisible):first').isSelected();
+    $newSelection = deselect ? lastActionRow.$row : lastActionRow.$row.prevAll('.table-row:not(.invisible):first');
     table.selectionHandler.lastActionRow = this._calculateLastActionRowUp(lastActionRow, deselect);
   } else {
     $newSelection = $rows.last();

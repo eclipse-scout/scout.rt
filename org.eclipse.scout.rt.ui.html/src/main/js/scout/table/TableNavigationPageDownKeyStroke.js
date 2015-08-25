@@ -11,7 +11,7 @@ scout.inherits(scout.TableNavigationPageDownKeyStroke, scout.AbstractTableNaviga
 
 scout.TableNavigationPageDownKeyStroke.prototype._acceptForNavigation = function(event) {
   var accepted = scout.TableNavigationPageDownKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted && !this._isLastRowSelected();
+  return accepted;
 };
 
 scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {

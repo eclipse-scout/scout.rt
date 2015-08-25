@@ -11,7 +11,7 @@ scout.inherits(scout.TableNavigationHomeKeyStroke, scout.AbstractTableNavigation
 
 scout.TableNavigationHomeKeyStroke.prototype._acceptForNavigation = function(event) {
   var accepted = scout.TableNavigationHomeKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted && !this._isFirstRowSelected();
+  return accepted;
 };
 
 scout.TableNavigationHomeKeyStroke.prototype.handle = function(event) {

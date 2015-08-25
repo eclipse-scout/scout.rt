@@ -1414,6 +1414,10 @@ scout.Table.prototype._deleteRows = function(rows) {
     scout.arrays.remove(this.rows, row);
     delete this.rowsMap[row.id];
 
+    if(this.selectionHandler.lastActionRow===row){
+      this.selectionHandler.clearLastSelectedRowMarker();
+    }
+
     // Update HTML
     if (this.rendered) {
       // Cancel cell editing if cell editor belongs to a cell of the deleted row
@@ -1448,6 +1452,9 @@ scout.Table.prototype._updateRows = function(rows) {
 
     // Replace old row
     this._initRow(updatedRow);
+    if(this.selectionHandler.lastActionRow===oldRow){
+      this.selectionHandler.lastActionRow=updatedRow;
+    }
     var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
@@ -1712,7 +1719,7 @@ scout.Table.prototype.$filteredRows = function(includeSumRows) {
 };
 
 scout.Table.prototype.$prevFilteredRow = function($row, includeSumRow) {
-  return $row.prev(this.newFilteredRowsSelector(includeSumRow));
+  return $row.prevAll(this.newFilteredRowsSelector(includeSumRow)).first();
 };
 
 scout.Table.prototype.$prevFilteredRows = function($row, includeSumRows) {
@@ -1720,7 +1727,7 @@ scout.Table.prototype.$prevFilteredRows = function($row, includeSumRows) {
 };
 
 scout.Table.prototype.$nextFilteredRow = function($row, includeSumRow) {
-  return $row.next(this.newFilteredRowsSelector(includeSumRow));
+  return $row.nextAll(this.newFilteredRowsSelector(includeSumRow)).first();
 };
 
 scout.Table.prototype.$nextFilteredRows = function($row, includeSumRows) {

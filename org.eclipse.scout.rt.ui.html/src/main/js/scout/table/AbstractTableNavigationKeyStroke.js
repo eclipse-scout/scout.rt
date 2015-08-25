@@ -113,7 +113,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._applyRowSelection = function(t
 };
 
 scout.AbstractTableNavigationKeyStroke.prototype._calculateLastActionRowUp = function(lastActionRow, deselect) {
-  var $prev = lastActionRow.$row.prev('.table-row:not(.invisible)');
+  var $prev = lastActionRow.$row.prevAll('.table-row:not(.invisible):first');
   if ($prev.prev().isSelected() && !deselect) {
     return this._calculateLastActionRowUp($prev.data('row'), deselect);
   }
@@ -121,7 +121,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._calculateLastActionRowUp = fun
 };
 
 scout.AbstractTableNavigationKeyStroke.prototype._calculateLastActionRowDown = function(lastActionRow, deselect) {
-  var $next = lastActionRow.$row.next('.table-row:not(.invisible)');
+  var $next = lastActionRow.$row.nextAll('.table-row:not(.invisible):first');
   if ($next.next().isSelected() && !deselect) {
     return this._calculateLastActionRowDown($next.data('row'), deselect);
   }

@@ -11,7 +11,7 @@ scout.inherits(scout.TableNavigationPageUpKeyStroke, scout.AbstractTableNavigati
 
 scout.TableNavigationPageUpKeyStroke.prototype._acceptForNavigation = function(event) {
   var accepted = scout.TableNavigationPageUpKeyStroke.parent.prototype._acceptForNavigation.call(this, event);
-  return accepted && !this._isFirstRowSelected();
+  return accepted ;
 };
 
 scout.TableNavigationPageUpKeyStroke.prototype.handle = function(event) {
