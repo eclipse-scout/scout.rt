@@ -4,7 +4,10 @@ scout.TreeNavigationUpKeyStroke = function(tree, modifierBitMask) {
   this.renderingHints.text = '↑';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var $currentNode = event._$treeCurrentNode;
-    return ($currentNode.length ? $currentNode.prev('.tree-node') : this.field.$nodes().last());
+    if ($currentNode.length === 0) {
+      return this.field.$nodes().last();
+    }
+    return $currentNode.prevAll('.tree-node:not(.hidden):first');
   }.bind(this);
 };
 scout.inherits(scout.TreeNavigationUpKeyStroke, scout.AbstractTreeNavigationKeyStroke);
@@ -12,7 +15,6 @@ scout.inherits(scout.TreeNavigationUpKeyStroke, scout.AbstractTreeNavigationKeyS
 scout.TreeNavigationUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
   if ($currentNode.length === 0) {
     return this.field.$nodes().last().data('node');
-  } else {
-    return $currentNode.prev('.tree-node').data('node');
   }
+  return $currentNode.prevAll('.tree-node:not(.hidden):first').data('node');
 };
