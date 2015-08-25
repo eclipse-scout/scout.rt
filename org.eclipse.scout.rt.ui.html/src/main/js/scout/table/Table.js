@@ -18,6 +18,8 @@ scout.Table = function() {
   this._addEventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
+  this._filteredRows = [];
+  this._filteredRowsDirty = true;
   this.tooltips = [];
   this._animationRowLimit = 25;
   this.menuBar;
@@ -664,7 +666,8 @@ scout.Table.prototype._updateRowWidth = function() {
  * @param new rows to append at the end of this.$data. If undefined this.rows is used.
  */
 scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlockSelected) {
-  var $rows, numRowsLoaded,
+  var $rows, numRowsLoaded, filterChanged,
+    newInvisibleRows = [],
     rowString = '',
     that = this;
 
@@ -695,21 +698,41 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       rowString += this._buildRowDiv(row, rowSelected, previousRowSelected, followingRowSelected);
     }
     numRowsLoaded = r;
+
+    // append block of rows
     $rows = $(rowString);
+    $rows.appendTo(this.$data);
 
     // Link model and jQuery objects and render selection borders
-    //FIXME CGU merge with loop in installRows
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
       var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
       lastRowOfBlockSelected = $row.isSelected();
+
+      // Apply row filter and memorize the new invisible rows
+      // This is done here and not in install rows, because the notification handling differs when rows are updated
+      if (that._filterCount() > 0) {
+        if (that._applyFiltersForRow(row)) {
+          if (!row.filterAccepted) {
+            newInvisibleRows.push(row);
+          }
+        }
+        // always notify if there are new rows which accept the filter
+        if (row.filterAccepted) {
+          filterChanged = true;
+        }
+        that._renderRowFilterAccepted(row);
+      }
     });
 
-    // append block of rows
-    $rows.appendTo(this.$data);
     this._installRows($rows);
+
+    // notify
     this._triggerRowsDrawn($rows);
+    if (filterChanged) {
+      this._rowsFiltered(newInvisibleRows);
+    }
     this._triggerRowsSelected();
 
     if (this.scrollToSelection) {
@@ -743,23 +766,13 @@ scout.Table.prototype._removeRows = function($rows) {
  * are expected to be linked with the corresponding 'rows' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRows = function($rows) {
-  var filterChanged,
-    newInvisibleRows = [],
+  var newInvisibleRows = [],
     that = this;
 
   $rows.each(function(entry, index, $rows) {
     var editorField,
       $row = $(this),
       row = $row.data('row');
-
-    // Apply row filter and memorize the new invisible rows
-    if (that._applyFiltersForRow(row)) {
-      filterChanged = true;
-      if (!row.filterAccepted) {
-        newInvisibleRows.push(row);
-      }
-    }
-    that._renderRowFilterAccepted(row);
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -776,9 +789,6 @@ scout.Table.prototype._installRows = function($rows) {
 
   // update grouping if data was grouped
   this._group();
-  if (filterChanged) {
-    this._rowsFiltered(newInvisibleRows);
-  }
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
@@ -1381,6 +1391,7 @@ scout.Table.prototype.checkRow = function(row, checked) {
 };
 
 scout.Table.prototype._insertRows = function(rows) {
+  var filterChanged = false;
   // Update model
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
@@ -1406,12 +1417,15 @@ scout.Table.prototype._insertRows = function(rows) {
 };
 
 scout.Table.prototype._deleteRows = function(rows) {
-  var invalidate, i;
+  var invalidate, i, filterChanged;
 
   this.deselectRows(rows, false);
   rows.forEach(function(row) {
-    //Update model
+    // Update model
     scout.arrays.remove(this.rows, row);
+    if (scout.arrays.remove(this._filteredRows, row)) {
+      filterChanged = true;
+    }
     delete this.rowsMap[row.id];
 
     if(this.selectionHandler.lastActionRow===row){
@@ -1433,13 +1447,16 @@ scout.Table.prototype._deleteRows = function(rows) {
     }
   }.bind(this));
 
+  if (filterChanged) {
+    this._rowsFiltered();
+  }
   if (invalidate) {
     this.invalidateLayoutTree();
   }
 };
 
 scout.Table.prototype._updateRows = function(rows) {
-  var $updatedRows = $();
+  var filterChanged, newInvisibleRows = [], $updatedRows = $();
 
   // Update model
   for (var i = 0; i < rows.length; i++) {
@@ -1471,16 +1488,34 @@ scout.Table.prototype._updateRows = function(rows) {
         followingRowSelected = this.selectedRows.indexOf(this.rows[rowIndex + 1]) > -1;
       }
 
+      // render row and replace div in DOM
       var $updatedRow = $(this._buildRowDiv(updatedRow, rowSelected, previousRowSelected, followingRowSelected));
       scout.Table.linkRowToDiv(updatedRow, $updatedRow);
-      // replace div in DOM
       oldRow.$row.replaceWith($updatedRow);
       $updatedRows = $updatedRows.add($updatedRow);
+
+      // Apply row filter
+      updatedRow.filterAccepted = oldRow.filterAccepted;
+      if (this._filterCount() > 0) {
+        if (this._applyFiltersForRow(updatedRow)){
+          filterChanged = true;
+          if (!updatedRow.filterAccepted) {
+            newInvisibleRows.push(updatedRow);
+          }
+        } else {
+          // If filter state has not changed, just update cached rows
+          scout.arrays.replace(this._filteredRows, oldRow, updatedRow);
+        }
+        this._renderRowFilterAccepted(updatedRow);
+      }
     }
   }
 
   if ($updatedRows.length > 0) {
     this._installRows($updatedRows);
+  }
+  if (filterChanged) {
+    this._rowsFiltered(newInvisibleRows);
   }
 };
 
@@ -1685,16 +1720,22 @@ scout.Table.prototype.$selectedRows = function() {
   return this.$data.find('.selected');
 };
 
+scout.Table.prototype._filterCount = function() {
+  return Object.keys(this._filterMap).length;
+};
+
 scout.Table.prototype.filteredRows = function(includeSumRows) {
-  var filteredRows = [];
-  for (var i = 0; i < this.rows.length; i++) {
-    var row = this.rows[i];
-    if (row.filterAccepted) {
-      filteredRows.push(row);
-    }
+  // filtered rows are cached to avoid unnecessary loops
+  if (this._filteredRowsDirty) {
+    this._filteredRows = [];
+    this.rows.forEach(function(row) {
+      if (row.filterAccepted) {
+        this._filteredRows.push(row);
+      }
+    }, this);
+    this._filteredRowsDirty = false;
   }
-  //FIXME CGU maybe cache, every listener reads filter count -> a lot of loops
-  return filteredRows;
+  return this._filteredRows;
 };
 
 //TODO CGU still necessary? maybe better remove and use rows(), filteredRows() and selectedRows instead
@@ -1814,8 +1855,8 @@ scout.Table.prototype.filter = function() {
 scout.Table.prototype._rowsFiltered = function(invisibleRows) {
   // non visible rows must be deselected
   this.deselectRows(invisibleRows);
-
   // notify
+  this._filteredRowsDirty = true;
   this._sendRowsFiltered(this._rowsToIds(this.filteredRows()));
   this._triggerRowsFiltered();
 };
@@ -1886,27 +1927,29 @@ scout.Table.prototype.resetFilter = function() {
 /**
  * @param filter object with createKey() and accept()
  */
-scout.Table.prototype.addFilter = function(filter) {
+scout.Table.prototype.addFilter = function(filter, notifyServer) {
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
   var key = filter.createKey();
   if (!key) {
     throw new Error('key has to be defined');
   }
   this._filterMap[key] = filter;
 
-  if (filter instanceof scout.UserTableFilter) {
+  if (notifyServer && filter instanceof scout.UserTableFilter) {
     this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
   }
 };
 
 //TODO CGU use filter as param or rename to removeFilterByKey
-scout.Table.prototype.removeFilter = function(key) {
+scout.Table.prototype.removeFilter = function(key, notifyServer) {
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
   if (!key) {
     throw new Error('key has to be defined');
   }
   var filter = this._filterMap[key];
   delete this._filterMap[key];
 
-  if (filter instanceof scout.UserTableFilter) {
+  if (notifyServer && filter instanceof scout.UserTableFilter) {
     this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
   }
 };
@@ -2164,7 +2207,7 @@ scout.Table.prototype._syncMenus = function(menus) {
 
 scout.Table.prototype._syncFilters = function(filters) {
   for (var key in this._filterMap) {
-    this.removeFilter(key);
+    this.removeFilter(key, false);
   }
   if (filters) {
     filters.forEach(function(filterData) {
@@ -2173,7 +2216,7 @@ scout.Table.prototype._syncFilters = function(filters) {
       }
       filterData.table = this;
       var filter = this.session.objectFactory.create(filterData);
-      this.addFilter(filter);
+      this.addFilter(filter, false);
     }, this);
   }
 

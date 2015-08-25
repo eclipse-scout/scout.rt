@@ -74,6 +74,8 @@ describe("Table Filter", function() {
 
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
+      expect(table.rows[2].filterAccepted).toBe(false);
+      expect(table.rows[2].$row.isVisible()).toBe(false);
 
       rows = helper.createModelRows(2, 1);
       rows[0].cells[0].value = 'cell1_0';
@@ -114,6 +116,52 @@ describe("Table Filter", function() {
       filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
       expect(filteredRows[0]).toBe(table.rows[1]);
+
+      // change cell 2 of row 1, filter state should not change
+      rows = helper.createModelRows(2, 1);
+      rows[0].id = row1.id;
+      rows[0].cells[0].value = 'cell1_0';
+      rows[0].cells[1].value = 'new cell1_1';
+      table._updateRows(rows);
+
+      // still expects 1 row to be visible
+      filteredRows = table.filteredRows();
+      expect(filteredRows.length).toBe(1);
+      // if this check fails, filteredRow cache has not been updated
+      expect(filteredRows[0]).toBe(table.rows[1]);
+    });
+
+    it("properly handles successive row insertion and updates", function() {
+      var model = helper.createModelFixture(2, 2),
+        table = helper.createTable(model),
+        column0 = table.columns[0],
+        row1 = table.rows[1];
+
+      // expects 1 row to be visible
+      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.render(session.$entryPoint);
+      expect(table.filteredRows().length).toBe(1);
+
+      // insert new row -> not visible
+      var rows = helper.createModelRows(2, 1);
+      rows[0].cells[0].value = 'newCell';
+      table._insertRows(rows);
+
+      var filteredRows = table.filteredRows();
+      expect(filteredRows.length).toBe(1);
+      expect(table.rows[2].filterAccepted).toBe(false);
+      expect(table.rows[2].$row.isVisible()).toBe(false);
+
+      // update new row -> still not visible
+      rows = helper.createModelRows(2, 1);
+      rows[0].id = table.rows[2].id;
+      rows[0].cells[0].value = 'updatedCell';
+      table._updateRows(rows);
+
+      filteredRows = table.filteredRows();
+      expect(filteredRows.length).toBe(1);
+      expect(table.rows[2].filterAccepted).toBe(false);
+      expect(table.rows[2].$row.isVisible()).toBe(false);
     });
 
   });
@@ -184,22 +232,6 @@ describe("Table Filter", function() {
         expect(listener._onRowsFiltered).toHaveBeenCalled();
       });
 
-//      it("gets fired if filter is resetted", function() {
-//        var model = helper.createModelFixture(2, 2),
-//          table = helper.createTable(model),
-//          column0 = table.columns[0];
-//
-//        table.render(session.$entryPoint);
-//
-//        spyOn(listener, '_onRowsFiltered');
-//        table.on('rowsFiltered', listener._onRowsFiltered);
-//
-//        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
-//        table.resetFilter();
-//
-//        expect(listener._onRowsFiltered).toHaveBeenCalled();
-//      });
-
       it("gets fired if rows are filtered during updateRows", function() {
         var model = helper.createModelFixture(2, 2),
           table = helper.createTable(model),
@@ -212,11 +244,57 @@ describe("Table Filter", function() {
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
 
-        // updateRows applies filter which fire the event
         var rows = helper.createModelRows(2, 1);
         rows[0].id = row1.id;
         rows[0].cells[0].value = 'updatedCell';
         table._updateRows(rows);
+
+        expect(table.filteredRows().length).toBe(0);
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets fired if rows are filtered during insertRows", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0],
+          row1 = table.rows[1];
+
+        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.render(session.$entryPoint);
+        expect(table.filteredRows().length).toBe(1);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        var rows = helper.createModelRows(2, 1);
+        rows[0].cells[0].value = 'cell1_0';
+        table._insertRows(rows);
+
+        expect(table.filteredRows().length).toBe(2);
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+
+        rows = helper.createModelRows(2, 1);
+        rows[0].cells[0].value = 'wont accept';
+        table._insertRows(rows);
+
+        expect(table.filteredRows().length).toBe(2);
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets fired if rows are filtered during deleteRows", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0],
+          row1 = table.rows[1];
+
+        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.render(session.$entryPoint);
+        expect(table.filteredRows().length).toBe(1);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        table._deleteRows([row1]);
 
         expect(table.filteredRows().length).toBe(0);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
@@ -245,23 +323,27 @@ describe("Table Filter", function() {
         expect(listener._onRowsFiltered).not.toHaveBeenCalled();
       });
 
-//      it("gets sent to server containing rowIds when rows are filtered", function() {
-//        var model = helper.createModelFixture(2, 5);
-//        var table = helper.createTable(model);
-//        table.render(session.$entryPoint);
-//
-//        var rows = [table.rows[0], table.rows[4]];
-//        table.selectRows(rows, true);
-//
-//        sendQueuedAjaxCalls();
-//
-//        expect(jasmine.Ajax.requests.count()).toBe(1);
-//
-//        var event = new scout.Event(table.id, 'rowsSelected', {
-//          rowIds: helper.getRowIds(rows)
-//        });
-//        expect(mostRecentJsonRequest()).toContainEvents(event);
-//      });
+      it("gets sent to server containing rowIds when rows are filtered", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0];
+        table.render(session.$entryPoint);
+
+        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
+
+        expect(table.rows[0].filterAccepted).toBe(false);
+        expect(table.rows[1].filterAccepted).toBe(true);
+
+        sendQueuedAjaxCalls();
+
+        expect(jasmine.Ajax.requests.count()).toBe(1);
+
+        var event = new scout.Event(table.id, 'rowsFiltered', {
+          rowIds: [table.rows[1].id]
+        });
+        expect(mostRecentJsonRequest()).toContainEvents(event);
+      });
     });
   });
 });

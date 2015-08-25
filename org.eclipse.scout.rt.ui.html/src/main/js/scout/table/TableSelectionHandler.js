@@ -37,7 +37,6 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
     oldSelectedState = $row.isSelected();
   this._mouseDown = true;
 
-  //TODO nbu check option to save filtered rows in model
   this._allRows = this.table.filteredRows();
   if (this.table.multiSelect && event.shiftKey) {
     this.fromIndex = this._allRows.indexOf(this.lastActionRow);
