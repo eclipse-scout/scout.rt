@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -250,13 +251,14 @@ public class ClientNotificationRegistry {
 
   private void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
     synchronized (m_notificationQueues) {
-      for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
+      final Iterator<ClientNotificationNodeQueue> iter = m_notificationQueues.values().iterator();
+      while (iter.hasNext()) {
+        final ClientNotificationNodeQueue queue = iter.next();
         if (!queue.getNodeId().equals(excludedUiNodeId)) {
           queue.put(messages);
-
           if (isQueueExpired(queue)) {
             LOG.debug("Removing expired queue " + queue.getNodeId());
-            m_notificationQueues.remove(queue.getNodeId());
+            iter.remove();
           }
         }
       }
