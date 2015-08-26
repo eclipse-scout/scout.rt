@@ -14,6 +14,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.BottomBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.BottomBox.BottomBoxField;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.BottomBox.ChildBox;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.BottomBox.ChildBox.ChildBoxField;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm.MainBox.TopBox.TopBoxField;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -42,6 +44,14 @@ public class AddRemoveFieldsForm extends AbstractForm {
     return getFieldByClass(TopBox.class);
   }
 
+  public ChildBox getChildBox() {
+    return getFieldByClass(ChildBox.class);
+  }
+
+  public ChildBoxField getChildBoxField() {
+    return getFieldByClass(ChildBoxField.class);
+  }
+
   public MainBox getMainBox() {
     return (MainBox) getRootGroupBox();
   }
@@ -66,6 +76,14 @@ public class AddRemoveFieldsForm extends AbstractForm {
 
       @Order(10)
       public class BottomBoxField extends AbstractStringField {
+      }
+
+      @Order(20)
+      public class ChildBox extends AbstractGroupBox {
+
+        @Order(10)
+        public class ChildBoxField extends AbstractStringField {
+        }
       }
     }
   }

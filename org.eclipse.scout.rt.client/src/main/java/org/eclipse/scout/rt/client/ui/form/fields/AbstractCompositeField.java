@@ -513,7 +513,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   /**
    * Implementation of PropertyChangeListener Proxy on all attached fields (not groups)
    */
-  private class P_FieldPropertyChangeListener implements PropertyChangeListener {
+  protected class P_FieldPropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
@@ -526,10 +526,26 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       else if (e.getPropertyName().equals(IFormField.PROP_EMPTY)) {
         checkEmpty();
       }
+      // if a field is moved to another parent this listener unregisters itself
+      else if (e.getPropertyName().equals(IFormField.PROP_PARENT_FIELD)) {
+        IFormField field = (IFormField) e.getSource();
+        if (!isDirectChildOfComposite(field)) {
+          field.removePropertyChangeListener(this);
+        }
+      }
     }
-  }// end private class
 
-  protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER>implements ICompositeFieldExtension<OWNER> {
+    /**
+     * @return <code>true</code>, if the field is a direct child inside this listener's composite field instance,
+     *         <code>false</code> otherwise.
+     */
+    protected boolean isDirectChildOfComposite(IFormField field) {
+      return field.getParentField() == AbstractCompositeField.this;
+    }
+
+  }
+
+  protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER> implements ICompositeFieldExtension<OWNER> {
 
     public LocalCompositeFieldExtension(OWNER owner) {
       super(owner);

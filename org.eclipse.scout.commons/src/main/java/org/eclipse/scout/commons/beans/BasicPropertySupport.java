@@ -364,6 +364,57 @@ public class BasicPropertySupport implements IEventListenerSource {
     }
   }
 
+  /**
+   * get a map with all registered unspecific listeners (i.e. those which are NOT registered for a specific
+   * property-name)
+   */
+  public ArrayList<PropertyChangeListener> getPropertyChangeListeners() {
+    ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>(4);
+    synchronized (m_listenerLock) {
+      if (m_listeners != null) {
+        for (Object o : m_listeners) {
+          if (o instanceof WeakReference) {
+            o = ((WeakReference) o).get();
+          }
+          if (o != null) {
+            listeners.add((PropertyChangeListener) o);
+          }
+        }
+      }
+    }// end synchronized
+    return listeners;
+  }
+
+  /**
+   * get a map with all listeners which are registered for a specific property-name
+   */
+  public Map<String, List<PropertyChangeListener>> getSpecificPropertyChangeListeners() {
+    HashMap<String, List<PropertyChangeListener>> listeners = new HashMap<String, List<PropertyChangeListener>>();
+    synchronized (m_listenerLock) {
+      if (m_childListeners != null) {
+        for (String propertyName : m_childListeners.keySet()) {
+          List propertySpecificListeners = m_childListeners.get(propertyName);
+          if (propertySpecificListeners != null) {
+            for (Object o : propertySpecificListeners) {
+              if (o instanceof WeakReference) {
+                o = ((WeakReference) o).get();
+              }
+              if (o != null) {
+                List<PropertyChangeListener> children = listeners.get(propertyName);
+                if (children == null) {
+                  children = new ArrayList<PropertyChangeListener>();
+                  listeners.put(propertyName, children);
+                }
+                children.add((PropertyChangeListener) o);
+              }
+            }
+          }
+        }
+      }
+    }
+    return listeners;
+  }
+
   private void removeFromListNoLock(List listeners, PropertyChangeListener listener) {
     if (listeners == null) {
       return;
@@ -500,14 +551,23 @@ public class BasicPropertySupport implements IEventListenerSource {
     }
   }
 
+  /**
+   * Returns whether there are any listeners registerd (unspecific or specific for the given propertyName)
+   *
+   * @param propertyName
+   * <br>
+   *          if null, returns true if any unspecific Listeners are registered else false<br>
+   *          if not null, returns true if any Listeners specific for the given propertyName - or unspecifc are
+   *          registered
+   */
   public boolean hasListeners(String propertyName) {
     synchronized (m_listenerLock) {
-      List l0 = m_listeners;
-      List l1 = null;
-      if (propertyName != null) {
-        l1 = m_childListeners.get(propertyName);
+      List generalListeners = getPropertyChangeListeners();
+      List specificListeners = null;
+      if (propertyName != null && m_childListeners != null) {
+        specificListeners = getSpecificPropertyChangeListeners().get(propertyName);
       }
-      int count = (l0 != null ? l0.size() : 0) + (l1 != null ? l1.size() : 0);
+      int count = (generalListeners != null ? generalListeners.size() : 0) + (specificListeners != null ? specificListeners.size() : 0);
       return count > 0;
     }
   }
