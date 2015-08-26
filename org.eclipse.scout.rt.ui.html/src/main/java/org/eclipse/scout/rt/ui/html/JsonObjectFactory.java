@@ -35,8 +35,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserTableFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
@@ -159,8 +159,8 @@ import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonGraphTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonMapTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
-import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserTableFilter;
-import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextUserTableFilter;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
 @Bean
@@ -406,11 +406,11 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (object instanceof IColumn<?>) {
       return new JsonColumn((IColumn<?>) object);
     }
-    if (object instanceof ColumnUserTableFilter) {
-      return new JsonColumnUserTableFilter((ColumnUserTableFilter) object);
+    if (object instanceof ColumnUserFilterState) {
+      return new JsonColumnUserFilter((ColumnUserFilterState) object);
     }
-    if (object instanceof TextUserTableFilter) {
-      return new JsonTextUserTableFilter((TextUserTableFilter) object);
+    if (object instanceof TableTextUserFilterState) {
+      return new JsonTableTextUserFilter((TableTextUserFilterState) object);
     }
     return null;
   }

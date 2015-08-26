@@ -65,7 +65,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .appendTo(this.$container)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));
-  filter = this._table.getFilter(scout.TextUserTableFilter.Type);
+  filter = this._table.getFilter(scout.TableTextUserFilter.Type);
   if (filter) {
     this._$filterField.val(filter.text);
   }
@@ -121,14 +121,14 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
     filterText = $input.val();
 
   if (filterText) {
-    filter = new scout.TextUserTableFilter();
+    filter = new scout.TableTextUserFilter();
     filter.init({
       table: this._table
     }, this.session);
     filter.text = filterText.toLowerCase();
     this._table.addFilter(filter);
   } else if (!filterText) {
-    this._table.removeFilter(scout.TextUserTableFilter.Type);
+    this._table.removeFilter(scout.TableTextUserFilter.Type);
   }
 
   this._table.filter();

@@ -145,7 +145,7 @@ scout.TableHeaderMenu.prototype._render = function() {
 
   var filter = table.getFilter(column.id);
   if (!filter) {
-    filter = new scout.ColumnUserTableFilter();
+    filter = new scout.ColumnUserFilter();
     filter.init({
       table: table,
       column: column

@@ -10,17 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONObject;
 
-public class JsonUserTableFilter<T extends IUserTableFilter> implements IJsonObject {
+public abstract class JsonTableUserFilter<T extends IUserFilterState> implements IJsonObject {
   private T m_filter;
   private JsonTable m_jsonTable;
 
-  public JsonUserTableFilter(T filter) {
+  public JsonTableUserFilter(T filter) {
     m_filter = filter;
   }
 
@@ -32,19 +32,17 @@ public class JsonUserTableFilter<T extends IUserTableFilter> implements IJsonObj
     return m_jsonTable;
   }
 
-  public T getFilter() {
+  public T getFilterState() {
     return m_filter;
   }
 
-  public String getObjectType() {
-    return "UserTableFilter";
-  }
+  public abstract String getObjectType();
 
   @Override
   public JSONObject toJson() {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     json.put("objectType", getObjectType());
-    json.put("filterType", getFilter().getType());
+    json.put("filterType", getFilterState().getType());
     return json;
   }
 }

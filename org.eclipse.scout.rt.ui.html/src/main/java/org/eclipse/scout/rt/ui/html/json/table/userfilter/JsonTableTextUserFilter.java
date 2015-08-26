@@ -10,24 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextUserTableFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.json.JSONObject;
 
-public class JsonTextUserTableFilter<T extends TextUserTableFilter> extends JsonUserTableFilter<T> {
+public class JsonTableTextUserFilter<T extends TableTextUserFilterState> extends JsonTableUserFilter<T> {
 
-  public JsonTextUserTableFilter(T filter) {
+  public JsonTableTextUserFilter(T filter) {
     super(filter);
   }
 
   @Override
   public String getObjectType() {
-    return "TextUserTableFilter";
+    return "TableTextUserFilter";
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put("text", getFilter().getText());
+    json.put("text", getFilterState().getText());
     return json;
   }
 

@@ -1,5 +1,5 @@
-scout.ColumnUserTableFilter = function() {
-  scout.ColumnUserTableFilter.parent.call(this);
+scout.ColumnUserFilter = function() {
+  scout.ColumnUserFilter.parent.call(this);
   this.filterType = 'column';
 
   /**
@@ -12,9 +12,9 @@ scout.ColumnUserTableFilter = function() {
    */
   this.selectedValues = [];
 };
-scout.inherits(scout.ColumnUserTableFilter, scout.UserTableFilter);
+scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
-scout.ColumnUserTableFilter.prototype.calculateCube = function() {
+scout.ColumnUserFilter.prototype.calculateCube = function() {
   var containsSelectedValue, reorderAxis,
     group = -1;
 
@@ -67,30 +67,30 @@ scout.ColumnUserTableFilter.prototype.calculateCube = function() {
   }, this);
 };
 
-scout.ColumnUserTableFilter.prototype.createAddFilterEventData = function() {
-  var data = scout.ColumnUserTableFilter.parent.prototype.createAddFilterEventData.call(this);
+scout.ColumnUserFilter.prototype.createAddFilterEventData = function() {
+  var data = scout.ColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
   return $.extend(data, {
     columnId: this.column.id,
     selectedValues: this.selectedValues
   });
 };
 
-scout.ColumnUserTableFilter.prototype.createRemoveFilterEventData = function() {
-  var data = scout.ColumnUserTableFilter.parent.prototype.createRemoveFilterEventData.call(this);
+scout.ColumnUserFilter.prototype.createRemoveFilterEventData = function() {
+  var data = scout.ColumnUserFilter.parent.prototype.createRemoveFilterEventData.call(this);
   return $.extend(data, {
     columnId: this.column.id
   });
 };
 
-scout.ColumnUserTableFilter.prototype.createLabel = function() {
+scout.ColumnUserFilter.prototype.createLabel = function() {
   return this.column.text || '';
 };
 
-scout.ColumnUserTableFilter.prototype.createKey = function() {
+scout.ColumnUserFilter.prototype.createKey = function() {
   return this.column.id;
 };
 
-scout.ColumnUserTableFilter.prototype.accept = function($row) {
+scout.ColumnUserFilter.prototype.accept = function($row) {
   if (!this.xAxis) {
     // Lazy calculation. It is not possible on init, because the table is not rendered yet.
     this.calculateCube();

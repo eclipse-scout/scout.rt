@@ -18,7 +18,7 @@ describe("TableHeaderMenu", function() {
   });
 
   function createAndRegisterColumnFilter(table, column, selectedValues) {
-    var filter = new scout.ColumnUserTableFilter();
+    var filter = new scout.ColumnUserFilter();
     helper.createAndRegisterColumnFilter({
       table: table,
       column: column,

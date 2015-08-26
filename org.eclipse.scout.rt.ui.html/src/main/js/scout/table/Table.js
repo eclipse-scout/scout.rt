@@ -1939,7 +1939,7 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   }
   this._filterMap[key] = filter;
 
-  if (notifyServer && filter instanceof scout.UserTableFilter) {
+  if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
   }
 };
@@ -1953,7 +1953,7 @@ scout.Table.prototype.removeFilter = function(key, notifyServer) {
   var filter = this._filterMap[key];
   delete this._filterMap[key];
 
-  if (notifyServer && filter instanceof scout.UserTableFilter) {
+  if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
   }
 };

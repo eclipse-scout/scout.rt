@@ -149,9 +149,9 @@ __include("scout/table/editor/CellEditorPopupLayout.js");
 __include("scout/table/editor/CellEditorCancelEditKeyStroke.js");
 __include("scout/table/editor/CellEditorCompleteEditKeyStroke.js");
 __include("scout/table/editor/CellEditorTabKeyStroke.js");
-__include("scout/table/userfilter/UserTableFilter.js");
-__include("scout/table/userfilter/ColumnUserTableFilter.js");
-__include("scout/table/userfilter/TextUserTableFilter.js");
+__include("scout/table/userfilter/TableUserFilter.js");
+__include("scout/table/userfilter/ColumnUserFilter.js");
+__include("scout/table/userfilter/TableTextUserFilter.js");
 // Desktop
 __include("scout/tree/Tree.js");
 __include("scout/tree/TreeCompact.js");

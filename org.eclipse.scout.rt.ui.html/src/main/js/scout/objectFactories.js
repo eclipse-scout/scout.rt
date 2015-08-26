@@ -92,19 +92,14 @@ scout.defaultObjectFactories = [{
     return new scout.TableControl();
   }
 }, {
-  objectType: 'UserTableFilter',
+  objectType: 'ColumnUserFilter',
   create: function() {
-    return new scout.UserTableFilter();
+    return new scout.ColumnUserFilter();
   }
 }, {
-  objectType: 'ColumnUserTableFilter',
+  objectType: 'TableTextUserFilter',
   create: function() {
-    return new scout.ColumnUserTableFilter();
-  }
-}, {
-  objectType: 'TextUserTableFilter',
-  create: function() {
-    return new scout.TextUserTableFilter();
+    return new scout.TableTextUserFilter();
   }
 }, {
   objectType: 'Tree',
