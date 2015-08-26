@@ -26,6 +26,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   private boolean m_searchFilterComplete;
   private String m_searchFilterState;
   private byte[] m_tableCustomizerData;
+  private byte[] m_userFilterData;
   /**
    * legacy, replaced by m_availableColumns
    */
@@ -48,6 +49,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
     this.m_searchFilterState = state.m_searchFilterState;
     this.m_searchFilterComplete = state.m_searchFilterComplete;
     this.m_tableCustomizerData = state.m_tableCustomizerData;
+    this.m_userFilterData = state.m_userFilterData;
     if (state.m_visibleColumns != null) {
       this.m_visibleColumns = new ArrayList<TableColumnState>();
       for (TableColumnState col : state.m_visibleColumns) {
@@ -146,6 +148,14 @@ public class TablePageState extends AbstractPageState implements Serializable, C
    */
   public void setTableCustomizerData(byte[] tableCustomizer) {
     m_tableCustomizerData = tableCustomizer;
+  }
+
+  public byte[] getUserFilterData() {
+    return m_userFilterData;
+  }
+
+  public void setUserFilterData(byte[] userFilterData) {
+    m_userFilterData = userFilterData;
   }
 
   @Override

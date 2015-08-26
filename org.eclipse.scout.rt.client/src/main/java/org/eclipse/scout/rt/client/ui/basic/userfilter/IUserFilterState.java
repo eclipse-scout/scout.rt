@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 /**
  * @since 5.1
  */
@@ -24,4 +26,6 @@ public interface IUserFilterState extends Serializable {
    * Computes a key which is used by the table to store the filter.
    */
   Object createKey();
+
+  void notifyDeserialized(Object obj) throws ProcessingException;
 }

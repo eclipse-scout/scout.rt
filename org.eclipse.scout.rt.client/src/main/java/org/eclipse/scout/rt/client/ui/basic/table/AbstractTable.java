@@ -99,10 +99,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.userfilter.UserFilterManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -1935,10 +1935,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * factory to manage user filters
    * <p>
-   * default creates a {@link UserFilterManager}
+   * default creates a {@link TableUserFilterManager}
    */
-  protected UserFilterManager createUserFilterManager() {
-    return new UserFilterManager();
+  protected TableUserFilterManager createUserFilterManager() {
+    return new TableUserFilterManager(this);
   }
 
   /**
@@ -3306,12 +3306,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public UserFilterManager getUserFilterManager() {
-    return (UserFilterManager) propertySupport.getProperty(PROP_USER_FILTER_MANAGER);
+  public TableUserFilterManager getUserFilterManager() {
+    return (TableUserFilterManager) propertySupport.getProperty(PROP_USER_FILTER_MANAGER);
   }
 
   @Override
-  public void setUserFilterManager(UserFilterManager m) {
+  public void setUserFilterManager(TableUserFilterManager m) {
     propertySupport.setProperty(PROP_USER_FILTER_MANAGER, m);
   }
 

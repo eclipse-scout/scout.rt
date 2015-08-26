@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -619,6 +620,20 @@ public final class BookmarkUtility {
     finally {
       table.setTableChanging(false);
     }
+    // setup user filter
+    if (tablePageState.getUserFilterData() != null && tablePage.getTable().getUserFilterManager() != null) {
+      byte[] newData = tablePageState.getUserFilterData();
+      TableUserFilterManager ufm = tablePage.getTable().getUserFilterManager();
+      byte[] curData = ufm.getSerializedData();
+      if (!CompareUtility.equals(curData, newData)) {
+        try {
+          ufm.setSerializedData(newData);
+        }
+        catch (ProcessingException e) {
+          LOG.error("User filters could not be restored. ", e);
+        }
+      }
+    }
     // setup search
     if (tablePageState.getSearchFormState() != null) {
       ISearchForm searchForm = tablePage.getSearchFormInternal();
@@ -766,6 +781,9 @@ public final class BookmarkUtility {
     }
     if (page.getTable().getTableCustomizer() != null) {
       state.setTableCustomizerData(page.getTable().getTableCustomizer().getSerializedData());
+    }
+    if (page.getTable().getUserFilterManager() != null) {
+      state.setUserFilterData(page.getTable().getUserFilterManager().getSerializedData());
     }
     List<TableColumnState> allColumns = backupTableColumns(page.getTable());
     state.setAvailableColumns(allColumns);

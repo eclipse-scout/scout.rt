@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
 import java.util.Set;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
@@ -20,21 +23,22 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "column";
 
-  private IColumn<String> m_column;
+  private transient IColumn<?> m_column;
+  private String m_columnId;
   private Set<Object> m_selectedValues;
 
   public ColumnUserFilterState(IColumn<String> column) {
-    m_column = column;
+    setColumn(column);
     setType("column");
   }
 
-  public IColumn<String> getColumn() {
+  public IColumn<?> getColumn() {
     return m_column;
   }
 
-  @SuppressWarnings("unchecked")
-  public void setColumn(IColumn column) {
+  private void setColumn(IColumn<?> column) {
     m_column = column;
+    m_columnId = column.getColumnId();
   }
 
   public Set<Object> getSelectedValues() {
@@ -45,10 +49,6 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
     m_selectedValues = selectedValues;
   }
 
-  public boolean isEmpty() {
-    return (m_selectedValues == null || m_selectedValues.isEmpty());
-  }
-
   @Override
   public Object createKey() {
     return createKeyForColumn(getColumn());
@@ -56,5 +56,15 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
 
   public static Object createKeyForColumn(IColumn<?> column) {
     return column;
+  }
+
+  @Override
+  public void notifyDeserialized(Object obj) throws ProcessingException {
+    ITable table = (ITable) obj;
+    IColumn<?> col = BookmarkUtility.resolveColumn(table.getColumns(), m_columnId);
+    if (col == null) {
+      throw new ProcessingException("Column could not be restored. " + m_columnId);
+    }
+    m_column = col;
   }
 }
