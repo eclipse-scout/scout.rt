@@ -15,20 +15,24 @@ scout.createUniqueId = function() {
 };
 
 scout.init = function(options) {
+  options = options || {};
+  if (!this._checkBrowserCompability(options)) {
+    return;
+  }
+  $('noscript').remove(); // cleanup DOM
+
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor();
+
   var tabId = scout.dates.timestamp();
-  options = options || {};
   $('.scout').each(function() {
-    var $container = $(this);
-    options.portletPartId = options.portletPartId || $container.data('partid') || '0';
-    options.uiSessionId = options.uiSessionId || [options.portletPartId, tabId].join(':');
-    var session = new scout.Session($container, options);
+    var $entryPoint = $(this);
+    options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
+    options.uiSessionId = options.uiSessionId || scout.strings.join(':', options.portletPartId, tabId);
+    var session = new scout.Session($entryPoint, options);
     session.init();
     scout.sessions.push(session);
   });
-  // Cleanup up DOM, <noscript> is not necessary (apparently...)
-  $('noscript').remove();
 };
 
 /**
@@ -40,37 +44,30 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.parent = parentCtor;
 };
 
-scout.checkBrowserCompability = function(options, dataPartId) {
+scout._checkBrowserCompability = function(options) {
   var device = scout.device;
   $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
-  if (!this.supportedBrowser(device.browser, device.browserVersion)) {
-    var $entryPoint = $('.scout[data-partId="' + dataPartId + '"'),
-      $box = $entryPoint.appendDiv('box-with-logo small'),
-      session = this;
+  if (!scout.helpers.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
+    // No check requested or browser is supported
+    return true;
+  }
+
+  var session = this;
+  $('.scout').each(function() {
+    var $entryPoint = $(this);
+    var $box = $entryPoint.appendDiv('box-with-logo');
+
+    var newOptions = scout.objects.valueCopy(options);
+    newOptions.checkBrowserCompatibility = false;
+
     $box.load('unsupported-browser.html', function() {
-      $box.find('button').click(function() {
+      $box.find('button').on('click', function() {
         $box.remove();
-        session.init(options);
+        session.init(newOptions);
       });
     });
-    return false;
-  }
-  return true;
-};
-
-/**
- * This method returns false for very old browsers. Basically we check for the first version that supports ECMA 5.
- * Also we exclude otherwise lame browsers
- */
-scout.supportedBrowser = function(browser, version) {
-  var browsers = scout.Device.SupportedBrowsers;
-  if (browser === browsers.INTERNET_EXPLORER && version < 9 ||
-      browser === browsers.CHROME && version < 23 ||
-      browser === browsers.FIREFOX && version < 21 ||
-      browser === browsers.SAFARI && version < 7) {
-    return false;
-  }
-  return true;
+  });
+  return false;
 };
 
 scout._installGlobalJavascriptErrorHandler = function() {

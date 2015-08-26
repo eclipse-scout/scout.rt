@@ -44,6 +44,24 @@ scout.Device.prototype.isIos = function() {
   return this.system === scout.Device.SYSTEM_IOS;
 };
 
+/**
+ * This method returns false for very old browsers. Basically we check for the first version
+ * that supports ECMAScript 5. This methods excludes all browsers that are known to be
+ * unsupported, all others (e.g. unknown engines) are allowed by default.
+ */
+scout.Device.prototype.isSupportedBrowser = function(browser, version) {
+  browser = scout.helpers.nvl(browser, this.browser);
+  version = scout.helpers.nvl(version, this.browserVersion);
+  var browsers = scout.Device.SupportedBrowsers;
+  if ((browser === browsers.INTERNET_EXPLORER && version < 9) ||
+      (browser === browsers.CHROME && version < 23) ||
+      (browser === browsers.FIREFOX && version < 21) ||
+      (browser === browsers.SAFARI && version < 7)) {
+    return false;
+  }
+  return true;
+};
+
 scout.Device.prototype.parseUserAgent = function(userAgent) {
   if (!userAgent) {
     return;

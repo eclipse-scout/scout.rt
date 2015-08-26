@@ -10,20 +10,27 @@ scout.logout = {
         }
       },
       options = $.extend({}, defaultOpts, opts),
-      texts = new scout.Texts(options.texts),
-      $box = $('<div>')
-        .addClass('box-with-logo small centered')
-        .html(scout.strings.nl2br(texts.get('ui.logoutSuccessful')))
-        .appendTo($('body')),
-      $buttonBar = $('<div>')
-        .addClass('button')
-        .appendTo($box);
-      $('<button>')
-        .text(texts.get('ui.loginAgain'))
-        .click(function() {
-          window.location = options.loginUrl;
-        })
-        .appendTo($buttonBar);
+      texts = new scout.Texts(options.texts);
+
+    var $box = $('<div>')
+      .addClass('box-with-logo centered')
+      .html(scout.strings.nl2br(texts.get('ui.logoutSuccessful')))
+      .appendTo($('body'));
+    var $buttonBar = $('<div>')
+      .addClass('button')
+      .appendTo($box);
+    $('<button>')
+      .text(texts.get('ui.loginAgain'))
+      .on('click', loginAgain)
+      .appendTo($buttonBar);
+
+    $('noscript').remove(); // cleanup DOM
+
+    // ----- Helper functions -----
+
+    function loginAgain() {
+      window.location = options.loginUrl;
+    }
   }
 
 };

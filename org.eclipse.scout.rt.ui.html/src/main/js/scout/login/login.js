@@ -7,13 +7,13 @@ scout.login = {
    */
   init: function(opts) {
     var $buttonDiv, texts, defaultOpts = {
-      texts: {
-        'ui.login': 'Login',
-        'ui.loginFailed': 'Login failed',
-        'ui.user': 'User',
-        'ui.password': 'Password'
-      }
-    };
+        texts: {
+          'ui.login': 'Login',
+          'ui.loginFailed': 'Login failed',
+          'ui.user': 'User',
+          'ui.password': 'Password'
+        }
+      };
     this.options = $.extend({}, defaultOpts, opts);
     texts = new scout.Texts(this.options.texts);
     this.$form = $('<form>')
@@ -39,13 +39,15 @@ scout.login = {
       .attr('id', 'login-button')
       .addClass('button')
       .appendTo(this.$container);
-    this.$button =  $('<button>')
+    this.$button = $('<button>')
       .addClass('default')
       .attr('type', 'submit')
       .text(texts.get('ui.login'))
       .appendTo($buttonDiv);
 
     this.$user.focus();
+
+    $('noscript').remove(); // cleanup DOM
 
     // ----- Helper functions -----
 
@@ -88,8 +90,7 @@ scout.login = {
       // Go to target URL
       if (url) {
         window.location.href = url;
-      }
-      else {
+      } else {
         window.location.reload();
       }
     }

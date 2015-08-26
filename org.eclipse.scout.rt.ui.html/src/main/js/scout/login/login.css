@@ -7,11 +7,9 @@
     margin: 15px 0;
     font-size: 16px;
   }
-
 }
 
 #login-button {
-
   padding-top: 0;
 
   & > button {
@@ -22,7 +20,7 @@
     &.login-error {
       background-color: @palette-red-4;
 
-      Also change color of focus glow
+      /* Also change color of focus glow */
       &:focus::before {
         border-color: @palette-red-4;
         #scout.glow(@palette-red-4);
