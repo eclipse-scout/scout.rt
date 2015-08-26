@@ -666,8 +666,7 @@ scout.Table.prototype._updateRowWidth = function() {
  * @param new rows to append at the end of this.$data. If undefined this.rows is used.
  */
 scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlockSelected) {
-  var $rows, numRowsLoaded, filterChanged,
-    newInvisibleRows = [],
+  var $rows, numRowsLoaded,
     rowString = '',
     that = this;
 
@@ -709,30 +708,20 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       var row = rows[startRowIndex + index];
       scout.Table.linkRowToDiv(row, $row);
       lastRowOfBlockSelected = $row.isSelected();
-
-      // Apply row filter and memorize the new invisible rows
-      // This is done here and not in install rows, because the notification handling differs when rows are updated
-      if (that._filterCount() > 0) {
-        if (that._applyFiltersForRow(row)) {
-          if (!row.filterAccepted) {
-            newInvisibleRows.push(row);
-          }
-        }
-        // always notify if there are new rows which accept the filter
-        if (row.filterAccepted) {
-          filterChanged = true;
-        }
-        that._renderRowFilterAccepted(row);
-      }
     });
+
+    // Apply row filters
+    // This cannot be done in the above loop because the filter calculates the cube which calls column.cellValueForGrouping for every row
+    // -> depending on the implementation row.$row has to exist (see BeanColumn.js)
+    // This cannot be done in install rows as well, because the notification handling differs when rows are updated
+    if (this._filterCount() > 0) {
+      this._applyFilters(rows);
+    }
 
     this._installRows($rows);
 
     // notify
     this._triggerRowsDrawn($rows);
-    if (filterChanged) {
-      this._rowsFiltered(newInvisibleRows);
-    }
     this._triggerRowsSelected();
 
     if (this.scrollToSelection) {
@@ -1529,11 +1518,17 @@ scout.Table.prototype._removeTooltipsForRow = function(row) {
 };
 
 scout.Table.prototype._deleteAllRows = function() {
+  var filterChanged = this._filteredRows.length > 0;
+
   // Update model
   this.rows = [];
   this.rowsMap = {};
   this.selectRows([], false);
   this._filteredRows = [];
+
+  if (filterChanged) {
+    this._rowsFiltered();
+  }
 
   // Update HTML
   if (this.rendered) {
@@ -1817,7 +1812,6 @@ scout.Table.prototype.columnById = function(columnId) {
 scout.Table.prototype.filter = function() {
   var i, useAnimation,
     that = this,
-    rowCount = 0,
     rowsToHide = [],
     rowsToShow = [];
 
@@ -1832,7 +1826,6 @@ scout.Table.prototype.filter = function() {
       if ($row.hasClass('invisible')) {
         rowsToShow.push(row);
       }
-      rowCount++;
     } else {
        if (!$row.hasClass('invisible')) {
         rowsToHide.push(row);
@@ -1849,11 +1842,13 @@ scout.Table.prototype.filter = function() {
     that.showRow(row.$row, useAnimation);
   });
 
-  this._rowsFiltered(rowsToHide);
-
-  $(':animated', that.$data).promise().done(function() {
-    that._group();
-  });
+  // notify and regroup only if at least one row changed it's state
+  if (rowsToShow.length > 0 || rowsToHide.length > 0) {
+    this._rowsFiltered(rowsToHide);
+    $(':animated', that.$data).promise().done(function() {
+      that._group();
+    });
+  }
 };
 
 scout.Table.prototype._rowsFiltered = function(invisibleRows) {
@@ -1893,6 +1888,32 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
     }
   }
   return false;
+};
+
+/**
+ * Applies the filters for the given row.<p>
+ * This function is intended to be used for new rows. That's why rowsFiltered event is only triggered if there are accepted rows in the given list.
+ */
+scout.Table.prototype._applyFilters = function(rows) {
+  var filterChanged,
+    newInvisibleRows = [];
+
+  rows.forEach(function(row) {
+    if (this._applyFiltersForRow(row)) {
+      if (!row.filterAccepted) {
+        newInvisibleRows.push(row);
+      }
+    }
+    // always notify if there are new rows which accept the filter
+    if (row.filterAccepted) {
+      filterChanged = true;
+    }
+    this._renderRowFilterAccepted(row);
+  }, this);
+
+  if (filterChanged) {
+    this._rowsFiltered(newInvisibleRows);
+  }
 };
 
 scout.Table.prototype._renderRowFilterAccepted = function(row) {

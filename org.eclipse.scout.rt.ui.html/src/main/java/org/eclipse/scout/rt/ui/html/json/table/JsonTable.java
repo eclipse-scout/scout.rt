@@ -1131,7 +1131,11 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     // Resend filters because a column with a filter may got invisible.
     // Since the gui does not know invisible columns, the filter would fail.
     if (getModel().getUserFilterManager() != null) {
-      addPropertyChangeEvent(PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
+      Collection<IUserFilterState> filters = getModel().getUserFilterManager().getFilters();
+      // Only resend if there are filters at all
+      if (filters.size() > 0) {
+        addPropertyChangeEvent(PROP_FILTERS, filtersToJson(filters));
+      }
     }
   }
 

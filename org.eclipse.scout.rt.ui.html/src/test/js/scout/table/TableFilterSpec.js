@@ -211,6 +211,16 @@ describe("Table Filter", function() {
 
   describe("events", function() {
 
+    beforeEach(function() {
+      // filter animates -> disable
+      $.fx.off = true;
+    });
+
+    afterEach(function() {
+      $.fx.off = false;
+    });
+
+
     describe("rowsFiltered", function() {
       var listener = {
         _onRowsFiltered: function() {}
@@ -230,6 +240,23 @@ describe("Table Filter", function() {
         table.filter();
 
         expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets not fired if rows are filtered again but the filtered rows have not changed", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0];
+
+        table.render(session.$entryPoint);
+
+        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.filter();
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+        table.filter();
+
+        expect(listener._onRowsFiltered).not.toHaveBeenCalled();
       });
 
       it("gets fired if rows are filtered during updateRows", function() {
@@ -295,6 +322,25 @@ describe("Table Filter", function() {
         table.on('rowsFiltered', listener._onRowsFiltered);
 
         table._deleteRows([row1]);
+
+        expect(table.filteredRows().length).toBe(0);
+        expect(listener._onRowsFiltered).toHaveBeenCalled();
+      });
+
+      it("gets fired if rows are filtered during deleteAllRows", function() {
+        var model = helper.createModelFixture(2, 2),
+          table = helper.createTable(model),
+          column0 = table.columns[0],
+          row1 = table.rows[1];
+
+        var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+        table.render(session.$entryPoint);
+        expect(table.filteredRows().length).toBe(1);
+
+        spyOn(listener, '_onRowsFiltered');
+        table.on('rowsFiltered', listener._onRowsFiltered);
+
+        table._deleteAllRows();
 
         expect(table.filteredRows().length).toBe(0);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
