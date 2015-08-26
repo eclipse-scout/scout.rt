@@ -244,7 +244,7 @@ scout.MenuBar.prototype.updateDefaultMenu = function() {
 scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
   var found = false;
   items.some(function(item) {
-    if (item.visible && item.enabled && scout.helpers.isOneOf(scout.keys.ENTER, item.actionKeyStroke.which)) {
+    if (item.visible && item.enabled && this._isDefaultKeyStroke(item.actionKeyStroke)) {
       if (this._defaultMenu && this._defaultMenu !== item) {
         this._defaultMenu.$container.removeClass('default-menu');
       }
@@ -257,6 +257,14 @@ scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
   }.bind(this));
   return found;
 };
+
+scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
+  return scout.helpers.isOneOf(scout.keys.ENTER, keyStroke.which) &&
+      !keyStroke.ctrl &&
+      !keyStroke.alt  &&
+      !keyStroke.shift;
+};
+
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   // Reverse the list if alignment is right to preserve the visible order specified by the
