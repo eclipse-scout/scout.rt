@@ -283,25 +283,25 @@ scout.Planner.prototype._renderRange = function() {
   }
   var text,
     toDate = new Date(this.viewRange.to.valueOf() - 1),
-    toText = ' bis ',
+    toText = this.session.text('ui.To'),
     DISPLAY_MODE = scout.Planner.DisplayMode;
 
   // find range text
   if (scout.dates.isSameDay(this.viewRange.from, toDate)) {
     text = this._dateFormat(this.viewRange.from, 'd. MMMM yyyy');
   } else if (this.viewRange.from.getMonth() === toDate.getMonth() && this.viewRange.from.getFullYear() === toDate.getFullYear()) {
-    text = this._dateFormat(this.viewRange.from, 'd.') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
+    text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'd.'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
   } else if (this.viewRange.from.getFullYear() === toDate.getFullYear()) {
     if (this.displayMode === DISPLAY_MODE.YEAR) {
-      text = this._dateFormat(this.viewRange.from, 'MMMM') + toText + this._dateFormat(toDate, 'MMMM yyyy');
+      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'MMMM'), toText, this._dateFormat(toDate, 'MMMM yyyy'));
     } else {
-      text = this._dateFormat(this.viewRange.from, 'd.  MMMM') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
+      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'd.  MMMM'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
     }
   } else {
     if (this.displayMode === DISPLAY_MODE.YEAR) {
-      text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(toDate, 'MMMM yyyy');
+      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'MMMM yyyy'), toText, this._dateFormat(toDate, 'MMMM yyyy'));
     } else {
-      text = this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
+      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
     }
   }
 

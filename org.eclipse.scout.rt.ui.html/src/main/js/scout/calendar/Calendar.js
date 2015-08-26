@@ -587,12 +587,13 @@ scout.Calendar.prototype.layoutLabel = function() {
   if (this._isDay()) {
     text = this._format(exFrom, 'd. MMMM yyyy');
   } else if (this._isWork() || this._isWeek()) {
+    var toText=this.session.text('ui.To');
     if (exFrom.getMonth() === exTo.getMonth()) {
-      text = this._format(exFrom, 'd.') + ' bis ' + this._format(exTo, 'd. MMMM yyyy');
+      text = scout.strings.join(' ', this._format(exFrom, 'd.'), toText, this._format(exTo, 'd. MMMM yyyy'));
     } else if (exFrom.getFullYear() === exTo.getFullYear()) {
-      text = this._format(exFrom, 'd. MMMM') + ' bis ' + this._format(exTo, 'd. MMMM yyyy');
+      text = scout.strings.join(' ', this._format(exFrom, 'd. MMMM'), toText, this._format(exTo, 'd. MMMM yyyy'));
     } else {
-      text = this._format(exFrom, 'd. MMMM yyyy') + ' bis ' + this._format(exTo, 'd. MMMM yyyy');
+      text = scout.strings.join(' ', this._format(exFrom, 'd. MMMM yyyy'), toText, this._format(exTo, 'd. MMMM yyyy'));
     }
   } else if (this._isMonth()) {
     text = this._format(exFrom, 'MMMM yyyy');
