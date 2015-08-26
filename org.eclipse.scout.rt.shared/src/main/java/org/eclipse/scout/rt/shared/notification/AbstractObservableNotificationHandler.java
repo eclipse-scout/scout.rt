@@ -63,11 +63,11 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
 
   @Override
   public void handleNotification(T notification) {
-    notifiyListeners(notification);
+    notifyListeners(notification);
   }
 
   @SuppressWarnings("unchecked")
-  protected void notifiyListeners(T notification) {
+  protected void notifyListeners(T notification) {
     ISession session = ISession.CURRENT.get();
 
     final INotificationListener<T>[] listeners;
