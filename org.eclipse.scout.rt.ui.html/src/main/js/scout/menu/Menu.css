@@ -60,7 +60,7 @@
   &:not(.disabled):hover {
     color: @hover-color;
 
-    &.default-menu {
+    &.menu-button.default-menu {
       background-color: @palette-blue-5;
     }
 
