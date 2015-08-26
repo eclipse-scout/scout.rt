@@ -1533,6 +1533,7 @@ scout.Table.prototype._deleteAllRows = function() {
   this.rows = [];
   this.rowsMap = {};
   this.selectRows([], false);
+  this._filteredRows = [];
 
   // Update HTML
   if (this.rendered) {
@@ -1724,7 +1725,10 @@ scout.Table.prototype._filterCount = function() {
   return Object.keys(this._filterMap).length;
 };
 
-scout.Table.prototype.filteredRows = function(includeSumRows) {
+scout.Table.prototype.filteredRows = function() {
+  if (this._filterCount() === 0) {
+    return this.rows;
+  }
   // filtered rows are cached to avoid unnecessary loops
   if (this._filteredRowsDirty) {
     this._filteredRows = [];
