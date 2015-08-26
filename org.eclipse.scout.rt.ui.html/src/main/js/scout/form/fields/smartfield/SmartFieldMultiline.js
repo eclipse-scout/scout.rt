@@ -36,13 +36,15 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
  * @override ValueField.js
  */
 scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
-  var tmp = this._splitValue(displayText);
-  this.$field.val(tmp.firstLine);
-  this._$multilineField.html(tmp.multiLines);
+  var tmp = displayText.split('\n'),
+    firstLine = tmp.shift(),
+    additionalLines = tmp.join('<br/>');
+  this.$field.val(firstLine);
+  this._$multilineField.html(additionalLines);
 };
 
 /**
- * @override SmartField
+ * @override SmartField.js
  */
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   var fieldBounds = scout.graphics.offsetBounds(this.$fieldContainer),
@@ -51,16 +53,20 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   return fieldBounds;
 };
 
-scout.SmartFieldMultiline.prototype._splitValue = function(value) {
-  var firstLine = '', multiLines = '';
-  if (value) {
-    var tmp = value.split("\n");
-    firstLine = tmp.shift();
-    multiLines = tmp.join('<br/>');
+/**
+ * Concatenates the text in the input-field and from the other additional lines in model.displayText
+ * (which are displayed in the text-box below the input-field).
+ *
+ * @override SmartField.js
+ */
+scout.SmartFieldMultiline.prototype._readSearchText = function() {
+  var i,
+    firstLine = this.$field.val(),
+    newDisplayText = [firstLine],
+    oldDisplayText = this.displayText.split('\n');
+  for (i = 1; i < oldDisplayText.length; i++) {
+    newDisplayText.push(oldDisplayText[i]);
   }
-  return {
-    firstLine: firstLine,
-    multiLines: multiLines
-  };
+  return newDisplayText.join('\n');
 };
 

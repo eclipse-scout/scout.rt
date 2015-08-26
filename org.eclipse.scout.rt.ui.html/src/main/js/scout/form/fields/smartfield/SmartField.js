@@ -145,8 +145,6 @@ scout.SmartField.prototype._onKeyDown = function(e) {
     }
   }
 
-  // We must not deal with TAB key here, because
-  // this is already handled by _onFieldBlur()
   if (e.which === scout.keys.ENTER) {
     if (this._popup.rendered) {
       e.stopPropagation();
@@ -206,7 +204,7 @@ scout.SmartField.prototype._onKeyUp = function(e) {
 };
 
 scout.SmartField.prototype._onFocus = function(e) {
-  this._oldSearchText = this._readDisplayText();
+  this._oldSearchText = this._readSearchText();
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
@@ -237,9 +235,21 @@ scout.SmartField.prototype._fieldBounds = function() {
 
 scout.SmartField.prototype._onFieldBlur = function() {
   // omit super call
-  $.log.debug('(SmartField#_onFieldBlur)');
+  $.log.debug('(SmartField#_onFieldBlur) tabPrevented=' + this._tabPrevented);
   this._requestedProposal = false;
-  this._acceptProposal(true);
+
+  // When we have prevented TAB handling in keyDown handler, we have already sent an acceptProposal event.
+  // At this time the proposalChooser was open, and thus the proposalChooserOpen flag was set to true
+  // which means the Java-client uses the selected row from the proposalChooser and _not_ the display text.
+  // After the request, when we set the focus with _focusNextTabbable(), we must _not_ send acceptProposal
+  // again. It is not only unnecessary but would even cause errors, because at this time the proposalChooser
+  // is closed and for the Java-client the request would look like, it should perform a lookup after the
+  // user has typed something into the SmartField.
+  if (this._tabPrevented) {
+    this._tabPrevented = false;
+  } else {
+    this._acceptProposal(true);
+  }
 };
 
 /**
@@ -256,9 +266,9 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
 
   forceClose = scout.helpers.nvl(forceClose, false);
   var proposalChooserOpen = !! this.proposalChooser,
-    searchText = this._readDisplayText();
+    searchText = this._readSearchText();
 
-  $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen);
+  $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);
   if (proposalChooserOpen) {
     // Always send accept proposal, when proposal chooser is opened
     // Because user wants to choose the selected proposal from the
@@ -277,22 +287,27 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   }
 
   this.session.listen().done(function() {
-    $.log.debug('SmartField request done proposalChooser=' + this.proposalChooser);
-    if (this._tabPrevented) {
-      this._tabPrevented = false;
-      if (!this.proposalChooser) {
-        this._focusNextTabbable();
-      }
+    $.log.debug('(SmartField) request done proposalChooser=' + this.proposalChooser);
+    if (this._tabPrevented && !this.proposalChooser) {
+      this._focusNextTabbable();
     }
   }.bind(this));
 };
 
-scout.SmartField.prototype._sendAcceptProposal = function(searchText, proposalChooserOpen, forceClose) {
+/**
+ * Override this method to return the search-text for this smart-field.
+ * The implementation is different for single- and multi-line smart-fields.
+ */
+scout.SmartField.prototype._readSearchText = function() {
+  return this._readDisplayText();
+};
+
+scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, forceClose) {
   this.displayText = searchText;
   this._oldSearchText = searchText;
   this.remoteHandler(this.id, 'acceptProposal', {
     searchText: searchText,
-    chooser: proposalChooserOpen,
+    chooser: chooser,
     forceClose: forceClose
   });
 };
