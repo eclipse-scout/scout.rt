@@ -166,7 +166,7 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
  * Finds the first focusable element of the given $container, or null if not found.
  */
 scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
-  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents, $messageBoxButtons,
+  var firstElement, firstDefaultButton, firstButton, i, candidate, $menuParents, $tabParents, $boxButtons,
     $candidates = $container
       .find(':focusable')
       .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
@@ -190,12 +190,12 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
       firstDefaultButton = candidate;
     }
 
-    $menuParents = $(candidate).parents('div.menubar');
-    $tabParents = $(candidate).parents('div.tab-area');
-    $messageBoxButtons = $(candidate).parents('div.messagebox-buttons');
-    if (($menuParents.length> 0 ||$tabParents.length> 0 || $messageBoxButtons.length  > 0 ) && !firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
+    $menuParents = $(candidate).parents('.menubar');
+    $tabParents = $(candidate).parents('.tab-area');
+    $boxButtons = $(candidate).parents('.box-buttons');
+    if (($menuParents.length> 0 ||$tabParents.length> 0 || $boxButtons.length  > 0 ) && !firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
       firstButton = candidate;
-    } else if (!$menuParents.length && !$tabParents.length && !$messageBoxButtons.length && typeof candidate.focus === 'function') { //inline buttons and menues are selectable before choosing button or menu from bar
+    } else if (!$menuParents.length && !$tabParents.length && !$boxButtons.length && typeof candidate.focus === 'function') { //inline buttons and menues are selectable before choosing button or menu from bar
       return candidate;
     }
   }

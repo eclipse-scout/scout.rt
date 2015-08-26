@@ -61,18 +61,27 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$html = this.$content.appendDiv('messagebox-label messagebox-html');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
-  var buttons = new scout.MessageBoxButtons(this.$buttons, this._onButtonClick.bind(this));
+  var boxButtons = new scout.BoxButtons(this.$buttons, this._onButtonClick.bind(this));
   this._$closeButton = null; // button to be executed when close() is called, e.g. when ESCAPE is pressed
   if (this.yesButtonText) {
-    this.$yesButton = buttons.renderButton('yes', this.yesButtonText);
+    this.$yesButton = boxButtons.addButton({
+      text: this.yesButtonText,
+      option: 'yes'
+    });
     this._$closeButton = this.$yesButton;
   }
   if (this.noButtonText) {
-    this.$noButton = buttons.renderButton('no', this.noButtonText);
+    this.$noButton = boxButtons.addButton({
+      text: this.noButtonText,
+      option: 'no'
+    });
     this._$closeButton = this.$noButton;
   }
   if (this.cancelButtonText) {
-    this.$cancelButton = buttons.renderButton('cancel', this.cancelButtonText);
+    this.$cancelButton = boxButtons.addButton({
+      text: this.cancelButtonText,
+      option: 'cancel'
+    });
     this._$closeButton = this.$cancelButton;
   }
 
@@ -90,7 +99,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$container.addClass('calc-helper');
   this.$container.css('min-width', this.$container.width());
   this.$container.removeClass('calc-helper');
-  this._updateButtonWidths();
+  boxButtons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
   this.$container.addClassForAnimation('shown');
@@ -153,9 +162,9 @@ scout.MessageBox.prototype._renderCopyPasteText = function(text) {
   // nop
 };
 
-scout.MessageBox.prototype._onButtonClick = function(event) {
+scout.MessageBox.prototype._onButtonClick = function(event, option) {
   this.remoteHandler(this.id, 'action', {
-    option: event.option
+    option: option
   });
 };
 
@@ -169,30 +178,6 @@ scout.MessageBox.prototype.onModelAction = function(event) {
 
 scout.MessageBox.prototype._onMessageBoxClosed = function(event) {
   this.destroy();
-};
-
-scout.MessageBox.prototype._updateButtonWidths = function() {
-  // Find all visible buttons
-  var $visibleButtons = [];
-  this.$container.find('.button').each(function() {
-    var $button = $(this);
-    if ($button.isVisible()) {
-      $visibleButtons.push($button);
-    }
-  });
-
-  // Manually calculate equal width fore each button, addding remaining pixels to last button.
-  // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
-  var availableWidth = this.$container.width();
-  var w = Math.floor(availableWidth / $visibleButtons.length);
-  $visibleButtons.forEach(function($button, index) {
-    if (index === $visibleButtons.length - 1) {
-      w = availableWidth;
-    } else {
-      availableWidth -= w;
-    }
-    $button.outerWidth(w);
-  });
 };
 
 /**

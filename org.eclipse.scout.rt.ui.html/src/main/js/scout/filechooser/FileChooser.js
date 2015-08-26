@@ -69,7 +69,8 @@ scout.FileChooser.prototype._render = function($parent) {
       .text(this.session.text('ui.FileChooserHint'));
 
     // List of files
-    this.$files = $.makeDiv('file-chooser-files')
+    this.$files = $('<ul>')
+      .addClass('file-chooser-files')
       .appendTo(this.$content);
     scout.scrollbars.install(this.$files, this.session);
 
@@ -115,30 +116,22 @@ scout.FileChooser.prototype._render = function($parent) {
   // Buttons
   this.$buttons = $.makeDiv('file-chooser-buttons')
     .appendTo(this.$container);
+  var boxButons = new scout.BoxButtons(this.$buttons);
   if (scout.device.supportsFile()) {
-    this.$addFileButton = $('<div>')
-      .unfocusable()
-      .attr('tabindex', 0)
-      .addClass('button')
-      .text(this.session.text('ui.Browse'))
-      .on('click', this._onAddFileButtonClicked.bind(this))
-      .appendTo(this.$buttons);
+    this.$addFileButton = boxButons.addButton({
+      text: this.session.text('ui.Browse'),
+      onClick: this._onAddFileButtonClicked.bind(this)
+    });
   }
-  this.$uploadButton = $('<div>')
-    .attr('tabindex', 0)
-    .addClass('button')
-    .unfocusable()
-    .setEnabled(false)
-    .text(this.session.text('ui.Upload'))
-    .on('click', this._onUploadButtonClicked.bind(this))
-    .appendTo(this.$buttons);
-  this.$cancelButton = $('<div>')
-    .attr('tabindex', 0)
-    .addClass('button')
-    .unfocusable()
-    .text(this.session.text('Cancel'))
-    .on('click', this._onCancelButtonClicked.bind(this))
-    .appendTo(this.$buttons);
+  this.$uploadButton = boxButons.addButton({
+    text: this.session.text('ui.Upload'),
+    onClick: this._onUploadButtonClicked.bind(this),
+    enabled: false
+  });
+  this.$cancelButton = boxButons.addButton({
+    text: this.session.text('Cancel'),
+    onClick: this._onCancelButtonClicked.bind(this)
+  });
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.FormLayout(this));
@@ -147,9 +140,9 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$container.addClassForAnimation('shown');
   // Prevent resizing when file chooser is dragged off the viewport
   this.$container.addClass('calc-helper');
-  this.$container.css('min-width', this.$container.width() + 100);
+  this.$container.css('min-width', this.$container.width());
   this.$container.removeClass('calc-helper');
-  this._updateButtonWidths();
+  boxButons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
 
@@ -196,23 +189,14 @@ scout.FileChooser.prototype._doAddFile = function() {
 };
 
 scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
-  if ($.suppressEventIfDisabled(event)) {
-    return;
-  }
   this._doUpload();
 };
 
 scout.FileChooser.prototype._onCancelButtonClicked = function(event) {
-  if ($.suppressEventIfDisabled(event)) {
-    return;
-  }
   this._doCancel();
 };
 
 scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
-  if ($.suppressEventIfDisabled(event)) {
-    return;
-  }
   this._doAddFile();
 };
 
@@ -236,13 +220,21 @@ scout.FileChooser.prototype.addFiles = function(files) {
       this._files = [file];
       this.$files.empty();
     }
-    this.$files
-      .appendDiv('file')
+    var $file = $('<li>')
+      .addClass('file')
       .text(file.name)
-      .appendDiv('remove')
-      .addClass('menu-item')
+      .appendTo(this.$files);
+    var $remove = $('<span>')
+      .appendTo($file)
+      .addClass('remove menu-item')
+      .on('click', this.removeFile.bind(this, file, $file));
+    var $removeLink = $('<a>')
       .text(this.session.text('Remove'))
-      .one('click', this.removeFile.bind(this, file, this.$files.children().last()));
+      .addClass('remove-link');
+    $remove
+      .append(document.createTextNode('('))
+      .append($removeLink)
+      .append(document.createTextNode(')'));
   }
   this.$uploadButton.setEnabled(this._files.length > 0);
   scout.scrollbars.update(this.$files);
@@ -317,30 +309,6 @@ scout.FileChooser.prototype.detach = function() {
   this.$container.detach();
 
   this.attached = false;
-};
-
-scout.FileChooser.prototype._updateButtonWidths = function() {
-  // Find all visible buttons
-  var $visibleButtons = [];
-  this.$buttons.children().each(function() {
-    var $button = $(this);
-    if ($button.isVisible()) {
-      $visibleButtons.push($button);
-    }
-  });
-
-  // Manually calculate equal width fore each button, addding remaining pixels to last button.
-  // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
-  var availableWidth = this.$container.width();
-  var w = Math.floor(availableWidth / $visibleButtons.length);
-  $visibleButtons.forEach(function($button, index) {
-    if (index === $visibleButtons.length - 1) {
-      w = availableWidth;
-    } else {
-      availableWidth -= w;
-    }
-    $button.outerWidth(w);
-  });
 };
 
 /**

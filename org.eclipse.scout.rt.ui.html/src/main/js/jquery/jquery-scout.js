@@ -83,8 +83,9 @@
    * If the event target is disabled (according to $.fn.isEnabled()), the event is suppressed
    * and the method returns true. Otherwise, false is returned.
    */
-  $.suppressEventIfDisabled = function(event) {
-    if (!$(event.target).isEnabled()) {
+  $.suppressEventIfDisabled = function(event, $target) {
+    $target = $target || $(event.target);
+    if (!$target.isEnabled()) {
       $.suppressEvent(event);
       return true;
     }

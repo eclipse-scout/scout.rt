@@ -811,7 +811,7 @@ scout.Session.prototype._removeBusy = function() {
   }
 };
 
-scout.Session.prototype._onCancelProcessing = function() {
+scout.Session.prototype._onCancelProcessing = function(event) {
   var busyIndicator = this._busyIndicator;
   busyIndicator.off('clickCancel');
 

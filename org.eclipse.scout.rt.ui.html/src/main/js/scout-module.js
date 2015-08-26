@@ -10,6 +10,7 @@ __include("scout/objectFactories.js");
 __include("scout/widget/Widget.js");
 // Basic utilities
 __include("scout/util/arrays.js");
+__include("scout/util/BoxButtons.js");
 __include("scout/util/dates.js");
 __include("scout/util/defaultValues.js");
 __include("scout/util/DetachHelper.js");
@@ -197,7 +198,6 @@ __include("scout/form/fields/ValueField.js");
 __include("scout/form/FormController.js");
 // Basics for message boxes
 __include("scout/messagebox/MessageBox.js");
-__include("scout/messagebox/MessageBoxButtons.js");
 __include("scout/messagebox/MessageBoxController.js");
 // Form fields (A-Z)
 __include("scout/form/fields/beanfield/BeanField.js");

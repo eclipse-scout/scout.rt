@@ -49,8 +49,11 @@ scout.BusyIndicator.prototype._render = function($parent) {
 
   if (this._cancellable) {
     this.$buttons = this.$container.appendDiv('busyindicator-buttons');
-    var buttons = new scout.MessageBoxButtons(this.$buttons, this._onClickCancel.bind(this));
-    this.$cancelButton = buttons.renderButton('cancel', this.session.text('Cancel'));
+    var boxButtons = new scout.BoxButtons(this.$buttons);
+    this.$cancelButton = boxButtons.addButton({
+      text: this.session.text('Cancel'),
+      onClick: this._onClickCancel.bind(this)
+    });
     this.$cancelButton.css('width', '100%');
   } else {
     this.$content.addClass('no-buttons');
