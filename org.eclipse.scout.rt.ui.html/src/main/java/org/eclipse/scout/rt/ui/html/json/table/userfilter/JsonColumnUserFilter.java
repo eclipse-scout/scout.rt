@@ -15,10 +15,20 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
   }
 
   @Override
+  public boolean isValid() {
+    return getJsonTable().getColumnId(getFilterState().getColumn()) != null;
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put("column", getJsonTable().getColumnId(getFilterState().getColumn()));
     json.put("selectedValues", getFilterState().getSelectedValues());
     return json;
+  }
+
+  @Override
+  public String toString() {
+    return getObjectType() + ", " + getFilterState().getColumn();
   }
 }

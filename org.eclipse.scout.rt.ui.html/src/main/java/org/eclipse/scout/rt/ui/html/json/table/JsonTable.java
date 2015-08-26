@@ -659,7 +659,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
       Set<Object> selectedValues = new HashSet<Object>();
       for (int i = 0; i < jsonSelectedValues.length(); i++) {
-        selectedValues.add(jsonSelectedValues.get(i));
+        if (jsonSelectedValues.isNull(i)) {
+          selectedValues.add(null);
+        }
+        else {
+          selectedValues.add(jsonSelectedValues.get(i));
+        }
       }
       ColumnUserFilterState filter = new ColumnUserFilterState(column);
       filter.setSelectedValues(selectedValues);
@@ -871,7 +876,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     for (IUserFilterState filter : filters) {
       JsonTableUserFilter jsonFilter = (JsonTableUserFilter) MainJsonObjectFactory.get().createJsonObject(filter);
       jsonFilter.setJsonTable(this);
-      jsonFilters.put(jsonFilter.toJson());
+      if (jsonFilter.isValid()) {
+        jsonFilters.put(jsonFilter.toJson());
+      }
+      else {
+        LOG.info("Filter is not valid, maybe column is invisible. " + jsonFilter);
+      }
     }
     return jsonFilters;
   }
@@ -1117,6 +1127,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent(EVENT_COLUMN_STRUCTURE_CHANGED, jsonEvent);
+
+    // Resend filters because a column with a filter may got invisible.
+    // Since the gui does not know invisible columns, the filter would fail.
+    if (getModel().getUserFilterManager() != null) {
+      addPropertyChangeEvent(PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
+    }
   }
 
   protected void handleModelColumnOrderChanged() {

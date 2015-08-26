@@ -136,6 +136,56 @@ describe("TableHeaderMenu", function() {
         expect($filterItems.eq(2).text()).toBe('Value');
         table.header.closeTableHeaderMenu();
       });
+
+      it("displays empty values as -empty-", function() {
+        session.text = function(key) {
+          if (key === 'ui.EmptyCell') {
+            return '-empty-';
+          }
+        };
+        var table = createSingleColumnTableByTexts(['Value', '']);
+        var column = table.columns[0];
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var $filterItems = find$FilterItems(table);
+        expect($filterItems.eq(0).text()).toBe('-empty-');
+        expect($filterItems.eq(1).text()).toBe('Value');
+        table.header.closeTableHeaderMenu();
+      });
+
+      it("stores selected text in filter.selectedValues", function() {
+        var table = createSingleColumnTableByTexts(['Value', 'Value2']);
+        var column = table.columns[0];
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var $filterItems = find$FilterItems(table);
+        expect($filterItems.eq(0).text()).toBe('Value');
+        expect($filterItems.eq(1).text()).toBe('Value2');
+        $filterItems.eq(0).triggerClick();
+        expect(table.getFilter(table.columns[0].id).selectedValues).toEqual(['Value']);
+        $filterItems.eq(1).triggerClick();
+        expect(table.getFilter(table.columns[0].id).selectedValues).toEqual(['Value', 'Value2']);
+        table.header.closeTableHeaderMenu();
+      });
+
+      it("stores empty as null and not '-empty-'", function() {
+        session.text = function(key) {
+          if (key === 'ui.EmptyCell') {
+            return '-empty-';
+          }
+        };
+        var table = createSingleColumnTableByTexts(['Value', '']);
+        var column = table.columns[0];
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var $filterItems = find$FilterItems(table);
+        expect($filterItems.eq(0).text()).toBe('-empty-');
+        expect($filterItems.eq(1).text()).toBe('Value');
+        $filterItems.eq(0).triggerClick();
+        table.header.closeTableHeaderMenu();
+
+        expect(table.getFilter(table.columns[0].id).selectedValues).toEqual([null]);
+      });
     });
 
 

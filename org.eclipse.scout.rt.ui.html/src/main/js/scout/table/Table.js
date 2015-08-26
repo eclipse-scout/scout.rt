@@ -2224,10 +2224,11 @@ scout.Table.prototype._syncFilters = function(filters) {
     }, this);
   }
 
-  // if filters change after initialization, call filter
-  if (this.rendered) {
-    this.filter();
-  }
+};
+
+scout.Table.prototype._renderFilters = function() {
+  // _renderFilters is only called after initialization (due to a property change). In that case -> filter()
+  this.filter();
 };
 
 scout.Table.prototype._renderCheckable = function() {

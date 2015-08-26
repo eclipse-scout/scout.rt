@@ -36,6 +36,10 @@ public abstract class JsonTableUserFilter<T extends IUserFilterState> implements
     return m_filter;
   }
 
+  public boolean isValid() {
+    return true;
+  }
+
   public abstract String getObjectType();
 
   @Override
