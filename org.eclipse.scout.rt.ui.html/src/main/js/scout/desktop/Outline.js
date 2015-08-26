@@ -223,6 +223,10 @@ scout.Outline.prototype._updateOutlineNode = function(node) {
     node.detailForm = null;
   }
 
+  if (!this.rendered || !scout.helpers.isOneOf(node, this.selectedNodes)) {
+    return;
+  }
+
   var content;
   if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     content = node.detailForm;
