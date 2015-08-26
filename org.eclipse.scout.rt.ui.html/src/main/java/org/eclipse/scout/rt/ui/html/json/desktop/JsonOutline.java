@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,7 +83,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       attachNodes(node.getChildNodes(), attachChildren);
     }
     if (!(node instanceof IPage)) {
-      throw new IllegalArgumentException("Expected page.");
+      throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     IPage<?> page = (IPage) node;
     if (page.isDetailFormVisible()) {
@@ -97,13 +98,13 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   protected void handleModelTreeEvent(TreeEvent event) {
     super.handleModelTreeEvent(event);
 
-    // When nodes are deleted, immediately dispose the nodes. If we would do this later when the event
-    // buffer is processed, there could have been other events in the meantime (e.g. table events) which
-    // fail when the nodes (and everything that is attached to them, namely detail tables) are still
-    // existing. (Disposing the nodes right away is correct, because no matter what the event buffer
-    // does, the nodes are definitively deleted.)
+    // When nodes are deleted, immediately detach the detail table from the deleted nodes. If we would do
+    // this later when the event buffer is processed, there could have been other events in the meantime
+    // (e.g. table events) which fail when the nodes (and everything that is attached to them, namely detail
+    // tables) are still existing. (Disposing the detail table right away is correct, because no matter what
+    // the event buffer does, the nodes are definitively deleted.)
     if (CompareUtility.isOneOf(event.getType(), TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED)) {
-      disposeNodes(event.getNodes(), true);
+      detachDetailTables(event.getNodes(), true);
     }
   }
 
@@ -175,21 +176,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void disposeNode(ITreeNode node, boolean disposeChildren) {
     super.disposeNode(node, disposeChildren);
-
-    IPage page = (IPage) node;
-    ITable table = page.getTable();
-    if (table != null) {
-      IJsonAdapter<?> jsonTableAdapter = getGlobalAdapter(table);
-      if (jsonTableAdapter != null) {
-        // Detail tables are global to make them reusable by other components (e.g. table field)
-        // Therefore we have to dispose them by our own
-        m_jsonDetailTables.remove(jsonTableAdapter);
-        if (!jsonTableAdapter.isDisposed()) {
-          jsonTableAdapter.dispose();
-        }
-      }
-    }
-
+    detachDetailTable(node, false);
     // No need to dispose detail form (it will be disposed automatically when it is closed)
   }
 
@@ -198,6 +185,37 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable());
     m_jsonDetailTables.add(detailTableAdapter);
     return detailTableAdapter;
+  }
+
+  protected void detachDetailTable(IPage page) {
+    ITable table = page.getTable();
+    if (table != null) {
+      table.setProperty(JsonOutlineTable.PROP_PAGE, null);
+      IJsonAdapter<?> jsonTableAdapter = getGlobalAdapter(table);
+      if (jsonTableAdapter != null) {
+        m_jsonDetailTables.remove(jsonTableAdapter);
+        if (!jsonTableAdapter.isDisposed()) {
+          jsonTableAdapter.dispose();
+        }
+      }
+    }
+  }
+
+  protected void detachDetailTable(ITreeNode node, boolean disposeChildren) {
+    if (disposeChildren) {
+      detachDetailTables(node.getChildNodes(), disposeChildren);
+    }
+
+    if (!(node instanceof IPage)) {
+      throw new IllegalArgumentException("Expected node to be a page. " + node);
+    }
+    detachDetailTable((IPage) node);
+  }
+
+  protected void detachDetailTables(Collection<ITreeNode> nodes, boolean disposeChildren) {
+    for (ITreeNode node : nodes) {
+      detachDetailTable(node, disposeChildren);
+    }
   }
 
   @Override
