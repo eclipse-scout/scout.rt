@@ -567,6 +567,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     try {
       ensureDetailFormCreated();
       ensureDetailFormStarted();
+      execDetailFormActivated();
       enhanceTableWithPageMenus();
       interceptPageActivated();
     }
@@ -660,6 +661,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return;
     }
     startDetailForm();
+  }
+
+  protected void execDetailFormActivated() {
+    if (getDetailForm() != null) {
+      getDetailForm().getUIFacade().fireFormActivatedFromUI();
+    }
   }
 
   protected void disposeDetailForm() throws ProcessingException {
