@@ -74,6 +74,10 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
     json.put("headerTooltip", getColumn().getHeaderCell().getTooltipText());
+    if (getUiSession().isInspectorHint()) {
+      json.put("modelClass", getColumn().getClass().getName());
+      json.put("classId", getColumn().classId());
+    }
     return json;
   }
 
