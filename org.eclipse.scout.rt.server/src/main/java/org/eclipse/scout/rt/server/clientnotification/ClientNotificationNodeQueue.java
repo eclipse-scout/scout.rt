@@ -102,13 +102,15 @@ public class ClientNotificationNodeQueue {
     m_sessionUserCacheLock.writeLock().lock();
     try {
       m_sessions.remove(sessionId);
-      for (Entry<String, Set<String>> e : m_userToSessions.entrySet()) {
-        Set<String> sessions = e.getValue();
+      Iterator<Entry<String, Set<String>>> iterator = m_userToSessions.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Entry<String, Set<String>> entry = iterator.next();
+        Set<String> sessions = entry.getValue();
         if (sessions.contains(sessionId)) {
           sessions.remove(sessionId);
         }
         if (sessions.isEmpty()) {
-          m_userToSessions.remove(e.getKey());
+          iterator.remove();
         }
       }
     }
