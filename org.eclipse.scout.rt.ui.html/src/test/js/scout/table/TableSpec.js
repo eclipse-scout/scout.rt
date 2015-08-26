@@ -672,8 +672,16 @@ describe("Table", function() {
       rows[2].cells[1].value = 3;
       render(table);
 
-      table.rows[2].filterAccepted = false;
-      table._renderRowFilterAccepted(table.rows[2]);
+      var filter = {
+        accept: function($row) {
+          return $row.data('row').id !== table.rows[2].id;
+        },
+        createKey: function() {
+          return 1; // dummy value
+        }
+      };
+      table.addFilter(filter);
+      table.filter();
       table.group();
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('3');
