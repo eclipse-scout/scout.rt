@@ -17,10 +17,6 @@ scout.Calendar = function() {
   // additional modes; should be stored in model
   this._showYearPanel = false;
   this._showListPanel = false;
-  this._tooltipSupport = new scout.TooltipSupport(this.session, {
-    htmlEnabled: true,
-    tooltipDelay: 750
-  });
 
   /**
    * The narrow view range is different from the regular view range.
@@ -39,6 +35,16 @@ scout.Calendar = function() {
   this._addAdapterProperties(['components', 'menus', 'selectedComponent']);
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
+
+scout.Calendar.prototype.init = function(model, session) {
+  scout.Calendar.parent.prototype.init.call(this, model, session);
+
+  this._tooltipSupport = new scout.TooltipSupport(this.session, {
+    htmlEnabled: true,
+    tooltipDelay: 750
+  });
+
+};
 
 scout.Calendar.DisplayMode = {
   DAY: 1,
