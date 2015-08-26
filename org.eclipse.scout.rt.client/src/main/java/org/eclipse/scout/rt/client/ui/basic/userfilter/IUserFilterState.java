@@ -8,13 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
+package org.eclipse.scout.rt.client.ui.basic.userfilter;
+
+import java.io.Serializable;
 
 /**
- * FIXME CGU javadoc
- * 
  * @since 5.1
  */
-public interface IUserFilter {
+public interface IUserFilterState extends Serializable {
+  String getType();
 
+  void setType(String type);
+
+  /**
+   * Computes a key which is used by the table to store the filter.
+   */
+  Object createKey();
 }

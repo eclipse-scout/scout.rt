@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 
 /**
  * @since 5.1

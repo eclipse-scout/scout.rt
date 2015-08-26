@@ -13,15 +13,17 @@ package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 
-public class ColumnUserTableFilter extends AbstractUserTableFilter implements IUserTableFilter {
+public class ColumnUserFilterState extends AbstractUserFilterState implements IUserFilterState {
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "column";
 
   private IColumn<String> m_column;
   private Set<Object> m_selectedValues;
 
-  public ColumnUserTableFilter(IColumn<String> column) {
+  public ColumnUserFilterState(IColumn<String> column) {
     m_column = column;
     setType("column");
   }

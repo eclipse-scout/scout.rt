@@ -99,10 +99,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserTableFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.UserFilterManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -1935,10 +1935,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * factory to manage user filters
    * <p>
-   * default creates a {@link UserTableFilterManager}
+   * default creates a {@link UserFilterManager}
    */
-  protected UserTableFilterManager createUserFilterManager() {
-    return new UserTableFilterManager();
+  protected UserFilterManager createUserFilterManager() {
+    return new UserFilterManager();
   }
 
   /**
@@ -3306,12 +3306,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public UserTableFilterManager getUserFilterManager() {
-    return (UserTableFilterManager) propertySupport.getProperty(PROP_USER_FILTER_MANAGER);
+  public UserFilterManager getUserFilterManager() {
+    return (UserFilterManager) propertySupport.getProperty(PROP_USER_FILTER_MANAGER);
   }
 
   @Override
-  public void setUserFilterManager(UserTableFilterManager m) {
+  public void setUserFilterManager(UserFilterManager m) {
     propertySupport.setProperty(PROP_USER_FILTER_MANAGER, m);
   }
 
@@ -4544,7 +4544,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void fireFilterAddedFromUI(IUserTableFilter filter) {
+    public void fireFilterAddedFromUI(IUserFilterState filter) {
       try {
         pushUIProcessor();
         //
@@ -4559,7 +4559,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void fireFilterRemovedFromUI(IUserTableFilter filter) {
+    public void fireFilterRemovedFromUI(IUserFilterState filter) {
       try {
         pushUIProcessor();
         //

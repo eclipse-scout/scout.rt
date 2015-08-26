@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
+package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
 /**
  * @since 5.1
  */
-public class AbstractUserTableFilter implements IUserTableFilter {
+public class AbstractUserFilterState implements IUserFilterState {
   private static final long serialVersionUID = 1L;
   private String m_type;
 

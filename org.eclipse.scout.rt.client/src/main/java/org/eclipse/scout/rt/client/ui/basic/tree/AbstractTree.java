@@ -67,7 +67,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.IUserFilter;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;

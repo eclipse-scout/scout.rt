@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
+package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,26 +22,27 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 /**
  * @since 5.1 replaces ITableColumnFilterManager
  */
-public class UserTableFilterManager {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UserTableFilterManager.class);
+public class UserFilterManager {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UserFilterManager.class);
 
-  private final Map<Object, IUserTableFilter> m_filterMap = new HashMap<Object, IUserTableFilter>();
+  private final Map<Object, IUserFilterState> m_filterMap = new HashMap<Object, IUserFilterState>();
 
-  public void addFilter(IUserTableFilter filter) throws ProcessingException {
+  public void addFilter(IUserFilterState filter) throws ProcessingException {
     m_filterMap.put(filter.createKey(), filter);
     LOG.info("Filter added " + filter);
   }
 
-  public void removeFilter(IUserTableFilter filter) throws ProcessingException {
+  public void removeFilter(IUserFilterState filter) throws ProcessingException {
     m_filterMap.remove(filter.createKey());
     LOG.info("Filter removed " + filter);
   }
 
-  public IUserTableFilter getFilter(Object key) {
+  public IUserFilterState getFilter(Object key) {
     return m_filterMap.get(key);
   }
 
-  public Collection<IUserTableFilter> getFilters() {
+  public Collection<IUserFilterState> getFilters() {
     return Collections.unmodifiableCollection(m_filterMap.values());
   }
+
 }
