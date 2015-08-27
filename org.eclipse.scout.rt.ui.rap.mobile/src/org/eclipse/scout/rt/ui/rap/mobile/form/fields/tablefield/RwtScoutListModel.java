@@ -18,16 +18,17 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTableEvent;
 import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.graphics.Image;
 
 public class RwtScoutListModel implements IRwtScoutListModel {
@@ -44,10 +45,12 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   private final ITable m_scoutTable;
   private final RwtScoutList m_uiList;
   private boolean m_multiline;
+  private final IRwtEnvironment m_env;
 
   public RwtScoutListModel(ITable scoutTable, RwtScoutList uiTable) {
     m_scoutTable = scoutTable;
     m_uiList = uiTable;
+    m_env = uiTable.getUiEnvironment();
   }
 
   @Override
@@ -167,10 +170,8 @@ public class RwtScoutListModel implements IRwtScoutListModel {
       return "";
     }
 
-    String text = cell.getText();
-    if (text == null) {
-      text = "";
-    }
+    String text = StringUtility.nvl(cell.getText(), "");
+
     if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
       HtmlAdapter htmlAdapter = m_uiList.getUiEnvironment().getHtmlAdapter();
       text = htmlAdapter.adaptHtmlCell(m_uiList, text);
@@ -188,11 +189,11 @@ public class RwtScoutListModel implements IRwtScoutListModel {
           text = StringUtility.replaceNewLines(text, " ");
         }
       }
-      boolean markupEnabled = Boolean.TRUE.equals(getUiList().getUiField().getData(RWT.MARKUP_ENABLED));
-      if (markupEnabled || multiline) {
-        text = HtmlTextUtility.transformPlainTextToHtml(text);
+      if (cell.isHtmlEnabled() && (RwtUtility.isMarkupEnabled(getUiList().getUiField()) || multiline)) {
+        return HtmlTextUtility.transformPlainTextToHtml(text);
       }
     }
-    return text;
+
+    return HtmlTextUtility.validateHtmlCapableText(m_env.getHtmlValidator(), cell, text);
   }
 }

@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutHtmlValidator;
 import org.eclipse.scout.rt.ui.rap.form.IRwtScoutForm;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
@@ -239,5 +240,7 @@ public interface IRwtEnvironment {
   void addEnvironmentListener(IRwtEnvironmentListener listener);
 
   void removeEnvironmentListener(IRwtEnvironmentListener listener);
+
+  IRwtScoutHtmlValidator getHtmlValidator();
 
 }

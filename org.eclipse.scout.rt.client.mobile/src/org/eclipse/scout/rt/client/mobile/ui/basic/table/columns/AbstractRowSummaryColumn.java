@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Activator;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -92,6 +93,11 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     catch (Throwable t) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", t);
     }
+  }
+
+  @Override
+  protected boolean getConfiguredHtmlEnabled() {
+    return true;
   }
 
   @Override
@@ -203,9 +209,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
         if (cellHeaderText != null && cellHeaderText.contains(columnDisplayText)) {
           return false;
         }
-
       }
-
     }
 
     if (columnEmpty) {
@@ -213,6 +217,13 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
 
     return true;
+  }
+
+  private ICell getHeaderCell(ITableRow row) {
+    if (m_cellHeaderColumn != null) {
+      return row.getCell(m_cellHeaderColumn);
+    }
+    return row.getTable().getSummaryCell(row);
   }
 
   private String getCellHeaderText(ITableRow row) {
@@ -282,13 +293,14 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return null;
     }
 
+    ICell headerCell = getHeaderCell(row);
     String cellHeaderText = getCellHeaderText(row);
     if (cellHeaderText == null) {
       cellHeaderText = "";
     }
     //Don't generate cell content if the only column contains html.
     //It is assumed that such a column is already optimized for mobile devices.
-    if (m_cellDetailColumns.size() == 0 && containsHtml(cellHeaderText)) {
+    if (m_cellDetailColumns.size() == 0 && headerCell.isHtmlEnabled()) {
       cellHeaderText = adaptExistingHtmlInCellHeader(cellHeaderText);
 
       //Make sure drill down style is set to none
@@ -301,7 +313,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     String content = "";
     boolean cellHasHeader = false;
     if (StringUtility.hasText(cellHeaderText)) {
-      content = createCellHeader(cellHeaderText);
+      content = createCellHeader(cellHeaderText, headerCell);
       content += "<br/>";
       cellHasHeader = true;
     }
@@ -349,7 +361,7 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
       return "";
     }
     else {
-      return "<img width=\"16\" height=\"16\" src=\"cid:" + iconId + "\"/>";
+      return "<img width=\"16\" height=\"16\" src=\"cid:" + StringUtility.htmlEncode(iconId) + "\"/>";
     }
   }
 
@@ -411,13 +423,9 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     }
   }
 
-  private String createCellHeader(String cellHeaderText) {
-    String content = "";
-
-    content = cleanupText(cellHeaderText);
-    content = "<b>" + content + "</b>";
-
-    return content;
+  private String createCellHeader(String cellHeaderText, ICell headerCell) {
+    String content = cleanupText(cellHeaderText, headerCell);
+    return "<b>" + content + "</b>";
   }
 
   private String createCellDetail(ITableRow row, boolean cellHasHeader) {
@@ -453,28 +461,38 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
     return content;
   }
 
-  private String cleanupText(String text) {
+  private String cleanupText(String text, ICell cell) {
+    return cleanupText(text, cell.isHtmlEnabled());
+  }
+
+  private String cleanupText(String text, boolean containsHtml) {
     if (text == null) {
       return null;
     }
 
-    boolean containsHtml = text.contains("<html>");
     if (containsHtml) {
+      String textWithoutHtml = null;
       //Ignore every html code by removing all the tags to make sure it does not destroy the layout
-      String textWithoutHtml = HTMLUtility.getPlainText(text);
+      if (StringUtility.hasText(StringUtility.getTag(text, "body"))) {
+        textWithoutHtml = HTMLUtility.getPlainText(text);
+      }
+      else {
+        textWithoutHtml = HTMLUtility.getPlainText(text, false, false);
+      }
+
       if (textWithoutHtml != null) {
         text = textWithoutHtml;
       }
     }
+
     text = StringUtility.removeNewLines(text);
     text = StringUtility.trim(text);
+
     if (!containsHtml) {
       //If the text is not surrounded by <html> the html must not be interpreted but displayed as it is including all the html tags.
       text = StringUtility.htmlEncode(text);
     }
-    text = replaceSpaces(text);
-
-    return text;
+    return replaceSpaces(text);
   }
 
   /**
@@ -486,19 +504,13 @@ public class AbstractRowSummaryColumn extends AbstractStringColumn implements IR
   }
 
   private String extractCellDisplayText(IColumn<?> column, ITableRow row) {
-    String displayText = column.getDisplayText(row);
-
-    displayText = cleanupText(displayText);
-
-    return displayText;
+    ICell cell = row.getCell(column);
+    return cleanupText(cell.getText(), cell);
   }
 
   private String extractColumnHeader(IColumn<?> column) {
     String header = column.getHeaderCell().getText();
-
-    header = cleanupText(header);
-
-    return header;
+    return cleanupText(header, containsHtml(header));
   }
 
   /**

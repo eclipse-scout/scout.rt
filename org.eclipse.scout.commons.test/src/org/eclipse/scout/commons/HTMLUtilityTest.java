@@ -642,7 +642,7 @@ public class HTMLUtilityTest {
     String value = "a\nb\tc   d<br/><p>e</p>";
     String htmlEncoded = StringUtility.htmlEncode(value, true);
 
-    assertEquals("a<br/>b<span style=\"white-space:pre\">&#9;</span>c&nbsp;&nbsp;&nbsp;d&lt;br/&gt;&lt;p&gt;e&lt;/p&gt;", StringUtility.htmlEncode(value, true));
+    assertEquals("a<br/>b<span style=\"white-space:pre\">&#9;</span>c&nbsp;&nbsp;&nbsp;d&lt;br&#47;&gt;&lt;p&gt;e&lt;&#47;p&gt;", StringUtility.htmlEncode(value, true));
     assertEquals("a\nb\tc   d\n<p>e</p>", StringUtility.htmlDecode(htmlEncoded));
   }
 

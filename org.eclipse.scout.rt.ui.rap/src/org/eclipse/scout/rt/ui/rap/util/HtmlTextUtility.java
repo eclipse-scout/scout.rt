@@ -2,6 +2,9 @@ package org.eclipse.scout.rt.ui.rap.util;
 
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutHtmlValidator;
+
 /**
  * Utility class that provides a number of useful static methods to support the
  * implementation of widget life cycle adapters with regard to supporting html markup in table headers, cells, etc.
@@ -149,6 +152,27 @@ public final class HtmlTextUtility {
       pos++;
     }
     return r;
+  }
+
+  /**
+   * Validates the text of a given object if the object is an instance of {@link IHtmlCapable}. Validation is done with
+   * the given validator of type {@link IRwtScoutHtmlValidator}
+   * 
+   * @since 4.2 (backported)
+   * @param validator
+   *          the HTML validator
+   * @param obj
+   *          validation is only done if the object is of type {@link IHtmlCapable}
+   * @param text
+   *          the text to validate
+   * @return validated text if the given object is of type {@link IHtmlCapable}, otherwise the input text will be
+   *         returned.
+   */
+  public static String validateHtmlCapableText(IRwtScoutHtmlValidator validator, Object obj, String text) {
+    if (!(obj instanceof IHtmlCapable)) {
+      return text;
+    }
+    return validator.validate(text, (IHtmlCapable) obj);
   }
 
 }
