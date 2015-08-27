@@ -48,6 +48,10 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
   if (!this._displayParent.rendered) {
     return;
   }
+  // Prevent "Already rendered" errors / FIXME BSH/DWI Remove this hack! Fix in on model if possible. See #162954.
+  if (messageBox.rendered) {
+    return;
+  }
 
   messageBox.render(this.session.desktop.$container);
 

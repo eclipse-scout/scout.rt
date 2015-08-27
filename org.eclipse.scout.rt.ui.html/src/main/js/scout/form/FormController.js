@@ -67,6 +67,10 @@ scout.FormController.prototype._renderView = function(view, register) {
   if (!this._displayParent.rendered) {
     return;
   }
+  // Prevent "Already rendered" errors / FIXME BSH/DWI Remove this hack! Fix in on model if possible. See #162954.
+  if (view.rendered) {
+    return;
+  }
 
   var viewTabsController = this.session.desktop.viewTabsController;
 
@@ -82,6 +86,10 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
 
   // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
   if (!this._displayParent.rendered) {
+    return;
+  }
+  // Prevent "Already rendered" errors / FIXME BSH/DWI Remove this hack! Fix in on model if possible. See #162954.
+  if (dialog.rendered) {
     return;
   }
 

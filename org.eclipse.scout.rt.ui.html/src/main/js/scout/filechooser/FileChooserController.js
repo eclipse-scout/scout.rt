@@ -48,6 +48,10 @@ scout.FileChooserController.prototype._render = function(fileChooser) {
   if (!this._displayParent.rendered) {
     return;
   }
+  // Prevent "Already rendered" errors / FIXME BSH/DWI Remove this hack! Fix in on model if possible. See #162954.
+  if (fileChooser.rendered) {
+    return;
+  }
 
   fileChooser.render(this.session.desktop.$container);
 
