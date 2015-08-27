@@ -20,10 +20,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 
 /**
  * a swing runnable that can be enqueued into the awt event queue when run it
@@ -52,6 +55,10 @@ public class SwingPopupWorker implements Runnable {
 
   @Override
   public void run() {
+    if (SwingPopupWorker.this.getTarget() instanceof JTextFieldEx) {
+      JTextFieldEx field = (JTextFieldEx) SwingPopupWorker.this.getTarget();
+      field.showingPopup(true);
+    }
     if (m_scoutMenus == null || m_scoutMenus.length == 0) {
       return;
     }
@@ -125,6 +132,24 @@ public class SwingPopupWorker implements Runnable {
 
         p = r.getLocation();
         p.translate(-compLocationOnScreen.x, -compLocationOnScreen.y);
+        pop.addPopupMenuListener(new PopupMenuListener() {
+
+          @Override
+          public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+          }
+
+          @Override
+          public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            if (SwingPopupWorker.this.getTarget() instanceof JTextFieldEx) {
+              JTextFieldEx field = (JTextFieldEx) SwingPopupWorker.this.getTarget();
+              field.showingPopup(false);
+            }
+          }
+
+          @Override
+          public void popupMenuCanceled(PopupMenuEvent e) {
+          }
+        });
         pop.show(m_target, p.x, p.y);
       }
     }
@@ -135,5 +160,9 @@ public class SwingPopupWorker implements Runnable {
 
   public void enqueue() {
     m_env.invokeSwingLater(this);
+  }
+
+  public Component getTarget() {
+    return m_target;
   }
 }

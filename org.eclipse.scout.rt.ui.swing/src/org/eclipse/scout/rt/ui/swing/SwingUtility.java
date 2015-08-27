@@ -68,6 +68,8 @@ import javax.swing.RootPaneContainer;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.JTextComponent;
 
@@ -92,6 +94,7 @@ import org.eclipse.scout.rt.ui.swing.dnd.AwtImageTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.FileListTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.JVMLocalObjectTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.TextTransferable;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.htmlfield.SwingScoutHtmlField;
 import org.eclipse.scout.rt.ui.swing.form.fields.labelfield.SwingScoutLabelField;
 import org.eclipse.scout.rt.ui.swing.simulator.SimulatorAction;
@@ -1343,7 +1346,11 @@ public final class SwingUtility {
       }
     }
 
-    private void onSwingPopup(MouseEvent e, boolean pasteEnabled) {
+    private void onSwingPopup(final MouseEvent e, boolean pasteEnabled) {
+      if (e.getSource() instanceof JTextFieldEx) {
+        JTextFieldEx field = (JTextFieldEx) e.getSource();
+        field.showingPopup(true);
+      }
       JPopupMenu pop = new JPopupMenu();
 
       if (pasteEnabled) {
@@ -1397,6 +1404,24 @@ public final class SwingUtility {
 
       m_comp.requestFocus();
       m_comp.setComponentPopupMenu(pop);
+      pop.addPopupMenuListener(new PopupMenuListener() {
+
+        @Override
+        public void popupMenuWillBecomeVisible(PopupMenuEvent e1) {
+        }
+
+        @Override
+        public void popupMenuWillBecomeInvisible(PopupMenuEvent e1) {
+          if (e.getSource() instanceof JTextFieldEx) {
+            JTextFieldEx field = (JTextFieldEx) e.getSource();
+            field.showingPopup(false);
+          }
+        }
+
+        @Override
+        public void popupMenuCanceled(PopupMenuEvent e1) {
+        }
+      });
       pop.show(m_comp, e.getX(), e.getY());
     }
 
@@ -1411,10 +1436,10 @@ public final class SwingUtility {
 
     }
   }// end class
-  
-    /**
+
+  /**
    * Replaces 3 digit CSS colors with 6 digit colors: (e.g. #fff with #ffffff)
-   *
+   * 
    * @param rawHtml
    *          may be <code>null</code>
    */
@@ -1446,6 +1471,5 @@ public final class SwingUtility {
     sb.append(rawHtml.substring(matchEndIndex, rawHtml.length()));
     return sb.toString();
   }
-  
 
 }

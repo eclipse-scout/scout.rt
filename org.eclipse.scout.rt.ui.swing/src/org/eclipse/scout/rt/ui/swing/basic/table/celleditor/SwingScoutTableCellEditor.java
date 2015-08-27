@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 import org.eclipse.scout.rt.ui.swing.focus.SwingScoutFocusTraversalPolicy;
 
 public class SwingScoutTableCellEditor {
@@ -396,6 +397,11 @@ public class SwingScoutTableCellEditor {
   private final class P_SwingInputVerifyListener implements ISwingInputVerifyListener {
     @Override
     public void verify(JComponent input) {
+      if (input instanceof JTextFieldEx) {
+        if (((JTextFieldEx) input).isShowingPopup()) {
+          return;
+        }
+      }
       saveEditorFromSwing();
     }
   }
