@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -659,6 +660,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected JSONObject treeNodeToJson(ITreeNode node) {
+    // Virtual and resolved nodes are equal in maps, but they don't behave the same. For example, a
+    // a virtual node does not return child nodes, while the resolved node does. Therefore, we
+    // want to always use the resolved node, if it exists.
+    node = TreeUtility.unwrapResolvedNode(node);
+
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "id", getOrCreateNodeId(node));
     putProperty(json, "expanded", node.isExpanded());

@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
@@ -76,8 +77,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void attachNode(ITreeNode node, boolean attachChildren) {
-    // Don't attach virtual nodes, if they are already resolved
-    node = unwrapResolvedNode(node);
+    // Don't attach virtual nodes if they are already resolved
+    node = TreeUtility.unwrapResolvedNode(node);
 
     if (attachChildren) {
       attachNodes(node.getChildNodes(), attachChildren);
@@ -113,7 +114,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     // Virtual and resolved nodes are equal in maps, but they don't behave the same. For example, a
     // a virtual page does not return a detail table, while the resolved node does. Therefore, we
     // want to always use the resolved node, if it exists.
-    node = unwrapResolvedNode(node);
+    node = TreeUtility.unwrapResolvedNode(node);
 
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
@@ -130,20 +131,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       putProperty(json, "classId", page.classId());
     }
     return json;
-  }
-
-  /**
-   * If the given node is a virtual node and has a resolved node, that resolved node is returned. Otherwise, the given
-   * node is returned.
-   */
-  protected ITreeNode unwrapResolvedNode(ITreeNode node) {
-    if (node instanceof IVirtualTreeNode) {
-      ITreeNode resolvedNode = ((IVirtualTreeNode) node).getResolvedNode();
-      if (resolvedNode != null) {
-        return resolvedNode;
-      }
-    }
-    return node;
   }
 
   protected void putNodeType(JSONObject json, ITreeNode node) {
