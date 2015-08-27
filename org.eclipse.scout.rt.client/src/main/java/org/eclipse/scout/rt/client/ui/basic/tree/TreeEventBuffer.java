@@ -86,6 +86,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     List<ITreeNode> remainingNodes = new ArrayList<ITreeNode>();
 
     for (ITreeNode nodeToRemove : nodesToRemove) {
+      // Unwrap resolved node to get the real answer to "getChildNodes()"
+      nodeToRemove = TreeUtility.unwrapResolvedNode(nodeToRemove);
       Collection<ITreeNode> allChildNodes = collectAllNodesRec(nodeToRemove.getChildNodes());
       boolean nodeRemovedFromCreationEvent = false;
 
@@ -194,6 +196,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
    */
   protected boolean containsNodeRec(Collection<ITreeNode> nodes, ITreeNode nodeToFind) {
     for (ITreeNode node : nodes) {
+      // Unwrap resolved node to get the real answer to "getChildNodes()"
+      node = TreeUtility.unwrapResolvedNode(node);
       if (CompareUtility.equals(node, nodeToFind)) {
         return true;
       }
@@ -210,6 +214,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected Collection<ITreeNode> collectAllNodesRec(Collection<ITreeNode> nodes) {
     List<ITreeNode> result = new ArrayList<ITreeNode>();
     for (ITreeNode node : nodes) {
+      // Unwrap resolved node to get the real answer to "getChildNodes()"
+      node = TreeUtility.unwrapResolvedNode(node);
       result.add(node);
       result.addAll(collectAllNodesRec(node.getChildNodes()));
     }

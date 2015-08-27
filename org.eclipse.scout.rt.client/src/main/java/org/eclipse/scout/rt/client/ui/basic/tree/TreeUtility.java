@@ -120,4 +120,18 @@ public final class TreeUtility {
 
     return node;
   }
+
+  /**
+   * If the given node is a virtual node and has a resolved node, that resolved node is returned. Otherwise, the given
+   * node is returned.
+   */
+  public static ITreeNode unwrapResolvedNode(ITreeNode node) {
+    if (node instanceof IVirtualTreeNode) {
+      ITreeNode resolvedNode = ((IVirtualTreeNode) node).getResolvedNode();
+      if (resolvedNode != null) {
+        return resolvedNode;
+      }
+    }
+    return node;
+  }
 }

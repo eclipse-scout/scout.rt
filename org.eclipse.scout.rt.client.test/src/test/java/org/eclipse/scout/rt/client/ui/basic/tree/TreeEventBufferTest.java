@@ -418,6 +418,43 @@ public class TreeEventBufferTest {
     assertTrue(CollectionUtility.equalsCollection(allCollectedNodes, allNodes));
   }
 
+  /**
+   * Tests that the event buffer uses the resolved nodes instead of the virtual nodes. This is relevant when looping
+   * over the children of nodes.
+   */
+  @Test
+  public void testResolveVirtualNodes() {
+    // A
+    // +- (D) = B
+    //          +- E
+    // +- (C)
+    AbstractTreeNode nodeA = new AbstractTreeNode() {
+    };
+    AbstractTreeNode nodeB = new AbstractTreeNode() {
+    };
+    VirtualTreeNode nodeC = new VirtualTreeNode() {
+    };
+    VirtualTreeNode nodeD = new VirtualTreeNode() {
+    };
+    VirtualTreeNode nodeE = new VirtualTreeNode() {
+    };
+    nodeD.setResolvedNode(nodeB);
+    nodeA.addChildNodesInternal(0, Collections.singletonList(nodeD), false);
+    nodeA.addChildNodesInternal(1, Collections.singletonList(nodeC), false);
+    nodeB.addChildNodesInternal(0, Collections.singletonList(nodeE), false);
+    nodeA.getCellForUpdate().setText("A");
+    nodeB.getCellForUpdate().setText("B");
+    nodeC.getCellForUpdate().setText("C (v)");
+    nodeD.getCellForUpdate().setText("D (v)");
+    nodeE.getCellForUpdate().setText("E");
+
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeA));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeE));
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, coalesced.size());
+  }
+
   private TreeEvent mockEvent(int type, String... nodeIds) {
     return mockEvent(type, mockNodes(nodeIds));
   }
