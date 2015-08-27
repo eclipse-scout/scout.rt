@@ -90,3 +90,7 @@ scout.BoxButtons.prototype.updateButtonWidths = function(availableWidth) {
     $button.outerWidth(w);
   });
 };
+
+scout.BoxButtons.prototype.buttonCount = function() {
+  return this._$buttons.length;
+};

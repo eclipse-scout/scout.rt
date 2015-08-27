@@ -97,8 +97,9 @@ scout.MessageBox.prototype._render = function($parent) {
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
-  this.$container.css('min-width', this.$container.width());
+  var naturalWidth = this.$container.width();
   this.$container.removeClass('calc-helper');
+  this.$container.css('min-width', Math.max(naturalWidth, boxButtons.buttonCount() * 100));
   boxButtons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();

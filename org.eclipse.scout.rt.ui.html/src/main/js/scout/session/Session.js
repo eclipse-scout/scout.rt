@@ -552,13 +552,23 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     return;
   }
 
-  this._throwError('Error while processing request: ' + errorThrown);
+  // Show error message
+  var boxOptions = {
+    header: this.optText('ui.NetworkError', 'Network error'),
+    body: jqXHR.status + ' ' + errorThrown,
+    yesButtonText: this.optText('ui.Reload', 'Reload'),
+    yesButtonAction: function() {
+      scout.reloadPage();
+    },
+    noButtonText: this.optText('ui.Ignore', 'Ignore')
+  };
+  this.showFatalMessage(boxOptions, jqXHR.status + '.net');
 };
 
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   // Default values for fatal message boxes
   var boxOptions = {
-    header: this.optText('ui.ServerError', 'Server Error') + ' (' + this.optText('ui.ErrorCodeX', 'Code ' + jsonError.code, jsonError.code) + ')',
+    header: this.optText('ui.ServerError', 'Server error') + ' (' + this.optText('ui.ErrorCodeX', 'Code ' + jsonError.code, jsonError.code) + ')',
     body: jsonError.message,
     yesButtonText: this.optText('ui.Reload', 'Reload'),
     yesButtonAction: function() {

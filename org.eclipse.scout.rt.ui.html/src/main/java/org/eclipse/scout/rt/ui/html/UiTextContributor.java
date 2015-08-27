@@ -99,6 +99,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.PopupBlockerDetected",
         "ui.OpenManually",
         "ui.FileChooserHint",
-        "ui.Outlines"));
+        "ui.Outlines",
+        "ui.NetworkError"));
   }
 }
