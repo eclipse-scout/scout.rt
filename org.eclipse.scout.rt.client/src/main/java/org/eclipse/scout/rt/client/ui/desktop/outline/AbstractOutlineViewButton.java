@@ -16,14 +16,11 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineViewButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public abstract class AbstractOutlineViewButton extends AbstractViewButton implements IOutlineViewButton {
 
@@ -97,46 +94,12 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
   }
 
   /**
-   * here is execAction used instead of execSelectionChanged to ensure every click event is handled. In case an outline
-   * is already selected the selection of the node will be reseted and the tree collapsed to the initial state.
+   * Activates the associated outline if it is not the desktop's active outline.
    */
   @Override
   protected void execAction() throws ProcessingException {
-    if (isSelected()) {
-      if (m_desktop.getOutline() != null && m_desktop.getOutline() == m_outline) {
-        //determine new selection
-        ITreeNode newSelectedNode;
-        if (m_outline.isRootNodeVisible()) {
-          newSelectedNode = m_outline.getRootPage();
-        }
-        else {
-          newSelectedNode = m_outline.getSelectedNode();
-          while (newSelectedNode != null && newSelectedNode.getParentNode() != m_outline.getRootPage()) {
-            newSelectedNode = newSelectedNode.getParentNode();
-          }
-        }
-        m_outline.selectNode(newSelectedNode);
-        // collapse outline
-        if (m_outline.isRootNodeVisible()) {
-          m_outline.collapseAll(m_outline.getRootPage());
-          if (m_outline.getRootPage() instanceof AbstractPage && ((AbstractPage) m_outline.getRootPage()).isInitialExpanded()) {
-            m_outline.setNodeExpanded(m_outline.getRootPage(), true);
-          }
-        }
-        else {
-          for (IPage<?> root : m_outline.getRootPage().getChildPages()) {
-            m_outline.collapseAll(root);
-          }
-          for (IPage<?> root : m_outline.getRootPage().getChildPages()) {
-            if (root instanceof AbstractPage && ((AbstractPage) root).isInitialExpanded()) {
-              m_outline.setNodeExpanded(root, true);
-            }
-          }
-        }
-      }
-      else {
-        m_desktop.activateOutline(m_outline);
-      }
+    if (isSelected() && m_desktop.getOutline() != m_outline) {
+      m_desktop.activateOutline(m_outline);
     }
   }
 
