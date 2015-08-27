@@ -1,0 +1,32 @@
+{
+  "adapterData": [
+    {
+      "id": "1",
+      "objectType": "FormField",
+      "enabled": true,
+      "visible": true,
+      "borderDecoration": "auto"
+    },
+    {
+      "id": "2",
+      "objectType": "TableField",
+      "enabled": true,
+      "visible": true,
+      "borderDecoration": "auto"
+    },
+    {
+      "id": "3",
+      "objectType": "FormField.Custom",
+      "enabled": true,
+      "visible": true,
+      "borderDecoration": "auto"
+    },
+    {
+      "id": "4",
+      "objectType": "TableField.Custom",
+      "enabled": true,
+      "visible": true,
+      "borderDecoration": "auto"
+    }
+  ]
+}

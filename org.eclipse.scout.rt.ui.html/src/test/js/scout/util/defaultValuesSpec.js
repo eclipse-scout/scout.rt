@@ -7,17 +7,23 @@ describe("scout.defaultValues", function() {
         scout.defaultValues._loadDefaultsConfiguration();
       }).toThrow();
       scout.defaultValues._loadDefaultsConfiguration({});
-      scout.defaultValues._loadDefaultsConfiguration({"defaults": {}});
-      scout.defaultValues._loadDefaultsConfiguration({"objectTypeHierarchy": {}});
+      scout.defaultValues._loadDefaultsConfiguration({
+        "defaults": {}
+      });
+      scout.defaultValues._loadDefaultsConfiguration({
+        "objectTypeHierarchy": {}
+      });
       expect(function() {
-        scout.defaultValues._loadDefaultsConfiguration({"objectTypeHierarchy": {
-          "FormField": {
-            "TableField": null,
-            "ValueField": {
-              "TableField": null
+        scout.defaultValues._loadDefaultsConfiguration({
+          "objectTypeHierarchy": {
+            "FormField": {
+              "TableField": null,
+              "ValueField": {
+                "TableField": null
+              }
             }
           }
-        }});
+        });
       }).toThrow();
     });
 
@@ -89,6 +95,62 @@ describe("scout.defaultValues", function() {
       expect(testObjects[4].gridData).toBe('77');
       expect(testObjects[5].gridData.x).toBe(0);
       expect(testObjects[5].gridData.y).toBe(5);
+    });
+
+    it("can apply default values to JSON considering the model variant", function() {
+      var config = {
+        "defaults": {
+          "FormField": {
+            "enabled": true
+          },
+          "TableField.Custom": {
+            "enabled": false,
+            "borderDecoration": "auto"
+          }
+        },
+        "objectTypeHierarchy": {
+          "FormField": {
+            "TableField": null
+          }
+        }
+      };
+      scout.defaultValues._loadDefaultsConfiguration(config);
+
+      var testObjects = [{ // [0]
+        "id": "1",
+        "objectType": "FormField",
+        "visible": true,
+        "borderDecoration": "auto"
+      }, { // [1]
+        "id": "2",
+        "objectType": "TableField",
+        "visible": true,
+        "borderDecoration": "auto"
+      }, { // [2]
+        "id": "3",
+        "objectType": "FormField.Custom",
+        "visible": true,
+        "borderDecoration": "auto"
+      }, { // [3]
+        "id": "4",
+        "objectType": "TableField.Custom",
+        "enabled": true,
+        "visible": true
+      }];
+      scout.defaultValues.applyTo(testObjects);
+
+      expect(testObjects[0].enabled).toBe(true);
+      expect(testObjects[0].visible).toBe(true);
+      expect(testObjects[0].borderDecoration).toBe("auto");
+      expect(testObjects[1].enabled).toBe(true);
+      expect(testObjects[1].visible).toBe(true);
+      expect(testObjects[1].borderDecoration).toBe("auto");
+      expect(testObjects[2].enabled).toBe(true);
+      expect(testObjects[2].visible).toBe(true);
+      expect(testObjects[2].borderDecoration).toBe("auto");
+      expect(testObjects[3].enabled).toBe(true);
+      expect(testObjects[3].visible).toBe(true);
+      expect(testObjects[3].borderDecoration).toBe("auto");
     });
 
     it("copies default values 'by value'", function() {

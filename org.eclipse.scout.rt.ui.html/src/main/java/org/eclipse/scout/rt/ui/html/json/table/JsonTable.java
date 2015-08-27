@@ -736,7 +736,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     for (IColumn<?> column : columns) {
       JsonColumn jsonColumn = m_jsonColumns.get(column);
       JSONObject json = jsonColumn.toJson();
-      JsonObjectUtility.filterDefaultValues(json, jsonColumn.getObjectType());
+      JsonObjectUtility.filterDefaultValues(json, jsonColumn.getObjectTypeVariant());
       jsonColumns.put(json);
     }
     return jsonColumns;

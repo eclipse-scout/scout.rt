@@ -85,6 +85,39 @@ public class DefaultValuesFilterTest {
   }
 
   @Test
+  public void testDefaultValueFilter_variant() throws Exception {
+    // Load defaults and build filter
+    JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_variant.json");
+    JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults", "{}"));
+    JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy", "{}"));
+    DefaultValuesFilter filter = new DefaultValuesFilter(0L, jsonDefaults, jsonObjectTypeHierarchy);
+
+    // Load test data and apply filter
+    JSONObject jsonToFilter = readJsonFile("json/DefaultValuesFilterTest_test_variant.json");
+    JSONArray adapterData = jsonToFilter.getJSONArray("adapterData");
+    for (int i = 0; i < adapterData.length(); i++) {
+      filter.filter(adapterData.getJSONObject(i));
+    }
+
+    // Checks
+    assertEquals(null, ((JSONObject) adapterData.get(0)).opt("enabled"));
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
+    assertEquals("auto", ((JSONObject) adapterData.get(0)).opt("borderDecoration"));
+
+    assertEquals(null, ((JSONObject) adapterData.get(1)).opt("enabled"));
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
+    assertEquals("auto", ((JSONObject) adapterData.get(1)).opt("borderDecoration"));
+
+    assertEquals(null, ((JSONObject) adapterData.get(2)).opt("enabled"));
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
+    assertEquals("auto", ((JSONObject) adapterData.get(2)).opt("borderDecoration"));
+
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(3)).opt("enabled"));
+    assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
+    assertEquals(null, ((JSONObject) adapterData.get(3)).opt("borderDecoration"));
+  }
+
+  @Test
   public void testDefaultValueFilter_lists() throws Exception {
     // Load defaults and build filter
     JSONObject jsonDefaultValueConfiguration = readJsonFile("json/DefaultValuesFilterTest_defaults_lists.json");

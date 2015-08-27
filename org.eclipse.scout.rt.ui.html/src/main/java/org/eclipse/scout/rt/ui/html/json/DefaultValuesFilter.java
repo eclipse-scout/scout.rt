@@ -137,7 +137,12 @@ public class DefaultValuesFilter {
     }
     List<String> objectTypeHierarchy = m_objectTypeHierarchyFlat.get(objectType);
     if (objectTypeHierarchy == null) {
-      // no default values
+      // Remove model variant and try again
+      objectType = objectType.replaceAll("\\..*", "");
+      objectTypeHierarchy = m_objectTypeHierarchyFlat.get(objectType);
+    }
+    if (objectTypeHierarchy == null) {
+      // Unknown type, no default values
       return;
     }
     for (String t : objectTypeHierarchy) {

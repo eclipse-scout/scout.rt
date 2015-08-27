@@ -80,7 +80,12 @@ scout.TableLayout.prototype._layoutColumns = function() {
   // First resize columns which will get smaller than the minimum width
   columns = relevantColumns;
   columns.forEach(function(column) {
-    weight = column.initialWidth / totalInitialWidth;
+    if (totalInitialWidth === 0) {
+      weight = 1 / relevantColumns.length;
+    }
+    else {
+      weight = column.initialWidth / totalInitialWidth;
+    }
     newWidth = weight * availableWidth;
     if (newWidth < scout.Table.COLUMN_MIN_WIDTH) {
       newWidth = scout.Table.COLUMN_MIN_WIDTH;
@@ -94,7 +99,12 @@ scout.TableLayout.prototype._layoutColumns = function() {
 
   // Then resize the others
   relevantColumns.forEach(function(column) {
-    weight = column.initialWidth / totalInitialWidth;
+    if (totalInitialWidth === 0) {
+      weight = 1 / relevantColumns.length;
+    }
+    else {
+      weight = column.initialWidth / totalInitialWidth;
+    }
     newWidth = weight * availableWidth;
     if (newWidth !== column.width) {
       this.table.resizeColumn(column, newWidth);

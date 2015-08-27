@@ -11,7 +11,7 @@ scout.Column.prototype.init = function(model, session) {
 
   // InitialWidth is only sent if it differs from width
   if (this.initialWidth === undefined) {
-    this.initialWidth = this.width;
+    this.initialWidth = scout.helpers.nvl(this.width, 0);
   }
 };
 

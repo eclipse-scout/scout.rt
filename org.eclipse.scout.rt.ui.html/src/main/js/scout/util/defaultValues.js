@@ -96,6 +96,11 @@ scout.defaultValues = {
   _applyToInternal: function(object, objectType) {
     var objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     if (!objectTypeHierarchy) {
+      // Remove model variant and try again
+      objectType = objectType.replace(/\..*/, '');
+      objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
+    }
+    if (!objectTypeHierarchy) {
       // Unknown type, nothing to apply
       return;
     }
