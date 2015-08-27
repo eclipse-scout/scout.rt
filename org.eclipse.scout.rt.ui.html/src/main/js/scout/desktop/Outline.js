@@ -223,7 +223,7 @@ scout.Outline.prototype._updateOutlineNode = function(node) {
     node.detailForm = null;
   }
 
-  if (!this.rendered || !scout.helpers.isOneOf(node, this.selectedNodes)) {
+  if (this.session.desktop.outline !== this || !scout.helpers.isOneOf(node, this.selectedNodes)) {
     return;
   }
 
