@@ -12,6 +12,21 @@ scout.TreeCompact = function() {
 };
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);
 
+
+scout.TreeCompact.prototype.init = function(model, session, register) {
+  scout.TreeCompact.parent.prototype.init.call(this, model, session, register);
+
+  // Keystroke context for the search field.
+  // TODO [dwi] migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
+  this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
+  this.searchFieldKeyStrokeContext.$bindTarget = function() {
+    return this.$filter;
+  }.bind(this);
+  this.searchFieldKeyStrokeContext.$scopeTarget = function() {
+    return this.$filter;
+  }.bind(this);
+};
+
 scout.TreeCompact.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('compact-tree');
 
@@ -34,9 +49,11 @@ scout.TreeCompact.prototype._render = function($parent) {
   });
   this.$nodes = $.makeDiv('nodes').appendTo(this.$nodesWrapper);
   this._renderNodes();
+  this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
 
 scout.TreeCompact.prototype._remove = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   scout.scrollbars.uninstall(this.$nodesWrapper, this.session);
 };
 
