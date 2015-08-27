@@ -2833,7 +2833,18 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     displayParent = Assertions.assertNotNull(displayParent, "'displayParent' must not be null");
 
+    // FIXME DWI: discuss about PreferredValue class: wouldn't it be easier to delete this class
+    // and simply return resolveDisplayParent() in getDisplayParent() when m_displayParent is null?
+    // Also review change from A.WE/N.BU: we've added the set(displayParent, true) because in
+    // the office add-in we have a form with an inner-form that opens another view-tab. In this
+    // particular case the displayParent was always wrong. When we came to this if for the first
+    // time "m_displayParent.get() == displayParent" was true, and the method returned immediately.
+    // At this time the boolean flag of the preferred-value object was false. Later, before the form
+    // was shown, AbstractForm#setDisplayHint() was called and changed the displayParent to Desktop,
+    // overriding the displayParent we set before. That's why we must mark the displayParent as
+    // preferred value here, because otherwise it could be changed later.
     if (m_displayParent.get() == displayParent) {
+      m_displayParent.set(displayParent, true);
       return;
     }
 
