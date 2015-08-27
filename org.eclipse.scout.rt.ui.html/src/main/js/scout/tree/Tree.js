@@ -921,7 +921,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     return;
   }
 
-  $predecessor = !$predecessor ? $parent : $predecessor;
+  $predecessor = $predecessor || $parent;
   var parentNode = ($parent ? $parent.data('node') : null);
   var hasHiddenNodes = false;
 

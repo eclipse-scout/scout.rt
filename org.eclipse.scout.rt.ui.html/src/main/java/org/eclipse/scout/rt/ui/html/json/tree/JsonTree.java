@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.ui.html.json.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -249,39 +249,52 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         // NOTE: This may lead to a temporary inconsistent situation, where node events exist in the buffer after the
         // node itself is deleted. This is because the node is not really deleted from the model. However, when processing
         // the buffered events, the "wrong" events will be ignored and everything is fixed again.
-        final List<ITreeNode> nodesToInsert = new ArrayList<>();
-        final List<ITreeNode> nodesToDelete = new ArrayList<>();
-        getModel().visitTree(new ITreeVisitor() {
-
-          @Override
-          public boolean visit(ITreeNode node) {
-            if (isInvisibleRootNode(node)) {
-              return true;
-            }
-
-            String existingNodeId = getNodeId(node);
-            if (node.isFilterAccepted()) {
-              if (existingNodeId == null) {
-                // Node is not filtered but JsonTree does not know it yet --> handle as insertion event
-                nodesToInsert.add(node);
-              }
-            }
-            else if (!node.isRejectedByUser()) {
-              if (existingNodeId != null) {
-                // Node is filtered, but JsonTree has it in its list --> handle as deletion event
-                nodesToDelete.add(node);
-              }
-            }
-            return true;
-          }
-        });
-        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_DELETED, nodesToDelete));
-        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_INSERTED, nodesToInsert));
-
+        applyFilterChangedEventToUiRec(Collections.singletonList(getModel().getRootNode()));
         break;
       }
       default: {
         m_eventBuffer.add(event);
+      }
+    }
+  }
+
+  /**
+   * Recursively traverses through the given nodes (and its child nodes) and checks which of the model nodes are hidden
+   * by tree filters.
+   * <ul>
+   * <li>For every newly hidden node (i.e. a node that is currently visible on the UI) a NODES_DELETED event is created.
+   * <li>For every newly visible node (i.e. a node that is currently invisible on the UI) a NODES_INSERTED event is
+   * created.
+   * </ul>
+   * All new events are added to the event buffer, where they might be coalesced later.
+   */
+  protected void applyFilterChangedEventToUiRec(List<ITreeNode> nodes) {
+    for (ITreeNode node : nodes) {
+      boolean processChildNodes = true;
+
+      if (!isInvisibleRootNode(node) && node.getTree() != null) {
+        String existingNodeId = getNodeId(node);
+        if (node.isFilterAccepted()) {
+          if (existingNodeId == null) {
+            // Node is not filtered but JsonTree does not know it yet --> handle as insertion event
+            m_eventBuffer.add(new TreeEvent(node.getTree(), TreeEvent.TYPE_NODES_INSERTED, node));
+            // Stop recursion, because this node (including its child nodes) is already inserted
+            processChildNodes = false;
+          }
+        }
+        else if (!node.isRejectedByUser()) {
+          if (existingNodeId != null) {
+            // Node is filtered, but JsonTree has it in its list --> handle as deletion event
+            m_eventBuffer.add(new TreeEvent(node.getTree(), TreeEvent.TYPE_NODES_DELETED, node));
+          }
+          // Stop recursion, because this node (including its child nodes) is already deleted
+          processChildNodes = false;
+        }
+      }
+
+      // Recursion
+      if (processChildNodes) {
+        applyFilterChangedEventToUiRec(node.getChildNodes());
       }
     }
   }
