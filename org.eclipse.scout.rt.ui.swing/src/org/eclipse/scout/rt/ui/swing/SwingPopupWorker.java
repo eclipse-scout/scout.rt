@@ -25,6 +25,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 
@@ -41,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 
 /**
  * a swing runnable that can be enqueued into the awt event queue when run it
@@ -139,6 +141,10 @@ public class SwingPopupWorker implements Runnable {
   @Override
   public void run() {
     // about to show
+    if (SwingPopupWorker.this.getTarget() instanceof JTextFieldEx) {
+      JTextFieldEx field = (JTextFieldEx) SwingPopupWorker.this.getTarget();
+      field.showingPopup(true);
+    }
     Runnable t = new Runnable() {
       @SuppressWarnings("deprecation")
       @Override
@@ -269,6 +275,24 @@ public class SwingPopupWorker implements Runnable {
 
         p = r.getLocation();
         p.translate(-compLocationOnScreen.x, -compLocationOnScreen.y);
+        pop.addPopupMenuListener(new PopupMenuListener() {
+
+          @Override
+          public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+          }
+
+          @Override
+          public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            if (SwingPopupWorker.this.getTarget() instanceof JTextFieldEx) {
+              JTextFieldEx field = (JTextFieldEx) SwingPopupWorker.this.getTarget();
+              field.showingPopup(false);
+            }
+          }
+
+          @Override
+          public void popupMenuCanceled(PopupMenuEvent e) {
+          }
+        });
         pop.show(target, p.x, p.y);
       }
     }

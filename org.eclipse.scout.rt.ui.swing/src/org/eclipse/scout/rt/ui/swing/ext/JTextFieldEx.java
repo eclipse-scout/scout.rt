@@ -39,6 +39,8 @@ public class JTextFieldEx extends JTextField {
 
   private OnFieldLabelDecorator m_onFieldLabelHandler;
 
+  private boolean m_isShowingPopup = false;
+
   public JTextFieldEx() {
     super();
     SwingUtility.installDefaultFocusHandling(this);
@@ -106,4 +108,16 @@ public class JTextFieldEx extends JTextField {
   public Point getToolTipLocation(MouseEvent e) {
     return SwingUtility.getAdjustedToolTipLocation(e, this, getTopLevelAncestor());
   }
+
+  /**
+   * @param b
+   */
+  public void showingPopup(boolean b) {
+    m_isShowingPopup = b;
+  }
+
+  public boolean isShowingPopup() {
+    return m_isShowingPopup;
+  }
+
 }
