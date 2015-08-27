@@ -13,7 +13,7 @@ scout.logout = {
       texts = new scout.Texts(options.texts);
 
     var $box = $('<div>')
-      .addClass('box-with-logo centered')
+      .addClass('box-with-logo small centered')
       .html(scout.strings.nl2br(texts.get('ui.logoutSuccessful')))
       .appendTo($('body'));
     var $buttonBar = $('<div>')

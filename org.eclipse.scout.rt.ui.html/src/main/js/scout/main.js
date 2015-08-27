@@ -54,12 +54,11 @@ scout._checkBrowserCompability = function(options) {
 
   var session = this;
   $('.scout').each(function() {
-    var $entryPoint = $(this);
-    var $box = $entryPoint.appendDiv('box-with-logo');
+    var $entryPoint = $(this),
+      $box = $entryPoint.appendDiv('box-with-logo small'),
+      newOptions = scout.objects.valueCopy(options);
 
-    var newOptions = scout.objects.valueCopy(options);
     newOptions.checkBrowserCompatibility = false;
-
     $box.load('unsupported-browser.html', function() {
       $box.find('button').on('click', function() {
         $box.remove();
