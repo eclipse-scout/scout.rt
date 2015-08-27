@@ -816,10 +816,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if ((!parentAccepted) && inode.isFilterAccepted()) {
       ITreeNode tmp = inode.getParentNode();
       while (tmp != null) {
-        if (tmp instanceof AbstractTreeNode) {
-          ((AbstractTreeNode) tmp).setFilterAccepted(true);
-          ((AbstractTreeNode) tmp).setRejectedByUser(false);
-        }
+        tmp.setFilterAccepted(true);
+        tmp.setRejectedByUser(false);
         tmp = tmp.getParentNode();
       }
     }
