@@ -6,7 +6,7 @@
   which accompanies this distribution, and is available at
   http://www.eclipse.org/legal/epl-v10.html
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,6 +22,22 @@
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
+
+  <dependencies>
+    <!-- Build Dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -41,10 +57,10 @@
         <executions>
           <execution>
             <id>add-resource</id>
-            <phase>generate-resources</phase>
             <goals>
               <goal>add-resource</goal>
             </goals>
+            <phase>generate-resources</phase>
             <configuration>
               <resources>
                 <resource>
@@ -55,10 +71,10 @@
           </execution>
           <execution>
             <id>add-test-resource</id>
-            <phase>generate-resources</phase>
             <goals>
               <goal>add-resource</goal>
             </goals>
+            <phase>generate-resources</phase>
             <configuration>
               <resources>
                 <resource>
@@ -71,20 +87,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-    <!-- Build Dependencies -->
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-      <groupId>org.eclipse.scout.rt</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-    </dependency>
-  </dependencies>
 </project>

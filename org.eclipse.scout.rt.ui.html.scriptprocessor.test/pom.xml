@@ -6,7 +6,7 @@
   which accompanies this distribution, and is available at
   http://www.eclipse.org/legal/epl-v10.html
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -18,6 +18,20 @@
 
   <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor.test</artifactId>
   <packaging>jar</packaging>
+
+  <dependencies>
+    <!-- Build Dependencies (Provided) -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -54,18 +68,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-    <!-- Build Dependencies (Provided) -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
-    </dependency>
-
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
 </project>

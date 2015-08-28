@@ -6,7 +6,7 @@
   which accompanies this distribution, and is available at
   http://www.eclipse.org/legal/epl-v10.html
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,6 +22,27 @@
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
+
+  <dependencies>
+    <!-- Build Dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+    </dependency>
+
+    <!-- Build Dependencies (Provided) -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.client.test</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -62,25 +83,4 @@
 
     </plugins>
   </build>
-
-  <dependencies>
-    <!-- Build Dependencies -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-    </dependency>
-
-    <!-- Build Dependencies (Provided) -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-    </dependency>
-  </dependencies>
 </project>
