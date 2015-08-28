@@ -86,9 +86,12 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   if (this._displayParent instanceof scout.Form) {
     dialog.on('remove', function() {
       if (this._displayParent.dialogs.length > 0) {
-        this.session.desktop._sendFormActivated(this._displayParent.dialogs[this._displayParent.dialogs.length - 1]);
-      } else {
-        this.session.desktop._sendFormActivated(this._displayParent);
+        this.session.desktop._setFormActivated(this._displayParent.dialogs[this._displayParent.dialogs.length - 1]);
+      } else if (this._displayParent.parent instanceof scout.Outline){
+        // if displayParent is a page
+        this.session.desktop._setOutlineActivated();
+      } else{
+        this.session.desktop._setFormActivated(this._displayParent);
       }
     }.bind(this));
   }

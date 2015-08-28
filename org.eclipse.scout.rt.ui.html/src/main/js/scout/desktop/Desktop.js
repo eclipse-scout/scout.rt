@@ -25,7 +25,7 @@ scout.Desktop = function() {
   this.messageBoxController;
   this.fileChooserController;
 
-  this.suppressSendActiveForm = false;
+  this.suppressSetActiveForm = false;
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -102,10 +102,12 @@ scout.Desktop.prototype._render = function($parent) {
  * @returns
  */
 scout.Desktop.prototype._findActiveSelectablePart = function(form) {
-  if (form.parent.isView()) {
-    return form.parent;
-  } else if (form.parent.isDialog()) {
-    return this._findActiveSelectablePart(form.parent);
+  if (form.parent.isView && form.parent.isDialog) {
+    if (form.parent.isView()) {
+      return form.parent;
+    } else if (form.parent.isDialog()) {
+      return this._findActiveSelectablePart(form.parent);
+    }
   }
   return null;
 };
@@ -181,7 +183,7 @@ scout.Desktop.prototype._postRender = function() {
 
   //find active form and set selected.
   var selectable;
-  this.suppressSendActiveForm = true;
+  this.suppressSetActiveForm = true;
   if (this.activeForm) {
     var form = this.session.getModelAdapter(this.activeForm);
     if (form.isDialog()) {
@@ -196,11 +198,11 @@ scout.Desktop.prototype._postRender = function() {
   } else {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
-  this.suppressSendActiveForm = false;
+  this.suppressSetActiveForm = false;
 };
 
 scout.Desktop.prototype._renderActiveForm = function($parent) {
-  //nop -> is handled in _sendFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
+  //nop -> is handled in _setFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {
@@ -396,7 +398,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   }
 
   //set active form to null because outline is active form.
-  this._sendFormActivated();
+  this._setOutlineActivated();
   // Request focus on first element in new outlineTab.
   this.session.focusManager.validateFocus(); // TODO [nbu][dwi] why double validate?
 };
@@ -409,7 +411,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
 scout.Desktop.prototype._onModelFormShow = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    this.activeForm = event.form;
+    this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent), true);
     //register listener to recover active form when child dialog is removed
     displayParent.formController.registerAndRender(event.form);
   }
@@ -426,7 +428,7 @@ scout.Desktop.prototype._onModelFormActivate = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.formController.activateForm(event.form);
-    this.activeForm = event.form;
+    this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent), true);
   }
 };
 
@@ -569,7 +571,7 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
       this._bringNavigationToFront();
     }
     //set active form to null because outline is active form.
-    this._sendFormActivated();
+    this._setOutlineActivated();
   } else {
     this.setOutline(outline);
   }
@@ -653,19 +655,31 @@ scout.Desktop.prototype._addNullOutline = function(outline) {
   this.viewButtons.push(ovb);
 };
 
-scout.Desktop.prototype._sendFormActivated = function(form) {
+scout.Desktop.prototype._setOutlineActivated = function() {
+  this._setFormActivated();
+};
+
+scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
+
   //if desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
-  if (!this.rendered || this.suppressSendActiveForm) {
+  if (!this.rendered || this.suppressSetActiveForm) {
     return;
   }
+
+  if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
+    this.activeForm = form ? form.id : null;
+    if (!suppressSend) {
+      this._sendFormActivated(form);
+    }
+  }
+};
+
+scout.Desktop.prototype._sendFormActivated = function(form) {
   var data = {
     formId: null
   };
   if (form) {
     data.formId = form.id;
   }
-  if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
-    this.activeForm = form ? form.id : null;
-    this.remoteHandler(this.id, 'formActivated', data);
-  }
+  this.remoteHandler(this.id, 'formActivated', data);
 };
