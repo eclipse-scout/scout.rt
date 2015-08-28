@@ -425,16 +425,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public <T extends IForm> T findActiveForm() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public <T extends IForm> T findLastActiveForm(Class<T> formType) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public List<IOutline> getAvailableOutlines() {
     throw createUnsupportedOperationException();
   }

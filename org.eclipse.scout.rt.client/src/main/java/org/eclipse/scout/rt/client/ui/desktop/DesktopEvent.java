@@ -134,13 +134,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_TRAVERSE_FOCUS_PREVIOUS = 1030;
 
-  /**
-   * Event type that indicates that the currently active (focused) {@link IForm} should be calculated.
-   *
-   * @see IDesktop#traverseFocusPrevious()
-   */
-  public static final int TYPE_FIND_ACTIVE_FORM = 1040;
-
   private final int m_type;
   private IOutline m_outline;
   private IForm m_form;

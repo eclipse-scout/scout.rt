@@ -96,6 +96,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_DESKTOP_STYLE = "desktopStyle";
 
+  String PROP_ACTIVE_FORM = "activeForm";
+
   public enum DesktopStyle {
     /**
      * Default desktop style with header, navigation (tree) and bench (forms).
@@ -119,17 +121,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * Returns all registered Forms which are of the given type or a sub type of the given type.
    */
   <T extends IForm> List<T> findForms(Class<T> formType);
-
-  /**
-   * @return the currently active {@link IForm}, or <code>null</code> if not available.
-   */
-  <T extends IForm> T findActiveForm();
-
-  /**
-   * @return the most recent activated {@link IForm} of the given type, or <code>null</code> if not available. However,
-   *         that IForm must not be the currently active {@link IForm}.
-   */
-  <T extends IForm> T findLastActiveForm(Class<T> formType);
 
   /**
    * @return an available outline of this type ({@link #getAvailableOutlines()}

@@ -142,7 +142,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final FormStore m_formStore;
   private final MessageBoxStore m_messageBoxStore;
   private final FileChooserStore m_fileChooserStore;
-  private final FormActivationTracker m_formActivationTracker;
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
   private List<IToolButton> m_toolButtons;
@@ -173,7 +172,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_formStore = BEANS.get(FormStore.class);
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
     m_fileChooserStore = BEANS.get(FileChooserStore.class);
-    m_formActivationTracker = BEANS.get(FormActivationTracker.class);
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
     m_addOns = new ArrayList<>();
     m_objectExtensions = new ObjectExtensions<>(this);
@@ -511,8 +509,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void initConfig() {
-    m_formActivationTracker.start(this);
-
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
@@ -765,19 +761,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public IForm getActiveForm() {
-    return fireFindActiveForm();
+    return (IForm) propertySupport.getProperty(PROP_ACTIVE_FORM);
   }
 
-  //TODO [dwi] remove this oder getActiveForm
-  @Override
-  public <T extends IForm> T findActiveForm() {
-    return m_formActivationTracker.getActiveForm();
-  }
-
-  @Override
-  // TODO [dwi] rename to findActiveForm
-  public <FORM extends IForm> FORM findLastActiveForm(Class<FORM> formType) {
-    return m_formActivationTracker.getActiveForm(formType);
+  protected void setActiveForm(IForm form) {
+    propertySupport.setProperty(PROP_ACTIVE_FORM, form);
   }
 
   @Override
@@ -907,6 +895,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void activateForm(IForm form) {
     if (form == null) {
+      setActiveForm(form);
       return;
     }
 
@@ -921,6 +910,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     else if (displayParent instanceof IOutline) {
       activateOutline(((IOutline) displayParent));
     }
+    setActiveForm(form);
     fireFormActivate(form);
   }
 
@@ -1072,6 +1062,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     m_formStore.add(form);
+    activateForm(form);
     fireFormShow(form);
   }
 
@@ -1086,7 +1077,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (form == null || !m_formStore.contains(form)) {
       return;
     }
-
+    //clean active form-> new active form is set by ui or activateForm(IFORM)
+    if (getActiveForm() == form) {
+      setActiveForm(null);
+    }
     m_formStore.remove(form);
     fireFormHide(form);
   }
@@ -1774,12 +1768,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FIND_FOCUS_OWNER);
     fireDesktopEvent(e);
     return e.getFocusedField();
-  }
-
-  private IForm fireFindActiveForm() {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FIND_ACTIVE_FORM);
-    fireDesktopEvent(e);
-    return e.getActiveForm();
   }
 
   // main handler
