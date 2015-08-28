@@ -59,8 +59,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlLookupService.class);
 
-  public AbstractSqlLookupService() {
-  }
+  private volatile String m_wildcard = "*";
 
   /**
    * Sql SELECT statement
@@ -113,11 +112,11 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
 
   @Override
   public List<ILookupRow<T>> getDataByText(ILookupCall<T> call) throws ProcessingException {
-    // change wildcards * in text to db specific wildcards
+    // change wildcards in text to db specific wildcards
     if (call.getText() != null) {
       String s = call.getText();
       String sqlWildcard = SERVICES.getService(ISqlService.class).getSqlStyle().getLikeWildcard();
-      call.setText(s.replaceAll("[*]", sqlWildcard));
+      call.setText(s.replace(getWildcard(), sqlWildcard));
     }
     String sql = getConfiguredSqlSelect();
     return execLoadLookupRows(sql, filterSqlByText(sql), call);
@@ -183,6 +182,14 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
    */
   protected String filterSqlByRec(String sqlSelect) {
     return StringUtility.removeTagBounds(StringUtility.removeTags(sqlSelect, new String[]{"key", "text", "all"}), "rec");
+  }
+
+  public String getWildcard() {
+    return m_wildcard;
+  }
+
+  public void setWildcard(String wildcard) {
+    m_wildcard = wildcard;
   }
 
 }

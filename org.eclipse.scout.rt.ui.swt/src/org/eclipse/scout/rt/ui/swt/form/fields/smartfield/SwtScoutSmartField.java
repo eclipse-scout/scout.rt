@@ -454,7 +454,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
 
   protected void handleSwtBrowseAction() {
     if (getSwtBrowseButton().isVisible() && getSwtBrowseButton().isEnabled()) {
-      requestProposalSupportFromSwt(IContentAssistField.BROWSE_ALL_TEXT, true);
+      requestProposalSupportFromSwt(getScoutObject().getWildcard(), true);
     }
   }
 
@@ -506,7 +506,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
       case SWT.PAGE_UP:
         if (getSwtField().isEnabled() && getSwtField().getEditable() && getSwtField().isVisible()) {
           if (m_proposalPopup == null) {
-            requestProposalSupportFromSwt(IContentAssistField.BROWSE_ALL_TEXT, true);
+            requestProposalSupportFromSwt(getScoutObject().getWildcard(), true);
           }
           else {
             Widget c = null;

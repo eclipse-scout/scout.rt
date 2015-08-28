@@ -128,7 +128,6 @@ public class StringUtilityTest {
     assertEquals("1, 2", StringUtility.join(", ", new Long[]{Long.valueOf(1), null, Long.valueOf(2)}));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testJoinCollection() {
     assertEquals("", StringUtility.join(null, (Collection<?>) null));
@@ -497,6 +496,14 @@ public class StringUtilityTest {
     assertFalse(StringUtility.notEqualsIgnoreCase("", ""));
     assertFalse(StringUtility.notEqualsIgnoreCase("teststring", "TestString"));
     assertTrue(StringUtility.notEqualsIgnoreCase("teststring", "teststring2"));
+  }
+
+  @Test
+  public void testEscapeRegexMetachars() {
+    assertEquals("", StringUtility.escapeRegexMetachars(null));
+    assertEquals("", StringUtility.escapeRegexMetachars(""));
+    assertEquals("no metachar in source", StringUtility.escapeRegexMetachars("no metachar in source"));
+    assertEquals("all metachars: \\^\\[\\.\\$\\{\\*\\(\\\\\\+\\)\\|\\?\\<\\>", StringUtility.escapeRegexMetachars("all metachars: ^[.${*(\\+)|?<>"));
   }
 
 }

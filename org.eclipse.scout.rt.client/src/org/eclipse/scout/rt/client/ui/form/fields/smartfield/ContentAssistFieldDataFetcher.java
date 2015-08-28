@@ -24,8 +24,8 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
 
   private JobEx m_dataLoadJob;
 
-  public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> proposalField) {
-    super(proposalField);
+  public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
+    super(contentAssistField);
 
   }
 
@@ -45,7 +45,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     if (synchronous) {
       try {
         List<? extends ILookupRow<LOOKUP_KEY>> rows;
-        if (IContentAssistField.BROWSE_ALL_TEXT.equals(text)) {
+        if (getContentAssistField().getWildcard().equals(text)) {
           rows = getContentAssistField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
         }
         else if (text.length() == 0) {
@@ -61,7 +61,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
       }
     }
     else {
-      if (IContentAssistField.BROWSE_ALL_TEXT.equals(textNonNull)) {
+      if (getContentAssistField().getWildcard().equals(textNonNull)) {
         m_dataLoadJob = getContentAssistField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
       }
       else if (textNonNull.length() == 0) {

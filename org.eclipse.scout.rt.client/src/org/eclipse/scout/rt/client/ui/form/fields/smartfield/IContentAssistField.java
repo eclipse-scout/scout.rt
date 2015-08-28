@@ -45,8 +45,6 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   String PROP_ICON_ID = "iconId";
 
-  String BROWSE_ALL_TEXT = "*";
-
   void addSmartFieldListener(ContentAssistFieldListener listener);
 
   void removeSmartFieldListener(ContentAssistFieldListener listener);
@@ -272,5 +270,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * @return
    */
   Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass();
+
+  void setWildcard(String wildcard);
+
+  String getWildcard();
 
 }

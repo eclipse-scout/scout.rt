@@ -263,7 +263,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     @Override
     public void openProposalFromUI(String newText, boolean selectCurrentValue) {
       if (newText == null) {
-        newText = BROWSE_ALL_TEXT;
+        newText = getWildcard();
       }
       IContentAssistFieldProposalForm smartForm = getProposalForm();
       if (smartForm == null) {
@@ -309,6 +309,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     public void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form) {
       unregisterProposalFormInternal(form);
     }
+
   }
 
   protected static class LocalProposalFieldExtension<LOOKUP_KEY, OWNER extends AbstractProposalField<LOOKUP_KEY>> extends LocalContentAssistFieldExtension<String, LOOKUP_KEY, OWNER> implements IProposalFieldExtension<LOOKUP_KEY, OWNER> {

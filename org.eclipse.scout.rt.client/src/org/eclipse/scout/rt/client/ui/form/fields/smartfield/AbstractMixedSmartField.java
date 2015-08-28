@@ -350,7 +350,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     @Override
     public void openProposalFromUI(String newText, boolean selectCurrentValue) {
       if (newText == null) {
-        newText = BROWSE_ALL_TEXT;
+        newText = getWildcard();
       }
       try {
         IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();

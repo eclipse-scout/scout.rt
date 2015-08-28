@@ -188,7 +188,7 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<IConte
         return;
       }
 
-      requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true);
+      requestProposalSupportFromUi(getScoutObject().getWildcard(), true);
     }
   }
 

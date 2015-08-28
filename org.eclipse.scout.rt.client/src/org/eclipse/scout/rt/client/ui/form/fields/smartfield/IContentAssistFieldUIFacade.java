@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-
 public interface IContentAssistFieldUIFacade {
 
   boolean setTextFromUI(String newText);
@@ -24,4 +23,5 @@ public interface IContentAssistFieldUIFacade {
   boolean acceptProposalFromUI();
 
   void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form);
+
 }

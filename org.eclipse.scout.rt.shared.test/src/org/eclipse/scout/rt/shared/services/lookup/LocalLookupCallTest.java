@@ -34,37 +34,64 @@ public class LocalLookupCallTest {
   private static final String ROW30_TEXT = "dolor";
   private static final Integer ROW31_KEY = Integer.valueOf(43);
   private static final String ROW31_TEXT = "mor";
+  private static final Integer ROW40_KEY = Integer.valueOf(140);
+  // with regex meta-chars
+  private static final String ROW40_TEXT = "text with a '*' in the middle";
+  private static final Integer ROW50_KEY = Integer.valueOf(150);
+  private static final String ROW50_TEXT = "all regex meta-chars: ^[.${*(\\+)|?<>";
 
   @Test
   public void testGetDataByAll() throws Exception {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
-
-    assertEquals("rows lengh", 6, rows.size());
+    assertEquals("rows lengh", 8, rows.size());
   }
 
   @Test
   public void testGetDataByText() throws Exception {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     List<? extends ILookupRow<Integer>> rows = lc.getDataByText();
-
-    assertEquals("rows length", 6, rows.size());
+    assertEquals("rows length", 8, rows.size());
   }
 
   @Test
   public void testGetDataByTextFiltered() throws Exception {
-    runGetDataByTextFiltered(6, null);
-    runGetDataByTextFiltered(4, "*or*");
-    runGetDataByTextFiltered(3, "*or");
-    runGetDataByTextFiltered(2, "ip");
-    runGetDataByTextFiltered(0, "foo");
-    runGetDataByTextFiltered(1, "ipi");
-    runGetDataByTextFiltered(6, "*");
-    runGetDataByTextFiltered(6, "");
+    runGetDataByTextFiltered(8, null, null);
+    runGetDataByTextFiltered(4, "*or*", null);
+    runGetDataByTextFiltered(4, "*or*", "*");
+    runGetDataByTextFiltered(3, "*or", null);
+    runGetDataByTextFiltered(2, "ip", null);
+    runGetDataByTextFiltered(0, "foo", null);
+    runGetDataByTextFiltered(1, "ipi", null);
+    runGetDataByTextFiltered(8, "*", null);
+    runGetDataByTextFiltered(8, "", null);
+    runGetDataByTextFiltered(0, "°", null);
+    runGetDataByTextFiltered(1, "*?*", null);
+    runGetDataByTextFiltered(1, "*\\*", null);
   }
 
-  private void runGetDataByTextFiltered(int expectedLength, String text) throws ProcessingException {
+  @Test
+  public void testGetDataByTextFilteredCustomWildcard() throws Exception {
+    runGetDataByTextFiltered(8, null, "°");
+    runGetDataByTextFiltered(4, "°or°", "°");
+    runGetDataByTextFiltered(3, "°or", "°");
+    runGetDataByTextFiltered(2, "ip", "°");
+    runGetDataByTextFiltered(0, "foo", "°");
+    runGetDataByTextFiltered(1, "ipi", "°");
+    runGetDataByTextFiltered(8, "°", "°");
+    runGetDataByTextFiltered(8, "", "°");
+    runGetDataByTextFiltered(0, "*", "°");
+    runGetDataByTextFiltered(2, "°*°", "°");
+    runGetDataByTextFiltered(1, "text with°*°", "°");
+    runGetDataByTextFiltered(1, "°?°", "°");
+    runGetDataByTextFiltered(1, "°\\°", "°");
+  }
+
+  private void runGetDataByTextFiltered(int expectedLength, String text, String wildcard) throws ProcessingException {
     P_LocalLookupCall lc = new P_LocalLookupCall();
+    if (wildcard != null) {
+      lc.setWildcard(wildcard);
+    }
     lc.setText(text);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByText();
 
@@ -90,7 +117,7 @@ public class LocalLookupCallTest {
 
   @Test
   public void testGetDataByRec() throws Exception {
-    runGetDataByRec(3, null);
+    runGetDataByRec(5, null);
     runGetDataByRec(2, ROW10_KEY);
     runGetDataByRec(0, ROW20_KEY);
     runGetDataByRec(1, ROW30_KEY);
@@ -112,14 +139,16 @@ public class LocalLookupCallTest {
 
     @Override
     protected List<ILookupRow<Integer>> execCreateLookupRows() throws ProcessingException {
-      List<ILookupRow<Integer>> list = new ArrayList<ILookupRow<Integer>>();
-      list.add(new LookupRow<Integer>(ROW10_KEY, ROW10_TEXT));
-      list.add(new LookupRow<Integer>(ROW20_KEY, ROW20_TEXT));
-      list.add(new LookupRow<Integer>(ROW30_KEY, ROW30_TEXT));
-      list.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT, null, null, null, null, null, true, ROW10_KEY));
-      list.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT, null, null, null, null, null, true, ROW10_KEY));
-      list.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT, null, null, null, null, null, true, ROW30_KEY));
-      return list;
+      List<ILookupRow<Integer>> rows = new ArrayList<ILookupRow<Integer>>();
+      rows.add(new LookupRow<Integer>(ROW10_KEY, ROW10_TEXT));
+      rows.add(new LookupRow<Integer>(ROW20_KEY, ROW20_TEXT));
+      rows.add(new LookupRow<Integer>(ROW30_KEY, ROW30_TEXT));
+      rows.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT, null, null, null, null, null, true, ROW10_KEY));
+      rows.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT, null, null, null, null, null, true, ROW10_KEY));
+      rows.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT, null, null, null, null, null, true, ROW30_KEY));
+      rows.add(new LookupRow<Integer>(ROW40_KEY, ROW40_TEXT));
+      rows.add(new LookupRow<Integer>(ROW50_KEY, ROW50_TEXT));
+      return rows;
     }
   }
 }

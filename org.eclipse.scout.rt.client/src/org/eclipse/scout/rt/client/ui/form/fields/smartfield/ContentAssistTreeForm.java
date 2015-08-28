@@ -106,7 +106,7 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
       getStatusField().setValue(ScoutTexts.get("searchingProposals"));
       getStatusField().setVisible(true);
       //go async to fetch data
-      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
+      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(getContentAssistField().getWildcard(), 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
         @Override
         public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
           if (failed == null) {
@@ -198,10 +198,10 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
     s = s.toLowerCase();
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-      s = "*" + s;
+      s = getContentAssistField().getWildcard() + s;
     }
-    if (!s.endsWith("*")) {
-      s = s + "*";
+    if (!s.endsWith(getContentAssistField().getWildcard())) {
+      s = s + getContentAssistField().getWildcard();
     }
     s = StringUtility.toRegExPattern(s);
     return Pattern.compile(s, Pattern.DOTALL);

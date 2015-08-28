@@ -1813,4 +1813,43 @@ public final class StringUtility {
     }
     return true;
   }
+
+  /**
+   * @param s
+   * @return
+   */
+  public static String escapeRegexMetachars(String s) {
+    if (s == null) {
+      s = "";
+    }
+    StringBuilder sb = new StringBuilder();
+    char[] ch = s.toCharArray();
+    for (int i = 0; i < ch.length; i++) {
+      switch (ch[i]) {
+        case '^':
+        case '[':
+        case '.':
+        case '$':
+        case '{':
+        case '*':
+        case '(':
+        case '\\':
+        case '+':
+        case ')':
+        case '|':
+        case '?':
+        case '<':
+        case '>': {
+          sb.append('\\');
+          break;
+        }
+        default: {
+          // nop
+          break;
+        }
+      }
+      sb.append(ch[i]);
+    }
+    return sb.toString();
+  }
 }

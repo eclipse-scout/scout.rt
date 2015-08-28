@@ -322,7 +322,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
       public void actionPerformed(ActionEvent e) {
         if (getSwingTextField().isVisible() && getSwingTextField().isEditable()) {
           if (m_proposalPopup == null) {
-            requestProposalSupportFromSwing(IContentAssistField.BROWSE_ALL_TEXT, true, 0);
+            requestProposalSupportFromSwing(getScoutObject().getWildcard(), true, 0);
           }
           else {
             JComponent c = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTable.class);
@@ -613,7 +613,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
 
   protected void handleSwingSmartChooserAction(long initialDelay) {
     if (isSmartChooserEnabled()) {
-      requestProposalSupportFromSwing(IContentAssistField.BROWSE_ALL_TEXT, true, initialDelay);
+      requestProposalSupportFromSwing(getScoutObject().getWildcard(), true, initialDelay);
     }
   }
 

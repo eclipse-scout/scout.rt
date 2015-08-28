@@ -592,7 +592,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
 
   protected void handleUiBrowseAction() {
     if (getUiBrowseButton().isVisible() && getUiBrowseButton().isEnabled()) {
-      requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+      requestProposalSupportFromUi(getScoutObject().getWildcard(), true, 0);
     }
   }
 
@@ -717,7 +717,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
         default:
           if (m_proposalPopup == null) {
             if (getUiField().getEditable() && getUiField().isVisible()) {
-              requestProposalSupportFromUi(ISmartField.BROWSE_ALL_TEXT, true, 0);
+              requestProposalSupportFromUi(getScoutObject().getWildcard(), true, 0);
             }
             e.doit = false;
           }
