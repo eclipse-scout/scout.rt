@@ -6,6 +6,10 @@
   padding-bottom: 5px;
   border: 1px solid @border-color;
 
+  &:focus {
+    outline: 0;
+  }
+
   &.down {
     #scout.drop-shadow;
   }

@@ -361,7 +361,8 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
   var $header = column.$header;
   this._tableHeaderMenu = new scout.TableHeaderMenu(this.session, {
     tableHeader: this,
-    $anchor: $header
+    $anchor: $header,
+    focusableContainer: true
   });
   this._tableHeaderMenu.render();
   this.addChild(this._tableHeaderMenu);

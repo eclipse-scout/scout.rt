@@ -50,6 +50,9 @@ scout.TableHeaderMenu.prototype._render = function() {
       .data('label', session.text('ui.toEnd'))
       .click(moveBottom);
   }
+  if (this.withFocusContext && this.focusableContainer) {
+    this.$container.attr('tabindex', -1);
+  }
 
   // create buttons in command for sorting
   var $commandSort = $menuHeader.appendDiv('header-group');
