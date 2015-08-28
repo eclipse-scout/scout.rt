@@ -258,6 +258,10 @@ scout.Form.prototype.attach = function() {
 
   // form is attached even if children are not yet
   this.attached = true;
+  if (this.isView() || this.isDialog()) {
+    //notify model this form is active
+    this.session.desktop._sendFormActivated(this);
+  }
 
   // Attach child dialogs, message boxes and file choosers.
   this.formController.attachDialogs();

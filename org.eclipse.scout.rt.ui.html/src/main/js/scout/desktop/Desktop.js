@@ -24,6 +24,8 @@ scout.Desktop = function() {
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
+
+  this.suppressSendActiveForm = false;
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -95,6 +97,20 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 /**
+ * goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
+ * @param form
+ * @returns
+ */
+scout.Desktop.prototype._findActiveSelectablePart = function(form) {
+  if (form.parent.isView()) {
+    return form.parent;
+  } else if (form.parent.isDialog()) {
+    return this._findActiveSelectablePart(form.parent);
+  }
+  return null;
+};
+
+/**
  * Installs the keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
  */
 scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
@@ -111,7 +127,7 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
  * Installs the keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
  */
 scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = function() {
-  if(!this._hasNavigation()){
+  if (!this._hasNavigation()) {
     return;
   }
   var keyStrokeContext = new scout.KeyStrokeContext();
@@ -129,7 +145,7 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = functi
  * Installs the keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
  */
 scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
-  if(!this._hasTaskBar()){
+  if (!this._hasTaskBar()) {
     return;
   }
   var keyStrokeContext = new scout.KeyStrokeContext();
@@ -159,6 +175,29 @@ scout.Desktop.prototype._postRender = function() {
       action.popup.alignTo(); // TODO [dwi] positioning of the popup does not work properly, and must be analyzed in more detail (likely a timing problem; approx 10px too far on the left side)
       return true;
     });
+
+  //find active form and set selected.
+  var selectable;
+  this.suppressSendActiveForm = true;
+  if (this.activeForm) {
+    var form = this.session.getModelAdapter(this.activeForm);
+    if (form.isDialog()) {
+      //find ui selectable part
+      selectable = this._findActiveSelectablePart(form);
+    } else if (form.isView()) {
+      selectable = form;
+    }
+  }
+  if (!selectable) {
+    this.bringOutlineToFront(this.outline);
+  } else {
+    this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
+  }
+  this.suppressSendActiveForm = false;
+};
+
+scout.Desktop.prototype._renderActiveForm = function($parent) {
+  //nop -> is handled in _sendFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {
@@ -313,6 +352,7 @@ scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
 scout.Desktop.prototype._attachOutlineContent = function() {
   if (this._outlineContent) {
     this._outlineContent.attach();
+
   }
 };
 
@@ -352,6 +392,8 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
     content.htmlComp.validateRoot = true;
   }
 
+  //set active form to null because outline is active form.
+  this._sendFormActivated();
   // Request focus on first element in new outlineTab.
   this.session.focusManager.validateFocus(); // TODO [nbu][dwi] why double validate?
 };
@@ -364,6 +406,8 @@ scout.Desktop.prototype.setOutline = function(outline) {
 scout.Desktop.prototype._onModelFormShow = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
+    this.activeForm = event.form;
+    //register listener to recover active form when child dialog is removed
     displayParent.formController.registerAndRender(event.form);
   }
 };
@@ -379,6 +423,7 @@ scout.Desktop.prototype._onModelFormActivate = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.formController.activateForm(event.form);
+    this.activeForm = event.form;
   }
 };
 
@@ -520,6 +565,8 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
       this._attachOutlineContent();
       this._bringNavigationToFront();
     }
+    //set active form to null because outline is active form.
+    this._sendFormActivated();
   } else {
     this.setOutline(outline);
   }
@@ -577,7 +624,6 @@ scout.Desktop.prototype.inFront = function() {
   return true; // Desktop is always available to the user.
 };
 
-
 /**
  * Creates a local "null-outline" and an OutlineViewButton which is used, when no outline is available.
  * This avoids a lot of if/else code. The OVB adds a property 'visibleInMenu' which is only used in
@@ -588,16 +634,35 @@ scout.Desktop.prototype._addNullOutline = function(outline) {
     return;
   }
   var nullOutline = scout.localObjects.createObject(this.session, {
-      objectType: 'Outline'}),
+    objectType: 'Outline'
+  }),
     ovb = scout.localObjects.createObject(this.session, {
       objectType: 'OutlineViewButton',
       displayStyle: 'MENU',
       selected: true,
       text: this.session.text('ui.Outlines'),
       desktop: this,
-      visibleInMenu: false});
+      visibleInMenu: false
+    });
 
   ovb.outline = nullOutline;
   this.outline = nullOutline;
   this.viewButtons.push(ovb);
+};
+
+scout.Desktop.prototype._sendFormActivated = function(form) {
+  //if desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
+  if (!this.rendered || this.suppressSendActiveForm) {
+    return;
+  }
+  var data = {
+    formId: null
+  };
+  if (form) {
+    data.formId = form.id;
+  }
+  if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
+    this.activeForm = form ? form.id : null;
+    this.remoteHandler(this.id, 'formActivated', data);
+  }
 };

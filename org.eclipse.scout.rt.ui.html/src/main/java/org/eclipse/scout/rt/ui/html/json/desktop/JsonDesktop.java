@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
@@ -45,6 +46,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
+  private static final String EVENT_FORM_ACTIVATED = "formActivated";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -57,10 +59,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   private final DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
+  private DesktopEventFilter m_desktopEventFilter;
 
   public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(desktop, uiSession, id, parent);
     m_downloads = new DownloadHandlerStorage();
+    m_desktopEventFilter = new DesktopEventFilter();
   }
 
   @Override
@@ -86,6 +90,43 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   protected boolean hasDefaultStyle() {
     return DesktopStyle.DEFAULT == getModel().getDesktopStyle();
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_FORM_ACTIVATED.equals(event.getType())) {
+      handleUiFormActivated(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  /**
+   *
+   */
+  private void handleUiFormActivated(JsonEvent event) {
+    String formId = event.getData().optString("formId", null);
+    if (formId == null) {
+      getModel().activateForm(null);
+      return;
+    }
+    IForm form = (IForm) getUiSession().getJsonAdapter(formId).getModel();
+    addDesktopEventFilterCondition(DesktopEvent.TYPE_FORM_ACTIVATE).setForm(form);
+    getModel().activateForm(form);
+  }
+
+  protected DesktopEventFilterCondition addDesktopEventFilterCondition(int tableEventType) {
+    DesktopEventFilterCondition conditon = new DesktopEventFilterCondition(tableEventType);
+    conditon.setCheckDisplayParents(true);
+    m_desktopEventFilter.addCondition(conditon);
+    return conditon;
+  }
+
+  @Override
+  public void cleanUpEventFilters() {
+    super.cleanUpEventFilters();
+    m_desktopEventFilter.removeAllConditions();
   }
 
   /**
@@ -145,12 +186,14 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         return getModel().getSelectViewTabsKeyStrokeModifier();
       }
     });
+
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put(IDesktop.PROP_DESKTOP_STYLE, getModel().getDesktopStyle());
+    putAdapterIdProperty(json, IDesktop.PROP_ACTIVE_FORM, getModel().getActiveForm());
     putAdapterIdsProperty(json, "views", getModel().getViews(getModel()));
     putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
@@ -167,6 +210,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelDesktopEvent(DesktopEvent event) {
+    event = m_desktopEventFilter.filter(event);
+    if (event == null) {
+      return;
+    }
     switch (event.getType()) {
       case DesktopEvent.TYPE_OUTLINE_CHANGED:
         handleModelOutlineChanged(event.getOutline());
@@ -251,8 +298,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       return;
     }
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
-    addActionEvent(EVENT_OUTLINE_CHANGED, new JSONObject()
-        .put(PROP_OUTLINE, jsonAdapter.getId()));
+    addActionEvent(EVENT_OUTLINE_CHANGED, new JSONObject().put(PROP_OUTLINE, jsonAdapter.getId()));
   }
 
   protected void handleModelOutlineContentActivate() {

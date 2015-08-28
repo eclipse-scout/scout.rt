@@ -83,6 +83,15 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   if (register) {
     this._displayParent.dialogs.push(dialog);
   }
+  if (this._displayParent instanceof scout.Form) {
+    dialog.on('remove', function() {
+      if (this._displayParent.dialogs.length > 0) {
+        this.session.desktop._sendFormActivated(this._displayParent.dialogs[this._displayParent.dialogs.length - 1]);
+      } else {
+        this.session.desktop._sendFormActivated(this._displayParent);
+      }
+    }.bind(this));
+  }
 
   // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
   if (!this._displayParent.rendered) {
@@ -175,7 +184,6 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   dialog.$container
     .cssLeft(left)
     .cssTop(top);
-
 
   // FIXME [dwi][awe] If not validated anew, focus on single-button forms is not gained.
   //                 Maybe, this is the same problem as in BusyIndicator.js
