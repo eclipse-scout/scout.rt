@@ -161,6 +161,9 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
 };
 
 scout.Desktop.prototype._postRender = function() {
+  //keystroke is not handled by default keystrokecontext.
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
+
   // Render attached forms, message boxes and file choosers.
   this.formController.render();
   this.messageBoxController.render();
