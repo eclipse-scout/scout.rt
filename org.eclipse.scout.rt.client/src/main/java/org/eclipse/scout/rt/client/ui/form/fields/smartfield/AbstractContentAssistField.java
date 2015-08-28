@@ -927,6 +927,30 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
   }
 
+  @Override
+  protected VALUE validateValueInternal(VALUE rawValue) throws ProcessingException {
+    VALUE validatedValue = super.validateValueInternal(rawValue);
+
+    // set currentLookupRow to null, when new value doesn't match lookupRow
+    // we must do this every time setValue() is called.
+    ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
+    if (currentLookupRow != null) {
+      if (!lookupRowMatchesValue(currentLookupRow, validatedValue)) {
+        setCurrentLookupRow(null);
+      }
+    }
+
+    return validatedValue;
+  }
+
+  /**
+   * Returns true if the given value matches the given lookup-row. The default impl. checks if the key of the lookup-row
+   * matches. Override this method to implement another behavior.
+   */
+  protected boolean lookupRowMatchesValue(ILookupRow<LOOKUP_KEY> lookupRow, VALUE value) {
+    return lookupRow.getKey().equals(value);
+  }
+
   protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
     interceptFilterLookupResult(call, result);
     interceptFilterKeyLookupResult(call, result);

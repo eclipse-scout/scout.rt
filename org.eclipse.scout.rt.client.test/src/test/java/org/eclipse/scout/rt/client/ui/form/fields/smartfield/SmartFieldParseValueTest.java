@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,7 +49,7 @@ public class SmartFieldParseValueTest {
 
   private static List<IBean<?>> m_beans;
 
-  private AbstractSmartField m_smartField;
+  private AbstractSmartField<Long> m_smartField;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -91,19 +92,27 @@ public class SmartFieldParseValueTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testSetValue() throws Exception {
     m_smartField.setValue(1L);
     assertTrue(m_smartField.isCurrentLookupRowSet());
-    assertEquals(1L, m_smartField.getValue());
+    assertEquals(1L, m_smartField.getValue().longValue());
     assertEquals("aName", m_smartField.getDisplayText());
+  }
+
+  @Test
+  public void testSetValue_MustChangeDisplayText() throws Exception {
+    m_smartField.setCurrentLookupRow(LookupRows.ROW_1);
+    m_smartField.setValue(1L);
+    assertEquals("aName", m_smartField.getDisplayText());
+    m_smartField.setValue(2L);
+    assertEquals("bName1", m_smartField.getDisplayText());
   }
 
   @Test
   public void testParseAndSetValue() throws Exception {
     m_smartField.parseAndSetValue("aName");
     assertTrue(m_smartField.isCurrentLookupRowSet());
-    assertEquals(1L, m_smartField.getValue());
+    assertEquals(1L, m_smartField.getValue().longValue());
     assertEquals("aName", m_smartField.getDisplayText());
   }
 

@@ -109,6 +109,11 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
+  protected boolean lookupRowMatchesValue(ILookupRow<LOOKUP_KEY> lookupRow, String value) {
+    return CompareUtility.equals(lookupRow.getText(), value);
+  }
+
+  @Override
   protected String handleMissingLookupRow(String text) throws VetoException {
     return text;
   }
