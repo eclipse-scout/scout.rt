@@ -61,6 +61,11 @@
     <tycho-extras.version>0.23.0</tycho-extras.version>
     <cbi-plugins.version>1.1.2</cbi-plugins.version>
     <jarsigner.version>1.1.2</jarsigner.version>
+
+    <forgeReleaseId>repo.eclipse.org</forgeReleaseId>
+    <forgeReleaseUrl>https://repo.eclipse.org/content/repositories/scout-releases/</forgeReleaseUrl>
+    <forgeSnapshotId>repo.eclipse.org</forgeSnapshotId>
+    <forgeSnapshotUrl>https://repo.eclipse.org/content/repositories/scout-snapshots/</forgeSnapshotUrl>
   </properties>
 
   <dependencyManagement>
@@ -486,18 +491,20 @@
 
   <distributionManagement>
     <site>
-      <id>site.eclipse.org</id>
-      <url>https://wiki.eclipse.org/Scout/maven-site</url>
+      <id>eclipse.scout.site</id>
+      <name>Eclipse Scout Site</name>
+      <!-- >workaround for http://jira.codehaus.org/browse/MSITE-671 -->
+      <url>http://staging</url>
     </site>
     <repository>
-      <id>repo.eclipse.org</id>
+      <id>${forgeReleaseId}</id>
       <name>Scout Repository - Releases</name>
-      <url>https://repo.eclipse.org/content/repositories/scout-releases/</url>
+      <url>${forgeReleaseUrl}</url>
     </repository>
     <snapshotRepository>
-      <id>repo.eclipse.org</id>
+      <id>${forgeSnapshotId}</id>
       <name>Scout Repository - Snapshots</name>
-      <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
+      <url>${forgeSnapshotUrl}</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -535,7 +542,7 @@
     </profile>
 
     <profile>
-      <id>prepare-release</id>
+      <id>release.setversion</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
@@ -558,6 +565,32 @@
                 <phase>validate</phase>
                 <configuration>
                   <newVersion>${newVersion}</newVersion>
+                  <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>release.updatechilds</id>
+      <build>
+        <defaultGoal>org.codehaus.mojo:versions-maven-plugin:update-child-modules</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>versions-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>update-child-modules</id>
+                <goals>
+                  <goal>update-child-modules</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <generateBackupPoms>false</generateBackupPoms>
                 </configuration>
               </execution>
             </executions>
