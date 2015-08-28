@@ -21,18 +21,24 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
+import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.mockito.Mockito;
 
 /**
  *
  */
 public final class TestingUtility {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TestingUtility.class);
+
   public static final int TESTING_BEAN_ORDER = -10000;
 
   private static final String REGEX_MARKER = "regex:";
@@ -169,7 +175,8 @@ public final class TestingUtility {
 
   /**
    * Registers the given bean in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
-   * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
+   * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans. If the underlying instance is
+   * mocked, any {@link TunnelToServer} annotation is removed.
    * <p>
    * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
    *
@@ -179,10 +186,15 @@ public final class TestingUtility {
     if (beanData == null) {
       return null;
     }
-    Assertions.assertFalse(Mockito.mockingDetails(beanData.getBeanClazz()).isMock() && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]",
+    boolean isMock = Mockito.mockingDetails(beanData.getBeanClazz()).isMock();
+    Assertions.assertFalse(isMock && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]",
         beanData.getBeanClazz());
     if (beanData.getBeanAnnotation(Order.class) == null) {
       beanData.withOrder(TESTING_BEAN_ORDER);
+    }
+    if (Mockito.mockingDetails(beanData.getInitialInstance()).isMock() && beanData.getBeanAnnotation(TunnelToServer.class) != null) {
+      LOG.info("removing TunnelToServer annotation on mocked bean: " + beanData.getBeanClazz());
+      beanData.withoutAnnotation(TunnelToServer.class);
     }
     return Platform.get().getBeanManager().registerBean(beanData);
   }
