@@ -1077,7 +1077,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (form == null || !m_formStore.contains(form)) {
       return;
     }
-    //clean active form-> new active form is set by ui or activateForm(IFORM)
+
+    // Unset the currently active Form if being the given Form.
+    // The new active Form will be set by the UI or manually by IDesktop.activateForm(IForm).
     if (getActiveForm() == form) {
       setActiveForm(null);
     }
@@ -2330,7 +2332,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP>implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
+  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP> implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
 
     public LocalDesktopExtension(DESKTOP desktop) {
       super(desktop);
