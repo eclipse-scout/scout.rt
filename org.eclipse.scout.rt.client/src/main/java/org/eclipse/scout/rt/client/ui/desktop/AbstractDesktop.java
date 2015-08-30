@@ -1029,7 +1029,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showForm(IForm form) {
-    form = interceptAddForm(form);
+    form = interceptShowForm(form);
     if (form == null || m_formStore.contains(form)) {
       return;
     }
@@ -2014,18 +2014,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Method invoked to intercept a {@link IForm} before being added to the {@link IDesktop}.<br/>
+   * Method invoked to intercept a {@link IForm} before being shown.<br/>
    * The default implementation delegates interception to installed desktop extensions via
-   * {@link IDesktopExtension#customFormModificationDelegate(IHolder)}.
+   * {@link IDesktopExtension#formAboutToShowDelegate(IHolder)}.
    *
    * @return the {@link IForm} to be added to the {@link IDesktop}, or <code>null</code> to not add the {@link IForm} to
    *         the {@link IDesktop}.
    */
-  protected IForm interceptAddForm(IForm form) {
+  protected IForm interceptShowForm(IForm form) {
     final IHolder<IForm> formHolder = new Holder<>(form);
     for (IDesktopExtension extension : getDesktopExtensions()) {
       try {
-        if (extension.customFormModificationDelegate(formHolder) == ContributionCommand.Stop) {
+        if (extension.formAboutToShowDelegate(formHolder) == ContributionCommand.Stop) {
           break;
         }
       }
@@ -2122,7 +2122,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public ContributionCommand customFormModificationDelegate(IHolder<IForm> formHolder) throws ProcessingException {
+    public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) throws ProcessingException {
       return ContributionCommand.Continue;
     }
 

@@ -129,9 +129,9 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execCustomFormModification(IHolder<IForm> formHolder) {
+  protected ContributionCommand execFormAboutToShow(IHolder<IForm> formHolder) {
     if (!isActive()) {
-      return super.execCustomFormModification(formHolder);
+      return super.execFormAboutToShow(formHolder);
     }
 
     IForm form = formHolder.getValue();

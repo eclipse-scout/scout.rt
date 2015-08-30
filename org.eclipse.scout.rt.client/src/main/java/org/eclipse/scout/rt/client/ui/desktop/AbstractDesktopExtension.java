@@ -75,8 +75,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public ContributionCommand customFormModificationDelegate(IHolder<IForm> formHolder) throws ProcessingException {
-    return execCustomFormModification(formHolder);
+  public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) throws ProcessingException {
+    return execFormAboutToShow(formHolder);
   }
 
   @Override
@@ -257,10 +257,10 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   /**
-   * Called right before a form is added to the core desktop. This means this method is called before any UI is informed
-   * about the new form. The form is provided in a holder. This allows it to prevent the form being added to the desktop
-   * (set reference to {@code null}), do some general modifications needed to be done prior UI instantiation, or even
-   * replace it with a different instance.
+   * Called right before a form is shown and therefore added to the desktop. This means this method is called before any
+   * UI is informed about the new form. The form is provided in a holder. This allows it to prevent the form being added
+   * to the desktop (set reference to {@code null}), do some general modifications needed to be done prior UI
+   * instantiation, or even replace it with a different instance.
    * <p>
    * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
    *
@@ -269,7 +269,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    */
-  protected ContributionCommand execCustomFormModification(IHolder<IForm> formHolder) {
+  protected ContributionCommand execFormAboutToShow(IHolder<IForm> formHolder) {
     return ContributionCommand.Continue;
   }
 
