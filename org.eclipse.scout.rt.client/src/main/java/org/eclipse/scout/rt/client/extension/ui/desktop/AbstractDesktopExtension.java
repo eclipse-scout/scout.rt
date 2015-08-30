@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFormAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
@@ -36,7 +37,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP>implements IDesktopExtension<DESKTOP> {
+public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP> implements IDesktopExtension<DESKTOP> {
 
   public AbstractDesktopExtension(DESKTOP owner) {
     super(owner);
@@ -75,6 +76,11 @@ public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> 
   @Override
   public void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) throws ProcessingException {
     chain.execOutlineChanged(oldOutline, newOutline);
+  }
+
+  @Override
+  public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) throws ProcessingException {
+    return chain.execFormAboutToShow(form);
   }
 
   @Override

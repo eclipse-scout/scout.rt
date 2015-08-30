@@ -183,6 +183,29 @@ public final class DesktopChains {
     }
   }
 
+  public static class DesktopFormAboutToShowChain extends AbstractDesktopChain {
+
+    public DesktopFormAboutToShowChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
+      super(extensions);
+    }
+
+    public IForm execFormAboutToShow(final IForm form) throws ProcessingException {
+      MethodInvocation<IForm> methodInvocation = new MethodInvocation<IForm>() {
+        @Override
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) throws ProcessingException {
+          setReturnValue(next.execFormAboutToShow(DesktopFormAboutToShowChain.this, form));
+        }
+      };
+      callChain(methodInvocation, form);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+      else {
+        return methodInvocation.getReturnValue();
+      }
+    }
+  }
+
   public static class DesktopClosingChain extends AbstractDesktopChain {
 
     public DesktopClosingChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {

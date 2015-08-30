@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFormAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
@@ -315,7 +316,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @throws ProcessingException
    */
   @ConfigOperation
-  @Order(12)
+  @Order(20)
   protected void execOpened() throws ProcessingException {
   }
 
@@ -329,7 +330,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @throws ProcessingException
    */
   @ConfigOperation
-  @Order(14)
+  @Order(30)
   protected void execBeforeClosing() throws ProcessingException {
   }
 
@@ -341,7 +342,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @throws ProcessingException
    */
   @ConfigOperation
-  @Order(15)
+  @Order(40)
   protected void execClosing() throws ProcessingException {
   }
 
@@ -353,7 +354,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @throws ProcessingException
    */
   @ConfigOperation
-  @Order(20)
+  @Order(50)
   protected void execGuiAttached() throws ProcessingException {
   }
 
@@ -365,7 +366,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @throws ProcessingException
    */
   @ConfigOperation
-  @Order(25)
+  @Order(60)
   protected void execGuiDetached() throws ProcessingException {
   }
 
@@ -381,8 +382,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @throws ProcessingException
    */
   @ConfigOperation
-  @Order(30)
+  @Order(70)
   protected void execOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+  }
+
+  /**
+   * Method invoked right before the given form is shown and therefore added to the desktop. That is before any UI is
+   * informed about the new form.<br/>
+   * Overwrite this method to modify the given form, or to replace it with another form instance. The default
+   * implementation simply returns the given form.
+   *
+   * @param form
+   *          the form which is about to show.
+   * @return the form to show, or <code>null</code> to not show the form.
+   */
+  @ConfigOperation
+  @Order(80)
+  protected IForm execFormAboutToShow(IForm form) throws ProcessingException {
+    return form;
   }
 
   /**
@@ -397,7 +414,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          is the search form of the new (selected) page or {@code null}
    * @throws ProcessingException
    */
-  @Order(40)
+  @Order(90)
   @ConfigOperation
   protected void execPageSearchFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
   }
@@ -414,7 +431,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          is the detail form of the new (selected) page or {@code null}
    * @throws ProcessingException
    */
-  @Order(50)
+  @Order(100)
   @ConfigOperation
   protected void execPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
   }
@@ -432,7 +449,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          is the table of the new (selected) table page or {@code null}
    * @throws ProcessingException
    */
-  @Order(60)
+  @Order(110)
   @ConfigOperation
   protected void execPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
   }
@@ -447,7 +464,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          the table page that has been (re)loaded
    * @throws ProcessingException
    */
-  @Order(62)
+  @Order(120)
   @ConfigOperation
   protected void execTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
     ISearchForm searchForm = tablePage.getSearchFormInternal();
@@ -469,7 +486,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          a live list to add menus to the tray
    * @throws ProcessingException
    */
-  @Order(70)
+  @Order(130)
   @ConfigOperation
   protected void execAddTrayMenus(List<IMenu> menus) throws ProcessingException {
   }
@@ -1029,7 +1046,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void showForm(IForm form) {
-    form = interceptShowForm(form);
+    // Let the desktop extensions to intercept the given form.
+    final IHolder<IForm> formHolder = new Holder<>(form);
+    for (IDesktopExtension extension : getDesktopExtensions()) {
+      try {
+        if (extension.formAboutToShowDelegate(formHolder) == ContributionCommand.Stop) {
+          break;
+        }
+      }
+      catch (Exception e) {
+        formHolder.setValue(form);
+        BEANS.get(ExceptionHandler.class).handle(e);
+      }
+    }
+    form = formHolder.getValue();
+
+    // Only show the form if not null nor already showing.
     if (form == null || m_formStore.contains(form)) {
       return;
     }
@@ -2014,30 +2046,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Method invoked to intercept a {@link IForm} before being shown.<br/>
-   * The default implementation delegates interception to installed desktop extensions via
-   * {@link IDesktopExtension#formAboutToShowDelegate(IHolder)}.
-   *
-   * @return the {@link IForm} to be added to the {@link IDesktop}, or <code>null</code> to not add the {@link IForm} to
-   *         the {@link IDesktop}.
-   */
-  protected IForm interceptShowForm(IForm form) {
-    final IHolder<IForm> formHolder = new Holder<>(form);
-    for (IDesktopExtension extension : getDesktopExtensions()) {
-      try {
-        if (extension.formAboutToShowDelegate(formHolder) == ContributionCommand.Stop) {
-          break;
-        }
-      }
-      catch (Exception e) {
-        formHolder.setValue(form);
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-    }
-    return formHolder.getValue();
-  }
-
-  /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
   private class P_LocalDesktopExtension implements IDesktopExtension {
@@ -2123,6 +2131,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public ContributionCommand formAboutToShowDelegate(IHolder<IForm> formHolder) throws ProcessingException {
+      formHolder.setValue(interceptFormAboutToShow(formHolder.getValue()));
       return ContributionCommand.Continue;
     }
 
@@ -2374,6 +2383,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
+    public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) throws ProcessingException {
+      return getOwner().execFormAboutToShow(form);
+    }
+
+    @Override
     public void execClosing(DesktopClosingChain chain) throws ProcessingException {
       getOwner().execClosing();
     }
@@ -2434,6 +2448,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopOutlineChangedChain chain = new DesktopOutlineChangedChain(extensions);
     chain.execOutlineChanged(oldOutline, newOutline);
+  }
+
+  protected final IForm interceptFormAboutToShow(IForm form) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopFormAboutToShowChain chain = new DesktopFormAboutToShowChain(extensions);
+    return chain.execFormAboutToShow(form);
   }
 
   protected final void interceptClosing() throws ProcessingException {
