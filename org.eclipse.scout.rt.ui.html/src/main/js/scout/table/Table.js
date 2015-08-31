@@ -715,7 +715,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     // -> depending on the implementation row.$row has to exist (see BeanColumn.js)
     // This cannot be done in install rows as well, because the notification handling differs when rows are updated
     if (this._filterCount() > 0) {
-      this._applyFilters(rows);
+      this._applyFilters($rows);
     }
 
     this._installRows($rows);
@@ -1891,15 +1891,19 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 };
 
 /**
- * Applies the filters for the given row.<p>
+ * Applies the filters for the given $rows.<p>
  * This function is intended to be used for new rows. That's why rowsFiltered event is only triggered if there are accepted rows in the given list.
  */
-scout.Table.prototype._applyFilters = function(rows) {
+scout.Table.prototype._applyFilters = function($rows) {
   var filterChanged,
-    newInvisibleRows = [];
+    newInvisibleRows = [],
+    that = this;
 
-  rows.forEach(function(row) {
-    if (this._applyFiltersForRow(row)) {
+  $rows.each(function() {
+    var $row = $(this),
+      row = $row.data('row');
+
+    if (that._applyFiltersForRow(row)) {
       if (!row.filterAccepted) {
         newInvisibleRows.push(row);
       }
@@ -1908,8 +1912,8 @@ scout.Table.prototype._applyFilters = function(rows) {
     if (row.filterAccepted) {
       filterChanged = true;
     }
-    this._renderRowFilterAccepted(row);
-  }, this);
+    that._renderRowFilterAccepted(row);
+  });
 
   if (filterChanged) {
     this._rowsFiltered(newInvisibleRows);
