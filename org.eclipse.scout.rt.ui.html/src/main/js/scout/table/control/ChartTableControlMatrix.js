@@ -12,18 +12,17 @@ scout.ChartTableControlMatrix = function(table, session) {
 };
 
 scout.ChartTableControlMatrix.DateGroup = {
-    NONE: 0,
-    YEAR: 1,
-    MONTH: 2,
-    WEEKDAY: 3
-  };
+  NONE: 0,
+  YEAR: 1,
+  MONTH: 2,
+  WEEKDAY: 3
+};
 
 scout.ChartTableControlMatrix.NumberGroup = {
-    COUNT: -1,
-    SUM: 1,
-    AVG: 2
-  };
-
+  COUNT: -1,
+  SUM: 1,
+  AVG: 2
+};
 
 /**
  * add data axis
@@ -74,8 +73,8 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
     };
     dataAxis.group = function(array) {
       var sum = array.reduce(function(a, b) {
-          return a + b;
-        }),
+        return a + b;
+      }),
         count = array.reduce(function(a, b) {
           return (b === null ? a : a + 1);
         }, 0);
@@ -114,7 +113,17 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
 
   // default sorts function
   keyAxis.reorder = function() {
-    keyAxis.sort(function(a, b){ return (a === null ? 1 : a - b); });
+    keyAxis.sort(function(a, b) {
+      // make sure -empty- is at the bottom
+      if (a === null) {
+        return 1;
+      }
+      if (b === null) {
+        return -1;
+      }
+      // sort others
+      return (a - b);
+    });
   };
 
   // norm and format depends of datatype and group functionality
@@ -202,8 +211,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         var format = axis.format;
         if (format) {
           format = new scout.DecimalFormat(locale, format);
-        }
-        else {
+        } else {
           format = locale.decimalFormat;
         }
         return format.format(n);
@@ -245,9 +253,17 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
       }
     };
     keyAxis.reorder = function() {
-      keyAxis.sort(function(a, b){
-          return a === null ? 1 : (keyAxis.format(a) < keyAxis.format(b) ? -1 : 1);
-        });
+      keyAxis.sort(function(a, b) {
+        // make sure -empty- is at the bottom
+        if (a === null) {
+          return 1;
+        }
+        if (b === null) {
+          return -1;
+        }
+        // sort others
+        return (keyAxis.format(a) < keyAxis.format(b) ? -1 : 1);
+      });
     };
   }
 
