@@ -386,6 +386,10 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxDone(data) {
     try {
+      //remove busy handling first before processing request, otherwise there are problems with the glasspane of the busy indicator.
+      if (busyHandling) {
+        this.setBusy(false);
+      }
       success = this.processJsonResponse(data);
     } catch (err) {
       jsError = jsError || err;
@@ -790,9 +794,11 @@ scout.Session.prototype.setBusy = function(busy) {
     }
     this._busyCounter++;
   } else {
-    this._busyCounter--;
-    if (this._busyCounter === 0) {
-      this._removeBusy();
+    if(this._busyCounter>0){
+      this._busyCounter--;
+      if (this._busyCounter === 0) {
+        this._removeBusy();
+      }
     }
   }
 };
