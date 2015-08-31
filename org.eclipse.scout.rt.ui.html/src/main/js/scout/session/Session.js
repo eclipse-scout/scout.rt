@@ -323,12 +323,10 @@ scout.Session.prototype._sendRequest = function(request) {
         }.bind(this));
         // 2. Add request events to end of queued events
         this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
-      }
-      else {
+      } else {
         this._queuedRequest.events = request.events;
       }
-    }
-    else {
+    } else {
       this._queuedRequest = request;
     }
     this.layoutValidator.validate();
@@ -398,6 +396,9 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     try {
+      if (busyHandling) {
+        this.setBusy(false);
+      }
       this._processErrorResponse(jqXHR, textStatus, errorThrown);
     } catch (err) {
       jsError = jsError || err;
@@ -406,9 +407,6 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxAlways(data, textStatus, errorThrown) {
     this._requestsPendingCounter--;
-    if (busyHandling) {
-      this.setBusy(false);
-    }
     this.layoutValidator.validate();
     if (success) {
       this._resumeBackgroundJobPolling();
@@ -745,8 +743,7 @@ scout.Session.prototype.goOnline = function() {
   this.offline = false;
   if (this._queuedRequest) {
     this._sendRequest(this._queuedRequest); // implies "_resumeBackgroundJobPolling"
-  }
-  else {
+  } else {
     this._resumeBackgroundJobPolling();
   }
   this.rootAdapter.goOnline();
@@ -939,8 +936,7 @@ scout.Session.prototype._onInitialized = function(event) {
   // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
   if (scout.fonts.loadingComplete) {
     this._renderDesktop();
-  }
-  else {
+  } else {
     scout.fonts.preloader().then(function() {
       this._renderDesktop();
     }.bind(this));
