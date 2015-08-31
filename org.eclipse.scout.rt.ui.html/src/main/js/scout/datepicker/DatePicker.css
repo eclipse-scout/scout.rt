@@ -46,6 +46,7 @@
   border-radius: 50%;
   border: 1px solid transparent;
 
+  /* helps to center days between 10 and 19 nicer */
   &.center-nice {
     padding-right: 2px;
   }

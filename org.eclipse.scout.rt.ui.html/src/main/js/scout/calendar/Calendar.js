@@ -629,7 +629,7 @@ scout.Calendar.prototype.layoutLabel = function() {
         cssClass += ' selected';
       }
 
-      // some dates are not centred nice by browsers
+      // adjust position for days between 10 and 19 (because "1" is narrower than "0" or "2")
       if (date.getDate() > 9 && date.getDate() < 20) {
         cssClass += ' center-nice';
       }
