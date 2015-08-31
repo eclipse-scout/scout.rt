@@ -223,7 +223,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     if (page.isStatusDeleted() || !page.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
       return;
     }
-    String nodeId = getNodeId(page);
+    String nodeId = optNodeId(page);
     if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
       return;
     }

@@ -117,7 +117,7 @@ public class JsonOutlineTest {
 
     // Verify nodes get unregistered
     for (ITreeNode node : allNodes) {
-      assertNull(JsonTreeTest.getNodeId(jsonOutline, node));
+      assertNull(JsonTreeTest.optNodeId(jsonOutline, node));
     }
     for (String nodeId : allNodeIds) {
       assertNull(JsonTreeTest.getNode(jsonOutline, nodeId));

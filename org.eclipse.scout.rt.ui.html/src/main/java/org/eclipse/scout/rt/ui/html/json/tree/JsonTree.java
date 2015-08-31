@@ -274,7 +274,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       boolean processChildNodes = true;
 
       if (!isInvisibleRootNode(node) && node.getTree() != null) {
-        String existingNodeId = getNodeId(node);
+        String existingNodeId = optNodeId(node);
         if (node.isFilterAccepted()) {
           if (existingNodeId == null) {
             // Node is not filtered but JsonTree does not know it yet --> handle as insertion event
@@ -302,6 +302,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   @Override
   public void processBufferedEvents() {
+    System.err.println("-------------------- PROCESS TREE");
     if (m_eventBuffer.isEmpty()) {
       return;
     }
@@ -386,7 +387,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     if (!isNodeAccepted(modelNode)) {
       return;
     }
-    String nodeId = getNodeId(modelNode);
+    String nodeId = optNodeId(modelNode);
     if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
       return;
     }
@@ -421,7 +422,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       if (!isNodeAccepted(node)) {
         continue;
       }
-      String nodeId = getNodeId(node);
+      String nodeId = optNodeId(node);
       if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
         continue;
       }
@@ -449,14 +450,14 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     }
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
-    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, optNodeId(event.getCommonParentNode()));
     addActionEvent(EVENT_NODES_UPDATED, jsonEvent);
   }
 
   protected void handleModelNodesDeleted(TreeEvent event) {
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
-    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getNodeId(event.getCommonParentNode()));
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, optNodeId(event.getCommonParentNode()));
     // Small optimization: If no nodes remain, just
     // send "all" instead of every single nodeId. (However, the nodes must be disposed individually.)
     // Caveat: This can only be optimized when no nodes were inserted again in the same "tree changing" scope.
@@ -494,7 +495,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       if (!isNodeAccepted(node)) {
         continue;
       }
-      String nodeId = getNodeId(node);
+      String nodeId = optNodeId(node);
       if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
         continue;
       }
@@ -515,7 +516,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     if (!isNodeAccepted(modelNode)) {
       return;
     }
-    String nodeId = getNodeId(modelNode);
+    String nodeId = optNodeId(modelNode);
     if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
       return;
     }
@@ -533,7 +534,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       if (!isNodeAccepted(childNode)) {
         continue;
       }
-      String childNodeId = getNodeId(childNode);
+      String childNodeId = optNodeId(childNode);
       if (childNodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
         continue;
       }
@@ -593,7 +594,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         nodeId = getOrCreateNodeId(node);
       }
       else {
-        nodeId = getNodeId(node);
+        nodeId = optNodeId(node);
         if (nodeId == null) { // Ignore nodes that are not yet sent to the UI (may happen due to asynchronous event processing)
           continue;
         }
@@ -623,7 +624,32 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return id;
   }
 
+  /**
+   * @return the nodeIdfor the given node. Returns <code>null</code> if the node is the invisible root node or
+   *         <code>null</code> itself. Use {@link #optNodeId(ITreeNode)} to prevent an exception when no nodeId could be
+   *         found.
+   * @throws UiException
+   *           when no nodeId is found for the given node
+   */
   protected String getNodeId(ITreeNode node) {
+    if (node == null) {
+      return null;
+    }
+    if (isInvisibleRootNode(node)) {
+      return null;
+    }
+    String nodeId = m_treeNodeIds.get(node);
+    if (nodeId == null) {
+      throw new UiException("Unknown node: " + node);
+    }
+    return nodeId;
+  }
+
+  /**
+   * @return the nodeId for the given node or <code>null</code> if the node has no nodeId assigned. Also returns
+   *         <code>null</code> if the node is the invisible root node or <code>null</code> itself.
+   */
+  protected String optNodeId(ITreeNode node) {
     if (node == null) {
       return null;
     }

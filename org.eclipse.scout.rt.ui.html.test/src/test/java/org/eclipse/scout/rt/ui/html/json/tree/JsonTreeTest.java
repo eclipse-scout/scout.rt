@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -287,7 +288,7 @@ public class JsonTreeTest {
     tree.removeNode(nodes.get(0));
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
-    assertNull(jsonTree.getNodeId(nodes.get(0)));
+    assertNull(jsonTree.optNodeId(nodes.get(0)));
     assertNull(jsonTree.optTreeNodeForNodeId(node0Id));
   }
 
@@ -316,8 +317,44 @@ public class JsonTreeTest {
     });
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
-    assertNull(jsonTree.getNodeId(nodes.get(0)));
+    assertNull(jsonTree.optNodeId(nodes.get(0)));
     assertNull(jsonTree.optTreeNodeForNodeId(node0Id));
+  }
+
+  @Test
+  public void testGetVsOpt() throws ProcessingException {
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+
+    String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
+    assertNotNull(node0Id);
+    assertEquals(node0Id, jsonTree.optNodeId(nodes.get(0)));
+    assertEquals(node0Id, jsonTree.getNodeId(nodes.get(0)));
+    assertNotNull(jsonTree.optTreeNodeForNodeId(node0Id));
+    assertNotNull(jsonTree.getTreeNodeForNodeId(node0Id));
+
+    String nonExistingNodeId = "bla";
+    ITreeNode nonExistingTreeNode = new TreeNode();
+    assertNull(jsonTree.optNodeId(nonExistingTreeNode));
+    try {
+      jsonTree.getNodeId(nonExistingTreeNode);
+      fail("Expected UiException");
+    }
+    catch (UiException e) {
+      // ok
+    }
+    assertNull(jsonTree.optTreeNodeForNodeId(nonExistingNodeId));
+    try {
+      jsonTree.getTreeNodeForNodeId(nonExistingNodeId);
+      fail("Expected UiException");
+    }
+    catch (UiException e) {
+      // ok
+    }
   }
 
   @Test
@@ -346,7 +383,7 @@ public class JsonTreeTest {
     });
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
-    assertNull(jsonTree.getNodeId(nodes.get(0)));
+    assertNull(jsonTree.optNodeId(nodes.get(0)));
     assertNull(jsonTree.optTreeNodeForNodeId(node0Id));
 
     List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
@@ -417,7 +454,7 @@ public class JsonTreeTest {
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
     for (ITreeNode node : allNodes) {
-      assertNull(jsonTree.getNodeId(node));
+      assertNull(jsonTree.optNodeId(node));
     }
     for (String nodeId : allNodeIds) {
       assertNull(jsonTree.optTreeNodeForNodeId(nodeId));
@@ -650,6 +687,10 @@ public class JsonTreeTest {
 
   public static String getNodeId(JsonTree tree, ITreeNode node) {
     return tree.getNodeId(node);
+  }
+
+  public static String optNodeId(JsonTree tree, ITreeNode node) {
+    return tree.optNodeId(node);
   }
 
   public static ITreeNode getNode(JsonTree tree, String nodeId) {
