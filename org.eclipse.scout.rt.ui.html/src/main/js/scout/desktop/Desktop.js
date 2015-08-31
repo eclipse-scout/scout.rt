@@ -681,5 +681,11 @@ scout.Desktop.prototype._sendFormActivated = function(form) {
   if (form) {
     data.formId = form.id;
   }
-  this.remoteHandler(this.id, 'formActivated', data);
+
+  var event = new scout.Event(this.id, 'formActivated', data);
+  event.coalesce = function(previous) {
+    return this.type === previous.type ;
+  };
+
+  this.session.sendEvent(event);
 };
