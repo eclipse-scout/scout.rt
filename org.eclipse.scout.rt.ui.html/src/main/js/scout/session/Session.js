@@ -384,7 +384,8 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxDone(data) {
     try {
-      //remove busy handling first before processing request, otherwise there are problems with the glasspane of the busy indicator.
+      // Note: remove busy handling _before_ processing the response, otherwise the focus cannot be set
+      // correctly, because the glasspane of the busy indicator is still visible.
       if (busyHandling) {
         this.setBusy(false);
       }
@@ -791,11 +792,9 @@ scout.Session.prototype.setBusy = function(busy) {
     }
     this._busyCounter++;
   } else {
-    if(this._busyCounter>0){
-      this._busyCounter--;
-      if (this._busyCounter === 0) {
-        this._removeBusy();
-      }
+    this._busyCounter--;
+    if (this._busyCounter === 0) {
+      this._removeBusy();
     }
   }
 };
