@@ -70,8 +70,8 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         topPart = "<div class=\"infoBox\">" + StringUtility.nvl(w.getTitleHtml(), w.getTooltipText()) + "</div>";
       }
       if (w.getActiveStep() != null) {
-        if (w.getActiveStep().getTooltipText() != null || w.getActiveStep().getDescriptionHtml() != null) {
-          bottomPart = "<div class=\"infoBox\">" + StringUtility.nvl(w.getActiveStep().getDescriptionHtml(), w.getActiveStep().getTooltipText()) + "</div>";
+        if (w.getActiveStep().getTooltipText() != null || w.getActiveStep().getSubTitle() != null) {
+          bottomPart = "<div class=\"infoBox\">" + StringUtility.nvl(w.getActiveStep().getSubTitle(), w.getActiveStep().getTooltipText()) + "</div>";
         }
       }
       int index = 1;
@@ -112,7 +112,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     buf.append(" <td width=\"15\"><img src=\"binaryResource:empty.png\" width=\"1\" height=\"30\"></td>\n");
     buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:0px;padding-top:5px;\">" + index + "</td>\n");
     buf.append(" <td width=\"17\"></td>\n");
-    buf.append(" <td style=\"padding-top:2px;\">" + StringUtility.nvl(step.getTitleHtml(), step.getTitle()) + "</td>\n");
+    buf.append(" <td style=\"padding-top:2px;\">" + step.getTitle() + "</td>\n");
     buf.append(" <td width=\"15\"></td>\n");
     buf.append("</tr>\n");
     appendHtmlForSpacerLine(buf, spacerCssClass, 11, null);
