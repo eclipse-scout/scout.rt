@@ -216,7 +216,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     @Override
     public void openProposalFromUI(String searchText, boolean selectCurrentValue) {
       if (searchText == null) {
-        searchText = BROWSE_ALL_TEXT;
+        searchText = getWildcard();
       }
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
       if (proposalChooser == null) {

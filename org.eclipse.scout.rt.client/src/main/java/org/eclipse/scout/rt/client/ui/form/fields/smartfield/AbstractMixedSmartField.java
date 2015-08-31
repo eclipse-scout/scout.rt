@@ -353,7 +353,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     @Override
     public void openProposalFromUI(String searchText, boolean selectCurrentValue) {
       if (searchText == null) {
-        searchText = BROWSE_ALL_TEXT;
+        searchText = getWildcard();
       }
       try {
         IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();

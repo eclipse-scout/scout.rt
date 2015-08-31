@@ -29,7 +29,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   private String toSearchText(String text) {
-    return StringUtility.isNullOrEmpty(text) ? IContentAssistField.BROWSE_ALL_TEXT : text;
+    return StringUtility.isNullOrEmpty(text) ? m_field.getWildcard() : text;
   }
 
   @Override

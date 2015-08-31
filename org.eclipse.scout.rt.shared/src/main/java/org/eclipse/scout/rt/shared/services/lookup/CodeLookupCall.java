@@ -144,11 +144,14 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID>implements 
     if (s == null) {
       s = "";
     }
+    s = s.replace(getWildcard(), "@wildcard@");
     s = s.toLowerCase();
-    if (!s.endsWith("*")) {
-      s = s + "*";
+    s = StringUtility.escapeRegexMetachars(s);
+    s = s.replace("@wildcard@", ".*");
+    if (!s.endsWith(".*")) {
+      s = s + ".*";
     }
-    return Pattern.compile(StringUtility.toRegExPattern(s), Pattern.DOTALL);
+    return Pattern.compile(s, Pattern.DOTALL);
   }
 
   /**
@@ -312,4 +315,5 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID>implements 
       return m_list;
     }
   }
+
 }
