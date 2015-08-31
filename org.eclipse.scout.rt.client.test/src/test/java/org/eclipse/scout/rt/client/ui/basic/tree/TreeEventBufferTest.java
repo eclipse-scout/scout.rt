@@ -261,6 +261,64 @@ public class TreeEventBufferTest {
   }
 
   /**
+   * Insert some nodes, then delete some children of them --> only insert event should remain
+   */
+  @Test
+  public void testAllChildNodesDeleted() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    // simulate "all child nodes deleted"
+    installChildNodes(nodeB, new ITreeNode[0]);
+
+    // --- Test case 1: ALL_CHILD_NODES_DELETED ----------------------
+
+    TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeB, nodeD);
+    TreeEvent e2 = mockEvent(nodeB, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeE);
+    TreeEvent e3 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeC);
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, coalesced.size()); // 1x NODES_INSERTED
+    assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(0).getType());
+    assertEquals(3, coalesced.get(0).getNodes().size());
+
+    // --- Test case 2: NODES_DELETED --------------------------------
+
+    TreeEvent e4 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeB, nodeD);
+    TreeEvent e5 = mockEvent(nodeE, TreeEvent.TYPE_NODES_DELETED, nodeF);
+    TreeEvent e6 = mockEvent(nodeB, TreeEvent.TYPE_NODES_DELETED, nodeE);
+    TreeEvent e7 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeC);
+    m_testBuffer.add(e4);
+    m_testBuffer.add(e5);
+    m_testBuffer.add(e6);
+    m_testBuffer.add(e7);
+
+    coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, coalesced.size()); // 1x NODES_INSERTED
+    assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(0).getType());
+    assertEquals(3, coalesced.get(0).getNodes().size());
+  }
+
+  /**
    * Expanded/Collapsed events ==> If all are collapsed, we don't care about the previous expansion events
    */
   @Test

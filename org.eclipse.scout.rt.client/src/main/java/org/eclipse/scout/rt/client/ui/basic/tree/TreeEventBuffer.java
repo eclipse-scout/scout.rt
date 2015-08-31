@@ -96,9 +96,25 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
         // Remove the current node from the event and check if was removed from a creation event
         TreeEvent newEvent = removeNode(event, nodeToRemove);
-        boolean removed = (event.getNodes().size() != newEvent.getNodes().size());
-        if (removed && creationTypesList.contains(event.getType())) {
-          nodeRemovedFromCreationEvent = true;
+        if (creationTypesList.contains(event.getType())) {
+          boolean removed = (event.getNodes().size() != newEvent.getNodes().size());
+          if (removed) {
+            nodeRemovedFromCreationEvent = true;
+          }
+          else {
+            // Also consider it as "removed from creation event" if one of the parents of nodeToRemove
+            // is a directly inserted node. The nodeToRemove will then not be contained in the insertion
+            // event, but because one of its parents was inserted recently, the deletion event is not
+            // required anymore (the insertion event does not contain deleted nodes).
+            ITreeNode parentToCheck = nodeToRemove.getParentNode();
+            while (parentToCheck != null) {
+              if (containsNode(newEvent.getNodes(), parentToCheck)) {
+                nodeRemovedFromCreationEvent = true;
+                break;
+              }
+              parentToCheck = parentToCheck.getParentNode();
+            }
+          }
         }
 
         // Now remove all recursive children (without considering them for the 'remainingNodes' list)
@@ -189,6 +205,20 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       }
     }
     return removed;
+  }
+
+  /**
+   * @return <code>true</code> if 'nodes' contains 'nodeToFind'. Children of 'nodes are <b>not</b> considered, use
+   *         {@link #containsNodeRec(Collection, ITreeNode)} if they should be checked as well.
+   */
+  protected boolean containsNode(Collection<ITreeNode> nodes, ITreeNode nodeToFind) {
+    for (ITreeNode node : nodes) {
+      node = TreeUtility.unwrapResolvedNode(node);
+      if (CompareUtility.equals(node, nodeToFind)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -394,7 +424,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       case TreeEvent.TYPE_NODES_DELETED:
       case TreeEvent.TYPE_NODES_DRAG_REQUEST:
       case TreeEvent.TYPE_NODES_INSERTED:
-      case TreeEvent.TYPE_NODES_UPDATED: {
+      case TreeEvent.TYPE_NODES_UPDATED:
+      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED: {
         // Multiple nodes
         return true;
       }
@@ -412,7 +443,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         // Single node
         return true;
       }
-      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED:
       case TreeEvent.TYPE_BEFORE_NODES_SELECTED:
       case TreeEvent.TYPE_NODES_SELECTED:
       case TreeEvent.TYPE_DRAG_FINISHED:
