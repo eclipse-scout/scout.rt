@@ -53,7 +53,7 @@
           <execution>
             <id>attach-test-sources</id>
             <goals>
-                <goal>test-jar-no-fork</goal>
+              <goal>test-jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
