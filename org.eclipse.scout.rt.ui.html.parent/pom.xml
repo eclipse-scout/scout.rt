@@ -66,7 +66,7 @@
       <dependency>
         <groupId>com.asual.lesscss</groupId>
         <artifactId>lesscss-engine</artifactId>
-        <version>1.7.4.bsiR01</version>
+        <version>1.7.4.bsiR02</version>
         <scope>provided</scope>
       </dependency>
       <dependency>

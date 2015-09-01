@@ -62,7 +62,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.9</version>
         <executions>
           <execution>
             <id>copy</id>
@@ -98,7 +97,7 @@
                   <type>jar</type>
                 </artifactItem>
               </artifactItems>
-              <outputDirectory>${basedir}/src/main/resources/private-libs</outputDirectory>
+              <outputDirectory>${project.build.outputDirectory}/private-libs</outputDirectory>
               <overWriteReleases>false</overWriteReleases>
               <overWriteSnapshots>true</overWriteSnapshots>
               <stripVersion>true</stripVersion>
