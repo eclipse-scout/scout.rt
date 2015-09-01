@@ -9,11 +9,6 @@ scout.Planner = function() {
   // visual
   this._resourceTitleWidth = 20;
 
-  this._tooltipSupport = new scout.TooltipSupport(this.session, {
-    parent: this,
-    arrowPosition: 50
-  });
-
   // main elements
   this.$container;
   this.$range;
@@ -75,6 +70,11 @@ scout.Planner.prototype._init = function(model, session) {
   this._syncViewRange(this.viewRange);
   this._syncSelectedResources(this.selectedResources);
   this._syncSelectionRange(this.selectionRange);
+
+  this._tooltipSupport = new scout.TooltipSupport(this.session, {
+    parent: this,
+    arrowPosition: 50
+  });
 
   var menuOrder = new scout.PlannerMenuItemsOrder(this.session, this.objectType);
   this.menuBar = new scout.MenuBar(this.session, menuOrder);
