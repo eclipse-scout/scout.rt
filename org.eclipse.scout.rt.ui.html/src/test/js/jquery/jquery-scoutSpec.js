@@ -1,4 +1,4 @@
-describe("scout-jquery", function() {
+describe('scout-jquery', function() {
 
   var $e;
 
@@ -6,9 +6,9 @@ describe("scout-jquery", function() {
     $e = $('<div>');
   });
 
-  describe("isEnabled", function() {
+  describe('isEnabled', function() {
 
-    it("is only false when class disabled is set", function() {
+    it('is only false when class disabled is set', function() {
       expect($e.isEnabled()).toBe(true);
       $e.addClass('disabled');
       expect($e.isEnabled()).toBe(false);
@@ -18,9 +18,25 @@ describe("scout-jquery", function() {
 
   });
 
-  describe("setEnabled", function() {
+  describe('isVisible', function() {
 
-    it("DIV does not have disabled attribute", function() {
+    it('returns true when display != none and visiblity != hidden', function() {
+      expect($e.isVisible()).toBe(true);
+      $e.css('display', 'none');
+      expect($e.isVisible()).toBe(false);
+      $e.css('display', '');
+      expect($e.isVisible()).toBe(true);
+      $e.css('visibility', 'hidden');
+      expect($e.isVisible()).toBe(false);
+      $e.css('visibility', '');
+      expect($e.isVisible()).toBe(true);
+    });
+
+  });
+
+  describe('setEnabled', function() {
+
+    it('DIV does not have disabled attribute', function() {
       $e.setEnabled(false);
       expect($e.hasClass('disabled')).toBe(true);
       expect($e.attr('disabled')).toBeUndefined();
@@ -29,7 +45,7 @@ describe("scout-jquery", function() {
       expect($e.attr('disabled')).toBeUndefined();
     });
 
-    it("INPUT must have disabled attribute", function() {
+    it('INPUT must have disabled attribute', function() {
       $e = $('<input>');
       $e.setEnabled(false);
       expect($e.hasClass('disabled')).toBe(true);
@@ -41,9 +57,9 @@ describe("scout-jquery", function() {
 
   });
 
-  describe("toggleAttr", function() {
+  describe('toggleAttr', function() {
 
-    it("is toggles attribute", function() {
+    it('is toggles attribute', function() {
       expect($e.attr('test')).toBeUndefined();
       $e.toggleAttr('test');
       expect($e.attr('test')).toBe('test');
