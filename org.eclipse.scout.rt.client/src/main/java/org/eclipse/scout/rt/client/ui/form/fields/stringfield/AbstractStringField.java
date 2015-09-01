@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
@@ -476,21 +477,27 @@ public abstract class AbstractStringField extends AbstractBasicField<String>impl
     return propertySupport.getPropertyInt(PROP_DROP_MAXIMUM_SIZE);
   }
 
-  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringFieldUIFacade
-     * #fireLinkActionFromUI(java.lang.String)
-     */
-    @Override
-    public void fireActionFromUI() {
+  @Override
+  public void doAction() throws ProcessingException {
+    if (isHasAction() && isEnabled() && isVisible() && isEnabledProcessingButton()) {
       try {
         interceptAction();
       }
+      finally {
+        setEnabledProcessingButton(true);
+      }
+    }
+  }
+
+  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
+
+    @Override
+    public void fireActionFromUI() {
+      try {
+        doAction();
+      }
       catch (ProcessingException e) {
-        LOG.warn("execAction failed", e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
 
