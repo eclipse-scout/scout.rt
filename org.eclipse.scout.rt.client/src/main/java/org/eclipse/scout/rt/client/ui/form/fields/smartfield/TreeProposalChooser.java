@@ -385,13 +385,16 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     s = s.toLowerCase();
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-      s = "*" + s;
+      s = getContentAssistField().getWildcard() + s;
     }
-    if (!s.endsWith("*")) {
-      s = s + "*";
+    s = s.replace(getContentAssistField().getWildcard(), "@wildcard@");
+    s = StringUtility.escapeRegexMetachars(s);
+    s = s.replace("@wildcard@", ".*");
+    if (!s.endsWith(".*")) {
+      s = s + ".*";
     }
-    s = StringUtility.toRegExPattern(s);
     return Pattern.compile(s, Pattern.DOTALL);
+
   }
 
   /**

@@ -17,13 +17,14 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
@@ -68,6 +69,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   private TriState m_active;
   private int m_maxRowCount;
   private transient ILookupService<KEY_TYPE> m_serviceCached;
+
+  private String m_wildcard = "*";
 
   public LookupCall() {
     m_serviceCached = createLookupService();
@@ -527,5 +530,18 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     }
     b.append("]");
     return b.toString();
+  }
+
+  @Override
+  public void setWildcard(String wildcard) {
+    if (StringUtility.isNullOrEmpty(wildcard)) {
+      throw new IllegalArgumentException("Wildcard must not be null nor empty!");
+    }
+    m_wildcard = wildcard;
+  }
+
+  @Override
+  public String getWildcard() {
+    return m_wildcard;
   }
 }

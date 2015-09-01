@@ -180,4 +180,8 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
     return m_allowCustomText;
   }
 
+  public IContentAssistField<?, LOOKUP_KEY> getContentAssistField() {
+    return m_contentAssistField;
+  }
+
 }
