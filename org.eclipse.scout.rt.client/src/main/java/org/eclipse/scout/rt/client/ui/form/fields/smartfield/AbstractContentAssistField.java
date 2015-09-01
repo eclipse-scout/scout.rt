@@ -931,6 +931,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   protected VALUE validateValueInternal(VALUE rawValue) throws ProcessingException {
     VALUE validatedValue = super.validateValueInternal(rawValue);
 
+    // when value is null, current lookupRow must be null too
+    if (validatedValue == null) {
+      setCurrentLookupRow(null);
+      return validatedValue;
+    }
+
     // set currentLookupRow to null, when new value doesn't match lookupRow
     // we must do this every time setValue() is called.
     ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
@@ -1422,11 +1428,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   protected boolean isCurrentLookupRowSet() {
     return getCurrentLookupRow() != null;
-  }
-
-  protected void setCurrentLookupRowAndValueToNull() {
-    setCurrentLookupRow(null);
-    setValue(null);
   }
 
 }

@@ -113,7 +113,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       openProposalChooser = m_field.handleAcceptByDisplayText(text);
     }
     else {
-      m_field.setCurrentLookupRowAndValueToNull();
+      m_field.setValue(null);
     }
     return openProposalChooser;
   }

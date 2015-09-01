@@ -153,31 +153,26 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   protected boolean handleAcceptByDisplayText(String text) {
-    try {
-      String searchText = toSearchText(text);
-      List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = callTextLookup(searchText, 2);
-      int numRows = lookupRows.size();
-      if (numRows == 0) {
-        setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text));
-        return true;
-      }
-      else if (numRows == 1) {
-        acceptProposal(lookupRows.get(0));
-      }
-      else if (numRows > 1) {
-        setValidationError(text, TEXTS.get("SmartFieldNotUnique", text));
-        return true;
-      }
+    String searchText = toSearchText(text);
+    getLookupRowFetcher().update(searchText, false, true);
+    List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = getLookupRowFetcher().getResult().getLookupRows();
+    int numRows = lookupRows.size();
+    if (numRows == 0) {
+      setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text));
+      return true;
     }
-    catch (ProcessingException e) {
-      setValidationError(text, TEXTS.get("SmartFieldSearchFailed"));
+    else if (numRows == 1) {
+      acceptProposal(lookupRows.get(0));
+    }
+    else if (numRows > 1) {
+      setValidationError(text, TEXTS.get("SmartFieldNotUnique", text));
       return true;
     }
     return false;
   }
 
   private void setValidationError(String displayText, String errorMessage) {
-    setCurrentLookupRowAndValueToNull();
+    setCurrentLookupRow(null);
     setDisplayText(displayText);
     addErrorStatus(new ValidationFailedStatus(errorMessage));
   }
@@ -192,39 +187,41 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   protected void valueChangedInternal() {
-    if (getLookupCall() != null) {
-      try {
-        if (getLookupCall() instanceof LocalLookupCall) {
-          List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
-          safeInstallLookupRowContext(rows);
-        }
-        else {
-          // enqueue LookupRow fetcher
-          // this will later on call installLookupRowContext()
-          final ILookupCall<LOOKUP_KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(),
-              new FormFieldProvisioningContext(AbstractMixedSmartField.this));
-          prepareKeyLookup(call, interceptConvertValueToKey(getValue()));
-
-          m_backgroundJobFuture.set(ClientJobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
-            @Override
-            public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
-              List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
-              filterKeyLookup(call, result);
-              return cleanupResultList(result);
-            }
-          }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("Fetch smart-field data")));
-
-          ModelJobs.schedule(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              waitForLookupRows();
-            }
-          });
-        }
+    ILookupCall<LOOKUP_KEY> lookupCall = getLookupCall();
+    if (lookupCall == null) {
+      return;
+    }
+    try {
+      if (lookupCall instanceof LocalLookupCall) {
+        List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
+        safeInstallLookupRowContext(rows);
       }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
+      else {
+        // enqueue LookupRow fetcher
+        // this will later on call installLookupRowContext()
+        final ILookupCall<LOOKUP_KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(lookupCall,
+            new FormFieldProvisioningContext(AbstractMixedSmartField.this));
+        prepareKeyLookup(call, interceptConvertValueToKey(getValue()));
+
+        m_backgroundJobFuture.set(ClientJobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
+          @Override
+          public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
+            List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
+            filterKeyLookup(call, result);
+            return cleanupResultList(result);
+          }
+        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName("Fetch smart-field data")));
+
+        ModelJobs.schedule(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            waitForLookupRows();
+          }
+        });
       }
+    }
+    catch (ProcessingException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
