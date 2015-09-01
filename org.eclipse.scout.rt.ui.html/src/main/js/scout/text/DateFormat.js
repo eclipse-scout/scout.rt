@@ -990,9 +990,25 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   // and startDate = 2015-07-29 would result in invalid date 2015-03-11, because February
   // 2015 does not have 29 days and is "corrected" to March.)
   var result = new Date(0);
-  result.setFullYear(scout.helpers.nvl(dateInfo.year, startDate.getFullYear()));
-  result.setMonth(scout.helpers.nvl(dateInfo.month, startDate.getMonth()));
+
+  //set day to nexts valid month if a month has not days in rage between 29(february) and 31. Do this only when month is not set.
+  var validMonth = scout.helpers.nvl(dateInfo.month, startDate.getMonth());
+  var validYear = scout.helpers.nvl(dateInfo.year, startDate.getFullYear());
+  var monthsThirthyOne = [0, 2, 4, 6, 7, 9, 11];
+  if (dateInfo.day && dateInfo.day >= 29 && dateInfo.day <= 31 && !dateInfo.month && validMonth === 1) {
+    if (this.leapYear(scout.helpers.nvl(dateInfo.year, startDate.getFullYear())) && dateInfo.day === 29) {
+      validMonth = 1;
+    } else {
+      validMonth = 2;
+    }
+  } else if (dateInfo.day === 31 && !dateInfo.month && !scout.helpers.isOneOf(validMonth, monthsThirthyOne)) {
+    validMonth = validMonth + 1;
+  }
+
+  result.setFullYear(validYear);
+  result.setMonth(validMonth);
   result.setDate(scout.helpers.nvl(dateInfo.day, startDate.getDate()));
+
   result.setHours(scout.helpers.nvl(dateInfo.hours, startDate.getHours()));
   result.setMinutes(scout.helpers.nvl(dateInfo.minutes, startDate.getMinutes()));
   result.setSeconds(scout.helpers.nvl(dateInfo.seconds, startDate.getSeconds()));
@@ -1030,6 +1046,14 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   function isValid(value, expectedValue) {
     return (expectedValue === undefined || expectedValue === value);
   }
+};
+
+scout.DateFormat.prototype.leapYear = function(year) {
+  var date = new Date();
+  date.setYear(year);
+  date.setMonth(1);
+  date.setDate(29);
+  return date.getDate() === 29;
 };
 
 /**
