@@ -52,7 +52,7 @@ describe('SmartField', function() {
       expect(smartField._requestedProposal).toBe(false);
     });
 
-  },
+  }),
 
   describe('_openProposal', function() {
 
