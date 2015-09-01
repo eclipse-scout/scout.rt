@@ -13,7 +13,7 @@ scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
     var radioButton = this.field._radioButtonMap[key];
     if (fieldBefore && radioButton.enabled) {
       radioButton._renderTabbable(true);
-      this.session.focusManager.requestFocus(radioButton.$field);
+      this.field.session.focusManager.requestFocus(radioButton.$field);
       radioButton._toggleChecked();
       fieldBefore._renderTabbable(false);
       break;
