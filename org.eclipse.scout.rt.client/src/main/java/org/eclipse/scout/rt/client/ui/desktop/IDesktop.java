@@ -682,13 +682,24 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /**
    * Activates a {@link Bookmark} on this desktop.
    * <p />
-   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and selected, afterwards every page from the
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated, afterwards every page from the
    * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
   void activateBookmark(Bookmark bm) throws ProcessingException;
+
+  /**
+   * Activates a {@link Bookmark} on this desktop.
+   * <p />
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and, if activateOutline is true, activated. Afterwards every page from the
+   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
+   * <p />
+   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
+   * the outline is not available.
+   */
+  void activateBookmark(Bookmark bm, boolean activateOutline) throws ProcessingException;
 
   /**
    * Creates a bookmark of the active page

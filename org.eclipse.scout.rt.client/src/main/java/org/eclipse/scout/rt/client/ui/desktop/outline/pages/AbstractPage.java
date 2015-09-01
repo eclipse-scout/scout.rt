@@ -336,7 +336,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         if (desktop != null) {
           Bookmark bm = desktop.createBookmark();
           setChildrenDirty(true);
-          desktop.activateBookmark(bm);
+          //activate bookmark without activating the outline, since this would hide active tabs.
+          desktop.activateBookmark(bm, false);
         }
       }
       catch (ProcessingException e) {

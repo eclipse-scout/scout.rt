@@ -236,6 +236,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void activateBookmark(Bookmark bm, boolean activateOutline) throws ProcessingException {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public boolean isShowing(IFileChooser fileChooser) {
     throw createUnsupportedOperationException();
   }
