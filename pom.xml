@@ -16,12 +16,20 @@
     <maven>3.2.2</maven>
   </prerequisites>
 
+  <parent>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>scout-parent</artifactId>
+    <version>1-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
   <version>5.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
+    <module>org.eclipse.scout.rt.bom</module>
+
     <module>org.eclipse.scout.commons</module>
     <module>org.eclipse.scout.commons.test</module>
     <module>org.eclipse.scout.rt.platform</module>
@@ -50,369 +58,22 @@
 
   <properties>
     <scout.base.version>5.1.0</scout.base.version>
-
-    <jdk.source.version>1.7</jdk.source.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
-
-    <!-- version of Tycho used by profiles eclipse-sign and eclipse-pack -->
-    <tycho.version>0.23.0</tycho.version>
-    <tycho-extras.version>0.23.0</tycho-extras.version>
-    <cbi-plugins.version>1.1.2</cbi-plugins.version>
-    <jarsigner.version>1.1.2</jarsigner.version>
-
-    <forgeReleaseId>repo.eclipse.org</forgeReleaseId>
-    <forgeReleaseUrl>https://repo.eclipse.org/content/repositories/scout-releases/</forgeReleaseUrl>
-    <forgeSnapshotId>repo.eclipse.org</forgeSnapshotId>
-    <forgeSnapshotUrl>https://repo.eclipse.org/content/repositories/scout-snapshots/</forgeSnapshotUrl>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <!-- Build Dependencies -->
       <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.7.12</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>jandex</artifactId>
-        <version>1.1.0.Final</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.xmlgraphics</groupId>
-        <artifactId>batik-swing</artifactId>
-        <version>1.7</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.commons</artifactId>
+        <artifactId>org.eclipse.scout.rt.bom</artifactId>
         <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.commons.test</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.platform</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.shared</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.server</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.server.test</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.client.mobile</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.swt.win32.win32</groupId>
-        <artifactId>x86</artifactId>
-        <version>3.3.0-v3346</version>
-      </dependency>
-
-      <!-- Build Dependencies (Provided) -->
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>1.1.3</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
-        <version>1.7.12</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.jms</groupId>
-        <artifactId>jms-api</artifactId>
-        <version>1.1-rev-1</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <!-- Test Dependencies -->
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.12</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>2.0.2-beta</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>2.4</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-math</artifactId>
-        <version>2.2</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.7</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.3</version>
-          <configuration>
-            <compilerId>jdt</compilerId>
-            <source>${jdk.source.version}</source>
-            <target>${jdk.source.version}</target>
-            <compilerArgs>
-              <arg>-proc:none</arg>
-            </compilerArgs>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.tycho</groupId>
-              <artifactId>tycho-compiler-jdt</artifactId>
-              <version>0.23.1</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.18.1</version>
-          <configuration>
-            <testFailureIgnore>true</testFailureIgnore>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.6</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.4</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <goals>
-                <goal>jar-no-fork</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.3</version>
-          <executions>
-            <execution>
-              <id>attach-javadocs</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-              <configuration>
-                <failOnError>false</failOnError>
-                <quiet>true</quiet>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.cbi.maven.plugins</groupId>
-          <artifactId>eclipse-cbi-plugin</artifactId>
-          <version>${cbi-plugins.version}</version>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.6.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-          <configuration>
-            <deployAtEnd>true</deployAtEnd>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.10</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.5.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>2.5.2</version>
-          <configuration>
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-            <tagNameFormat>@{project.version}</tagNameFormat>
-            <pushChanges>false</pushChanges>
-          </configuration>
-        </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.jboss.jandex</groupId>
-                    <artifactId>jandex-maven-plugin</artifactId>
-                    <versionRange>[1.0.1,)</versionRange>
-                    <goals>
-                      <goal>jandex</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.eclipse.cbi.maven.plugins</groupId>
-                    <artifactId>eclipse-cbi-plugin</artifactId>
-                    <versionRange>[1.1.2,)</versionRange>
-                    <goals>
-                      <goal>generate-api-build-xml</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>2.2</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
     <plugins>
       <plugin>
         <groupId>org.eclipse.cbi.maven.plugins</groupId>
@@ -495,57 +156,7 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <distributionManagement>
-    <site>
-      <id>eclipse.scout.site</id>
-      <name>Eclipse Scout Site</name>
-      <!-- >workaround for http://jira.codehaus.org/browse/MSITE-671 -->
-      <url>http://staging</url>
-    </site>
-    <repository>
-      <id>${forgeReleaseId}</id>
-      <name>Scout Repository - Releases</name>
-      <url>${forgeReleaseUrl}</url>
-    </repository>
-    <snapshotRepository>
-      <id>${forgeSnapshotId}</id>
-      <name>Scout Repository - Snapshots</name>
-      <url>${forgeSnapshotUrl}</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <profiles>
-    <profile>
-      <!-- Only create the jandex.idx when a scout.xml is found -->
-      <id>jandex-idx</id>
-      <activation>
-        <file>
-          <exists>${basedir}/src/main/resources/META-INF/scout.xml</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <!-- Create META-INF/jandex.idx -->
-          <plugin>
-            <groupId>org.jboss.jandex</groupId>
-            <artifactId>jandex-maven-plugin</artifactId>
-            <version>1.0.1</version>
-            <executions>
-              <execution>
-                <id>make-index</id>
-                <goals>
-                  <goal>jandex</goal>
-                </goals>
-                <!-- phase is 'process-classes by default' -->
-                <configuration>
-                  <!-- Nothing needed here for simple cases -->
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
     <profile>
       <id>release.setversion</id>
@@ -728,27 +339,4 @@
       </build>
     </profile>
   </profiles>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.8</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-        <version>2.2</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>dependency-updates-report</report>
-              <report>plugin-updates-report</report>
-              <report>property-updates-report</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
