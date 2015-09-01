@@ -3,6 +3,7 @@ scout.CheckBoxToggleKeyStroke = function(checkbox) {
   this.field = checkbox;
   this.which = [scout.keys.ENTER, scout.keys.SPACE];
   this.renderingHints.render = false;
+  this.stopPropagation = true;
 };
 scout.inherits(scout.CheckBoxToggleKeyStroke, scout.KeyStroke);
 
