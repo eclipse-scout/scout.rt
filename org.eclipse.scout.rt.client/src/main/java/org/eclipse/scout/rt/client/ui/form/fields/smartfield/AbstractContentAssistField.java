@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
@@ -954,7 +955,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * matches. Override this method to implement another behavior.
    */
   protected boolean lookupRowMatchesValue(ILookupRow<LOOKUP_KEY> lookupRow, VALUE value) {
-    return lookupRow.getKey().equals(value);
+    return CompareUtility.equals(lookupRow.getKey(), value);
   }
 
   protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
