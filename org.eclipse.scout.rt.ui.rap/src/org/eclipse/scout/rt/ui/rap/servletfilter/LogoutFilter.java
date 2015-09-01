@@ -86,7 +86,7 @@ public class LogoutFilter implements Filter {
 
     String doitParamValue = request.getParameter(DOIT_PARAM);
     if (!StringUtility.hasText(doitParamValue)) {
-      forceClientSideReload(httpRequest, httpResponse);
+      forceClientSideReload(config, httpRequest, httpResponse);
       return;
     }
 
@@ -140,7 +140,7 @@ public class LogoutFilter implements Filter {
    * the ajax calls could interfere with the form authentication of tomcat. The result would be a redirect by tomcat to
    * such an ajax call instead of the actual site.
    */
-  protected void forceClientSideReload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  protected void forceClientSideReload(FilterConfigInjection.FilterConfig config, HttpServletRequest request, HttpServletResponse response) throws IOException {
     String redirectHtmlTemplate = ""
         + "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"
         + "<html>"
@@ -159,7 +159,7 @@ public class LogoutFilter implements Filter {
     }
     servletPath += "?" + LOGOUT_PARAM + "=true";
     servletPath += "&" + DOIT_PARAM + "=true";
-    String redirectParamValue = request.getParameter(REDIRECT_PARAM);
+    String redirectParamValue = computeRedirectLocation(config, request);
     if (StringUtility.hasText(redirectParamValue)) {
       servletPath += "&" + REDIRECT_PARAM + "=" + redirectParamValue;
     }
