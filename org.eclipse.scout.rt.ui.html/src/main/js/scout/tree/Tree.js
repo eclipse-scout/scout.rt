@@ -1485,7 +1485,7 @@ scout.Tree.prototype.showNode = function($node, useAnimation) {
       }
     });
   } else {
-    $node.show();
+    $node.showFast();
     $node.removeClass('invisible');
     that.updateScrollbar();
   }
@@ -1507,7 +1507,7 @@ scout.Tree.prototype.hideNode = function($node, useAnimation) {
       }
     });
   } else {
-    $node.hide();
+    $node.hideFast();
     $node.addClass('invisible');
     that.updateScrollbar();
   }

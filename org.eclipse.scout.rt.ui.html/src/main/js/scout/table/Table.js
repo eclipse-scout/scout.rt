@@ -2006,7 +2006,7 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
       }
     });
   } else {
-    $row.show();
+    $row.showFast();
     $row.removeClass('invisible');
     that.updateScrollbars();
   }
@@ -2028,7 +2028,7 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
       }
     });
   } else {
-    $row.hide();
+    $row.hideFast();
     $row.addClass('invisible');
     that.updateScrollbars();
   }

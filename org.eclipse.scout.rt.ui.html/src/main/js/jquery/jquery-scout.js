@@ -684,10 +684,30 @@
   };
 
   var _oldhide = $.fn.hide;
-  $.fn.hide = function(speed, callback) {
+  $.fn.hide = function() {
     this.trigger('hide');
     var returnValue = _oldhide.apply(this, arguments);
     return returnValue;
+  };
+
+  /**
+   * Compared to the regular hide it does not remember the current display state, it just sets display to none.
+   * This is a lot faster (1.8sec faster when applying hide to 500 nodes).
+   * It has the drawback that show cannot revert the display style, so you have to know the style.<p>
+   * See also showFast.
+   */
+  $.fn.hideFast = function() {
+    //TODO CGU 5.2 change to use css class (this.addClass('hidden');). Replace jquery hide and show -> should be a lot faster because it is not necessary to remember any state.
+    this[0].style.display = 'none';
+    return this;
+  };
+
+  /**
+   * Just sets display to block. See hideFast for details.
+   */
+  $.fn.showFast = function() {
+    this[0].style.display = 'block';
+    return this;
   };
 
   /**
