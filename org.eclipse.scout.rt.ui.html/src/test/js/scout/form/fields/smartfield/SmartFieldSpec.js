@@ -42,6 +42,18 @@ describe('SmartField', function() {
 
   });
 
+  describe('_syncProposalChooser', function() {
+
+    it('must reset _requestProposal property', function() {
+      expect(smartField._requestedProposal).toBe(false);
+      smartField._openProposal(true);
+      expect(smartField._requestedProposal).toBe(true);
+      smartField._syncProposalChooser({});
+      expect(smartField._requestedProposal).toBe(false);
+    });
+
+  },
+
   describe('_openProposal', function() {
 
     var events = [null];

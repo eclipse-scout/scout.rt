@@ -73,6 +73,17 @@ scout.SmartField.prototype._syncDisplayText = function(displayText) {
 };
 
 /**
+ * Sync method is required because when proposal-chooser has never been rendered and the search-string
+ * does not return any proposals in a proposal field, neither _renderProposalChooser nor _removeProposalChooser
+ * is called and thus the _requestedProposal flag would never be resetted.
+ */
+scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
+  $.log.debug('(SmartField#_syncProposalChooser) set _requestedProposal to false');
+  this.proposalChooser = proposalChooser;
+  this._requestedProposal = false;
+};
+
+/**
  * When popup is not rendered at this point, we render the popup.
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
@@ -80,8 +91,6 @@ scout.SmartField.prototype._renderProposalChooser = function() {
   if (!this.proposalChooser) {
     return;
   }
-
-  this._requestedProposal = false;
   this._renderPopup();
   this.proposalChooser.render(this._popup.$container);
   this._popup.resize();
