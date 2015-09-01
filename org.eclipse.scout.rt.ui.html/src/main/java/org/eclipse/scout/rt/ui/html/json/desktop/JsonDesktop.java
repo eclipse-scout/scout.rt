@@ -102,10 +102,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  /**
-   *
-   */
-  private void handleUiFormActivated(JsonEvent event) {
+  protected void handleUiFormActivated(JsonEvent event) {
     String formId = event.getData().optString("formId", null);
     if (formId == null) {
       getModel().activateForm(null);
