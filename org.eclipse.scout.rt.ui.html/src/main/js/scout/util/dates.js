@@ -75,6 +75,9 @@ scout.dates = {
   },
 
   isSameDay: function(date, date2) {
+    if (!date || !date2) {
+      return false;
+    }
     return date.getFullYear() === date2.getFullYear() &&
       date.getMonth() === date2.getMonth() &&
       date.getDate() === date2.getDate();
@@ -418,6 +421,19 @@ scout.dates = {
       newDate.setMilliseconds(scout.helpers.nvl(time.getMilliseconds(), 0));
     }
     return newDate;
-  }
+  },
 
+  /**
+   * Returns <code>true</code> if the given year is a leap year, i.e if february 29 exists in that year.
+   */
+  isLeapYear: function(year) {
+    if (year === undefined || year === null) {
+      return false;
+    }
+    var date = new Date(0);
+    date.setYear(year);
+    date.setMonth(1);
+    date.setDate(29);
+    return (date.getDate() === 29);
+  }
 };

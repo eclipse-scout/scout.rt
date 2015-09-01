@@ -376,4 +376,30 @@ describe("scout.dates", function() {
 
   });
 
+  describe("isLeapYear", function() {
+
+    it("correctly identifies leap years", function() {
+      expect(scout.dates.isLeapYear()).toBe(false);
+      expect(scout.dates.isLeapYear(undefined)).toBe(false);
+      expect(scout.dates.isLeapYear(null)).toBe(false);
+
+      expect(scout.dates.isLeapYear(1900)).toBe(false);
+      expect(scout.dates.isLeapYear(1996)).toBe(true);
+      expect(scout.dates.isLeapYear(1997)).toBe(false);
+      expect(scout.dates.isLeapYear(1998)).toBe(false);
+      expect(scout.dates.isLeapYear(1999)).toBe(false);
+      expect(scout.dates.isLeapYear(2000)).toBe(true);
+      expect(scout.dates.isLeapYear(2001)).toBe(false);
+      expect(scout.dates.isLeapYear(2002)).toBe(false);
+      expect(scout.dates.isLeapYear(2003)).toBe(false);
+      expect(scout.dates.isLeapYear(2004)).toBe(true);
+      expect(scout.dates.isLeapYear(2005)).toBe(false);
+      expect(scout.dates.isLeapYear(2006)).toBe(false);
+      expect(scout.dates.isLeapYear(2007)).toBe(false);
+      expect(scout.dates.isLeapYear(2008)).toBe(true);
+      expect(scout.dates.isLeapYear(2100)).toBe(false);
+    });
+
+  });
+
 });

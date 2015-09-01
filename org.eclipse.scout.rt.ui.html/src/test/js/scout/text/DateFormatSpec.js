@@ -90,7 +90,7 @@ describe("DateFormat", function() {
         expect(result.parsedPattern).toBe('dd.M.yyyy');
       });
 
-      it('considers pattern dd.MM.yyyy', function() {
+      it('considers pattern yyyy-MM-dd', function() {
         var pattern = 'yyyy-MM-dd';
         var dateFormat = new scout.DateFormat(locale, pattern);
 
@@ -100,7 +100,7 @@ describe("DateFormat", function() {
         expect(result.matchInfo.year).toBe('2000');
       });
 
-      it('considers pattern dd.MM.yyyy', function() {
+      it('considers pattern MM/dd/yyy', function() {
         var pattern = 'MM/dd/yyyy';
         var dateFormat = new scout.DateFormat(locale, pattern);
 
@@ -108,6 +108,38 @@ describe("DateFormat", function() {
         expect(result.matchInfo.day).toBe('16');
         expect(result.matchInfo.month).toBe('08');
         expect(result.matchInfo.year).toBe('1999');
+      });
+
+      it('proposes valid dates', function() {
+        var pattern = 'dd.MM.yyyy';
+        var dateFormat = new scout.DateFormat(locale, pattern);
+
+        var result = dateFormat.analyze('2', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('02.02.2016');
+
+        result = dateFormat.analyze('21', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('21.02.2016');
+
+        result = dateFormat.analyze('29', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('29.02.2016');
+
+        result = dateFormat.analyze('29', scout.dates.create('2015-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('29.03.2015');
+
+        result = dateFormat.analyze('30', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('30.03.2016');
+
+        result = dateFormat.analyze('31', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('31.03.2016');
+
+        result = dateFormat.analyze('31', scout.dates.create('2016-03-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('31.03.2016');
+
+        result = dateFormat.analyze('31', scout.dates.create('2016-04-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('31.05.2016');
+
+        result = dateFormat.analyze('32', scout.dates.create('2016-04-01'));
+        expect(result.predictedDate).toBe(null);
       });
     });
   });

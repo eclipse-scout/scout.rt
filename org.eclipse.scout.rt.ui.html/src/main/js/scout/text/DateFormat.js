@@ -991,20 +991,24 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   // 2015 does not have 29 days and is "corrected" to March.)
   var result = new Date(0);
 
-  //set day to nexts valid month if a month has not days in rage between 29(february) and 31. Do this only when month is not set.
   var validMonth = scout.helpers.nvl(dateInfo.month, startDate.getMonth());
   var validYear = scout.helpers.nvl(dateInfo.year, startDate.getFullYear());
-  var monthsThirthyOne = [0, 2, 4, 6, 7, 9, 11];
-  if (dateInfo.day && dateInfo.day >= 29 && dateInfo.day <= 31 && !dateInfo.month && validMonth === 1) {
-    if (this.leapYear(scout.helpers.nvl(dateInfo.year, startDate.getFullYear())) && dateInfo.day === 29) {
-      validMonth = 1;
-    } else {
-      validMonth = 2;
+  // When user entered the day but not (yet) the month, adjust month if possible to propose a valid date
+  if (dateInfo.day && !dateInfo.month) {
+    // If day "31" does not exist in the proposed month, use the next month
+    if (dateInfo.day === 31) {
+      var monthsWithThirthyOneDays = [0, 2, 4, 6, 7, 9, 11];
+      if (!scout.helpers.isOneOf(validMonth, monthsWithThirthyOneDays)) {
+        validMonth = validMonth + 1;
+      }
     }
-  } else if (dateInfo.day === 31 && !dateInfo.month && !scout.helpers.isOneOf(validMonth, monthsThirthyOne)) {
-    validMonth = validMonth + 1;
+    // If day is "29" or "30" and month is february, use next month (except day is "29" and the year is a leap year)
+    else if (dateInfo.day >= 29 && validMonth === 1) {
+      if (dateInfo.day > 29 || !scout.dates.isLeapYear(validYear)) {
+        validMonth = validMonth + 1;
+      }
+    }
   }
-
   result.setFullYear(validYear);
   result.setMonth(validMonth);
   result.setDate(scout.helpers.nvl(dateInfo.day, startDate.getDate()));
@@ -1046,14 +1050,6 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   function isValid(value, expectedValue) {
     return (expectedValue === undefined || expectedValue === value);
   }
-};
-
-scout.DateFormat.prototype.leapYear = function(year) {
-  var date = new Date();
-  date.setYear(year);
-  date.setMonth(1);
-  date.setDate(29);
-  return date.getDate() === 29;
 };
 
 /**
