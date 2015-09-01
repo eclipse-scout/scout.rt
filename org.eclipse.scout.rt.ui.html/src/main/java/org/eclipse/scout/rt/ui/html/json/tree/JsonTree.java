@@ -302,7 +302,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   @Override
   public void processBufferedEvents() {
-    System.err.println("-------------------- PROCESS TREE");
     if (m_eventBuffer.isEmpty()) {
       return;
     }
