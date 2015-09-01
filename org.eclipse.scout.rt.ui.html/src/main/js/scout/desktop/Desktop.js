@@ -537,18 +537,14 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
   var popup;
   if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER) {
     // Workaround for IE: When in "protected mode", window.open() returns null for external URLs, even when
-    // the popup was successfully opened! To check if a popup blocker is active, we first open a dummy
-    // popup with no URL, which will return an object if popup block is disabled. If the popup could be
-    // opened, we open a second popup with the actual URL (will return null, but we know it won't be blocked
-    // because of the test we just performed) and close the test popup again.
-    // FIXME BSH Test popup can be seen for a short moment. Is there a better solution?
+    // the popup was successfully opened! To check if a popup blocker is active, we first open an empty
+    // popup with no URL, which will return null when the popup was blocked. If the popup was successful,
+    // we change the location to the target URI.
     popup = window.open('');
     if (popup) {
-      window.open(uri);
-      popup.close();
+      popup.window.location.href = uri;
     }
-  }
-  else {
+  } else {
     // Chrome returns undefined, FF null when popup is blocked
     popup = window.open(uri);
   }
