@@ -5,6 +5,20 @@
 /*global console: false */
 (function($) {
 
+  // === internal methods ===
+
+  /**
+   * Returns false when the component display is 'none' or visibility is 'hidden', otherwise true.
+   * Note: this gives other results than $.is(':visible'), since that method will also return false
+   * when a component has absolute positioning and no width and height is defined (well, you cannot
+   * see a component with a style like this, but technically it is not set to 'not visible').
+   */
+  function elemVisible(elem) {
+    return !(
+        'none' === elem.style.display ||
+        'hidden' === elem.style.visibility);
+  }
+
   // === $ extensions ===
 
   // chris' shortcut
@@ -260,7 +274,7 @@
     var i, elem;
     for (i = 0; i < this.length; i++) {
       elem = this[i];
-      if (this.elemVisible(elem) != visible) {
+      if (elemVisible(elem) != visible) {
         if (visible) {
           this.show();
         } else {
@@ -327,19 +341,7 @@
 
 
   $.fn.isVisible = function() {
-    return this.elemVisible(this[0]);
-  };
-
-  /**
-   * Returns false when the component display is 'none' or visibility is 'hidden', otherwise true.
-   * Note: this gives other results than $.is(':visible'), since that method will also return false
-   * when a component has absolute positioning and no width and height is defined (well, you cannot
-   * see a component with a style like this, but technically it is not set to 'not visible').
-   */
-  $.fn.elemVisible = function(elem) {
-    return !(
-        'none' === elem.style.display ||
-        'hidden' === elem.style.visibility);
+    return elemVisible(this[0]);
   };
 
   /**
