@@ -57,6 +57,9 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
       EventListenerList listeners = m_listeners.get(Assertions.assertNotNull(session));
       if (listeners != null) {
         listeners.remove(INotificationListener.class, listener);
+        if (listeners.getListenerCount(INotificationListener.class) == 0) {
+          m_listeners.remove(session);
+        }
       }
     }
   }
@@ -96,21 +99,22 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
       // only interested in session stopped
       return;
     }
-
     synchronized (m_listeners) {
-      EventListenerList listeners = m_listeners.get(Assertions.assertNotNull(event.getSource()));
+      ISession session = Assertions.assertNotNull(event.getSource());
+      EventListenerList listeners = m_listeners.get(session);
       if (listeners == null) {
         return;
       }
 
-      INotificationListener[] notificationListeners = listeners.getListeners(INotificationListener.class);
+      @SuppressWarnings("unchecked")
+      INotificationListener<T>[] notificationListeners = listeners.getListeners(INotificationListener.class);
       if (notificationListeners == null || notificationListeners.length == 0) {
         return;
       }
 
-      for (INotificationListener<?> notificationListener : notificationListeners) {
+      for (INotificationListener<T> notificationListener : notificationListeners) {
         LOG.warn("Auto fallback removal of session listener due to stopped session. This must be done explicitly by the one that registered the listener: " + notificationListener);
-        listeners.remove(INotificationListener.class, notificationListener);
+        removeListener(session, notificationListener);
       }
     }
   }

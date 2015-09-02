@@ -11,6 +11,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.SessionEvent;
 
 /**
  * HTTP cookie store implementation that manages different sets of cookies ("cookie jars"), one per {@link ISession}.
@@ -93,6 +95,7 @@ public class MultiSessionCookieStore implements CookieStore {
       else {
         cookieStore = createInMemoryCookieStore();
         m_cookieStores.put(currentSession, cookieStore);
+        currentSession.addListener(new P_SessionStoppedListenr());
         return cookieStore;
       }
     }
@@ -108,6 +111,17 @@ public class MultiSessionCookieStore implements CookieStore {
     }
     finally {
       m_cookieStoresLock.writeLock().unlock();
+    }
+  }
+
+  private class P_SessionStoppedListenr implements ISessionListener {
+    @Override
+    public void sessionChanged(SessionEvent event) {
+      if (SessionEvent.TYPE_STOPPED == event.getType()) {
+        ISession session = event.getSource();
+        sessionStopped(session);
+        session.removeListener(this);
+      }
     }
   }
 }
