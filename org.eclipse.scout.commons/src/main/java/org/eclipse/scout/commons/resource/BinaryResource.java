@@ -32,14 +32,15 @@ public final class BinaryResource implements Serializable {
 
   private final String m_filename;
   private final String m_contentType;
+  private final String m_charset;
   private final byte[] m_content;
   private final long m_lastModified;
-
   private final long m_fingerprint;
 
-  private BinaryResource(String filename, String contentType, byte[] content, long lastModified, long fingerprint) {
+  private BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified, long fingerprint) {
     m_filename = filename;
     m_contentType = contentType;
+    m_charset = charset;
     m_content = content;
     m_lastModified = lastModified;
     m_fingerprint = fingerprint;
@@ -60,7 +61,7 @@ public final class BinaryResource implements Serializable {
    * @param lastModified
    *          "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
    */
-  public BinaryResource(String filename, String contentType, byte[] content, long lastModified) {
+  public BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified) {
     m_filename = filename;
     if (contentType == null && filename != null) {
       int i = filename.lastIndexOf('.');
@@ -69,6 +70,7 @@ public final class BinaryResource implements Serializable {
       }
     }
     m_contentType = contentType;
+    m_charset = charset;
     m_content = content;
     m_lastModified = lastModified;
     if (content != null) {
@@ -84,19 +86,28 @@ public final class BinaryResource implements Serializable {
   /**
    * Convenience constructor which assumes <code>filename = empty, lastModified = -1</code>.
    *
-   * @see #BinaryResource(String, String, byte[], long)
+   * @see #BinaryResource(String, String, String, byte[], long)
    */
   public BinaryResource(MimeType contentType, byte[] content) {
-    this(null, contentType != null ? contentType.getType() : null, content, -1);
+    this(null, contentType != null ? contentType.getType() : null, null, content, -1);
+  }
+
+  /**
+   * Convenience constructor which assumes <code>charset = null</code>.
+   *
+   * @see #BinaryResource(String, String, String, byte[], long)
+   */
+  public BinaryResource(String filename, String contentType, byte[] content, long lastModified) {
+    this(filename, contentType, null, content, lastModified);
   }
 
   /**
    * Convenience constructor which assumes <code>lastModified = -1</code>.
    *
-   * @see #BinaryResource(String, String, byte[], long)
+   * @see #BinaryResource(String, String, String, byte[], long)
    */
   public BinaryResource(String filename, String contentType, byte[] content) {
-    this(filename, contentType, content, -1);
+    this(filename, contentType, null, content, -1);
   }
 
   /**
@@ -104,10 +115,10 @@ public final class BinaryResource implements Serializable {
    * <p>
    * null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
    *
-   * @see #BinaryResource(String, String, byte[], long)
+   * @see #BinaryResource(String, String, String, byte[], long)
    */
   public BinaryResource(String filename, byte[] content) {
-    this(filename, null, content, -1);
+    this(filename, null, null, content, -1);
   }
 
   /**
@@ -115,7 +126,7 @@ public final class BinaryResource implements Serializable {
    * temporary files only. If the file is not accessible, the constructor will fail.
    */
   public BinaryResource(File file) throws ProcessingException {
-    this(file.getName(), FileUtility.getContentType(file), IOUtility.getContent(file), file.lastModified());
+    this(file.getName(), FileUtility.getContentType(file), null, IOUtility.getContent(file), file.lastModified());
   }
 
   /**
@@ -138,6 +149,14 @@ public final class BinaryResource implements Serializable {
    */
   public String getContentType() {
     return m_contentType;
+  }
+
+  /**
+   * @return the charset (character encoding), as passed to the constructor. May be <code>null</code> for non-text
+   *         resources.
+   */
+  public String getCharset() {
+    return m_charset;
   }
 
   /**
@@ -182,7 +201,7 @@ public final class BinaryResource implements Serializable {
    * @return a new {@link BinaryResource} that represents the same content, but has another name
    */
   public BinaryResource createAlias(String newName) {
-    return new BinaryResource(newName, m_contentType, m_content, m_lastModified, m_fingerprint);
+    return new BinaryResource(newName, m_contentType, m_charset, m_content, m_lastModified, m_fingerprint);
   }
 
   @Override
@@ -215,19 +234,30 @@ public final class BinaryResource implements Serializable {
 
   @Override
   public String toString() {
-    String s = "content: " + (m_content == null ? "null" : m_content.length + " bytes");
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+    sb.append("content: ");
+    if (m_content == null) {
+      sb.append("null");
+    }
+    else {
+      sb.append(m_content.length).append(" bytes");
+    }
     if (m_filename != null) {
-      s += ", filename: " + m_filename;
+      sb.append(", filename: ").append(m_filename);
     }
     if (m_contentType != null) {
-      s += ", contentType: " + m_contentType;
+      sb.append(", contentType: ").append(m_contentType);
+    }
+    if (m_charset != null) {
+      sb.append(", charset: ").append(m_charset);
     }
     if (m_lastModified != -1) {
-      s += ", lastModified: " + m_lastModified;
+      sb.append(", lastModified: ").append(m_lastModified);
     }
     if (m_fingerprint != -1) {
-      s += ", fingerprint: " + m_fingerprint;
+      sb.append(", fingerprint: ").append(m_fingerprint);
     }
-    return getClass().getSimpleName() + " [" + s + "]";
+    sb.append("]");
+    return sb.toString();
   }
 }
