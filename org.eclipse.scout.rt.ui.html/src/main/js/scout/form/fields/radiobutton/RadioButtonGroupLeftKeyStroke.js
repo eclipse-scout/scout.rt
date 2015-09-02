@@ -18,7 +18,7 @@ scout.RadioButtonGroupLeftKeyStroke.prototype.handle = function(event) {
       fieldBefore._toggleChecked();
       break;
     }
-    if (radioButton.enabled) {
+    if (radioButton.enabled && radioButton.visible) {
       fieldBefore = radioButton;
     }
   }
