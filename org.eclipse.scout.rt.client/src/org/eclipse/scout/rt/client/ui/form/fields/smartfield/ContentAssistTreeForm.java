@@ -190,7 +190,6 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
   @ConfigOperation
   @Order(100)
   protected Pattern execCreatePatternForTreeFilter(String filterText) {
-    // check pattern
     String s = filterText;
     if (s == null) {
       s = "";
@@ -200,10 +199,12 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
       s = getContentAssistField().getWildcard() + s;
     }
-    if (!s.endsWith(getContentAssistField().getWildcard())) {
-      s = s + getContentAssistField().getWildcard();
+    s = s.replace(getContentAssistField().getWildcard(), "@wildcard@");
+    s = StringUtility.escapeRegexMetachars(s);
+    s = s.replace("@wildcard@", ".*");
+    if (!s.endsWith(".*")) {
+      s = s + ".*";
     }
-    s = StringUtility.toRegExPattern(s);
     return Pattern.compile(s, Pattern.DOTALL);
   }
 
