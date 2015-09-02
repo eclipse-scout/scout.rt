@@ -1,0 +1,9 @@
+target "_eclipse-testing_license.target" with source
+
+location "http://download.eclipse.org/scout/releases/4.0/testing" {
+  org.mockito.mockito-all lazy
+}
+
+location cbi_license "http://download.eclipse.org/cbi/updates/license" {
+  org.eclipse.license.feature.group lazy
+}
