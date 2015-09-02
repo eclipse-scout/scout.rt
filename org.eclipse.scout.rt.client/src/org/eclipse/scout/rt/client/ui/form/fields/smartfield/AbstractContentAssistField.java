@@ -418,7 +418,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     setBrowseNewText(getConfiguredBrowseNewText());
     setProposalFormProvider(createProposalFormProvider());
     setProposalFormHeight(getConfiguredProposalFormHeight());
-    setWildcard(getConfiguredWildcard());
     // content assist table
     Class<? extends IContentAssistFieldTable<VALUE>> contentAssistTableClazz = getConfiguredContentAssistTable();
     // if no table is configured try to find a fitting inner class
@@ -450,6 +449,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lsCls.getName() + "'.", e));
       }
     }
+    setWildcard(getConfiguredWildcard());
   }
 
   /**
@@ -628,7 +628,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
       CodeLookupCall<LOOKUP_KEY> codeLookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
-      codeLookupCall.setWildcard(getWildcard());
       m_lookupCall = codeLookupCall;
       ICodeType t = CODES.getCodeType(m_codeTypeClass);
       if (t != null) {
@@ -654,7 +653,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    */
   @Override
   public void setWildcard(String wildcard) {
+    if (StringUtility.isNullOrEmpty(wildcard)) {
+      throw new IllegalArgumentException("Wildcard must not be null nor empty!");
+    }
     m_wildcard = wildcard;
+    if (m_lookupCall != null) {
+      m_lookupCall.setWildcard(wildcard);
+    }
   }
 
   @Override

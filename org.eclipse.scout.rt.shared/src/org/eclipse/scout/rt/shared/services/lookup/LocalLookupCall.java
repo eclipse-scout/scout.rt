@@ -30,8 +30,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  */
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
-  private String m_wildcard = "*";
-
   public LocalLookupCall() {
   }
 
@@ -152,13 +150,5 @@ public class LocalLookupCall<T> extends LookupCall<T> {
       }
     }
     return list;
-  }
-
-  public void setWildcard(String wildcard) {
-    m_wildcard = wildcard;
-  }
-
-  public String getWildcard() {
-    return m_wildcard;
   }
 }

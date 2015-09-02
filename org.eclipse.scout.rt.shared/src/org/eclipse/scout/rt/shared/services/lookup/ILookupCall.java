@@ -140,4 +140,8 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    */
   void setMaxRowCount(int n);
 
+  String getWildcard();
+
+  void setWildcard(String wildcard);
+
 }
