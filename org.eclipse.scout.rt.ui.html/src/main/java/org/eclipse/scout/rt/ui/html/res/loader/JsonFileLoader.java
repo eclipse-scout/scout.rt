@@ -45,7 +45,7 @@ public class JsonFileLoader extends AbstractResourceLoader {
     // FIXME BSH: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
     String json = new String(IOUtility.readFromUrl(url), Encoding.UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), json.getBytes(Encoding.UTF_8), System.currentTimeMillis());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), Encoding.UTF_8, json.getBytes(Encoding.UTF_8), System.currentTimeMillis());
     return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 

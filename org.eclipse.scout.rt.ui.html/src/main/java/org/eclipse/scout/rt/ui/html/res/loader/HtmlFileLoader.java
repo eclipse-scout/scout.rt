@@ -17,6 +17,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -57,7 +58,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(cacheKey);
     HtmlDocumentParser parser = createHtmlDocumentParser(params);
     byte[] parsedDocument = parser.parseDocument(document);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), parsedDocument, System.currentTimeMillis());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), Encoding.UTF_8, parsedDocument, System.currentTimeMillis());
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, true, -1, content);

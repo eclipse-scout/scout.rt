@@ -158,6 +158,10 @@ public class UploadRequestHandler extends AbstractJsonRequestHandler {
         }
         String contentType = item.getContentType();
         byte[] content = IOUtility.getContent(stream);
+        // Info: we cannot set the charset property for uploaded files here, because we simply don't know it.
+        // the only thing we could do is to guess the charset (encoding) by reading the byte contents of
+        // uploaded text files (for binary file types the encoding is not relevant). However: currently we
+        // do not set the charset at all.
         uploadResources.add(new BinaryResource(filename, contentType, content));
       }
     }

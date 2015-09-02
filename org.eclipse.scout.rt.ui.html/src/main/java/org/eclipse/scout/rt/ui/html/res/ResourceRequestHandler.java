@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -69,14 +70,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
       return false;
     }
 
-    String contentType = resource.getResource().getContentType();
-    if (contentType != null) {
-      resp.setContentType(contentType);
-    }
-    else {
-      LOG.warn("Could not determine content type of resource: " + resourcePath);
-    }
-    resp.setContentLength(resource.getResource().getContentLength());
+    BinaryResource binaryResource = resource.getResource();
+    setHttpResponseHeaders(resp, binaryResource);
 
     // cached in browser? -> returns 304 if the resource has not been modified
     // Important: Check is only done if the request still processes the requested resource
@@ -92,9 +87,32 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     resource.applyHttpResponseInterceptors(servlet, req, resp);
 
     if (!"HEAD".equals(req.getMethod())) {
-      resp.getOutputStream().write(resource.getResource().getContent());
+      resp.getOutputStream().write(binaryResource.getContent());
     }
     return true;
+  }
+
+  /**
+   * Sets HTTP response header fields: content-length, content-type (incl. optional charset).
+   */
+  protected void setHttpResponseHeaders(HttpServletResponse resp, BinaryResource resource) {
+    // content-length
+    resp.setContentLength(resource.getContentLength());
+
+    // charset
+    String charset = resource.getCharset();
+    if (charset != null) {
+      resp.setCharacterEncoding(charset);
+    }
+
+    // content-type
+    String contentType = resource.getContentType();
+    if (contentType != null) {
+      resp.setContentType(contentType);
+    }
+    else {
+      LOG.warn("Could not determine content-type of resource: " + resource);
+    }
   }
 
   protected ResourceLoaderFactory resourceLoaderFactory() {
