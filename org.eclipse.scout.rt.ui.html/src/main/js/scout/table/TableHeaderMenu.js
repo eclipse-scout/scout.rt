@@ -13,14 +13,14 @@ scout.TableHeaderMenu = function(session, options) {
 };
 scout.inherits(scout.TableHeaderMenu, scout.Popup);
 
-scout.TableHeaderMenu.prototype._render = function() {
+scout.TableHeaderMenu.prototype._render = function($parent) {
   var table = this.table,
     session = this.session,
-    $parent = this.session.$entryPoint,
     $headerItem = this.$anchor,
     column = $headerItem.data('column'),
     pos = table.columns.indexOf(column);
 
+  $parent = $parent || this.session.$entryPoint,
   this.$parent = $parent;
   $headerItem.select(true);
 

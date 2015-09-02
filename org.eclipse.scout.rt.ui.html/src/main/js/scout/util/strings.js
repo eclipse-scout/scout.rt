@@ -5,7 +5,7 @@ scout.strings = {
    * @param encodeHtml defaults to true
    */
   nl2br: function(text, encodeHtml) {
-    if (text === undefined || text === null) {
+    if (text === undefined || text === null || text === '') {
       return text;
     }
     text = this.asString(text);
@@ -17,7 +17,7 @@ scout.strings = {
   },
 
   removeAmpersand: function(text) {
-    if (text === undefined || text === null) {
+    if (text === undefined || text === null || text === '') {
       return text;
     }
     text = this.asString(text);

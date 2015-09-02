@@ -4,6 +4,7 @@ describe("scout.strings", function() {
 
     it("can convert newlines to br tags", function() {
       expect(scout.strings.nl2br()).toBe(undefined);
+      expect(scout.strings.nl2br(null)).toBe(null);
       expect(scout.strings.nl2br('')).toBe('');
       expect(scout.strings.nl2br('Hello')).toBe('Hello');
       expect(scout.strings.nl2br('Hello\nGoodbye')).toBe('Hello<br>Goodbye');
@@ -24,6 +25,7 @@ describe("scout.strings", function() {
 
     it("can remove ampersands", function() {
       expect(scout.strings.removeAmpersand()).toBe(undefined);
+      expect(scout.strings.removeAmpersand(null)).toBe(null);
       expect(scout.strings.removeAmpersand('')).toBe('');
       expect(scout.strings.removeAmpersand(' ')).toBe(' ');
       expect(scout.strings.removeAmpersand('Hello')).toBe('Hello');

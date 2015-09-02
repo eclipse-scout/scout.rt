@@ -15,7 +15,7 @@ scout.TableHeader = function(table) {
 };
 scout.inherits(scout.TableHeader, scout.Widget);
 
-scout.TableHeader.prototype._render = function() {
+scout.TableHeader.prototype._render = function($parent) {
   var column, $header, alignment, $defaultCheckedColumHeader, $separator,
     that = this,
     columns = this.columns,

@@ -381,7 +381,7 @@ scout.SmartField.prototype._renderPopup = function() {
 /**
  * @override ValueField.js
  */
-scout.SmartField.prototype.acceptInput = function() {
+scout.SmartField.prototype.acceptInput = function(whileTyping) {
   if (this.mode !== scout.FormField.MODE_CELLEDITOR) {
     this._acceptProposal(true);
   }

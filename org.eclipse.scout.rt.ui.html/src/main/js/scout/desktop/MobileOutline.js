@@ -71,12 +71,12 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
   }
 };
 
-scout.MobileOutline.prototype._filterMenus = function(allowedTypes) {
+scout.MobileOutline.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   if (this._currentDetailForm) {
     // Don't display menus of the tree if a detail form is shown, because the detail form has its own menubar
     return [];
   }
-  return scout.MobileOutline.parent.prototype._filterMenus.call(this, allowedTypes);
+  return scout.MobileOutline.parent.prototype._filterMenus.call(this, allowedTypes, onlyVisible);
 };
 
 scout.MobileOutline.prototype.onResize = function() {

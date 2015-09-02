@@ -11,16 +11,16 @@ scout.inherits(scout.MobileTable, scout.Table);
 /**
  * @override
  */
-scout.MobileTable.prototype.init = function(model, session) {
+scout.MobileTable.prototype.init = function(model, session, register) {
   // FIXME CGU: should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   model.headerVisible = false;
-  scout.MobileTable.parent.prototype.init.call(this, model, session);
+  scout.MobileTable.parent.prototype.init.call(this, model, session, register);
 };
 
 /**
  * @override
  */
-scout.MobileTable.prototype._RenderRows = function(rows, startRowIndex) {
+scout.MobileTable.prototype._renderRows = function(rows, startRowIndex) {
   this._headerColumns = this._computeHeaderColumns();
   scout.MobileTable.parent.prototype._renderRows.call(this, rows, startRowIndex);
 };
@@ -28,7 +28,7 @@ scout.MobileTable.prototype._RenderRows = function(rows, startRowIndex) {
 /**
  * @override
  */
-scout.MobileTable.prototype._buildRowDiv = function(row) {
+scout.MobileTable.prototype._buildRowDiv = function(row, rowSelected, previousRowSelected, followingRowSelected) {
   //TODO nbu selection border
   var rowClass,
     cellContent = '',

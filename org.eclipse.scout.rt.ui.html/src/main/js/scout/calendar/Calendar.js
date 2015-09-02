@@ -36,14 +36,13 @@ scout.Calendar = function() {
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
 
-scout.Calendar.prototype.init = function(model, session) {
-  scout.Calendar.parent.prototype.init.call(this, model, session);
+scout.Calendar.prototype.init = function(model, session, register) {
+  scout.Calendar.parent.prototype.init.call(this, model, session, register);
 
   this._tooltipSupport = new scout.TooltipSupport(this.session, {
     htmlEnabled: true,
     tooltipDelay: 750
   });
-
 };
 
 scout.Calendar.DisplayMode = {

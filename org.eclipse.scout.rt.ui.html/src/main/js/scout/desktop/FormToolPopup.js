@@ -87,6 +87,6 @@ scout.FormToolPopup.prototype.alignTo = function() {
 /**
  * @override Popup.js
  */
-scout.FormToolPopup.prototype.close = function() {
+scout.FormToolPopup.prototype.close = function(event) {
   this.formToolButton.setSelected(false);
 };

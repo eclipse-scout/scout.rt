@@ -174,7 +174,7 @@ scout.DateField.prototype._renderEnabled = function() {
 /**
  * @Override
  */
-scout.DateField.prototype._renderDisplayText = function(text) {
+scout.DateField.prototype._renderDisplayText = function() {
   //nop -> handled in _renderTimestamp
 };
 
