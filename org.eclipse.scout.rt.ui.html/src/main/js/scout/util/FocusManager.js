@@ -26,11 +26,24 @@ scout.FocusManager = function(session, options) {
     if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
       event.preventDefault();
     }
+    //Because in ie divs are focusable also without tabindex we have to handle it here-> select next parent with tabindex.
+    this._handleIEEvent(event);
     return true;
   }.bind(this));
 
   // Install a focus context for the $entryPoint.
   this.installFocusContext(this.$entryPoint, scout.focusRule.AUTO);
+};
+
+scout.FocusManager.prototype._handleIEEvent = function(event) {
+  var $element = $(event.target);
+  if (scout.device.browser === scout.Device.SupportedBrowsers.INTERNET_EXPLORER && $element.is("div")) {
+    var $elementToFocus = $element.closest('div[tabindex]');
+    if ($elementToFocus) {
+      this.requestFocus($elementToFocus.get(0));
+    }
+    event.preventDefault();
+  }
 };
 
 /**
@@ -170,9 +183,8 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     $candidates = $container
       .find(':focusable')
       .addBack(':focusable') // in some use cases, the container should be focusable as well, e.g. context menu without focusable children
-      .not(this.$entryPoint) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
-      .filter(filter || scout.filters.returnTrue);
-
+    .not(this.$entryPoint) // $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback.
+    .filter(filter || scout.filters.returnTrue);
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
@@ -193,7 +205,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     $menuParents = $(candidate).parents('.menubar');
     $tabParents = $(candidate).parents('.tab-area');
     $boxButtons = $(candidate).parents('.box-buttons');
-    if (($menuParents.length> 0 ||$tabParents.length> 0 || $boxButtons.length  > 0 ) && !firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
+    if (($menuParents.length > 0 || $tabParents.length > 0 || $boxButtons.length > 0) && !firstButton && ($(candidate).hasClass('button') || $(candidate).hasClass('menu-item'))) {
       firstButton = candidate;
     } else if (!$menuParents.length && !$tabParents.length && !$boxButtons.length && typeof candidate.focus === 'function') { //inline buttons and menues are selectable before choosing button or menu from bar
       return candidate;
