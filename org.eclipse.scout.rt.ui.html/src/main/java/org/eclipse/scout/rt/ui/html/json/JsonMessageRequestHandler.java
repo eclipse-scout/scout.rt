@@ -24,7 +24,9 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.json.JSONObject;
@@ -40,6 +42,8 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestHandler.class);
 
   private static final int BACKGROUND_POLLING_INTERVAL_SECONDS = 60;
+
+  private final int m_maxUserIdleTime = CONFIG.getPropertyValue(MaxUserIdleTimeProperty.class).intValue();
 
   @Override
   public boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -75,7 +79,7 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
 
         if (jsonReq.isPollForBackgroundJobsRequest()) {
           int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
-          int maxIdle = req.getSession().getMaxInactiveInterval();
+          int maxIdle = Math.min(req.getSession().getMaxInactiveInterval(), m_maxUserIdleTime);
           // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
           // because that might trigger many very short polling calls until the ui session is really disposed.
           int pollWait = Math.max(Math.min(maxIdle - curIdle, BACKGROUND_POLLING_INTERVAL_SECONDS), 3);
@@ -214,7 +218,7 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
 
       //check timeout
       int idleSeconds = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
-      int maxIdleSeconds = httpSession.getMaxInactiveInterval();
+      int maxIdleSeconds = m_maxUserIdleTime;
       if (idleSeconds > maxIdleSeconds) {
         LOG.info("detected UI session timeout [id=" + jsonReq.getUiSessionId() + "] after idle of " + idleSeconds + " seconds (maxInactiveInterval=" + maxIdleSeconds + ")");
         httpSession.invalidate();
