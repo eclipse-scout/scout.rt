@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
-import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 
 /**
@@ -42,8 +41,12 @@ public class ClientBeanScopeEvaluator implements IBeanScopeEvaluator {
     List<IBean<T>> result = new ArrayList<IBean<T>>(candidates.size());
     for (IBean<T> bean : candidates) {
       Client clientAnnotation = bean.getBeanAnnotation(Client.class);
+      //(from imo, 03.09.2015) this line is only for the mig-app. This breaks the general tunneltoserver conecpt which does NOT require a clientsession at all
+      /*
       TunnelToServer tunnelToServerAnnotation = bean.getBeanAnnotation(TunnelToServer.class);
       if (clientAnnotation == null && tunnelToServerAnnotation == null) {
+      */
+      if (clientAnnotation == null) {
         // no filter -> accept
         result.add(bean);
       }
@@ -53,10 +56,12 @@ public class ClientBeanScopeEvaluator implements IBeanScopeEvaluator {
         if (clientAnnotation != null) {
           expectedSession = clientAnnotation.value();
         }
+        /* (from imo) see comment above
         else {
           // @TunnelToServer does not specify a specific session class
           expectedSession = IClientSession.class;
         }
+        */
 
         Class<?> scopeClass = (Class<?>) currentScope;
         if (expectedSession.isAssignableFrom(scopeClass)) {
