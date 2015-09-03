@@ -823,6 +823,9 @@ scout.Session.prototype._removeBusy = function() {
 
 scout.Session.prototype._onCancelProcessing = function(event) {
   var busyIndicator = this._busyIndicator;
+  if (!busyIndicator) {
+    return; // removed in the mean time
+  }
   busyIndicator.off('clickCancel');
 
   // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
