@@ -73,8 +73,8 @@ describe('Device', function() {
 
       function test(userAgent, expectedBrowser, expectedVersion) {
         var device = new scout.Device(userAgent);
-        expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
-        expect(device.browserVersion).toEqual(11.0);
+        expect(device.browser).toBe(expectedBrowser);
+        expect(device.browserVersion).toEqual(expectedVersion);
       }
     });
 
