@@ -17,7 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -269,10 +268,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
-    String clientSessionId = jsonStartupReq.getClientSessionId();
+    String requestedClientSessionId = jsonStartupReq.getClientSessionId();
     IClientSession clientSession = null;
-    if (StringUtility.hasText(clientSessionId)) {
-      clientSession = loadClientSessionFromHttpSession(httpSession, clientSessionId);
+    if (StringUtility.hasText(requestedClientSessionId)) {
+      clientSession = loadClientSessionFromHttpSession(httpSession, requestedClientSessionId);
     }
 
     if (clientSession != null) {
@@ -281,19 +280,14 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
     else {
       // No client session for the requested ID was found, so create one
-      clientSessionId = generateClientSessionId();
-      LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
-      clientSession = createAndStartClientSession(clientSessionId, req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
+      clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
+      LOG.info("Created new client session [clientSessionId=" + clientSession.getId() + "]");
       // Ensure session is active
       if (!clientSession.isActive()) {
-        throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + clientSessionId + "]");
+        throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + clientSession.getId() + "]");
       }
     }
     return clientSession;
-  }
-
-  protected String generateClientSessionId() {
-    return UUID.randomUUID().toString();
   }
 
   protected IClientSession loadClientSessionFromHttpSession(HttpSession httpSession, String clientSessionId) {
@@ -338,13 +332,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
   }
 
-  protected IClientSession createAndStartClientSession(String clientSessionId, Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
+  protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
       final ClientRunContext ctx = ClientRunContexts.empty().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
-      return BEANS.get(ClientSessionProvider.class).provide(ctx, clientSessionId);
+      return BEANS.get(ClientSessionProvider.class).provide(ctx);
     }
     catch (ProcessingException e) {
-      throw new UiException("Error while creating new client session for clientSessionId=" + clientSessionId, e);
+      throw new UiException("Error while creating new client session", e);
     }
   }
 
