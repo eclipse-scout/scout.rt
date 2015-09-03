@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLifeProperty;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLiveProperty;
 
 @Bean
 public class DefaultAuthToken {
@@ -97,7 +97,7 @@ public class DefaultAuthToken {
    * @param customArgs
    */
   public void init(String userId, String... customArgs) {
-    long tokenTTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
+    long tokenTTL = CONFIG.getPropertyValue(AuthTokenTimeToLiveProperty.class);
     m_userId = userId;
     m_validUntil = System.currentTimeMillis() + tokenTTL;
     if (customArgs != null && customArgs.length == 0) {

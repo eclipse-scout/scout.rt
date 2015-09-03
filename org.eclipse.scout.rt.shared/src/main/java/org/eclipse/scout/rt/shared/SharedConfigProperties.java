@@ -56,9 +56,9 @@ public final class SharedConfigProperties {
   }
 
   /**
-   * Time to Life for the authentication token in milliseconds. The default is 10 minutes.
+   * Time to Live for the authentication token in milliseconds. The default is 10 minutes.
    */
-  public static class AuthTokenTimeToLifeProperty extends AbstractPositiveLongConfigProperty {
+  public static class AuthTokenTimeToLiveProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
     protected Long getDefaultValue() {
