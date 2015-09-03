@@ -49,34 +49,33 @@ describe('Device', function() {
       var userAgent, device;
 
       // Internet Explorer 11
-      userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko';
-      device = new scout.Device(userAgent);
-      expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
-      expect(device.browserVersion).toEqual(11.0);
+      test('Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko',
+          scout.Device.SupportedBrowsers.INTERNET_EXPLORER, 11.0);
+      // Internet Explorer 11 - as used by Outlook - note the additional ; and text after the version-no (rv).
+      test('Mozilla/5.0 (Windows NT 6.1; WOW65; Trident/7.0; rv:11.0; Microsoft Outlook 14.0.7155)',
+          scout.Device.SupportedBrowsers.INTERNET_EXPLORER, 11.0);
 
       // Internet Explorer 8
-      userAgent = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; WOW64; Trident/4.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; InfoPath.2; .NET CLR 3.5.30729; .NET CLR 3.0.30729)';
-      device = new scout.Device(userAgent);
-      expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
-      expect(device.browserVersion).toEqual(8.0);
+      test('Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; WOW64; Trident/4.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; InfoPath.2; .NET CLR 3.5.30729; .NET CLR 3.0.30729)',
+          scout.Device.SupportedBrowsers.INTERNET_EXPLORER, 8.0);
 
       // Safari (6)
-      userAgent = 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25';
-      device = new scout.Device(userAgent);
-      expect(device.browser).toBe(scout.Device.SupportedBrowsers.SAFARI);
-      expect(device.browserVersion).toEqual(6.0);
+      test('Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+          scout.Device.SupportedBrowsers.SAFARI, 6.0);
 
       // Firefox (21) from v21 Firefox supports ECMA 5
-      userAgent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1';
-      device = new scout.Device(userAgent);
-      expect(device.browser).toBe(scout.Device.SupportedBrowsers.FIREFOX);
-      expect(device.browserVersion).toEqual(21.0);
+      test('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1',
+          scout.Device.SupportedBrowsers.FIREFOX, 21.0);
 
       // Chrome (23) from v23 Chrome supports ECMA 5
-      userAgent = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.6 Safari/537.11';
-      device = new scout.Device(userAgent);
-      expect(device.browser).toBe(scout.Device.SupportedBrowsers.CHROME);
-      expect(device.browserVersion).toEqual(23.0);
+      test('Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.6 Safari/537.11',
+          scout.Device.SupportedBrowsers.CHROME, 23.0);
+
+      function test(userAgent, expectedBrowser, expectedVersion) {
+        var device = new scout.Device(userAgent);
+        expect(device.browser).toBe(scout.Device.SupportedBrowsers.INTERNET_EXPLORER);
+        expect(device.browserVersion).toEqual(11.0);
+      }
     });
 
   });

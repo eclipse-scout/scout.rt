@@ -216,7 +216,7 @@ scout.Device.prototype.parseBrowserVersion = function(userAgent) {
     if (this.contains(userAgent, 'MSIE')) {
       versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
     } else {
-      versionRegex = /rv:([0-9]+\.?[0-9]*)\)/;
+      versionRegex = /rv:([0-9]+\.?[0-9]*)/;
     }
   } else if (this.browser === browsers.SAFARI) {
     versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
