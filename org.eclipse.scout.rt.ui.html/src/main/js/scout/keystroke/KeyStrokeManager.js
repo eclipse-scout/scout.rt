@@ -113,7 +113,7 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
 };
 
 scout.KeyStrokeManager.prototype._isPreventedByDescendantContext = function(key, target, descendantContexts) {
-  var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
+  var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, target);
 
   // Check whether any descendant keyStrokeContext prevents this keystroke from execution.
   return descendantContexts.some(function(descendantContext) {
