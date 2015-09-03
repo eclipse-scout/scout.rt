@@ -174,6 +174,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   private void setValidationError(String displayText, String errorMessage) {
     setCurrentLookupRow(null);
     setDisplayText(displayText);
+    removeErrorStatus(ValidationFailedStatus.class); // remove existing validation errors first
     addErrorStatus(new ValidationFailedStatus(errorMessage));
   }
 
