@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AbstractComposerNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
@@ -763,6 +764,22 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     @Override
     protected boolean getConfiguredRootNodeVisible() {
       return true;
+    }
+
+    @Override
+    protected void execDisposeTree() throws ProcessingException {
+      super.execDisposeTree();
+
+      // dispose nodes (not necessary to remove them, dispose is sufficient)
+      visitTree(new ITreeVisitor() {
+        @Override
+        public boolean visit(ITreeNode node) {
+          if (node instanceof AbstractComposerNode) {
+            ((AbstractComposerNode) node).dispose();
+          }
+          return true;
+        }
+      });
     }
 
     @Override
