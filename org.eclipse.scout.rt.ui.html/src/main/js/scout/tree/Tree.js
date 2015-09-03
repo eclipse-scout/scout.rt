@@ -239,21 +239,21 @@ scout.Tree.prototype._renderAutoCheckChildren = function() {
 };
 
 scout.Tree.prototype._renderCheckable = function() {
-  // nop
+  // NOP
 };
 
 scout.Tree.prototype._renderMultiCheck = function() {
-  // nop
+  // NOP
 };
 
 scout.Tree.prototype.onResize = function() {
-  this.updateScrollbar();
+  if (this.rendered) {
+    this.htmlComp.revalidateLayoutTree();
+  }
 };
 
 scout.Tree.prototype.updateScrollbar = function() {
   scout.scrollbars.update(this.$data);
-  //FIXME do not call invalidateTree here, replace updateScrollbar with invalidateTree instead, see Table.js
-  this.invalidateLayoutTree();
 };
 
 scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {

@@ -99,9 +99,14 @@ scout.scrollbars = {
 
   /**
    * Recalculates the scrollbar size and position.
-   * @immediate set to true to immediately update the scrollbar, If set to false, it will be queued in order to prevent unnecessary updates.
+   * @param $scrollable JQuery element that has .data('scrollbars'), when $scrollable is falsy the function returns immediately
+   * @param immediate set to true to immediately update the scrollbar, If set to false,
+   *        it will be queued in order to prevent unnecessary updates.
    */
   update: function($scrollable, immediate) {
+    if (!$scrollable) {
+      return;
+    }
     var scrollbars = $scrollable.data('scrollbars');
     if (!scrollbars) {
       return;
@@ -110,7 +115,6 @@ scout.scrollbars = {
       doUpdate();
       return;
     }
-
     if ($scrollable.data('scrollbarUpdatePending')) {
       return;
     }
