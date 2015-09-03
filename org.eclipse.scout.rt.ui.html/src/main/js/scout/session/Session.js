@@ -17,7 +17,7 @@
  *     Identifies the 'client instance' on the UI server. If the property is not set
  *     (which is the default case), the clientSessionId is taken from the browser's
  *     session storage (per browser window, survives F5 refresh of page). If no
- *     clientSessionId can be found, a new one is generated.
+ *     clientSessionId can be found, a new one is generated on the server.
  *   [userAgent]
  *     Default: DESKTOP
  *   [objectFactories]
@@ -43,10 +43,6 @@ scout.Session = function($entryPoint, options) {
   var clientSessionId = options.clientSessionId;
   if (!clientSessionId) {
     clientSessionId = sessionStorage.getItem('scout:clientSessionId');
-  }
-  if (!clientSessionId) {
-    clientSessionId = scout.numbers.toBase62(scout.dates.timestamp());
-    sessionStorage.setItem('scout:clientSessionId', clientSessionId);
   }
 
   // Set members
@@ -276,7 +272,9 @@ scout.Session.prototype._sendNow = function() {
     this._startup = false;
     // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
     request.startup = true;
-    request.clientSessionId = this.clientSessionId;
+    if (this.clientSessionId) {
+      request.clientSessionId = this.clientSessionId;
+    }
     if (this.parentUiSession) {
       request.parentUiSessionId = this.parentUiSession.uiSessionId;
     }
@@ -926,6 +924,11 @@ scout.Session.prototype._onLocaleChanged = function(event) {
 scout.Session.prototype._onInitialized = function(event) {
   this.locale = new scout.Locale(event.locale);
   this._texts = new scout.Texts(event.textMap);
+
+  // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
+  this.clientSessionId = event.clientSessionId;
+  sessionStorage.setItem('scout:clientSessionId', this.clientSessionId);
+
   var clientSessionData = this._getAdapterData(event.clientSession);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
 

@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -79,7 +81,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * <p>
    * The full attribute name is: <b><code>{@link #CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX} + clientSessionId</code></b>
    */
-  public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.clientsession."/*+m_clientSessionId*/;
+  public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.clientsession."/*+clientSessionId*/;
 
   private static final long ROOT_ID = 1;
   private static final String EVENT_INITIALIZED = "initialized";
@@ -90,7 +92,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private final P_RootAdapter m_rootJsonAdapter;
 
   private boolean m_initialized;
-  private String m_clientSessionId;
   private String m_uiSessionId;
   private IClientSession m_clientSession;
   private long m_jsonAdapterSeq = ROOT_ID;
@@ -215,7 +216,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       m_currentHttpContext.set(req, resp);
       m_currentJsonRequest = jsonStartupReq;
 
-      m_clientSessionId = jsonStartupReq.getClientSessionId();
       m_uiSessionId = jsonStartupReq.getUiSessionId();
       HttpSession httpSession = req.getSession();
       m_currentHttpSession = httpSession;
@@ -269,50 +269,56 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
-    IClientSession clientSession = loadClientSessionFromHttpSession(httpSession);
+    String clientSessionId = jsonStartupReq.getClientSessionId();
+    IClientSession clientSession = null;
+    if (StringUtility.hasText(clientSessionId)) {
+      clientSession = loadClientSessionFromHttpSession(httpSession, clientSessionId);
+    }
 
     if (clientSession != null) {
       // Found existing client session
-      LOG.info("Using cached client session [clientSessionId=" + m_clientSessionId + "]");
+      LOG.info("Using cached client session [clientSessionId=" + clientSession.getId() + "]");
     }
     else {
       // No client session for the requested ID was found, so create one
-      LOG.info("Creating new client session [clientSessionId=" + m_clientSessionId + "]");
-      clientSession = createAndStartClientSession(req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
+      clientSessionId = generateClientSessionId();
+      LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
+      clientSession = createAndStartClientSession(clientSessionId, req.getLocale(), createUserAgent(jsonStartupReq), extractSessionInitParams(jsonStartupReq.getCustomParams()));
       // Ensure session is active
       if (!clientSession.isActive()) {
-        throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + m_clientSessionId + "]");
+        throw new UiException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + clientSessionId + "]");
       }
     }
     return clientSession;
   }
 
-  protected IClientSession loadClientSessionFromHttpSession(HttpSession httpSession) {
-    if (m_clientSessionId == null) {
-      throw new IllegalStateException("Missing clientSessionId in JSON request");
+  protected String generateClientSessionId() {
+    return UUID.randomUUID().toString();
+  }
+
+  protected IClientSession loadClientSessionFromHttpSession(HttpSession httpSession, String clientSessionId) {
+    if (clientSessionId == null) {
+      return null;
     }
-    return (IClientSession) httpSession.getAttribute(CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId);
+    return (IClientSession) httpSession.getAttribute(getClientSessionAttributeName(clientSessionId));
   }
 
   protected void storeClientSessionInHttpSession(HttpSession httpSession, IClientSession clientSession) {
-    IClientSession existingClientSession = loadClientSessionFromHttpSession(httpSession);
+    IClientSession existingClientSession = loadClientSessionFromHttpSession(httpSession, clientSession.getId());
 
     // Implementation note: The cleanup listener is triggered, when the attribute value is changed.
     // This happens in two cases:
     //   1. when the attribute is set manually
     //   2. the entire session is invalidated.
     if (existingClientSession != clientSession) {
-      String clientSessionAttributeName = getClientSessionAttributeName();
+      String clientSessionAttributeName = getClientSessionAttributeName(clientSession.getId());
       httpSession.setAttribute(clientSessionAttributeName, clientSession);
-      httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(m_clientSessionId, clientSession));
+      httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSession));
     }
   }
 
-  protected String getClientSessionAttributeName() {
-    if (m_clientSessionId == null) {
-      throw new IllegalStateException("Missing clientSessionId in JSON request");
-    }
-    return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId;
+  protected String getClientSessionAttributeName(String clientSessionId) {
+    return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + clientSessionId;
   }
 
   protected void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
@@ -332,13 +338,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
   }
 
-  protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
+  protected IClientSession createAndStartClientSession(String clientSessionId, Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
       final ClientRunContext ctx = ClientRunContexts.empty().withLocale(locale).withUserAgent(userAgent).withProperties(sessionInitParams);
-      return BEANS.get(ClientSessionProvider.class).provide(ctx, getClientSessionId());
+      return BEANS.get(ClientSessionProvider.class).provide(ctx, clientSessionId);
     }
     catch (ProcessingException e) {
-      throw new UiException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
+      throw new UiException("Error while creating new client session for clientSessionId=" + clientSessionId, e);
     }
   }
 
@@ -403,6 +409,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     final UiJobs uiJobs = BEANS.get(UiJobs.class);
 
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    // Send back clientSessionId to allow the browser to attach to the same client session on page reload
+    jsonEvent.put("clientSessionId", m_clientSession.getId());
     jsonEvent.put("clientSession", clientSessionAdapterId);
     Locale sessionLocale = uiJobs.runAsModelJob(new Callable<Locale>() {
       @Override
@@ -478,7 +486,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public String getClientSessionId() {
-    return m_clientSessionId;
+    return (m_clientSession == null ? null : m_clientSession.getId());
   }
 
   @Override
@@ -756,7 +764,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void logout() {
-    LOG.info("Logging out from UI session with ID " + m_uiSessionId + " [clientSessionId=" + m_clientSessionId + "]");
+    LOG.info("Logging out from UI session with ID " + m_uiSessionId + " [clientSessionId=" + getClientSessionId() + "]");
     HttpSession httpSession = currentHttpSession();
     if (httpSession != null) {
       // This will cause P_ClientSessionCleanupHandler.valueUnbound() to be executed
@@ -792,11 +800,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    */
   protected static class P_ClientSessionCleanupHandler implements HttpSessionBindingListener {
 
-    private final String m_clientSessionId;
     private final IClientSession m_clientSession;
 
-    public P_ClientSessionCleanupHandler(String clientSessionId, IClientSession clientSession) {
-      m_clientSessionId = clientSessionId;
+    public P_ClientSessionCleanupHandler(IClientSession clientSession) {
       m_clientSession = clientSession;
     }
 
@@ -812,13 +818,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() {
-          LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session");
+          LOG.info("Shutting down client session with ID " + m_clientSession.getId() + " due to invalidation of HTTP session");
           // Dispose model (if session was not already stopped earlier by itself).
           // Session inactivation is executed delayed (see AbstractClientSession#getMaxShutdownWaitTime(), that's why desktop may already be null
           if (m_clientSession.isActive() && m_clientSession.getDesktop() != null) {
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
-          LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
+          LOG.info("Client session with ID " + m_clientSession.getId() + " terminated.");
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(m_clientSession, true)).withName("Close desktop due to HTTP session invalidation"));
     }

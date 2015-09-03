@@ -64,7 +64,7 @@ public class UiSessionTest {
     ((AbstractClientSession) clientSession).setMaxShutdownWaitTime(0);
     WeakReference<IUiSession> ref = new WeakReference<IUiSession>(uiSession);
     HttpSessionBindingEvent mockEvent = Mockito.mock(HttpSessionBindingEvent.class);
-    P_ClientSessionCleanupHandler dummyCleanupHandler = new UiSession.P_ClientSessionCleanupHandler("1", clientSession);
+    P_ClientSessionCleanupHandler dummyCleanupHandler = new UiSession.P_ClientSessionCleanupHandler(clientSession);
 
     JsonTestUtility.endRequest(uiSession);
     uiSession.valueUnbound(mockEvent);
