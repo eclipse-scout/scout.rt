@@ -14,8 +14,8 @@ scout.RadioButtonGroupLeftKeyStroke.prototype.handle = function(event) {
     if (fieldBefore && key === selectedKey) {
       radioButton._renderTabbable(false);
       fieldBefore._renderTabbable(true);
-      this.field.session.focusManager.requestFocus(fieldBefore.$field);
       fieldBefore._toggleChecked();
+      this.field.session.focusManager.requestFocus(fieldBefore.$field);
       break;
     }
     if (radioButton.enabled && radioButton.visible) {
