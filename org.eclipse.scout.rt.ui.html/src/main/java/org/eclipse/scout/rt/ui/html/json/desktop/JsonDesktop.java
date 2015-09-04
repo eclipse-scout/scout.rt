@@ -46,7 +46,7 @@ import org.json.JSONObject;
 
 public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyObserver<DESKTOP>implements IBinaryResourceProvider {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserver.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
