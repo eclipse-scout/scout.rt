@@ -344,6 +344,6 @@ public class JsonResponse {
   }
 
   public boolean isEmpty() {
-    return m_adapterMap.isEmpty() && m_eventList.isEmpty();
+    return m_adapterMap.isEmpty() && m_eventList.isEmpty() && m_bufferedEventsAdapters.isEmpty();
   }
 }

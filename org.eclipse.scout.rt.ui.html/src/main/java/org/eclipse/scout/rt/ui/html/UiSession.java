@@ -709,15 +709,40 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void waitForBackgroundJobs(int pollWaitSeconds) {
-    LOG.trace("Wait until background job terminates or session timeout...");
+    boolean wait = true;
+    while (wait) {
+      LOG.trace("Wait for max. " + pollWaitSeconds + " seconds until background job terminates or wait timeout occurs...");
+      try {
+        long t0 = System.currentTimeMillis();
+        // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
+        Object notificationToken = m_backgroundJobNotificationQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
+        int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
+        int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
+        if (notificationToken == null || newPollWaitSeconds <= 0 || !currentJsonResponse().isEmpty()) {
+          // Stop wait loop for one of the following reasons:
+          // 1. Timeout has occurred -> return always, even with empty answer
+          // 2. Remaining pollWaitTime would be zero -> same as no. 1
+          // 3. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
+          wait = false;
+        }
+        else {
+          // Continue wait loop, because timeout has not yet elapsed and JsonResponse is empty
+          LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep.");
+          pollWaitSeconds = newPollWaitSeconds;
+        }
+      }
+      catch (InterruptedException e) {
+        LOG.warn("Interrupted while waiting for notification token", e);
+      }
+    }
+    LOG.trace("Background job terminated. Continue request processing...");
+    // Wait at least 100ms to allow some sort of "coalescing background job result" (if many jobs
+    // finish at the same time, we want to prevent too many polling requests).
     try {
-      m_backgroundJobNotificationQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
+      Thread.sleep(100);
     }
-    catch (InterruptedException e) {
-      LOG.warn("Interrupted while waiting for notification token", e);
-    }
-    finally {
-      LOG.trace("Background job terminated. Continue request processing...");
+    catch (InterruptedException e1) {
+      // nop
     }
   }
 
