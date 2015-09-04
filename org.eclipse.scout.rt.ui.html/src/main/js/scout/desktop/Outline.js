@@ -23,6 +23,11 @@ scout.Outline.prototype._init = function(model, session) {
   this.addFilter(new scout.DetailTableTreeFilter());
 };
 
+scout.Outline.prototype._createKeyStrokeContext = function() {
+  return new scout.OutlineKeyStrokeContext(this);
+};
+
+
 /**
  * @override Tree.js
  */
