@@ -55,7 +55,7 @@ function sendQueuedAjaxCalls(response, time) {
   }
 
   var request = jasmine.Ajax.requests.mostRecent();
-  if (request && request.onLoad) {
+  if (request && request.onload) {
     request.response(response);
   }
 }

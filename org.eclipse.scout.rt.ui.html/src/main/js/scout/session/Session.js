@@ -69,7 +69,7 @@ scout.Session = function($entryPoint, options) {
   this._initObjectFactory(options.objectFactories);
   this._texts = new scout.Texts();
   this._customParams;
-  this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
+  this._requestsPendingCounter = 0;
   this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper(this);
@@ -259,11 +259,20 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
+    if (this.areRequestsPending()) {
+      // do not send if there are any requests pending because the order matters -> prevents race conditions
+      return;
+    }
     this._sendNow();
   }.bind(this), delay);
 };
 
 scout.Session.prototype._sendNow = function() {
+  if (this._asyncEvents.length === 0 && !this._startup && !this._unload) {
+    // Nothing to send -> return
+    return;
+  }
+
   var request = {
     uiSessionId: this.uiSessionId
   };
@@ -346,7 +355,7 @@ scout.Session.prototype._sendRequest = function(request) {
   }
 
   var ajaxOptions = this.defaultAjaxOptions(request, !request.unload);
-  var busyHandling = (!request.unload && !this.areRequestsPending());
+  var busyHandling = !request.unload;
   this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
 };
 
@@ -364,7 +373,7 @@ scout.Session.prototype.defaultAjaxOptions = function(request, async) {
   };
 };
 
-scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling) {
+scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling, request) {
   if (busyHandling) {
     this.setBusy(true);
   }
@@ -398,7 +407,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
       if (busyHandling) {
         this.setBusy(false);
       }
-      this._processErrorResponse(jqXHR, textStatus, errorThrown);
+      this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
     } catch (err) {
       jsError = jsError || err;
     }
@@ -411,6 +420,10 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
       this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
     }
+
+    // If there already is a another request pending, send it now
+    this._sendNow();
+
     // Throw previously catched error
     if (jsError) {
       throw jsError;
@@ -791,7 +804,8 @@ scout.Session.prototype.setBusy = function(busy) {
     this._busyCounter++;
   } else {
     this._busyCounter--;
-    if (this._busyCounter === 0) {
+    // Do not remove busy indicators if there is a scheduled request which will run immediately to prevent busy cursor flickering
+    if (this._busyCounter === 0 && !this.areEventsQueued()) {
       this._removeBusy();
     }
   }
@@ -801,6 +815,10 @@ scout.Session.prototype._renderBusy = function() {
   // Don't show the busy indicator immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
   this._busyIndicatorTimeoutId = setTimeout(function() {
+    if (this._busyIndicator) {
+      // busy indicator is already showing
+      return;
+    }
     if (!this.desktop || !this.desktop.rendered) {
       return; // No busy indicator without desktop (e.g. during shutdown)
     }
