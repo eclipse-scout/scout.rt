@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -43,6 +45,8 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
 public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyObserver<DESKTOP>implements IBinaryResourceProvider {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserver.class);
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
@@ -109,6 +113,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       return;
     }
     IForm form = (IForm) getUiSession().getJsonAdapter(formId).getModel();
+    if (form == null) {
+      //should not occure, but if it occures its not fatal because on next dialog/view/outline opening this is repaired
+      LOG.info("handleUIFormActivated is looking for form which exists no more. ID: " + formId);
+      return;
+    }
     addDesktopEventFilterCondition(DesktopEvent.TYPE_FORM_ACTIVATE).setForm(form);
     getModel().activateForm(form);
   }

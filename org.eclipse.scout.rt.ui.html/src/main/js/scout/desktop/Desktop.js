@@ -581,11 +581,11 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
       this._attachOutlineContent();
       this._bringNavigationToFront();
     }
-    //set active form to null because outline is active form.
-    this._setOutlineActivated();
   } else {
     this.setOutline(outline);
   }
+  //set active form to null because outline is active form.
+  this._setOutlineActivated();
 
   if (this._hasNavigation()) {
     this.navigation.revalidateLayout();

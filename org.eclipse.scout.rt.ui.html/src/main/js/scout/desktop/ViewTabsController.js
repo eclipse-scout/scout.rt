@@ -55,9 +55,7 @@ scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
       this.selectViewTab(this._viewTabs[viewTabIndexBefore]);
     }
     else{
-      this.deselectViewTab();
-      this._desktop._attachOutlineContent();
-      this._desktop._bringNavigationToFront();
+      this._desktop.bringOutlineToFront(this._desktop.outline);
     }
   }
 
