@@ -26,8 +26,10 @@ scout.FocusManager = function(session, options) {
     if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
       event.preventDefault();
     }
-    //Because in ie divs are focusable also without tabindex we have to handle it here-> select next parent with tabindex.
-    this._handleIEEvent(event);
+    else {
+      //Because in ie divs are focusable also without tabindex we have to handle it here-> select next parent with tabindex.
+      this._handleIEEvent(event);
+    }
     return true;
   }.bind(this));
 
