@@ -82,9 +82,7 @@ scout.graphics = {
    * @param includeMargin when set to true, returned dimensions include margins of component
    */
   getSize: function($comp, includeMargin) {
-    if (includeMargin === undefined) {
-      includeMargin = false;
-    }
+    includeMargin = scout.helpers.nvl(includeMargin, false);
     return new scout.Dimension(
       $comp.outerWidth(includeMargin),
       $comp.outerHeight(includeMargin));

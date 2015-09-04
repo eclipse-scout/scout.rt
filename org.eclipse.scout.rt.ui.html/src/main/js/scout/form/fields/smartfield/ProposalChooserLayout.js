@@ -14,6 +14,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
     TABLE: {
       _$table: null,
       _$tableData: null,
+      _$tableRows: null,
       cssSelector: '.table',
       modifyDom: function($container) {
         this._$table = $container.find('.table')
@@ -22,13 +23,15 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
           .css('height', 'auto');
         this._$tableData = this._$table.children('.table-data')
           .css('display', 'inline-block');
+        this._$tableRows = this._$tableData.children('.table-row')
+          .css('width', '');
       },
       restoreDom: function($container) {
         this._$table
           .css('display', 'block')
           .css('width', '100%')
           .css('height', '100%');
-       this._$tableData
+        this._$tableData
           .css('display', 'block');
       }
     },
@@ -101,6 +104,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   this._typeHandler.modifyDom($container);
   $container
     .css('display', 'inline-block')
+    .css('width', 'auto')
     .css('height', 'auto');
 
   $container.detach();

@@ -252,10 +252,6 @@ scout.Tree.prototype.onResize = function() {
   }
 };
 
-scout.Tree.prototype.updateScrollbar = function() {
-  scout.scrollbars.update(this.$data);
-};
-
 scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {
   if (!this.checkable) {
     return;
@@ -332,7 +328,7 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
 scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
   if (this._breadcrumbEnabled !== enabled) {
     // update scrollbar if mode has changed (from tree to bc or vice versa)
-    this.updateScrollbar();
+    this.revalidateLayoutTree();
   }
   this._breadcrumbEnabled = enabled;
 
@@ -443,7 +439,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
             $(this).replaceWith($(this).contents());
           };
           $wrapper.css('height', 0)
-            .animateAVCSD('height', h, removeContainer, this.updateScrollbar.bind(this), 200);
+            .animateAVCSD('height', h, removeContainer, this.revalidateLayoutTree.bind(this), 200);
         }
       }
     }
@@ -465,9 +461,10 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
         });
         if (animate) {
           $wrapper = $existingNodes.wrapAll('<div class="animationWrapper">)').parent();
-          $wrapper.animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
+          $wrapper.animateAVCSD('height', 0, $.removeThis, this.revalidateLayoutTree.bind(this), 200);
         } else {
           $existingNodes.remove();
+          this.invalidateLayoutTree();
         }
       }
     }
@@ -913,7 +910,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
     }
   }
 
-  this.updateScrollbar();
+  this.invalidateLayoutTree();
 };
 
 scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
@@ -958,7 +955,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
     parentNode.$node.toggleClass('show-all', hasHiddenNodes && parentNode.expanded);
   }
 
-  this.updateScrollbar();
+  this.invalidateLayoutTree();
 
   //return the last created node
   return $predecessor;
@@ -1242,7 +1239,7 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
   parentNode.$node.removeClass('show-all');
 
   var updateFunc = function() {
-    this.updateScrollbar();
+    this.revalidateLayoutTree();
     this.revealSelection();
   }.bind(this);
 
@@ -1280,7 +1277,7 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
   }
 
   // without animation
-  this.updateScrollbar();
+  this.revalidateLayoutTree();
   this.revealSelection();
 };
 
@@ -1481,13 +1478,13 @@ scout.Tree.prototype.showNode = function($node, useAnimation) {
       duration: 250,
       complete: function() {
         $node.removeClass('invisible');
-        that.updateScrollbar();
+        that.invalidateLayoutTree();
       }
     });
   } else {
     $node.showFast();
     $node.removeClass('invisible');
-    that.updateScrollbar();
+    that.invalidateLayoutTree();
   }
 };
 
@@ -1503,13 +1500,13 @@ scout.Tree.prototype.hideNode = function($node, useAnimation) {
       duration: 250,
       complete: function() {
         $node.addClass('invisible');
-        that.updateScrollbar();
+        that.invalidateLayoutTree();
       }
     });
   } else {
     $node.hideFast();
     $node.addClass('invisible');
-    that.updateScrollbar();
+    that.invalidateLayoutTree();
   }
 };
 
