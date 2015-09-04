@@ -55,19 +55,23 @@ public class ClientNotificationDispatcher {
     for (ClientNotificationMessage message : notifications) {
       ClientNotificationAddress address = message.getAddress();
       Serializable notification = message.getNotification();
+      LOG.debug("Processing client notification " + notification);
 
       if (address.isNotifyAllNodes()) {
         // notify all nodes
+        LOG.debug("Notify all nodes");
         dispatch(notification);
       }
       else if (address.isNotifyAllSessions()) {
         // notify all sessions
+        LOG.debug("Notify all sessions");
         for (IClientSession session : notificationService.getAllClientSessions()) {
           dispatch(session, notification);
         }
       }
       else if (CollectionUtility.hasElements(address.getSessionIds())) {
         // notify all specified sessions
+        LOG.debug("Notify sessions by session id: " + address.getSessionIds());
         for (String sessionId : address.getSessionIds()) {
           IClientSession session = notificationService.getClientSession(sessionId);
           if (session == null) {
@@ -79,6 +83,7 @@ public class ClientNotificationDispatcher {
         }
       }
       else if (CollectionUtility.hasElements(address.getUserIds())) {
+        LOG.debug("Notify sessions by user id: " + address.getUserIds());
         for (String userId : address.getUserIds()) {
           for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
             dispatch(session, notification);
@@ -97,7 +102,6 @@ public class ClientNotificationDispatcher {
    * @param notification
    */
   public void dispatch(final Serializable notification) {
-
     if (IClientSession.CURRENT.get() != null) {
       // dispatch sync for piggyback notifications
       dispatchSync(notification);
@@ -147,7 +151,6 @@ public class ClientNotificationDispatcher {
         future.whenDone(new P_NotificationFutureCallback(future));
       }
     }
-
   }
 
   protected void dispatchSync(Serializable notification) {
