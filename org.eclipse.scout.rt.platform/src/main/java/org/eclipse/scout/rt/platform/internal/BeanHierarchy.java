@@ -144,8 +144,22 @@ public class BeanHierarchy<T> {
         HashMap<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value
         for (IBean<T> bean : list) {
           if (bean.getBeanAnnotation(Replace.class) != null) {
-            Class<?> superClazz = bean.getBeanClazz().getSuperclass();
-            if (superClazz != null && !superClazz.isInterface() && !Modifier.isAbstract(superClazz.getModifiers())) {
+            Class<?> superClazz = null;
+            if (bean.getBeanClazz().isInterface()) {
+              //interface replaces interfaces, only replce FIRST declared interface
+              Class[] ifs = bean.getBeanClazz().getInterfaces();
+              if (ifs != null && ifs.length > 0) {
+                superClazz = ifs[0];
+              }
+            }
+            else {
+              //class replaces class
+              Class<?> s = bean.getBeanClazz().getSuperclass();
+              if (s != null && !s.isInterface() && !Modifier.isAbstract(s.getModifiers())) {
+                superClazz = s;
+              }
+            }
+            if (superClazz != null) {
               //only add if first to override, respects @Order annotation
               if (!extendsMap.containsKey(superClazz)) {
                 extendsMap.put(superClazz, bean.getBeanClazz());
@@ -153,12 +167,10 @@ public class BeanHierarchy<T> {
             }
           }
         }
-        //find most specific version of @Replaced class if this hierarchy is not based on an interface
+        //find most specific version of @Replaced class
         Class<T> refClazz = m_clazz;
-        if (!refClazz.isInterface()) {
-          while (extendsMap.containsKey(refClazz)) {
-            refClazz = (Class<T>) extendsMap.get(refClazz);
-          }
+        while (extendsMap.containsKey(refClazz)) {
+          refClazz = (Class<T>) extendsMap.get(refClazz);
         }
         //remove replaced beans
         for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {

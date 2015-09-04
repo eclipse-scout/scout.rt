@@ -33,7 +33,7 @@ public class BeanMetaData {
   public BeanMetaData(Class<?> clazz, Object initialInstance) {
     m_beanClazz = Assertions.assertNotNull(clazz);
     m_beanAnnotations = new HashMap<>();
-    readStaticAnnoations(clazz, false);
+    readStaticAnnotations(clazz, false);
     m_initialInstance = initialInstance;
   }
 
@@ -47,7 +47,7 @@ public class BeanMetaData {
   /**
    * @return
    */
-  protected void readStaticAnnoations(Class<?> clazz, boolean inheritedOnly) {
+  protected void readStaticAnnotations(Class<?> clazz, boolean inheritedOnly) {
     if (clazz == null || Object.class.equals(clazz)) {
       return;
     }
@@ -62,9 +62,9 @@ public class BeanMetaData {
         m_beanAnnotations.put(a.annotationType(), a);
       }
     }
-    readStaticAnnoations(clazz.getSuperclass(), true);
+    readStaticAnnotations(clazz.getSuperclass(), true);
     for (Class<?> ifc : clazz.getInterfaces()) {
-      readStaticAnnoations(ifc, true);
+      readStaticAnnotations(ifc, true);
     }
   }
 
