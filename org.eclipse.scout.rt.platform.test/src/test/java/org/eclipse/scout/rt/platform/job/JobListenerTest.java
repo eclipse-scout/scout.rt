@@ -18,13 +18,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.internal.JobListeners;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -43,12 +44,7 @@ public class JobListenerTest {
 
   @Before
   public void before() {
-    m_jobManager = new JobManager() {
-      @Override
-      protected JobListeners createJobListeners(ExecutorService executor) {
-        return new JobListeners(null); // null to notify synchronously.
-      }
-    };
+    m_jobManager = new JobManager();
   }
 
   @After
@@ -58,11 +54,11 @@ public class JobListenerTest {
 
   @Test
   public void testEvents() throws Exception {
-    P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter(), listener);
+    P_JobChangeListener jobListener = new P_JobChangeListener();
+    IJobListenerRegistration jobListenerRegistration = m_jobManager.addListener(jobListener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchEventTypes(JobEventType.SHUTDOWN), shutdownListener);
+    IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SHUTDOWN), shutdownListener);
 
     IFuture<Void> future = null;
     future = m_jobManager.schedule(new Callable<Void>() {
@@ -71,33 +67,34 @@ public class JobListenerTest {
         return null;
       }
     }, Jobs.newInput(RunContexts.empty()));
-    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 1, TimeUnit.MINUTES);
-    m_jobManager.removeListener(listener);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.MINUTES);
+    sleep();
+    jobListenerRegistration.dispose();
     m_jobManager.shutdown();
-    m_jobManager.removeListener(shutdownListener);
+    shutdownListenerRegistration.dispose();
 
     List<JobEventType> expectedStati = new ArrayList<>();
     expectedStati.add(JobEventType.SCHEDULED);
     expectedStati.add(JobEventType.ABOUT_TO_RUN);
     expectedStati.add(JobEventType.DONE);
-    assertEquals(expectedStati, listener.m_eventTypes);
+    assertEquals(expectedStati, jobListener.m_eventTypes);
 
     List<IFuture<Void>> expectedFutures = new ArrayList<>();
     expectedFutures.add(future); // scheduled
     expectedFutures.add(future); // about to run
     expectedFutures.add(future); // done
-    assertEquals(expectedFutures, listener.m_futures);
+    assertEquals(expectedFutures, jobListener.m_futures);
 
     assertTrue(shutdownListener.m_shutdown.get());
   }
 
   @Test
   public void testCancel() throws Exception {
-    P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter(), listener);
+    P_JobChangeListener jobListener = new P_JobChangeListener();
+    IJobListenerRegistration jobListenerRegistration = m_jobManager.addListener(jobListener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    m_jobManager.addListener(Jobs.newEventFilter().andMatchEventTypes(JobEventType.SHUTDOWN), shutdownListener);
+    IJobListenerRegistration shutdownListenerRegistration = m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SHUTDOWN), shutdownListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -108,17 +105,138 @@ public class JobListenerTest {
       }
     }, 200, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()));
     future.cancel(true);
-    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 1, TimeUnit.MINUTES);
-    m_jobManager.removeListener(listener);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.MINUTES);
+    jobListenerRegistration.dispose();
     m_jobManager.shutdown();
-    m_jobManager.removeListener(shutdownListener);
+    shutdownListenerRegistration.dispose();
 
     Assert.assertFalse(hasStarted.getValue().booleanValue());
-    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future, future), listener.m_futures);
+    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.DONE), jobListener.m_eventTypes);
+    assertEquals(Arrays.asList(future, future), jobListener.m_futures);
     assertTrue(future.isCancelled());
 
     assertTrue(shutdownListener.m_shutdown.get());
+  }
+
+  @Test
+  public void testGlobalListener1() throws ProcessingException {
+    P_JobChangeListener listener = new P_JobChangeListener();
+    m_jobManager.addListener(listener);
+
+    IFuture<Void> future = runJob(0, TimeUnit.SECONDS);
+    future.awaitDone();
+    sleep();
+
+    // verify
+    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.ABOUT_TO_RUN, JobEventType.DONE), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future, future, future), listener.m_futures);
+  }
+
+  @Test
+  public void testGlobalListener2() throws ProcessingException, InterruptedException {
+    P_JobChangeListener listener = new P_JobChangeListener();
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.SCHEDULED, JobEventType.DONE), listener);
+
+    IFuture<Void> future = runJob(0, TimeUnit.SECONDS);
+    future.awaitDone();
+    sleep();
+
+    // verify
+    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.DONE), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future, future), listener.m_futures);
+  }
+
+  @Test
+  public void testLocalListener1() throws ProcessingException {
+    IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
+
+    P_JobChangeListener listener = new P_JobChangeListener();
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN).andMatchAnyFuture(future), listener);
+
+    // verify
+    future.awaitDone();
+    sleep();
+
+    assertEquals(Arrays.asList(JobEventType.ABOUT_TO_RUN), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future), listener.m_futures);
+  }
+
+  @Test
+  public void testLocalListener2a() throws ProcessingException {
+    IFuture<Void> future1 = runJob(0, TimeUnit.MILLISECONDS);
+    future1.awaitDone();
+
+    IFuture<Void> future2 = runJob(500, TimeUnit.MILLISECONDS);
+    P_JobChangeListener listener = new P_JobChangeListener();
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyFuture(future1, future2), listener);
+    future2.awaitDone();
+    sleep();
+
+    // verify
+    assertEquals(Arrays.asList(JobEventType.ABOUT_TO_RUN, JobEventType.DONE), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future2, future2), listener.m_futures);
+  }
+
+  @Test
+  public void testLocalListener2b() throws ProcessingException {
+    IFuture<Void> future1 = runJob(0, TimeUnit.MILLISECONDS);
+    future1.awaitDone();
+
+    IFuture<Void> future2 = runJob(500, TimeUnit.MILLISECONDS);
+    P_JobChangeListener listener = new P_JobChangeListener();
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyFuture(future2).andMatchAnyFuture(future1), listener);
+    future2.awaitDone();
+    sleep();
+
+    // verify
+    assertEquals(Collections.emptyList(), listener.m_eventTypes);
+    assertEquals(Collections.emptyList(), listener.m_futures);
+  }
+
+  @Test
+  public void testLocalListener3() throws ProcessingException {
+    IFuture<Void> future1 = runJob(0, TimeUnit.MILLISECONDS);
+    future1.awaitDone();
+
+    IFuture<Void> future2 = runJob(500, TimeUnit.MILLISECONDS);
+    P_JobChangeListener listener = new P_JobChangeListener();
+    m_jobManager.addListener(Jobs.newEventFilter().andMatchAnyFuture(future2).andMatch(new NotFilter<>(Jobs.newEventFilter().andMatchAnyFuture(future2))), listener);
+    future2.awaitDone();
+    sleep();
+
+    // verify
+    assertEquals(Collections.emptyList(), listener.m_eventTypes);
+    assertEquals(Collections.emptyList(), listener.m_futures);
+  }
+
+  @Test
+  public void testLocalListener4() throws ProcessingException {
+    IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
+
+    P_JobChangeListener listener = new P_JobChangeListener();
+    future.addListener(listener);
+
+    // verify
+    future.awaitDone();
+    sleep();
+
+    assertEquals(Arrays.asList(JobEventType.ABOUT_TO_RUN, JobEventType.DONE), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future, future), listener.m_futures);
+  }
+
+  @Test
+  public void testLocalListener5() throws ProcessingException {
+    IFuture<Void> future = runJob(500, TimeUnit.MILLISECONDS);
+
+    P_JobChangeListener listener = new P_JobChangeListener();
+    future.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN), listener);
+
+    // verify
+    future.awaitDone();
+    sleep();
+
+    assertEquals(Arrays.asList(JobEventType.ABOUT_TO_RUN), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future), listener.m_futures);
   }
 
   private static final class P_JobChangeListener implements IJobListener {
@@ -142,4 +260,29 @@ public class JobListenerTest {
       m_shutdown.set(JobEventType.SHUTDOWN == event.getType());
     }
   }
+
+  private IFuture<Void> runJob(long delay, TimeUnit unit) {
+    IFuture<Void> future2 = m_jobManager.schedule(new Callable<Void>() {
+
+      @Override
+      public Void call() throws Exception {
+        return null;
+      }
+    }, delay, unit, Jobs.newInput(null));
+    return future2;
+  }
+
+  /**
+   * Wait until the 'done-event' is fired. That is because {@link FutureTask} releases any waiting thread before
+   * {@link FutureTask#done()} is invoked.
+   */
+  private void sleep() {
+    try {
+      Thread.sleep(500);
+    }
+    catch (InterruptedException e) {
+      // NOOP
+    }
+  }
+
 }

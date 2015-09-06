@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.holders.Holder;
@@ -28,9 +27,9 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.JobListeners;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -59,7 +58,7 @@ public class JobListenerBlockedFutureTest {
   @Test
   public void testEvents() throws Exception {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(Jobs.newEventFilter(), listener);
+    IJobListenerRegistration listenerRegistration = m_jobManager.addListener(listener);
     IClientSession clientSession = mock(IClientSession.class);
 
     IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
@@ -68,9 +67,9 @@ public class JobListenerBlockedFutureTest {
         return null;
       }
     }, ClientJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true)));
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 1, TimeUnit.MINUTES));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
-    m_jobManager.removeListener(listener);
+    listenerRegistration.dispose();
 
     // verify Event Types
     List<JobEventType> expectedStati = new ArrayList<>();
@@ -92,11 +91,11 @@ public class JobListenerBlockedFutureTest {
   @Test(timeout = 10000)
   public void testEventsForBlockingJob() throws Exception {
     final IBlockingCondition condition = m_jobManager.createBlockingCondition("test condition", true);
+
     P_JobChangeListener modelJobListener = new P_JobChangeListener();
     P_JobChangeListener clientJobListener = new P_JobChangeListener();
-
-    m_jobManager.addListener(ModelJobs.newEventFilter(), modelJobListener);
-    m_jobManager.addListener(ClientJobs.newEventFilter(), clientJobListener);
+    IJobListenerRegistration modelJobListenerRegistration = m_jobManager.addListener(ModelJobs.newEventFilter(), modelJobListener);
+    IJobListenerRegistration clientJobListenerRegistration = m_jobManager.addListener(ClientJobs.newEventFilter(), clientJobListener);
     IFuture<Void> outerFuture = null;
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
@@ -122,12 +121,12 @@ public class JobListenerBlockedFutureTest {
           return null;
         }
       }, input);
-      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(outerFuture), 1, TimeUnit.MINUTES));
+      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(outerFuture), 1, TimeUnit.MINUTES));
       m_jobManager.shutdown();
     }
     finally {
-      m_jobManager.removeListener(modelJobListener);
-      m_jobManager.removeListener(clientJobListener);
+      modelJobListenerRegistration.dispose();
+      clientJobListenerRegistration.dispose();
     }
 
     // verify Event Types
@@ -188,11 +187,6 @@ public class JobListenerBlockedFutureTest {
         }
         Thread.sleep(10);
       }
-    }
-
-    @Override
-    protected JobListeners createJobListeners(ExecutorService executor) {
-      return new JobListeners(null); // null to notify synchronously.
     }
   }
 }

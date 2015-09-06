@@ -38,7 +38,7 @@ public class JobNameFilterTest {
     JobInput input = Jobs.newInput(RunContexts.empty()).withName(null);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(Jobs.newFutureFilter().andMatchNames(new String[]{null}).accept(m_future));
+    assertTrue(Jobs.newFutureFilter().andMatchAnyName(new String[]{null}).accept(m_future));
   }
 
   @Test
@@ -46,7 +46,7 @@ public class JobNameFilterTest {
     JobInput input = Jobs.newInput(RunContexts.empty()).withName(null);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(Jobs.newFutureFilter().andMatchNames("ABC").accept(m_future));
+    assertFalse(Jobs.newFutureFilter().andMatchAnyName("ABC").accept(m_future));
   }
 
   @Test
@@ -54,7 +54,7 @@ public class JobNameFilterTest {
     JobInput input = Jobs.newInput(RunContexts.empty()).withName("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(Jobs.newFutureFilter().andMatchNames("abc").accept(m_future));
+    assertFalse(Jobs.newFutureFilter().andMatchAnyName("abc").accept(m_future));
   }
 
   @Test
@@ -62,7 +62,7 @@ public class JobNameFilterTest {
     JobInput input = Jobs.newInput(RunContexts.empty()).withName("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(Jobs.newFutureFilter().andMatchNames("ABC").accept(m_future));
+    assertTrue(Jobs.newFutureFilter().andMatchAnyName("ABC").accept(m_future));
   }
 
   @Test
@@ -70,6 +70,6 @@ public class JobNameFilterTest {
     JobInput input = Jobs.newInput(RunContexts.empty()).withName("XYZ");
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(Jobs.newFutureFilter().andMatchNames("ABC", "XYZ").accept(m_future));
+    assertTrue(Jobs.newFutureFilter().andMatchAnyName("ABC", "XYZ").accept(m_future));
   }
 }

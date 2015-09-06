@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -215,7 +216,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     RunMonitor.CURRENT.get().registerCancellable(monitor);
 
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
-    final JobInput jobInput = Jobs.newInput(createCurrentRunContext().withRunMonitor(monitor)).withName("Remote service request [%s]", requestSequence);
+    final JobInput jobInput = Jobs.newInput(createCurrentRunContext().withRunMonitor(monitor)).withName(createServiceRequestName(requestSequence));
 
     ServiceTunnelResponse serviceResponse;
     try {
@@ -249,5 +250,14 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
    * @since 06.07.2009
    */
   protected void preprocessHttpResponse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
+  }
+
+  /**
+   * Returns the name to decorate the thread's name which executes the service request.
+   */
+  protected String createServiceRequestName(long requestSequence) {
+    IFuture<?> currentFuture = IFuture.CURRENT.get();
+    String scheduledBy = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
+    return String.format("Remote service request [seq=%s]; scheduled by %s", requestSequence, scheduledBy);
   }
 }

@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -23,20 +25,27 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.Filters;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.filter.OrFilter;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerInitialFutureSetCapacityProperty;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
+import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
  * Thread-safe implementation of a {@link Set} to contain {@link IFuture}s.
  *
  * @since 5.1
  */
-public class FutureSet implements IJobListener {
+@Bean
+public class FutureSet {
 
   private final Set<IFuture<?>> m_futures;
 
@@ -44,8 +53,10 @@ public class FutureSet implements IJobListener {
   private final WriteLock m_writeLock;
   private final Condition m_changedCondition;
 
+  private IJobListenerRegistration m_listenerRegistration;
+
   public FutureSet() {
-    m_futures = new HashSet<>();
+    m_futures = new HashSet<>(CONFIG.getPropertyValue(JobManagerInitialFutureSetCapacityProperty.class));
 
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
@@ -54,41 +65,38 @@ public class FutureSet implements IJobListener {
   }
 
   /**
-   * Adds the given Future to this Set.
+   * Invoke to initialize this {@link FutureSet}.
    */
-  public void add(final IFuture<?> future) {
-    m_writeLock.lock();
-    try {
-      m_futures.add(future);
-    }
-    finally {
-      m_writeLock.unlock();
-    }
+  public void init(IJobManager jobManager) {
+    m_listenerRegistration = jobManager.addListener(
+        Jobs.newEventFilter().andMatchAnyEventType(JobEventType.BLOCKED, JobEventType.UNBLOCKED),
+        new IJobListener() {
+          @Override
+          public void changed(JobEvent event) {
+            m_writeLock.lock();
+            try {
+              m_changedCondition.signalAll();
+            }
+            finally {
+              m_writeLock.unlock();
+            }
+          }
+        });
   }
 
   /**
-   * Removes the given Future from this Set.
+   * Invoke to destroy this {@link FutureSet}.
    */
-  public void remove(final IFuture<?> future) {
+  public void dispose() {
+    m_listenerRegistration.dispose();
+
+    // Clear and cancel all futures.
+    final List<IFuture<?>> runningFutures;
     m_writeLock.lock();
     try {
-      m_futures.remove(future);
-    }
-    finally {
-      m_writeLock.unlock();
-    }
-  }
-
-  /**
-   * Clears this Set and cancels all removed Futures.
-   */
-  public void clear() {
-    final Set<IFuture<?>> runningFutures;
-
-    m_writeLock.lock();
-    try {
-      runningFutures = new HashSet<>(m_futures);
+      runningFutures = copyFutures();
       m_futures.clear();
+      m_changedCondition.signalAll();
     }
     finally {
       m_writeLock.unlock();
@@ -100,11 +108,38 @@ public class FutureSet implements IJobListener {
   }
 
   /**
+   * Adds the given Future to this {@link FutureSet}.
+   */
+  public void add(final IFuture<?> future) {
+    m_writeLock.lock();
+    try {
+      m_futures.add(future);
+      m_changedCondition.signalAll();
+    }
+    finally {
+      m_writeLock.unlock();
+    }
+  }
+
+  /**
+   * Removes the given Future from this {@link FutureSet}.
+   */
+  public void remove(final IFuture<?> future) {
+    m_writeLock.lock();
+    try {
+      m_futures.remove(future);
+      m_changedCondition.signalAll();
+    }
+    finally {
+      m_writeLock.unlock();
+    }
+  }
+
+  /**
    * Checks whether all Futures accepted by the given Filter are in 'done-state'.
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.<br/>
-   * e.g. <code>new AndFilter(new ClientSessionFutureFilter(...), new NotFilter(new BlockedFutureFilter()));</code>
+   * a filter in {@link NotFilter}.
    *
    * @param filter
    *          filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all contained
@@ -112,10 +147,8 @@ public class FutureSet implements IJobListener {
    * @return <code>true</code> if all Futures matching the given Filter are in 'done-state'.
    */
   public boolean isDone(final IFilter<IFuture<?>> filter) {
-    final IFilter<IFuture<?>> f = Filters.alwaysFilterIfNull(filter);
-
-    for (final IFuture<?> future : futures()) {
-      if (!future.isDone() && f.accept(future)) {
+    for (final IFuture<?> future : copyFutures()) {
+      if (!future.isDone() && (filter == null || filter.accept(future))) {
         return false;
       }
     }
@@ -142,17 +175,15 @@ public class FutureSet implements IJobListener {
    *           if the current thread is interrupted while waiting.
    */
   public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
-    final IFilter<IFuture<?>> futureFilter = Filters.alwaysFilterIfNull(filter);
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout=%s]", timeout);
 
     // Wait until all Futures matching the filter are 'done' or the deadline is passed.
     m_writeLock.lockInterruptibly();
     try {
       long nanos = unit.toNanos(timeout);
-      while (!isDone(futureFilter) && nanos > 0L) {
+      while (!isDone(filter) && nanos > 0L) {
         nanos = m_changedCondition.awaitNanos(nanos);
       }
-
       return (nanos > 0L);
     }
     finally {
@@ -164,8 +195,7 @@ public class FutureSet implements IJobListener {
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.<br/>
-   * e.g. <code>new AndFilter(new ClientSessionFutureFilter(...), new NotFilter(new BlockedFutureFilter()));</code>
+   * a filter in {@link NotFilter}.
    *
    * @param filter
    *          to limit the Futures to be visited. If <code>null</code>, all contained Futures are visited, which is the
@@ -174,10 +204,8 @@ public class FutureSet implements IJobListener {
    *          called for each Futures that passed the filter.
    */
   public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
-    final IFilter<IFuture<?>> f = Filters.alwaysFilterIfNull(filter);
-
-    for (final IFuture<?> future : futures()) {
-      if (future.isDone() || !f.accept(future)) {
+    for (final IFuture<?> future : copyFutures()) {
+      if (future.isDone() || (filter != null && !filter.accept(future))) {
         continue;
       }
       if (!visitor.visit(future)) {
@@ -190,8 +218,7 @@ public class FutureSet implements IJobListener {
    * Cancels all Futures which are accepted by the given Filter.
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.<br/>
-   * e.g. <code>new AndFilter(new ClientSessionFutureFilter(...), new NotFilter(new BlockedFutureFilter()));</code>
+   * a filter in {@link NotFilter}.
    *
    * @param filter
    *          to limit the Futures to be cancelled. If <code>null</code>, all contained Futures are cancelled, which is
@@ -204,7 +231,7 @@ public class FutureSet implements IJobListener {
   public boolean cancel(final IFilter<IFuture<?>> filter, final boolean interruptIfRunning) {
     final Set<Boolean> success = new HashSet<>();
 
-    visit(Filters.alwaysFilterIfNull(filter), new IVisitor<IFuture<?>>() {
+    visit(filter, new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(final IFuture<?> future) {
@@ -216,27 +243,13 @@ public class FutureSet implements IJobListener {
     return Collections.singleton(Boolean.TRUE).equals(success);
   }
 
-  private Set<IFuture<?>> futures() {
+  protected List<IFuture<?>> copyFutures() {
     m_readLock.lock();
     try {
-      return new HashSet<>(m_futures);
+      return new ArrayList<>(m_futures); // performance hint: creating an ArrayList has much better performance than creating a HashSet.
     }
     finally {
       m_readLock.unlock();
-    }
-  }
-
-  /**
-   * This method is called for the following events: SCHEDULED, DONE, BLOCKED, UNBLOCKED, SHUTDOWN
-   */
-  @Override
-  public void changed(final JobEvent event) {
-    m_writeLock.lock();
-    try {
-      m_changedCondition.signalAll();
-    }
-    finally {
-      m_writeLock.unlock();
     }
   }
 }

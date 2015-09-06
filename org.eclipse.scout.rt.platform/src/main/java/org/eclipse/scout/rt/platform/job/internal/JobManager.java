@@ -25,11 +25,11 @@ import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.Filters;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -42,9 +42,9 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerM
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.callable.LogOnErrorCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
@@ -67,25 +67,23 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
 
-  @Internal
   protected final ExecutorService m_executor;
-  @Internal
   protected final MutexSemaphores m_mutexSemaphores;
-  @Internal
   protected final FutureSet m_futures;
-  @Internal
   protected final JobListeners m_listeners;
-  @Internal
   private final DelayedExecutor m_delayedExecutor;
 
   public JobManager() {
     m_executor = Assertions.assertNotNull(createExecutor());
-    m_futures = new FutureSet();
-    m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
-    m_listeners = Assertions.assertNotNull(createJobListeners(m_executor));
     m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", CONFIG.getPropertyValue(JobManagerDispatcherThreadCountProperty.class));
 
-    addListener(Jobs.newEventFilter().andMatchEventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
+    m_mutexSemaphores = BEANS.get(MutexSemaphores.class);
+    m_mutexSemaphores.init(m_executor);
+
+    m_listeners = BEANS.get(JobListeners.class);
+
+    m_futures = BEANS.get(FutureSet.class);
+    m_futures.init(this);
   }
 
   @Override
@@ -158,7 +156,7 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   @Override
   public final void shutdown() {
-    m_futures.clear();
+    m_futures.dispose();
     m_mutexSemaphores.clear();
     m_executor.shutdownNow();
     try {
@@ -167,7 +165,8 @@ public class JobManager implements IJobManager, IPlatformListener {
     catch (final InterruptedException e) {
       // NOOP
     }
-    m_listeners.fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
+
+    fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
   }
 
   @Override
@@ -176,13 +175,18 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public IJobListener addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
-    return m_listeners.add(listener, Filters.alwaysFilterIfNull(filter));
+  public IJobListenerRegistration addListener(IJobListener listener) {
+    return addListener(null, listener);
   }
 
   @Override
-  public void removeListener(final IJobListener listener) {
-    m_listeners.remove(listener);
+  public IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener) {
+    return m_listeners.add(filter, listener);
+  }
+
+  @Internal
+  protected void fireEvent(final JobEvent eventToFire) {
+    m_listeners.notifyListeners(eventToFire);
   }
 
   /**
@@ -207,14 +211,6 @@ public class JobManager implements IJobManager, IPlatformListener {
 
     // Create the Future to be returned to the caller.
     return interceptFuture(JobFutureTask.create(this, inputCopy, periodic, interceptCallable(callable, inputCopy)));
-  }
-
-  /**
-   * Creates a semaphore to manage acquisition of the mutex objects.
-   */
-  @Internal
-  protected MutexSemaphores createMutexSemaphores(final ExecutorService executor) {
-    return new MutexSemaphores(executor);
   }
 
   /**
@@ -249,14 +245,6 @@ public class JobManager implements IJobManager, IPlatformListener {
     final ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize + dispatcherThreadCount, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new NamedThreadFactory("scout-thread"), rejectHandler);
     executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
     return executor;
-  }
-
-  /**
-   * Method invoked to create the manager to register and notify job listeners.
-   */
-  @Internal
-  protected JobListeners createJobListeners(final ExecutorService executor) {
-    return new JobListeners(executor);
   }
 
   /**
@@ -323,11 +311,6 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Internal
-  protected void fireEvent(final JobEvent eventToFire) {
-    m_listeners.fireEvent(eventToFire);
-  }
-
-  @Internal
   protected void registerFuture(final IFuture<?> future) {
     m_futures.add(future);
   }
@@ -353,7 +336,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public void stateChanged(PlatformEvent event) throws PlatformException {
+  public void stateChanged(final PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.PlatformStopping) {
       shutdown();
     }

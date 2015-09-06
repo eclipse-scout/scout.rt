@@ -72,7 +72,7 @@ public class ScheduleWithFixedDelayTest {
     }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -113,7 +113,7 @@ public class ScheduleWithFixedDelayTest {
     }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -156,7 +156,7 @@ public class ScheduleWithFixedDelayTest {
     }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
@@ -199,7 +199,7 @@ public class ScheduleWithFixedDelayTest {
     }, initialDelayNano, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).withLogOnError(false));
 
     // verify
-    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchFutures(future), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().andMatchAnyFuture(future), 30, TimeUnit.SECONDS));
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);

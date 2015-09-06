@@ -10,29 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Provides a thread-safe implementation of a non-blocking 1-permit-per-mutex semaphore backed with a fair queue. For
  * each mutex object, a separate {@link MutexSemaphore} is created to hold the mutex state.
  *
+ * @see MutexSemaphore
  * @since 5.1
  */
 @Internal
+@Bean
 public class MutexSemaphores {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MutexSemaphores.class);
@@ -40,38 +38,29 @@ public class MutexSemaphores {
   private static final boolean POSITION_TAIL = true;
   private static final boolean POSITION_HEAD = false;
 
-  private final ReadLock m_readLock;
-  private final WriteLock m_writeLock;
+  private final Map<Object, MutexSemaphore> m_mutexSemaphores = new ConcurrentHashMap<>();
 
-  private final Map<Object, MutexSemaphore> m_mutexSemaphores;
+  private volatile ExecutorService m_executor;
 
-  private final ExecutorService m_executor;
-
-  public MutexSemaphores(final ExecutorService executor) {
+  /**
+   * Initializes this class with the executor to schedule pending mutex taks once a mutex task of the same mutex-object
+   * completes.
+   */
+  public void init(final ExecutorService executor) {
     m_executor = executor;
-    m_mutexSemaphores = new HashMap<>();
-
-    final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    m_readLock = lock.readLock();
-    m_writeLock = lock.writeLock();
   }
 
   /**
    * @return <code>true</code> if the given task is a mutex task and currently owns the mutex.
    */
   public boolean isMutexOwner(final IMutexTask<?> task) {
-    m_readLock.lock();
-    try {
+    synchronized (task.getMutexObject()) {
       final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(task.getMutexObject());
-      if (mutexSemaphore == null) {
-        return false;
-      }
-      else {
+
+      if (mutexSemaphore != null) {
         return mutexSemaphore.isMutexOwner(task);
       }
-    }
-    finally {
-      m_readLock.unlock();
+      return false;
     }
   }
 
@@ -101,17 +90,23 @@ public class MutexSemaphores {
   private boolean tryAcquireElseOffer(final IMutexTask<?> task, final boolean tail) {
     Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
 
-    m_writeLock.lock();
-    try {
-      if (m_executor.isShutdown()) {
-        task.cancel(true);
-        return false;
+    if (m_executor.isShutdown()) {
+      task.cancel(true);
+      return false;
+    }
+
+    final Object mutexObject = task.getMutexObject();
+
+    synchronized (mutexObject) {
+      MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
+      if (mutexSemaphore == null) {
+        mutexSemaphore = BEANS.get(MutexSemaphore.class);
+        mutexSemaphore.init(mutexObject);
+        m_mutexSemaphores.put(mutexObject, mutexSemaphore);
       }
 
-      return getMutexSemaphore(task.getMutexObject()).tryAcquireElseOffer(task, tail);
-    }
-    finally {
-      m_writeLock.unlock();
+      // The mutex acquisition must be within the global 'writeLock', so that the semaphore is not removed by a simultaneously completing mutex task.
+      return mutexSemaphore.tryAcquireElseOffer(task, tail);
     }
   }
 
@@ -140,14 +135,18 @@ public class MutexSemaphores {
       @Override
       protected void mutexAcquired() {
         synchronized (acquisitionLock) {
-          final MutexSemaphore mutexSemaphore = getMutexSemaphore(mutexObject);
+          synchronized (task.getMutexObject()) {
+            final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
+            Assertions.assertNotNull(mutexSemaphore, "Inconsistency detected: Mutex semaphore must not be null when being the mutex owner");
+            Assertions.assertTrue(mutexSemaphore.isMutexOwner(this), "Inconsistency detected: wrong mutex owner [expected=%s, actual=%s]", this, mutexSemaphore.getMutexOwner());
 
-          if (isAwaitMutex()) {
-            mutexSemaphore.replaceMutexOwner(this, task); // make the task the mutex-owner.
-            acquisitionLock.notify();
-          }
-          else {
-            passMutexToNextTask(this);
+            if (isAwaitMutex()) {
+              mutexSemaphore.replaceMutexOwner(this, task); // make the task the mutex-owner.
+              acquisitionLock.notify();
+            }
+            else {
+              passMutexToNextTask(this);
+            }
           }
         }
       }
@@ -155,7 +154,13 @@ public class MutexSemaphores {
 
     // Try to acquire the mutex, or wait for the mutex to become available.
     if (tryAcquireElseOffer(mutexAcquisitionTask, POSITION_HEAD)) {
-      getMutexSemaphore(mutexObject).replaceMutexOwner(mutexAcquisitionTask, task); // make the task the mutex-owner.
+      synchronized (task.getMutexObject()) {
+        final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
+        Assertions.assertNotNull(mutexSemaphore, "Inconsistency detected: Mutex semaphore must not be null when being the mutex owner");
+        Assertions.assertTrue(mutexSemaphore.isMutexOwner(mutexAcquisitionTask), "Inconsistency detected: wrong mutex owner [expected=%s, actual=%s]", mutexAcquisitionTask, mutexSemaphore.getMutexOwner());
+
+        mutexSemaphore.replaceMutexOwner(mutexAcquisitionTask, task); // make the task the mutex-owner.
+      }
     }
     else {
       synchronized (acquisitionLock) {
@@ -175,7 +180,7 @@ public class MutexSemaphores {
   }
 
   /**
-   * Passes the taks's mutex to the first task in the queue.
+   * Passes the tasks's mutex to the first task in the queue.
    *
    * @param task
    *          task which currently is the mutex-owner.
@@ -183,23 +188,17 @@ public class MutexSemaphores {
    */
   public IMutexTask<?> releaseAndPoll(final IMutexTask<?> task) {
     Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
+
+    if (m_executor.isShutdown()) {
+      return null;
+    }
+
     final Object mutexObject = task.getMutexObject();
 
-    m_writeLock.lock();
-    try {
-      if (m_executor.isShutdown()) {
-        return null;
-      }
-
+    synchronized (mutexObject) {
       final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
-      if (mutexSemaphore == null) {
-        LOG.error("Unexpected inconsistency while releasing mutex: mutex-semaphore must not be null.");
-        return null;
-      }
-
-      if (!mutexSemaphore.isMutexOwner(task)) {
-        LOG.error("Unexpected inconsistency while releasing  mutex: wrong mutex owner [expected=%s, actual=%s].", task, mutexSemaphore.getMutexOwner());
-      }
+      Assertions.assertNotNull(mutexSemaphore, "Inconsistency detected: Mutex semaphore must not be null when being the mutex owner");
+      Assertions.assertTrue(mutexSemaphore.isMutexOwner(task), "Inconsistency detected: wrong mutex owner [expected=%s, actual=%s]", task, mutexSemaphore.getMutexOwner());
 
       final IMutexTask<?> nextTask = mutexSemaphore.releaseAndPoll();
       if (nextTask == null) {
@@ -207,9 +206,6 @@ public class MutexSemaphores {
       }
 
       return nextTask;
-    }
-    finally {
-      m_writeLock.unlock();
     }
   }
 
@@ -229,37 +225,15 @@ public class MutexSemaphores {
   }
 
   /**
-   * Returns the mutex-semaphore for the given mutex-object.
-   */
-  private MutexSemaphore getMutexSemaphore(final Object mutexObject) {
-    m_writeLock.lock();
-    try {
-      MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
-      if (mutexSemaphore == null) {
-        mutexSemaphore = new MutexSemaphore();
-        m_mutexSemaphores.put(mutexObject, mutexSemaphore);
-      }
-      return mutexSemaphore;
-    }
-    finally {
-      m_writeLock.unlock();
-    }
-  }
-
-  /**
    * Returns the current permit count for the given mutex-object. This is the mutex-owner plus all pending tasks; if
    * <code>0</code>, the mutex is not acquired.
    */
   public int getPermitCount(final Object mutexObject) {
     Assertions.assertNotNull(mutexObject, "Mutex object must not be null");
 
-    m_readLock.lock();
-    try {
+    synchronized (mutexObject) {
       final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(mutexObject);
       return (mutexSemaphore != null ? mutexSemaphore.getPermitCount() : 0);
-    }
-    finally {
-      m_readLock.unlock();
     }
   }
 
@@ -267,93 +241,11 @@ public class MutexSemaphores {
    * Clears all queued tasks and mutex-owners.
    */
   void clear() {
-    m_writeLock.lock();
-    try {
-      for (final MutexSemaphore mutexSemaphore : m_mutexSemaphores.values()) {
+    for (final MutexSemaphore mutexSemaphore : m_mutexSemaphores.values()) {
+      synchronized (mutexSemaphore.getMutexObject()) {
         mutexSemaphore.clear();
       }
-      m_mutexSemaphores.clear();
     }
-    finally {
-      m_writeLock.unlock();
-    }
-  }
-
-  // === Mutex-Semaphore per mutex object ===
-
-  private static class MutexSemaphore {
-
-    private final Deque<IMutexTask<?>> m_pendingQueue;
-
-    private int m_permits;
-    private IMutexTask<?> m_mutexOwner;
-
-    MutexSemaphore() {
-      m_permits = 0;
-      m_pendingQueue = new ArrayDeque<>();
-    }
-
-    int getPermitCount() {
-      return m_permits;
-    }
-
-    boolean isMutexOwner(final IMutexTask<?> task) {
-      return m_mutexOwner == task;
-    }
-
-    IMutexTask<?> getMutexOwner() {
-      return m_mutexOwner;
-    }
-
-    boolean tryAcquireElseOffer(final IMutexTask<?> task, final boolean tail) {
-      if (m_permits++ == 0) {
-        m_mutexOwner = task;
-        return true;
-      }
-      else {
-        if (tail) {
-          m_pendingQueue.offerLast(task);
-        }
-        else {
-          m_pendingQueue.offerFirst(task);
-        }
-        return false;
-      }
-    }
-
-    void replaceMutexOwner(final IMutexTask<?> currentMutexOwner, final IMutexTask<?> newMutexOwner) {
-      if (!isMutexOwner(currentMutexOwner)) {
-        LOG.error("Unexpected inconsistency: current task must be mutex-owner [currentTask={}, newMutexOwner={}, currentMutexOwner={}]", new Object[]{currentMutexOwner, newMutexOwner, getMutexOwner()});
-      }
-      m_mutexOwner = newMutexOwner;
-    }
-
-    IMutexTask<?> releaseAndPoll() {
-      m_mutexOwner = m_pendingQueue.poll();
-
-      m_permits--;
-
-      if (m_permits < 0) {
-        LOG.error("Unexpected inconsistency while releasing mutex: permit count must not be '0'.", m_permits);
-        m_permits = 0;
-      }
-
-      return m_mutexOwner;
-    }
-
-    void clear() {
-      m_permits = 0;
-      m_pendingQueue.clear();
-      m_mutexOwner = null;
-    }
-
-    @Override
-    public String toString() {
-      final ToStringBuilder builder = new ToStringBuilder(this);
-      builder.attr("mutexOwner", m_mutexOwner);
-      builder.attr("permits", m_permits);
-      builder.attr("pendingQueue", m_pendingQueue);
-      return builder.toString();
-    }
+    m_mutexSemaphores.clear();
   }
 }

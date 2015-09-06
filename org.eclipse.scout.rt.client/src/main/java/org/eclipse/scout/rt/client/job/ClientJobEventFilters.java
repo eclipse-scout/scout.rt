@@ -64,13 +64,13 @@ public final class ClientJobEventFilters {
     }
 
     @Override
-    public Filter andMatchEventTypes(final JobEventType... eventTypes) {
-      return (Filter) super.andMatchEventTypes(eventTypes);
+    public Filter andMatchAnyEventType(final JobEventType... eventTypes) {
+      return (Filter) super.andMatchAnyEventType(eventTypes);
     }
 
     @Override
-    public Filter andMatchNames(final String... names) {
-      return (Filter) super.andMatchNames(names);
+    public Filter andMatchAnyName(final String... names) {
+      return (Filter) super.andMatchAnyName(names);
     }
 
     @Override
@@ -79,13 +79,13 @@ public final class ClientJobEventFilters {
     }
 
     @Override
-    public Filter andMatchFutures(final IFuture<?>... futures) {
-      return (Filter) super.andMatchFutures(futures);
+    public Filter andMatchAnyFuture(final IFuture<?>... futures) {
+      return (Filter) super.andMatchAnyFuture(futures);
     }
 
     @Override
-    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
-      return (Filter) super.andMatchFutures(futures);
+    public Filter andMatchAnyFuture(final Collection<IFuture<?>> futures) {
+      return (Filter) super.andMatchAnyFuture(futures);
     }
 
     @Override

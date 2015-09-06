@@ -79,10 +79,10 @@ public class ClientJobEventFilterTest {
 
   @Test
   public void testEventTypes() {
-    assertFalse(ClientJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_clientJobFuture)));
-    assertTrue(ClientJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture)));
-    assertTrue(ClientJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.DONE, m_clientJobFuture)));
-    assertFalse(ClientJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SHUTDOWN, m_clientJobFuture)));
+    assertFalse(ClientJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_clientJobFuture)));
+    assertTrue(ClientJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture)));
+    assertTrue(ClientJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.DONE, m_clientJobFuture)));
+    assertFalse(ClientJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SHUTDOWN, m_clientJobFuture)));
   }
 
   @Test
@@ -122,10 +122,10 @@ public class ClientJobEventFilterTest {
     assertTrue(ClientJobs.newEventFilter().andMatchSession(m_clientSession2).accept(clientEvent));
     assertTrue(ModelJobs.newEventFilter().andMatchSession(m_clientSession2).accept(modelEvent));
 
-    assertFalse(ClientJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession1).accept(clientEvent));
-    assertFalse(ModelJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession1).accept(modelEvent));
-    assertFalse(ClientJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession2).accept(clientEvent));
-    assertFalse(ModelJobs.newEventFilter().andMatchEventTypes(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession2).accept(modelEvent));
+    assertFalse(ClientJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession1).accept(clientEvent));
+    assertFalse(ModelJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession1).accept(modelEvent));
+    assertFalse(ClientJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession2).accept(clientEvent));
+    assertFalse(ModelJobs.newEventFilter().andMatchAnyEventType(JobEventType.ABOUT_TO_RUN).andMatchSession(m_clientSession2).accept(modelEvent));
   }
 
   @Test
@@ -161,10 +161,10 @@ public class ClientJobEventFilterTest {
     JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture);
     JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_modelJobFuture);
 
-    assertTrue(ClientJobs.newEventFilter().andMatchFutures(m_clientJobFuture, m_modelJobFuture).accept(clientEvent));
-    assertTrue(ModelJobs.newEventFilter().andMatchFutures(m_clientJobFuture, m_modelJobFuture).accept(modelEvent));
-    assertFalse(ClientJobs.newEventFilter().andMatchFutures(m_modelJobFuture).accept(clientEvent));
-    assertFalse(ModelJobs.newEventFilter().andMatchFutures(m_clientJobFuture).accept(modelEvent));
+    assertTrue(ClientJobs.newEventFilter().andMatchAnyFuture(m_clientJobFuture, m_modelJobFuture).accept(clientEvent));
+    assertTrue(ModelJobs.newEventFilter().andMatchAnyFuture(m_clientJobFuture, m_modelJobFuture).accept(modelEvent));
+    assertFalse(ClientJobs.newEventFilter().andMatchAnyFuture(m_modelJobFuture).accept(clientEvent));
+    assertFalse(ModelJobs.newEventFilter().andMatchAnyFuture(m_clientJobFuture).accept(modelEvent));
   }
 
   @Test

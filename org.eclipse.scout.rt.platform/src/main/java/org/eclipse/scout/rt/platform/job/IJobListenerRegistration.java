@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.filter;
+package org.eclipse.scout.rt.platform.job;
+
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 
 /**
- * Factory and utility methods for Filters.
+ * A token representing the registration of a {@link IJobListener}. This token can later be used to unregister the
+ * listener.
  *
  * @since 5.1
  */
-public final class Filters {
-
-  private Filters() {
-  }
+public interface IJobListenerRegistration {
 
   /**
-   * Returns an {@link AlwaysFilter} if the given filter is <code>null</code>.
+   * Invoke to unregister the associated listener.
    */
-  public static <ELEMENT> IFilter<ELEMENT> alwaysFilterIfNull(final IFilter<ELEMENT> filter) {
-    return (filter != null ? filter : new AlwaysFilter<ELEMENT>());
-  }
+  void dispose();
 }

@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -27,6 +29,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
@@ -34,7 +37,9 @@ import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
@@ -55,7 +60,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT>implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IMutexTask<RESULT>, IRejectable {
 
   protected final JobManager m_jobManager;
 
@@ -68,6 +73,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT>implements IFuture<
   private final RunMonitor m_runMonitor;
 
   private final DonePromise<RESULT> m_donePremise;
+
+  private final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Factory method to create a {@link JobFutureTask} for the given {@link Callable}.
@@ -113,6 +120,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT>implements IFuture<
     m_jobManager.unregisterFuture(this);
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
     m_donePremise.onDone();
+    m_listeners.clear();
 
     // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
   }
@@ -326,13 +334,26 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT>implements IFuture<
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("job", m_input);
-    builder.attr("periodic", m_periodic);
-    builder.attr("blocked", m_blocked);
-    builder.attr("expirationDate", m_expirationDate);
-    return builder.toString();
+  public IJobListenerRegistration addListener(final IJobListener listener) {
+    return addListener(null, listener);
+  }
+
+  @Override
+  public IJobListenerRegistration addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+    final JobListenerWithFilter localListener = new JobListenerWithFilter(listener, filter);
+    m_listeners.add(localListener);
+
+    return new IJobListenerRegistration() {
+
+      @Override
+      public void dispose() {
+        m_listeners.remove(localListener);
+      }
+    };
+  }
+
+  List<JobListenerWithFilter> getListeners() {
+    return m_listeners;
   }
 
   private <ERROR extends Throwable> RESULT throwElseReturnNull(final Throwable t, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
@@ -365,5 +386,15 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT>implements IFuture<
     }
 
     Assertions.assertFalse(currentMutex.equals(getMutexObject()), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex=%s]", currentMutex);
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("job", m_input);
+    builder.attr("periodic", m_periodic);
+    builder.attr("blocked", m_blocked);
+    builder.attr("expirationDate", m_expirationDate);
+    return builder.toString();
   }
 }

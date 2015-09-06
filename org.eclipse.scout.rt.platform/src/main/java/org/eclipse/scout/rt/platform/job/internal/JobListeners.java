@@ -10,54 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.filter.Filters;
+import org.eclipse.scout.commons.IAdaptable;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 
 /**
  * Responsible for notifying all job listeners about job lifecycle events.
+ * <p/>
+ * This implementation works with global and local listeners to reduce contention among threads by registering listeners
+ * directly on the related Future whenever possible. Also, a {@link CopyOnWriteArrayList} is used to hold global
+ * listeners as more read than write operations occur.
  *
  * @since 5.1
  */
-@Internal
+@Bean
 public class JobListeners {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobListeners.class);
-
-  private final Map<IJobListener, IFilter<JobEvent>> m_listenerMap;
-
-  private final ExecutorService m_executor;
-
-  private final ReadLock m_readLock;
-  private final WriteLock m_writeLock;
-
-  /**
-   * @param executor
-   *          Executor to be used to notify listeners about job lifecycle events; use <code>null</code> to not notify
-   *          asynchronously, e.g. for testing purpose.
-   */
-  public JobListeners(final ExecutorService executor) {
-    m_executor = executor;
-    m_listenerMap = new HashMap<>();
-
-    final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    m_readLock = lock.readLock();
-    m_writeLock = lock.writeLock();
-  }
+  private final List<JobListenerWithFilter> m_globalListeners = new CopyOnWriteArrayList<>();
 
   /**
    * Registers the given listener to be notified about job lifecycle events. If the listener is already registered, that
@@ -67,96 +44,97 @@ public class JobListeners {
    *          listener to be registered.
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.
-   * @return the given listener.
+   * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
+   *         unregister the listener.
    */
-  IJobListener add(final IJobListener listener, final IFilter<JobEvent> filter) {
-    Assertions.assertNotNull(listener, "Listener must not be null");
-    m_writeLock.lock();
-    try {
-      m_listenerMap.put(listener, Filters.alwaysFilterIfNull(filter));
-      return listener;
+  IJobListenerRegistration add(final IFilter<JobEvent> filter, final IJobListener listener) {
+    final IFuture[] futures = getFilteredFutures(filter);
+    if (futures != null) {
+      return addLocalListener(filter, listener, futures); // register the listener directly on the future to reduce contention.
     }
-    finally {
-      m_writeLock.unlock();
+    else {
+      return addGlobalListener(filter, listener);
     }
   }
 
   /**
-   * Removes the given listener from the list.
-   *
-   * @param listener
-   *          listener to be removed.
+   * Registers the given listener as global listeners.
    */
-  void remove(final IJobListener listener) {
-    if (listener == null) {
-      return;
-    }
-    m_writeLock.lock();
-    try {
-      m_listenerMap.remove(listener);
-    }
-    finally {
-      m_writeLock.unlock();
-    }
+  protected IJobListenerRegistration addGlobalListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+    final JobListenerWithFilter globalListener = new JobListenerWithFilter(listener, filter);
+    m_globalListeners.add(globalListener);
+
+    return new IJobListenerRegistration() {
+
+      @Override
+      public void dispose() {
+        m_globalListeners.remove(globalListener);
+      }
+    };
   }
 
   /**
-   * Notifies all listener about an event, unless not accept by the filter. This method never throws an exception and
-   * notifies the listeners asynchronously.
+   * Registers the given listener locally on the given Futures to reduce contention.
+   */
+  protected IJobListenerRegistration addLocalListener(final IFilter<JobEvent> filter, final IJobListener listener, final IFuture[] futures) {
+    final List<IJobListenerRegistration> registrations = new ArrayList<>(futures.length);
+    for (final IFuture<?> future : futures) {
+      registrations.add(future.addListener(filter, listener));
+    }
+
+    return new IJobListenerRegistration() {
+
+      @Override
+      public void dispose() {
+        for (final IJobListenerRegistration registration : registrations) {
+          registration.dispose();
+        }
+      }
+    };
+  }
+
+  /**
+   * Notifies all listener about an event, unless not accept by the filter.<br/>
+   * This method never throws an exception.
    *
    * @param eventToFire
    *          The event to fire.
    */
-  void fireEvent(final JobEvent eventToFire) {
-    // Copy listener map to immediately release the monitor.
-    final Map<IJobListener, IFilter<JobEvent>> listeners;
-    m_readLock.lock();
-    try {
-      listeners = new HashMap<>(m_listenerMap);
-    }
-    finally {
-      m_readLock.unlock();
-    }
+  public void notifyListeners(final JobEvent eventToFire) {
+    notifyGlobalListeners(eventToFire);
+    notifyLocalListeners(eventToFire);
+  }
 
-    // Identify the listeners to be notified.
-    final Set<IJobListener> acceptedListeners = new HashSet<>();
-    for (final IJobListener listener : listeners.keySet()) {
-      try {
-        if (listeners.get(listener).accept(eventToFire)) {
-          acceptedListeners.add(listener);
-        }
-      }
-      catch (final Throwable t) {
-        LOG.error(String.format("Listener threw exception while accepting job lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), t);
-      }
-    }
-
-    // Notify the listeners.
-    for (final IJobListener listener : acceptedListeners) {
-      if (m_executor == null || m_executor.isShutdown()) { // executor is null e.g. for testing purpose
-        notifyListenerSafe(listener, eventToFire);
-      }
-      else {
-        m_executor.execute(new Runnable() {
-
-          @Override
-          public void run() {
-            notifyListenerSafe(listener, eventToFire);
-          }
-        });
-      }
+  /**
+   * Notifies all global listeners accepting the given event.
+   */
+  public void notifyGlobalListeners(final JobEvent eventToFire) {
+    for (final JobListenerWithFilter globalListener : m_globalListeners) {
+      globalListener.changed(eventToFire);
     }
   }
 
   /**
-   * Notifies the given listener about the given job lifecycle event.
+   * Notifies all local listeners which are registered on the event's future and accept the given event.
    */
-  private void notifyListenerSafe(final IJobListener listener, final JobEvent eventToFire) {
-    try {
-      listener.changed(eventToFire);
+  public void notifyLocalListeners(final JobEvent eventToFire) {
+    final JobFutureTask<?> future = (JobFutureTask<?>) eventToFire.getFuture();
+    if (future == null) {
+      return;
     }
-    catch (final Throwable t) {
-      LOG.error(String.format("Listener threw exception while being notified about job lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), t);
+    for (final JobListenerWithFilter localListener : future.getListeners()) {
+      localListener.changed(eventToFire);
     }
+  }
+
+  /**
+   * Returns the futures constrained by the given filter (if any), or <code>null</code> otherwise.<br/>
+   * For that to work, the given filter must implement {@link IAdaptable} for the type <code>IFuture[].class</code>.
+   */
+  protected IFuture[] getFilteredFutures(final IFilter<JobEvent> filter) {
+    if (filter instanceof IAdaptable) {
+      return ((IAdaptable) filter).getAdapter(IFuture[].class);
+    }
+    return null;
   }
 }

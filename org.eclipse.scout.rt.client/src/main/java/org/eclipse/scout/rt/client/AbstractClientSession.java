@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
@@ -52,6 +53,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobFutureFilters.Filter;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -94,7 +96,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private final Map<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
-  private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
 
   public AbstractClientSession(boolean autoInitConfig) {
@@ -461,19 +462,21 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       m_desktop = null;
     }
 
-    final long shutdownWaitTime = getMaxShutdownWaitTime();
-    if (shutdownWaitTime > 0) {
-      // Wait for running jobs to complete prior shutdown the session.
-      try {
-        final Filter futureFilter = Jobs.newFutureFilter().andMatchFutures(findRunningJobs());
-        Jobs.getJobManager().awaitDone(futureFilter, shutdownWaitTime, TimeUnit.MILLISECONDS);
+    // Wait for running jobs to complete prior shutdown the session.
+    try {
+      long delay = NumberUtility.nvl(CONFIG.getPropertyValue(JobCompletionDelayOnSessionShutdown.class), 0L);
+      if (delay > 0L) {
+        final Filter runningJobsFilter = Jobs.newFutureFilter().andMatchAnyFuture(findRunningJobs());
+        Jobs.getJobManager().awaitDone(runningJobsFilter, delay, TimeUnit.SECONDS);
       }
-      catch (ProcessingException e) {
-        LOG.warn("Encountered an error while waiting for running jobs to complete.", e);
-      }
+      cancelRunningJobs();
     }
-    logRunningJobs();
-    inactivateSession();
+    catch (ProcessingException e) {
+      LOG.warn("Encountered an error while waiting for running jobs to complete.", e);
+    }
+    finally {
+      inactivateSession();
+    }
   }
 
   protected void inactivateSession() {
@@ -495,22 +498,23 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * Check if any jobs are currently running, that are different from the current job, have the same session assigned
    * and are not blocked. If yes, a warning with the list of found jobs is printed to the logger.
    */
-  protected void logRunningJobs() {
+  protected void cancelRunningJobs() {
     final List<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
-      LOG.warn(
-          "" + "Some running client jobs found while client session is going to shutdown. " + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. "
-              + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}",
+      Jobs.getJobManager().cancel(Jobs.newFutureFilter().andMatchAnyFuture(runningJobs), true);
+
+      LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
+          + "[session={0}, user={1}, jobs=(see next line)]\n{2}",
           new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
     }
   }
 
   /**
-   * Returns all the jobs which currently are running and prevent the session from shutdown.
+   * Returns all the jobs which currently are running.
    */
   protected List<IFuture<?>> findRunningJobs() {
     CollectorVisitor<IFuture<?>> collector = new CollectorVisitor<>();
-    Jobs.getJobManager().visit(ClientJobs.newFutureFilter().andMatchNotCurrentFuture().andMatchCurrentSession().andAreNotBlocked(), collector);
+    Jobs.getJobManager().visit(ClientJobs.newFutureFilter().andMatchNotCurrentFuture().andMatchCurrentSession(), collector);
     return collector.getElements();
   }
 
@@ -597,27 +601,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * Sets the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before it
-   * is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without waiting for
-   * client jobs to finish.
-   */
-  public void setMaxShutdownWaitTime(long maxShutdownWaitTime) {
-    m_maxShutdownWaitTime = maxShutdownWaitTime;
-  }
-
-  /**
-   * @return the maximum time (in milliseconds) to wait for all client/model jobs to finish before shutdown the session.
-   *         The default value is 4567, which should be reasonable for most use cases.
-   */
-  public long getMaxShutdownWaitTime() {
-    return m_maxShutdownWaitTime;
-  }
-
-  /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER>implements IClientSessionExtension<OWNER> {
+  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
 
     public LocalClientSessionExtension(OWNER owner) {
       super(owner);

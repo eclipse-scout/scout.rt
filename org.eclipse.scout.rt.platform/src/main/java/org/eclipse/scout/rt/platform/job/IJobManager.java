@@ -204,26 +204,31 @@ public interface IJobManager {
   void shutdown();
 
   /**
-   * Registers the given listener to be notified about job lifecycle events. If the listener is already registered, that
-   * previous registration is replaced.
-   * <p/>
+   * Registers the given listener to be notified about all job lifecycle events. If the listener is already registered,
+   * that previous registration is replaced.
+   *
+   * @param listener
+   *          listener to be registered.
+   * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
+   *         unregister the listener.
+   */
+  IJobListenerRegistration addListener(IJobListener listener);
+
+  /**
+   * Registers the given listener to be notified about job lifecycle events that comply with the given filter. If the
+   * listener is already registered, that previous registration is replaced.
+   * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobEventFilters} for simplified usage:<br/>
-   * <code>Jobs.newEventFilter().andMatchNotCurrentFuture().session(...);</code>
-   *
+   * <code>Jobs.newEventFilter().andMatchAnyFuture(..);</code>
+   * </p>
+   * 
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.
    * @param listener
    *          listener to be registered.
-   * @return the given listener.
+   * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
+   *         unregister the listener.
    */
-  IJobListener addListener(IFilter<JobEvent> filter, IJobListener listener);
-
-  /**
-   * Removes the given listener from the list.
-   *
-   * @param listener
-   *          listener to be removed.
-   */
-  void removeListener(IJobListener listener);
+  IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
 }

@@ -13,10 +13,14 @@ package org.eclipse.scout.rt.platform.job.internal.callable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -25,11 +29,13 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.junit.After;
@@ -69,10 +75,14 @@ public class ThreadNameDecoratorTest {
     };
 
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
+    IFuture.CURRENT.set(mockFuture());
+
     new ThreadNameDecorator<Void>(next, "scout-client-thread", "123:job1").call();
     assertEquals("scout-client-thread-5 (Running) \"123:job1\"", threadName.getValue());
     assertEquals("scout-thread-5 (Idle)", Thread.currentThread().getName());
+
     ThreadInfo.CURRENT.remove();
+    IFuture.CURRENT.remove();
   }
 
   @Test
@@ -89,10 +99,14 @@ public class ThreadNameDecoratorTest {
     };
 
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
+    IFuture.CURRENT.set(mockFuture());
+
     new ThreadNameDecorator<Void>(next, "scout-client-thread", null).call();
     assertEquals("scout-client-thread-5 (Running)", threadName.getValue());
     assertEquals("scout-thread-5 (Idle)", Thread.currentThread().getName());
+
     ThreadInfo.CURRENT.remove();
+    IFuture.CURRENT.remove();
   }
 
   @Test
@@ -192,5 +206,12 @@ public class ThreadNameDecoratorTest {
 
   private interface ICondition {
     boolean evaluate();
+  }
+
+  @SuppressWarnings("unchecked")
+  private IFuture<?> mockFuture() {
+    IFuture futureMock = mock(IFuture.class);
+    when(futureMock.addListener(any(IFilter.class), any(IJobListener.class))).thenReturn(mock(IJobListenerRegistration.class));
+    return futureMock;
   }
 }

@@ -53,7 +53,8 @@ public class ClientNotificationPoller {
           Jobs.newInput(ClientRunContexts.copyCurrent()
               .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
               .withUserAgent(UserAgent.createDefault())
-              .withSession(null, false)));
+              .withSession(null, false))
+              .withName(ClientNotificationPoller.class.getSimpleName()));
     }
     else {
       LOG.debug("Starting without notifications due to no proxy service is available");

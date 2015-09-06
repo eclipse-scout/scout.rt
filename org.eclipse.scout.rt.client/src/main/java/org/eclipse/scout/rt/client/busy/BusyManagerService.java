@@ -10,17 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
@@ -32,29 +33,37 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
  * @since 3.8
  */
 
-public class BusyManagerService extends AbstractService implements IBusyManagerService {
+public class BusyManagerService extends AbstractService implements IBusyManagerService, IJobListener {
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();
 
-  private final IJobListener m_jobChangeListener;
+  private IJobListenerRegistration m_jobListenerRegistration;
 
   public BusyManagerService() {
-    m_jobChangeListener = new P_JobChangeListener();
   }
 
   @Override
   public void initializeService() {
     super.initializeService();
-    Jobs.getJobManager().addListener(Jobs.newEventFilter(), m_jobChangeListener);
+
+    IFilter<JobEvent> clientOrModelJobFilter = new OrFilter<>(ClientJobs.newEventFilter(), ModelJobs.newEventFilter());
+    m_jobListenerRegistration = Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatch(clientOrModelJobFilter).andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE), this);
+  }
+
+  @Override
+  public void changed(JobEvent event) {
+    switch (event.getType()) {
+      case ABOUT_TO_RUN: {
+        onJobAboutToRun(event.getFuture());
+      }
+      case DONE: {
+        onJobEnd(event.getFuture());
+      }
+    }
   }
 
   @Override
   public void disposeServices() {
-    try {
-      Jobs.getJobManager().removeListener(m_jobChangeListener);
-    }
-    finally {
-      super.disposeServices();
-    }
+    m_jobListenerRegistration.dispose();
   }
 
   private IBusyHandler getHandlerInternal(IFuture<?> future) {
@@ -95,83 +104,41 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     session.setData(HANDLER_CLIENT_SESSION_KEY, null);
   }
 
-  private class P_JobChangeListener implements IJobListener {
-
-    private Map<IFuture, IJobListener> m_listeners = new HashMap<>();
-
-    private void running(JobEvent event) {
-      IFuture<?> future = event.getFuture();
-      IBusyHandler handler = getHandlerInternal(future);
-      if (handler == null) {
-        return;
-      }
-      if (!handler.acceptFuture(future)) {
-        return;
-      }
-
-      IJobListener listener = new P_JobChangeListenerEx();
-      m_listeners.put(future, listener);
-      Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatchFutures(future), listener);
-
-      handler.onJobBegin(future);
+  protected void onJobAboutToRun(final IFuture<?> future) {
+    final IBusyHandler handler = getHandlerInternal(future);
+    if (handler == null) {
+      return;
+    }
+    if (!handler.acceptFuture(future)) {
+      return;
     }
 
-    private void done(JobEvent event) {
-      IFuture<?> future = event.getFuture();
-      IBusyHandler handler = getHandlerInternal(future);
-      if (handler == null) {
-        return;
-      }
-      if (!handler.acceptFuture(future)) {
-        return;
-      }
+    future.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.BLOCKED), new IJobListener() {
 
-      Jobs.getJobManager().removeListener(m_listeners.remove(future));
-      handler.onJobEnd(future);
-    }
-
-    @Override
-    public void changed(JobEvent event) {
-      switch (event.getType()) {
-        case ABOUT_TO_RUN:
-          running(event);
-          break;
-        case DONE:
-          done(event);
-          break;
+      @Override
+      public void changed(JobEvent blockedEvent) {
+        handler.onJobEnd(future);
       }
-    }
+    });
+    future.addListener(Jobs.newEventFilter().andMatchAnyEventType(JobEventType.UNBLOCKED), new IJobListener() {
+
+      @Override
+      public void changed(JobEvent blockedEvent) {
+        handler.onJobBegin(future);
+      }
+    });
+    handler.onJobBegin(future);
   }
 
-  private class P_JobChangeListenerEx implements IJobListener {
-    private void blockingConditionStart(JobEvent event) {
-      IFuture<?> future = event.getFuture();
-      IBusyHandler handler = getHandlerInternal(future);
-      if (handler == null) {
-        return;
-      }
-      handler.onJobEnd(future);
+  protected void onJobEnd(final IFuture<?> future) {
+    IBusyHandler handler = getHandlerInternal(future);
+    if (handler == null) {
+      return;
+    }
+    if (!handler.acceptFuture(future)) {
+      return;
     }
 
-    private void blockingConditionEnd(JobEvent event) {
-      IFuture<?> future = event.getFuture();
-      IBusyHandler handler = getHandlerInternal(future);
-      if (handler == null) {
-        return;
-      }
-      handler.onJobBegin(future);
-    }
-
-    @Override
-    public void changed(JobEvent event) {
-      switch (event.getType()) {
-        case BLOCKED:
-          blockingConditionStart(event);
-          break;
-        case UNBLOCKED:
-          blockingConditionEnd(event);
-          break;
-      }
-    }
+    handler.onJobEnd(future);
   }
 }

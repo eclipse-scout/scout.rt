@@ -30,7 +30,6 @@ public class JobEvent extends EventObject {
   private final JobEventType m_eventType;
   private final IFuture<?> m_future;
   private final IBlockingCondition m_blockingCondition;
-  private final long m_nanoTime = System.nanoTime();
 
   public JobEvent(final IJobManager jobManager, final JobEventType type, final IFuture<?> future) {
     this(jobManager, type, future, null);
@@ -56,13 +55,6 @@ public class JobEvent extends EventObject {
   }
 
   /**
-   * @return time of the event (ns).
-   */
-  public long getNanoTime() {
-    return m_nanoTime;
-  }
-
-  /**
    * @return blocking condition which a 'blocking event' is associated with; is <code>null</code> for other events.
    * @see JobEventType#BLOCKED
    * @see JobEventType#UNBLOCKED
@@ -83,7 +75,6 @@ public class JobEvent extends EventObject {
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("type", m_eventType.name());
-    builder.attr("nanoTime", m_nanoTime);
     builder.attr("future", m_future);
     builder.ref("source", getSource());
     return builder.toString();

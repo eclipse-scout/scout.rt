@@ -11,10 +11,11 @@
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
@@ -56,33 +57,28 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, IChainable
   public RESULT call() throws Exception {
     final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
 
-    final AtomicLong lastEventTime = new AtomicLong(System.nanoTime());
-
-    // Install job listener to decorate the thread's name once being blocked.
-    final IJobListener listener = Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatchCurrentFuture().andMatchEventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.RESUMED), new IJobListener() {
-
-      @Override
-      public void changed(final JobEvent event) {
-        synchronized (lastEventTime) { // synchronize event handling because being fired asynchronously.
-          if (event.getNanoTime() < lastEventTime.get()) {
-            return; // this event is out-of-date
+    // Install job listener to decorate the thread name
+    final IJobListenerRegistration listenerRegistration = IFuture.CURRENT.get().addListener(
+        Jobs.newEventFilter().andMatchAnyEventType(
+            JobEventType.BLOCKED,
+            JobEventType.UNBLOCKED,
+            JobEventType.RESUMED),
+        new IJobListener() {
+          @Override
+          public void changed(final JobEvent event) {
+            switch (event.getType()) {
+              case BLOCKED:
+                currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
+                break;
+              case UNBLOCKED:
+                currentThreadInfo.updateState(JobState.Resuming, event.getBlockingCondition().getName());
+                break;
+              case RESUMED:
+                currentThreadInfo.updateState(JobState.Running, null);
+                break;
+            }
           }
-          lastEventTime.set(event.getNanoTime());
-
-          switch (event.getType()) {
-            case BLOCKED:
-              currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
-              break;
-            case UNBLOCKED:
-              currentThreadInfo.updateState(JobState.Resuming, event.getBlockingCondition().getName());
-              break;
-            case RESUMED:
-              currentThreadInfo.updateState(JobState.Running, null);
-              break;
-          }
-        }
-      }
-    });
+        });
 
     // Update the name of the thread.
     currentThreadInfo.updateNameAndState(m_threadName, m_jobName, JobState.Running);
@@ -90,7 +86,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, IChainable
       return m_next.call();
     }
     finally {
-      Jobs.getJobManager().removeListener(listener);
+      listenerRegistration.dispose();
       currentThreadInfo.updateNameAndState(null, null, JobState.Idle);
     }
   }

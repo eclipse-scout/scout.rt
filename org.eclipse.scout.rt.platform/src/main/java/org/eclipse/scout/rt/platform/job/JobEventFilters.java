@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.platform.job;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IAdaptable;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
@@ -42,9 +44,9 @@ public final class JobEventFilters {
    *
    * @since 5.1
    */
-  public static class Filter implements IFilter<JobEvent> {
+  public static class Filter implements IFilter<JobEvent>, IAdaptable {
 
-    private final List<IFilter<JobEvent>> m_filters = new ArrayList<>();
+    private final List<IFilter<JobEvent>> m_andFilters = new ArrayList<>();
 
     public Filter() {
       postConstruct();
@@ -52,7 +54,7 @@ public final class JobEventFilters {
 
     @Override
     public boolean accept(final JobEvent event) {
-      return (m_filters.isEmpty() ? true : new AndFilter<>(m_filters).accept(event));
+      return (m_andFilters.isEmpty() ? true : new AndFilter<>(m_andFilters).accept(event));
     }
 
     /**
@@ -65,14 +67,14 @@ public final class JobEventFilters {
      * Registers the given filter to further constrain the events to be accepted.
      */
     public Filter andMatch(final IFilter<JobEvent> filter) {
-      m_filters.add(filter);
+      m_andFilters.add(filter);
       return this;
     }
 
     /**
      * To accept only events of the given event types.
      */
-    public Filter andMatchEventTypes(final JobEventType... eventTypes) {
+    public Filter andMatchAnyEventType(final JobEventType... eventTypes) {
       andMatch(new EventTypeFilter(eventTypes));
       return this;
     }
@@ -80,7 +82,7 @@ public final class JobEventFilters {
     /**
      * To accept only events which belong to jobs of the given job name's.
      */
-    public Filter andMatchNames(final String... names) {
+    public Filter andMatchAnyName(final String... names) {
       andMatch(new FutureEventFilterDelegate(new JobFutureFilters.JobNameFilter(names)));
       return this;
     }
@@ -94,28 +96,26 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events which belong to the given Futures.
-     */
-    public Filter andMatchFutures(final IFuture<?>... futures) {
-      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
-      return this;
-    }
-
-    /**
-     * To accept only events which belong to the given Futures.
-     */
-    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
-      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
-      return this;
-    }
-
-    /**
      * To accept only events which belong to the current executing job.
      *
      * @see IFuture#CURRENT
      */
     public Filter andMatchCurrentFuture() {
-      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get())));
+      return andMatchAnyFuture(IFuture.CURRENT.get());
+    }
+
+    /**
+     * To accept only events which belong to the given Futures.
+     */
+    public Filter andMatchAnyFuture(final IFuture<?>... futures) {
+      return andMatchAnyFuture(Arrays.asList(futures));
+    }
+
+    /**
+     * To accept only events which belong to the given Futures.
+     */
+    public Filter andMatchAnyFuture(final Collection<IFuture<?>> futures) {
+      andMatch(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
       return this;
     }
 
@@ -157,6 +157,46 @@ public final class JobEventFilters {
       andMatch(NON_PERIODIC_JOB_EVENT_FILTER);
       return this;
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getAdapter(final Class<T> adapterType) {
+      if (adapterType == IFuture[].class) {
+        return (T) getFuturesAdapter();
+      }
+      return null;
+    }
+
+    protected IFuture[] getFuturesAdapter() {
+      List<IFuture<?>> adapters = null;
+
+      for (final IFilter<JobEvent> andFilter : m_andFilters) {
+        // Check whether the current 'andFilter' supports the adaptable mechanism.
+        if (!(andFilter instanceof IAdaptable)) {
+          continue;
+        }
+
+        // Check whether the current 'andFilter' is adaptable to 'IFuture[].class'.
+        final IFuture<?>[] futures = ((IAdaptable) andFilter).getAdapter(IFuture[].class);
+        if (futures == null) {
+          continue;
+        }
+
+        // Because these filters have an 'AND' semantic, only retain futures which are contained yet.
+        if (adapters == null) {
+          adapters = new ArrayList<>(Arrays.asList(futures));
+        }
+        else {
+          adapters.retainAll(Arrays.asList(futures));
+        }
+      }
+
+      if (adapters == null || adapters.isEmpty()) {
+        return null;
+      }
+
+      return adapters.toArray(new IFuture[adapters.size()]);
+    }
   }
 
   /**
@@ -179,10 +219,10 @@ public final class JobEventFilters {
   }
 
   /**
-   * Passes the event's Future to the given delegate to be evaluated. Evaluates to <code>true</code>, if there is no
-   * Future associated with the event.
+   * Event filter for events associated with futures. Evaluates to <code>true</code>, if there is no Future associated
+   * with the event.
    */
-  public static class FutureEventFilterDelegate implements IFilter<JobEvent> {
+  public static class FutureEventFilterDelegate implements IFilter<JobEvent>, IAdaptable {
 
     private final IFilter<IFuture<?>> m_delegate;
 
@@ -193,6 +233,14 @@ public final class JobEventFilters {
     @Override
     public final boolean accept(final JobEvent event) {
       return (event.getFuture() != null ? m_delegate.accept(event.getFuture()) : true);
+    }
+
+    @Override
+    public <T> T getAdapter(final Class<T> type) {
+      if (m_delegate instanceof IAdaptable) {
+        return ((IAdaptable) m_delegate).getAdapter(type);
+      }
+      return null;
     }
   }
 }

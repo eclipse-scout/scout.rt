@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferencesStorageService;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
@@ -57,6 +58,23 @@ public final class ClientConfigProperties {
     @Override
     public String getKey() {
       return "user.area";
+    }
+  }
+
+  /**
+   * Specifies the maximal time (in seconds) to wait until running jobs are cancelled on session shutdown.
+   */
+  // TODO [jgu] Add AbstractLongConfigProperty
+  public static class JobCompletionDelayOnSessionShutdown extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "session.jobCompletionDelayOnSessionShutdown";
+    }
+
+    @Override
+    protected Long getDefaultValue() {
+      return 10L;
     }
   }
 }

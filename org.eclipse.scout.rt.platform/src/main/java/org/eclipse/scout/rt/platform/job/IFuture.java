@@ -14,8 +14,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 
 /**
  * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's
@@ -142,8 +148,7 @@ public interface IFuture<RESULT> extends ICancellable {
    *           <li>if this thread was interrupted while waiting for the job to complete; see
    *           {@link ProcessingException#isInterruption()}</li>
    *           <li>if this job was cancelled; see {@link ProcessingException#isCancellation()}</li>
-   *           <li>if this job did not return within the timeout specified; see {@link ProcessingException#isTimeout()}
-   *           </li>
+   *           <li>if this job did not return within the timeout specified; see {@link ProcessingException#isTimeout()}</li>
    *           </ul>
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;
@@ -193,4 +198,33 @@ public interface IFuture<RESULT> extends ICancellable {
    * </pre>
    */
   void whenDone(IDoneCallback<RESULT> callback);
+
+  /**
+   * Registers the given listener to be notified about job lifecycle events related to this Future, and which comply
+   * with the given filter. If the listener is already registered, that previous registration is replaced.
+   * <p>
+   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
+   * a filter in {@link NotFilter}. Also see {@link JobEventFilters} for simplified usage:<br/>
+   * <code>Jobs.newEventFilter().andMatchAnyFuture(..);</code>
+   * </p>
+   *
+   * @param filter
+   *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   * @param listener
+   *          listener to be registered.
+   * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
+   *         unregister the listener.
+   */
+  IJobListenerRegistration addListener(IJobListener listener);
+
+  /**
+   * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener
+   * is already registered, that previous registration is replaced.
+   *
+   * @param listener
+   *          listener to be registered.
+   * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
+   *         unregister the listener.
+   */
+  IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
 }

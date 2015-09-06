@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import org.eclipse.scout.rt.platform.job.internal.FutureSet;
+
 /**
  *
  */
@@ -158,4 +160,20 @@ public final class PlatformConfigProperties {
     }
   }
 
+  /**
+   * The initial capacity of the {@link FutureSet} to hold running Futures. This number should correspond to the
+   * expected number of running jobs.
+   */
+  public static class JobManagerInitialFutureSetCapacityProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.initialFutureSetCapacity";
+    }
+
+    @Override
+    protected Integer getDefaultValue() {
+      return 10_000;
+    }
+  }
 }

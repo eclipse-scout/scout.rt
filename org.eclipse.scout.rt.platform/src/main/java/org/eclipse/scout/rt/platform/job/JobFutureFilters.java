@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.IAdaptable;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
@@ -68,7 +69,7 @@ public final class JobFutureFilters {
     /**
      * To accept only jobs of the given job names.
      */
-    public Filter andMatchNames(final String... names) {
+    public Filter andMatchAnyName(final String... names) {
       andMatch(new JobNameFilter(names));
       return this;
     }
@@ -84,7 +85,7 @@ public final class JobFutureFilters {
     /**
      * To accept only jobs which belong to the given Futures.
      */
-    public Filter andMatchFutures(final IFuture<?>... futures) {
+    public Filter andMatchAnyFuture(final IFuture<?>... futures) {
       andMatch(new FutureFilter(futures));
       return this;
     }
@@ -92,7 +93,7 @@ public final class JobFutureFilters {
     /**
      * To accept only jobs which belong to the given Futures.
      */
-    public Filter andMatchFutures(final Collection<IFuture<?>> futures) {
+    public Filter andMatchAnyFuture(final Collection<IFuture<?>> futures) {
       andMatch(new FutureFilter(futures));
       return this;
     }
@@ -168,11 +169,11 @@ public final class JobFutureFilters {
   }
 
   /**
-   * Filter which discards all Futures except the given ones.
+   * Filter which accepts any of the given Futures.
    *
    * @since 5.1
    */
-  public static class FutureFilter implements IFilter<IFuture<?>> {
+  public static class FutureFilter implements IFilter<IFuture<?>>, IAdaptable {
 
     private final Set<IFuture<?>> m_futures;
 
@@ -187,6 +188,15 @@ public final class JobFutureFilters {
     @Override
     public boolean accept(final IFuture<?> future) {
       return m_futures.contains(future);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getAdapter(final Class<T> type) {
+      if (type == IFuture[].class) {
+        return (T) m_futures.toArray(new IFuture[m_futures.size()]);
+      }
+      return null;
     }
   }
 
