@@ -14,20 +14,50 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.eclipse.scout.commons.utility.TestUtility;
-import org.eclipse.scout.rt.client.AbstractClientSession;
+import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 @RunWith(PlatformTestRunner.class)
 public class UiSessionTest {
+
+  private List<IBean<?>> m_beans;
+
+  @Before
+  public void before() {
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withReplace(true).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+
+      @Override
+      public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
+        return new JobCompletionDelayOnSessionShutdown() {
+
+          @Override
+          protected Long getDefaultValue() {
+            return 0L;
+          }
+        };
+      }
+    }));
+  }
+
+  @After
+  public void after() {
+    TestingUtility.unregisterBeans(m_beans);
+  }
 
   @Test
   public void testDispose() throws Exception {
@@ -61,7 +91,6 @@ public class UiSessionTest {
     assertFalse(uiSession.isDisposed());
 
     // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
-    ((AbstractClientSession) clientSession).setMaxShutdownWaitTime(0);
     WeakReference<IUiSession> ref = new WeakReference<IUiSession>(uiSession);
     HttpSessionBindingEvent mockEvent = Mockito.mock(HttpSessionBindingEvent.class);
     P_ClientSessionCleanupHandler dummyCleanupHandler = new UiSession.P_ClientSessionCleanupHandler(clientSession);

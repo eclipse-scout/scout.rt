@@ -41,15 +41,16 @@ import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.ModelJobFilter;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
@@ -106,7 +107,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
-  private IJobListener m_modelJobFinishedListener;
+  private IJobListenerRegistration m_modelJobFinishedListenerRegistration;
   private final ArrayBlockingQueue<Object> m_backgroundJobNotificationQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_notificationToken = new Object();
   private volatile long m_lastAccessedTime;
@@ -117,50 +118,40 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_jsonEventProcessor = createJsonEventProcessor();
 
-    // When a model job finishes but no client request is currently being processed, the background poller has to be notified.
-    // This enables sending JSON responses to the UI without user interaction. Note that a model job is also considered
-    // "finished", when it is blocked, e.g. form.waitFor().
-    m_modelJobFinishedListener = new IJobListener() {
-      @Override
-      public void changed(JobEvent event) {
-        LOG.trace("Model job finished: " + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
-        notifyPollingBackgroundJobRequests();
-      }
-    };
-    Jobs.getJobManager().addListener(new IFilter<JobEvent>() {
-      @Override
-      public boolean accept(JobEvent event) {
-        if (!ModelJobFilter.INSTANCE.accept(event.getFuture())) {
-          return false; // only model jobs are of interest
-        }
-        if (BEANS.get(UiJobs.class).isPollingRequest(event.getFuture().getJobInput().getRunContext())) {
-          return false; // only non-polling requests are of interest
-        }
+    m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
+        ModelJobs.newEventFilter()
+            .andMatchAnyEventType(
+                JobEventType.BLOCKED,
+                JobEventType.DONE,
+                JobEventType.REJECTED,
+                JobEventType.SHUTDOWN)
+            .andMatch(new IFilter<JobEvent>() {
+              @Override
+              public boolean accept(JobEvent event) {
+                if (BEANS.get(UiJobs.class).isPollingRequest(event.getFuture().getJobInput().getRunContext())) {
+                  return false; // only non-polling requests are of interest
+                }
 
-        // it has to be in a state that is considered "finished"
-        switch (event.getType()) {
-          case BLOCKED:
-          case DONE:
-          case REJECTED:
-          case SHUTDOWN:
-            // continue
-            break;
-          default:
-            return false;
-        }
-        // no client request must currently being processed (because in that case, the result of the
-        // model job will be returned as payload of the current JSON response).
-        if (isProcessingJsonRequest()) {
-          return false;
-        }
-        // the model job's session has to match our session
-        ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().getRunContext();
-        if (runContext.getSession() != getClientSession()) {
-          return false;
-        }
-        return true;
-      }
-    }, m_modelJobFinishedListener);
+                // no client request must currently being processed (because in that case, the result of the
+                // model job will be returned as payload of the current JSON response).
+                if (isProcessingJsonRequest()) {
+                  return false;
+                }
+                // the model job's session has to match our session
+                ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().getRunContext();
+                return runContext.getSession() == getClientSession();
+              }
+            })
+        , new IJobListener() {
+          @Override
+          public void changed(JobEvent event) {
+            // When a model job finishes but no client request is currently being processed, the background poller has to be notified.
+            // This enables sending JSON responses to the UI without user interaction. Note that a model job is also considered
+            // "finished", when it is blocked, e.g. form.waitFor().
+            LOG.trace("Model job finished: " + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
+            notifyPollingBackgroundJobRequests();
+          }
+        });
   }
 
   protected JsonResponse createJsonResponse() {
@@ -449,7 +440,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       return;
     }
 
-    Jobs.getJobManager().removeListener(m_modelJobFinishedListener);
+    m_modelJobFinishedListenerRegistration.dispose();
 
     // Notify waiting requests - should not delay web-container shutdown
     notifyPollingBackgroundJobRequests();
