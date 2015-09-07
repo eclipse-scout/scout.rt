@@ -15,10 +15,12 @@ scout.SplitBox.prototype._render = function($parent) {
   this.addContainer($parent, 'split-box');
   // This widget does not support label, mandatoryIndicator and status
 
-  // Prepare split area
+  // Create split area
   this._$splitArea = $.makeDiv('split-area');
+  this.addField(this._$splitArea);
   this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
+
   // Add fields and splitter
   if (this.firstField) {
     this.firstField.render(this._$splitArea);
@@ -40,8 +42,6 @@ scout.SplitBox.prototype._render = function($parent) {
       this.secondField.on('propertyChange', onInnerFieldPropertyChange.bind(this));
     }
   }
-  // Add splitArea as field
-  this.addField(this._$splitArea);
 
   // --- Helper functions ---
 
