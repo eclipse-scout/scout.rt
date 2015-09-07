@@ -141,8 +141,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
                 ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().getRunContext();
                 return runContext.getSession() == getClientSession();
               }
-            })
-        , new IJobListener() {
+            }),
+        new IJobListener() {
           @Override
           public void changed(JobEvent event) {
             // When a model job finishes but no client request is currently being processed, the background poller has to be notified.
@@ -709,11 +709,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         Object notificationToken = m_backgroundJobNotificationQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
         int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
         int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
-        if (notificationToken == null || newPollWaitSeconds <= 0 || !currentJsonResponse().isEmpty()) {
+        if (notificationToken == null || newPollWaitSeconds <= 0 || currentJsonResponse() == null || !currentJsonResponse().isEmpty()) {
           // Stop wait loop for one of the following reasons:
           // 1. Timeout has occurred -> return always, even with empty answer
           // 2. Remaining pollWaitTime would be zero -> same as no. 1
-          // 3. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
+          // 3. Session is disposed (-> currentJsonResponse is null)
+          // 4. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
           wait = false;
         }
         else {
