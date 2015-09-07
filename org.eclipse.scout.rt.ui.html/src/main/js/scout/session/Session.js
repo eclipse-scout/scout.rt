@@ -688,7 +688,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
     if (!allowedTypes || allowedTypes.length === 0 || scout.helpers.isOneOf(value.type, allowedTypes)) {
       totalSize += value.size;
       var filename = value.name;
-      if (filename === undefined) {
+      if (!filename) {
         filename = scout.mimeTypes.getDefaultFilename(value.type, '-' + scout.dates.timestamp());
       }
       formData.append('files', value, filename);
