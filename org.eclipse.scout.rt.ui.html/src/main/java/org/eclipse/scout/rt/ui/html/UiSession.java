@@ -728,6 +728,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       }
     }
     LOG.trace("Background job terminated. Continue request processing...");
+    if (!m_disposed) {
+      return;
+    }
     // Wait at least 100ms to allow some sort of "coalescing background job result" (if many jobs
     // finish at the same time, we want to prevent too many polling requests).
     try {

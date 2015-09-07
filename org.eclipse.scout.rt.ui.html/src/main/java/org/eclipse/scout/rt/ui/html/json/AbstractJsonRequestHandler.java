@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -85,20 +86,32 @@ public abstract class AbstractJsonRequestHandler extends AbstractUiServletReques
   protected void writeResponse(HttpServletResponse httpResp, JSONObject jsonResp) throws IOException {
     String jsonText = jsonResp.toString();
     byte[] data = jsonText.getBytes(Encoding.UTF_8);
+    if (LOG.isDebugEnabled() && !LOG.isTraceEnabled()) {
+      // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
+      if (jsonText.length() > 10000) {
+        jsonText = jsonText.substring(0, 10000) + "...";
+      }
+    }
     httpResp.setContentLength(data.length);
     if (httpResp.getContentType() == null) {
       httpResp.setContentType("application/json");
     }
     httpResp.setCharacterEncoding(Encoding.UTF_8);
-    httpResp.getOutputStream().write(data);
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Returned: " + jsonText);
+    try {
+      httpResp.getOutputStream().write(data);
     }
-    else if (LOG.isDebugEnabled()) {
-      // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
-      if (jsonText.length() > 10000) {
-        jsonText = jsonText.substring(0, 10000) + "...";
+    catch (EOFException e) {
+      StringBuilder sb = new StringBuilder("EOF - Client disconnected, cannot write response");
+      if (LOG.isDebugEnabled()) {
+        sb.append(": ").append(jsonText);
       }
+      else {
+        sb.append(" (").append(data.length).append(" bytes)");
+      }
+      LOG.warn(sb.toString());
+      return;
+    }
+    if (LOG.isDebugEnabled()) {
       LOG.debug("Returned: " + jsonText);
     }
   }
