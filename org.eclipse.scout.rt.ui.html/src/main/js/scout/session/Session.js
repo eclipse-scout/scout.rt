@@ -294,7 +294,7 @@ scout.Session.prototype._sendNow = function() {
   }
 
   if (this._unload) {
-    this._unload = false;  
+    this._unload = false;
     request.unload = true;
   }
 
@@ -813,6 +813,10 @@ scout.Session.prototype.setBusy = function(busy) {
 };
 
 scout.Session.prototype._renderBusy = function() {
+  if (this._busyIndicatorTimeoutId !== null && this._busyIndicatorTimeoutId !== undefined) {
+    // Do not schedule it twice
+    return;
+  }
   // Don't show the busy indicator immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
   this._busyIndicatorTimeoutId = setTimeout(function() {
@@ -832,6 +836,7 @@ scout.Session.prototype._renderBusy = function() {
 scout.Session.prototype._removeBusy = function() {
   // Clear pending timer
   clearTimeout(this._busyIndicatorTimeoutId);
+  this._busyIndicatorTimeoutId = null;
 
   // Remove busy indicator (if it was already created)
   if (this._busyIndicator) {
