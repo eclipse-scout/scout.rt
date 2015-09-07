@@ -8,10 +8,10 @@ scout.logout = {
           'ui.logoutSuccessful': 'Good bye!',
           'ui.loginAgain': 'Login again'
         }
-      },
-      options = $.extend({}, defaultOpts, opts),
-      texts = new scout.Texts(options.texts);
-
+      };
+    opts.loginUrl = opts.loginUrl || sessionStorage.getItem('scout:loginUrl');
+    var options = $.extend({}, defaultOpts, opts);
+    var texts = new scout.Texts(options.texts);
     var $box = $('<div>')
       .addClass('box-with-logo small centered')
       .html(scout.strings.nl2br(texts.get('ui.logoutSuccessful')))
