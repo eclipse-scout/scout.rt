@@ -31,13 +31,14 @@ public interface IConfigProperty<DATA_TYPE> {
   String getKey();
 
   /**
-   * Gets the configured value. If nothing is configured the default value ({@link #getDefaultValue()}) is returned.
+   * Gets the configured value. If nothing is configured the default value is returned.
    * <p>
    * A config property has a constant value, never changing during runtime.
-   * <p>
+   * </p>
    * Callers may therefore cache or reference the returned value.
    *
-   * @return The actual value of this property. May be <code>null</code>
+   * @return The actual value of this property. <code>null</code>, if and only if both the value and the default value
+   *         are null.
    * @throws PlatformException
    */
   DATA_TYPE getValue();
