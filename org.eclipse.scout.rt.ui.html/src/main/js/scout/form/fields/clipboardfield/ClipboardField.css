@@ -2,6 +2,7 @@
   margin-left: @mandatory-indicator-width;
   background-color: @item-selection-background-color;
   padding: @text-field-padding;
+  #scout.user-select(text);
 
   & > img {
     display: none;
