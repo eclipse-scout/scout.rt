@@ -294,6 +294,7 @@ scout.Session.prototype._sendNow = function() {
   }
 
   if (this._unload) {
+    this._unload = false;  
     request.unload = true;
   }
 
