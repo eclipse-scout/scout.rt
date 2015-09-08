@@ -86,11 +86,9 @@ public abstract class AbstractJsonRequestHandler extends AbstractUiServletReques
   protected void writeResponse(HttpServletResponse httpResp, JSONObject jsonResp) throws IOException {
     String jsonText = jsonResp.toString();
     byte[] data = jsonText.getBytes(Encoding.UTF_8);
-    if (LOG.isDebugEnabled() && !LOG.isTraceEnabled()) {
+    if (LOG.isDebugEnabled() && !LOG.isTraceEnabled() && jsonText.length() > 10000) {
       // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
-      if (jsonText.length() > 10000) {
-        jsonText = jsonText.substring(0, 10000) + "...";
-      }
+      jsonText = jsonText.substring(0, 10000) + "...";
     }
     httpResp.setContentLength(data.length);
     if (httpResp.getContentType() == null) {
