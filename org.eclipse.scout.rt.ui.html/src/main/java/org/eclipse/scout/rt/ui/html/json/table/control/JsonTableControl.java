@@ -42,6 +42,10 @@ public class JsonTableControl<TABLE_CONTROL extends ITableControl> extends JsonA
         return getModel().getForm();
       }
 
+      @Override
+      public boolean accept() {
+        return getModel().isSelected();
+      }
     });
     getJsonProperty(IAction.PROP_SELECTED).addSlaveProperty(getJsonProperty(ITableControl.PROP_FORM));
   }
