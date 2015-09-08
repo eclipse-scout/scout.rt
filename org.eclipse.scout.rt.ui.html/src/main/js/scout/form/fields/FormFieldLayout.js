@@ -96,6 +96,24 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   // Check for scrollbars, update them if neccessary
   if (formField.$field) {
     scout.scrollbars.update(formField.$field);
+    this._layoutDisabledOverlay(formField.$field);
+  }
+
+};
+
+scout.FormFieldLayout.prototype._layoutDisabledOverlay = function($field) {
+  if (scout.device.supportsCopyFromDisabledInputFields()) {
+    return;
+  }
+  var $disabledOverlay = $field.siblings('.disabled-overlay');
+  if ($disabledOverlay.length) {
+    var pos = $field.position(),
+      padding = scout.graphics.getInsets($field, {includePadding: true});
+    $disabledOverlay
+      .css('top', pos.top)
+      .css('left', pos.left)
+      .width($field.width() + padding.left + padding.right)
+      .height($field.height()  + padding.top + padding.bottom);
   }
 };
 

@@ -45,6 +45,7 @@ scout.StringField.prototype._render = function($parent) {
   $field.on('blur', this._onFieldBlur.bind(this))
     .on('select', this._onSelect.bind(this));
 
+
   // add drag and drop support
   this.dragAndDropHandler = scout.dragAndDrop.handler(this,
     scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
@@ -57,8 +58,64 @@ scout.StringField.prototype._render = function($parent) {
   this.dragAndDropHandler.install($field);
 
   this.addField($field);
-
   this.addStatus();
+};
+
+/**
+ * @override FormField.js
+ */
+scout.StringField.prototype._renderEnabled = function() {
+  scout.StringField.parent.prototype._renderEnabled.call(this);
+  this._renderDisabledOverlay();
+};
+
+/**
+ * Add or remove an overlay DIV for browsers that don't support copy from disabled text-fields.
+ * The overlay provides a custom 'copy' menu which opens the ClipboardForm.
+ */
+scout.StringField.prototype._renderDisabledOverlay = function() {
+  if (scout.device.supportsCopyFromDisabledInputFields()) {
+    return;
+  }
+
+  if (this.enabled) {
+    if (this._$disabledOverlay) {
+      this._$disabledOverlay.remove();
+      this._$disabledOverlay = null;
+    }
+  } else if (!this._$disabledOverlay) {
+    this._$disabledOverlay = $.makeDiv('disabled-overlay')
+      .on('contextmenu', this._createCopyContextMenu.bind(this))
+      .appendTo(this.$container);
+  }
+};
+
+scout.StringField.prototype._createCopyContextMenu = function(event) {
+  if (!this.visible) {
+    return;
+  }
+
+  var fieldId = this.id;
+  var menu = scout.localObjects.createObject(this.session, {
+    objectType: 'Menu',
+    text: this.session.text('ui.copy')
+  });
+  menu.remoteHandler = function(target, type) {
+    if ('doAction' === type) {
+      this.session.send(fieldId, 'exportToClipboard');
+    }
+  };
+
+  var popup = new scout.ContextMenuPopup(this.session, {
+    menuItems: [menu],
+    cloneMenuItems: false,
+    location: {
+      x: event.pageX,
+      y: event.pageY
+    },
+    $anchor: this._$disabledOverlay
+  });
+  popup.render();
 };
 
 scout.StringField.prototype._renderProperties = function() {

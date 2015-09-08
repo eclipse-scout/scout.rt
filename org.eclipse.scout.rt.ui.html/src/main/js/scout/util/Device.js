@@ -138,6 +138,10 @@ scout.Device.prototype.hasPrettyScrollbars = function() {
   }
 };
 
+scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
+  return scout.Device.SupportedBrowsers.FIREFOX !== this.browser;
+};
+
 scout.Device.prototype.supportsCssProperty = function(property) {
   return this.supportsFeature(property, check);
 
