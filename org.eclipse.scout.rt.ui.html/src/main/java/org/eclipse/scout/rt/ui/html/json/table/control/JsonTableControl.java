@@ -47,7 +47,7 @@ public class JsonTableControl<TABLE_CONTROL extends ITableControl> extends JsonA
         return getModel().isSelected();
       }
     });
-    getJsonProperty(IAction.PROP_SELECTED).addSlaveProperty(getJsonProperty(ITableControl.PROP_FORM));
+    getJsonProperty(IAction.PROP_SELECTED).addLazyProperty(getJsonProperty(ITableControl.PROP_FORM));
   }
 
   @Override

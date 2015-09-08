@@ -39,7 +39,7 @@ public class JsonOutlineViewButton<OUTLINE_VIEW_BUTTON extends IOutlineViewButto
         return getModel().isSelected();
       }
     });
-    getJsonProperty(IAction.PROP_SELECTED).addSlaveProperty(getJsonProperty("outline"));
+    getJsonProperty(IAction.PROP_SELECTED).addLazyProperty(getJsonProperty("outline"));
   }
 
 }

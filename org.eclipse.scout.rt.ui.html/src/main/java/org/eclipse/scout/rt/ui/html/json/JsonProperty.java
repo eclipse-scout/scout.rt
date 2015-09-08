@@ -25,7 +25,7 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
   private final String m_propertyName;
   private final MODEL_ELEMENT m_model;
   private IJsonAdapter<?> m_parentJsonAdapter;
-  private List<JsonProperty<?>> m_slaveProperties = new LinkedList<JsonProperty<?>>();
+  private List<JsonProperty<?>> m_lazyProperties = new LinkedList<JsonProperty<?>>();
   private boolean m_valueSent;
 
   public JsonProperty(String propertyName, MODEL_ELEMENT model) {
@@ -57,12 +57,12 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
     return m_parentJsonAdapter;
   }
 
-  public void addSlaveProperty(JsonProperty<?> property) {
-    m_slaveProperties.add(property);
+  public void addLazyProperty(JsonProperty<?> property) {
+    m_lazyProperties.add(property);
   }
 
-  public List<JsonProperty<?>> getSlaveProperties() {
-    return m_slaveProperties;
+  public List<JsonProperty<?>> getLazyProperties() {
+    return m_lazyProperties;
   }
 
   public void setValueSent(boolean valueSent) {
@@ -80,7 +80,7 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
 
   /**
    * Controls the lazy loading behavior. Expects that the property was added using
-   * {@link #addSlaveProperty(JsonProperty)}.
+   * {@link #addLazyProperty(JsonProperty)}.
    *
    * @return true if the value is allowed to be sent, false if not.
    */

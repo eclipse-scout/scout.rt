@@ -132,7 +132,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty<?> jsonProperty = m_jsonProperties.get(propertyName);
-      handleSlaveJsonProperties(jsonProperty);
+      handleLazyJsonProperties(jsonProperty);
       jsonProperty.handlePropertyChange(oldValue, newValue);
       if (!jsonProperty.accept()) {
         return;
@@ -159,13 +159,13 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     return m_propertyEventFilter.filter(event);
   }
 
-  protected void handleSlaveJsonProperties(JsonProperty<?> masterProperty) {
-    for (JsonProperty<?> slaveProperty : masterProperty.getSlaveProperties()) {
-      Object modelValue = slaveProperty.modelValue();
-      slaveProperty.handlePropertyChange(null, modelValue);
+  protected void handleLazyJsonProperties(JsonProperty<?> masterProperty) {
+    for (JsonProperty<?> lazyProperty : masterProperty.getLazyProperties()) {
+      Object modelValue = lazyProperty.modelValue();
+      lazyProperty.handlePropertyChange(null, modelValue);
       // Note: at this point we don'check if the a property-change-event is filtered or not
-      if (modelValue != null && slaveProperty.accept() && !slaveProperty.isValueSent()) {
-        addPropertyChangeEvent(slaveProperty, null, modelValue);
+      if (modelValue != null && lazyProperty.accept() && !lazyProperty.isValueSent()) {
+        addPropertyChangeEvent(lazyProperty, null, modelValue);
       }
     }
   }
