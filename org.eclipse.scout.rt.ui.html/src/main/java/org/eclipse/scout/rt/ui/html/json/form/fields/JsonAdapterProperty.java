@@ -83,6 +83,9 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   }
 
   protected void createAdapter(Object model) {
+    if (!accept()) {
+      return;
+    }
     if (m_global) {
       m_uiSession.getRootJsonAdapter().attachAdapter(model, m_filter);
     }

@@ -69,12 +69,21 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
     m_valueSent = valueSent;
   }
 
-  //FIXME CGU: (von A.WE) dokumentieren wozu diese methode gut sein soll, wie und wann sie verwendet wird.
+  /**
+   * Necessary for the lazy loading behavior. Will be used to check whether a lazy property has already been sent.
+   *
+   * @return true if the value has been sent, false if not
+   */
   public boolean isValueSent() {
     return m_valueSent;
   }
 
-  // FIXME CGU: (von A.WE) dokumentieren wozu diese methode gut sein soll, wie und wann sie verwendet wird.
+  /**
+   * Controls the lazy loading behavior. Expects that the property was added using
+   * {@link #addSlaveProperty(JsonProperty)}.
+   *
+   * @return true if the value is allowed to be sent, false if not.
+   */
   public boolean accept() {
     return true;
   }

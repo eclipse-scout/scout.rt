@@ -99,6 +99,36 @@ public class JsonTableControlTest {
   }
 
   @Test
+  public void testLazyLoadingForm_onModelFormChanged() throws ProcessingException, JSONException {
+    FormWithOneField form = new FormWithOneField();
+    form.setShowOnStart(false);
+    TableControl control = new TableControl();
+    control.setTable(new Table());
+    control.setForm(form);
+    control.decorateForm();
+    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null);
+    assertNull(jsonControl.getAdapter(form));
+
+    FormWithOneField anotherForm = new FormWithOneField();
+    anotherForm.setShowOnStart(false);
+    control.setForm(anotherForm);
+    control.decorateForm();
+
+    // Both forms have to be null because the control has not been selected yet
+    assertNull(jsonControl.getAdapter(form));
+    assertNull(jsonControl.getAdapter(anotherForm));
+
+    control.setSelected(true);
+
+    IJsonAdapter<?> formAdapter = jsonControl.getAdapter(anotherForm);
+    // Form is still null because it was exchanged with anotherForm
+    assertNull(jsonControl.getAdapter(form));
+    assertNotNull(formAdapter);
+    String formId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonControl.getId(), "form");
+    assertEquals(formAdapter.getId(), formId);
+  }
+
+  @Test
   public void testNonLazyLoadingFormWhenSelected() throws ProcessingException, JSONException {
     FormWithOneField form = new FormWithOneField();
     TableControl control = new TableControl();
