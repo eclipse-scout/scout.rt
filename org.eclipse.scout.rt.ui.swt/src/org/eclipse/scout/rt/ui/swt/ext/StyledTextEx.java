@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext;
 
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.DndAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -23,13 +24,15 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ScrollBar;
 
 /**
  * <h3>StyledTextEx</h3> ...
- * 
+ *
  * @since 1.0.0 15.04.2008
  */
 public class StyledTextEx extends StyledText {
@@ -87,6 +90,18 @@ public class StyledTextEx extends StyledText {
     ScrollBar vBar = getVerticalBar();
     if (vBar != null && !vBar.isDisposed()) {
       vBar.setVisible(size.y > clientArea.height);
+    }
+  }
+
+  @Override
+  public void paste() {
+    super.paste();
+    if (getTextLimit() > -1 && getText().length() > getTextLimit()) {
+      setText(getText().substring(0, getTextLimit()));
+      MessageBox messageBox = new MessageBox(getShell(), SWT.OK);
+      messageBox.setText(SwtUtility.getNlsText(Display.getCurrent(), "Paste"));
+      messageBox.setMessage(SwtUtility.getNlsText(Display.getCurrent(), "PasteTextTooLongForFieldX", "" + getTextLimit()));
+      messageBox.open();
     }
   }
 
