@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -21,8 +25,11 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonResponseTest;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
+import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithWrappedFormField;
+import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,5 +71,76 @@ public class JsonFormTest {
     form.start();
     assertNotNull(adapter.toJson().get(JsonForm.PROP_INITIAL_FOCUS));
     form.doClose();
+  }
+
+  @Test
+  public void testFormOpenCloseInTwoRequests() throws Exception {
+    // Create adapter for client session and desktop
+    m_uiSession.newJsonAdapter(IClientSession.CURRENT.get(), null);
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ---------
+
+    FormWithOneField form = new FormWithOneField();
+
+    // --- 1 ---
+
+    form.start();
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertFalse(JsonResponseTest.getAdapterData(m_uiSession.currentJsonResponse()).isEmpty());
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    assertEquals("formShow", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
+
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // --- 2 ---
+
+    form.doClose();
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertTrue(JsonResponseTest.getAdapterData(m_uiSession.currentJsonResponse()).isEmpty());
+    assertEquals(2, m_uiSession.currentJsonResponse().getEventList().size());
+    assertEquals("formHide", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
+    assertEquals("disposeAdapter", m_uiSession.currentJsonResponse().getEventList().get(1).getType());
+  }
+
+  @Test
+  public void testFormOpenCloseInSameRequest() throws Exception {
+    // Create adapter for client session and desktop
+    m_uiSession.newJsonAdapter(IClientSession.CURRENT.get(), null);
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ---------
+
+    FormWithOneField form = new FormWithOneField();
+    form.start();
+    form.doClose();
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertTrue(JsonResponseTest.getAdapterData(m_uiSession.currentJsonResponse()).isEmpty());
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    assertEquals("disposeAdapter", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
+  }
+
+  @Test
+  public void testFormOpenCloseInWrappedFormField() throws Exception {
+    // Create adapter for client session and desktop
+    m_uiSession.newJsonAdapter(IClientSession.CURRENT.get(), null);
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ---------
+
+    FormWithWrappedFormField form = new FormWithWrappedFormField();
+    form.start();
+    form.doClose();
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertTrue(JsonResponseTest.getAdapterData(m_uiSession.currentJsonResponse()).isEmpty());
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    assertEquals("disposeAdapter", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
   }
 }

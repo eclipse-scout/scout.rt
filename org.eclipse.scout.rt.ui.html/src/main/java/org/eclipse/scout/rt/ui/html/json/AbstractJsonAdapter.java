@@ -298,8 +298,18 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected final void addActionEvent(String eventName, JSONObject eventData) {
-    getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
-    LOG.debug("Added action event '" + eventName + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
+    addActionEvent(eventName, null, eventData);
+  }
+
+  protected final void addActionEvent(String eventName, IJsonAdapter referenceAdapter, JSONObject eventData) {
+    if (referenceAdapter == null) {
+      getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
+      LOG.debug("Added action event '" + eventName + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
+    }
+    else {
+      getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, referenceAdapter.getId(), eventData);
+      LOG.debug("Added action event '" + eventName + "' for " + getObjectType() + " with id " + getId() + " and reference " + referenceAdapter.getId() + ". Model: " + getModel());
+    }
   }
 
   protected final void registerAsBufferedEventsAdapter() {

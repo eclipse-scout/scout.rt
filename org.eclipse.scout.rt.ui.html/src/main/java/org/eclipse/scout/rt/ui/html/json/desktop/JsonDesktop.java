@@ -366,7 +366,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
       jsonEvent.put(propModelAdapterId, modelAdapter.getId());
       jsonEvent.put(PROP_DISPLAY_PARENT, displayParentAdapter.getId());
-      addActionEvent(eventName, jsonEvent);
+      // Add modelAdapter as "referenced adapter" to event (to remove event when
+      // modelAdapter is disposed but desktop is not)
+      addActionEvent(eventName, modelAdapter, jsonEvent);
     }
   }
 

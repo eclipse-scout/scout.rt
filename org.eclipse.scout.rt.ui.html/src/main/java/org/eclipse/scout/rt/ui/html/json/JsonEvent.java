@@ -22,6 +22,7 @@ public class JsonEvent implements IJsonObject {
 
   private final String m_target;
   private final String m_type;
+  private final String m_reference;
   private final JSONObject m_data;
 
   /**
@@ -29,13 +30,15 @@ public class JsonEvent implements IJsonObject {
    *          Event target (usually, an adapter ID)
    * @param type
    *          See {@link JsonEventType} enum for a list of often used event types.
+   * @param reference
+   *          Optional reference value, used to clean up events in the JSON response (see
+   *          {@link JsonResponse#removeJsonAdapter(String)}. Should be of the same type as the 'target' attribute.
    * @param data
    *          Event data (or <code>null</code>).
-   *          <b><font color=red>Please note:</font></b> Do not use the reserved property names <code>'target'</code>
-   *          and <code>'type'</code> in this object, as they will be overridden by the corresponding first two
-   *          arguments.
+   *          <b><font color=red>Important:</font></b> Do not use the reserved property names <code>'target'</code> and
+   *          <code>'type'</code> in this object, as they will be overridden by the corresponding first two arguments.
    */
-  public JsonEvent(String target, String type, JSONObject data) {
+  public JsonEvent(String target, String type, String reference, JSONObject data) {
     if (target == null) {
       throw new IllegalArgumentException("Argument 'target' must be null");
     }
@@ -47,7 +50,22 @@ public class JsonEvent implements IJsonObject {
     }
     m_target = target;
     m_type = type;
+    m_reference = reference;
     m_data = data;
+  }
+
+  /**
+   * @param target
+   *          Event target (usually, an adapter ID)
+   * @param type
+   *          See {@link JsonEventType} enum for a list of often used event types.
+   * @param data
+   *          Event data (or <code>null</code>).
+   *          <b><font color=red>Important:</font></b> Do not use the reserved property names <code>'target'</code> and
+   *          <code>'type'</code> in this object, as they will be overridden by the corresponding first two arguments.
+   */
+  public JsonEvent(String target, String type, JSONObject data) {
+    this(target, type, null, data);
   }
 
   public String getTarget() {
@@ -56,6 +74,10 @@ public class JsonEvent implements IJsonObject {
 
   public String getType() {
     return m_type;
+  }
+
+  public String getReference() {
+    return m_reference;
   }
 
   public JSONObject getData() {
@@ -86,6 +108,6 @@ public class JsonEvent implements IJsonObject {
 
   @Override
   public String toString() {
-    return "Target: " + m_target + ". Type: " + m_type + ". Data: " + m_data;
+    return "Target: " + m_target + ". Type: " + m_type + (m_reference == null ? "" : ". Reference: " + m_reference) + ". Data: " + m_data;
   }
 }

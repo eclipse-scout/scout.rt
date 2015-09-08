@@ -118,6 +118,18 @@ public class JsonResponse {
   }
 
   /**
+   * Same as {@link #addActionEvent(String, String, JSONObject)} but with an 'eventReference' added to the JSON event.
+   * This reference is considered additionally to 'eventTarget' when removing events (see
+   * {@link #removeJsonAdapter(String)}).
+   * <p>
+   * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
+   * also {@link #doAddEvent(JsonEvent)}
+   */
+  public void addActionEvent(String eventTarget, String eventType, String eventReference, JSONObject eventData) {
+    m_eventList.add(new JsonEvent(eventTarget, eventType, eventReference, eventData));
+  }
+
+  /**
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
@@ -286,20 +298,27 @@ public class JsonResponse {
 
   /**
    * Removes all traces of the adapter with the given ID from the current response. This includes all events with the
-   * given ID as target. Also, if the adapter was registered as "buffered events adapter", it is unregistered
-   * automatically. Any deferred model event for this adapter will therefore not be handled.
+   * given ID as target or "reference". Also, if the adapter was registered as "buffered events adapter", it is
+   * unregistered automatically. Any deferred model event for this adapter will therefore not be handled.
    *
    * @param id
    *          Adapter ID to be removed
    */
   public void removeJsonAdapter(String id) {
     // Remove from adapterMap
-    m_adapterMap.remove(id);
+    IJsonAdapter<?> removedAdapter = m_adapterMap.remove(id);
 
-    // Remove all events with the given ID as event target
+    // Remove all related events
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
       if (CompareUtility.equals(event.getTarget(), id)) {
+        // Event is targeted to the removed adapter
+        it.remove();
+      }
+      else if (removedAdapter != null && event.getReference() != null && CompareUtility.equals(event.getReference(), id)) {
+        // Event is not directly targeted to the removed adapter but "references" it. If the adapter
+        // was not yet sent to the UI (= it was contained in the m_adapterMap) we may safely purge
+        // the event. Example: "showForm" + "hideForm" in the same request.
         it.remove();
       }
     }

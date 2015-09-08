@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Map;
+
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -31,7 +33,7 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonResponseTest {
 
-  UiSessionMock m_uiSession = new UiSessionMock();
+  private UiSessionMock m_uiSession = new UiSessionMock();
 
   @Test
   public void testJsonEventPropertyChangeEvent() throws JSONException {
@@ -93,4 +95,7 @@ public class JsonResponseTest {
     assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
   }
 
+  public static Map<String, IJsonAdapter<?>> getAdapterData(JsonResponse jsonResponse) {
+    return jsonResponse.adapterMap();
+  }
 }
