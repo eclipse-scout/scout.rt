@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>5.1.0.R005</version>
+    <version>5.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.scout.rt.server.jms</artifactId>
