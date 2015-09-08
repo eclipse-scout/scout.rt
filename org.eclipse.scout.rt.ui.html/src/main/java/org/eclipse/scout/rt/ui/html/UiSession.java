@@ -782,7 +782,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     HttpSession httpSession = currentHttpSession();
     if (httpSession != null) {
       // This will cause P_ClientSessionCleanupHandler.valueUnbound() to be executed
-      httpSession.invalidate();
+      try {
+        httpSession.invalidate();
+      }
+      catch (IllegalStateException e) {
+        // May happen in tomcat if session was already invalidated (e.g. due to expiration)
+        // We need to keep a reference to the session and cannot call req.getSession(false) because the model may call logout without having a pending request
+        // TODO CGU verify with BSH if this statement is true.
+        // FIXME This will generate a deadlock in jetty (tomcat will throw the exception). Happens if client session close job is running when UIsession.valueUnboudn is called.
+        LOG.info("Session already invalidated");
+      }
     }
     JsonResponse jsonResponse = currentJsonResponse();
     if (jsonResponse != null) {
