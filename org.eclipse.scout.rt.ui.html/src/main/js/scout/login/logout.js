@@ -3,13 +3,12 @@ scout.logout = {
   init: function(opts) {
     var $container,
       defaultOpts = {
-        loginUrl: './',
+        loginUrl: sessionStorage.getItem('scout:loginUrl') || './',
         texts: {
           'ui.logoutSuccessful': 'Good bye!',
           'ui.loginAgain': 'Login again'
         }
       };
-    opts.loginUrl = opts.loginUrl || sessionStorage.getItem('scout:loginUrl');
     var options = $.extend({}, defaultOpts, opts);
     var texts = new scout.Texts(options.texts);
     var $box = $('<div>')

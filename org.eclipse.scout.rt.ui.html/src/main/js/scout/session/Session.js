@@ -487,7 +487,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       // If were are not yet logged out, redirect to the logout URL (the session that initiated the
       // session invalidation will receive a dedicated logout event, redirect is handled there).
       if (!this._loggedOut && data.redirectUrl) {
-        scout.reloadPage(data.redirectUrl, true);
+        this.logout(data.redirectUrl);
       }
     } else {
       this._processSuccessResponse(data);
@@ -978,12 +978,16 @@ scout.Session.prototype._renderDesktop = function() {
 };
 
 scout.Session.prototype._onLogout = function(event) {
+  this.logout(event.redirectUrl);
+};
+
+scout.Session.prototype.logout = function(logoutUrl) {
   this._loggedOut = true;
   // remember current url to not loose query parameters
   sessionStorage.setItem('scout:loginUrl', window.location.href);
   // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
   setTimeout(function() {
-    scout.reloadPage(event.redirectUrl, true);
+    scout.reloadPage(logoutUrl, true);
   });
 };
 
