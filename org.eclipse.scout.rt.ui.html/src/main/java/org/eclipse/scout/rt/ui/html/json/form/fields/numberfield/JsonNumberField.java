@@ -16,11 +16,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonBasicField;
 
-public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValueField<NUMBER_FIELD> {
+public class JsonNumberField<T extends INumberField> extends JsonBasicField<T> {
 
-  public JsonNumberField(NUMBER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonNumberField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -35,7 +35,7 @@ public class JsonNumberField<NUMBER_FIELD extends INumberField> extends JsonValu
   }
 
   @Override
-  protected void initJsonProperties(NUMBER_FIELD model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<INumberField>(INumberField.PROP_DECIMAL_FORMAT, model) {
       @Override

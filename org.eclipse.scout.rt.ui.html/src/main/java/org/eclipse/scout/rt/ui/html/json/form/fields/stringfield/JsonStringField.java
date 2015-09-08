@@ -14,28 +14,23 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.dnd.ResourceListTransferObject;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.BinaryResource;
-import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonBasicField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValueField<STRING_FIELD>implements IBinaryResourceConsumer {
+public class JsonStringField<T extends IStringField> extends JsonBasicField<T>implements IBinaryResourceConsumer {
 
   public static final String EVENT_CALL_ACTION = "callAction";
   public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
   public static final String EVENT_SELECTION_CHANGED = "selectionChanged";
-  public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
 
-  public JsonStringField(STRING_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonStringField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -45,18 +40,12 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
   }
 
   @Override
-  protected void initJsonProperties(STRING_FIELD model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_MULTILINE_TEXT, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isMultilineText();
-      }
-    });
-    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isUpdateDisplayTextOnModify();
       }
     });
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_INPUT_MASKED, model) {
@@ -170,15 +159,6 @@ public class JsonStringField<STRING_FIELD extends IStringField> extends JsonValu
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText) {
     getModel().getUIFacade().setDisplayTextFromUI(displayText);
-  }
-
-  protected void handleUiExportToClipboard() {
-    try {
-      BEANS.get(IClipboardService.class).setTextContents(getModel().getValue());
-    }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
   }
 
   @Override

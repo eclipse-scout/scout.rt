@@ -195,6 +195,7 @@ __include("scout/form/fields/FormField.js");
 __include("scout/form/fields/FormFieldLayout.js");
 __include("scout/form/fields/CompositeField.js");
 __include("scout/form/fields/ValueField.js");
+__include("scout/form/fields/BasicField.js");
 __include("scout/form/FormController.js");
 // Basics for message boxes
 __include("scout/messagebox/MessageBox.js");

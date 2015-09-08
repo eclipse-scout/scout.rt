@@ -1,7 +1,7 @@
 scout.NumberField = function() {
   scout.NumberField.parent.call(this);
 };
-scout.inherits(scout.NumberField, scout.ValueField);
+scout.inherits(scout.NumberField, scout.BasicField);
 
 /**
  * @override Widget.js
