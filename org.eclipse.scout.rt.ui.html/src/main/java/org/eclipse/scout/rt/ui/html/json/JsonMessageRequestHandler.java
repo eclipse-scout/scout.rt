@@ -79,7 +79,7 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
 
         if (jsonReq.isPollForBackgroundJobsRequest()) {
           int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
-          int maxIdle = Math.min(req.getSession().getMaxInactiveInterval(), m_maxUserIdleTime);
+          int maxIdle = m_maxUserIdleTime;
           // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
           // because that might trigger many very short polling calls until the ui session is really disposed.
           int pollWait = Math.max(Math.min(maxIdle - curIdle, BACKGROUND_POLLING_INTERVAL_SECONDS), 3);
@@ -203,7 +203,7 @@ public class JsonMessageRequestHandler extends AbstractJsonRequestHandler {
       }
 
       if (uiSession == null) {
-        LOG.info("Creating new UI session with ID " + jsonReq.getUiSessionId() + ", timeout after " + req.getSession().getMaxInactiveInterval() + " sec...");
+        LOG.info("Creating new UI session with ID " + jsonReq.getUiSessionId() + ". MaxIdleTime: " + m_maxUserIdleTime + "sec, httpSession.MaxInactiveInterval: " + req.getSession().getMaxInactiveInterval() + "sec");
 
         uiSession = BEANS.get(IUiSession.class);
         uiSession.uiSessionLock().lock();
