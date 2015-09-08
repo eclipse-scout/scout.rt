@@ -1181,7 +1181,7 @@ scout.Table.prototype._group = function(update) {
       value = this.cellValue(column, row);
 
       if (column.type === 'number') {
-        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
+        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : Number(value));
       }
     }
 
