@@ -1,6 +1,12 @@
 package org.eclipse.scout.rt.ui.swt.ext;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -15,13 +21,14 @@ import org.eclipse.swt.widgets.Menu;
  * SWT's RadioButton and Checkbox don't support multiline in their labels.
  * A pure SWT Label however supports multiline.
  * Therefore this class was created, it is a composite of a button and a label.
- * 
+ *
  * @since 3.10.0-M4
  */
 public abstract class MultilineButton extends Composite {
 
   protected Label m_label;
   protected Button m_btn;
+  private boolean m_hasFocus;
 
   public MultilineButton(Composite parent, int style) {
     super(parent, style);
@@ -30,8 +37,49 @@ public abstract class MultilineButton extends Composite {
   }
 
   protected void createContent(Composite parent, int style) {
-    this.m_btn = new Button(parent, style);
-    this.m_label = new Label(parent, 0);
+    m_btn = new Button(parent, style);
+    m_label = new Label(parent, 0);
+    m_label.addPaintListener(new PaintListener() {
+
+      @Override
+      public void paintControl(PaintEvent e) {
+        if (m_hasFocus) {
+          // draw focus border
+          GC gc = e.gc;
+          int lineStyleBackup = gc.getLineStyle();
+          Color foregroundBackup = gc.getForeground();
+          int lineWidthBackup = gc.getLineWidth();
+          try {
+            // do not use gc.drawFocus() because this does not draw properly in some cases.
+            gc.setLineStyle(SWT.LINE_DOT);
+            gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_DARK_BLUE));
+            gc.setLineWidth(1);
+            gc.drawRectangle(0, 0, e.width - 1, e.height - 1);
+          }
+          finally {
+            gc.setLineStyle(lineStyleBackup);
+            gc.setForeground(foregroundBackup);
+            gc.setLineWidth(lineWidthBackup);
+          }
+        }
+      }
+    });
+
+    m_btn.addFocusListener(new FocusListener() {
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        m_hasFocus = false;
+        m_label.redraw();
+
+      }
+
+      @Override
+      public void focusGained(FocusEvent e) {
+        m_hasFocus = true;
+        m_label.redraw();
+      }
+    });
   }
 
   protected void createLayout() {
