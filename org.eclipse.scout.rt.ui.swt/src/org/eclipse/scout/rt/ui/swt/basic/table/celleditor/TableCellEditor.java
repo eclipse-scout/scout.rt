@@ -150,13 +150,11 @@ public class TableCellEditor extends CellEditor {
         m_requestFocus = false;
         return;
       }
-      else {
-        // hide the checkbox image when editing a boolean value in traversal-mode.
-        ViewerCell cell = (ViewerCell) e.getSource();
-        m_image = cell.getImage();
-        cell.setImage(null);
-      }
     }
+    // always hide the image when editing
+    ViewerCell cell = (ViewerCell) e.getSource();
+    m_image = cell.getImage();
+    cell.setImage(null);
 
     // create the Scout model field.
     IFormField formField = createFormField();
