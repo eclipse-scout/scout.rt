@@ -26,6 +26,7 @@ scout.FormField = function() {
   this._addAdapterProperties(['keyStrokes', 'menus']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
+  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -47,6 +48,7 @@ scout.FormField.MODE_CELLEDITOR = 'celleditor';
 scout.FormField.prototype._init = function(model, session) {
   scout.FormField.parent.prototype._init.call(this, model, session);
   this.refFieldId = this.uniqueId('ref');
+  this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
 };
 
@@ -287,20 +289,12 @@ scout.FormField.prototype._updateMenus = function() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };
 
-scout.FormField.prototype._syncMenus = function(menus) {
-  if (this.initialized && this._hasMenus()) {
-    this.menus.forEach(function(menu) {
-      this.keyStrokeContext.unregisterKeyStroke(menu);
-    }, this);
-  }
-  this.menus = menus;
-  if (this._hasMenus()) {
-    this.menus.forEach(function(menu) {
-      if (menu.enabled) {
-        this.keyStrokeContext.registerKeyStroke(menu);
-      }
-    }, this);
-  }
+scout.FormField.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
+  this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
+};
+
+scout.FormField.prototype._syncMenus = function(newMenus, oldMenus) {
+  this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
 };
 
 scout.FormField.prototype.setTooltipText = function(tooltipText) {

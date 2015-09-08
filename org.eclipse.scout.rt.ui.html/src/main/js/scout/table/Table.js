@@ -17,6 +17,7 @@ scout.Table = function() {
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
   this._addEventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
+  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -2221,17 +2222,8 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
   this.selectionHandler.clearLastSelectedRowMarker();
 };
 
-scout.Table.prototype._syncMenus = function(menus) {
-  var i;
-  for (i = 0; i < this.menus.length; i++) {
-    this.keyStrokeContext.unregisterKeyStroke(this.menus[i]);
-  }
-  this.menus = menus;
-  for (i = 0; i < this.menus.length; i++) {
-    if (this.menus[i].enabled) {
-      this.keyStrokeContext.registerKeyStroke(this.menus[i]);
-    }
-  }
+scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
+  this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
 };
 
 scout.Table.prototype._syncFilters = function(filters) {

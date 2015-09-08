@@ -18,6 +18,7 @@ scout.Tree = function() {
   this.checkedNodes = [];
   this._filters = [];
   this._animationNodeLimit = 25;
+  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
 
   // Flag (0 = false, > 0 = true) to indicate whether child nodes should be added to the tree lazily if
   // they request it.  Default is false, which has the consequences that most UI actions show all nodes.
@@ -70,17 +71,8 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   });
 };
 
-scout.Tree.prototype._syncMenus = function(menus) {
-  var i;
-  for (i = 0; i < this.menus.length; i++) {
-    this.keyStrokeContext.unregisterKeyStroke(this.menus[i]);
-  }
-  this.menus = menus;
-  for (i = 0; i < this.menus.length; i++) {
-    if (this.menus[i].enabled) {
-      this.keyStrokeContext.registerKeyStroke(this.menus[i]);
-    }
-  }
+scout.Tree.prototype._syncMenus = function(newMenus, oldMenus) {
+  this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
 };
 
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {

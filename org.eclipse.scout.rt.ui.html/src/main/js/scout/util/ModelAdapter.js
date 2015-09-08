@@ -58,15 +58,10 @@ scout.ModelAdapter.prototype.init = function(model, session, register) {
     this[propertyName] = value;
   }.bind(this));
 
-  // Register model keystrokes.
-  if (this.keyStrokes) {
-    this.keyStrokeContext.registerKeyStroke(this.keyStrokes);
-  }
-
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
-  this._init(model, session);
   this._initKeyStrokeContext(this.keyStrokeContext);
+  this._init(model, session);
   this.initialized = true;
   this.trigger('initialized');
 };

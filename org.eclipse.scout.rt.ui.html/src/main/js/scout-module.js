@@ -64,6 +64,7 @@ __include("scout/keystroke/keyStrokeModifier.js");
 __include("scout/keystroke/VirtualKeyStrokeEvent.js");
 __include("scout/keystroke/KeyStrokeManager.js");
 __include("scout/keystroke/KeyStrokeContext.js");
+__include("scout/keystroke/KeyStrokeSupport.js");
 __include("scout/keystroke/InputFieldKeyStrokeContext.js");
 __include("scout/keystroke/KeyStroke.js");
 __include("scout/keystroke/RangeKeyStroke.js");
