@@ -114,7 +114,7 @@ public final class PlatformConfigProperties {
    * The time limit (in seconds) for which threads, which are created upon exceeding the 'core-pool-size' limit, may
    * remain idle before being terminated.
    */
-  public static class JobManagerKeepAliveTimeProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class JobManagerKeepAliveTimeProperty extends AbstractPositiveLongConfigProperty {
 
     @Override
     public String getKey() {
@@ -122,8 +122,8 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    protected Integer getDefaultValue() {
-      return Integer.valueOf(60);
+    protected Long getDefaultValue() {
+      return Long.valueOf(60);
     }
   }
 
