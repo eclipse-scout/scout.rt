@@ -99,6 +99,7 @@
 
   & > .menu-item {
     border-top: solid 1px @border-color;
+    line-height: @menu-item-height - 1px; /* subtract border-top */
     display: block;
     width: 100%;
     padding-left: 15px;
