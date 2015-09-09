@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.index.AbstractMultiValueIndex;
 import org.eclipse.scout.commons.index.IndexedStore;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DisplayParentViewIndex;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -130,7 +131,7 @@ public class FormStore extends IndexedStore<IForm> {
     }
   }
 
-  private class P_DisplayParentViewIndex extends AbstractMultiValueIndex<IDisplayParent, IForm> {
+  private class P_DisplayParentViewIndex extends DisplayParentViewIndex {
 
     @Override
     protected IDisplayParent calculateIndexFor(final IForm form) {
@@ -140,6 +141,19 @@ public class FormStore extends IndexedStore<IForm> {
       else {
         return null;
       }
+    }
+
+    @Override
+    protected int calculatePositionForElement(IForm element) {
+      IForm activeForm = ClientSessionProvider.currentSession().getDesktop().getActiveForm();
+      List formsOnThisDisplayParent = FormStore.this.getViewsByDisplayParent(calculateIndexFor(element));
+      int position = formsOnThisDisplayParent.indexOf(activeForm);
+      if (position == -1) {
+        //insert at first position
+        return 0;
+      }
+      //insert after active form.
+      return position + 1;
     }
   }
 
