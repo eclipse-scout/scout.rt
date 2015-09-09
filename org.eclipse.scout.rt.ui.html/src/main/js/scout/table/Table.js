@@ -26,6 +26,7 @@ scout.Table = function() {
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
+  this._doubleClickSupport = new scout.DoubleClickSupport();
 
   this.attached = false; // Indicates whether this table is currently visible to the user.
 };
@@ -223,6 +224,7 @@ scout.Table.prototype._render = function($parent) {
   var $mouseDownRow, mouseDownColumn, that = this;
 
   function onMouseDown(event) {
+    that._doubleClickSupport.mousedown(event);
     $mouseDownRow = $(event.currentTarget);
     mouseDownColumn = that._columnAtX(event.pageX);
     that.selectionHandler.onMouseDown(event);
@@ -231,7 +233,8 @@ scout.Table.prototype._render = function($parent) {
   function onMouseUp(event) {
     var $row, $mouseUpRow, column, $appLink,
       mouseButton = event.which;
-    if (event.originalEvent.detail > 1) {
+
+    if (that._doubleClickSupport.doubleClicked()) {
       // Don't execute on double click events
       return;
     }

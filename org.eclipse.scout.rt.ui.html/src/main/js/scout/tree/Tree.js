@@ -19,6 +19,7 @@ scout.Tree = function() {
   this._filters = [];
   this._animationNodeLimit = 25;
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
+  this._doubleClickSupport = new scout.DoubleClickSupport();
 
   // Flag (0 = false, > 0 = true) to indicate whether child nodes should be added to the tree lazily if
   // they request it.  Default is false, which has the consequences that most UI actions show all nodes.
@@ -135,7 +136,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
-    .on('dblclick', '.tree-node-control', this._onNodeControlMouseDown.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
+    .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
 
   scout.scrollbars.install(this.$data, this.session, {
     axis: 'y'
@@ -1157,7 +1158,8 @@ scout.Tree.prototype._showContextMenu = function(event, allowedTypes) {
 };
 
 scout.Tree.prototype._onNodeMouseDown = function(event) {
-  if (event.originalEvent.detail > 1) {
+  this._doubleClickSupport.mousedown(event);
+  if (this._doubleClickSupport.doubleClicked()) {
     //don't execute on double click events
     return;
   }
@@ -1170,6 +1172,16 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   if (this.checkable && this._isCheckboxClicked(event)) {
     this.checkNode(node, !node.checked);
   }
+};
+
+scout.Tree.prototype._onNodeMouseUp = function(event) {
+  if (this._doubleClickSupport.doubleClicked()) {
+    //don't execute on double click events
+    return;
+  }
+
+  var $node = $(event.currentTarget);
+  var node = $node.data('node');
 
   this.remoteHandler(this.id, 'nodeClicked', {
     nodeId: node.id
@@ -1197,7 +1209,8 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
 };
 
 scout.Tree.prototype._onNodeControlMouseDown = function(event) {
-  if (event.originalEvent.detail > 1) {
+  this._doubleClickSupport.mousedown(event);
+  if (this._doubleClickSupport.doubleClicked()) {
     //don't execute on double click events
     return false;
   }
@@ -1224,6 +1237,11 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   this.setNodeExpanded(node, expanded, expansionOpts);
 
   // prevent immediately reopening
+  return false;
+};
+
+scout.Tree.prototype._onNodeControlDoubleClick = function(event) {
+  // prevent bubbling to _onNodeDoubleClick()
   return false;
 };
 
