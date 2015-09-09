@@ -71,13 +71,9 @@ public class JsonAdapterRegistryTest {
     form.doClose();
     formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
-    assertEquals(3, uiSession.currentJsonResponse().eventList().size());
-    assertEquals(jsonDesktop.getId(), uiSession.currentJsonResponse().eventList().get(0).getTarget());
-    assertEquals("formShow", uiSession.currentJsonResponse().eventList().get(0).getType());
-    assertEquals(jsonDesktop.getId(), uiSession.currentJsonResponse().eventList().get(1).getTarget());
-    assertEquals("formHide", uiSession.currentJsonResponse().eventList().get(1).getType());
-    assertEquals(uiSession.getUiSessionId(), uiSession.currentJsonResponse().eventList().get(2).getTarget());
-    assertEquals("disposeAdapter", uiSession.currentJsonResponse().eventList().get(2).getType());
+    assertEquals(1, uiSession.currentJsonResponse().eventList().size());
+    assertEquals(uiSession.getUiSessionId(), uiSession.currentJsonResponse().eventList().get(0).getTarget());
+    assertEquals("disposeAdapter", uiSession.currentJsonResponse().eventList().get(0).getType());
     assertEquals(0, uiSession.currentJsonResponse().adapterMap().size());
   }
 
