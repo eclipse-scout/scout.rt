@@ -134,6 +134,7 @@ scout.Tree.prototype._render = function($parent) {
   this.$data = this.$container.appendDiv('tree-data')
     .on('contextmenu', this._onContextMenu.bind(this))
     .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
+    .on('mouseup', '.tree-node', this._onNodeMouseUp.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));

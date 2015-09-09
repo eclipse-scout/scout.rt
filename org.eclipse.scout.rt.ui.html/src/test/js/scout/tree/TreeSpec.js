@@ -525,6 +525,9 @@ describe("Tree", function() {
       $nodeControl.triggerDoubleClick();
       expect($node).toHaveClass('expanded');
 
+      // Reset internal state because there is no "sleep" in JS
+      tree._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
+
       $nodeControl.triggerDoubleClick();
       expect($node).not.toHaveClass('expanded');
     });

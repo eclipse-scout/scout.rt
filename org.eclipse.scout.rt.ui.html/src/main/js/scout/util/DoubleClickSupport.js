@@ -29,8 +29,8 @@ scout.DoubleClickSupport = function(options) {
 
 scout.DoubleClickSupport.prototype.mousedown = function(event) {
   if (event && event.type === 'mousedown') {
-    var posX = event.screenX;
-    var posY = event.screenY;
+    var posX = scout.helpers.nvl(event.pageX, 0);
+    var posY = scout.helpers.nvl(event.pageY, 0);
     var timestamp = Date.now();
     var isDoubleClick = false;
     if (this._lastTimestamp !== undefined) {
@@ -51,5 +51,5 @@ scout.DoubleClickSupport.prototype.mousedown = function(event) {
 };
 
 scout.DoubleClickSupport.prototype.doubleClicked = function() {
-  return this._isDoubleClick;
+  return this._doubleClicked;
 };

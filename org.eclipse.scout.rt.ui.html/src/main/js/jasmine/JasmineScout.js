@@ -345,7 +345,7 @@ $.fn.triggerMouseAction = function(eventType, opts) {
       detail: opts.clicks
     },
     pageX: opts.position.left,
-    pageY: opts.position.right
+    pageY: opts.position.top
   };
   if (opts.modifier) {
     extendEventWithModifier(event, opts.modifier);
