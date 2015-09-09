@@ -11,19 +11,21 @@ scout.ViewTabsController = function(desktop) {
 /**
  * Creates and renders a view tab for the given view.
  */
-scout.ViewTabsController.prototype.createAndRenderViewTab = function(view) {
+scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
   // Create the view tab.
-  var viewTab = new scout.DesktopViewTab(view, this._desktop.$bench, this._desktop.session);
+  var viewTab = new scout.DesktopViewTab(view, this._desktop.$bench, this._desktop.session, this);
   var viewId = view.id;
 
   // Register lifecycle listener on view tab.
   viewTab.on('tabClicked', this.selectViewTab.bind(this));
   viewTab.on('remove', this._removeViewTab.bind(this, viewTab, viewId));
 
-  var index = 0;
+  var index = position;
   var parentViewTab = this.viewTab(viewTab._view.parent);
-  if(parentViewTab){
-    index = this._viewTabs.indexOf(parentViewTab)+1;
+  if (parentViewTab) {
+    index = this._viewTabs.indexOf(parentViewTab) + this._calculateExactPosition(parentViewTab, index) + 1;
+  } else {
+    index = this._calculateExactPosition(this._desktop, index);
   }
 
   // Register the view tab.
@@ -38,23 +40,34 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view) {
   return viewTab;
 };
 
+scout.ViewTabsController.prototype._calculateExactPosition = function(parent, position) {
+  if (position === 0) {
+    return 0;
+  } else {
+    var tabs = position || parent.views.length;
+    var searchUntil = position || parent.views.length;
+    for (var i = 0; i < searchUntil; i++) {
+      tabs = tabs + this._calculateExactPosition(parent.views[i]);
+    }
+    return tabs;
+  }
+};
 /**
  * Method invoked once the given view tab is removed from DOM.
  */
 scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
   // Unregister the view tab.
-  var viewTabIndexBefore = this._viewTabs.indexOf(viewTab)-1;
+  var viewTabIndexBefore = this._viewTabs.indexOf(viewTab) - 1;
   scout.arrays.remove(this._viewTabs, viewTab);
   delete this._viewTabMap[viewId];
 
   // Select next available view tab.
   // FIXME DWI: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
   if (this._selectedViewTab === viewTab) {
-    var parentViewTab=this.viewTab(viewTab._view.parent);
-    if(viewTabIndexBefore>=0){
+    var parentViewTab = this.viewTab(viewTab._view.parent);
+    if (viewTabIndexBefore >= 0) {
       this.selectViewTab(this._viewTabs[viewTabIndexBefore]);
-    }
-    else{
+    } else {
       this._desktop.bringOutlineToFront(this._desktop.outline);
     }
   }

@@ -54,6 +54,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
+  public static final String PROP_POSITION = "position";
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
   public static final String PROP_FILE_CHOOSER = "fileChooser";
@@ -316,44 +317,45 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   protected void handleModelFormShow(IForm form) {
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
-    addActionEventForEachDisplayParentAdapter("formShow", PROP_FORM, jsonAdapter, form.getDisplayParent());
+    //if form is dialog form.getViews(getDisplayParent()).indexOf(form) retunrs -1 -> position is not sent to UI
+    addActionEventForEachDisplayParentAdapter("formShow", PROP_FORM, jsonAdapter, form.getDisplayParent(), getModel().getViews(form.getDisplayParent()).indexOf(form));
   }
 
   protected void handleModelFormHide(IForm form) {
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form);
     if (jsonAdapter != null) {
-      addActionEventForEachDisplayParentAdapter("formHide", PROP_FORM, jsonAdapter, form.getDisplayParent());
+      addActionEventForEachDisplayParentAdapter("formHide", PROP_FORM, jsonAdapter, form.getDisplayParent(), -1);
     }
   }
 
   protected void handleModelFormActivate(IForm form) {
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form);
     if (jsonAdapter != null) {
-      addActionEventForEachDisplayParentAdapter("formActivate", PROP_FORM, jsonAdapter, form.getDisplayParent());
+      addActionEventForEachDisplayParentAdapter("formActivate", PROP_FORM, jsonAdapter, form.getDisplayParent(), -1);
     }
   }
 
   protected void handleModelMessageBoxShow(final IMessageBox messageBox) {
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox);
-    addActionEventForEachDisplayParentAdapter("messageBoxShow", PROP_MESSAGE_BOX, jsonAdapter, messageBox.getDisplayParent());
+    addActionEventForEachDisplayParentAdapter("messageBoxShow", PROP_MESSAGE_BOX, jsonAdapter, messageBox.getDisplayParent(), -1);
   }
 
   protected void handleModelMessageBoxHide(final IMessageBox messageBox) {
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(messageBox);
     if (jsonAdapter != null) {
-      addActionEventForEachDisplayParentAdapter("messageBoxHide", PROP_MESSAGE_BOX, jsonAdapter, messageBox.getDisplayParent());
+      addActionEventForEachDisplayParentAdapter("messageBoxHide", PROP_MESSAGE_BOX, jsonAdapter, messageBox.getDisplayParent(), -1);
     }
   }
 
   protected void handleModelFileChooserShow(final IFileChooser fileChooser) {
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(fileChooser);
-    addActionEventForEachDisplayParentAdapter("fileChooserShow", PROP_FILE_CHOOSER, jsonAdapter, fileChooser.getDisplayParent());
+    addActionEventForEachDisplayParentAdapter("fileChooserShow", PROP_FILE_CHOOSER, jsonAdapter, fileChooser.getDisplayParent(), -1);
   }
 
   protected void handleModelFileChooserHide(final IFileChooser fileChooser) {
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(fileChooser);
     if (jsonAdapter != null) {
-      addActionEventForEachDisplayParentAdapter("fileChooserHide", PROP_FILE_CHOOSER, jsonAdapter, fileChooser.getDisplayParent());
+      addActionEventForEachDisplayParentAdapter("fileChooserHide", PROP_FILE_CHOOSER, jsonAdapter, fileChooser.getDisplayParent(), -1);
     }
   }
 
@@ -361,11 +363,14 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     getUiSession().logout();
   }
 
-  protected void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent) {
+  protected void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent, int position) {
     for (IJsonAdapter<IDisplayParent> displayParentAdapter : getUiSession().getJsonAdapters(displayParent)) {
       JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
       jsonEvent.put(propModelAdapterId, modelAdapter.getId());
       jsonEvent.put(PROP_DISPLAY_PARENT, displayParentAdapter.getId());
+      if (position >= 0) {
+        jsonEvent.put(PROP_POSITION, position);
+      }
       // Add modelAdapter as "referenced adapter" to event (to remove event when
       // modelAdapter is disposed but desktop is not)
       addActionEvent(eventName, modelAdapter, jsonEvent);

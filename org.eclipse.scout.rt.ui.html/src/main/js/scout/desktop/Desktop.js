@@ -413,7 +413,7 @@ scout.Desktop.prototype._onModelFormShow = function(event) {
   if (displayParent) {
     this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent), true);
     //register listener to recover active form when child dialog is removed
-    displayParent.formController.registerAndRender(event.form);
+    displayParent.formController.registerAndRender(event.form, event.position);
   }
 };
 
@@ -695,7 +695,7 @@ scout.Desktop.prototype._sendFormActivated = function(form) {
 
   var event = new scout.Event(this.id, 'formActivated', data);
   event.coalesce = function(previous) {
-    return this.type === previous.type ;
+    return this.type === previous.type;
   };
 
   this.session.sendEvent(event);

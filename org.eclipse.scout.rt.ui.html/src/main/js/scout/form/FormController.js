@@ -10,12 +10,13 @@ scout.FormController = function(displayParent, session) {
 
 /**
  * Adds the given view or dialog to this controller and renders it.
+ * position is only used if form is a view. this position determines at which position the tab is placed.
  */
-scout.FormController.prototype.registerAndRender = function(formAdapterId) {
+scout.FormController.prototype.registerAndRender = function(formAdapterId, position) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
 
   if (form.displayHint === 'view') {
-    this._renderView(form, true);
+    this._renderView(form, true, position);
   } else {
     this._renderDialog(form, true);
   }
@@ -41,8 +42,12 @@ scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
  * Renders all dialogs and views registered with this controller.
  */
 scout.FormController.prototype.render = function() {
-  this._displayParent.dialogs.forEach(this._renderDialog.bind(this));
-  this._displayParent.views.forEach(this._renderView.bind(this));
+  this._displayParent.dialogs.forEach(function(dialog) {
+    this._renderDialog(dialog, false);
+  }.bind(this));
+  this._displayParent.views.forEach(function(view, position) {
+    this._renderView(view, false, position);
+  }.bind(this));
 };
 
 /**
@@ -58,9 +63,13 @@ scout.FormController.prototype.activateForm = function(formAdapterId) {
   }
 };
 
-scout.FormController.prototype._renderView = function(view, register) {
+scout.FormController.prototype._renderView = function(view, register, position) {
   if (register) {
-    this._displayParent.views.push(view);
+    if (position !== undefined) {
+      scout.arrays.insert(this._displayParent.views, view, position);
+    } else {
+      this._displayParent.views.push(view);
+    }
   }
 
   // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
@@ -75,7 +84,7 @@ scout.FormController.prototype._renderView = function(view, register) {
   var viewTabsController = this.session.desktop.viewTabsController;
 
   // Create the view-tab.
-  var viewTab = viewTabsController.createAndRenderViewTab(view);
+  var viewTab = viewTabsController.createAndRenderViewTab(view, this._displayParent.views.indexOf(view));
   viewTabsController.selectViewTab(viewTab);
 };
 
@@ -87,10 +96,10 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     dialog.on('remove', function() {
       if (this._displayParent.dialogs.length > 0) {
         this.session.desktop._setFormActivated(this._displayParent.dialogs[this._displayParent.dialogs.length - 1]);
-      } else if (this._displayParent.parent instanceof scout.Outline){
+      } else if (this._displayParent.parent instanceof scout.Outline) {
         // if displayParent is a page
         this.session.desktop._setOutlineActivated();
-      } else{
+      } else {
         this.session.desktop._setFormActivated(this._displayParent);
       }
     }.bind(this));

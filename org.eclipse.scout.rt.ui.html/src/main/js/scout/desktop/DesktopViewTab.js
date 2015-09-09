@@ -1,10 +1,11 @@
-scout.DesktopViewTab = function(view, $bench, session) {
+scout.DesktopViewTab = function(view, $bench, session, viewTabController) {
   scout.DesktopViewTab.parent.call(this);
   this.init(session);
 
   this._view = view;
   this._$bench = $bench;
   this._mouseListener;
+  this.viewTabController = viewTabController;
 
   // Container for the _Tab_ (not for the view).
   this.$container;
@@ -40,11 +41,13 @@ scout.DesktopViewTab.prototype._uninstallListeners = function() {
 };
 
 scout.DesktopViewTab.prototype._render = function($parent) {
-  var parentTab = this.session.desktop.viewTabsController.viewTab(this._view.parent);
-  if (parentTab) {
-    this.$container = parentTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
-  } else {
+  var position = this.viewTabController.viewTabs().indexOf(this);
+  if (position === 0) {
     this.$container = $parent.prependDiv('desktop-view-tab').addClass('hidden');
+  } else if (position > 0) {
+    var previousTab = this.viewTabController.viewTabs()[position - 1];
+    this.$container = previousTab.$container.afterDiv('desktop-view-tab').addClass('hidden');
+
   }
   this._mouseListener = this._onMouseDown.bind(this);
   this.$container.on('mousedown', this._mouseListener);
