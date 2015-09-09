@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +54,7 @@ public class ClientSessionRegistryTest {
     when(m_clientSession.getUserId()).thenReturn("testUserId");
   }
 
-  @Before
+  @After
   public void after() {
     TestingUtility.unregisterBeans(m_regs);
   }
