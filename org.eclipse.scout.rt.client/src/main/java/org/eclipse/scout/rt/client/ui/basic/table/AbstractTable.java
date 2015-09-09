@@ -20,6 +20,7 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -139,7 +140,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableRow> m_cachedRows;
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private List<ITableRow/* ordered by rowIndex */> m_selectedRows = new ArrayList<ITableRow>();
-  private Set<ITableRow> m_checkedRows = new HashSet<ITableRow>();
+  private Set<ITableRow/* ordered by rowIndex */> m_checkedRows = new LinkedHashSet<ITableRow>();
   private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
   private ITableUIFacade m_uiFacade;
   private final List<ITableRowFilter> m_rowFilters;
@@ -2438,7 +2439,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public Collection<ITableRow> getCheckedRows() {
+  public List<ITableRow> getCheckedRows() {
     return CollectionUtility.arrayList(m_checkedRows);
   }
 
@@ -2481,15 +2482,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
       else {
-        List<ITableRow> rowsChecked = new ArrayList<ITableRow>();
+        List<ITableRow> rowsUpdated = new ArrayList<ITableRow>();
         for (ITableRow row : rows) {
           if (row.isChecked() != value && (!enabledRowsOnly || row.isEnabled())) {
             checkRowImpl(row, value);
-            rowsChecked.add(row);
+            rowsUpdated.add(row);
           }
         }
-        if (rowsChecked.size() > 0) {
-          fireRowsChecked(CollectionUtility.arrayList(rowsChecked));
+        if (rowsUpdated.size() > 0) {
+          if (value) {
+            // sort checked rows if new checked rows have been added (not necessary if checked rows have been removed)
+            sortCheckedRows();
+          }
+          fireRowsChecked(CollectionUtility.arrayList(rowsUpdated));
         }
       }
     }
@@ -2539,6 +2544,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
+  public void uncheckRow(ITableRow row) {
+    checkRow(row, false);
+  }
+
+  @Override
+  public void uncheckRows(Collection<? extends ITableRow> rows) {
+    checkRows(rows, false);
+  }
+
+  @Override
   public void uncheckAllEnabledRows() {
     try {
       setTableChanging(true);
@@ -3111,6 +3127,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         List<ITableRow> deletedRows = new ArrayList<ITableRow>(rows);
         // remove from selection
         deselectRows(deletedRows);
+        uncheckRows(deletedRows);
         //delete impl
         //peformance quick-check
         if (rows == existingRows) {
@@ -3159,6 +3176,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         else {
           fireRowsDeleted(deletedRows);
         }
+        //TODO CGU is this necessary? Deleted rows are deselected above
         selectRows(selectionRows, false);
       }
       finally {
@@ -3409,13 +3427,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_rows.clear();
       m_rows.addAll(resolvedRows);
     }
-    //sort selection without firing an event
+    //sort selection and checked rows without firing an event
     if (m_selectedRows != null && m_selectedRows.size() > 0) {
       TreeSet<ITableRow> newSelection = new TreeSet<ITableRow>(new RowIndexComparator());
       newSelection.addAll(m_selectedRows);
       m_selectedRows = new ArrayList<ITableRow>(newSelection);
     }
+    sortCheckedRows();
     fireRowOrderChanged();
+  }
+
+  private void sortCheckedRows() {
+    if (m_checkedRows == null || m_checkedRows.size() == 0) {
+      return;
+    }
+    TreeSet<ITableRow> newCheckedRows = new TreeSet<ITableRow>(new RowIndexComparator());
+    newCheckedRows.addAll(m_checkedRows);
+    m_checkedRows = new LinkedHashSet<>(newCheckedRows);
   }
 
   @SuppressWarnings("unchecked")

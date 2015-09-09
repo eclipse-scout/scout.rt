@@ -619,6 +619,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void selectRow(ITableRow row);
 
+  /**
+   * @param append
+   *          true if the row should be appended to the existing selection, false if not. True has only an effect if
+   *          {@link ITable#isMultiSelect()} is true.
+   */
   void selectRow(ITableRow row, boolean append);
 
   void selectRows(List<? extends ITableRow> rows);
@@ -649,21 +654,39 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   IBooleanColumn getCheckableColumn();
 
-  Collection<ITableRow> getCheckedRows();
+  List<ITableRow> getCheckedRows();
 
+  /**
+   * @param value
+   *          true if the row should be checked, false if not
+   */
   void checkRow(int rowIndex, boolean value);
 
+  /**
+   * @param value
+   *          true if the row should be checked, false if not
+   */
   void checkRow(ITableRow row, boolean value);
 
+  /**
+   * @param value
+   *          true if the row should be checked, false if not
+   */
   void checkRows(Collection<? extends ITableRow> rows, boolean value) throws ProcessingException;
 
   void checkAllRows() throws ProcessingException;
 
+  void uncheckRow(ITableRow row);
+
+  void uncheckRows(Collection<? extends ITableRow> rows);
+
+  void uncheckAllEnabledRows();
+
   void uncheckAllRows() throws ProcessingException;
 
   /**
-   * column that represented the last ui (mouse click) context
-   * {@link ITableUIFacade#setContextColumnFromUI(IColumn)} see {@link #setContextColumn(IColumn)}
+   * column that represented the last ui (mouse click) context {@link ITableUIFacade#setContextColumnFromUI(IColumn)}
+   * see {@link #setContextColumn(IColumn)}
    */
   IColumn<?> getContextColumn();
 

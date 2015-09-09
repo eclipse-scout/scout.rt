@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -135,11 +136,119 @@ public class CheckRowsInTableTest {
     assertEquals(table.getCheckedRows().size(), 1);
   }
 
+  /**
+   * Tests whether the row gets removed from checked rows as well if the row gets deleted
+   */
+  @Test
+  public void testDeleteRow() throws Exception {
+    P_Table table = createTable(true);
+    ITableRow row = table.getRow(0);
+    table.checkRow(row, true);
+    assertTrue(row.isChecked());
+    assertEquals(1, table.getCheckedRows().size());
+
+    table.deleteRow(row);
+    assertFalse(row.isChecked());
+    assertEquals(0, table.getCheckedRows().size());
+  }
+
+  @Test
+  public void testDeleteRow_Multiple() throws Exception {
+    P_Table table = createTable(true);
+    ITableRow row0 = table.getRow(0);
+    ITableRow row1 = table.getRow(1);
+    table.checkRow(row0, true);
+    table.checkRow(row1, true);
+    assertTrue(row0.isChecked());
+    assertTrue(row1.isChecked());
+    assertEquals(2, table.getCheckedRows().size());
+
+    table.deleteRow(row0);
+    assertFalse(row0.isChecked());
+    assertTrue(row1.isChecked());
+    assertEquals(1, table.getCheckedRows().size());
+  }
+
+  /**
+   * {@link ITable#getCheckedRows()} should be ordered according the sort spec
+   */
+  @Test
+  public void testGetCheckedRows_NoSorting() throws Exception {
+    P_Table table = createTable(true);
+    table.getColumnSet().clearSortColumns();
+    table.sort();
+    table.getRow(0).setChecked(true);
+    table.getRow(2).setChecked(true);
+    assertEquals(2, table.getCheckedRows().size());
+    assertEquals("Lorem", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+  }
+
+  @Test
+  public void testGetCheckedRows_WithSorting() throws Exception {
+    P_Table table = createTable(true);
+    table.getColumnSet().clearSortColumns();
+    table.getColumnSet().addSortColumn(table.getSecondColumn(), false);
+    table.sort();
+    table.getRow(0).setChecked(true);
+    table.getRow(2).setChecked(true);
+    assertEquals(2, table.getCheckedRows().size());
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Ipsum", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+
+    table.getColumnSet().addSortColumn(table.getSecondColumn(), true);
+    table.sort();
+
+    assertEquals(2, table.getCheckedRows().size());
+    assertEquals("Ipsum", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+  }
+
+  @Test
+  public void testGetCheckedRows_WithSorting2() throws Exception {
+    P_Table table = createTable(true);
+    table.getColumnSet().clearSortColumns();
+    table.getColumnSet().addSortColumn(table.getSecondColumn(), false);
+    table.sort();
+    table.getRow(0).setChecked(true);
+    table.getRow(2).setChecked(true);
+    assertEquals(2, table.getCheckedRows().size());
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Ipsum", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+
+    table.getRow(1).setChecked(true);
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Lorem", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+    assertEquals("Ipsum", table.getSecondColumn().getValue(table.getCheckedRows().get(2)));
+  }
+
+  /**
+   * Tests sorting behavior for selected rows, should behave the same as for checked rows
+   */
+  @Test
+  public void testGetSelectedRows_WithSorting2() throws Exception {
+    P_Table table = createTable(true);
+    table.setMultiSelect(true);
+    table.getColumnSet().clearSortColumns();
+    table.getColumnSet().addSortColumn(table.getSecondColumn(), false);
+    table.sort();
+    table.selectRow(table.getRow(0), true);
+    table.selectRow(table.getRow(2), true);
+    assertEquals(2, table.getSelectedRows().size());
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getSelectedRows().get(0)));
+    assertEquals("Ipsum", table.getSecondColumn().getValue(table.getSelectedRows().get(1)));
+
+    table.selectRow(table.getRow(1), true);
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getSelectedRows().get(0)));
+    assertEquals("Lorem", table.getSecondColumn().getValue(table.getSelectedRows().get(1)));
+    assertEquals("Ipsum", table.getSecondColumn().getValue(table.getSelectedRows().get(2)));
+  }
+
   private P_Table createTable(boolean isMulticheck) throws ProcessingException {
     P_Table table = new P_Table();
     table.initTable();
     table.setMultiCheck(isMulticheck);
-    table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}, new Object[]{12, "Bla"}}, ITableRow.STATUS_NON_CHANGED);
+    table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}, new Object[]{12, "Zzz"}}, ITableRow.STATUS_NON_CHANGED);
 
     return table;
   }
