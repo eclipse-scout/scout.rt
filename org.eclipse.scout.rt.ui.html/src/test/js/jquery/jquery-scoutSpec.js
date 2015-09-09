@@ -2,8 +2,13 @@ describe('scout-jquery', function() {
 
   var $e;
 
+  /**
+   * We must append $e to the DOM, because otherwise test would fail in some browsers (Chrome, PhantomJS).
+   */
   beforeEach(function() {
+    setFixtures(sandbox());
     $e = $('<div>');
+    $e.appendTo($('#sandbox'));
   });
 
   describe('isEnabled', function() {
