@@ -1195,7 +1195,7 @@ scout.Table.prototype._group = function(update) {
     // test if group is finished
     skip = (r === rows.length - 1);
     skip = skip || (groupColumn && groupColumn.type !== 'date' && !this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow));
-    skip = skip || (groupColumn && groupColumn.type === 'date' && !this.grouped && scout.dates.parseJsonDate(this.cellValue(groupColumn, row)).getFullYear() !== scout.dates.parseJsonDate(this.cellValue(groupColumn, nextRow)).getFullYear());
+    skip = skip || (groupColumn && groupColumn.type === 'date' && !this.grouped && this.cellValue(groupColumn, row).getFullYear() !== this.cellValue(groupColumn, nextRow).getFullYear());
 
     // if group is finished: add group row
     if (sum.length > 0 && skip) {
@@ -1235,7 +1235,7 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all, updat
         .css('text-align', alignment);
     } else if (!all && column === groupColumn) {
       if (column.type === 'date') {
-        $cell = $.makeDiv('table-cell', scout.dates.parseJsonDate(this.cellValue(groupColumn, row)).getFullYear())
+        $cell = $.makeDiv('table-cell', this.cellValue(groupColumn, row).getFullYear())
           .css('text-align', alignment);
       } else {
         $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
