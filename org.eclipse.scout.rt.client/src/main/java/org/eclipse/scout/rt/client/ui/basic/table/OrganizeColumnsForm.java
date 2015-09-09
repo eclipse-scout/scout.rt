@@ -1,9 +1,9 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.CancelButton;
@@ -42,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.Gr
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.RemoveCustomColumnButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ViewBox.SelectAllButton;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -255,7 +253,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execReloadTableData() throws ProcessingException {
-            ArrayList<ITableRow> rowList = new ArrayList<ITableRow>();
+            List<ITableRow> rowList = new ArrayList<ITableRow>();
             for (IColumn<?> col : m_table.getColumnSet().getAllColumnsInUserOrder()) {
               if (col.isDisplayable()) {
                 if (col.isVisible() || col.isVisibleGranted()) {
@@ -264,9 +262,6 @@ public class OrganizeColumnsForm extends AbstractForm {
 
                   // Key
                   getTable().getKeyColumn().setValue(row, col);
-
-                  // Visible
-                  getTable().getVisibleColumn().setValue(row, col.isVisible());
 
                   // Column Title
                   String columnTitle = headerCell.getText();
@@ -292,7 +287,12 @@ public class OrganizeColumnsForm extends AbstractForm {
             try {
               getTable().setTableChanging(true);
               getTable().discardAllRows();
-              getTable().addRows(rowList);
+              rowList = getTable().addRows(rowList);
+
+              // check visible columns
+              for (ITableRow row : rowList) {
+                getTable().checkRow(row, getTable().getKeyColumn().getValue(row).isVisible());
+              }
             }
             finally {
               getTable().setTableChanging(false);
@@ -380,37 +380,24 @@ public class OrganizeColumnsForm extends AbstractForm {
               return getColumnSet().getColumnByClass(TitleColumn.class);
             }
 
-            public VisibleColumn getVisibleColumn() {
-              return getColumnSet().getColumnByClass(VisibleColumn.class);
+            @Override
+            protected boolean getConfiguredCheckable() {
+              return true;
             }
 
             @Override
-            protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
-              if (row != null && getContextColumn() == getVisibleColumn() && getKeyColumn().getValue(row) != null) {
-                Boolean oldValue = getVisibleColumn().getValue(row);
-                setColumnVisible(row, !oldValue);
+            protected void execRowsChecked(Collection<? extends ITableRow> rows) throws ProcessingException {
+              if (isFormLoading()) {
+                return;
+              }
+              for (ITableRow row : rows) {
+                setColumnVisible(row, row.isChecked());
               }
             }
 
             @Override
             protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
               validateButtons();
-            }
-
-            @Order(10.0)
-            public class SpaceKeyStroke extends AbstractKeyStroke {
-              @Override
-              protected String getConfiguredKeyStroke() {
-                return "space";
-              }
-
-              @Override
-              protected void execAction() throws ProcessingException {
-                for (ITableRow row : getSelectedRows()) {
-                  Boolean oldValue = BooleanUtility.nvl(getVisibleColumn().getValue(row));
-                  setColumnVisible(row, !oldValue);
-                }
-              }
             }
 
             @Order(20.0)
@@ -451,21 +438,6 @@ public class OrganizeColumnsForm extends AbstractForm {
               protected boolean getConfiguredDisplayable() {
                 return false;
               }
-            }
-
-            @Order(20.0)
-            public class VisibleColumn extends AbstractBooleanColumn {
-
-              @Override
-              protected String getConfiguredHeaderText() {
-                return TEXTS.get("Visible");
-              }
-
-              @Override
-              protected int getConfiguredWidth() {
-                return 20;
-              }
-
             }
 
             @Order(30.0)
@@ -560,9 +532,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            for (ITableRow row : getColumnsTableField().getTable().getRows()) {
-              getColumnsTableField().getTable().getVisibleColumn().setValue(row, true);
-            }
+            getColumnsTableField().getTable().checkAllRows();
 
             updateColumnVisibilityAndOrder();
           }
@@ -583,9 +553,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            for (ITableRow row : getColumnsTableField().getTable().getRows()) {
-              getColumnsTableField().getTable().getVisibleColumn().setValue(row, false);
-            }
+            getColumnsTableField().getTable().uncheckAllRows();
 
             updateColumnVisibilityAndOrder();
           }
@@ -1029,13 +997,13 @@ public class OrganizeColumnsForm extends AbstractForm {
   }
 
   private void updateColumnVisibilityAndOrder() {
-    List<IColumn<?>> visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getVisibleColumn().findRows(true));
+    List<IColumn<?>> visibleColumns = getColumnsTableField().getTable().getKeyColumn().getValues(getColumnsTableField().getTable().getCheckedRows());
     m_table.getColumnSet().setVisibleColumns(visibleColumns);
     ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_table);
   }
 
   private void setColumnVisible(ITableRow row, Boolean visible) throws ProcessingException {
-    getColumnsTableField().getTable().getVisibleColumn().setValue(row, visible);
+    getColumnsTableField().getTable().checkRow(row, visible);
 
     updateColumnVisibilityAndOrder();
   }
@@ -1125,13 +1093,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   @Override
   public void validateForm() throws ProcessingException {
-    boolean oneColumnIsVisble = false;
-    for (Boolean visible : getColumnsTableField().getTable().getVisibleColumn().getValues()) {
-      if (BooleanUtility.nvl(visible)) {
-        oneColumnIsVisble = true;
-        break;
-      }
-    }
+    boolean oneColumnIsVisble = getColumnsTableField().getTable().getCheckedRows().size() > 0;
 
     if (!oneColumnIsVisble) {
       throw new VetoException(TEXTS.get("OrganizeTableColumnsMinimalColumnCountMessage"));
