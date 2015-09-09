@@ -10,20 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 
+//TODO bsh: Use or remove BusiManager Code in Scout client
 /**
  * The busy manager is the primary place to register/unregister {@link IBusyHandler} per {@link IClientSession}
  * <p>
@@ -36,7 +34,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
 public class BusyManagerService extends AbstractService implements IBusyManagerService, IJobListener {
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();
 
-  private IJobListenerRegistration m_jobListenerRegistration;
+//  private IJobListenerRegistration m_jobListenerRegistration;
 
   public BusyManagerService() {
   }
@@ -44,9 +42,8 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   @Override
   public void initializeService() {
     super.initializeService();
-
-    IFilter<JobEvent> clientOrModelJobFilter = new OrFilter<>(ClientJobs.newEventFilter(), ModelJobs.newEventFilter());
-    m_jobListenerRegistration = Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatch(clientOrModelJobFilter).andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE), this);
+//    IFilter<JobEvent> clientOrModelJobFilter = new OrFilter<>(ClientJobs.newEventFilter(), ModelJobs.newEventFilter());
+//    m_jobListenerRegistration = Jobs.getJobManager().addListener(Jobs.newEventFilter().andMatch(clientOrModelJobFilter).andMatchAnyEventType(JobEventType.ABOUT_TO_RUN, JobEventType.DONE), this);
   }
 
   @Override
@@ -63,7 +60,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
 
   @Override
   public void disposeServices() {
-    m_jobListenerRegistration.dispose();
+//    m_jobListenerRegistration.dispose();
   }
 
   private IBusyHandler getHandlerInternal(IFuture<?> future) {
