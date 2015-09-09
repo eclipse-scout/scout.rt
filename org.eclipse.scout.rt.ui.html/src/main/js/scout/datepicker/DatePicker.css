@@ -25,6 +25,9 @@
 /* necessary for animation */
 .date-picker-month {
   display: inline-block;
+  /* Set fixed width (7 * width of one day) to prevent wrapping of days when */
+  /* browser zoom is set to != 100%. */
+  width: 238px;
 }
 
 /* weekday header */
