@@ -16,10 +16,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
@@ -59,9 +57,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
  */
 @ScoutSdkIgnore
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY>implements IMixedSmartField<VALUE, LOOKUP_KEY> {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
-  @SuppressWarnings("deprecation")
-  private IContentAssistFieldUIFacadeLegacy m_uiFacadeLegacy;
+
   private AtomicReference<IFuture<List<ILookupRow<LOOKUP_KEY>>>> m_backgroundJobFuture;
   private IContentAssistFieldUIFacade m_uiFacade;
 
@@ -103,14 +101,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected void initConfig() {
     m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
-    m_uiFacadeLegacy = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacadeLegacy(), ModelContext.copyCurrent());
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public IContentAssistFieldUIFacadeLegacy getUIFacadeLegacy() {
-    return m_uiFacadeLegacy;
   }
 
   @Override
@@ -153,6 +144,12 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   protected boolean handleAcceptByDisplayText(String text) {
+    // do not change smart-field value if text of current lookup-row matches current display text
+    ILookupRow<LOOKUP_KEY> lookupRow = getCurrentLookupRow();
+    if (lookupRow != null && textEquals(text, lookupRow.getText())) {
+      return false;
+    }
+
     String searchText = toSearchText(text);
     getLookupRowFetcher().update(searchText, false, true);
     List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = getLookupRowFetcher().getResult().getLookupRows();
@@ -169,6 +166,10 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       return true;
     }
     return false;
+  }
+
+  private boolean textEquals(String displayText, String lookupRowText) {
+    return StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(displayText), StringUtility.emptyIfNull(lookupRowText));
   }
 
   private void setValidationError(String displayText, String errorMessage) {
@@ -292,120 +293,6 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     if (proposalChooser != null && result != null) {
       proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
-    }
-  }
-
-  @SuppressWarnings("deprecation")
-  private class P_UIFacadeLegacy implements IContentAssistFieldUIFacadeLegacy {
-
-    @Override
-    public boolean setTextFromUI(String text) {
-      String currentValidText = (getCurrentLookupRow() != null ? getCurrentLookupRow().getText() : null);
-      IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-      // accept proposal form if either input text matches search text or
-      // existing display text is valid
-      try {
-        if (proposalChooser != null && proposalChooser.getAcceptedProposal() != null) {
-          // a proposal was selected
-          return acceptProposalFromUI();
-        }
-        if (proposalChooser != null &&
-            (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
-                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
-          /*
-           * empty text means null
-           */
-          if (text == null || text.length() == 0) {
-            return parseValue(text);
-          }
-          else {
-            // no proposal was selected...
-            if (!StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText))) {
-              // ...and the current value is incomplete -> force proposal selection
-              proposalChooser.forceProposalSelection();
-              return false;
-            }
-            else {
-              // ... and current display is unchanged from model value -> nop
-              unregisterProposalChooserInternal();
-              return true;
-            }
-          }
-        }
-        else {
-          /*
-           * ticket 88359
-           * check if changed at all
-           */
-          if (CompareUtility.equals(text, currentValidText)) {
-            return true;
-          }
-          else {
-            return parseValue(text);
-          }
-        }
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-        return true;
-      }
-    }
-
-    @Override
-    public void openProposalFromUI(String searchText, boolean selectCurrentValue) {
-      if (searchText == null) {
-        searchText = BROWSE_ALL_TEXT;
-      }
-      try {
-        IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-        if (proposalChooser == null) {
-          setActiveFilter(TriState.TRUE);
-          proposalChooser = registerProposalChooserInternal();
-          proposalChooser.dataFetchedDelegate(getLookupRowFetcher().getResult(), getConfiguredBrowseMaxRowCount());
-          doSearch(searchText, selectCurrentValue, false);
-        }
-        else {
-          if (!StringUtility.equalsIgnoreNewLines(getLookupRowFetcher().getLastSearchText(), searchText)) {
-            doSearch(searchText, false, false);
-          }
-        }
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-    }
-
-    @Override
-    public void closeProposalFromUI() {
-      unregisterProposalChooserInternal();
-    }
-
-    @Override
-    public boolean acceptProposalFromUI() {
-      try {
-        IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-        if (proposalChooser != null) {
-          if (proposalChooser.getAcceptedProposal() != null) {
-            acceptProposal();
-            return true;
-          }
-          else {
-            // allow with null text traverse
-            if (StringUtility.isNullOrEmpty(getDisplayText())) {
-              return true;
-            }
-            else {
-              // select first
-              proposalChooser.forceProposalSelection();
-              return false;
-            }
-          }
-        }
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      return false;
     }
   }
 

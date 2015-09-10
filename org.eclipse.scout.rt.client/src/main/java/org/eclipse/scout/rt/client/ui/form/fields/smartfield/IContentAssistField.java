@@ -245,9 +245,6 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException;
 
-  @SuppressWarnings("deprecation")
-  IContentAssistFieldUIFacadeLegacy getUIFacadeLegacy();
-
   IContentAssistFieldUIFacade getUIFacade();
 
   LOOKUP_KEY getValueAsLookupKey();
