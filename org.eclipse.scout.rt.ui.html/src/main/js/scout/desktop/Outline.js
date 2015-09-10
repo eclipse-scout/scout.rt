@@ -152,8 +152,8 @@ scout.Outline.prototype._linkNodeWithRow = function(row) {
 scout.Outline.prototype._decorateNode = function(node) {
   scout.Outline.parent.prototype._decorateNode.call(this, node);
   if (node.$node) {
-    node.$node.toggleAttr('data-modelclass', node.modelClass, node.modelClass);
-    node.$node.toggleAttr('data-classid', node.classId, node.classId);
+    node.$node.toggleAttr('data-modelclass', !!node.modelClass, node.modelClass);
+    node.$node.toggleAttr('data-classid', !!node.classId, node.classId);
   }
 };
 

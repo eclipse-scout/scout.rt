@@ -53,15 +53,15 @@ scout.Widget.prototype._renderProperties = function() {
 
 scout.Widget.prototype._renderModelClass = function($target) {
   $target = $target || this.$container;
-  if ($target && this.modelClass) {
-    $target.attr('data-modelclass', this.modelClass);
+  if ($target) {
+    $target.toggleAttr('data-modelclass', !!this.modelClass, this.modelClass);
   }
 };
 
 scout.Widget.prototype._renderClassId = function($target) {
   $target = $target || this.$container;
-  if ($target && this.classId) {
-    $target.attr('data-classid', this.classId);
+  if ($target) {
+    $target.toggleAttr('data-classid', !!this.classId, this.classId);
   }
 };
 

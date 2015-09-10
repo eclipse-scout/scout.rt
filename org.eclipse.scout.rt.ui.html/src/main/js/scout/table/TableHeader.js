@@ -40,8 +40,8 @@ scout.TableHeader.prototype._render = function($parent) {
       .css('max-width', column.width + 'px')
       .on('click', this._onHeaderItemClick.bind(this))
       .on('mousedown', dragHeader);
-    $header.toggleAttr('data-modelclass', column.modelClass, column.modelClass);
-    $header.toggleAttr('data-classid', column.classId, column.classId);
+    $header.toggleAttr('data-modelclass', !!column.modelClass, column.modelClass);
+    $header.toggleAttr('data-classid', !!column.classId, column.classId);
 
     column.$header = $header;
 
