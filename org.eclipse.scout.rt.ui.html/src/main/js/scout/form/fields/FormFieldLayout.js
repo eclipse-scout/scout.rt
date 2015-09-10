@@ -96,17 +96,18 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   // Check for scrollbars, update them if neccessary
   if (formField.$field) {
     scout.scrollbars.update(formField.$field);
-    this._layoutDisabledOverlay(formField.$field);
+    this._layoutDisabledOverlay(formField);
   }
 
 };
 
-scout.FormFieldLayout.prototype._layoutDisabledOverlay = function($field) {
+scout.FormFieldLayout.prototype._layoutDisabledOverlay = function(formField) {
   if (scout.device.supportsCopyFromDisabledInputFields()) {
     return;
   }
-  var $disabledOverlay = $field.siblings('.disabled-overlay');
-  if ($disabledOverlay.length) {
+  var $disabledOverlay = formField._$disabledOverlay,
+    $field = formField.$field;
+  if ($disabledOverlay) {
     var pos = $field.position(),
       padding = scout.graphics.getInsets($field, {includePadding: true});
     $disabledOverlay

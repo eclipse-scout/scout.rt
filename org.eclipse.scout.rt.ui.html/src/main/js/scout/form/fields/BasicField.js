@@ -79,10 +79,7 @@ scout.BasicField.prototype._renderDisabledOverlay = function() {
   }
 
   if (this.enabled) {
-    if (this._$disabledOverlay) {
-      this._$disabledOverlay.remove();
-      this._$disabledOverlay = null;
-    }
+    this._removeDisabledOverlay();
   } else if (!this._$disabledOverlay) {
     this._$disabledOverlay = $.makeDiv('disabled-overlay')
       .on('contextmenu', this._createCopyContextMenu.bind(this))
@@ -90,8 +87,16 @@ scout.BasicField.prototype._renderDisabledOverlay = function() {
   }
 };
 
+scout.BasicField.prototype._removeDisabledOverlay = function() {
+  if (this._$disabledOverlay) {
+    this._$disabledOverlay.remove();
+    this._$disabledOverlay = null;
+  }
+};
+
 scout.BasicField.prototype._createCopyContextMenu = function(event) {
-  if (!this.visible) {
+  if (!this.visible ||
+      !scout.strings.hasText(this.displayText)) {
     return;
   }
 
@@ -116,4 +121,9 @@ scout.BasicField.prototype._createCopyContextMenu = function(event) {
     $anchor: this._$disabledOverlay
   });
   popup.render();
+};
+
+scout.BasicField.prototype._remove = function() {
+  scout.BasicField.parent.prototype._remove.call(this);
+  this._removeDisabledOverlay();
 };
