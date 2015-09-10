@@ -27,20 +27,17 @@ scout.Outline.prototype._createKeyStrokeContext = function() {
   return new scout.OutlineKeyStrokeContext(this);
 };
 
-
 /**
  * @override Tree.js
  */
 scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
-  var modifierBitMask = scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT;
-
   keyStrokeContext.registerKeyStroke([
       new scout.TreeSpaceKeyStroke(this),
-      new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
-      new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
-      new scout.TreeCollapseAllKeyStroke(this, modifierBitMask),
-      new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
-      new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+      new scout.OutlineTreeNavigationUpKeyStroke(this),
+      new scout.OutlineTreeNavigationDownKeyStroke(this),
+      new scout.OutlineTreeCollapseAllKeyStroke(this),
+      new scout.OutlineTreeCollapseOrDrillUpKeyStroke(this),
+      new scout.OutlineTreeExpandOrDrillDownKeyStroke(this)
     ]
     .concat(this.menus));
   keyStrokeContext.$bindTarget = function() {
@@ -55,6 +52,16 @@ scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
   if (this.selectedNodes.length === 0) {
+    this._showDefaultDetailForm();
+  }
+};
+
+scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
+  // Outline does not support multi selection -> [0]
+  var node = this.selectedNodes[0];
+  if (node) {
+    this._updateOutlineNode(node, bringToFront);
+  } else {
     this._showDefaultDetailForm();
   }
 };
@@ -185,18 +192,6 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
   }
 };
 
-scout.Outline.prototype._renderSelection = function() {
-  scout.Outline.parent.prototype._renderSelection.call(this);
-
-  // Outline does not support multi selection -> [0]
-  var node = this.selectedNodes[0];
-  if (node) {
-    this._updateOutlineNode(node);
-  } else {
-    this._showDefaultDetailForm();
-  }
-};
-
 scout.Outline.prototype.selectNodes = function(nodes, notifyServer) {
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer);
   if (this.navigateUpInProgress) {
@@ -212,11 +207,21 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer) {
 
 scout.Outline.prototype._showDefaultDetailForm = function() {
   if (this.defaultDetailForm) {
-    this.session.desktop.setOutlineContent(this.defaultDetailForm);
+    this.session.desktop.setOutlineContent(this.defaultDetailForm, true);
   }
 };
 
-scout.Outline.prototype._updateOutlineNode = function(node) {
+/*
+ * @override Tree.js
+ */
+scout.Outline.prototype._onNodeMouseDown = function(event) {
+  if (scout.Outline.parent.prototype._onNodeMouseDown.call(this, event)) {
+    this.handleOutlineContent(true);
+  }
+};
+
+scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
+  bringToFront = bringToFront || true;
   if (!node) {
     throw new Error('called _updateOutlineNode without node');
   }
@@ -239,7 +244,7 @@ scout.Outline.prototype._updateOutlineNode = function(node) {
     content = node.detailTable;
   }
 
-  this.session.desktop.setOutlineContent(content);
+  this.session.desktop.setOutlineContent(content, bringToFront);
 };
 
 /**
@@ -325,7 +330,7 @@ scout.Outline.prototype._onPageChanged = function(event) {
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodes.indexOf(node) !== -1) {
-      this._updateOutlineNode(node);
+      this._updateOutlineNode(node, false);
     }
   } else {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);

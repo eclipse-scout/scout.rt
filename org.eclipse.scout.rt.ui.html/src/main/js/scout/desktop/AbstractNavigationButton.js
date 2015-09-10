@@ -59,7 +59,7 @@ scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
   var detailVisible = this._toggleDetail();
   $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
   this.node.detailFormVisibleByUi = detailVisible;
-  this.outline._updateOutlineNode(this.node);
+  this.outline._updateOutlineNode(this.node, true);
 };
 
 /**
@@ -79,4 +79,3 @@ scout.AbstractNavigationButton.prototype.updateEnabled = function() {
     this._renderEnabled(this.enabled);
   }
 };
-

@@ -191,7 +191,7 @@ scout.Tree.prototype._renderProperties = function() {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'],false, true);
+  var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'], false, true);
   this.menuBar.updateItems(menuItems);
 };
 
@@ -1162,7 +1162,7 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   this._doubleClickSupport.mousedown(event);
   if (this._doubleClickSupport.doubleClicked()) {
     //don't execute on double click events
-    return;
+    return false;
   }
 
   var $node = $(event.currentTarget);
@@ -1173,12 +1173,13 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   if (this.checkable && this._isCheckboxClicked(event)) {
     this.checkNode(node, !node.checked);
   }
+  return true;
 };
 
 scout.Tree.prototype._onNodeMouseUp = function(event) {
   if (this._doubleClickSupport.doubleClicked()) {
     //don't execute on double click events
-    return;
+    return false;
   }
 
   var $node = $(event.currentTarget);
@@ -1187,6 +1188,7 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
   this.remoteHandler(this.id, 'nodeClicked', {
     nodeId: node.id
   });
+  return true;
 };
 
 scout.Tree.prototype._isCheckboxClicked = function(event) {

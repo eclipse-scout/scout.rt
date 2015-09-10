@@ -10,7 +10,7 @@ scout.inherits(scout.MobileDesktop, scout.Desktop);
 scout.MobileDesktop.prototype._render = function($parent) {
   this.navigation = new scout.DesktopNavigation(this);
   this.navigation.render($parent);
-  this.navigation.onOutlineChanged(this.outline);
+  this.navigation.onOutlineChanged(this.outline, true);
 
   $(window).on('resize', this.onResize.bind(this));
 };

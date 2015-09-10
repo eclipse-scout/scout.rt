@@ -43,14 +43,14 @@ scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
   var viewButtons = [];
   this.desktop.viewButtons.forEach(function(viewButton) {
     if (displayStyle === undefined ||
-        displayStyle === viewButton.displayStyle) {
+      displayStyle === viewButton.displayStyle) {
       viewButtons.push(viewButton);
     }
   });
   return viewButtons;
 };
 
-scout.DesktopNavigation.prototype._getNumSelectedTabs = function () {
+scout.DesktopNavigation.prototype._getNumSelectedTabs = function() {
   var numSelected = 0;
   if (this.viewMenuTab.selected) {
     numSelected++;
@@ -69,7 +69,7 @@ scout.DesktopNavigation.prototype._onNavigationMousedown = function(event) {
   }
 };
 
-scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
+scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFront) {
   if (this.outline === outline) {
     return;
   }
@@ -78,6 +78,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   }
   this.outline = outline;
   this.outline.render(this.$container);
+  this.outline.handleOutlineContent(bringToFront);
   this.outline.htmlComp.validateLayout();
   this.outline.pixelBasedSizing = true;
   this._updateViewButtons(outline);
@@ -111,8 +112,8 @@ scout.DesktopNavigation.prototype._setBreadcrumbEnabled = function(enabled) {
   if (oldBreadcrumbEnabled !== enabled) {
     this._breadcrumbEnabled = enabled;
     // FIXME BSH Enable the following two lines again when the breadcrumb mode is fixed
-//    this.$navigation.toggleClass('navigation-breadcrumb', enabled);
-//    this.outline.setBreadcrumbEnabled(enabled);
+    //    this.$navigation.toggleClass('navigation-breadcrumb', enabled);
+    //    this.outline.setBreadcrumbEnabled(enabled);
     this.viewMenuTab.setBreadcrumbEnabled(enabled);
     this._viewButtons('TAB').forEach(function(viewButton) {
       viewButton.setBreadcrumbEnabled(enabled);
@@ -145,4 +146,3 @@ scout.DesktopNavigation.prototype.revalidateLayout = function() {
     this.htmlViewButtons.revalidateLayout();
   }
 };
-

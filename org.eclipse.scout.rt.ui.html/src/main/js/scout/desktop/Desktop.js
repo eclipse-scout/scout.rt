@@ -75,7 +75,7 @@ scout.Desktop.prototype._render = function($parent) {
   });
 
   this._renderToolMenus();
-  this.navigation.onOutlineChanged(this.outline);
+  this.navigation.onOutlineChanged(this.outline, true);
   this._setSplitterPosition();
 
   $(window).on('resize', this.onResize.bind(this));
@@ -369,7 +369,8 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 
 /* communication with outline */
 
-scout.Desktop.prototype.setOutlineContent = function(content) {
+scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
+  bringToFront = bringToFront || true;
   if (this._outlineContent && this._outlineContent !== content) {
     this._outlineContent.remove();
     this._outlineContent = null;
@@ -380,8 +381,10 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   }
 
   this._outlineContent = content;
-  this.viewTabsController.deselectViewTab();
-  this._bringNavigationToFront();
+  if (bringToFront) {
+    this.viewTabsController.deselectViewTab();
+    this._bringNavigationToFront();
+  }
 
   if (!content.rendered) {
     if (content instanceof scout.Table) {
@@ -403,7 +406,7 @@ scout.Desktop.prototype.setOutlineContent = function(content) {
   this.session.focusManager.validateFocus(); // TODO [nbu][dwi] why double validate?
 };
 
-scout.Desktop.prototype.setOutline = function(outline) {
+scout.Desktop.prototype.setOutline = function(outline, bringToFront) {
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
 };
@@ -483,7 +486,7 @@ scout.Desktop.prototype._onModelOpenUri = function(event) {
 
 scout.Desktop.prototype._onModelOutlineChanged = function(event) {
   if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
-    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this), false);
   }
 };
 
@@ -582,7 +585,7 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
       this._bringNavigationToFront();
     }
   } else {
-    this.setOutline(outline);
+    this.setOutline(outline, true);
   }
   //set active form to null because outline is active form.
   this._setOutlineActivated();
