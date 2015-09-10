@@ -19,6 +19,8 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.resource.MimeType;
+import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.CancelButton;
@@ -183,17 +185,35 @@ public class ClipboardForm extends AbstractForm {
     @Order(40.0)
     public class CancelButton extends AbstractCancelButton {
     }
+
+    /**
+     * Escape keyStroke is required in CopyHandler case, when form has no cancel-button but user should be able to close
+     * form with ESC anyway.
+     */
+    @Order(50.0)
+    public class EscapeKeyStroke extends AbstractKeyStroke {
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ESCAPE;
+      }
+
+      @Override
+      protected void execAction() throws ProcessingException {
+        doClose();
+      }
+    }
+
   }
 
   public class CopyHandler extends AbstractFormHandler {
 
     @Override
     protected void execLoad() throws ProcessingException {
+      // use setVisibleGranted here because we don't want to send the cancel-button (incl. ESC keyStroke) to the UI
       super.execLoad();
-
       getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
-
-      getCancelButton().setVisible(false);
+      getCancelButton().setVisibleGranted(false);
       checkOkButtonEnabled();
     }
   }
@@ -203,10 +223,9 @@ public class ClipboardForm extends AbstractForm {
     @Override
     protected void execLoad() throws ProcessingException {
       super.execLoad();
-
       getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
-
       checkOkButtonEnabled();
     }
   }
+
 }
