@@ -464,6 +464,7 @@ scout.Table.prototype._sort = function() {
     return 0;
   }
   this.rows.sort(compare.bind(this));
+  this._filteredRowsDirty = true; // order has been changed
 
   //Sort was possible -> return true
   return true;
@@ -1644,25 +1645,24 @@ scout.Table.prototype.renderSelection = function($row, deselect) {
 };
 
 scout.Table.prototype._rerenderSelection = function() {
-  this.$rows().each(function(idx, row) {
-    var $row = $(row);
-    if ($row.hasClass('selected')) {
-      var previousRow = $row.prevAll(':not(.scrollbar, .invisible)').first();
-      var previousRowSelected = previousRow && previousRow.hasClass('selected');
-      var followingRow = $row.nextAll(':not(.scrollbar, .invisible)').first();
-      var followingRowSelected = followingRow && followingRow.hasClass('selected');
-      $row.removeClass('select-middle select-top select-bottom select-single');
-      if (previousRowSelected && followingRowSelected) {
-        $row.addClass('select-middle');
-      } else if (!previousRowSelected && followingRowSelected) {
-        $row.addClass('select-top');
-      } else if (!previousRowSelected && !followingRowSelected) {
-        $row.addClass('select-single');
-      } else if (previousRowSelected && !followingRowSelected) {
-        $row.addClass('select-bottom');
-      }
+  this.selectedRows.forEach(function(row) {
+    var $row = row.$row,
+      filteredRows = this.filteredRows(),
+      previousIndex = filteredRows.indexOf(row) -1,
+      previousRowSelected = previousIndex > 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
+      followingIndex = filteredRows.indexOf(row) + 1,
+      followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
+    $row.removeClass('select-middle select-top select-bottom select-single');
+    if (previousRowSelected && followingRowSelected) {
+      $row.addClass('select-middle');
+    } else if (!previousRowSelected && followingRowSelected) {
+      $row.addClass('select-top');
+    } else if (!previousRowSelected && !followingRowSelected) {
+      $row.addClass('select-single');
+    } else if (previousRowSelected && !followingRowSelected) {
+      $row.addClass('select-bottom');
     }
-  });
+  }.bind(this));
 };
 
 scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
