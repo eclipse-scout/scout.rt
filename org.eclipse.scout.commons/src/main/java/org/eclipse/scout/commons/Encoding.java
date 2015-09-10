@@ -12,10 +12,13 @@ package org.eclipse.scout.commons;
 
 /**
  * This constant class defines often used encodings.
- * 
+ *
  * @since 5.1.0
  */
 public final class Encoding {
+
+  private Encoding() {
+  }
 
   public static final String UTF_8 = "UTF-8";
 

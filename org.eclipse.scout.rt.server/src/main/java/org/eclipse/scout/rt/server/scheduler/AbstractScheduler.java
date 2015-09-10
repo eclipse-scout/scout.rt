@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
 import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 
 public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
-  protected static final IScoutLogger LOG = ScoutLogManager.getLogger(Scheduler.class);
+  protected static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScheduler.class);
   private P_Dispatcher m_dispatcher;
   private final Object m_queueLock;
   private final HashSet<ISchedulerJob> m_availableJobs;
