@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.testing.shared;
 import java.lang.reflect.Field;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +40,15 @@ public final class TestingUtility {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TestingUtility.class);
 
+  /**
+   * Order to make sure testing beans are preferred over regular beans
+   */
   public static final int TESTING_BEAN_ORDER = -10000;
+
+  /**
+   * Order for testing beans to be used when needed
+   */
+  public static final int TESTING_RESOURSE_ORDER = 10000;
 
   private static final String REGEX_MARKER = "regex:";
 
@@ -197,6 +206,24 @@ public final class TestingUtility {
       beanData.withoutAnnotation(TunnelToServer.class);
     }
     return Platform.get().getBeanManager().registerBean(beanData);
+  }
+
+  /**
+   * Register an existing bean with order {@link TESTING_BEAN_ORDER}
+   */
+  public static IBean<?> registerWithTestingOrder(Class<?> beanClass) {
+    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
+    BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
+    return BEANS.getBeanManager().registerBean(newBean);
+  }
+
+  /**
+   * Unregister a bean
+   */
+  public static void unregisterBean(IBean<?> bean) {
+    LinkedList<IBean<?>> beans = new LinkedList<>();
+    beans.add(bean);
+    unregisterBeans(beans);
   }
 
   /**
