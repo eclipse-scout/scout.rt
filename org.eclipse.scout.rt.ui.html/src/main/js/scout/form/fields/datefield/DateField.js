@@ -17,7 +17,7 @@ scout.DateField = function() {
   // has to be set again. Therefore, we have to store it in a private variable.
   this._modelErrorStatus = null;
 };
-scout.inherits(scout.DateField, scout.ValueField);
+scout.inherits(scout.DateField, scout.BasicField);
 
 /**
  * @override Widget.js
@@ -158,7 +158,7 @@ scout.DateField.prototype._renderTimeFormatPattern = function() {
 };
 
 /**
- * @Override FormField.js
+ * @override BasicField.js
  */
 scout.DateField.prototype._renderEnabled = function() {
   scout.DateField.parent.prototype._renderEnabled.call(this);
@@ -172,7 +172,7 @@ scout.DateField.prototype._renderEnabled = function() {
 };
 
 /**
- * @Override
+ * @override
  */
 scout.DateField.prototype._renderDisplayText = function() {
   //nop -> handled in _renderTimestamp
@@ -205,7 +205,7 @@ scout.DateField.prototype._renderErrorStatus = function() {
     // Put invalid input in the field, if the current input differs
     // (don't do it always, this would alter the cursor position)
     if (!this._isDateValid() && this.$dateField.val() !== this.errorStatus.invalidDateText) {
-      this.$dateField.val(this.errorStatus.invalidDateText);
+      this._setDateDisplayText(this.errorStatus.invalidDateText);
     }
   }
 
@@ -216,7 +216,7 @@ scout.DateField.prototype._renderErrorStatus = function() {
       this._$predictTimeField.toggleClass('has-error', hasError);
     }
     if (!this._isTimeValid() && this.$timeField.val() !== this.errorStatus.invalidTimeText) {
-      this.$timeField.val(this.errorStatus.invalidTimeText);
+      this._setTimeDisplayText(this.errorStatus.invalidTimeText);
     }
   }
 
@@ -302,7 +302,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
   if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     // Move cursor one right and apply next char of the prediction
     if (prediction) {
-      this.$dateField.val(prediction.substring(0, displayText.length + 1));
+      this._setDateDisplayText(prediction.substring(0, displayText.length + 1));
     }
     return;
   }
@@ -435,7 +435,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
   if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     // Move cursor one right and apply next char of the prediction
     if (prediction) {
-      this.$timeField.val(prediction.substring(0, displayText.length + 1));
+      this._setTimeDisplayText(prediction.substring(0, displayText.length + 1));
     }
     return;
   }
@@ -554,12 +554,12 @@ scout.DateField.prototype.updateDisplayText = function(date) {
   var selection;
   if (this.hasDate && this._isDateValid()) {
     selection = this.$dateField.backupSelection();
-    this.$dateField.val(this.isolatedDateFormat.format(date));
+    this._setDateDisplayText(this.isolatedDateFormat.format(date));
     this.$dateField.restoreSelection(selection);
   }
   if (this.hasTime && this._isTimeValid()) {
     selection = this.$timeField.backupSelection();
-    this.$timeField.val(this.isolatedTimeFormat.format(date));
+    this._setTimeDisplayText(this.isolatedTimeFormat.format(date));
     this.$timeField.restoreSelection(selection);
   }
   // Make sure there is no invisible and wrong prediction
@@ -864,7 +864,7 @@ scout.DateField.prototype._hasUiErrorStatus = function() {
 };
 
 /**
- * @Override FormField.js
+ * @override FormField.js
  */
 scout.DateField.prototype.prepareForCellEdit = function(opts) {
   scout.DateField.parent.prototype.prepareForCellEdit.call(this, opts);
@@ -883,4 +883,23 @@ scout.DateField.prototype.prepareForCellEdit = function(opts) {
       this.$timeField.addClass('first');
     }
   }
+};
+
+scout.DateField.prototype._setDateDisplayText = function(displayText) {
+  this.$dateField.val(displayText);
+  this._updateDisplayText();
+};
+
+scout.DateField.prototype._setTimeDisplayText = function(displayText) {
+  this.$timeField.val(displayText);
+  this._updateDisplayText();
+};
+
+/**
+ * displayText is only used in the UI and is not synchronized with the Java client.
+ */
+scout.DateField.prototype._updateDisplayText = function() {
+  var dateText = this.$dateField ? this.$dateField.val() : '',
+      timeText = this.$timeField ? this.$timeField.val() : '';
+  this.displayText = scout.strings.join(' ', dateText, timeText);
 };

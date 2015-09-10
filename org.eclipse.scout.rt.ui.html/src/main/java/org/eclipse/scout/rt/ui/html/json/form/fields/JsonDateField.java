@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.json.JSONObject;
 
-public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField<DATE_FIELD> {
+public class JsonDateField<T extends IDateField> extends JsonBasicField<T> {
 
   private static final String PROP_TIMESTAMP = "timestamp";
   private static final String PROP_AUTO_TIMESTAMP = "autoTimestamp";
@@ -39,7 +39,7 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
   private static final String EVENT_TIMESTAMP_CHANGED = "timestampChanged";
   private static final String EVENT_PARSING_ERROR = "parsingError";
 
-  public JsonDateField(DATE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonDateField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -49,14 +49,14 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
   }
 
   @Override
-  protected void initJsonProperties(DATE_FIELD model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     // Don't send the displayText to the UI. Formatting and parsing is done completely on the UI,
     // the JSON layer only needs to send the format and the time stamp.
     removeJsonProperty(IValueField.PROP_DISPLAY_TEXT);
 
-    putJsonProperty(new JsonProperty<DATE_FIELD>(IFormField.PROP_ERROR_STATUS, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IStatus modelValue() {
         return getModel().getErrorStatus();
@@ -83,7 +83,7 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
         return jsonStatus;
       }
     });
-    putJsonProperty(new JsonProperty<DATE_FIELD>(PROP_TIMESTAMP, model) {
+    putJsonProperty(new JsonProperty<T>(PROP_TIMESTAMP, model) {
       @Override
       protected Date modelValue() {
         return getModel().getValue();
@@ -94,7 +94,7 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
         return dateToJson((Date) value);
       }
     });
-    putJsonProperty(new JsonProperty<DATE_FIELD>(PROP_AUTO_TIMESTAMP, model) {
+    putJsonProperty(new JsonProperty<T>(PROP_AUTO_TIMESTAMP, model) {
       @Override
       protected Date modelValue() {
         return getModel().getAutoDate();
@@ -105,25 +105,25 @@ public class JsonDateField<DATE_FIELD extends IDateField> extends JsonValueField
         return dateToJson((Date) value);
       }
     });
-    putJsonProperty(new JsonProperty<DATE_FIELD>(IDateField.PROP_HAS_TIME, model) {
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_HAS_TIME, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isHasTime();
       }
     });
-    putJsonProperty(new JsonProperty<DATE_FIELD>(IDateField.PROP_HAS_DATE, model) {
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_HAS_DATE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isHasDate();
       }
     });
-    putJsonProperty(new JsonProperty<DATE_FIELD>(IDateField.PROP_DATE_FORMAT_PATTERN, model) {
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_DATE_FORMAT_PATTERN, model) {
       @Override
       protected String modelValue() {
         return getModel().getDateFormatPattern();
       }
     });
-    putJsonProperty(new JsonProperty<DATE_FIELD>(IDateField.PROP_TIME_FORMAT_PATTERN, model) {
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_TIME_FORMAT_PATTERN, model) {
       @Override
       protected String modelValue() {
         return getModel().getTimeFormatPattern();
