@@ -1647,8 +1647,10 @@ scout.Table.prototype._rerenderSelection = function() {
   this.$rows().each(function(idx, row) {
     var $row = $(row);
     if ($row.hasClass('selected')) {
-      var previousRowSelected = $row.prev().hasClass('selected');
-      var followingRowSelected = $row.next().hasClass('selected');
+      var previousRow = $row.prevAll(':not(.scrollbar, .invisible)').first();
+      var previousRowSelected = previousRow && previousRow.hasClass('selected');
+      var followingRow = $row.nextAll(':not(.scrollbar, .invisible)').first();
+      var followingRowSelected = followingRow && followingRow.hasClass('selected');
       $row.removeClass('select-middle select-top select-bottom select-single');
       if (previousRowSelected && followingRowSelected) {
         $row.addClass('select-middle');
@@ -1876,10 +1878,9 @@ scout.Table.prototype.filter = function() {
     this._rowsFiltered(rowsToHide);
     $(':animated', that.$data).promise().done(function() {
       that._group();
+      that._rerenderSelection();
     });
   }
-
-  this._rerenderSelection();
 };
 
 scout.Table.prototype._rowsFiltered = function(invisibleRows) {
