@@ -75,7 +75,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(OrganizeColumnsForm.class);
 
-  ITable m_table;
+  private final ITable m_table;
 
   public OrganizeColumnsForm(ITable table) throws ProcessingException {
     super(false);

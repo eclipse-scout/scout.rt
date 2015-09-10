@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -19,10 +20,21 @@ import java.util.List;
 
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.shared.AllAccessControlService;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,6 +47,19 @@ import org.junit.runner.RunWith;
 @RunWithSubject("anna")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class OrganizeColumnsFormTest {
+
+  private IBean<?> m_reg;
+
+  @Before
+  public void before() {
+    m_reg = TestingUtility.registerWithTestingOrder(AllAccessControlService.class);
+  }
+
+  @After
+  public void after() {
+    TestingUtility.unregisterBean(m_reg);
+  }
+
   @Test
   public void testNoNPEInExecDrop() throws ProcessingException {
     ITable table = mock(ITable.class);
@@ -52,4 +77,74 @@ public class OrganizeColumnsFormTest {
       fail("Null-Argument should not lead to NullPointerException " + e);
     }
   }
+
+  /**
+   * The table should be reset to the original state after the form has been canceled.
+   */
+  @Test
+  @Ignore //TODO JGU: fix, waiting for clarifications
+  public void testResetAfterCancel() throws ProcessingException {
+    TestPage page = new TestOutline().getPage();
+    page.ensureChildrenLoaded();
+    ITable table = page.getTable();
+
+    OrganizeColumnsForm form = new OrganizeColumnsForm(table);
+    form.startModify();
+
+    form.getColumnsTableField().getTable().checkRow(0, false);
+
+    cancelIgnoringConsumedExceptions(form);
+    form.doFinally();
+
+    assertEquals("Child", table.getCell(0, 0).getText());
+  }
+
+  private void cancelIgnoringConsumedExceptions(IForm form) throws ProcessingException {
+    try {
+      form.doCancel();
+    }
+    catch (VetoException e) {
+      if (!e.isConsumed()) {
+        throw e;
+      }
+    }
+  }
+
+  public static class TestOutline extends AbstractOutline {
+    private TestPage m_page;
+
+    public TestPage getPage() {
+      return m_page;
+    }
+
+    @Override
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+      TestPage page = new TestPage();
+      page.initPage();
+      pageList.add(page);
+      m_page = page;
+    }
+
+  }
+
+  public static class TestPage extends AbstractPageWithNodes {
+
+    @Override
+    protected String getConfiguredTitle() {
+      return "Parent";
+    }
+
+    @Override
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+      pageList.add(new ChildPage());
+    }
+  }
+
+  public static class ChildPage extends AbstractPageWithNodes {
+    @Override
+    protected String getConfiguredTitle() {
+      return "Child";
+    }
+  }
+
 }

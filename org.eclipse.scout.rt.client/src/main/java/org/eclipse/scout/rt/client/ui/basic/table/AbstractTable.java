@@ -136,8 +136,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * synchronized list
    */
   private final List<ITableRow> m_rows;
+
   private final Object m_cachedRowsLock;
   private List<ITableRow> m_cachedRows;
+
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private List<ITableRow/* ordered by rowIndex */> m_selectedRows = new ArrayList<ITableRow>();
   private Set<ITableRow/* ordered by rowIndex */> m_checkedRows = new LinkedHashSet<ITableRow>();
@@ -4060,10 +4062,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       getEventBuffer().add(e);
     }
     else {
-      EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
-      for (EventListener l : listeners) {
+      TableListener[] listeners = m_listenerList.getListeners(TableListener.class);
+      for (TableListener l : listeners) {
         try {
-          ((TableListener) l).tableChanged(e);
+          l.tableChanged(e);
         }
         catch (Exception t) {
           LOG.error("fire " + e, t);
