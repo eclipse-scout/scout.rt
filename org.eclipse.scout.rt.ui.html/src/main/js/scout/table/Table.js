@@ -560,6 +560,8 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   if (this._groupColumn()) {
     this._group();
   }
+
+  this._rerenderSelection();
 };
 
 /**
@@ -1164,8 +1166,12 @@ scout.Table.prototype._group = function(update) {
   if (update) {
     this.$sumRows().remove();
   } else {
-    this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbars.bind(that));
+    this.$sumRows().animateAVCSD('height', 0, function() {
+        $.removeThis.call(this);
+        that._rerenderSelection();
+    }, that.updateScrollbars.bind(that));
   }
+
 
   if (!this.grouped && !groupColumn) {
     return;
@@ -1638,6 +1644,26 @@ scout.Table.prototype.renderSelection = function($row, deselect) {
   }
 };
 
+scout.Table.prototype._rerenderSelection = function() {
+  this.$rows().each(function(idx, row) {
+    var $row = $(row);
+    if ($row.hasClass('selected')) {
+      var previousRowSelected = $row.prev().hasClass('selected');
+      var followingRowSelected = $row.next().hasClass('selected');
+      $row.removeClass('select-middle select-top select-bottom select-single');
+      if (previousRowSelected && followingRowSelected) {
+        $row.addClass('select-middle');
+      } else if (!previousRowSelected && followingRowSelected) {
+        $row.addClass('select-top');
+      } else if (!previousRowSelected && !followingRowSelected) {
+        $row.addClass('select-single');
+      } else if (previousRowSelected && !followingRowSelected) {
+        $row.addClass('select-bottom');
+      }
+    }
+  });
+};
+
 scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
   if (this.selectedRows.indexOf(row) > -1) {
     return;
@@ -1853,6 +1879,8 @@ scout.Table.prototype.filter = function() {
       that._group();
     });
   }
+
+  this._rerenderSelection();
 };
 
 scout.Table.prototype._rowsFiltered = function(invisibleRows) {
