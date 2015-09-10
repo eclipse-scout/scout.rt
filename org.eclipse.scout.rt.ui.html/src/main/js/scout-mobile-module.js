@@ -92,6 +92,7 @@ __include("scout/datepicker/DatePicker.js");
 __include("scout/datepicker/DatePickerPopup.js");
 __include("scout/menu/menus.js");
 __include("scout/menu/Menu.js");
+__include("scout/menu/MenuKeyStroke.js");
 __include("scout/menu/MenuBar.js");
 __include("scout/menu/MenuBarLeftKeyStroke.js");
 __include("scout/menu/MenuBarRightKeyStroke.js");

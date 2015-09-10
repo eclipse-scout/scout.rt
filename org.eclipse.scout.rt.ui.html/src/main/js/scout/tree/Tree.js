@@ -191,11 +191,11 @@ scout.Tree.prototype._renderProperties = function() {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection']);
+  var menuItems = this._filterMenus(['Tree.EmptySpace', 'Tree.SingleSelection', 'Tree.MultiSelection'],false, true);
   this.menuBar.updateItems(menuItems);
 };
 
-scout.Tree.prototype._filterMenus = function(allowedTypes, onlyVisible) {
+scout.Tree.prototype._filterMenus = function(allowedTypes, onlyVisible, enableDisableKeyStroke) {
   allowedTypes = allowedTypes || [];
   if (allowedTypes.indexOf('Tree.SingleSelection') > -1 && this.selectedNodes.length !== 1) {
     scout.arrays.remove(allowedTypes, 'Tree.SingleSelection');
@@ -203,7 +203,7 @@ scout.Tree.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   if (allowedTypes.indexOf('Tree.MultiSelection') > -1 && this.selectedNodes.length <= 1) {
     scout.arrays.remove(allowedTypes, 'Tree.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
+  return scout.menus.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
 };
 
 scout.Tree.prototype._renderEnabled = function() {

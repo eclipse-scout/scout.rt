@@ -3,6 +3,7 @@ scout.Menu = function() {
   this.childActions = [];
   this._addAdapterProperties('childActions');
   this.popup;
+  this.excludedByFilter=false;
 
   /**
    * This property is true when the menu instance was moved into a overflow-menu
@@ -137,4 +138,8 @@ scout.Menu.prototype.doAction = function(event) {
   }
   // Default action handling
   return scout.Menu.parent.prototype.doAction.call(this, event);
+};
+
+scout.Action.prototype._createActionKeyStroke = function() {
+  return new scout.MenuKeyStroke(this);
 };

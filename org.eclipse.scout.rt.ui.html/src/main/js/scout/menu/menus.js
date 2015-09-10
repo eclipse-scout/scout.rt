@@ -10,7 +10,7 @@ scout.menus = {
    * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
    * menu-bar DOM (invisible, however). They may change their visible state later.
    */
-  filter: function(menus, types, onlyVisible) {
+  filter: function(menus, types, onlyVisible, enableDisableKeyStrokes) {
     if (!menus) {
       return;
     }
@@ -23,21 +23,25 @@ scout.menus = {
     menus.forEach(function(menu) {
       var childMenus = menu.childActions;
       if (childMenus.length > 0) {
-        childMenus = scout.menus.filter(childMenus, types);
+        childMenus = scout.menus.filter(childMenus, types, onlyVisible, enableDisableKeyStrokes);
         if (childMenus.length === 0) {
+          scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
           return;
         }
       } // Don't check the menu type for a group
       else if (!scout.menus._checkType(menu, types)) {
+        scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }
 
       if (onlyVisible && !menu.visible) {
+        scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }
       if (menu.separator) {
         separatorCount++;
       }
+      scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, false);
       filteredMenus.push(menu);
     });
 
@@ -45,7 +49,6 @@ scout.menus = {
     if (separatorCount === filteredMenus.length) {
       return [];
     }
-
     return filteredMenus;
   },
 
@@ -56,6 +59,13 @@ scout.menus = {
       return (childMenus.length > 0);
     }
     return scout.menus._checkType(menu, types);
+  },
+
+
+  _enableDisableMenuKeyStroke:function(menu, activated, exclude){
+    if(activated){
+      menu.excludedByFilter=exclude;
+    }
   },
 
   /**

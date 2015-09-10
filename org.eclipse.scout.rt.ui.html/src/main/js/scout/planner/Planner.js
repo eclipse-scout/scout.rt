@@ -876,11 +876,11 @@ scout.Planner.prototype._renderMenus = function() {
 };
 
 scout.Planner.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range']);
+  var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], true);
   this.menuBar.updateItems(menuItems);
 };
 
-scout.Planner.prototype._filterMenus = function(allowedTypes) {
+scout.Planner.prototype._filterMenus = function(allowedTypes, enableDisableKeyStroke) {
   allowedTypes = allowedTypes || [];
   if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
     scout.arrays.remove(allowedTypes, 'Planner.Resource');
@@ -891,7 +891,7 @@ scout.Planner.prototype._filterMenus = function(allowedTypes) {
   if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
     scout.arrays.remove(allowedTypes, 'Planner.Range');
   }
-  return scout.menus.filter(this.menus, allowedTypes, true);
+  return scout.menus.filter(this.menus, allowedTypes, true, enableDisableKeyStroke);
 };
 
 scout.Planner.prototype._renderWorkDayCount = function() {};
