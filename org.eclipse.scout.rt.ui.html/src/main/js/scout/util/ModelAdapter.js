@@ -247,14 +247,15 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var oldProperties = {};
+  var oldProperties = {},
+    preventRendering = [];
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._syncPropertiesOnPropertyChange(oldProperties, event.properties);
+  this._syncPropertiesOnPropertyChange(oldProperties, event.properties, preventRendering);
 
   // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
   if (this.rendered) {
-    this._renderPropertiesOnPropertyChange(oldProperties, event.properties);
+    this._renderPropertiesOnPropertyChange(oldProperties, event.properties, preventRendering);
   }
 
   // step 3 notify - fire propertyChange _after_ properties have been rendered. (This is important
@@ -315,7 +316,7 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
   $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
 };
 
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties) {
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
       oldValue = this[propertyName];
@@ -331,15 +332,25 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
     }
 
     if (this[syncFuncName]) {
-      this[syncFuncName](value, oldValue);
+      if (this[syncFuncName](value, oldValue) === false) {
+        // _syncPropName may return false to prevent the rendering (e.g. if the property has not changed)
+        // This may be useful for some properties with an expensive render method
+        // Do not prevent if undefined is returned!
+        preventRendering.push(propertyName);
+      }
     } else {
       this[propertyName] = value;
     }
   }.bind(this));
 };
 
-scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldProperties, newProperties) {
+scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
+    if (preventRendering.indexOf(propertyName) > -1) {
+      // Do not render if _syncPropName returned false
+      return;
+    }
+
     var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
     var oldValue = oldProperties[propertyName];
     var newValue = this[propertyName];

@@ -740,11 +740,10 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
   this._renderRowsInProgress = false;
   if (rows.length > numRowsLoaded) {
     this._renderRowsInProgress = true;
-    // FIXME CGU: von A.WE - siehe E-Mail. Das hier macht Probleme, weil später invalidateLayoutTree() aufgerufen wird
-    // prüfen ob auf setTimeout verzichtet werden kann, oder _renderRows ohne Seiteneffekte funktionieren kann.
-    // siehe _installRows
     setTimeout(function() {
       that._renderRows(rows, startRowIndex + 100, lastRowOfBlockSelected);
+      // Manual validation necessary due to set timeout
+      that.validateLayoutTree();
     }, 0);
   }
 };
@@ -2224,7 +2223,11 @@ scout.Table.prototype._renderHeaderVisible = function() {
   this._renderTableHeader();
 };
 
-scout.Table.prototype._syncCheckable = function(checkable) {
+scout.Table.prototype._syncCheckable = function(checkable, oldValue) {
+  if (checkable === oldValue) {
+    // Do nothing if value has not changed (only on property change, not initially)
+    return false;
+  }
   this.checkable = checkable;
 
   var column = this.checkableColumn;
@@ -2236,7 +2239,11 @@ scout.Table.prototype._syncCheckable = function(checkable) {
   }
 };
 
-scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
+scout.Table.prototype._syncRowIconVisible = function(rowIconVisible, oldValue) {
+  if (rowIconVisible === oldValue) {
+    // Do nothing if value has not changed (only on property change, not initially)
+    return false;
+  }
   this.rowIconVisible = rowIconVisible;
 
   var column = this.rowIconColumn;
