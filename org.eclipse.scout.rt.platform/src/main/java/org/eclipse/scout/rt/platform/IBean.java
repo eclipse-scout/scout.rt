@@ -16,19 +16,31 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
- * This is the registration for one {@link IBean} in the {@link IBeanManager}
+ * This is the registration for one bean in the {@link IBeanManager}.
+ *
+ * @since 5.1
  */
 public interface IBean<T> {
 
   /**
-   * To access all annotations of the bean.
+   * Gets a {@link Map} holding all {@link Annotation}s of this {@link IBean}.
+   *
+   * @return A {@link Map} with the {@link Annotation} class as key and the {@link Annotation} instance as value.
    */
   Map<Class<? extends Annotation>, Annotation> getBeanAnnotations();
 
+  /**
+   * Gets the {@link Annotation} instance for the given {@link Annotation} {@link Class}.
+   *
+   * @param annotation
+   *          The {@link Annotation} {@link Class} to search.
+   * @return The {@link Annotation} instance if this annotation exists for this {@link IBean} or <code>null</code>
+   *         otherwise.
+   */
   <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotation);
 
   /**
-   * @return
+   * @return The {@link Class} of this {@link IBean}.
    */
   Class<? extends T> getBeanClazz();
 
@@ -44,12 +56,19 @@ public interface IBean<T> {
   T getInitialInstance();
 
   /**
-   * @return the instance of the bean, decorated and intercepted by {@link IBeanDecorationFactory}
-   *         <p>
-   *         Not that this may create the bean instance prior to returning it.
+   * Gets and creates if necessary the instance for this {@link IBean}.<br>
+   * The returned instance is created using the {@link IBeanInstanceProducer} and has been decorated using the
+   * {@link IBeanDecorationFactory}.
+   *
+   * @return The instance of the bean
    */
-  T getInstance(Class<T> queryType);
+  T getInstance();
 
+  /**
+   * Gets the {@link IBeanInstanceProducer} associated with this {@link IBean}.
+   * 
+   * @return The {@link IBeanInstanceProducer} of this {@link IBean}.
+   */
   IBeanInstanceProducer<T> getBeanInstanceProducer();
 
 }

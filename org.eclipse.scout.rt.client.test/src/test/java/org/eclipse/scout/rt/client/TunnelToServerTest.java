@@ -36,7 +36,7 @@ public class TunnelToServerTest {
   @Test
   public void testBeanRegistration() {
     m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServer.class).withApplicationScoped(true));
-    IFixtureTunnelToServer obj = m_beanManager.getBean(IFixtureTunnelToServer.class).getInstance(IFixtureTunnelToServer.class);
+    IFixtureTunnelToServer obj = m_beanManager.getBean(IFixtureTunnelToServer.class).getInstance();
     Assert.assertNotNull(obj);
     Assert.assertEquals("return IFixtureTunnelToServer#ping", obj.ping());
   }
@@ -47,7 +47,7 @@ public class TunnelToServerTest {
     m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServerEx1.class).withApplicationScoped(true));
     IBean<IFixtureTunnelToServer> bean = m_beanManager.getBean(IFixtureTunnelToServer.class);
     Assert.assertNotNull(bean);
-    IFixtureTunnelToServer obj = bean.getInstance(IFixtureTunnelToServer.class);
+    IFixtureTunnelToServer obj = bean.getInstance();
     Assert.assertNull(obj);
   }
 
@@ -59,19 +59,19 @@ public class TunnelToServerTest {
     m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServer.class).withApplicationScoped(true));
     IBean<IFixtureTunnelToServer> bean = m_beanManager.getBean(IFixtureTunnelToServer.class);
     Assert.assertNotNull(bean);
-    IFixtureTunnelToServer obj = bean.getInstance(IFixtureTunnelToServer.class);
+    IFixtureTunnelToServer obj = bean.getInstance();
     Assert.assertNotNull(obj);
     Assert.assertEquals("return IFixtureTunnelToServerEx2#ping", obj.ping());
 
     IBean<IFixtureTunnelToServerEx1> bean1 = m_beanManager.getBean(IFixtureTunnelToServerEx1.class);
     Assert.assertNotNull(bean1);
-    IFixtureTunnelToServerEx1 obj1 = bean1.getInstance(IFixtureTunnelToServerEx1.class);
+    IFixtureTunnelToServerEx1 obj1 = bean1.getInstance();
     Assert.assertNotNull(obj1);
     Assert.assertEquals("return IFixtureTunnelToServerEx2#ping", obj1.ping());
 
     IBean<IFixtureTunnelToServerEx2> bean2 = m_beanManager.getBean(IFixtureTunnelToServerEx2.class);
     Assert.assertNotNull(bean2);
-    IFixtureTunnelToServerEx2 obj2 = bean2.getInstance(IFixtureTunnelToServerEx2.class);
+    IFixtureTunnelToServerEx2 obj2 = bean2.getInstance();
     Assert.assertNotNull(obj2);
     Assert.assertEquals("return IFixtureTunnelToServerEx2#ping", obj2.ping());
   }
@@ -80,7 +80,7 @@ public class TunnelToServerTest {
   @ApplicationScoped
   private static final class FixtureClientBeanDecorationFactory extends ClientBeanDecorationFactory {
     @Override
-    protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<T> queryType) {
+    protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<? extends T> queryType) {
       return new IBeanInterceptor<T>() {
         @Override
         public Object invoke(IBeanInvocationContext<T> context) throws ProcessingException {

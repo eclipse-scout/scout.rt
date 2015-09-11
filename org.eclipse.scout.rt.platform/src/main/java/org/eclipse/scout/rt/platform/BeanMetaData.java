@@ -20,6 +20,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 
+/**
+ * Bean descriptor holding meta data for an {@link IBean} creation.<br>
+ * Use with {@link IBeanManager#registerBean(BeanMetaData)} to register a new {@link IBean}.
+ *
+ * @since 5.1
+ */
 public class BeanMetaData {
   private final Class<?> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
@@ -45,7 +51,10 @@ public class BeanMetaData {
   }
 
   /**
-   * @return
+   * Adds the annotations present on the given class to the annotation map.
+   *
+   * @param clazz
+   * @param inheritedOnly
    */
   protected void readStaticAnnotations(Class<?> clazz, boolean inheritedOnly) {
     if (clazz == null || Object.class.equals(clazz)) {
@@ -68,10 +77,16 @@ public class BeanMetaData {
     }
   }
 
+  /**
+   * @return the bean {@link Class}.
+   */
   public Class<?> getBeanClazz() {
     return m_beanClazz;
   }
 
+  /**
+   * @return the initial instance of the bean.
+   */
   public Object getInitialInstance() {
     return m_initialInstance;
   }
@@ -96,6 +111,9 @@ public class BeanMetaData {
     return this;
   }
 
+  /**
+   * @return The {@link IBeanInstanceProducer} responsible for instance creations in this bean.
+   */
   public IBeanInstanceProducer<?> getProducer() {
     return m_producer;
   }
@@ -140,15 +158,34 @@ public class BeanMetaData {
     return this;
   }
 
+  /**
+   * Gets the {@link Annotation} instance for the given {@link Annotation} {@link Class}.
+   *
+   * @param annotation
+   *          The {@link Annotation} {@link Class} to search.
+   * @return The {@link Annotation} instance if this annotation exists for this {@link BeanMetaData} or
+   *         <code>null</code> otherwise.
+   */
   @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
     return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
   }
 
+  /**
+   * Gets a {@link Map} holding all {@link Annotation}s of this {@link BeanMetaData}.
+   *
+   * @return A {@link Map} with the {@link Annotation} class as key and the {@link Annotation} instance as value.
+   */
   public Map<Class<? extends Annotation>, Annotation> getBeanAnnotations() {
     return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
   }
 
+  /**
+   * Replaces all annotations in this {@link BeanMetaData} with the ones provided.
+   * 
+   * @param annotations
+   *          The new annotations.
+   */
   public void setBeanAnnotations(Map<Class<? extends Annotation>, Annotation> annotations) {
     m_beanAnnotations.clear();
     m_beanAnnotations.putAll(annotations);

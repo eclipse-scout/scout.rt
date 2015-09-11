@@ -15,6 +15,8 @@ import java.util.EventObject;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 
 /**
+ * Event object describing a {@link IPlatform} change.
+ * 
  * @since 5.2
  */
 public class PlatformEvent extends EventObject {
@@ -27,11 +29,17 @@ public class PlatformEvent extends EventObject {
     m_state = state;
   }
 
+  /**
+   * @return The {@link IPlatform} sending the event.
+   */
   @Override
   public IPlatform getSource() {
     return (IPlatform) super.getSource();
   }
 
+  /**
+   * @return The new platform state.
+   */
   public IPlatform.State getState() {
     return m_state;
   }

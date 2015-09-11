@@ -15,11 +15,20 @@ import java.util.EventListener;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
- * @since 5.2
+ * All instances of IPlatformListener receive event notifications from the platform
+ *
+ * @since 5.1
  */
 @ApplicationScoped
 public interface IPlatformListener extends EventListener {
 
+  /**
+   * Informs about a state change in the current {@link IPlatform}.
+   * 
+   * @param event
+   *          The event describing the state change.
+   * @throws PlatformException
+   */
   void stateChanged(PlatformEvent event) throws PlatformException;
 
 }

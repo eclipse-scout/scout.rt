@@ -10,11 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+
 /**
- * All instances of IPlatformListener receive event notifications from the platform
+ * Scout platform life cycle manager.
+ *
+ * @since 5.2
  */
 public interface IPlatform {
 
+  /**
+   * Enumeration describing the different platform states.
+   */
   enum State {
     /**
      * This event signals that {@link IPlatform#getBeanContext()} was prepared with the beans found in the
@@ -50,23 +57,50 @@ public interface IPlatform {
     PlatformStopped
   }
 
+  /**
+   * @return The current {@link State} of the platform.
+   */
   State getState();
 
+  /**
+   * @return The {@link IBeanManager} of the platform.
+   */
   IBeanManager getBeanManager();
 
+  /**
+   * Starts the platform.
+   *
+   * @throws PlatformException
+   *           When the platform is already started or there is an error during startup.
+   */
   void start();
 
   /**
+   * Starts the platform.
+   *
    * @param stateLatch
    *          an optional object that can be used to wait for the internal platform lock to be acquired. Consumers of
    *          this method may call {@link PlatformStateLatch#await()} to be blocked until the {@link IPlatform}
    *          implementor has acquired it's internal lock.
    *          <p>
    *          If no such synchronization is required, use {@link #start()}.
+   * @throws PlatformException
+   *           When the platform is already started or there is an error during startup.
    */
   void start(PlatformStateLatch stateLatch);
 
+  /**
+   * Stops the platform and releases all resources.
+   *
+   * @throws IllegalArgumentException
+   *           if the platform cannot be stopped because it is not running yet.
+   */
   void stop();
 
+  /**
+   * Gets if the platform is running in development mode.<br>
+   *
+   * @return <code>true</code> if the platform is running in development mode. <code>false</code> otherwise.
+   */
   boolean inDevelopmentMode();
 }

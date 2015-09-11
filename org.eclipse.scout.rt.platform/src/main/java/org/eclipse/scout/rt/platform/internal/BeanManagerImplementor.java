@@ -48,7 +48,6 @@ public class BeanManagerImplementor implements IBeanManager {
     m_beanDecorationFactory = f;
   }
 
-  @Override
   public ReentrantReadWriteLock getReadWriteLock() {
     return m_lock;
   }
@@ -170,16 +169,11 @@ public class BeanManagerImplementor implements IBeanManager {
 
   @Override
   public <T> IBean<T> getBean(Class<T> beanClazz) {
-    List<IBean<T>> list = querySingle(beanClazz);
-    if (list.size() == 1) {
-      return list.get(0);
+    IBean<T> result = optBean(beanClazz);
+    if (result == null) {
+      return Assertions.fail("no instances found for query: %s", beanClazz);
     }
-    if (list.size() == 0) {
-      return Assertions.fail("no instances found for query: %s %s", beanClazz, list);
-    }
-    else {
-      return Assertions.fail("multiple instances found for query: %s %s", beanClazz, list);
-    }
+    return result;
   }
 
   @Override
@@ -222,12 +216,11 @@ public class BeanManagerImplementor implements IBeanManager {
     m_scopeEvaluator = scopeEvaluator;
   }
 
-  @SuppressWarnings("unchecked")
   public void startCreateImmediatelyBeans() {
     for (IBean bean : getBeans(Object.class)) {
       if (BeanManagerImplementor.isCreateImmediately(bean)) {
         if (BeanManagerImplementor.isApplicationScoped(bean)) {
-          bean.getInstance(Object.class);
+          bean.getInstance();
         }
         else {
           throw new InitializationException(String.format(

@@ -19,10 +19,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 
 /**
- * The static accessor to the {@link BeanManagerImplementor}
+ * The static accessor to the {@link IBeanManager}
+ *
+ * @see IBeanManager
  */
 public final class BEANS {
 
@@ -30,46 +31,59 @@ public final class BEANS {
   }
 
   /**
-   * @return the single instance of this type with respect to {@link Order} and {@link Replace}. See also
-   *         {@link IBeanManager#getBean(Class)}
+   * Gets the single instance of the given beanClazz with respect to {@link Order} and {@link Replace}.<br>
+   * See {@link IBeanManager#getBean(Class)} for details.
+   *
+   * @param beanClazz
+   *          The query {@link Class}.
+   * @return The bean instance. Never returns <code>null</code>.
    * @throws AssertionException
-   *           when no instance is available or when multiple instances are registered
+   *           When no instance is available or when multiple instances are registered.
    */
   public static <T> T get(Class<T> beanClazz) {
     return Assertions.assertNotNull(opt(beanClazz), "no instance found for query: %s", beanClazz);
   }
 
   /**
-   * @return the single instance of this type with respect to {@link Order} and {@link Replace}. See also {@link Bean}
-   *         <p>
-   *         returns <code>null</code> when no instance is available
+   * Gets the single instance of the given beanClazz with respect to {@link Order} and {@link Replace}.<br>
+   * See {@link IBeanManager#getBean(Class)} for details.
+   *
+   * @param beanClazz
+   *          The query {@link Class}.
+   * @return The bean instance or <code>null</code> if no {@link IBean} could be found.
    * @throws AssertionException
-   *           when multiple instances are registered
+   *           When multiple instances are registered
    */
   public static <T> T opt(Class<T> beanClazz) {
     IBean<T> bean = Platform.get().getBeanManager().optBean(beanClazz);
     if (bean != null) {
-      return bean.getInstance(beanClazz);
+      return bean.getInstance();
     }
     return null;
   }
 
   /**
-   * @return all instances of this type ordered by {@link Order} (never <code>null</code>)
+   * Gets all not replaced beans of the given beanClazz.<br>
+   * See {@link IBeanManager#getBeans(Class)} for more details.
+   *
+   * @return All instances of this type ordered by {@link Order} annotation value. Never returns <code>null</code>.
    */
   public static <T> List<T> all(Class<T> beanClazz) {
     return BEANS.all(beanClazz, new AlwaysFilter<T>());
   }
 
   /**
-   * @return all instances of this type ordered by {@link Order} (never <code>null</code>)
+   * Gets all not replaced beans of the given beanClazz that are accepted by the given {@link IFilter}.<br>
+   * See {@link IBeanManager#getBeans(Class)} for more details.
+   *
+   * @return All instances of this type ordered by {@link Order} annotation value. Never returns <code>null</code>.
    */
   public static <T> List<T> all(Class<T> beanClazz, IFilter<T> filter) {
     List<IBean<T>> beans = Platform.get().getBeanManager().getBeans(beanClazz);
     List<T> instances = new ArrayList<T>(beans.size());
     for (IBean<T> bean : beans) {
-      T instance = bean.getInstance(beanClazz);
-      if (instance != null && filter.accept(instance)) {
+      T instance = bean.getInstance();
+      if (instance != null && (filter == null || filter.accept(instance))) {
         instances.add(instance);
       }
     }

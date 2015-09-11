@@ -141,12 +141,12 @@ public class BeanHierarchy<T> {
         }
 
         //manage replaced beans
-        HashMap<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value
+        Map<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value
         for (IBean<T> bean : list) {
           if (bean.getBeanAnnotation(Replace.class) != null) {
             Class<?> superClazz = null;
             if (bean.getBeanClazz().isInterface()) {
-              //interface replaces interfaces, only replce FIRST declared interface
+              //interface replaces interfaces, only replace FIRST declared interface
               Class[] ifs = bean.getBeanClazz().getInterfaces();
               if (ifs != null && ifs.length > 0) {
                 superClazz = ifs[0];
@@ -195,7 +195,7 @@ public class BeanHierarchy<T> {
             it.remove();
           }
         }
-        //only retain lowest order and if lowest order is same for multiple beans, keep them all, provocating a mutliple instance exception on getBean()
+        //only retain lowest order and if lowest order is same for multiple beans, keep them all, provocating a multiple instance exception on getBean()
         if (list.size() > 1) {
           Double lowestOrder = null;
           for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {

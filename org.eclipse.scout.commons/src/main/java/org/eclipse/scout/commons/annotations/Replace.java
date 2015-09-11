@@ -9,9 +9,24 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 
 /**
  * Annotation on a class used to replace the first occurrence of its super class. The Annotation can be applied to
- * several scout objects types like columns, menus, form fields. Further, the annotation can be applied recursively
- * (i.e. replaced objects can be replaced as well).
+ * several scout objects types like columns, menus, form fields and beans. Further, the annotation can be applied
+ * recursively (i.e. replaced objects can be replaced as well).
  * <p/>
+ * <h3>Usage on Beans</h3> If this annotation is added to a bean this means that the original bean is no longer
+ * available in the Scout bean manager and only the new child class is returned.<br>
+ * <b>Example:</b> The CustomFileSystemUserPreferencesStorageService replaces the
+ * FileSystemUserPreferencesStorageService already present in Scout with some custom behavior:
+ *
+ * <pre>
+ * &#064;Replace
+ * public class CustomFileSystemUserPreferencesStorageService extends FileSystemUserPreferencesStorageService {
+ *   protected String computeFullNodeName(String userScope, String nodeId) {
+ *     ...
+ *   }
+ * }
+ * </pre>
+ * 
+ * Wherever now an IUserPreferencesService is used the custom instance is returned. <br>
  * <h3>Usage on form fields</h3> If this annotation is added to a form field in an extended form, it works like the
  * {@link InjectFieldTo} annotation except that the original field is removed. The replaced field's container is used by
  * the replacing field as well. If the {@link Order} annotation is missing on the replacing class, the order of the
@@ -35,7 +50,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *     }
  *   }
  * }
- * 
+ *
  * public class ExtendedForm extends BaseForm {
  *   &#064;Replace
  *   public class NameExField extends NameField {
@@ -55,7 +70,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   public class NameField extends AbstractStringField {
  *   }
  * }
- * 
+ *
  * public class BaseForm extends AbstractForm {
  *   &#064;Order(10)
  *   public class MainBox extends AbstractGroupBox {
@@ -64,14 +79,14 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *     }
  *   }
  * }
- * 
+ *
  * public class ExtendedForm extends BaseForm {
  *   &#064;Replace
  *   public class FirstGroupBoxEx extends FirstGroupBox {
  *     public FirstGroupBoxEx(BaseForm.MainBox container) {
  *       container.super();
  *     }
- * 
+ *
  *     &#064;Replace
  *     public class NameExField extends AbstractFirstGroupBox.NameField {
  *       public NameExField(AbstractFirstGroupBox container) {
@@ -92,12 +107,12 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   &#064;Order(10)
  *   public class FirstColumn extends AbstractStringColumn {
  *   }
- * 
+ *
  *   &#064;Order(20)
  *   public class SecondColumn extends AbstractStringColumn {
  *   }
  * }
- * 
+ *
  * public class ExtendedTable extends Table {
  *   &#064;Replace
  *   public class FirstExColumn extends FirstColumn {
@@ -124,14 +139,14 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *     }
  *   }
  * }
- * 
+ *
  * public class ExtendedForm extends BaseForm {
  *   &#064;Replace
  *   public class TableExField extends NameField {
  *     public TableExField(BaseForm.MainBox.FirstGroupBox container) {
  *       container.super();
  *     }
- * 
+ *
  *     public class TableEx extends Table {
  *       &#064;Replace
  *       public class FirstExColumn extends FirstColumn {
@@ -158,14 +173,14 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *     }
  *   }
  * }
- * 
+ *
  * public class ExtendedForm extends BaseForm {
  *   &#064;Replace
  *   public class MyExSmartField extends MySmartField {
  *     public MyExSmartField(BaseForm.MainBox container) {
  *       container.super();
  *     }
- * 
+ *
  *     &#064;Replace
  *     public class MyExMenu extends MyMenu {
  *     }

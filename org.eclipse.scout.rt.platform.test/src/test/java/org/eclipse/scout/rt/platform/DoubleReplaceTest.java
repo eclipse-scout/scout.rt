@@ -10,20 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SimpleInstanceTest {
+/**
+ * Test case for Class A which is replaced by two child classes
+ */
+public class DoubleReplaceTest {
 
   private static BeanManagerImplementor context;
 
   @BeforeClass
   public static void registerBeans() {
     context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
-    context.registerClass(TestObject.class);
+    context.registerClass(BaseClass.class);
+    context.registerClass(ChildClassB.class);
+    context.registerClass(ChildClassA.class);
   }
 
   @AfterClass
@@ -32,19 +38,21 @@ public class SimpleInstanceTest {
   }
 
   @Test
-  public void test() {
-    TestObject i1 = context.getBean(TestObject.class).getInstance();
-    Assert.assertNotNull(i1);
-    ITestObject i2 = context.getBean(ITestObject.class).getInstance();
-    Assert.assertNotNull(i2);
-    Assert.assertNotEquals(i1, i2);
+  public void testBothPresent() {
+    IBean<BaseClass> bean = context.getBean(BaseClass.class);
+    Assert.assertEquals(ChildClassA.class, bean.getBeanClazz());
   }
 
-  private static interface ITestObject {
+  @ApplicationScoped
+  private static class BaseClass {
 
   }
 
-  private static class TestObject implements ITestObject {
+  @Replace
+  private static class ChildClassB extends BaseClass {
+  }
 
+  @Replace
+  private static class ChildClassA extends BaseClass {
   }
 }

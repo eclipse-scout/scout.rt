@@ -11,10 +11,22 @@
 package org.eclipse.scout.rt.platform;
 
 /**
- * Used in {@link IBean#getInstance(Class)}
+ * Used in {@link IBean#getInstance()}
  * <p>
- * Knows how to create an object instance of a {@link IBean}
+ * Knows how to create an object instance for a {@link IBean}.
+ * <p>
+ * May be provided using {@link BeanMetaData#withProducer(IBeanInstanceProducer)} and
+ * {@link IBeanManager#registerBean(BeanMetaData)}.
+ * 
+ * @since 5.1
  */
 public interface IBeanInstanceProducer<T> {
+  /**
+   * Creates an instance for the given {@link IBean}.
+   * 
+   * @param bean
+   *          The {@link IBean} to create the instance for.
+   * @return The created instance or <code>null</code>.
+   */
   T produce(IBean<T> bean);
 }

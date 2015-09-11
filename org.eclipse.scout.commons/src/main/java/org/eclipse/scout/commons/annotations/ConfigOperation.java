@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,7 +16,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Method is a callback or a method that can be overrided. By convention these methods have a name prefix <i>exec</i>...
+ * Marks a method as callback function that is considered to be public API and may be overridden by clients to change
+ * behavior.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -19,11 +19,13 @@ import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
  * using all the known {@link BeanInvocationHint} annotations on the beans
  * <p>
  * see {@link IBeanInstanceProducer}
+ * 
+ * @since 5.1
  */
 @Bean
 public interface IBeanDecorationFactory {
   /**
    * @return the decorated instance
    */
-  <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType);
+  <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<? extends T> queryType);
 }

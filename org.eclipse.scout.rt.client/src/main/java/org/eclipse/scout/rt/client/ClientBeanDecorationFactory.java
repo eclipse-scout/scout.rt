@@ -16,14 +16,14 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 public class ClientBeanDecorationFactory extends SimpleBeanDecorationFactory {
 
   @Override
-  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType) {
+  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<? extends T> queryType) {
     if (bean.getBeanAnnotation(TunnelToServer.class) != null) {
       return decorateWithTunnelToServer(bean, queryType);
     }
     return super.decorate(bean, queryType);
   }
 
-  protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(IBean<T> bean, Class<T> queryType) {
+  protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(IBean<T> bean, Class<? extends T> queryType) {
     return new TunnelToServerBeanInterceptor<T>(queryType);
   }
 }

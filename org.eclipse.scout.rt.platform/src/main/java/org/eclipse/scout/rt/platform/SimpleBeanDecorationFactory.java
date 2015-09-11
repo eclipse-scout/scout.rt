@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 public class SimpleBeanDecorationFactory implements IBeanDecorationFactory {
 
   @Override
-  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType) {
+  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<? extends T> queryType) {
     return null;
   }
 

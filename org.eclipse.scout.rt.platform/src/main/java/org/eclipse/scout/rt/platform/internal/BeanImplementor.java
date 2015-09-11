@@ -69,15 +69,15 @@ public class BeanImplementor<T> implements IBean<T> {
   }
 
   @Override
-  public T getInstance(Class<T> queryType) {
+  public T getInstance() {
     //produce
     T instance = m_initialInstance != null ? m_initialInstance : m_producer != null ? m_producer.produce(this) : null;
     //decorate
     IBeanDecorationFactory deco = m_beanManager.getBeanDecorationFactory();
-    if (deco != null && queryType.isInterface()) {
-      IBeanInterceptor<T> interceptor = deco.decorate(this, queryType);
+    if (deco != null && m_beanClazz.isInterface()) {
+      IBeanInterceptor<T> interceptor = deco.decorate(this, m_beanClazz);
       if (interceptor != null) {
-        instance = new BeanProxyImplementor<T>(this, interceptor, instance, queryType).getProxy();
+        instance = new BeanProxyImplementor<T>(this, interceptor, instance, m_beanClazz).getProxy();
       }
     }
     return instance;
