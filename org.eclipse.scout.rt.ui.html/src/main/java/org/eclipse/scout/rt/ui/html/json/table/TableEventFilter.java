@@ -53,6 +53,15 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEvent
 
         return null;
       }
+      else if (condition.checkUserFilter()) {
+        if (condition.getUserFilter().equals(event.getUserFilter())) {
+          return null;
+        }
+        //Don't ignore if filters are different
+        return event;
+      }
+
+      return null;
     }
     return event;
   }

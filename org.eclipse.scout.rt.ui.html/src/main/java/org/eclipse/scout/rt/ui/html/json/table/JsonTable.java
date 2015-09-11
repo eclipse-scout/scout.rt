@@ -40,13 +40,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -492,27 +489,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   protected void handleUiResetColumns(JsonEvent event) {
-    // FIXME AWE/CGU Code from ResetColumnsMenu, move to ITableUiFacade
-    try {
-      getModel().setTableChanging(true);
-      getModel().resetDisplayableColumns();
-      try {
-        ITableColumnFilterManager m = getModel().getColumnFilterManager();
-        if (m != null) {
-          m.reset();
-        }
-        ITableCustomizer cst = getModel().getTableCustomizer();
-        if (cst != null) {
-          cst.removeAllColumns();
-        }
-      }
-      catch (ProcessingException e) {
-        throw new UiException("", e);
-      }
-    }
-    finally {
-      getModel().setTableChanging(false);
-    }
+    getModel().getUIFacade().fireTableResetFromUI();
   }
 
   /**
@@ -648,6 +625,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   protected void handleUiAddFilter(JsonEvent event) {
     JSONObject data = event.getData();
     IUserFilterState filter = createFilterState(data);
+    TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_ADDED);
+    condition.setUserFilter(filter);
+    condition.checkUserFilter();
     getModel().getUIFacade().fireFilterAddedFromUI(filter);
   }
 
@@ -683,8 +663,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     String type = data.getString("filterType");
     if ("column".equals(type)) {
       IColumn column = extractColumn(data);
-      Object key = ColumnUserFilterState.createKeyForColumn(column);
-      return getModel().getUserFilterManager().getFilter(key);
+      return getModel().getUserFilterManager().getFilter(column);
     }
 
     return getModel().getUserFilterManager().getFilter(type);
@@ -692,6 +671,9 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
   protected void handleUiRemoveFilter(JsonEvent event) {
     IUserFilterState filter = getFilterState(event.getData());
+    TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_REMOVED);
+    condition.setUserFilter(filter);
+    condition.checkUserFilter();
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
@@ -984,11 +966,15 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
         // See special handling in bufferModelEvent()
         throw new IllegalStateException("Unsupported event type: " + event);
-      case TreeEvent.TYPE_REQUEST_FOCUS:
+      case TableEvent.TYPE_REQUEST_FOCUS:
         handleModelRequestFocus(event);
         break;
-      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
+      case TableEvent.TYPE_SCROLL_TO_SELECTION:
         handleModelScrollToSelection(event);
+        break;
+      case TableEvent.TYPE_USER_FILTER_ADDED:
+      case TableEvent.TYPE_USER_FILTER_REMOVED:
+        handleModelUserFilterChanged(event);
         break;
       default:
         // NOP
@@ -1130,13 +1116,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
     // Resend filters because a column with a filter may got invisible.
     // Since the gui does not know invisible columns, the filter would fail.
-    if (getModel().getUserFilterManager() != null) {
-      Collection<IUserFilterState> filters = getModel().getUserFilterManager().getFilters();
-      // Only resend if there are filters at all
-      if (filters.size() > 0) {
-        addPropertyChangeEvent(PROP_FILTERS, filtersToJson(filters));
-      }
-    }
+    // True means only resend if there are filters at all
+    addUserFiltersChanged(true);
   }
 
   protected void handleModelColumnOrderChanged() {
@@ -1172,6 +1153,24 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
   protected void handleModelScrollToSelection(TableEvent event) {
     addActionEvent(EVENT_SCROLL_TO_SELECTION);
+  }
+
+  protected void handleModelUserFilterChanged(TableEvent event) {
+    addUserFiltersChanged();
+  }
+
+  protected void addUserFiltersChanged() {
+    addUserFiltersChanged(false);
+  }
+
+  protected void addUserFiltersChanged(boolean onlyIfThereAreFilters) {
+    if (getModel().getUserFilterManager() == null) {
+      return;
+    }
+    Collection<IUserFilterState> filters = getModel().getUserFilterManager().getFilters();
+    if (!onlyIfThereAreFilters || filters.size() > 0) {
+      addPropertyChangeEvent(PROP_FILTERS, filtersToJson(filters));
+    }
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {

@@ -16,14 +16,17 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 
 public class TableEventFilterCondition {
 
   private int m_type;
   private List<ITableRow> m_rows;
   private List<IColumn<?>> m_columns;
+  private IUserFilterState m_userFilter;
   private boolean m_checkRows;
   private boolean m_checkColumns;
+  private boolean m_checkUserFilter;
 
   public TableEventFilterCondition(int type) {
     m_type = type;
@@ -53,11 +56,23 @@ public class TableEventFilterCondition {
     m_checkColumns = true;
   }
 
+  public IUserFilterState getUserFilter() {
+    return m_userFilter;
+  }
+
+  public void setUserFilter(IUserFilterState userFilter) {
+    m_userFilter = userFilter;
+  }
+
   public boolean checkRows() {
     return m_checkRows;
   }
 
   public boolean checkColumns() {
     return m_checkColumns;
+  }
+
+  public boolean checkUserFilter() {
+    return m_checkUserFilter;
   }
 }
