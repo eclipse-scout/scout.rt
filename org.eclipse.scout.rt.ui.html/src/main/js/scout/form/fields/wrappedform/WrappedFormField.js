@@ -25,6 +25,7 @@ scout.WrappedFormField.prototype._renderInnerForm = function() {
   if (this.innerForm) {
     this.innerForm.displayHint = 'view'; // by definition, an inner form is a view.
     this.innerForm.modal = false; // by definition, an inner form is not modal.
+    this.innerForm.renderInitialFocusEnabled = false; // do not render initial focus of form
 
     this.innerForm.render(this.$container);
 
