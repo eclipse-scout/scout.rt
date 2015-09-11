@@ -80,11 +80,6 @@ public class JsonProposalChooser<PROPOSAL_CHOOSER extends IProposalChooser> exte
     }
   }
 
-  @Override
-  protected void detachModel() {
-    getUiSession().currentJsonResponse().getEventList();
-  }
-
   private void handleActiveFilterChanged(JsonEvent event) {
     String state = event.getData().optString("state", null);
     getModel().updateActiveFilter(TriState.valueOf(state));
