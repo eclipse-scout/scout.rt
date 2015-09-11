@@ -370,7 +370,7 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 /* communication with outline */
 
 scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
-  bringToFront = bringToFront || true;
+  bringToFront = scout.helpers.nvl(bringToFront,true);
   if (this._outlineContent && this._outlineContent !== content) {
     this._outlineContent.remove();
     this._outlineContent = null;
@@ -398,6 +398,9 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
 
     content.htmlComp.validateLayout();
     content.htmlComp.validateRoot = true;
+  }
+  else if(!content.attached){
+    content.attach();
   }
 
   //set active form to null because outline is active form.
