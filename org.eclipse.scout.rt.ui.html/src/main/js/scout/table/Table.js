@@ -1999,6 +1999,7 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
   }
+  this.trigger('addFilter', {filter: filter});
 };
 
 //TODO CGU use filter as param or rename to removeFilterByKey
@@ -2008,11 +2009,15 @@ scout.Table.prototype.removeFilter = function(key, notifyServer) {
     throw new Error('key has to be defined');
   }
   var filter = this._filterMap[key];
+  if (!filter) {
+    return;
+  }
   delete this._filterMap[key];
 
   if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
   }
+  this.trigger('removeFilter', {filter: filter});
 };
 
 scout.Table.prototype.getFilter = function(key) {

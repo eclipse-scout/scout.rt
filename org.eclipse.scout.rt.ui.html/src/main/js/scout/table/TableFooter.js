@@ -89,7 +89,22 @@ scout.TableFooter.prototype._render = function($parent) {
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
     this._updateInfoFilter();
+  }.bind(this));
+
+  this._table.events.on('addFilter', function(event) {
+    this._updateInfoFilter();
     this._updateInfoFilterVisibility();
+    if (event.filter.filterType === scout.TableTextUserFilter.Type) {
+      this._$filterField.val(event.filter.text);
+    }
+  }.bind(this));
+
+  this._table.events.on('removeFilter', function(event) {
+    this._updateInfoFilter();
+    this._updateInfoFilterVisibility();
+    if (event.filter.filterType === scout.TableTextUserFilter.Type) {
+      this._$filterField.val('');
+    }
   }.bind(this));
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
@@ -266,7 +281,6 @@ scout.TableFooter.prototype._onClickInfoLoad = function() {
 
 scout.TableFooter.prototype._onClickInfoFilter = function() {
   this._table.resetFilter();
-  this._$filterField.val('');
 };
 
 scout.TableFooter.prototype._onClickInfoSelection = function() {
