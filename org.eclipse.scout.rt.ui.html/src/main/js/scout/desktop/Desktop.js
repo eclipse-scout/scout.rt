@@ -411,7 +411,7 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
 
 scout.Desktop.prototype.setOutline = function(outline, bringToFront) {
   this.outline = outline;
-  this.navigation.onOutlineChanged(this.outline);
+  this.navigation.onOutlineChanged(this.outline, bringToFront);
 };
 
 scout.Desktop.prototype._onModelFormShow = function(event) {
