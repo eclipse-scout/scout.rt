@@ -20,8 +20,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.TableColumnFilterEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.TableColumnFilterListener;
+import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -68,11 +69,11 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     }
   };
 
-  private final TableColumnFilterListener m_tableColumnFilterListener = new TableColumnFilterListener() {
+  private final TableListener m_tableListener = new TableAdapter() {
     @Override
-    public void tableColumnFilterChanged(TableColumnFilterEvent e) throws ProcessingException {
+    public void tableChanged(TableEvent e) {
       if (!m_active) {
-        e.getColumnFilterManager().removeListener(m_tableColumnFilterListener);
+        e.getTable().removeTableListener(m_tableListener);
         return;
       }
       String id = m_tableToIdentifierMap.get(e.getTable());
@@ -116,7 +117,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
       if (table != null) {
         String pageTableIdentifier = registerPageTable(pt, table);
         if (pageTableIdentifier != null) {
-          loadColumnFilterState(table, pageTableIdentifier);
+          loadUserFilterState(table, pageTableIdentifier);
         }
       }
     }
@@ -151,13 +152,13 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
    * @return the identifier for the page table or <code>null</code> if the table does not have a column filter manager.
    */
   protected String registerPageTable(IPage<?> p, ITable t) {
-    if (t.getColumnFilterManager() == null) {
+    if (t.getUserFilterManager() == null) {
       return null;
     }
     String id = createUniqueIdForPage(p, t);
     m_tableToIdentifierMap.put(t, id);
-    t.getColumnFilterManager().removeListener(m_tableColumnFilterListener);
-    t.getColumnFilterManager().addListener(m_tableColumnFilterListener);
+    t.removeTableListener(m_tableListener);
+    t.addTableListener(m_tableListener);
     return id;
   }
 
@@ -232,23 +233,21 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     //nop
   }
 
-  protected void handleTableFilterEvent(TableColumnFilterEvent e, String id) throws ProcessingException {
+  protected void handleTableFilterEvent(TableEvent e, String id) throws ProcessingException {
     switch (e.getType()) {
-      case TableColumnFilterEvent.TYPE_FILTER_ADDED:
-      case TableColumnFilterEvent.TYPE_FILTER_CHANGED:
-      case TableColumnFilterEvent.TYPE_FILTER_REMOVED:
-      case TableColumnFilterEvent.TYPE_FILTERS_RESET:
-        storeColumnFilterState(e.getTable(), id);
+      case TableEvent.TYPE_USER_FILTER_ADDED:
+      case TableEvent.TYPE_USER_FILTER_REMOVED:
+        storeUserFilterState(e.getTable(), id);
         break;
     }
 
   }
 
-  protected void storeColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+  protected void storeUserFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
     // nop
   }
 
-  protected void loadColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
+  protected void loadUserFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
     // nop
   }
 

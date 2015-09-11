@@ -400,9 +400,6 @@ public final class BookmarkUtility {
           colState.setSortOrder(-1);
         }
       }
-      if (table.getColumnFilterManager() != null && c.isColumnFilterActive()) {
-        colState.setColumnFilterData(table.getColumnFilterManager().getSerializedFilter(c));
-      }
       allColumns.add(colState);
     }
     return allColumns;
@@ -437,21 +434,6 @@ public final class BookmarkUtility {
       List<IColumn<?>> existingVisibleCols = columnSet.getVisibleColumns();
       if (!existingVisibleCols.equals(visibleColumns)) {
         columnSet.setVisibleColumns(visibleColumns);
-      }
-      // filters
-      if (table.getColumnFilterManager() != null) {
-        // If a column filter was set, but did not have one before
-        // the change, it will not be reset.
-        // So reset all column filters beforehand:
-        table.getColumnFilterManager().reset();
-        for (TableColumnState colState : oldColumns) {
-          if (colState.getColumnFilterData() != null) {
-            IColumn col = BookmarkUtility.resolveColumn(columnSet.getColumns(), colState.getClassName());
-            if (col != null) {
-              table.getColumnFilterManager().setSerializedFilter(colState.getColumnFilterData(), col);
-            }
-          }
-        }
       }
       //sort order (only respect visible and user-sort columns)
       boolean userSortValid = true;
@@ -734,8 +716,8 @@ public final class BookmarkUtility {
 
     // check, whether table column filter must be reset
     if (resetViewAndWarnOnFail) {
-      if (childPage == null || (!childPage.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled())) {
-        table.getColumnFilterManager().reset();
+      if (childPage == null || (!childPage.isFilterAccepted() && table.getUserFilterManager() != null)) {
+        table.getUserFilterManager().reset();
         tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResetColumnFilters"), IStatus.WARNING));
       }
     }
@@ -765,8 +747,8 @@ public final class BookmarkUtility {
       if (p != null) {
         ITable table = nodePage.getTable();
         // reset table column filter if requested
-        if (resetViewAndWarnOnFail && !p.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
-          table.getColumnFilterManager().reset();
+        if (resetViewAndWarnOnFail && !p.isFilterAccepted() && table.getUserFilterManager() != null) {
+          table.getUserFilterManager().reset();
         }
 
         // check table column filter

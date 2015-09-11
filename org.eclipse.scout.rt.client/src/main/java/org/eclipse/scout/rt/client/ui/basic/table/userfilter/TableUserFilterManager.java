@@ -14,13 +14,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 
 /**
@@ -30,20 +32,36 @@ public class TableUserFilterManager {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableUserFilterManager.class);
 
   private Map<Object, IUserFilterState> m_filterMap = new HashMap<Object, IUserFilterState>();
-  private ITable m_table;
+  private AbstractTable m_table;
 
-  public TableUserFilterManager(ITable table) {
+  public TableUserFilterManager(AbstractTable table) {
     m_table = table;
   }
 
   public void addFilter(IUserFilterState filter) throws ProcessingException {
     m_filterMap.put(filter.createKey(), filter);
+    fireFilterAdded(filter);
     LOG.info("Filter added " + filter);
   }
 
   public void removeFilter(IUserFilterState filter) throws ProcessingException {
-    m_filterMap.remove(filter.createKey());
+    removeFilterByKey(filter.createKey());
+  }
+
+  public void removeFilterByKey(Object key) throws ProcessingException {
+    IUserFilterState filter = m_filterMap.remove(key);
+    fireFilterRemoved(filter);
     LOG.info("Filter removed " + filter);
+  }
+
+  public void reset() throws ProcessingException {
+    for (IUserFilterState filter : new ArrayList<>(m_filterMap.values())) {
+      removeFilter(filter);
+    }
+  }
+
+  public boolean isEmpty() {
+    return m_filterMap.isEmpty();
   }
 
   public IUserFilterState getFilter(Object key) {
@@ -52,6 +70,26 @@ public class TableUserFilterManager {
 
   public Collection<IUserFilterState> getFilters() {
     return Collections.unmodifiableCollection(m_filterMap.values());
+  }
+
+  public List<String> getDisplayTexts() {
+    ArrayList<String> list = new ArrayList<String>();
+    for (IUserFilterState filter : m_filterMap.values()) {
+      list.add(filter.getDisplayText());
+    }
+    return list;
+  }
+
+  private void fireFilterAdded(IUserFilterState filter) throws ProcessingException {
+    TableEvent event = new TableEvent(m_table, TableEvent.TYPE_USER_FILTER_ADDED);
+    event.setUserFilter(filter);
+    m_table.fireTableEventInternal(event);
+  }
+
+  private void fireFilterRemoved(IUserFilterState filter) throws ProcessingException {
+    TableEvent event = new TableEvent(m_table, TableEvent.TYPE_USER_FILTER_REMOVED);
+    event.setUserFilter(filter);
+    m_table.fireTableEventInternal(event);
   }
 
   /**

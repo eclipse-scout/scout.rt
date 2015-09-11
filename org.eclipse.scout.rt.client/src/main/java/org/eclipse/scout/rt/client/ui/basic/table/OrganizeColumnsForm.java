@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetAllMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetFiltersMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetSortingMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu.ResetViewMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -955,7 +956,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return TEXTS.get("Remove");
+            return TEXTS.get("Filter");
           }
 
           @Override
@@ -965,21 +966,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            Integer selectedIndex = null;
-            if (m_table != null && getColumnsTableField().getTable().getSelectedRow() != null) {
-              selectedIndex = getColumnsTableField().getTable().getSelectedRow().getRowIndex();
-              if (m_table.getColumnFilterManager() != null) {
-                IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
-                if (col != null) {
-                  m_table.getColumnFilterManager().removeFilter(col);
-                  m_table.applyRowFilters();
-                }
-              }
-            }
-            getColumnsTableField().reloadTableData();
-            if (selectedIndex != null) {
-              getColumnsTableField().getTable().selectRow(selectedIndex);
-            }
+            doResetAction(ResetFiltersMenu.class);
           }
 
         }
@@ -1035,7 +1022,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     ITableRow selectedRow = getColumnsTableField().getTable().getSelectedRow();
     boolean selectedRowExists = selectedRow != null;
     boolean isCustomColumn = selectedRow != null && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow) instanceof ICustomColumn<?>;
-    boolean selectedRowHasFilter = selectedRowExists && getColumnsTableField().getTable().getKeyColumn().getValue(selectedRow).isColumnFilterActive();
+    boolean filterActive = m_table.getUserFilterManager() != null && !m_table.getUserFilterManager().isEmpty();
     boolean sortEnabled = m_table.isSortEnabled();
     getModifyCustomColumnButton().setEnabled(isCustomColumn);
     getRemoveCustomColumnButton().setEnabled(isCustomColumn);
@@ -1047,13 +1034,13 @@ public class OrganizeColumnsForm extends AbstractForm {
     getDescendingButton().setEnabled(sortEnabled && selectedRowExists);
     getWithoutButton().setEnabled(sortEnabled && selectedRowExists);
 
-    getRemoveFilterButton().setEnabled(selectedRowHasFilter);
+    getRemoveFilterButton().setEnabled(filterActive);
   }
 
   private void doResetAction(Class<? extends IMenu> action) throws ProcessingException {
     ResetColumnsMenu menu = new ResetColumnsMenu(m_table);
-    List<IMenu> childs = menu.getChildActions();
-    for (IMenu child : childs) {
+    List<IMenu> children = menu.getChildActions();
+    for (IMenu child : children) {
       if (child.getClass().equals(action)) {
         child.doAction();
       }
@@ -1103,6 +1090,7 @@ public class OrganizeColumnsForm extends AbstractForm {
   public class ModifyHandler extends AbstractFormHandler {
 
     private byte[] m_tableCustomizerData;
+    private byte[] m_oldUserFilterData;
     private List<TableColumnState> m_oldColumns;
     private Object[][] m_oldData;
 
@@ -1115,6 +1103,9 @@ public class OrganizeColumnsForm extends AbstractForm {
       }
       m_oldColumns = BookmarkUtility.backupTableColumns(m_table);
       m_oldData = m_table.getTableData();
+      if (m_table.getUserFilterManager() != null) {
+        m_oldUserFilterData = m_table.getUserFilterManager().getSerializedData();
+      }
       getColumnsTableField().reloadTableData();
     }
 
@@ -1142,6 +1133,9 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
           m_table.resetColumnConfiguration();
           BookmarkUtility.restoreTableColumns(m_table, m_oldColumns);
+          if (m_table.getUserFilterManager() != null) {
+            m_table.getUserFilterManager().setSerializedData(m_oldUserFilterData);
+          }
           m_table.addRowsByMatrix(m_oldData);
         }
         finally {

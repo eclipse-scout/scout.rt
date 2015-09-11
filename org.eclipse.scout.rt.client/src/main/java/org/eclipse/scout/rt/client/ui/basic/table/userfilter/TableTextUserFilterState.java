@@ -33,4 +33,9 @@ public class TableTextUserFilterState extends AbstractUserFilterState implements
     m_text = text;
   }
 
+  @Override
+  public String getDisplayText() {
+    return m_text;
+  }
+
 }

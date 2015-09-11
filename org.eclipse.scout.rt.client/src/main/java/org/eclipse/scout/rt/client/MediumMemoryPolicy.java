@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -24,9 +22,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -47,11 +43,11 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   private boolean m_release = false;
   //cache last 5 search form contents and table filters
   private final LRUCache<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
-  private final LRUCache<String /*pageTableIdentifier*/, Map<String, byte[]>> m_tableColumnFilterManagerState;
+  private final LRUCache<String /*pageTableIdentifier*/, byte[]> m_tableUserFilterState;
 
   public MediumMemoryPolicy() {
     m_searchFormCache = new LRUCache<String, SearchFormState>(5, 0L);
-    m_tableColumnFilterManagerState = new LRUCache<String, Map<String, byte[]>>(5, 0L);
+    m_tableUserFilterState = new LRUCache<String, byte[]>(5, 0L);
   }
 
   @Override
@@ -82,44 +78,24 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  protected void storeColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
-    ITableColumnFilterManager filterManager = t.getColumnFilterManager();
-    if (filterManager == null || filterManager.getFilters().isEmpty()) {
-      m_tableColumnFilterManagerState.remove(pageTableIdentifier);
+  protected void storeUserFilterState(ITable table, String pageTableIdentifier) throws ProcessingException {
+    TableUserFilterManager filterManager = table.getUserFilterManager();
+    if (filterManager == null || filterManager.isEmpty()) {
+      m_tableUserFilterState.remove(pageTableIdentifier);
       return;
     }
-    Map<String, byte[]> state = m_tableColumnFilterManagerState.get(pageTableIdentifier);
-    if (state == null) {
-      state = new HashMap<String, byte[]>();
-      m_tableColumnFilterManagerState.put(pageTableIdentifier, state);
-    }
-    for (ITableColumnFilter<?> filter : filterManager.getFilters()) {
-      IColumn<?> col = filter.getColumn();
-      if (col.getColumnId() != null) {
-        byte[] data = filterManager.getSerializedFilter(col);
-        if (data == null || data.length == 0) {
-          state.remove(col.getColumnId());
-        }
-        else {
-          state.put(col.getColumnId(), data);
-        }
-      }
-    }
+    m_tableUserFilterState.put(pageTableIdentifier, filterManager.getSerializedData());
   }
 
   @Override
-  protected void loadColumnFilterState(ITable t, String pageTableIdentifier) throws ProcessingException {
-    if (t == null || t.getColumnFilterManager() == null) {
+  protected void loadUserFilterState(ITable table, String pageTableIdentifier) throws ProcessingException {
+    TableUserFilterManager filterManager = table.getUserFilterManager();
+    if (filterManager == null) {
       return;
     }
-    Map<String, byte[]> state = m_tableColumnFilterManagerState.get(pageTableIdentifier);
+    byte[] state = m_tableUserFilterState.get(pageTableIdentifier);
     if (state != null) {
-      for (Map.Entry<String, byte[]> entry : state.entrySet()) {
-        IColumn col = t.getColumnSet().getColumnById(entry.getKey());
-        if (col != null) {
-          t.getColumnFilterManager().setSerializedFilter(entry.getValue(), col);
-        }
-      }
+      filterManager.setSerializedData(state);
     }
   }
 

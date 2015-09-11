@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ColumnUserFilterState extends AbstractUserFilterState implements IUserFilterState {
   private static final long serialVersionUID = 1L;
@@ -36,7 +37,7 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
     return m_column;
   }
 
-  private void setColumn(IColumn<?> column) {
+  public void setColumn(IColumn<?> column) {
     m_column = column;
     m_columnId = column.getColumnId();
   }
@@ -51,11 +52,12 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
 
   @Override
   public Object createKey() {
-    return createKeyForColumn(getColumn());
+    return getColumn();
   }
 
-  public static Object createKeyForColumn(IColumn<?> column) {
-    return column;
+  @Override
+  public String getDisplayText() {
+    return ScoutTexts.get("Column") + " \"" + getColumn().getHeaderCell().getText() + "\"";
   }
 
   @Override

@@ -28,4 +28,6 @@ public interface IUserFilterState extends Serializable {
   Object createKey();
 
   void notifyDeserialized(Object obj) throws ProcessingException;
+
+  String getDisplayText();
 }
