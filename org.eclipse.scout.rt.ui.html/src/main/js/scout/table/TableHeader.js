@@ -232,6 +232,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   }
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
+    $headerResize,
     width = column.width,
     menuBarWidth = this._$menuBar.outerWidth(),
     isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
@@ -243,8 +244,13 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
       adjustment = menuBarWidth - remainingHeaderSpace + 1;
       width -= adjustment;
       width = Math.max(width, scout.Table.COLUMN_MIN_WIDTH);
-      this.$filler.cssWidth(adjustment);
+
+      this.$filler.cssWidth(column.width - width);
     }
+
+    // adjust visibility of last resize item (avoid unnecessary scroll bars) (e.g. COLUMN_MIN_WIDTH has been used).
+    $headerResize = $header.next('.header-resize');
+    $headerResize.css('display', (remainingHeaderSpace > menuBarWidth || column.width - width >= adjustment) ? '' : 'none');
   }
   $header
     .css('min-width', width)

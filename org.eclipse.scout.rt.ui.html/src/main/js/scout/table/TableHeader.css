@@ -96,6 +96,12 @@
     color: @active-color;
     z-index: 1;
   }
+
+  &.filler {
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
 }
 
 .header-resize {
