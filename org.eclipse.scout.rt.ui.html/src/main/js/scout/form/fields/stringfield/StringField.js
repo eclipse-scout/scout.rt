@@ -69,8 +69,6 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderFormat(this.format);
   this._renderSpellCheckEnabled(this.spellCheckEnabled);
   this._renderHasAction(this.hasAction);
-  this._renderSelectionStart(this.selectionStart);
-  this._renderSelectionEnd(this.selectionEnd);
   this._renderMaxLength();
   // no render operation necessary: this._renderSelectionTrackingEnabled(...);
 };
