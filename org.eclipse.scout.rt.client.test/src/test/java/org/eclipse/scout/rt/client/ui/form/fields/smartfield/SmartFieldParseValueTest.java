@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
@@ -168,10 +169,26 @@ public class SmartFieldParseValueTest {
     }
   }
 
+  /**
+   * Test case for #163567. When a SmartField has the following proposals:
+   * <ul>
+   * <li>foo</li>
+   * <li>fooBar</li>
+   * </ul>
+   * When the user clicks on "foo" in the proposalChooser and then clicks into another field acceptProposal is called
+   * with "foo". In that case (displayText == text of current lookup row) the smart-field should not lookup rows! It
+   * would result in a validation error because the search-term "foo" is not unique and would match more than 1
+   * proposal, which results in a validation error.
+   */
   @Test
-  public void testForceClose() throws Exception {
-    // FIXME AWE: test
-
+  public void testHandleAcceptByDisplayText() throws Exception {
+    ILookupRow<Long> currentLookupRow = LookupRows.ROW_1;
+    String displayText = "aName";
+    m_smartField.setCurrentLookupRow(currentLookupRow);
+    boolean openProposalChooser = m_smartField.handleAcceptByDisplayText(displayText);
+    assertFalse(openProposalChooser);
+    assertSame(currentLookupRow, m_smartField.getCurrentLookupRow());
+    assertNull(m_smartField.getErrorStatus());
   }
 
   int getProposalTableRowCount() {
