@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 
 public class TableEvent extends java.util.EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
@@ -135,14 +136,17 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   public static final int TYPE_TABLE_POPULATED = 820;
 
   /**
+   * Advise to scroll to selection
+   */
+  public static final int TYPE_SCROLL_TO_SELECTION = 830;
+
+  /**
    * A rows has been checked or unchecked
    */
   public static final int TYPE_ROWS_CHECKED = 850;
 
-  /**
-   * Advise to scroll to selection
-   */
-  public static final int TYPE_SCROLL_TO_SELECTION = 830;
+  public static final int TYPE_USER_FILTER_ADDED = 900;
+  public static final int TYPE_USER_FILTER_REMOVED = 910;
 
   private final int m_type;
   private List<? extends ITableRow> m_rows;
@@ -154,6 +158,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   private Collection<? extends IColumn<?>> m_columns;
   private Map<ITableRow, Set<IColumn<?>>> m_updatedColumns;
   private boolean m_sortInMemoryAllowed;
+  private IUserFilterState m_userFilter;
 
   public TableEvent(ITable source, int type) {
     this(source, type, null);
@@ -318,6 +323,14 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
    */
   public Set<IColumn<?>> getUpdatedColumns(ITableRow row) {
     return CollectionUtility.hashSet(m_updatedColumns == null ? null : m_updatedColumns.get(row));
+  }
+
+  public void setUserFilter(IUserFilterState userFilter) {
+    m_userFilter = userFilter;
+  }
+
+  public IUserFilterState getUserFilter() {
+    return m_userFilter;
   }
 
   /**

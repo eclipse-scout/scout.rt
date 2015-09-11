@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
@@ -102,11 +101,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link IColumn}
    */
   String PROP_CONTEXT_COLUMN = "contextColumn";
-
-  /**
-   * {@link ITableColumnFilterManager}
-   */
-  String PROP_COLUMN_FILTER_MANAGER = "columnFilterManger";
 
   /**
    * {@link TableUserFilterManager}
@@ -817,10 +811,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   boolean isSortEnabled();
 
   void setSortEnabled(boolean b);
-
-  ITableColumnFilterManager getColumnFilterManager();
-
-  void setColumnFilterManager(ITableColumnFilterManager m);
 
   TableUserFilterManager getUserFilterManager();
 

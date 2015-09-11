@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.userfilter;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * @since 5.1
@@ -32,6 +33,11 @@ public class AbstractUserFilterState implements IUserFilterState {
   @Override
   public Object createKey() {
     return m_type;
+  }
+
+  @Override
+  public String getDisplayText() {
+    return TEXTS.get("Filter");
   }
 
   @Override

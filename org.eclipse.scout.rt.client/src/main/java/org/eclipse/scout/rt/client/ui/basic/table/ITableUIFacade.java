@@ -98,6 +98,8 @@ public interface ITableUIFacade {
 
   void fireTableReloadFromUI();
 
+  void fireTableResetFromUI();
+
   void fireSortColumnRemovedFromUI(IColumn<?> column);
 
   void fireFilterAddedFromUI(IUserFilterState filter);

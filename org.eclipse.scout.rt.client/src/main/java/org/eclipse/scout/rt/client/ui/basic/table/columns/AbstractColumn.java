@@ -54,7 +54,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -1338,7 +1338,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public boolean isColumnFilterActive() {
     ITable table = getTable();
     if (table != null) {
-      ITableColumnFilterManager m = table.getColumnFilterManager();
+      TableUserFilterManager m = table.getUserFilterManager();
       if (m != null) {
         return m.getFilter(this) != null;
       }

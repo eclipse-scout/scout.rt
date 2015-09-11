@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ResetColumnsMenu extends AbstractMenu {
@@ -62,7 +62,7 @@ public class ResetColumnsMenu extends AbstractMenu {
         m_table.setTableChanging(true);
         //
         m_table.resetDisplayableColumns();
-        ITableColumnFilterManager m = m_table.getColumnFilterManager();
+        TableUserFilterManager m = m_table.getUserFilterManager();
         if (m != null) {
           m.reset();
         }
@@ -150,11 +150,11 @@ public class ResetColumnsMenu extends AbstractMenu {
   }
 
   @Order(50.0)
-  public class ResetColumnFiltersMenu extends AbstractMenu {
+  public class ResetFiltersMenu extends AbstractMenu {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ResetTableColumnFilter");
+      return ScoutTexts.get("ResetTableFilter");
     }
 
     @Override
@@ -173,7 +173,7 @@ public class ResetColumnsMenu extends AbstractMenu {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-          if (ITable.PROP_COLUMN_FILTER_MANAGER.equals(evt.getPropertyName())) {
+          if (ITable.PROP_USER_FILTER_MANAGER.equals(evt.getPropertyName())) {
             updateVisibility();
           }
         }
@@ -183,7 +183,7 @@ public class ResetColumnsMenu extends AbstractMenu {
     }
 
     private void updateVisibility() {
-      setVisible(m_table.getColumnFilterManager() != null);
+      setVisible(m_table.getUserFilterManager() != null);
     }
 
     @Override
@@ -191,7 +191,7 @@ public class ResetColumnsMenu extends AbstractMenu {
       try {
         m_table.setTableChanging(true);
         //
-        ITableColumnFilterManager m = m_table.getColumnFilterManager();
+        TableUserFilterManager m = m_table.getUserFilterManager();
         if (m != null) {
           m.reset();
         }

@@ -87,9 +87,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColumnFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -100,6 +97,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
@@ -1202,9 +1200,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   protected void initTableInternal() throws ProcessingException {
     initColumnsInternal();
-    if (getColumnFilterManager() == null) {
-      setColumnFilterManager(createColumnFilterManager());
-    }
     if (getUserFilterManager() == null) {
       setUserFilterManager(createUserFilterManager());
     }
@@ -1924,15 +1919,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     return c;
-  }
-
-  /**
-   * factory to manage table column filters
-   * <p>
-   * default creates a {@link DefaultTableColumnFilterManager}
-   */
-  protected ITableColumnFilterManager createColumnFilterManager() {
-    return new DefaultTableColumnFilterManager(this);
   }
 
   /**
@@ -3075,6 +3061,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       fireRowOrderChanged();
       // rebuild selection
       selectRows(getSelectedRows(), false);
+      //FIXME CGU rebuild checked rows as well
     }
   }
 
@@ -3336,16 +3323,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public ITableColumnFilterManager getColumnFilterManager() {
-    return (ITableColumnFilterManager) propertySupport.getProperty(PROP_COLUMN_FILTER_MANAGER);
-  }
-
-  @Override
-  public void setColumnFilterManager(ITableColumnFilterManager m) {
-    propertySupport.setProperty(PROP_COLUMN_FILTER_MANAGER, m);
-  }
-
-  @Override
   public ITableCustomizer getTableCustomizer() {
     return (ITableCustomizer) propertySupport.getProperty(PROP_TABLE_CUSTOMIZER);
   }
@@ -3448,7 +3425,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_checkedRows = new LinkedHashSet<>(newCheckedRows);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void resetColumnConfiguration() {
     discardAllRows();
@@ -3470,22 +3446,29 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           col.setDisplayable(displayableState.get(col.getColumnId()));
         }
       }
-      // re-apply existing filters to new columns
-      ITableColumnFilterManager filterManager = getColumnFilterManager();
-      if (filterManager != null) {
-        for (IColumn<?> col : getColumns()) {
-          for (ITableColumnFilter filter : filterManager.getFilters()) {
-            if (filter.getColumn().getColumnId().equals(col.getColumnId())) {
-              filter.setColumn(col);
-            }
-          }
-          filterManager.refresh();
-        }
-      }
+      // re link existing filters to new columns
+      linkColumnFilters();
       fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED));
     }
     finally {
       setTableChanging(false);
+    }
+  }
+
+  private void linkColumnFilters() {
+    TableUserFilterManager filterManager = getUserFilterManager();
+    if (filterManager == null) {
+      return;
+    }
+    for (IColumn<?> col : getColumns()) {
+      IUserFilterState filter = getUserFilterManager().getFilter(col);
+      if (filter == null) {
+        continue;
+      }
+      if (!(filter instanceof ColumnUserFilterState)) {
+        throw new IllegalStateException("Unexpected filter state" + filter.getClass());
+      }
+      ((ColumnUserFilterState) filter).setColumn(col);
     }
   }
 
@@ -4056,7 +4039,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   // main handler
-  protected void fireTableEventInternal(TableEvent e) {
+  public void fireTableEventInternal(TableEvent e) {
     if (isTableChanging()) {
       // buffer the event for later batch firing
       getEventBuffer().add(e);
@@ -4233,7 +4216,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
-  // FIXME CGU: merge with ITableField table status. Probably move status from field to table to make it work without a field (outline mode)
   @Override
   public boolean isTableStatusVisible() {
     return propertySupport.getPropertyBool(PROP_TABLE_STATUS_VISIBLE);
@@ -4557,6 +4539,30 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         finally {
           popUIProcessor();
         }
+      }
+    }
+
+    @Override
+    public void fireTableResetFromUI() {
+      try {
+        setTableChanging(true);
+        resetDisplayableColumns();
+        try {
+          TableUserFilterManager m = getUserFilterManager();
+          if (m != null) {
+            m.reset();
+          }
+          ITableCustomizer cst = getTableCustomizer();
+          if (cst != null) {
+            cst.removeAllColumns();
+          }
+        }
+        catch (ProcessingException e) {
+          BEANS.get(ExceptionHandler.class).handle(e);
+        }
+      }
+      finally {
+        setTableChanging(false);
       }
     }
 
