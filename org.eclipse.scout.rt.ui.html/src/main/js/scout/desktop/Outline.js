@@ -338,6 +338,11 @@ scout.Outline.prototype._onPageChanged = function(event) {
   }
 };
 
+scout.Outline.prototype._onNodesSelected = function(nodeIds) {
+  scout.Outline.parent.prototype._onNodesSelected.call(this, nodeIds);
+  this.handleOutlineContent(true);
+};
+
 scout.Outline.prototype.onModelAction = function(event) {
   if (event.type === 'pageChanged') {
     this._onPageChanged(event);
