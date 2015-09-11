@@ -48,6 +48,7 @@
   text-align: center;
   border-radius: 50%;
   border: 1px solid transparent;
+  #scout.vendor(transition; border-color 0.2s, background-color 0.1s); /* use semicolon as first separator to allow comma separated second argument */
 
   /* helps to center days between 10 and 19 nicer */
   &.center-nice {
@@ -81,13 +82,22 @@
     font-weight: bold;
   }
 
+  &.date-picker-preselected {
+    border-color:  @item-selection-border-color;
+    border-style: dashed;
+
+    &.date-picker-now {
+      border-color:  @highlight-color;
+    }
+  }
+
   &.date-picker-selected {
     background-color:  @item-selection-border-color;
     color: @palette-white;
 
     &.date-picker-now {
-    background-color:  @highlight-color;
-    color: @palette-white;
+      background-color:  @highlight-color;
+      color: @palette-white;
     }
   }
 }

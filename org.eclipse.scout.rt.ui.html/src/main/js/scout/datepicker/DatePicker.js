@@ -3,6 +3,10 @@ scout.DatePicker = function(session, dateFormat) {
   this.init(session);
 
   this.dateFormat = dateFormat;
+  // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
+  // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
+  // the UP or DOWN key while no date is selected.)
+  this.preselectedDate;
   this.selectedDate;
   this.viewDate;
   this.$container;
@@ -32,6 +36,11 @@ scout.DatePicker.prototype._render = function($parent) {
   });
 };
 
+scout.DatePicker.prototype.preselectDate = function(date, animated) {
+  this.preselectedDate = date;
+  this.show(date, null, animated);
+};
+
 scout.DatePicker.prototype.selectDate = function(date, animated) {
   this.show(null, date, animated);
 };
@@ -39,10 +48,14 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
 
-  this.selectedDate = selectedDate || new Date();
+  this.selectedDate = selectedDate;
+  if (this.selectedDate) {
+    // Clear preselection when a date is selected
+    this.preselectedDate = null;
+  }
 
   if (!viewDate) {
-    viewDate = this.selectedDate;
+    viewDate = this.selectedDate || new Date();
   }
   if (this.viewDate && viewDate) {
     viewDateDiff = scout.dates.compareMonths(viewDate, this.viewDate);
@@ -152,7 +165,10 @@ scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
 };
 
 scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
-  var date = scout.dates.shift(this.selectedDate, years, months, days);
+  var date = this.preselectedDate;
+  if (this.selectedDate) {
+    date = scout.dates.shift(this.selectedDate, years, months, days);
+  }
 
   this.trigger('dateSelect', {
     date: date,
@@ -198,7 +214,10 @@ scout.DatePicker.prototype._build$DateBox = function() {
       cl += ' date-picker-now';
     }
 
-    if (scout.dates.isSameDay(start, this.selectedDate)) {
+    if (scout.dates.isSameDay(start, this.preselectedDate)) {
+      cl += ' date-picker-preselected';
+    }
+    else if (scout.dates.isSameDay(start, this.selectedDate)) {
       cl += ' date-picker-selected';
     }
 

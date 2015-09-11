@@ -20,6 +20,13 @@ scout.DatePickerPopup.prototype._render = function($parent) {
     .on('mousedown', this._onContainerMouseDown.bind(this));
 };
 
+scout.DatePickerPopup.prototype.preselectDate = function(date, animated) {
+  if (!this.isOpen()) {
+    this.render();
+  }
+  this.picker.preselectDate(date, animated);
+};
+
 scout.DatePickerPopup.prototype.selectDate = function(date, animated) {
   if (!this.isOpen()) {
     this.render();
