@@ -14,10 +14,17 @@
    * see a component with a style like this, but technically it is not set to 'not visible').
    */
   function elemVisible(elem) {
-    var style = window.getComputedStyle(elem);
-    return !(
-        'none' === style.display ||
-        'hidden' === style.visibility);
+    // Check if element itself is hidden by its own style attribute
+    if (_isHidden(elem.style)) {
+      return false;
+    }
+    // Check if element itself is hidden by external style-sheet
+    return !_isHidden(window.getComputedStyle(elem));
+
+    function _isHidden(style) {
+      return 'none' === style.display ||
+             'hidden' === style.visibility;
+    }
   }
 
   // === $ extensions ===
@@ -273,6 +280,7 @@
 
   $.fn.setVisible = function(visible) {
     var i, elem;
+    console.log('setVisible visible=' + visible + ' length=' + this.length + ' this=' + scout.graphics.debugOutput(this));
     for (i = 0; i < this.length; i++) {
       elem = this[i];
       if (elemVisible(elem) != visible) {
