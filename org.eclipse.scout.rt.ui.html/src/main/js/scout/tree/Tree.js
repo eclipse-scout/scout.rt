@@ -395,8 +395,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
   animate = scout.helpers.nvl(animate, true);
 
-  var $wrapper,
-    $node = node.$node,
+  var $node = node.$node,
     expanded = node.expanded;
 
   // Only render if node is rendered to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
@@ -413,6 +412,9 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
     return true;
   }
 
+  // If there is already an animation is already going on for this node, stop it immediately
+  ensureNodeAnimationStopped(node);
+
   if (expanded) {
     this._addNodes(node.childNodes, $node, $predecessor);
     this._updateItemPath();
@@ -427,13 +429,11 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
       if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
         var $newNodes = scout.Tree.collectSubtree($node, false);
         if (animate && $newNodes.length) {
-          $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
-          var h = $wrapper.outerHeight();
-          var removeContainer = function() {
-            $(this).replaceWith($(this).contents());
-          };
-          $wrapper.css('height', 0)
-            .animateAVCSD('height', h, removeContainer, this.revalidateLayoutTree.bind(this), 200);
+          node._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
+          var h = node._$animationWrapper.outerHeight();
+          node._$animationWrapper
+            .css('height', 0)
+            .animateAVCSD('height', h, onAnimationComplete.bind(this, node, true), this.revalidateLayoutTree.bind(this), 200);
         }
       }
     }
@@ -454,14 +454,36 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
           }
         });
         if (animate) {
-          $wrapper = $existingNodes.wrapAll('<div class="animationWrapper">)').parent();
-          $wrapper.animateAVCSD('height', 0, $.removeThis, this.revalidateLayoutTree.bind(this), 200);
+          node._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
+          node._$animationWrapper
+            .animateAVCSD('height', 0, onAnimationComplete.bind(this, node, false), this.revalidateLayoutTree.bind(this), 200);
         } else {
           $existingNodes.remove();
           this.invalidateLayoutTree();
         }
       }
     }
+  }
+
+  // ----- Helper functions -----
+
+  function ensureNodeAnimationStopped(node) {
+    if (node._$animationWrapper) {
+      // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
+      // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
+      // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
+      // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
+      node._$animationWrapper.stop(false, true);
+    }
+  }
+
+  function onAnimationComplete(node, expanding) {
+    if (expanding) {
+      node._$animationWrapper.replaceWith(node._$animationWrapper.contents());
+    } else {
+      node._$animationWrapper.remove();
+    }
+    delete node._$animationWrapper;
   }
 };
 
@@ -1311,7 +1333,7 @@ scout.Tree.prototype._updateItemPath = function() {
   $node = $selectedNodes.next();
   level = parseFloat($selectedNodes.attr('data-level'));
   while ($node.length > 0) {
-    if ($node.hasClass('animationWrapper')) {
+    if ($node.hasClass('animation-wrapper')) {
       $node = $node.children().first();
     }
     var l = parseFloat($node.attr('data-level'));
@@ -1320,7 +1342,7 @@ scout.Tree.prototype._updateItemPath = function() {
     } else if (l === level) {
       break;
     }
-    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
+    if ($node.next().length === 0 && $node.parent().hasClass('animation-wrapper')) {
       // If there is no next node but we are inside an animationWrapper, step out the wrapper
       $node = $node.parent();
     }
@@ -1329,7 +1351,7 @@ scout.Tree.prototype._updateItemPath = function() {
 
   // find parents
   var $ultimate;
-  if ($selectedNodes.parent().hasClass('animationWrapper')) {
+  if ($selectedNodes.parent().hasClass('animation-wrapper')) {
     //If node expansion animation is in progress, the nodes are wrapped by a div
     $node = $selectedNodes.parent().prev();
   } else {
@@ -1347,7 +1369,7 @@ scout.Tree.prototype._updateItemPath = function() {
       level = k;
       $ultimate = $node;
     }
-    if ($node.parent().hasClass('animationWrapper')) {
+    if ($node.parent().hasClass('animation-wrapper')) {
       $node = $node.parent();
     }
     $node = $node.prev();
@@ -1359,12 +1381,12 @@ scout.Tree.prototype._updateItemPath = function() {
   level = $node.attr('data-level');
   while ($node.length > 0) {
     $node.addClass('group');
-    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
+    if ($node.next().length === 0 && $node.parent().hasClass('animation-wrapper')) {
       // If there is no next node but we are inside an animationWrapper, step out the wrapper
       $node = $node.parent();
     }
     $node = $node.next();
-    if ($node.hasClass('animationWrapper')) {
+    if ($node.hasClass('animation-wrapper')) {
       $node = $node.children().first();
     }
 

@@ -26,7 +26,7 @@
 
 
   & > .tree-node,
-  & > .animationWrapper > .tree-node {
+  & > .animation-wrapper > .tree-node {
     #scout.font-text-plus();
     cursor: pointer;
     border: 0;
@@ -71,7 +71,7 @@
   /* bread crumb mode */
 
   .navigation-breadcrumb & > .tree-node,
-  .navigation-breadcrumb & > .animationWrapper > .tree-node {
+  .navigation-breadcrumb & > .animation-wrapper > .tree-node {
     overflow: visible;
     white-space: normal;
     text-align: center;
