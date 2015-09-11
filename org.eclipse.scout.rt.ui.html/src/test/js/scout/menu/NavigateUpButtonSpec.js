@@ -5,7 +5,10 @@ describe("NavigateUpButton", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    outline = {session: session};
+    outline = {
+      session: session,
+      handleOutlineContent: function() {}
+    };
     menu = new scout.NavigateUpButton(outline, node);
   });
 
