@@ -35,9 +35,11 @@ scout.NavigateUpButton.prototype._drill = function() {
     $.log.debug('drill up to node ' + parentNode);
     this.outline.navigateUpInProgress = true;
     this.outline.selectNodes(parentNode);
+    this.outline.handleOutlineContent(true);
     this.outline.setNodeExpanded(parentNode, false, {collapseChildNodes: true});
   } else {
     $.log.debug('show default detail-form');
     this.outline.selectNodes([]);
+    this.outline.handleOutlineContent(true);
   }
 };
