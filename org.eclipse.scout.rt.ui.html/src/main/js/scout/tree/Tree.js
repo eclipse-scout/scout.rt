@@ -1019,8 +1019,8 @@ scout.Tree.prototype._decorateNode = function(node) {
   // Replace only the "text part" of the node, leave control and checkbox untouched
   var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
   $node.empty()
-    .append(preservedChildren)
-    .append(node.text);
+    .textOrNbsp(node.text)
+    .prepend(preservedChildren);
 
   scout.helpers.legacyStyle(node, $node);
 
