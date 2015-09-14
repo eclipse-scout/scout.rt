@@ -1003,6 +1003,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     if (row != null && targetIndex >= 0) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
+    touch();
     updateColumnVisibilityAndOrder();
   }
 
@@ -1014,7 +1015,7 @@ public class OrganizeColumnsForm extends AbstractForm {
     if (row != null && targetIndex < getColumnsTableField().getTable().getRowCount()) {
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
-
+    touch();
     updateColumnVisibilityAndOrder();
   }
 
@@ -1061,12 +1062,7 @@ public class OrganizeColumnsForm extends AbstractForm {
         m_table.getColumnSet().removeSortColumn(selectedCol);
       }
       else {
-        if (m_table.getColumnSet().isSortColumn(selectedCol)) {
-          m_table.getColumnSet().handleSortEvent(selectedCol, true, !selectedCol.isSortAscending());
-        }
-        else {
-          m_table.getColumnSet().addSortColumn(selectedCol, ascending);
-        }
+        m_table.getColumnSet().handleSortEvent(selectedCol, true, ascending);
       }
       m_table.sort();
 
