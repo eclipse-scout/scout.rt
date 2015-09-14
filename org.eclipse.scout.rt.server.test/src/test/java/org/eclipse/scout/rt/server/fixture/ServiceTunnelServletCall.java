@@ -14,7 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -40,7 +40,7 @@ public class ServiceTunnelServletCall extends Thread {
   public void run() {
     try {
       URL url = new URL(m_serverUrl + "/process");
-      IServiceTunnelContentHandler contentHandler = new DefaultServiceTunnelContentHandler();
+      IServiceTunnelContentHandler contentHandler = BEANS.get(IServiceTunnelContentHandler.class);
       contentHandler.initialize();
       //
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();

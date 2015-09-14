@@ -13,14 +13,19 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.eclipse.scout.rt.platform.Bean;
+
 /**
  * This is the content handler that defines the format in which data is exchanged through a service tunnel.
  * <p>
  * Most implementations also implement {@link IServiceTunnelContentObserver}
  */
+@Bean
 public interface IServiceTunnelContentHandler {
 
   void initialize();
+
+  String getContentType();
 
   void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception;
 

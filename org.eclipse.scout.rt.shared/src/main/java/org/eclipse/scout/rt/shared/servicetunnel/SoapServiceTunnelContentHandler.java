@@ -32,12 +32,10 @@ import java.util.zip.InflaterInputStream;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.Encoding;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.serialization.IObjectSerializer;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelRequestProperty;
 
 /**
  * Creates SOAP envelopes for {@link IServiceTunnelRequest} and {@link IServiceTunnelResponse} objects.<br>
@@ -102,40 +100,38 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelR
  * The default is true.
  * <p>
  * To enable debug output only for this class, use logger specific parameters.
+ * <p>
+ * This implementation can by used by an application by subclassing this class and adding the {@link Replace}
+ * annotation.
  */
-public class DefaultServiceTunnelContentHandler implements IServiceTunnelContentHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultServiceTunnelContentHandler.class);
+@Order(1000.0D)
+public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelContentHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SoapServiceTunnelContentHandler.class);
   private static final Pattern BEGIN_DATA_TAG = Pattern.compile("[<]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern END_DATA_TAG = Pattern.compile("[<][/]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern COMPRESSED_ATTRIBUTE = Pattern.compile("compressed\\s*=\\s*\"(true|false)\"");
-  private static final Boolean COMPRESS = CONFIG.getPropertyValue(CompressServiceTunnelRequestProperty.class);
+  private static final String CONTENT_TYPE = "text/xml";
 
   private String m_originAddress;
-  private Boolean m_sendCompressed;
   private Boolean m_receivedCompressed;
-  private IObjectSerializer m_objectSerializer;
 
-  public DefaultServiceTunnelContentHandler() {
+  public SoapServiceTunnelContentHandler() {
   }
 
   @Override
   public void initialize() {
+    super.initialize();
     try {
       m_originAddress = InetAddress.getLocalHost().getHostAddress();
     }
     catch (Throwable t) {
       // nop
     }
-    m_sendCompressed = COMPRESS;
-    m_objectSerializer = createObjectSerializer();
   }
 
-  /**
-   * @return Creates an {@link IObjectSerializer} instance used for serializing and deserializing data.
-   * @since 3.8.2
-   */
-  protected IObjectSerializer createObjectSerializer() {
-    return SerializationUtility.createObjectSerializer(new ServiceTunnelObjectReplacer());
+  @Override
+  public String getContentType() {
+    return CONTENT_TYPE;
   }
 
   @Override
@@ -254,7 +250,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
         deflater = new Deflater(Deflater.BEST_SPEED);
         out = new DeflaterOutputStream(bos, deflater);
       }
-      m_objectSerializer.serialize(out, msg);
+      getObjectSerializer().serialize(out, msg);
       String base64Data = StringUtility.wrapText(Base64Utility.encode(bos.toByteArray()), 10000);
       writer.write(base64Data);
     }
@@ -340,14 +336,13 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   protected Object getData(String dataPart, boolean compressed) throws IOException, ClassNotFoundException {
     Inflater inflater = null;
     try {
-      String base64Data = dataPart.replaceAll("[\\n\\r]", "");
       // decode serial data
-      InputStream in = new ByteArrayInputStream(Base64Utility.decode(base64Data));
+      InputStream in = new ByteArrayInputStream(Base64Utility.decode(dataPart));
       if (compressed) {
         inflater = new Inflater();
         in = new InflaterInputStream(in, inflater);
       }
-      return m_objectSerializer.deserialize(in, null);
+      return getObjectSerializer().deserialize(in, null);
     }
     finally {
       if (inflater != null) {
@@ -361,8 +356,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   protected boolean isUseCompression() {
-    if (m_sendCompressed != null) {
-      return m_sendCompressed;
+    if (isSendCompressed() != null) {
+      return isSendCompressed();
     }
     if (m_receivedCompressed != null) {
       return m_receivedCompressed;

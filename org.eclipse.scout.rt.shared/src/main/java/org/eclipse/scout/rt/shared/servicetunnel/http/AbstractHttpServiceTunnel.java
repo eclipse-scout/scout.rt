@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
-import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -162,7 +162,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
 
   /**
    * @return msgEncoder used to encode and decode a request / response to and from the binary stream. Default is the
-   *         {@link DefaultServiceTunnelContentHandler} which handles soap style messages
+   *         {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
   public IServiceTunnelContentHandler getContentHandler() {
     return m_contentHandler;
@@ -171,7 +171,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   /**
    * @param msgEncoder
    *          that can encode and decode a request / response to and from the binary stream. Default is the
-   *          {@link DefaultServiceTunnelContentHandler} which handles soap style messages
+   *          {@link BinaryServiceTunnelContentHandler} which handles binary messages
    */
   public void setContentHandler(IServiceTunnelContentHandler e) {
     m_contentHandler = e;
@@ -180,7 +180,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   @Override
   public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
     if (m_contentHandler == null) {
-      m_contentHandler = new DefaultServiceTunnelContentHandler();
+      m_contentHandler = BEANS.get(IServiceTunnelContentHandler.class);
       m_contentHandler.initialize();
     }
     return super.invokeService(serviceInterfaceClass, operation, callerArgs);
