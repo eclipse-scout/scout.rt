@@ -208,6 +208,10 @@ TableSpecHelper.prototype.assertSelection = function(table, rows) {
   var selectedRows = [];
   $selectedRows.each(function() {
     selectedRows.push($(this).data('row'));
+
+    if ($selectedRows.length == 1) {
+      expect($(this).hasClass('select-single')).toBeTruthy();
+    }
   });
 
   expect(scout.arrays.equalsIgnoreOrder(rows, selectedRows)).toBeTruthy();

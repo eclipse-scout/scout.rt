@@ -712,6 +712,9 @@ describe("Table", function() {
 
       var $selectedRow = $selectedRows.first();
       expect($selectedRow).toEqual($row);
+
+      expect($selectedRow.hasClass('selected')).toBeTruthy();
+      expect($selectedRow.hasClass('select-single')).toBeTruthy();
     }
 
     it("selects row and unselects others", function() {

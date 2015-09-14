@@ -390,7 +390,7 @@ scout.Table.prototype.clearSelection = function(dontFire) {
   this.selectedRows.forEach(function(row) {
     if (row.$row) {
       row.$row.select(false);
-      row.$row.toggleClass('select-middle select-top select-bottom select-single', false);
+      row.$row.toggleClass('select-middle select-top select-bottom select-single selected', false);
     }
   });
   this.selectedRows = [];
