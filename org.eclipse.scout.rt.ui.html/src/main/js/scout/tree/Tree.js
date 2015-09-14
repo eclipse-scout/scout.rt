@@ -622,9 +622,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
   }
 };
 
-scout.Tree.prototype._updateChildNodeIndex = function(parentNode, startIndex) {
-  for (var i = startIndex; i < parentNode.childNodes.length; i++) {
-    parentNode.childNodes[i].childNodeIndex = i;
+scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
+  for (var i = scout.helpers.nvl(startIndex, 0); i < nodes.length; i++) {
+    nodes[i].childNodeIndex = i;
   }
 };
 
@@ -648,10 +648,9 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   if (parentNode) {
     if (parentNode.childNodes && parentNode.childNodes.length > 0) {
       nodes.forEach(function(entry) {
-        var nodeIndex = entry.childNodeIndex ? entry.childNodeIndex : 0;
-        scout.arrays.insert(parentNode.childNodes, entry, nodeIndex);
+        scout.arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex);
       }.bind(this));
-      this._updateChildNodeIndex(parentNode, nodes[0].childNodeIndex);
+      this._updateChildNodeIndex(parentNode.childNodes, nodes[0].childNodeIndex);
     } else {
       scout.arrays.pushAll(parentNode.childNodes, nodes);
     }
@@ -676,8 +675,10 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   } else {
     if (this.nodes && this.nodes.length > 0) {
       nodes.forEach(function(entry) {
-        scout.arrays.insert(this.nodes, entry, entry.childNodeIndex ? entry.childNodeIndex : 0);
+        scout.arrays.insert(this.nodes, entry, entry.childNodeIndex);
       }.bind(this));
+      this._updateChildNodeIndex(this.nodes, nodes[0].childNodeIndex);
+
       if (nodes[0].childNodeIndex !== 0) {
         $predecessor = calcPredecessor(this.nodes[nodes[0].childNodeIndex - 1]);
       }
