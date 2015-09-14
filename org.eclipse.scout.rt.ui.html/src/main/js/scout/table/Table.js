@@ -831,7 +831,7 @@ scout.Table.prototype._columnAtX = function(x) {
   columnOffsetLeft -= scrollLeft;
   return scout.arrays.find(this.columns, function(column) {
     columnOffsetRight = columnOffsetLeft + column.width;
-    if (columnOffsetLeft >= 0 && x >= columnOffsetLeft && x < columnOffsetRight) {
+    if (x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
     }
     columnOffsetLeft = columnOffsetRight;
