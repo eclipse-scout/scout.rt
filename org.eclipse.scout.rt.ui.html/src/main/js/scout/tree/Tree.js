@@ -137,6 +137,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('mouseup', '.tree-node', this._onNodeMouseUp.bind(this))
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
+    .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
 
   scout.scrollbars.install(this.$data, this.session, {
@@ -1270,6 +1271,11 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   this.setNodeExpanded(node, expanded, expansionOpts);
 
   // prevent immediately reopening
+  return false;
+};
+
+scout.Tree.prototype._onNodeControlMouseUp = function(event) {
+  // prevent bubbling to _onNodeMouseUp()
   return false;
 };
 
