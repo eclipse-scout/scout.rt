@@ -21,18 +21,21 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.junit.Ignore;
 
 /**
  * {@link AllAccessControlService} service for testing using {@link AllPermission}
+ * <p>
+ * This service is ignored by default and needs to be registered explicitly.
+ * </p>
  */
 @Bean
 @ApplicationScoped
-@Order(TestingUtility.TESTING_RESOURSE_ORDER)
+@Ignore
 public class AllAccessControlService implements IAccessControlService {
   private final Permissions m_permSet;
 
