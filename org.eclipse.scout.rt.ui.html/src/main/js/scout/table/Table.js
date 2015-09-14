@@ -562,7 +562,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
     this._group();
   }
 
-  this._rerenderSelection();
+  this.renderSelection();
 };
 
 /**
@@ -1168,7 +1168,7 @@ scout.Table.prototype._group = function(update) {
   } else {
     this.$sumRows().animateAVCSD('height', 0, function() {
         $.removeThis.call(this);
-        that._rerenderSelection();
+        that.renderSelection();
     }, that.updateScrollbars.bind(that));
   }
 
@@ -1586,83 +1586,42 @@ scout.Table.prototype._rowsToIds = function(rows) {
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
  */
-scout.Table.prototype.renderSelection = function($row, deselect) {
-  //TODO CGU rewrite, render selection based on model and not using jquery selectors
-  var $previousElement = this.$prevFilteredRow($row, false), // TODO [dwi] verify
-    $followingElement = this.$nextFilteredRow($row, false); // TODO [dwi] verify
-  $row.removeClass('select-middle select-top select-bottom select-single selected');
-  if (!deselect) {
-    $row.select(true);
-    if (!$previousElement.isSelected()) {
-      if ($followingElement.isSelected()) {
-        $row.addClass('select-top');
-      } else {
-        $row.addClass('select-single');
-      }
-    } else {
-      if ($followingElement.isSelected()) {
-        $row.addClass('select-middle');
-      } else {
-        $row.addClass('select-bottom');
-      }
-      if ($previousElement.hasClass('select-bottom')) {
-        $previousElement.toggleClass('select-middle', true);
-        $previousElement.toggleClass('select-bottom', false);
-      } else {
-        $previousElement.toggleClass('select-single', false);
-        $previousElement.toggleClass('select-top', true);
-      }
+scout.Table.prototype.renderSelection = function(rows) {
+  rows = scout.arrays.ensure(rows || this.selectedRows);
+
+  // helper function adds/removes a class for a row only if necessary, return true if classes have been changed
+  var addOrRemoveClassIfNeededFunc = function($row, condition, classname) {
+    var hasClass = $row.hasClass(classname);
+    if (condition && !hasClass) {
+      $row.addClass(classname);
+      return true;
+    } else if (!condition && hasClass) {
+      $row.removeClass(classname);
+      return true;
     }
-    if ($followingElement.isSelected()) {
-      if ($followingElement.hasClass('select-single')) {
-        $followingElement.toggleClass('select-single', false);
-        $followingElement.toggleClass('select-bottom', true);
-      } else if ($followingElement.hasClass('select-top')) {
-        $followingElement.toggleClass('select-top', false);
-        $followingElement.toggleClass('select-middle', true);
-      }
+    return false;
+  };
+
+  for (var i = 0; i < rows.length; i++) { // traditional for loop, elements might be added during loop
+    var row = rows[i],
+      filteredRows = this.filteredRows(),
+      previousIndex = filteredRows.indexOf(row) - 1,
+      previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
+      followingIndex = filteredRows.indexOf(row) + 1,
+      followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1,
+      classChanged = addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1, 'selected') +
+          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && followingRowSelected, 'select-top') +
+          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && !followingRowSelected, 'select-bottom') +
+          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && !previousRowSelected && !followingRowSelected, 'select-single') +
+          addOrRemoveClassIfNeededFunc(row.$row, this.selectedRows.indexOf(row) !== -1 && previousRowSelected && followingRowSelected, 'select-middle');
+
+    if (classChanged && previousRowSelected && rows.indexOf(filteredRows[previousIndex]) == -1) {
+      rows.push(filteredRows[previousIndex]);
     }
-  } else {
-    if ($previousElement.isSelected()) {
-      if ($previousElement.hasClass('select-middle')) {
-        $previousElement.toggleClass('select-middle', false);
-        $previousElement.toggleClass('select-bottom', true);
-      } else if ($previousElement.hasClass('select-top')) {
-        $previousElement.toggleClass('select-top', false);
-        $previousElement.toggleClass('select-single', true);
-      }
-    }
-    if ($followingElement.isSelected()) {
-      if ($followingElement.hasClass('select-bottom')) {
-        $followingElement.toggleClass('select-single', true);
-        $followingElement.toggleClass('select-bottom', false);
-      } else if ($followingElement.hasClass('select-middle')) {
-        $followingElement.toggleClass('select-top', true);
-        $followingElement.toggleClass('select-middle', false);
-      }
+    if (classChanged && followingRowSelected && rows.indexOf(filteredRows[followingIndex]) == -1) {
+      rows.push(filteredRows[followingIndex]);
     }
   }
-};
-
-scout.Table.prototype._rerenderSelection = function() {
-  this.selectedRows.forEach(function(row) {
-    var $row = row.$row,
-      filteredRows = this.filteredRows(),
-      previousIndex = filteredRows.indexOf(row) -1,
-      previousRowSelected = previousIndex > 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
-      followingIndex = filteredRows.indexOf(row) + 1,
-      followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
-    $row.removeClass('select-middle select-top select-bottom select-single');
-    if (previousRowSelected && followingRowSelected) {
-      $row.addClass('select-middle');
-    } else if (!previousRowSelected && followingRowSelected) {
-      $row.addClass('select-top');
-    } else if (!previousRowSelected && !followingRowSelected) {
-      $row.addClass('select-single');
-    } else if (previousRowSelected && !followingRowSelected) {
-      $row.addClass('select-bottom');
-    }
-  }.bind(this));
 };
 
 scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
@@ -1674,7 +1633,7 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
 
   if (row.$row && this.rendered) {
     row.$row.select(true);
-    this.renderSelection(row.$row);
+    this.renderSelection(row);
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -1690,7 +1649,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
   if (scout.arrays.remove(this.selectedRows, row)) {
     if (this.rendered) {
-      this.renderSelection(row.$row, true);
+      this.renderSelection(row);
     }
     if (!ongoingSelection) {
       this._triggerRowsSelected();
@@ -1715,7 +1674,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer) {
 
   if (this.rendered && !selectedEqualsRows) {
     this.selectedRows.forEach(function(row) {
-      this.renderSelection(row.$row, false);
+      this.renderSelection(row);
 
       // Make sure the cell editor popup is correctly layouted because selection changes the cell bounds
       if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
@@ -1878,7 +1837,7 @@ scout.Table.prototype.filter = function() {
     this._rowsFiltered(rowsToHide);
     $(':animated', that.$data).promise().done(function() {
       that._group();
-      that._rerenderSelection();
+      that.renderSelection();
     });
   }
 };
