@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -250,7 +249,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     servletResponse.setDateHeader("Expires", -1);
     servletResponse.setHeader("Cache-Control", "no-cache");
     servletResponse.setHeader("pragma", "no-cache");
-    servletResponse.setContentType("text/xml");
+    servletResponse.setContentType(m_contentHandler.getContentType());
     m_contentHandler.writeResponse(servletResponse.getOutputStream(), serviceResponse);
   }
 
@@ -278,7 +277,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    * This method is part of the protected api and can be overridden.
    */
   protected IServiceTunnelContentHandler createContentHandler() {
-    DefaultServiceTunnelContentHandler e = new DefaultServiceTunnelContentHandler();
+    IServiceTunnelContentHandler e = BEANS.get(IServiceTunnelContentHandler.class);
     e.initialize();
     return e;
   }
