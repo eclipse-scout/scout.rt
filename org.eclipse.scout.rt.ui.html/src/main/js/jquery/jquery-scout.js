@@ -280,7 +280,6 @@
 
   $.fn.setVisible = function(visible) {
     var i, elem;
-    console.log('setVisible visible=' + visible + ' length=' + this.length + ' this=' + scout.graphics.debugOutput(this));
     for (i = 0; i < this.length; i++) {
       elem = this[i];
       if (elemVisible(elem) != visible) {
