@@ -501,7 +501,7 @@ scout.Tree.prototype.clearSelection = function() {
   this.selectNodes([]);
 };
 
-scout.Tree.prototype.selectNodes = function(nodes, notifyServer) {
+scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.helpers.nvl(notifyServer, true);
   if (scout.arrays.equalsIgnoreOrder(nodes, this.selectedNodes)) {
@@ -514,9 +514,17 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer) {
 
   this.selectedNodes = nodes;
   if (notifyServer) {
-    this.remoteHandler(this.id, 'nodesSelected', {
+    var event = new scout.Event(this.id, 'nodesSelected', {
       nodeIds: this._nodesToIds(nodes)
     });
+
+    // Only send the latest selection changed event for a field
+    event.coalesce = function(previous) {
+      return this.id === previous.id && this.type === previous.type;
+    };
+
+    // send delayed to avoid a lot of requests while selecting
+    this.session.sendEvent(event, debounceSend ? 250 : 0);
   }
 
   if (this.rendered) {

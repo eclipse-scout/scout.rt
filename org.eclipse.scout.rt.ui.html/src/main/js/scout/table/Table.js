@@ -63,7 +63,9 @@ scout.Table.prototype._initRow = function(row) {
   scout.defaultValues.applyTo(row, 'TableRow');
   this._initCells(row);
   this.rowsMap[row.id] = row;
-  this.trigger('rowInitialized', {row: row});
+  this.trigger('rowInitialized', {
+    row: row
+  });
 };
 
 scout.Table.prototype._initColumns = function() {
@@ -978,10 +980,18 @@ scout.Table.prototype._sendRowsChecked = function(rows) {
   this.remoteHandler(this.id, 'rowsChecked', data);
 };
 
-scout.Table.prototype._sendRowsSelected = function(rowIds) {
-  this.remoteHandler(this.id, 'rowsSelected', {
+scout.Table.prototype._sendRowsSelected = function(rowIds, debounceSend) {
+  var event = new scout.Event(this.id, 'rowsSelected', {
     rowIds: rowIds
   });
+
+  // Only send the latest selection changed event for a field
+  event.coalesce = function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  };
+
+  // send delayed to avoid a lot of requests while selecting
+  this.session.sendEvent(event, debounceSend ? 250 : 0);
 };
 
 scout.Table.prototype._sendRowsFiltered = function(rowIds) {
@@ -1166,11 +1176,10 @@ scout.Table.prototype._group = function(update) {
     this.$sumRows().remove();
   } else {
     this.$sumRows().animateAVCSD('height', 0, function() {
-        $.removeThis.call(this);
-        that._rerenderSelection();
+      $.removeThis.call(this);
+      that._rerenderSelection();
     }, that.updateScrollbars.bind(that));
   }
-
 
   if (!this.grouped && !groupColumn) {
     return;
@@ -1426,7 +1435,7 @@ scout.Table.prototype._deleteRows = function(rows) {
     }
     delete this.rowsMap[row.id];
 
-    if(this.selectionHandler.lastActionRow===row){
+    if (this.selectionHandler.lastActionRow === row) {
       this.selectionHandler.clearLastSelectedRowMarker();
     }
 
@@ -1454,7 +1463,8 @@ scout.Table.prototype._deleteRows = function(rows) {
 };
 
 scout.Table.prototype._updateRows = function(rows) {
-  var filterChanged, newInvisibleRows = [], $updatedRows = $();
+  var filterChanged, newInvisibleRows = [],
+    $updatedRows = $();
 
   // Update model
   for (var i = 0; i < rows.length; i++) {
@@ -1467,8 +1477,8 @@ scout.Table.prototype._updateRows = function(rows) {
 
     // Replace old row
     this._initRow(updatedRow);
-    if(this.selectionHandler.lastActionRow===oldRow){
-      this.selectionHandler.lastActionRow=updatedRow;
+    if (this.selectionHandler.lastActionRow === oldRow) {
+      this.selectionHandler.lastActionRow = updatedRow;
     }
     var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
@@ -1495,7 +1505,7 @@ scout.Table.prototype._updateRows = function(rows) {
       // Apply row filter
       updatedRow.filterAccepted = oldRow.filterAccepted;
       if (this._filterCount() > 0) {
-        if (this._applyFiltersForRow(updatedRow)){
+        if (this._applyFiltersForRow(updatedRow)) {
           filterChanged = true;
           if (!updatedRow.filterAccepted) {
             newInvisibleRows.push(updatedRow);
@@ -1701,15 +1711,15 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   }
 };
 
-scout.Table.prototype.selectRows = function(rows, notifyServer) {
+scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualsRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
   if (!selectedEqualsRows) {
-    this.clearSelection(!notifyServer);
+    //never fire clear selection because of notification thru select row
+    this.clearSelection(true);
     this.selectedRows = rows;
-    // FIXME CGU send delayed in case of key navigation
     if (notifyServer) {
-      this._sendRowsSelected(this._rowsToIds(rows));
+      this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
     }
   }
 
@@ -1858,7 +1868,7 @@ scout.Table.prototype.filter = function() {
         rowsToShow.push(row);
       }
     } else {
-       if (!$row.hasClass('invisible')) {
+      if (!$row.hasClass('invisible')) {
         rowsToHide.push(row);
       }
     }
@@ -1999,7 +2009,9 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'addFilter', filter.createAddFilterEventData());
   }
-  this.trigger('addFilter', {filter: filter});
+  this.trigger('addFilter', {
+    filter: filter
+  });
 };
 
 //TODO CGU use filter as param or rename to removeFilterByKey
@@ -2017,7 +2029,9 @@ scout.Table.prototype.removeFilter = function(key, notifyServer) {
   if (notifyServer && filter instanceof scout.TableUserFilter) {
     this.remoteHandler(this.id, 'removeFilter', filter.createRemoveFilterEventData());
   }
-  this.trigger('removeFilter', {filter: filter});
+  this.trigger('removeFilter', {
+    filter: filter
+  });
 };
 
 scout.Table.prototype.getFilter = function(key) {

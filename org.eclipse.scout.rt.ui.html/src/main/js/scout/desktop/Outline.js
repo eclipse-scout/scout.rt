@@ -56,6 +56,13 @@ scout.Outline.prototype._render = function($parent) {
   }
 };
 
+scout.Outline.prototype.handleOutlineContentDebounced = function(bringToFront) {
+  clearTimeout(this._handleOutlineTimeout);
+  this._handleOutlineTimeout = setTimeout(function() {
+    this.handleOutlineContent(bringToFront);
+  }.bind(this), 300);
+};
+
 scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
   // Outline does not support multi selection -> [0]
   var node = this.selectedNodes[0];
@@ -152,8 +159,8 @@ scout.Outline.prototype._linkNodeWithRow = function(row) {
 scout.Outline.prototype._decorateNode = function(node) {
   scout.Outline.parent.prototype._decorateNode.call(this, node);
   if (node.$node) {
-    node.$node.toggleAttr('data-modelclass', !!node.modelClass, node.modelClass);
-    node.$node.toggleAttr('data-classid', !!node.classId, node.classId);
+    node.$node.toggleAttr('data-modelclass', !! node.modelClass, node.modelClass);
+    node.$node.toggleAttr('data-classid', !! node.classId, node.classId);
   }
 };
 
@@ -192,8 +199,8 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
   }
 };
 
-scout.Outline.prototype.selectNodes = function(nodes, notifyServer) {
-  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer);
+scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
+  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
   if (this.navigateUpInProgress) {
     this.navigateUpInProgress = false;
   } else {
