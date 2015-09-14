@@ -20,6 +20,7 @@ scout.Tree = function() {
   this._animationNodeLimit = 25;
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._$animationWrapper; // used by _renderExpansion()
 
   // Flag (0 = false, > 0 = true) to indicate whether child nodes should be added to the tree lazily if
   // they request it.  Default is false, which has the consequences that most UI actions show all nodes.
@@ -414,7 +415,13 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
   }
 
   // If there is already an animation is already going on for this node, stop it immediately
-  ensureNodeAnimationStopped(node);
+  if (this._$animationWrapper) {
+    // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
+    // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
+    // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
+    // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
+    this._$animationWrapper.stop(false, true);
+  }
 
   if (expanded) {
     this._addNodes(node.childNodes, $node, $predecessor);
@@ -430,11 +437,11 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
       if (this.rendered) { // only when rendered (otherwise not necessary, or may even lead to timing issues)
         var $newNodes = scout.Tree.collectSubtree($node, false);
         if (animate && $newNodes.length) {
-          node._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
-          var h = node._$animationWrapper.outerHeight();
-          node._$animationWrapper
+          this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
+          var h = this._$animationWrapper.outerHeight();
+          this._$animationWrapper
             .css('height', 0)
-            .animateAVCSD('height', h, onAnimationComplete.bind(this, node, true), this.revalidateLayoutTree.bind(this), 200);
+            .animateAVCSD('height', h, onAnimationComplete.bind(this, true), this.revalidateLayoutTree.bind(this), 200);
         }
       }
     }
@@ -455,9 +462,9 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
           }
         });
         if (animate) {
-          node._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
-          node._$animationWrapper
-            .animateAVCSD('height', 0, onAnimationComplete.bind(this, node, false), this.revalidateLayoutTree.bind(this), 200);
+          this._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
+          this._$animationWrapper
+            .animateAVCSD('height', 0, onAnimationComplete.bind(this, false), this.revalidateLayoutTree.bind(this), 200);
         } else {
           $existingNodes.remove();
           this.invalidateLayoutTree();
@@ -468,23 +475,13 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
 
   // ----- Helper functions -----
 
-  function ensureNodeAnimationStopped(node) {
-    if (node._$animationWrapper) {
-      // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
-      // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
-      // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
-      // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-      node._$animationWrapper.stop(false, true);
-    }
-  }
-
-  function onAnimationComplete(node, expanding) {
+  function onAnimationComplete(expanding) {
     if (expanding) {
-      node._$animationWrapper.replaceWith(node._$animationWrapper.contents());
+      this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
     } else {
-      node._$animationWrapper.remove();
+      this._$animationWrapper.remove();
     }
-    delete node._$animationWrapper;
+    this._$animationWrapper = null;
   }
 };
 
