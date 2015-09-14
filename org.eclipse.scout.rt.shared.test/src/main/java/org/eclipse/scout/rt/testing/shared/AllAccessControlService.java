@@ -21,11 +21,11 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.junit.Ignore;
 
 /**
  * {@link AllAccessControlService} service for testing using {@link AllPermission}
@@ -35,7 +35,7 @@ import org.junit.Ignore;
  */
 @Bean
 @ApplicationScoped
-@Ignore
+@Order(1000d)
 public class AllAccessControlService implements IAccessControlService {
   private final Permissions m_permSet;
 
