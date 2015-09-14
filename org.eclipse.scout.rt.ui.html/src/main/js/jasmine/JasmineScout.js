@@ -223,6 +223,7 @@ var jasmineScoutMatchers = {
       }
     };
   },
+
   /**
    * Checks if given request contains events with the expected event types in the given order
    * @actual json request, may be obtained by mostRecentJsonRequest
@@ -253,7 +254,60 @@ var jasmineScoutMatchers = {
         return result;
       }
     };
+  },
 
+  /**
+   * Checks if all given jQuery objects (array of jQuery objects) have a specific class (list).
+   */
+  allToHaveClass: function(util, customEqualityTesters) {
+    return {
+      compare: function(actual, expected) {
+        if (expected === undefined) {
+          expected = [];
+        }
+        if (!Array.isArray(expected)) {
+          expected = [expected];
+        }
+        if (!Array.isArray(actual)) {
+          actual = [actual];
+        }
+        var result = {
+          pass: actual.every(function($elem) { return $elem.hasClass(expected); })
+        };
+
+        if (!result.pass) {
+          result.message = 'Expected ' + actual + ' all to have ' + expected + ' as classes.';
+        }
+        return result;
+      }
+    };
+  },
+
+  /**
+   * Checks if any given jQuery object (array of jQuery objects) has a specific class (list).
+   */
+  anyToHaveClass: function(util, customEqualityTesters) {
+    return {
+      compare: function(actual, expected) {
+        if (expected === undefined) {
+          expected = [];
+        }
+        if (!Array.isArray(expected)) {
+          expected = [expected];
+        }
+        if (!Array.isArray(actual)) {
+          actual = [actual];
+        }
+        var result = {
+            pass: actual.some(function($elem) { return $elem.hasClass(expected); })
+        };
+
+        if (!result.pass) {
+          result.message = 'Expected any ' + actual + ' to have ' + expected + ' as classes.';
+        }
+        return result;
+      }
+    };
   }
 };
 

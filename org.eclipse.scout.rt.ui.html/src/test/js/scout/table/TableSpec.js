@@ -890,7 +890,7 @@ describe("Table", function() {
     });
   });
 
-  describe("row mouse down / move / up", function() {
+  describe("selection: row mouse down / move / up", function() {
 
     it("selects multiple rows", function() {
       var model = helper.createModelFixture(2, 5);
@@ -904,19 +904,122 @@ describe("Table", function() {
       var $row3 = $rows.eq(3);
       var $row4 = $rows.eq(4);
 
-      expect($rows).not.toHaveClass('selected');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
 
       $row0.triggerMouseDown();
       $row1.trigger('mouseover');
       $row2.trigger('mouseover');
       $row2.triggerMouseUp();
 
-      expect($row0).toHaveClass('selected');
-      expect($row1).toHaveClass('selected');
-      expect($row2).toHaveClass('selected');
-      expect($row3).not.toHaveClass('selected');
-      expect($row4).not.toHaveClass('selected');
+      expect([$row0, $row1, $row2]).allToHaveClass('selected');
+      expect($row0).toHaveClass('select-top');
+      expect($row1).toHaveClass('select-middle');
+      expect($row2).toHaveClass('select-bottom');
+
+      expect([$row3, $row4]).not.allToHaveClass('selected');
+      expect([$row1, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
+
+    it("selection classes after sorting", function() {
+      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'number'),
+        table = helper.createTable(model),
+        column0 = model.columns[0];
+      table.render(session.$entryPoint);
+
+      var $rows = table.$data.children('.table-row');
+      var $row0 = $rows.eq(0);
+      var $row1 = $rows.eq(1);
+      var $row2 = $rows.eq(2);
+      var $row3 = $rows.eq(3);
+      var $row4 = $rows.eq(4);
+
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+
+      $row1.triggerMouseDown();
+      $row2.trigger('mouseover');
+      $row3.trigger('mouseover');
+      $row3.triggerMouseUp();
+
+      expect([$row0, $row4]).not.anyToHaveClass('selected');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+
+      // sort table (descending)
+      table.sort(column0, 'desc');
+
+      // after sorting
+      expect([$row1, $row2, $row3]).allToHaveClass('selected');
+      expect($row3).toHaveClass('select-top');
+      expect($row1).toHaveClass('select-middle');
+      expect($row2).toHaveClass('select-bottom');
+
+      expect([$row0, $row4]).not.allToHaveClass('selected');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+    });
+
+    it("selection classes after filtering", function() {
+      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'number'),
+        table = helper.createTable(model),
+        column0 = model.columns[0];
+      table._animationRowLimit = 0;
+      table.render(session.$entryPoint);
+
+      var $rows = table.$data.children('.table-row');
+      var $row0 = $rows.eq(0);
+      var $row1 = $rows.eq(1);
+      var $row2 = $rows.eq(2);
+      var $row3 = $rows.eq(3);
+      var $row4 = $rows.eq(4);
+
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('invisible');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+
+      $row1.triggerMouseDown();
+      $row2.trigger('mouseover');
+      $row3.trigger('mouseover');
+      $row3.triggerMouseUp();
+
+      // before filtering
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('invisible');
+      expect([$row1, $row2, $row3]).allToHaveClass('selected');
+      expect($row1).toHaveClass('select-top');
+      expect($row2).toHaveClass('select-middle');
+      expect($row3).toHaveClass('select-bottom');
+
+      expect([$row0, $row4]).not.anyToHaveClass('selected');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+
+      // filter table (descending)
+      table.addFilter({
+        createKey: function() { return 1; },
+        accept: function($row) { return $row.text() % 2 === 0; }
+      });
+      table.filter();
+
+      // after filtering
+      expect([$row0, $row2, $row3]).allToHaveClass('invisible');
+      expect($row1).allToHaveClass('selected');
+      expect($row1).toHaveClass('select-single');
+
+      expect([$row1, $row4]).not.anyToHaveClass('invisible');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+    });
+
 
     it("only sends selection event, no click", function() {
       var model = helper.createModelFixture(2, 5);
