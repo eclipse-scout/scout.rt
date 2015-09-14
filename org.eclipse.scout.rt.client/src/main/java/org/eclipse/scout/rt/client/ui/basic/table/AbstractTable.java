@@ -3059,9 +3059,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         ((InternalTableRow) changedRows[i - min]).setRowIndex(i);
       }
       fireRowOrderChanged();
-      // rebuild selection
+      // rebuild selection and checked rows
       selectRows(getSelectedRows(), false);
-      //FIXME CGU rebuild checked rows as well
+      sortCheckedRows();
     }
   }
 

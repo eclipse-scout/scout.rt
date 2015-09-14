@@ -244,6 +244,23 @@ public class CheckRowsInTableTest {
     assertEquals("Ipsum", table.getSecondColumn().getValue(table.getSelectedRows().get(2)));
   }
 
+  @Test
+  public void testGetCheckedRows_moveRow() throws Exception {
+    P_Table table = createTable(true);
+    table.getColumnSet().clearSortColumns();
+    table.sort();
+    table.getRow(0).setChecked(true);
+    table.getRow(2).setChecked(true);
+    assertEquals(2, table.getCheckedRows().size());
+    assertEquals("Lorem", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+
+    table.moveRow(table.getRow(0).getRowIndex(), table.getRowCount() - 1);
+
+    assertEquals("Zzz", table.getSecondColumn().getValue(table.getCheckedRows().get(0)));
+    assertEquals("Lorem", table.getSecondColumn().getValue(table.getCheckedRows().get(1)));
+  }
+
   private P_Table createTable(boolean isMulticheck) throws ProcessingException {
     P_Table table = new P_Table();
     table.initTable();
