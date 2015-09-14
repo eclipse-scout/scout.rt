@@ -32,6 +32,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
   //cache all search form contents
   private final Map<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
   private final Map<String /*pageTableIdentifier*/, byte[]> m_tableUserFilterState;
+  private long m_maxMemThreshold = 90L;
 
   public LargeMemoryPolicy() {
     m_searchFormCache = new HashMap<String, SearchFormState>();
@@ -92,12 +93,11 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
     long memTotal = Runtime.getRuntime().totalMemory();
     long memUsed = (memTotal - Runtime.getRuntime().freeMemory());
     long memMax = Runtime.getRuntime().maxMemory();
-    if (memUsed > memMax * 80L / 100L) {
+    if (memUsed > memMax * getMaxMemThreshold() / 100L) {
       ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           desktop.releaseUnusedPages();
-          System.gc();
         }
       }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("Check memory"));
     }
@@ -106,5 +106,16 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
   @Override
   public String toString() {
     return "Large";
+  }
+
+  /**
+   * Threshold in percentage. After this threshold the unused pages are released
+   */
+  public long getMaxMemThreshold() {
+    return m_maxMemThreshold;
+  }
+
+  public void setMaxMemThreshold(long maxMemThreshold) {
+    m_maxMemThreshold = maxMemThreshold;
   }
 }

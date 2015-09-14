@@ -12,14 +12,11 @@ package org.eclipse.scout.rt.client;
 
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
@@ -30,12 +27,11 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
  * Cache only last 5 table page search form contents, last 5 table filter settings, releaseUnusedPages after every page
- * reload and force gc do free memory.
+ * reload.
  */
 public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediumMemoryPolicy.class);
@@ -159,14 +155,6 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
         }
       }
       desktop.releaseUnusedPages();
-      System.gc();
-
-      String gcJobId = getClass().getName();
-
-      // Cancel already running GC job
-      Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().andMatchCurrentSession().andMatchNameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")), true);
-      // Schedule new GC job
-      ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).withName(gcJobId + ":release memory"));
 
       m_release = false;
     }
