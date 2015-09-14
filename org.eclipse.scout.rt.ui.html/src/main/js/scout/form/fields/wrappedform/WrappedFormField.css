@@ -7,6 +7,14 @@
     padding-right: 0;
   }
 
+  /* Reset margin set in GroupBox.css */
+  & > .root-group-box > .group-box-body {
+    & > .scrollbar.y-axis {
+      /* position scrollbar as right as possible to prevent overlapping field parts. */
+      margin-right: 0;
+    }
+  }
+
   /* Reset margin set in MenuBar.css */
   & > .root-group-box > .menubar {
     margin-left: @mandatory-indicator-width;
