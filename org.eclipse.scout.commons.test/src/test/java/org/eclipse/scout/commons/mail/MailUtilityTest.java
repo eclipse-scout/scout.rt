@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.mail;
 
+import static org.eclipse.scout.commons.mail.MailUtilityTest.MailParticipantUtility.createMailParticipant;
+import static org.eclipse.scout.commons.mail.MailUtilityTest.MailParticipantUtility.createMailParticipants;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -57,12 +59,11 @@ public class MailUtilityTest {
    */
   @Test
   public void testMimeMessageWithoutSender() throws ProcessingException, MessagingException {
-    MailMessage definition = new MailMessage("Body", null);
+    MailMessage definition = new MailMessage().withBodyPlainText("Body");
     MimeMessage message = MailUtility.createMimeMessage(definition);
     assertNotNull(message);
 
-    definition = new MailMessage("Body", null);
-    definition.setSubject("Subject");
+    definition = new MailMessage().withSubject("Subject").withBodyPlainText("Body");
     message = MailUtility.createMimeMessage(definition);
     assertNotNull(message);
   }
@@ -96,10 +97,8 @@ public class MailUtilityTest {
     byte[] data = IOUtility.getContent(bds.getInputStream());
     assertArrayEquals(sampleData, data);
 
-    MailMessage definition = new MailMessage("test", null);
-    definition.addAttachment(new MailAttachment(ds));
-
-    MimeMessage message = MailUtility.createMimeMessage(definition);
+    new MailMessage().withBodyPlainText("test").withAttachment(new MailAttachment(ds));
+    MimeMessage message = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText("test"));
     message.writeTo(new ByteArrayOutputStream());
   }
 
@@ -107,12 +106,12 @@ public class MailUtilityTest {
   public void testGetParts() throws ProcessingException, IOException, MessagingException {
     final String plainText = "plain text";
     final String htmlText = "<html><body><p>plain text</p></body></html>";
-    MailMessage definition = new MailMessage(plainText, htmlText);
+    MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(htmlText);
 
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
-    definition.addAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
-    definition.addAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null)));
-    definition.addAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample3.dat", null)));
+    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
+    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null)));
+    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample3.dat", null)));
 
     MimeMessage message = MailUtility.createMimeMessage(definition);
 
@@ -139,29 +138,30 @@ public class MailUtilityTest {
   @Test
   public void testCreateMimeMessage() throws Exception {
     // no plain text or html body
-    Assert.assertNull(MailUtility.createMimeMessage(new MailMessage(null, null)));
+    Assert.assertNull(MailUtility.createMimeMessage(new MailMessage()));
 
     final String plainText = "plain text";
     final String html = "<html><body><p>html</p></body></html>";
 
-    MimeMessage plainTextMessage = MailUtility.createMimeMessage(new MailMessage(plainText, null));
+    MimeMessage plainTextMessage = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText(plainText));
     verifyMimeMessage(plainTextMessage, plainText, null);
 
-    MimeMessage htmlMessage = MailUtility.createMimeMessage(new MailMessage(null, html));
+    MimeMessage htmlMessage = MailUtility.createMimeMessage(new MailMessage().withBodyHtml(html));
     verifyMimeMessage(htmlMessage, null, html);
 
-    MimeMessage plainTextAndHtmlMessage = MailUtility.createMimeMessage(new MailMessage(plainText, html));
+    MimeMessage plainTextAndHtmlMessage = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText(plainText).withBodyHtml(html));
     verifyMimeMessage(plainTextAndHtmlMessage, plainText, html);
 
-    MailMessage definition = new MailMessage(plainText, html, "Subject", "info@example.org", CollectionUtility.arrayList("to1@example.org"));
+    MailMessage definition =
+        new MailMessage().withSubject("Subject").withBodyPlainText(plainText).withBodyHtml(html).withSender(createMailParticipant("info@example.org")).withToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@example.org")));
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     final String attachmentContentId = "mycontentid";
-    definition.addAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null), attachmentContentId));
-    definition.addCcRecipient("cc1@example.org");
-    definition.addCcRecipient("cc2@example.org");
-    definition.addBccRecipient("bcc1@example.org");
-    definition.addBccRecipient("bcc2@example.org");
-    definition.addBccRecipient("bcc3@example.org");
+    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null), null, null, attachmentContentId));
+    definition.withCcRecipient(createMailParticipant("cc1@example.org"));
+    definition.withCcRecipient(createMailParticipant("cc2@example.org"));
+    definition.withBccRecipient(createMailParticipant("bcc1@example.org"));
+    definition.withBccRecipient(createMailParticipant("bcc2@example.org"));
+    definition.withBccRecipient(createMailParticipant("bcc3@example.org"));
     MimeMessage msg = MailUtility.createMimeMessage(definition);
     verifyMimeMessage(msg, plainText, html, "sample1.dat");
     // exactly one, already verified by verify method
@@ -214,7 +214,7 @@ public class MailUtilityTest {
     // create html mime message without attachments
     final String plainText = "plain text";
     final String html = "<html><body><p>plain text</p></html>";
-    MailMessage definition = new MailMessage(plainText, html);
+    MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(html);
     MimeMessage message = MailUtility.createMimeMessage(definition);
     verifyMimeMessage(message, plainText, html /* no attachments*/);
 
@@ -249,7 +249,7 @@ public class MailUtilityTest {
     // create html mime message without attachments
     final String plainText = "plain text";
     final String html = "<html><body><p>plain text</p></html>";
-    MailMessage definition = new MailMessage(plainText, html);
+    MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(html);
     MimeMessage message = MailUtility.createMimeMessage(definition);
     verifyMimeMessage(message, plainText, html /* no attachments*/);
 
@@ -282,17 +282,17 @@ public class MailUtilityTest {
   @Test
   public void testMimeMessageDefinitionRecipients() {
     MailMessage definition = new MailMessage();
-    definition.addToRecipient("to@example.org");
-    definition.addCcRecipient("cc@example.org");
-    definition.addBccRecipient("bcc@example.org");
+    definition.withToRecipient(createMailParticipant("to@example.org"));
+    definition.withCcRecipient(createMailParticipant("cc@example.org"));
+    definition.withBccRecipient(createMailParticipant("bcc@example.org"));
 
     Assert.assertEquals("Number of TO recipients is wrong", 1, definition.getToRecipients().size());
     Assert.assertEquals("Number of CC recipients is wrong", 1, definition.getCcRecipients().size());
     Assert.assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
 
-    Assert.assertEquals("TO recipient is wrong", "to@example.org", CollectionUtility.firstElement(definition.getToRecipients()));
-    Assert.assertEquals("CC recipient is wrong", "cc@example.org", CollectionUtility.firstElement(definition.getCcRecipients()));
-    Assert.assertEquals("BCC recipient is wrong", "bcc@example.org", CollectionUtility.firstElement(definition.getBccRecipients()));
+    Assert.assertEquals("TO recipient is wrong", "to@example.org", CollectionUtility.firstElement(definition.getToRecipients()).toString());
+    Assert.assertEquals("CC recipient is wrong", "cc@example.org", CollectionUtility.firstElement(definition.getCcRecipients()).toString());
+    Assert.assertEquals("BCC recipient is wrong", "bcc@example.org", CollectionUtility.firstElement(definition.getBccRecipients()).toString());
 
     definition.clearToRecipients();
     Assert.assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
@@ -309,9 +309,9 @@ public class MailUtilityTest {
     Assert.assertEquals("Number of CC recipients is wrong", 0, definition.getCcRecipients().size());
     Assert.assertEquals("Number of BCC recipients is wrong", 0, definition.getBccRecipients().size());
 
-    definition.addToRecipients(CollectionUtility.arrayList("to1@exapmle.org", "to2@example.org"));
-    definition.addCcRecipients(CollectionUtility.arrayList("cc1@exapmle.org", "cc2@example.org", "cc3@example.org"));
-    definition.addBccRecipients(CollectionUtility.arrayList("bcc1@exapmle.org", "bcc2@example.org", "bcc3@example.org", "bcc4@example.org"));
+    definition.withToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@exapmle.org", "to2@example.org")));
+    definition.withCcRecipients(createMailParticipants(CollectionUtility.arrayList("cc1@exapmle.org", "cc2@example.org", "cc3@example.org")));
+    definition.withBccRecipients(createMailParticipants(CollectionUtility.arrayList("bcc1@exapmle.org", "bcc2@example.org", "bcc3@example.org", "bcc4@example.org")));
 
     Assert.assertEquals("Number of TO recipients is wrong", 2, definition.getToRecipients().size());
     Assert.assertEquals("Number of CC recipients is wrong", 3, definition.getCcRecipients().size());
@@ -323,7 +323,7 @@ public class MailUtilityTest {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
 
     MailMessage definition = new MailMessage();
-    definition.addAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
+    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
 
     Assert.assertEquals("Number of attachments is wrong", 1, definition.getAttachments().size());
 
@@ -331,7 +331,7 @@ public class MailUtilityTest {
 
     Assert.assertEquals("Number of attachments is wrong", 0, definition.getAttachments().size());
 
-    definition.addAttachments(CollectionUtility.arrayList(
+    definition.withAttachments(CollectionUtility.arrayList(
         new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)),
         new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null))));
 
@@ -340,12 +340,12 @@ public class MailUtilityTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMimeMessageAttachmentWithNullDataSource1() {
-    new MailAttachment(null);
+    new MailAttachment((DataSource) null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testMimeMessageAttachmentWithNullDataSource2() {
-    new MailAttachment(null, "mycontentid");
+    new MailAttachment(null, null, null, "mycontentid");
   }
 
   /**
@@ -414,5 +414,26 @@ public class MailUtilityTest {
     for (String attachmentFilename : attachmentFilenames) {
       Assert.assertTrue("attachment filename " + attachmentFilename + " is missing", attachmentFilenamesSet.contains(attachmentFilename));
     }
+  }
+
+  /**
+   * Testing only. Utility class to easily create a list of participants.
+   */
+  static class MailParticipantUtility extends MailParticipant {
+
+    private static final long serialVersionUID = 1L;
+
+    static MailParticipant createMailParticipant(String email) {
+      return new MailParticipant(email);
+    }
+
+    static List<MailParticipant> createMailParticipants(List<String> emails) {
+      List<MailParticipant> participants = new ArrayList<MailParticipant>();
+      for (String email : emails) {
+        participants.add(new MailParticipant(email));
+      }
+      return participants;
+    }
+
   }
 }

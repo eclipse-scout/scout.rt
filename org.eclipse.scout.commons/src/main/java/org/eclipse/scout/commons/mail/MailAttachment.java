@@ -10,37 +10,81 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.mail;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import javax.activation.DataSource;
+
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
 
 /**
  * Class representing a mail attachment.
  */
 public class MailAttachment {
   private final DataSource m_dataSource;
-  private String m_contentId;
+  private final String m_contentType;
+  private final String m_name;
+  private final String m_contentId;
+  private byte[] m_content;
 
   public MailAttachment(DataSource dataSource) {
-    this(dataSource, null);
+    this(dataSource, null, null, null);
   }
 
-  public MailAttachment(DataSource dataSource, String contentId) {
+  public MailAttachment(DataSource dataSource, String contentType, String name, String contentId) {
     super();
     if (dataSource == null) {
       throw new IllegalArgumentException("DataSource is missing");
     }
     m_dataSource = dataSource;
+    m_contentType = contentType;
+    m_name = name;
     m_contentId = contentId;
+  }
+
+  public MailAttachment(BinaryResource binaryResource) throws IOException {
+    this(binaryResource, null);
+  }
+
+  public MailAttachment(BinaryResource binaryResource, String contentId) throws IOException {
+    this(new BinaryResourceDataSource(binaryResource), binaryResource.getContentType(), binaryResource.getFilename(), contentId);
+    m_content = binaryResource.getContent();
   }
 
   public DataSource getDataSource() {
     return m_dataSource;
   }
 
-  public String getContentId() {
-    return m_contentId;
+  public byte[] getContent() throws ProcessingException {
+    if (m_content == null) {
+      try {
+        m_content = IOUtility.getContent(m_dataSource.getInputStream());
+      }
+      catch (IOException e) {
+        throw new ProcessingException("Failed to get content", e);
+      }
+    }
+    return Arrays.copyOf(m_content, m_content.length);
   }
 
-  public void setContentId(String contentId) {
-    m_contentId = contentId;
+  /**
+   * @return the content type (MIME type), as passed to the constructor. May be <code>null</code>. In this case, the
+   *         name extension might give a hint to determine the content type.
+   */
+  public String getContentType() {
+    return m_contentType;
+  }
+
+  /**
+   * @return the name, as passed to the constructor. Should not be <code>null</code> (but could).
+   */
+  public String getName() {
+    return m_name;
+  }
+
+  public String getContentId() {
+    return m_contentId;
   }
 }

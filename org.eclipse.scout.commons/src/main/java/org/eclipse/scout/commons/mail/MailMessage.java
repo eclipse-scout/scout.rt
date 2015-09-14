@@ -21,10 +21,11 @@ import java.util.List;
  */
 public class MailMessage {
 
-  private final List<String> m_toRecipients = new ArrayList<String>();
-  private final List<String> m_ccRecipients = new ArrayList<String>();
-  private final List<String> m_bccRecipients = new ArrayList<String>();
-  private String m_sender;
+  private final List<MailParticipant> m_toRecipients = new ArrayList<MailParticipant>();
+  private final List<MailParticipant> m_ccRecipients = new ArrayList<MailParticipant>();
+  private final List<MailParticipant> m_bccRecipients = new ArrayList<MailParticipant>();
+  private MailParticipant m_sender;
+  private final List<MailParticipant> m_replyToRecipients = new ArrayList<MailParticipant>();
   private String m_subject;
   private String m_bodyPlainText;
   private String m_bodyHtml;
@@ -34,47 +35,12 @@ public class MailMessage {
    * Creates an empty mail message.
    */
   public MailMessage() {
-    this(null, null);
-  }
-
-  /**
-   * Creates a mail message with body (plain text & html).
-   *
-   * @param bodyPlainText
-   *          Plain text
-   * @param bodyHtml
-   *          HTML
-   */
-  public MailMessage(String bodyPlainText, String bodyHtml) {
-    this(bodyPlainText, bodyHtml, null, null, null);
-  }
-
-  /**
-   * Creates a mail message with body (plain text & html), subject, sender and TO recipients.
-   *
-   * @param bodyPlainText
-   *          Plain text
-   * @param bodyHtml
-   *          HTML
-   * @param subject
-   *          Subject
-   * @param sender
-   *          Sender
-   * @param toRecipients
-   *          List of TO recipients
-   */
-  public MailMessage(String bodyPlainText, String bodyHtml, String subject, String sender, List<String> toRecipients) {
-    m_bodyPlainText = bodyPlainText;
-    m_bodyHtml = bodyHtml;
-    m_subject = subject;
-    m_sender = sender;
-    addToRecipients(toRecipients);
   }
 
   /**
    * @return an unmodifiable list of TO recipients.
    */
-  public List<String> getToRecipients() {
+  public List<MailParticipant> getToRecipients() {
     return Collections.unmodifiableList(m_toRecipients);
   }
 
@@ -84,8 +50,9 @@ public class MailMessage {
    * @param toRecipient
    *          TO recipient to add
    */
-  public void addToRecipient(String toRecipient) {
+  public MailMessage withToRecipient(MailParticipant toRecipient) {
     m_toRecipients.add(toRecipient);
+    return this;
   }
 
   /**
@@ -94,23 +61,25 @@ public class MailMessage {
    * @param toRecipients
    *          TO recipients to add
    */
-  public void addToRecipients(Collection<String> toRecipients) {
+  public MailMessage withToRecipients(Collection<MailParticipant> toRecipients) {
     if (toRecipients != null) {
       m_toRecipients.addAll(toRecipients);
     }
+    return this;
   }
 
   /**
    * Clears the list of the TO recipients.
    */
-  public void clearToRecipients() {
+  public MailMessage clearToRecipients() {
     m_toRecipients.clear();
+    return this;
   }
 
   /**
    * @return an unmodifiable list of CC recipients.
    */
-  public List<String> getCcRecipients() {
+  public List<MailParticipant> getCcRecipients() {
     return Collections.unmodifiableList(m_ccRecipients);
   }
 
@@ -120,8 +89,9 @@ public class MailMessage {
    * @param ccRecipient
    *          CC recipient to add
    */
-  public void addCcRecipient(String ccRecipient) {
+  public MailMessage withCcRecipient(MailParticipant ccRecipient) {
     m_ccRecipients.add(ccRecipient);
+    return this;
   }
 
   /**
@@ -130,23 +100,25 @@ public class MailMessage {
    * @param ccRecipients
    *          CC recipients to add
    */
-  public void addCcRecipients(Collection<String> ccRecipients) {
+  public MailMessage withCcRecipients(Collection<MailParticipant> ccRecipients) {
     if (ccRecipients != null) {
       m_ccRecipients.addAll(ccRecipients);
     }
+    return this;
   }
 
   /**
    * Clears the list of the CC recipients.
    */
-  public void clearCcRecipients() {
+  public MailMessage clearCcRecipients() {
     m_ccRecipients.clear();
+    return this;
   }
 
   /**
    * @return an unmodifiable list of BCC recipients.
    */
-  public List<String> getBccRecipients() {
+  public List<MailParticipant> getBccRecipients() {
     return Collections.unmodifiableList(m_bccRecipients);
   }
 
@@ -156,8 +128,9 @@ public class MailMessage {
    * @param bccRecipient
    *          BCC recipient to add
    */
-  public void addBccRecipient(String bccRecipient) {
+  public MailMessage withBccRecipient(MailParticipant bccRecipient) {
     m_bccRecipients.add(bccRecipient);
+    return this;
   }
 
   /**
@@ -166,49 +139,103 @@ public class MailMessage {
    * @param bccRecipients
    *          BCC recipients to add
    */
-  public void addBccRecipients(Collection<String> bccRecipients) {
+  public MailMessage withBccRecipients(Collection<MailParticipant> bccRecipients) {
     if (bccRecipients != null) {
       m_bccRecipients.addAll(bccRecipients);
     }
+    return this;
   }
 
   /**
    * Clears the list of the BCC recipients.
    */
-  public void clearBccRecipients() {
+  public MailMessage clearBccRecipients() {
     m_bccRecipients.clear();
+    return this;
   }
 
-  public String getSender() {
+  /**
+   * @return Sender
+   */
+  public MailParticipant getSender() {
     return m_sender;
   }
 
-  public void setSender(String sender) {
+  /**
+   * Set sender.
+   *
+   * @param sender
+   *          Sender
+   */
+  public MailMessage withSender(MailParticipant sender) {
     m_sender = sender;
+    return this;
+  }
+
+  /**
+   * @return an unmodifiable list of reply TO recipients.
+   */
+  public List<MailParticipant> getReplyToRecipients() {
+    return Collections.unmodifiableList(m_replyToRecipients);
+  }
+
+  /**
+   * Adds the recipient to the reply TO list.
+   *
+   * @param replyToRecipient
+   *          TO recipient to add
+   */
+  public MailMessage withReplyToRecipient(MailParticipant replyToRecipient) {
+    m_toRecipients.add(replyToRecipient);
+    return this;
+  }
+
+  /**
+   * Adds the recipients to the reply TO list.
+   *
+   * @param replyToRecipients
+   *          reply TO recipients to add
+   */
+  public MailMessage withReplyToRecipients(Collection<MailParticipant> replyToRecipients) {
+    if (replyToRecipients != null) {
+      m_replyToRecipients.addAll(replyToRecipients);
+    }
+    return this;
+  }
+
+  /**
+   * Clears the list of the reply TO recipients.
+   */
+  public MailMessage clearReplyToRecipients() {
+    m_replyToRecipients.clear();
+    return this;
   }
 
   public String getSubject() {
     return m_subject;
   }
 
-  public void setSubject(String subject) {
+  public MailMessage withSubject(String subject) {
     m_subject = subject;
+    return this;
   }
 
   public String getBodyPlainText() {
     return m_bodyPlainText;
   }
 
-  public void setBodyPlainText(String bodyPlainText) {
+  public MailMessage withBodyPlainText(String bodyPlainText) {
     m_bodyPlainText = bodyPlainText;
+    return this;
   }
 
   public String getBodyHtml() {
     return m_bodyHtml;
   }
 
-  public void setBodyHtml(String bodyHtml) {
+  public MailMessage withBodyHtml(String bodyHtml) {
     m_bodyHtml = bodyHtml;
+    return this;
   }
 
   /**
@@ -223,8 +250,9 @@ public class MailMessage {
    *
    * @param attachment
    */
-  public void addAttachment(MailAttachment attachment) {
+  public MailMessage withAttachment(MailAttachment attachment) {
     m_attachments.add(attachment);
+    return this;
   }
 
   /**
@@ -232,14 +260,16 @@ public class MailMessage {
    *
    * @param attachments
    */
-  public void addAttachments(Collection<MailAttachment> attachments) {
+  public MailMessage withAttachments(Collection<MailAttachment> attachments) {
     m_attachments.addAll(attachments);
+    return this;
   }
 
   /**
    * Clears the attachment list.
    */
-  public void clearAttachments() {
+  public MailMessage clearAttachments() {
     m_attachments.clear();
+    return this;
   }
 }

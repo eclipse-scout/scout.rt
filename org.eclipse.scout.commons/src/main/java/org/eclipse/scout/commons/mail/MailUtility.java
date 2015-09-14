@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.IDN;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,6 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -303,22 +303,25 @@ public class MailUtility {
       }
       m.setContent(multiPart);
 
-      if (StringUtility.hasText(mailMessage.getSender())) {
-        InternetAddress addrSender = new InternetAddress(mailMessage.getSender());
+      if (mailMessage.getSender() != null && StringUtility.hasText(mailMessage.getSender().getEmail())) {
+        InternetAddress addrSender = createInternetAddress(mailMessage.getSender());
         m.setFrom(addrSender);
         m.setSender(addrSender);
+      }
+      if (!CollectionUtility.isEmpty(mailMessage.getReplyToRecipients())) {
+        m.setReplyTo(createInternetAddresses(mailMessage.getReplyToRecipients()));
       }
       if (StringUtility.hasText(mailMessage.getSubject())) {
         m.setSubject(mailMessage.getSubject(), Encoding.UTF_8);
       }
       if (!CollectionUtility.isEmpty(mailMessage.getToRecipients())) {
-        m.setRecipients(Message.RecipientType.TO, parseAddresses(mailMessage.getToRecipients()));
+        m.setRecipients(Message.RecipientType.TO, createInternetAddresses(mailMessage.getToRecipients()));
       }
       if (!CollectionUtility.isEmpty(mailMessage.getCcRecipients())) {
-        m.setRecipients(Message.RecipientType.CC, parseAddresses(mailMessage.getCcRecipients()));
+        m.setRecipients(Message.RecipientType.CC, createInternetAddresses(mailMessage.getCcRecipients()));
       }
       if (!CollectionUtility.isEmpty(mailMessage.getBccRecipients())) {
-        m.setRecipients(Message.RecipientType.BCC, parseAddresses(mailMessage.getBccRecipients()));
+        m.setRecipients(Message.RecipientType.BCC, createInternetAddresses(mailMessage.getBccRecipients()));
       }
       return m;
     }
@@ -527,6 +530,19 @@ public class MailUtility {
     return type;
   }
 
+  private static InternetAddress createInternetAddress(MailParticipant participant) throws MessagingException {
+    try {
+      InternetAddress internetAddress = new InternetAddress(IDN.toASCII(participant.getEmail()));
+      if (StringUtility.hasText(participant.getName())) {
+        internetAddress.setPersonal(participant.getName());
+      }
+      return internetAddress;
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new MessagingException("Failed to create internet address", e);
+    }
+  }
+
   /**
    * Careful: this method returns null when the list of addresses is empty! This is a (stupid) default by
    * javax.mime.Message.
@@ -534,13 +550,13 @@ public class MailUtility {
    * Array instead of list is returned in order to directly used to result with
    * {@link MimeMessage#setRecipients(javax.mail.Message.RecipientType, javax.mail.Address[])}.
    */
-  private static InternetAddress[] parseAddresses(List<String> addresses) throws AddressException {
-    if (CollectionUtility.isEmpty(addresses)) {
+  private static InternetAddress[] createInternetAddresses(List<MailParticipant> participants) throws MessagingException {
+    if (CollectionUtility.isEmpty(participants)) {
       return null;
     }
     ArrayList<InternetAddress> addrList = new ArrayList<InternetAddress>();
-    for (String address : addresses) {
-      addrList.add(new InternetAddress(address));
+    for (MailParticipant participant : participants) {
+      addrList.add(createInternetAddress(participant));
     }
     return addrList.toArray(new InternetAddress[addrList.size()]);
   }
