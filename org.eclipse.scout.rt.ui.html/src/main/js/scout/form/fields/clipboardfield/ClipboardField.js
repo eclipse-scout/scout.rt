@@ -68,8 +68,10 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   // do not use this.$field.text(), it suppresses new lines
   var text = scout.strings.plainText(this.$field.html());
   try {
+    // Chrome, Firefox - causes an exception in IE
     dataTransfer.setData('text/plain', text);
   } catch (e) {
+    // IE, see https://www.lucidchart.com/techblog/2014/12/02/definitive-guide-copying-pasting-javascript/
     dataTransfer.setData('Text', text);
   }
 
