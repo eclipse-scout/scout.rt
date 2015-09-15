@@ -489,6 +489,11 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
   // initialize comparators
   for (var c = 0; c < sortColumns.length; c++) {
     column = sortColumns[c];
+
+    if (!column.uiSortPossible) {
+      return false;
+    }
+
     if (column.type === 'text') {
       if (!scout.device.supportsInternationalization()) {
         //Locale comparison not possible -> do it on server

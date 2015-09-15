@@ -78,6 +78,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
       json.put("modelClass", getColumn().getClass().getName());
       json.put("classId", getColumn().classId());
     }
+    json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     return json;
   }
 
