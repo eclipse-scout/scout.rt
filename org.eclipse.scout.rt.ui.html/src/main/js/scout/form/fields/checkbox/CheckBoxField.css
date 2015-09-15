@@ -37,6 +37,10 @@
       top: 5px;
     }
 
+    &.checked::before {
+      #scout.checkbox-before-checked();
+    }
+
     &:focus::before {
       #scout.checkbox-before-focus();
     }
@@ -47,10 +51,6 @@
 
     &.disabled:hover::before {
       #scout.checkbox-before-disabled-border();
-    }
-
-    &.checked::before {
-      #scout.checkbox-before-checked();
     }
   }
 

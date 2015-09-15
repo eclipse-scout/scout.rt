@@ -88,6 +88,10 @@
       margin-top: -12px;
     }
 
+    &.checked::before {
+      #scout.checkbox-before-checked();
+    }
+
     &.disabled::before {
       #scout.checkbox-before-disabled();
     }
@@ -96,12 +100,12 @@
       #scout.checkbox-before-disabled-border();
     }
 
-    &.checked::before {
-      #scout.checkbox-before-checked();
-    }
-
     &:not(.checked).children-checked::after {
       #scout.checkbox-after-children-checked();
+    }
+
+    &.disabled:not(.checked).children-checked::after {
+      #scout.checkbox-after-children-checked-disabled();
     }
   }
 }
