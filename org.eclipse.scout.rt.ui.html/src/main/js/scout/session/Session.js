@@ -259,6 +259,7 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
+    this._sendTimeoutId = null;
     if (this.areRequestsPending()) {
       // do not send if there are any requests pending because the order matters -> prevents race conditions
       return;
@@ -423,7 +424,10 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
     }
 
     // If there already is a another request pending, send it now
-    this._sendNow();
+    // But only if it should not be sent delayed
+    if (!this._sendTimeoutId) {
+      this._sendNow();
+    }
 
     // Throw previously catched error
     if (jsError) {

@@ -1008,15 +1008,20 @@ scout.Table.prototype._sendRowsSelected = function(rowIds, debounceSend) {
 };
 
 scout.Table.prototype._sendRowsFiltered = function(rowIds) {
+  var event = new scout.Event(this.id, 'rowsFiltered');
+
+  // only send last event
+  event.coalesce = function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  };
+
   if (rowIds.length === this.rows.length) {
-    this.remoteHandler(this.id, 'rowsFiltered', {
-      remove: true
-    });
+    event.remove = true;
   } else {
-    this.remoteHandler(this.id, 'rowsFiltered', {
-      rowIds: rowIds
-    });
+    event.rowIds = rowIds;
   }
+  // send with timeout, mainly for incremental load of a large table
+  this.session.sendEvent(event, 250);
 };
 
 scout.Table.prototype._sendRowAction = function($row, columnId) {

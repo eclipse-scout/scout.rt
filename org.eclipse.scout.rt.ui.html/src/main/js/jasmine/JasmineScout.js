@@ -47,14 +47,19 @@ function sendQueuedAjaxCalls(response, time) {
   time = time || 0;
   jasmine.clock().tick(time);
 
+  receiveResponseForAjaxCall('', response);
+}
+
+function receiveResponseForAjaxCall(request, response) {
   if (!response) {
     response = {
       status: 200,
       responseText: '{"events":[]}'
     };
   }
-
-  var request = jasmine.Ajax.requests.mostRecent();
+  if (!request) {
+    request = jasmine.Ajax.requests.mostRecent();
+  }
   if (request && request.onload) {
     request.response(response);
   }

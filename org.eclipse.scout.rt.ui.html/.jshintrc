@@ -25,6 +25,7 @@
     "mostRecentJsonRequest": false,
     "createUniqueId": false,
     "sendQueuedAjaxCalls": false,
+    "receiveResponseForAjaxCall": false,
     "uninstallUnloadHandlers": false,
     "createPropertyChangeEvent": false,
     "createAdapterData": false,
