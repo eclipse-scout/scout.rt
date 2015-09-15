@@ -479,16 +479,6 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
     return collator.compare(valueA, valueB);
   };
 
-  var numberComparator = function(valueA, valueB) {
-    var numberA = Number(valueA), numberB = Number(valueB);
-    if (numberA < numberB) {
-      return -1;
-    } else if (numberA > numberB) {
-      return 1;
-    }
-    return 0;
-  };
-
   var defaultComparator = function(valueA, valueB) {
     if (valueA < valueB) {
       return -1;
@@ -511,8 +501,6 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
         collator = new window.Intl.Collator(this.session.locale.languageTag);
       }
       column.compare = textComparator;
-    } else if(column.type ==='number'){
-      column.compare = numberComparator;
     } else {
       column.compare = defaultComparator;
     }
@@ -1217,7 +1205,7 @@ scout.Table.prototype._group = function(update) {
       value = this.cellValue(column, row);
 
       if (column.type === 'number') {
-        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : Number(value));
+        sum[c] = (sum[c] || 0) + (value === '' || !useRow ? 0 : value);
       }
     }
 
