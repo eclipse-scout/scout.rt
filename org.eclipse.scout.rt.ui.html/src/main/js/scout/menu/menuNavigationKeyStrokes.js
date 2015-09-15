@@ -84,8 +84,10 @@ scout.inherits(scout.MenuNavigationExecKeyStroke, scout.KeyStroke);
 
 scout.MenuNavigationExecKeyStroke.prototype.handle = function(event) {
   var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
-  menuItems.$selected.trigger({
-    type: 'click',
-    which: 1
-  }); // simulate left-mouse click
+  ['mousedown', 'mouseup', 'click'].forEach(function(eventType) {
+    menuItems.$selected.trigger({
+      type: eventType,
+      which: 1
+    });
+  }); // simulate left-mouse click (full click event sequence in order, see scout.Menu.prototype._onMouseEvent)
 };
