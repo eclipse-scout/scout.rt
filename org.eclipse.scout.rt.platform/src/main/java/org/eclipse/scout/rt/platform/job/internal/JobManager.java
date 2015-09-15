@@ -157,13 +157,15 @@ public class JobManager implements IJobManager, IPlatformListener {
   @Override
   public final void shutdown() {
     m_futures.dispose();
-    m_mutexSemaphores.clear();
     m_executor.shutdownNow();
     try {
       m_executor.awaitTermination(1, TimeUnit.MINUTES);
     }
     catch (final InterruptedException e) {
       // NOOP
+    }
+    finally {
+      m_mutexSemaphores.clear();
     }
 
     fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
