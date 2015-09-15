@@ -109,11 +109,56 @@ public interface IBrowserField extends IFormField {
 
   boolean isScrollBarEnabled();
 
+  /**
+   * Enable or disable sandboxing for this field.
+   * <p>
+   * To display insecure content (for example, third-party content or HTML entered by a possibly malicious user) in a
+   * browser field, you can enable sandboxing which places a set of extra restrictions on the content.
+   * </p>
+   * <p>
+   * The implementation depends on the UI layer. In the case uf the HMTL5 UI layer, the implementation adds the
+   * <code>sandbox</code> attribute to the <code>iframe</code> HTML tag in which the content is displayed.<br/>
+   * You can lift specific restrictions with {@link #setSandboxPermissions(EnumSet)}. For more information of sandboxing
+   * in HTML, refer to the HTML 5 specification.
+   * </p>
+   *
+   * @param sandboxEnabled
+   *          <code>true</code> if sandboxing is to be turned on
+   * @see #isSandboxEnabled()
+   * @see #setSandboxPermissions(EnumSet)
+   * @see <a href="http://www.w3.org/TR/html5/embedded-content-0.html#attr-iframe-sandbox">HTML 5 specification: Iframe
+   *      sandbox</a>
+   */
   void setSandboxEnabled(boolean sandboxEnabled);
 
+  /**
+   * Returns true if sandboxing is enabled for this browser field.
+   *
+   * @return <code>true</code> if sandboxing is enabled for this browser field.
+   * @see #setSandboxEnabled(boolean)
+   * @see #getSandboxPermissions()
+   */
   boolean isSandboxEnabled();
 
+  /**
+   * Set which sandbox restrictions on the content should be lifted.
+   * <p>
+   * Passing an empty set, or <code>null</code> as argument means all restrictions apply.
+   * </p>
+   *
+   * @param sandboxPermission
+   *          Sandbox permissions to lift restrictions on the content
+   * @see #getSandboxPermissions()
+   * @see #setSandboxEnabled(boolean)
+   */
   void setSandboxPermissions(EnumSet<SandboxPermission> sandboxPermission);
 
+  /**
+   * Returns which restrictions on the sandbox are lifted.
+   *
+   * @return the currently lifted sandbox restrictions
+   * @see #isSandboxEnabled()
+   * @see #setSandboxPermissions(EnumSet)
+   */
   EnumSet<SandboxPermission> getSandboxPermissions();
 }
