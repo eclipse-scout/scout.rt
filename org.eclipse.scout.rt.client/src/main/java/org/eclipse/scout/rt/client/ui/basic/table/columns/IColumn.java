@@ -78,6 +78,11 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   String PROP_VIEW_ORDER = "viewOrder";
 
+  /**
+   * type boolean
+   */
+  String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
+
   void initColumn() throws ProcessingException;
 
   void disposeColumn() throws ProcessingException;
@@ -313,6 +318,16 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * and all column cells. Cell specific alignments can be applied by overriding the decorateCell methods.
    */
   int getHorizontalAlignment();
+
+  /**
+   * Is a simplified ui sorting possible? If enabled, ui (e.g. web browser, presentation layer itself) may sort the
+   * column without computing the order on a client server (e.g. application server). The ui uses a very simplified sort
+   * rule set, e.g. alphabetical or numerical sorting is possible, more advanced sort rules are not implemented. Which
+   * rules to use are determined by the client. To use advanced sort rules return <code>false</code>.
+   */
+  boolean isUiSortPossible();
+
+  void setUiSortPossible(boolean uiSortPossible);
 
   /**
    * <p>

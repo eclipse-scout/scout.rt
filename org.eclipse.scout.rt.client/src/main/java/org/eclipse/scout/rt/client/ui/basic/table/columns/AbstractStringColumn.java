@@ -108,6 +108,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String>impleme
   }
 
   @Override
+  protected boolean getConfiguredUiSortPossible() {
+    return true;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     setInputMasked(getConfiguredInputMasked());

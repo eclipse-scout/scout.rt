@@ -493,6 +493,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * @see IColumn#isUiSortPossible()
+   * @return {@code true} to allow simplified sorting e.g. by web browser, <code>false</code> otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(220)
+  protected boolean getConfiguredUiSortPossible() {
+    return false;
+  }
+
+  /**
    * Called after this column has been added to the column set of the surrounding table. This method may execute
    * additional initialization for this column (e.g. register listeners).
    * <p>
@@ -832,6 +842,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       setFont(FontSpec.parse(getConfiguredFont()));
     }
     setHtmlEnabled(getConfiguredHtmlEnabled());
+    setUiSortPossible(getConfiguredUiSortPossible());
   }
 
   /**
@@ -919,6 +930,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public boolean isMandatory() {
     return propertySupport.getPropertyBool(IFormField.PROP_MANDATORY);
+  }
+
+  @Override
+  public boolean isUiSortPossible() {
+    return propertySupport.getPropertyBool(IColumn.PROP_UI_SORT_POSSIBLE);
+  }
+
+  @Override
+  public void setUiSortPossible(boolean uiSortPossible) {
+    propertySupport.setPropertyBool(IColumn.PROP_UI_SORT_POSSIBLE, uiSortPossible);
   }
 
   @Override

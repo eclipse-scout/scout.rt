@@ -108,6 +108,11 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   @Override
+  protected boolean getConfiguredUiSortPossible() {
+    return true;
+  }
+
+  @Override
   protected void initConfig() {
     super.initConfig();
     initFormat();
