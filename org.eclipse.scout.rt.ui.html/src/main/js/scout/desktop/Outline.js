@@ -218,11 +218,20 @@ scout.Outline.prototype._showDefaultDetailForm = function() {
   }
 };
 
-/*
+/**
  * @override Tree.js
  */
 scout.Outline.prototype._onNodeMouseDown = function(event) {
   if (scout.Outline.parent.prototype._onNodeMouseDown.call(this, event)) {
+    this.handleOutlineContent(true);
+  }
+};
+
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._onNodeControlMouseDown = function(event) {
+  if (scout.Outline.parent.prototype._onNodeControlMouseDown.call(this, event)) {
     this.handleOutlineContent(true);
   }
 };

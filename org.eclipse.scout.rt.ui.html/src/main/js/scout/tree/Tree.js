@@ -1268,8 +1268,10 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   this.selectNodes(node);
   this.setNodeExpanded(node, expanded, expansionOpts);
 
-  // prevent immediately reopening
-  return false;
+  // prevent bubbling to _onNodeMouseDown()
+  $.suppressEvent(event);
+  // ...but return true, so Outline.js can override this method and check if selection has been changed or not
+  return true;
 };
 
 scout.Tree.prototype._onNodeControlMouseUp = function(event) {
