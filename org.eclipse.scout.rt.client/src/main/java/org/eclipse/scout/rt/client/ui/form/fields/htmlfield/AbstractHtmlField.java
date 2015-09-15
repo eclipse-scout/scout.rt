@@ -250,6 +250,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String>implem
 
     @Override
     public void parseAndSetValueFromUI(String htmlText) {
+      if (!AbstractHtmlField.this.isEnabled() || !AbstractHtmlField.this.isVisible()) {
+        return;
+      }
       if (isHtmlEditor()) {
         if (htmlText != null && htmlText.length() == 0) {
           htmlText = null;
@@ -261,6 +264,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String>implem
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
+      if (!AbstractHtmlField.this.isEnabled() || !AbstractHtmlField.this.isVisible()) {
+        return;
+      }
       try {
         doAppLinkAction(ref);
       }

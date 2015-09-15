@@ -34,6 +34,9 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void proposalTypedFromUI(String text) {
+    if (!m_field.isVisible() || !m_field.isEnabled()) {
+      return;
+    }
     LOG.debug("proposalTypedFromUI text=" + text);
     m_field.clearProposal();
     m_field.setDisplayText(text);
@@ -44,6 +47,9 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void openProposalChooserFromUI(String text, boolean selectCurrentValue) {
+    if (!m_field.isVisible() || !m_field.isEnabled()) {
+      return;
+    }
     LOG.debug("openProposalChooserFromUI");
     m_field.clearProposal();
     try {
@@ -68,6 +74,9 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void acceptProposalFromUI(String text, boolean chooser, boolean forceClose) {
+    if (!m_field.isVisible() || !m_field.isEnabled()) {
+      return;
+    }
     boolean openProposalChooser = false;
     if (chooser) {
       // choose from proposal chooser

@@ -244,6 +244,9 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage>i
   private class P_UIFacade implements IMailFieldUIFacade {
     @Override
     public boolean setMailFromUI(MimeMessage message) {
+      if (!AbstractMailField.this.isEnabled() || !AbstractMailField.this.isVisible()) {
+        return true;
+      }
       if (isMailEditor()) {
         setValue(message);
       }
@@ -252,6 +255,9 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage>i
 
     @Override
     public void fireAttachementActionFromUI(File file) {
+      if (!AbstractMailField.this.isEnabled() || !AbstractMailField.this.isVisible()) {
+        return;
+      }
       try {
         doAttachementAction(file);
       }
@@ -262,6 +268,9 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage>i
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
+      if (!AbstractMailField.this.isEnabled() || !AbstractMailField.this.isVisible()) {
+        return;
+      }
       try {
         doAppLinkAction(ref);
       }

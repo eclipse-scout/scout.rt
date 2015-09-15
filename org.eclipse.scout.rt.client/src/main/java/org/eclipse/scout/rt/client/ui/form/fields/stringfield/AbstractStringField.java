@@ -493,6 +493,9 @@ public abstract class AbstractStringField extends AbstractBasicField<String>impl
 
     @Override
     public void fireActionFromUI() {
+      if (!isSettableByUI()) {
+        return;
+      }
       try {
         doAction();
       }
@@ -503,6 +506,9 @@ public abstract class AbstractStringField extends AbstractBasicField<String>impl
 
     @Override
     public void setSelectionFromUI(int startOfSelection, int endOfSelection) {
+      if (!isSettableByUI()) {
+        return;
+      }
       select(startOfSelection, endOfSelection);
     }
 
@@ -513,6 +519,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String>impl
 
     @Override
     public void fireDropActionFromUi(TransferObject scoutTransferable) {
+      if (!isSettableByUI()) {
+        //do not drop into disabled ore invisible fields.
+        return;
+      }
       interceptDropRequest(scoutTransferable);
     }
   }

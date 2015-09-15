@@ -305,6 +305,9 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
 
     @Override
     public void firePostMessageFromUI(String data, String origin) {
+      if (!AbstractBrowserField.this.isEnabled() || !AbstractBrowserField.this.isVisible()) {
+        return;
+      }
       try {
         interceptPostMessage(data, origin);
       }
