@@ -115,7 +115,7 @@ public class ClientNotificationDispatcher {
           dispatchSync(notification);
         }
       };
-      IFuture<Void> future = Jobs.schedule(dispatchRunnable, Jobs.newInput(ClientRunContexts.empty()));
+      IFuture<Void> future = Jobs.schedule(dispatchRunnable, Jobs.newInput(ClientRunContexts.copyCurrent()));
       synchronized (m_notificationFutures) {
         m_notificationFutures.add(future);
         future.whenDone(new P_NotificationFutureCallback(future));

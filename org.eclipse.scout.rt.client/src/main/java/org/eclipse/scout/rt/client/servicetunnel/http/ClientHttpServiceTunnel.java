@@ -76,6 +76,10 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
     if (session != null) {
       serviceRequest.setSessionId(session.getId());
     }
+    else {
+      // user notification node id as identifier for created back end session
+      serviceRequest.setSessionId(IClientSessionRegistry.NOTIFICATION_NODE_ID);
+    }
     serviceRequest.setClientNotificationNodeId(IClientSessionRegistry.NOTIFICATION_NODE_ID);
   }
 
