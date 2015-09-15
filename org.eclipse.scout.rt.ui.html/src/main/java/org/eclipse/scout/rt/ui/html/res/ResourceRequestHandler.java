@@ -136,10 +136,12 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
   protected String resolveIndexHtml(HttpServletRequest request) {
     BrowserInfo browserInfo = BrowserInfo.createFrom(request);
+    LOG.info("Resolve index html. Browser info: " + browserInfo);
     if (browserInfo.isMobile()) {
       // Return index-mobile.html, but only if index-mobile.html exists (project may decide to always use index.html)
       URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_HTML);
       if (url != null) {
+        LOG.info("Return " + MOBILE_INDEX_HTML);
         return MOBILE_INDEX_HTML;
       }
     }

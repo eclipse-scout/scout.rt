@@ -53,7 +53,7 @@ public class JsonEventProcessor {
       jsonAdapter.cleanUpEventFilters();
     }
     catch (Exception e) {
-      LOG.error("Error while handling event '" + event.getType() + "' for adapter with ID " + event.getTarget(), e);
+      LOG.error("Error while handling event '" + event.getType() + "' for adapter " + jsonAdapter, e);
       throw new UiException(e);
     }
   }
