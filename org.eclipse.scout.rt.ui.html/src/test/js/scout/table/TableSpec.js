@@ -579,16 +579,16 @@ describe("Table", function() {
       });
 
       it("sorts number columns", function() {
-        var model = helper.createModelSingleColumnByValues([11, 1, 8], 'number');
+        var model = helper.createModelSingleColumnByValues(['100', '90', '300'], 'number');
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
 
         table.sort(column0, 'desc');
-        helper.assertValuesInCells(table.rows, 0, [11, 8, 1]);
+        helper.assertValuesInCells(table.rows, 0, ['300', '100', '90']);
 
         table.sort(column0, 'asc');
-        helper.assertValuesInCells(table.rows, 0, [1, 8, 11]);
+        helper.assertValuesInCells(table.rows, 0, ['90', '100', '300']);
       });
 
       it("sorts date columns", function() {
