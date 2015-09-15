@@ -881,7 +881,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       that.table.addFilter(filter);
 
     } else {
-      that.table.removeFilter(scout.ChartTableControl.FILTER_KEY);
+      that.table.removeFilterByKey(scout.ChartTableControl.FILTER_KEY);
     }
 
     that.table.filter();

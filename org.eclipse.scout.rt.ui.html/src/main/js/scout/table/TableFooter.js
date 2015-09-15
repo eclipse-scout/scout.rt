@@ -143,7 +143,7 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
     filter.text = filterText.toLowerCase();
     this._table.addFilter(filter);
   } else if (!filterText) {
-    this._table.removeFilter(scout.TableTextUserFilter.Type);
+    this._table.removeFilterByKey(scout.TableTextUserFilter.Type);
   }
 
   this._table.filter();

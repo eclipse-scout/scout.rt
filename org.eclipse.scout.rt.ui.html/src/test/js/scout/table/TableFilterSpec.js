@@ -52,7 +52,7 @@ describe("Table Filter", function() {
       expect(filteredRows.length).toBe(1);
       expect(filteredRows[0]).toBe(table.rows[1]);
 
-      table.removeFilter(filter.column.id);
+      table.removeFilterByKey(filter.column.id);
       table.filter();
 
       filteredRows = table.filteredRows();
@@ -162,6 +162,22 @@ describe("Table Filter", function() {
       expect(filteredRows.length).toBe(1);
       expect(table.rows[2].filterAccepted).toBe(false);
       expect(table.rows[2].$row.isVisible()).toBe(false);
+    });
+
+    it("properly handles block loading", function() {
+      var model = helper.createModelFixture(2, 7),
+        table = helper.createTable(model),
+        column0 = table.columns[0],
+        row1 = table.rows[1];
+
+      table._blockLoadThreshold = 2;
+
+      // expects 1 row to be visible
+      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.render(session.$entryPoint);
+
+      expect(table.rows.length).toBe(7);
+      expect(table.filteredRows().length).toBe(1);
     });
 
   });

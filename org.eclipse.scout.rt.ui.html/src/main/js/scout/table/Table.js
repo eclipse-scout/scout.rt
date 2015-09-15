@@ -23,6 +23,7 @@ scout.Table = function() {
   this._filteredRowsDirty = true;
   this.tooltips = [];
   this._animationRowLimit = 25;
+  this._blockLoadThreshold = 100;
   this.menuBar;
   this._renderRowsInProgress = false;
   this._drawDataInProgress = false;
@@ -700,7 +701,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
     // Build $rows (as string instead of jQuery objects for efficiency reasons)
     var previousRowSelected = false,
       followingRowSelected = false;
-    for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + 100); r++) {
+    for (var r = startRowIndex; r < Math.min(rows.length, startRowIndex + this._blockLoadThreshold); r++) {
       var row = rows[r],
         rowSelected = this.selectedRows.indexOf(row) > -1;
 
@@ -709,7 +710,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
       } else {
         previousRowSelected = this.selectedRows.indexOf(rows[r - 1]) > -1;
       }
-      if (r < Math.min(rows.length, startRowIndex + 100) - 1) {
+      if (r < Math.min(rows.length, startRowIndex + this._blockLoadThreshold) - 1) {
         followingRowSelected = this.selectedRows.indexOf(rows[r + 1]) > -1;
       } else {
         followingRowSelected = false;
@@ -755,7 +756,7 @@ scout.Table.prototype._renderRows = function(rows, startRowIndex, lastRowOfBlock
   if (rows.length > numRowsLoaded) {
     this._renderRowsInProgress = true;
     setTimeout(function() {
-      that._renderRows(rows, startRowIndex + 100, lastRowOfBlockSelected);
+      that._renderRows(rows, startRowIndex + that._blockLoadThreshold, lastRowOfBlockSelected);
       // Manual validation necessary due to set timeout
       that.validateLayoutTree();
     }, 0);
@@ -1781,7 +1782,8 @@ scout.Table.prototype.filteredRows = function() {
   if (this._filteredRowsDirty) {
     this._filteredRows = [];
     this.rows.forEach(function(row) {
-      if (row.filterAccepted) {
+      // row.$row check is necessary because filterAccepted state is only correct for rendered rows (_applyFilters is only called for rendered rows)
+      if (row.$row && row.filterAccepted) {
         this._filteredRows.push(row);
       }
     }, this);
@@ -1998,7 +2000,7 @@ scout.Table.prototype.filteredBy = function() {
 scout.Table.prototype.resetFilter = function() {
   // remove filters
   for (var key in this._filterMap) {
-    this.removeFilter(key);
+    this.removeFilterByKey(key);
   }
   this._filterMap = {};
 
@@ -2026,8 +2028,11 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   });
 };
 
-//TODO CGU use filter as param or rename to removeFilterByKey
-scout.Table.prototype.removeFilter = function(key, notifyServer) {
+scout.Table.prototype.removeFilter = function(filter, notifyServer) {
+  this.removeFilterByKey(filter.createKey(), notifyServer);
+};
+
+scout.Table.prototype.removeFilterByKey = function(key, notifyServer) {
   notifyServer = notifyServer !== undefined ? notifyServer : true;
   if (!key) {
     throw new Error('key has to be defined');
@@ -2235,7 +2240,6 @@ scout.Table.prototype._triggerRowsSelected = function() {
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
-  //FIXME CGU create all rows filtered event
   this.events.trigger(scout.Table.GUI_EVENT_ROWS_FILTERED);
 };
 
@@ -2298,7 +2302,7 @@ scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
 
 scout.Table.prototype._syncFilters = function(filters) {
   for (var key in this._filterMap) {
-    this.removeFilter(key, false);
+    this.removeFilterByKey(key, false);
   }
   if (filters) {
     filters.forEach(function(filterData) {
