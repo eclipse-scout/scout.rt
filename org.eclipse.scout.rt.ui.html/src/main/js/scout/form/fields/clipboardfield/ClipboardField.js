@@ -28,7 +28,9 @@ scout.ClipboardField.prototype._render = function($parent) {
   this.dragAndDropHandler.install(this.$field);
 
   this.$field.attr('contenteditable', 'true')
-    .on('paste', this._onPaste.bind(this));
+    .on('paste', this._onPaste.bind(this))
+    .on('copy',  this._onCopy.bind(this))
+    .on('cut',  this._onCopy.bind(this));
 
   $parent.on('click', function(event) {
     this.session.focusManager.requestFocus(this.$field);
@@ -48,6 +50,34 @@ scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
     this.$field.empty();
   }
 };
+
+scout.ClipboardField.prototype._onCopy = function(event) {
+  var dataTransfer;
+  if (event.originalEvent.clipboardData) {
+    dataTransfer = event.originalEvent.clipboardData;
+  } else if (window.clipboardData) {
+    dataTransfer = window.clipboardData;
+  } else {
+    // unable to obtain data transfer object
+    throw new Error('Unable to access clipboard data.');
+  }
+
+  // scroll bar must not be in field when copying
+  scout.scrollbars.uninstall(this.$field, this.session);
+
+  // do not use this.$field.text(), it suppresses new lines
+  var text = scout.strings.plainText(this.$field.html());
+  try {
+    dataTransfer.setData('text/plain', text);
+  } catch (e) {
+    dataTransfer.setData('Text', text);
+  }
+
+  // (re)install scroll bars
+  scout.scrollbars.install(this.$field, this.session);
+
+  return false;
+},
 
 scout.ClipboardField.prototype._onPaste = function(event) {
   var dataTransfer;
