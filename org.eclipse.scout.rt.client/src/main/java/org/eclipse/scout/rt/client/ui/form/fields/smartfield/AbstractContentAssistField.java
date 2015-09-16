@@ -99,6 +99,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   private boolean m_browseHierarchy;
   private boolean m_loadIncremental;
   private int m_proposalFormHeight;
+  private String m_wildcard;
 
   private ILookupRow<LOOKUP_KEY> m_currentLookupRow;
 
@@ -224,6 +225,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Order(290)
   protected Class<? extends IContentAssistFieldTable<VALUE>> getConfiguredContentAssistTable() {
     return null;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(300)
+  protected String getConfiguredWildcard() {
+    return "*";
   }
 
   /**
@@ -440,6 +447,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
+    setWildcard(getConfiguredWildcard());
   }
 
   /**
@@ -614,7 +622,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
+      CodeLookupCall<LOOKUP_KEY> codeLookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
+      m_lookupCall = codeLookupCall;
       ICodeType t = CODES.getCodeType(m_codeTypeClass);
       if (t != null) {
         if (!ConfigurationUtility.isMethodOverwrite(AbstractContentAssistField.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
@@ -634,6 +643,25 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     m_lookupCall = call;
   }
 
+  /**
+   * @param wildcard
+   */
+  @Override
+  public void setWildcard(String wildcard) {
+    if (StringUtility.isNullOrEmpty(wildcard)) {
+      throw new IllegalArgumentException("Wildcard must not be null nor empty!");
+    }
+    m_wildcard = wildcard;
+    if (m_lookupCall != null) {
+      m_lookupCall.setWildcard(wildcard);
+    }
+  }
+
+  @Override
+  public String getWildcard() {
+    return m_wildcard;
+  }
+
   @Override
   public void setUniquelyDefinedValue(boolean background) throws ProcessingException {
     ILookupCallFetcher<LOOKUP_KEY> fetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
@@ -647,10 +675,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
     };
     if (background) {
-      callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 2, fetcher);
+      callBrowseLookupInBackground(getWildcard(), 2, fetcher);
     }
     else {
-      fetcher.dataFetched(callBrowseLookup(IContentAssistField.BROWSE_ALL_TEXT, 2), null);
+      fetcher.dataFetched(callBrowseLookup(getWildcard(), 2), null);
     }
   }
 
@@ -813,7 +841,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   protected String toSearchText(String text) {
-    return StringUtility.isNullOrEmpty(text) ? IContentAssistField.BROWSE_ALL_TEXT : text;
+    return StringUtility.isNullOrEmpty(text) ? getWildcard() : text;
   }
 
   @Override
@@ -856,10 +884,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     textPattern = textPattern.toLowerCase();
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-      textPattern = "*" + textPattern;
+      textPattern = getWildcard() + textPattern;
     }
-    if (!textPattern.endsWith("*")) {
-      textPattern = textPattern + "*";
+    if (!textPattern.endsWith(getWildcard())) {
+      textPattern = textPattern + getWildcard();
     }
     call.setKey(null);
     call.setText(textPattern);

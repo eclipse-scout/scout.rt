@@ -161,7 +161,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
       setStatusVisible(true);
       //go async to fetch data
-      m_populateInitialTreeJob = m_contentAssistField.callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
+      m_populateInitialTreeJob = m_contentAssistField.callBrowseLookupInBackground(m_contentAssistField.getWildcard(), 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
         @Override
         public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
           if (failed == null) {
@@ -385,13 +385,16 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     s = s.toLowerCase();
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-      s = "*" + s;
+      s = getContentAssistField().getWildcard() + s;
     }
-    if (!s.endsWith("*")) {
-      s = s + "*";
+    s = s.replace(getContentAssistField().getWildcard(), "@wildcard@");
+    s = StringUtility.escapeRegexMetachars(s);
+    s = s.replace("@wildcard@", ".*");
+    if (!s.endsWith(".*")) {
+      s = s + ".*";
     }
-    s = StringUtility.toRegExPattern(s);
     return Pattern.compile(s, Pattern.DOTALL);
+
   }
 
   /**

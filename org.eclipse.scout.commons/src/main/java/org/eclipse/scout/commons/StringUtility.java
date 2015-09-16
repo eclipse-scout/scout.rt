@@ -1811,4 +1811,43 @@ public final class StringUtility {
     x = lpad(x, "0", 7);
     return (nanos < 0 ? "-" : "") + x.substring(0, x.length() - 6) + "." + x.substring(x.length() - 6);
   }
+
+  /**
+   * @param s
+   * @return
+   */
+  public static String escapeRegexMetachars(String s) {
+    if (s == null) {
+      s = "";
+    }
+    StringBuilder sb = new StringBuilder();
+    char[] ch = s.toCharArray();
+    for (int i = 0; i < ch.length; i++) {
+      switch (ch[i]) {
+        case '^':
+        case '[':
+        case '.':
+        case '$':
+        case '{':
+        case '*':
+        case '(':
+        case '\\':
+        case '+':
+        case ')':
+        case '|':
+        case '?':
+        case '<':
+        case '>': {
+          sb.append('\\');
+          break;
+        }
+        default: {
+          // nop
+          break;
+        }
+      }
+      sb.append(ch[i]);
+    }
+    return sb.toString();
+  }
 }

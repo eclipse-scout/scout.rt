@@ -557,4 +557,12 @@ public class StringUtilityTest {
     assertEquals("-9223372036854.775808", StringUtility.formatNanos(Long.MIN_VALUE));
   }
 
+  @Test
+  public void testEscapeRegexMetachars() {
+    assertEquals("", StringUtility.escapeRegexMetachars(null));
+    assertEquals("", StringUtility.escapeRegexMetachars(""));
+    assertEquals("no metachar in source", StringUtility.escapeRegexMetachars("no metachar in source"));
+    assertEquals("all metachars: \\^\\[\\.\\$\\{\\*\\(\\\\\\+\\)\\|\\?\\<\\>", StringUtility.escapeRegexMetachars("all metachars: ^[.${*(\\+)|?<>"));
+  }
+
 }

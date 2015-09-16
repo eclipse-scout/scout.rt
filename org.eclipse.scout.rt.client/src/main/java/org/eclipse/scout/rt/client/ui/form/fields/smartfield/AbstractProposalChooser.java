@@ -102,7 +102,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
    * @return
    */
   protected boolean isBrowseAll() {
-    return IContentAssistField.BROWSE_ALL_TEXT.equals(getSearchText());
+    return m_contentAssistField.getWildcard().equals(getSearchText());
   }
 
   @Override
@@ -178,6 +178,10 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
 
   public final boolean isAllowCustomText() {
     return m_allowCustomText;
+  }
+
+  public IContentAssistField<?, LOOKUP_KEY> getContentAssistField() {
+    return m_contentAssistField;
   }
 
 }

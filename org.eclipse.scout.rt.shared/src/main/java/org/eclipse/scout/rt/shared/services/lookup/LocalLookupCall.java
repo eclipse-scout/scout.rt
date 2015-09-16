@@ -25,12 +25,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * Data is directly provided by {@link #execCreateLookupRows()}
  * <p>
  * Does not implements serializable, since this special subclass is not intended to be exchanged between gui and server.
- * 
+ *
  * @see LookupCall
  */
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
-
   public LocalLookupCall() {
   }
 
@@ -50,18 +49,24 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     return null;
   }
 
-  /**
-   * @param humanReadbleFilterPattern
-   *          is not a regex and may contain *,%,? as wildcards for searching override this method for custom filter
-   *          pattern creation
-   */
-  protected Pattern createSearchPattern(String humanReadbleFilterPattern) {
-    return createLowerCaseSearchPattern(humanReadbleFilterPattern);
+  protected Pattern createSearchPattern(String s) {
+    if (s == null) {
+      s = "";
+    }
+    s = s.replace(getWildcard(), "@wildcard@");
+    s = s.toLowerCase();
+    s = StringUtility.escapeRegexMetachars(s);
+    s = s.replace("@wildcard@", ".*");
+    if (!s.contains(".*")) {
+      s = s + ".*";
+    }
+    return Pattern.compile(s, Pattern.DOTALL);
   }
 
   /**
-   * alias for {@link StringUtility#toRegEx(String, int)}
+   * @deprecated: Will be removed in the neon release.
    */
+  @Deprecated
   public static Pattern createLowerCaseSearchPattern(String s) {
     return StringUtility.toRegEx(s, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   }
