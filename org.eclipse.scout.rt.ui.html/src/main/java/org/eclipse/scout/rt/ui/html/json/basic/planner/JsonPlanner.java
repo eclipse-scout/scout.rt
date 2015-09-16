@@ -158,25 +158,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
         return new JsonDateRange((Range<Date>) value).toJson();
       }
     });
-    //FIXME CGU needed?
-//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_FIRST_HOUR_OF_DAY, model) {
-//      @Override
-//      protected Integer modelValue() {
-//        return getModel().getFirstHourOfDay();
-//      }
-//    });
-//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_LAST_HOUR_OF_DAY, model) {
-//      @Override
-//      protected Integer modelValue() {
-//        return getModel().getLastHourOfDay();
-//      }
-//    });
-//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_INTRADAY_INTERVAL, model) {
-//      @Override
-//      protected Long modelValue() {
-//        return getModel().getIntradayInterval();
-//      }
-//    });
     putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_SELECTED_ACTIVITY, model) {
       @Override
       protected Activity<?, ?> modelValue() {
@@ -227,7 +208,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     if (id != null) {
       throw new IllegalStateException("Cell already has an id. " + cell);
     }
-    id = getUiSession().createUniqueIdFor(null);
+    id = getUiSession().createUniqueId();
     m_activities.put(id, cell);
     m_activityIds.put(cell, id);
     return id;
@@ -266,7 +247,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     if (id != null) {
       throw new IllegalStateException("Resource already has an id. " + resource);
     }
-    id = getUiSession().createUniqueIdFor(null);
+    id = getUiSession().createUniqueId();
     m_resources.put(id, resource);
     m_resourceIds.put(resource, id);
     return id;
@@ -465,7 +446,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   @SuppressWarnings("unchecked")
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
     Activity<?, ?> activityCell = null;
-    // TODO Map data from JSON
+    // FIXME CGU Map data from JSON
 
     getModel().getUIFacade().setSelectedActivityCellFromUI(activityCell);
   }

@@ -484,8 +484,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   @Override
-  public String createUniqueIdFor(IJsonAdapter jsonAdapter) {
-    // FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
+  public String createUniqueId() {
     return "" + (++m_jsonAdapterSeq);
   }
 
@@ -541,7 +540,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
    * <code>init()</code> method on the created instance.
    */
   public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent) {
-    String id = createUniqueIdFor(null); // FIXME CGU
+    String id = createUniqueId();
     @SuppressWarnings("unchecked")
     A adapter = (A) MainJsonObjectFactory.get().createJsonAdapter(model, this, id, parent);
     adapter.init();

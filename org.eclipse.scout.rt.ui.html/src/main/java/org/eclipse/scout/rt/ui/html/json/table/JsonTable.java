@@ -280,7 +280,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         offset += 1;
         continue;
       }
-      String id = getUiSession().createUniqueIdFor(null);
+      String id = getUiSession().createUniqueId();
       JsonColumn jsonColumn = (JsonColumn) MainJsonObjectFactory.get().createJsonObject(column);
       jsonColumn.setUiSession(getUiSession());
       jsonColumn.setId(id);
@@ -744,7 +744,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
     String id = m_tableRowIds.get(row);
     if (id == null) {
-      id = getUiSession().createUniqueIdFor(null);
+      id = getUiSession().createUniqueId();
       m_tableRows.put(id, row);
       m_tableRowIds.put(row, id);
     }

@@ -29,7 +29,7 @@ public class JsonHtmlFieldTest extends BaseFormFieldTest {
   private AbstractHtmlField m_model = new AbstractHtmlField() {
   };
 
-  private JsonHtmlField m_htmlField = new JsonHtmlField<IHtmlField>(m_model, m_session, m_session.createUniqueIdFor(null), null);
+  private JsonHtmlField m_htmlField = new JsonHtmlField<IHtmlField>(m_model, m_session, m_session.createUniqueId(), null);
 
   @Before
   public void setUp() {

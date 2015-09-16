@@ -312,7 +312,6 @@ scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
   this.filter();
 };
 
-//FIXME CGU better use inserted and updated? weil sowieso bei der Initialisierung kein Event getriggert werden kann.
 scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
   this._linkNodeWithRow(event.row);
 };

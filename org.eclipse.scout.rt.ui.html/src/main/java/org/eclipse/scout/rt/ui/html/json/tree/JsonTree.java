@@ -617,7 +617,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     if (id != null) {
       return id;
     }
-    id = getUiSession().createUniqueIdFor(null);
+    id = getUiSession().createUniqueId();
     m_treeNodes.put(id, node);
     m_treeNodeIds.put(node, id);
     return id;

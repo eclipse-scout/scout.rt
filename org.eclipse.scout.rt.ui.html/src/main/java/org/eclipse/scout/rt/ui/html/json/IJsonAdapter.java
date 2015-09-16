@@ -55,7 +55,7 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
   // attachAdapter -> attachChildAdapter
   // getAdapter -> getChildAdapter
   // getAdapters -> getChildAdapters
-  // getParent -> getParentAdapter
+  // getParent -> getParentAdapter (owner would be better to have consistent naming with the js part)
 
   <A extends IJsonAdapter<?>, MODEL> A attachAdapter(MODEL model, IFilter<MODEL> filter);
 

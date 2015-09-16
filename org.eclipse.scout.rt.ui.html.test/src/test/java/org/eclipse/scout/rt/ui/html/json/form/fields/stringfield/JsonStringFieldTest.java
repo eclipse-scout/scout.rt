@@ -34,7 +34,7 @@ public class JsonStringFieldTest extends BaseFormFieldTest {
 
   };
 
-  private JsonStringField m_stringField = new JsonStringField<IStringField>(m_model, m_session, m_session.createUniqueIdFor(null), null);
+  private JsonStringField m_stringField = new JsonStringField<IStringField>(m_model, m_session, m_session.createUniqueId(), null);
 
   @Before
   public void setUp() {

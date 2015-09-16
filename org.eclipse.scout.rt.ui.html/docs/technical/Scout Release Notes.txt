@@ -525,3 +525,12 @@ Migration:
 - getConfiguredTableStatusVisible() was dropped without replacement. Instead, the initial "table status
   visible" property should be set on the table. (In most cases, you can simply move the
   getConfiguredTableStatusVisible() method from the table field to the table.
+
+CGU 16.09.2015
+Replaced ITableColumnFilterManager by TableUserFilterManager
+Reason for the rename is because more filter types were added.
+There are currently 2 filter types: Column filter and text filter, there will be a chart filter in the future.
+Additionally, the filtering now happens in the UI.
+The ui sends the filtered rows to the ui server to update its table state so that getFilteredRows return the currently visible rows on the ui.
+This rowsFiltered event leads to a creation of UserTableRowFilter which contains the filtered rows. This is the only active filter on a table.
+The filters managed by TableUserFilterManager are actually only filter states and are not added to the table.

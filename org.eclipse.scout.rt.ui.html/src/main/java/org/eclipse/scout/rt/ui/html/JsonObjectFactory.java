@@ -67,7 +67,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
@@ -125,7 +124,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.mailfield.JsonMailField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.placeholder.JsonPlaceholderField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerFieldOld;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
@@ -244,9 +242,6 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IPlannerField<?>) {
       return new JsonPlannerField((IPlannerField<?>) model, session, id, parent);
-    }
-    if (model instanceof IPlannerFieldOld<?, ?, ?, ?>) {
-      return new JsonPlannerFieldOld((IPlannerFieldOld<?, ?, ?, ?>) model, session, id, parent);
     }
     if (model instanceof IWrappedFormField<?>) {
       return new JsonWrappedFormField<IWrappedFormField<? extends IForm>>((IWrappedFormField<?>) model, session, id, parent);

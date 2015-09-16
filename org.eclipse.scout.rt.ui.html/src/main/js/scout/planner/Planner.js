@@ -1240,10 +1240,6 @@ scout.Planner.prototype._onResourcesUpdated = function(resources) {
   this._updateResources(resources);
 };
 
-scout.Planner.prototype._onResourceOrderChanged = function(resourceIds) {
-  //FIXME CGU implement
-};
-
 scout.Planner.prototype.onModelAction = function(event) {
   if (event.type === 'resourcesInserted') {
     this._onResourcesInserted(event.resources);
@@ -1253,8 +1249,6 @@ scout.Planner.prototype.onModelAction = function(event) {
     this._onResourcesSelected(event.resourceIds);
   } else if (event.type === 'allResourcesDeleted') {
     this._onAllResourcesDeleted();
-  } else if (event.type === 'resourceOrderChanged') {
-    this._onResourceOrderChanged(event.resourceIds);
   } else if (event.type === 'resourcesUpdated') {
     this._onResourcesUpdated(event.resources);
   } else {

@@ -147,7 +147,7 @@ public interface IUiSession {
 
   <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent);
 
-  String createUniqueIdFor(IJsonAdapter<?> adapter);
+  String createUniqueId();
 
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 
