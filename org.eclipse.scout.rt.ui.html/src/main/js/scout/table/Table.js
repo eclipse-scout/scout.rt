@@ -1744,6 +1744,10 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
       this.revealSelection();
     }
     this._updateMenuBar();
+
+    if (this.groupedSelection) {
+      this._group(true);
+    }
   }
 };
 
