@@ -356,7 +356,7 @@ scout.Outline.prototype._onPageChanged = function(event) {
 
 scout.Outline.prototype._onNodesSelected = function(nodeIds) {
   scout.Outline.parent.prototype._onNodesSelected.call(this, nodeIds);
-  this.handleOutlineContent(true);
+  this.handleOutlineContent(this.inFront());
 };
 
 scout.Outline.prototype.onModelAction = function(event) {
