@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.testing.shared.AllAccessControlService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -82,7 +81,6 @@ public class OrganizeColumnsFormTest {
    * The table should be reset to the original state after the form has been canceled.
    */
   @Test
-  @Ignore //TODO JGU: fix, waiting for clarifications
   public void testResetAfterCancel() throws ProcessingException {
     TestPage page = new TestOutline().getPage();
     page.ensureChildrenLoaded();

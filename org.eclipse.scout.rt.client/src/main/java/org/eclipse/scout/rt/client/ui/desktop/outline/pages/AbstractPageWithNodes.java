@@ -132,7 +132,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable>implemen
    */
   protected void updateParentTableRow(ICell cell) {
     IPage<?> parent = getParentPage();
-    if (parent != null && parent instanceof IPageWithNodes) {
+    if (parent instanceof IPageWithNodes) {
       ITableRow row = ((IPageWithNodes) parent).getTableRowFor(this);
       if (row != null) {
         row.getCellForUpdate(0).setText(cell.getText());
@@ -253,7 +253,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable>implemen
       getTable().discardAllRows();
       for (ITreeNode childNode : childNodes) {
         ITableRow row = new TableRow(getTable().getColumnSet());
-        row.setCell(0, childNode.getCell());
+        //ensure a value is set on the treenode
+        Cell treeCell = childNode.getCellForUpdate();
+        treeCell.setValue(treeCell.getText());
+        row.setCell(0, treeCell);
         ITableRow insertedRow = getTable().addRow(row);
         linkTableRowWithPage(insertedRow, (IPage) childNode);
       }
@@ -341,10 +344,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable>implemen
       @Override
       protected String getConfiguredHeaderText() {
         return ScoutTexts.get("Folders");
-      }
-
-      @Override
-      public void updateDisplayText(ITableRow row, Cell cell) {
       }
 
       @Override
