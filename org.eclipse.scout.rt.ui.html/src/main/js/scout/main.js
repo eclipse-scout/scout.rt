@@ -72,11 +72,12 @@ scout._checkBrowserCompability = function(options) {
 scout._installGlobalJavascriptErrorHandler = function() {
   window.onerror = function(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {
-      // TODO Log error to server?
+      var errorCode = getJsErrorCode(error);
       var logStr = errorMessage + ' at ' + fileName + ':' + lineNumber;
       if (error && error.stack) {
         logStr = error.stack;
       }
+      logStr += ' (' + 'Code ' + errorCode + ')';
       $.log.error(logStr);
       if (window.console) {
         window.console.log(logStr);
@@ -84,7 +85,6 @@ scout._installGlobalJavascriptErrorHandler = function() {
       // FIXME Improve this!
       if (scout.sessions.length > 0) {
         var session = scout.sessions[0];
-        var errorCode = getJsErrorCode(error);
         var boxOptions = {
           header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
           body: scout.strings.join('\n\n',
@@ -98,6 +98,7 @@ scout._installGlobalJavascriptErrorHandler = function() {
           hiddenText: logStr
         };
         session.showFatalMessage(boxOptions, errorCode);
+        session.sendLogRequest(logStr);
       }
     } catch (err) {
       throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');

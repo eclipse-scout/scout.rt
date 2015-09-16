@@ -24,6 +24,7 @@ public class JsonRequest {
 
   public static final String PROP_STARTUP = "startup";
   public static final String PROP_UNLOAD = "unload";
+  public static final String PROP_LOG = "log";
   public static final String PROP_POLL_FOR_BACKGROUND_JOBS = "pollForBackgroundJobs";
   public static final String PROP_CANCEL = "cancel";
   public static final String PROP_UI_SESSION_ID = "uiSessionId";
@@ -79,6 +80,10 @@ public class JsonRequest {
 
   public boolean isCancelRequest() {
     return m_request.has(PROP_CANCEL);
+  }
+
+  public boolean isLogRequest() {
+    return m_request.has(PROP_LOG);
   }
 
   @Override
