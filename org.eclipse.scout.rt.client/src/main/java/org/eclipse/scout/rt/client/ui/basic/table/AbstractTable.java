@@ -147,7 +147,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private String m_userPreferenceContext;
   // batch mutation
   private boolean m_autoDiscardOnDelete;
-  private boolean m_sortEnabled;
   private boolean m_sortValid;
   private boolean m_initialMultiLineText;
   private int m_tableChanging;
@@ -3346,12 +3345,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public boolean isSortEnabled() {
-    return m_sortEnabled;
+    return propertySupport.getPropertyBool(PROP_SORT_ENABLED);
   }
 
   @Override
   public void setSortEnabled(boolean b) {
-    m_sortEnabled = b;
+    propertySupport.setPropertyBool(PROP_SORT_ENABLED, b);
   }
 
   @Override

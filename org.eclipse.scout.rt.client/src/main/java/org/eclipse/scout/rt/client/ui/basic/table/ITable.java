@@ -159,6 +159,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_TABLE_STATUS = "tableStatus";
 
+  /**
+   * Boolean
+   *
+   * @since 5.2.0
+   */
+  String PROP_SORT_ENABLED = "sortEnabled";
+
   void initTable() throws ProcessingException;
 
   void disposeTable();
